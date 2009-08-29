@@ -34,6 +34,21 @@ describe Mongoloid::Document do
 
   end
 
+  describe "#destroy" do
+
+    context "when the Document is remove from the database" do
+
+      it "returns nil" do
+        id = XGen::Mongo::ObjectID.new
+        @collection.expects(:remove).with(:_id => id)
+        document = Document.new(:_id => id)
+        document.destroy.should be_nil
+      end
+
+    end
+
+  end
+
   describe "#find" do
 
     context "when finding first" do

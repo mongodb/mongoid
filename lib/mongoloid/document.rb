@@ -46,6 +46,11 @@ module Mongoloid
       self.class.collection
     end
 
+    # Delete this Document from the database.
+    def destroy
+      collection.remove(:_id => id)
+    end
+
     # Get the XGen::Mongo::ObjectID associated with this object.
     # This is in essence the primary key.
     def id
