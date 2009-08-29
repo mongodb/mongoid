@@ -1,26 +1,34 @@
 module Mongoloid
   class Document
 
-    attr_reader :attributes, :collection
+    attr_reader :attributes
 
     class << self
+
+      def collection
+        @collection ||= Mongoloid.database.collection(self.class.to_s.downcase)
+      end
 
       def create(attributes = nil)
         new(attributes).save
       end
 
+      def find(selector = nil)
+        collection.find(selector).collect { |doc| new(doc) }
+      end
+
+    end
+
+    def collection
+      self.class.collection
     end
 
     def id
       @attributes[:_id]
     end
 
-    #
-    # Create a new instance of the document.
-    #
     def initialize(attributes = nil)
       @attributes = attributes || {}
-      @collection = Mongoloid.database.collection(self.class.to_s.downcase)
     end
 
     def new_record?
@@ -28,7 +36,7 @@ module Mongoloid
     end
 
     def save
-      @collection.save(@attributes)
+      collection.save(@attributes)
       self
     end
 

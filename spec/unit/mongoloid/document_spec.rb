@@ -6,10 +6,61 @@ end
 describe Mongoloid::Document do
 
   before do
-    @database = mock
     @collection = mock
-    Mongoloid.expects(:database).returns(@database)
-    @database.expects(:collection).with("document").returns(@collection)
+    Document.expects(:collection).returns(@collection)
+  end
+
+  describe "#create" do
+
+    context "with no attributes" do
+
+      it "should create a new saved document" do
+        @collection.expects(:save).with({})
+        document = Document.create
+        document.should_not be_nil
+      end
+
+    end
+
+    context "with attributes" do
+
+      it "should create a new saved document" do
+        @collection.expects(:save).with({:test => "test"})
+        document = Document.create(:test => "test")
+        document.should_not be_nil
+      end
+
+    end
+
+  end
+  
+  describe "#find" do
+
+    before do
+      @cursor = mock
+      @documents = []
+    end
+
+    context "when a selector is provided" do
+      
+      it "should find from the collection and instantiate objects for each returned" do
+        @collection.expects(:find).with(:test => "Test").returns(@cursor)
+        @cursor.expects(:collect).returns(@documents)
+        Document.find(:test => "Test")
+      end
+
+    end
+
+    context "when a selector is not provided" do
+
+      it "should find from the collection and instantiate objects for each returned" do
+        @collection.expects(:find).with(nil).returns(@cursor)
+        @cursor.expects(:collect).returns(@documents)
+        Document.find
+      end
+
+    end
+
   end
 
   describe "#new" do
@@ -34,20 +85,6 @@ describe Mongoloid::Document do
         document.attributes.should == @attributes
       end
 
-    end
-
-  end
-
-  describe "#save" do
-
-    before do
-      @attributes = { :test => "test" }
-      @document = Document.new(@attributes)
-    end
-
-    it "should persist the object to the MongoDB collection" do
-      @collection.expects(:save).with(@document.attributes)
-      @document.save
     end
 
   end
@@ -78,27 +115,18 @@ describe Mongoloid::Document do
 
   end
 
-  describe "#create" do
+  describe "#save" do
 
-    context "with no attributes" do
-
-      it "should create a new saved document" do
-        @collection.expects(:save).with({})
-        document = Document.create
-        document.should_not be_nil
-      end
-
+    before do
+      @attributes = { :test => "test" }
+      @document = Document.new(@attributes)
     end
 
-    context "with attributes" do
-
-      it "should create a new saved document" do
-        @collection.expects(:save).with({:test => "test"})
-        document = Document.create(:test => "test")
-        document.should_not be_nil
-      end
-
+    it "should persist the object to the MongoDB collection" do
+      @collection.expects(:save).with(@document.attributes)
+      @document.save
     end
 
   end
+
 end
