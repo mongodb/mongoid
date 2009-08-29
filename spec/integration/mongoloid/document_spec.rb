@@ -34,16 +34,20 @@ describe Mongoloid::Document do
       Document.create(:test => "Test")
     end
 
-    it "returns an array of documents based on the selector provided" do
-      documents = Document.find(:test => "Test")
-      documents[0].attributes["test"].should == "Test"
-    end
+    context "finding all documents" do
 
-    context "when selector is nil" do
-
-      it "returns all documents" do
-        documents = Document.find
+      it "returns an array of documents based on the selector provided" do
+        documents = Document.find(:all, :test => "Test")
         documents[0].attributes["test"].should == "Test"
+      end
+
+    end
+    
+    context "finding first document" do
+
+      it "returns the first document based on the selector provided" do
+        document = Document.find(:first, :test => "Test")
+        document.attributes["test"].should == "Test"
       end
 
     end

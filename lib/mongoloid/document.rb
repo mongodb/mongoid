@@ -15,8 +15,27 @@ module Mongoloid
         new(attributes).save
       end
       
-      # Find all Documents for the given selector, or return all Documents if selector is nil.
-      def find(selector = nil)
+      # Find all Documents in several ways.
+      #
+      # Model.find(:first, :attribute => "value")
+      # Model.find(:all, :attribute => "value")
+      #
+      def find(*args)
+        case args[0]
+          when :first then find_first(args[1])
+          when :all then find_all(args[1])
+        end
+      end
+
+      # Find a single Document given the passed selector, which is a Hash of attributes that
+      # must match the Document in the database exactly.
+      def find_first(selector = nil)
+        new(collection.find_one(selector))
+      end
+
+      # Find a all Documents given the passed selector, which is a Hash of attributes that
+      # must match the Document in the database exactly.
+      def find_all(selector = nil)
         collection.find(selector).collect { |doc| new(doc) }
       end
 

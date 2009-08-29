@@ -14,7 +14,7 @@ describe Mongoloid::Document do
 
     context "with no attributes" do
 
-      it "should create a new saved document" do
+      it "creates a new saved document" do
         @collection.expects(:save).with({})
         document = Document.create
         document.should_not be_nil
@@ -24,7 +24,7 @@ describe Mongoloid::Document do
 
     context "with attributes" do
 
-      it "should create a new saved document" do
+      it "creates a new saved document" do
         @collection.expects(:save).with({:test => "test"})
         document = Document.create(:test => "test")
         document.should_not be_nil
@@ -33,8 +33,62 @@ describe Mongoloid::Document do
     end
 
   end
-  
+
   describe "#find" do
+
+    context "when finding first" do
+
+      it "delegates to find_first" do
+        @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
+        Document.find(:first, :test => "Test")
+      end
+
+    end
+
+    context "when finding all" do
+      
+      before do
+        @cursor = mock
+        @documents = []
+      end
+
+      it "delegates to find_all" do
+        @collection.expects(:find).with(:test => "Test").returns(@cursor)
+        @cursor.expects(:collect).returns(@documents)
+        Document.find(:all, :test => "Test")
+      end
+
+    end
+
+  end
+
+  describe "#find_first" do
+
+    before do
+      @attributes = {}
+    end
+
+    context "when a selector is provided" do
+      
+      it "finds the first document from the collection and instantiates it" do
+        @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
+        Document.find_first(:test => "Test").attributes.should == @attributes
+      end
+
+    end
+
+    context "when a selector is not provided" do
+
+      it "finds the first document from the collection and instantiates it" do
+        @collection.expects(:find_one).with(nil).returns(@attribute)
+        Document.find_first.attributes.should == @attributes
+      end
+
+    end
+
+  end
+
+  describe "#find_all" do
 
     before do
       @cursor = mock
@@ -43,20 +97,20 @@ describe Mongoloid::Document do
 
     context "when a selector is provided" do
       
-      it "should find from the collection and instantiate objects for each returned" do
+      it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
         @cursor.expects(:collect).returns(@documents)
-        Document.find(:test => "Test")
+        Document.find_all(:test => "Test")
       end
 
     end
 
     context "when a selector is not provided" do
 
-      it "should find from the collection and instantiate objects for each returned" do
+      it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(nil).returns(@cursor)
         @cursor.expects(:collect).returns(@documents)
-        Document.find
+        Document.find_all
       end
 
     end
@@ -122,7 +176,7 @@ describe Mongoloid::Document do
       @document = Document.new(@attributes)
     end
 
-    it "should persist the object to the MongoDB collection" do
+    it "persists the object to the MongoDB collection" do
       @collection.expects(:save).with(@document.attributes)
       @document.save
     end
