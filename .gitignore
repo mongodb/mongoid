@@ -1,1 +1,3 @@
 tmp/*
+pkg/*
+.DS_STORE
