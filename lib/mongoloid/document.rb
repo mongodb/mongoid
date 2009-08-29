@@ -14,7 +14,7 @@ module Mongoloid
       def create(attributes = nil)
         new(attributes).save
       end
-      
+
       # Find all Documents in several ways.
       #
       # Model.find(:first, :attribute => "value")
