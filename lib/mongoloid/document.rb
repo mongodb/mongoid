@@ -68,10 +68,14 @@ module Mongoloid
       @attributes[:_id].nil?
     end
 
-    # Save this Document to the database, and return self.
+    # Save this Document to the database and return self.
     def save
-      collection.save(@attributes)
-      self
+      collection.save(@attributes); self
+    end
+
+    # Update the attributes of this Document and return true
+    def update_attributes(attributes)
+      @attributes = attributes; save; true
     end
 
   end

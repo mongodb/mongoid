@@ -10,6 +10,20 @@ describe Mongoloid::Document do
     Document.expects(:collection).returns(@collection)
   end
 
+  describe "#collection" do
+
+    before do
+      @database = mock
+    end
+
+    it "should get the collection with class name from the database" do
+      Mongoloid.expects(:database).returns(@database)
+      @database.expects(:collection).with("document").returns(@collection)
+      Document.collection.should == @collection
+    end
+
+  end
+
   describe "#create" do
 
     context "with no attributes" do
@@ -193,7 +207,21 @@ describe Mongoloid::Document do
 
     it "persists the object to the MongoDB collection" do
       @collection.expects(:save).with(@document.attributes)
-      @document.save
+      @document.save.should be_true
+    end
+
+  end
+
+  describe "#update_attributes" do
+
+    context "when attributes are provided" do
+
+      it "saves and returns true" do
+        document = Document.new
+        document.expects(:save).returns(true)
+        document.update_attributes(:test => "Test").should be_true
+      end
+
     end
 
   end
