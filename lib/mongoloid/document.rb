@@ -20,6 +20,16 @@ module Mongoloid
         new(attributes).save
       end
 
+      # Defines all the fields that are accessable on the Document
+      def fields(names)
+        @fields = []
+        names.each do |name|
+          @fields << name
+          define_method(name) { read_attribute(name) }
+          define_method("#{name}=") { |value| write_attribute(name, value) }
+        end
+      end
+
       # Find all Documents in several ways.
       #
       # Model.find(:first, :attribute => "value")
@@ -87,6 +97,16 @@ module Mongoloid
     # Update the attributes of this Document and return true
     def update_attributes(attributes)
       @attributes = attributes; save; true
+    end
+    
+    private
+
+    def read_attribute(name)
+      @attributes[name]
+    end
+
+    def write_attribute(name, value)
+      @attributes[name] = value
     end
 
   end

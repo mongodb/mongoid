@@ -63,6 +63,23 @@ describe Mongoloid::Document do
 
   end
 
+  describe "#fields" do
+
+    it "adds a reader for the fields defined" do
+      Document.fields([:name])
+      @document = Document.new(:name => "Test")
+      @document.name.should == "Test"
+    end
+
+    it "adds a writer for the fields defined" do
+      Document.fields([:name])
+      @document = Document.new(:name => "Test")
+      @document.name = "Testy"
+      @document.name.should == "Testy"
+    end
+
+  end
+
   describe "#find" do
 
     context "when finding first" do
