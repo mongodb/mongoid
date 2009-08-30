@@ -75,7 +75,7 @@ describe Mongoloid::Document do
     end
 
     context "when finding all" do
-      
+
       before do
         @cursor = mock
         @documents = []
@@ -125,7 +125,7 @@ describe Mongoloid::Document do
     end
 
     context "when a selector is provided" do
-      
+
       it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
         @cursor.expects(:collect).returns(@documents)

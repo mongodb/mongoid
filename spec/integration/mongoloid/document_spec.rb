@@ -43,7 +43,7 @@ describe Mongoloid::Document do
       end
 
     end
-    
+
     context "finding first document" do
 
       it "returns the first document based on the selector provided" do
