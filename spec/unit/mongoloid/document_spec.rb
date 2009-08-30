@@ -5,15 +5,12 @@ end
 
 describe Mongoloid::Document do
 
-  before do
-    @collection = mock
-    Document.expects(:collection).returns(@collection)
-  end
-
   describe "#collection" do
 
     before do
       @database = mock
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
     end
 
     it "should get the collection with class name from the database" do
@@ -25,6 +22,11 @@ describe Mongoloid::Document do
   end
 
   describe "#create" do
+
+    before do
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
+    end
 
     context "with no attributes" do
 
@@ -49,6 +51,11 @@ describe Mongoloid::Document do
   end
 
   describe "#destroy" do
+
+    before do
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
+    end
 
     context "when the Document is remove from the database" do
 
@@ -82,6 +89,11 @@ describe Mongoloid::Document do
 
   describe "#find" do
 
+    before do
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
+    end
+
     context "when finding first" do
 
       it "delegates to find_first" do
@@ -96,6 +108,8 @@ describe Mongoloid::Document do
       before do
         @cursor = mock
         @documents = []
+        @collection = mock
+        Document.expects(:collection).returns(@collection)
       end
 
       it "delegates to find_all" do
@@ -112,6 +126,8 @@ describe Mongoloid::Document do
 
     before do
       @attributes = {}
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
     end
 
     context "when a selector is provided" do
@@ -139,6 +155,8 @@ describe Mongoloid::Document do
     before do
       @cursor = mock
       @documents = []
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
     end
 
     context "when a selector is provided" do
@@ -219,6 +237,11 @@ describe Mongoloid::Document do
 
   describe "#paginate" do
 
+    before do
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
+    end
+
     context "when pagination parameters are passed" do
 
       it "delegates offset and limit to find_all" do
@@ -244,6 +267,8 @@ describe Mongoloid::Document do
     before do
       @attributes = { :test => "test" }
       @document = Document.new(@attributes)
+      @collection = mock
+      Document.expects(:collection).returns(@collection)
     end
 
     it "persists the object to the MongoDB collection" do

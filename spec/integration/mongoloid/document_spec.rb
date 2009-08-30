@@ -1,20 +1,24 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-class Document < Mongoloid::Document
-  collection_name :documents
+class Person < Mongoloid::Document
+  collection_name :people
+  fields \
+    :first_name,
+    :middle_name,
+    :last_name
 end
 
 describe Mongoloid::Document do
 
   before do
-    Mongoloid.database.collection(:documents).drop
+    Mongoloid.database.collection(:people).drop
   end
 
   describe "#new" do
 
     it "gets a new or current database connection" do
-      document = Document.new
-      document.collection.should be_a_kind_of(XGen::Mongo::Collection)
+      person = Person.new
+      person.collection.should be_a_kind_of(XGen::Mongo::Collection)
     end
 
   end
@@ -22,9 +26,9 @@ describe Mongoloid::Document do
   describe "#create" do
 
     it "persists a new record to the database" do
-      document = Document.create(:test => "Test")
-      document.id.should be_a_kind_of(XGen::Mongo::ObjectID)
-      document.attributes[:test].should == "Test"
+      person = Person.create(:test => "Test")
+      person.id.should be_a_kind_of(XGen::Mongo::ObjectID)
+      person.attributes[:test].should == "Test"
     end
 
   end
@@ -32,13 +36,13 @@ describe Mongoloid::Document do
   describe "#find" do
 
     before do
-      Document.create(:test => "Test")
+      Person.create(:test => "Test")
     end
 
     context "finding all documents" do
 
       it "returns an array of documents based on the selector provided" do
-        documents = Document.find(:all, :test => "Test")
+        documents = Person.find(:all, :test => "Test")
         documents[0].attributes["test"].should == "Test"
       end
 
@@ -47,8 +51,8 @@ describe Mongoloid::Document do
     context "finding first document" do
 
       it "returns the first document based on the selector provided" do
-        document = Document.find(:first, :test => "Test")
-        document.attributes["test"].should == "Test"
+        person = Person.find(:first, :test => "Test")
+        person.attributes["test"].should == "Test"
       end
 
     end
@@ -59,12 +63,12 @@ describe Mongoloid::Document do
 
     before do
       30.times do |num|
-        Document.create(:test => "Test-#{num}")
+        Person.create(:test => "Test-#{num}")
       end
     end
 
     it "returns paginated documents" do
-      Document.paginate({}, { :per_page => 20, :page => 2 }).length.should == 10
+      Person.paginate({}, { :per_page => 20, :page => 2 }).length.should == 10
     end
 
   end

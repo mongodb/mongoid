@@ -23,9 +23,9 @@ module Mongoloid
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
-      def fields(names)
+      def fields(*names)
         @fields = []
-        names.each do |name|
+        names.flatten.each do |name|
           @fields << name
           define_method(name) { read_attribute(name) }
           define_method("#{name}=") { |value| write_attribute(name, value) }
@@ -38,7 +38,7 @@ module Mongoloid
       def find(*args)
         case args[0]
           when :first then find_first(args[1])
-          when :all then find_all(args[1])
+          else find_all(args[1])
         end
       end
 
