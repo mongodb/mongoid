@@ -1,6 +1,6 @@
 require "rubygems"
 
-gem "mongodb-mongo", "0.13"
+gem "mongodb-mongo", "0.14"
 
 require "mongo"
 require "mongoloid/paginator"
