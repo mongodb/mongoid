@@ -2,4 +2,22 @@ Project planning hosted on Pivotal Tracker:
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoloid on Pivotal Tracker</a>
 
-You will need to signup for a free account, and request for access to the project.
+Initialize Mongoloid:
+
+In a Rails initializer:
+
+<pre>
+  Mongoloid.connect_to("myapp_database_name")
+</pre>
+
+Specifying a Model as a Document in MongoDB:
+
+<pre>
+  class Person < Mongoloid::Document
+    collection_name :people
+    fields \
+      :first_name,
+      :middle_name,
+      :last_name
+  end
+</pre>
