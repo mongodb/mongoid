@@ -45,11 +45,9 @@ module Mongoloid
       end
 
       # Find all documents in paginated fashion given the supplied arguments.
-      # If no paramers are passed just default to offset 0 and limit 20.
-      def paginate(selector = nil, options = {})
-        limit = options[:per_page] || 20
-        offset = options[:page] ? (options[:page] - 1) * limit : 0
-        collection.find(selector, { :limit => limit, :offset => offset }).collect { |doc| new(doc) }
+      # If no parameters are passed just default to offset 0 and limit 20.
+      def paginate(selector = nil, params = {})
+        collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| new(doc) }
       end
 
     end

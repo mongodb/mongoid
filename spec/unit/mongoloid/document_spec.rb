@@ -98,7 +98,7 @@ describe Mongoloid::Document do
     end
 
     context "when a selector is provided" do
-      
+
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
         Document.find_first(:test => "Test").attributes.should == @attributes
@@ -183,6 +183,7 @@ describe Mongoloid::Document do
       it "returns false" do
         @document.new_record?.should be_false
       end
+
     end
 
     context "when the object has not been saved" do
@@ -194,6 +195,7 @@ describe Mongoloid::Document do
       it "returns true" do
         @document.new_record?.should be_true
       end
+
     end
 
   end

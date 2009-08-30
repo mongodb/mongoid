@@ -3,6 +3,7 @@ require "rubygems"
 gem "mongodb-mongo", "0.13"
 
 require "mongo"
+require "mongoloid/paginator"
 require "mongoloid/document"
 
 module Mongoloid
