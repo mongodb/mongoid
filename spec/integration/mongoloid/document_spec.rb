@@ -1,12 +1,13 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 class Document < Mongoloid::Document
+  collection_name :documents
 end
 
 describe Mongoloid::Document do
 
   before do
-    Mongoloid.database.collection("document").drop
+    Mongoloid.database.collection(:documents).drop
   end
 
   describe "#new" do
@@ -50,6 +51,20 @@ describe Mongoloid::Document do
         document.attributes["test"].should == "Test"
       end
 
+    end
+
+  end
+
+  describe "#paginate" do
+
+    before do
+      30.times do |num|
+        Document.create(:test => "Test-#{num}")
+      end
+    end
+
+    it "returns paginated documents" do
+      Document.paginate({}, { :per_page => 20, :page => 2 }).length.should == 10
     end
 
   end

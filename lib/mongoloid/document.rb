@@ -7,7 +7,12 @@ module Mongoloid
 
       # Get the XGen::Mongo::Collection associated with this Document.
       def collection
-        @collection ||= Mongoloid.database.collection(self.class.to_s.downcase)
+        @collection ||= Mongoloid.database.collection(@collection_name)
+      end
+
+      # Set the name of the collection to store this object in the db
+      def collection_name(name)
+        @collection_name = name
       end
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
@@ -37,6 +42,14 @@ module Mongoloid
       # must match the Document in the database exactly.
       def find_all(selector = nil)
         collection.find(selector).collect { |doc| new(doc) }
+      end
+
+      # Find all documents in paginated fashion given the supplied arguments.
+      # If no paramers are passed just default to offset 0 and limit 20.
+      def paginate(selector = nil, options = {})
+        limit = options[:per_page] || 20
+        offset = options[:page] ? (options[:page] - 1) * limit : 0
+        collection.find(selector, { :limit => limit, :offset => offset }).collect { |doc| new(doc) }
       end
 
     end

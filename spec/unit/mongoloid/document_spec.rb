@@ -198,6 +198,28 @@ describe Mongoloid::Document do
 
   end
 
+  describe "#paginate" do
+
+    context "when pagination parameters are passed" do
+
+      it "delegates offset and limit to find_all" do
+        @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 20}).returns([])
+        Document.paginate({ :test => "Test" }, { :page => 2, :per_page => 20 })
+      end
+
+    end
+
+    context "when pagination parameters are not passed" do
+
+      it "passes the default offset and limit to find_all" do
+        @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 0}).returns([])
+        Document.paginate({ :test => "Test" })
+      end
+
+    end
+
+  end
+
   describe "#save" do
 
     before do
