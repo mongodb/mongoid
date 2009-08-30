@@ -21,6 +21,8 @@ module Mongoloid
       end
 
       # Defines all the fields that are accessable on the Document
+      # For each field that is defined, a getter and setter will be
+      # added as an instance method to the Document.
       def fields(names)
         @fields = []
         names.each do |name|
@@ -31,10 +33,8 @@ module Mongoloid
       end
 
       # Find all Documents in several ways.
-      #
       # Model.find(:first, :attribute => "value")
       # Model.find(:all, :attribute => "value")
-      #
       def find(*args)
         case args[0]
           when :first then find_first(args[1])
