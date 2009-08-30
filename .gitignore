@@ -1,3 +1,5 @@
-tmp/*
-pkg/*
 .DS_STORE
+coverage/*
+pkg/*
+scratch_directory/*
+tmp/*
