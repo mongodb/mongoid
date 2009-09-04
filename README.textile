@@ -15,9 +15,13 @@ Specifying a Model as a Document in MongoDB:
 <pre>
   class Person < Mongoloid::Document
     collection_name :people
+
     fields \
       :first_name,
       :middle_name,
       :last_name
+
+    has_many :addresses
+    has_one :email
   end
 </pre>
