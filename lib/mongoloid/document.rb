@@ -5,6 +5,16 @@ module Mongoloid
 
     class << self
 
+      # Return all the associations for this class.
+      def associations
+        @associations ||= {}
+      end
+
+      # Create an association to a parent Document.
+      def belongs_to(association_name)
+        associations[association_name] = Mongoloid::Association.new(:belongs_to, association_name.to_s.classify.constantize, nil)
+      end
+
       # Get the XGen::Mongo::Collection associated with this Document.
       def collection
         @collection ||= Mongoloid.database.collection(@collection_name)
@@ -52,6 +62,11 @@ module Mongoloid
       # must match the Document in the database exactly.
       def find_all(selector = nil)
         collection.find(selector).collect { |doc| new(doc) }
+      end
+
+      # Create a one-to-many association between Documents.
+      def has_many(association_name)
+        associations[association_name] = Mongoloid::Association.new(:has_many, association_name.to_s.classify.constantize, nil)
       end
 
       # Find all documents in paginated fashion given the supplied arguments.

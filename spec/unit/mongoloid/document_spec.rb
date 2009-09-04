@@ -2,8 +2,19 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 class Parent < Mongoloid::Document
 end
+class Child < Mongoloid::Document
+end
 
 describe Mongoloid::Document do
+
+  describe "#belongs_to" do
+
+    it "adds the new Association" do
+      Child.belongs_to :parent
+      Child.associations[:parent].type.should == :belongs_to
+    end
+
+  end
 
   describe "#collection" do
 
@@ -182,6 +193,11 @@ describe Mongoloid::Document do
   end
 
   describe "#has_many" do
+
+    it "adds the new Association" do
+      Parent.has_many :childs
+      Parent.associations[:childs].type.should == :has_many
+    end
 
   end
 

@@ -1,7 +1,9 @@
 require "rubygems"
 
+gem "activesupport"
 gem "mongodb-mongo", "0.14"
 
+require "activesupport"
 require "mongo"
 require "mongoloid/association"
 require "mongoloid/document"
