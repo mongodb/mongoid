@@ -199,6 +199,20 @@ describe Mongoloid::Document do
       Parent.associations[:childs].type.should == :has_many
     end
 
+    it "initializes the instance to an empty array" do
+      Parent.has_many :childs
+      Parent.associations[:childs].instance.should == []
+    end
+
+  end
+
+  describe "#has_one" do
+
+    it "adds the new Association" do
+      Parent.has_one :child
+      Parent.associations[:child].type.should == :has_one
+    end
+
   end
 
   describe "#new" do
