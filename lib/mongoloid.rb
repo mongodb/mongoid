@@ -3,8 +3,9 @@ require "rubygems"
 gem "mongodb-mongo", "0.14"
 
 require "mongo"
-require "mongoloid/paginator"
+require "mongoloid/association"
 require "mongoloid/document"
+require "mongoloid/paginator"
 
 module Mongoloid
 
