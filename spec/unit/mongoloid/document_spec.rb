@@ -12,6 +12,25 @@ describe Mongoloid::Document do
     Person.instance_variable_set(:@collection, nil)
   end
 
+  describe "#belongs_to" do
+
+    it "adds a new Association to the collection" do
+      address = Address.new
+      address.associations[:person].should_not be_nil
+    end
+
+    it "creates a reader for the association" do
+      address = Address.new
+      address.should respond_to(:person)
+    end
+
+    it "creates a writer for the association" do
+      address = Address.new
+      address.should respond_to(:person=)
+    end
+
+  end
+
   describe "#create" do
 
     context "with no attributes" do
@@ -153,6 +172,44 @@ describe Mongoloid::Document do
         Person.find_all
       end
 
+    end
+
+  end
+
+  describe "#has_many" do
+
+    it "adds a new Association to the collection" do
+      person = Person.new
+      person.associations[:addresses].should_not be_nil
+    end
+
+    it "creates a reader for the association" do
+      person = Person.new
+      person.should respond_to(:addresses)
+    end
+
+    it "creates a writer for the association" do
+      person = Person.new
+      person.should respond_to(:addresses=)
+    end
+
+  end
+
+  describe "#has_one" do
+
+    it "adds a new Association to the collection" do
+      person = Person.new
+      person.associations[:name].should_not be_nil
+    end
+
+    it "creates a reader for the association" do
+      person = Person.new
+      person.should respond_to(:name)
+    end
+
+    it "creates a writer for the association" do
+      person = Person.new
+      person.should respond_to(:name=)
     end
 
   end

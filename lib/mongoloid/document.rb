@@ -13,6 +13,8 @@ module Mongoloid
       # Create an association to a parent Document.
       def belongs_to(association_name)
         associations[association_name] = Mongoloid::Association.new(:belongs_to, association_name.to_s.classify.constantize, nil)
+        define_method(association_name) { associations[association_name].instance }
+        define_method("#{association_name}=") { |object| associations[association_name].instance = object }
       end
 
       # Get the XGen::Mongo::Collection associated with this Document.
@@ -68,12 +70,15 @@ module Mongoloid
       # Create a one-to-many association between Documents.
       def has_many(association_name)
         associations[association_name] = Mongoloid::Association.new(:has_many, association_name.to_s.classify, [])
+        define_method(association_name) { associations[association_name].instance }
+        define_method("#{association_name}=") { |object| associations[association_name].instance = object }
       end
 
       # Create a one-to-many association between Documents.
       def has_one(association_name)
         associations[association_name] = Mongoloid::Association.new(:has_one, association_name.to_s.titleize, nil)
         define_method(association_name) { associations[association_name].instance }
+        define_method("#{association_name}=") { |object| associations[association_name].instance = object }
       end
 
       # Find all documents in paginated fashion given the supplied arguments.
