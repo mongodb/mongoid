@@ -4,8 +4,8 @@ describe Mongoloid::Document do
 
   before do
     @collection = mock
-    database = stub(:collection => @collection)
-    Mongoloid.stubs(:database).returns(database)
+    @database = stub(:collection => @collection)
+    Mongoloid.stubs(:database).returns(@database)
   end
 
   after do
@@ -27,6 +27,15 @@ describe Mongoloid::Document do
     it "creates a writer for the association" do
       address = Address.new
       address.should respond_to(:person=)
+    end
+
+  end
+
+  describe "#collection" do
+
+    it "sets the collection name to the class pluralized" do
+      @database.expects(:collection).with("people").returns(@collection)
+      Person.collection
     end
 
   end

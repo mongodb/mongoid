@@ -17,12 +17,8 @@ module Mongoloid
 
       # Get the XGen::Mongo::Collection associated with this Document.
       def collection
+        @collection_name = self.to_s.demodulize.tableize
         @collection ||= Mongoloid.database.collection(@collection_name)
-      end
-
-      # Set the name of the collection to store this object in the db
-      def collection_name(name)
-        @collection_name = name
       end
 
       # Create a new Document with the supplied attribtues, and insert it into the database.

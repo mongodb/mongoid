@@ -68,7 +68,6 @@ describe Mongoloid::Document do
 end
 
 class Person < Mongoloid::Document
-  collection_name :people
   fields :title
   has_many :addresses
   has_one :name
