@@ -91,7 +91,7 @@ Paginate Document search results:
   Person.paginate(:title => "Esquire", :page => 1, :per_page => 20)
 </pre>
 
-<h2>License</h2
+<h2>License</h2>
 
 <p>
   Copyright (c) 2009 Durran Jordan
