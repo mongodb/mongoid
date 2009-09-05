@@ -12,6 +12,8 @@ begin
     gem.email = "durran@gmail.com"
     gem.homepage = "http://github.com/durran/mongoloid"
     gem.authors = ["Durran Jordan"]
+    gem.add_dependency "active_support"
+    gem.add_dependency "mongodb-mongo"
   end
 
 rescue LoadError

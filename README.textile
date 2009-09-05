@@ -25,7 +25,7 @@ Initialize Mongoloid:
   Mongoloid.connect_to("myapp_database_name")
 </pre>
 
-Specifying a Model as a Document in MongoDB:
+Example of a simple domain model:
 
 <pre>
   class Person < Mongoloid::Document
