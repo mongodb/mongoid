@@ -22,6 +22,17 @@ Specifying a Model as a Document in MongoDB:
       :last_name
 
     has_many :addresses
-    has_one :email
+    has_one :name
+  end
+  
+  class Address < Mongoloid::Document
+
+    fields \
+      :street,
+      :city,
+      :state,
+      :post_code
+
+    belongs_to :person
   end
 </pre>
