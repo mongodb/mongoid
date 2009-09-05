@@ -2,16 +2,21 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 describe Mongoloid::Document do
 
-  describe "#create" do
+  before do
+    @collection = mock
+    database = stub(:collection => @collection)
+    Mongoloid.stubs(:database).returns(database)
+  end
 
-    before do
-      @collection = mock
-    end
+  after do
+    Person.instance_variable_set(:@collection, nil)
+  end
+
+  describe "#create" do
 
     context "with no attributes" do
 
       it "creates a new saved document" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:save).with({})
         person = Person.create
         person.should_not be_nil
@@ -22,7 +27,6 @@ describe Mongoloid::Document do
     context "with attributes" do
 
       it "creates a new saved document" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:save).with({:test => "test"})
         person = Person.create(:test => "test")
         person.should_not be_nil
@@ -34,14 +38,9 @@ describe Mongoloid::Document do
 
   describe "#destroy" do
 
-    before do
-      @collection = mock
-    end
-
     context "when the Document is remove from the database" do
 
       it "returns nil" do
-        Person.expects(:collection).returns(@collection)
         id = XGen::Mongo::ObjectID.new
         @collection.expects(:remove).with(:_id => id)
         person = Person.new(:_id => id)
@@ -54,17 +53,19 @@ describe Mongoloid::Document do
 
   describe "#fields" do
 
+    before do
+      Person.fields([:testing])
+    end
+
     it "adds a reader for the fields defined" do
-      Person.fields([:name])
-      @person = Person.new(:name => "Test")
-      @person.name.should == "Test"
+      @person = Person.new(:testing => "Test")
+      @person.testing.should == "Test"
     end
 
     it "adds a writer for the fields defined" do
-      Person.fields([:name])
-      @person = Person.new(:name => "Test")
-      @person.name = "Testy"
-      @person.name.should == "Testy"
+      @person = Person.new(:testing => "Test")
+      @person.testing = "Testy"
+      @person.testing.should == "Testy"
     end
 
   end
@@ -73,13 +74,11 @@ describe Mongoloid::Document do
 
     before do
       @attributes = { :document_class => "Person" }
-      @collection = mock
     end
 
     context "when finding first" do
 
       it "delegates to find_first" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
         Person.find(:first, :test => "Test")
       end
@@ -90,14 +89,12 @@ describe Mongoloid::Document do
 
       before do
         @cursor = mock
-        @persons = []
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
+        @people = []
       end
 
       it "delegates to find_all" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
-        @cursor.expects(:collect).returns(@persons)
+        @cursor.expects(:collect).returns(@people)
         Person.find(:all, :test => "Test")
       end
 
@@ -109,13 +106,11 @@ describe Mongoloid::Document do
 
     before do
       @attributes = { :document_class => "Person" }
-      @collection = mock
     end
 
     context "when a selector is provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
         Person.find_first(:test => "Test").attributes.should == @attributes
       end
@@ -125,7 +120,6 @@ describe Mongoloid::Document do
     context "when a selector is not provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:find_one).with(nil).returns(@attributes)
         Person.find_first.attributes.should == @attributes
       end
@@ -138,16 +132,14 @@ describe Mongoloid::Document do
 
     before do
       @cursor = mock
-      @persons = []
-      @collection = mock
+      @people = []
     end
 
     context "when a selector is provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
-        @cursor.expects(:collect).returns(@persons)
+        @cursor.expects(:collect).returns(@people)
         Person.find_all(:test => "Test")
       end
 
@@ -156,9 +148,8 @@ describe Mongoloid::Document do
     context "when a selector is not provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with(nil).returns(@cursor)
-        @cursor.expects(:collect).returns(@persons)
+        @cursor.expects(:collect).returns(@people)
         Person.find_all
       end
 
@@ -222,11 +213,6 @@ describe Mongoloid::Document do
 
   describe "#paginate" do
 
-    before do
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
-    end
-
     context "when pagination parameters are passed" do
 
       it "delegates offset and limit to find_all" do
@@ -252,8 +238,6 @@ describe Mongoloid::Document do
     before do
       @attributes = { :test => "test" }
       @person = Person.new(@attributes)
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
     end
 
     it "persists the object to the MongoDB collection" do
@@ -277,26 +261,4 @@ describe Mongoloid::Document do
 
   end
 
-end
-
-class Person < Mongoloid::Document
-  fields :title
-  has_many :addresses
-  has_one :name
-end
-
-class Address < Mongoloid::Document
-  fields \
-    :street,
-    :city,
-    :state,
-    :post_code
-  belongs_to :person
-end
-
-class Name < Mongoloid::Document
-  fields \
-    :first_name,
-    :last_name
-  belongs_to :person
 end
