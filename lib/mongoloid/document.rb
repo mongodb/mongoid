@@ -72,6 +72,7 @@ module Mongoloid
       # Create a one-to-many association between Documents.
       def has_one(association_name)
         associations[association_name] = Mongoloid::Association.new(:has_one, association_name.to_s.titleize, nil)
+        define_method(association_name) { associations[association_name].instance }
       end
 
       # Find all documents in paginated fashion given the supplied arguments.
@@ -80,6 +81,11 @@ module Mongoloid
         collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| new(doc) }
       end
 
+    end
+
+    # Get the Associations collection from the class.
+    def associations
+      self.class.associations
     end
 
     # Get the XGen::Mongo::Collection associated with this Document.

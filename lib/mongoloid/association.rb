@@ -7,7 +7,7 @@ module Mongoloid
 
     TYPES = [:has_many, :has_one, :belongs_to]
 
-    attr_reader :type, :klass, :instance
+    attr_accessor :type, :klass, :instance
 
     # Create a new Association which is a relationship between Models.
     # All associations will be treated as a single Document in the database.

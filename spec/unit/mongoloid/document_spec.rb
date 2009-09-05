@@ -208,6 +208,12 @@ describe Mongoloid::Document do
       Person.associations[:address].type.should == :has_one
     end
 
+    it "adds the accessor for the association" do
+      Person.has_one :address
+      person = Person.new
+      person.should respond_to(:address)
+    end
+
   end
 
   describe "#new" do
@@ -321,4 +327,26 @@ describe Mongoloid::Document do
 
   end
 
+end
+
+class Person < Mongoloid::Document
+  fields :title
+  has_many :addresses
+  has_one :name
+end
+
+class Address < Mongoloid::Document
+  fields \
+    :street,
+    :city,
+    :state,
+    :post_code
+  belongs_to :person
+end
+
+class Name < Mongoloid::Document
+  fields \
+    :first_name,
+    :last_name
+  belongs_to :person
 end
