@@ -26,7 +26,7 @@ describe Mongoloid::DocumentFactory do
 
       before do
         @attributes = { :title => "Consigliare", :document_class => "Person", 
-                        :name => { :first_name => "Robin", :last_name => "Williams", :document_class => "Name" } }
+          :name => { :first_name => "Robin", :last_name => "Williams", :document_class => "Name" } }
       end
 
       it "sets the associations" do
@@ -40,9 +40,9 @@ describe Mongoloid::DocumentFactory do
 
       before do
         @attributes = { :title => "Consigliare", :document_class => "Person", 
-                        :name => { :first_name => "Robin", :last_name => "Williams", :document_class => "Name" }, 
-                        :addresses => [ { :street => "38 Genoa Place", :city => "San Francisco", :state => "CA", :post_code => "94133", :document_class => "Address" },
-                                        { :street => "668 Bourke Street", :city => "Melbourne", :state => "VIC", :post_code => "3000", :document_class => "Address" } ] }
+          :name => { :first_name => "Robin", :last_name => "Williams", :document_class => "Name" }, 
+          :addresses => [ { :street => "38 Genoa Place", :city => "San Francisco", :state => "CA", :post_code => "94133", :document_class => "Address" },
+            { :street => "668 Bourke Street", :city => "Melbourne", :state => "VIC", :post_code => "3000", :document_class => "Address" } ] }
       end
 
       it "sets the associations" do

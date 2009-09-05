@@ -9,9 +9,9 @@ module Mongoloid
         association = document.associations[key]
         if association
           case value
-            when Hash then association.instance = Mongoloid::DocumentFactory.create(value)
-            when Array then association.instance = value.collect { |nested| Mongoloid::DocumentFactory.create(nested) }
-            else raise TypeMismatchError
+          when Hash then association.instance = Mongoloid::DocumentFactory.create(value)
+          when Array then association.instance = value.collect { |nested| Mongoloid::DocumentFactory.create(nested) }
+          else raise TypeMismatchError
           end
         end
       end

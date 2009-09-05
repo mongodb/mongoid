@@ -44,8 +44,8 @@ module Mongoloid
       # Model.find(:all, :attribute => "value")
       def find(*args)
         case args[0]
-          when :first then find_first(args[1])
-          else find_all(args[1])
+        when :first then find_first(args[1])
+        else find_all(args[1])
         end
       end
 
@@ -120,7 +120,7 @@ module Mongoloid
     def update_attributes(attributes)
       @attributes = attributes; save; true
     end
-    
+
     private
 
     class << self
