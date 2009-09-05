@@ -36,6 +36,24 @@ describe Mongoloid::DocumentFactory do
 
     end
 
+    context "with has_one and has_many associations" do
+
+      before do
+        @attributes = { :title => "Consigliare", :document_class => "Person", 
+                        :name => { :first_name => "Robin", :last_name => "Williams", :document_class => "Name" }, 
+                        :addresses => [ { :street => "38 Genoa Place", :city => "San Francisco", :state => "CA", :post_code => "94133", :document_class => "Address" },
+                                        { :street => "668 Bourke Street", :city => "Melbourne", :state => "VIC", :post_code => "3000", :document_class => "Address" } ] }
+      end
+
+      it "sets the associations" do
+        person = Mongoloid::DocumentFactory.create(@attributes)
+        person.name.first_name.should == "Robin"
+        person.addresses[0].street.should == "38 Genoa Place"
+        person.addresses[1].street.should == "668 Bourke Street"
+      end
+
+    end
+
   end
 
 end
