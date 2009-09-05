@@ -10,13 +10,15 @@ module Mongoloid
       create_associations(document, attributes)
       document
     end
-    
+
     private
+
+    # Create all the associations for the Document give the supplied attributes.
     def self.create_associations(document, attributes)
       attributes.each_key do |key|
-        attribute = attributes[key]
+        nested_attributes = attributes[key]
         association = document.associations[key]
-        association.instance = create(attribute) if association
+        association.instance = create(nested_attributes) if association
       end
     end
 
