@@ -1,10 +1,17 @@
+Mongoloid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
+mapping frameworks in that it constrains the models into behaving in a manner appropriate for a 
+document database. That is to say there are no relationships between documents in the underlying datastore.
+If a relationship is set up in the Model the child models are automatically embedded within the parent document 
+in the database. The concept of a foreign key relationship to another Document does not exist, as that is 
+design and thinking for a relational database, not a document database. Mongoloid does however provide 
+all the ActiveRecord style functionality you need, with the difference that it stores all associations 
+within the parent document.
+
 Project planning hosted on Pivotal Tracker:
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoloid on Pivotal Tracker</a>
 
 Initialize Mongoloid:
-
-In a Rails initializer:
 
 <pre>
   Mongoloid.connect_to("myapp_database_name")
@@ -36,6 +43,30 @@ Specifying a Model as a Document in MongoDB:
       :first_name,
       :last_name
   end
+</pre>
+
+Create a new Document:
+
+<pre>
+  Person.create(:title => "Esquire")
+</pre>
+
+Save a Document:
+
+<pre>
+  person.save
+</pre>
+
+Delete a Document:
+
+<pre>
+  person.destroy
+</pre>
+
+Update a Document:
+
+<pre>
+  person.update_attributes(:title => "Sir")
 </pre>
 
 Search for a Document in the database:
