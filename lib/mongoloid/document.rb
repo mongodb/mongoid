@@ -26,8 +26,9 @@ module Mongoloid
       end
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
-      def create(attributes = nil)
-        new(attributes).save
+      def create(attributes = {})
+        Mongoloid::DocumentFactory.create(attributes).save if attributes[:document_class]
+        new(attributes).save unless attributes[:document_class]
       end
 
       # Defines all the fields that are accessable on the Document
@@ -55,13 +56,13 @@ module Mongoloid
       # Find a single Document given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_first(selector = nil)
-        new(collection.find_one(selector))
+        Mongoloid::DocumentFactory.create(collection.find_one(selector))
       end
 
       # Find a all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_all(selector = nil)
-        collection.find(selector).collect { |doc| new(doc) }
+        collection.find(selector).collect { |doc| Mongoloid::DocumentFactory.create(doc) }
       end
 
       # Create a one-to-many association between Documents.
@@ -78,7 +79,7 @@ module Mongoloid
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
       def paginate(selector = nil, params = {})
-        collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| new(doc) }
+        collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| Mongoloid::DocumentFactory.create(doc) }
       end
 
     end

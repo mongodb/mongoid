@@ -9,3 +9,7 @@ require "mongoloid"
 require "spec"
 
 Mongoloid.connect_to("mongoloid_test")
+
+Spec::Runner.configure do |config|
+  config.mock_with :mocha
+end

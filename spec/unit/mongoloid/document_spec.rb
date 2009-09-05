@@ -2,41 +2,16 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 describe Mongoloid::Document do
 
-  describe "#belongs_to" do
-
-    it "adds the new Association" do
-      Address.belongs_to :person
-      Address.associations[:person].type.should == :belongs_to
-    end
-
-  end
-
-  describe "#collection" do
-
-    before do
-      @database = mock
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
-    end
-
-    it "should get the collection with class name from the database" do
-      Mongoloid.expects(:database).returns(@database)
-      @database.expects(:collection).with("person").returns(@collection)
-      Person.collection.should == @collection
-    end
-
-  end
-
   describe "#create" do
 
     before do
       @collection = mock
-      Person.expects(:collection).returns(@collection)
     end
 
     context "with no attributes" do
 
       it "creates a new saved document" do
+        Person.expects(:collection).returns(@collection)
         @collection.expects(:save).with({})
         person = Person.create
         person.should_not be_nil
@@ -47,6 +22,7 @@ describe Mongoloid::Document do
     context "with attributes" do
 
       it "creates a new saved document" do
+        Person.expects(:collection).returns(@collection)
         @collection.expects(:save).with({:test => "test"})
         person = Person.create(:test => "test")
         person.should_not be_nil
@@ -60,12 +36,12 @@ describe Mongoloid::Document do
 
     before do
       @collection = mock
-      Person.expects(:collection).returns(@collection)
     end
 
     context "when the Document is remove from the database" do
 
       it "returns nil" do
+        Person.expects(:collection).returns(@collection)
         id = XGen::Mongo::ObjectID.new
         @collection.expects(:remove).with(:_id => id)
         person = Person.new(:_id => id)
@@ -96,13 +72,14 @@ describe Mongoloid::Document do
   describe "#find" do
 
     before do
+      @attributes = { :document_class => "Person" }
       @collection = mock
-      Person.expects(:collection).returns(@collection)
     end
 
     context "when finding first" do
 
       it "delegates to find_first" do
+        Person.expects(:collection).returns(@collection)
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
         Person.find(:first, :test => "Test")
       end
@@ -131,14 +108,14 @@ describe Mongoloid::Document do
   describe "#find_first" do
 
     before do
-      @attributes = {}
+      @attributes = { :document_class => "Person" }
       @collection = mock
-      Person.expects(:collection).returns(@collection)
     end
 
     context "when a selector is provided" do
 
       it "finds the first document from the collection and instantiates it" do
+        Person.expects(:collection).returns(@collection)
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
         Person.find_first(:test => "Test").attributes.should == @attributes
       end
@@ -148,7 +125,8 @@ describe Mongoloid::Document do
     context "when a selector is not provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        @collection.expects(:find_one).with(nil).returns(@attribute)
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(nil).returns(@attributes)
         Person.find_first.attributes.should == @attributes
       end
 
@@ -162,12 +140,12 @@ describe Mongoloid::Document do
       @cursor = mock
       @persons = []
       @collection = mock
-      Person.expects(:collection).returns(@collection)
     end
 
     context "when a selector is provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
+        Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
         @cursor.expects(:collect).returns(@persons)
         Person.find_all(:test => "Test")
@@ -178,40 +156,12 @@ describe Mongoloid::Document do
     context "when a selector is not provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
+        Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with(nil).returns(@cursor)
         @cursor.expects(:collect).returns(@persons)
         Person.find_all
       end
 
-    end
-
-  end
-
-  describe "#has_many" do
-
-    it "adds the new Association" do
-      Person.has_many :addresss
-      Person.associations[:addresss].type.should == :has_many
-    end
-
-    it "initializes the instance to an empty array" do
-      Person.has_many :addresss
-      Person.associations[:addresss].instance.should == []
-    end
-
-  end
-
-  describe "#has_one" do
-
-    it "adds the new Association" do
-      Person.has_one :address
-      Person.associations[:address].type.should == :has_one
-    end
-
-    it "adds the accessor for the association" do
-      Person.has_one :address
-      person = Person.new
-      person.should respond_to(:address)
     end
 
   end

@@ -1,13 +1,5 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-class Person < Mongoloid::Document
-  collection_name :people
-  fields \
-    :first_name,
-    :middle_name,
-    :last_name
-end
-
 describe Mongoloid::Document do
 
   before do
@@ -36,7 +28,7 @@ describe Mongoloid::Document do
   describe "#find" do
 
     before do
-      Person.create(:test => "Test")
+      Person.create(:test => "Test", :document_class => "Person")
     end
 
     context "finding all documents" do
@@ -63,7 +55,7 @@ describe Mongoloid::Document do
 
     before do
       30.times do |num|
-        Person.create(:test => "Test-#{num}")
+        Person.create(:test => "Test-#{num}", :document_class => "Person")
       end
     end
 
@@ -73,4 +65,27 @@ describe Mongoloid::Document do
 
   end
 
+end
+
+class Person < Mongoloid::Document
+  collection_name :people
+  fields :title
+  has_many :addresses
+  has_one :name
+end
+
+class Address < Mongoloid::Document
+  fields \
+    :street,
+    :city,
+    :state,
+    :post_code
+  belongs_to :person
+end
+
+class Name < Mongoloid::Document
+  fields \
+    :first_name,
+    :last_name
+  belongs_to :person
 end
