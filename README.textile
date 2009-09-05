@@ -1,4 +1,6 @@
-<h3>Overview</h3>
+<h2>Overview</h2>
+
+<h3>About Mongoloid</h3>
 
 <p>
   Mongoloid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
@@ -11,11 +13,11 @@
   within the parent document.
 </p>
 
-Project planning hosted on Pivotal Tracker:
+<h3>Project Tracking</h3>
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoloid on Pivotal Tracker</a>
 
-<h3>Usage:</h3>
+<h2>Mongoloid in Action</h2>
 
 Initialize Mongoloid:
 
