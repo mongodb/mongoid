@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-class Parent < Mongoloid::Document
+class Person < Mongoloid::Document
 end
-class Child < Mongoloid::Document
+class Address < Mongoloid::Document
 end
 
 describe Mongoloid::Document do
@@ -10,8 +10,8 @@ describe Mongoloid::Document do
   describe "#belongs_to" do
 
     it "adds the new Association" do
-      Child.belongs_to :parent
-      Child.associations[:parent].type.should == :belongs_to
+      Address.belongs_to :person
+      Address.associations[:person].type.should == :belongs_to
     end
 
   end
@@ -21,13 +21,13 @@ describe Mongoloid::Document do
     before do
       @database = mock
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     it "should get the collection with class name from the database" do
       Mongoloid.expects(:database).returns(@database)
-      @database.expects(:collection).with("parent").returns(@collection)
-      Parent.collection.should == @collection
+      @database.expects(:collection).with("person").returns(@collection)
+      Person.collection.should == @collection
     end
 
   end
@@ -36,15 +36,15 @@ describe Mongoloid::Document do
 
     before do
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     context "with no attributes" do
 
       it "creates a new saved document" do
         @collection.expects(:save).with({})
-        parent = Parent.create
-        parent.should_not be_nil
+        person = Person.create
+        person.should_not be_nil
       end
 
     end
@@ -53,8 +53,8 @@ describe Mongoloid::Document do
 
       it "creates a new saved document" do
         @collection.expects(:save).with({:test => "test"})
-        parent = Parent.create(:test => "test")
-        parent.should_not be_nil
+        person = Person.create(:test => "test")
+        person.should_not be_nil
       end
 
     end
@@ -65,7 +65,7 @@ describe Mongoloid::Document do
 
     before do
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     context "when the Document is remove from the database" do
@@ -73,8 +73,8 @@ describe Mongoloid::Document do
       it "returns nil" do
         id = XGen::Mongo::ObjectID.new
         @collection.expects(:remove).with(:_id => id)
-        parent = Parent.new(:_id => id)
-        parent.destroy.should be_nil
+        person = Person.new(:_id => id)
+        person.destroy.should be_nil
       end
 
     end
@@ -84,16 +84,16 @@ describe Mongoloid::Document do
   describe "#fields" do
 
     it "adds a reader for the fields defined" do
-      Parent.fields([:name])
-      @parent = Parent.new(:name => "Test")
-      @parent.name.should == "Test"
+      Person.fields([:name])
+      @person = Person.new(:name => "Test")
+      @person.name.should == "Test"
     end
 
     it "adds a writer for the fields defined" do
-      Parent.fields([:name])
-      @parent = Parent.new(:name => "Test")
-      @parent.name = "Testy"
-      @parent.name.should == "Testy"
+      Person.fields([:name])
+      @person = Person.new(:name => "Test")
+      @person.name = "Testy"
+      @person.name.should == "Testy"
     end
 
   end
@@ -102,14 +102,14 @@ describe Mongoloid::Document do
 
     before do
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     context "when finding first" do
 
       it "delegates to find_first" do
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
-        Parent.find(:first, :test => "Test")
+        Person.find(:first, :test => "Test")
       end
 
     end
@@ -118,15 +118,15 @@ describe Mongoloid::Document do
 
       before do
         @cursor = mock
-        @parents = []
+        @persons = []
         @collection = mock
-        Parent.expects(:collection).returns(@collection)
+        Person.expects(:collection).returns(@collection)
       end
 
       it "delegates to find_all" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
-        @cursor.expects(:collect).returns(@parents)
-        Parent.find(:all, :test => "Test")
+        @cursor.expects(:collect).returns(@persons)
+        Person.find(:all, :test => "Test")
       end
 
     end
@@ -138,14 +138,14 @@ describe Mongoloid::Document do
     before do
       @attributes = {}
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     context "when a selector is provided" do
 
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
-        Parent.find_first(:test => "Test").attributes.should == @attributes
+        Person.find_first(:test => "Test").attributes.should == @attributes
       end
 
     end
@@ -154,7 +154,7 @@ describe Mongoloid::Document do
 
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with(nil).returns(@attribute)
-        Parent.find_first.attributes.should == @attributes
+        Person.find_first.attributes.should == @attributes
       end
 
     end
@@ -165,17 +165,17 @@ describe Mongoloid::Document do
 
     before do
       @cursor = mock
-      @parents = []
+      @persons = []
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     context "when a selector is provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
-        @cursor.expects(:collect).returns(@parents)
-        Parent.find_all(:test => "Test")
+        @cursor.expects(:collect).returns(@persons)
+        Person.find_all(:test => "Test")
       end
 
     end
@@ -184,8 +184,8 @@ describe Mongoloid::Document do
 
       it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(nil).returns(@cursor)
-        @cursor.expects(:collect).returns(@parents)
-        Parent.find_all
+        @cursor.expects(:collect).returns(@persons)
+        Person.find_all
       end
 
     end
@@ -195,13 +195,13 @@ describe Mongoloid::Document do
   describe "#has_many" do
 
     it "adds the new Association" do
-      Parent.has_many :childs
-      Parent.associations[:childs].type.should == :has_many
+      Person.has_many :addresss
+      Person.associations[:addresss].type.should == :has_many
     end
 
     it "initializes the instance to an empty array" do
-      Parent.has_many :childs
-      Parent.associations[:childs].instance.should == []
+      Person.has_many :addresss
+      Person.associations[:addresss].instance.should == []
     end
 
   end
@@ -209,8 +209,8 @@ describe Mongoloid::Document do
   describe "#has_one" do
 
     it "adds the new Association" do
-      Parent.has_one :child
-      Parent.associations[:child].type.should == :has_one
+      Person.has_one :address
+      Person.associations[:address].type.should == :has_one
     end
 
   end
@@ -220,8 +220,8 @@ describe Mongoloid::Document do
     context "with no attributes" do
 
       it "does not set any attributes" do
-        parent = Parent.new
-        parent.attributes.empty?.should be_true
+        person = Person.new
+        person.attributes.empty?.should be_true
       end
 
     end
@@ -233,8 +233,8 @@ describe Mongoloid::Document do
       end
 
       it "sets the arributes hash on the object" do
-        parent = Parent.new(@attributes)
-        parent.attributes.should == @attributes
+        person = Person.new(@attributes)
+        person.attributes.should == @attributes
       end
 
     end
@@ -246,11 +246,11 @@ describe Mongoloid::Document do
     context "when the object has been saved" do
 
       before do
-        @parent = Parent.new(:_id => "1")
+        @person = Person.new(:_id => "1")
       end
 
       it "returns false" do
-        @parent.new_record?.should be_false
+        @person.new_record?.should be_false
       end
 
     end
@@ -258,11 +258,11 @@ describe Mongoloid::Document do
     context "when the object has not been saved" do
 
       before do
-        @parent = Parent.new
+        @person = Person.new
       end
 
       it "returns true" do
-        @parent.new_record?.should be_true
+        @person.new_record?.should be_true
       end
 
     end
@@ -273,14 +273,14 @@ describe Mongoloid::Document do
 
     before do
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     context "when pagination parameters are passed" do
 
       it "delegates offset and limit to find_all" do
         @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 20}).returns([])
-        Parent.paginate({ :test => "Test" }, { :page => 2, :per_page => 20 })
+        Person.paginate({ :test => "Test" }, { :page => 2, :per_page => 20 })
       end
 
     end
@@ -289,7 +289,7 @@ describe Mongoloid::Document do
 
       it "passes the default offset and limit to find_all" do
         @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 0}).returns([])
-        Parent.paginate({ :test => "Test" })
+        Person.paginate({ :test => "Test" })
       end
 
     end
@@ -300,14 +300,14 @@ describe Mongoloid::Document do
 
     before do
       @attributes = { :test => "test" }
-      @parent = Parent.new(@attributes)
+      @person = Person.new(@attributes)
       @collection = mock
-      Parent.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(@collection)
     end
 
     it "persists the object to the MongoDB collection" do
-      @collection.expects(:save).with(@parent.attributes)
-      @parent.save.should be_true
+      @collection.expects(:save).with(@person.attributes)
+      @person.save.should be_true
     end
 
   end
@@ -317,9 +317,9 @@ describe Mongoloid::Document do
     context "when attributes are provided" do
 
       it "saves and returns true" do
-        parent = Parent.new
-        parent.expects(:save).returns(true)
-        parent.update_attributes(:test => "Test").should be_true
+        person = Person.new
+        person.expects(:save).returns(true)
+        person.update_attributes(:test => "Test").should be_true
       end
 
     end
