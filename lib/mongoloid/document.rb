@@ -13,8 +13,7 @@ module Mongoloid
       # Create an association to a parent Document.
       def belongs_to(association_name)
         associations[association_name] = Mongoloid::Association.new(:belongs_to, association_name.to_s.classify.constantize, nil)
-        define_method(association_name) { associations[association_name].instance }
-        define_method("#{association_name}=") { |object| associations[association_name].instance = object }
+        add_association_accessors(association_name)
       end
 
       # Get the XGen::Mongo::Collection associated with this Document.
@@ -70,15 +69,13 @@ module Mongoloid
       # Create a one-to-many association between Documents.
       def has_many(association_name)
         associations[association_name] = Mongoloid::Association.new(:has_many, association_name.to_s.classify, [])
-        define_method(association_name) { associations[association_name].instance }
-        define_method("#{association_name}=") { |object| associations[association_name].instance = object }
+        add_association_accessors(association_name)
       end
 
       # Create a one-to-many association between Documents.
       def has_one(association_name)
         associations[association_name] = Mongoloid::Association.new(:has_one, association_name.to_s.titleize, nil)
-        define_method(association_name) { associations[association_name].instance }
-        define_method("#{association_name}=") { |object| associations[association_name].instance = object }
+        add_association_accessors(association_name)
       end
 
       # Find all documents in paginated fashion given the supplied arguments.
@@ -133,10 +130,22 @@ module Mongoloid
     
     private
 
+    class << self
+
+      # Creates the accessors for the association given its name.
+      def add_association_accessors(name)
+        define_method(name) { associations[name].instance }
+        define_method("#{name}=") { |object| associations[name].instance = object }
+      end
+
+    end
+
+    # Read from the attributes hash.
     def read_attribute(name)
       @attributes[name]
     end
 
+    # Write to the attributes hash.
     def write_attribute(name, value)
       @attributes[name] = value
     end
