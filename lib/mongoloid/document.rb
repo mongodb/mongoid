@@ -66,12 +66,12 @@ module Mongoloid
 
       # Create a one-to-many association between Documents.
       def has_many(association_name)
-        associations[association_name] = Mongoloid::Association.new(:has_many, association_name.to_s.classify.constantize, [])
+        associations[association_name] = Mongoloid::Association.new(:has_many, association_name.to_s.classify, [])
       end
 
       # Create a one-to-many association between Documents.
       def has_one(association_name)
-        associations[association_name] = Mongoloid::Association.new(:has_one, association_name.to_s.titleize.constantize, nil)
+        associations[association_name] = Mongoloid::Association.new(:has_one, association_name.to_s.titleize, nil)
       end
 
       # Find all documents in paginated fashion given the supplied arguments.
