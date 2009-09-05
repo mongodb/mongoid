@@ -7,6 +7,7 @@ require "activesupport"
 require "mongo"
 require "mongoloid/association"
 require "mongoloid/document"
+require "mongoloid/document_factory"
 require "mongoloid/paginator"
 
 module Mongoloid

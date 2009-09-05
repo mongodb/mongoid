@@ -1,15 +1,12 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-class Parent < Mongoloid::Document
-end
-
 describe Mongoloid::Association do
 
   describe "#klass" do
 
     it "returns the klass supplied in the constructor" do
-      association = Mongoloid::Association.new(:has_many, "Parent", Parent.new)
-      association.klass.should == "Parent"
+      association = Mongoloid::Association.new(:has_many, "Person", Person.new)
+      association.klass.should == "Person"
     end
 
   end
@@ -17,8 +14,8 @@ describe Mongoloid::Association do
   describe "#instance" do
 
     it "returns the instance supplied in the constructor" do
-      instance = Parent.new
-      association = Mongoloid::Association.new(:has_many, "Parent", instance)
+      instance = Person.new
+      association = Mongoloid::Association.new(:has_many, "Person", instance)
       association.instance.should == instance
     end
 
@@ -39,7 +36,7 @@ describe Mongoloid::Association do
   describe "#type" do
 
     it "returns the association type defined in the constructor" do
-      association = Mongoloid::Association.new(:has_many, "Parent", Parent.new)
+      association = Mongoloid::Association.new(:has_many, "Person", Person.new)
       association.type.should == :has_many
     end
 
