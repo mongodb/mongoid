@@ -1,15 +1,21 @@
-Mongoloid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
-mapping frameworks in that it constrains the models into behaving in a manner appropriate for a 
-document database. That is to say there are no relationships between documents in the underlying datastore.
-If a relationship is set up in the Model the child models are automatically embedded within the parent document 
-in the database. The concept of a foreign key relationship to another Document does not exist, as that is 
-design and thinking for a relational database, not a document database. Mongoloid does however provide 
-all the ActiveRecord style functionality you need, with the difference that it stores all associations 
-within the parent document.
+<h2>Overview</h2>
+
+<p>
+  Mongoloid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
+  mapping frameworks in that it constrains the models into behaving in a manner appropriate for a 
+  document database. That is to say there are no relationships between documents in the underlying datastore.
+  If a relationship is set up in the Model the child models are automatically embedded within the parent document 
+  in the database. The concept of a foreign key relationship to another Document does not exist, as that is 
+  design and thinking for a relational database, not a document database. Mongoloid does however provide 
+  all the ActiveRecord style functionality you need, with the difference that it stores all associations 
+  within the parent document.
+</p>
 
 Project planning hosted on Pivotal Tracker:
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoloid on Pivotal Tracker</a>
+
+<h2>Usage:</h2>
 
 Initialize Mongoloid:
 
