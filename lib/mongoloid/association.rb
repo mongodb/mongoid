@@ -1,10 +1,5 @@
 module Mongoloid
-
-  class InvalidAssociationError < RuntimeError
-  end
-
   class Association
-
     TYPES = [:has_many, :has_one, :belongs_to]
 
     attr_accessor :type, :class_name, :instance
