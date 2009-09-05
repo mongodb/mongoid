@@ -7,12 +7,17 @@ module Mongoloid
     def self.create(attributes)
       document_class = attributes[:document_class]
       document = document_class.constantize.new(attributes)
+      create_associations(document, attributes)
+      document
+    end
+    
+    private
+    def self.create_associations(document, attributes)
       attributes.each_key do |key|
         attribute = attributes[key]
         association = document.associations[key]
         association.instance = create(attribute) if association
       end
-      document
     end
 
   end
