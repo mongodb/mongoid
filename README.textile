@@ -16,23 +16,38 @@ Specifying a Model as a Document in MongoDB:
   class Person < Mongoloid::Document
     collection_name :people
 
-    fields \
-      :first_name,
-      :middle_name,
-      :last_name
+    fields :title
 
     has_many :addresses
     has_one :name
   end
   
   class Address < Mongoloid::Document
-
     fields \
       :street,
       :city,
       :state,
       :post_code
-
     belongs_to :person
   end
+
+  class Name < Mongoloid::Document
+    fields \
+      :first_name,
+      :last_name
+  end
+</pre>
+
+Search for a Document in the database:
+
+<pre>
+  Person.find(:all, :title => "Esquire")
+
+  Person.find(:first, :title => "Esquire")
+</pre>
+
+Paginate Document search results:
+
+<pre>
+  Person.paginate(:title => "Esquire", :page => 1, :per_page => 20)
 </pre>
