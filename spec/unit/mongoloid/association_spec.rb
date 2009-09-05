@@ -2,11 +2,11 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 describe Mongoloid::Association do
 
-  describe "#klass" do
+  describe "#class_name" do
 
     it "returns the klass supplied in the constructor" do
       association = Mongoloid::Association.new(:has_many, "Person", Person.new)
-      association.klass.should == "Person"
+      association.class_name.should == "Person"
     end
 
   end
