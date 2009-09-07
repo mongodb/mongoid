@@ -1,7 +1,7 @@
 module Mongoloid
   class Document
 
-    attr_reader :attributes
+    attr_reader :attributes, :parent
 
     class << self
 
@@ -100,6 +100,11 @@ module Mongoloid
       @attributes[:_id].nil?
     end
 
+    # Set the parent to this document.
+    def parent=(document)
+      @parent = document
+    end
+
     # Save this Document to the database and return self.
     def save
       collection.save(@attributes); self
@@ -117,10 +122,10 @@ module Mongoloid
       # Adds the association to the associations hash with the type as the key, 
       # then adds the accessors for the association.
       def add_association(type, class_name, name)
-        define_method(name) do 
+        define_method(name) do
           Mongoloid::Associations::AssociationFactory.create(type, name, self)
         end
-        define_method("#{name}=") do |object| 
+        define_method("#{name}=") do |object|
           Mongoloid::Associations::AssociationFactory.create(type, name, object)
         end
       end

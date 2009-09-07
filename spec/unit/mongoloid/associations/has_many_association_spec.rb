@@ -4,8 +4,8 @@ describe Mongoloid::Associations::HasManyAssociation do
 
   before do
     @attributes = { :addresses => [ 
-                    { :street => "Street 1", :document_class => "Address" }, 
-                    { :street => "Street 2", :document_class => "Address" } ] }
+      { :street => "Street 1", :document_class => "Address" }, 
+      { :street => "Street 2", :document_class => "Address" } ] }
     @document = stub(:attributes => @attributes)
   end
 
@@ -30,6 +30,19 @@ describe Mongoloid::Associations::HasManyAssociation do
         @association[3].should be_nil
       end
 
+    end
+
+  end
+
+  describe "#<<" do
+
+    before do
+      @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+    end
+
+    it "appends the document to the end of the array" do
+      @association << Address.new
+      @association.length.should == 3
     end
 
   end
@@ -59,6 +72,32 @@ describe Mongoloid::Associations::HasManyAssociation do
         @association.first.should be_nil
       end
 
+    end
+
+  end
+
+  describe "#length" do
+
+    context "#length" do
+
+      it "returns the length of the delegated array" do
+        @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+        @association.length.should == 2
+      end
+
+    end
+
+  end
+
+  describe "#push" do
+
+    before do
+      @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+    end
+
+    it "appends the document to the end of the array" do
+      @association.push(Address.new)
+      @association.length.should == 3
     end
 
   end

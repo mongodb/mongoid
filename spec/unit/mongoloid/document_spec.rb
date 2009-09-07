@@ -299,6 +299,34 @@ describe Mongoloid::Document do
 
   end
 
+  describe "#parent" do
+
+    before do
+      @attributes = { :title => "Sir",
+        :addresses => [
+          { :street => "Street 1", :document_class => "Address" },
+          { :street => "Street 2", :document_class => "Address" } ] }
+      @person = Person.new(@attributes)
+    end
+
+    context "when document is embedded" do
+
+      it "returns the parent document" do
+        @person.addresses.first.parent.should == @person
+      end
+
+    end
+
+    context "when document is root" do
+
+      it "returns nil" do
+        @person.parent.should be_nil
+      end
+
+    end
+
+  end
+
   describe "#save" do
 
     before do

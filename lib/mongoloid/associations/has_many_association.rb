@@ -12,7 +12,11 @@ module Mongoloid
       def initialize(association_name, document)
         klass = association_name.to_s.classify.constantize
         attributes = document.attributes[association_name]
-        @documents = attributes ? attributes.collect { |attribute| klass.new(attribute) } : []
+        @documents = attributes ? attributes.collect do |attribute| 
+          child = klass.new(attribute)
+          child.parent = document
+          child
+        end : []
         super(@documents)
       end
 

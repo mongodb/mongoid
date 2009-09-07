@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 describe Mongoloid::Associations::BelongsToAssociation do
 
   before do
-    @document = Name.new(:first_name => "Drexel")
+    @parent = Name.new(:first_name => "Drexel")
+    @document = stub(:parent => @parent)
   end
 
   describe "#method_missing" do

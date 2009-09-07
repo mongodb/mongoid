@@ -8,8 +8,8 @@ module Mongoloid
       #
       # All method calls on this object will then be delegated
       # to the internal document itself.
-      def initialize(parent)
-        @document = parent
+      def initialize(document)
+        @document = document.parent
       end
 
       # All calls to this association will be delegated straight

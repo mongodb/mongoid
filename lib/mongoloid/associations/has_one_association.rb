@@ -12,6 +12,7 @@ module Mongoloid
         klass = association_name.to_s.titleize.constantize
         attributes = document.attributes[association_name]
         @document = klass.new(attributes)
+        @document.parent = document
       end
 
       # All calls to this association will be delegated straight
