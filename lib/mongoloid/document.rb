@@ -5,11 +5,6 @@ module Mongoloid
 
     class << self
 
-      # Return all the associations for this class.
-      def associations
-        @associations ||= {}
-      end
-
       # Create an association to a parent Document.
       def belongs_to(association_name)
         add_association(:belongs_to, association_name.to_s.classify, association_name)
@@ -76,11 +71,6 @@ module Mongoloid
         collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| new(doc) }
       end
 
-    end
-
-    # Get the Associations collection from the class.
-    def associations
-      self.class.associations
     end
 
     # Get the XGen::Mongo::Collection associated with this Document.
