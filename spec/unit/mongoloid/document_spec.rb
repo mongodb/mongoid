@@ -16,7 +16,7 @@ describe Mongoloid::Document do
 
     it "adds a new Association to the collection" do
       address = Address.new
-      address.associations[:person].should_not be_nil
+      address.person.should_not be_nil
     end
 
     it "creates a reader for the association" do
@@ -189,7 +189,7 @@ describe Mongoloid::Document do
 
     it "adds a new Association to the collection" do
       person = Person.new
-      person.associations[:addresses].should_not be_nil
+      person.addresses.should_not be_nil
     end
 
     it "creates a reader for the association" do
@@ -208,7 +208,7 @@ describe Mongoloid::Document do
 
     it "adds a new Association to the collection" do
       person = Person.new
-      person.associations[:name].should_not be_nil
+      person.name.should_not be_nil
     end
 
     it "creates a reader for the association" do

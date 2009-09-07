@@ -23,7 +23,7 @@ module Mongoloid
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
       def create(attributes = {})
-        Mongoloid::DocumentFactory.create(attributes).save if attributes[:document_class]
+        new(attributes).save if attributes[:document_class]
         new(attributes).save unless attributes[:document_class]
       end
 
@@ -52,13 +52,13 @@ module Mongoloid
       # Find a single Document given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_first(selector = nil)
-        Mongoloid::DocumentFactory.create(collection.find_one(selector))
+        new(collection.find_one(selector))
       end
 
       # Find a all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_all(selector = nil)
-        collection.find(selector).collect { |doc| Mongoloid::DocumentFactory.create(doc) }
+        collection.find(selector).collect { |doc| new(doc) }
       end
 
       # Create a one-to-many association between Documents.
@@ -74,7 +74,7 @@ module Mongoloid
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
       def paginate(selector = nil, params = {})
-        collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| Mongoloid::DocumentFactory.create(doc) }
+        collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| new(doc) }
       end
 
     end
@@ -128,9 +128,12 @@ module Mongoloid
       # Adds the association to the associations hash with the type as the key, 
       # then adds the accessors for the association.
       def add_association(type, class_name, name)
-        associations[name] = Mongoloid::Association.new(type, class_name, nil)
-        define_method(name) { associations[name].instance }
-        define_method("#{name}=") { |object| associations[name].instance = object }
+        define_method(name) do 
+          Mongoloid::Associations::AssociationFactory.create(type, name, self)
+        end
+        define_method("#{name}=") do |object| 
+          Mongoloid::Associations::AssociationFactory.create(type, name, object)
+        end
       end
 
     end

@@ -4,11 +4,13 @@ gem "activesupport"
 gem "mongodb-mongo", "0.14"
 
 require "activesupport"
+require "delegate"
 require "mongo"
-require "mongoloid/association"
-require "mongoloid/association_factory"
+require "mongoloid/associations/association_factory"
+require "mongoloid/associations/belongs_to_association"
+require "mongoloid/associations/has_many_association"
+require "mongoloid/associations/has_one_association"
 require "mongoloid/document"
-require "mongoloid/document_factory"
 require "mongoloid/paginator"
 
 module Mongoloid
