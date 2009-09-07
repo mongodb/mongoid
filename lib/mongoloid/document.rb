@@ -23,8 +23,7 @@ module Mongoloid
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
       def create(attributes = {})
-        new(attributes).save if attributes[:document_class]
-        new(attributes).save unless attributes[:document_class]
+        new(attributes).save
       end
 
       # Defines all the fields that are accessable on the Document
