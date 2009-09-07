@@ -12,8 +12,7 @@ module Mongoloid
       def initialize(association_name, document)
         klass = association_name.to_s.classify.constantize
         attributes = document.attributes[association_name]
-        @documents = []
-        attributes.each { |attribute| @documents << klass.new(attribute) } if attributes
+        @documents = attributes ? attributes.collect { |attribute| klass.new(attribute) } : []
         super(@documents)
       end
 
