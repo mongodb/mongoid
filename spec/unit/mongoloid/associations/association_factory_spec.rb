@@ -35,6 +35,14 @@ describe Mongoloid::Associations::AssociationFactory do
 
     end
 
+    context "when type is invalid" do
+
+      it "should raise a InvalidAssociationError" do
+        lambda { Mongoloid::Associations::AssociationFactory.create(:something, :person, @document) }.should raise_error
+      end
+
+    end
+
   end
 
 end
