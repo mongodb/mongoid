@@ -3,7 +3,7 @@
 <h3>About Mongoid</h3>
 
 <p>
-  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
+  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. Mongoid differs from other 
   mapping frameworks in that it constrains the models into behaving in a manner appropriate for a 
   document database. That is to say there are no relationships between documents in the underlying datastore.
   If a relationship is set up in the Model the child models are automatically embedded within the parent document 
