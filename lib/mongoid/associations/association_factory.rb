@@ -1,4 +1,4 @@
-module Mongoloid
+module Mongoid
   module Associations
     class AssociationFactory
 

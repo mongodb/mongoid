@@ -7,10 +7,10 @@ require "metric_fu"
 begin
   require "jeweler"
   Jeweler::Tasks.new do |gem|
-    gem.name = "mongoloid"
-    gem.summary = %Q{Mongoloid}
+    gem.name = "mongoid"
+    gem.summary = %Q{Mongoid}
     gem.email = "durran@gmail.com"
-    gem.homepage = "http://github.com/durran/mongoloid"
+    gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
     gem.add_dependency "active_support"
     gem.add_dependency "mongodb-mongo"

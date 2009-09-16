@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-describe Mongoloid::Paginator do
+describe Mongoid::Paginator do
 
   describe "#limit" do
 
@@ -8,7 +8,7 @@ describe Mongoloid::Paginator do
 
       before do
         @options = { :per_page => 50 }
-        @paginator = Mongoloid::Paginator.new(@options)
+        @paginator = Mongoid::Paginator.new(@options)
       end
 
       it "returns the per_page value" do
@@ -21,7 +21,7 @@ describe Mongoloid::Paginator do
 
       before do
         @options = {}
-        @paginator = Mongoloid::Paginator.new(@options)
+        @paginator = Mongoid::Paginator.new(@options)
       end
 
       it "returns the default of 20" do
@@ -38,7 +38,7 @@ describe Mongoloid::Paginator do
 
       before do
         @options = { :page => 11 }
-        @paginator = Mongoloid::Paginator.new(@options)
+        @paginator = Mongoid::Paginator.new(@options)
       end
 
       it "returns the page value - 1 * limit" do
@@ -51,7 +51,7 @@ describe Mongoloid::Paginator do
 
       before do
         @options = {}
-        @paginator = Mongoloid::Paginator.new(@options)
+        @paginator = Mongoid::Paginator.new(@options)
       end
 
       it "returns the default of 0" do
@@ -65,7 +65,7 @@ describe Mongoloid::Paginator do
   describe "#options" do
 
     it "returns a hash of the limit and offset" do
-      @paginator = Mongoloid::Paginator.new
+      @paginator = Mongoid::Paginator.new
       @paginator.options.should == { :limit => 20, :offset => 0 }
     end
 

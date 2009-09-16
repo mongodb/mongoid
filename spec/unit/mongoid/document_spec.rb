@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-describe Mongoloid::Document do
+describe Mongoid::Document do
 
   before do
     @collection = mock
     @database = stub(:collection => @collection)
-    Mongoloid.stubs(:database).returns(@database)
+    Mongoid.stubs(:database).returns(@database)
   end
 
   after do

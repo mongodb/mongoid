@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 
-describe Mongoloid::Associations::HasOneAssociation do
+describe Mongoid::Associations::HasOneAssociation do
 
   before do
     @attributes = { :name => { :first_name => "Drexel" } }
@@ -10,7 +10,7 @@ describe Mongoloid::Associations::HasOneAssociation do
   describe "#method_missing" do
 
     before do
-      @association = Mongoloid::Associations::HasOneAssociation.new(:name, @document)
+      @association = Mongoid::Associations::HasOneAssociation.new(:name, @document)
     end
 
     context "when getting values" do

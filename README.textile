@@ -1,9 +1,9 @@
 <h2>Overview</h2>
 
-<h3>About Mongoloid</h3>
+<h3>About Mongoid</h3>
 
 <p>
-  Mongoloid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
+  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. MongoDB differs from other 
   mapping frameworks in that it constrains the models into behaving in a manner appropriate for a 
   document database. That is to say there are no relationships between documents in the underlying datastore.
   If a relationship is set up in the Model the child models are automatically embedded within the parent document 
@@ -15,26 +15,26 @@
 
 <h3>Project Tracking</h3>
 
-<a href="http://www.pivotaltracker.com/projects/27482">Mongoloid on Pivotal Tracker</a>
+<a href="http://www.pivotaltracker.com/projects/27482">Mongoid on Pivotal Tracker</a>
 
-<h2>Mongoloid in Action</h2>
+<h2>Mongoid in Action</h2>
 
-Initialize Mongoloid:
+Initialize Mongoid:
 
 <pre>
-  Mongoloid.connect_to("myapp_database_name")
+  Mongoid.connect_to("myapp_database_name")
 </pre>
 
 Example of a simple domain model:
 
 <pre>
-  class Person < Mongoloid::Document
+  class Person < Mongoid::Document
     fields :title
     has_many :addresses
     has_one :name
   end
   
-  class Address < Mongoloid::Document
+  class Address < Mongoid::Document
     fields \
       :street,
       :city,
@@ -43,7 +43,7 @@ Example of a simple domain model:
     belongs_to :person
   end
 
-  class Name < Mongoloid::Document
+  class Name < Mongoid::Document
     fields \
       :first_name,
       :last_name

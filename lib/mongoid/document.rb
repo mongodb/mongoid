@@ -1,4 +1,4 @@
-module Mongoloid
+module Mongoid
   class Document
 
     attr_reader :attributes, :parent
@@ -13,7 +13,7 @@ module Mongoloid
       # Get the XGen::Mongo::Collection associated with this Document.
       def collection
         @collection_name = self.to_s.demodulize.tableize
-        @collection ||= Mongoloid.database.collection(@collection_name)
+        @collection ||= Mongoid.database.collection(@collection_name)
       end
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
@@ -68,7 +68,7 @@ module Mongoloid
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
       def paginate(selector = nil, params = {})
-        collection.find(selector, Mongoloid::Paginator.new(params).options).collect { |doc| new(doc) }
+        collection.find(selector, Mongoid::Paginator.new(params).options).collect { |doc| new(doc) }
       end
 
     end
@@ -123,10 +123,10 @@ module Mongoloid
       # then adds the accessors for the association.
       def add_association(type, class_name, name)
         define_method(name) do
-          Mongoloid::Associations::AssociationFactory.create(type, name, self)
+          Mongoid::Associations::AssociationFactory.create(type, name, self)
         end
         define_method("#{name}=") do |object|
-          Mongoloid::Associations::AssociationFactory.create(type, name, object)
+          Mongoid::Associations::AssociationFactory.create(type, name, object)
         end
       end
 

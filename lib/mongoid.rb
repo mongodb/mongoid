@@ -6,14 +6,14 @@ gem "mongodb-mongo", "0.14"
 require "activesupport"
 require "delegate"
 require "mongo"
-require "mongoloid/associations/association_factory"
-require "mongoloid/associations/belongs_to_association"
-require "mongoloid/associations/has_many_association"
-require "mongoloid/associations/has_one_association"
-require "mongoloid/document"
-require "mongoloid/paginator"
+require "mongoid/associations/association_factory"
+require "mongoid/associations/belongs_to_association"
+require "mongoid/associations/has_many_association"
+require "mongoid/associations/has_one_association"
+require "mongoid/document"
+require "mongoid/paginator"
 
-module Mongoloid
+module Mongoid
 
   # Thrown when the database connection has not been set up.
   class NoConnectionError < RuntimeError
@@ -41,7 +41,7 @@ module Mongoloid
     @@database ||= @@connection.db(name)
   end
 
-  # Get the MongoDB database. If initialization via Mongoloid.connect_to()
+  # Get the MongoDB database. If initialization via Mongoid.connect_to()
   # has not happened, an exception will occur.
   def self.database
     raise NoConnectionError unless @@database

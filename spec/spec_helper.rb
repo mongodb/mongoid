@@ -5,22 +5,22 @@ require 'rubygems'
 gem "mocha", "0.9.7"
 
 require "mocha"
-require "mongoloid"
+require "mongoid"
 require "spec"
 
-Mongoloid.connect_to("mongoloid_test")
+Mongoid.connect_to("mongoid_test")
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
 end
 
-class Person < Mongoloid::Document
+class Person < Mongoid::Document
   fields :title
   has_many :addresses
   has_one :name
 end
 
-class Address < Mongoloid::Document
+class Address < Mongoid::Document
   fields \
     :street,
     :city,
@@ -29,7 +29,7 @@ class Address < Mongoloid::Document
   belongs_to :person
 end
 
-class Name < Mongoloid::Document
+class Name < Mongoid::Document
   fields \
     :first_name,
     :last_name

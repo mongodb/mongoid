@@ -4,12 +4,12 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{mongoloid}
+  s.name = %q{mongoid}
   s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-09-05}
+  s.date = %q{2009-09-16}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -21,32 +21,35 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/mongoloid.rb",
-     "lib/mongoloid/association.rb",
-     "lib/mongoloid/association_factory.rb",
+     "lib/mongoloid/associations/association_factory.rb",
+     "lib/mongoloid/associations/belongs_to_association.rb",
+     "lib/mongoloid/associations/has_many_association.rb",
+     "lib/mongoloid/associations/has_one_association.rb",
      "lib/mongoloid/document.rb",
-     "lib/mongoloid/document_factory.rb",
      "lib/mongoloid/paginator.rb",
      "mongoloid.gemspec",
      "spec/integration/mongoloid/document_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "spec/unit/mongoloid/association_factory_spec.rb",
-     "spec/unit/mongoloid/association_spec.rb",
-     "spec/unit/mongoloid/document_factory_spec.rb",
+     "spec/unit/mongoloid/associations/association_factory_spec.rb",
+     "spec/unit/mongoloid/associations/belongs_to_association_spec.rb",
+     "spec/unit/mongoloid/associations/has_many_association_spec.rb",
+     "spec/unit/mongoloid/associations/has_one_association_spec.rb",
      "spec/unit/mongoloid/document_spec.rb",
      "spec/unit/mongoloid/paginator_spec.rb"
   ]
-  s.homepage = %q{http://github.com/durran/mongoloid}
+  s.homepage = %q{http://github.com/durran/mongoid}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
-  s.summary = %q{Mongoloid}
+  s.summary = %q{Mongoid}
   s.test_files = [
     "spec/integration/mongoloid/document_spec.rb",
      "spec/spec_helper.rb",
-     "spec/unit/mongoloid/association_factory_spec.rb",
-     "spec/unit/mongoloid/association_spec.rb",
-     "spec/unit/mongoloid/document_factory_spec.rb",
+     "spec/unit/mongoloid/associations/association_factory_spec.rb",
+     "spec/unit/mongoloid/associations/belongs_to_association_spec.rb",
+     "spec/unit/mongoloid/associations/has_many_association_spec.rb",
+     "spec/unit/mongoloid/associations/has_one_association_spec.rb",
      "spec/unit/mongoloid/document_spec.rb",
      "spec/unit/mongoloid/paginator_spec.rb"
   ]

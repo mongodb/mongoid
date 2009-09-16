@@ -1,4 +1,4 @@
-module Mongoloid
+module Mongoid
   class Paginator
 
     attr_reader :limit, :offset

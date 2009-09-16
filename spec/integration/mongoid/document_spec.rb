@@ -1,9 +1,9 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
-describe Mongoloid::Document do
+describe Mongoid::Document do
 
   before do
-    Mongoloid.database.collection(:people).drop
+    Mongoid.database.collection(:people).drop
   end
 
   describe "#new" do

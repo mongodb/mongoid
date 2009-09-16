@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 
-describe Mongoloid::Associations::HasManyAssociation do
+describe Mongoid::Associations::HasManyAssociation do
 
   before do
     @attributes = { :addresses => [ 
@@ -12,7 +12,7 @@ describe Mongoloid::Associations::HasManyAssociation do
   describe "#[]" do
 
     before do
-      @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+      @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
     end
 
     context "when the index is present in the association" do
@@ -37,7 +37,7 @@ describe Mongoloid::Associations::HasManyAssociation do
   describe "#<<" do
 
     before do
-      @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+      @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
     end
 
     it "appends the document to the end of the array" do
@@ -52,7 +52,7 @@ describe Mongoloid::Associations::HasManyAssociation do
     context "when there are elements in the array" do
 
       before do
-        @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+        @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
       end
 
       it "returns the first element" do
@@ -65,7 +65,7 @@ describe Mongoloid::Associations::HasManyAssociation do
     context "when the array is empty" do
 
       before do
-        @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, Person.new)
+        @association = Mongoid::Associations::HasManyAssociation.new(:addresses, Person.new)
       end
 
       it "returns nil" do
@@ -81,7 +81,7 @@ describe Mongoloid::Associations::HasManyAssociation do
     context "#length" do
 
       it "returns the length of the delegated array" do
-        @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+        @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
         @association.length.should == 2
       end
 
@@ -92,7 +92,7 @@ describe Mongoloid::Associations::HasManyAssociation do
   describe "#push" do
 
     before do
-      @association = Mongoloid::Associations::HasManyAssociation.new(:addresses, @document)
+      @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
     end
 
     it "appends the document to the end of the array" do
