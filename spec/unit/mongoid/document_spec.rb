@@ -202,6 +202,24 @@ describe Mongoid::Document do
       person.should respond_to(:addresses=)
     end
 
+    context "when setting the association directly" do
+
+      before do
+        @attributes = { :title => "Sir",
+          :addresses => [
+            { :street => "Street 1", :document_class => "Address" },
+            { :street => "Street 2", :document_class => "Address" } ] }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the attributes for the association" do
+        address = Address.new(:street => "New Street", :document_class => "Address")
+        @person.addresses = [address]
+        @person.addresses.first.street.should == "New Street"
+      end
+
+    end
+
   end
 
   describe "#has_one" do
@@ -219,6 +237,22 @@ describe Mongoid::Document do
     it "creates a writer for the association" do
       person = Person.new
       person.should respond_to(:name=)
+    end
+
+    context "when setting the association directly" do
+
+      before do
+        @attributes = { :title => "Sir",
+          :name => { :first_name => "Test" } }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the attributes for the association" do
+        name = Name.new(:first_name => "New Name", :document_class => "Name")
+        @person.name = name
+        @person.name.first_name.should == "New Name"
+      end
+
     end
 
   end

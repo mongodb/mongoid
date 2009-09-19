@@ -1,5 +1,5 @@
-module Mongoid
-  class Document
+module Mongoid #:nodoc:
+  class Document #:nodoc:
     include Validatable
 
     attr_reader :attributes, :parent
@@ -135,7 +135,7 @@ module Mongoid
           Mongoid::Associations::AssociationFactory.create(type, name, self)
         end
         define_method("#{name}=") do |object|
-          # TODO: Need to set the attributes of the associated object here.
+          @attributes[name] = object.mongoidize
         end
       end
 

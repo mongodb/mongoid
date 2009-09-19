@@ -1,5 +1,5 @@
-module Mongoid
-  class Paginator
+module Mongoid #:nodoc:
+  class Paginator #:nodoc:
 
     attr_reader :limit, :offset
 

@@ -1,6 +1,6 @@
-module Mongoid
-  module Associations
-    class BelongsToAssociation
+module Mongoid #:nodoc:
+  module Associations #:nodoc:
+    class BelongsToAssociation #:nodoc:
 
       # Creates the new association by setting the internal 
       # document as the passed in Document. This should be the

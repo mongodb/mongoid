@@ -1,6 +1,6 @@
-module Mongoid
-  module Associations
-    class HasManyAssociation < DelegateClass(Array)
+module Mongoid #:nodoc:
+  module Associations #:nodoc:
+    class HasManyAssociation < DelegateClass(Array) #:nodoc:
 
       # Creates the new association by finding the attributes in 
       # the parent document with its name, and instantiating a 

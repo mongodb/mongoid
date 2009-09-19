@@ -1,6 +1,6 @@
-module Mongoid
-  module Associations
-    class HasOneAssociation
+module Mongoid #:nodoc:
+  module Associations #:nodoc:
+    class HasOneAssociation #:nodoc:
 
       # Creates the new association by finding the attributes in 
       # the parent document with its name, and instantiating a 
