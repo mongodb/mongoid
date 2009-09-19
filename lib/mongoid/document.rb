@@ -106,7 +106,10 @@ module Mongoid
       @parent = document
     end
 
-    # Save this Document to the database and return self.
+    # Save this document to the database. If this document is the root document
+    # in the object graph, it will save itself, and return self. If the
+    # document is embedded within another document, or is multiple levels down
+    # the tree, the root object will get saved, and return itself.
     def save
       if @parent
         @parent.save
