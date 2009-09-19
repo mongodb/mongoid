@@ -84,7 +84,7 @@ module Mongoid
       collection.remove(:_id => id)
     end
 
-    # Get the XGen::Mongo::ObjectID associated with this object.
+    # Get the Mongo::ObjectID associated with this object.
     # This is in essence the primary key.
     def id
       @attributes[:_id]
@@ -106,14 +106,14 @@ module Mongoid
       @parent = document
     end
 
-    # Returns the root document in the object graph.
-    def root
-      @parent || self
-    end
-
     # Save this Document to the database and return self.
     def save
-      collection.save(@attributes); self
+      if @parent
+        @parent.save
+      else
+        collection.save(@attributes)
+        return self
+      end
     end
 
     # Update the attributes of this Document and return true

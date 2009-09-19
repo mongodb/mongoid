@@ -327,44 +327,37 @@ describe Mongoid::Document do
 
   end
 
-  describe "#root" do
-
-    before do
-      @attributes = { :title => "Sir",
-        :addresses => [
-          { :street => "Street 1", :document_class => "Address" },
-          { :street => "Street 2", :document_class => "Address" } ] }
-      @person = Person.new(@attributes)
-    end
-
-    context "when document is the root" do
-
-      it "returns self" do
-        @person.root.should == @person
-      end
-
-    end
-
-    context "when document is embedded" do
-
-      it "returns the root document" do
-        @person.addresses.first.root.should == @person
-      end
-
-    end
-
-  end
-
   describe "#save" do
 
-    before do
-      @attributes = { :test => "test" }
-      @person = Person.new(@attributes)
+    context "when the document is the root" do
+
+      before do
+        @attributes = { :test => "test" }
+        @person = Person.new(@attributes)
+      end
+
+      it "persists the object to the MongoDB collection" do
+        @collection.expects(:save).with(@person.attributes)
+        @person.save.should be_true
+      end
+
     end
 
-    it "persists the object to the MongoDB collection" do
-      @collection.expects(:save).with(@person.attributes)
-      @person.save.should be_true
+    context "when the document is embedded" do
+
+      before do
+        @attributes = { :title => "Sir",
+          :addresses => [
+            { :street => "Street 1", :document_class => "Address" },
+            { :street => "Street 2", :document_class => "Address" } ] }
+        @person = Person.new(@attributes)
+      end
+
+      it "saves the root document" do
+        @collection.expects(:save).with(@person.attributes)
+        @person.addresses.first.save
+      end
+
     end
 
   end
