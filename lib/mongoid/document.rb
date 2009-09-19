@@ -11,7 +11,7 @@ module Mongoid
         add_association(:belongs_to, association_name.to_s.classify, association_name)
       end
 
-      # Get the XGen::Mongo::Collection associated with this Document.
+      # Get the Mongo::Collection associated with this Document.
       def collection
         @collection_name = self.to_s.demodulize.tableize
         @collection ||= Mongoid.database.collection(@collection_name)
@@ -74,7 +74,7 @@ module Mongoid
 
     end
 
-    # Get the XGen::Mongo::Collection associated with this Document.
+    # Get the Mongo::Collection associated with this Document.
     def collection
       self.class.collection
     end
@@ -135,7 +135,7 @@ module Mongoid
           Mongoid::Associations::AssociationFactory.create(type, name, self)
         end
         define_method("#{name}=") do |object|
-          Mongoid::Associations::AssociationFactory.create(type, name, object)
+          # TODO: Need to set the attributes of the associated object here.
         end
       end
 
