@@ -355,4 +355,90 @@ describe Mongoid::Document do
 
   end
 
+  context "validations" do
+
+    after do
+      Person.validations.clear
+    end
+
+    describe "#validates_acceptance_of" do
+
+      it "adds the acceptance validation" do
+        Person.class_eval do
+          validates_acceptance_of :terms
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesAcceptanceOf)
+      end
+
+    end
+
+    describe "#validates_associated" do
+
+      it "adds the associated validation" do
+        Person.class_eval do
+          validates_associated :name
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesAssociated)
+      end
+
+    end
+
+    describe "#validates_format_of" do
+
+      it "adds the format validation" do
+        Person.class_eval do
+          validates_format_of :title, :with => /[A-Za-z]/
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesFormatOf)
+      end
+
+    end
+
+    describe "#validates_length_of" do
+
+      it "adds the length validation" do
+        Person.class_eval do
+          validates_length_of :title, :minimum => 10
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesLengthOf)
+      end
+
+    end
+
+    describe "#validates_numericality_of" do
+
+      it "adds the numericality validation" do
+        Person.class_eval do
+          validates_numericality_of :age
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesNumericalityOf)
+      end
+
+    end
+
+    describe "#validates_presence_of" do
+
+      it "adds the presence validation" do
+        Person.class_eval do
+          validates_presence_of :title
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesPresenceOf)
+      end
+
+    end
+
+    describe "#validates_true_for" do
+
+      it "adds the true validation" do
+        Person.class_eval do
+          validates_true_for :title, :logic => lambda { title == "Esquire" }
+        end
+        Person.validations.first.should be_a_kind_of(Validatable::ValidatesTrueFor)
+      end
+
+    end
+
+  end
+
+
 end

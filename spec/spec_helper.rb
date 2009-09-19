@@ -2,7 +2,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'rubygems'
 
-gem "mocha", "0.9.7"
+gem "mocha", "0.9.8"
 
 require "mocha"
 require "mongoid"
@@ -15,7 +15,10 @@ Spec::Runner.configure do |config|
 end
 
 class Person < Mongoid::Document
-  fields :title
+  fields \
+    :title,
+    :terms,
+    :age
   has_many :addresses
   has_one :name
 end

@@ -1,8 +1,11 @@
 require "rubygems"
 
-gem "activesupport"
-gem "mongodb-mongo", "0.14"
+gem "activesupport", "2.3.4"
+gem "mongodb-mongo", "0.14.1"
+gem "validatable", "1.7.4"
 
+require "mongoid/paginator"
+require "validatable"
 require "activesupport"
 require "delegate"
 require "mongo"

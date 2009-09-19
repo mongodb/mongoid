@@ -1,5 +1,6 @@
 module Mongoid
   class Document
+    include Validatable
 
     attr_reader :attributes, :parent
 
