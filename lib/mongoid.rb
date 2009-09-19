@@ -26,7 +26,7 @@ module Mongoid
   class ClassNotProvidedError < RuntimeError
   end
 
-  # Thrown when an association is defined on the class, but the 
+  # Thrown when an association is defined on the class, but the
   # attribute in the hash is not an Array or Hash.
   class TypeMismatchError < RuntimeError
   end

@@ -3,13 +3,13 @@
 <h3>About Mongoid</h3>
 
 <p>
-  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. Mongoid differs from other 
-  mapping frameworks in that it constrains the models into behaving in a manner appropriate for a 
+  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. Mongoid differs from other
+  mapping frameworks in that it constrains the models into behaving in a manner appropriate for a
   document database. That is to say there are no relationships between documents in the underlying datastore.
-  If a relationship is set up in the Model the child models are automatically embedded within the parent document 
-  in the database. The concept of a foreign key relationship to another Document does not exist, as that is 
-  design and thinking for a relational database, not a document database. Mongoloid does however provide 
-  all the ActiveRecord style functionality you need, with the difference that it stores all associations 
+  If a relationship is set up in the Model the child models are automatically embedded within the parent document
+  in the database. The concept of a foreign key relationship to another Document does not exist, as that is
+  design and thinking for a relational database, not a document database. Mongoloid does however provide
+  all the ActiveRecord style functionality you need, with the difference that it stores all associations
   within the parent document.
 </p>
 
@@ -33,7 +33,7 @@ Example of a simple domain model:
     has_many :addresses
     has_one :name
   end
-  
+
   class Address < Mongoid::Document
     fields \
       :street,
@@ -87,6 +87,13 @@ Paginate Document search results:
 <pre>
   Person.paginate(:title => "Esquire", :page => 1, :per_page => 20)
 </pre>
+
+Validations:
+
+Mongoid supports all validations provided by Jay Fields' <tt>Validatable</tt> gem.
+For more information please see the <tt>Validatable</tt> documentation.
+
+<a href="http://validatable.rubyforge.org/">Validatable on RubyForge</a>
 
 <h2>License</h2>
 
