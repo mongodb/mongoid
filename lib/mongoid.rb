@@ -39,7 +39,7 @@ module Mongoid
   # Connect to the database name supplied. This should be run
   # for initial setup, potentially in a rails initializer.
   def self.connect_to(name)
-    @@connection ||= XGen::Mongo::Connection.new
+    @@connection ||= Mongo::Connection.new
     @@database ||= @@connection.db(name)
   end
 
