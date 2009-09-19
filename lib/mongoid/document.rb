@@ -106,6 +106,11 @@ module Mongoid
       @parent = document
     end
 
+    # Returns the root document in the object graph.
+    def root
+      @parent || self
+    end
+
     # Save this Document to the database and return self.
     def save
       collection.save(@attributes); self
