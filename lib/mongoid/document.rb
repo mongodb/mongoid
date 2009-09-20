@@ -110,7 +110,8 @@ module Mongoid #:nodoc:
     # Instantiate a new Document, setting the Document's attirbutes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attributes = {})
-      @attributes = attributes
+      @attributes = attributes || {}
+      @attributes.symbolize_keys!
     end
 
     # Returns true is the Document has not been persisted to the database, false if it has.
@@ -138,7 +139,7 @@ module Mongoid #:nodoc:
 
     # Update the attributes of this Document and return true
     def update_attributes(attributes)
-      @attributes = attributes; save; true
+      @attributes = attributes.symbolize_keys!; save; true
     end
 
     private
@@ -165,12 +166,12 @@ module Mongoid #:nodoc:
 
     # Read from the attributes hash.
     def read_attribute(name)
-      @attributes[name]
+      @attributes[name.to_sym]
     end
 
     # Write to the attributes hash.
     def write_attribute(name, value)
-      @attributes[name] = value
+      @attributes[name.to_sym] = value
     end
 
   end

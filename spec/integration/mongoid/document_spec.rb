@@ -28,14 +28,14 @@ describe Mongoid::Document do
   describe "#find" do
 
     before do
-      Person.create(:test => "Test", :document_class => "Person")
+      Person.create(:title => "Test", :document_class => "Person")
     end
 
     context "finding all documents" do
 
       it "returns an array of documents based on the selector provided" do
-        documents = Person.find(:all, :test => "Test")
-        documents[0].attributes["test"].should == "Test"
+        documents = Person.find(:all, :title => "Test")
+        documents[0].title.should == "Test"
       end
 
     end
@@ -43,8 +43,8 @@ describe Mongoid::Document do
     context "finding first document" do
 
       it "returns the first document based on the selector provided" do
-        person = Person.find(:first, :test => "Test")
-        person.attributes["test"].should == "Test"
+        person = Person.find(:first, :title => "Test")
+        person.title.should == "Test"
       end
 
     end
