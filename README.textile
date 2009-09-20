@@ -17,6 +17,12 @@
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoid on Pivotal Tracker</a>
 
+<h3>Compatibility</h3>
+
+<p>
+  Mongoid is developed against Ruby 1.8.6, 1.8.7, 1.9.1
+</p>
+
 <h2>Mongoid in Action</h2>
 
 Initialize Mongoid:

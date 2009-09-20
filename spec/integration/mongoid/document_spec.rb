@@ -62,7 +62,9 @@ describe Mongoid::Document do
     it "returns grouped documents" do
       grouped = Person.group_by([:title], {})
       people = grouped.first["group"]
-      people.first.should be_a_kind_of(Person)
+      person = people.first
+      person.should be_a_kind_of(Person)
+      person.title.should == "Sir"
     end
 
   end
