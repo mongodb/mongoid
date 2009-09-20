@@ -2,9 +2,18 @@ module Mongoid #:nodoc:
   class Document #:nodoc:
     include Validatable
 
+    AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
+    GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
+
     attr_reader :attributes, :parent
 
     class << self
+
+      # Get an aggregate count for the supplied group of fields and the
+      # selector that is provided.
+      def aggregate(fields, selector)
+        collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
+      end
 
       # Create an association to a parent Document.
       def belongs_to(association_name)
@@ -50,10 +59,19 @@ module Mongoid #:nodoc:
         new(collection.find_one(selector))
       end
 
-      # Find a all Documents given the passed selector, which is a Hash of attributes that
+      # Find all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_all(selector = nil)
         collection.find(selector).collect { |doc| new(doc) }
+      end
+
+      # Find all Documents given the supplied criteria, grouped by the fields
+      # provided.
+      def group_by(fields, selector)
+        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |grouping|
+          grouping["group"] = grouping["group"].collect { |attributes| new(attributes) }
+          grouping
+        end
       end
 
       # Create a one-to-many association between Documents.
@@ -92,8 +110,8 @@ module Mongoid #:nodoc:
 
     # Instantiate a new Document, setting the Document's attirbutes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
-    def initialize(attributes = nil)
-      @attributes = attributes || {}
+    def initialize(attributes = {})
+      @attributes = attributes
     end
 
     # Returns true is the Document has not been persisted to the database, false if it has.

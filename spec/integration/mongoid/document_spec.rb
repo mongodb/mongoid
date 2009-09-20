@@ -10,7 +10,7 @@ describe Mongoid::Document do
 
     it "gets a new or current database connection" do
       person = Person.new
-      person.collection.should be_a_kind_of(XGen::Mongo::Collection)
+      person.collection.should be_a_kind_of(Mongo::Collection)
     end
 
   end
@@ -51,11 +51,27 @@ describe Mongoid::Document do
 
   end
 
+  describe "#group_by" do
+
+    before do
+      30.times do |num|
+        Person.create(:title => "Sir", :age => num, :document_class => "Person")
+      end
+    end
+
+    it "returns grouped documents" do
+      grouped = Person.group_by([:title], {})
+      people = grouped.first["group"]
+      people.first.should be_a_kind_of(Person)
+    end
+
+  end
+
   describe "#paginate" do
 
     before do
       30.times do |num|
-        Person.create(:test => "Test-#{num}", :document_class => "Person")
+        Person.create(:title => "Test-#{num}", :document_class => "Person")
       end
     end
 
