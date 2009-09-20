@@ -68,9 +68,8 @@ module Mongoid #:nodoc:
       # Find all Documents given the supplied criteria, grouped by the fields
       # provided.
       def group_by(fields, selector)
-        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |grouping|
-          grouping["group"] = grouping["group"].collect { |attributes| new(attributes) }
-          grouping
+        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
+          group!(docs)
         end
       end
 
@@ -157,6 +156,11 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Takes the supplied raw grouping of documents and alters it to a
+      # grouping of actual document objects.
+      def group!(docs)
+        docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
+      end
     end
 
     # Read from the attributes hash.
