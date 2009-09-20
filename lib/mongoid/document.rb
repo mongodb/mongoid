@@ -69,7 +69,9 @@ module Mongoid #:nodoc:
       # provided.
       def group_by(fields, selector)
         collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
-          docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
+          docs["group"] = docs["group"].collect do |attrs| 
+            new(attrs); docs
+          end
         end
       end
 
