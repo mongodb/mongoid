@@ -415,7 +415,8 @@ describe Mongoid::Document do
   describe "#to_param" do
 
     it "returns the id" do
-      Person.new(:_id => "test").to_param.should == "test"
+      id = Mongo::ObjectID.new
+      Person.new(:_id => id).to_param.should == id.to_s
     end
 
   end

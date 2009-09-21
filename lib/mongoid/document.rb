@@ -139,7 +139,7 @@ module Mongoid #:nodoc:
 
     # Returns the id of the Document
     def to_param
-      id
+      id.to_s
     end
 
     # Update the attributes of this Document and return true
