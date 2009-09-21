@@ -48,8 +48,9 @@ module Mongoid #:nodoc:
       # Model.find(:all, :attribute => "value")
       def find(*args)
         case args[0]
+        when :all then find_all(args[1])
         when :first then find_first(args[1])
-        else find_all(args[1])
+        else find_first(:_id => Mongo::ObjectID.from_string(args[0]))
         end
       end
 

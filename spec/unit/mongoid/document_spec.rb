@@ -104,6 +104,19 @@ describe Mongoid::Document do
       @attributes = { :document_class => "Person" }
     end
 
+    context "when an id is passed in" do
+
+      before do
+        @id = Mongo::ObjectID.new
+      end
+
+      it "delegates to find_first" do
+        @collection.expects(:find_one).with(:_id => Mongo::ObjectID.from_string(@id.to_s)).returns(@attributes)
+        Person.find(@id.to_s)
+      end
+
+    end
+
     context "when finding first" do
 
       it "delegates to find_first" do
