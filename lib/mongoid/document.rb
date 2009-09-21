@@ -50,7 +50,7 @@ module Mongoid #:nodoc:
         case args[0]
         when :all then find_all(args[1])
         when :first then find_first(args[1])
-        else find_first(:_id => Mongo::ObjectID.from_string(args[0]))
+        else find_first(Mongo::ObjectID.from_string(args[0].to_s))
         end
       end
 
@@ -111,8 +111,8 @@ module Mongoid #:nodoc:
     # Instantiate a new Document, setting the Document's attirbutes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attributes = {})
-      @attributes = attributes || {}
-      @attributes.symbolize_keys!
+      @attributes = attributes.symbolize_keys if attributes
+      @attributes = {} unless attributes
     end
 
     # Returns true is the Document has not been persisted to the database, false if it has.

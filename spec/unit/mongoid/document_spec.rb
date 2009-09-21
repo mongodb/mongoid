@@ -111,7 +111,7 @@ describe Mongoid::Document do
       end
 
       it "delegates to find_first" do
-        @collection.expects(:find_one).with(:_id => Mongo::ObjectID.from_string(@id.to_s)).returns(@attributes)
+        @collection.expects(:find_one).with(Mongo::ObjectID.from_string(@id.to_s)).returns(@attributes)
         Person.find(@id.to_s)
       end
 

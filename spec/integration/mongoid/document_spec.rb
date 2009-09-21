@@ -28,7 +28,7 @@ describe Mongoid::Document do
   describe "#find" do
 
     before do
-      Person.create(:title => "Test", :document_class => "Person")
+      @person = Person.create(:title => "Test", :document_class => "Person")
     end
 
     context "finding all documents" do
@@ -45,6 +45,15 @@ describe Mongoid::Document do
       it "returns the first document based on the selector provided" do
         person = Person.find(:first, :title => "Test")
         person.title.should == "Test"
+      end
+
+    end
+
+    context "finding by id" do
+
+      it "finds the document by the supplied id" do
+        person = Person.find(@person.id)
+        person.id.should == @person.id
       end
 
     end
