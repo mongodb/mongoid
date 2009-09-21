@@ -69,9 +69,7 @@ module Mongoid #:nodoc:
       # provided.
       def group_by(fields, selector)
         collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
-          docs["group"] = docs["group"].collect do |attrs| 
-            new(attrs); docs
-          end
+          group!(docs)
         end
       end
 
@@ -139,6 +137,11 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Returns the id of the Document
+    def to_param
+      id
+    end
+
     # Update the attributes of this Document and return true
     def update_attributes(attributes)
       @attributes = attributes.symbolize_keys!; save; true
@@ -157,6 +160,12 @@ module Mongoid #:nodoc:
         define_method("#{name}=") do |object|
           @attributes[name] = object.mongoidize
         end
+      end
+
+      # Takes the supplied raw grouping of documents and alters it to a
+      # grouping of actual document objects.
+      def group!(docs)
+        docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
       end
 
     end

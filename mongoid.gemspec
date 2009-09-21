@@ -66,14 +66,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<active_support>, [">= 0"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_runtime_dependency(%q<mongodb-mongo>, [">= 0"])
     else
-      s.add_dependency(%q<active_support>, [">= 0"])
+      s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<mongodb-mongo>, [">= 0"])
     end
   else
-    s.add_dependency(%q<active_support>, [">= 0"])
+    s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<mongodb-mongo>, [">= 0"])
   end
 end

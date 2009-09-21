@@ -412,6 +412,14 @@ describe Mongoid::Document do
 
   end
 
+  describe "#to_param" do
+
+    it "returns the id" do
+      Person.new(:_id => "test").to_param.should == "test"
+    end
+
+  end
+
   describe "#update_attributes" do
 
     context "when attributes are provided" do
