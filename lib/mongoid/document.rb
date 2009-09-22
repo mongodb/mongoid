@@ -9,12 +9,8 @@ module Mongoid #:nodoc:
     attr_reader :attributes, :parent
 
     define_callbacks \
-      :after_create,
       :after_save,
-      :after_validation,
-      :before_create,
-      :before_save,
-      :before_validation
+      :before_save
 
     class << self
 
@@ -139,11 +135,10 @@ module Mongoid #:nodoc:
     # document is embedded within another document, or is multiple levels down
     # the tree, the root object will get saved, and return itself.
     def save
-      run_callbacks(:before_save)
       if @parent
-        run_callbacks(:after_save)
         @parent.save
       else
+        run_callbacks(:before_save)
         collection.save(@attributes)
         run_callbacks(:after_save)
         return self
