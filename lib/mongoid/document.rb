@@ -1,11 +1,20 @@
 module Mongoid #:nodoc:
   class Document #:nodoc:
+    include ActiveSupport::Callbacks
     include Validatable
 
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
     attr_reader :attributes, :parent
+
+    define_callbacks \
+      :after_create,
+      :after_save,
+      :after_validation,
+      :before_create,
+      :before_save,
+      :before_validation
 
     class << self
 
@@ -130,10 +139,13 @@ module Mongoid #:nodoc:
     # document is embedded within another document, or is multiple levels down
     # the tree, the root object will get saved, and return itself.
     def save
+      run_callbacks(:before_save)
       if @parent
+        run_callbacks(:after_save)
         @parent.save
       else
         collection.save(@attributes)
+        run_callbacks(:after_save)
         return self
       end
     end
