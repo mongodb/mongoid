@@ -69,7 +69,7 @@ describe Mongoid::Document do
     context "when the Document is remove from the database" do
 
       it "returns nil" do
-        id = XGen::Mongo::ObjectID.new
+        id = Mongo::ObjectID.new
         @collection.expects(:remove).with(:_id => id)
         person = Person.new(:_id => id)
         person.destroy.should be_nil
