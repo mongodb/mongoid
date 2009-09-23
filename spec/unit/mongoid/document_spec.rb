@@ -64,28 +64,6 @@ describe Mongoid::Document do
 
   end
 
-  describe "#index" do
-
-    context "when unique options are not provided" do
-
-      it "delegates to collection with unique => false" do
-        @collection.expects(:create_index).with(:title, :unique => false)
-        Person.index :title
-      end
-
-    end
-
-    context "when unique option is provided" do
-
-      it "delegates to collection with unique option" do
-        @collection.expects(:create_index).with(:title, :unique => true)
-        Person.index :title, :unique => true
-      end
-
-    end
-
-  end
-
   describe "#destroy" do
 
     context "when the Document is remove from the database" do
@@ -302,6 +280,28 @@ describe Mongoid::Document do
         name = Name.new(:first_name => "New Name", :document_class => "Name")
         @person.name = name
         @person.name.first_name.should == "New Name"
+      end
+
+    end
+
+  end
+
+  describe "#index" do
+
+    context "when unique options are not provided" do
+
+      it "delegates to collection with unique => false" do
+        @collection.expects(:create_index).with(:title, :unique => false)
+        Person.index :title
+      end
+
+    end
+
+    context "when unique option is provided" do
+
+      it "delegates to collection with unique option" do
+        @collection.expects(:create_index).with(:title, :unique => true)
+        Person.index :title, :unique => true
       end
 
     end
