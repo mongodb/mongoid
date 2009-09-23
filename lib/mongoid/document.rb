@@ -89,6 +89,8 @@ module Mongoid #:nodoc:
         add_association(:has_one, association_name.to_s.titleize, association_name)
       end
 
+      # Adds an index on the field specified. Options can be :unique => true or
+      # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
         collection.create_index(name, options)
       end
