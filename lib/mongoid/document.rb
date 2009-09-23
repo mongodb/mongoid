@@ -89,6 +89,10 @@ module Mongoid #:nodoc:
         add_association(:has_one, association_name.to_s.titleize, association_name)
       end
 
+      def index(name, options = { :unique => false })
+        collection.create_index(name, options)
+      end
+
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
       def paginate(selector = nil, params = {})
