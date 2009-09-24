@@ -56,6 +56,8 @@ describe Mongoid::Associations::HasManyAssociation do
     it "adds a new document to the array with the suppied parameters" do
       @association.build({ :street => "Street 1", :document_class => "Address" })
       @association.length.should == 3
+      @association[2].should be_a_kind_of(Address)
+      @association[2].street.should == "Street 1"
     end
 
   end

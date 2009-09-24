@@ -20,7 +20,9 @@ module Mongoid #:nodoc:
         super(@documents)
       end
 
-      # Builds a new Document and adds it to the association collection.
+      # Builds a new Document and adds it to the association collection. The
+      # document created will be of the same class as the others in the
+      # association, and the attributes will be passed into the constructor.
       def build(attributes)
         push(@klass.new(attributes))
       end
