@@ -9,7 +9,9 @@ module Mongoid #:nodoc:
     attr_reader :attributes, :parent
 
     define_callbacks \
+      :after_create,
       :after_save,
+      :before_create,
       :before_save
 
     class << self
