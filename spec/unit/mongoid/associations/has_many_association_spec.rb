@@ -3,8 +3,8 @@ require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 describe Mongoid::Associations::HasManyAssociation do
 
   before do
-    @attributes = { :addresses => [ 
-      { :street => "Street 1", :document_class => "Address" }, 
+    @attributes = { :addresses => [
+      { :street => "Street 1", :document_class => "Address" },
       { :street => "Street 2", :document_class => "Address" } ] }
     @document = stub(:attributes => @attributes)
   end
@@ -42,6 +42,19 @@ describe Mongoid::Associations::HasManyAssociation do
 
     it "appends the document to the end of the array" do
       @association << Address.new
+      @association.length.should == 3
+    end
+
+  end
+
+  describe "#build" do
+
+    before do
+      @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
+    end
+
+    it "adds a new document to the array with the suppied parameters" do
+      @association.build({ :street => "Street 1", :document_class => "Address" })
       @association.length.should == 3
     end
 

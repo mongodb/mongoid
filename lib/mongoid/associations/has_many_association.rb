@@ -10,14 +10,19 @@ module Mongoid #:nodoc:
       # This then delegated all methods to the array class since this is 
       # essentially a proxy to an array itself.
       def initialize(association_name, document)
-        klass = association_name.to_s.classify.constantize
+        @klass = association_name.to_s.classify.constantize
         attributes = document.attributes[association_name]
         @documents = attributes ? attributes.collect do |attribute| 
-          child = klass.new(attribute)
+          child = @klass.new(attribute)
           child.parent = document
           child
         end : []
         super(@documents)
+      end
+
+      # Builds a new Document and adds it to the association collection.
+      def build(attributes)
+        push(@klass.new(attributes))
       end
 
     end
