@@ -52,10 +52,11 @@ module Mongoid #:nodoc:
       # Model.find(:first, :attribute => "value")
       # Model.find(:all, :attribute => "value")
       def find(*args)
-        case args[0]
-        when :all then find_all(args[1])
-        when :first then find_first(args[1])
-        else find_first(Mongo::ObjectID.from_string(args[0].to_s))
+        type, selector = args[0], args[1]
+        case type
+        when :all then find_all(selector)
+        when :first then find_first(selector)
+        else find_first(Mongo::ObjectID.from_string(type.to_s))
         end
       end
 
