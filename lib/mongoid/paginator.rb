@@ -7,8 +7,9 @@ module Mongoid #:nodoc:
     # * Will default to offset 0 if no page defined in the options.
     # * Will default to limit 20 if no per_page defined in the options.
     def initialize(options = {})
+      page = options[:page]
       @limit = options[:per_page] || 20
-      @offset = options[:page] ? (options[:page] - 1) * @limit : 0
+      @offset = page ? (page - 1) * @limit : 0
     end
 
     # Generate the options needed for returning the correct
