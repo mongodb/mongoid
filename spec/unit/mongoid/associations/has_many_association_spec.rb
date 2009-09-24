@@ -60,6 +60,12 @@ describe Mongoid::Associations::HasManyAssociation do
       @association[2].street.should == "Street 1"
     end
 
+    it "returns the newly built object in the association" do
+      address = @association.build({ :street => "Yet Another", :document_class => "Address" })
+      address.should be_a_kind_of(Address)
+      address.street.should == "Yet Another"
+    end
+
   end
 
   describe "#first" do

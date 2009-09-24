@@ -23,8 +23,12 @@ module Mongoid #:nodoc:
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
+      #
+      # Returns the newly created object.
       def build(attributes)
-        push(@klass.new(attributes))
+        object = @klass.new(attributes)
+        push(object)
+        object
       end
 
     end
