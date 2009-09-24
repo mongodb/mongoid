@@ -22,7 +22,7 @@ require "rubygems"
 
 gem "activesupport", "2.3.4"
 gem "mongodb-mongo", "0.14.1"
-gem "hashrocket-validatable", "1.7.4"
+gem "durran-validatable", "1.7.5"
 
 require "validatable"
 require "active_support/callbacks"
