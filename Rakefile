@@ -12,7 +12,7 @@ begin
     gem.email = "durran@gmail.com"
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
-    gem.add_dependency "active_support"
+    gem.add_dependency "activesupport"
     gem.add_dependency "mongodb-mongo"
   end
 
