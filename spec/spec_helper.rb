@@ -12,6 +12,7 @@ Mongoid.connect_to("mongoid_test")
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
+  Mocha::Configuration.prevent(:stubbing_non_existent_method)
 end
 
 class Person < Mongoid::Document
