@@ -13,12 +13,18 @@ module Mongoid #:nodoc:
         attributes = document.attributes[association_name]
         @document = klass.new(attributes)
         @document.parent = document
+        decorate!
       end
 
-      # All calls to this association will be delegated straight
-      # to the encapsulated document.
-      def method_missing(method, *args)
-        @document.send(method, *args)
+      private
+      def decorate!
+        @document.public_methods(false).each do |method|
+          (class << self; self; end).class_eval do
+            define_method method do |*args|
+              @document.send method, *args
+            end
+          end
+        end
       end
 
     end
