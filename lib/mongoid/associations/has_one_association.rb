@@ -2,6 +2,9 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasOneAssociation #:nodoc:
 
+      attr_reader :document
+      delegate :valid?, :to => :document
+
       # Creates the new association by finding the attributes in 
       # the parent document with its name, and instantiating a 
       # new document for it.

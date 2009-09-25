@@ -181,7 +181,6 @@ module Mongoid #:nodoc:
 
       # Takes the supplied raw grouping of documents and alters it to a
       # grouping of actual document objects.
-      # TODO: Me no likey this...
       def group!(docs)
         docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
       end
