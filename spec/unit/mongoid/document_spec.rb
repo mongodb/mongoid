@@ -120,8 +120,8 @@ describe Mongoid::Document do
     context "when finding first" do
 
       it "delegates to find_first" do
-        @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
-        Person.find(:first, :test => "Test")
+        @collection.expects(:find_one).with(:test => "Test" ).returns(@attributes)
+        Person.find(:first, :conditions => { :test => "Test" })
       end
 
     end
@@ -136,7 +136,7 @@ describe Mongoid::Document do
       it "delegates to find_all" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
         @cursor.expects(:collect).returns(@people)
-        Person.find(:all, :test => "Test")
+        Person.find(:all, :conditions => { :test => "Test" })
       end
 
     end

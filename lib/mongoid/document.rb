@@ -56,8 +56,8 @@ module Mongoid #:nodoc:
       def find(*args)
         type, selector = args[0], args[1]
         case type
-        when :all then find_all(selector)
-        when :first then find_first(selector)
+        when :all then find_all(selector[:conditions])
+        when :first then find_first(selector[:conditions])
         else find_first(Mongo::ObjectID.from_string(type.to_s))
         end
       end
