@@ -368,7 +368,7 @@ describe Mongoid::Document do
 
       it "delegates offset and limit to find_all" do
         @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 20}).returns([])
-        Person.paginate({ :test => "Test" }, { :page => 2, :per_page => 20 })
+        Person.paginate({ :conditions => { :test => "Test" } }, { :page => 2, :per_page => 20 })
       end
 
     end
@@ -377,7 +377,7 @@ describe Mongoid::Document do
 
       it "passes the default offset and limit to find_all" do
         @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 0}).returns([])
-        Person.paginate({ :test => "Test" })
+        Person.paginate(:conditions => { :test => "Test" })
       end
 
     end

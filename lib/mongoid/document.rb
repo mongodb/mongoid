@@ -100,8 +100,8 @@ module Mongoid #:nodoc:
 
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
-      def paginate(selector = nil, params = {})
-        collection.find(selector, Mongoid::Paginator.new(params).options).collect { |doc| new(doc) }
+      def paginate(selector = {}, params = {})
+        collection.find(selector[:conditions], Mongoid::Paginator.new(params).options).collect { |doc| new(doc) }
       end
 
     end
