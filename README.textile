@@ -16,6 +16,7 @@
 <h3>Project Tracking</h3>
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoid on Pivotal Tracker</a>
+<a href="http://groups.google.com/group/mongoid">Mongoid Google Group</a>
 
 <h3>Compatibility</h3>
 
