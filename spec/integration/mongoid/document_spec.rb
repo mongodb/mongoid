@@ -87,7 +87,7 @@ describe Mongoid::Document do
     end
 
     it "returns paginated documents" do
-      Person.paginate({}, { :per_page => 20, :page => 2 }).length.should == 10
+      Person.paginate(:per_page => 20, :page => 2).length.should == 10
     end
 
   end

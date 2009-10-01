@@ -372,7 +372,7 @@ describe Mongoid::Document do
 
       it "delegates to will paginate with the results" do
         @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 20}).returns(@cursor)
-        Person.paginate({ :conditions => { :test => "Test" } }, { :page => 2, :per_page => 20 })
+        Person.paginate(:conditions => { :test => "Test" }, :page => 2, :per_page => 20)
       end
 
     end
