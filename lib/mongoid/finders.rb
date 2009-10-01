@@ -1,8 +1,14 @@
-module Mongoid
-  module Finders
+module Mongoid #:nodoc:
+  module Finders #:nodoc:
 
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
+
+    # Get an aggregate count for the supplied group of fields and the
+    # selector that is provided.
+    def aggregate(fields, selector)
+      collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
+    end
 
     # Find all Documents in several ways.
     # Model.find(:first, :attribute => "value")
@@ -32,7 +38,7 @@ module Mongoid
     # provided.
     def group_by(fields, selector)
       collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
-        group!(docs)
+        docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
       end
     end
 

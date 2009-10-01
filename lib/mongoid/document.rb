@@ -14,12 +14,6 @@ module Mongoid #:nodoc:
 
     class << self
 
-      # Get an aggregate count for the supplied group of fields and the
-      # selector that is provided.
-      def aggregate(fields, selector)
-        collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
-      end
-
       # Create an association to a parent Document.
       def belongs_to(association_name)
         add_association(:belongs_to, association_name.to_s.classify, association_name)
@@ -137,12 +131,6 @@ module Mongoid #:nodoc:
         define_method("#{name}=") do |object|
           @attributes[name] = object.mongoidize
         end
-      end
-
-      # Takes the supplied raw grouping of documents and alters it to a
-      # grouping of actual document objects.
-      def group!(docs)
-        docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
       end
 
     end
