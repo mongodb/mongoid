@@ -39,7 +39,6 @@ require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions"
 require "mongoid/document"
-require "mongoid/paginator"
 
 module Mongoid
 
