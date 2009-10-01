@@ -15,9 +15,10 @@ module Mongoid #:nodoc:
     # Model.find(:all, :attribute => "value")
     def find(*args)
       type, selector = args[0], args[1]
+      conditions = selector[:conditions] if selector
       case type
-      when :all then find_all(selector[:conditions])
-      when :first then find_first(selector[:conditions])
+      when :all then find_all(conditions)
+      when :first then find_first(conditions)
       else find_first(Mongo::ObjectID.from_string(type.to_s))
       end
     end
