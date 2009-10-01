@@ -101,7 +101,14 @@ module Mongoid #:nodoc:
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
       def paginate(selector = {}, params = {})
-        collection.find(selector[:conditions], Mongoid::Paginator.new(params).options).collect { |doc| new(doc) }
+        WillPaginate::Collection.create(
+          params[:page] || 1,
+          params[:per_page] || 20,
+          0) do |pager|
+            results = collection.find(selector[:conditions], { :limit => pager.per_page, :offset => pager.offset })
+            pager.total_entries = results.count
+            pager.replace(results.collect { |doc| new(doc) })
+        end
       end
 
     end
@@ -168,7 +175,7 @@ module Mongoid #:nodoc:
 
     class << self
 
-      # Adds the association to the associations hash with the type as the key, 
+      # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.
       def add_association(type, class_name, name)
         define_method(name) do

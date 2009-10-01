@@ -1,0 +1,2 @@
+0.2.5:
+- Switching pagination over to will_paginate

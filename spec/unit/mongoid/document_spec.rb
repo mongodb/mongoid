@@ -364,10 +364,14 @@ describe Mongoid::Document do
 
   describe "#paginate" do
 
+    before do
+      @cursor = stub(:count => 100, :collect => [])
+    end
+
     context "when pagination parameters are passed" do
 
-      it "delegates offset and limit to find_all" do
-        @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 20}).returns([])
+      it "delegates to will paginate with the results" do
+        @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 20}).returns(@cursor)
         Person.paginate({ :conditions => { :test => "Test" } }, { :page => 2, :per_page => 20 })
       end
 
@@ -375,8 +379,8 @@ describe Mongoid::Document do
 
     context "when pagination parameters are not passed" do
 
-      it "passes the default offset and limit to find_all" do
-        @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 0}).returns([])
+      it "delegates to will paginate with default values" do
+        @collection.expects(:find).with({ :test => "Test" }, {:limit => 20, :offset => 0}).returns(@cursor)
         Person.paginate(:conditions => { :test => "Test" })
       end
 
