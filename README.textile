@@ -17,6 +17,7 @@
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoid on Pivotal Tracker</a>
 <a href="http://groups.google.com/group/mongoid">Mongoid Google Group</a>
+<a href="http://ci.hshrckt.com:4891/">Mongoid on CI Joe</a>
 
 <h3>Compatibility</h3>
 
