@@ -37,7 +37,7 @@ describe Mongoid::Associations::AssociationFactory do
 
     context "when type is invalid" do
 
-      it "should raise a InvalidAssociationError" do
+      it "raises an InvalidAssociationError" do
         lambda { Mongoid::Associations::AssociationFactory.create(:something, :person, @document) }.should raise_error
       end
 
