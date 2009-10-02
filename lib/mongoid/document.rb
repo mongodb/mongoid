@@ -30,6 +30,12 @@ module Mongoid #:nodoc:
         new(attributes).save(true)
       end
 
+      # Deletes all records from the collection. Will actually call drop on the
+      # Mongo::Collection for efficiency.
+      def destroy_all
+        collection.drop
+      end
+
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.

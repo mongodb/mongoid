@@ -79,6 +79,15 @@ describe Mongoid::Document do
 
   end
 
+  describe "#destroy_all" do
+
+    it "deletes all documents from the collection" do
+      @collection.expects(:drop)
+      Person.destroy_all
+    end
+
+  end
+
   describe "#fields" do
 
     before do
