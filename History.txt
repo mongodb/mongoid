@@ -1,2 +1,7 @@
+0.2.6:
+- Adding destroy_all to document
+- Adding before and after create callbacks
+- Document#paginate now only takes a single hash as an argument
+
 0.2.5:
 - Switching pagination over to will_paginate
