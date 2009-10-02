@@ -1,3 +1,6 @@
+0.2.7:
+- Added has_timestamps macro
+
 0.2.6:
 - Adding destroy_all to document
 - Adding before and after create callbacks
