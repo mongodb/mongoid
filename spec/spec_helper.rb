@@ -39,3 +39,7 @@ class Name < Mongoid::Document
     :last_name
   belongs_to :person
 end
+
+class Tester < Mongoid::Document
+  has_timestamps
+end

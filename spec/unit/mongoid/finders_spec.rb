@@ -152,6 +152,14 @@ describe Mongoid::Finders do
 
     end
 
+    context "when param keys are strings" do
+
+      it "converts the keys to symbols" do
+
+      end
+
+    end
+
   end
 
 end

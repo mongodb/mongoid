@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
       def fields(*names)
-        @fields = []
+        @fields ||= []
         names.flatten.each do |name|
           @fields << name
           define_method(name) { read_attribute(name) }
@@ -56,6 +56,15 @@ module Mongoid #:nodoc:
       # Create a one-to-many association between Documents.
       def has_one(association_name)
         add_association(:has_one, association_name.to_s.titleize, association_name)
+      end
+
+      # Adds timestamps on the Document in the form of the fields 'created_on'
+      # and 'last_modified'
+      def has_timestamps
+        fields :created_on, :last_modified
+        class_eval do
+          before_save :update_timestamps
+        end
       end
 
       # Adds an index on the field specified. Options can be :unique => true or
@@ -124,6 +133,11 @@ module Mongoid #:nodoc:
     # Update the attributes of this Document and return true
     def update_attributes(attributes)
       @attributes = attributes.symbolize_keys!; save; true
+    end
+
+    def update_timestamps
+      self.created_on = Time.now
+      self.last_modified = Time.now
     end
 
     private
