@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
       def create(attributes = {})
-        new(attributes).save
+        new(attributes).save(true)
       end
 
       # Defines all the fields that are accessable on the Document
@@ -97,12 +97,14 @@ module Mongoid #:nodoc:
     # in the object graph, it will save itself, and return self. If the
     # document is embedded within another document, or is multiple levels down
     # the tree, the root object will get saved, and return itself.
-    def save
+    def save(creating = false)
       if @parent
         @parent.save
       else
+        run_callbacks(:before_create) if creating
         run_callbacks(:before_save)
         collection.save(@attributes)
+        run_callbacks(:after_create) if creating
         run_callbacks(:after_save)
         return self
       end
