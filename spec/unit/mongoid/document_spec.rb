@@ -299,7 +299,7 @@ describe Mongoid::Document do
     it "adds created_on and last_modified to the document" do
       @collection.expects(:save).with(@tester.attributes)
       @tester.save
-      @tester.created_on.should_not be_nil
+      @tester.created_at.should_not be_nil
       @tester.last_modified.should_not be_nil
     end
 

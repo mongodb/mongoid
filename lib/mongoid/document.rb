@@ -102,7 +102,7 @@ module Mongoid #:nodoc:
       # Adds timestamps on the Document in the form of the fields 'created_on'
       # and 'last_modified'
       def has_timestamps
-        fields :created_on, :last_modified
+        fields :created_at, :last_modified
         class_eval do
           before_save :update_timestamps
         end
@@ -189,11 +189,6 @@ module Mongoid #:nodoc:
       @attributes = attributes.symbolize_keys!; save; true
     end
 
-    def update_timestamps
-      self.created_on = Time.now
-      self.last_modified = Time.now
-    end
-
     private
 
     class << self
@@ -214,6 +209,12 @@ module Mongoid #:nodoc:
     # Read from the attributes hash.
     def read_attribute(name)
       @attributes[name.to_sym]
+    end
+
+    # Update the timestamps on this document.
+    def update_timestamps
+      self.created_at = Time.now
+      self.last_modified = Time.now
     end
 
     # Write to the attributes hash.
