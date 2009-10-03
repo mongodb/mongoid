@@ -12,6 +12,8 @@ begin
     gem.email = "durran@gmail.com"
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
+    gem.add_dependency "durran-validatable"
+    gem.add_dependency "mislav-will_paginate"
     gem.add_dependency "activesupport"
     gem.add_dependency "mongodb-mongo"
   end
