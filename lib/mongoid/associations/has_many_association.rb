@@ -31,6 +31,13 @@ module Mongoid #:nodoc:
         object
       end
 
+      # Finds a document in this association.
+      # If :all is passed, returns all the documents
+      # If an id is passed, will return the document for that id.
+      def find(param)
+        return @documents if param == :all
+        return detect { |document| document.id == param }
+      end
     end
   end
 end
