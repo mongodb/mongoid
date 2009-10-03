@@ -2,7 +2,9 @@ module Mongoid #:nodoc:
   class Document #:nodoc:
     include ActiveSupport::Callbacks
     include Validatable
-    extend Finders
+
+    AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
+    GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
     attr_reader :attributes, :parent
 
@@ -15,6 +17,12 @@ module Mongoid #:nodoc:
     class << self
 
       # Create an association to a parent Document.
+      # Get an aggregate count for the supplied group of fields and the
+      # selector that is provided.
+      def aggregate(fields, selector)
+        collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
+      end
+
       def belongs_to(association_name)
         add_association(:belongs_to, association_name.to_s.classify, association_name)
       end
@@ -36,6 +44,31 @@ module Mongoid #:nodoc:
         collection.drop
       end
 
+      # Find all Documents in several ways.
+      # Model.find(:first, :attribute => "value")
+      # Model.find(:all, :attribute => "value")
+      def find(*args)
+        type, selector = args[0], args[1]
+        conditions = selector[:conditions] if selector
+        case type
+        when :all then find_all(conditions)
+        when :first then find_first(conditions)
+        else find_first(Mongo::ObjectID.from_string(type.to_s))
+        end
+      end
+
+      # Find a single Document given the passed selector, which is a Hash of attributes that
+      # must match the Document in the database exactly.
+      def find_first(selector = nil)
+        new(collection.find_one(selector))
+      end
+
+      # Find all Documents given the passed selector, which is a Hash of attributes that
+      # must match the Document in the database exactly.
+      def find_all(selector = nil)
+        collection.find(selector).collect { |doc| new(doc) }
+      end
+
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
@@ -45,6 +78,14 @@ module Mongoid #:nodoc:
           @fields << name
           define_method(name) { read_attribute(name) }
           define_method("#{name}=") { |value| write_attribute(name, value) }
+        end
+      end
+
+      # Find all Documents given the supplied criteria, grouped by the fields
+      # provided.
+      def group_by(fields, selector)
+        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
+          docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
         end
       end
 
@@ -71,6 +112,19 @@ module Mongoid #:nodoc:
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
         collection.create_index(name, options)
+      end
+
+      # Find all documents in paginated fashion given the supplied arguments.
+      # If no parameters are passed just default to offset 0 and limit 20.
+      def paginate(params = {})
+        WillPaginate::Collection.create(
+          params[:page] || 1,
+          params[:per_page] || 20,
+          0) do |pager|
+            results = collection.find(params[:conditions], { :limit => pager.per_page, :offset => pager.offset })
+            pager.total_entries = results.count
+            pager.replace(results.collect { |doc| new(doc) })
+        end
       end
 
     end

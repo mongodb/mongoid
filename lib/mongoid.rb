@@ -38,7 +38,6 @@ require "mongoid/associations/has_one_association"
 require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions"
-require "mongoid/finders"
 require "mongoid/document"
 
 module Mongoid
