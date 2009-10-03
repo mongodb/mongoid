@@ -14,11 +14,6 @@ describe Mongoid::Document do
 
   describe "#belongs_to" do
 
-    it "adds a new Association to the collection" do
-      address = Address.new
-      address.person.should_not be_nil
-    end
-
     it "creates a reader for the association" do
       address = Address.new
       address.should respond_to(:person)

@@ -43,3 +43,11 @@ end
 class Tester < Mongoid::Document
   has_timestamps
 end
+
+class Decorated
+  include Mongoid::Associations::Decorator
+
+  def initialize(doc)
+    @document = doc
+  end
+end
