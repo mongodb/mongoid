@@ -7,7 +7,24 @@ describe Mongoid::Associations::BelongsToAssociation do
     @document = stub(:parent => @parent)
   end
 
-  describe "#method_missing" do
+  describe "#find" do
+
+    before do
+      @association = Mongoid::Associations::BelongsToAssociation.new(@document)
+    end
+
+    context "when finding by id" do
+
+      it "returns the document in the array with that id" do
+        name = @association.find(Mongo::ObjectID.new)
+        name.should == @parent
+      end
+
+    end
+
+  end
+
+  context "when decorating" do
 
     before do
       @association = Mongoid::Associations::BelongsToAssociation.new(@document)

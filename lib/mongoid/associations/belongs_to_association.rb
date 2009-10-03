@@ -13,6 +13,14 @@ module Mongoid #:nodoc:
         @document = document.parent
         decorate!
       end
+
+      # Returns the parent document. The id param is present for
+      # compatibility with rails, however this could be overwritten 
+      # in the future.
+      def find(id)
+        @document
+      end
+
     end
   end
 end
