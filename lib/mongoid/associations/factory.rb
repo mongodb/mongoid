@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class AssociationFactory #:nodoc:
+    class Factory #:nodoc:
 
       # Creates a new association, based on the type provided and 
       # passes the name and document into the newly instantiated

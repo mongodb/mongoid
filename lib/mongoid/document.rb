@@ -202,7 +202,7 @@ module Mongoid #:nodoc:
       # then adds the accessors for the association.
       def add_association(type, class_name, name)
         define_method(name) do
-          Mongoid::Associations::AssociationFactory.create(type, name, self)
+          Mongoid::Associations::Factory.create(type, name, self)
         end
         define_method("#{name}=") do |object|
           @attributes[name] = object.mongoidize
