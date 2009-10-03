@@ -410,14 +410,6 @@ describe Mongoid::Document do
 
     end
 
-    context "when param keys are strings" do
-
-      it "converts the keys to symbols" do
-
-      end
-
-    end
-
   end
 
   describe "#parent" do
