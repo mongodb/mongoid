@@ -20,8 +20,9 @@ module Mongoid #:nodoc:
       # Create an association to a parent Document.
       # Get an aggregate count for the supplied group of fields and the
       # selector that is provided.
-      def aggregate(fields, params)
-        collection.group(fields, params[:conditions], { :count => 0 }, AGGREGATE_REDUCE)
+      def aggregate(fields, params = {})
+        selector = params[:conditions]
+        collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
       end
 
       def belongs_to(association_name)
@@ -69,7 +70,8 @@ module Mongoid #:nodoc:
       # Find all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_all(params = {})
-        collection.find(params[:conditions]).collect { |doc| new(doc) }
+        selector = params[:conditions]
+        collection.find(selector).collect { |doc| new(doc) }
       end
 
       # Defines all the fields that are accessable on the Document
@@ -86,8 +88,9 @@ module Mongoid #:nodoc:
 
       # Find all Documents given the supplied criteria, grouped by the fields
       # provided.
-      def group_by(fields, params)
-        collection.group(fields, params[:conditions], { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
+      def group_by(fields, params = {})
+        selector = params[:condition]
+        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
           docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
         end
       end
@@ -120,11 +123,12 @@ module Mongoid #:nodoc:
       # Find all documents in paginated fashion given the supplied arguments.
       # If no parameters are passed just default to offset 0 and limit 20.
       def paginate(params = {})
+        selector = params[:conditions]
         WillPaginate::Collection.create(
           params[:page] || 1,
           params[:per_page] || 20,
           0) do |pager|
-            results = collection.find(params[:conditions], { :limit => pager.per_page, :offset => pager.offset })
+            results = collection.find(selector, { :limit => pager.per_page, :offset => pager.offset })
             pager.total_entries = results.count
             pager.replace(results.collect { |doc| new(doc) })
         end
