@@ -14,6 +14,8 @@ module Mongoid
 
     def create
       run_callbacks(:before_create)
+
+      run_callbacks(:after_create)
     end
 
   end

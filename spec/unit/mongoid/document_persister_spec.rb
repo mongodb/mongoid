@@ -11,23 +11,9 @@ describe Mongoid::Persister do
 
     context "callbacks" do
 
-      it "calls before create" do
-        @document.expects(:run_callbacks).with(:before_create)
-        @persister.create
-      end
-
-      it "calls before save" do
-        @document.expects(:run_callbacks).with(:before_save)
-        @persister.create
-      end
-
-      it "calls after create" do
-        @document.expects(:run_callbacks).with(:after_create)
-        @persister.create
-      end
-
-      it "calls after save" do
-        @document.expects(:run_callbacks).with(:after_save)
+      it "calls before and after create" do
+        @persister.expects(:run_callbacks).with(:before_create)
+        @persister.expects(:run_callbacks).with(:after_create)
         @persister.create
       end
 

@@ -10,6 +10,10 @@ require "spec"
 
 Mongoid.connect_to("mongoid_test")
 
+Spec::Runner.configure do |config|
+  config.mock_with :mocha
+end
+
 class Person < Mongoid::Document
   fields \
     :title,
