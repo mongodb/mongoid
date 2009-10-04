@@ -28,6 +28,18 @@ describe Mongoid::Document do
 
   end
 
+  describe "#collection" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "sets the collection name to the class pluralized" do
+      Person.collection.name.should == "people"
+    end
+
+  end
+
   describe "#create" do
 
     context "with no attributes" do

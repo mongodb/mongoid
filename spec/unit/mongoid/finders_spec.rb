@@ -29,18 +29,6 @@ describe Mongoid::Finders do
 
   end
 
-  describe "#collection" do
-
-    before do
-      @person = Person.new
-    end
-
-    it "sets the collection name to the class pluralized" do
-      Person.collection.name.should == "people"
-    end
-
-  end
-
   describe "#find" do
 
     before do

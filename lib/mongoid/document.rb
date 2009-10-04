@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   class Document #:nodoc:
-    include Finders
+    extend Finders
     include ActiveSupport::Callbacks
     include Validatable
 
@@ -16,6 +16,12 @@ module Mongoid #:nodoc:
 
       def belongs_to(association_name)
         add_association(:belongs_to, association_name.to_s.classify, association_name)
+      end
+
+      # Get the Mongo::Collection associated with this Document.
+      def collection
+        @collection_name = self.to_s.demodulize.tableize
+        @collection ||= Mongoid.database.collection(@collection_name)
       end
 
       # Create a new Document with the supplied attribtues, and insert it into the database.
@@ -69,6 +75,11 @@ module Mongoid #:nodoc:
         collection.create_index(name, options)
       end
 
+    end
+
+    # Get the Mongo::Collection associated with this Document.
+    def collection
+      self.class.collection
     end
 
     # Delete this Document from the database.
