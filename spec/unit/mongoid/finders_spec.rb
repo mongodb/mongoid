@@ -3,13 +3,15 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 describe Mongoid::Finders do
 
   before do
-    @collection = mock
+    @collection = stub(:name => "people")
     @database = stub(:collection => @collection)
     Mongoid.stubs(:database).returns(@database)
   end
 
   after do
     Person.instance_variable_set(:@collection, nil)
+    @database = nil
+    @collection = nil
   end
 
   describe "#aggregate" do
@@ -34,8 +36,7 @@ describe Mongoid::Finders do
     end
 
     it "sets the collection name to the class pluralized" do
-      @database.expects(:collection).with("people").returns(@collection)
-      Person.collection
+      Person.collection.name.should == "people"
     end
 
   end

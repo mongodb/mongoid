@@ -3,13 +3,15 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 describe Mongoid::Document do
 
   before do
-    @collection = mock
+    @collection = stub(:name => "people")
     @database = stub(:collection => @collection)
     Mongoid.stubs(:database).returns(@database)
   end
 
   after do
     Person.instance_variable_set(:@collection, nil)
+    @database = nil
+    @collection = nil
   end
 
   describe "#belongs_to" do
