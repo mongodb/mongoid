@@ -1,5 +1,5 @@
-module Mongoid
-  module Finders
+module Mongoid #:nodoc:
+  module Finders #:nodoc:
 
     def self.included(base)
       base.class_eval do
@@ -7,16 +7,14 @@ module Mongoid
       end
     end
 
-    module InstanceMethods
-
+    module InstanceMethods #:nodoc:
       # Get the Mongo::Collection associated with this Document.
       def collection
         self.class.collection
       end
-
     end
 
-    module ClassMethods
+    module ClassMethods #:nodoc:
 
       AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
       GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
