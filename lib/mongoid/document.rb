@@ -118,12 +118,13 @@ module Mongoid #:nodoc:
       if @parent
         @parent.save
       else
+        return false unless valid?
         run_callbacks(:before_create) if creating
         run_callbacks(:before_save)
         collection.save(@attributes)
         run_callbacks(:after_create) if creating
         run_callbacks(:after_save)
-        return self
+        creating ? self : true
       end
     end
 
