@@ -34,6 +34,7 @@ require "mongo"
 require "mongoid/associations"
 require "mongoid/extensions"
 require "mongoid/finders"
+require "mongoid/persister"
 require "mongoid/document"
 
 module Mongoid
