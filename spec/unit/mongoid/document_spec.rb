@@ -174,10 +174,7 @@ describe Mongoid::Document do
     end
 
     it "adds created_on and last_modified to the document" do
-      @collection.expects(:save).with(@tester.attributes)
-      @tester.save
-      @tester.created_at.should_not be_nil
-      @tester.last_modified.should_not be_nil
+      Tester.instance_variable_get(:@fields).should include(:created_at, :last_modified)
     end
 
   end

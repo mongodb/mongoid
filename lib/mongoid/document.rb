@@ -56,7 +56,10 @@ module Mongoid #:nodoc:
       def has_timestamps
         fields :created_at, :last_modified
         class_eval do
-          before_save :update_timestamps
+          before_create \
+            :update_created_at,
+            :update_last_modified
+          before_save :update_last_modified
         end
       end
 
@@ -145,9 +148,15 @@ module Mongoid #:nodoc:
       @attributes[name.to_sym]
     end
 
-    # Update the timestamps on this document.
-    def update_timestamps
+    # Update the created_at field on the Document to the current time. This is
+    # only called on create.
+    def update_created_at
       self.created_at = Time.now
+    end
+
+    # Update the last_modified field on the Document to the current time.
+    # This is only called on create and on save.
+    def update_last_modified
       self.last_modified = Time.now
     end
 
