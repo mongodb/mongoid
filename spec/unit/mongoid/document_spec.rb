@@ -153,11 +153,25 @@ describe Mongoid::Document do
       end
 
       it "delegates to find_all" do
-        @collection.expects(:find).with(:test => "Test").returns(@cursor)
+        @collection.expects(:find).with({:test => "Test"}, {}).returns(@cursor)
         @cursor.expects(:collect).returns(@people)
         Person.find(:all, :conditions => { :test => "Test" })
       end
 
+    end
+
+    context "when sorting" do
+
+      before do
+        @cursor = mock
+        @people = []
+      end
+
+      it "adds the sort parameters for the collection call" do
+        @collection.expects(:find).with({ :test => "Test" }, { :sort => { :test => -1 }}).returns(@cursor)
+        @cursor.expects(:collect).returns(@people)
+        Person.find(:all, :conditions => { :test => "Test" }, :sort => { :test => -1 })
+      end
     end
 
   end
@@ -198,7 +212,7 @@ describe Mongoid::Document do
     context "when a selector is provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with(:test => "Test").returns(@cursor)
+        @collection.expects(:find).with({ :test => "Test" }, {}).returns(@cursor)
         @cursor.expects(:collect).returns(@people)
         Person.find_all(:conditions => {:test => "Test"})
       end
@@ -208,7 +222,7 @@ describe Mongoid::Document do
     context "when a selector is not provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with(nil).returns(@cursor)
+        @collection.expects(:find).with(nil, {}).returns(@cursor)
         @cursor.expects(:collect).returns(@people)
         Person.find_all
       end

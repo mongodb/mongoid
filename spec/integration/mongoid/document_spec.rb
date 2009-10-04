@@ -34,7 +34,7 @@ describe Mongoid::Document do
     context "finding all documents" do
 
       it "returns an array of documents based on the selector provided" do
-        documents = Person.find(:all, :title => "Test")
+        documents = Person.find(:all, :conditions => { :title => "Test"})
         documents[0].title.should == "Test"
       end
 

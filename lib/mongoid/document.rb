@@ -7,7 +7,6 @@ module Mongoid #:nodoc:
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
     attr_reader :attributes, :parent
-    # delegate :first, :to => :find_first
 
     define_callbacks \
       :after_create,
@@ -70,8 +69,8 @@ module Mongoid #:nodoc:
       # Find all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
       def find_all(params = {})
-        selector = params[:conditions]
-        collection.find(selector).collect { |doc| new(doc) }
+        selector = params.delete(:conditions)
+        collection.find(selector, params).collect { |doc| new(doc) }
       end
 
       # Defines all the fields that are accessable on the Document
