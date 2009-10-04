@@ -37,7 +37,32 @@ describe Mongoid::Criteria do
   end
 
   describe "#order_by" do
-    
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    context "when field names specified" do
+
+      it "adds the sort to the options ascending" do
+        @criteria.order_by(:title)
+        @criteria.options.should == { :sort => [:title] }
+      end
+
+    end
+
+    context "when field names and direction specified" do
+
+      it "adds the sort to the options" do
+        
+      end
+
+    end
+
+    it "returns self" do
+      @criteria.order_by.should == @criteria
+    end
+
   end
 
 end

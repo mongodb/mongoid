@@ -22,5 +22,11 @@ module Mongoid #:nodoc:
     def where(selector = {})
       @selector = selector; self
     end
+
+    # Specifies how to sort this Criteria.
+    def order_by(*args)
+      options[:sort] = args.collect { |field| field }; self
+    end
+
   end
 end
