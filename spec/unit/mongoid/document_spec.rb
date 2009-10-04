@@ -12,6 +12,21 @@ describe Mongoid::Document do
     Person.instance_variable_set(:@collection, nil)
   end
 
+  describe "#aggregate" do
+
+    before do
+      @reduce = "function(obj, prev) { prev.count++; }"
+    end
+
+    it "returns documents grouped by the supplied fields" do
+      results = [{ "title" => "Sir", "count" => 30 }]
+      @collection.expects(:group).with([:title], nil, {:count => 0}, @reduce).returns(results)
+      grouped = Person.aggregate([:title], {})
+      grouped.first["count"].should == 30
+    end
+
+  end
+
   describe "#belongs_to" do
 
     it "creates a reader for the association" do
