@@ -7,6 +7,7 @@ module Mongoid #:nodoc:
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
     attr_reader :attributes, :parent
+    # delegate :first, :to => :find_first
 
     define_callbacks \
       :after_create,
@@ -19,8 +20,8 @@ module Mongoid #:nodoc:
       # Create an association to a parent Document.
       # Get an aggregate count for the supplied group of fields and the
       # selector that is provided.
-      def aggregate(fields, selector)
-        collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
+      def aggregate(fields, params)
+        collection.group(fields, params[:conditions], { :count => 0 }, AGGREGATE_REDUCE)
       end
 
       def belongs_to(association_name)
@@ -48,25 +49,27 @@ module Mongoid #:nodoc:
       # Model.find(:first, :attribute => "value")
       # Model.find(:all, :attribute => "value")
       def find(*args)
-        type, selector = args[0], args[1]
-        conditions = selector[:conditions] if selector
+        type, params = args[0], args[1]
         case type
-        when :all then find_all(conditions)
-        when :first then find_first(conditions)
+        when :all then find_all(params)
+        when :first then find_first(params)
         else find_first(Mongo::ObjectID.from_string(type.to_s))
         end
       end
 
       # Find a single Document given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
-      def find_first(selector = nil)
-        new(collection.find_one(selector))
+      def find_first(params = {})
+        case params
+        when Hash then new(collection.find_one(params[:conditions]))
+        else new(collection.find_one(params))
+        end
       end
 
       # Find all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
-      def find_all(selector = nil)
-        collection.find(selector).collect { |doc| new(doc) }
+      def find_all(params = {})
+        collection.find(params[:conditions]).collect { |doc| new(doc) }
       end
 
       # Defines all the fields that are accessable on the Document
@@ -83,8 +86,8 @@ module Mongoid #:nodoc:
 
       # Find all Documents given the supplied criteria, grouped by the fields
       # provided.
-      def group_by(fields, selector)
-        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
+      def group_by(fields, params)
+        collection.group(fields, params[:conditions], { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
           docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
         end
       end

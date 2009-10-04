@@ -157,7 +157,7 @@ describe Mongoid::Document do
 
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
-        Person.find_first(:test => "Test").attributes.should == @attributes
+        Person.find_first(:conditions => {:test => "Test"}).attributes.should == @attributes
       end
 
     end
@@ -185,7 +185,7 @@ describe Mongoid::Document do
       it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(:test => "Test").returns(@cursor)
         @cursor.expects(:collect).returns(@people)
-        Person.find_all(:test => "Test")
+        Person.find_all(:conditions => {:test => "Test"})
       end
 
     end
@@ -210,7 +210,7 @@ describe Mongoid::Document do
 
     it "returns documents grouped by the supplied fields" do
       results = [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30 }] }]
-      @collection.expects(:group).with([:title], {}, { :group => [] }, @reduce).returns(results)
+      @collection.expects(:group).with([:title], nil, { :group => [] }, @reduce).returns(results)
       grouped = Person.group_by([:title], {})
       people = grouped.first["group"]
       people.first.should be_a_kind_of(Person)
