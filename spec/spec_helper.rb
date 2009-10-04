@@ -51,3 +51,7 @@ class Decorated
     @document = doc
   end
 end
+
+class Post
+  include Mongoid::Finders
+end

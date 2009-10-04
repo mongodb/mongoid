@@ -33,6 +33,7 @@ require "will_paginate/collection"
 require "mongo"
 require "mongoid/associations"
 require "mongoid/extensions"
+require "mongoid/finders"
 require "mongoid/document"
 
 module Mongoid
