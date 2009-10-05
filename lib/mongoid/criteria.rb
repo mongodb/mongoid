@@ -24,8 +24,8 @@ module Mongoid #:nodoc:
     end
 
     # Specifies how to sort this Criteria.
-    def order_by(*args)
-      options[:sort] = args.collect { |field| field }; self
+    def order_by(params = {})
+      @options[:sort] = params; self
     end
 
   end

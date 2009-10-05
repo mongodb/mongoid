@@ -42,19 +42,11 @@ describe Mongoid::Criteria do
       @criteria = Mongoid::Criteria.new
     end
 
-    context "when field names specified" do
-
-      it "adds the sort to the options ascending" do
-        @criteria.order_by(:title)
-        @criteria.options.should == { :sort => [:title] }
-      end
-
-    end
-
     context "when field names and direction specified" do
 
       it "adds the sort to the options" do
-        
+        @criteria.order_by(:title => 1, :text => -1)
+        @criteria.options.should == { :sort => { :title => 1, :text => -1 }}
       end
 
     end
