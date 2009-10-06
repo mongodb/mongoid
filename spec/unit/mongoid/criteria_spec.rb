@@ -57,4 +57,37 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#skip" do
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    context "when value provided" do
+
+      it "adds the skip value to the options" do
+        @criteria.skip(20)
+        @criteria.options.should == { :skip => 20 }
+      end
+
+    end
+
+    context "when value not provided" do
+
+      it "defaults to zero" do
+        @criteria.skip
+        @criteria.options.should == { :skip => 0 }
+      end
+
+    end
+
+    it "returns self" do
+      @criteria.skip.should == @criteria
+    end
+
+  end
+
+  describe "#limit" do
+  end
+
 end

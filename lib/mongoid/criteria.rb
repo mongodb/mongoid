@@ -23,9 +23,16 @@ module Mongoid #:nodoc:
       @selector = selector; self
     end
 
-    # Specifies how to sort this Criteria.
+    # Specifies how to sort this Criteria. Current valid params
+    # are: { :field => 1 } or { :field => -1 }
     def order_by(params = {})
       @options[:sort] = params; self
+    end
+
+    # Skips the supplied number of records, as offset behaves in traditional
+    # pagination.
+    def skip(value = 0)
+      @options[:skip] = value; self
     end
 
   end
