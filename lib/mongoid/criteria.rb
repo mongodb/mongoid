@@ -35,5 +35,11 @@ module Mongoid #:nodoc:
       @options[:skip] = value; self
     end
 
+    # Limits the number of results returned by the query, usually used in
+    # conjunction with skip() for pagination.
+    def limit(value = 20)
+      @options[:limit] = value; self
+    end
+
   end
 end

@@ -88,6 +88,33 @@ describe Mongoid::Criteria do
   end
 
   describe "#limit" do
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    context "when value provided" do
+
+      it "adds the limit to the options" do
+        @criteria.limit(100)
+        @criteria.options.should == { :limit => 100 }
+      end
+
+    end
+
+    context "when value not provided" do
+
+      it "defaults to 20" do
+        @criteria.limit
+        @criteria.options.should == { :limit => 20 }
+      end
+
+    end
+
+    it "returns self" do
+      @criteria.limit.should == @criteria
+    end
+
   end
 
 end
