@@ -3,6 +3,11 @@ module Mongoid #:nodoc:
 
     attr_reader :selector, :options
 
+    # Excludes the parameters passed using $ne in the selector.
+    def excludes(exclusions = {})
+      exclusions.each { |key, value| @selector[key] = { "$ne" => value } }; self
+    end
+
     # Create the new Criteria object. Does not take any params, just
     # initializes the selector and options hashes that will be 
     # eventually passed to the driver.

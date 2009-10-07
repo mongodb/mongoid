@@ -2,6 +2,23 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 describe Mongoid::Criteria do
 
+  describe "#excludes" do
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    it "adds the $ne query to the selector" do
+      @criteria.excludes(:title => "Bad Title", :text => "Bad Text")
+      @criteria.selector.should == { :title => { "$ne" => "Bad Title"}, :text => { "$ne" => "Bad Text" } }
+    end
+
+    it "returns self" do
+      @criteria.excludes(:title => "Bad").should == @criteria
+    end
+
+  end
+
   describe "#limit" do
 
     before do
@@ -28,6 +45,23 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.limit.should == @criteria
+    end
+
+  end
+
+  describe "#matches" do
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    it "adds the clause to the selector" do
+      @criteria.matches(:title => "Title", :text => "Text")
+      @criteria.selector.should == { :title => "Title", :text => "Text" }
+    end
+
+    it "returns self" do
+      @criteria.matches.should == @criteria
     end
 
   end
@@ -96,23 +130,6 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.skip.should == @criteria
-    end
-
-  end
-
-  describe "#matches" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
-
-    it "adds the clause to the selector" do
-      @criteria.matches(:title => "Title", :text => "Text")
-      @criteria.selector.should == { :title => "Title", :text => "Text" }
-    end
-
-    it "returns self" do
-      @criteria.matches.should == @criteria
     end
 
   end
