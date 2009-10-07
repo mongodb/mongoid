@@ -83,6 +83,23 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#not_in" do
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    it "adds the exclusion to the selector" do
+      @criteria.not_in(:title => ["title1", "title2"], :text => ["test"])
+      @criteria.selector.should == { :title => { "$nin" => ["title1", "title2"] }, :text => { "$nin" => ["test"] } }
+    end
+
+    it "returns self" do
+      @criteria.not_in(:title => ["title1"]).should == @criteria
+    end
+
+  end
+
   describe "#order_by" do
 
     before do

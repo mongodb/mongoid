@@ -34,6 +34,11 @@ module Mongoid #:nodoc:
       @selector = selector; self
     end
 
+    # Defines a clause that the criteria should ignore.
+    def not_in(exclusions)
+      exclusions.each { |key, value| @selector[key] = { "$nin" => value } }; self
+    end
+
     # Specifies how to sort this Criteria. Current valid params
     # are: { :field => 1 } or { :field => -1 }
     def order_by(params = {})
