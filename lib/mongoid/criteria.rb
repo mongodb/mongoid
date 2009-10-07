@@ -10,16 +10,16 @@ module Mongoid #:nodoc:
       @selector, @options = {}, {}
     end
 
-    # Specify what fields to be returned from the database.
-    # Similar to a SQL select field1, field2, field3
-    def select(*args)
-      @options[:fields] = args.flatten; self
+    # Limits the number of results returned by the query, usually used in
+    # conjunction with skip() for pagination.
+    def limit(value = 20)
+      @options[:limit] = value; self
     end
 
     # The conditions that must prove true on each record in the
     # database in order for them to be a part of the result set.
     # This is a hash that maps to a selector in the driver.
-    def where(selector = {})
+    def matches(selector = {})
       @selector = selector; self
     end
 
@@ -29,16 +29,16 @@ module Mongoid #:nodoc:
       @options[:sort] = params; self
     end
 
+    # Specify what fields to be returned from the database.
+    # Similar to a SQL select field1, field2, field3
+    def select(*args)
+      @options[:fields] = args.flatten; self
+    end
+
     # Skips the supplied number of records, as offset behaves in traditional
     # pagination.
     def skip(value = 0)
       @options[:skip] = value; self
-    end
-
-    # Limits the number of results returned by the query, usually used in
-    # conjunction with skip() for pagination.
-    def limit(value = 20)
-      @options[:limit] = value; self
     end
 
   end
