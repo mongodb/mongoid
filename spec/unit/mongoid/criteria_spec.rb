@@ -19,6 +19,23 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#in" do
+
+    before do
+      @criteria = Mongoid::Criteria.new
+    end
+
+    it "adds the $in clause to the selector" do
+      @criteria.in(:title => ["title1", "title2"], :text => ["test"])
+      @criteria.selector.should == { :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] } }
+    end
+
+    it "returns self" do
+      @criteria.in(:title => ["title1"]).should == @criteria
+    end
+
+  end
+
   describe "#limit" do
 
     before do

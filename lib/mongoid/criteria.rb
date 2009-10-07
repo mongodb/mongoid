@@ -8,6 +8,12 @@ module Mongoid #:nodoc:
       exclusions.each { |key, value| @selector[key] = { "$ne" => value } }; self
     end
 
+    # Defines criteria for matching any of the supplied parameters, similar to
+    # a SQL in statement.
+    def in(inclusions)
+      inclusions.each { |key, value| @selector[key] = { "$in" => value } }; self
+    end
+
     # Create the new Criteria object. Does not take any params, just
     # initializes the selector and options hashes that will be 
     # eventually passed to the driver.
