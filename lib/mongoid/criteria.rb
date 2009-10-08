@@ -30,7 +30,7 @@ module Mongoid #:nodoc:
     # The conditions that must prove true on each record in the
     # database in order for them to be a part of the result set.
     # This is a hash that maps to a selector in the driver.
-    def matches(selector = {})
+    def select(selector = {})
       @selector = selector; self
     end
 
@@ -47,7 +47,7 @@ module Mongoid #:nodoc:
 
     # Specify what fields to be returned from the database.
     # Similar to a SQL select field1, field2, field3
-    def select(*args)
+    def only(*args)
       @options[:fields] = args.flatten; self
     end
 

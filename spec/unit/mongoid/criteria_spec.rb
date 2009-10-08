@@ -2,11 +2,15 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 describe Mongoid::Criteria do
 
-  describe "#excludes" do
+  before do
+    @criteria = Mongoid::Criteria.new
+  end
 
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
+  describe "#all" do
+
+  end
+
+  describe "#excludes" do
 
     it "adds the $ne query to the selector" do
       @criteria.excludes(:title => "Bad Title", :text => "Bad Text")
@@ -21,10 +25,6 @@ describe Mongoid::Criteria do
 
   describe "#in" do
 
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
-
     it "adds the $in clause to the selector" do
       @criteria.in(:title => ["title1", "title2"], :text => ["test"])
       @criteria.selector.should == { :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] } }
@@ -37,10 +37,6 @@ describe Mongoid::Criteria do
   end
 
   describe "#limit" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
 
     context "when value provided" do
 
@@ -66,28 +62,20 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#matches" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
+  describe "#select" do
 
     it "adds the clause to the selector" do
-      @criteria.matches(:title => "Title", :text => "Text")
+      @criteria.select(:title => "Title", :text => "Text")
       @criteria.selector.should == { :title => "Title", :text => "Text" }
     end
 
     it "returns self" do
-      @criteria.matches.should == @criteria
+      @criteria.select.should == @criteria
     end
 
   end
 
   describe "#not_in" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
 
     it "adds the exclusion to the selector" do
       @criteria.not_in(:title => ["title1", "title2"], :text => ["test"])
@@ -101,10 +89,6 @@ describe Mongoid::Criteria do
   end
 
   describe "#order_by" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
 
     context "when field names and direction specified" do
 
@@ -121,28 +105,20 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#select" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
+  describe "#only" do
 
     it "adds the options for limiting by fields" do
-      @criteria.select(:title, :text)
+      @criteria.only(:title, :text)
       @criteria.options.should == { :fields => [ :title, :text ] }
     end
 
     it "returns self" do
-      @criteria.select.should == @criteria
+      @criteria.only.should == @criteria
     end
 
   end
 
   describe "#skip" do
-
-    before do
-      @criteria = Mongoid::Criteria.new
-    end
 
     context "when value provided" do
 
