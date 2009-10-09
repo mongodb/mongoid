@@ -43,7 +43,7 @@ describe Mongoid::Document do
     context "finding first document" do
 
       it "returns the first document based on the selector provided" do
-        person = Person.find(:first, :title => "Test")
+        person = Person.find(:first, :conditions => { :title => "Test" })
         person.title.should == "Test"
       end
 
@@ -52,7 +52,7 @@ describe Mongoid::Document do
     context "finding by id" do
 
       it "finds the document by the supplied id" do
-        person = Person.find(@person.id)
+        person = Person.find(@person.id.to_s)
         person.id.should == @person.id
       end
 

@@ -61,28 +61,19 @@ module Mongoid #:nodoc:
       # Model.find(:first, :attribute => "value")
       # Model.find(:all, :attribute => "value")
       def find(*args)
-        type, params = args[0], args[1]
-        case type
-        when :all then find_all(params)
-        when :first then find_first(params)
-        else find_first(Mongo::ObjectID.from_string(type.to_s))
-        end
+        Criteria.translate(*args).execute(collection, self)
       end
 
       # Find a single Document given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
-      def find_first(params = {})
-        case params
-        when Hash then new(collection.find_one(params[:conditions]))
-        else new(collection.find_one(params))
-        end
+      def first(*args)
+        find(:first, *args)
       end
 
       # Find all Documents given the passed selector, which is a Hash of attributes that
       # must match the Document in the database exactly.
-      def find_all(params = {})
-        selector = params.delete(:conditions)
-        collection.find(selector, params).collect { |doc| new(doc) }
+      def all(*args)
+        find(:all, *args)
       end
 
       # Find all Documents given the supplied criteria, grouped by the fields

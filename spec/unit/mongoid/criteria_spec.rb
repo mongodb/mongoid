@@ -39,8 +39,8 @@ describe Mongoid::Criteria do
       it "calls find on the collection with the selector and options" do
         criteria = Mongoid::Criteria.new(:first)
         collection = mock
-        collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns([])
-        criteria.execute(collection).should == []
+        collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({})
+        criteria.execute(collection, Person).should be_a_kind_of(Person)
       end
 
     end
@@ -51,7 +51,7 @@ describe Mongoid::Criteria do
         criteria = Mongoid::Criteria.new(:all)
         collection = mock
         collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
-        criteria.execute(collection).should == []
+        criteria.execute(collection, Person).should == []
       end
 
     end

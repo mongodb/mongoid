@@ -15,9 +15,9 @@ module Mongoid #:nodoc:
 
     # Execute the criteria, which will retrieve the results from
     # the collection.
-    def execute(collection)
-      return collection.find_one(@selector, @options) if type == :first
-      return collection.find(@selector, @options)
+    def execute(collection, klass)
+      return klass.new(collection.find_one(@selector, @options)) if type == :first
+      return collection.find(@selector, @options).collect { |doc| klass.new(doc) }
     end
 
     # Defines criteria for matching any of the supplied parameters, similar to
@@ -81,8 +81,8 @@ module Mongoid #:nodoc:
 
     # Translate the supplied arguments into a criteria object.
     def self.translate(*args)
-      type, params = args[0], args[1]
-      return new(:first).id(args.to_s) if type.is_a?(String)
+      type, params = args[0], args[1] || {}
+      return new(:first).id(type.to_s) if type.is_a?(String)
       return new(type).select(params.delete(:conditions)).extras(params)
     end
 

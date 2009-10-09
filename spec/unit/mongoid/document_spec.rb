@@ -126,6 +126,7 @@ describe Mongoid::Document do
 
     before do
       @attributes = { :document_class => "Person" }
+      @criteria = mock
     end
 
     context "when an id is passed in" do
@@ -134,8 +135,9 @@ describe Mongoid::Document do
         @id = Mongo::ObjectID.new
       end
 
-      it "delegates to find_first" do
-        @collection.expects(:find_one).with(Mongo::ObjectID.from_string(@id.to_s)).returns(@attributes)
+      it "delegates to criteria" do
+        Mongoid::Criteria.expects(:translate).with(@id.to_s).returns(@criteria)
+        @criteria.expects(:execute).with(@collection, Person).returns(@attributes)
         Person.find(@id.to_s)
       end
 
@@ -143,8 +145,9 @@ describe Mongoid::Document do
 
     context "when finding first" do
 
-      it "delegates to find_first" do
-        @collection.expects(:find_one).with(:test => "Test" ).returns(@attributes)
+      it "delegates to criteria" do
+        Mongoid::Criteria.expects(:translate).with(:first, :conditions => { :test => "Test" }).returns(@criteria)
+        @criteria.expects(:execute).with(@collection, Person).returns(@attributes)
         Person.find(:first, :conditions => { :test => "Test" })
       end
 
@@ -181,7 +184,7 @@ describe Mongoid::Document do
 
   end
 
-  describe "#find_first" do
+  describe "#first" do
 
     before do
       @attributes = { :document_class => "Person" }
@@ -190,8 +193,8 @@ describe Mongoid::Document do
     context "when a selector is provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        @collection.expects(:find_one).with(:test => "Test").returns(@attributes)
-        Person.find_first(:conditions => {:test => "Test"}).attributes.should == @attributes
+        @collection.expects(:find_one).with({ :test => "Test" }, {}).returns(@attributes)
+        Person.first(:conditions => {:test => "Test"}).attributes.should == @attributes
       end
 
     end
@@ -199,15 +202,15 @@ describe Mongoid::Document do
     context "when a selector is not provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        @collection.expects(:find_one).with(nil).returns(@attributes)
-        Person.find_first.attributes.should == @attributes
+        @collection.expects(:find_one).with(nil, {}).returns(@attributes)
+        Person.first.attributes.should == @attributes
       end
 
     end
 
   end
 
-  describe "#find_all" do
+  describe "#all" do
 
     before do
       @cursor = mock
@@ -219,7 +222,7 @@ describe Mongoid::Document do
       it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with({ :test => "Test" }, {}).returns(@cursor)
         @cursor.expects(:collect).returns(@people)
-        Person.find_all(:conditions => {:test => "Test"})
+        Person.all(:conditions => {:test => "Test"})
       end
 
     end
@@ -229,7 +232,7 @@ describe Mongoid::Document do
       it "finds from the collection and instantiate objects for each returned" do
         @collection.expects(:find).with(nil, {}).returns(@cursor)
         @cursor.expects(:collect).returns(@people)
-        Person.find_all
+        Person.all
       end
 
     end
