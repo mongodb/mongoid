@@ -56,6 +56,11 @@ module Mongoid #:nodoc:
       exclusions.each { |key, value| @selector[key] = { "$nin" => value } }; self
     end
 
+    # Define extras for the criteria.
+    def extras(extras)
+      @options = extras; self
+    end
+
     # Specifies how to sort this Criteria. Current valid params
     # are: { :field => 1 } or { :field => -1 }
     def order_by(params = {})
@@ -78,7 +83,7 @@ module Mongoid #:nodoc:
     def self.translate(*args)
       type, params = args[0], args[1]
       return new(:first).id(args.to_s) if type.is_a?(String)
-      return new(type).select(params[:conditions])
+      return new(type).select(params.delete(:conditions)).extras(params)
     end
 
   end

@@ -58,6 +58,19 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#extras" do
+
+    it "adds the extras to the options" do
+      @criteria.extras({ :skip => 10 })
+      @criteria.options.should == { :skip => 10 }
+    end
+
+    it "returns self" do
+      @criteria.extras({}).should == @criteria
+    end
+
+  end
+
   describe "#id" do
 
     it "adds the _id query to the selector" do
@@ -252,6 +265,19 @@ describe Mongoid::Criteria do
 
         it "returns a criteria with type :last" do
           @criteria.type.should == :last
+        end
+
+      end
+
+      context "when options are provided" do
+
+        before do
+          @criteria = Mongoid::Criteria.translate(:last, :conditions => { :title => "Test" }, :skip => 10)
+        end
+
+        it "adds the criteria and the options" do
+          @criteria.selector.should == { :title => "Test" }
+          @criteria.options.should == { :skip => 10 }
         end
 
       end
