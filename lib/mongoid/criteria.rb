@@ -3,6 +3,12 @@ module Mongoid #:nodoc:
 
     attr_reader :selector, :options
 
+    # Supply a hash of arrays for field values that must match every single
+    # element in the array.
+    def all(selections = {})
+      selections.each { |key, value| @selector[key] = { "$all" => value } }; self
+    end
+
     # Excludes the parameters passed using $ne in the selector.
     def excludes(exclusions = {})
       exclusions.each { |key, value| @selector[key] = { "$ne" => value } }; self
@@ -10,7 +16,7 @@ module Mongoid #:nodoc:
 
     # Defines criteria for matching any of the supplied parameters, similar to
     # a SQL in statement.
-    def in(inclusions)
+    def in(inclusions = {})
       inclusions.each { |key, value| @selector[key] = { "$in" => value } }; self
     end
 

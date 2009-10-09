@@ -8,6 +8,15 @@ describe Mongoid::Criteria do
 
   describe "#all" do
 
+    it "adds the $all query to the selector" do
+      @criteria.all(:title => ["title1", "title2"])
+      @criteria.selector.should == { :title => { "$all" => ["title1", "title2"] } }
+    end
+
+    it "returns self" do
+      @criteria.all(:title => [ "title1" ]).should == @criteria
+    end
+
   end
 
   describe "#excludes" do
