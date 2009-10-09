@@ -1,7 +1,6 @@
 module Mongoid #:nodoc:
   class Criteria #:nodoc:
-
-    attr_reader :selector, :options
+    attr_reader :selector, :options, :type
 
     # Supply a hash of arrays for field values that must match every single
     # element in the array.
@@ -14,17 +13,29 @@ module Mongoid #:nodoc:
       exclusions.each { |key, value| @selector[key] = { "$ne" => value } }; self
     end
 
+    # Execute the criteria, which will retrieve the results from
+    # the collection.
+    def execute(collection)
+      return collection.find_one(@selector, @options) if type == :first
+      return collection.find(@selector, @options)
+    end
+
     # Defines criteria for matching any of the supplied parameters, similar to
     # a SQL in statement.
     def in(inclusions = {})
       inclusions.each { |key, value| @selector[key] = { "$in" => value } }; self
     end
 
+    # Adds an _id criteria to the selector.
+    def id(object_id)
+      @selector[:_id] = Mongo::ObjectID.from_string(object_id); self
+    end
+
     # Create the new Criteria object. Does not take any params, just
     # initializes the selector and options hashes that will be 
     # eventually passed to the driver.
-    def initialize
-      @selector, @options = {}, {}
+    def initialize(type)
+      @selector, @options, @type = {}, {}, type
     end
 
     # Limits the number of results returned by the query, usually used in
@@ -61,6 +72,13 @@ module Mongoid #:nodoc:
     # pagination.
     def skip(value = 0)
       @options[:skip] = value; self
+    end
+
+    # Translate the supplied arguments into a criteria object.
+    def self.translate(*args)
+      type, params = args[0], args[1]
+      return new(:first).id(args.to_s) if type.is_a?(String)
+      return new(type).select(params[:conditions])
     end
 
   end

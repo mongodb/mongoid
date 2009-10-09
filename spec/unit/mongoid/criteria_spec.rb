@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 describe Mongoid::Criteria do
 
   before do
-    @criteria = Mongoid::Criteria.new
+    @criteria = Mongoid::Criteria.new(:all)
   end
 
   describe "#all" do
@@ -28,6 +28,47 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.excludes(:title => "Bad").should == @criteria
+    end
+
+  end
+
+  describe "#execute" do
+
+    context "when type is :first" do
+
+      it "calls find on the collection with the selector and options" do
+        criteria = Mongoid::Criteria.new(:first)
+        collection = mock
+        collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns([])
+        criteria.execute(collection).should == []
+      end
+
+    end
+
+    context "when type is not :first" do
+
+      it "calls find on the collection with the selector and options" do
+        criteria = Mongoid::Criteria.new(:all)
+        collection = mock
+        collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
+        criteria.execute(collection).should == []
+      end
+
+    end
+
+  end
+
+  describe "#id" do
+
+    it "adds the _id query to the selector" do
+      id = Mongo::ObjectID.new
+      @criteria.id(id.to_s)
+      @criteria.selector.should == { :_id => id }
+    end
+
+    it "returns self" do
+      id = Mongo::ObjectID.new
+      @criteria.id(id.to_s).should == @criteria
     end
 
   end
@@ -149,6 +190,72 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.skip.should == @criteria
+    end
+
+  end
+
+  describe "#translate" do
+
+    context "single argument as a string" do
+
+      it "creates a new select criteria" do
+        id = Mongo::ObjectID.new
+        criteria = Mongoid::Criteria.translate(id.to_s)
+        criteria.selector.should == { :_id => id }
+      end
+
+    end
+
+    context "multiple arguments" do
+
+      context "when :first, :conditions => {}" do
+
+        before do
+          @criteria = Mongoid::Criteria.translate(:first, :conditions => { :title => "Test" })
+        end
+
+        it "returns a criteria with a selector from the conditions" do
+          @criteria.selector.should == { :title => "Test" }
+        end
+
+        it "returns a criteria with type :first" do
+          @criteria.type.should == :first
+        end
+
+      end
+
+      context "when :all, :conditions => {}" do
+
+        before do
+          @criteria = Mongoid::Criteria.translate(:all, :conditions => { :title => "Test" })
+        end
+
+        it "returns a criteria with a selector from the conditions" do
+          @criteria.selector.should == { :title => "Test" }
+        end
+
+        it "returns a criteria with type :all" do
+          @criteria.type.should == :all
+        end
+
+      end
+
+      context "when :last, :conditions => {}" do
+
+        before do
+          @criteria = Mongoid::Criteria.translate(:last, :conditions => { :title => "Test" })
+        end
+
+        it "returns a criteria with a selector from the conditions" do
+          @criteria.selector.should == { :title => "Test" }
+        end
+
+        it "returns a criteria with type :last" do
+          @criteria.type.should == :last
+        end
+
+      end
+
     end
 
   end
