@@ -13,9 +13,9 @@ begin
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
     gem.add_dependency("durran-validatable", "1.7.5")
-    gem.add_dependency("mislav-will_paginate", "2.3.11")
+    gem.add_dependency("will_paginate", "2.3.11")
     gem.add_dependency("activesupport", "2.3.4")
-    gem.add_dependency("mongodb-mongo", "0.14.1")
+    gem.add_dependency("mongo", "0.15.1")
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
