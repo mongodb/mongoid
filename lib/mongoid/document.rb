@@ -16,7 +16,6 @@ module Mongoid #:nodoc:
 
     class << self
 
-      # Create an association to a parent Document.
       # Get an aggregate count for the supplied group of fields and the
       # selector that is provided.
       def aggregate(fields, params = {})
@@ -61,7 +60,7 @@ module Mongoid #:nodoc:
       # Model.find(:first, :attribute => "value")
       # Model.find(:all, :attribute => "value")
       def find(*args)
-        Criteria.translate(*args).execute(collection, self)
+        Criteria.translate(*args).execute(self)
       end
 
       # Find a single Document given the passed selector, which is a Hash of attributes that

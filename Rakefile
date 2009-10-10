@@ -8,7 +8,7 @@ begin
   require "jeweler"
   Jeweler::Tasks.new do |gem|
     gem.name = "mongoid"
-    gem.summary = %Q{Mongoid}
+    gem.summary = "ODM framework for MongoDB"
     gem.email = "durran@gmail.com"
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]

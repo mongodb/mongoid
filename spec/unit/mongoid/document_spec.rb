@@ -137,7 +137,7 @@ describe Mongoid::Document do
 
       it "delegates to criteria" do
         Mongoid::Criteria.expects(:translate).with(@id.to_s).returns(@criteria)
-        @criteria.expects(:execute).with(@collection, Person).returns(@attributes)
+        @criteria.expects(:execute).with(Person).returns(@attributes)
         Person.find(@id.to_s)
       end
 
@@ -147,7 +147,7 @@ describe Mongoid::Document do
 
       it "delegates to criteria" do
         Mongoid::Criteria.expects(:translate).with(:first, :conditions => { :test => "Test" }).returns(@criteria)
-        @criteria.expects(:execute).with(@collection, Person).returns(@attributes)
+        @criteria.expects(:execute).with(Person).returns(@attributes)
         Person.find(:first, :conditions => { :test => "Test" })
       end
 

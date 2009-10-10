@@ -15,9 +15,9 @@ module Mongoid #:nodoc:
 
     # Execute the criteria, which will retrieve the results from
     # the collection.
-    def execute(collection, klass)
-      return klass.new(collection.find_one(@selector, @options)) if type == :first
-      return collection.find(@selector, @options).collect { |doc| klass.new(doc) }
+    def execute(klass)
+      return klass.new(klass.collection.find_one(@selector, @options)) if type == :first
+      return klass.collection.find(@selector, @options).collect { |doc| klass.new(doc) }
     end
 
     # Defines criteria for matching any of the supplied parameters, similar to
