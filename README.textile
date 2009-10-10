@@ -3,26 +3,19 @@
 <h3>About Mongoid</h3>
 
 <p>
-  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby. Mongoid differs from other
-  mapping frameworks in that it constrains the models into behaving in a manner appropriate for a
-  document database. That is to say there are no relationships between documents in the underlying datastore.
-  If a relationship is set up in the Model the child models are automatically embedded within the parent document
-  in the database. The concept of a foreign key relationship to another Document does not exist, as that is
-  design and thinking for a relational database, not a document database. Mongoloid does however provide
-  all the ActiveRecord style functionality you need, with the difference that it stores all associations
-  within the parent document.
+  Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 </p>
 
 <h3>Project Tracking</h3>
 
 <a href="http://www.pivotaltracker.com/projects/27482">Mongoid on Pivotal Tracker</a>
 <a href="http://groups.google.com/group/mongoid">Mongoid Google Group</a>
-<a href="http://ci.hshrckt.com:4891/">Mongoid on CI Joe</a>
+<a href="http://mongoid.org:4444/">Mongoid on CI Joe</a>
 
 <h3>Compatibility</h3>
 
 <p>
-  Mongoid is developed against Ruby 1.8.6, 1.8.7, 1.9.1
+  Mongoid is developed against Ruby 1.8.6, 1.8.7, 1.9.1, 1.9.2
 </p>
 
 <h2>Mongoid in Action</h2>
@@ -55,6 +48,7 @@ Example of a simple domain model:
     fields \
       :first_name,
       :last_name
+    has_timestamps
   end
 </pre>
 
@@ -85,15 +79,15 @@ Update a Document:
 Search for a Document in the database:
 
 <pre>
-  Person.find(:all, :title => "Esquire")
+  Person.find(:all, :conditions => {:title => "Esquire"})
 
-  Person.find(:first, :title => "Esquire")
+  Person.find(:first, :conditions => {:title => "Esquire"})
 </pre>
 
 Paginate Document search results:
 
 <pre>
-  Person.paginate(:title => "Esquire", :page => 1, :per_page => 20)
+  Person.paginate(:conditions => {:title => "Esquire"}, :page => 1, :per_page => 20)
 </pre>
 
 Validations:
