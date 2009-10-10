@@ -21,9 +21,9 @@
 require "rubygems"
 
 gem "activesupport", "2.3.4"
-gem "mongodb-mongo", "0.14.1"
+gem "mongo", "0.15.1"
 gem "durran-validatable", "1.7.5"
-gem "mislav-will_paginate", "2.3.11"
+gem "will_paginate", "2.3.11"
 
 require "validatable"
 require "active_support/callbacks"
