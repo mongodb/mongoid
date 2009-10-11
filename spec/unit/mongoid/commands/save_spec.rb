@@ -64,6 +64,10 @@ describe Mongoid::Commands::Save do
         @document.expects(:valid?).returns(false)
       end
 
+      it "returns false" do
+        Mongoid::Commands::Save.execute(@document).should be_false
+      end
+
     end
 
   end
