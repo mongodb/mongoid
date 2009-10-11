@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.4.0"
+  s.version = "0.4.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-10-10}
+  s.date = %q{2009-10-11}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -28,6 +28,13 @@ Gem::Specification.new do |s|
      "lib/mongoid/associations/factory.rb",
      "lib/mongoid/associations/has_many_association.rb",
      "lib/mongoid/associations/has_one_association.rb",
+     "lib/mongoid/commands.rb",
+     "lib/mongoid/commands/create.rb",
+     "lib/mongoid/commands/delete.rb",
+     "lib/mongoid/commands/delete_all.rb",
+     "lib/mongoid/commands/destroy.rb",
+     "lib/mongoid/commands/destroy_all.rb",
+     "lib/mongoid/commands/save.rb",
      "lib/mongoid/criteria.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/extensions.rb",
@@ -42,6 +49,12 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/factory_spec.rb",
      "spec/unit/mongoid/associations/has_many_association_spec.rb",
      "spec/unit/mongoid/associations/has_one_association_spec.rb",
+     "spec/unit/mongoid/commands/create_spec.rb",
+     "spec/unit/mongoid/commands/delete_all_spec.rb",
+     "spec/unit/mongoid/commands/delete_spec.rb",
+     "spec/unit/mongoid/commands/destroy_all_spec.rb",
+     "spec/unit/mongoid/commands/destroy_spec.rb",
+     "spec/unit/mongoid/commands/save_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
@@ -60,6 +73,12 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/factory_spec.rb",
      "spec/unit/mongoid/associations/has_many_association_spec.rb",
      "spec/unit/mongoid/associations/has_one_association_spec.rb",
+     "spec/unit/mongoid/commands/create_spec.rb",
+     "spec/unit/mongoid/commands/delete_all_spec.rb",
+     "spec/unit/mongoid/commands/delete_spec.rb",
+     "spec/unit/mongoid/commands/destroy_all_spec.rb",
+     "spec/unit/mongoid/commands/destroy_spec.rb",
+     "spec/unit/mongoid/commands/save_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
