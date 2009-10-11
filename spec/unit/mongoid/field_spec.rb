@@ -26,4 +26,28 @@ describe Mongoid::Field do
 
   end
 
+  describe "#key?" do
+
+    context "when key option provided" do
+      before do
+        @field = Mongoid::Field.new(:title, :key => true)
+      end
+
+      it "returns true" do
+        @field.key?.should be_true
+      end
+    end
+    
+    context "when key option not provided" do
+      before do
+        @field = Mongoid::Field.new(:title)
+      end
+      
+      it "returns false" do
+        @field.key?.should be_false
+      end
+    end
+
+  end
+
 end
