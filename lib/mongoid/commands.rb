@@ -1,3 +1,6 @@
 require "mongoid/commands/create"
+require "mongoid/commands/delete"
+require "mongoid/commands/delete_all"
 require "mongoid/commands/destroy"
+require "mongoid/commands/destroy_all"
 require "mongoid/commands/save"

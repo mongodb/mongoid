@@ -1,7 +1,7 @@
 module Mongoid #:nodoc:
   module Commands #:nodoc:
     class Save #:nodoc:
-      # Performs a save of the supplied Document, handling all associated
+      # Performs a save of the supplied +Document+, handling all associated
       # callbacks and validation.
       #
       # Options:
