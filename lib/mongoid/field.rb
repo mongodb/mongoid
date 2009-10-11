@@ -3,11 +3,10 @@ module Mongoid #:nodoc:
 
     attr_reader \
       :default,
-      :key,
       :name
 
     # Create the new field with a name and optional additional options. Valid
-    # options are :default, :key
+    # options are :default
     #
     # Options:
     #
@@ -20,12 +19,6 @@ module Mongoid #:nodoc:
     def initialize(name, options = {})
       @name = name
       @default = options[:default]
-      @key = options[:key]
-    end
-
-    # Returns true if this field acts as a primary key.
-    def key?
-      @key ? key : false
     end
 
   end
