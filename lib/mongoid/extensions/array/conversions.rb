@@ -1,11 +1,11 @@
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
-    module Object #:nodoc:
-      # This module converts objects into mongoid related objects.
+    module Array #:nodoc:
+      # This module converts arrays into mongoid related objects.
       module Conversions #:nodoc:
-        # Converts this object to a hash of attributes
+        # Converts this array into an array of hashes.
         def mongoidize
-          self.attributes
+          collect { |obj| obj.attributes }
         end
       end
     end
