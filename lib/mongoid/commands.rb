@@ -1,0 +1,1 @@
+require "mongoid/commands/save"
