@@ -32,9 +32,10 @@ require "delegate"
 require "will_paginate/collection"
 require "mongo"
 require "mongoid/associations"
+require "mongoid/commands"
 require "mongoid/criteria"
 require "mongoid/extensions"
-require "mongoid/commands"
+require "mongoid/field"
 require "mongoid/document"
 
 module Mongoid
