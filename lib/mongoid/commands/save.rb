@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Commands
-    class Save #:nodoc:
+    class Save
       # Performs a save of the supplied +Document+, handling all associated
       # callbacks and validation.
       #

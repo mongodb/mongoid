@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Commands
-    class DeleteAll #:nodoc:
+    class DeleteAll
       # Performs a delete of the all the +Documents+ that match the criteria
       # supplied.
       #

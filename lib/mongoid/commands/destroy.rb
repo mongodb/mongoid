@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Commands
-    class Destroy #:nodoc:
+    class Destroy
       # Performs a destroy of the supplied +Document+, with the necessary
       # callbacks. It then deletes the record from the collection.
       #
