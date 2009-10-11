@@ -1,5 +1,5 @@
 module Mongoid #:nodoc:
-  module Commands #:nodoc:
+  module Commands
     class DestroyAll #:nodoc:
       # Performs a destroy of the all the +Documents+ that match the criteria
       # supplied. Will execute all the destroy callbacks for each +Document+.

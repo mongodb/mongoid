@@ -1,5 +1,5 @@
 module Mongoid #:nodoc:
-  module Commands #:nodoc:
+  module Commands
     class Delete #:nodoc:
       # Performs a delete of the supplied +Document+ without any callbacks.
       #

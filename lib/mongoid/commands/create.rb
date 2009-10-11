@@ -1,5 +1,5 @@
 module Mongoid #:nodoc:
-  module Commands #:nodoc:
+  module Commands
     class Create #:nodoc:
       # Performs a create of the supplied Document, with the necessary
       # callbacks. It then delegates to the Save command.

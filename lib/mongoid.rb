@@ -39,24 +39,23 @@ require "mongoid/document"
 
 module Mongoid
 
-  # Thrown when the database connection has not been set up.
-  class NoConnectionError < RuntimeError
-  end
+  # Raised when the database connection has not been set up.
+  class NoConnectionError < RuntimeError; end
 
-  # Thrown when :document_class is not provided in the attributes
+  # Raised when :document_class is not provided in the attributes
   # hash when creating a new Document
-  class ClassNotProvidedError < RuntimeError
-  end
+  class ClassNotProvidedError < RuntimeError; end
 
-  # Thrown when an association is defined on the class, but the
+  # Raised when an association is defined on the class, but the
   # attribute in the hash is not an Array or Hash.
-  class TypeMismatchError < RuntimeError
-  end
+  class TypeMismatchError < RuntimeError; end
 
-  # Thrown when an association is defined that is not valid. Must
+  # Raised when an association is defined that is not valid. Must
   # be belongs_to, has_many, has_one
-  class InvalidAssociationError < RuntimeError
-  end
+  class InvalidAssociationError < RuntimeError; end
+
+  # Raised when a persisence method ending in ! fails validation.
+  class ValidationsError < RuntimeError; end
 
   # Connect to the database name supplied. This should be run
   # for initial setup, potentially in a rails initializer.

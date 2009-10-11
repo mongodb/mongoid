@@ -85,8 +85,8 @@ describe Mongoid::Document do
 
       it "returns nil" do
         id = Mongo::ObjectID.new
-        @collection.expects(:remove).with(:_id => id)
         person = Person.new(:_id => id)
+        Mongoid::Commands::Destroy.expects(:execute).with(person)
         person.destroy.should be_nil
       end
 
@@ -97,7 +97,7 @@ describe Mongoid::Document do
   describe "#destroy_all" do
 
     it "deletes all documents from the collection" do
-      @collection.expects(:drop)
+      Mongoid::Commands::DestroyAll.expects(:execute).with(Person, {})
       Person.destroy_all
     end
 

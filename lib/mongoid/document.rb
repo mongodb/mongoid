@@ -2,16 +2,19 @@ module Mongoid #:nodoc:
   class Document #:nodoc:
     include ActiveSupport::Callbacks
     include Validatable
+    include Commands
 
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
-    attr_reader :attributes, :parent
+    attr_accessor :attributes, :parent
 
     define_callbacks \
       :after_create,
+      :after_destroy,
       :after_save,
       :before_create,
+      :before_destroy,
       :before_save
 
     class << self
@@ -31,17 +34,6 @@ module Mongoid #:nodoc:
       def collection
         @collection_name = self.to_s.demodulize.tableize
         @collection ||= Mongoid.database.collection(@collection_name)
-      end
-
-      # Create a new Document with the supplied attribtues, and insert it into the database.
-      def create(attributes = {})
-        new(attributes).save(true)
-      end
-
-      # Deletes all records from the collection. Will actually call drop on the
-      # Mongo::Collection for efficiency.
-      def destroy_all
-        collection.drop
       end
 
       # Defines all the fields that are accessable on the Document
@@ -135,11 +127,6 @@ module Mongoid #:nodoc:
       self.class.collection
     end
 
-    # Delete this Document from the database.
-    def destroy
-      collection.remove(:_id => id)
-    end
-
     # Get the Mongo::ObjectID associated with this object.
     # This is in essence the primary key.
     def id
@@ -158,37 +145,9 @@ module Mongoid #:nodoc:
       @attributes[:_id].nil?
     end
 
-    # Set the parent to this document.
-    def parent=(document)
-      @parent = document
-    end
-
-    # Save this document to the database. If this document is the root document
-    # in the object graph, it will save itself, and return self. If the
-    # document is embedded within another document, or is multiple levels down
-    # the tree, the root object will get saved, and return itself.
-    def save(creating = false)
-      if @parent
-        @parent.save
-      else
-        return false unless valid?
-        run_callbacks(:before_create) if creating
-        run_callbacks(:before_save)
-        collection.save(@attributes)
-        run_callbacks(:after_create) if creating
-        run_callbacks(:after_save)
-        creating ? self : true
-      end
-    end
-
     # Returns the id of the Document
     def to_param
       id.to_s
-    end
-
-    # Update the attributes of this Document and return true
-    def update_attributes(attributes)
-      @attributes = attributes.symbolize_keys!; save; true
     end
 
     private
