@@ -72,6 +72,22 @@ module Mongoid #:nodoc:
       return klass.collection.find(@selector, @options).collect { |doc| klass.new(doc) }
     end
 
+    # Adds a criterion to the +Criteria+ that specifies additional options
+    # to be passed to the Ruby driver, in the exact format for the driver.
+    #
+    # Options:
+    #
+    # extras: A +Hash+ that gets set to the driver options.
+    #
+    # Example:
+    #
+    # <tt>criteria.extras(:limit => 20, :skip => 40)</tt>
+    #
+    # Returns: <tt>self</tt>
+    def extras(extras)
+      @options = extras; self
+    end
+
     # Adds a criterion to the +Criteria+ that specifies values where any can
     # be matched in order to return results. This is similar to an SQL "IN"
     # clause. The MongoDB conditional operator that will be used is "$in".
@@ -173,36 +189,19 @@ module Mongoid #:nodoc:
       exclusions.each { |key, value| @selector[key] = { "$nin" => value } }; self
     end
 
-    # Adds a criterion to the +Criteria+ that specifies additional options
-    # to be passed to the Ruby driver, in the exact format for the driver.
-    #
-    # Options:
-    #
-    # extras: A +Hash+ that gets set to the driver options.
-    #
-    # Example:
-    #
-    # <tt>criteria.extras(:limit => 20, :skip => 40)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def extras(extras)
-      @options = extras; self
-    end
-
     # Adds a criterion to the +Criteria+ that specifies the sort order of
     # the returned documents in the database. Similar to a SQL "ORDER BY".
     #
     # Options:
     #
-    # params: A +Hash+ where the key is the field name and the value is an
-    # integer specifying the direction: 1 for ascending, -1 for descending.
+    # params: An +Array+ of [field, direction] sorting pairs.
     #
     # Example:
     #
-    # <tt>criteria.order_by(:field1 => 1, :field2 => -1)</tt>
+    # <tt>criteria.order_by([[:field1, :asc], [:field2, :desc]])</tt>
     #
     # Returns: <tt>self</tt>
-    def order_by(params = {})
+    def order_by(params = [])
       @options[:sort] = params; self
     end
 

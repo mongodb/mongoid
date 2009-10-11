@@ -158,8 +158,8 @@ describe Mongoid::Criteria do
     context "when field names and direction specified" do
 
       it "adds the sort to the options" do
-        @criteria.order_by(:title => 1, :text => -1)
-        @criteria.options.should == { :sort => { :title => 1, :text => -1 }}
+        @criteria.order_by([[:title, :asc], [:text, :desc]])
+        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
       end
 
     end
