@@ -55,54 +55,6 @@ describe Mongoid::Document do
 
   end
 
-  describe "#create" do
-
-    context "with no attributes" do
-
-      it "creates a new saved document" do
-        @collection.expects(:save).with({})
-        person = Person.create
-        person.should_not be_nil
-      end
-
-    end
-
-    context "with attributes" do
-
-      it "creates a new saved document" do
-        @collection.expects(:save).with({:test => "test"})
-        person = Person.create(:test => "test")
-        person.should_not be_nil
-      end
-
-    end
-
-  end
-
-  describe "#destroy" do
-
-    context "when the Document is remove from the database" do
-
-      it "returns nil" do
-        id = Mongo::ObjectID.new
-        person = Person.new(:_id => id)
-        Mongoid::Commands::Destroy.expects(:execute).with(person)
-        person.destroy.should be_nil
-      end
-
-    end
-
-  end
-
-  describe "#destroy_all" do
-
-    it "deletes all documents from the collection" do
-      Mongoid::Commands::DestroyAll.expects(:execute).with(Person, {})
-      Person.destroy_all
-    end
-
-  end
-
   describe "#fields" do
 
     before do
@@ -478,60 +430,11 @@ describe Mongoid::Document do
 
   end
 
-  describe "#save" do
-
-    context "when the document is the root" do
-
-      before do
-        @attributes = { :test => "test" }
-        @person = Person.new(@attributes)
-      end
-
-      it "persists the object to the MongoDB collection" do
-        @collection.expects(:save).with(@person.attributes)
-        @person.save.should be_true
-      end
-
-    end
-
-    context "when the document is embedded" do
-
-      before do
-        @attributes = { :title => "Sir",
-          :addresses => [
-            { :street => "Street 1", :document_class => "Address" },
-            { :street => "Street 2", :document_class => "Address" } ] }
-        @person = Person.new(@attributes)
-      end
-
-      it "saves the root document" do
-        @collection.expects(:save).with(@person.attributes)
-        @person.addresses.first.save
-      end
-
-    end
-
-  end
-
   describe "#to_param" do
 
     it "returns the id" do
       id = Mongo::ObjectID.new
       Person.new(:_id => id).to_param.should == id.to_s
-    end
-
-  end
-
-  describe "#update_attributes" do
-
-    context "when attributes are provided" do
-
-      it "saves and returns true" do
-        person = Person.new
-        person.expects(:save).returns(true)
-        person.update_attributes(:test => "Test").should be_true
-      end
-
     end
 
   end
