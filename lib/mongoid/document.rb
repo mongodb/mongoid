@@ -40,13 +40,16 @@ module Mongoid #:nodoc:
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
-      def fields(*names)
-        @fields ||= []
-        names.flatten.each do |name|
-          @fields << name
-          define_method(name) { read_attribute(name) }
-          define_method("#{name}=") { |value| write_attribute(name, value) }
-        end
+      def field(name, options = {})
+        @fields ||= {}
+        @fields[name] = Field.new(name, options)
+        define_method(name) { read_attribute(name) }
+        define_method("#{name}=") { |value| write_attribute(name, value) }
+      end
+
+      # Returns all the fields for the Document as a +Hash+ with names as keys.
+      def fields
+        @fields
       end
 
       # Find all Documents in several ways.
@@ -90,7 +93,8 @@ module Mongoid #:nodoc:
       # Adds timestamps on the Document in the form of the fields 'created_on'
       # and 'last_modified'
       def has_timestamps
-        fields :created_at, :last_modified
+        field :created_at
+        field :last_modified
         class_eval do
           before_create \
             :update_created_at,
@@ -126,6 +130,11 @@ module Mongoid #:nodoc:
     # Get the Mongo::Collection associated with this Document.
     def collection
       self.class.collection
+    end
+
+    # Get the fields for the Document class.
+    def fields
+      self.class.fields
     end
 
     # Get the Mongo::ObjectID associated with this object.
@@ -170,7 +179,8 @@ module Mongoid #:nodoc:
 
     # Read from the attributes hash.
     def read_attribute(name)
-      @attributes[name.to_sym]
+      symbol = name.to_sym
+      fields[symbol].value(@attributes[symbol])
     end
 
     # Update the created_at field on the Document to the current time. This is

@@ -21,5 +21,11 @@ module Mongoid #:nodoc:
       @default = options[:default]
     end
 
+    # Gets the value for the supplied object. If the object is nil, then the
+    # default value will be returned.
+    def value(object)
+      object ? object : default
+    end
+
   end
 end

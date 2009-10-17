@@ -26,4 +26,28 @@ describe Mongoid::Field do
 
   end
 
+  describe "#value" do
+
+    before do
+      @field = Mongoid::Field.new(:score, :default => 10)
+    end
+
+    context "nil is provided" do
+
+      it "returns the default value" do
+        @field.value(nil).should == 10
+      end
+
+    end
+
+    context "value is provided" do
+
+      it "returns the value" do
+        @field.value(30).should == 30
+      end
+
+    end
+
+  end
+
 end

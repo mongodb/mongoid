@@ -29,6 +29,35 @@ describe Mongoid::Document do
 
   end
 
+  describe "#all" do
+
+    before do
+      @cursor = mock
+      @people = []
+    end
+
+    context "when a selector is provided" do
+
+      it "finds from the collection and instantiate objects for each returned" do
+        @collection.expects(:find).with({ :test => "Test" }, {}).returns(@cursor)
+        @cursor.expects(:collect).returns(@people)
+        Person.all(:conditions => {:test => "Test"})
+      end
+
+    end
+
+    context "when a selector is not provided" do
+
+      it "finds from the collection and instantiate objects for each returned" do
+        @collection.expects(:find).with(nil, {}).returns(@cursor)
+        @cursor.expects(:collect).returns(@people)
+        Person.all
+      end
+
+    end
+
+  end
+
   describe "#belongs_to" do
 
     it "creates a reader for the association" do
@@ -55,21 +84,25 @@ describe Mongoid::Document do
 
   end
 
-  describe "#fields" do
+  describe "#field" do
 
-    before do
-      Person.fields([:testing])
-    end
+    context "with no options" do
 
-    it "adds a reader for the fields defined" do
-      @person = Person.new(:testing => "Test")
-      @person.testing.should == "Test"
-    end
+      before do
+        Person.field(:testing)
+      end
 
-    it "adds a writer for the fields defined" do
-      @person = Person.new(:testing => "Test")
-      @person.testing = "Testy"
-      @person.testing.should == "Testy"
+      it "adds a reader for the fields defined" do
+        @person = Person.new(:testing => "Test")
+        @person.testing.should == "Test"
+      end
+
+      it "adds a writer for the fields defined" do
+        @person = Person.new(:testing => "Test")
+        @person.testing = "Testy"
+        @person.testing.should == "Testy"
+      end
+
     end
 
   end
@@ -156,35 +189,6 @@ describe Mongoid::Document do
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with(nil, {}).returns(@attributes)
         Person.first.attributes.should == @attributes
-      end
-
-    end
-
-  end
-
-  describe "#all" do
-
-    before do
-      @cursor = mock
-      @people = []
-    end
-
-    context "when a selector is provided" do
-
-      it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with({ :test => "Test" }, {}).returns(@cursor)
-        @cursor.expects(:collect).returns(@people)
-        Person.all(:conditions => {:test => "Test"})
-      end
-
-    end
-
-    context "when a selector is not provided" do
-
-      it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with(nil, {}).returns(@cursor)
-        @cursor.expects(:collect).returns(@people)
-        Person.all
       end
 
     end
@@ -286,7 +290,9 @@ describe Mongoid::Document do
     end
 
     it "adds created_on and last_modified to the document" do
-      Tester.instance_variable_get(:@fields).should include(:created_at, :last_modified)
+      fields = Tester.instance_variable_get(:@fields)
+      fields[:created_at].should_not be_nil
+      fields[:last_modified].should_not be_nil
     end
 
   end
@@ -424,6 +430,23 @@ describe Mongoid::Document do
 
       it "returns nil" do
         @person.parent.should be_nil
+      end
+
+    end
+
+  end
+
+  describe "#read_attribute" do
+
+    context "when attribute does not exist" do
+
+      before do
+        Person.field :weight, :default => 100
+        @person = Person.new
+      end
+
+      it "returns the default value" do
+        @person.weight.should == 100
       end
 
     end

@@ -16,27 +16,24 @@ Spec::Runner.configure do |config|
 end
 
 class Person < Mongoid::Document
-  fields \
-    :title,
-    :terms,
-    :age
+  field :title
+  field :terms
+  field :age
   has_many :addresses
   has_one :name
 end
 
 class Address < Mongoid::Document
-  fields \
-    :street,
-    :city,
-    :state,
-    :post_code
+  field :street
+  field :city
+  field :state
+  field :post_code
   belongs_to :person
 end
 
 class Name < Mongoid::Document
-  fields \
-    :first_name,
-    :last_name
+  field :first_name
+  field :last_name
   belongs_to :person
 end
 
