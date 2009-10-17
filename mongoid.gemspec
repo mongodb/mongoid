@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.4.3"
+  s.version = "0.4.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -39,7 +39,9 @@ Gem::Specification.new do |s|
      "lib/mongoid/document.rb",
      "lib/mongoid/extensions.rb",
      "lib/mongoid/extensions/array/conversions.rb",
+     "lib/mongoid/extensions/array/parentization.rb",
      "lib/mongoid/extensions/object/conversions.rb",
+     "lib/mongoid/extensions/object/parentization.rb",
      "lib/mongoid/field.rb",
      "mongoid.gemspec",
      "spec/integration/mongoid/document_spec.rb",
@@ -60,7 +62,9 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/array/parentization_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/object/parentization_spec.rb",
      "spec/unit/mongoid/field_spec.rb"
   ]
   s.homepage = %q{http://github.com/durran/mongoid}
@@ -86,7 +90,9 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/array/parentization_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/object/parentization_spec.rb",
      "spec/unit/mongoid/field_spec.rb"
   ]
 
