@@ -30,24 +30,23 @@ Example of a simple domain model:
 
 <pre>
   class Person < Mongoid::Document
-    fields :title
+    field :title
+    field :age, :default => 0
     has_many :addresses
     has_one :name
   end
 
   class Address < Mongoid::Document
-    fields \
-      :street,
-      :city,
-      :state,
-      :post_code
+    field :street
+    field :city
+    field :state
+    field :post_code
     belongs_to :person
   end
 
   class Name < Mongoid::Document
-    fields \
-      :first_name,
-      :last_name
+    field :first_name
+    field :last_name
     has_timestamps
   end
 </pre>
