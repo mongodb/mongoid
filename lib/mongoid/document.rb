@@ -28,11 +28,13 @@ module Mongoid #:nodoc:
 
       # Adds the association back to the parent document.
       def belongs_to(association_name)
+        @embedded = true
         add_association(:belongs_to, association_name.to_s.classify, association_name)
       end
 
       # Get the Mongo::Collection associated with this Document.
       def collection
+        return nil if @embedded
         @collection_name = self.to_s.demodulize.tableize
         @collection ||= Mongoid.database.collection(@collection_name)
       end

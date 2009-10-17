@@ -82,6 +82,18 @@ describe Mongoid::Document do
       Person.collection.name.should == "people"
     end
 
+    context "when document is embedded" do
+
+      before do
+        @address = Address.new
+      end
+
+      it "returns nil" do
+        Address.collection.should be_nil
+      end
+
+    end
+
   end
 
   describe "#field" do
