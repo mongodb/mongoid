@@ -121,7 +121,7 @@ module Mongoid #:nodoc:
           0) do |pager|
             results = collection.find(selector, { :sort => params[:sort],
                                                   :limit => pager.per_page,
-                                                  :offset => pager.offset })
+                                                  :skip => pager.offset })
             pager.total_entries = results.count
             pager.replace(results.collect { |doc| new(doc) })
         end

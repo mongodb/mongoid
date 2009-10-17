@@ -408,7 +408,7 @@ describe Mongoid::Document do
     context "when pagination parameters are passed" do
 
       it "delegates to will paginate with the results" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => nil, :limit => 20, :offset => 20}).returns(@cursor)
+        @collection.expects(:find).with({ :test => "Test" }, { :sort => nil, :limit => 20, :skip => 20}).returns(@cursor)
         Person.paginate(:conditions => { :test => "Test" }, :page => 2, :per_page => 20)
       end
 
@@ -417,7 +417,7 @@ describe Mongoid::Document do
     context "when pagination parameters are not passed" do
 
       it "delegates to will paginate with default values" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => nil, :limit => 20, :offset => 0}).returns(@cursor)
+        @collection.expects(:find).with({ :test => "Test" }, { :sort => nil, :limit => 20, :skip => 0}).returns(@cursor)
         Person.paginate(:conditions => { :test => "Test" })
       end
 
@@ -426,7 +426,7 @@ describe Mongoid::Document do
     context "when sorting paramters provided" do
 
       it "adds the sorting parameters in the collection#find" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => { :test => -1}, :limit => 20, :offset => 0}).returns(@cursor)
+        @collection.expects(:find).with({ :test => "Test" }, { :sort => { :test => -1}, :limit => 20, :skip => 0}).returns(@cursor)
         Person.paginate(:conditions => { :test => "Test" }, :sort => { :test => -1 })
       end
 
