@@ -40,11 +40,43 @@ describe Mongoid::Associations::HasManyAssociation do
 
     before do
       @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
+      @address = Address.new
     end
 
-    it "appends the document to the end of the array" do
-      @association << Address.new
+    it "adds the parent document before appending to the array" do
+      @association << @address
       @association.length.should == 3
+      @address.parent.should == @document
+    end
+
+  end
+
+  describe "#concat" do
+
+    before do
+      @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
+      @address = Address.new
+    end
+
+    it "adds the parent document before appending to the array" do
+      @association.concat [@address]
+      @association.length.should == 3
+      @address.parent.should == @document
+    end
+
+  end
+
+  describe "#push" do
+
+    before do
+      @association = Mongoid::Associations::HasManyAssociation.new(:addresses, @document)
+      @address = Address.new
+    end
+
+    it "adds the parent document before appending to the array" do
+      @association.push @address
+      @association.length.should == 3
+      @address.parent.should == @document
     end
 
   end

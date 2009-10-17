@@ -92,4 +92,24 @@ describe Mongoid::Document do
 
   end
 
+  describe "#save" do
+
+    context "on a has_one association" do
+
+      before do
+        @person = Person.new(:title => "Sir")
+        @name = Name.new(:first_name => "Test")
+        @person.name = @name
+      end
+
+      it "saves the parent document" do
+        @name.save
+        person = Person.find(@person.id.to_s)
+        person.name.first_name.should == @name.first_name
+      end
+
+    end
+
+  end
+
 end

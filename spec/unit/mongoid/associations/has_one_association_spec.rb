@@ -7,7 +7,7 @@ describe Mongoid::Associations::HasOneAssociation do
     @document = stub(:attributes => @attributes)
   end
 
-  describe "#method_missing" do
+  describe "#decorate!" do
 
     before do
       @association = Mongoid::Associations::HasOneAssociation.new(:name, @document)
