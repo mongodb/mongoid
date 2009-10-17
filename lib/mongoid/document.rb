@@ -173,6 +173,7 @@ module Mongoid #:nodoc:
           Mongoid::Associations::Factory.create(type, name, self)
         end
         define_method("#{name}=") do |object|
+          object.parentize(self)
           @attributes[name] = object.mongoidize
         end
       end

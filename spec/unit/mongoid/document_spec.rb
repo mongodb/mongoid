@@ -58,6 +58,20 @@ describe Mongoid::Document do
 
   end
 
+  describe "#association=" do
+
+    before do
+      @name = Name.new
+      @person = Person.new
+    end
+
+    it "parentizes the association" do
+      @person.name = @name
+      @name.parent.should == @person
+    end
+
+  end
+
   describe "#belongs_to" do
 
     it "creates a reader for the association" do
