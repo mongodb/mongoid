@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
       module Parentization #:nodoc:
         # Adds the parent document to each element in the array.
         def parentize(parent)
-          each { |obj| obj.parent = parent }
+          each { |obj| obj.parentize(parent) }
         end
       end
     end
