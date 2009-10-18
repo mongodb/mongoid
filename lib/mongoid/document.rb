@@ -1,8 +1,7 @@
 module Mongoid #:nodoc:
   class Document
     include ActiveSupport::Callbacks
-    include Validatable
-    include Commands
+    include Commands, Observable, Validatable
 
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
