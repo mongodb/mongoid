@@ -6,6 +6,41 @@ describe Mongoid::Criteria do
     @criteria = Mongoid::Criteria.new(:all)
   end
 
+  describe "#aggregate" do
+
+    context "when klass provided" do
+
+      before do
+        @reduce = "function(obj, prev) { prev.count++; }"
+        @criteria = Mongoid::Criteria.new(:all, Person)
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+      end
+
+      it "calls group on the collection with the aggregate js" do
+        @collection.expects(:group).with([:field1], {}, {:count => 0}, @reduce)
+        @criteria.select(:field1).aggregate
+      end
+
+    end
+
+    context "when klass not provided" do
+
+      before do
+        @reduce = "function(obj, prev) { prev.count++; }"
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+      end
+
+      it "calls group on the collection with the aggregate js" do
+        @collection.expects(:group).with([:field1], {}, {:count => 0}, @reduce)
+        @criteria.select(:field1).aggregate(Person)
+      end
+
+    end
+
+  end
+
   describe "#all" do
 
     it "adds the $all query to the selector" do

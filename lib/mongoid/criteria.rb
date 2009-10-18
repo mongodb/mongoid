@@ -14,7 +14,22 @@ module Mongoid #:nodoc:
   #
   # <tt>criteria.execute</tt>
   class Criteria
+    attr_accessor :klass
     attr_reader :selector, :options, :type
+
+    AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
+    # Aggregate the criteria. This will take the internally built selector and options
+    # and pass them on to the Ruby driver's +group()+ method on the collection. The
+    # collection itself will be retrieved from the class provided, and once the
+    # query has returned it will provided a grouping of keys with counts.
+    #
+    # Example:
+    # 
+    # <tt>criteria.select(:field1).where(:field1 => "Title").aggregate(Person)</tt>
+    def aggregate(klass = nil)
+      @klass = klass if klass
+      @klass.collection.group(@options[:fields], @selector, { :count => 0 }, AGGREGATE_REDUCE)
+    end
 
     # Adds a criterion to the +Criteria+ that specifies values that must all
     # be matched in order to return results. Similar to an "in" clause but the
@@ -67,9 +82,10 @@ module Mongoid #:nodoc:
     #
     # If this is a +Criteria+ to find multiple results, will return an +Array+ of
     # objects of the type of class provided.
-    def execute(klass)
-      return klass.new(klass.collection.find_one(@selector, @options)) if type == :first
-      return klass.collection.find(@selector, @options).collect { |doc| klass.new(doc) }
+    def execute(klass = nil)
+      @klass = klass if klass
+      return @klass.new(klass.collection.find_one(@selector, @options)) if type == :first
+      return @klass.collection.find(@selector, @options).collect { |doc| klass.new(doc) }
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -129,8 +145,9 @@ module Mongoid #:nodoc:
     # Options:
     #
     # type: One of :all, :first:, or :last
-    def initialize(type)
-      @selector, @options, @type = {}, {}, type
+    # klass: The class to execute on.
+    def initialize(type, klass = nil)
+      @selector, @options, @type, @klass = {}, {}, type, klass
     end
 
     # Adds a criterion to the +Criteria+ that specifies the maximum number of

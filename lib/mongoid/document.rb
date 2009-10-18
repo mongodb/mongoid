@@ -4,7 +4,6 @@ module Mongoid #:nodoc:
     include Commands, Observable, Validatable
     extend Associations
 
-    AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
     attr_accessor :parent
@@ -19,13 +18,6 @@ module Mongoid #:nodoc:
       :before_save
 
     class << self
-
-      # Get an aggregate count for the supplied group of fields and the
-      # selector that is provided.
-      def aggregate(fields, params = {})
-        selector = params[:conditions]
-        collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
-      end
 
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
@@ -159,7 +151,7 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>Criteria</tt>
       def select(*args)
-        Criteria.new(:all).select(*args)
+        Criteria.new(:all, self).select(*args)
       end
 
     end
