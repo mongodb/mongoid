@@ -18,6 +18,11 @@
   Mongoid is developed against Ruby 1.8.6, 1.8.7, 1.9.1, 1.9.2
 </p>
 
+<p>
+  Note API changes will be frequent until the 1.0 release, and do not expect
+  the gem to be of full production quality until that point.
+</p>
+
 <h2>Mongoid in Action</h2>
 
 Initialize Mongoid:
