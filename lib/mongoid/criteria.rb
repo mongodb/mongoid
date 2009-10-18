@@ -85,7 +85,7 @@ module Mongoid #:nodoc:
     def execute(klass = nil)
       @klass = klass if klass
       return @klass.new(klass.collection.find_one(@selector, @options)) if type == :first
-      return @klass.collection.find(@selector, @options).collect { |doc| klass.new(doc) }
+      return @klass.collection.find(@selector, @options).collect { |doc| @klass.new(doc) }
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -102,6 +102,27 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def extras(extras)
       @options = extras; self
+    end
+
+    GROUP_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
+    # Groups the criteria. This will take the internally built selector and options
+    # and pass them on to the Ruby driver's +group()+ method on the collection. The
+    # collection itself will be retrieved from the class provided, and once the
+    # query has returned it will provided a grouping of keys with objects.
+    #
+    # Example:
+    # 
+    # <tt>criteria.select(:field1).where(:field1 => "Title").group(Person)</tt>
+    def group(klass = nil)
+      @klass = klass if klass
+      @klass.collection.group(
+        @options[:fields],
+        @selector,
+        { :group => [] },
+        GROUP_REDUCE
+      ).collect do |docs|
+        docs["group"] = docs["group"].collect { |attrs| @klass.new(attrs) }; docs
+      end
     end
 
     # Adds a criterion to the +Criteria+ that specifies values where any can

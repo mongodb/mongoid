@@ -60,7 +60,7 @@ describe Mongoid::Document do
 
   end
 
-  describe "#group_by" do
+  describe "#group" do
 
     before do
       30.times do |num|
@@ -69,7 +69,7 @@ describe Mongoid::Document do
     end
 
     it "returns grouped documents" do
-      grouped = Person.group_by([:title], {})
+      grouped = Person.select(:title).group
       people = grouped.first["group"]
       person = people.first
       person.should be_a_kind_of(Person)

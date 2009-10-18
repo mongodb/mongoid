@@ -108,6 +108,45 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#group" do
+
+    before do
+      @grouping = [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30 }] }]
+    end
+
+    context "when klass provided" do
+
+      before do
+        @reduce = "function(obj, prev) { prev.group.push(obj); }"
+        @criteria = Mongoid::Criteria.new(:all, Person)
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+      end
+
+      it "calls group on the collection with the aggregate js" do
+        @collection.expects(:group).with([:field1], {}, {:group => []}, @reduce).returns(@grouping)
+        @criteria.select(:field1).group
+      end
+
+    end
+
+    context "when klass not provided" do
+
+      before do
+        @reduce = "function(obj, prev) { prev.group.push(obj); }"
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+      end
+
+      it "calls group on the collection with the aggregate js" do
+        @collection.expects(:group).with([:field1], {}, {:group => []}, @reduce).returns(@grouping)
+        @criteria.select(:field1).group(Person)
+      end
+
+    end
+
+  end
+
   describe "#id" do
 
     it "adds the _id query to the selector" do

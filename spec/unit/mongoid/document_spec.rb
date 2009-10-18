@@ -178,22 +178,6 @@ describe Mongoid::Document do
 
   end
 
-  describe "#group_by" do
-
-    before do
-      @reduce = "function(obj, prev) { prev.group.push(obj); }"
-    end
-
-    it "returns documents grouped by the supplied fields" do
-      results = [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30 }] }]
-      @collection.expects(:group).with([:title], nil, { :group => [] }, @reduce).returns(results)
-      grouped = Person.group_by([:title], {})
-      people = grouped.first["group"]
-      people.first.should be_a_kind_of(Person)
-    end
-
-  end
-
   describe "#has_timestamps" do
 
     before do

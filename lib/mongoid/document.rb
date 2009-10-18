@@ -4,8 +4,6 @@ module Mongoid #:nodoc:
     include Commands, Observable, Validatable
     extend Associations
 
-    GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
-
     attr_accessor :parent
     attr_reader :attributes
 
@@ -91,15 +89,6 @@ module Mongoid #:nodoc:
       # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
       def all(*args)
         find(:all, *args)
-      end
-
-      # Find all Documents given the supplied criteria, grouped by the fields
-      # provided.
-      def group_by(fields, params = {})
-        selector = params[:condition]
-        collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
-          docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
-        end
       end
 
       # Adds timestamps on the Document in the form of the fields 'created_on'
