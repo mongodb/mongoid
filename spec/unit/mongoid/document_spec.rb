@@ -136,7 +136,7 @@ describe Mongoid::Document do
   describe "#find" do
 
     before do
-      @attributes = { :document_class => "Person" }
+      @attributes = {}
       @criteria = mock
     end
 
@@ -198,7 +198,7 @@ describe Mongoid::Document do
   describe "#first" do
 
     before do
-      @attributes = { :document_class => "Person" }
+      @attributes = {}
     end
 
     context "when a selector is provided" do
@@ -259,13 +259,13 @@ describe Mongoid::Document do
       before do
         @attributes = { :title => "Sir",
           :addresses => [
-            { :street => "Street 1", :document_class => "Address" },
-            { :street => "Street 2", :document_class => "Address" } ] }
+            { :street => "Street 1" },
+            { :street => "Street 2" } ] }
         @person = Person.new(@attributes)
       end
 
       it "sets the attributes for the association" do
-        address = Address.new(:street => "New Street", :document_class => "Address")
+        address = Address.new(:street => "New Street")
         @person.addresses = [address]
         @person.addresses.first.street.should == "New Street"
       end
@@ -300,7 +300,7 @@ describe Mongoid::Document do
       end
 
       it "sets the attributes for the association" do
-        name = Name.new(:first_name => "New Name", :document_class => "Name")
+        name = Name.new(:first_name => "New Name")
         @person.name = name
         @person.name.first_name.should == "New Name"
       end
@@ -439,8 +439,8 @@ describe Mongoid::Document do
     before do
       @attributes = { :title => "Sir",
         :addresses => [
-          { :street => "Street 1", :document_class => "Address" },
-          { :street => "Street 2", :document_class => "Address" } ] }
+          { :street => "Street 1" },
+          { :street => "Street 2" } ] }
       @person = Person.new(@attributes)
     end
 

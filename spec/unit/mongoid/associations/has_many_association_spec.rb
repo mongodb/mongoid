@@ -6,8 +6,8 @@ describe Mongoid::Associations::HasManyAssociation do
     @first_id = Mongo::ObjectID.new
     @second_id = Mongo::ObjectID.new
     @attributes = { :addresses => [
-      { :_id => @first_id, :street => "Street 1", :document_class => "Address" },
-      { :_id => @second_id, :street => "Street 2", :document_class => "Address" } ] }
+      { :_id => @first_id, :street => "Street 1" },
+      { :_id => @second_id, :street => "Street 2" } ] }
     @document = stub(:attributes => @attributes)
   end
 
@@ -88,14 +88,14 @@ describe Mongoid::Associations::HasManyAssociation do
     end
 
     it "adds a new document to the array with the suppied parameters" do
-      @association.build({ :street => "Street 1", :document_class => "Address" })
+      @association.build({ :street => "Street 1" })
       @association.length.should == 3
       @association[2].should be_a_kind_of(Address)
       @association[2].street.should == "Street 1"
     end
 
     it "returns the newly built object in the association" do
-      address = @association.build({ :street => "Yet Another", :document_class => "Address" })
+      address = @association.build({ :street => "Yet Another" })
       address.should be_a_kind_of(Address)
       address.street.should == "Yet Another"
     end

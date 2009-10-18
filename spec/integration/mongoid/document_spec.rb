@@ -28,7 +28,7 @@ describe Mongoid::Document do
   describe "#find" do
 
     before do
-      @person = Person.create(:title => "Test", :document_class => "Person")
+      @person = Person.create(:title => "Test")
     end
 
     context "finding all documents" do
@@ -64,7 +64,7 @@ describe Mongoid::Document do
 
     before do
       30.times do |num|
-        Person.create(:title => "Sir", :age => num, :document_class => "Person")
+        Person.create(:title => "Sir", :age => num)
       end
     end
 
@@ -82,7 +82,7 @@ describe Mongoid::Document do
 
     before do
       30.times do |num|
-        Person.create(:title => "Test-#{num}", :document_class => "Person")
+        Person.create(:title => "Test-#{num}")
       end
     end
 

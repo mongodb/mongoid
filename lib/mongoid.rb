@@ -43,10 +43,6 @@ module Mongoid
   # Raised when the database connection has not been set up.
   class NoConnectionError < RuntimeError; end
 
-  # Raised when :document_class is not provided in the attributes
-  # hash when creating a new Document
-  class ClassNotProvidedError < RuntimeError; end
-
   # Raised when an association is defined on the class, but the
   # attribute in the hash is not an Array or Hash.
   class TypeMismatchError < RuntimeError; end
