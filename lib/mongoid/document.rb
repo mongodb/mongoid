@@ -118,7 +118,23 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Create a one-to-many association between Documents.
+      # Adds the association from a parent document to its children. The name
+      # of the association needs to be a pluralized form of the child class
+      # name.
+      #
+      # Options:
+      #
+      # association_name: A +Symbol+ that is the plural child class name.
+      #
+      # Example:
+      #
+      #   class Person < Mongoid::Document
+      #     has_many :addresses
+      #   end
+      #
+      #   class Address < Mongoid::Document
+      #     belongs_to :person
+      #   end
       def has_many(association_name)
         add_association(:has_many, association_name.to_s.classify, association_name)
       end
@@ -236,7 +252,8 @@ module Mongoid #:nodoc:
 
     # Write to the attributes hash.
     def write_attribute(name, value)
-      @attributes[name.to_sym] = value
+      symbol = name.to_sym
+      @attributes[name.to_sym] = fields[symbol].value(value)
     end
 
   end

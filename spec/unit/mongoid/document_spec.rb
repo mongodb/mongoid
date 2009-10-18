@@ -488,6 +488,24 @@ describe Mongoid::Document do
 
   end
 
+  describe "#write_attribute" do
+
+    context "when attribute does not exist" do
+
+      before do
+        Person.field :weight, :default => 100
+        @person = Person.new
+      end
+
+      it "returns the default value" do
+        @person.weight = nil
+        @person.weight.should == 100
+      end
+
+    end
+
+  end
+
   context "validations" do
 
     context "when defining using macros" do
