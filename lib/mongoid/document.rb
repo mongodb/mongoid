@@ -237,6 +237,11 @@ module Mongoid #:nodoc:
       id.to_s
     end
 
+    # Update the document based on notify from child
+    def update(child)
+      # Placeholder for handling updates to child documents
+    end
+
     # Write to the attributes hash.
     def write_attribute(name, value)
       symbol = name.to_sym

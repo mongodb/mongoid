@@ -28,6 +28,7 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def build(attributes)
         object = @klass.new(attributes)
+        object.parentize(@parent)
         push(object)
         object
       end
@@ -53,7 +54,7 @@ module Mongoid #:nodoc:
         attributes = document.attributes[association_name]
         @documents = attributes ? attributes.collect do |attribute|
           child = @klass.new(attribute)
-          child.parent = document
+          child.parentize(@parent)
           child
         end : []
         super(@documents)

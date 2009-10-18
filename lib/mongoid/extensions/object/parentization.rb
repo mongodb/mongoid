@@ -5,6 +5,7 @@ module Mongoid #:nodoc:
         # Sets the parent object
         def parentize(object)
           self.parent = object
+          object.add_observer(self)
         end
       end
     end

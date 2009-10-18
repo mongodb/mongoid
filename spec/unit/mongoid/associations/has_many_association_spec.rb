@@ -8,7 +8,7 @@ describe Mongoid::Associations::HasManyAssociation do
     @attributes = { :addresses => [
       { :_id => @first_id, :street => "Street 1" },
       { :_id => @second_id, :street => "Street 2" } ] }
-    @document = stub(:attributes => @attributes)
+    @document = stub(:attributes => @attributes, :add_observer => true)
   end
 
   describe "#[]" do
