@@ -7,7 +7,8 @@ module Mongoid #:nodoc:
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
 
-    attr_accessor :attributes, :parent
+    attr_accessor :parent
+    attr_reader :attributes
 
     define_callbacks \
       :after_create,
@@ -253,6 +254,10 @@ module Mongoid #:nodoc:
     def read_attribute(name)
       symbol = name.to_sym
       fields[symbol].value(@attributes[symbol])
+    end
+
+    def set_attributes(attrs)
+      @attributes = attrs
     end
 
     # Update the created_at field on the Document to the current time. This is
