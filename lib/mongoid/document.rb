@@ -227,9 +227,30 @@ module Mongoid #:nodoc:
       @attributes[:_id].nil?
     end
 
+    # Read from the attributes hash.
+    def read_attribute(name)
+      symbol = name.to_sym
+      fields[symbol].value(@attributes[symbol])
+    end
+
     # Returns the id of the Document
     def to_param
       id.to_s
+    end
+
+    # Write to the attributes hash.
+    def write_attribute(name, value)
+      symbol = name.to_sym
+      @attributes[name.to_sym] = value
+    end
+
+    # Writes all the attributes of this Document, and delegate up to 
+    # the parent.
+    def write_attributes(attrs)
+      name = self.class.to_s.downcase.demodulize.to_sym
+      # name = self.class.to_s.demodulize.tableize.to_sym
+      @parent.write_attribute(name, attrs) if @parent
+      @attributes = attrs
     end
 
     private
@@ -240,7 +261,7 @@ module Mongoid #:nodoc:
       # then adds the accessors for the association.
       def add_association(type, class_name, name)
         define_method(name) do
-          Mongoid::Associations::Factory.create(type, name, self)
+          Associations::Factory.create(type, name, self)
         end
         define_method("#{name}=") do |object|
           object.parentize(self)
@@ -248,16 +269,6 @@ module Mongoid #:nodoc:
         end
       end
 
-    end
-
-    # Read from the attributes hash.
-    def read_attribute(name)
-      symbol = name.to_sym
-      fields[symbol].value(@attributes[symbol])
-    end
-
-    def set_attributes(attrs)
-      @attributes = attrs
     end
 
     # Update the created_at field on the Document to the current time. This is
@@ -270,12 +281,6 @@ module Mongoid #:nodoc:
     # This is only called on create and on save.
     def update_last_modified
       self.last_modified = Time.now
-    end
-
-    # Write to the attributes hash.
-    def write_attribute(name, value)
-      symbol = name.to_sym
-      @attributes[name.to_sym] = fields[symbol].value(value)
     end
 
   end

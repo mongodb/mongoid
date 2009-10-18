@@ -58,14 +58,14 @@ module Mongoid #:nodoc:
       # Update the attributes of the +Document+. Will call save after the
       # attributes have been updated.
       def update_attributes(attrs = {})
-        set_attributes(attrs); save
+        write_attributes(attrs); save
       end
 
       # Update the attributes of the +Document+. Will call save! after the
       # attributes have been updated, causing a +ValidationError+ if the
       # +Document+ failed validation.
       def update_attributes!(attrs = {})
-        set_attributes(attrs); save!
+        write_attributes(attrs); save!
       end
 
     end

@@ -60,14 +60,22 @@ describe Mongoid::Document do
 
   describe "#association=" do
 
-    before do
-      @name = Name.new
-      @person = Person.new
-    end
+    context "when child is a has one" do
 
-    it "parentizes the association" do
-      @person.name = @name
-      @name.parent.should == @person
+      before do
+        @person = Person.new(:title => "Sir", :age => 30)
+        @name = Name.new(:first_name => "Test", :last_name => "User")
+        @person.name = @name
+      end
+
+      it "parentizes the association" do
+        @name.parent.should == @person
+      end
+
+      it "sets the child attributes on the parent" do
+        @person.attributes[:name].should == { :first_name => "Test", :last_name => "User" }
+      end
+
     end
 
   end
@@ -509,6 +517,35 @@ describe Mongoid::Document do
       it "returns the default value" do
         @person.weight = nil
         @person.weight.should == 100
+      end
+
+    end
+
+  end
+
+  describe "#write_attributes" do
+
+    context "on a child document" do
+
+      context "when child is part of a has one" do
+
+        before do
+          @person = Person.new(:title => "Sir", :age => 30)
+          @name = Name.new(:first_name => "Test", :last_name => "User")
+          @person.name = @name
+        end
+
+        it "sets the child attributes on the parent" do
+          @name.write_attributes(:first_name => "Test2", :last_name => "User2")
+          @person.attributes[:name].should == 
+            { :first_name => "Test2", :last_name => "User2" }
+        end
+
+      end
+
+      context "when child is part of a has many" do
+
+        it "updates the child attributes on the parent"
       end
 
     end
