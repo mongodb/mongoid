@@ -26,7 +26,24 @@ module Mongoid #:nodoc:
         collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
       end
 
-      # Adds the association back to the parent document.
+      # Adds the association back to the parent document. This macro is
+      # necessary to set the references from the child back to the parent
+      # document. If a child does not define this association calling
+      # persistence methods on the child object will cause a save to fail.
+      #
+      # Options:
+      #
+      # association_name: A +Symbol+ that matches the name of the parent class.
+      #
+      # Example:
+      #
+      #   class Person < Mongoid::Document
+      #     has_many :addresses
+      #   end
+      #
+      #   class Address < Mongoid::Document
+      #     belongs_to :person
+      #   end
       def belongs_to(association_name)
         @embedded = true
         add_association(:belongs_to, association_name.to_s.classify, association_name)
@@ -42,6 +59,15 @@ module Mongoid #:nodoc:
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
+      #
+      # Options:
+      #
+      # name: The name of the field, as a +Symbol+.
+      # options: A +Hash+ of options to supply to the +Field+.
+      #
+      # Example:
+      #
+      # <tt>field :score, :default => 0</tt>
       def field(name, options = {})
         @fields ||= {}
         @fields[name] = Field.new(name, options)
@@ -54,9 +80,19 @@ module Mongoid #:nodoc:
         @fields
       end
 
-      # Find all Documents in several ways.
-      # Model.find(:first, :attribute => "value")
-      # Model.find(:all, :attribute => "value")
+      # Find a +Document+ in several different ways.
+      #
+      # If a +String+ is provided, it will be assumed that it is a
+      # representation of a Mongo::ObjectID and will attempt to find a single
+      # +Document+ based on that id. If a +Symbol+ and +Hash+ is provided then
+      # it will attempt to find either a single +Document+ or multiples based
+      # on the conditions provided and the first parameter.
+      #
+      # <tt>Person.find(:first, :conditions => { :attribute => "value" })</tt>
+      #
+      # <tt>Person.find(:all, :conditions => { :attribute => "value" })</tt>
+      #
+      # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
       def find(*args)
         Criteria.translate(*args).execute(self)
       end
