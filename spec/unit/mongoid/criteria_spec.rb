@@ -127,19 +127,6 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#select" do
-
-    it "adds the clause to the selector" do
-      @criteria.select(:title => "Title", :text => "Text")
-      @criteria.selector.should == { :title => "Title", :text => "Text" }
-    end
-
-    it "returns self" do
-      @criteria.select.should == @criteria
-    end
-
-  end
-
   describe "#not_in" do
 
     it "adds the exclusion to the selector" do
@@ -170,15 +157,15 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#only" do
+  describe "#select" do
 
     it "adds the options for limiting by fields" do
-      @criteria.only(:title, :text)
+      @criteria.select(:title, :text)
       @criteria.options.should == { :fields => [ :title, :text ] }
     end
 
     it "returns self" do
-      @criteria.only.should == @criteria
+      @criteria.select.should == @criteria
     end
 
   end
@@ -284,6 +271,19 @@ describe Mongoid::Criteria do
 
       end
 
+    end
+
+  end
+
+  describe "#where" do
+
+    it "adds the clause to the selector" do
+      @criteria.where(:title => "Title", :text => "Text")
+      @criteria.selector.should == { :title => "Title", :text => "Text" }
+    end
+
+    it "returns self" do
+      @criteria.where.should == @criteria
     end
 
   end

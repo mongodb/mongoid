@@ -150,25 +150,6 @@ module Mongoid #:nodoc:
       @options[:limit] = value; self
     end
 
-    # Adds a criterion to the +Criteria+ that specifies values that must
-    # be matched in order to return results. This is similar to a SQL "WHERE"
-    # clause. This is the actual selector that will be provided to MongoDB, 
-    # similar to the Javascript object that is used when performing a find()
-    # in the MongoDB console.
-    #
-    # Options:
-    #
-    # selectior: A +Hash+ that must match the attributes of the +Document+.
-    #
-    # Example:
-    #
-    # <tt>criteria.select(:field1 => "value1", :field2 => 15)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def select(selector = {})
-      @selector = selector; self
-    end
-
     # Adds a criterion to the +Criteria+ that specifies values where none
     # should match in order to return results. This is similar to an SQL "NOT IN"
     # clause. The MongoDB conditional operator that will be used is "$nin".
@@ -215,10 +196,10 @@ module Mongoid #:nodoc:
     #
     # Example:
     #
-    # <tt>criteria.only(:field1, :field2, :field3)</tt>
+    # <tt>criteria.select(:field1, :field2, :field3)</tt>
     #
     # Returns: <tt>self</tt>
-    def only(*args)
+    def select(*args)
       @options[:fields] = args.flatten; self
     end
 
@@ -262,7 +243,26 @@ module Mongoid #:nodoc:
     def self.translate(*args)
       type, params = args[0], args[1] || {}
       return new(:first).id(type.to_s) if type.is_a?(String)
-      return new(type).select(params.delete(:conditions)).extras(params)
+      return new(type).where(params.delete(:conditions)).extras(params)
+    end
+
+    # Adds a criterion to the +Criteria+ that specifies values that must
+    # be matched in order to return results. This is similar to a SQL "WHERE"
+    # clause. This is the actual selector that will be provided to MongoDB, 
+    # similar to the Javascript object that is used when performing a find()
+    # in the MongoDB console.
+    #
+    # Options:
+    #
+    # selectior: A +Hash+ that must match the attributes of the +Document+.
+    #
+    # Example:
+    #
+    # <tt>criteria.where(:field1 => "value1", :field2 => 15)</tt>
+    #
+    # Returns: <tt>self</tt>
+    def where(selector = {})
+      @selector = selector; self
     end
 
   end
