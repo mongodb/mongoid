@@ -27,7 +27,11 @@ module Mongoid #:nodoc:
         collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
       end
 
-      # Get the Mongo::Collection associated with this Document.
+      # Returns the collection associated with this +Document+. If the
+      # document is embedded, there will be no collection associated
+      # with it.
+      #
+      # Returns: <tt>Mongo::Collection</tt>
       def collection
         return nil if @embedded
         @collection_name = self.to_s.demodulize.tableize
@@ -75,14 +79,24 @@ module Mongoid #:nodoc:
         Criteria.translate(*args).execute(self)
       end
 
-      # Find a single Document given the passed selector, which is a Hash of attributes that
-      # must match the Document in the database exactly.
+      # Find the first +Document+ given the conditions.
+      #
+      # Options:
+      #
+      # args: A +Hash+ with a conditions key and other options
+      #
+      # <tt>Person.first(:conditions => { :attribute => "value" })</tt>
       def first(*args)
         find(:first, *args)
       end
 
-      # Find all Documents given the passed selector, which is a Hash of attributes that
-      # must match the Document in the database exactly.
+      # Find +Documents+ given the conditions.
+      #
+      # Options:
+      #
+      # args: A +Hash+ with a conditions key and other options
+      #
+      # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
       def all(*args)
         find(:all, *args)
       end
