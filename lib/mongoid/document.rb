@@ -179,6 +179,23 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Entry point for creating a new criteria from a Document. This will
+      # instantiate a new +Criteria+ object with the supplied select criterion
+      # already added to it.
+      #
+      # Options:
+      #
+      # args: A list of field names to retrict the returned fields to.
+      #
+      # Example:
+      #
+      # <tt>Person.select(:field1, :field2, :field3)</tt>
+      #
+      # Returns: <tt>Criteria</tt>
+      def select(*args)
+        Criteria.new(:all).select(*args)
+      end
+
     end
 
     # Get the Mongo::Collection associated with this Document.

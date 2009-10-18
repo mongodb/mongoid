@@ -192,7 +192,7 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # params: A list of field names to retrict the returned fields to.
+    # args: A list of field names to retrict the returned fields to.
     #
     # Example:
     #

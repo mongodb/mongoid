@@ -98,7 +98,7 @@ Old School:
 New School:
 
 <pre>
-  Criteria.new.select(:first_name, :last_name).where(:title => "Sir").skip(10).limit(10).execute
+  Person.select(:first_name, :last_name).where(:title => "Sir").skip(10).limit(10).execute
   Criteria.translate(:conditions => { :title => "Sir" }).execute
 </pre>
 

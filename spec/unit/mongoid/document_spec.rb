@@ -479,6 +479,15 @@ describe Mongoid::Document do
 
   end
 
+  describe "#select" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Person.select(:title, :age)
+      criteria.options.should == { :fields => [ :title, :age ] }
+    end
+
+  end
+
   describe "#to_param" do
 
     it "returns the id" do
