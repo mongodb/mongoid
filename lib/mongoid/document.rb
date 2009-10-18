@@ -2,6 +2,7 @@ module Mongoid #:nodoc:
   class Document
     include ActiveSupport::Callbacks
     include Commands, Observable, Validatable
+    extend Associations
 
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     GROUP_BY_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
@@ -24,29 +25,6 @@ module Mongoid #:nodoc:
       def aggregate(fields, params = {})
         selector = params[:conditions]
         collection.group(fields, selector, { :count => 0 }, AGGREGATE_REDUCE)
-      end
-
-      # Adds the association back to the parent document. This macro is
-      # necessary to set the references from the child back to the parent
-      # document. If a child does not define this association calling
-      # persistence methods on the child object will cause a save to fail.
-      #
-      # Options:
-      #
-      # association_name: A +Symbol+ that matches the name of the parent class.
-      #
-      # Example:
-      #
-      #   class Person < Mongoid::Document
-      #     has_many :addresses
-      #   end
-      #
-      #   class Address < Mongoid::Document
-      #     belongs_to :person
-      #   end
-      def belongs_to(association_name)
-        @embedded = true
-        add_association(:belongs_to, association_name.to_s.classify, association_name)
       end
 
       # Get the Mongo::Collection associated with this Document.
@@ -116,32 +94,6 @@ module Mongoid #:nodoc:
         collection.group(fields, selector, { :group => [] }, GROUP_BY_REDUCE).collect do |docs|
           docs["group"] = docs["group"].collect { |attrs| new(attrs) }; docs
         end
-      end
-
-      # Adds the association from a parent document to its children. The name
-      # of the association needs to be a pluralized form of the child class
-      # name.
-      #
-      # Options:
-      #
-      # association_name: A +Symbol+ that is the plural child class name.
-      #
-      # Example:
-      #
-      #   class Person < Mongoid::Document
-      #     has_many :addresses
-      #   end
-      #
-      #   class Address < Mongoid::Document
-      #     belongs_to :person
-      #   end
-      def has_many(association_name)
-        add_association(:has_many, association_name.to_s.classify, association_name)
-      end
-
-      # Create a one-to-many association between Documents.
-      def has_one(association_name)
-        add_association(:has_one, association_name.to_s.titleize, association_name)
       end
 
       # Adds timestamps on the Document in the form of the fields 'created_on'
@@ -258,22 +210,6 @@ module Mongoid #:nodoc:
     end
 
     private
-
-    class << self
-
-      # Adds the association to the associations hash with the type as the key,
-      # then adds the accessors for the association.
-      def add_association(type, class_name, name)
-        define_method(name) do
-          Associations::Factory.create(type, name, self)
-        end
-        define_method("#{name}=") do |object|
-          object.parentize(self)
-          @attributes[name] = object.mongoidize
-        end
-      end
-
-    end
 
     # Update the created_at field on the Document to the current time. This is
     # only called on create.
