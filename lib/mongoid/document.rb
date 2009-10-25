@@ -166,6 +166,11 @@ module Mongoid #:nodoc:
       @attributes[:_id].nil?
     end
 
+    def notify
+      changed(true)
+      notify_observers(self)
+    end
+
     # Read from the attributes hash.
     def read_attribute(name)
       symbol = name.to_sym
@@ -187,16 +192,14 @@ module Mongoid #:nodoc:
     def write_attribute(name, value)
       symbol = name.to_sym
       @attributes[name.to_sym] = value
-      changed(true)
-      notify_observers(self)
+      notify
     end
 
     # Writes all the attributes of this Document, and delegate up to 
     # the parent.
     def write_attributes(attrs)
       @attributes = attrs
-      changed(true)
-      notify_observers(self)
+      notify
     end
 
   end
