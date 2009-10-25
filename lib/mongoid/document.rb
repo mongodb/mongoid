@@ -179,22 +179,24 @@ module Mongoid #:nodoc:
 
     # Update the document based on notify from child
     def update(child)
-      # Placeholder for handling updates to child documents
+      name = child.class.to_s.downcase.demodulize.to_sym
+      write_attribute(name, child.attributes)
     end
 
     # Write to the attributes hash.
     def write_attribute(name, value)
       symbol = name.to_sym
       @attributes[name.to_sym] = value
+      changed(true)
+      notify_observers(self)
     end
 
     # Writes all the attributes of this Document, and delegate up to 
     # the parent.
     def write_attributes(attrs)
-      name = self.class.to_s.downcase.demodulize.to_sym
-      # name = self.class.to_s.demodulize.tableize.to_sym
-      @parent.write_attribute(name, attrs) if @parent
       @attributes = attrs
+      changed(true)
+      notify_observers(self)
     end
 
   end

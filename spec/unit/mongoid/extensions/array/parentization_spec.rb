@@ -11,7 +11,7 @@ describe Mongoid::Extensions::Array::Parentization do
     end
 
     it "sets the parent on each element" do
-      @parent.expects(:add_observer).with(@child)
+      @child.expects(:add_observer).with(@parent)
       @child.expects(:parent=).with(@parent)
       @array.parentize(@parent)
     end

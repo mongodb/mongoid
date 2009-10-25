@@ -385,7 +385,7 @@ describe Mongoid::Document do
 
         it "sets the child attributes on the parent" do
           @name.write_attributes(:first_name => "Test2", :last_name => "User2")
-          @person.attributes[:name].should == 
+          @person.attributes[:name].should ==
             { :first_name => "Test2", :last_name => "User2" }
         end
 
