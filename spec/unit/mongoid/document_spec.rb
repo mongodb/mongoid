@@ -260,6 +260,35 @@ describe Mongoid::Document do
 
     end
 
+    context "with a primary key" do
+
+      context "when the value for the key exists" do
+
+        before do
+          Address.key :street
+          @address = Address.new(:street => "Test")
+        end
+
+        it "sets the primary key" do
+          @address.id.should == "test"
+        end
+
+      end
+
+      context "when the value for the key is nonexistant" do
+
+        before do
+          @address = Address.new(:street => "Test")
+        end
+
+        it "sets the primary key" do
+          @address.id.should be_nil
+        end
+
+      end
+
+    end
+
   end
 
   describe "#new_record?" do
@@ -436,8 +465,8 @@ describe Mongoid::Document do
         end
 
         it "updates the child attributes on the parent" do
-          #@address.write_attributes(:street => "Test2")
-          #@person.attributes[:addresses].should == { :street => "Test2" }
+          @address.write_attributes(:street => "Test2")
+          @person.attributes[:addresses].should == [{ :street => "Test2" }]
         end
 
       end

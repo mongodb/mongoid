@@ -2,10 +2,12 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasManyAssociation < DelegateClass(Array) #:nodoc:
 
+      attr_accessor :association_name
+
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def <<(object)
-        object.parentize(@parent)
+        object.parentize(@parent, @association_name)
         @documents << object
       end
 
@@ -28,7 +30,7 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def build(attributes)
         object = @klass.new(attributes)
-        object.parentize(@parent)
+        object.parentize(@parent, @association_name)
         push(object)
         object
       end
@@ -50,11 +52,12 @@ module Mongoid #:nodoc:
       # essentially a proxy to an array itself.
       def initialize(association_name, document)
         @parent = document
-        @klass = association_name.to_s.classify.constantize
-        attributes = document.attributes[association_name]
+        @association_name = association_name
+        @klass = @association_name.to_s.classify.constantize
+        attributes = document.attributes[@association_name]
         @documents = attributes ? attributes.collect do |attribute|
           child = @klass.new(attribute)
-          child.parentize(@parent)
+          child.parentize(@parent, @association_name)
           child
         end : []
         super(@documents)

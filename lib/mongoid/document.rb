@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     include Commands, Observable, Validatable
     extend Associations
 
-    attr_accessor :parent
+    attr_accessor :association_name, :parent
     attr_reader :attributes
 
     define_callbacks \
@@ -174,6 +174,7 @@ module Mongoid #:nodoc:
     def initialize(attributes = {})
       @attributes = attributes.symbolize_keys if attributes
       @attributes = {} unless attributes
+      generate_key
     end
 
     # Return the +Document+ primary key.
@@ -205,8 +206,8 @@ module Mongoid #:nodoc:
 
     # Update the document based on notify from child
     def update(child)
-      name = child.class.to_s.downcase.demodulize.to_sym
-      write_attribute(name, child.attributes)
+      @attributes.insert(child.association_name, child.attributes)
+      notify
     end
 
     # Write to the attributes hash.
@@ -225,8 +226,10 @@ module Mongoid #:nodoc:
 
     private
     def generate_key
-      values = primary_key.collect { |key| @attributes[key] }
-      @attributes[:_id] = values.join(" ").parameterize.to_s
+      if primary_key
+        values = primary_key.collect { |key| @attributes[key] }
+        @attributes[:_id] = values.join(" ").parameterize.to_s
+      end
     end
   end
 end

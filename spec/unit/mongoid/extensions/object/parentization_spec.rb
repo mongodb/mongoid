@@ -10,7 +10,7 @@ describe Mongoid::Extensions::Object::Parentization do
     end
 
     it "sets the parent on each element" do
-      @child.parentize(@parent)
+      @child.parentize(@parent, :child)
       @child.parent.should == @parent
     end
 

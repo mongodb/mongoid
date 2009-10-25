@@ -80,7 +80,7 @@ module Mongoid # :nodoc:
         Associations::Factory.create(type, name, self)
       end
       define_method("#{name}=") do |object|
-        object.parentize(self)
+        object.parentize(self, name)
         @attributes[name] = object.mongoidize
       end
     end

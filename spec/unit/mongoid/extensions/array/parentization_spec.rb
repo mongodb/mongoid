@@ -13,7 +13,8 @@ describe Mongoid::Extensions::Array::Parentization do
     it "sets the parent on each element" do
       @child.expects(:add_observer).with(@parent)
       @child.expects(:parent=).with(@parent)
-      @array.parentize(@parent)
+      @child.expects(:association_name=).with(:child)
+      @array.parentize(@parent, :child)
     end
 
   end
