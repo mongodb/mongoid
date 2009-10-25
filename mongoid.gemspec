@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.4.5"
+  s.version = "0.4.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-10-18}
+  s.date = %q{2009-10-25}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -40,9 +40,13 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions.rb",
      "lib/mongoid/extensions/array/conversions.rb",
      "lib/mongoid/extensions/array/parentization.rb",
+     "lib/mongoid/extensions/hash/accessors.rb",
      "lib/mongoid/extensions/object/conversions.rb",
      "lib/mongoid/extensions/object/parentization.rb",
+     "lib/mongoid/extensions/string/inflections.rb",
+     "lib/mongoid/extensions/symbol/inflections.rb",
      "lib/mongoid/field.rb",
+     "lib/mongoid/timestamps.rb",
      "mongoid.gemspec",
      "spec/integration/mongoid/document_spec.rb",
      "spec/spec.opts",
@@ -52,6 +56,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/factory_spec.rb",
      "spec/unit/mongoid/associations/has_many_association_spec.rb",
      "spec/unit/mongoid/associations/has_one_association_spec.rb",
+     "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
      "spec/unit/mongoid/commands/delete_all_spec.rb",
      "spec/unit/mongoid/commands/delete_spec.rb",
@@ -63,9 +68,13 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
+     "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/parentization_spec.rb",
-     "spec/unit/mongoid/field_spec.rb"
+     "spec/unit/mongoid/extensions/string/inflections_spec.rb",
+     "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
+     "spec/unit/mongoid/field_spec.rb",
+     "spec/unit/mongoid/timestamps_spec.rb"
   ]
   s.homepage = %q{http://github.com/durran/mongoid}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -80,6 +89,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/factory_spec.rb",
      "spec/unit/mongoid/associations/has_many_association_spec.rb",
      "spec/unit/mongoid/associations/has_one_association_spec.rb",
+     "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
      "spec/unit/mongoid/commands/delete_all_spec.rb",
      "spec/unit/mongoid/commands/delete_spec.rb",
@@ -91,9 +101,13 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
+     "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/parentization_spec.rb",
-     "spec/unit/mongoid/field_spec.rb"
+     "spec/unit/mongoid/extensions/string/inflections_spec.rb",
+     "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
+     "spec/unit/mongoid/field_spec.rb",
+     "spec/unit/mongoid/timestamps_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
