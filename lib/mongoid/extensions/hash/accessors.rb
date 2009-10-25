@@ -3,13 +3,10 @@ module Mongoid #:nodoc:
     module Hash #:nodoc:
       module Accessors #:nodoc:
         def insert(key, attrs)
-          # TODO: Refactor me.
           store(key, attrs) if key.singular?
           if key.plural?
-            if has_key?(key)
-              elements = fetch(key)
-              elements.delete_if { |e| (e[:_id] == attrs[:_id]) }
-              elements << attrs
+            if elements = fetch(key, nil)
+              elements.delete_if { |e| (e[:_id] == attrs[:_id]) } << attrs
             else
               store(key, [attrs])
             end
