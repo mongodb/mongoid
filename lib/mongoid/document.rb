@@ -166,6 +166,7 @@ module Mongoid #:nodoc:
       @attributes[:_id].nil?
     end
 
+    # Notify observers that this Document has changed.
     def notify
       changed(true)
       notify_observers(self)
