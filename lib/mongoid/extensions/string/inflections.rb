@@ -1,12 +1,12 @@
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
-    module Symbol #:nodoc:
+    module String #:nodoc:
       module Inflections #:nodoc:
         def singular?
-          to_s.singular?
+          singularize == self
         end
         def plural?
-          to_s.plural?
+          pluralize == self
         end
       end
     end
