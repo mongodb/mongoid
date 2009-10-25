@@ -208,6 +208,14 @@ module Mongoid #:nodoc:
       exclusions.each { |key, value| @selector[key] = { "$nin" => value } }; self
     end
 
+    # Returns the offset option. If a per_page option is in the list then it
+    # will replace it with a skip parameter and return the same value. Defaults
+    # to 20 if nothing was provided.
+    def offset
+      offset = @options.delete(:per_page) || 20
+      @options[:skip] ||= offset
+    end
+
     # Adds a criterion to the +Criteria+ that specifies the sort order of
     # the returned documents in the database. Similar to a SQL "ORDER BY".
     #
@@ -222,6 +230,12 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def order_by(params = [])
       @options[:sort] = params; self
+    end
+
+    # Either returns the page option and removes it from the options, or
+    # returns a default value of 1.
+    def page
+      @options.delete(:page) || 1
     end
 
     # Adds a criterion to the +Criteria+ that specifies the fields that will

@@ -214,6 +214,53 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#offset" do
+
+    context "when the per_page option exists" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(:all).extras({ :per_page => 20 })
+      end
+
+      it "returns the per_page option" do
+        @criteria.offset.should == 20
+      end
+
+      it "replaces per_page with skip in the options" do
+        @criteria.offset
+        @criteria.options[:per_page].should be_nil
+        @criteria.options[:skip].should == 20
+      end
+
+    end
+
+    context "when the skip option exists" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(:all).extras({ :skip => 20 })
+      end
+
+      it "returns the skip option" do
+        @criteria.offset.should == 20
+      end
+
+    end
+
+    context "when no option exists" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(:all)
+      end
+
+      it "adds the skip option to the options and returns it" do
+        @criteria.offset.should == 20
+        @criteria.options[:skip].should == 20
+      end
+
+    end
+
+  end
+
   describe "#order_by" do
 
     context "when field names and direction specified" do
@@ -227,6 +274,39 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.order_by.should == @criteria
+    end
+
+  end
+
+  describe "#page" do
+
+    context "when the page option exists" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(:all).extras({ :page => 5 })
+      end
+
+      it "returns the page option" do
+        @criteria.page.should == 5
+      end
+
+      it "deletes the page option from the options" do
+        @criteria.page.should == 5
+        @criteria.options[:page].should be_nil
+      end
+
+    end
+
+    context "when the page option does not exist" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(:all)
+      end
+
+      it "returns 1" do
+        @criteria.page.should == 1
+      end
+
     end
 
   end

@@ -271,32 +271,33 @@ describe Mongoid::Document do
   describe "#paginate" do
 
     before do
-      @cursor = stub(:count => 100, :collect => [])
+      @criteria = stub(:page => 1, :offset => "20")
     end
 
     context "when pagination parameters are passed" do
 
+      before do
+        @params = { :conditions => { :test => "Test" }, :page => 2, :per_page => 20 }
+      end
+
       it "delegates to will paginate with the results" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => nil, :limit => 20, :skip => 20}).returns(@cursor)
-        Person.paginate(:conditions => { :test => "Test" }, :page => 2, :per_page => 20)
+        Mongoid::Criteria.expects(:translate).with(:all, @params).returns(@criteria)
+        @criteria.expects(:execute).with(Person).returns([])
+        Person.paginate(@params)
       end
 
     end
 
     context "when pagination parameters are not passed" do
 
-      it "delegates to will paginate with default values" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => nil, :limit => 20, :skip => 0}).returns(@cursor)
-        Person.paginate(:conditions => { :test => "Test" })
+      before do
+        @params = { :conditions => { :test => "Test" }}
       end
 
-    end
-
-    context "when sorting paramters provided" do
-
-      it "adds the sorting parameters in the collection#find" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => { :test => -1}, :limit => 20, :skip => 0}).returns(@cursor)
-        Person.paginate(:conditions => { :test => "Test" }, :sort => { :test => -1 })
+      it "delegates to will paginate with default values" do
+        Mongoid::Criteria.expects(:translate).with(:all, @params).returns(@criteria)
+        @criteria.expects(:execute).with(Person).returns([])
+        Person.paginate(:conditions => { :test => "Test" })
       end
 
     end
