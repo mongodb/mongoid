@@ -29,6 +29,7 @@ class Address < Mongoid::Document
   field :city
   field :state
   field :post_code
+  key :street
   belongs_to :person
 end
 

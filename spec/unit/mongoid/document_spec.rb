@@ -275,18 +275,6 @@ describe Mongoid::Document do
 
       end
 
-      context "when the value for the key is nonexistant" do
-
-        before do
-          @address = Address.new(:street => "Test")
-        end
-
-        it "sets the primary key" do
-          @address.id.should be_nil
-        end
-
-      end
-
     end
 
   end

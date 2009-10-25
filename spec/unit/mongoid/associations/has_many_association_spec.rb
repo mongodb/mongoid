@@ -3,11 +3,9 @@ require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 describe Mongoid::Associations::HasManyAssociation do
 
   before do
-    @first_id = Mongo::ObjectID.new
-    @second_id = Mongo::ObjectID.new
     @attributes = { :addresses => [
-      { :_id => @first_id, :street => "Street 1" },
-      { :_id => @second_id, :street => "Street 2" } ] }
+      { :street => "Street 1" },
+      { :street => "Street 2" } ] }
     @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
   end
 
@@ -119,8 +117,8 @@ describe Mongoid::Associations::HasManyAssociation do
     context "when finding by id" do
 
       it "returns the document in the array with that id" do
-        address = @association.find(@second_id)
-        address.id.should == @second_id
+        address = @association.find("street-2")
+        address.should_not be_nil
       end
 
     end
