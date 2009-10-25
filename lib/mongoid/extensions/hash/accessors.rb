@@ -3,6 +3,7 @@ module Mongoid #:nodoc:
     module Hash #:nodoc:
       module Accessors #:nodoc:
         def insert(key, attrs)
+          # TODO: Refactor me.
           store(key, attrs) if key.singular?
           if key.plural?
             if has_key?(key)
