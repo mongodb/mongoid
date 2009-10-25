@@ -91,19 +91,6 @@ module Mongoid #:nodoc:
         find(:all, *args)
       end
 
-      # Adds timestamps on the Document in the form of the fields 'created_on'
-      # and 'last_modified'
-      def has_timestamps
-        field :created_at
-        field :last_modified
-        class_eval do
-          before_create \
-            :update_created_at,
-            :update_last_modified
-          before_save :update_last_modified
-        end
-      end
-
       # Adds an index on the field specified. Options can be :unique => true or
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
@@ -197,20 +184,6 @@ module Mongoid #:nodoc:
       # name = self.class.to_s.demodulize.tableize.to_sym
       @parent.write_attribute(name, attrs) if @parent
       @attributes = attrs
-    end
-
-    private
-
-    # Update the created_at field on the Document to the current time. This is
-    # only called on create.
-    def update_created_at
-      self.created_at = Time.now
-    end
-
-    # Update the last_modified field on the Document to the current time.
-    # This is only called on create and on save.
-    def update_last_modified
-      self.last_modified = Time.now
     end
 
   end

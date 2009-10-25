@@ -16,6 +16,7 @@ Spec::Runner.configure do |config|
 end
 
 class Person < Mongoid::Document
+  include Mongoid::Timestamps
   field :title
   field :terms
   field :age
@@ -35,10 +36,6 @@ class Name < Mongoid::Document
   field :first_name
   field :last_name
   belongs_to :person
-end
-
-class Tester < Mongoid::Document
-  has_timestamps
 end
 
 class Decorated

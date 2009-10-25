@@ -178,20 +178,6 @@ describe Mongoid::Document do
 
   end
 
-  describe "#has_timestamps" do
-
-    before do
-      @tester = Tester.new
-    end
-
-    it "adds created_on and last_modified to the document" do
-      fields = Tester.instance_variable_get(:@fields)
-      fields[:created_at].should_not be_nil
-      fields[:last_modified].should_not be_nil
-    end
-
-  end
-
   describe "#index" do
 
     context "when unique options are not provided" do
