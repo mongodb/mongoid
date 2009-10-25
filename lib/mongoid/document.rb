@@ -17,6 +17,17 @@ module Mongoid #:nodoc:
 
     class << self
 
+      # Find +Documents+ given the conditions.
+      #
+      # Options:
+      #
+      # args: A +Hash+ with a conditions key and other options
+      #
+      # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
+      def all(*args)
+        find(:all, *args)
+      end
+
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
       # with it.
@@ -80,21 +91,25 @@ module Mongoid #:nodoc:
         find(:first, *args)
       end
 
-      # Find +Documents+ given the conditions.
-      #
-      # Options:
-      #
-      # args: A +Hash+ with a conditions key and other options
-      #
-      # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
-      def all(*args)
-        find(:all, *args)
-      end
-
       # Adds an index on the field specified. Options can be :unique => true or
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
         collection.create_index(name, options)
+      end
+
+      # Defines the field that will be used for the id of this +Document+. This
+      # set the id of this +Document+ before save to a parameterized version of
+      # the field that was supplied. This is good for use for readable URLS in
+      # web applications and *MUST* be defined on documents that are embedded
+      # in order for proper updates in has_may associations.
+      def key(field)
+        @primary_key = field
+        before_save :generate_key
+      end
+
+      # Returns the primary key field of the +Document+
+      def primary_key
+        @primary_key
       end
 
       # Find all documents in paginated fashion given the supplied arguments.
@@ -161,6 +176,11 @@ module Mongoid #:nodoc:
       @attributes = {} unless attributes
     end
 
+    # Return the +Document+ primary key.
+    def primary_key
+      self.class.primary_key
+    end
+
     # Returns true is the Document has not been persisted to the database, false if it has.
     def new_record?
       @attributes[:_id].nil?
@@ -203,5 +223,9 @@ module Mongoid #:nodoc:
       notify
     end
 
+    private
+    def generate_key
+      @attributes[:_id] = @attributes[primary_key].parameterize.to_s
+    end
   end
 end

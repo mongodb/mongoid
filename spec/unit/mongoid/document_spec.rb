@@ -200,6 +200,22 @@ describe Mongoid::Document do
 
   end
 
+  describe "#key" do
+
+    before do
+      Address.key :street
+      @address = Address.new(:street => "Testing Street Name")
+      @address.expects(:collection).returns(@collection)
+      @collection.expects(:save)
+    end
+
+    it "adds the callback for primary key generation" do
+      @address.save
+      @address.id.should == "testing-street-name"
+    end
+
+  end
+
   describe "#new" do
 
     context "with no attributes" do
@@ -393,7 +409,17 @@ describe Mongoid::Document do
 
       context "when child is part of a has many" do
 
-        it "updates the child attributes on the parent"
+        before do
+          @person = Person.new(:title => "Sir")
+          @address = Address.new(:street => "Test")
+          @person.addresses << @address
+        end
+
+        it "updates the child attributes on the parent" do
+          #@address.write_attributes(:street => "Test2")
+          #@person.attributes[:addresses].should == { :street => "Test2" }
+        end
+
       end
 
     end
