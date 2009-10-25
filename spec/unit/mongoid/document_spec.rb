@@ -202,16 +202,36 @@ describe Mongoid::Document do
 
   describe "#key" do
 
-    before do
-      Address.key :street
-      @address = Address.new(:street => "Testing Street Name")
-      @address.expects(:collection).returns(@collection)
-      @collection.expects(:save)
+    context "when key is single field" do
+
+      before do
+        Address.key :street
+        @address = Address.new(:street => "Testing Street Name")
+        @address.expects(:collection).returns(@collection)
+        @collection.expects(:save)
+      end
+
+      it "adds the callback for primary key generation" do
+        @address.save
+        @address.id.should == "testing-street-name"
+      end
+
     end
 
-    it "adds the callback for primary key generation" do
-      @address.save
-      @address.id.should == "testing-street-name"
+    context "when key is composite" do
+
+      before do
+        Address.key :street, :zip
+        @address = Address.new(:street => "Testing Street Name", :zip => "94123")
+        @address.expects(:collection).returns(@collection)
+        @collection.expects(:save)
+      end
+
+      it "combines all fields" do
+        @address.save
+        @address.id.should == "testing-street-name-94123"
+      end
+
     end
 
   end

@@ -102,8 +102,8 @@ module Mongoid #:nodoc:
       # the field that was supplied. This is good for use for readable URLS in
       # web applications and *MUST* be defined on documents that are embedded
       # in order for proper updates in has_may associations.
-      def key(field)
-        @primary_key = field
+      def key(*fields)
+        @primary_key = fields
         before_save :generate_key
       end
 
@@ -225,7 +225,8 @@ module Mongoid #:nodoc:
 
     private
     def generate_key
-      @attributes[:_id] = @attributes[primary_key].parameterize.to_s
+      values = primary_key.collect { |key| @attributes[key] }
+      @attributes[:_id] = values.join(" ").parameterize.to_s
     end
   end
 end
