@@ -153,6 +153,13 @@ module Mongoid #:nodoc:
 
     end
 
+    # Performs equality checking on the attributes.
+    def ==(other)
+      raise TypeMismatchError unless other.is_a?(Document)
+      @attributes.except(:modified_at).except(:created_at) ==
+        other.attributes.except(:modified_at).except(:created_at)
+    end
+
     # Get the Mongo::Collection associated with this Document.
     def collection
       self.class.collection
@@ -215,7 +222,7 @@ module Mongoid #:nodoc:
       notify
     end
 
-    # Writes all the attributes of this Document, and delegate up to 
+    # Writes all the attributes of this Document, and delegate up to
     # the parent.
     def write_attributes(attrs)
       @attributes = attrs

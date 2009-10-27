@@ -46,7 +46,8 @@ module Mongoid
   class NoConnectionError < RuntimeError; end
 
   # Raised when an association is defined on the class, but the
-  # attribute in the hash is not an Array or Hash.
+  # attribute in the hash is not an Array or Hash, or when
+  # checking equality on objects of different types.
   class TypeMismatchError < RuntimeError; end
 
   # Raised when an association is defined that is not valid. Must

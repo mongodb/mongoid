@@ -130,7 +130,7 @@ describe Mongoid::Document do
 
       it "saves the entire graph up from the has_one" do
         person = Person.first(:conditions => { :title => "Sir" })
-        person.name.first_name.should == @person.name.first_name
+        person.should == @person
       end
 
     end
@@ -143,7 +143,7 @@ describe Mongoid::Document do
 
       it "saves the entire graph up from the has_many" do
         person = Person.first(:conditions => { :title => "Sir" })
-        person.addresses.first.street.should == @person.addresses.first.street
+        person.should == @person
       end
     end
 

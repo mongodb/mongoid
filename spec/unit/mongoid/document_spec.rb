@@ -14,6 +14,48 @@ describe Mongoid::Document do
     @collection = nil
   end
 
+  describe "#==" do
+
+    context "when other object is a Document" do
+
+      context "when attributes are equal" do
+
+        before do
+          @document = Person.new(:title => "Sir")
+          @other = Person.new(:title => "Sir")
+        end
+
+        it "returns true" do
+          @document.should == @other
+        end
+
+      end
+
+      context "when attributes are not equal" do
+
+        before do
+          @document = Person.new(:title => "Sir")
+          @other = Person.new(:title => "Madam")
+        end
+
+        it "returns false" do
+          @document.should_not == @other
+        end
+
+      end
+
+    end
+
+    context "when other object is not a Document" do
+
+      it "raises an exception" do
+        lambda { Person.new.==("Test") }.should raise_error
+      end
+
+    end
+
+  end
+
   describe "#all" do
 
     before do
