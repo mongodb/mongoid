@@ -14,6 +14,12 @@ describe Mongoid::Timestamps do
       fields[:modified_at].should_not be_nil
     end
 
+    it "forces the timestamps to UTC" do
+      @person.run_callbacks(:before_create)
+      @person.created_at.should be_close(Time.now.utc, 10.seconds)
+      @person.modified_at.should be_close(Time.now.utc, 10.seconds)
+    end
+
   end
 
 end

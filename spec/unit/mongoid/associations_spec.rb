@@ -29,7 +29,8 @@ describe Mongoid::Associations do
       end
 
       it "sets the child attributes on the parent" do
-        @person.attributes[:name].should == { :first_name => "Test", :last_name => "User" }
+        @person.attributes[:name].should ==
+          HashWithIndifferentAccess.new({ :_id => "test-user", :first_name => "Test", :last_name => "User" })
       end
 
     end

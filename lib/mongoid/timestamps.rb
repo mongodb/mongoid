@@ -16,13 +16,13 @@ module Mongoid
       # Update the created_at field on the Document to the current time. This is
       # only called on create.
       def update_created_at
-        self.created_at = Time.now
+        self.created_at = Time.now.utc
       end
 
       # Update the last_modified field on the Document to the current time.
       # This is only called on create and on save.
       def update_modified_at
-        self.modified_at = Time.now
+        self.modified_at = Time.now.utc
       end
     end
 

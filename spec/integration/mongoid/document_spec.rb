@@ -112,4 +112,41 @@ describe Mongoid::Document do
 
   end
 
+  context "the lot" do
+
+    before do
+      @person = Person.new(:title => "Sir")
+      @name = Name.new(:first_name => "Syd", :last_name => "Vicious")
+      @address = Address.new(:street => "Oxford Street")
+      @person.name = @name
+      @person.addresses << @address
+    end
+
+    context "when saving on a has_one" do
+
+      before do
+        @name.save
+      end
+
+      it "saves the entire graph up from the has_one" do
+        person = Person.first(:conditions => { :title => "Sir" })
+        person.name.first_name.should == @person.name.first_name
+      end
+
+    end
+
+    context "when saving on a has_many" do
+
+      before do
+        @address.save
+      end
+
+      it "saves the entire graph up from the has_many" do
+        person = Person.first(:conditions => { :title => "Sir" })
+        person.addresses.first.street.should == @person.addresses.first.street
+      end
+    end
+
+  end
+
 end

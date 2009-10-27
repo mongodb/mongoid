@@ -52,8 +52,8 @@ module Mongoid #:nodoc:
       #
       # <tt>field :score, :default => 0</tt>
       def field(name, options = {})
-        @fields ||= {}
-        @fields[name] = Field.new(name, options)
+        @fields ||= HashWithIndifferentAccess.new
+        @fields[name.to_s] = Field.new(name.to_s, options)
         define_method(name) { read_attribute(name) }
         define_method("#{name}=") { |value| write_attribute(name, value) }
       end
@@ -172,8 +172,8 @@ module Mongoid #:nodoc:
     # Instantiate a new Document, setting the Document's attirbutes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attributes = {})
-      @attributes = attributes.symbolize_keys if attributes
-      @attributes = {} unless attributes
+      @attributes = HashWithIndifferentAccess.new(attributes) if attributes
+      @attributes = HashWithIndifferentAccess.new unless attributes
       generate_key
     end
 
@@ -195,8 +195,7 @@ module Mongoid #:nodoc:
 
     # Read from the attributes hash.
     def read_attribute(name)
-      symbol = name.to_sym
-      fields[symbol].value(@attributes[symbol])
+      fields[name].value(@attributes[name])
     end
 
     # Returns the id of the Document
@@ -212,8 +211,7 @@ module Mongoid #:nodoc:
 
     # Write to the attributes hash.
     def write_attribute(name, value)
-      symbol = name.to_sym
-      @attributes[name.to_sym] = value
+      @attributes[name] = value
       notify
     end
 

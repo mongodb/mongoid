@@ -250,10 +250,10 @@ describe Mongoid::Document do
     context "with attributes" do
 
       before do
-        @attributes = { :test => "test" }
+        @attributes = HashWithIndifferentAccess.new({ :test => "test" })
       end
 
-      it "sets the arributes hash on the object" do
+      it "sets the attributes hash on the object" do
         person = Person.new(@attributes)
         person.attributes.should == @attributes
       end

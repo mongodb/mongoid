@@ -36,6 +36,7 @@ end
 class Name < Mongoid::Document
   field :first_name
   field :last_name
+  key :first_name, :last_name
   belongs_to :person
 end
 

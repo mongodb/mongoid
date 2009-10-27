@@ -9,6 +9,7 @@ module Mongoid #:nodoc:
       def <<(object)
         object.parentize(@parent, @association_name)
         @documents << object
+        object.is_a?(Array) ? object.each(&:notify) : object.notify
       end
 
       # Appends the object to the +Array+, setting its parent in
