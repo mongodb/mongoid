@@ -18,8 +18,8 @@ end
 class Person < Mongoid::Document
   include Mongoid::Timestamps
   field :title
-  field :terms
-  field :age
+  field :terms, :type => Boolean
+  field :age, :type => Integer
   has_many :addresses
   has_one :name
 end

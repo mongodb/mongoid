@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
     module Integer #:nodoc:
       module Conversions #:nodoc:
         def cast(value)
-          value.to_i
+          value =~ /\d/ ? value.to_i : value
         end
       end
     end
