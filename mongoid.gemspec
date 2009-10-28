@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.5.3"
+  s.version = "0.5.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/associations/factory.rb",
      "lib/mongoid/associations/has_many_association.rb",
      "lib/mongoid/associations/has_one_association.rb",
+     "lib/mongoid/attributes.rb",
      "lib/mongoid/commands.rb",
      "lib/mongoid/commands/create.rb",
      "lib/mongoid/commands/delete.rb",
@@ -64,6 +65,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/has_many_association_spec.rb",
      "spec/unit/mongoid/associations/has_one_association_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
+     "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
      "spec/unit/mongoid/commands/delete_all_spec.rb",
      "spec/unit/mongoid/commands/delete_spec.rb",
@@ -103,6 +105,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/has_many_association_spec.rb",
      "spec/unit/mongoid/associations/has_one_association_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
+     "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
      "spec/unit/mongoid/commands/delete_all_spec.rb",
      "spec/unit/mongoid/commands/delete_spec.rb",
