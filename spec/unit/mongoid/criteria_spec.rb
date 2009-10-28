@@ -54,6 +54,25 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#count" do
+
+    before do
+      @criteria = Mongoid::Criteria.new(:all, Person)
+      @selector = { :test => "Testing" }
+      @criteria.where(@selector)
+      @collection = mock
+      @cursor = mock
+      Person.expects(:collection).returns(@collection)
+    end
+
+    it "returns the count from the cursor without creating the documents" do
+      @collection.expects(:find).with(@selector, {}).returns(@cursor)
+      @cursor.expects(:count).returns(10)
+      @criteria.count.should == 10
+    end
+
+  end
+
   describe "#excludes" do
 
     it "adds the $ne query to the selector" do

@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
     # query has returned it will provided a grouping of keys with counts.
     #
     # Example:
-    # 
+    #
     # <tt>criteria.select(:field1).where(:field1 => "Title").aggregate(Person)</tt>
     def aggregate(klass = nil)
       @klass = klass if klass
@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # selections: A +Hash+ where the key is the field name and the value is an 
+    # selections: A +Hash+ where the key is the field name and the value is an
     # +Array+ of values that must all match.
     #
     # Example:
@@ -50,6 +50,22 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def all(selections = {})
       selections.each { |key, value| @selector[key] = { "$all" => value } }; self
+    end
+
+    # Get the count of matching documents in the database for the +Criteria+.
+    #
+    # Options:
+    #
+    # klass: Optional class that the collection will be retrieved from.
+    #
+    # Example:
+    #
+    # <tt>criteria.count</tt>
+    #
+    # Returns: <tt>Integer</tt>
+    def count(klass = nil)
+      @klass = klass if klass
+      return @klass.collection.find(@selector, @options).count
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that are not allowed
@@ -111,7 +127,7 @@ module Mongoid #:nodoc:
     # query has returned it will provided a grouping of keys with objects.
     #
     # Example:
-    # 
+    #
     # <tt>criteria.select(:field1).where(:field1 => "Title").group(Person)</tt>
     def group(klass = nil)
       @klass = klass if klass
@@ -256,8 +272,8 @@ module Mongoid #:nodoc:
     end
 
     # Adds a criterion to the +Criteria+ that specifies how many results to skip
-    # when returning Documents. This is mostly used in conjunction with 
-    # <tt>limit()</tt> to handle paginated results, and is similar to the 
+    # when returning Documents. This is mostly used in conjunction with
+    # <tt>limit()</tt> to handle paginated results, and is similar to the
     # traditional "offset" parameter.
     #
     # Options:
@@ -273,9 +289,9 @@ module Mongoid #:nodoc:
       @options[:skip] = value; self
     end
 
-    # Translate the supplied arguments into a +Criteria+ object. 
-    # 
-    # If the passed in args is a single +String+, then it will 
+    # Translate the supplied arguments into a +Criteria+ object.
+    #
+    # If the passed in args is a single +String+, then it will
     # construct an id +Criteria+ from it.
     #
     # If the passed in args are a type and a hash, then it will construct
@@ -300,7 +316,7 @@ module Mongoid #:nodoc:
 
     # Adds a criterion to the +Criteria+ that specifies values that must
     # be matched in order to return results. This is similar to a SQL "WHERE"
-    # clause. This is the actual selector that will be provided to MongoDB, 
+    # clause. This is the actual selector that will be provided to MongoDB,
     # similar to the Javascript object that is used when performing a find()
     # in the MongoDB console.
     #

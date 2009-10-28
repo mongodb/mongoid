@@ -39,6 +39,14 @@ module Mongoid #:nodoc:
         @collection ||= Mongoid.database.collection(@collection_name)
       end
 
+      # Returns a count of matching records in the database based on the
+      # provided arguments.
+      #
+      # <tt>Person.count(:first, :conditions => { :attribute => "value" })</tt>
+      def count(*args)
+        Criteria.translate(*args).count(self)
+      end
+
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.

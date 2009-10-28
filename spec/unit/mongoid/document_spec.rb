@@ -109,6 +109,21 @@ describe Mongoid::Document do
 
   end
 
+  describe "#count" do
+
+    before do
+      @params = { :conditions => { :title => "Sir" } }
+      @criteria = mock
+    end
+
+    it "delegates to the criteria api" do
+      Mongoid::Criteria.expects(:translate).with(@params).returns(@criteria)
+      @criteria.expects(:count).with(Person).returns(10)
+      Person.count(@params).should == 10
+    end
+
+  end
+
   describe "#field" do
 
     context "with no options" do
