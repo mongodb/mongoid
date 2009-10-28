@@ -226,7 +226,7 @@ module Mongoid #:nodoc:
 
     # Write to the attributes hash.
     def write_attribute(name, value)
-      @attributes[name] = value
+      @attributes[name] = fields[name].value(value)
       notify
     end
 

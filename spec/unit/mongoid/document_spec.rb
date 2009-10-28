@@ -468,7 +468,7 @@ describe Mongoid::Document do
     context "when attribute does not exist" do
 
       before do
-        Person.field :weight, :default => 100
+        Person.field :weight, :default => 100, :type => Integer
         @person = Person.new
       end
 
