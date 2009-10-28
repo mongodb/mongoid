@@ -307,12 +307,25 @@ describe Mongoid::Document do
     context "with attributes" do
 
       before do
-        @attributes = HashWithIndifferentAccess.new({ :test => "test" })
+        @attributes = {
+          :_id => "1",
+          :title => "value",
+          :age => "30",
+          :terms => "true",
+          :name => {
+            :_id => "2", :first_name => "Test", :last_name => "User"
+          },
+          :addresses => [
+            { :_id => "3", :street => "First Street" },
+            { :_id => "4", :street => "Second Street" }
+          ]
+        }
       end
 
-      it "sets the attributes hash on the object" do
+      it "sets the attributes hash on the object properly casted" do
         person = Person.new(@attributes)
-        person.attributes.should == @attributes
+        person.attributes[:age].should == 30
+        person.attributes[:terms].should be_true
       end
 
     end

@@ -1,7 +1,7 @@
 module Mongoid #:nodoc:
   class Document
     include ActiveSupport::Callbacks
-    include Commands, Observable, Validatable
+    include Attributes, Commands, Observable, Validatable
     extend Associations
 
     attr_accessor :association_name, :parent
@@ -184,11 +184,10 @@ module Mongoid #:nodoc:
       @attributes[:_id]
     end
 
-    # Instantiate a new Document, setting the Document's attirbutes if given.
+    # Instantiate a new Document, setting the Document's attributes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attributes = {})
-      @attributes = HashWithIndifferentAccess.new(attributes) if attributes
-      @attributes = HashWithIndifferentAccess.new unless attributes
+      @attributes = process(fields, attributes)
       generate_key
     end
 
