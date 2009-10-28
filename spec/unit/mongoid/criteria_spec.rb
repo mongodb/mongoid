@@ -332,13 +332,26 @@ describe Mongoid::Criteria do
 
   describe "#select" do
 
-    it "adds the options for limiting by fields" do
-      @criteria.select(:title, :text)
-      @criteria.options.should == { :fields => [ :title, :text ] }
+    context "when args are provided" do
+
+      it "adds the options for limiting by fields" do
+        @criteria.select(:title, :text)
+        @criteria.options.should == { :fields => [ :title, :text ] }
+      end
+
+      it "returns self" do
+        @criteria.select.should == @criteria
+      end
+
     end
 
-    it "returns self" do
-      @criteria.select.should == @criteria
+    context "when no args provided" do
+
+      it "does not add the field option" do
+        @criteria.select
+        @criteria.options[:fields].should be_nil
+      end
+
     end
 
   end

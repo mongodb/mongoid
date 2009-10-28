@@ -268,7 +268,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>self</tt>
     def select(*args)
-      @options[:fields] = args.flatten; self
+      @options[:fields] = args.flatten if args.any?; self
     end
 
     # Adds a criterion to the +Criteria+ that specifies how many results to skip
