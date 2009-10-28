@@ -3,7 +3,8 @@ module Mongoid #:nodoc:
 
     attr_reader \
       :default,
-      :name
+      :name,
+      :type
 
     # Create the new field with a name and optional additional options. Valid
     # options are :default
@@ -19,12 +20,13 @@ module Mongoid #:nodoc:
     def initialize(name, options = {})
       @name = name
       @default = options[:default]
+      @type = options[:type] || String
     end
 
     # Gets the value for the supplied object. If the object is nil, then the
     # default value will be returned.
     def value(object)
-      object ? object : default
+      object ? type.cast(object) : default
     end
 
   end

@@ -26,10 +26,23 @@ describe Mongoid::Field do
 
   end
 
+  describe "#type" do
+
+    before do
+      @field = Mongoid::Field.new(:name)
+    end
+
+    it "defaults to String" do
+      @field.type.should == String
+    end
+
+  end
+
   describe "#value" do
 
     before do
-      @field = Mongoid::Field.new(:score, :default => 10)
+      @type = mock
+      @field = Mongoid::Field.new(:score, :default => 10, :type => @type)
     end
 
     context "nil is provided" do
@@ -42,8 +55,9 @@ describe Mongoid::Field do
 
     context "value is provided" do
 
-      it "returns the value" do
-        @field.value(30).should == 30
+      it "casts the value" do
+        @type.expects(:cast).with("30").returns(30)
+        @field.value("30").should == 30
       end
 
     end

@@ -4,8 +4,8 @@ module Mongoid
     def self.included(base)
       base.class_eval do
         include InstanceMethods
-        field :created_at
-        field :modified_at
+        field :created_at, :type => Time
+        field :modified_at, :type => Time
         before_create :update_created_at, :update_modified_at
         before_save :update_modified_at
       end
