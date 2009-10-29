@@ -56,7 +56,7 @@ Example of a simple domain model:
   end
 </pre>
 
-Mongoid suuports all the basic ActiveRecord creation and persistence methods.
+Mongoid supports all the basic ActiveRecord creation and persistence methods.
 
 Creation:
 
