@@ -47,8 +47,8 @@ module Mongoid # :nodoc:
     #   class Address < Mongoid::Document
     #     belongs_to :person
     #   end
-    def has_many(association_name)
-      add_association(:has_many, association_name.to_s.classify, association_name)
+    def has_many(association_name, options = {})
+      add_association(:has_many, association_name.to_s.classify, association_name, options)
     end
 
     # Adds the association from a parent document to its child. The name
@@ -68,16 +68,16 @@ module Mongoid # :nodoc:
     #   class Address < Mongoid::Document
     #     belongs_to :person
     #   end
-    def has_one(association_name)
-      add_association(:has_one, association_name.to_s.titleize, association_name)
+    def has_one(association_name, options = {})
+      add_association(:has_one, association_name.to_s.titleize, association_name, options)
     end
 
     private
     # Adds the association to the associations hash with the type as the key,
     # then adds the accessors for the association.
-    def add_association(type, class_name, name)
+    def add_association(type, class_name, name, options = {})
       define_method(name) do
-        Associations::Factory.create(type, name, self)
+        Associations::Factory.create(type, name, self, options)
       end
       define_method("#{name}=") do |object|
         object.parentize(self, name)

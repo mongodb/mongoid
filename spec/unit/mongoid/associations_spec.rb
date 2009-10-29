@@ -86,6 +86,21 @@ describe Mongoid::Associations do
 
     end
 
+    context "when a class_name is supplied" do
+
+      before do
+        @attributes = { :title => "Sir",
+          :phone_numbers => [ { :number => "404-555-1212" } ]
+        }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the association name" do
+        @person.phone_numbers.first.should == Phone.new(:number => "404-555-1212")
+      end
+
+    end
+
   end
 
   describe "#has_one" do
@@ -117,6 +132,21 @@ describe Mongoid::Associations do
         name = Name.new(:first_name => "New Name")
         @person.name = name
         @person.name.first_name.should == "New Name"
+      end
+
+    end
+
+    context "when a class_name is supplied" do
+
+      before do
+        @attributes = { :title => "Sir",
+          :pet => { :name => "Fido" }
+        }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the association name" do
+        @person.pet.should == Animal.new(:name => "Fido")
       end
 
     end

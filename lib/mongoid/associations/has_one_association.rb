@@ -11,14 +11,19 @@ module Mongoid #:nodoc:
       #
       # All method calls on this object will then be delegated
       # to the internal document itself.
-      def initialize(association_name, document)
-        klass = association_name.to_s.titleize.constantize
-        attributes = document.attributes[association_name]
+      def initialize(name, document, options = {})
+        class_name = options[:class_name]
+        klass = class_name ? class_name.constantize : name.to_s.titleize.constantize
+        attributes = document.attributes[name]
         @document = klass.new(attributes)
         @document.parent = document
         decorate!
       end
 
+      # Equality delegates to the document.
+      def ==(other)
+        @document == other
+      end
     end
   end
 end

@@ -21,7 +21,9 @@ class Person < Mongoid::Document
   field :terms, :type => Boolean
   field :age, :type => Integer
   has_many :addresses
+  has_many :phone_numbers, :class_name => "Phone"
   has_one :name
+  has_one :pet, :class_name => "Animal"
 end
 
 class Address < Mongoid::Document
@@ -30,6 +32,18 @@ class Address < Mongoid::Document
   field :state
   field :post_code
   key :street
+  belongs_to :person
+end
+
+class Phone < Mongoid::Document
+  field :number
+  key :number
+  belongs_to :person
+end
+
+class Animal < Mongoid::Document
+  field :name
+  key :name
   belongs_to :person
 end
 
