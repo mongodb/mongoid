@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
     extend Associations
 
     attr_accessor :association_name, :parent
-    attr_reader :attributes
+    attr_reader :attributes, :new_record
 
     define_callbacks \
       :after_create,
@@ -190,6 +190,7 @@ module Mongoid #:nodoc:
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attributes = {})
       @attributes = process(fields, attributes)
+      @new_record = true if id.nil?
       generate_key
     end
 
@@ -200,7 +201,7 @@ module Mongoid #:nodoc:
 
     # Returns true is the Document has not been persisted to the database, false if it has.
     def new_record?
-      @attributes[:_id].nil?
+      @new_record == true
     end
 
     # Notify observers that this Document has changed.
@@ -245,6 +246,8 @@ module Mongoid #:nodoc:
       if primary_key
         values = primary_key.collect { |key| @attributes[key] }
         @attributes[:_id] = values.join(" ").parameterize.to_s
+      else
+        @attributes[:_id] = Mongo::ObjectID.new unless id
       end
     end
   end

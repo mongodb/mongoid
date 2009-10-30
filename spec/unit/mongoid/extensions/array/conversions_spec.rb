@@ -5,10 +5,13 @@ describe Mongoid::Extensions::Array::Conversions do
   describe "#mongoidize" do
 
     it "collects each of its attributes" do
-      array = [Person.new(:title => "Sir"), Person.new(:title => "Madam")]
+      array = [
+        Person.new(:_id => 1, :title => "Sir"),
+        Person.new(:_id => 2, :title => "Madam")
+      ]
       array.mongoidize.should ==
-        [HashWithIndifferentAccess.new({ :title => "Sir", :age => 100 }),
-         HashWithIndifferentAccess.new({ :title => "Madam", :age => 100 })]
+        [ HashWithIndifferentAccess.new({ :_id => 1, :title => "Sir", :age => 100 }),
+          HashWithIndifferentAccess.new({ :_id => 2, :title => "Madam", :age => 100 }) ]
     end
 
   end

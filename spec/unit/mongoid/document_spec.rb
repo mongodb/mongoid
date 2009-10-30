@@ -21,8 +21,8 @@ describe Mongoid::Document do
       context "when attributes are equal" do
 
         before do
-          @document = Person.new(:title => "Sir")
-          @other = Person.new(:title => "Sir")
+          @document = Person.new(:_id => 1, :title => "Sir")
+          @other = Person.new(:_id => 1, :title => "Sir")
         end
 
         it "returns true" do
@@ -219,7 +219,7 @@ describe Mongoid::Document do
 
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with({ :test => "Test" }, {}).returns(@attributes)
-        Person.first(:conditions => {:test => "Test"}).attributes.should == @attributes
+        Person.first(:conditions => {:test => "Test"}).attributes.except(:_id).should == @attributes
       end
 
     end
@@ -228,7 +228,7 @@ describe Mongoid::Document do
 
       it "finds the first document from the collection and instantiates it" do
         @collection.expects(:find_one).with(nil, {}).returns(@attributes)
-        Person.first.attributes.should == @attributes
+        Person.first.attributes.except(:_id).should == @attributes
       end
 
     end
