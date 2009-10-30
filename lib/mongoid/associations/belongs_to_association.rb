@@ -21,6 +21,10 @@ module Mongoid #:nodoc:
         @document
       end
 
+      # Delegate equality to the parent document.
+      def ==(other)
+        @document == other
+      end
     end
   end
 end

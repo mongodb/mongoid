@@ -49,6 +49,13 @@ describe Mongoid::Associations do
       address.should respond_to(:person=)
     end
 
+    it "allows the parent to be any type of class" do
+      phone_number = Phone.new(:number => "415-555-1212")
+      code = CountryCode.new(:code => 1)
+      phone_number.country_code = code
+      code.phone_number.should == phone_number
+    end
+
   end
 
   describe "#has_many" do

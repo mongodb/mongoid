@@ -39,6 +39,13 @@ class Phone < Mongoid::Document
   field :number
   key :number
   belongs_to :person
+  has_one :country_code
+end
+
+class CountryCode < Mongoid::Document
+  field :code, :type => Integer
+  key :code
+  belongs_to :phone_number
 end
 
 class Animal < Mongoid::Document
