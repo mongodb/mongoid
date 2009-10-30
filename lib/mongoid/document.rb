@@ -11,9 +11,11 @@ module Mongoid #:nodoc:
       :after_create,
       :after_destroy,
       :after_save,
+      :after_update,
       :before_create,
       :before_destroy,
-      :before_save
+      :before_save,
+      :before_update
 
     class << self
 
@@ -225,7 +227,9 @@ module Mongoid #:nodoc:
 
     # Write to the attributes hash.
     def write_attribute(name, value)
+      run_callbacks(:before_update)
       @attributes[name] = fields[name].set(value)
+      run_callbacks(:after_update)
       notify
     end
 
