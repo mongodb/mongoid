@@ -19,7 +19,8 @@ class Person < Mongoid::Document
   include Mongoid::Timestamps
   field :title
   field :terms, :type => Boolean
-  field :age, :type => Integer
+  field :age, :type => Integer, :default => 100
+  field :dob, :type => Date
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
   has_one :name

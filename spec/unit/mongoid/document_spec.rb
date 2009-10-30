@@ -212,7 +212,7 @@ describe Mongoid::Document do
   describe "#first" do
 
     before do
-      @attributes = {}
+      @attributes = HashWithIndifferentAccess.new(:age => 100)
     end
 
     context "when a selector is provided" do
@@ -297,9 +297,10 @@ describe Mongoid::Document do
 
     context "with no attributes" do
 
-      it "does not set any attributes" do
+      it "sets default attributes" do
         person = Person.new
-        person.attributes.empty?.should be_true
+        person.attributes.empty?.should be_false
+        person.age.should == 100
       end
 
     end
@@ -446,12 +447,11 @@ describe Mongoid::Document do
     context "when attribute does not exist" do
 
       before do
-        Person.field :weight, :default => 100
         @person = Person.new
       end
 
       it "returns the default value" do
-        @person.weight.should == 100
+        @person.age.should == 100
       end
 
     end
@@ -481,13 +481,12 @@ describe Mongoid::Document do
     context "when attribute does not exist" do
 
       before do
-        Person.field :weight, :default => 100, :type => Integer
         @person = Person.new
       end
 
       it "returns the default value" do
-        @person.weight = nil
-        @person.weight.should == 100
+        @person.age = nil
+        @person.age.should == 100
       end
 
     end

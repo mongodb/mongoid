@@ -6,7 +6,7 @@ describe Mongoid::Extensions::Object::Conversions do
 
     it "returns its attributes" do
       Person.new(:title => "Sir").mongoidize.should ==
-        HashWithIndifferentAccess.new({ :title => "Sir" })
+        HashWithIndifferentAccess.new({ :title => "Sir", :age => 100 })
     end
 
   end

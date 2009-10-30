@@ -7,8 +7,8 @@ describe Mongoid::Extensions::Array::Conversions do
     it "collects each of its attributes" do
       array = [Person.new(:title => "Sir"), Person.new(:title => "Madam")]
       array.mongoidize.should ==
-        [HashWithIndifferentAccess.new({ :title => "Sir" }),
-         HashWithIndifferentAccess.new({ :title => "Madam" })]
+        [HashWithIndifferentAccess.new({ :title => "Sir", :age => 100 }),
+         HashWithIndifferentAccess.new({ :title => "Madam", :age => 100 })]
     end
 
   end

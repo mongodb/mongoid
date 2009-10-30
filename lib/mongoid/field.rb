@@ -23,10 +23,15 @@ module Mongoid #:nodoc:
       @type = options[:type] || String
     end
 
-    # Gets the value for the supplied object. If the object is nil, then the
-    # default value will be returned.
-    def value(object)
-      object ? type.cast(object) : default
+    # Used for setting an object in the attributes hash. If nil is provided the
+    # default will get returned if it exists.
+    def set(object)
+      object ? type.set(object) : default
+    end
+
+    # Used for retrieving the object out of the attributes hash.
+    def get(object)
+      type.get(object)
     end
 
   end

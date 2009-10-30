@@ -38,7 +38,7 @@ describe Mongoid::Field do
 
   end
 
-  describe "#value" do
+  describe "#set" do
 
     before do
       @type = mock
@@ -48,18 +48,32 @@ describe Mongoid::Field do
     context "nil is provided" do
 
       it "returns the default value" do
-        @field.value(nil).should == 10
+        @field.set(nil).should == 10
       end
 
     end
 
     context "value is provided" do
 
-      it "casts the value" do
-        @type.expects(:cast).with("30").returns(30)
-        @field.value("30").should == 30
+      it "sets the value" do
+        @type.expects(:set).with("30").returns(30)
+        @field.set("30").should == 30
       end
 
+    end
+
+  end
+
+  describe "#get" do
+
+    before do
+      @type = mock
+      @field = Mongoid::Field.new(:score, :default => 10, :type => @type)
+    end
+
+    it "returns the value" do
+      @type.expects(:get).with(30).returns(30)
+      @field.get(30).should == 30
     end
 
   end

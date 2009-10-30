@@ -209,7 +209,7 @@ module Mongoid #:nodoc:
 
     # Read from the attributes hash.
     def read_attribute(name)
-      fields[name].value(@attributes[name])
+      fields[name].get(@attributes[name])
     end
 
     # Returns the id of the Document
@@ -225,7 +225,7 @@ module Mongoid #:nodoc:
 
     # Write to the attributes hash.
     def write_attribute(name, value)
-      @attributes[name] = fields[name].value(value)
+      @attributes[name] = fields[name].set(value)
       notify
     end
 

@@ -149,4 +149,19 @@ describe Mongoid::Document do
 
   end
 
+  context "typecasting" do
+
+    before do
+      @date = Date.new(1976, 7, 4)
+      @person = Person.new(:dob => @date)
+      @person.save
+    end
+
+    it "properly casts dates and times" do
+      person = Person.first
+      person.dob.should == @date
+    end
+
+  end
+
 end

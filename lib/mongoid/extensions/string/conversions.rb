@@ -2,8 +2,11 @@ module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module String #:nodoc:
       module Conversions #:nodoc:
-        def cast(value)
+        def set(value)
           value.to_s
+        end
+        def get(value)
+          value
         end
       end
     end

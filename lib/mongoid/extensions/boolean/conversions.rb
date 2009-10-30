@@ -2,9 +2,11 @@ module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Boolean #:nodoc:
       module Conversions #:nodoc:
-        def cast(value)
-          return true if value == "true"
-          false
+        def set(value)
+          value == "true"
+        end
+        def get(value)
+          value
         end
       end
     end

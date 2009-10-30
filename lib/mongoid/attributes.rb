@@ -4,9 +4,11 @@ module Mongoid #:nodoc:
     # field exists for them on the +Document+.
     def process(fields, params)
       attributes = HashWithIndifferentAccess.new(params)
-      attributes.each_pair do |key, value|
-        attributes[key] = fields[key].value(value) if fields[key]
+      fields.values.each do |field|
+        value = field.set(attributes[field.name])
+        attributes[field.name] = value if value
       end
+      attributes
     end
 
   end

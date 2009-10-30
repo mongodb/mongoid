@@ -2,12 +2,12 @@ require File.join(File.dirname(__FILE__), "/../../../../spec_helper.rb")
 
 describe Mongoid::Extensions::Boolean::Conversions do
 
-  describe "#cast" do
+  describe "#set" do
 
     context "when 'true'" do
 
       it "returns true" do
-        Boolean.cast("true").should be_true
+        Boolean.set("true").should be_true
       end
 
     end
@@ -15,9 +15,17 @@ describe Mongoid::Extensions::Boolean::Conversions do
     context "when 'false'" do
 
       it "returns false" do
-        Boolean.cast("false").should be_false
+        Boolean.set("false").should be_false
       end
 
+    end
+
+  end
+
+  describe "#get" do
+
+    it "returns the boolean" do
+      Boolean.get(false).should be_false
     end
 
   end

@@ -20,7 +20,6 @@ describe Mongoid::Attributes do
             { :_id => "4", :street => "Second Street" }
           ]
         }
-        @fields = Person.fields.values
       end
 
       it "returns a properly cast HashWithIndifferentAccess" do
