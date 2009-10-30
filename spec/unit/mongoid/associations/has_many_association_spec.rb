@@ -47,6 +47,12 @@ describe Mongoid::Associations::HasManyAssociation do
       @address.parent.should == @document
     end
 
+    it "allows multiple additions" do
+      @association << @address
+      @association << @address
+      @association.length.should == 4
+    end
+
   end
 
   describe "#concat" do

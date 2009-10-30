@@ -508,7 +508,7 @@ describe Mongoid::Document do
         it "sets the child attributes on the parent" do
           @name.write_attributes(:first_name => "Test2", :last_name => "User2")
           @person.attributes[:name].should ==
-            { :first_name => "Test2", :last_name => "User2" }
+            { "first_name" => "Test2", "last_name" => "User2" }
         end
 
       end
@@ -522,8 +522,10 @@ describe Mongoid::Document do
         end
 
         it "updates the child attributes on the parent" do
-          @address.write_attributes(:street => "Test2")
-          @person.attributes[:addresses].should == [{ :street => "Test2" }]
+          @address.write_attributes("street" => "Test2")
+          @person.attributes[:addresses].should ==
+            [ { "_id" => "test", "street" => "Test" },
+              { "street" => "Test2" } ]
         end
 
       end

@@ -117,9 +117,15 @@ describe Mongoid::Document do
     before do
       @person = Person.new(:title => "Sir")
       @name = Name.new(:first_name => "Syd", :last_name => "Vicious")
-      @address = Address.new(:street => "Oxford Street")
+      @home = Address.new(:street => "Oxford Street")
+      @business = Address.new(:street => "Upper Street")
       @person.name = @name
-      @person.addresses << @address
+      @person.addresses << @home
+      @person.addresses << @business
+    end
+
+    it "allows adding multiples on a has_many in a row" do
+      @person.addresses.length.should == 2
     end
 
     context "when saving on a has_one" do
@@ -138,7 +144,7 @@ describe Mongoid::Document do
     context "when saving on a has_many" do
 
       before do
-        @address.save
+        @home.save
       end
 
       it "saves the entire graph up from the has_many" do

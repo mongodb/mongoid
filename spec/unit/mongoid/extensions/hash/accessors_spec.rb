@@ -67,7 +67,7 @@ describe Mongoid::Extensions::Hash::Accessors do
       context "when matching attribute does not exist" do
 
         before do
-          @new = { :street => "New Street" }
+          @new = { :_id => 10, :street => "New Street" }
         end
 
         it "updates the matching attributes" do
@@ -75,7 +75,7 @@ describe Mongoid::Extensions::Hash::Accessors do
           @hash[:addresses].should == [
             { :_id => 3, :street => "First Street" },
             { :_id => 4, :street => "Second Street" },
-            { :street => "New Street" }
+            { :_id => 10, :street => "New Street" }
           ]
         end
       end
