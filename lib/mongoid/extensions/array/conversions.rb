@@ -7,6 +7,21 @@ module Mongoid #:nodoc:
         def mongoidize
           collect { |obj| obj.attributes }
         end
+
+        def self.included(base)
+          base.class_eval do
+            extend ClassMethods
+          end
+        end
+
+        module ClassMethods
+          def get(value)
+            value
+          end
+          def set(value)
+            value
+          end
+        end
       end
     end
   end

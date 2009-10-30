@@ -13,4 +13,20 @@ describe Mongoid::Extensions::Array::Conversions do
 
   end
 
+  describe "#get" do
+
+    it "returns the array" do
+      Array.get(["test"]).should == ["test"]
+    end
+
+  end
+
+  describe "#set" do
+
+    it "returns the array" do
+      Array.set(["test"]).should == ["test"]
+    end
+
+  end
+
 end
