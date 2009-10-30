@@ -27,6 +27,10 @@ class Person < Mongoid::Document
   has_one :pet, :class_name => "Animal"
 end
 
+class MixedDrink < Mongoid::Document
+  field :name
+end
+
 class Address < Mongoid::Document
   field :street
   field :city

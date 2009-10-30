@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
       # to the internal document itself.
       def initialize(name, document, options = {})
         class_name = options[:class_name]
-        klass = class_name ? class_name.constantize : name.to_s.titleize.constantize
+        klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
         attributes = document.attributes[name]
         @document = klass.new(attributes)
         @document.parent = document
