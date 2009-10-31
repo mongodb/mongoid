@@ -173,7 +173,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>self</tt>
     def id(object_id)
-      @selector[:_id] = Mongo::ObjectID.from_string(object_id); self
+      @selector[:_id] = object_id; self
     end
 
     # Create the new +Criteria+ object. This will initialize the selector
@@ -310,7 +310,7 @@ module Mongoid #:nodoc:
     # Returns a new +Criteria+ object.
     def self.translate(*args)
       type, params = args[0], args[1] || {}
-      return new(:first).id(type.to_s) if type.is_a?(Mongo::ObjectID)
+      return new(:first).id(type) unless type.is_a?(Symbol)
       return new(type).where(params.delete(:conditions)).extras(params)
     end
 

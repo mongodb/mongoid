@@ -170,7 +170,7 @@ describe Mongoid::Criteria do
 
     it "adds the _id query to the selector" do
       id = Mongo::ObjectID.new
-      @criteria.id(id.to_s)
+      @criteria.id(id)
       @criteria.selector.should == { :_id => id }
     end
 
@@ -384,10 +384,16 @@ describe Mongoid::Criteria do
 
   describe "#translate" do
 
-    context "single argument as a string" do
+    context "with a single argument" do
 
-      it "creates a new select criteria" do
+      it "creates a criteria for an object id" do
         id = Mongo::ObjectID.new
+        criteria = Mongoid::Criteria.translate(id)
+        criteria.selector.should == { :_id => id }
+      end
+
+      it "creates a criteria for a string" do
+        id = Mongo::ObjectID.new.to_s
         criteria = Mongoid::Criteria.translate(id)
         criteria.selector.should == { :_id => id }
       end
