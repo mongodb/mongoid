@@ -122,6 +122,16 @@ describe Mongoid::Document do
       Person.count(@params).should == 10
     end
 
+    context "when no options provided" do
+
+      it "adds in the default parameters" do
+        Mongoid::Criteria.expects(:translate).with(nil).returns(@criteria)
+        @criteria.expects(:count).with(Person).returns(10)
+        Person.count.should == 10
+      end
+
+    end
+
   end
 
   describe "#field" do

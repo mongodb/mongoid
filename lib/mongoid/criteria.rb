@@ -309,8 +309,9 @@ module Mongoid #:nodoc:
     #
     # Returns a new +Criteria+ object.
     def self.translate(*args)
-      type, params = args[0], args[1] || {}
-      return new(:first).id(type) unless type.is_a?(Symbol)
+      type = args[0] || :all
+      params = args[1] || {}
+      return new(:first).id(args[0]) unless type.is_a?(Symbol)
       return new(type).where(params.delete(:conditions)).extras(params)
     end
 

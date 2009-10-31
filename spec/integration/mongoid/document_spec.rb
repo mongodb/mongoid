@@ -15,6 +15,18 @@ describe Mongoid::Document do
 
   end
 
+  describe "#count" do
+
+    before do
+      Person.create(:title => "Sir")
+    end
+
+    it "returns the count" do
+      Person.count.should == 1
+    end
+
+  end
+
   describe "#create" do
 
     it "persists a new record to the database" do
