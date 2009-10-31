@@ -215,6 +215,11 @@ module Mongoid #:nodoc:
       fields[name].get(@attributes[name])
     end
 
+    # Reloads the +Document+ attributes from the database.
+    def reload
+      @attributes = HashWithIndifferentAccess.new(collection.find_one(id))
+    end
+
     # Returns the id of the Document
     def to_param
       id.to_s

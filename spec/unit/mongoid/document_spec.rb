@@ -458,6 +458,21 @@ describe Mongoid::Document do
 
   end
 
+  describe "#reload" do
+
+    before do
+      @attributes = { "title" => "Herr" }
+      @person = Person.new(:_id => Mongo::ObjectID.new)
+      @collection.expects(:find_one).with(@person.id).returns(@attributes)
+    end
+
+    it "reloads the object attribtues from the database" do
+      @person.reload
+      @person.attributes.should == @attributes
+    end
+
+  end
+
   describe "#select" do
 
     it "returns a new criteria with select conditions added" do

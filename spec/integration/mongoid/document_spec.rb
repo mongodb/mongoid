@@ -92,6 +92,23 @@ describe Mongoid::Document do
 
   end
 
+  describe "#reload" do
+
+    before do
+      @person = Person.new(:title => "Sir")
+      @person.save
+      @from_db = Person.find(@person.id)
+      @from_db.age = 35
+      @from_db.save
+    end
+
+    it "reloads the obejct attributes from the db" do
+      @person.reload
+      @person.age.should == 35
+    end
+
+  end
+
   describe "#save" do
 
     context "on a has_one association" do
