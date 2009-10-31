@@ -145,6 +145,21 @@ describe Mongoid::Document do
 
     end
 
+    context "when type is an object" do
+
+      before do
+        @person = Person.new
+        @drink = MixedDrink.new(:name => "Jack and Coke")
+        @person.mixed_drink = @drink
+      end
+
+      it "allows proper access to the object" do
+        @person.mixed_drink.should == @drink
+        @person.attributes[:mixed_drink].except(:_id).should == { "name" => "Jack and Coke" }
+      end
+
+    end
+
   end
 
   describe "#find" do

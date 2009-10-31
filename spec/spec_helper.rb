@@ -15,20 +15,21 @@ Spec::Runner.configure do |config|
   Mocha::Configuration.prevent(:stubbing_non_existent_method)
 end
 
+class MixedDrink < Mongoid::Document
+  field :name
+end
+
 class Person < Mongoid::Document
   include Mongoid::Timestamps
   field :title
   field :terms, :type => Boolean
   field :age, :type => Integer, :default => 100
   field :dob, :type => Date
+  field :mixed_drink, :type => MixedDrink
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
   has_one :name
   has_one :pet, :class_name => "Animal"
-end
-
-class MixedDrink < Mongoid::Document
-  field :name
 end
 
 class Address < Mongoid::Document
