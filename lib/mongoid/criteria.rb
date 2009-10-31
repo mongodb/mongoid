@@ -310,7 +310,7 @@ module Mongoid #:nodoc:
     # Returns a new +Criteria+ object.
     def self.translate(*args)
       type, params = args[0], args[1] || {}
-      return new(:first).id(type.to_s) if type.is_a?(String)
+      return new(:first).id(type.to_s) if type.is_a?(Mongo::ObjectID)
       return new(type).where(params.delete(:conditions)).extras(params)
     end
 

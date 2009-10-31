@@ -388,7 +388,7 @@ describe Mongoid::Criteria do
 
       it "creates a new select criteria" do
         id = Mongo::ObjectID.new
-        criteria = Mongoid::Criteria.translate(id.to_s)
+        criteria = Mongoid::Criteria.translate(id)
         criteria.selector.should == { :_id => id }
       end
 

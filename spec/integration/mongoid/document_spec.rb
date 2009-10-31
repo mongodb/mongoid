@@ -52,7 +52,7 @@ describe Mongoid::Document do
     context "finding by id" do
 
       it "finds the document by the supplied id" do
-        person = Person.find(@person.id.to_s)
+        person = Person.find(@person.id)
         person.id.should == @person.id
       end
 
@@ -104,7 +104,7 @@ describe Mongoid::Document do
 
       it "saves the parent document" do
         @name.save
-        person = Person.find(@person.id.to_s)
+        person = Person.find(@person.id)
         person.name.first_name.should == @name.first_name
       end
 
