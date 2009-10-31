@@ -21,8 +21,8 @@
 require "rubygems"
 
 gem "activesupport", "2.3.4"
-gem "mongo", "0.15.1"
-gem "durran-validatable", "1.7.5"
+gem "mongo", "0.16"
+gem "durran-validatable", "1.8.1"
 gem "will_paginate", "2.3.11"
 
 require "delegate"

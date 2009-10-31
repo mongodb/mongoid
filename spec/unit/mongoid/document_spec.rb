@@ -638,6 +638,39 @@ describe Mongoid::Document do
 
       end
 
+      describe "#validates_uniqueness_of" do
+
+        it "adds the uniqueness validation" do
+          Person.class_eval do
+            validates_uniqueness_of :title
+          end
+          Person.validations.first.should be_a_kind_of(Validatable::ValidatesUniquenessOf)
+        end
+
+      end
+
+      describe "#validates_inclusion_of" do
+
+        it "adds the inclusion validation" do
+          Person.class_eval do
+            validates_inclusion_of :title, :within => ["test"]
+          end
+          Person.validations.first.should be_a_kind_of(Validatable::ValidatesInclusionOf)
+        end
+
+      end
+
+      describe "#validates_exclusion_of" do
+
+        it "adds the exclusion validation" do
+          Person.class_eval do
+            validates_exclusion_of :title, :within => ["test"]
+          end
+          Person.validations.first.should be_a_kind_of(Validatable::ValidatesExclusionOf)
+        end
+
+      end
+
       describe "#validates_true_for" do
 
         it "adds the true validation" do
