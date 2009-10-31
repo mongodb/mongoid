@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.5.9"
+  s.version = "0.5.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/date/conversions.rb",
      "lib/mongoid/extensions/float/conversions.rb",
      "lib/mongoid/extensions/hash/accessors.rb",
+     "lib/mongoid/extensions/hash/conversions.rb",
      "lib/mongoid/extensions/integer/conversions.rb",
      "lib/mongoid/extensions/object/casting.rb",
      "lib/mongoid/extensions/object/conversions.rb",
@@ -81,6 +82,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/date/conversions_spec.rb",
      "spec/unit/mongoid/extensions/float/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
+     "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/parentization_spec.rb",
@@ -121,6 +123,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/date/conversions_spec.rb",
      "spec/unit/mongoid/extensions/float/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
+     "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/parentization_spec.rb",
