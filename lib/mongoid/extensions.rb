@@ -4,6 +4,7 @@ require "mongoid/extensions/boolean/conversions"
 require "mongoid/extensions/date/conversions"
 require "mongoid/extensions/float/conversions"
 require "mongoid/extensions/hash/accessors"
+require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/object/parentization"
@@ -31,6 +32,7 @@ end
 
 class Hash #:nodoc
   include Mongoid::Extensions::Hash::Accessors
+  extend Mongoid::Extensions::Hash::Conversions
 end
 
 class Integer #:nodoc
