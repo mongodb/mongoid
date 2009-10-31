@@ -12,6 +12,7 @@ describe Mongoid::Extensions::Time::Conversions do
         Time.set(@time.to_s).should == @time
       end
     end
+
   end
 
   describe "#get" do

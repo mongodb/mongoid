@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
     module Time #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value.to_time
+          ::Time.parse(value.to_s).utc
         end
         def get(value)
           value
