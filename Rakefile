@@ -12,10 +12,11 @@ begin
     gem.email = "durran@gmail.com"
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
-    gem.add_dependency("durran-validatable", "1.7.5")
+    gem.add_dependency("durran-validatable", "1.8.2")
     gem.add_dependency("will_paginate", "2.3.11")
     gem.add_dependency("activesupport", "2.3.4")
-    gem.add_dependency("mongo", "0.15.1")
+    gem.add_dependency("mongo", "0.16")
+    gem.add_dependency("mongo_ext", "0.16")
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
