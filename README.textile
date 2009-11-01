@@ -35,8 +35,9 @@ Example of a simple domain model:
 
 <pre>
   class Person < Mongoid::Document
+    include Mongoid::Versioning
     field :title
-    field :age, :default => 0
+    field :age, :type => Integer, :default => 0
     has_many :addresses
     has_one :name
   end
@@ -50,9 +51,9 @@ Example of a simple domain model:
   end
 
   class Name < Mongoid::Document
+    include Mongoid::Timestamps
     field :first_name
     field :last_name
-    has_timestamps
   end
 </pre>
 
@@ -88,6 +89,12 @@ Deleting:
   Person.delete_all(:title => "Sir")
 </pre>
 
+Count:
+
+<pre>
+  Person.count
+</pre>
+
 Retrieval of Documents from the database can be done in the traditional ActiveRecord
 manner or done using the Mongoid criteria DSL.
 
@@ -104,6 +111,7 @@ New School:
 
 <pre>
   Person.select(:first_name, :last_name).where(:title => "Sir").skip(10).limit(10).execute
+  Person.select(:title).aggregate
   Criteria.translate(:conditions => { :title => "Sir" }).execute
 </pre>
 
@@ -111,6 +119,25 @@ Paginate Document search results:
 
 <pre>
   Person.paginate(:conditions => {:title => "Esquire"}, :page => 1, :per_page => 20)
+</pre>
+
+Versioning:
+
+Versioning can be added by including Mongoid::Versioning in your document. This will give
+a version field, and will update the version number with each save. Additionally each
+version of the document will be stored in a versions array, embedded within the document.
+
+<pre>
+  class Person < Mongoid::Document
+    include Mongoid::Versioning
+    field :title
+  end
+
+  @person = Person.new
+  @person.save # Version 1
+  @person.title = "Madam"
+  @person.save # Version 2
+  @person.versions.size = 1
 </pre>
 
 Validations:
