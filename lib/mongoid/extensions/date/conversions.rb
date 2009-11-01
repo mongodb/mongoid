@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
           value.to_time.utc
         end
         def get(value)
-          value.to_date
+          value ? value.to_date : value
         end
       end
     end

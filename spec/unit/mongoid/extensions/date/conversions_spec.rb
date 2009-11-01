@@ -36,8 +36,20 @@ describe Mongoid::Extensions::Date::Conversions do
 
   describe "#get" do
 
-    it "converts the time back to a date" do
-      Date.get(@time).should == @time.to_date
+    context "when value is nil" do
+
+      it "returns nil" do
+        Date.get(nil).should be_nil
+      end
+
+    end
+
+    context "when value is not nil" do
+
+      it "converts the time back to a date" do
+        Date.get(@time).should == @time.to_date
+      end
+
     end
 
   end
