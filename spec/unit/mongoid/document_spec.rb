@@ -344,6 +344,19 @@ describe Mongoid::Document do
 
   end
 
+  describe "#last" do
+
+    before do
+      @attributes = { :_id => 1, :title => "Sir" }
+      @collection.expects(:find_one).with({}, :sort => [[:_id, :asc]]).returns(@attributes)
+    end
+
+    it "finds the last document by the id" do
+      Person.last.should == Person.new(@attributes)
+    end
+
+  end
+
   describe "#new" do
 
     context "with no attributes" do
