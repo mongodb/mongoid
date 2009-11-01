@@ -20,10 +20,6 @@ module Mongoid #:nodoc:
         decorate!
       end
 
-      # Equality delegates to the document.
-      def ==(other)
-        @document == other
-      end
     end
   end
 end

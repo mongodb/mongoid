@@ -1,6 +1,8 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     module Decorator #:nodoc:
+      EXTRAS = [:save, :save!, :==]
+
       def self.included(base)
         base.class_eval do
           attr_reader :document
@@ -10,7 +12,8 @@ module Mongoid #:nodoc:
           # since we can ask the class for its methods and get an
           # accurate list.
           def decorate!
-            document.public_methods.each do |method|
+            meths = document.public_methods(false) + EXTRAS
+            meths.each do |method|
               (class << self; self; end).class_eval do
                 define_method method do |*args|
                   document.send method, *args
