@@ -570,6 +570,19 @@ describe Mongoid::Document do
 
     end
 
+    context "when field has a default value" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "should allow overwriting of the default value" do
+        @person.terms = true
+        @person.terms.should be_true
+      end
+
+    end
+
   end
 
   describe "#write_attributes" do

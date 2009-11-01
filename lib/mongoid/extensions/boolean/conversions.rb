@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
     module Boolean #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value == "true"
+          value.to_s == "true"
         end
         def get(value)
           value

@@ -2,6 +2,7 @@ require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
 class Person < Mongoid::Document
   field :title
+  field :terms, :type => Boolean, :default => false
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
   has_one :name
