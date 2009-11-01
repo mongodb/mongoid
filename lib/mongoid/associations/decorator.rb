@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
           # since we can ask the class for its methods and get an
           # accurate list.
           def decorate!
-            document.public_methods(false).each do |method|
+            document.public_methods.each do |method|
               (class << self; self; end).class_eval do
                 define_method method do |*args|
                   document.send method, *args

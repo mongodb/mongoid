@@ -55,9 +55,9 @@ describe Mongoid::Associations::Decorator do
       @decorated = Decorated.new(@person)
     end
 
-    it "adds all the documents public methods to the class" do
+    it "adds all the documents methods to the class" do
       @decorated.decorate!
-      @decorated.should respond_to(:title, :terms, :age, :addresses, :name)
+      @decorated.should respond_to(:title, :terms, :age, :addresses, :name, :save)
     end
 
   end
