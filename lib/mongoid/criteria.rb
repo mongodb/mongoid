@@ -100,8 +100,13 @@ module Mongoid #:nodoc:
     # objects of the type of class provided.
     def execute(klass = nil)
       @klass = klass if klass
-      return @klass.new(klass.collection.find_one(@selector, @options)) if type == :first
-      return @klass.collection.find(@selector, @options).collect { |doc| @klass.new(doc) }
+      if type == :first
+        attributes = klass.collection.find_one(@selector, @options)
+        attributes ? @klass.new(attributes) : nil
+      else
+        attributes = @klass.collection.find(@selector, @options)
+        attributes ? attributes.collect { |doc| @klass.new(doc) } : []
+      end
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options

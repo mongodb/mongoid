@@ -1,5 +1,9 @@
 require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 
+class MixedDrink < Mongoid::Document
+  field :name
+end
+
 describe Mongoid::Associations::HasOneAssociation do
 
   before do

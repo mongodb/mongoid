@@ -1,5 +1,10 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Post < Mongoid::Document
+  include Mongoid::Versioning
+  field :title
+end
+
 describe Mongoid::Versioning do
 
   describe "#version" do

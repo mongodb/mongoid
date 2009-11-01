@@ -1,5 +1,12 @@
 require File.join(File.dirname(__FILE__), "/../../../spec_helper.rb")
 
+class Name < Mongoid::Document
+  field :first_name
+  field :last_name
+  key :first_name, :last_name
+  belongs_to :person
+end
+
 describe Mongoid::Associations::BelongsToAssociation do
 
   before do

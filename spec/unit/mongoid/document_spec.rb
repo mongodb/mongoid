@@ -1,5 +1,31 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class MixedDrink < Mongoid::Document
+  field :name
+end
+
+class Person < Mongoid::Document
+  field :title
+  field :terms, :type => Boolean
+  field :age, :type => Integer, :default => 100
+  field :mixed_drink, :type => MixedDrink
+  has_many :addresses
+  has_one :name
+end
+
+class Name < Mongoid::Document
+  field :first_name
+  field :last_name
+  key :first_name, :last_name
+  belongs_to :person
+end
+
+class Address < Mongoid::Document
+  field :street
+  key :street
+  belongs_to :person
+end
+
 describe Mongoid::Document do
 
   before do

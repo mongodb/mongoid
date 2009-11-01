@@ -1,5 +1,10 @@
 require File.join(File.dirname(__FILE__), "/../../../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  field :title
+  field :age, :type => Integer, :default => 100
+end
+
 describe Mongoid::Extensions::Array::Conversions do
 
   describe "#mongoidize" do

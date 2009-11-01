@@ -1,5 +1,48 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  field :title
+  has_many :addresses
+  has_many :phone_numbers, :class_name => "Phone"
+  has_one :name
+  has_one :pet, :class_name => "Animal"
+end
+
+class Animal < Mongoid::Document
+  field :name
+  key :name
+  belongs_to :person
+end
+
+class CountryCode < Mongoid::Document
+  field :code, :type => Integer
+  key :code
+  belongs_to :phone_number
+end
+
+class Address < Mongoid::Document
+  field :street
+  field :city
+  field :state
+  field :post_code
+  key :street
+  belongs_to :person
+end
+
+class Name < Mongoid::Document
+  field :first_name
+  field :last_name
+  key :first_name, :last_name
+  belongs_to :person
+end
+
+class Phone < Mongoid::Document
+  field :number
+  key :number
+  belongs_to :person
+  has_one :country_code
+end
+
 describe Mongoid::Associations do
 
   before do

@@ -1,5 +1,36 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  include Mongoid::Timestamps
+  field :title
+  field :terms, :type => Boolean
+  field :age, :type => Integer, :default => 100
+  field :dob, :type => Date
+  has_many :addresses
+  has_one :name
+end
+
+class Address < Mongoid::Document
+  field :street
+  field :city
+  field :state
+  field :comment_code
+  key :street
+  belongs_to :person
+end
+
+class Name < Mongoid::Document
+  field :first_name
+  field :last_name
+  key :first_name, :last_name
+  belongs_to :person
+end
+
+class Comment < Mongoid::Document
+  include Mongoid::Versioning
+  field :text
+end
+
 describe Mongoid::Document do
 
   before do
@@ -195,6 +226,23 @@ describe Mongoid::Document do
     it "properly casts dates and times" do
       person = Person.first
       person.dob.should == @date
+    end
+
+  end
+
+  context "versioning" do
+
+    before do
+      @comment = Comment.new(:text => "Testing")
+      @comment.save
+    end
+
+    it "versions on save" do
+      @from_db = Comment.find(@comment.id)
+      @from_db.text = "New"
+      @from_db.save
+      @from_db.versions.size.should == 1
+      @from_db.version.should == 2
     end
 
   end

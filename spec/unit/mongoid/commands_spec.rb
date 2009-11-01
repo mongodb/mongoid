@@ -1,5 +1,9 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  field :title
+end
+
 describe Mongoid::Commands do
 
   context "instance methods" do

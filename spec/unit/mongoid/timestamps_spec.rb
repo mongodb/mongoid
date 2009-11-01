@@ -1,5 +1,9 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  include Mongoid::Timestamps
+end
+
 describe Mongoid::Timestamps do
 
   describe "#included" do

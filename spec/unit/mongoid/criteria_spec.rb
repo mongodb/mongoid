@@ -1,5 +1,9 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  field :title
+end
+
 describe Mongoid::Criteria do
 
   before do
@@ -90,12 +94,34 @@ describe Mongoid::Criteria do
 
     context "when type is :first" do
 
-      it "calls find on the collection with the selector and options" do
-        criteria = Mongoid::Criteria.new(:first)
-        collection = mock
-        Person.expects(:collection).returns(collection)
-        collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({})
-        criteria.execute(Person).should be_a_kind_of(Person)
+      context "when documents exist" do
+
+        before do
+          @collection = mock
+          Person.expects(:collection).returns(@collection)
+          @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
+        end
+
+        it "calls find on the collection with the selector and options" do
+          criteria = Mongoid::Criteria.new(:first)
+          criteria.execute(Person).should be_a_kind_of(Person)
+        end
+
+      end
+
+      context "when no documents exist" do
+
+        before do
+          @collection = mock
+          Person.expects(:collection).returns(@collection)
+          @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(nil)
+        end
+
+        it "returns nil" do
+          criteria = Mongoid::Criteria.new(:first)
+          criteria.execute(Person).should be_nil
+        end
+
       end
 
     end

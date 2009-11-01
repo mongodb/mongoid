@@ -1,5 +1,10 @@
 require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
 
+class Person < Mongoid::Document
+  field :terms, :type => Boolean
+  field :age, :type => Integer, :default => 100
+end
+
 describe Mongoid::Attributes do
 
   describe "#process" do
@@ -22,7 +27,7 @@ describe Mongoid::Attributes do
         }
       end
 
-      it "returns a properly cast HashWithIndifferentAccess" do
+      it "returns a properly cast the attributes" do
         attrs = Person.new(@attributes).attributes
         attrs[:age].should == 30
         attrs[:terms].should == true
