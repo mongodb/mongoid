@@ -30,13 +30,29 @@ describe Mongoid::Extensions::Object::Conversions do
 
   describe "#set" do
 
-    before do
-      @attributes = { "_id" => "test", "title" => "Sir", "age" => 100 }
-      @person = Person.new(@attributes)
+    context "when object does not have attributes" do
+
+      before do
+        @id = Mongo::ObjectID.new
+      end
+
+      it "returns the object" do
+        Mongo::ObjectID.set(@id).should == @id
+      end
+
     end
 
-    it "converts the object to a hash" do
-      Person.set(@person).should == @attributes
+    context "when object has attributes" do
+
+      before do
+        @attributes = { "_id" => "test", "title" => "Sir", "age" => 100 }
+        @person = Person.new(@attributes)
+      end
+
+      it "converts the object to a hash" do
+        Person.set(@person).should == @attributes
+      end
+
     end
 
   end

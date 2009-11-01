@@ -19,7 +19,7 @@ module Mongoid #:nodoc:
 
         module ClassMethods
           def set(value)
-            value.attributes
+            value.respond_to?(:attributes) ? value.attributes : value
           end
 
           def get(value)
