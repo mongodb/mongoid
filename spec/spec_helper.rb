@@ -67,6 +67,11 @@ class Name < Mongoid::Document
   belongs_to :person
 end
 
+class Post < Mongoid::Document
+  include Mongoid::Versioning
+  field :title
+end
+
 class Decorated
   include Mongoid::Associations::Decorator
 

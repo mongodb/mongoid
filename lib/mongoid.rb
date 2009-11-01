@@ -38,8 +38,9 @@ require "mongoid/commands"
 require "mongoid/criteria"
 require "mongoid/extensions"
 require "mongoid/field"
-require "mongoid/document"
 require "mongoid/timestamps"
+require "mongoid/versioning"
+require "mongoid/document"
 
 module Mongoid
 

@@ -237,7 +237,7 @@ describe Mongoid::Document do
   describe "#first" do
 
     before do
-      @attributes = HashWithIndifferentAccess.new(:age => 100)
+      @attributes = { "age" => 100, "version" => 1 }
     end
 
     context "when a selector is provided" do
