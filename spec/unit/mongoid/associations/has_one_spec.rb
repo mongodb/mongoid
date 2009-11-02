@@ -4,7 +4,7 @@ class MixedDrink < Mongoid::Document
   field :name
 end
 
-describe Mongoid::Associations::HasOneAssociation do
+describe Mongoid::Associations::HasOne do
 
   before do
     @attributes = { :mixed_drink => { :name => "Jack and Coke" } }
@@ -14,7 +14,7 @@ describe Mongoid::Associations::HasOneAssociation do
   describe "#decorate!" do
 
     before do
-      @association = Mongoid::Associations::HasOneAssociation.new(:mixed_drink, @document)
+      @association = Mongoid::Associations::HasOne.new(:mixed_drink, @document)
     end
 
     context "when getting values" do

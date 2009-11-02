@@ -1,8 +1,8 @@
 require "mongoid/associations/decorator"
-require "mongoid/associations/factory"
-require "mongoid/associations/belongs_to_association"
-require "mongoid/associations/has_many_association"
-require "mongoid/associations/has_one_association"
+require "mongoid/associations/accessor"
+require "mongoid/associations/belongs_to"
+require "mongoid/associations/has_many"
+require "mongoid/associations/has_one"
 
 module Mongoid # :nodoc:
   module Associations
@@ -77,7 +77,7 @@ module Mongoid # :nodoc:
     # then adds the accessors for the association.
     def add_association(type, class_name, name, options = {})
       define_method(name) do
-        Associations::Factory.create(type, name, self, options)
+        Associations::Accessor.get(type, name, self, options)
       end
       define_method("#{name}=") do |object|
         if type == :belongs_to

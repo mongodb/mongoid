@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasManyAssociation < DelegateClass(Array) #:nodoc:
+    class HasMany < DelegateClass(Array) #:nodoc:
 
       attr_accessor :association_name
 

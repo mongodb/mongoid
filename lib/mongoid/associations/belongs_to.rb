@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class BelongsToAssociation #:nodoc:
+    class BelongsTo #:nodoc:
       include Decorator
 
       # Creates the new association by setting the internal 

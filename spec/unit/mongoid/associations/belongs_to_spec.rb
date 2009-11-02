@@ -7,7 +7,7 @@ class Name < Mongoid::Document
   belongs_to :person
 end
 
-describe Mongoid::Associations::BelongsToAssociation do
+describe Mongoid::Associations::BelongsTo do
 
   before do
     @parent = Name.new(:first_name => "Drexel")
@@ -17,7 +17,7 @@ describe Mongoid::Associations::BelongsToAssociation do
   describe "#find" do
 
     before do
-      @association = Mongoid::Associations::BelongsToAssociation.new(@document)
+      @association = Mongoid::Associations::BelongsTo.new(@document)
     end
 
     context "when finding by id" do
@@ -34,7 +34,7 @@ describe Mongoid::Associations::BelongsToAssociation do
   context "when decorating" do
 
     before do
-      @association = Mongoid::Associations::BelongsToAssociation.new(@document)
+      @association = Mongoid::Associations::BelongsTo.new(@document)
     end
 
     context "when getting values" do

@@ -1,6 +1,6 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasOneAssociation #:nodoc:
+    class HasOne #:nodoc:
       include Decorator
 
       delegate :valid?, :to => :document
