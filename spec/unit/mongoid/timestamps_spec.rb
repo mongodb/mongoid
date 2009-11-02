@@ -1,8 +1,4 @@
-require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
-
-class Person < Mongoid::Document
-  include Mongoid::Timestamps
-end
+require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.rb"))
 
 describe Mongoid::Timestamps do
 

@@ -92,7 +92,6 @@ module Mongoid # :nodoc:
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.
       def add_association(type, class_name, name, options = {})
-        associations[name] = type
         define_method(name) do
           Associations::Accessor.get(type, name, self, options)
         end

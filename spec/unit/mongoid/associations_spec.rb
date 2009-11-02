@@ -1,48 +1,4 @@
-require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
-
-class Person < Mongoid::Document
-  field :title
-  field :terms, :type => Boolean, :default => false
-  has_many :addresses
-  has_many :phone_numbers, :class_name => "Phone"
-  has_one :name
-  has_one :pet, :class_name => "Animal"
-end
-
-class Animal < Mongoid::Document
-  field :name
-  key :name
-  belongs_to :person
-end
-
-class CountryCode < Mongoid::Document
-  field :code, :type => Integer
-  key :code
-  belongs_to :phone_number
-end
-
-class Address < Mongoid::Document
-  field :street
-  field :city
-  field :state
-  field :post_code
-  key :street
-  belongs_to :person
-end
-
-class Name < Mongoid::Document
-  field :first_name
-  field :last_name
-  key :first_name, :last_name
-  belongs_to :person
-end
-
-class Phone < Mongoid::Document
-  field :number
-  key :number
-  belongs_to :person
-  has_one :country_code
-end
+require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.rb"))
 
 describe Mongoid::Associations do
 
@@ -167,6 +123,21 @@ describe Mongoid::Associations do
 
       it "sets the association name" do
         @person.phone_numbers.first.should == Phone.new(:number => "404-555-1212")
+      end
+
+    end
+
+    context "when updating objects internally" do
+
+      before do
+        @address = Address.new(:street => "Bourke Street")
+        @person = Person.new(:title => "Sir")
+        @person.addresses << @address
+        @person.update_addresses
+      end
+
+      it "retains its references to the original objects" do
+        @address.street.should == "Updated 0"
       end
 
     end

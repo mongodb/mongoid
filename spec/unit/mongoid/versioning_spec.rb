@@ -1,9 +1,4 @@
-require File.join(File.dirname(__FILE__), "/../../spec_helper.rb")
-
-class Post < Mongoid::Document
-  include Mongoid::Versioning
-  field :title
-end
+require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.rb"))
 
 describe Mongoid::Versioning do
 

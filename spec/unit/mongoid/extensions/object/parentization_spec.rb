@@ -1,16 +1,4 @@
-require File.join(File.dirname(__FILE__), "/../../../../spec_helper.rb")
-
-class Person < Mongoid::Document
-  field :title
-  has_one :name
-end
-
-class Name < Mongoid::Document
-  field :first_name
-  field :last_name
-  key :first_name, :last_name
-  belongs_to :person
-end
+require File.expand_path(File.join(File.dirname(__FILE__), "/../../../../spec_helper.rb"))
 
 describe Mongoid::Extensions::Object::Parentization do
 
