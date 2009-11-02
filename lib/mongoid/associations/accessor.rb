@@ -9,9 +9,12 @@ module Mongoid #:nodoc:
         # If the type is invalid a InvalidAssociationError will be thrown.
         def get(type, name, document, options = {})
           case type
-            when :belongs_to then BelongsTo.new(document)
-            when :has_many then HasMany.new(name, document, options)
-            when :has_one then HasOne.new(name, document, options)
+            when :belongs_to
+              BelongsTo.new(document)
+            when :has_many
+              HasMany.new(name, document, options)
+            when :has_one
+              document ? HasOne.new(name, document, options) : nil
             else raise InvalidAssociationError
           end
         end

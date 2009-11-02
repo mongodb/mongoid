@@ -20,9 +20,22 @@ describe Mongoid::Associations::Accessor do
 
     context "when type is has_one" do
 
-      it "returns a HasOne" do
-        association = Mongoid::Associations::Accessor.get(:has_one, :name, @document)
-        association.should be_a_kind_of(Mongoid::Associations::HasOne)
+      context "when document is not nil" do
+
+        it "returns a HasOne" do
+          association = Mongoid::Associations::Accessor.get(:has_one, :name, @document)
+          association.should be_a_kind_of(Mongoid::Associations::HasOne)
+        end
+
+      end
+
+      context "when document is nil" do
+
+        it "returns nil" do
+          association = Mongoid::Associations::Accessor.get(:has_one, :name, nil)
+          association.should be_nil
+        end
+
       end
 
     end

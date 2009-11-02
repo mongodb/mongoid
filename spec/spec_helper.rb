@@ -14,8 +14,6 @@ Spec::Runner.configure do |config|
   config.mock_with :mocha
   Mocha::Configuration.prevent(:stubbing_non_existent_method)
 end
-puts caller
-p "IN SPEC HELPER"
 
 class MixedDrink < Mongoid::Document
   field :name
