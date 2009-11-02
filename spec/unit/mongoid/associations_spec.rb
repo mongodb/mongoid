@@ -79,6 +79,25 @@ describe Mongoid::Associations do
 
     end
 
+    context "when setting a parent" do
+
+      before do
+        @person = Person.new(:title => "Mr")
+        @address = Address.new(:street => "Picadilly Circus")
+        @address.person = @person
+      end
+
+      it "re-parentizes the association" do
+        @address.parent.should == @person
+      end
+
+      it "adds the child attributes to the parent" do
+        @person.attributes[:addresses].should ==
+          [{ "_id" => "picadilly-circus", "street" => "Picadilly Circus" }]
+      end
+
+    end
+
   end
 
   describe "#belongs_to" do

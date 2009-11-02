@@ -80,8 +80,13 @@ module Mongoid # :nodoc:
         Associations::Factory.create(type, name, self, options)
       end
       define_method("#{name}=") do |object|
-        object.parentize(self, name)
-        @attributes[name] = object.mongoidize
+        if type == :belongs_to
+          parentize(object, self.class.name.demodulize.tableize.pluralize.to_sym)
+          notify
+        else
+          object.parentize(self, name)
+          @attributes[name] = object.mongoidize
+        end
       end
     end
   end
