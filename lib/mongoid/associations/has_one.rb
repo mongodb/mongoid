@@ -26,6 +26,7 @@ module Mongoid #:nodoc:
         def update(child, parent, name)
           child.parentize(parent, name)
           child.notify
+          child
         end
       end
 
