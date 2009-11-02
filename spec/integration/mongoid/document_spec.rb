@@ -250,6 +250,22 @@ describe Mongoid::Document do
 
   end
 
+  context "setting belongs_to" do
+
+    before do
+      @person = Person.new(:title => "Mr")
+      @address = Address.new(:street => "Bloomsbury Ave")
+      @person.save!
+    end
+
+    it "allows the parent reference to change" do
+      @address.person = @person
+      @address.save!
+      @person.addresses.first.should == @address
+    end
+
+  end
+
   context "typecasting" do
 
     before do

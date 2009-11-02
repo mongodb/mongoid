@@ -20,6 +20,15 @@ module Mongoid #:nodoc:
         decorate!
       end
 
+      class << self
+        # Perform an update of the relationship of the parent and child. This
+        # is initialized by setting the has_one to the supplied child.
+        def update(child, parent, name)
+          child.parentize(parent, name)
+          child.notify
+        end
+      end
+
     end
   end
 end

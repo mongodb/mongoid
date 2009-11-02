@@ -25,6 +25,7 @@ describe Mongoid::Associations::Accessor do
 
     before do
       @document = Person.new
+      @object = stub
     end
 
     context "when type is has_many" do
@@ -62,6 +63,46 @@ describe Mongoid::Associations::Accessor do
 
     end
 
+  end
+
+  describe "#set" do
+
+    context "when type is has_many" do
+
+      it "returns a HasMany" do
+        Mongoid::Associations::HasMany.expects(:update).with(@document, @object, :addresses)
+        Mongoid::Associations::Accessor.set(:has_many, :addresses, @document, @object)
+      end
+
+    end
+
+    context "when type is has_one" do
+
+      it "returns a HasOne" do
+        Mongoid::Associations::HasOne.expects(:update).with(@document, @object, :name)
+        Mongoid::Associations::Accessor.set(:has_one, :name, @document, @object)
+      end
+
+    end
+
+    context "when type is belongs_to" do
+
+      it "returns a BelongsTo" do
+        Mongoid::Associations::BelongsTo.expects(:update).with(@document, @object)
+        Mongoid::Associations::Accessor.set(:belongs_to, :person, @document, @object)
+      end
+
+    end
+
+    context "when type is invalid" do
+
+      it "raises an InvalidAssociationError" do
+        lambda {
+          Mongoid::Associations::Accessor.set(:something, :person, @document, @object)
+        }.should raise_error
+      end
+
+    end
   end
 
 end

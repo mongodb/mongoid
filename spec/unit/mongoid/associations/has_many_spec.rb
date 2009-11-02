@@ -20,6 +20,25 @@ describe Mongoid::Associations::HasMany do
     @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
   end
 
+  describe "#update" do
+
+    before do
+      @address = Address.new(:street => "Madison Ave")
+      @person = Person.new(:title => "Sir")
+      Mongoid::Associations::HasMany.update([@address], @person, :addresses)
+    end
+
+    it "parentizes the child document" do
+      @address.parent.should == @person
+    end
+
+    it "sets the attributes of the child on the parent" do
+      @person.attributes[:addresses].should ==
+        [{ "_id" => "madison-ave", "street" => "Madison Ave" }]
+    end
+
+  end
+
   describe "#[]" do
 
     before do

@@ -1,8 +1,7 @@
 module Mongoid #:nodoc:
   class Document
     include ActiveSupport::Callbacks
-    include Attributes, Commands, Observable, Validatable
-    extend Associations
+    include Associations, Attributes, Commands, Observable, Validatable
 
     attr_accessor :association_name, :parent
     attr_reader :attributes, :new_record
