@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.6.3"
+  s.version = "0.6.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-11-01}
+  s.date = %q{2009-11-02}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -23,11 +23,11 @@ Gem::Specification.new do |s|
      "VERSION",
      "lib/mongoid.rb",
      "lib/mongoid/associations.rb",
-     "lib/mongoid/associations/belongs_to_association.rb",
+     "lib/mongoid/associations/accessor.rb",
+     "lib/mongoid/associations/belongs_to.rb",
      "lib/mongoid/associations/decorator.rb",
-     "lib/mongoid/associations/factory.rb",
-     "lib/mongoid/associations/has_many_association.rb",
-     "lib/mongoid/associations/has_one_association.rb",
+     "lib/mongoid/associations/has_many.rb",
+     "lib/mongoid/associations/has_one.rb",
      "lib/mongoid/attributes.rb",
      "lib/mongoid/commands.rb",
      "lib/mongoid/commands/create.rb",
@@ -61,11 +61,11 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/document_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "spec/unit/mongoid/associations/belongs_to_association_spec.rb",
+     "spec/unit/mongoid/associations/accessor_spec.rb",
+     "spec/unit/mongoid/associations/belongs_to_spec.rb",
      "spec/unit/mongoid/associations/decorator_spec.rb",
-     "spec/unit/mongoid/associations/factory_spec.rb",
-     "spec/unit/mongoid/associations/has_many_association_spec.rb",
-     "spec/unit/mongoid/associations/has_one_association_spec.rb",
+     "spec/unit/mongoid/associations/has_many_spec.rb",
+     "spec/unit/mongoid/associations/has_one_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
@@ -103,11 +103,11 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/integration/mongoid/document_spec.rb",
      "spec/spec_helper.rb",
-     "spec/unit/mongoid/associations/belongs_to_association_spec.rb",
+     "spec/unit/mongoid/associations/accessor_spec.rb",
+     "spec/unit/mongoid/associations/belongs_to_spec.rb",
      "spec/unit/mongoid/associations/decorator_spec.rb",
-     "spec/unit/mongoid/associations/factory_spec.rb",
-     "spec/unit/mongoid/associations/has_many_association_spec.rb",
-     "spec/unit/mongoid/associations/has_one_association_spec.rb",
+     "spec/unit/mongoid/associations/has_many_spec.rb",
+     "spec/unit/mongoid/associations/has_one_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
