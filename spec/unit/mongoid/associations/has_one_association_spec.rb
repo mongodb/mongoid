@@ -8,7 +8,7 @@ describe Mongoid::Associations::HasOneAssociation do
 
   before do
     @attributes = { :mixed_drink => { :name => "Jack and Coke" } }
-    @document = stub(:attributes => @attributes)
+    @document = stub(:attributes => @attributes, :update => true)
   end
 
   describe "#decorate!" do

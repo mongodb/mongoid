@@ -199,6 +199,10 @@ module Mongoid #:nodoc:
       generate_key
     end
 
+    def inspect
+      "Class: #{self.class.name} | Attributes: #{@attributes.inspect} | Parent: #{@parent.class.name}"
+    end
+
     # Return the +Document+ primary key.
     def primary_key
       self.class.primary_key
@@ -231,8 +235,9 @@ module Mongoid #:nodoc:
     end
 
     # Update the document based on notify from child
-    def update(child)
-      @attributes.insert(child.association_name, child.attributes)
+    def update(child, clear = false)
+      @attributes.insert(child.association_name, child.attributes) unless clear
+      @attributes.delete(child.association_name) if clear
       notify
     end
 

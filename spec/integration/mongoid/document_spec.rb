@@ -10,6 +10,23 @@ class Person < Mongoid::Document
   has_one :name
 end
 
+class PetOwner < Mongoid::Document
+  field :title
+  has_one :pet
+end
+
+class Pet < Mongoid::Document
+  field :name
+  field :weight, :type => Float, :default => 0.0
+  has_many :vet_visits
+  belongs_to :pet_owner
+end
+
+class VetVisit < Mongoid::Document
+  field :date, :type => Date
+  belongs_to :pet
+end
+
 class Address < Mongoid::Document
   field :street
   field :city
@@ -168,6 +185,24 @@ describe Mongoid::Document do
         person.name.first_name.should == @name.first_name
       end
 
+    end
+
+  end
+
+  context "when has many exists through a has one" do
+
+    before do
+      @owner = PetOwner.new(:title => "Sir")
+      @pet = Pet.new(:name => "Fido")
+      @visit = VetVisit.new(:date => Date.today)
+      @pet.vet_visits << @visit
+      @owner.pet = @pet
+    end
+
+    it "can clear the association" do
+      @owner.pet.vet_visits.size.should == 1
+      @owner.pet.vet_visits.clear
+      @owner.pet.vet_visits.size.should == 0
     end
 
   end

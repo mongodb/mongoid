@@ -12,6 +12,14 @@ module Mongoid #:nodoc:
         object.is_a?(Array) ? object.each(&:notify) : object.notify
       end
 
+      # Clears the association, and notifies the parents of the removal.
+      def clear
+        object = @documents.first
+        object.changed(true)
+        object.notify_observers(object, true)
+        super
+      end
+
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def push(object)
