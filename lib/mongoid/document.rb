@@ -222,7 +222,7 @@ module Mongoid #:nodoc:
 
     # Reloads the +Document+ attributes from the database.
     def reload
-      @attributes = HashWithIndifferentAccess.new(collection.find_one(id))
+      @attributes = HashWithIndifferentAccess.new(collection.find_one(:_id => id))
     end
 
     # Returns the id of the Document
@@ -257,7 +257,7 @@ module Mongoid #:nodoc:
         values = primary_key.collect { |key| @attributes[key] }
         @attributes[:_id] = values.join(" ").parameterize.to_s
       else
-        @attributes[:_id] = Mongo::ObjectID.new unless id
+        @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
       end
     end
   end

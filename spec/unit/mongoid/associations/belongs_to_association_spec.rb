@@ -23,7 +23,7 @@ describe Mongoid::Associations::BelongsToAssociation do
     context "when finding by id" do
 
       it "returns the document in the array with that id" do
-        name = @association.find(Mongo::ObjectID.new)
+        name = @association.find(Mongo::ObjectID.new.to_s)
         name.should == @parent
       end
 

@@ -30,18 +30,6 @@ describe Mongoid::Extensions::Object::Conversions do
 
   describe "#set" do
 
-    context "when object does not have attributes" do
-
-      before do
-        @id = Mongo::ObjectID.new
-      end
-
-      it "returns the object" do
-        Mongo::ObjectID.set(@id).should == @id
-      end
-
-    end
-
     context "when object has attributes" do
 
       before do

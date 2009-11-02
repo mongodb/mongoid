@@ -208,7 +208,7 @@ describe Mongoid::Document do
     context "when an id is passed in" do
 
       before do
-        @id = Mongo::ObjectID.new
+        @id = Mongo::ObjectID.new.to_s
       end
 
       it "delegates to criteria" do
@@ -526,8 +526,8 @@ describe Mongoid::Document do
 
     before do
       @attributes = { "title" => "Herr" }
-      @person = Person.new(:_id => Mongo::ObjectID.new)
-      @collection.expects(:find_one).with(@person.id).returns(@attributes)
+      @person = Person.new(:_id => Mongo::ObjectID.new.to_s)
+      @collection.expects(:find_one).with(:_id => @person.id).returns(@attributes)
     end
 
     it "reloads the object attribtues from the database" do
@@ -549,7 +549,7 @@ describe Mongoid::Document do
   describe "#to_param" do
 
     it "returns the id" do
-      id = Mongo::ObjectID.new
+      id = Mongo::ObjectID.new.to_s
       Person.new(:_id => id).to_param.should == id.to_s
     end
 
