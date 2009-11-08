@@ -91,6 +91,11 @@ module Mongoid #:nodoc:
         Criteria.translate(*args).execute(self)
       end
 
+      # Find a +Document+ by its id.
+      def find_by_id(id)
+        find(id)
+      end
+
       # Find the first +Document+ given the conditions.
       #
       # Options:

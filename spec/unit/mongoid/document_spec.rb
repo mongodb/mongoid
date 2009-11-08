@@ -234,6 +234,19 @@ describe Mongoid::Document do
 
   end
 
+  describe "#find_by_id" do
+
+    before do
+      @criteria = stub_everything
+    end
+
+    it "delegates to find with an id parameter" do
+      Mongoid::Criteria.expects(:translate).with("1").returns(@criteria)
+      Person.find_by_id("1")
+    end
+
+  end
+
   describe "#first" do
 
     before do

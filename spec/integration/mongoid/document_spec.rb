@@ -72,6 +72,18 @@ describe Mongoid::Document do
 
   end
 
+  describe "#find_by_id" do
+
+    before do
+      @person = Person.create
+    end
+
+    it "returns the document with the matching id" do
+      Person.find_by_id(@person.id).should == @person
+    end
+
+  end
+
   describe "#group" do
 
     before do
