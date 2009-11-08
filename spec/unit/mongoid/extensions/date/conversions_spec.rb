@@ -3,7 +3,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "/../../../../spec_he
 describe Mongoid::Extensions::Date::Conversions do
 
   before do
-    @time = Date.today.to_time.utc
+    @time = Date.today.to_time
   end
 
   describe "#set" do
@@ -11,7 +11,7 @@ describe Mongoid::Extensions::Date::Conversions do
     context "when string provided" do
 
       it "returns a time from the string" do
-        Date.set(@time.to_s).should == @time
+        Date.set(@time.utc.to_s).should == @time
       end
 
     end
