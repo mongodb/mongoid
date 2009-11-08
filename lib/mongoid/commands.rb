@@ -53,7 +53,7 @@ module Mongoid #:nodoc:
       # Save the +Document+. Delegates to the Save command. If the command
       # returns false then a +ValidationError+ will be raised.
       def save!
-        Save.execute(self) || (raise ValidationsError)
+        Save.execute(self) || (raise ValidationsError.new(self.errors.full_messages))
       end
 
       # Update the attributes of the +Document+. Will call save after the
@@ -84,7 +84,7 @@ module Mongoid #:nodoc:
       # validation.
       def create!(attributes = {})
         document = Create.execute(new(attributes))
-        raise ValidationsError unless document.errors.empty?
+        raise ValidationsError.new(self.errors.full_messages) unless document.errors.empty?
         return document
       end
 
