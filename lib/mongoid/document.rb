@@ -251,7 +251,7 @@ module Mongoid #:nodoc:
     # Writes all the attributes of this Document, and delegate up to
     # the parent.
     def write_attributes(attrs)
-      @attributes = attrs
+      @attributes = process(fields, attrs)
       notify
     end
 

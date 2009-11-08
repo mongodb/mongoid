@@ -561,6 +561,20 @@ describe Mongoid::Document do
 
   describe "#write_attributes" do
 
+    context "typecasting" do
+
+      before do
+        @person = Person.new
+        @attributes = { :age => "50" }
+      end
+
+      it "properly casts values" do
+        @person.write_attributes(@attributes)
+        @person.age.should == 50
+      end
+
+    end
+
     context "on a child document" do
 
       context "when child is part of a has one" do
