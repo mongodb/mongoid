@@ -11,10 +11,12 @@ module Mongoid #:nodoc:
       :after_destroy,
       :after_save,
       :after_update,
+      :after_validation,
       :before_create,
       :before_destroy,
       :before_save,
-      :before_update
+      :before_update,
+      :before_validation
 
     class << self
 
