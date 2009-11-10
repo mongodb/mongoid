@@ -40,7 +40,7 @@ describe Mongoid::Associations do
       before do
         @person = Person.new(:title => "Mr")
         @address = Address.new(:street => "Picadilly Circus")
-        @address.person = @person
+        @address.addressable = @person
       end
 
       it "re-parentizes the association" do
@@ -60,12 +60,12 @@ describe Mongoid::Associations do
 
     it "creates a reader for the association" do
       address = Address.new
-      address.should respond_to(:person)
+      address.should respond_to(:addressable)
     end
 
     it "creates a writer for the association" do
       address = Address.new
-      address.should respond_to(:person=)
+      address.should respond_to(:addressable=)
     end
 
     it "allows the parent to be any type of class" do

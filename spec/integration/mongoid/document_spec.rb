@@ -223,7 +223,7 @@ describe Mongoid::Document do
     end
 
     it "allows the parent reference to change" do
-      @address.person = @person
+      @address.addressable = @person
       @address.save!
       @person.addresses.first.should == @address
     end

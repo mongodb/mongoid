@@ -80,7 +80,7 @@ class Address < Mongoid::Document
   field :state
   field :comment_code
   key :street
-  belongs_to :person
+  belongs_to :addressable
 end
 
 class Name < Mongoid::Document

@@ -41,9 +41,9 @@ module Mongoid # :nodoc:
       #   class Address < Mongoid::Document
       #     belongs_to :person
       #   end
-      def belongs_to(association_name)
+      def belongs_to(association_name, options = {})
         @embedded = true
-        add_association(Associations::BelongsTo, association_name)
+        add_association(Associations::BelongsTo, association_name, options)
       end
 
       # Adds the association from a parent document to its children. The name
