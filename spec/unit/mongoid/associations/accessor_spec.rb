@@ -24,7 +24,7 @@ describe Mongoid::Associations::Accessor do
 
         it "returns a HasOne" do
           association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, :name, @document)
-          association.should be_a_kind_of(Mongoid::Associations::HasOne)
+          association.should be_a_kind_of(Name)
         end
 
       end
@@ -43,8 +43,8 @@ describe Mongoid::Associations::Accessor do
     context "when type is belongs_to" do
 
       it "returns a BelongsTo" do
-        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::BelongsTo, :person, @document)
-        association.should be_a_kind_of(Mongoid::Associations::BelongsTo)
+        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::BelongsTo, :person, stub(:parent => @document))
+        association.should be_a_kind_of(Person)
       end
 
     end
