@@ -245,6 +245,7 @@ module Mongoid #:nodoc:
       @attributes = HashWithIndifferentAccess.new(collection.find_one(:_id => id))
     end
 
+    # Return the root +Document+ in the object graph.
     def root
       object = self
       while (object.parent) do object = object.parent; end
