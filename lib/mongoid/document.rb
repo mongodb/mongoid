@@ -50,6 +50,11 @@ module Mongoid #:nodoc:
         Criteria.translate(*args).count(self)
       end
 
+      # return true if the +Document+ is embedded in another +Documnet+.
+      def embedded?
+        @embedded == true
+      end
+
       # Defines all the fields that are accessable on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
@@ -184,6 +189,11 @@ module Mongoid #:nodoc:
     # Get the Mongo::Collection associated with this Document.
     def collection
       self.class.collection
+    end
+
+    # Return true if the +Document+ is embedded in another +Document+.
+    def embedded?
+      self.class.embedded?
     end
 
     # Get the fields for the Document class.

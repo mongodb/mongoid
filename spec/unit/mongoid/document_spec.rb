@@ -134,6 +134,48 @@ describe Mongoid::Document do
 
   end
 
+  describe ".embedded?" do
+
+    context "when the document is embedded" do
+
+      it "returns true" do
+        Address.embedded?.should be_true
+      end
+
+    end
+
+    context "when the document is not embedded" do
+
+      it "returns false" do
+        Person.embedded?.should be_false
+      end
+
+    end
+
+  end
+
+  describe "#embedded?" do
+
+    context "when the document is embedded" do
+
+      it "returns true" do
+        address = Address.new
+        address.embedded?.should be_true
+      end
+
+    end
+
+    context "when the document is not embedded" do
+
+      it "returns false" do
+        person = Person.new
+        person.embedded?.should be_false
+      end
+
+    end
+
+  end
+
   describe "#field" do
 
     context "with no options" do
