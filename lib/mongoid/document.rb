@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>Mongo::Collection</tt>
       def collection
-        return nil if @embedded
+        return nil if embedded?
         @collection_name = self.to_s.demodulize.tableize
         @collection ||= Mongoid.database.collection(@collection_name)
       end
@@ -216,7 +216,7 @@ module Mongoid #:nodoc:
     end
 
     def inspect
-      "Class: #{self.class.name} | Attributes: #{@attributes.inspect} | Parent: #{@parent.class.name}"
+      "#{self.class.name} : #{@attributes.inspect}"
     end
 
     # Return the +Document+ primary key.
@@ -243,6 +243,12 @@ module Mongoid #:nodoc:
     # Reloads the +Document+ attributes from the database.
     def reload
       @attributes = HashWithIndifferentAccess.new(collection.find_one(:_id => id))
+    end
+
+    def root
+      object = self
+      while (object.parent) do object = object.parent; end
+      object || self
     end
 
     # Returns the id of the Document

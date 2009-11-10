@@ -535,6 +535,116 @@ describe Mongoid::Document do
 
   end
 
+  describe "#persist" do
+
+    context "when the document is new" do
+
+      before do
+        @person = Person.new(:title => "Sir")
+      end
+
+      it "inserts the document in the collection" do
+        @collection.expects(:insert).with(@person.attributes, :safe => false)
+        @person.persist
+        @person.new_record.should be_false
+      end
+
+    end
+
+    context "when the document exists" do
+
+      before do
+        @person = Person.new(:_id => "1", :title => "Sir")
+      end
+
+      it "inserts the document in the collection" do
+        @collection.expects(:update).with(
+          { :_id => "1" }, 
+          @person.attributes,
+          :upsert => false,
+          :safe => false
+        )
+        @person.persist
+      end
+
+    end
+
+    context "when the document is embedded" do
+
+      before do
+        @person = Person.new(
+          :_id => "1",
+          :title => "Sir",
+          :name => { :_id => "2", :title => "Mr" },
+          :addresses => [ { :_id => "3", :street => "Picadilly Circus" } ]
+        )
+      end
+
+      context "document is a has one" do
+
+        before do
+          @name = Name.new(:first_name => "Test")
+        end
+
+        it "sets the new embedded document" do
+          @collection.expects(:update).with(
+            { :_id => "1" },
+            { "$set" => { :name => @name.attributes } },
+            :upsert => false,
+            :safe => false
+          )
+          @name.persist
+          @name.new_record.should be_false
+        end
+
+      end
+
+      context "document is a has many" do
+
+        context "when embedded document is new" do
+
+          before do
+            @address = Address.new(:street => "Oxford Street")
+          end
+
+          it "adds the new embedded document" do
+            @collection.expects(:update).with(
+              { :_id => "1" },
+              { "$push" => { "addresses" => @address.attributes } },
+              :upsert => false,
+              :safe => false
+            )
+            @address.persist
+            @address.new_record.should be_false
+          end
+
+        end
+
+        context "when updating existing embedded document" do
+
+          before do
+            @address = Address.new(:_id => "3", :street => "Oxford Street")
+          end
+
+          it "replaces the entire has many" do
+            @collection.expects(:update).with(
+              { :_id => "1" },
+              { "$set" => { "addresses" => [ @address.attributes ] } },
+              :upsert => false,
+              :safe => false
+            )
+            @address.persist
+            @address.new_record.should be_false
+          end
+
+        end
+
+      end
+
+    end
+
+  end
+
   describe "#read_attribute" do
 
     context "when attribute does not exist" do
@@ -562,6 +672,42 @@ describe Mongoid::Document do
     it "reloads the object attribtues from the database" do
       @person.reload
       @person.attributes.should == @attributes
+    end
+
+  end
+
+  describe "#root" do
+
+    before do
+      @person = Person.new(:title => "Mr")
+      @phone_number = Phone.new(:number => "415-555-1212")
+      @country_code = CountryCode.new(:code => 1)
+      @phone_number.country_code = @country_code
+      @person.phone_numbers << @phone_number
+    end
+
+    context "when document is the root" do
+
+      it "returns self" do
+        @person.root.should == @person
+      end
+
+    end
+
+    context "when document is embedded one level" do
+
+      it "returns the parent" do
+        @phone_number.root.should == @person
+      end
+
+    end
+
+    context "when document is embedded multiple levels" do
+
+      it "returns the top level parent" do
+        @country_code.root.should == @person
+      end
+
     end
 
   end
