@@ -94,9 +94,7 @@ module Mongoid # :nodoc:
       def add_association(type, name, options = {})
         associations[name] = type
         define_method(name) do
-          if instance_variable_defined?("@#{name}")
-            return instance_variable_get("@#{name}")
-          end
+          return instance_variable_get("@#{name}") if instance_variable_defined?("@#{name}")
           proxy = Associations::Accessor.get(type, name, self, options)
           instance_variable_set("@#{name}", proxy)
         end
