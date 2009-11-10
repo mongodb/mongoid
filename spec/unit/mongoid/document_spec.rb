@@ -851,7 +851,17 @@ describe Mongoid::Document do
 
         context "when association is a has_many" do
 
-          it "fails when any association fails validation"
+          it "fails when any association fails validation" do
+            Person.class_eval do
+              validates_associated :addresses
+            end
+            Address.class_eval do
+              validates_presence_of :street
+            end
+            @person.addresses << Address.new
+            @person.valid?.should be_false
+            @person.errors.on(:addresses).should_not be_nil
+          end
 
         end
 
