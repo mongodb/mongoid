@@ -26,6 +26,23 @@ describe Mongoid::Attributes do
         attrs = Person.new(@attributes).attributes
         attrs[:age].should == 30
         attrs[:terms].should == true
+        attrs[:_id].should == "1"
+      end
+
+    end
+
+    context "when associations provided in the attributes" do
+
+      before do
+        @name = Name.new(:first_name => "Testy")
+        @attributes = {
+          :name => @name
+        }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the associations" do
+        @person.name.should == @name
       end
 
     end

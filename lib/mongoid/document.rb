@@ -209,8 +209,8 @@ module Mongoid #:nodoc:
 
     # Instantiate a new Document, setting the Document's attributes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
-    def initialize(attributes = {})
-      @attributes = process(fields, attributes)
+    def initialize(attrs = {})
+      process(attrs)
       @new_record = true if id.nil?
       generate_key
     end
@@ -275,7 +275,7 @@ module Mongoid #:nodoc:
     # Writes all the attributes of this Document, and delegate up to
     # the parent.
     def write_attributes(attrs)
-      @attributes = process(fields, attrs)
+      process(attrs)
       notify
     end
 
