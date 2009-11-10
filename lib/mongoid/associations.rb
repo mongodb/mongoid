@@ -43,7 +43,7 @@ module Mongoid # :nodoc:
       #   end
       def belongs_to(association_name)
         @embedded = true
-        add_association(:belongs_to, association_name.to_s.classify, association_name)
+        add_association(Associations::BelongsTo, association_name)
       end
 
       # Adds the association from a parent document to its children. The name
@@ -64,7 +64,7 @@ module Mongoid # :nodoc:
       #     belongs_to :person
       #   end
       def has_many(association_name, options = {})
-        add_association(:has_many, association_name.to_s.classify, association_name, options)
+        add_association(Associations::HasMany, association_name, options)
       end
 
       # Adds the association from a parent document to its child. The name
@@ -85,13 +85,13 @@ module Mongoid # :nodoc:
       #     belongs_to :person
       #   end
       def has_one(association_name, options = {})
-        add_association(:has_one, association_name.to_s.titleize, association_name, options)
+        add_association(Associations::HasOne, association_name, options)
       end
 
       private
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.
-      def add_association(type, class_name, name, options = {})
+      def add_association(type, name, options = {})
         associations[name] = type
         define_method(name) do
           if instance_variable_defined?("@#{name}")

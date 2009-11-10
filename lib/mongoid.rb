@@ -52,10 +52,6 @@ module Mongoid
   # checking equality on objects of different types.
   class TypeMismatchError < RuntimeError; end
 
-  # Raised when an association is defined that is not valid. Must
-  # be belongs_to, has_many, has_one
-  class InvalidAssociationError < RuntimeError; end
-
   # Raised when a persisence method ending in ! fails validation.
   class ValidationsError < RuntimeError; end
 

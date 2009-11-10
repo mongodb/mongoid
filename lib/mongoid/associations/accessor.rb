@@ -5,18 +5,8 @@ module Mongoid #:nodoc:
         # Gets an association, based on the type provided and
         # passes the name and document into the newly instantiated
         # association.
-        #
-        # If the type is invalid a InvalidAssociationError will be thrown.
         def get(type, name, document, options = {})
-          case type
-            when :belongs_to
-              BelongsTo.new(document)
-            when :has_many
-              HasMany.new(name, document, options)
-            when :has_one
-              document ? HasOne.new(name, document, options) : nil
-            else raise InvalidAssociationError
-          end
+          document ? type.new(name, document, options) : nil
         end
 
         # Set an object association. This is used to set the parent reference
@@ -31,12 +21,7 @@ module Mongoid #:nodoc:
         # object: The object that was passed in to the setter method.
         # options: optional options.
         def set(type, name, document, object, options ={})
-          case type
-            when :belongs_to then BelongsTo.update(document, object)
-            when :has_many then HasMany.update(object, document, name)
-            when :has_one then HasOne.update(object, document, name)
-            else raise InvalidAssociationError
-          end
+          type.update(object, document, name)
         end
       end
     end

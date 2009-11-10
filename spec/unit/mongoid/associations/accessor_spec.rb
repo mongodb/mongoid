@@ -12,7 +12,7 @@ describe Mongoid::Associations::Accessor do
     context "when type is has_many" do
 
       it "returns a HasMany" do
-        association = Mongoid::Associations::Accessor.get(:has_many, :addresses, @document)
+        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasMany, :addresses, @document)
         association.should be_a_kind_of(Mongoid::Associations::HasMany)
       end
 
@@ -23,7 +23,7 @@ describe Mongoid::Associations::Accessor do
       context "when document is not nil" do
 
         it "returns a HasOne" do
-          association = Mongoid::Associations::Accessor.get(:has_one, :name, @document)
+          association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, :name, @document)
           association.should be_a_kind_of(Mongoid::Associations::HasOne)
         end
 
@@ -32,7 +32,7 @@ describe Mongoid::Associations::Accessor do
       context "when document is nil" do
 
         it "returns nil" do
-          association = Mongoid::Associations::Accessor.get(:has_one, :name, nil)
+          association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, :name, nil)
           association.should be_nil
         end
 
@@ -43,16 +43,8 @@ describe Mongoid::Associations::Accessor do
     context "when type is belongs_to" do
 
       it "returns a BelongsTo" do
-        association = Mongoid::Associations::Accessor.get(:belongs_to, :person, @document)
+        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::BelongsTo, :person, @document)
         association.should be_a_kind_of(Mongoid::Associations::BelongsTo)
-      end
-
-    end
-
-    context "when type is invalid" do
-
-      it "raises an InvalidAssociationError" do
-        lambda { Mongoid::Associations::Accessor.get(:something, :person, @document) }.should raise_error
       end
 
     end
@@ -65,7 +57,7 @@ describe Mongoid::Associations::Accessor do
 
       it "returns a HasMany" do
         Mongoid::Associations::HasMany.expects(:update).with(@document, @object, :addresses)
-        Mongoid::Associations::Accessor.set(:has_many, :addresses, @document, @object)
+        Mongoid::Associations::Accessor.set(Mongoid::Associations::HasMany, :addresses, @document, @object)
       end
 
     end
@@ -74,7 +66,7 @@ describe Mongoid::Associations::Accessor do
 
       it "returns a HasOne" do
         Mongoid::Associations::HasOne.expects(:update).with(@document, @object, :name)
-        Mongoid::Associations::Accessor.set(:has_one, :name, @document, @object)
+        Mongoid::Associations::Accessor.set(Mongoid::Associations::HasOne, :name, @document, @object)
       end
 
     end
@@ -82,21 +74,12 @@ describe Mongoid::Associations::Accessor do
     context "when type is belongs_to" do
 
       it "returns a BelongsTo" do
-        Mongoid::Associations::BelongsTo.expects(:update).with(@document, @object)
-        Mongoid::Associations::Accessor.set(:belongs_to, :person, @document, @object)
+        Mongoid::Associations::BelongsTo.expects(:update).with(@object, @document, :person)
+        Mongoid::Associations::Accessor.set(Mongoid::Associations::BelongsTo, :person, @document, @object)
       end
 
     end
 
-    context "when type is invalid" do
-
-      it "raises an InvalidAssociationError" do
-        lambda {
-          Mongoid::Associations::Accessor.set(:something, :person, @document, @object)
-        }.should raise_error
-      end
-
-    end
   end
 
 end
