@@ -20,6 +20,22 @@ describe Mongoid::Extensions::Boolean::Conversions do
 
     end
 
+    context "when 0" do
+
+      it "returns false" do
+        Boolean.set("0").should be_false
+      end
+
+    end
+
+    context "when 1" do
+
+      it "returns true" do
+        Boolean.set("1").should be_true
+      end
+
+    end
+
   end
 
   describe "#get" do
