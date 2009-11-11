@@ -33,16 +33,33 @@ describe Mongoid::Attributes do
 
     context "when associations provided in the attributes" do
 
-      before do
-        @name = Name.new(:first_name => "Testy")
-        @attributes = {
-          :name => @name
-        }
-        @person = Person.new(@attributes)
+      context "when association is a has_one" do
+
+        before do
+          @name = Name.new(:first_name => "Testy")
+          @attributes = {
+            :name => @name
+          }
+          @person = Person.new(@attributes)
+        end
+
+        it "sets the associations" do
+          @person.name.should == @name
+        end
+
       end
 
-      it "sets the associations" do
-        @person.name.should == @name
+      context "when association is a belongs_to" do
+
+        before do
+          @person = Person.new
+          @name = Name.new(:first_name => "Tyler", :person => @person)
+        end
+
+        it "sets the association" do
+          @name.person.should == @person
+        end
+
       end
 
     end

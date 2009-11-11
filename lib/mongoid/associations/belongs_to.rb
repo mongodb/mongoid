@@ -31,6 +31,7 @@ module Mongoid #:nodoc:
           child.parentize(parent, name) if has_one
           child.parentize(parent, name.tableize) unless has_one
           child.notify
+          parent
         end
       end
     end
