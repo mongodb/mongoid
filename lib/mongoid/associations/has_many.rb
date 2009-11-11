@@ -83,6 +83,7 @@ module Mongoid #:nodoc:
             child.parentize(parent, name)
             child.notify
           end
+          new(name, parent)
         end
       end
 
