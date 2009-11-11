@@ -2,7 +2,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasMany < DelegateClass(Array) #:nodoc:
 
-      attr_accessor :association_name
+      attr_accessor :association_name, :klass
 
       # Appends the object to the +Array+, setting its parent in
       # the process.
