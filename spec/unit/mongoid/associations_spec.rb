@@ -75,6 +75,22 @@ describe Mongoid::Associations do
       code.phone_number.should == phone_number
     end
 
+    context "when navigating the graph" do
+
+      before do
+        @person = Person.new(:title => "Mr")
+        @name = Name.new(:first_name => "Mason")
+        @address = Address.new(:street => "King St.")
+        @person.name = @name
+        @person.addresses << @address
+      end
+
+      it "allows referencing another child through the parent" do
+        @name.person.addresses.first.should == @address
+      end
+
+    end
+
   end
 
   describe "#has_many" do
