@@ -4,6 +4,11 @@ module Mongoid #:nodoc:
 
       attr_accessor :association_name, :klass
 
+      # Returns the target of the proxy.
+      def target
+        @documents
+      end
+
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def <<(object)
