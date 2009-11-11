@@ -28,8 +28,11 @@ module Mongoid #:nodoc:
         def update(parent, child, name, options = {})
           name = child.class.name.demodulize.downcase
           has_one = parent.associations[name]
-          child.parentize(parent, name) if has_one
-          child.parentize(parent, name.tableize) unless has_one
+          if has_one
+            child.parentize(parent, name)
+          else
+            child.parentize(parent, name.tableize)
+          end
           child.notify
           parent
         end
