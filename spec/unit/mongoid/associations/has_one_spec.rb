@@ -7,37 +7,6 @@ describe Mongoid::Associations::HasOne do
     @document = stub(:attributes => @attributes, :update => true)
   end
 
-  describe "#build" do
-
-    before do
-      @association = Mongoid::Associations::HasOne.new(:name, @document)
-    end
-
-    it "creates a new document with the asssociations set up" do
-      child = @association.build(:first_name => "Test", :last_name => "User")
-      child.first_name.should == "Test"
-      child.last_name.should == "User"
-      child.parent.should_not be_nil
-    end
-
-    context "when the association already exists" do
-
-      before do
-        @person = Person.new(:title => "Sir")
-        @name = Name.new(:first_name => "Prince", :last_name => "Humperdink")
-        @person.name = @name
-      end
-
-      it "replaces the existing association" do
-        @person.name.build(:first_name => "Princess", :last_name => "Buttercup")
-        @person.name.first_name.should == "Princess"
-        @person.name.person.should == @person
-      end
-
-    end
-
-  end
-
   describe "#update" do
 
     before do

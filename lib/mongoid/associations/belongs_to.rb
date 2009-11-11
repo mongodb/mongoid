@@ -21,11 +21,6 @@ module Mongoid #:nodoc:
         @document
       end
 
-      # Return the target of the proxy
-      def target
-        @document
-      end
-
       class << self
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the

@@ -97,11 +97,6 @@ module Mongoid # :nodoc:
           return instance_variable_get("@#{name}") if instance_variable_defined?("@#{name}")
           proxy = Associations::Accessor.get(type, name, self, options)
           instance_variable_set("@#{name}", proxy)
-          proxy.target.nil? ? nil : proxy
-        end
-        define_method("build_#{name}") do |*args|
-          proxy = Associations::Accessor.get(type, name, self, options)
-          proxy.build(*args)
         end
         define_method("#{name}=") do |object|
           proxy = Associations::Accessor.set(type, name, self, object, options)

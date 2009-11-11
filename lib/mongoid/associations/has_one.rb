@@ -5,16 +5,6 @@ module Mongoid #:nodoc:
 
       delegate :valid?, :to => :document
 
-      # Builds a new Document and sets up the has one association.
-      #
-      # Returns the newly created object.
-      def build(attributes = nil)
-        attributes ||= {}
-        @document = @klass.new(attributes)
-        @document.parentize(@parent, @association_name)
-        @document
-      end
-
       # Creates the new association by finding the attributes in 
       # the parent document with its name, and instantiating a 
       # new document for it.
@@ -22,18 +12,12 @@ module Mongoid #:nodoc:
       # All method calls on this object will then be delegated
       # to the internal document itself.
       def initialize(name, document, options = {})
-        @parent = document
         class_name = options[:class_name]
-        @klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
+        klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
         attributes = document.attributes[name]
-        @document = @klass.new(attributes)
+        @document = klass.new(attributes)
         @document.parentize(document, name)
         decorate!
-      end
-
-      # Return the target of the proxy
-      def target
-        @document
       end
 
       class << self
@@ -42,7 +26,7 @@ module Mongoid #:nodoc:
         def update(child, parent, name, options = {})
           child.parentize(parent, name)
           child.notify
-          new(name, parent, options)
+          child
         end
       end
 
