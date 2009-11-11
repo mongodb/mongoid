@@ -201,11 +201,13 @@ module Mongoid #:nodoc:
       self.class.fields
     end
 
-    # Get the Mongo::ObjectID associated with this object.
+    # Get the id associated with this object.
     # This is in essence the primary key.
     def id
       @attributes[:_id]
     end
+
+    alias :_id :id
 
     # Instantiate a new Document, setting the Document's attributes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
