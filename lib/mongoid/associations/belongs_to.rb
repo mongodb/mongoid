@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
         # +Document+. Will properly set a has_one or a has_many.
-        def update(parent, child, name)
+        def update(parent, child, name, options = {})
           name = child.class.name.demodulize.downcase
           has_one = parent.associations[name]
           child.parentize(parent, name) if has_one

@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
       class << self
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting the has_one to the supplied child.
-        def update(child, parent, name)
+        def update(child, parent, name, options = {})
           child.parentize(parent, name)
           child.notify
           child

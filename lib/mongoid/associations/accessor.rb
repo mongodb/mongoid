@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
         # object: The object that was passed in to the setter method.
         # options: optional options.
         def set(type, name, document, object, options ={})
-          type.update(object, document, name)
+          type.update(object, document, name, options)
         end
       end
     end

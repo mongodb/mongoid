@@ -77,13 +77,13 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting the has_many to the supplied +Enumerable+
         # and setting up the parentization.
-        def update(children, parent, name)
+        def update(children, parent, name, options = {})
           parent.attributes.delete(name)
           children.each do |child|
             child.parentize(parent, name)
             child.notify
           end
-          new(name, parent)
+          new(name, parent, options)
         end
       end
 
