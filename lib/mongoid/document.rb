@@ -68,7 +68,7 @@ module Mongoid #:nodoc:
       #
       # <tt>field :score, :default => 0</tt>
       def field(name, options = {})
-        @fields ||= HashWithIndifferentAccess.new
+        @fields ||= {}.with_indifferent_access
         @fields[name.to_s] = Field.new(name.to_s, options)
         define_method(name) { read_attribute(name) }
         define_method("#{name}=") { |value| write_attribute(name, value) }
@@ -116,6 +116,13 @@ module Mongoid #:nodoc:
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
         collection.create_index(name, options)
+      end
+
+      # Instantiate a new object, only when loaded from the database.
+      def instantiate(attributes = {})
+        document = allocate
+        document.instance_variable_set(:@attributes, attributes.with_indifferent_access)
+        document
       end
 
       # Defines the field that will be used for the id of this +Document+. This
@@ -257,7 +264,7 @@ module Mongoid #:nodoc:
 
     # Reloads the +Document+ attributes from the database.
     def reload
-      @attributes = HashWithIndifferentAccess.new(collection.find_one(:_id => id))
+      @attributes = collection.find_one(:_id => id).with_indifferent_access
     end
 
     # Return the root +Document+ in the object graph.

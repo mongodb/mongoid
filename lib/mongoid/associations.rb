@@ -21,7 +21,7 @@ module Mongoid # :nodoc:
 
     module ClassMethods
       def associations
-        @associations ||= HashWithIndifferentAccess.new
+        @associations ||= {}.with_indifferent_access
       end
       # Adds the association back to the parent document. This macro is
       # necessary to set the references from the child back to the parent

@@ -349,6 +349,19 @@ describe Mongoid::Document do
 
   end
 
+  describe "#instantiate" do
+
+    before do
+      @attributes = { :_id => "1", :title => "Sir", :age => 30 }
+      @person = Person.new(@attributes)
+    end
+
+    it "sets the attributes directly" do
+      Person.instantiate(@attributes).should == @person
+    end
+
+  end
+
   describe "#key" do
 
     context "when key is single field" do
@@ -393,7 +406,7 @@ describe Mongoid::Document do
     end
 
     it "finds the last document by the id" do
-      Person.last.should == Person.new(@attributes)
+      Person.last.should == Person.instantiate(@attributes)
     end
 
   end

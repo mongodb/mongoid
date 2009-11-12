@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
         @klass = class_name ? class_name.constantize : @association_name.to_s.classify.constantize
         attributes = document.attributes[@association_name]
         @documents = attributes ? attributes.collect do |attribute|
-          child = @klass.new(attribute)
+          child = @klass.instantiate(attribute)
           child.parentize(@parent, @association_name)
           child
         end : []

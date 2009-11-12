@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
         class_name = options[:class_name]
         klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
         attributes = document.attributes[name]
-        @document = klass.new(attributes)
+        @document = klass.instantiate(attributes || {})
         @document.parentize(document, name)
         decorate!
       end

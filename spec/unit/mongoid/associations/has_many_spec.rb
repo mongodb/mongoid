@@ -4,8 +4,8 @@ describe Mongoid::Associations::HasMany do
 
   before do
     @attributes = { :addresses => [
-      { :street => "Street 1" },
-      { :street => "Street 2" } ] }
+      { :_id => "street-1", :street => "Street 1" },
+      { :_id => "street-2", :street => "Street 2" } ] }
     @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
   end
 

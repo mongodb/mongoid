@@ -102,10 +102,10 @@ module Mongoid #:nodoc:
       @klass = klass if klass
       if type == :first
         attributes = klass.collection.find_one(@selector, @options)
-        attributes ? @klass.new(attributes) : nil
+        attributes ? @klass.instantiate(attributes) : nil
       else
         attributes = @klass.collection.find(@selector, @options)
-        attributes ? attributes.collect { |doc| @klass.new(doc) } : []
+        attributes ? attributes.collect { |doc| @klass.instantiate(doc) } : []
       end
     end
 
@@ -142,7 +142,7 @@ module Mongoid #:nodoc:
         { :group => [] },
         GROUP_REDUCE
       ).collect do |docs|
-        docs["group"] = docs["group"].collect { |attrs| @klass.new(attrs) }; docs
+        docs["group"] = docs["group"].collect { |attrs| @klass.instantiate(attrs) }; docs
       end
     end
 
