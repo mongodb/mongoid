@@ -5,7 +5,7 @@ describe Mongoid::Commands do
   context "instance methods" do
 
     before do
-      @person = Person.new(:_id => Mongo::ObjectID.new)
+      @person = Person.new(:_id => Mongo::ObjectID.new.to_s)
     end
 
     describe "#delete" do
@@ -33,6 +33,19 @@ describe Mongoid::Commands do
         @person.save
       end
 
+      context "when document is new" do
+
+        before do
+          @person = Person.new
+        end
+
+        it "delegates to the Create command" do
+          Mongoid::Commands::Create.expects(:execute).with(@person).returns(@person)
+          @person.save
+        end
+
+      end
+
     end
 
     describe "#save!" do
@@ -51,6 +64,28 @@ describe Mongoid::Commands do
         it "it raises a ValidationsError" do
           Mongoid::Commands::Save.expects(:execute).with(@person).returns(false)
           lambda { @person.save! }.should raise_error
+        end
+
+      end
+
+      context "when document is new" do
+
+        before do
+          @person = Person.new
+        end
+
+        it "delegates to the Create command" do
+          Mongoid::Commands::Create.expects(:execute).with(@person).returns(@person)
+          @person.save!
+        end
+
+        context "when validation fails" do
+
+          it "it raises a ValidationsError" do
+            Mongoid::Commands::Create.expects(:execute).with(@person).returns(false)
+            lambda { @person.save! }.should raise_error
+          end
+
         end
 
       end
@@ -123,7 +158,7 @@ describe Mongoid::Commands do
         it "raises an exception" do
           person = stub(:errors => stub(:empty? => false))
           Mongoid::Commands::Create.expects(:execute).returns(person)
-          lambda { Person.create! }.should raise_error          
+          lambda { Person.create! }.should raise_error
         end
 
       end
