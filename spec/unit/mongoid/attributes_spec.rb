@@ -64,6 +64,20 @@ describe Mongoid::Attributes do
 
     end
 
+    context "when non-associations provided in the attributes" do
+
+      before do
+        @employer = Employer.new
+        @attributes = { :employer => @employer, :title => "Sir" }
+        @person = Person.new(@attributes)
+      end
+
+      it "calls the setter for the association" do
+        @person.employer_id.should == "1"
+      end
+
+    end
+
   end
 
 end

@@ -24,6 +24,11 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting the has_one to the supplied child.
         def update(child, parent, name, options = {})
+          unless child.respond_to?(:parentize)
+            class_name = options[:class_name]
+            klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
+            child = klass.new(child)
+          end
           child.parentize(parent, name)
           child.notify
           child

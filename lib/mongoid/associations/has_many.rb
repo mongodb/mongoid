@@ -79,7 +79,12 @@ module Mongoid #:nodoc:
         # and setting up the parentization.
         def update(children, parent, name, options = {})
           parent.attributes.delete(name)
+          class_name = options[:class_name]
+          klass = class_name ? class_name.constantize : name.to_s.classify.constantize
           children.each do |child|
+            unless child.respond_to?(:parentize)
+              child = klass.new(child)
+            end
             child.parentize(parent, name)
             child.notify
           end

@@ -292,7 +292,7 @@ describe Mongoid::Document do
   describe "#first" do
 
     before do
-      @attributes = { "age" => 100, "version" => 1 }
+      @attributes = { "age" => 100 }
     end
 
     context "when a selector is provided" do
@@ -370,8 +370,8 @@ describe Mongoid::Document do
     context "when key is composite" do
 
       before do
-        Address.key :street, :zip
-        @address = Address.new(:street => "Testing Street Name", :zip => "94123")
+        Address.key :street, :post_code
+        @address = Address.new(:street => "Testing Street Name", :post_code => "94123")
         @address.expects(:collection).returns(@collection)
         @collection.expects(:save)
       end
@@ -543,6 +543,20 @@ describe Mongoid::Document do
         @person.parent.should be_nil
       end
 
+    end
+
+  end
+
+  describe "#parentize" do
+
+    before do
+      @parent = Person.new
+      @child = Name.new
+    end
+
+    it "sets the parent on each element" do
+      @child.parentize(@parent, :child)
+      @child.parent.should == @parent
     end
 
   end

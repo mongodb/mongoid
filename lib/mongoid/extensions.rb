@@ -7,7 +7,6 @@ require "mongoid/extensions/hash/accessors"
 require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/object/conversions"
-require "mongoid/extensions/object/parentization"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
@@ -41,7 +40,6 @@ end
 
 class Object #:nodoc:
   include Mongoid::Extensions::Object::Conversions
-  include Mongoid::Extensions::Object::Parentization
 end
 
 class String #:nodoc

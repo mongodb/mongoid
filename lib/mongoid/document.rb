@@ -207,7 +207,13 @@ module Mongoid #:nodoc:
       @attributes[:_id]
     end
 
+    # Set the id
+    def id=(new_id)
+      @attributes[:_id] = new_id
+    end
+
     alias :_id :id
+    alias :_id= :id=
 
     # Instantiate a new Document, setting the Document's attributes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
@@ -235,6 +241,13 @@ module Mongoid #:nodoc:
     def notify
       changed(true)
       notify_observers(self)
+    end
+
+    # Sets the parent object
+    def parentize(object, association_name)
+      self.parent = object
+      self.association_name = association_name
+      add_observer(object)
     end
 
     # Read from the attributes hash.

@@ -26,6 +26,7 @@ class Person < Mongoid::Document
   field :age, :type => Integer, :default => 100
   field :dob, :type => Date
   field :mixed_drink, :type => MixedDrink
+  field :employer_id
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
   has_one :name
@@ -35,6 +36,16 @@ class Person < Mongoid::Document
     addresses.each_with_index do |address, i|
       address.street = "Updated #{i}"
     end
+  end
+
+  def employer=(emp)
+    self.employer_id = emp.id
+  end
+end
+
+class Employer
+  def id
+    "1"
   end
 end
 
@@ -78,7 +89,7 @@ class Address < Mongoid::Document
   field :street
   field :city
   field :state
-  field :comment_code
+  field :post_code
   key :street
   belongs_to :addressable
 end

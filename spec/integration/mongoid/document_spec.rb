@@ -30,9 +30,9 @@ describe Mongoid::Document do
   describe "#create" do
 
     it "persists a new record to the database" do
-      person = Person.create(:test => "Test")
+      person = Person.create(:title => "Test")
       person.id.should be_a_kind_of(String)
-      person.attributes[:test].should == "Test"
+      person.attributes[:title].should == "Test"
     end
 
   end

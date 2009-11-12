@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
     def process(params)
       @attributes = HashWithIndifferentAccess.new(params)
       process_fields
-      process_associations
+      process_attributes
     end
 
     protected
@@ -16,9 +16,9 @@ module Mongoid #:nodoc:
       end
     end
 
-    def process_associations
+    def process_attributes
       @attributes.each_pair do |key, value|
-        @attributes[key] = send("#{key}=", value) if value.is_a?(Document)
+        send("#{key}=", value)
       end
     end
 
