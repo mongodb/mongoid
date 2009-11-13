@@ -188,7 +188,7 @@ module Mongoid #:nodoc:
 
     # Performs equality checking on the attributes.
     def ==(other)
-      raise TypeMismatchError unless other.is_a?(Document)
+      return false unless other.is_a?(Document)
       @attributes.except(:modified_at).except(:created_at) ==
         other.attributes.except(:modified_at).except(:created_at)
     end

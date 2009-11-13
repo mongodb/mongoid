@@ -48,8 +48,8 @@ describe Mongoid::Document do
 
     context "when other object is not a Document" do
 
-      it "raises an exception" do
-        lambda { Person.new.==("Test") }.should raise_error
+      it "returns false" do
+        Person.new.==("Test").should be_false
       end
 
     end

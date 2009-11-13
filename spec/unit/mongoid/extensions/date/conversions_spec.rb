@@ -14,6 +14,14 @@ describe Mongoid::Extensions::Date::Conversions do
         Date.set(@time.utc.to_s).should == @time
       end
 
+      context "when string is empty" do
+
+        it "returns nil" do
+          Date.set("").should == nil
+        end
+
+      end
+
     end
 
     context "when time provided" do

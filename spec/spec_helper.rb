@@ -27,6 +27,7 @@ class Person < Mongoid::Document
   field :dob, :type => Date
   field :mixed_drink, :type => MixedDrink
   field :employer_id
+  field :lunch_time, :type => Time
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
   has_one :name

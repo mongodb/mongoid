@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
     module Date #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value.to_time.utc
+          value.to_time.utc unless value.blank?
         end
         def get(value)
           value ? value.to_date : value

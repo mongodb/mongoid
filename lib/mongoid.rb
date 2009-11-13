@@ -27,6 +27,7 @@ gem "will_paginate", "2.3.11"
 
 require "delegate"
 require "observer"
+require "time"
 require "validatable"
 require "active_support/callbacks"
 require "active_support/core_ext"
