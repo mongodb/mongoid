@@ -50,6 +50,11 @@ module Mongoid #:nodoc:
         Criteria.translate(*args).count(self)
       end
 
+      # Returns a hash of all the default values
+      def defaults
+        @defaults
+      end
+
       # return true if the +Document+ is embedded in another +Documnet+.
       def embedded?
         @embedded == true
@@ -69,7 +74,9 @@ module Mongoid #:nodoc:
       # <tt>field :score, :default => 0</tt>
       def field(name, options = {})
         @fields ||= {}.with_indifferent_access
+        @defaults ||= {}.with_indifferent_access
         @fields[name.to_s] = Field.new(name.to_s, options)
+        @defaults[name.to_s] = options[:default] if options[:default]
         define_method(name) { read_attribute(name) }
         define_method("#{name}=") { |value| write_attribute(name, value) }
       end
@@ -198,6 +205,11 @@ module Mongoid #:nodoc:
       self.class.collection
     end
 
+    # Returns the class defaults
+    def defaults
+      self.class.defaults
+    end
+
     # Return true if the +Document+ is embedded in another +Document+.
     def embedded?
       self.class.embedded?
@@ -225,7 +237,7 @@ module Mongoid #:nodoc:
     # Instantiate a new Document, setting the Document's attributes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attrs = {})
-      process(attrs)
+      process(defaults.merge(attrs))
       @new_record = true if id.nil?
       generate_key
     end

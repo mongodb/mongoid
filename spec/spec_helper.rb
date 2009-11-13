@@ -118,3 +118,8 @@ class Post < Mongoid::Document
   include Mongoid::Versioning
   field :title
 end
+
+class Game < Mongoid::Document
+  field :high_score, :default => 500
+  field :score, :default => 0
+end

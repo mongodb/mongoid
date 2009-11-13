@@ -134,6 +134,26 @@ describe Mongoid::Document do
 
   end
 
+  describe ".defaults" do
+
+    it "returns a hash of all the default values" do
+      Game.defaults.should == { "high_score" => 500, "score" => 0 }
+    end
+
+  end
+
+  describe "#defaults" do
+
+    before do
+      @game = Game.new
+    end
+
+    it "returns the class defaults" do
+      @game.defaults.should == { "high_score" => 500, "score" => 0 }
+    end
+
+  end
+
   describe ".embedded?" do
 
     context "when the document is embedded" do

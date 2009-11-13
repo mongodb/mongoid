@@ -4,18 +4,10 @@ module Mongoid #:nodoc:
     # field exists for them on the +Document+.
     def process(params = nil)
       @attributes = (params || {}).with_indifferent_access
-      process_fields
       process_attributes
     end
 
     protected
-    def process_fields
-      fields.values.each do |field|
-        value = field.set(@attributes[field.name])
-        @attributes[field.name] = value if value
-      end
-    end
-
     def process_attributes
       @attributes.each_pair do |key, value|
         send("#{key}=", value)
