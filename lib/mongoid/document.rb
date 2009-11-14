@@ -126,10 +126,15 @@ module Mongoid #:nodoc:
       end
 
       # Instantiate a new object, only when loaded from the database.
-      def instantiate(attributes = {})
-        document = allocate
-        document.instance_variable_set(:@attributes, attributes.with_indifferent_access)
-        document
+      def instantiate(attrs = {})
+        attributes = attrs.with_indifferent_access
+        if attributes[:_id]
+          document = allocate
+          document.instance_variable_set(:@attributes, attributes)
+          return document
+        else
+          return new(attributes)
+        end
       end
 
       # Defines the field that will be used for the id of this +Document+. This
