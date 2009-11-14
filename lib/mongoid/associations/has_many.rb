@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
       #
       # Returns the newly created object.
       def build(attributes)
-        object = @klass.new(attributes)
+        object = @klass.instantiate(attributes)
         object.parentize(@parent, @association_name)
         push(object)
         object
