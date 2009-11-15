@@ -536,7 +536,7 @@ describe Mongoid::Document do
   describe "#paginate" do
 
     before do
-      @criteria = stub(:page => 1, :offset => "20")
+      @criteria = stub(:page => 1, :per_page => "20")
     end
 
     context "when pagination parameters are passed" do

@@ -100,6 +100,7 @@ module Mongoid #:nodoc:
     # objects of the type of class provided.
     def execute(klass = nil)
       @klass = klass if klass
+      filter_options
       if type == :first
         attributes = klass.collection.find_one(@selector, @options)
         attributes ? @klass.instantiate(attributes) : nil
@@ -233,7 +234,8 @@ module Mongoid #:nodoc:
     # will replace it with a skip parameter and return the same value. Defaults
     # to 20 if nothing was provided.
     def offset
-      offset = @options.delete(:per_page) || 20
+      per_page = @options[:per_page] || 20
+      offset = (page * per_page) - per_page
       @options[:skip] ||= offset
     end
 
@@ -256,7 +258,15 @@ module Mongoid #:nodoc:
     # Either returns the page option and removes it from the options, or
     # returns a default value of 1.
     def page
-      @options.delete(:page) || 1
+      @options[:page] || 1
+    end
+
+    # Returns the number of results per page or the default of 20.
+    def per_page
+      num = @options[:per_page] || 20
+      skip = (page * num) - num
+      @options[:skip] = skip
+      num
     end
 
     # Adds a criterion to the +Criteria+ that specifies the fields that will
@@ -337,6 +347,12 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def where(selector = {})
       @selector = selector; self
+    end
+
+    protected
+    def filter_options
+      @options.delete(:page)
+      @options.delete(:per_page)
     end
 
   end
