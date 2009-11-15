@@ -5,6 +5,8 @@ module Mongoid #:nodoc:
 
       delegate :valid?, :to => :document
 
+      attr_accessor :klass
+
       # Creates the new association by finding the attributes in 
       # the parent document with its name, and instantiating a 
       # new document for it.
@@ -13,7 +15,7 @@ module Mongoid #:nodoc:
       # to the internal document itself.
       def initialize(name, document, options = {})
         class_name = options[:class_name]
-        klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
+        @klass = class_name ? class_name.constantize : name.to_s.camelize.constantize
         attributes = document.attributes[name]
         @document = klass.instantiate(attributes || {})
         @document.parentize(document, name)
