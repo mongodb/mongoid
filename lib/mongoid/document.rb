@@ -205,6 +205,12 @@ module Mongoid #:nodoc:
         other.attributes.except(:modified_at).except(:created_at)
     end
 
+    # Clone the current +Document+. This will return all attributes with the
+    # exception of the document's id and versions.
+    def clone
+      self.class.new(@attributes.except(:_id).except(:versions).dup)
+    end
+
     # Get the Mongo::Collection associated with this Document.
     def collection
       self.class.collection

@@ -85,6 +85,20 @@ describe Mongoid::Document do
 
   end
 
+  describe "#clone" do
+
+    before do
+      @comment = Comment.new(:text => "Woooooo")
+      @clone = @comment.clone
+    end
+
+    it "returns a new document sans id and versions" do
+      @clone.id.should_not == @comment.id
+      @clone.versions.should be_empty
+    end
+
+  end
+
   describe "#collection" do
 
     before do
