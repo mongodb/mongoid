@@ -64,6 +64,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Integer</tt>
     def count(klass = nil)
+      return @count if @count
       @klass = klass if klass
       return @klass.collection.find(@selector, @options).count
     end
@@ -105,7 +106,12 @@ module Mongoid #:nodoc:
         attributes ? @klass.instantiate(attributes) : nil
       else
         attributes = @klass.collection.find(@selector, @options)
-        attributes ? attributes.collect { |doc| @klass.instantiate(doc) } : []
+        if attributes
+          @count = attributes.count
+          attributes.collect { |doc| @klass.instantiate(doc) }
+        else
+          []
+        end
       end
     end
 

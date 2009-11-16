@@ -59,7 +59,7 @@ describe Mongoid::Document do
   describe "#all" do
 
     before do
-      @cursor = mock
+      @cursor = stub(:count => 100)
       @people = []
     end
 
@@ -282,7 +282,7 @@ describe Mongoid::Document do
     context "when finding all" do
 
       before do
-        @cursor = mock
+        @cursor = stub(:count => 100)
         @people = []
       end
 
@@ -297,7 +297,7 @@ describe Mongoid::Document do
     context "when sorting" do
 
       before do
-        @cursor = mock
+        @cursor = stub(:count => 50)
         @people = []
       end
 

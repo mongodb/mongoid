@@ -56,19 +56,35 @@ describe Mongoid::Criteria do
 
   describe "#count" do
 
-    before do
-      @criteria = Mongoid::Criteria.new(:all, Person)
-      @selector = { :test => "Testing" }
-      @criteria.where(@selector)
-      @collection = mock
-      @cursor = mock
-      Person.expects(:collection).returns(@collection)
+    context "when criteria has not been executed" do
+
+      before do
+        @criteria.instance_variable_set(:@count, 34)
+      end
+
+      it "returns a count from the cursor" do
+        @criteria.count.should == 34
+      end
+
     end
 
-    it "returns the count from the cursor without creating the documents" do
-      @collection.expects(:find).with(@selector, {}).returns(@cursor)
-      @cursor.expects(:count).returns(10)
-      @criteria.count.should == 10
+    context "when criteria has been executed" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(:all, Person)
+        @selector = { :test => "Testing" }
+        @criteria.where(@selector)
+        @collection = mock
+        @cursor = mock
+        Person.expects(:collection).returns(@collection)
+      end
+
+      it "returns the count from the cursor without creating the documents" do
+        @collection.expects(:find).with(@selector, {}).returns(@cursor)
+        @cursor.expects(:count).returns(10)
+        @criteria.count.should == 10
+      end
+
     end
 
   end
@@ -101,6 +117,23 @@ describe Mongoid::Criteria do
         @criteria.execute(Person)
         @criteria.options[:page].should be_nil
         @criteria.options[:per_page].should be_nil
+      end
+
+    end
+
+    context "when type is :all" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @criteria = Mongoid::Criteria.new(:all).extras(:page => 1, :per_page => 20)
+        @cursor = stub(:count => 44, :collect => [])
+        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns(@cursor)
+      end
+
+      it "adds the count instance variable" do
+        @criteria.execute(Person).should == []
+        @criteria.count.should == 44
       end
 
     end
