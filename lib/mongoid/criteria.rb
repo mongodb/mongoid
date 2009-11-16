@@ -262,7 +262,7 @@ module Mongoid #:nodoc:
     # returns a default value of 1.
     def page
       if @options[:skip] && @options[:limit]
-        (@options[:skip] + @options[:limit]) / @options[:limit]
+        (@options[:skip].to_i + @options[:limit].to_i) / @options[:limit].to_i
       else
         1
       end
@@ -270,7 +270,7 @@ module Mongoid #:nodoc:
 
     # Returns the number of results per page or the default of 20.
     def per_page
-      @options[:limit] || 20
+      (@options[:limit] || 20).to_i
     end
 
     # Adds a criterion to the +Criteria+ that specifies the fields that will
