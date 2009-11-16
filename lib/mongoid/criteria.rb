@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
     def count(klass = nil)
       return @count if @count
       @klass = klass if klass
-      return @klass.collection.find(@selector, @options).count
+      return @klass.collection.find(@selector, @options.dup).count
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that are not allowed
@@ -102,10 +102,10 @@ module Mongoid #:nodoc:
     def execute(klass = nil)
       @klass = klass if klass
       if type == :first
-        attributes = klass.collection.find_one(@selector, @options)
+        attributes = klass.collection.find_one(@selector, @options.dup)
         return attributes ? @klass.instantiate(attributes) : nil
       else
-        attributes = @klass.collection.find(@selector, @options)
+        attributes = @klass.collection.find(@selector, @options.dup)
         if attributes
           @count = attributes.count
           return attributes.collect { |doc| @klass.instantiate(doc) }
@@ -128,7 +128,9 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>self</tt>
     def extras(extras)
-      @options = extras; filter_options; self
+      @options = extras
+      filter_options
+      self
     end
 
     GROUP_REDUCE = "function(obj, prev) { prev.group.push(obj); }"

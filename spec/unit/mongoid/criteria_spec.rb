@@ -193,8 +193,9 @@ describe Mongoid::Criteria do
       context "when page is provided" do
 
         it "sets the limit and skip options" do
-          @criteria.extras({ :page => 5 })
-          @criteria.options.should == { :skip => 80, :limit => 20 }
+          @criteria.extras({ :page => "2" })
+          @criteria.page.should == 2
+          @criteria.options.should == { :skip => 20, :limit => 20 }
         end
 
       end
@@ -211,8 +212,9 @@ describe Mongoid::Criteria do
       context "when page and per_page both provided" do
 
         it "sets the limit and skip options" do
-          @criteria.extras({ :per_page => 30, :page => 4 })
+          @criteria.extras({ :per_page => 30, :page => "4" })
           @criteria.options.should == { :skip => 90, :limit => 30 }
+          @criteria.page.should == 4
         end
 
       end
