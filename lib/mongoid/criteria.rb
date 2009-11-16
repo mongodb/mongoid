@@ -355,11 +355,11 @@ module Mongoid #:nodoc:
 
     protected
     def filter_options
-      page = @options.delete(:page)
-      per_page = @options.delete(:per_page)
-      if (page || per_page)
-        @options[:limit] = per_page || 20
-        @options[:skip] = (page || 1) * @options[:limit] - @options[:limit]
+      page_num = @options.delete(:page)
+      per_page_num = @options.delete(:per_page)
+      if (page_num || per_page_num)
+        @options[:limit] = (per_page_num || 20).to_i
+        @options[:skip] = (page_num || 1).to_i * @options[:limit] - @options[:limit]
       end
     end
 
