@@ -103,14 +103,14 @@ module Mongoid #:nodoc:
       @klass = klass if klass
       if type == :first
         attributes = klass.collection.find_one(@selector, @options)
-        attributes ? @klass.instantiate(attributes) : nil
+        return attributes ? @klass.instantiate(attributes) : nil
       else
         attributes = @klass.collection.find(@selector, @options)
         if attributes
           @count = attributes.count
-          attributes.collect { |doc| @klass.instantiate(doc) }
+          return attributes.collect { |doc| @klass.instantiate(doc) }
         else
-          []
+          return []
         end
       end
     end

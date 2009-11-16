@@ -114,6 +114,12 @@ describe Mongoid::Document do
       Person.paginate(:per_page => 20, :page => 2).length.should == 10
     end
 
+    it "returns a proper count" do
+      @criteria = Mongoid::Criteria.translate(:all, { :per_page => 20, :page => 1 })
+      @criteria.execute(Person)
+      @criteria.count.should == 30
+    end
+
   end
 
   describe "#reload" do
