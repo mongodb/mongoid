@@ -174,7 +174,7 @@ module Mongoid #:nodoc:
         criteria = Criteria.translate(:all, params)
         WillPaginate::Collection.create(criteria.page, criteria.per_page, 0) do |pager|
           results = criteria.execute(self)
-          pager.total_entries = results.size
+          pager.total_entries = criteria.count
           pager.replace(results)
         end
       end
