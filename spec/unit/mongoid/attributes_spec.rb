@@ -80,4 +80,18 @@ describe Mongoid::Attributes do
 
   end
 
+  context "updating when attributes already exist" do
+
+    before do
+      @person = Person.new(:title => "Sir")
+      @attributes = { :dob => "2000-01-01" }
+    end
+
+    it "only overwrites supplied attributes" do
+      @person.process(@attributes)
+      @person.title.should == "Sir"
+    end
+
+  end
+
 end

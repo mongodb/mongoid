@@ -242,6 +242,7 @@ module Mongoid #:nodoc:
     # Instantiate a new Document, setting the Document's attributes if given.
     # If no attributes are provided, they will be initialized with an empty Hash.
     def initialize(attrs = {})
+      @attributes = {}.with_indifferent_access
       process(defaults.merge(attrs))
       @new_record = true if id.nil?
       generate_key
