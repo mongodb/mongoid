@@ -172,9 +172,8 @@ module Mongoid #:nodoc:
       # Returns paginated array of docs.
       def paginate(params = {})
         criteria = Criteria.translate(:all, params)
-        WillPaginate::Collection.create(criteria.page, criteria.per_page, 0) do |pager|
-          results = criteria.execute(self)
-          pager.total_entries = criteria.count
+        results = criteria.execute(self)
+        WillPaginate::Collection.create(criteria.page, criteria.per_page, criteria.count) do |pager|
           pager.replace(results)
         end
       end
