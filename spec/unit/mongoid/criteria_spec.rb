@@ -93,8 +93,8 @@ describe Mongoid::Criteria do
       before do
         @collection = mock
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
         @criteria = Mongoid::Criteria.new(:all).extras(:page => 1, :per_page => 20)
+        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
       end
 
       it "filters out unused params" do
@@ -154,6 +154,37 @@ describe Mongoid::Criteria do
   end
 
   describe "#extras" do
+
+    context "filtering" do
+
+      context "when page is provided" do
+
+        it "sets the limit and skip options" do
+          @criteria.extras({ :page => 5 })
+          @criteria.options.should == { :skip => 80, :limit => 20 }
+        end
+
+      end
+
+      context "when per_page is provided" do
+
+        it "sets the limit and skip options" do
+          @criteria.extras({ :per_page => 45 })
+          @criteria.options.should == { :skip => 0, :limit => 45 }
+        end
+
+      end
+
+      context "when page and per_page both provided" do
+
+        it "sets the limit and skip options" do
+          @criteria.extras({ :per_page => 30, :page => 4 })
+          @criteria.options.should == { :skip => 90, :limit => 30 }
+        end
+
+      end
+
+    end
 
     it "adds the extras to the options" do
       @criteria.extras({ :skip => 10 })
@@ -319,9 +350,9 @@ describe Mongoid::Criteria do
           @criteria = Mongoid::Criteria.new(:all)
         end
 
-        it "adds the skip option to the options and returns it" do
-          @criteria.offset.should == 0
-          @criteria.options[:skip].should == 0
+        it "returns nil" do
+          @criteria.offset.should be_nil
+          @criteria.options[:skip].should be_nil
         end
 
       end
