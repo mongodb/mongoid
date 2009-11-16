@@ -17,7 +17,7 @@ describe Mongoid::Versioning do
       before do
         @post.title = "New"
         @version = Post.new(:title => "Test")
-        Post.expects(:find).at_least(1).with(@post.id).returns(@version)
+        Post.expects(:first).at_least(1).with(:conditions => { :_id => @post.id, :version => 1 }).returns(@version)
         @post.revise
       end
 

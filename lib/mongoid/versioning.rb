@@ -16,9 +16,9 @@ module Mongoid #:nodoc:
       # document from the database and set it as the next version before saving
       # the current document. It then increments the version number.
       def revise
-        last_version = self.class.find(id)
+        last_version = self.class.first(:conditions => { :_id => id, :version => version })
         if last_version
-          self.versions << last_version
+          self.versions << last_version.clone
           self.version = version + 1
         end
       end

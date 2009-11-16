@@ -252,12 +252,35 @@ describe Mongoid::Document do
       @comment.save
     end
 
-    it "versions on save" do
-      @from_db = Comment.find(@comment.id)
-      @from_db.text = "New"
-      @from_db.save
-      @from_db.versions.size.should == 1
-      @from_db.version.should == 2
+    context "first save" do
+
+      it "creates a new version" do
+        @from_db = Comment.find(@comment.id)
+        @from_db.text = "New"
+        @from_db.save
+        @from_db.versions.size.should == 1
+        @from_db.version.should == 2
+      end
+
+    end
+
+    context "multiple saves" do
+
+      before do
+        5.times do |n|
+          @comment.text = "#{n}"
+          @comment.save
+        end
+      end
+
+      it "creates new versions" do
+        p @comment
+        @from_db = Comment.find(@comment.id)
+        @from_db.version.should == 6
+        p @from_db
+        @from_db.versions.size.should == 5
+      end
+
     end
 
   end
