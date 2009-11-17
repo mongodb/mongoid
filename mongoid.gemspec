@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.7.9"
+  s.version = "0.7.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -55,6 +55,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/symbol/inflections.rb",
      "lib/mongoid/extensions/time/conversions.rb",
      "lib/mongoid/field.rb",
+     "lib/mongoid/options.rb",
      "lib/mongoid/timestamps.rb",
      "lib/mongoid/versioning.rb",
      "mongoid.gemspec",
@@ -93,6 +94,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
+     "spec/unit/mongoid/options_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb"
   ]
@@ -135,6 +137,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
+     "spec/unit/mongoid/options_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb"
   ]
