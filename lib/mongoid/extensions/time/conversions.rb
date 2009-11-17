@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
           ::Time.parse(value.to_s).utc
         end
         def get(value)
-          ::Time.zone ? ::Time.zone.parse(value.to_s) : value
+          ::Time.zone ? ::Time.zone.parse(value.to_s).getlocal : value
         end
       end
     end

@@ -123,3 +123,17 @@ class Game < Mongoid::Document
   field :high_score, :default => 500
   field :score, :default => 0
 end
+
+if RUBY_VERSION == '1.8.6'
+  class Array
+    alias :count :size
+  end
+end
+
+class Object
+  def tapp
+    tap do
+      puts "#{File.basename caller[2]}: #{self.inspect}"
+    end
+  end
+end
