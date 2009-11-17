@@ -15,8 +15,8 @@ begin
     gem.add_dependency("durran-validatable", "1.8.2")
     gem.add_dependency("will_paginate", "2.3.11")
     gem.add_dependency("activesupport", "2.3.4")
-    gem.add_dependency("mongo", "0.16")
-    gem.add_dependency("mongo_ext", "0.16")
+    gem.add_dependency("mongo", "0.17")
+    gem.add_dependency("mongo_ext", "0.17")
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
