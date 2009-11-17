@@ -61,7 +61,7 @@ module Mongoid #:nodoc:
       # essentially a proxy to an array itself.
       def initialize(document, options)
         @parent = document
-        @association_name = options.association_name
+        @association_name = options.name
         @klass = options.klass
         attributes = document.attributes[@association_name]
         @documents = attributes ? attributes.collect do |attribute|
@@ -77,13 +77,13 @@ module Mongoid #:nodoc:
         # is initialized by setting the has_many to the supplied +Enumerable+
         # and setting up the parentization.
         def update(children, parent, options)
-          parent.attributes.delete(options.association_name)
+          parent.attributes.delete(options.name)
           klass = options.klass
           children.each do |child|
             unless child.respond_to?(:parentize)
               child = klass.new(child)
             end
-            child.parentize(parent, options.association_name)
+            child.parentize(parent, options.name)
             child.notify
           end
           new(parent, options)

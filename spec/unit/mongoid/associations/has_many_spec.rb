@@ -14,7 +14,7 @@ describe Mongoid::Associations::HasMany do
     before do
       @address = Address.new(:street => "Madison Ave")
       @person = Person.new(:title => "Sir")
-      Mongoid::Associations::HasMany.update([@address], @person, Mongoid::Options.new(:association_name => :addresses))
+      Mongoid::Associations::HasMany.update([@address], @person, Mongoid::Associations::Options.new(:name => :addresses))
     end
 
     it "parentizes the child document" do
@@ -31,7 +31,7 @@ describe Mongoid::Associations::HasMany do
   describe "#[]" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
     end
 
     context "when the index is present in the association" do
@@ -56,7 +56,7 @@ describe Mongoid::Associations::HasMany do
   describe "#<<" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
       @address = Address.new
     end
 
@@ -77,7 +77,7 @@ describe Mongoid::Associations::HasMany do
   describe "#concat" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
       @address = Address.new
     end
 
@@ -92,7 +92,7 @@ describe Mongoid::Associations::HasMany do
   describe "#push" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
       @address = Address.new
     end
 
@@ -107,7 +107,7 @@ describe Mongoid::Associations::HasMany do
   describe "#build" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
     end
 
     it "adds a new document to the array with the suppied parameters" do
@@ -128,7 +128,7 @@ describe Mongoid::Associations::HasMany do
   describe "#find" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
     end
 
     context "when finding all" do
@@ -155,7 +155,10 @@ describe Mongoid::Associations::HasMany do
     context "when there are elements in the array" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
       end
 
       it "returns the first element" do
@@ -168,7 +171,10 @@ describe Mongoid::Associations::HasMany do
     context "when the array is empty" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(Person.new, Mongoid::Options.new(:association_name => :addresses))
+        @association = Mongoid::Associations::HasMany.new(
+          Person.new,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
       end
 
       it "returns nil" do
@@ -184,7 +190,10 @@ describe Mongoid::Associations::HasMany do
     context "#length" do
 
       it "returns the length of the delegated array" do
-        @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
         @association.length.should == 2
       end
 
@@ -195,7 +204,10 @@ describe Mongoid::Associations::HasMany do
   describe "#push" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Options.new(:association_name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
     end
 
     it "appends the document to the end of the array" do

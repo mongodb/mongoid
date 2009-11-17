@@ -15,9 +15,9 @@ module Mongoid #:nodoc:
       # to the internal document itself.
       def initialize(document, options)
         @klass = options.klass
-        attributes = document.attributes[options.association_name]
+        attributes = document.attributes[options.name]
         @document = klass.instantiate(attributes || {})
-        @document.parentize(document, options.association_name)
+        @document.parentize(document, options.name)
         decorate!
       end
 
@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
             klass = options.klass
             child = klass.new(child)
           end
-          child.parentize(parent, options.association_name)
+          child.parentize(parent, options.name)
           child.notify
           child
         end

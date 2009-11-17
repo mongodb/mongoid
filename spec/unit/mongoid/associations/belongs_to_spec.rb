@@ -7,7 +7,7 @@ describe Mongoid::Associations::BelongsTo do
     before do
       @parent = Name.new(:first_name => "Drexel")
       @document = stub(:parent => @parent)
-      @options = Mongoid::Options.new(:association_name => :person)
+      @options = Mongoid::Associations::Options.new(:name => :person)
       @association = Mongoid::Associations::BelongsTo.new(@document, @options)
     end
 
@@ -27,7 +27,7 @@ describe Mongoid::Associations::BelongsTo do
     before do
       @parent = Name.new(:first_name => "Drexel")
       @document = stub(:parent => @parent)
-      @options = Mongoid::Options.new(:association_name => :person)
+      @options = Mongoid::Associations::Options.new(:name => :person)
       @association = Mongoid::Associations::BelongsTo.new(@document, @options)
     end
 
@@ -57,7 +57,7 @@ describe Mongoid::Associations::BelongsTo do
       before do
         @name = Name.new(:first_name => "Test", :last_name => "User")
         @person = Person.new(:title => "Mrs")
-        @options = Mongoid::Options.new(:association_name => :person)
+        @options = Mongoid::Associations::Options.new(:name => :person)
         Mongoid::Associations::BelongsTo.update(@person, @name, @options)
       end
 

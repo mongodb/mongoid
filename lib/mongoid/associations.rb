@@ -43,7 +43,7 @@ module Mongoid # :nodoc:
       #   end
       def belongs_to(name, options = {})
         @embedded = true
-        add_association(Associations::BelongsTo, Options.new(options.merge(:association_name => name)))
+        add_association(Associations::BelongsTo, Associations::Options.new(options.merge(:name => name)))
       end
 
       # Adds the association from a parent document to its children. The name
@@ -64,7 +64,7 @@ module Mongoid # :nodoc:
       #     belongs_to :person
       #   end
       def has_many(name, options = {})
-        add_association(Associations::HasMany, Options.new(options.merge(:association_name => name)))
+        add_association(Associations::HasMany, Associations::Options.new(options.merge(:name => name)))
       end
 
       # Adds the association from a parent document to its child. The name
@@ -85,15 +85,15 @@ module Mongoid # :nodoc:
       #     belongs_to :person
       #   end
       def has_one(name, options = {})
-        add_association(Associations::HasOne, Options.new(options.merge(:association_name => name)))
+        add_association(Associations::HasOne, Associations::Options.new(options.merge(:name => name)))
       end
 
       private
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.
       def add_association(type, options)
-        associations[options.association_name] = type
-        name = options.association_name
+        name = options.name
+        associations[name] = type
         define_method(name) do
           return instance_variable_get("@#{name}") if instance_variable_defined?("@#{name}")
           proxy = Associations::Accessor.get(type, self, options)
