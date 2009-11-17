@@ -2,6 +2,19 @@ require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.r
 
 describe Mongoid::Options do
 
+  describe "#association_name" do
+
+    before do
+      @attributes = { :association_name => :addresses }
+      @options = Mongoid::Options.new(@attributes)
+    end
+
+    it "returns the association name" do
+      @options.association_name.should == :addresses
+    end
+
+  end
+
   describe "#klass" do
 
     context "when class_name provided" do

@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
       #
       # All method calls on this object will then be delegated
       # to the internal document itself.
-      def initialize(name, document, options = {})
+      def initialize(document, options)
         @document = document.parent
         decorate!
       end
@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
         # +Document+. Will properly set a has_one or a has_many.
-        def update(parent, child, name, options = {})
+        def update(parent, child, options)
           name = child.class.name.demodulize.downcase
           has_one = parent.associations[name]
           if has_one

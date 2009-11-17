@@ -5,8 +5,8 @@ module Mongoid #:nodoc:
         # Gets an association, based on the type provided and
         # passes the name and document into the newly instantiated
         # association.
-        def get(type, name, document, options = {})
-          document ? type.new(name, document, options) : nil
+        def get(type, document, options)
+          document ? type.new(document, options) : nil
         end
 
         # Set an object association. This is used to set the parent reference
@@ -20,8 +20,8 @@ module Mongoid #:nodoc:
         # document: The base document to handle the access for.
         # object: The object that was passed in to the setter method.
         # options: optional options.
-        def set(type, name, document, object, options ={})
-          type.update(object, document, name, options)
+        def set(type, document, object, options)
+          type.update(object, document, options)
         end
       end
     end

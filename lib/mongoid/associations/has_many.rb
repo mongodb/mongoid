@@ -59,11 +59,10 @@ module Mongoid #:nodoc:
       #
       # This then delegated all methods to the array class since this is
       # essentially a proxy to an array itself.
-      def initialize(name, document, options = {})
+      def initialize(document, options)
         @parent = document
-        @association_name = name
-        class_name = options[:class_name]
-        @klass = class_name ? class_name.constantize : @association_name.to_s.classify.constantize
+        @association_name = options.association_name
+        @klass = options.klass
         attributes = document.attributes[@association_name]
         @documents = attributes ? attributes.collect do |attribute|
           child = @klass.instantiate(attribute)
@@ -77,18 +76,17 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting the has_many to the supplied +Enumerable+
         # and setting up the parentization.
-        def update(children, parent, name, options = {})
-          parent.attributes.delete(name)
-          class_name = options[:class_name]
-          klass = class_name ? class_name.constantize : name.to_s.classify.constantize
+        def update(children, parent, options)
+          parent.attributes.delete(options.association_name)
+          klass = options.klass
           children.each do |child|
             unless child.respond_to?(:parentize)
               child = klass.new(child)
             end
-            child.parentize(parent, name)
+            child.parentize(parent, options.association_name)
             child.notify
           end
-          new(name, parent, options)
+          new(parent, options)
         end
       end
 

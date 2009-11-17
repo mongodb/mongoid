@@ -12,7 +12,7 @@ describe Mongoid::Associations::HasOne do
     before do
       @name = Name.new(:first_name => "Donald")
       @person = Person.new(:title => "Sir")
-      Mongoid::Associations::HasOne.update(@name, @person, :name)
+      Mongoid::Associations::HasOne.update(@name, @person, Mongoid::Options.new(:association_name => :name))
     end
 
     it "parentizes the child document" do
@@ -29,7 +29,7 @@ describe Mongoid::Associations::HasOne do
   describe "#decorate!" do
 
     before do
-      @association = Mongoid::Associations::HasOne.new(:mixed_drink, @document)
+      @association = Mongoid::Associations::HasOne.new(@document, Mongoid::Options.new(:association_name => :mixed_drink))
     end
 
     context "when getting values" do

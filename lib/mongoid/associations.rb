@@ -30,7 +30,7 @@ module Mongoid # :nodoc:
       #
       # Options:
       #
-      # association_name: A +Symbol+ that matches the name of the parent class.
+      # name: A +Symbol+ that matches the name of the parent class.
       #
       # Example:
       #
@@ -41,9 +41,9 @@ module Mongoid # :nodoc:
       #   class Address < Mongoid::Document
       #     belongs_to :person
       #   end
-      def belongs_to(association_name, options = {})
+      def belongs_to(name, options = {})
         @embedded = true
-        add_association(Associations::BelongsTo, association_name, options)
+        add_association(Associations::BelongsTo, Options.new(options.merge(:association_name => name)))
       end
 
       # Adds the association from a parent document to its children. The name
@@ -52,7 +52,7 @@ module Mongoid # :nodoc:
       #
       # Options:
       #
-      # association_name: A +Symbol+ that is the plural child class name.
+      # name: A +Symbol+ that is the plural child class name.
       #
       # Example:
       #
@@ -63,8 +63,8 @@ module Mongoid # :nodoc:
       #   class Address < Mongoid::Document
       #     belongs_to :person
       #   end
-      def has_many(association_name, options = {})
-        add_association(Associations::HasMany, association_name, options)
+      def has_many(name, options = {})
+        add_association(Associations::HasMany, Options.new(options.merge(:association_name => name)))
       end
 
       # Adds the association from a parent document to its child. The name
@@ -73,7 +73,7 @@ module Mongoid # :nodoc:
       #
       # Options:
       #
-      # association_name: A +Symbol+ that is the plural child class name.
+      # name: A +Symbol+ that is the plural child class name.
       #
       # Example:
       #
@@ -84,22 +84,23 @@ module Mongoid # :nodoc:
       #   class Address < Mongoid::Document
       #     belongs_to :person
       #   end
-      def has_one(association_name, options = {})
-        add_association(Associations::HasOne, association_name, options)
+      def has_one(name, options = {})
+        add_association(Associations::HasOne, Options.new(options.merge(:association_name => name)))
       end
 
       private
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.
-      def add_association(type, name, options = {})
-        associations[name] = type
+      def add_association(type, options)
+        associations[options.association_name] = type
+        name = options.association_name
         define_method(name) do
           return instance_variable_get("@#{name}") if instance_variable_defined?("@#{name}")
-          proxy = Associations::Accessor.get(type, name, self, options)
+          proxy = Associations::Accessor.get(type, self, options)
           instance_variable_set("@#{name}", proxy)
         end
         define_method("#{name}=") do |object|
-          proxy = Associations::Accessor.set(type, name, self, object, options)
+          proxy = Associations::Accessor.set(type, self, object, options)
           instance_variable_set("@#{name}", proxy)
         end
       end

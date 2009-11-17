@@ -12,7 +12,8 @@ describe Mongoid::Associations::Accessor do
     context "when type is has_many" do
 
       it "returns a HasMany" do
-        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasMany, :addresses, @document)
+        @options = Mongoid::Options.new(:association_name => :addresses)
+        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasMany, @document, @options)
         association.should be_a_kind_of(Mongoid::Associations::HasMany)
       end
 
@@ -23,7 +24,8 @@ describe Mongoid::Associations::Accessor do
       context "when document is not nil" do
 
         it "returns a HasOne" do
-          association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, :name, @document)
+          @options = Mongoid::Options.new(:association_name => :name)
+          association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, @document, @options)
           association.should be_a_kind_of(Name)
         end
 
@@ -32,7 +34,8 @@ describe Mongoid::Associations::Accessor do
       context "when document is nil" do
 
         it "returns nil" do
-          association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, :name, nil)
+          @options = Mongoid::Options.new(:association_name => :name)
+          association = Mongoid::Associations::Accessor.get(Mongoid::Associations::HasOne, nil, @options)
           association.should be_nil
         end
 
@@ -43,7 +46,8 @@ describe Mongoid::Associations::Accessor do
     context "when type is belongs_to" do
 
       it "returns a BelongsTo" do
-        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::BelongsTo, :person, stub(:parent => @document))
+        @options = Mongoid::Options.new(:association_name => :person)
+        association = Mongoid::Associations::Accessor.get(Mongoid::Associations::BelongsTo, stub(:parent => @document), @options)
         association.should be_a_kind_of(Person)
       end
 
@@ -56,8 +60,9 @@ describe Mongoid::Associations::Accessor do
     context "when type is has_many" do
 
       it "returns a HasMany" do
-        Mongoid::Associations::HasMany.expects(:update).with(@document, @object, :addresses, {})
-        Mongoid::Associations::Accessor.set(Mongoid::Associations::HasMany, :addresses, @document, @object)
+        @options = Mongoid::Options.new(:association_name => :addresses)
+        Mongoid::Associations::HasMany.expects(:update).with(@document, @object, @options)
+        Mongoid::Associations::Accessor.set(Mongoid::Associations::HasMany, @document, @object, @options)
       end
 
     end
@@ -65,8 +70,9 @@ describe Mongoid::Associations::Accessor do
     context "when type is has_one" do
 
       it "returns a HasOne" do
-        Mongoid::Associations::HasOne.expects(:update).with(@document, @object, :name, {})
-        Mongoid::Associations::Accessor.set(Mongoid::Associations::HasOne, :name, @document, @object)
+        @options = Mongoid::Options.new(:association_name => :name)
+        Mongoid::Associations::HasOne.expects(:update).with(@document, @object, @options)
+        Mongoid::Associations::Accessor.set(Mongoid::Associations::HasOne, @document, @object, @options)
       end
 
     end
@@ -74,8 +80,9 @@ describe Mongoid::Associations::Accessor do
     context "when type is belongs_to" do
 
       it "returns a BelongsTo" do
-        Mongoid::Associations::BelongsTo.expects(:update).with(@object, @document, :person, {})
-        Mongoid::Associations::Accessor.set(Mongoid::Associations::BelongsTo, :person, @document, @object)
+        @options = Mongoid::Options.new(:association_name => :person)
+        Mongoid::Associations::BelongsTo.expects(:update).with(@object, @document, @options)
+        Mongoid::Associations::Accessor.set(Mongoid::Associations::BelongsTo, @document, @object, @options)
       end
 
     end
