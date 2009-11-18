@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.8.0"
+  s.version = "0.8.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-11-16}
+  s.date = %q{2009-11-17}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/associations/decorator.rb",
      "lib/mongoid/associations/has_many.rb",
      "lib/mongoid/associations/has_one.rb",
+     "lib/mongoid/associations/options.rb",
      "lib/mongoid/attributes.rb",
      "lib/mongoid/commands.rb",
      "lib/mongoid/commands/create.rb",
@@ -55,7 +56,6 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/symbol/inflections.rb",
      "lib/mongoid/extensions/time/conversions.rb",
      "lib/mongoid/field.rb",
-     "lib/mongoid/options.rb",
      "lib/mongoid/timestamps.rb",
      "lib/mongoid/versioning.rb",
      "mongoid.gemspec",
@@ -68,6 +68,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/decorator_spec.rb",
      "spec/unit/mongoid/associations/has_many_spec.rb",
      "spec/unit/mongoid/associations/has_one_spec.rb",
+     "spec/unit/mongoid/associations/options_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
@@ -94,7 +95,6 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
-     "spec/unit/mongoid/options_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb"
   ]
@@ -111,6 +111,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/decorator_spec.rb",
      "spec/unit/mongoid/associations/has_many_spec.rb",
      "spec/unit/mongoid/associations/has_one_spec.rb",
+     "spec/unit/mongoid/associations/options_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
@@ -137,7 +138,6 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
-     "spec/unit/mongoid/options_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb"
   ]
