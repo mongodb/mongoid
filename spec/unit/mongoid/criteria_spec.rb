@@ -441,6 +441,23 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#paginate" do
+
+    before do
+      @collection = mock
+      Person.expects(:collection).returns(@collection)
+      @criteria = Person.select.where(:_id => "1").skip(60).limit(20)
+      @collection.expects(:find).with({:_id => "1"}, :skip => 60, :limit => 20).returns([])
+      @results = @criteria.paginate
+    end
+
+    it "executes and paginates the results" do
+      @results.current_page.should == 4
+      @results.per_page.should == 20
+    end
+
+  end
+
   describe "#per_page" do
 
     context "when the per_page option exists" do

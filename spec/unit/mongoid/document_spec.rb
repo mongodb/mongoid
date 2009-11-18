@@ -561,7 +561,7 @@ describe Mongoid::Document do
 
       it "delegates to will paginate with the results" do
         Mongoid::Criteria.expects(:translate).with(:all, @params).returns(@criteria)
-        @criteria.expects(:execute).with(Person).returns([])
+        @criteria.expects(:paginate).with(Person).returns([])
         Person.paginate(@params)
       end
 
@@ -575,7 +575,7 @@ describe Mongoid::Document do
 
       it "delegates to will paginate with default values" do
         Mongoid::Criteria.expects(:translate).with(:all, @params).returns(@criteria)
-        @criteria.expects(:execute).with(Person).returns([])
+        @criteria.expects(:paginate).with(Person).returns([])
         Person.paginate(:conditions => { :test => "Test" })
       end
 

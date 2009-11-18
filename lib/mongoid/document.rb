@@ -171,11 +171,7 @@ module Mongoid #:nodoc:
       #
       # Returns paginated array of docs.
       def paginate(params = {})
-        criteria = Criteria.translate(:all, params)
-        results = criteria.execute(self)
-        WillPaginate::Collection.create(criteria.page, criteria.per_page, criteria.count) do |pager|
-          pager.replace(results)
-        end
+        Criteria.translate(:all, params).paginate(self)
       end
 
       # Entry point for creating a new criteria from a Document. This will

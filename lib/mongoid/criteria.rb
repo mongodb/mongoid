@@ -270,6 +270,22 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Executes the +Criteria+ and paginates the results.
+    #
+    # Options:
+    #
+    # klass: Optional class name to execute the criteria on.
+    #
+    # Example:
+    #
+    # <tt>criteria.paginate(Person)</tt>
+    def paginate(klass = nil)
+      results = execute(klass)
+      WillPaginate::Collection.create(page, per_page, count) do |pager|
+        pager.replace(results)
+      end
+    end
+
     # Returns the number of results per page or the default of 20.
     def per_page
       (@options[:limit] || 20).to_i
