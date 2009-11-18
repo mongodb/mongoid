@@ -24,7 +24,7 @@ gem "activesupport", "2.3.4"
 gem "mongo", "0.17"
 gem "mongo_ext", "0.17"
 gem "durran-validatable", "1.8.2"
-gem "will_paginate", "2.3.11"
+gem "leshill-will_paginate", "2.3.11"
 
 require "delegate"
 require "observer"
