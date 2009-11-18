@@ -72,4 +72,20 @@ describe Mongoid::Commands::Save do
 
   end
 
+  context "when the document is embedded" do
+
+    before do
+      @child_name = Name.new(:first_name => "Testy")
+    end
+
+    context "when parent reference does not exist" do
+
+      it "raises an error" do
+        lambda { @child_name.save }.should raise_error
+      end
+
+    end
+
+  end
+
 end

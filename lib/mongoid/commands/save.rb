@@ -13,7 +13,12 @@ module Mongoid #:nodoc:
         return false unless Validate.execute(doc)
         doc.run_callbacks :before_save
         parent = doc.parent
-        parent ? Save.execute(parent) : doc.collection.save(doc.attributes)
+        if parent
+          Save.execute(parent)
+        else
+          collection = doc.collection
+          collection ? collection.save(doc.attributes) : raise(MissingParentError.new(doc))
+        end
         doc.run_callbacks :after_save
         return doc
       end

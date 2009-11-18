@@ -59,6 +59,18 @@ module Mongoid
   # Raised when a persisence method ending in ! fails validation.
   class ValidationsError < RuntimeError; end
 
+  # A common case of errors is to instantiate a child document without a
+  # reference to a parent, which will result in trying to save on a nil
+  # collection. This error is raised to help debug the issue.
+  class MissingParentError < RuntimeError
+    def initialize(doc)
+      @document = doc
+    end
+    def message
+      "Attempted to save embedded document #{@document.class.name}, but there was no associated parent"
+    end
+  end
+
   # Connect to the database name supplied. This should be run
   # for initial setup, potentially in a rails initializer.
   def self.connect_to(name)
