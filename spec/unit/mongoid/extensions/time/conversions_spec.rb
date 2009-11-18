@@ -29,12 +29,32 @@ describe Mongoid::Extensions::Time::Conversions do
 
     end
 
+    context "when value is nil" do
+
+      it "returns nil" do
+        Time.set(nil).should be_nil
+      end
+
+    end
+
   end
 
   describe "#get" do
 
-    it "returns the local time" do
-      Time.get(@time.dup.utc).utc_offset.should == @time.utc_offset
+    context "when time is provided" do
+
+      it "returns the local time" do
+        Time.get(@time.dup.utc).utc_offset.should == @time.utc_offset
+      end
+
+    end
+
+    context "when time is nil" do
+
+      it "returns nil" do
+        Time.get(nil).should be_nil
+      end
+
     end
 
   end
