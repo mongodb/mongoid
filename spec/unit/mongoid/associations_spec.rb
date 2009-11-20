@@ -56,7 +56,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe "#belongs_to" do
+  describe ".belongs_to" do
 
     it "creates a reader for the association" do
       address = Address.new
@@ -93,7 +93,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe "#has_many" do
+  describe ".has_many" do
 
     it "adds a new Association to the collection" do
       person = Person.new
@@ -160,7 +160,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe "#has_one" do
+  describe ".has_one" do
 
     it "adds a new Association to the collection" do
       person = Person.new
