@@ -127,7 +127,7 @@ describe Mongoid::Commands do
 
   context "class methods" do
 
-    describe "#create" do
+    describe ".create" do
 
       it "delegates to the Create command" do
         Mongoid::Commands::Create.expects(:execute)
@@ -141,7 +141,7 @@ describe Mongoid::Commands do
 
     end
 
-    describe "#create!" do
+    describe ".create!" do
 
       it "delegates to the Create command" do
         Mongoid::Commands::Create.expects(:execute).returns(Person.new)
@@ -165,7 +165,7 @@ describe Mongoid::Commands do
 
     end
 
-    describe "#delete_all" do
+    describe ".delete_all" do
 
       it "delegates to the DeleteAll command" do
         Mongoid::Commands::DeleteAll.expects(:execute).with(Person, {})
@@ -174,7 +174,7 @@ describe Mongoid::Commands do
 
     end
 
-    describe "#destroy_all" do
+    describe ".destroy_all" do
 
       it "delegates to the DestroyAll command" do
         Mongoid::Commands::DestroyAll.expects(:execute).with(Person, {})
