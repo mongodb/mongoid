@@ -15,8 +15,8 @@ begin
     gem.add_dependency("durran-validatable", "1.8.2")
     gem.add_dependency("leshill-will_paginate", "2.3.11")
     gem.add_dependency("activesupport", "2.3.4")
-    gem.add_dependency("mongo", "0.17")
-    gem.add_dependency("mongo_ext", "0.17")
+    gem.add_dependency("mongo", "0.17.1")
+    gem.add_dependency("mongo_ext", "0.17.1")
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
