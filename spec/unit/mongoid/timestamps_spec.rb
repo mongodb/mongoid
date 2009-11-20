@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.r
 
 describe Mongoid::Timestamps do
 
-  describe "#included" do
+  describe ".included" do
 
     before do
       @person = Person.new
