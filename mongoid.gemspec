@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.8.2"
+  s.version = "0.8.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-11-17}
+  s.date = %q{2009-11-19}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -45,6 +45,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/array/parentization.rb",
      "lib/mongoid/extensions/boolean/conversions.rb",
      "lib/mongoid/extensions/date/conversions.rb",
+     "lib/mongoid/extensions/datetime/conversions.rb",
      "lib/mongoid/extensions/float/conversions.rb",
      "lib/mongoid/extensions/hash/accessors.rb",
      "lib/mongoid/extensions/hash/conversions.rb",
@@ -56,6 +57,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/symbol/inflections.rb",
      "lib/mongoid/extensions/time/conversions.rb",
      "lib/mongoid/field.rb",
+     "lib/mongoid/finders.rb",
      "lib/mongoid/timestamps.rb",
      "lib/mongoid/versioning.rb",
      "mongoid.gemspec",
@@ -85,6 +87,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
      "spec/unit/mongoid/extensions/boolean/conversions_spec.rb",
      "spec/unit/mongoid/extensions/date/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/datetime/conversions_spec.rb",
      "spec/unit/mongoid/extensions/float/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
@@ -95,6 +98,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
+     "spec/unit/mongoid/finders_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb"
   ]
@@ -128,6 +132,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
      "spec/unit/mongoid/extensions/boolean/conversions_spec.rb",
      "spec/unit/mongoid/extensions/date/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/datetime/conversions_spec.rb",
      "spec/unit/mongoid/extensions/float/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
@@ -138,6 +143,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
+     "spec/unit/mongoid/finders_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb"
   ]
