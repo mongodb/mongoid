@@ -538,7 +538,7 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#translate" do
+  describe ".translate" do
 
     context "with a single argument" do
 
