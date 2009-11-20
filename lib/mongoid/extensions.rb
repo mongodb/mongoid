@@ -2,6 +2,7 @@ require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/array/parentization"
 require "mongoid/extensions/boolean/conversions"
 require "mongoid/extensions/date/conversions"
+require "mongoid/extensions/datetime/conversions"
 require "mongoid/extensions/float/conversions"
 require "mongoid/extensions/hash/accessors"
 require "mongoid/extensions/hash/conversions"
@@ -23,6 +24,10 @@ end
 
 class Date #:nodoc
   extend Mongoid::Extensions::Date::Conversions
+end
+
+class DateTime #:nodoc
+  extend Mongoid::Extensions::DateTime::Conversions
 end
 
 class Float #:nodoc
