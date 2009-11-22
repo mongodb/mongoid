@@ -68,6 +68,11 @@ module Mongoid #:nodoc:
         @fields
       end
 
+      # Returns a human readable version of the class.
+      def human_name
+        name.underscore.humanize
+      end
+
       # Adds an index on the field specified. Options can be :unique => true or
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })

@@ -194,6 +194,14 @@ describe Mongoid::Document do
 
   end
 
+  describe ".human_name" do
+
+    it "returns the class name underscored and humanized" do
+      MixedDrink.human_name.should == "Mixed drink"
+    end
+
+  end
+
   describe "#_id" do
 
     before do
