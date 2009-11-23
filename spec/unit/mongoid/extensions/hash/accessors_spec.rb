@@ -11,11 +11,42 @@ describe Mongoid::Extensions::Hash::Accessors do
         :name => {
           :_id => 2, :first_name => "Test", :last_name => "User"
         },
+        :pet => {
+          :_id => 6,
+          :name => "Fido",
+          :vet_visits => [ { :date => Date.new(2007, 1, 1) } ]
+        },
         :addresses => [
           { :_id => 3, :street => "First Street" },
           { :_id => 4, :street => "Second Street" }
         ]
       }
+    end
+
+    context "when writing to a hash with a child array" do
+
+      context "when child attributes not present" do
+
+        it "does nothing to the children" do
+          @hash.insert(:pet, { :name => "Bingo" })
+          @hash[:pet].should == {
+            :_id => 6,
+            :name => "Bingo",
+            :vet_visits => [ { :date => Date.new(2007, 1, 1) } ]
+          }
+        end
+
+      end
+
+      context "when child attributes present" do
+
+        it "overwrites the child attributes" do
+          @hash.insert(:pet, { :vet_visits => [ { :date => Date.new(2009, 11, 11) } ] })
+          @hash[:pet][:vet_visits].should == [ { :date => Date.new(2009, 11, 11) } ]
+        end
+
+      end
+
     end
 
     context "when writing a single attribute" do

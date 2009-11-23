@@ -3,8 +3,10 @@ module Mongoid #:nodoc:
     module Hash #:nodoc:
       module Accessors #:nodoc:
         def insert(key, attrs)
-          self[key] = attrs if key.singular?
-          if key.plural?
+          if key.singular?
+            self[key] = attrs unless self[key]
+            self[key] = self[key].merge(attrs) if self[key]
+          else
             if elements = self[key]
               elements.delete_if { |e| (e[:_id] == attrs[:_id]) } << attrs
             else

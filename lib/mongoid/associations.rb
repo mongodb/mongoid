@@ -101,7 +101,7 @@ module Mongoid # :nodoc:
         end
         define_method("#{name}=") do |object|
           proxy = Associations::Accessor.set(type, self, object, options)
-          instance_variable_set("@#{name}", proxy)
+          remove_instance_variable("@#{name}") if instance_variable_defined?("@#{name}")
         end
       end
     end

@@ -551,6 +551,28 @@ describe Mongoid::Document do
 
     end
 
+    context "on a parent document" do
+
+      context "when the parent has a has many through a has one" do
+
+        before do
+          @owner = PetOwner.new(:title => "Mr")
+          @pet = Pet.new(:name => "Fido")
+          @owner.pet = @pet
+          @vet_visit = VetVisit.new(:date => Date.today)
+          @pet.vet_visits = [@vet_visit]
+        end
+
+        it "does not overwrite child attributes if not in the hash" do
+          @owner.write_attributes({ :pet => { :name => "Bingo" } })
+          @owner.pet.name.should == "Bingo"
+          @owner.pet.vet_visits.size.should == 1
+        end
+
+      end
+
+    end
+
     context "on a child document" do
 
       context "when child is part of a has one" do
