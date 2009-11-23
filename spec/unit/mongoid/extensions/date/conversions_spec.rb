@@ -10,8 +10,20 @@ describe Mongoid::Extensions::Date::Conversions do
 
     context "when string provided" do
 
-      it "returns a time from the string" do
-        Date.set(@time.utc.to_s).should == @time
+      context "when string is a utc time" do
+
+        it "returns a time from the string" do
+          Date.set(@time.utc.to_s).should == @time
+        end
+
+      end
+
+      context "when string is a date" do
+
+        it "returns a time from the string" do
+          Date.set("01/15/2007").should == Date.new(2007, 1, 15).at_midnight
+        end
+
       end
 
       context "when string is empty" do
@@ -53,6 +65,30 @@ describe Mongoid::Extensions::Date::Conversions do
     end
 
     context "when value is not nil" do
+
+      context "when time is UTC" do
+
+        before do
+          @utc = Date.new(1974, 12, 1).to_time.utc
+        end
+
+        context "when time zone is not utc" do
+
+          before do
+            Time.zone = "Eastern Time (US & Canada)"
+          end
+
+          after do
+            Time.zone = "UTC"
+          end
+
+          it "converts to the proper date" do
+            Date.get(@utc).should == Date.new(1974, 12, 1)
+          end
+
+        end
+
+      end
 
       it "converts the time back to a date" do
         Date.get(@time).should == @time.to_date
