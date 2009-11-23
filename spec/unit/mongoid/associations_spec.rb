@@ -37,19 +37,41 @@ describe Mongoid::Associations do
 
     context "when setting a parent" do
 
-      before do
-        @person = Person.new(:title => "Mr")
-        @address = Address.new(:street => "Picadilly Circus")
-        @address.addressable = @person
+      context "when the child is one level deep" do
+
+        before do
+          @person = Person.new(:title => "Mr")
+          @address = Address.new(:street => "Picadilly Circus")
+          @address.addressable = @person
+        end
+
+        it "re-parentizes the association" do
+          @address.parent.should == @person
+        end
+
+        it "adds the child attributes to the parent" do
+          @person.attributes[:addresses].should ==
+            [{ "_id" => "picadilly-circus", "street" => "Picadilly Circus" }]
+        end
+
       end
 
-      it "re-parentizes the association" do
-        @address.parent.should == @person
-      end
+      context "when the child is multiple levels deep" do
 
-      it "adds the child attributes to the parent" do
-        @person.attributes[:addresses].should ==
-          [{ "_id" => "picadilly-circus", "street" => "Picadilly Circus" }]
+        before do
+          @person = Person.new(:title => "Mr")
+          @phone = Phone.new(:number => "415-555-1212")
+          @person.phone_numbers = [@phone]
+          @country_code = CountryCode.new(:code => 1)
+          @phone.country_code = @country_code
+        end
+
+        it "properly decorates all parent references" do
+          @country_code.phone_number.should == @phone
+          @phone.person.should == @person
+          @country_code.phone_number.person.should == @person
+        end
+
       end
 
     end
