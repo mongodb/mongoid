@@ -113,7 +113,8 @@ module Mongoid #:nodoc:
 
     end
 
-    # Performs equality checking on the attributes.
+    # Performs equality checking on the attributes. For now we chack against
+    # all attributes excluding timestamps on the object.
     def ==(other)
       return false unless other.is_a?(Document)
       @attributes.except(:modified_at).except(:created_at) ==
@@ -146,8 +147,8 @@ module Mongoid #:nodoc:
       self.class.fields
     end
 
-    # Get the id associated with this object.
-    # This is in essence the primary key.
+    # Get the id associated with this object. This will pull the _id value out
+    # of the attributes +Hash+.
     def id
       @attributes[:_id]
     end
@@ -160,8 +161,20 @@ module Mongoid #:nodoc:
     alias :_id :id
     alias :_id= :id=
 
-    # Instantiate a new Document, setting the Document's attributes if given.
-    # If no attributes are provided, they will be initialized with an empty Hash.
+    # Instantiate a new +Document+, setting the Document's attributes if
+    # given. If no attributes are provided, they will be initialized with
+    # an empty +Hash+.
+    #
+    # If a primary key is defined, the document's id will be set to that key,
+    # otherwise it will be set to a fresh +Mongo::ObjectID+ string.
+    #
+    # Options:
+    #
+    # attrs: The attributes +Hash+ to set up the document with.
+    #
+    # Example:
+    #
+    # <tt>Person.new(:title => "Mr", :age => 30)</tt>
     def initialize(attrs = {})
       @attributes = {}.with_indifferent_access
       process(defaults.merge(attrs))
@@ -169,34 +182,72 @@ module Mongoid #:nodoc:
       generate_key
     end
 
+    # Returns the class name plus its attributes.
     def inspect
       "#{self.class.name} : #{@attributes.inspect}"
     end
 
-    # Return the +Document+ primary key.
+    # Return the +Document+ primary key. This will only exist if a key has been
+    # set up on the +Document+ and will return an array of fields.
+    #
+    # Example:
+    #
+    #   class Person < Mongoid::Document
+    #     field :first_name
+    #     field :last_name
+    #     key :first_name, :last_name
+    #   end
+    #
+    # <tt>person.primary_key #[:first_name, :last_name]</tt>
     def primary_key
       self.class.primary_key
     end
 
-    # Returns true is the Document has not been persisted to the database, false if it has.
+    # Returns true is the +Document+ has not been persisted to the database,
+    # false if it has. This is determined by the instance variable @new_record
+    # and NOT if the object has an id.
     def new_record?
       @new_record == true
     end
 
-    # Notify observers that this Document has changed.
+    # Set the changed state of the +Document+ then notify observers that it has changed.
+    #
+    # Example:
+    #
+    # <tt>person.notify</tt>
     def notify
       changed(true)
       notify_observers(self)
     end
 
-    # Sets the parent object
+    # Sets up a child/parent association. This is used for newly created
+    # objects so they can be properly added to the graph and have the parent
+    # observers set up properly.
+    #
+    # Options:
+    #
+    # abject: The parent object that needs to be set for the child.
+    # association_name: The name of the association for the child.
+    #
+    # Example:
+    #
+    # <tt>address.parentize(person, :addresses)</tt>
     def parentize(object, association_name)
       self.parent = object
       self.association_name = association_name
       add_observer(object)
     end
 
-    # Read from the attributes hash.
+    # Read a value from the +Document+ attributes. If the value does not exist
+    # it will return nil.
+    #
+    # Options:
+    #
+    # name: The name of the attribute to get.
+    #
+    # Example:
+    #
+    # <tt>person.read_attribute(:title)</tt>
     def read_attribute(name)
       fields[name].get(@attributes[name])
     end
@@ -206,26 +257,55 @@ module Mongoid #:nodoc:
       @attributes = collection.find_one(:_id => id).with_indifferent_access
     end
 
-    # Return the root +Document+ in the object graph.
+    # Return the root +Document+ in the object graph. If the current +Document+
+    # is the root object in the graph it will return self.
     def root
       object = self
       while (object.parent) do object = object.parent; end
       object || self
     end
 
-    # Returns the id of the Document
+    # Returns the id of the Document, used in Rails compatibility.
     def to_param
-      id.to_s
+      id
     end
 
-    # Update the document based on notify from child
+    # Observe a notify call from a child +Document+. This will either update
+    # existing attributes on the +Document+ or clear them out for the child if
+    # the clear boolean is provided.
+    #
+    # Options:
+    #
+    # child: The child +Document+ that sent the notification.
+    # clear: Will clear out the child's attributes if set to true.
+    #
+    # Example:
+    #
+    # <tt>person.notify_observers(self)</tt> will cause this method to execute.
+    #
+    # This will also cause the observing +Document+ to notify it's parent if
+    # there is any.
     def update(child, clear = false)
       @attributes.insert(child.association_name, child.attributes) unless clear
       @attributes.delete(child.association_name) if clear
       notify
     end
 
-    # Write to the attributes hash.
+    # Write a single attribute to the +Document+ attribute +Hash+. This will
+    # also fire the before and after update callbacks, and perform any
+    # necessary typecasting.
+    #
+    # Options:
+    #
+    # name: The name of the attribute to update.
+    # value: The value to set for the attribute.
+    #
+    # Example:
+    #
+    # <tt>person.write_attribute(:title, "Mr.")</tt>
+    #
+    # This will also cause the observing +Document+ to notify it's parent if
+    # there is any.
     def write_attribute(name, value)
       run_callbacks(:before_update)
       @attributes[name] = fields[name].set(value)
@@ -233,14 +313,26 @@ module Mongoid #:nodoc:
       notify
     end
 
-    # Writes all the attributes of this Document, and delegate up to
-    # the parent.
+    # Writes the supplied attributes +Hash+ to the +Document+. This will only
+    # overwrite existing attributes if they are present in the new +Hash+, all
+    # others will be preserved.
+    #
+    # Options:
+    #
+    # attrs: The +Hash+ of new attributes to set on the +Document+
+    #
+    # Example:
+    #
+    # <tt>person.write_attributes(:title => "Mr.")</tt>
+    #
+    # This will also cause the observing +Document+ to notify it's parent if
+    # there is any.
     def write_attributes(attrs)
       process(attrs)
       notify
     end
 
-    private
+    protected
     def generate_key
       if primary_key
         values = primary_key.collect { |key| @attributes[key] }
