@@ -47,13 +47,14 @@ Example of a simple domain model:
     field :city
     field :state
     field :post_code
-    belongs_to :person
+    belongs_to :person, :inverse_of => :addresses
   end
 
   class Name < Mongoid::Document
     include Mongoid::Timestamps
     field :first_name
     field :last_name
+    belongs_to :person, :inverse_of => :name
   end
 </pre>
 
@@ -110,7 +111,7 @@ Old School:
 New School:
 
 <pre>
-  Person.select(:first_name, :last_name).where(:title => "Sir").skip(10).limit(10).execute
+  Person.select(:first_name, :last_name).where(:title => "Sir").skip(10).limit(10).paginate
   Person.select(:title).aggregate
   Criteria.translate(:conditions => { :title => "Sir" }).execute
 </pre>
