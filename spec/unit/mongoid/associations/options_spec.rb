@@ -15,6 +15,19 @@ describe Mongoid::Associations::Options do
 
   end
 
+  describe "#inverse_of" do
+
+    before do
+      @attributes = { :inverse_of => :addresses }
+      @options = Mongoid::Associations::Options.new(@attributes)
+    end
+
+    it "returns the inverse_of value" do
+      @options.inverse_of.should == :addresses
+    end
+
+  end
+
   describe "#klass" do
 
     context "when class_name provided" do

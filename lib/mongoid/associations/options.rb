@@ -13,6 +13,11 @@ module Mongoid #:nodoc:
         @attributes[:name]
       end
 
+      # Returns the name of the inverse_of association
+      def inverse_of
+        @attributes[:inverse_of]
+      end
+
       # Return a +Class+ for the options. If a class_name was provided, then the
       # constantized class_name will be returned. If not, a constant based on the
       # association name will be returned.

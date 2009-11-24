@@ -53,20 +53,20 @@ end
 class CountryCode < Mongoid::Document
   field :code, :type => Integer
   key :code
-  belongs_to :phone_number
+  belongs_to :phone_number, :inverse_of => :country_codes
 end
 
 class Phone < Mongoid::Document
   field :number
   key :number
-  belongs_to :person
+  belongs_to :person, :inverse_of => :phone_numbers
   has_one :country_code
 end
 
 class Animal < Mongoid::Document
   field :name
   key :name
-  belongs_to :person
+  belongs_to :person, :inverse_of => :pet
 end
 
 class PetOwner < Mongoid::Document
@@ -78,12 +78,12 @@ class Pet < Mongoid::Document
   field :name
   field :weight, :type => Float, :default => 0.0
   has_many :vet_visits
-  belongs_to :pet_owner
+  belongs_to :pet_owner, :inverse_of => :pet
 end
 
 class VetVisit < Mongoid::Document
   field :date, :type => Date
-  belongs_to :pet
+  belongs_to :pet, :inverse_of => :vet_visits
 end
 
 class Address < Mongoid::Document
@@ -92,14 +92,14 @@ class Address < Mongoid::Document
   field :state
   field :post_code
   key :street
-  belongs_to :addressable
+  belongs_to :addressable, :inverse_of => :addresses
 end
 
 class Name < Mongoid::Document
   field :first_name
   field :last_name
   key :first_name, :last_name
-  belongs_to :person
+  belongs_to :person, :inverse_of => :name
 end
 
 class Comment < Mongoid::Document

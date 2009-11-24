@@ -39,9 +39,12 @@ module Mongoid # :nodoc:
       #   end
       #
       #   class Address < Mongoid::Document
-      #     belongs_to :person
+      #     belongs_to :person, :inverse_of => :addresses
       #   end
       def belongs_to(name, options = {})
+        unless options.has_key?(:inverse_of)
+          raise InvalidOptionsError.new("Options for belongs_to association must include :inverse_of")
+        end
         @embedded = true
         add_association(Associations::BelongsTo, Associations::Options.new(options.merge(:name => name)))
       end
@@ -61,7 +64,7 @@ module Mongoid # :nodoc:
       #   end
       #
       #   class Address < Mongoid::Document
-      #     belongs_to :person
+      #     belongs_to :person, :inverse_of => :addresses
       #   end
       def has_many(name, options = {})
         add_association(Associations::HasMany, Associations::Options.new(options.merge(:name => name)))

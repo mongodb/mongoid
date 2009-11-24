@@ -57,7 +57,7 @@ describe Mongoid::Associations::BelongsTo do
       before do
         @name = Name.new(:first_name => "Test", :last_name => "User")
         @person = Person.new(:title => "Mrs")
-        @options = Mongoid::Associations::Options.new(:name => :person)
+        @options = Mongoid::Associations::Options.new(:name => :person, :inverse_of => :name)
         Mongoid::Associations::BelongsTo.update(@person, @name, @options)
       end
 
@@ -74,7 +74,8 @@ describe Mongoid::Associations::BelongsTo do
       before do
         @address = Address.new(:street => "Broadway")
         @person = Person.new(:title => "Mrs")
-        Mongoid::Associations::BelongsTo.update(@person, @address, :person)
+        @options = Mongoid::Associations::Options.new(:name => :person, :inverse_of => :addresses)
+        Mongoid::Associations::BelongsTo.update(@person, @address, @options)
       end
 
       it "updates the parent document" do

@@ -72,6 +72,9 @@ module Mongoid
     end
   end
 
+  # Raised when invalid options are passed into an association.
+  class InvalidOptionsError < RuntimeError; end
+
   # Connect to the database name supplied. This should be run
   # for initial setup, potentially in a rails initializer.
   def self.connect_to(name)
