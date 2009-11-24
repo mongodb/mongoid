@@ -60,9 +60,7 @@ module Mongoid #:nodoc:
       # This then delegated all methods to the array class since this is
       # essentially a proxy to an array itself.
       def initialize(document, options)
-        @parent = document
-        @association_name = options.name
-        @klass = options.klass
+        @parent, @association_name, @klass = document, options.name, options.klass
         attributes = document.attributes[@association_name]
         @documents = attributes ? attributes.collect do |attribute|
           child = @klass.instantiate(attribute)
