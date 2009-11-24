@@ -9,25 +9,6 @@ describe Mongoid::Associations::HasMany do
     @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
   end
 
-  describe "#update" do
-
-    before do
-      @address = Address.new(:street => "Madison Ave")
-      @person = Person.new(:title => "Sir")
-      Mongoid::Associations::HasMany.update([@address], @person, Mongoid::Associations::Options.new(:name => :addresses))
-    end
-
-    it "parentizes the child document" do
-      @address.parent.should == @person
-    end
-
-    it "sets the attributes of the child on the parent" do
-      @person.attributes[:addresses].should ==
-        [{ "_id" => "madison-ave", "street" => "Madison Ave" }]
-    end
-
-  end
-
   describe "#[]" do
 
     before do
@@ -56,7 +37,10 @@ describe Mongoid::Associations::HasMany do
   describe "#<<" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
       @address = Address.new
     end
 
@@ -70,6 +54,49 @@ describe Mongoid::Associations::HasMany do
       @association << @address
       @association << @address
       @association.length.should == 4
+    end
+
+  end
+
+  describe "#build" do
+
+    before do
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+    end
+
+    it "adds a new document to the array with the suppied parameters" do
+      @association.build({ :street => "Street 1" })
+      @association.length.should == 3
+      @association[2].should be_a_kind_of(Address)
+      @association[2].street.should == "Street 1"
+    end
+
+    it "returns the newly built object in the association" do
+      address = @association.build({ :street => "Yet Another" })
+      address.should be_a_kind_of(Address)
+      address.street.should == "Yet Another"
+    end
+
+  end
+
+  describe "#create" do
+
+    before do
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+      @address = Address.new(:street => "Yet Another")
+    end
+
+    it "builds and saves a new object" do
+      Mongoid::Commands::Create.expects(:execute).returns(@address)
+      address = @association.create({ :street => "Yet Another" })
+      address.should be_a_kind_of(Address)
+      address.street.should == "Yet Another"
     end
 
   end
@@ -100,27 +127,6 @@ describe Mongoid::Associations::HasMany do
       @association.push @address
       @association.length.should == 3
       @address.parent.should == @document
-    end
-
-  end
-
-  describe "#build" do
-
-    before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
-    end
-
-    it "adds a new document to the array with the suppied parameters" do
-      @association.build({ :street => "Street 1" })
-      @association.length.should == 3
-      @association[2].should be_a_kind_of(Address)
-      @association[2].street.should == "Street 1"
-    end
-
-    it "returns the newly built object in the association" do
-      address = @association.build({ :street => "Yet Another" })
-      address.should be_a_kind_of(Address)
-      address.street.should == "Yet Another"
     end
 
   end
@@ -213,6 +219,25 @@ describe Mongoid::Associations::HasMany do
     it "appends the document to the end of the array" do
       @association.push(Address.new)
       @association.length.should == 3
+    end
+
+  end
+
+  describe "#update" do
+
+    before do
+      @address = Address.new(:street => "Madison Ave")
+      @person = Person.new(:title => "Sir")
+      Mongoid::Associations::HasMany.update([@address], @person, Mongoid::Associations::Options.new(:name => :addresses))
+    end
+
+    it "parentizes the child document" do
+      @address.parent.should == @person
+    end
+
+    it "sets the attributes of the child on the parent" do
+      @person.attributes[:addresses].should ==
+        [{ "_id" => "madison-ave", "street" => "Madison Ave" }]
     end
 
   end

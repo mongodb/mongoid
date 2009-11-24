@@ -35,6 +35,20 @@ describe Mongoid::Document do
       person.attributes[:title].should == "Test"
     end
 
+    context "when creating an association" do
+
+      before do
+        @person = Person.new(:title => "Esquire")
+        @person.addresses.create(:street => "Nan Jing Dong Lu", :city => "Shanghai")
+      end
+
+      it "should create and save the entire graph" do
+        person = Person.find(@person.id)
+        person.addresses.first.street.should == "Nan Jing Dong Lu"
+      end
+
+    end
+
   end
 
   describe "#find" do
