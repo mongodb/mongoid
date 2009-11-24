@@ -5,13 +5,21 @@ module Mongoid #:nodoc:
 
       delegate :valid?, :to => :document
 
-      attr_accessor :klass, :parent
+      attr_accessor :klass, :parent, :association_name
 
       # Build a new object for the association.
       def build(attributes)
         @document = @klass.instantiate(attributes)
         @document.parentize(@parent, @association_name)
+        @document.notify
         decorate!
+        self
+      end
+
+      # Create a new object for the association and save it.
+      def create(attributes)
+        build(attributes)
+        @document.save
         self
       end
 
@@ -22,7 +30,7 @@ module Mongoid #:nodoc:
       # All method calls on this object will then be delegated
       # to the internal document itself.
       def initialize(document, options)
-        @klass, @parent = options.klass, document
+        @klass, @parent, @association_name = options.klass, document, options.name
         attributes = document.attributes[options.name]
         @document = klass.instantiate(attributes || {})
         @document.parentize(document, options.name)

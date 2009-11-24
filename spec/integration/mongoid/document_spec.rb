@@ -35,7 +35,7 @@ describe Mongoid::Document do
       person.attributes[:title].should == "Test"
     end
 
-    context "when creating an association" do
+    context "when creating a has many" do
 
       before do
         @person = Person.new(:title => "Esquire")
@@ -49,6 +49,19 @@ describe Mongoid::Document do
 
     end
 
+    context "when creating a has one" do
+
+      before do
+        @person = Person.new(:title => "Esquire")
+        @person.name.create(:first_name => "Jorge")
+      end
+
+      it "should create and save the entire graph" do
+        person = Person.find(@person.id)
+        person.name.first_name.should == "Jorge"
+      end
+
+    end
   end
 
   describe "#find" do

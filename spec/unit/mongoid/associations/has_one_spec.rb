@@ -27,6 +27,28 @@ describe Mongoid::Associations::HasOne do
 
   end
 
+  describe "#create" do
+
+    context "when attributes provided" do
+
+      before do
+        @association = Mongoid::Associations::HasOne.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :mixed_drink)
+        )
+        @drink = MixedDrink.new(:name => "Sapphire and Tonic")
+      end
+
+      it "replaces and saves the existing has_one" do
+        Mongoid::Commands::Create.expects(:execute).returns(@drink)
+        drink = @association.create({ :name => "Sapphire and Tonic" })
+        drink.name.should == "Sapphire and Tonic"
+      end
+
+    end
+
+  end
+
   describe "#decorate!" do
 
     before do
