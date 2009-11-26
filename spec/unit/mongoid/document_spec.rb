@@ -56,6 +56,21 @@ describe Mongoid::Document do
 
   end
 
+  describe "#assimilate" do
+
+    before do
+      @child = Name.new(:first_name => "Hank", :last_name => "Moody")
+      @parent = Person.new(:title => "Mr.")
+      @options = Mongoid::Associations::Options.new(:name => :name)
+    end
+
+    it "sets up all associations in the object graph" do
+      @child.assimilate(@parent, @options)
+      @parent.name.should == @child
+    end
+
+  end
+
   describe "#clone" do
 
     before do

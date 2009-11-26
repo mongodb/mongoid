@@ -121,6 +121,26 @@ module Mongoid #:nodoc:
         other.attributes.except(:modified_at).except(:created_at)
     end
 
+    # Introduces a child object into the +Document+ object graph. This will
+    # set up the relationships between the parent and child and update the
+    # attributes of the parent +Document+.
+    #
+    # Options:
+    #
+    # parent: The +Document+ to incorporate into the object graph.
+    # options: The association +Options+ for the child.
+    #
+    # Example:
+    #
+    # <tt>person.assimilate(name, options)</tt>
+    #
+    # Returns: The child +Document+.
+    def assimilate(parent, options)
+      parentize(parent, options.name)
+      notify
+      self
+    end
+
     # Clone the current +Document+. This will return all attributes with the
     # exception of the document's id and versions.
     def clone
