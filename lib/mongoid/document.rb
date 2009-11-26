@@ -127,12 +127,12 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # parent: The +Document+ to incorporate into the object graph.
+    # parent: The +Document+ to assimilate with.
     # options: The association +Options+ for the child.
     #
     # Example:
     #
-    # <tt>person.assimilate(name, options)</tt>
+    # <tt>name.assimilate(person, options)</tt>
     #
     # Returns: The child +Document+.
     def assimilate(parent, options)

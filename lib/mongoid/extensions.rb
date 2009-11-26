@@ -5,6 +5,7 @@ require "mongoid/extensions/date/conversions"
 require "mongoid/extensions/datetime/conversions"
 require "mongoid/extensions/float/conversions"
 require "mongoid/extensions/hash/accessors"
+require "mongoid/extensions/hash/assimilation"
 require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/object/conversions"
@@ -36,6 +37,7 @@ end
 
 class Hash #:nodoc
   include Mongoid::Extensions::Hash::Accessors
+  include Mongoid::Extensions::Hash::Assimilation
   extend Mongoid::Extensions::Hash::Conversions
 end
 

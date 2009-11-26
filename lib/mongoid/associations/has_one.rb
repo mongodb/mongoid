@@ -39,15 +39,19 @@ module Mongoid #:nodoc:
 
       class << self
         # Perform an update of the relationship of the parent and child. This
-        # is initialized by setting the has_one to the supplied child.
+        # will assimilate the child +Document+ into the parent's object graph.
+        #
+        # Options:
+        #
+        # child: The child +Document+ or +Hash+.
+        # parent: The parent +Document+ to update.
+        # options: The association +Options+
+        #
+        # Example:
+        #
+        # <tt>HasOne.update({:first_name => "Hank"}, person, options)</tt>
         def update(child, parent, options)
-          unless child.respond_to?(:parentize)
-            klass = options.klass
-            child = klass.new(child)
-          end
-          child.parentize(parent, options.name)
-          child.notify
-          child
+          child.assimilate(parent, options)
         end
       end
 
