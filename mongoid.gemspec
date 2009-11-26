@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.8.8"
+  s.version = "0.8.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-11-24}
+  s.date = %q{2009-11-26}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/criteria.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/extensions.rb",
+     "lib/mongoid/extensions/array/assimilation.rb",
      "lib/mongoid/extensions/array/conversions.rb",
      "lib/mongoid/extensions/array/parentization.rb",
      "lib/mongoid/extensions/boolean/conversions.rb",
@@ -48,6 +49,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/datetime/conversions.rb",
      "lib/mongoid/extensions/float/conversions.rb",
      "lib/mongoid/extensions/hash/accessors.rb",
+     "lib/mongoid/extensions/hash/assimilation.rb",
      "lib/mongoid/extensions/hash/conversions.rb",
      "lib/mongoid/extensions/integer/conversions.rb",
      "lib/mongoid/extensions/object/casting.rb",
@@ -83,6 +85,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
+     "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
      "spec/unit/mongoid/extensions/boolean/conversions_spec.rb",
@@ -90,6 +93,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/datetime/conversions_spec.rb",
      "spec/unit/mongoid/extensions/float/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
+     "spec/unit/mongoid/extensions/hash/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
@@ -128,6 +132,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
+     "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
      "spec/unit/mongoid/extensions/boolean/conversions_spec.rb",
@@ -135,6 +140,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/datetime/conversions_spec.rb",
      "spec/unit/mongoid/extensions/float/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
+     "spec/unit/mongoid/extensions/hash/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
