@@ -460,6 +460,30 @@ describe Mongoid::Document do
 
   end
 
+  describe "#remove_attribute" do
+
+    context "when the attribute exists" do
+
+      it "removes the attribute" do
+        person = Person.new(:title => "Sir")
+        person.remove_attribute(:title)
+        person.title.should be_nil
+      end
+
+    end
+
+    context "when the attribute does not exist" do
+
+      it "does nothing" do
+        person = Person.new
+        person.remove_attribute(:title)
+        person.title.should be_nil
+      end
+
+    end
+
+  end
+
   describe "#reload" do
 
     before do

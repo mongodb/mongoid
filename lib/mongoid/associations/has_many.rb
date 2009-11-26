@@ -86,15 +86,8 @@ module Mongoid #:nodoc:
         # is initialized by setting the has_many to the supplied +Enumerable+
         # and setting up the parentization.
         def update(children, parent, options)
-          parent.attributes.delete(options.name)
-          klass = options.klass
-          children.each do |child|
-            unless child.respond_to?(:parentize)
-              child = klass.new(child)
-            end
-            child.parentize(parent, options.name)
-            child.notify
-          end
+          parent.remove_attribute(options.name)
+          children.assimilate(parent, options)
           new(parent, options)
         end
       end

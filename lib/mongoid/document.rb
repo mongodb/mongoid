@@ -272,6 +272,20 @@ module Mongoid #:nodoc:
       fields[name].get(@attributes[name])
     end
 
+    # Remove a value from the +Document+ attributes. If the value does not exist
+    # it will fail gracefully.
+    #
+    # Options:
+    #
+    # name: The name of the attribute to remove.
+    #
+    # Example:
+    #
+    # <tt>person.remove_attribute(:title)</tt>
+    def remove_attribute(name)
+      @attributes.delete(name)
+    end
+
     # Reloads the +Document+ attributes from the database.
     def reload
       @attributes = collection.find_one(:_id => id).with_indifferent_access
