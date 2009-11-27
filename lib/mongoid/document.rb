@@ -101,11 +101,6 @@ module Mongoid #:nodoc:
         before_save :generate_key
       end
 
-      # Find the last +Document+ in the collection by reverse id
-      def last
-        find(:first, :conditions => {}, :sort => [[:_id, :asc]])
-      end
-
       # Returns the primary key field of the +Document+
       def primary_key
         @primary_key

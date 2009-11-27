@@ -47,6 +47,18 @@ module Mongoid #:nodoc:
       find(:first, *args)
     end
 
+    # Find the last +Document+ given the conditions.
+    #
+    # Options:
+    #
+    # args: A +Hash+ with a conditions key and other options
+    #
+    # <tt>Person.last(:conditions => { :attribute => "value" })</tt>
+    def last(*args)
+      return find(:last, :conditions => {}, :sort => [[:_id, :desc]]) if args.empty?
+      return find(:last, *args) unless args.empty?
+    end
+
     # Will execute a +Criteria+ based on the +DynamicFinder+ that gets
     # generated.
     #

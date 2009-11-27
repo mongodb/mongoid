@@ -143,7 +143,7 @@ describe Mongoid::Finders do
 
   end
 
-  describe "#first" do
+  describe ".first" do
 
     before do
       @attributes = { "age" => 100 }
@@ -173,7 +173,7 @@ describe Mongoid::Finders do
 
     before do
       @attributes = { :_id => 1, :title => "Sir" }
-      @collection.expects(:find_one).with({}, :sort => [[:_id, :asc]]).returns(@attributes)
+      @collection.expects(:find_one).with({}, :sort => [[:_id, :desc]]).returns(@attributes)
     end
 
     it "finds the last document by the id" do

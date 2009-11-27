@@ -101,10 +101,7 @@ module Mongoid #:nodoc:
     # objects of the type of class provided.
     def execute(klass = nil)
       @klass = klass if klass
-      if type == :first
-        attributes = klass.collection.find_one(@selector, @options.dup)
-        return attributes ? @klass.instantiate(attributes) : nil
-      else
+      if type == :all
         attributes = @klass.collection.find(@selector, @options.dup)
         if attributes
           @count = attributes.count
@@ -112,6 +109,9 @@ module Mongoid #:nodoc:
         else
           return []
         end
+      else
+        attributes = @klass.collection.find_one(@selector, @options.dup)
+        return attributes ? @klass.instantiate(attributes) : nil
       end
     end
 
