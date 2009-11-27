@@ -64,6 +64,45 @@ describe Mongoid::Document do
     end
   end
 
+  context "using dynamic finders" do
+
+    before do
+      @person = Person.create(:title => "Mr", :age => 25)
+    end
+
+    context "finding by a single attribute" do
+
+      it "returns found documents" do
+        Person.find_by_title("Mr").should == @person
+      end
+
+    end
+
+    context "finding by multiple attributes" do
+
+      it "returns found documents" do
+        Person.find_by_title_and_age("Mr", 25).should == @person
+      end
+
+    end
+
+    context "finding all by a single attribute" do
+
+      it "returns found documents" do
+        Person.find_all_by_title("Mr").should == [@person]
+      end
+
+    end
+
+    context "finding all by multiple attributes" do
+
+      it "returns found documents" do
+        Person.find_all_by_title_and_age("Mr", 25).should == [@person]
+      end
+
+    end
+  end
+
   describe "#find" do
 
     before do
