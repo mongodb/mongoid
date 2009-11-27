@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.8.9"
+  s.version = "0.8.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-11-26}
+  s.date = %q{2009-11-27}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/commands/validate.rb",
      "lib/mongoid/criteria.rb",
      "lib/mongoid/document.rb",
+     "lib/mongoid/dynamic_finder.rb",
      "lib/mongoid/extensions.rb",
      "lib/mongoid/extensions/array/assimilation.rb",
      "lib/mongoid/extensions/array/conversions.rb",
@@ -85,6 +86,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
+     "spec/unit/mongoid/dynamic_finder_spec.rb",
      "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
@@ -132,6 +134,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
+     "spec/unit/mongoid/dynamic_finder_spec.rb",
      "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/array/conversions_spec.rb",
      "spec/unit/mongoid/extensions/array/parentization_spec.rb",
