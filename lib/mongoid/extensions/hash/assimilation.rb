@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
         # Returns: The child +Document+.
         def assimilate(parent, options)
           klass = options.klass
-          child = klass.new(self)
+          child = klass.instantiate(self)
           child.assimilate(parent, options)
         end
       end
