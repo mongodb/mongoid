@@ -20,8 +20,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>DynamicFinder.new(:find_by_title_and_age)</tt>
-    def initialize(method)
-      @finder, @bang = :first, false
+    def initialize(method, *args)
+      @finder, @bang, @args = :first, false, args
       case method.to_s
       when FINDER
         @finder = :all if $1 == "all_by"
@@ -37,6 +37,23 @@ module Mongoid #:nodoc:
         @finder = nil
       end
       @attributes = names && names.split("_and_")
+    end
+
+    # Provides a conditions +Hash+ that will be passed onto the +Criteria+ API
+    # in order to execute the search. This is built off the attributes derived
+    # from the method name and the args passed into the constructor.
+    #
+    # Example:
+    #
+    #   finder = DynamicFinder.new(:find_by_id, "5")
+    #   finder.conditions # { :id => "5" }
+    def conditions
+      conds = {}.with_indifferent_access
+      @attributes.each_with_index do |attr, index|
+        attr = "_id" if attr == "id"
+        conds[attr] = @args[index]
+      end
+      conds
     end
 
   end

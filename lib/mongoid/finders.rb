@@ -36,11 +36,6 @@ module Mongoid #:nodoc:
       Criteria.translate(*args).execute(self)
     end
 
-    # Find a +Document+ by its id.
-    def find_by_id(id)
-      find(id)
-    end
-
     # Find the first +Document+ given the conditions.
     #
     # Options:
@@ -50,6 +45,23 @@ module Mongoid #:nodoc:
     # <tt>Person.first(:conditions => { :attribute => "value" })</tt>
     def first(*args)
       find(:first, *args)
+    end
+
+    # Will execute a +Criteria+ based on the +DynamicFinder+ that gets
+    # generated.
+    #
+    # Options:
+    #
+    # name: The finder method name
+    # args: The arguments to pass to the method.
+    #
+    # Example:
+    #
+    # <tt>Person.find_all_by_title_and_age("Sir", 30)</tt>
+    def method_missing(name, *args)
+      dyna = DynamicFinder.new(name, *args)
+      finder, conditions = dyna.finder, dyna.conditions
+      Criteria.translate(finder, :conditions => conditions).execute(self)
     end
 
     # Find all documents in paginated fashion given the supplied arguments.

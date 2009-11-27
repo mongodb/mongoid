@@ -137,7 +137,7 @@ describe Mongoid::Finders do
     end
 
     it "delegates to find with an id parameter" do
-      Mongoid::Criteria.expects(:translate).with("1").returns(@criteria)
+      Mongoid::Criteria.expects(:translate).with(:first, :conditions => { "_id" => "1" }).returns(@criteria)
       Person.find_by_id("1")
     end
 
@@ -178,6 +178,26 @@ describe Mongoid::Finders do
 
     it "finds the last document by the id" do
       Person.last.should == Person.instantiate(@attributes)
+    end
+
+  end
+
+  describe ".method_missing" do
+
+    context "with a finder method name" do
+
+      before do
+        @criteria = stub
+        @document = stub
+        @conditions = { "title" => "Sir", "age" => 30 }
+      end
+
+      it "executes the finder" do
+        Mongoid::Criteria.expects(:translate).with(:first, :conditions => @conditions).returns(@criteria)
+        @criteria.expects(:execute).with(Person).returns(@document)
+        Person.find_by_title_and_age("Sir", 30)
+      end
+
     end
 
   end
