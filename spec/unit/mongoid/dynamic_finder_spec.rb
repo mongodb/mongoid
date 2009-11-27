@@ -28,6 +28,39 @@ describe Mongoid::DynamicFinder do
 
   end
 
+  describe "#create" do
+
+    context "when initializing" do
+
+      before do
+        @finder = Mongoid::DynamicFinder.new(:find_or_initialize_by_title_and_age, "Sir", 30)
+      end
+
+      it "instantiates a new document" do
+        person = @finder.create(Person)
+        person.title.should == "Sir"
+        person.age.should == 30
+      end
+
+    end
+
+    context "when creating" do
+
+      before do
+        @finder = Mongoid::DynamicFinder.new(:find_or_create_by_title_and_age, "Sir", 30)
+        @person = stub
+      end
+
+      it "creates a new document" do
+        Person.expects(:create).with(@finder.conditions).returns(@person)
+        person = @finder.create(Person)
+        person.should == @person
+      end
+
+    end
+
+  end
+
   describe ".initialize" do
 
     context "when find_by*" do
@@ -38,8 +71,7 @@ describe Mongoid::DynamicFinder do
 
       it "sets a first finder and attributes" do
         @finder.finder.should == :first
-        @finder.attributes.should == ["title", "age"]
-        @finder.bang.should be_false
+        @finder.conditions.should == { "title" => "Sir", "age" => 30 }
       end
 
     end
@@ -52,8 +84,7 @@ describe Mongoid::DynamicFinder do
 
       it "sets an all finder and attributes" do
         @finder.finder.should == :all
-        @finder.attributes.should == ["title", "age"]
-        @finder.bang.should be_false
+        @finder.conditions.should == { "title" => "Sir", "age" => 30 }
       end
 
     end
@@ -66,22 +97,7 @@ describe Mongoid::DynamicFinder do
 
       it "sets a last finder and attributes" do
         @finder.finder.should == :last
-        @finder.attributes.should == ["title", "age"]
-        @finder.bang.should be_false
-      end
-
-    end
-
-    context "when find_by*!" do
-
-      before do
-        @finder = Mongoid::DynamicFinder.new(:find_by_title_and_age!, "Sir", 30)
-      end
-
-      it "sets a first! finder and attributes" do
-        @finder.finder.should == :first
-        @finder.attributes.should == ["title", "age"]
-        @finder.bang.should be_true
+        @finder.conditions.should == { "title" => "Sir", "age" => 30 }
       end
 
     end
@@ -94,9 +110,7 @@ describe Mongoid::DynamicFinder do
 
       it "sets a first finder with attributes or a new" do
         @finder.finder.should == :first
-        @finder.attributes.should == ["title", "age"]
-        @finder.creator.should == :new
-        @finder.bang.should be_false
+        @finder.conditions.should == { "title" => "Sir", "age" => 30 }
       end
 
     end
@@ -109,9 +123,7 @@ describe Mongoid::DynamicFinder do
 
       it "sets a first finder with attributes or a create" do
         @finder.finder.should == :first
-        @finder.attributes.should == ["title", "age"]
-        @finder.creator.should == :create
-        @finder.bang.should be_false
+        @finder.conditions.should == { "title" => "Sir", "age" => 30 }
       end
 
     end

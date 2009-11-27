@@ -200,6 +200,39 @@ describe Mongoid::Finders do
 
     end
 
+    context "with a finder or creation method name" do
+
+      before do
+        @criteria = stub
+        @document = stub
+        @conditions = { "title" => "Sir", "age" => 30 }
+      end
+
+      context "when document is found" do
+
+        it "returns the document" do
+          Mongoid::Criteria.expects(:translate).with(:first, :conditions => @conditions).returns(@criteria)
+          @criteria.expects(:execute).with(Person).returns(@document)
+          Person.find_or_initialize_by_title_and_age("Sir", 30).should == @document
+        end
+
+      end
+
+      context "when document is not found" do
+
+        it "instantiates a new document" do
+          Mongoid::Criteria.expects(:translate).with(:first, :conditions => @conditions).returns(@criteria)
+          @criteria.expects(:execute).with(Person).returns(nil)
+          new_doc = Person.find_or_initialize_by_title_and_age("Sir", 30)
+          new_doc.new_record?.should be_true
+          new_doc.title.should == "Sir"
+          new_doc.age.should == 30
+        end
+
+      end
+
+    end
+
   end
 
   describe ".paginate" do

@@ -61,7 +61,8 @@ module Mongoid #:nodoc:
     def method_missing(name, *args)
       dyna = DynamicFinder.new(name, *args)
       finder, conditions = dyna.finder, dyna.conditions
-      Criteria.translate(finder, :conditions => conditions).execute(self)
+      results = Criteria.translate(finder, :conditions => conditions).execute(self)
+      results ? results : dyna.create(self)
     end
 
     # Find all documents in paginated fashion given the supplied arguments.
