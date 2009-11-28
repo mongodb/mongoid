@@ -116,6 +116,29 @@ New School:
   Criteria.translate(:conditions => { :title => "Sir" }).execute
 </pre>
 
+Chaining Scopes:
+
+Class methods that return criteria, either through the Criteria API or the traditional Finder API, can
+be chained, similar to DataMapper.
+
+<pre>
+  class Person < Mongoid::Document
+    field :title
+    field :age, :type => Integer
+
+    class << self
+      def knighted
+        criteria.where(:title => "Sir")
+      end
+      def old
+        criteria.where(:age => { "$gt" > 70 })
+      end
+    end
+  end
+
+  Person.old.knighted
+</pre>
+
 Paginate Document search results:
 
 <pre>
