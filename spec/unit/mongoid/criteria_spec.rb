@@ -245,40 +245,6 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#one" do
-
-    context "when documents exist" do
-
-      before do
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
-      end
-
-      it "calls find on the collection with the selector and options" do
-        criteria = Mongoid::Criteria.new(Person)
-        criteria.one.should be_a_kind_of(Person)
-      end
-
-    end
-
-    context "when no documents exist" do
-
-      before do
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(nil)
-      end
-
-      it "returns nil" do
-        criteria = Mongoid::Criteria.new(Person)
-        criteria.one.should be_nil
-      end
-
-    end
-
-  end
-
   describe "#group" do
 
     before do
@@ -505,6 +471,33 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#method_missing" do
+
+    before do
+      @criteria = Mongoid::Criteria.new(Person)
+      @criteria.where(:title => "Sir")
+    end
+
+    it "merges the criteria with the next one" do
+      @new_criteria = @criteria.accepted
+      @new_criteria.selector.should == { :title => "Sir", :terms => true }
+    end
+
+    context "chaining more than one scope" do
+
+      before do
+        @criteria = Person.accepted.old.knight
+      end
+
+      it "returns the final merged criteria" do
+        @criteria.selector.should ==
+          { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+      end
+
+    end
+
+  end
+
   describe "#not_in" do
 
     it "adds the exclusion to the selector" do
@@ -570,6 +563,40 @@ describe Mongoid::Criteria do
           @criteria.options[:skip].should be_nil
         end
 
+      end
+
+    end
+
+  end
+
+  describe "#one" do
+
+    context "when documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
+      end
+
+      it "calls find on the collection with the selector and options" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.one.should be_a_kind_of(Person)
+      end
+
+    end
+
+    context "when no documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(nil)
+      end
+
+      it "returns nil" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.one.should be_nil
       end
 
     end

@@ -19,6 +19,15 @@ module Mongoid #:nodoc:
       Criteria.translate(self, *args).count
     end
 
+    # Helper to initialize a new +Criteria+ object for this class.
+    #
+    # Example:
+    #
+    # <tt>Person.criteria</tt>
+    def criteria
+      Criteria.new(self)
+    end
+
     # Find a +Document+ in several different ways.
     #
     # If a +String+ is provided, it will be assumed that it is a

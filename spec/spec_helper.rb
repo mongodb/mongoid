@@ -21,6 +21,7 @@ end
 
 class Person < Mongoid::Document
   include Mongoid::Timestamps
+
   field :title
   field :terms, :type => Boolean
   field :age, :type => Integer, :default => 100
@@ -28,8 +29,10 @@ class Person < Mongoid::Document
   field :mixed_drink, :type => MixedDrink
   field :employer_id
   field :lunch_time, :type => Time
+
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
+
   has_one :name
   has_one :pet, :class_name => "Animal"
 
@@ -42,6 +45,19 @@ class Person < Mongoid::Document
   def employer=(emp)
     self.employer_id = emp.id
   end
+
+  class << self
+    def accepted
+      criteria.where(:terms => true)
+    end
+    def knight
+      criteria.where(:title => "Sir")
+    end
+    def old
+      criteria.where(:age => { "$gt" => 50 })
+    end
+  end
+
 end
 
 class Employer

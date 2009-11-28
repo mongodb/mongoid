@@ -64,6 +64,23 @@ describe Mongoid::Document do
     end
   end
 
+  context "chaining criteria scopes" do
+
+    before do
+      @one = Person.create(:title => "Mr", :age => 55, :terms => true)
+      @two = Person.create(:title => "Sir", :age => 55, :terms => true)
+      @three = Person.create(:title => "Sir", :age => 35, :terms => true)
+      @four = Person.create(:title => "Sir", :age => 55, :terms => false)
+    end
+
+    it "finds by the merged criteria" do
+      people = Person.old.accepted.knight
+      people.count.should == 1
+      people.first.should == @two
+    end
+
+  end
+
   context "using dynamic finders" do
 
     before do

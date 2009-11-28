@@ -270,6 +270,40 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Used for chaining +Criteria+ scopes together in the for of class methods
+    # on the +Document+ the criteria is for.
+    #
+    # Options:
+    #
+    # name: The name of the class method on the +Document+ to chain.
+    # args: The arguments passed to the method.
+    #
+    # Example:
+    #
+    #   class Person < Mongoid::Document
+    #     field :title
+    #     field :terms, :type => Boolean, :default => false
+    #
+    #     class << self
+    #       def knights
+    #         all(:conditions => { :title => "Sir" })
+    #       end
+    #
+    #       def accepted
+    #         all(:conditions => { :terms => true })
+    #       end
+    #     end
+    #   end
+    #
+    #   Person.accepted.knights #returns a merged criteria of the 2 scopes.
+    #
+    # Returns: <tt>Criteria</tt>
+    def method_missing(name, *args)
+      new_scope = @klass.send(name)
+      new_scope.merge(self)
+      new_scope
+    end
+
     # Adds a criterion to the +Criteria+ that specifies values where none
     # should match in order to return results. This is similar to an SQL "NOT IN"
     # clause. The MongoDB conditional operator that will be used is "$nin".
