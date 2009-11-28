@@ -261,13 +261,8 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
     def merge(other)
-      case other
-      when Hash
-        merge(self.class.translate(@klass, other))
-      else
-        @selector.update(other.selector)
-        @options.update(other.options)
-      end
+      @selector.update(other.selector)
+      @options.update(other.options)
     end
 
     # Used for chaining +Criteria+ scopes together in the for of class methods

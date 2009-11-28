@@ -430,45 +430,6 @@ describe Mongoid::Criteria do
 
     end
 
-    context "with a hash" do
-
-      context "when hash has values" do
-
-        before do
-          @hash = { :conditions => { :name => "Rebecca" }, :sort => [[:name, :desc]] }
-          @selector = { :title => "Sir", :age => 30, :name => "Rebecca" }
-          @options = { :skip => 40, :limit => 20, :sort => [[:name, :desc]] }
-          @criteria.merge(@hash)
-        end
-
-        it "merges the conditions with the selector" do
-          @criteria.selector.should == @selector
-        end
-
-        it "merges all valid other values into the options" do
-          @criteria.options.should == @options
-        end
-
-      end
-
-      context "when hash is empty" do
-
-        before do
-          @hash = {}
-          @selector = { :title => "Sir", :age => 30 }
-          @options = { :skip => 40, :limit => 20 }
-        end
-
-        it "merges nothing" do
-          @criteria.merge(@hash)
-          @criteria.selector.should == @selector
-          @criteria.options.should == @options
-        end
-
-      end
-
-    end
-
   end
 
   describe "#method_missing" do
