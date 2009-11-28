@@ -81,8 +81,6 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Integer</tt>
     def count
-      return @count if @count
-      @klass = klass if klass
       @count ||= @klass.collection.find(@selector, @options.dup).count
     end
 
