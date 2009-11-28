@@ -217,6 +217,27 @@ module Mongoid #:nodoc:
       @options[:limit] = value; self
     end
 
+    # Merges another object into this +Criteria+. The other object may be a
+    # +Criteria+ or a +Hash+. This is used to combine multiple scopes together,
+    # where a chained scope situation may be desired.
+    #
+    # Options:
+    #
+    # other: The +Criteria+ or +Hash+ to merge with.
+    #
+    # Example:
+    #
+    # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
+    def merge(other)
+      case other
+      when Hash
+        merge(self.class.translate(:all, other))
+      else
+        @selector.update(other.selector)
+        @options.update(other.options)
+      end
+    end
+
     # Adds a criterion to the +Criteria+ that specifies values where none
     # should match in order to return results. This is similar to an SQL "NOT IN"
     # clause. The MongoDB conditional operator that will be used is "$nin".
@@ -349,7 +370,7 @@ module Mongoid #:nodoc:
       type = args[0] || :all
       params = args[1] || {}
       return new(:first).id(args[0]) unless type.is_a?(Symbol)
-      return new(type).where(params.delete(:conditions)).extras(params)
+      return new(type).where(params.delete(:conditions) || {}).extras(params)
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that must

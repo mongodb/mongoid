@@ -34,7 +34,7 @@ describe Mongoid::Finders do
     context "when a selector is not provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with(nil, {}).returns(@cursor)
+        @collection.expects(:find).with({}, {}).returns(@cursor)
         @cursor.expects(:collect).returns(@people)
         Person.all
       end
@@ -161,7 +161,7 @@ describe Mongoid::Finders do
     context "when a selector is not provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        @collection.expects(:find_one).with(nil, {}).returns(@attributes)
+        @collection.expects(:find_one).with({}, {}).returns(@attributes)
         Person.first.attributes.except(:_id).should == @attributes
       end
 
