@@ -137,6 +137,7 @@ be chained, similar to DataMapper.
   end
 
   Person.old.knighted
+  Person.old.paginate
 </pre>
 
 Paginate Document search results:
