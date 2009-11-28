@@ -42,4 +42,39 @@ describe Mongoid::Extensions::String::Inflections do
 
   end
 
+  describe "invert" do
+
+    context "when asc" do
+
+      it "returns desc" do
+        "asc".invert.should == "desc"
+      end
+
+    end
+
+    context "when ascending" do
+
+      it "returns descending" do
+        "ascending".invert.should == "descending"
+      end
+
+    end
+
+    context "when desc" do
+
+      it "returns asc" do
+        "desc".invert.should == "asc"
+      end
+
+    end
+
+    context "when descending" do
+
+      it "returns ascending" do
+        "descending".invert.should == "ascending"
+      end
+
+    end
+
+  end
 end
