@@ -14,8 +14,29 @@ module Mongoid #:nodoc:
   #
   # <tt>criteria.execute</tt>
   class Criteria
-    attr_accessor :klass
-    attr_reader :selector, :options, :type
+    include Enumerable
+
+    attr_reader :klass, :options, :selector
+
+    # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
+    # of this +Criteria+ or the criteria itself.
+    #
+    # This will force a database load when called if an enumerable is passed.
+    #
+    # Options:
+    #
+    # other: The other +Enumerable+ or +Criteria+ to compare to.
+    def ==(other)
+      case other
+      when Criteria
+        self.selector == other.selector && self.options == other.options
+      when Enumerable
+        execute
+        return (@collection == other)
+      else
+        return false
+      end
+    end
 
     AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
     # Aggregate the criteria. This will take the internally built selector and options
@@ -54,19 +75,30 @@ module Mongoid #:nodoc:
 
     # Get the count of matching documents in the database for the +Criteria+.
     #
-    # Options:
-    #
-    # klass: Optional class that the collection will be retrieved from.
-    #
     # Example:
     #
     # <tt>criteria.count</tt>
     #
     # Returns: <tt>Integer</tt>
-    def count(klass = nil)
+    def count
       return @count if @count
       @klass = klass if klass
       return @klass.collection.find(@selector, @options.dup).count
+    end
+
+    # Iterate over each +Document+ in the results. This can take an optional
+    # block to pass to each argument in the results.
+    #
+    # Example:
+    #
+    # <tt>criteria.each { |doc| p doc }</tt>
+    def each
+      @collection ||= execute
+      if block_given?
+        @collection.each { |doc| yield doc }
+      else
+        @collection.each
+      end
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that are not allowed
@@ -89,32 +121,6 @@ module Mongoid #:nodoc:
       exclusions.each { |key, value| @selector[key] = { "$ne" => value } }; self
     end
 
-    # Execute the criteria. This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +find()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned new documents of the type of class provided will be instantiated.
-    #
-    # If this is a +Criteria+ to only find the first object, this will return a
-    # single object of the type of class provided.
-    #
-    # If this is a +Criteria+ to find multiple results, will return an +Array+ of
-    # objects of the type of class provided.
-    def execute(klass = nil)
-      @klass = klass if klass
-      if type == :all
-        attributes = @klass.collection.find(@selector, @options.dup)
-        if attributes
-          @count = attributes.count
-          return attributes.collect { |doc| @klass.instantiate(doc) }
-        else
-          return []
-        end
-      else
-        attributes = @klass.collection.find_one(@selector, @options.dup)
-        return attributes ? @klass.instantiate(attributes) : nil
-      end
-    end
-
     # Adds a criterion to the +Criteria+ that specifies additional options
     # to be passed to the Ruby driver, in the exact format for the driver.
     #
@@ -131,6 +137,16 @@ module Mongoid #:nodoc:
       @options = extras
       filter_options
       self
+    end
+
+    # Return the first result for the +Criteria+.
+    #
+    # Example:
+    #
+    # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
+    def one
+      attributes = @klass.collection.find_one(@selector, @options.dup)
+      attributes ? @klass.instantiate(attributes) : nil
     end
 
     GROUP_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
@@ -196,8 +212,24 @@ module Mongoid #:nodoc:
     #
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
-    def initialize(type, klass = nil)
-      @selector, @options, @type, @klass = {}, {}, type, klass
+    def initialize(klass)
+      @selector, @options, @klass = {}, {}, klass
+    end
+
+    # Return the last result for the +Criteria+. Essentially does a find_one on
+    # the collection with the sorting reversed. If no sorting parameters have
+    # been provided it will default to ids.
+    #
+    # Example:
+    #
+    # <tt>Criteria.select(:name).where(:name = "Chrissy").last</tt>
+    def last
+      opts = @options.dup
+      sorting = opts[:sort]
+      sorting = [[:_id, :asc]] unless sorting
+      opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
+      attributes = @klass.collection.find_one(@selector, opts)
+      attributes ? @klass.instantiate(attributes) : nil
     end
 
     # Adds a criterion to the +Criteria+ that specifies the maximum number of
@@ -231,7 +263,7 @@ module Mongoid #:nodoc:
     def merge(other)
       case other
       when Hash
-        merge(self.class.translate(:all, other))
+        merge(self.class.translate(@klass, other))
       else
         @selector.update(other.selector)
         @options.update(other.options)
@@ -293,17 +325,13 @@ module Mongoid #:nodoc:
 
     # Executes the +Criteria+ and paginates the results.
     #
-    # Options:
-    #
-    # klass: Optional class name to execute the criteria on.
-    #
     # Example:
     #
-    # <tt>criteria.paginate(Person)</tt>
-    def paginate(klass = nil)
-      results = execute(klass)
+    # <tt>criteria.paginate</tt>
+    def paginate
+      @collection ||= execute
       WillPaginate::Collection.create(page, per_page, count) do |pager|
-        pager.replace(results)
+        pager.replace(@collection)
       end
     end
 
@@ -361,16 +389,16 @@ module Mongoid #:nodoc:
     #
     # Example:
     #
-    # <tt>Criteria.translate("4ab2bc4b8ad548971900005c")</tt>
+    # <tt>Criteria.translate(Person, "4ab2bc4b8ad548971900005c")</tt>
     #
-    # <tt>Criteria.translate(:all, :conditions => { :field => "value"}, :limit => 20)</tt>
+    # <tt>Criteria.translate(Person, :conditions => { :field => "value"}, :limit => 20)</tt>
     #
     # Returns a new +Criteria+ object.
     def self.translate(*args)
-      type = args[0] || :all
+      klass = args[0]
       params = args[1] || {}
-      return new(:first).id(args[0]) unless type.is_a?(Symbol)
-      return new(type).where(params.delete(:conditions) || {}).extras(params)
+      return new(klass).id(params).one if params.is_a?(String)
+      return new(klass).where(params.delete(:conditions) || {}).extras(params)
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that must
@@ -393,6 +421,29 @@ module Mongoid #:nodoc:
     end
 
     protected
+    # Execute the criteria. This will take the internally built selector and options
+    # and pass them on to the Ruby driver's +find()+ method on the collection. The
+    # collection itself will be retrieved from the class provided, and once the
+    # query has returned new documents of the type of class provided will be instantiated.
+    #
+    # If this is a +Criteria+ to only find the first object, this will return a
+    # single object of the type of class provided.
+    #
+    # If this is a +Criteria+ to find multiple results, will return an +Array+ of
+    # objects of the type of class provided.
+    def execute
+      attributes = @klass.collection.find(@selector, @options.dup)
+      if attributes
+        @count = attributes.count
+        @collection = attributes.collect { |doc| @klass.instantiate(doc) }
+      else
+        @collection = []
+      end
+    end
+
+    # Filters the unused options out of the options +Hash+. Currently this
+    # takes into account the "page" and "per_page" options that would be passed
+    # in if using will_paginate.
     def filter_options
       page_num = @options.delete(:page)
       per_page_num = @options.delete(:per_page)

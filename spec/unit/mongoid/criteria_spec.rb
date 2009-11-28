@@ -3,7 +3,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.r
 describe Mongoid::Criteria do
 
   before do
-    @criteria = Mongoid::Criteria.new(:all)
+    @criteria = Mongoid::Criteria.new(Person)
   end
 
   describe "#aggregate" do
@@ -12,7 +12,7 @@ describe Mongoid::Criteria do
 
       before do
         @reduce = "function(obj, prev) { prev.count++; }"
-        @criteria = Mongoid::Criteria.new(:all, Person)
+        @criteria = Mongoid::Criteria.new(Person)
         @collection = mock
         Person.expects(:collection).returns(@collection)
       end
@@ -54,6 +54,61 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#collect" do
+
+    context "filtering" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @criteria = Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
+        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
+      end
+
+      it "filters out unused params" do
+        @criteria.collect
+        @criteria.options[:page].should be_nil
+        @criteria.options[:per_page].should be_nil
+      end
+
+    end
+
+    context "when type is :all" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @criteria = Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
+        @cursor = stub(:count => 44, :collect => [])
+        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns(@cursor)
+      end
+
+      it "adds the count instance variable" do
+        @criteria.collect.should == []
+        @criteria.count.should == 44
+      end
+
+    end
+
+    context "when type is :first" do
+
+
+    end
+
+    context "when type is not :first" do
+
+      it "calls find on the collection with the selector and options" do
+        criteria = Mongoid::Criteria.new(Person)
+        collection = mock
+        Person.expects(:collection).returns(collection)
+        collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
+        criteria.collect.should == []
+      end
+
+    end
+
+  end
+
   describe "#count" do
 
     context "when criteria has not been executed" do
@@ -71,7 +126,7 @@ describe Mongoid::Criteria do
     context "when criteria has been executed" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all, Person)
+        @criteria = Mongoid::Criteria.new(Person)
         @selector = { :test => "Testing" }
         @criteria.where(@selector)
         @collection = mock
@@ -89,6 +144,48 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#each" do
+
+    before do
+      @criteria.where(:title => "Sir")
+      @collection = stub
+      @person = Person.new(:title => "Sir")
+      @cursor = stub(:count => 10, :collect => [@person])
+    end
+
+    context "when the criteria has not been executed" do
+
+      before do
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find).with({ :title => "Sir" }, {}).returns(@cursor)
+      end
+
+      it "executes the criteria" do
+        @criteria.each do |person|
+          person.should == @person
+        end
+      end
+
+    end
+
+    context "when the criteria has been executed" do
+
+      before do
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find).with({ :title => "Sir" }, {}).returns(@cursor)
+      end
+
+      it "calls each on the existing results" do
+        @criteria.each
+        @criteria.each do |person|
+          person.should == @person
+        end
+      end
+
+    end
+
+  end
+
   describe "#excludes" do
 
     it "adds the $ne query to the selector" do
@@ -98,90 +195,6 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.excludes(:title => "Bad").should == @criteria
-    end
-
-  end
-
-  describe "#execute" do
-
-    context "filtering" do
-
-      before do
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-        @criteria = Mongoid::Criteria.new(:all).extras(:page => 1, :per_page => 20)
-        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
-      end
-
-      it "filters out unused params" do
-        @criteria.execute(Person)
-        @criteria.options[:page].should be_nil
-        @criteria.options[:per_page].should be_nil
-      end
-
-    end
-
-    context "when type is :all" do
-
-      before do
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-        @criteria = Mongoid::Criteria.new(:all).extras(:page => 1, :per_page => 20)
-        @cursor = stub(:count => 44, :collect => [])
-        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns(@cursor)
-      end
-
-      it "adds the count instance variable" do
-        @criteria.execute(Person).should == []
-        @criteria.count.should == 44
-      end
-
-    end
-
-    context "when type is :first" do
-
-      context "when documents exist" do
-
-        before do
-          @collection = mock
-          Person.expects(:collection).returns(@collection)
-          @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
-        end
-
-        it "calls find on the collection with the selector and options" do
-          criteria = Mongoid::Criteria.new(:first)
-          criteria.execute(Person).should be_a_kind_of(Person)
-        end
-
-      end
-
-      context "when no documents exist" do
-
-        before do
-          @collection = mock
-          Person.expects(:collection).returns(@collection)
-          @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(nil)
-        end
-
-        it "returns nil" do
-          criteria = Mongoid::Criteria.new(:first)
-          criteria.execute(Person).should be_nil
-        end
-
-      end
-
-    end
-
-    context "when type is not :first" do
-
-      it "calls find on the collection with the selector and options" do
-        criteria = Mongoid::Criteria.new(:all)
-        collection = mock
-        Person.expects(:collection).returns(collection)
-        collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
-        criteria.execute(Person).should == []
-      end
-
     end
 
   end
@@ -232,6 +245,40 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#one" do
+
+    context "when documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
+      end
+
+      it "calls find on the collection with the selector and options" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.one.should be_a_kind_of(Person)
+      end
+
+    end
+
+    context "when no documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(nil)
+      end
+
+      it "returns nil" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.one.should be_nil
+      end
+
+    end
+
+  end
+
   describe "#group" do
 
     before do
@@ -242,7 +289,7 @@ describe Mongoid::Criteria do
 
       before do
         @reduce = "function(obj, prev) { prev.group.push(obj); }"
-        @criteria = Mongoid::Criteria.new(:all, Person)
+        @criteria = Mongoid::Criteria.new(Person)
         @collection = mock
         Person.expects(:collection).returns(@collection)
       end
@@ -299,6 +346,56 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#last" do
+
+    context "when documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:title, :desc]] }).returns({ :title => "Sir" })
+      end
+
+      it "calls find on the collection with the selector and sort options reversed" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.order_by([[:title, :asc]])
+        criteria.last.should be_a_kind_of(Person)
+      end
+
+    end
+
+    context "when no documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:_id, :desc]] }).returns(nil)
+      end
+
+      it "returns nil" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.last.should be_nil
+      end
+
+    end
+
+    context "when no sorting options provided" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:_id, :desc]] }).returns({ :title => "Sir" })
+      end
+
+      it "defaults to sort by id" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.last
+      end
+
+    end
+
+  end
+
   describe "#limit" do
 
     context "when value provided" do
@@ -336,7 +433,7 @@ describe Mongoid::Criteria do
       context "when the other has a selector and options" do
 
         before do
-          @other = Mongoid::Criteria.new(:all)
+          @other = Mongoid::Criteria.new(Person)
           @other.where(:name => "Chloe").order_by([[:name, :asc]])
           @selector = { :title => "Sir", :age => 30, :name => "Chloe" }
           @options = { :skip => 40, :limit => 20, :sort => [[:name, :asc]] }
@@ -353,7 +450,7 @@ describe Mongoid::Criteria do
       context "when the other has no selector or options" do
 
         before do
-          @other = Mongoid::Criteria.new(:all)
+          @other = Mongoid::Criteria.new(Person)
           @selector = { :title => "Sir", :age => 30 }
           @options = { :skip => 40, :limit => 20 }
         end
@@ -426,7 +523,7 @@ describe Mongoid::Criteria do
     context "when the per_page option exists" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all).extras({ :per_page => 20, :page => 3 })
+        @criteria = Mongoid::Criteria.new(Person).extras({ :per_page => 20, :page => 3 })
       end
 
       it "returns the per_page option" do
@@ -438,7 +535,7 @@ describe Mongoid::Criteria do
     context "when the skip option exists" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all).extras({ :skip => 20 })
+        @criteria = Mongoid::Criteria.new(Person).extras({ :skip => 20 })
       end
 
       it "returns the skip option" do
@@ -452,7 +549,7 @@ describe Mongoid::Criteria do
       context "when page option exists" do
 
         before do
-          @criteria = Mongoid::Criteria.new(:all).extras({ :page => 2 })
+          @criteria = Mongoid::Criteria.new(Person).extras({ :page => 2 })
         end
 
         it "adds the skip option to the options and returns it" do
@@ -465,7 +562,7 @@ describe Mongoid::Criteria do
       context "when page option does not exist" do
 
         before do
-          @criteria = Mongoid::Criteria.new(:all)
+          @criteria = Mongoid::Criteria.new(Person)
         end
 
         it "returns nil" do
@@ -501,7 +598,7 @@ describe Mongoid::Criteria do
     context "when the page option exists" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all).extras({ :page => 5 })
+        @criteria = Mongoid::Criteria.new(Person).extras({ :page => 5 })
       end
 
       it "returns the page option" do
@@ -513,7 +610,7 @@ describe Mongoid::Criteria do
     context "when the page option does not exist" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all)
+        @criteria = Mongoid::Criteria.new(Person)
       end
 
       it "returns 1" do
@@ -546,7 +643,7 @@ describe Mongoid::Criteria do
     context "when the per_page option exists" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all).extras({ :per_page => 10 })
+        @criteria = Mongoid::Criteria.new(Person).extras({ :per_page => 10 })
       end
 
       it "returns the per_page option" do
@@ -558,7 +655,7 @@ describe Mongoid::Criteria do
     context "when the per_page option does not exist" do
 
       before do
-        @criteria = Mongoid::Criteria.new(:all)
+        @criteria = Mongoid::Criteria.new(Person)
       end
 
       it "returns 1" do
@@ -625,34 +722,35 @@ describe Mongoid::Criteria do
 
     context "with a single argument" do
 
-      it "creates a criteria for an object id" do
-        id = Mongo::ObjectID.new.to_s
-        criteria = Mongoid::Criteria.translate(id)
-        criteria.selector.should == { :_id => id }
+      before do
+        @id = Mongo::ObjectID.new.to_s
+        @document = stub
+        @criteria = mock
+        Mongoid::Criteria.expects(:new).returns(@criteria)
+        @criteria.expects(:id).with(@id).returns(@criteria)
+        @criteria.expects(:one).returns(@document)
       end
 
       it "creates a criteria for a string" do
-        id = Mongo::ObjectID.new.to_s
-        criteria = Mongoid::Criteria.translate(id)
-        criteria.selector.should == { :_id => id }
+        Mongoid::Criteria.translate(Person, @id)
       end
 
     end
 
     context "multiple arguments" do
 
-      context "when :first, :conditions => {}" do
+      context "when Person, :conditions => {}" do
 
         before do
-          @criteria = Mongoid::Criteria.translate(:first, :conditions => { :title => "Test" })
+          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
           @criteria.selector.should == { :title => "Test" }
         end
 
-        it "returns a criteria with type :first" do
-          @criteria.type.should == :first
+        it "returns a criteria with klass Person" do
+          @criteria.klass.should == Person
         end
 
       end
@@ -660,15 +758,15 @@ describe Mongoid::Criteria do
       context "when :all, :conditions => {}" do
 
         before do
-          @criteria = Mongoid::Criteria.translate(:all, :conditions => { :title => "Test" })
+          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
           @criteria.selector.should == { :title => "Test" }
         end
 
-        it "returns a criteria with type :all" do
-          @criteria.type.should == :all
+        it "returns a criteria with klass Person" do
+          @criteria.klass.should == Person
         end
 
       end
@@ -676,23 +774,22 @@ describe Mongoid::Criteria do
       context "when :last, :conditions => {}" do
 
         before do
-          @criteria = Mongoid::Criteria.translate(:last, :conditions => { :title => "Test" })
+          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
           @criteria.selector.should == { :title => "Test" }
         end
 
-        it "returns a criteria with type :last" do
-          @criteria.type.should == :last
+        it "returns a criteria with klass Person" do
+          @criteria.klass.should == Person
         end
-
       end
 
       context "when options are provided" do
 
         before do
-          @criteria = Mongoid::Criteria.translate(:last, :conditions => { :title => "Test" }, :skip => 10)
+          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" }, :skip => 10)
         end
 
         it "adds the criteria and the options" do

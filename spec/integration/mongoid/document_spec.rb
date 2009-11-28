@@ -113,7 +113,7 @@ describe Mongoid::Document do
 
       it "returns an array of documents based on the selector provided" do
         documents = Person.find(:all, :conditions => { :title => "Test"})
-        documents[0].title.should == "Test"
+        documents.first.title.should == "Test"
       end
 
     end
@@ -181,8 +181,7 @@ describe Mongoid::Document do
     end
 
     it "returns a proper count" do
-      @criteria = Mongoid::Criteria.translate(:all, { :per_page => 20, :page => 1 })
-      @criteria.execute(Person)
+      @criteria = Mongoid::Criteria.translate(Person, { :per_page => 20, :page => 1 })
       @criteria.count.should == 30
     end
 

@@ -73,7 +73,7 @@ module Mongoid
     end
   end
 
-  # Raised when invalid options are passed into an association.
+  # Raised when invalid options are passed into a constructor.
   class InvalidOptionsError < RuntimeError; end
 
   # Connect to the database name supplied. This should be run

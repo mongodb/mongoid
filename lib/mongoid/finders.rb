@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
     def all(*args)
-      find(:all, *args)
+      find(*args)
     end
 
     # Returns a count of matching records in the database based on the
@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.count(:first, :conditions => { :attribute => "value" })</tt>
     def count(*args)
-      Criteria.translate(*args).count(self)
+      Criteria.translate(self, *args).count
     end
 
     # Find a +Document+ in several different ways.
@@ -33,7 +33,14 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
     def find(*args)
-      Criteria.translate(*args).execute(self)
+      type = args.delete_at(0) if args[0].is_a?(Symbol)
+      criteria = Criteria.translate(self, *args)
+      case type
+      when :first then return criteria.one
+      when :last then return criteria.last
+      else
+        return criteria
+      end
     end
 
     # Find the first +Document+ given the conditions.
@@ -44,7 +51,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.first(:conditions => { :attribute => "value" })</tt>
     def first(*args)
-      find(:first, *args)
+      find(*args).one
     end
 
     # Find the last +Document+ given the conditions.
@@ -55,8 +62,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.last(:conditions => { :attribute => "value" })</tt>
     def last(*args)
-      return find(:last, :conditions => {}, :sort => [[:_id, :desc]]) if args.empty?
-      return find(:last, *args) unless args.empty?
+      find(*args).last
     end
 
     # Will execute a +Criteria+ based on the +DynamicFinder+ that gets
@@ -73,7 +79,7 @@ module Mongoid #:nodoc:
     def method_missing(name, *args)
       dyna = DynamicFinder.new(name, *args)
       finder, conditions = dyna.finder, dyna.conditions
-      results = Criteria.translate(finder, :conditions => conditions).execute(self)
+      results = find(finder, :conditions => conditions)
       results ? results : dyna.create(self)
     end
 
@@ -91,7 +97,7 @@ module Mongoid #:nodoc:
     #
     # Returns paginated array of docs.
     def paginate(params = {})
-      Criteria.translate(:all, params).paginate(self)
+      Criteria.translate(self, params).paginate
     end
 
     # Entry point for creating a new criteria from a Document. This will
@@ -108,7 +114,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Criteria</tt>
     def select(*args)
-      Criteria.new(:all, self).select(*args)
+      Criteria.new(self).select(*args)
     end
 
   end

@@ -17,16 +17,14 @@ describe Mongoid::Finders do
   describe ".all" do
 
     before do
-      @cursor = stub(:count => 100)
-      @people = []
+      @conditions = { :conditions => { :test => "Test" } }
     end
 
     context "when a selector is provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with({ :test => "Test" }, {}).returns(@cursor)
-        @cursor.expects(:collect).returns(@people)
-        Person.all(:conditions => {:test => "Test"})
+        Mongoid::Criteria.expects(:translate).with(Person, @conditions)
+        Person.all(@conditions)
       end
 
     end
@@ -34,8 +32,7 @@ describe Mongoid::Finders do
     context "when a selector is not provided" do
 
       it "finds from the collection and instantiate objects for each returned" do
-        @collection.expects(:find).with({}, {}).returns(@cursor)
-        @cursor.expects(:collect).returns(@people)
+        Mongoid::Criteria.expects(:translate).with(Person, nil)
         Person.all
       end
 
@@ -46,21 +43,21 @@ describe Mongoid::Finders do
   describe ".count" do
 
     before do
-      @params = { :conditions => { :title => "Sir" } }
+      @conditions = { :conditions => { :title => "Sir" } }
       @criteria = mock
     end
 
     it "delegates to the criteria api" do
-      Mongoid::Criteria.expects(:translate).with(@params).returns(@criteria)
-      @criteria.expects(:count).with(Person).returns(10)
-      Person.count(@params).should == 10
+      Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
+      @criteria.expects(:count).returns(10)
+      Person.count(@conditions).should == 10
     end
 
     context "when no options provided" do
 
       it "adds in the default parameters" do
-        Mongoid::Criteria.expects(:translate).with(nil).returns(@criteria)
-        @criteria.expects(:count).with(Person).returns(10)
+        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
+        @criteria.expects(:count).returns(10)
         Person.count.should == 10
       end
 
@@ -82,8 +79,7 @@ describe Mongoid::Finders do
       end
 
       it "delegates to criteria" do
-        Mongoid::Criteria.expects(:translate).with(@id.to_s).returns(@criteria)
-        @criteria.expects(:execute).with(Person).returns(@attributes)
+        Mongoid::Criteria.expects(:translate).with(Person, @id.to_s).returns(Person.new)
         Person.find(@id.to_s)
       end
 
@@ -92,8 +88,8 @@ describe Mongoid::Finders do
     context "when finding first" do
 
       it "delegates to criteria" do
-        Mongoid::Criteria.expects(:translate).with(:first, :conditions => { :test => "Test" }).returns(@criteria)
-        @criteria.expects(:execute).with(Person).returns(@attributes)
+        Mongoid::Criteria.expects(:translate).with(Person, :conditions => { :test => "Test" }).returns(@criteria)
+        @criteria.expects(:one).returns(@attributes)
         Person.find(:first, :conditions => { :test => "Test" })
       end
 
@@ -102,14 +98,12 @@ describe Mongoid::Finders do
     context "when finding all" do
 
       before do
-        @cursor = stub(:count => 100)
-        @people = []
+        @conditions = { :conditions => { :test => "Test" } }
       end
 
       it "delegates to find_all" do
-        @collection.expects(:find).with({:test => "Test"}, {}).returns(@cursor)
-        @cursor.expects(:collect).returns(@people)
-        Person.find(:all, :conditions => { :test => "Test" })
+        Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
+        Person.find(:all, @conditions)
       end
 
     end
@@ -117,14 +111,12 @@ describe Mongoid::Finders do
     context "when sorting" do
 
       before do
-        @cursor = stub(:count => 50)
-        @people = []
+        @conditions = { :conditions => { :test => "Test" }, :sort => { :test => -1 } }
       end
 
       it "adds the sort parameters for the collection call" do
-        @collection.expects(:find).with({ :test => "Test" }, { :sort => { :test => -1 }}).returns(@cursor)
-        @cursor.expects(:collect).returns(@people)
-        Person.find(:all, :conditions => { :test => "Test" }, :sort => { :test => -1 })
+        Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
+        Person.find(:all, @conditions)
       end
     end
 
@@ -133,11 +125,12 @@ describe Mongoid::Finders do
   describe ".find_by_id" do
 
     before do
-      @criteria = stub_everything
+      @criteria = mock
     end
 
     it "delegates to find with an id parameter" do
-      Mongoid::Criteria.expects(:translate).with(:first, :conditions => { "_id" => "1" }).returns(@criteria)
+      Mongoid::Criteria.expects(:translate).with(Person, :conditions => { "_id" => "1" }).returns(@criteria)
+      @criteria.expects(:one).returns(Person.new)
       Person.find_by_id("1")
     end
 
@@ -146,14 +139,16 @@ describe Mongoid::Finders do
   describe ".first" do
 
     before do
-      @attributes = { "age" => 100 }
+      @criteria = mock
+      @conditions = { :conditions => { :test => "Test" } }
     end
 
     context "when a selector is provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        @collection.expects(:find_one).with({ :test => "Test" }, {}).returns(@attributes)
-        Person.first(:conditions => {:test => "Test"}).attributes.except(:_id).should == @attributes
+        Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
+        @criteria.expects(:one)
+        Person.first(@conditions)
       end
 
     end
@@ -161,8 +156,9 @@ describe Mongoid::Finders do
     context "when a selector is not provided" do
 
       it "finds the first document from the collection and instantiates it" do
-        @collection.expects(:find_one).with({}, {}).returns(@attributes)
-        Person.first.attributes.except(:_id).should == @attributes
+        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
+        @criteria.expects(:one)
+        Person.first
       end
 
     end
@@ -172,12 +168,13 @@ describe Mongoid::Finders do
   describe ".last" do
 
     before do
-      @attributes = { :_id => 1, :title => "Sir" }
-      @collection.expects(:find_one).with({}, :sort => [[:_id, :desc]]).returns(@attributes)
+      @criteria = mock
     end
 
     it "finds the last document by the id" do
-      Person.last.should == Person.instantiate(@attributes)
+      Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
+      @criteria.expects(:last)
+      Person.last
     end
 
   end
@@ -193,8 +190,8 @@ describe Mongoid::Finders do
       end
 
       it "executes the finder" do
-        Mongoid::Criteria.expects(:translate).with(:first, :conditions => @conditions).returns(@criteria)
-        @criteria.expects(:execute).with(Person).returns(@document)
+        Mongoid::Criteria.expects(:translate).with(Person, :conditions => @conditions).returns(@criteria)
+        @criteria.expects(:one).returns(@document)
         Person.find_by_title_and_age("Sir", 30)
       end
 
@@ -211,8 +208,8 @@ describe Mongoid::Finders do
       context "when document is found" do
 
         it "returns the document" do
-          Mongoid::Criteria.expects(:translate).with(:first, :conditions => @conditions).returns(@criteria)
-          @criteria.expects(:execute).with(Person).returns(@document)
+          Mongoid::Criteria.expects(:translate).with(Person, :conditions => @conditions).returns(@criteria)
+          @criteria.expects(:one).returns(@document)
           Person.find_or_initialize_by_title_and_age("Sir", 30).should == @document
         end
 
@@ -221,8 +218,8 @@ describe Mongoid::Finders do
       context "when document is not found" do
 
         it "instantiates a new document" do
-          Mongoid::Criteria.expects(:translate).with(:first, :conditions => @conditions).returns(@criteria)
-          @criteria.expects(:execute).with(Person).returns(nil)
+          Mongoid::Criteria.expects(:translate).with(Person, :conditions => @conditions).returns(@criteria)
+          @criteria.expects(:one).returns(nil)
           new_doc = Person.find_or_initialize_by_title_and_age("Sir", 30)
           new_doc.new_record?.should be_true
           new_doc.title.should == "Sir"
@@ -248,8 +245,8 @@ describe Mongoid::Finders do
       end
 
       it "delegates to will paginate with the results" do
-        Mongoid::Criteria.expects(:translate).with(:all, @params).returns(@criteria)
-        @criteria.expects(:paginate).with(Person).returns([])
+        Mongoid::Criteria.expects(:translate).with(Person, @params).returns(@criteria)
+        @criteria.expects(:paginate).returns([])
         Person.paginate(@params)
       end
 
@@ -262,8 +259,8 @@ describe Mongoid::Finders do
       end
 
       it "delegates to will paginate with default values" do
-        Mongoid::Criteria.expects(:translate).with(:all, @params).returns(@criteria)
-        @criteria.expects(:paginate).with(Person).returns([])
+        Mongoid::Criteria.expects(:translate).with(Person, @params).returns(@criteria)
+        @criteria.expects(:paginate).returns([])
         Person.paginate(:conditions => { :test => "Test" })
       end
 
