@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
       when Criteria
         self.selector == other.selector && self.options == other.options
       when Enumerable
-        execute
+        @collection ||= execute
         return (@collection == other)
       else
         return false
@@ -83,7 +83,7 @@ module Mongoid #:nodoc:
     def count
       return @count if @count
       @klass = klass if klass
-      return @klass.collection.find(@selector, @options.dup).count
+      @count ||= @klass.collection.find(@selector, @options.dup).count
     end
 
     # Iterate over each +Document+ in the results. This can take an optional
@@ -464,9 +464,9 @@ module Mongoid #:nodoc:
       attributes = @klass.collection.find(@selector, @options.dup)
       if attributes
         @count = attributes.count
-        @collection = attributes.collect { |doc| @klass.instantiate(doc) }
+        attributes.collect { |doc| @klass.instantiate(doc) }
       else
-        @collection = []
+        []
       end
     end
 
