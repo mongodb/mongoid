@@ -138,7 +138,7 @@ module Mongoid # :nodoc:
         )
       end
 
-      private
+      protected
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.
       def add_association(type, options)
