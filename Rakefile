@@ -12,11 +12,15 @@ begin
     gem.email = "durran@gmail.com"
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
+
     gem.add_dependency("durran-validatable", "1.8.2")
     gem.add_dependency("leshill-will_paginate", "2.3.11")
     gem.add_dependency("activesupport", "2.3.4")
     gem.add_dependency("mongo", "0.17.1")
     gem.add_dependency("mongo_ext", "0.17.1")
+
+    gem.add_development_dependency("rspec", "1.2.9")
+    gem.add_development_dependency("mocha", "0.9.8")
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
@@ -25,13 +29,13 @@ end
 
 Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.pattern = "spec/**/*_spec.rb"
-  spec.spec_opts = ['--options', "spec/spec.opts"]
+  spec.spec_opts = ["--options", "spec/spec.opts"]
 end
 
 Spec::Rake::SpecTask.new(:rcov) do |spec|
   spec.libs << "lib" << "spec"
   spec.pattern = "spec/**/*_spec.rb"
-  spec.spec_opts = ['--options', "spec/spec.opts"]
+  spec.spec_opts = ["--options", "spec/spec.opts"]
   spec.rcov = true
 end
 
@@ -48,4 +52,5 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-task :default => ["rcov", "metrics:all"]
+task :default => ["spec"]
+task :metrics => ["rcov", "metrics:all"]
