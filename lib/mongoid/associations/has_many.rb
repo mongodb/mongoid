@@ -82,6 +82,11 @@ module Mongoid #:nodoc:
       end
 
       class << self
+        # Returns the macro used to create the association.
+        def macro
+          :has_many
+        end
+
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting the has_many to the supplied +Enumerable+
         # and setting up the parentization.

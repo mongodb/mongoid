@@ -91,6 +91,21 @@ module Mongoid # :nodoc:
         add_association(Associations::HasOne, Associations::Options.new(options.merge(:name => name)))
       end
 
+      # Returns the macro associated with the supplied association name. This
+      # will return has_one, has_many, belongs_to or nil.
+      #
+      # Options:
+      #
+      # name: The association name.
+      #
+      # Example:
+      #
+      # <tt>Person.reflect_on_association(:addresses)</tt>
+      def reflect_on_association(name)
+        association = associations[name]
+        association ? association.macro : nil
+      end
+
       private
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association.

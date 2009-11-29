@@ -50,7 +50,15 @@ describe Mongoid::Associations::BelongsTo do
 
   end
 
-  describe "#update" do
+  describe ".macro" do
+
+    it "returns :belongs_to" do
+      Mongoid::Associations::BelongsTo.macro.should == :belongs_to
+    end
+
+  end
+
+  describe ".update" do
 
     context "when child is a has one" do
 

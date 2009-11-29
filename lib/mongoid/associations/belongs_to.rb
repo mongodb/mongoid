@@ -22,6 +22,11 @@ module Mongoid #:nodoc:
       end
 
       class << self
+        # Returns the macro used to create the association.
+        def macro
+          :belongs_to
+        end
+
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
         # +Document+. Will properly set a has_one or a has_many.

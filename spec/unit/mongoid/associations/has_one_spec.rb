@@ -77,7 +77,15 @@ describe Mongoid::Associations::HasOne do
 
   end
 
-  describe "#update" do
+  describe ".macro" do
+
+    it "returns :has_many" do
+      Mongoid::Associations::HasOne.macro.should == :has_one
+    end
+
+  end
+
+  describe ".update" do
 
     before do
       @name = Name.new(:first_name => "Donald")

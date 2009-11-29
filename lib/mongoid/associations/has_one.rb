@@ -35,6 +35,11 @@ module Mongoid #:nodoc:
       end
 
       class << self
+        # Returns the macro used to create the association.
+        def macro
+          :has_one
+        end
+
         # Perform an update of the relationship of the parent and child. This
         # will assimilate the child +Document+ into the parent's object graph.
         #

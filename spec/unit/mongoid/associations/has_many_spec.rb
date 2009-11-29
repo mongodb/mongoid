@@ -116,21 +116,6 @@ describe Mongoid::Associations::HasMany do
 
   end
 
-  describe "#push" do
-
-    before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
-      @address = Address.new
-    end
-
-    it "adds the parent document before appending to the array" do
-      @association.push @address
-      @association.length.should == 3
-      @address.parent.should == @document
-    end
-
-  end
-
   describe "#find" do
 
     before do
@@ -207,6 +192,14 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe ".macro" do
+
+    it "returns :has_many" do
+      Mongoid::Associations::HasMany.macro.should == :has_many
+    end
+
+  end
+
   describe "#push" do
 
     before do
@@ -214,6 +207,13 @@ describe Mongoid::Associations::HasMany do
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
+      @address = Address.new
+    end
+
+    it "adds the parent document before appending to the array" do
+      @association.push @address
+      @association.length.should == 3
+      @address.parent.should == @document
     end
 
     it "appends the document to the end of the array" do
@@ -223,7 +223,7 @@ describe Mongoid::Associations::HasMany do
 
   end
 
-  describe "#update" do
+  describe ".update" do
 
     before do
       @address = Address.new(:street => "Madison Ave")
