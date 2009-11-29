@@ -261,16 +261,36 @@ describe Mongoid::Document do
 
   context "associating relational data" do
 
-    before do
-      @game = Game.create(:score => 100)
-      @person = Person.new(:title => "Sir")
-      @person.game = @game
-      @person.save
+    context "when relational data is a single object" do
+
+      before do
+        @game = Game.create(:score => 100)
+        @person = Person.new(:title => "Sir")
+        @person.game = @game
+        @person.save
+      end
+
+      it "properly associates the object" do
+        person = Person.find(@person.id)
+        person.game.should == @game
+      end
+
     end
 
-    it "properly associates the object" do
-      person = Person.find(@person.id)
-      person.game.should == @game
+    context "when relational data is many objects" do
+
+      before do
+        @post = Post.create(:title => "New Post")
+        @person = Person.new(:title => "Sir")
+        @person.posts = [@post]
+        @person.save
+      end
+
+      it "properly associates the objects" do
+        person = Person.find(@person.id)
+        person.posts.should == [@post]
+      end
+
     end
 
   end

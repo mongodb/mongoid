@@ -248,4 +248,12 @@ describe Mongoid::Associations do
 
   end
 
+  describe ".relates_to_many" do
+
+    it "creates an id field for the relationship" do
+      Person.new.should respond_to(:posts_ids)
+    end
+
+  end
+
 end

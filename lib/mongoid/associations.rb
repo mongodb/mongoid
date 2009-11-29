@@ -3,6 +3,7 @@ require "mongoid/associations/accessor"
 require "mongoid/associations/belongs_to"
 require "mongoid/associations/has_many"
 require "mongoid/associations/has_one"
+require "mongoid/associations/relates_to_many"
 require "mongoid/associations/relates_to_one"
 
 module Mongoid # :nodoc:
@@ -117,7 +118,7 @@ module Mongoid # :nodoc:
       end
 
       # Adds a relational association from the Document to a Document in
-      # another database or collectio.
+      # another database or collection.
       #
       # Options:
       #
@@ -134,6 +135,28 @@ module Mongoid # :nodoc:
         index "#{name.to_s}_id"
         add_association(
           Associations::RelatesToOne,
+          Associations::Options.new(options.merge(:name => name))
+        )
+      end
+
+      # Adds a relational association from the Document to many Documents in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name pluralized.
+      #
+      # Example:
+      #
+      #   class Person < Mongoid::Document
+      #     relates_to_many :posts
+      #   end
+      #
+      def relates_to_many(name, options = {})
+        field "#{name.to_s}_ids", :type => Array
+        index "#{name.to_s}_ids"
+        add_association(
+          Associations::RelatesToMany,
           Associations::Options.new(options.merge(:name => name))
         )
       end
