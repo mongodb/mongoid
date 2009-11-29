@@ -240,4 +240,12 @@ describe Mongoid::Associations do
 
   end
 
+  describe ".relates_to_one" do
+
+    it "creates an id field for the relationship" do
+      Person.new.should respond_to(:game_id)
+    end
+
+  end
+
 end

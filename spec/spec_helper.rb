@@ -36,6 +36,8 @@ class Person < Mongoid::Document
   has_one :name
   has_one :pet, :class_name => "Animal"
 
+  relates_to_one :game
+
   def update_addresses
     addresses.each_with_index do |address, i|
       address.street = "Updated #{i}"

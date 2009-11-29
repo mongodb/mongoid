@@ -259,6 +259,22 @@ describe Mongoid::Document do
 
   end
 
+  context "associating relational data" do
+
+    before do
+      @game = Game.create(:score => 100)
+      @person = Person.new(:title => "Sir")
+      @person.game = @game
+      @person.save
+    end
+
+    it "properly associates the object" do
+      person = Person.find(@person.id)
+      person.game.should == @game
+    end
+
+  end
+
   context "the lot" do
 
     before do

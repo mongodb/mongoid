@@ -3,6 +3,7 @@ require "mongoid/associations/accessor"
 require "mongoid/associations/belongs_to"
 require "mongoid/associations/has_many"
 require "mongoid/associations/has_one"
+require "mongoid/associations/relates_to_one"
 
 module Mongoid # :nodoc:
   module Associations #:nodoc:
@@ -46,7 +47,10 @@ module Mongoid # :nodoc:
           raise InvalidOptionsError.new("Options for belongs_to association must include :inverse_of")
         end
         @embedded = true
-        add_association(Associations::BelongsTo, Associations::Options.new(options.merge(:name => name)))
+        add_association(
+          Associations::BelongsTo,
+          Associations::Options.new(options.merge(:name => name))
+        )
       end
 
       # Adds the association from a parent document to its children. The name
@@ -67,7 +71,10 @@ module Mongoid # :nodoc:
       #     belongs_to :person, :inverse_of => :addresses
       #   end
       def has_many(name, options = {})
-        add_association(Associations::HasMany, Associations::Options.new(options.merge(:name => name)))
+        add_association(
+          Associations::HasMany,
+          Associations::Options.new(options.merge(:name => name))
+        )
       end
 
       # Adds the association from a parent document to its child. The name
@@ -88,7 +95,10 @@ module Mongoid # :nodoc:
       #     belongs_to :person
       #   end
       def has_one(name, options = {})
-        add_association(Associations::HasOne, Associations::Options.new(options.merge(:name => name)))
+        add_association(
+          Associations::HasOne,
+          Associations::Options.new(options.merge(:name => name))
+        )
       end
 
       # Returns the macro associated with the supplied association name. This
@@ -104,6 +114,28 @@ module Mongoid # :nodoc:
       def reflect_on_association(name)
         association = associations[name]
         association ? association.macro : nil
+      end
+
+      # Adds a relational association from the Document to a Document in
+      # another database or collectio.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name.
+      #
+      # Example:
+      #
+      #   class Person < Mongoid::Document
+      #     relates_to_one :game
+      #   end
+      #
+      def relates_to_one(name, options = {})
+        field "#{name.to_s}_id"
+        index "#{name.to_s}_id"
+        add_association(
+          Associations::RelatesToOne,
+          Associations::Options.new(options.merge(:name => name))
+        )
       end
 
       private
