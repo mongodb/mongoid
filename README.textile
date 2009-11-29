@@ -36,10 +36,14 @@ Example of a simple domain model:
 <pre>
   class Person < Mongoid::Document
     include Mongoid::Versioning
+
     field :title
     field :age, :type => Integer, :default => 0
+
     has_many :addresses
     has_one :name
+
+    relates_to_many :posts
   end
 
   class Address < Mongoid::Document
@@ -55,6 +59,13 @@ Example of a simple domain model:
     field :first_name
     field :last_name
     belongs_to :person, :inverse_of => :name
+  end
+
+  class Post < Mongoid::Document
+    include Mongoid::Timestamps
+    field :title
+    field :text
+    field :tags, :type => Array
   end
 </pre>
 
