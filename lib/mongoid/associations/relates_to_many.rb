@@ -10,7 +10,8 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options)
-        @documents = options.klass.criteria.in(:_id => document.send("#{options.name}_ids"))
+        name = document.class.to_s.foreign_key
+        @documents = options.klass.all(:conditions => { name => document.id })
         super(@documents)
       end
 
@@ -32,8 +33,9 @@ module Mongoid #:nodoc:
         # Example:
         #
         # <tt>RelatesToOne.update(game, person, options)</tt>
-        def update(related, parent, options)
-          parent.send("#{options.name}_ids=", related.collect(&:id))
+        def update(related, document, options)
+          name = document.class.to_s.underscore
+          related.each { |child| child.send("#{name}=", document) }
         end
       end
 

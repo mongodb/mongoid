@@ -153,8 +153,6 @@ module Mongoid # :nodoc:
       #   end
       #
       def relates_to_many(name, options = {})
-        field "#{name.to_s}_ids", :type => Array
-        index "#{name.to_s}_ids"
         add_association(
           Associations::RelatesToMany,
           Associations::Options.new(options.merge(:name => name))

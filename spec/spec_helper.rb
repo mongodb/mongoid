@@ -136,6 +136,7 @@ end
 class Post < Mongoid::Document
   include Mongoid::Versioning
   field :title
+  relates_to_one :person
 end
 
 class Game < Mongoid::Document

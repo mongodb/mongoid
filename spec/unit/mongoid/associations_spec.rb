@@ -246,12 +246,18 @@ describe Mongoid::Associations do
       Person.new.should respond_to(:game_id)
     end
 
+    it "creates a getter and setter for the relationship" do
+      Person.new.should respond_to(:game)
+      Person.new.should respond_to(:game=)
+    end
+
   end
 
   describe ".relates_to_many" do
 
-    it "creates an id field for the relationship" do
-      Person.new.should respond_to(:posts_ids)
+    it "creates a getter and setter for the relationship" do
+      Person.new.should respond_to(:posts)
+      Person.new.should respond_to(:posts=)
     end
 
   end

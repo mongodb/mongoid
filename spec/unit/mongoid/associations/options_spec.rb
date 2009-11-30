@@ -15,6 +15,19 @@ describe Mongoid::Associations::Options do
 
   end
 
+  describe "#foreign_key" do
+
+    before do
+      @attributes = { :name => :game }
+      @options = Mongoid::Associations::Options.new(@attributes)
+    end
+
+    it "returns the association foreign_key" do
+      @options.foreign_key.should == "game_id"
+    end
+
+  end
+
   describe "#inverse_of" do
 
     before do

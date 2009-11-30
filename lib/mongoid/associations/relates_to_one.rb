@@ -11,7 +11,7 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options)
-        @document = options.klass.find(document.send("#{options.name}_id"))
+        @document = options.klass.find(document.send(options.foreign_key))
         decorate!
       end
 
@@ -34,7 +34,7 @@ module Mongoid #:nodoc:
         #
         # <tt>RelatesToOne.update(game, person, options)</tt>
         def update(related, parent, options)
-          parent.send("#{options.name}_id=", related.id)
+          parent.send("#{options.foreign_key}=", related.id)
         end
       end
 

@@ -284,6 +284,7 @@ describe Mongoid::Document do
         @person = Person.new(:title => "Sir")
         @person.posts = [@post]
         @person.save
+        @post.save
       end
 
       it "properly associates the objects" do

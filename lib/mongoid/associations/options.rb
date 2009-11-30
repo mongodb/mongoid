@@ -8,9 +8,9 @@ module Mongoid #:nodoc:
         @attributes = attributes
       end
 
-      # Returns the association name of the options.
-      def name
-        @attributes[:name]
+      # Return the foreign key based off the association name.
+      def foreign_key
+        name.to_s.foreign_key
       end
 
       # Returns the name of the inverse_of association
@@ -24,6 +24,11 @@ module Mongoid #:nodoc:
       def klass
         class_name = @attributes[:class_name]
         class_name ? class_name.constantize : name.to_s.classify.constantize
+      end
+
+      # Returns the association name of the options.
+      def name
+        @attributes[:name]
       end
 
       # Returns whether or not this association is polymorphic.
