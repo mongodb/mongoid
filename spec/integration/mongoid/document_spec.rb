@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "/../../spec_helper.rb"))
+require "spec_helper"
 
 describe Mongoid::Document do
 
@@ -280,7 +280,7 @@ describe Mongoid::Document do
     context "when relational data is many objects" do
 
       before do
-        @post = Post.create(:title => "New Post")
+        @post = Post.new(:title => "New Post")
         @person = Person.new(:title => "Sir")
         @person.posts = [@post]
         @person.save

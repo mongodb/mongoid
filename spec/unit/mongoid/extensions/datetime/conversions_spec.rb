@@ -1,6 +1,15 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "/../../../../spec_helper.rb"))
+require "spec_helper"
 
 describe Mongoid::Extensions::DateTime::Conversions do
+
+  before do
+    Time.zone = "Eastern Time (US & Canada)"
+    @time = Time.local(1976, 11, 19)
+  end
+
+  after do
+    Time.zone = nil
+  end
 
   describe "#set" do
 
@@ -35,10 +44,6 @@ describe Mongoid::Extensions::DateTime::Conversions do
   end
 
   describe "#get" do
-
-    before do
-      @time = Time.now.utc
-    end
 
     context "when time is provided" do
 
