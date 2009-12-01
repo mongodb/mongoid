@@ -71,6 +71,9 @@ Example of a simple domain model:
     field :text
     field :tags, :type => Array
   end
+
+  class Game < ActiveRecord::Base
+  end
 </pre>
 
 Mongoid supports all the basic ActiveRecord creation and persistence methods.
