@@ -132,7 +132,8 @@ New School:
 <pre>
   Person.select(:first_name, :last_name).where(:title => "Sir").skip(10).limit(10).paginate
   Person.select(:title).aggregate
-  Criteria.translate(:conditions => { :title => "Sir" }).execute
+  Person.select(:first_name).order_by([[:first_name, :asc]])
+  Criteria.translate(:conditions => { :title => "Sir" })
 </pre>
 
 Chaining Scopes:
