@@ -457,6 +457,34 @@ describe Mongoid::Criteria do
 
     end
 
+    context "when expecting behaviour of an array" do
+
+      before do
+        @array = mock
+        @document = mock
+      end
+
+      describe "#[]" do
+
+        it "collects the criteria and calls []" do
+          @criteria.expects(:collect).returns([@document])
+          @criteria[0].should == @document
+        end
+
+      end
+
+      describe "#rand" do
+
+        it "collects the criteria and call rand" do
+          @criteria.expects(:collect).returns(@array)
+          @array.expects(:send).with(:rand).returns(@document)
+          @criteria.rand
+        end
+
+      end
+
+    end
+
   end
 
   describe "#not_in" do

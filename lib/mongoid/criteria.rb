@@ -292,9 +292,13 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Criteria</tt>
     def method_missing(name, *args)
-      new_scope = @klass.send(name)
-      new_scope.merge(self)
-      new_scope
+      if @klass.respond_to?(name)
+        new_scope = @klass.send(name)
+        new_scope.merge(self)
+        return new_scope
+      else
+        return collect.send(name, *args)
+      end
     end
 
     # Adds a criterion to the +Criteria+ that specifies values where none
@@ -365,11 +369,6 @@ module Mongoid #:nodoc:
     # Returns the number of results per page or the default of 20.
     def per_page
       (@options[:limit] || 20).to_i
-    end
-
-    # Execute the criteria and collect in order to handle random requests.
-    def rand
-      collect.rand
     end
 
     # Adds a criterion to the +Criteria+ that specifies the fields that will
