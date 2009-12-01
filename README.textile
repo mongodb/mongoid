@@ -46,6 +46,7 @@ Example of a simple domain model:
     has_many :addresses
     has_one :name
 
+    relates_to_one :game
     relates_to_many :posts
   end
 
