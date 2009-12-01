@@ -367,6 +367,11 @@ module Mongoid #:nodoc:
       (@options[:limit] || 20).to_i
     end
 
+    # Execute the criteria and collect in order to handle random requests.
+    def rand
+      collect.rand
+    end
+
     # Adds a criterion to the +Criteria+ that specifies the fields that will
     # get returned from the Document. Used mainly for list views that do not
     # require all fields to be present. This is similar to SQL "SELECT" values.
