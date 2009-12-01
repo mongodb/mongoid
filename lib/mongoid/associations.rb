@@ -16,8 +16,14 @@ module Mongoid # :nodoc:
     end
 
     module InstanceMethods
+      # Returns the associations for the +Document+.
       def associations
         self.class.associations
+      end
+
+      # Updates all the relational associations for the document.
+      def update_associations(name)
+        send(name).each { |doc| doc.save }
       end
     end
 
@@ -157,6 +163,9 @@ module Mongoid # :nodoc:
           Associations::RelatesToMany,
           Associations::Options.new(options.merge(:name => name))
         )
+        before_save do |document|
+          document.update_associations(name)
+        end
       end
 
       protected
@@ -172,7 +181,11 @@ module Mongoid # :nodoc:
         end
         define_method("#{name}=") do |object|
           proxy = Associations::Accessor.set(type, self, object, options)
-          remove_instance_variable("@#{name}") if instance_variable_defined?("@#{name}")
+          if instance_variable_defined?("@#{name}")
+            remove_instance_variable("@#{name}")
+          else
+            instance_variable_set("@#{name}", proxy)
+          end
         end
       end
     end

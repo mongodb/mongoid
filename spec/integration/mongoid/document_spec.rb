@@ -188,18 +188,18 @@ describe Mongoid::Document do
   describe "#paginate" do
 
     before do
-      30.times do |num|
+      10.times do |num|
         Person.create(:title => "Test-#{num}")
       end
     end
 
     it "returns paginated documents" do
-      Person.paginate(:per_page => 20, :page => 2).length.should == 10
+      Person.paginate(:per_page => 5, :page => 2).length.should == 5
     end
 
     it "returns a proper count" do
-      @criteria = Mongoid::Criteria.translate(Person, { :per_page => 20, :page => 1 })
-      @criteria.count.should == 30
+      @criteria = Mongoid::Criteria.translate(Person, { :per_page => 5, :page => 1 })
+      @criteria.count.should == 10
     end
 
   end
@@ -284,7 +284,6 @@ describe Mongoid::Document do
         @person = Person.new(:title => "Sir")
         @person.posts = [@post]
         @person.save
-        @post.save
       end
 
       it "properly associates the objects" do
