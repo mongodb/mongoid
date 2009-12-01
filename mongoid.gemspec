@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.9.2"
+  s.version = "0.9.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-11-28}
+  s.date = %q{2009-11-30}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -29,6 +29,8 @@ Gem::Specification.new do |s|
      "lib/mongoid/associations/has_many.rb",
      "lib/mongoid/associations/has_one.rb",
      "lib/mongoid/associations/options.rb",
+     "lib/mongoid/associations/relates_to_many.rb",
+     "lib/mongoid/associations/relates_to_one.rb",
      "lib/mongoid/attributes.rb",
      "lib/mongoid/commands.rb",
      "lib/mongoid/commands/create.rb",
@@ -74,6 +76,8 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/has_many_spec.rb",
      "spec/unit/mongoid/associations/has_one_spec.rb",
      "spec/unit/mongoid/associations/options_spec.rb",
+     "spec/unit/mongoid/associations/relates_to_many_spec.rb",
+     "spec/unit/mongoid/associations/relates_to_one_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
@@ -122,6 +126,8 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations/has_many_spec.rb",
      "spec/unit/mongoid/associations/has_one_spec.rb",
      "spec/unit/mongoid/associations/options_spec.rb",
+     "spec/unit/mongoid/associations/relates_to_many_spec.rb",
+     "spec/unit/mongoid/associations/relates_to_one_spec.rb",
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
