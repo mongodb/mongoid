@@ -70,6 +70,7 @@ Example of a simple domain model:
     field :title
     field :text
     field :tags, :type => Array
+    relates_to_one :person
   end
 
   class Game < ActiveRecord::Base
