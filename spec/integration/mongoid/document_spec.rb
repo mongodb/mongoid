@@ -407,4 +407,31 @@ describe Mongoid::Document do
 
   end
 
+  context "executing criteria with date comparisons" do
+
+    context "handling specific dates" do
+
+      before do
+        @person = Person.create(:dob => Date.new(2000, 10, 31))
+      end
+
+      it "handles comparisons with todays date"do
+        people = Person.select.where("this.dob < new Date()")
+        people.first.should == @person
+      end
+
+      it "handles conparisons with a date range" do
+        people = Person.select.where("new Date(1976, 10, 31) < this.dob && this.dob < new Date()")
+        people.first.should == @person
+      end
+
+      it "handles false comparisons in a date range" do
+        people = Person.select.where("new Date(2005, 10, 31) < this.dob && this.dob < new Date()")
+        people.should be_empty
+      end
+
+    end
+
+  end
+
 end

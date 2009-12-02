@@ -73,6 +73,25 @@ module Mongoid #:nodoc:
       selections.each { |key, value| @selector[key] = { "$all" => value } }; self
     end
 
+    # Adds a criterion to the +Criteria+ that specifies values that must
+    # be matched in order to return results. This is similar to a SQL "WHERE"
+    # clause. This is the actual selector that will be provided to MongoDB,
+    # similar to the Javascript object that is used when performing a find()
+    # in the MongoDB console.
+    #
+    # Options:
+    #
+    # selectior: A +Hash+ that must match the attributes of the +Document+.
+    #
+    # Example:
+    #
+    # <tt>criteria.and(:field1 => "value1", :field2 => 15)</tt>
+    #
+    # Returns: <tt>self</tt>
+    def and(selector = nil)
+      where(selector)
+    end
+
     # Get the count of matching documents in the database for the +Criteria+.
     #
     # Example:
@@ -447,8 +466,14 @@ module Mongoid #:nodoc:
     # <tt>criteria.where(:field1 => "value1", :field2 => 15)</tt>
     #
     # Returns: <tt>self</tt>
-    def where(selector = {})
-      @selector = selector; self
+    def where(selector = nil)
+      case selector
+      when String
+        @selector.update("$where" => selector)
+      else
+        @selector.update(selector || {})
+      end
+      self
     end
 
     protected

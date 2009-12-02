@@ -54,6 +54,32 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#and" do
+
+    context "when provided a hash" do
+
+      it "adds the clause to the selector" do
+        @criteria.and(:title => "Title", :text => "Text")
+        @criteria.selector.should == { :title => "Title", :text => "Text" }
+      end
+
+    end
+
+    context "when provided a string" do
+
+      it "adds the $where clause to the selector" do
+        @criteria.and("this.date < new Date()")
+        @criteria.selector.should == { "$where" => "this.date < new Date()" }
+      end
+
+    end
+
+    it "returns self" do
+      @criteria.and.should == @criteria
+    end
+
+  end
+
   describe "#collect" do
 
     context "filtering" do
@@ -821,9 +847,22 @@ describe Mongoid::Criteria do
 
   describe "#where" do
 
-    it "adds the clause to the selector" do
-      @criteria.where(:title => "Title", :text => "Text")
-      @criteria.selector.should == { :title => "Title", :text => "Text" }
+    context "when provided a hash" do
+
+      it "adds the clause to the selector" do
+        @criteria.where(:title => "Title", :text => "Text")
+        @criteria.selector.should == { :title => "Title", :text => "Text" }
+      end
+
+    end
+
+    context "when provided a string" do
+
+      it "adds the $where clause to the selector" do
+        @criteria.where("this.date < new Date()")
+        @criteria.selector.should == { "$where" => "this.date < new Date()" }
+      end
+
     end
 
     it "returns self" do
