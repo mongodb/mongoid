@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   class DynamicFinder
     # Regex for standard dynamic finder methods.

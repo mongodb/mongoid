@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   module Finders #:nodoc:
     # Find +Documents+ given the conditions.

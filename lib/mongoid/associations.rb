@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "mongoid/associations/decorator"
 require "mongoid/associations/accessor"
 require "mongoid/associations/belongs_to"

@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "mongoid/extensions/array/assimilation"
 require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/array/parentization"

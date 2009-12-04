@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Integer #:nodoc:

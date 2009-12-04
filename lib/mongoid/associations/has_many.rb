@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasMany < DelegateClass(Array) #:nodoc:

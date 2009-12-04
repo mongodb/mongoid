@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   module Attributes #:nodoc:
     # Process the provided attributes casting them to their proper values if a

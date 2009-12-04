@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   # Include this module to get automatic versioning of root level documents.
   # This will add a version field to the +Document+ and a has_many association
