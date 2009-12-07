@@ -81,9 +81,9 @@ module Mongoid #:nodoc:
       end
 
       # Instantiate a new object, only when loaded from the database.
-      def instantiate(attrs = {})
+      def instantiate(attrs = {}, allocating = false)
         attributes = attrs.with_indifferent_access
-        if attributes[:_id]
+        if attributes[:_id] || allocating
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
           return document
@@ -140,7 +140,7 @@ module Mongoid #:nodoc:
     # Clone the current +Document+. This will return all attributes with the
     # exception of the document's id and versions.
     def clone
-      self.class.new(@attributes.except(:_id).except(:versions).dup)
+      self.class.instantiate(@attributes.except(:_id).except(:versions).dup, true)
     end
 
     # Get the Mongo::Collection associated with this Document.

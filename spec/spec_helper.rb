@@ -124,6 +124,7 @@ end
 class Comment < Mongoid::Document
   include Mongoid::Versioning
   field :text
+  key :text
 end
 
 class Decorated

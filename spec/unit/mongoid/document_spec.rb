@@ -253,30 +253,13 @@ describe Mongoid::Document do
 
   describe ".instantiate" do
 
-    context "when document is new" do
-
-      before do
-        @attributes = { :_id => "1", :title => "Sir", :age => 30 }
-        @person = Person.new(@attributes)
-      end
-
-      it "sets the attributes directly" do
-        Person.instantiate(@attributes).should == @person
-      end
-
+    before do
+      @attributes = { :_id => "1", :title => "Sir", :age => 30 }
+      @person = Person.new(@attributes)
     end
 
-    context "when document is not new" do
-
-      before do
-        @attributes = { :title => "Sir", :age => 30 }
-        @person = Person.new(@attributes)
-      end
-
-      it "instantiates normally" do
-        Person.instantiate(@attributes).id.should_not be_nil
-      end
-
+    it "sets the attributes directly" do
+      Person.instantiate(@attributes).should == @person
     end
 
   end

@@ -376,6 +376,10 @@ describe Mongoid::Document do
       @comment.save
     end
 
+    after do
+      Comment.collection.drop
+    end
+
     context "first save" do
 
       it "creates a new version" do
@@ -392,7 +396,6 @@ describe Mongoid::Document do
 
       before do
         5.times do |n|
-          @comment.text = "#{n}"
           @comment.save
         end
       end
