@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
             self[key] = self[key].merge(attrs) if self[key]
           else
             if elements = self[key]
-              elements.delete_if { |e| attrs[:_id] && (e[:_id] == attrs[:_id]) } << attrs
+              elements.update(attrs)
             else
               self[key] = [attrs]
             end

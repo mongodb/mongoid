@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/extensions/array/accessors"
 require "mongoid/extensions/array/assimilation"
 require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/array/parentization"
@@ -17,6 +18,7 @@ require "mongoid/extensions/symbol/inflections"
 require "mongoid/extensions/time/conversions"
 
 class Array #:nodoc:
+  include Mongoid::Extensions::Array::Accessors
   include Mongoid::Extensions::Array::Assimilation
   include Mongoid::Extensions::Array::Conversions
   include Mongoid::Extensions::Array::Parentization

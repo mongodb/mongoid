@@ -433,6 +433,11 @@ describe Mongoid::Document do
         people.should be_empty
       end
 
+      it "handles comparisons with date objects"do
+        people = Person.select.where(:dob => { "$lt" => Date.today.midnight })
+        people.first.should == @person
+      end
+
     end
 
   end

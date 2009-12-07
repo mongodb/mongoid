@@ -36,6 +36,11 @@ class Person < Mongoid::Document
   has_one :name
   has_one :pet, :class_name => "Animal"
 
+  index :title
+  index :dob
+  index :addresses
+  index :name
+
   relates_to_one :game
   relates_to_many :posts
 
