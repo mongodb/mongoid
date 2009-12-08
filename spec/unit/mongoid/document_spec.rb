@@ -207,6 +207,18 @@ describe Mongoid::Document do
 
     end
 
+    context "when type is a boolean" do
+
+      before do
+        @person = Person.new(:terms => true)
+      end
+
+      it "adds an accessor method with a question mark" do
+        @person.terms?.should be_true
+      end
+
+    end
+
   end
 
   describe ".human_name" do

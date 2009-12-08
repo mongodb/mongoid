@@ -58,10 +58,9 @@ module Mongoid #:nodoc:
       def field(name, options = {})
         @fields ||= {}.with_indifferent_access
         @defaults ||= {}.with_indifferent_access
-        @fields[name.to_s] = Field.new(name.to_s, options)
-        @defaults[name.to_s] = options[:default] if options[:default]
-        define_method(name) { read_attribute(name) }
-        define_method("#{name}=") { |value| write_attribute(name, value) }
+        @fields[name] = Field.new(name.to_s, options)
+        @defaults[name] = options[:default] if options[:default]
+        define_field_methods(name, options)
       end
 
       # Returns all the fields for the Document as a +Hash+ with names as keys.
@@ -105,6 +104,13 @@ module Mongoid #:nodoc:
       # Returns the primary key field of the +Document+
       def primary_key
         @primary_key
+      end
+
+      protected
+      def define_field_methods(name, options)
+        define_method(name) { read_attribute(name) }
+        define_method("#{name}=") { |value| write_attribute(name, value) }
+        define_method("#{name}?") { read_attribute(name) == true } if options[:type] == Boolean
       end
 
     end
