@@ -2,7 +2,6 @@ require "rubygems"
 require "rake"
 require "rake/rdoctask"
 require "spec/rake/spectask"
-require "metric_fu"
 
 begin
   require "jeweler"
@@ -53,4 +52,3 @@ Rake::RDocTask.new do |rdoc|
 end
 
 task :default => ["spec"]
-task :metrics => ["rcov", "metrics:all"]
