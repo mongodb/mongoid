@@ -8,7 +8,8 @@ require "mocha"
 require "mongoid"
 require "spec"
 
-Mongoid.connect_to("mongoid_test")
+connection = Mongo::Connection.new
+Mongoid.database = connection.db("mongoid_test")
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha

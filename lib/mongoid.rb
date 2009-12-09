@@ -52,10 +52,10 @@ require "mongoid/document"
 module Mongoid
 
   # Raised when the database connection has not been set up.
-  class NoConnectionError < RuntimeError; end
+  class InvalidDatabaseError < RuntimeError; end
 
-  # Raised when the database object provided has not been set up.
-  class BadDatabaseError < RuntimeError; end
+  # Raised when invalid options are passed into a constructor.
+  class InvalidOptionsError < RuntimeError; end
 
   # Raised when an association is defined on the class, but the
   # attribute in the hash is not an Array or Hash, or when
@@ -77,29 +77,15 @@ module Mongoid
     end
   end
 
-  # Raised when invalid options are passed into a constructor.
-  class InvalidOptionsError < RuntimeError; end
-
-  # Connect to the database name supplied. This should be run
-  # for initial setup, potentially in a rails initializer.
-  def self.connect_to(name)
-    @@connection ||= Mongo::Connection.new
-    @@database ||= @@connection.db(name)
+  # Sets the Mongo::DB to be used.
+  def self.database=(db)
+    raise InvalidDatabaseError.new("Database should be a Mongo::DB, not #{db.class.name}") unless db.kind_of?(Mongo::DB)
+    @@database = db
   end
 
-  # Get the MongoDB database. If initialization via Mongoid.connect_to()
-  # has not happened, an exception will occur.
+  # Returns the Mongo::DB to use or raise an error if none was set.
   def self.database
-    raise NoConnectionError unless @@database
-    @@database
-  end
-  
-  # Allow database to be set outside the constraints of connect_to()
-  # Enables use of non-localhost hosts (Mongo::Connection.new('db.mongohq.com'))
-  def self.database=(mongo_db)
-    raise BadDatabaseError unless mongo_db.kind_of?(Mongo::DB)
-    @@connection = mongo_db.connection
-    @@database   = mongo_db
+    @@database || (raise InvalidDatabaseError.new("No database has been set"))
   end
 
 end
