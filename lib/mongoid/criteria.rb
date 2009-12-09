@@ -60,7 +60,7 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # selections: A +Hash+ where the key is the field name and the value is an
+    # attributes: A +Hash+ where the key is the field name and the value is an
     # +Array+ of values that must all match.
     #
     # Example:
@@ -70,8 +70,8 @@ module Mongoid #:nodoc:
     # <tt>criteria.all(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
     #
     # Returns: <tt>self</tt>
-    def all(selections = {})
-      selections.each { |key, value| @selector[key] = { "$all" => value } }; self
+    def all(attributes = {})
+      update_selector(attributes, "$all")
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that must
@@ -125,7 +125,7 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # excludes: A +Hash+ where the key is the field name and the value is a
+    # attributes: A +Hash+ where the key is the field name and the value is a
     # value that must not be equal to the corresponding field value in the database.
     #
     # Example:
@@ -135,8 +135,8 @@ module Mongoid #:nodoc:
     # <tt>criteria.excludes(:field1 => "value1", :field2 => "value1")</tt>
     #
     # Returns: <tt>self</tt>
-    def excludes(exclusions = {})
-      exclusions.each { |key, value| @selector[key] = { "$ne" => value } }; self
+    def excludes(attributes = {})
+      update_selector(attributes, "$ne")
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -194,7 +194,7 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # inclusions: A +Hash+ where the key is the field name and the value is an
+    # attributes: A +Hash+ where the key is the field name and the value is an
     # +Array+ of values that any can match.
     #
     # Example:
@@ -204,8 +204,8 @@ module Mongoid #:nodoc:
     # <tt>criteria.in(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
     #
     # Returns: <tt>self</tt>
-    def in(inclusions = {})
-      inclusions.each { |key, value| @selector[key] = { "$in" => value } }; self
+    def in(attributes = {})
+      update_selector(attributes, "$in")
     end
 
     # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
@@ -510,5 +510,10 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Update the selector setting the operator on the value for each key in the
+    # supplied attributes +Hash+.
+    def update_selector(attributes, operator)
+      attributes.each { |key, value| @selector[key] = { operator => value } }; self
+    end
   end
 end
