@@ -54,6 +54,9 @@ module Mongoid
   # Raised when the database connection has not been set up.
   class NoConnectionError < RuntimeError; end
 
+  # Raised when the database object provided has not been set up.
+  class BadDatabaseError < RuntimeError; end
+
   # Raised when an association is defined on the class, but the
   # attribute in the hash is not an Array or Hash, or when
   # checking equality on objects of different types.
@@ -89,6 +92,14 @@ module Mongoid
   def self.database
     raise NoConnectionError unless @@database
     @@database
+  end
+  
+  # Allow database to be set outside the constraints of connect_to()
+  # Enables use of non-localhost hosts (Mongo::Connection.new('db.mongohq.com'))
+  def self.database=(mongo_db)
+    raise BadDatabaseError unless mongo_db.kind_of?(Mongo::DB)
+    @@connection = mongo_db.connection
+    @@database   = mongo_db
   end
 
 end
