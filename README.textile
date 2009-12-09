@@ -31,7 +31,8 @@
 Initialize Mongoid:
 
 <pre>
-  Mongoid.connect_to("myapp_database_name")
+  connection = Mongo::Connection.new
+  Mongoid.database = connection.db("my_db_name")
 </pre>
 
 Example of a simple domain model:
