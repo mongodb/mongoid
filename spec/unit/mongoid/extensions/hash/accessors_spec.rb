@@ -71,7 +71,7 @@ describe Mongoid::Extensions::Hash::Accessors do
           @new = { :_id => 2, :first_name => "Test2", :last_name => "User2" }
         end
 
-        it "updates the existing attribute" do
+        it "adds the new attribute" do
           @hash.insert(:name, @new)
           @hash[:name].should == @new
         end

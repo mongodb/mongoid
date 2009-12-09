@@ -4,15 +4,11 @@ module Mongoid #:nodoc:
     module Hash #:nodoc:
       module Accessors #:nodoc:
         def insert(key, attrs)
-          if key.singular?
-            self[key] = attrs unless self[key]
-            self[key] = self[key].merge(attrs) if self[key]
+          elements = self[key]
+          if elements
+            elements.update(attrs)
           else
-            if elements = self[key]
-              elements.update(attrs)
-            else
-              self[key] = [attrs]
-            end
+            self[key] = key.singular? ? attrs : [attrs]
           end
         end
       end
