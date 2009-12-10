@@ -5,6 +5,7 @@ require "mongoid/commands/delete_all"
 require "mongoid/commands/destroy"
 require "mongoid/commands/destroy_all"
 require "mongoid/commands/save"
+require "mongoid/commands/quick_save"
 require "mongoid/commands/validate"
 
 module Mongoid #:nodoc:
@@ -59,6 +60,13 @@ module Mongoid #:nodoc:
         else
           return Save.execute(self) || (raise ValidationsError.new(self.errors.full_messages))
         end
+      end
+
+      # Performs a save with no validations and no callbacks. This is used in
+      # relational association saves, and is not recommended for use by
+      # anything else.
+      def quick_save
+        QuickSave.execute(self)
       end
 
       # Update the attributes of the +Document+. Will call save after the
