@@ -2,7 +2,9 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class BelongsTo #:nodoc:
-      include Decorator
+
+      delegate :==, :to => :document
+      attr_reader :document, :options
 
       # Creates the new association by setting the internal
       # document as the passed in Document. This should be the
@@ -16,8 +18,7 @@ module Mongoid #:nodoc:
       # document: The parent +Document+
       # options: The association options
       def initialize(document, options)
-        @document = document
-        decorate!
+        @document, @options = document, options
       end
 
       # Returns the parent document. The id param is present for
@@ -25,6 +26,11 @@ module Mongoid #:nodoc:
       # in the future.
       def find(id)
         @document
+      end
+
+      # Delegate all missing methods over to the parent +Document+.
+      def method_missing(name, *args)
+        @document.send(name, *args)
       end
 
       class << self

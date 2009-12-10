@@ -2,16 +2,13 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasOne #:nodoc:
-      include Decorator
 
-      delegate :valid?, :to => :document
-
-      attr_accessor :parent, :options
+      delegate :==, :to => :document
+      attr_reader :document, :parent, :options
 
       # Build a new object for the association.
       def build(attributes)
         @document = attributes.assimilate(@parent, @options)
-        decorate!
         self
       end
 
@@ -38,8 +35,12 @@ module Mongoid #:nodoc:
         @parent, @options = document, options
         unless attributes.nil?
           @document = attributes.assimilate(@parent, @options)
-          decorate!
         end
+      end
+
+      # Delegate all missing methods over to the +Document+.
+      def method_missing(name, *args)
+        @document.send(name, *args)
       end
 
       class << self
