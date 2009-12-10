@@ -80,12 +80,12 @@ module Mongoid
   # Sets the Mongo::DB to be used.
   def self.database=(db)
     raise InvalidDatabaseError.new("Database should be a Mongo::DB, not #{db.class.name}") unless db.kind_of?(Mongo::DB)
-    @@database = db
+    @database = db
   end
 
   # Returns the Mongo::DB to use or raise an error if none was set.
   def self.database
-    @@database || (raise InvalidDatabaseError.new("No database has been set"))
+    @database || (raise InvalidDatabaseError.new("No database has been set"))
   end
 
 end
