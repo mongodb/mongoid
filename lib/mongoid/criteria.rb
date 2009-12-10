@@ -172,8 +172,7 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>criteria.select(:field1).where(:field1 => "Title").group(Person)</tt>
-    def group(klass = nil)
-      @klass = klass if klass
+    def group
       @klass.collection.group(
         @options[:fields],
         @selector,

@@ -311,7 +311,7 @@ describe Mongoid::Criteria do
 
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {}, {:group => []}, @reduce).returns(@grouping)
-        @criteria.select(:field1).group(Person)
+        @criteria.select(:field1).group
       end
 
     end
