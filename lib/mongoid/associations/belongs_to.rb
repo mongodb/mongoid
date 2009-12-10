@@ -4,25 +4,43 @@ module Mongoid #:nodoc:
     class BelongsTo #:nodoc:
       include Decorator
 
-      # Creates the new association by setting the internal 
+      # Creates the new association by setting the internal
       # document as the passed in Document. This should be the
       # parent.
       #
       # All method calls on this object will then be delegated
       # to the internal document itself.
+      #
+      # Options:
+      #
+      # document: The parent +Document+
+      # options: The association options
       def initialize(document, options)
-        @document = document.parent
+        @document = document
         decorate!
       end
 
       # Returns the parent document. The id param is present for
-      # compatibility with rails, however this could be overwritten 
+      # compatibility with rails, however this could be overwritten
       # in the future.
       def find(id)
         @document
       end
 
       class << self
+        # Creates the new association by setting the internal
+        # document as the passed in Document. This should be the
+        # parent.
+        #
+        # Options:
+        #
+        # document: The parent +Document+
+        # options: The association options
+        def instantiate(document, options)
+          parent = document.parent
+          parent.nil? ? nil : new(parent, options)
+        end
+
         # Returns the macro used to create the association.
         def macro
           :belongs_to

@@ -6,9 +6,8 @@ describe Mongoid::Associations::BelongsTo do
 
     before do
       @parent = Name.new(:first_name => "Drexel")
-      @document = stub(:parent => @parent)
       @options = Mongoid::Associations::Options.new(:name => :person)
-      @association = Mongoid::Associations::BelongsTo.new(@document, @options)
+      @association = Mongoid::Associations::BelongsTo.new(@parent, @options)
     end
 
     context "when finding by id" do
@@ -26,9 +25,8 @@ describe Mongoid::Associations::BelongsTo do
 
     before do
       @parent = Name.new(:first_name => "Drexel")
-      @document = stub(:parent => @parent)
       @options = Mongoid::Associations::Options.new(:name => :person)
-      @association = Mongoid::Associations::BelongsTo.new(@document, @options)
+      @association = Mongoid::Associations::BelongsTo.new(@parent, @options)
     end
 
     context "when getting values" do
@@ -44,6 +42,38 @@ describe Mongoid::Associations::BelongsTo do
       it "delegates to the document" do
         @association.first_name = "Test"
         @association.first_name.should == "Test"
+      end
+
+    end
+
+  end
+
+  describe ".instantiate" do
+
+    context "when parent exists" do
+
+      before do
+        @parent = Name.new(:first_name => "Drexel")
+        @document = stub(:parent => @parent)
+        @options = Mongoid::Associations::Options.new(:name => :person)
+      end
+
+      it "delegates to new" do
+        Mongoid::Associations::BelongsTo.expects(:new).with(@parent, @options)
+        Mongoid::Associations::BelongsTo.instantiate(@document, @options)
+      end
+
+    end
+
+    context "when parent is nil" do
+
+      before do
+        @document = stub(:parent => nil)
+        @options = Mongoid::Associations::Options.new(:name => :person)
+      end
+
+      it "returns nil" do
+        Mongoid::Associations::BelongsTo.instantiate(@document, @options).should be_nil
       end
 
     end

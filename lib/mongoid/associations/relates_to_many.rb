@@ -17,6 +17,16 @@ module Mongoid #:nodoc:
       end
 
       class << self
+        # Preferred method for creating the new +RelatesToMany+ association.
+        #
+        # Options:
+        #
+        # document: The +Document+ that contains the relationship.
+        # options: The association +Options+.
+        def instantiate(document, options)
+          new(document, options)
+        end
+
         # Returns the macro used to create the association.
         def macro
           :relates_to_many

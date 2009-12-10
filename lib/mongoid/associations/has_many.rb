@@ -83,6 +83,18 @@ module Mongoid #:nodoc:
       end
 
       class << self
+
+        # Preferred method of creating a new +HasMany+ association. It will
+        # delegate to new.
+        #
+        # Options:
+        #
+        # document: The parent +Document+
+        # options: The association options
+        def instantiate(document, options)
+          new(document, options)
+        end
+
         # Returns the macro used to create the association.
         def macro
           :has_many

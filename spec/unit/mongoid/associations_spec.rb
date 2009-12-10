@@ -184,9 +184,10 @@ describe Mongoid::Associations do
 
   describe ".has_one" do
 
-    it "adds a new Association to the collection" do
+    it "adds a new Association to the document" do
       person = Person.new
       person.name.should_not be_nil
+      person.attributes[:name].should be_nil
     end
 
     it "creates a reader for the association" do
@@ -258,6 +259,57 @@ describe Mongoid::Associations do
     it "creates a getter and setter for the relationship" do
       Person.new.should respond_to(:posts)
       Person.new.should respond_to(:posts=)
+    end
+
+  end
+
+  describe "#update_associations" do
+
+    context "when associations exist" do
+
+      before do
+        @related = stub(:id => "100", :person= => true)
+        @person = Person.new
+        @person.posts = [@related]
+      end
+
+      it "saves each association" do
+        @related.expects(:quick_save).returns(@related)
+        @person.update_associations(:posts)
+      end
+
+    end
+
+    context "when no associations exist" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "does nothing" do
+        @person.update_associations(:posts)
+        @person.posts.first.should be_nil
+      end
+
+    end
+
+  end
+
+  describe "#update_association" do
+
+    context "when the association exists" do
+
+      before do
+        @related = stub(:id => "100", :person= => true)
+        @person = Person.new
+        @person.game = @related
+      end
+
+      it "saves each association" do
+        @related.expects(:quick_save).returns(@related)
+        @person.update_association(:game)
+      end
+
     end
 
   end

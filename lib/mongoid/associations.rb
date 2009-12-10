@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "mongoid/associations/decorator"
-require "mongoid/associations/accessor"
 require "mongoid/associations/belongs_to"
 require "mongoid/associations/has_many"
 require "mongoid/associations/has_one"
@@ -22,9 +21,15 @@ module Mongoid # :nodoc:
         self.class.associations
       end
 
-      # Updates all the relational associations for the document.
+      # Updates all the one-to-many relational associations for the name.
       def update_associations(name)
-        send(name).each { |doc| doc.save }
+        send(name).each { |doc| doc.quick_save }
+      end
+
+      # Update the one-to-one relational association for the name.
+      def update_association(name)
+        association = send(name)
+        association.quick_save if association
       end
     end
 
@@ -144,6 +149,9 @@ module Mongoid # :nodoc:
           Associations::RelatesToOne,
           Associations::Options.new(options.merge(:name => name))
         )
+        before_save do |document|
+          document.update_association(name)
+        end
       end
 
       # Adds a relational association from the Document to many Documents in
@@ -177,11 +185,11 @@ module Mongoid # :nodoc:
         associations[name] = type
         define_method(name) do
           return instance_variable_get("@#{name}") if instance_variable_defined?("@#{name}")
-          proxy = Associations::Accessor.get(type, self, options)
+          proxy = type.instantiate(self, options)
           instance_variable_set("@#{name}", proxy)
         end
         define_method("#{name}=") do |object|
-          proxy = Associations::Accessor.set(type, self, object, options)
+          proxy = type.update(object, self, options)
           if instance_variable_defined?("@#{name}")
             remove_instance_variable("@#{name}")
           else

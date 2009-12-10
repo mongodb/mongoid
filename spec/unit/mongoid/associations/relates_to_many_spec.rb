@@ -25,6 +25,24 @@ describe Mongoid::Associations::RelatesToMany do
 
   end
 
+  describe ".instantiate" do
+
+    context "when related id has been set" do
+
+      before do
+        @document = Person.new
+        @options = Mongoid::Associations::Options.new(:name => :posts)
+      end
+
+      it "delegates to new" do
+        Mongoid::Associations::RelatesToMany.expects(:new).with(@document, @options)
+        association = Mongoid::Associations::RelatesToMany.instantiate(@document, @options)
+      end
+
+    end
+
+  end
+
   describe ".macro" do
 
     it "returns :relates_to_many" do
@@ -47,6 +65,10 @@ describe Mongoid::Associations::RelatesToMany do
       Mongoid::Associations::RelatesToMany.update(@related, @parent, @options)
       @first.person_id.should == @parent.id
       @second.person_id.should == @parent.id
+    end
+
+    it "returns the related objects" do
+      Mongoid::Associations::RelatesToMany.update(@related, @parent, @options).should == @related
     end
 
   end

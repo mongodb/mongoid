@@ -28,14 +28,33 @@ module Mongoid #:nodoc:
       #
       # All method calls on this object will then be delegated
       # to the internal document itself.
-      def initialize(document, options)
+      #
+      # Options:
+      #
+      # document: The parent +Document+
+      # attributes: The attributes of the decorated object.
+      # options: The association options.
+      def initialize(document, attributes, options)
         @parent, @options = document, options
-        attributes = @parent.attributes[options.name]
-        @document = (attributes || {}).assimilate(@parent, @options)
-        decorate!
+        unless attributes.nil?
+          @document = attributes.assimilate(@parent, @options)
+          decorate!
+        end
       end
 
       class << self
+        # Preferred method of instantiating a new +HasOne+, since nil values
+        # will be handled properly.
+        #
+        # Options:
+        #
+        # document: The parent +Document+
+        # options: The association options.
+        def instantiate(document, options)
+          attributes = document.attributes[options.name]
+          new(document, attributes, options)
+        end
+
         # Returns the macro used to create the association.
         def macro
           :has_one

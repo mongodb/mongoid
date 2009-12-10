@@ -49,19 +49,6 @@ describe Mongoid::Document do
 
     end
 
-    context "when creating a has one" do
-
-      before do
-        @person = Person.new(:title => "Esquire")
-        @person.name.create(:first_name => "Jorge")
-      end
-
-      it "should create and save the entire graph" do
-        person = Person.find(@person.id)
-        person.name.first_name.should == "Jorge"
-      end
-
-    end
   end
 
   context "chaining criteria scopes" do

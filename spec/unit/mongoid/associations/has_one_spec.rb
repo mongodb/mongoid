@@ -14,6 +14,7 @@ describe Mongoid::Associations::HasOne do
       before do
         @association = Mongoid::Associations::HasOne.new(
           @document,
+          @attributes[:mixed_drink],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
         )
       end
@@ -34,6 +35,7 @@ describe Mongoid::Associations::HasOne do
       before do
         @association = Mongoid::Associations::HasOne.new(
           @document,
+          @attributes[:mixed_drink],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
         )
         @drink = MixedDrink.new(:name => "Sapphire and Tonic")
@@ -54,6 +56,7 @@ describe Mongoid::Associations::HasOne do
     before do
       @association = Mongoid::Associations::HasOne.new(
         @document,
+        @attributes[:mixed_drink],
         Mongoid::Associations::Options.new(:name => :mixed_drink)
       )
     end
@@ -77,9 +80,27 @@ describe Mongoid::Associations::HasOne do
 
   end
 
+  describe ".instantiate" do
+
+    context "when attributes exist" do
+
+      before do
+        @document = stub(:attributes => { :name => { :first_name => "Test" } })
+        @options = Mongoid::Associations::Options.new(:name => :name)
+      end
+
+      it "delegates to new" do
+        Mongoid::Associations::HasOne.expects(:new).with(@document, { :first_name => "Test" }, @options)
+        Mongoid::Associations::HasOne.instantiate(@document, @options)
+      end
+
+    end
+
+  end
+
   describe ".macro" do
 
-    it "returns :has_many" do
+    it "returns :has_one" do
       Mongoid::Associations::HasOne.macro.should == :has_one
     end
 

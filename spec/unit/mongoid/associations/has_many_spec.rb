@@ -176,6 +176,15 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe ".instantiate" do
+
+    it "delegates to new" do
+      Mongoid::Associations::HasMany.expects(:new).with(@document, @options)
+      Mongoid::Associations::HasMany.instantiate(@document, @options)
+    end
+
+  end
+
   describe "#length" do
 
     context "#length" do
