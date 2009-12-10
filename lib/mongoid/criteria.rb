@@ -148,9 +148,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>self</tt>
     def extras(extras)
-      @options = extras
-      filter_options
-      self
+      @options = extras; filter_options; self
     end
 
     # Return the first result for the +Criteria+.
