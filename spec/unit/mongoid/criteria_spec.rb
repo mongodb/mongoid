@@ -210,6 +210,14 @@ describe Mongoid::Criteria do
 
     end
 
+    context "when no block is passed" do
+
+      it "returns self" do
+        @criteria.each.should == @criteria
+      end
+
+    end
+
   end
 
   describe "#excludes" do

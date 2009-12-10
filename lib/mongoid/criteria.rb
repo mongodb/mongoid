@@ -110,13 +110,9 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
-    def each
+    def each(&block)
       @collection ||= execute
-      if block_given?
-        @collection.each { |doc| yield doc }
-      else
-        @collection.each
-      end
+      block_given? ? @collection.each { |doc| yield doc } : self
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that are not allowed
