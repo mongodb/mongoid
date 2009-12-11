@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.9.6"
+  s.version = "0.9.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-12-09}
+  s.date = %q{2009-12-10}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -23,9 +23,7 @@ Gem::Specification.new do |s|
      "VERSION",
      "lib/mongoid.rb",
      "lib/mongoid/associations.rb",
-     "lib/mongoid/associations/accessor.rb",
      "lib/mongoid/associations/belongs_to.rb",
-     "lib/mongoid/associations/decorator.rb",
      "lib/mongoid/associations/has_many.rb",
      "lib/mongoid/associations/has_one.rb",
      "lib/mongoid/associations/options.rb",
@@ -38,6 +36,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/commands/delete_all.rb",
      "lib/mongoid/commands/destroy.rb",
      "lib/mongoid/commands/destroy_all.rb",
+     "lib/mongoid/commands/quick_save.rb",
      "lib/mongoid/commands/save.rb",
      "lib/mongoid/commands/validate.rb",
      "lib/mongoid/criteria.rb",
@@ -68,12 +67,11 @@ Gem::Specification.new do |s|
      "lib/mongoid/versioning.rb",
      "mongoid.gemspec",
      "perf/benchmark.rb",
+     "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "spec/unit/mongoid/associations/accessor_spec.rb",
      "spec/unit/mongoid/associations/belongs_to_spec.rb",
-     "spec/unit/mongoid/associations/decorator_spec.rb",
      "spec/unit/mongoid/associations/has_many_spec.rb",
      "spec/unit/mongoid/associations/has_one_spec.rb",
      "spec/unit/mongoid/associations/options_spec.rb",
@@ -86,6 +84,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands/delete_spec.rb",
      "spec/unit/mongoid/commands/destroy_all_spec.rb",
      "spec/unit/mongoid/commands/destroy_spec.rb",
+     "spec/unit/mongoid/commands/quick_save_spec.rb",
      "spec/unit/mongoid/commands/save_spec.rb",
      "spec/unit/mongoid/commands/validate_spec.rb",
      "spec/unit/mongoid/commands_spec.rb",
@@ -121,11 +120,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{ODM framework for MongoDB}
   s.test_files = [
-    "spec/integration/mongoid/document_spec.rb",
+    "spec/integration/mongoid/associations_spec.rb",
+     "spec/integration/mongoid/document_spec.rb",
      "spec/spec_helper.rb",
-     "spec/unit/mongoid/associations/accessor_spec.rb",
      "spec/unit/mongoid/associations/belongs_to_spec.rb",
-     "spec/unit/mongoid/associations/decorator_spec.rb",
      "spec/unit/mongoid/associations/has_many_spec.rb",
      "spec/unit/mongoid/associations/has_one_spec.rb",
      "spec/unit/mongoid/associations/options_spec.rb",
@@ -138,6 +136,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands/delete_spec.rb",
      "spec/unit/mongoid/commands/destroy_all_spec.rb",
      "spec/unit/mongoid/commands/destroy_spec.rb",
+     "spec/unit/mongoid/commands/quick_save_spec.rb",
      "spec/unit/mongoid/commands/save_spec.rb",
      "spec/unit/mongoid/commands/validate_spec.rb",
      "spec/unit/mongoid/commands_spec.rb",
