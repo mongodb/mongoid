@@ -170,7 +170,7 @@ module Mongoid # :nodoc:
       def relates_to_many(name, options = {})
         add_association(
           Associations::RelatesToMany,
-          Associations::Options.new(options.merge(:name => name))
+          Associations::Options.new(options.merge(:name => name, :parent_key => self.name.foreign_key))
         )
         before_save do |document|
           document.update_associations(name)

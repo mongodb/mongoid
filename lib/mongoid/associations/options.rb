@@ -32,6 +32,11 @@ module Mongoid #:nodoc:
         @attributes[:name]
       end
 
+      # Returns the parent foreign key association name.
+      def parent_key
+        @attributes[:parent_key]
+      end
+
       # Returns whether or not this association is polymorphic.
       def polymorphic
         @attributes[:polymorphic] == true

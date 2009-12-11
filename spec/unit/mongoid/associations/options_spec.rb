@@ -84,7 +84,19 @@ describe Mongoid::Associations::Options do
 
       end
 
+    end
 
+  end
+
+  describe "#parent_key" do
+
+    before do
+      @attributes = { :parent_key => :person_id }
+      @options = Mongoid::Associations::Options.new(@attributes)
+    end
+
+    it "returns the parent's foreign key value" do
+      @options.parent_key.should == :person_id
     end
 
   end
@@ -96,7 +108,6 @@ describe Mongoid::Associations::Options do
       before do
         @attributes = { :polymorphic => true }
         @options = Mongoid::Associations::Options.new(@attributes)
-
       end
 
       it "returns the attribute" do
