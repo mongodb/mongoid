@@ -6,6 +6,30 @@ describe Mongoid::Criteria do
     @criteria = Mongoid::Criteria.new(Person)
   end
 
+  describe "#[]" do
+
+    before do
+      @criteria.where(:title => "Sir")
+      @collection = stub
+      @person = Person.new(:title => "Sir")
+      @cursor = stub(:count => 10, :collect => [@person])
+    end
+
+    context "when the criteria has not been executed" do
+
+      before do
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find).with({ :title => "Sir" }, {}).returns(@cursor)
+      end
+
+      it "executes the criteria and returns the element at the index" do
+        @criteria[0].should == @person
+      end
+
+    end
+
+  end
+
   describe "#aggregate" do
 
     context "when klass provided" do
