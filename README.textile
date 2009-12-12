@@ -47,8 +47,8 @@ Example of a simple domain model:
     has_many :addresses
     has_one :name
 
-    relates_to_one :game
-    relates_to_many :posts
+    has_one_related :game
+    has_may_related :posts
   end
 
   class Address < Mongoid::Document
@@ -71,10 +71,11 @@ Example of a simple domain model:
     field :title
     field :text
     field :tags, :type => Array
-    relates_to_one :person
+    belongs_to_related :person
   end
 
   class Game < ActiveRecord::Base
+    belongs_to_related :person
   end
 </pre>
 
