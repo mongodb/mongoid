@@ -143,7 +143,7 @@ module Mongoid # :nodoc:
       #
       def relates_to_one(name, options = {})
         key = name.to_s
-        field "#{key}_id"; index "#{key}_id"
+        field "#{key}_id"
         add_association(
           Associations::RelatesToOne,
           Associations::Options.new(options.merge(:name => name))
