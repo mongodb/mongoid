@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class RelatesToMany < DelegateClass(Array) #:nodoc:
+    class HasOneRelated #:nodoc:
+
+      delegate :==, :nil?, :to => :document
+      attr_reader :document
 
       # Initializing a related association only requires looking up the objects
       # by their ids.
@@ -12,8 +15,12 @@ module Mongoid #:nodoc:
       # options: The association +Options+.
       def initialize(document, options)
         name = document.class.to_s.foreign_key
-        @documents = options.klass.all(:conditions => { name => document.id })
-        super(@documents)
+        @document = options.klass.first(:conditions => { name => document.id })
+      end
+
+      # Delegate all missing methods over to the +Document+.
+      def method_missing(name, *args)
+        @document.send(name, *args)
       end
 
       class << self
@@ -29,7 +36,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :relates_to_many
+          :has_one_related
         end
 
         # Perform an update of the relationship of the parent and child. This
@@ -37,16 +44,17 @@ module Mongoid #:nodoc:
         #
         # Options:
         #
-        # related: The related object
-        # parent: The parent +Document+ to update.
+        # related: The related object to update.
+        # document: The parent +Document+.
         # options: The association +Options+
         #
         # Example:
         #
-        # <tt>RelatesToOne.update(game, person, options)</tt>
+        # <tt>HasManyToRelated.update(game, person, options)</tt>
         def update(related, document, options)
           name = document.class.to_s.underscore
-          related.each { |child| child.send("#{name}=", document) }
+          related.send("#{name}=", document)
+          related
         end
       end
 

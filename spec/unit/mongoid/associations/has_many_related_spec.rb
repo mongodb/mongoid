@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Associations::RelatesToMany do
+describe Mongoid::Associations::HasManyRelated do
 
   describe ".initialize" do
 
@@ -17,7 +17,7 @@ describe Mongoid::Associations::RelatesToMany do
 
       it "finds the object by id" do
         Post.expects(:all).with(:conditions => { "person_id" => @document.id }).returns(@related)
-        association = Mongoid::Associations::RelatesToMany.new(@document, @options)
+        association = Mongoid::Associations::HasManyRelated.new(@document, @options)
         association.should == @related
       end
 
@@ -35,8 +35,8 @@ describe Mongoid::Associations::RelatesToMany do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::RelatesToMany.expects(:new).with(@document, @options)
-        association = Mongoid::Associations::RelatesToMany.instantiate(@document, @options)
+        Mongoid::Associations::HasManyRelated.expects(:new).with(@document, @options)
+        association = Mongoid::Associations::HasManyRelated.instantiate(@document, @options)
       end
 
     end
@@ -46,7 +46,7 @@ describe Mongoid::Associations::RelatesToMany do
   describe ".macro" do
 
     it "returns :relates_to_many" do
-      Mongoid::Associations::RelatesToMany.macro.should == :relates_to_many
+      Mongoid::Associations::HasManyRelated.macro.should == :relates_to_many
     end
 
   end
@@ -62,13 +62,13 @@ describe Mongoid::Associations::RelatesToMany do
     end
 
     it "sets the related object id on the parent" do
-      Mongoid::Associations::RelatesToMany.update(@related, @parent, @options)
+      Mongoid::Associations::HasManyRelated.update(@related, @parent, @options)
       @first.person_id.should == @parent.id
       @second.person_id.should == @parent.id
     end
 
     it "returns the related objects" do
-      Mongoid::Associations::RelatesToMany.update(@related, @parent, @options).should == @related
+      Mongoid::Associations::HasManyRelated.update(@related, @parent, @options).should == @related
     end
 
   end

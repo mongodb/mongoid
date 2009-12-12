@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class RelatesToOne #:nodoc:
+    class BelongsToRelated #:nodoc:
 
       delegate :==, :to => :document
       attr_reader :document
@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
       end
 
       class << self
-        # Instantiate a new +RelatesToOne+ or return nil if the foreign key is
+        # Instantiate a new +BelongsToRelated+ or return nil if the foreign key is
         # nil. It is preferrable to use this method over the traditional call
         # to new.
         #
@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :relates_to_one
+          :belongs_to_related
         end
 
         # Perform an update of the relationship of the parent and child. This
@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
         #
         # Example:
         #
-        # <tt>RelatesToOne.update(game, person, options)</tt>
+        # <tt>BelongsToRelated.update(game, person, options)</tt>
         def update(related, parent, options)
           parent.send("#{options.foreign_key}=", related.id); related
         end

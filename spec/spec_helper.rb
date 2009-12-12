@@ -42,8 +42,8 @@ class Person < Mongoid::Document
   index :addresses
   index :name
 
-  relates_to_one :game
-  relates_to_many :posts
+  has_one_related :game
+  has_many_related :posts
 
   def update_addresses
     addresses.each_with_index do |address, i|
@@ -136,12 +136,13 @@ end
 class Post < Mongoid::Document
   include Mongoid::Versioning
   field :title
-  relates_to_one :person
+  belongs_to_related :person
 end
 
 class Game < Mongoid::Document
   field :high_score, :default => 500
   field :score, :type => Integer, :default => 0
+  belongs_to_related :person
 end
 
 if RUBY_VERSION == '1.8.6'

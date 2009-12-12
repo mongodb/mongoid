@@ -241,20 +241,39 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".relates_to_one" do
+  describe ".belongs_to_related" do
 
-    it "creates an id field for the relationship" do
-      Person.new.should respond_to(:game_id)
+    before do
+      @game = Game.new
     end
 
-    it "creates a getter and setter for the relationship" do
-      Person.new.should respond_to(:game)
-      Person.new.should respond_to(:game=)
+    it "creates an id field for the relationship" do
+      @game.should respond_to(:person_id)
+    end
+
+    it "creates a getter for the parent" do
+      @game.should respond_to(:person)
     end
 
   end
 
-  describe ".relates_to_many" do
+  describe ".has_one_related" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "creates a getter for the relationship" do
+      @person.should respond_to(:game)
+    end
+
+    it "creates a setter for the relationship" do
+      @person.should respond_to(:game=)
+    end
+
+  end
+
+  describe ".has_many_related" do
 
     it "creates a getter and setter for the relationship" do
       Person.new.should respond_to(:posts)
@@ -274,7 +293,7 @@ describe Mongoid::Associations do
       end
 
       it "saves each association" do
-        @related.expects(:quick_save).returns(@related)
+        @related.expects(:save).returns(@related)
         @person.update_associations(:posts)
       end
 
@@ -287,6 +306,7 @@ describe Mongoid::Associations do
       end
 
       it "does nothing" do
+        Post.expects(:find).returns([])
         @person.update_associations(:posts)
         @person.posts.first.should be_nil
       end
@@ -306,7 +326,7 @@ describe Mongoid::Associations do
       end
 
       it "saves each association" do
-        @related.expects(:quick_save).returns(@related)
+        @related.expects(:save).returns(@related)
         @person.update_association(:game)
       end
 

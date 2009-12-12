@@ -1,9 +1,10 @@
 # encoding: utf-8
 require "mongoid/associations/belongs_to"
+require "mongoid/associations/belongs_to_related"
 require "mongoid/associations/has_many"
+require "mongoid/associations/has_many_related"
 require "mongoid/associations/has_one"
-require "mongoid/associations/relates_to_many"
-require "mongoid/associations/relates_to_one"
+require "mongoid/associations/has_one_related"
 
 module Mongoid # :nodoc:
   module Associations #:nodoc:
@@ -22,13 +23,13 @@ module Mongoid # :nodoc:
 
       # Updates all the one-to-many relational associations for the name.
       def update_associations(name)
-        send(name).each { |doc| doc.quick_save }
+        send(name).each { |doc| doc.save }
       end
 
       # Update the one-to-one relational association for the name.
       def update_association(name)
         association = send(name)
-        association.quick_save if association
+        association.save unless association.nil?
       end
     end
 
@@ -65,6 +66,27 @@ module Mongoid # :nodoc:
         )
       end
 
+      # Adds a relational association from the child Document to a Document in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name.
+      #
+      # Example:
+      #
+      #   class Game < Mongoid::Document
+      #     belongs_to_related :person
+      #   end
+      #
+      def belongs_to_related(name, options = {})
+        field "#{name.to_s}_id"
+        add_association(
+          Associations::BelongsToRelated,
+          Associations::Options.new(options.merge(:name => name))
+        )
+      end
+
       # Adds the association from a parent document to its children. The name
       # of the association needs to be a pluralized form of the child class
       # name.
@@ -87,6 +109,29 @@ module Mongoid # :nodoc:
           Associations::HasMany,
           Associations::Options.new(options.merge(:name => name))
         )
+      end
+
+      # Adds a relational association from the Document to many Documents in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name pluralized.
+      #
+      # Example:
+      #
+      #   class Person < Mongoid::Document
+      #     has_many_related :posts
+      #   end
+      #
+      def has_many_related(name, options = {})
+        add_association(
+          Associations::HasManyRelated,
+          Associations::Options.new(options.merge(:name => name, :parent_key => self.name.foreign_key))
+        )
+        before_save do |document|
+          document.update_associations(name)
+        end
       end
 
       # Adds the association from a parent document to its child. The name
@@ -113,6 +158,28 @@ module Mongoid # :nodoc:
         )
       end
 
+      # Adds a relational association from the Document to one Document in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name pluralized.
+      #
+      # Example:
+      #
+      #   class Person < Mongoid::Document
+      #     has_one_related :game
+      #   end
+      def has_one_related(name, options = {})
+        add_association(
+          Associations::HasOneRelated,
+          Associations::Options.new(options.merge(:name => name, :parent_key => self.name.foreign_key))
+        )
+        before_save do |document|
+          document.update_association(name)
+        end
+      end
+
       # Returns the macro associated with the supplied association name. This
       # will return has_one, has_many, belongs_to or nil.
       #
@@ -126,54 +193,6 @@ module Mongoid # :nodoc:
       def reflect_on_association(name)
         association = associations[name]
         association ? association.macro : nil
-      end
-
-      # Adds a relational association from the Document to a Document in
-      # another database or collection.
-      #
-      # Options:
-      #
-      # name: A +Symbol+ that is the related class name.
-      #
-      # Example:
-      #
-      #   class Person < Mongoid::Document
-      #     relates_to_one :game
-      #   end
-      #
-      def relates_to_one(name, options = {})
-        key = name.to_s
-        field "#{key}_id"
-        add_association(
-          Associations::RelatesToOne,
-          Associations::Options.new(options.merge(:name => name))
-        )
-        before_save do |document|
-          document.update_association(name)
-        end
-      end
-
-      # Adds a relational association from the Document to many Documents in
-      # another database or collection.
-      #
-      # Options:
-      #
-      # name: A +Symbol+ that is the related class name pluralized.
-      #
-      # Example:
-      #
-      #   class Person < Mongoid::Document
-      #     relates_to_many :posts
-      #   end
-      #
-      def relates_to_many(name, options = {})
-        add_association(
-          Associations::RelatesToMany,
-          Associations::Options.new(options.merge(:name => name, :parent_key => self.name.foreign_key))
-        )
-        before_save do |document|
-          document.update_associations(name)
-        end
       end
 
       protected
