@@ -133,13 +133,6 @@ class Comment < Mongoid::Document
   key :text
 end
 
-class Decorated
-  include Mongoid::Associations::Decorator
-  def initialize(doc)
-    @document = doc
-  end
-end
-
 class Post < Mongoid::Document
   include Mongoid::Versioning
   field :title
@@ -148,7 +141,7 @@ end
 
 class Game < Mongoid::Document
   field :high_score, :default => 500
-  field :score, :default => 0
+  field :score, :type => Integer, :default => 0
 end
 
 if RUBY_VERSION == '1.8.6'

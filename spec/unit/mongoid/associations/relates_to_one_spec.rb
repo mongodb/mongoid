@@ -53,6 +53,35 @@ describe Mongoid::Associations::RelatesToOne do
 
   end
 
+  describe "#method_missing" do
+
+    before do
+      @game = Game.new(:score => 5000)
+      @document = stub(:game_id => "5")
+      @options = Mongoid::Associations::Options.new(:name => :game)
+      Game.expects(:find).with(@document.game_id).returns(@game)
+      @association = Mongoid::Associations::RelatesToOne.new(@document, "5", @options)
+    end
+
+    context "when getting values" do
+
+      it "delegates to the document" do
+        @association.score.should == 5000
+      end
+
+    end
+
+    context "when setting values" do
+
+      it "delegates to the document" do
+        @association.score = 400
+        @association.score.should == 400
+      end
+
+    end
+
+  end
+
   describe ".macro" do
 
     it "returns :relates_to_one" do

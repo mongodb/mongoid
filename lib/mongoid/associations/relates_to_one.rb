@@ -2,7 +2,9 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class RelatesToOne #:nodoc:
-      include Decorator
+
+      delegate :==, :to => :document
+      attr_reader :document
 
       # Initializing a related association only requires looking up the object
       # by its id.
@@ -13,7 +15,11 @@ module Mongoid #:nodoc:
       # options: The association +Options+.
       def initialize(document, foreign_key, options)
         @document = options.klass.find(foreign_key)
-        decorate!
+      end
+
+      # Delegate all missing methods over to the +Document+.
+      def method_missing(name, *args)
+        @document.send(name, *args)
       end
 
       class << self

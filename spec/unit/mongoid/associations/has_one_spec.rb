@@ -51,7 +51,7 @@ describe Mongoid::Associations::HasOne do
 
   end
 
-  describe "#decorate!" do
+  describe "#method_missing" do
 
     before do
       @association = Mongoid::Associations::HasOne.new(

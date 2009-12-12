@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/associations/decorator"
 require "mongoid/associations/belongs_to"
 require "mongoid/associations/has_many"
 require "mongoid/associations/has_one"
