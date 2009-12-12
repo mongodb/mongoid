@@ -49,11 +49,8 @@ module Mongoid #:nodoc:
       #
       # <tt>field :score, :default => 0</tt>
       def field(name, options = {})
-        @fields ||= {}.with_indifferent_access
-        @defaults ||= {}.with_indifferent_access
-        @fields[name] = Field.new(name.to_s, options)
-        @defaults[name] = options[:default] if options[:default]
-        define_field_methods(name, options)
+        define(name, options)
+        default(name, options)
       end
 
       # Returns all the fields for the Document as a +Hash+ with names as keys.
@@ -100,10 +97,20 @@ module Mongoid #:nodoc:
       end
 
       protected
-      def define_field_methods(name, options)
+
+      # Define a field attribute for the +Document+.
+      def define(name, options = {})
+        @fields ||= {}.with_indifferent_access
+        @fields[name] = Field.new(name.to_s, options)
         define_method(name) { read_attribute(name) }
         define_method("#{name}=") { |value| write_attribute(name, value) }
         define_method("#{name}?") { read_attribute(name) == true } if options[:type] == Boolean
+      end
+
+      # Set up a default value for a field.
+      def default(name, options = {})
+        @defaults ||= {}.with_indifferent_access
+        @defaults[name] = options[:default] if options[:default]
       end
 
     end
