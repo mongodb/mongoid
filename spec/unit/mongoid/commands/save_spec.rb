@@ -30,8 +30,8 @@ describe Mongoid::Commands::Save do
         Mongoid::Commands::Save.execute(@document)
       end
 
-      it "returns the document" do
-        Mongoid::Commands::Save.execute(@document).should == @document
+      it "returns true" do
+        Mongoid::Commands::Save.execute(@document).should be_true
       end
 
       context "when the document has a parent" do

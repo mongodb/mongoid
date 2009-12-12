@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
           collection ? collection.save(doc.attributes) : raise(MissingParentError.new(doc))
         end
         doc.run_callbacks :after_save
-        return doc
+        return true
       end
     end
   end
