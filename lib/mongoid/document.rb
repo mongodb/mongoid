@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
       # Returns: <tt>Mongo::Collection</tt>
       def collection
         return nil if embedded?
-        @collection_name = self.to_s.demodulize.tableize
+        @collection_name ||= self.to_s.demodulize.tableize
         @collection ||= Mongoid.database.collection(@collection_name)
       end
 
