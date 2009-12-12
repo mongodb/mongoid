@@ -360,11 +360,8 @@ module Mongoid #:nodoc:
     # Either returns the page option and removes it from the options, or
     # returns a default value of 1.
     def page
-      if @options[:skip] && @options[:limit]
-        (@options[:skip].to_i + @options[:limit].to_i) / @options[:limit].to_i
-      else
-        1
-      end
+      skips, limits = @options[:skip], @options[:limit]
+      (skips && limits) ? (skips + limits) / limits : 1
     end
 
     # Executes the +Criteria+ and paginates the results.
@@ -498,8 +495,8 @@ module Mongoid #:nodoc:
       page_num = @options.delete(:page)
       per_page_num = @options.delete(:per_page)
       if (page_num || per_page_num)
-        @options[:limit] = (per_page_num || 20).to_i
-        @options[:skip] = (page_num || 1).to_i * @options[:limit] - @options[:limit]
+        @options[:limit] = limits = (per_page_num || 20).to_i
+        @options[:skip] = (page_num || 1).to_i * limits - limits
       end
     end
 

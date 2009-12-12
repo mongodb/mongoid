@@ -109,8 +109,9 @@ module Mongoid #:nodoc:
 
       # Set up a default value for a field.
       def default(name, options = {})
+        value = options[:default]
         @defaults ||= {}.with_indifferent_access
-        @defaults[name] = options[:default] if options[:default]
+        @defaults[name] = value if value
       end
 
     end
@@ -284,8 +285,8 @@ module Mongoid #:nodoc:
     # This will also cause the observing +Document+ to notify it's parent if
     # there is any.
     def update(child, clear = false)
-      @attributes.insert(child.association_name, child.attributes) unless clear
-      @attributes.delete(child.association_name) if clear
+      name = child.association_name
+      clear ? @attributes.delete(name) : @attributes.insert(name, child.attributes)
       notify
     end
 
