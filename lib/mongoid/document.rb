@@ -8,17 +8,10 @@ module Mongoid #:nodoc:
     attr_accessor :association_name, :parent
     attr_reader :attributes, :new_record
 
-    define_callbacks \
-      :after_create,
-      :after_destroy,
-      :after_save,
-      :after_update,
-      :after_validation,
-      :before_create,
-      :before_destroy,
-      :before_save,
-      :before_update,
-      :before_validation
+    delegate :collection, :defaults, :embedded?, :fields, :primary_key, :to => :klass
+
+    define_callbacks :before_create, :before_destroy, :before_save, :before_update, :before_validation
+    define_callbacks :after_create, :after_destroy, :after_save, :after_update, :after_validation
 
     class << self
 
@@ -138,35 +131,13 @@ module Mongoid #:nodoc:
     #
     # Returns: The child +Document+.
     def assimilate(parent, options)
-      parentize(parent, options.name)
-      notify
-      self
+      parentize(parent, options.name); notify; self
     end
 
     # Clone the current +Document+. This will return all attributes with the
     # exception of the document's id and versions.
     def clone
       self.class.instantiate(@attributes.except(:_id).except(:versions).dup, true)
-    end
-
-    # Get the Mongo::Collection associated with this Document.
-    def collection
-      self.class.collection
-    end
-
-    # Returns the class defaults
-    def defaults
-      self.class.defaults
-    end
-
-    # Return true if the +Document+ is embedded in another +Document+.
-    def embedded?
-      self.class.embedded?
-    end
-
-    # Get the fields for the Document class.
-    def fields
-      self.class.fields
     end
 
     # Get the id associated with this object. This will pull the _id value out
@@ -207,22 +178,6 @@ module Mongoid #:nodoc:
     # Returns the class name plus its attributes.
     def inspect
       "#{self.class.name} : #{@attributes.inspect}"
-    end
-
-    # Return the +Document+ primary key. This will only exist if a key has been
-    # set up on the +Document+ and will return an array of fields.
-    #
-    # Example:
-    #
-    #   class Person < Mongoid::Document
-    #     field :first_name
-    #     field :last_name
-    #     key :first_name, :last_name
-    #   end
-    #
-    # <tt>person.primary_key #[:first_name, :last_name]</tt>
-    def primary_key
-      self.class.primary_key
     end
 
     # Returns true is the +Document+ has not been persisted to the database,
@@ -376,6 +331,11 @@ module Mongoid #:nodoc:
       else
         @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
       end
+    end
+
+    # Convenience method to get the document's class
+    def klass
+      self.class
     end
   end
 end
