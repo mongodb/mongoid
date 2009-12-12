@@ -129,4 +129,36 @@ describe Mongoid::Associations::HasOne do
 
   end
 
+  describe "#valid?" do
+
+    context "when the document is nil" do
+
+      before do
+        @document = stub(:attributes => {})
+        @options = Mongoid::Associations::Options.new(:name => :name)
+        @association = Mongoid::Associations::HasOne.instantiate(@document, @options)
+      end
+
+      it "returns false" do
+        @association.valid?.should be_false
+      end
+
+    end
+
+    context "when the document is not nil" do
+
+      before do
+        @document = stub(:attributes => { :name => { :first_name => "Test" } }, :update => true)
+        @options = Mongoid::Associations::Options.new(:name => :name)
+        @association = Mongoid::Associations::HasOne.instantiate(@document, @options)
+      end
+
+      it "validates the document" do
+        @association.valid?.should be_true
+      end
+
+    end
+
+  end
+
 end

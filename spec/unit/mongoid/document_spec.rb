@@ -807,16 +807,32 @@ describe Mongoid::Document do
 
         context "when association is a has_one" do
 
-          it "fails when the association fails validation" do
-            Person.class_eval do
-              validates_associated :name
+          context "when the associated is not nil" do
+
+            it "fails when the association fails validation" do
+              Person.class_eval do
+                validates_associated :name
+              end
+              Name.class_eval do
+                validates_presence_of :first_name
+              end
+              @person.name = Name.new
+              @person.valid?.should be_false
+              @person.errors.on(:name).should_not be_nil
             end
-            Name.class_eval do
-              validates_presence_of :first_name
+
+          end
+
+          context "when the associated is nil" do
+
+            it "fails when the association fails validation" do
+              Person.class_eval do
+                validates_associated :name
+              end
+              @person.valid?.should be_false
+              @person.errors.on(:name).should_not be_nil
             end
-            @person.name = Name.new
-            @person.valid?.should be_false
-            @person.errors.on(:name).should_not be_nil
+
           end
 
         end

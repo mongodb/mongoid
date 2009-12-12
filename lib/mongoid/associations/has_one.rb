@@ -43,6 +43,11 @@ module Mongoid #:nodoc:
         @document.send(name, *args)
       end
 
+      # Need to override here for when the underlying document is nil.
+      def valid?
+        @document ? @document.valid? : false
+      end
+
       class << self
         # Preferred method of instantiating a new +HasOne+, since nil values
         # will be handled properly.
