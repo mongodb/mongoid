@@ -94,4 +94,150 @@ describe Mongoid::Attributes do
 
   end
 
+  describe "#read_attribute" do
+
+    context "when attribute does not exist" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "returns the default value" do
+        @person.age.should == 100
+      end
+
+    end
+
+  end
+
+  describe "#remove_attribute" do
+
+    context "when the attribute exists" do
+
+      it "removes the attribute" do
+        person = Person.new(:title => "Sir")
+        person.remove_attribute(:title)
+        person.title.should be_nil
+      end
+
+    end
+
+    context "when the attribute does not exist" do
+
+      it "does nothing" do
+        person = Person.new
+        person.remove_attribute(:title)
+        person.title.should be_nil
+      end
+
+    end
+
+  end
+
+  describe "#write_attribute" do
+
+    context "when attribute does not exist" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "returns the default value" do
+        @person.age = nil
+        @person.age.should == 100
+      end
+
+    end
+
+    context "when field has a default value" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "should allow overwriting of the default value" do
+        @person.terms = true
+        @person.terms.should be_true
+      end
+
+    end
+
+  end
+
+  describe "#write_attributes" do
+
+    context "typecasting" do
+
+      before do
+        @person = Person.new
+        @attributes = { :age => "50" }
+      end
+
+      it "properly casts values" do
+        @person.write_attributes(@attributes)
+        @person.age.should == 50
+      end
+
+    end
+
+    context "on a parent document" do
+
+      context "when the parent has a has many through a has one" do
+
+        before do
+          @owner = PetOwner.new(:title => "Mr")
+          @pet = Pet.new(:name => "Fido")
+          @owner.pet = @pet
+          @vet_visit = VetVisit.new(:date => Date.today)
+          @pet.vet_visits = [@vet_visit]
+        end
+
+        it "does not overwrite child attributes if not in the hash" do
+          @owner.write_attributes({ :pet => { :name => "Bingo" } })
+          @owner.pet.name.should == "Bingo"
+          @owner.pet.vet_visits.size.should == 1
+        end
+
+      end
+
+    end
+
+    context "on a child document" do
+
+      context "when child is part of a has one" do
+
+        before do
+          @person = Person.new(:title => "Sir", :age => 30)
+          @name = Name.new(:first_name => "Test", :last_name => "User")
+          @person.name = @name
+        end
+
+        it "sets the child attributes on the parent" do
+          @name.write_attributes(:first_name => "Test2", :last_name => "User2")
+          @person.attributes[:name].should ==
+            { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2" }
+        end
+
+      end
+
+      context "when child is part of a has many" do
+
+        before do
+          @person = Person.new(:title => "Sir")
+          @address = Address.new(:street => "Test")
+          @person.addresses << @address
+        end
+
+        it "updates the child attributes on the parent" do
+          @address.write_attributes("street" => "Test2")
+          @person.attributes[:addresses].should ==
+            [ { "_id" => "test", "street" => "Test2" } ]
+        end
+
+      end
+
+    end
+
+  end
+
 end
