@@ -73,7 +73,21 @@ module Mongoid
       @document = doc
     end
     def message
-      "Attempted to save embedded document #{@document.class.name}, but there was no associated parent"
+      "Attempted to save embedded document #{@document.class.name}, " +
+        "but there was no associated parent"
+    end
+  end
+
+  # This error is raised when trying to access a Mongo::Collection from an
+  # embedded document.
+  class InvalidCollectionError < RuntimeError
+    def initialize(klass)
+      @klass = klass
+    end
+    def message
+      "Access to the collection for #{@klass.name} is not allowed " +
+        "since it is an embedded document, please access a collection from " +
+        "the root document"
     end
   end
 

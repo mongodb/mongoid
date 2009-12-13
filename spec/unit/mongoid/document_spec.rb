@@ -101,8 +101,8 @@ describe Mongoid::Document do
         @address = Address.new
       end
 
-      it "returns nil" do
-        Address.collection.should be_nil
+      it "raises an error" do
+        lambda { Address.collection }.should raise_error
       end
 
     end
