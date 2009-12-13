@@ -4,6 +4,66 @@ describe Mongoid::Associations::HasManyRelated do
 
   let(:options) { Mongoid::Associations::Options.new(:name => :posts) }
 
+  describe "#<<" do
+
+    before do
+      @child = stub
+      @second = stub
+      @children = [@child, @second]
+    end
+
+    context "when parent document has been saved" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => false, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "saves and appends the child document" do
+        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:save).returns(true)
+        @association << @child
+        @association.size.should == 1
+      end
+
+    end
+
+    context "when parent document has not been saved" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "appends the child document" do
+        @child.expects(:person_id=).with(@parent.id)
+        @association << @child
+        @association.size.should == 1
+      end
+
+    end
+
+    context "with multiple objects" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "appends the child documents" do
+        @child.expects(:person_id=).with(@parent.id)
+        @second.expects(:person_id=).with(@parent.id)
+        @association << [@child, @second]
+        @association.size.should == 2
+      end
+
+    end
+
+  end
+
   describe "#build" do
 
     before do
@@ -24,6 +84,65 @@ describe Mongoid::Associations::HasManyRelated do
 
     it "returns the new object" do
       @association.build(:title => "Sassy").title.should == "Sassy"
+    end
+
+  end
+
+  describe "#concat" do
+
+    before do
+      @child = stub
+      @second = stub
+    end
+
+    context "when parent document has been saved" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => false, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "saves and appends the child document" do
+        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:save).returns(true)
+        @association.concat(@child)
+        @association.size.should == 1
+      end
+
+    end
+
+    context "when parent document has not been saved" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "appends the child document" do
+        @child.expects(:person_id=).with(@parent.id)
+        @association.concat(@child)
+        @association.size.should == 1
+      end
+
+    end
+
+    context "with multiple objects" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "appends the child documents" do
+        @child.expects(:person_id=).with(@parent.id)
+        @second.expects(:person_id=).with(@parent.id)
+        @association.concat([@child, @second])
+        @association.size.should == 2
+      end
+
     end
 
   end
@@ -86,6 +205,65 @@ describe Mongoid::Associations::HasManyRelated do
 
     it "returns :has_many_related" do
       Mongoid::Associations::HasManyRelated.macro.should == :has_many_related
+    end
+
+  end
+
+  describe "#push" do
+
+    before do
+      @child = stub
+      @second = stub
+    end
+
+    context "when parent document has been saved" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => false, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "saves and appends the child document" do
+        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:save).returns(true)
+        @association.push(@child)
+        @association.size.should == 1
+      end
+
+    end
+
+    context "when parent document has not been saved" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "appends the child document" do
+        @child.expects(:person_id=).with(@parent.id)
+        @association.push(@child)
+        @association.size.should == 1
+      end
+
+    end
+
+    context "with multiple objects" do
+
+      before do
+        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        Post.expects(:all).returns([])
+        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      end
+
+      it "appends the child documents" do
+        @child.expects(:person_id=).with(@parent.id)
+        @second.expects(:person_id=).with(@parent.id)
+        @association.push(@child, @second)
+        @association.size.should == 2
+      end
+
     end
 
   end

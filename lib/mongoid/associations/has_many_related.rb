@@ -5,6 +5,16 @@ module Mongoid #:nodoc:
 
       attr_reader :klass
 
+      # Appends the object to the +Array+, setting its parent in
+      # the process.
+      def <<(*objects)
+        objects.flatten.each do |object|
+          object.send("#{@foreign_key}=", @parent.id)
+          @documents << object
+          object.save unless @parent.new_record?
+        end
+      end
+
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
@@ -14,6 +24,11 @@ module Mongoid #:nodoc:
         object = @klass.instantiate(attributes.merge(@foreign_key => @parent.id))
         @documents << object
         object
+      end
+
+      # Delegates to <<
+      def concat(*objects)
+        self << objects
       end
 
       # Creates a new Document and adds it to the association collection. The
@@ -39,6 +54,11 @@ module Mongoid #:nodoc:
         @foreign_key = document.class.to_s.foreign_key
         @documents = @klass.all(:conditions => { @foreign_key => document.id })
         super(@documents)
+      end
+
+      # Delegates to <<
+      def push(*objects)
+        self << objects
       end
 
       class << self
