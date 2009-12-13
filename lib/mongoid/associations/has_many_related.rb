@@ -5,14 +5,23 @@ module Mongoid #:nodoc:
 
       attr_reader :klass
 
-      # Instantiate a new associated object and add it to the relationship.
+      # Builds a new Document and adds it to the association collection. The
+      # document created will be of the same class as the others in the
+      # association, and the attributes will be passed into the constructor.
+      #
+      # Returns the newly created object.
       def build(attributes)
         object = @klass.instantiate(attributes.merge(@foreign_key => @parent.id))
         @documents << object
         object
       end
 
-      # Create a new object for the association, save it, and add it.
+      # Creates a new Document and adds it to the association collection. The
+      # document created will be of the same class as the others in the
+      # association, and the attributes will be passed into the constructor and
+      # the new object will then be saved.
+      #
+      # Returns the newly created object.
       def create(attributes)
         object = build(attributes)
         object.save
