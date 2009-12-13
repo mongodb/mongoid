@@ -90,19 +90,6 @@ describe Mongoid::Commands do
 
   end
 
-  describe "#quick_save" do
-
-    before do
-      @person = Person.new
-    end
-
-    it "delegates to the QuickSave command" do
-      Mongoid::Commands::QuickSave.expects(:execute).with(@person).returns(true)
-      @person.quick_save
-    end
-
-  end
-
   describe "#update_attributes" do
 
     it "delegates to the Save command" do
