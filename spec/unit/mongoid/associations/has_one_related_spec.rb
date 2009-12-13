@@ -5,6 +5,47 @@ describe Mongoid::Associations::HasOneRelated do
   let(:document) { stub(:id => "1") }
   let(:options) { Mongoid::Associations::Options.new(:name => :game) }
 
+  describe "#build" do
+
+    before do
+      @parent = stub(:id => "5", :class => Person)
+      Game.expects(:first).returns(nil)
+      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+    end
+
+    it "adds a new object to the association" do
+      @association.build(:score => 100)
+      @association.score.should == 100
+    end
+
+    it "sets the parent object id on the child" do
+      @association.build(:score => 100)
+      @association.person_id.should == @parent.id
+    end
+
+  end
+
+  describe "#create" do
+
+    before do
+      @parent = stub(:id => "5", :class => Person)
+      Game.expects(:first).returns(nil)
+      Mongoid::Commands::Save.expects(:execute)
+      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+    end
+
+    it "adds a new object to the association" do
+      @association.create(:score => 100)
+      @association.score.should == 100
+    end
+
+    it "sets the parent object id on the child" do
+      @association.create(:score => 100)
+      @association.person_id.should == @parent.id
+    end
+
+  end
+
   describe ".initialize" do
 
     before do

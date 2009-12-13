@@ -6,6 +6,22 @@ module Mongoid #:nodoc:
       delegate :==, :nil?, :to => :document
       attr_reader :document
 
+      # Builds a new Document and sets it as the association.
+      #
+      # Returns the newly created object.
+      def build(attributes)
+        @document = @klass.instantiate(attributes)
+        @document.send("#{@foreign_key}=", @parent.id)
+      end
+
+      # Builds a new Document and sets it as the association, then saves the
+      # newly created document.
+      #
+      # Returns the newly created object.
+      def create(attributes)
+        build(attributes); @document.save; @document
+      end
+
       # Initializing a related association only requires looking up the objects
       # by their ids.
       #
@@ -14,8 +30,9 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options)
-        name = document.class.to_s.foreign_key
-        @document = options.klass.first(:conditions => { name => document.id })
+        @parent, @klass = document, options.klass
+        @foreign_key = document.class.to_s.foreign_key
+        @document = @klass.first(:conditions => { @foreign_key => @parent.id })
       end
 
       # Delegate all missing methods over to the +Document+.
