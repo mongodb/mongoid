@@ -53,7 +53,7 @@ describe Mongoid::Errors do
           @error = Mongoid::Errors::Validations.new(@errors)
         end
 
-        it "returns the class name" do
+        it "contains the errors' full messages" do
           @error.message.should include("Testing")
         end
 
@@ -74,7 +74,7 @@ describe Mongoid::Errors do
           @error = Mongoid::Errors::InvalidCollection.new(@klass)
         end
 
-        it "returns the class name" do
+        it "contains class is not allowed" do
           @error.message.should include("Address is not allowed")
         end
 
