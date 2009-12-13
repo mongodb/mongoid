@@ -54,7 +54,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :relates_to_many
+          :has_many_related
         end
 
         # Perform an update of the relationship of the parent and child. This

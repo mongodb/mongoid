@@ -84,8 +84,8 @@ describe Mongoid::Associations::HasManyRelated do
 
   describe ".macro" do
 
-    it "returns :relates_to_many" do
-      Mongoid::Associations::HasManyRelated.macro.should == :relates_to_many
+    it "returns :has_many_related" do
+      Mongoid::Associations::HasManyRelated.macro.should == :has_many_related
     end
 
   end
