@@ -195,6 +195,11 @@ module Mongoid #:nodoc:
       @new_record == true
     end
 
+    # Sets the new_record boolean - used after document is saved.
+    def new_record=(saved)
+      @new_record = saved
+    end
+
     # Set the changed state of the +Document+ then notify observers that it has changed.
     #
     # Example:

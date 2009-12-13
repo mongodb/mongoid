@@ -14,6 +14,7 @@ module Mongoid #:nodoc:
         return false unless Validate.execute(doc)
         doc.run_callbacks :before_save
         parent = doc.parent
+        doc.new_record = false
         parent ? Save.execute(parent) : doc.collection.save(doc.attributes)
         doc.run_callbacks :after_save
         return true

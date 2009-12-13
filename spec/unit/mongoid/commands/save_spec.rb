@@ -11,11 +11,13 @@ describe Mongoid::Commands::Save do
                      :valid? => true,
                      :run_callbacks => true,
                      :parent => nil,
-                     :attributes => {})
+                     :attributes => {},
+                     :new_record= => false)
       @document = stub(:collection => @doc_collection,
                        :run_callbacks => true,
                        :parent => @parent,
-                       :attributes => {})
+                       :attributes => {},
+                       :new_record= => false)
     end
 
     context "when document is valid" do
