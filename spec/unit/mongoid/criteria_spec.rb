@@ -140,11 +140,6 @@ describe Mongoid::Criteria do
 
     end
 
-    context "when type is :first" do
-
-
-    end
-
     context "when type is not :first" do
 
       it "calls find on the collection with the selector and options" do
