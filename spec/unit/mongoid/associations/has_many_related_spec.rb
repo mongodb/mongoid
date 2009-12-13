@@ -23,7 +23,22 @@ describe Mongoid::Associations::HasManyRelated do
     end
 
     it "returns the new object" do
-      @association.build(:title => "Sassy").should be_a_kind_of(Post)
+      @association.build(:title => "Sassy").title.should == "Sassy"
+    end
+
+  end
+
+  describe "#create" do
+
+    before do
+      @parent = stub(:id => "5", :class => Person)
+      Post.expects(:all).returns([])
+      Mongoid::Commands::Save.expects(:execute)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+    end
+
+    it "builds and saves the new object" do
+      @association.create(:title => "Sassy")
     end
 
   end

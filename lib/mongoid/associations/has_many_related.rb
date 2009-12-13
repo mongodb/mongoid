@@ -12,6 +12,12 @@ module Mongoid #:nodoc:
         object
       end
 
+      # Create a new object for the association, save it, and add it.
+      def create(attributes)
+        object = build(attributes)
+        object.save
+      end
+
       # Initializing a related association only requires looking up the objects
       # by their ids.
       #
