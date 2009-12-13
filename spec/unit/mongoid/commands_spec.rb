@@ -59,7 +59,7 @@ describe Mongoid::Commands do
 
     context "when validation fails" do
 
-      it "it raises a ValidationsError" do
+      it "it raises an error" do
         Mongoid::Commands::Save.expects(:execute).with(@person).returns(false)
         lambda { @person.save! }.should raise_error
       end
@@ -79,7 +79,7 @@ describe Mongoid::Commands do
 
       context "when validation fails" do
 
-        it "it raises a ValidationsError" do
+        it "it raises an error " do
           Mongoid::Commands::Create.expects(:execute).with(@person).returns(false)
           lambda { @person.save! }.should raise_error
         end
@@ -112,7 +112,7 @@ describe Mongoid::Commands do
 
     context "when validation fails" do
 
-      it "it raises a ValidationsError" do
+      it "it raises an error" do
         Mongoid::Commands::Save.expects(:execute).with(@person).returns(false)
         lambda { @person.update_attributes!({}) }.should raise_error
       end
@@ -149,7 +149,7 @@ describe Mongoid::Commands do
 
     context "when validation fails" do
 
-      it "raises an exception" do
+      it "raises an error" do
         person = stub(:errors => stub(:empty? => false))
         Mongoid::Commands::Create.expects(:execute).returns(person)
         lambda { Person.create! }.should raise_error

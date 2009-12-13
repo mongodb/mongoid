@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>Mongo::Collection</tt>
       def collection
-        raise InvalidCollectionError.new(self) if embedded?
+        raise Errors::InvalidCollection.new(self) if embedded?
         @collection_name ||= self.to_s.demodulize.tableize
         @collection ||= Mongoid.database.collection(@collection_name)
       end

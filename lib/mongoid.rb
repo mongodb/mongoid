@@ -43,6 +43,7 @@ require "mongoid/commands"
 require "mongoid/criteria"
 require "mongoid/dynamic_finder"
 require "mongoid/extensions"
+require "mongoid/errors"
 require "mongoid/field"
 require "mongoid/finders"
 require "mongoid/timestamps"
@@ -51,55 +52,15 @@ require "mongoid/document"
 
 module Mongoid
 
-  # Raised when the database connection has not been set up.
-  class InvalidDatabaseError < RuntimeError; end
-
-  # Raised when invalid options are passed into a constructor.
-  class InvalidOptionsError < RuntimeError; end
-
-  # Raised when an association is defined on the class, but the
-  # attribute in the hash is not an Array or Hash, or when
-  # checking equality on objects of different types.
-  class TypeMismatchError < RuntimeError; end
-
-  # Raised when a persisence method ending in ! fails validation.
-  class ValidationsError < RuntimeError; end
-
-  # A common case of errors is to instantiate a child document without a
-  # reference to a parent, which will result in trying to save on a nil
-  # collection. This error is raised to help debug the issue.
-  class MissingParentError < RuntimeError
-    def initialize(doc)
-      @document = doc
-    end
-    def message
-      "Attempted to save embedded document #{@document.class.name}, " +
-        "but there was no associated parent"
-    end
-  end
-
-  # This error is raised when trying to access a Mongo::Collection from an
-  # embedded document.
-  class InvalidCollectionError < RuntimeError
-    def initialize(klass)
-      @klass = klass
-    end
-    def message
-      "Access to the collection for #{@klass.name} is not allowed " +
-        "since it is an embedded document, please access a collection from " +
-        "the root document"
-    end
-  end
-
   # Sets the Mongo::DB to be used.
   def self.database=(db)
-    raise InvalidDatabaseError.new("Database should be a Mongo::DB, not #{db.class.name}") unless db.kind_of?(Mongo::DB)
+    raise Errors::InvalidDatabase.new("Database should be a Mongo::DB, not #{db.class.name}") unless db.kind_of?(Mongo::DB)
     @database = db
   end
 
   # Returns the Mongo::DB to use or raise an error if none was set.
   def self.database
-    @database || (raise InvalidDatabaseError.new("No database has been set"))
+    @database || (raise Errors::InvalidDatabase.new("No database has been set, please use Mongoid.database="))
   end
 
 end

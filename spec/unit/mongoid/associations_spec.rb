@@ -97,6 +97,14 @@ describe Mongoid::Associations do
       code.phone_number.should == phone_number
     end
 
+    context "when inverse_of not supplied" do
+
+      it "raises an error" do
+        lambda { Person.class_eval { belongs_to :nothing } }.should raise_error
+      end
+
+    end
+
     context "when navigating the graph" do
 
       before do

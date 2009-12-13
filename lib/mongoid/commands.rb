@@ -55,9 +55,9 @@ module Mongoid #:nodoc:
       # returns false then a +ValidationError+ will be raised.
       def save!
         if new_record?
-          return Create.execute(self) || (raise ValidationsError.new(self.errors.full_messages))
+          return Create.execute(self) || (raise Errors::Validations.new(self.errors))
         else
-          return Save.execute(self) || (raise ValidationsError.new(self.errors.full_messages))
+          return Save.execute(self) || (raise Errors::Validations.new(self.errors))
         end
       end
 
@@ -89,7 +89,7 @@ module Mongoid #:nodoc:
       # validation.
       def create!(attributes = {})
         document = Create.execute(new(attributes))
-        raise ValidationsError.new(self.errors.full_messages) unless document.errors.empty?
+        raise Errors::Validations.new(self.errors) unless document.errors.empty?
         return document
       end
 

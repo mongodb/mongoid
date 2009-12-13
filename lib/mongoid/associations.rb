@@ -57,7 +57,7 @@ module Mongoid # :nodoc:
       #   end
       def belongs_to(name, options = {})
         unless options.has_key?(:inverse_of)
-          raise InvalidOptionsError.new("Options for belongs_to association must include :inverse_of")
+          raise Errors::InvalidOptions.new("Options for belongs_to association must include :inverse_of")
         end
         @embedded = true
         add_association(
