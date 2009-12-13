@@ -7,10 +7,12 @@ module Mongoid #:nodoc:
 
       # Appends the object to the +Array+, setting its parent in
       # the process.
-      def <<(object)
-        object.parentize(@parent, @association_name)
-        @documents << object
-        object.is_a?(Array) ? object.each(&:notify) : object.notify
+      def <<(*objects)
+        objects.flatten.each do |object|
+          object.parentize(@parent, @association_name)
+          @documents << object
+          object.notify
+        end
       end
 
       # Clears the association, and notifies the parents of the removal.
@@ -23,14 +25,8 @@ module Mongoid #:nodoc:
 
       # Appends the object to the +Array+, setting its parent in
       # the process.
-      def push(object)
-        self << object
-      end
-
-      # Appends the object to the +Array+, setting its parent in
-      # the process.
-      def concat(object)
-        self << object
+      def concat(*objects)
+        self << objects
       end
 
       # Builds a new Document and adds it to the association collection. The
@@ -80,6 +76,12 @@ module Mongoid #:nodoc:
           child
         end : []
         super(@documents)
+      end
+
+      # Appends the object to the +Array+, setting its parent in
+      # the process.
+      def push(*objects)
+        self << objects
       end
 
       class << self
