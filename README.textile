@@ -44,11 +44,11 @@ Example of a simple domain model:
     field :title
     field :age, :type => Integer, :default => 0
 
-    has_many :addresses
     has_one :name
+    has_many :addresses
 
     has_one_related :game
-    has_may_related :posts
+    has_many_related :posts
   end
 
   class Address < Mongoid::Document
