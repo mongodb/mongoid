@@ -3,6 +3,15 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasManyRelated < DelegateClass(Array) #:nodoc:
 
+      attr_reader :klass
+
+      # Instantiate a new associated object and add it to the relationship.
+      def build(attributes)
+        object = @klass.instantiate(attributes.merge(@foreign_key => @parent.id))
+        @documents << object
+        object
+      end
+
       # Initializing a related association only requires looking up the objects
       # by their ids.
       #
@@ -11,8 +20,9 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options)
-        name = document.class.to_s.foreign_key
-        @documents = options.klass.all(:conditions => { name => document.id })
+        @parent, @klass = document, options.klass
+        @foreign_key = document.class.to_s.foreign_key
+        @documents = @klass.all(:conditions => { @foreign_key => document.id })
         super(@documents)
       end
 
