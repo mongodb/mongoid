@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class HasOneRelated #:nodoc:
 
       delegate :==, :nil?, :to => :document
-      attr_reader :document
+      attr_reader :klass, :document
 
       # Builds a new Document and sets it as the association.
       #
