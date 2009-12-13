@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class HasOne #:nodoc:
 
       delegate :==, :to => :document
-      attr_reader :document, :parent, :options
+      attr_reader :association_name, :document, :parent, :options
 
       # Build a new object for the association.
       def build(attributes)
@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
       # attributes: The attributes of the decorated object.
       # options: The association options.
       def initialize(document, attributes, options)
-        @parent, @options = document, options
+        @parent, @options, @association_name = document, options, options.name
         unless attributes.nil?
           @document = attributes.assimilate(@parent, @options)
         end
@@ -41,6 +41,12 @@ module Mongoid #:nodoc:
       # Delegate all missing methods over to the +Document+.
       def method_missing(name, *args)
         @document.send(name, *args)
+      end
+
+      # Used for setting the association via a nested attributes setter on the
+      # parent +Document+.
+      def nested_build(attributes)
+        build(attributes)
       end
 
       # Need to override here for when the underlying document is nil.

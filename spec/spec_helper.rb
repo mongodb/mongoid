@@ -37,6 +37,8 @@ class Person < Mongoid::Document
   has_one :name
   has_one :pet, :class_name => "Animal"
 
+  accepts_nested_attributes_for :addresses, :name
+
   index :title
   index :dob
   index :addresses

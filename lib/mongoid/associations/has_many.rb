@@ -78,6 +78,18 @@ module Mongoid #:nodoc:
         super(@documents)
       end
 
+      # Used for setting associations via a nested attributes setter from the
+      # parent +Document+.
+      #
+      # Options:
+      #
+      # attributes: A +Hash+ of integer keys and +Hash+ values.
+      def nested_build(attributes)
+        attributes.values.each do |attrs|
+          build(attrs)
+        end
+      end
+
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def push(*objects)

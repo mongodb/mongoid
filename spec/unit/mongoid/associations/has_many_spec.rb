@@ -209,6 +209,23 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe "#nested_build" do
+
+    before do
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+    end
+
+    it "returns the newly built object in the association" do
+      @association.nested_build({ "0" => { :street => "Yet Another" } })
+      @association.size.should == 3
+      @association.last.street.should == "Yet Another"
+    end
+
+  end
+
   describe "#push" do
 
     before do

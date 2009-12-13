@@ -80,6 +80,27 @@ describe Mongoid::Associations::HasOne do
 
   end
 
+  describe "#nested_build" do
+
+    context "when attributes provided" do
+
+      before do
+        @association = Mongoid::Associations::HasOne.new(
+          @document,
+          @attributes[:mixed_drink],
+          Mongoid::Associations::Options.new(:name => :mixed_drink)
+        )
+      end
+
+      it "replaces the existing has_one" do
+        drink = @association.nested_build({ :name => "Sapphire and Tonic" })
+        drink.name.should == "Sapphire and Tonic"
+      end
+
+    end
+
+  end
+
   describe ".instantiate" do
 
     context "when attributes exist" do

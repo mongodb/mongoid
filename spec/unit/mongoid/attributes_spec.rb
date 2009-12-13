@@ -2,6 +2,78 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
+  describe ".accepts_nested_attributes_for" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "adds a setter for the association attributes" do
+      @person.should respond_to(:addresses_attributes=)
+    end
+
+    describe "#association_attributes=" do
+
+      context "on a has many association" do
+
+        context "when association is empty" do
+
+          before do
+            @attributes = {
+              "0" => { "street" => "Folsom", "city" => "San Francisco" }
+            }
+            @person.addresses_attributes = @attributes
+          end
+
+          it "adds a new document to the association" do
+            address = @person.addresses.first
+            address.street.should == "Folsom"
+            address.city.should == "San Francisco"
+          end
+
+        end
+
+        context "when association is not empty" do
+
+          before do
+            @person = Person.new
+            @person.addresses.build(:street => "Broadway", :city => "New York")
+            @attributes = {
+              "0" => { "street" => "Folsom", "city" => "San Francisco" }
+            }
+            @person.addresses_attributes = @attributes
+          end
+
+          it "updates the existing attributes on the association" do
+            @person.addresses.size.should == 2
+          end
+
+        end
+
+      end
+
+      context "on a has one association" do
+
+        before do
+          @person = Person.new
+          @attributes = {
+            "first_name" => "Fernando", "last_name" => "Torres"
+          }
+          @person.name_attributes = @attributes
+        end
+
+        it "replaces the document on the association" do
+          name = @person.name
+          name.first_name.should == "Fernando"
+          name.last_name.should == "Torres"
+        end
+
+      end
+
+    end
+
+  end
+
   describe "#process" do
 
     context "when supplied hash has values" do
