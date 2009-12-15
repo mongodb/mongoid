@@ -1,7 +1,8 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasMany < DelegateClass(Array) #:nodoc:
+    class HasMany
+      include Proxy
 
       attr_accessor :association_name, :klass
 
@@ -20,7 +21,7 @@ module Mongoid #:nodoc:
         object = @documents.first
         object.changed(true)
         object.notify_observers(object, true)
-        super
+        @documents.clear
       end
 
       # Appends the object to the +Array+, setting its parent in
@@ -75,7 +76,11 @@ module Mongoid #:nodoc:
           child.parentize(@parent, @association_name)
           child
         end : []
-        super(@documents)
+      end
+
+      # Delegate all missing methods over to the documents array.
+      def method_missing(name, *args, &block)
+        @documents.send(name, *args, &block)
       end
 
       # Used for setting associations via a nested attributes setter from the

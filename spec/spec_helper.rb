@@ -48,8 +48,8 @@ class Person < Mongoid::Document
   has_many_related :posts
 
   def update_addresses
-    addresses.each_with_index do |address, i|
-      address.street = "Updated #{i}"
+    addresses.each do |address|
+      address.street = "Updated Address"
     end
   end
 

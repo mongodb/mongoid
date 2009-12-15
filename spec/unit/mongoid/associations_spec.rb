@@ -183,7 +183,7 @@ describe Mongoid::Associations do
       end
 
       it "retains its references to the original objects" do
-        @address.street.should == "Updated 0"
+        @address.street.should == "Updated Address"
       end
 
     end

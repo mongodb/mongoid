@@ -39,8 +39,8 @@ module Mongoid #:nodoc:
       end
 
       # Delegate all missing methods over to the +Document+.
-      def method_missing(name, *args)
-        @document.send(name, *args)
+      def method_missing(name, *args, &block)
+        @document.send(name, *args, &block)
       end
 
       # Used for setting the association via a nested attributes setter on the
