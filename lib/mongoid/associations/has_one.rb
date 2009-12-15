@@ -2,8 +2,10 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasOne #:nodoc:
+      instance_methods.each do |method|
+        undef_method(method) unless method =~ /(^__|^nil\?$|^send$|^object_id$)/
+      end
 
-      delegate :==, :to => :document
       attr_reader :association_name, :document, :parent, :options
 
       # Build a new object for the association.
@@ -19,8 +21,8 @@ module Mongoid #:nodoc:
         self
       end
 
-      # Creates the new association by finding the attributes in 
-      # the parent document with its name, and instantiating a 
+      # Creates the new association by finding the attributes in
+      # the parent document with its name, and instantiating a
       # new document for it.
       #
       # All method calls on this object will then be delegated
