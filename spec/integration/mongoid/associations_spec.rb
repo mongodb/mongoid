@@ -3,7 +3,9 @@ require "spec_helper"
 describe Mongoid::Associations do
 
   before do
-    Person.delete_all; Game.delete_all; Post.delete_all
+    Mongoid.database.collection(:people).drop
+    Mongoid.database.collection(:games).drop
+    Mongoid.database.collection(:posts).drop
   end
 
   context "one-to-one relational associations" do
@@ -27,7 +29,7 @@ describe Mongoid::Associations do
 
   end
 
-  context "one-to_many relational associations" do
+  context "one-to-many relational associations" do
 
     before do
       @person = Person.new(:title => "Sir")
@@ -39,6 +41,43 @@ describe Mongoid::Associations do
     it "sets the association on save" do
       @from_db = Person.find(@person.id)
       @from_db.posts.should == [@post]
+    end
+
+  end
+
+  context "nested embedded associations" do
+
+    before do
+      @person = Person.create(:title => "Mr")
+    end
+
+    context "one level nested" do
+
+      before do
+        @address = @person.addresses.create(:street => "Oxford St")
+        @name = @person.name.create(:first_name => "Gordon")
+      end
+
+      it "persists all the associations properly" do
+        @name.last_name = "Brown"
+        @person.name.last_name.should == "Brown"
+      end
+
+    end
+
+    context "multiple levels nested" do
+
+      before do
+        @person.phone_numbers.create(:number => "4155551212")
+      end
+
+      it "persists all the associations properly" do
+        from_db = Person.find(@person.id)
+        phone = from_db.phone_numbers.first
+        phone.country_code.create(:code => 1)
+        from_db.phone_numbers.first.country_code.code.should == 1
+      end
+
     end
 
   end
