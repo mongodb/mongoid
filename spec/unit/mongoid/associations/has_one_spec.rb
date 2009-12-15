@@ -78,6 +78,34 @@ describe Mongoid::Associations::HasOne do
 
     end
 
+    context "when the document is nil" do
+
+      before do
+        @association = Mongoid::Associations::HasOne.new(
+          @document,
+          {},
+          Mongoid::Associations::Options.new(:name => :mixed_drink)
+        )
+      end
+
+      describe "#new_record?" do
+
+        it "returns true" do
+          @association.should be_new_record
+        end
+
+      end
+
+      context "attribute getters" do
+
+        it "returns nil" do
+          @association.name.should be_nil
+        end
+
+      end
+
+    end
+
   end
 
   describe "#nested_build" do

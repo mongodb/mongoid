@@ -679,11 +679,11 @@ describe Mongoid::Document do
 
           context "when the associated is nil" do
 
-            it "returns true" do
+            it "returns false" do
               Person.class_eval do
                 validates_associated :name
               end
-              @person.valid?.should be_true
+              @person.valid?.should be_false
             end
 
           end

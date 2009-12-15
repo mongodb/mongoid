@@ -40,6 +40,7 @@ module Mongoid #:nodoc:
 
       # Delegate all missing methods over to the +Document+.
       def method_missing(name, *args, &block)
+        @document = {}.assimilate(@parent, @options) if @document.nil?
         @document.send(name, *args, &block)
       end
 
