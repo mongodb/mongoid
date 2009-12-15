@@ -2,8 +2,8 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class BelongsTo #:nodoc:
+      include Proxy
 
-      delegate :==, :to => :document
       attr_reader :document, :options
 
       # Creates the new association by setting the internal
