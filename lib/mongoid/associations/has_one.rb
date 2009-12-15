@@ -2,9 +2,7 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasOne #:nodoc:
-      instance_methods.each do |method|
-        undef_method(method) unless method =~ /(^__|^nil\?$|^send$|^object_id$)/
-      end
+      include Proxy
 
       attr_reader :association_name, :document, :parent, :options
 

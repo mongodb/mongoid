@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/associations/proxy"
 require "mongoid/associations/belongs_to"
 require "mongoid/associations/belongs_to_related"
 require "mongoid/associations/has_many"
