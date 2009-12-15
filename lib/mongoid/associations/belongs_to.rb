@@ -29,8 +29,8 @@ module Mongoid #:nodoc:
       end
 
       # Delegate all missing methods over to the parent +Document+.
-      def method_missing(name, *args)
-        @document.send(name, *args)
+      def method_missing(name, *args, &block)
+        @document.send(name, *args, &block)
       end
 
       class << self
