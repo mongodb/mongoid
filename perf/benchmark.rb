@@ -16,7 +16,7 @@ class Name < Mongoid::Document
   field :given
   field :family
   field :middle
-  belongs_to :person
+  belongs_to :person, :inverse_of => :name
 end
 
 class Address < Mongoid::Document
@@ -26,7 +26,7 @@ class Address < Mongoid::Document
   field :state
   field :post_code
   field :type
-  belongs_to :person
+  belongs_to :person, :inverse_of => :addresses
 end
 
 class Phone < Mongoid::Document
@@ -34,14 +34,17 @@ class Phone < Mongoid::Document
   field :country_code, :type => Integer
   field :number
   field :type
-  belongs_to :person
+  belongs_to :person, :inverse_of => :phones
 end
 
-Mongoid.connect_to("mongoid_performance")
+connection = Mongo::Connection.new
+Mongoid.database = connection.db("mongoid_perf_test")
 
 Mongoid.database.collection("people").drop
 
 RubyProf.start
+
+puts "Starting benchmark..."
 
 1000.times do |n|
   person = Person.new(:birth_date => Date.new(1970, 1, 1))
@@ -58,9 +61,10 @@ RubyProf.start
   person.addresses << address
   person.phones << phone
   person.save
-  puts "Saved person #{n}"
 end
 
 result = RubyProf.stop
 printer = RubyProf::FlatPrinter.new(result)
 printer.print(STDOUT, 0)
+
+Mongoid.database.collection("people").drop
