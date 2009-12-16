@@ -100,11 +100,12 @@ module Mongoid #:nodoc:
 
       # Define a field attribute for the +Document+.
       def define(name, options = {})
+        meth = options.delete(:as) || name
         @fields ||= {}.with_indifferent_access
         @fields[name] = Field.new(name.to_s, options)
-        define_method(name) { read_attribute(name) }
-        define_method("#{name}=") { |value| write_attribute(name, value) }
-        define_method("#{name}?") { read_attribute(name) == true } if options[:type] == Boolean
+        define_method(meth) { read_attribute(name) }
+        define_method("#{meth}=") { |value| write_attribute(name, value) }
+        define_method("#{meth}?") { read_attribute(name) == true } if options[:type] == Boolean
       end
 
       # Set up a default value for a field.

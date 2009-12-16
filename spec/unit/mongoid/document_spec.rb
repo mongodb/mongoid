@@ -219,6 +219,30 @@ describe Mongoid::Document do
 
     end
 
+    context "when as is specified" do
+
+      before do
+        Person.field :aliased, :as => :alias, :type => Boolean
+        @person = Person.new(:alias => true)
+      end
+
+      it "uses the alias to write the attribute" do
+        @person.expects(:write_attribute).with(:aliased, true)
+        @person.alias = true
+      end
+
+      it "uses the alias to read the attribute" do
+        @person.expects(:read_attribute).with(:aliased)
+        @person.alias
+      end
+
+      it "uses the alias for the query method" do
+        @person.expects(:read_attribute).with(:aliased)
+        @person.alias?
+      end
+
+    end
+
   end
 
   describe ".human_name" do
