@@ -797,11 +797,20 @@ describe Mongoid::Criteria do
         @criteria = mock
         Mongoid::Criteria.expects(:new).returns(@criteria)
         @criteria.expects(:id).with(@id).returns(@criteria)
-        @criteria.expects(:one).returns(@document)
       end
 
       it "creates a criteria for a string" do
+        @criteria.expects(:one).returns(@document)
         Mongoid::Criteria.translate(Person, @id)
+      end
+
+      context "when the document is not found" do
+
+        it "raises an error" do
+          @criteria.expects(:one).returns(nil)
+          lambda { Mongoid::Criteria.translate(Person, @id) }.should raise_error
+        end
+
       end
 
     end

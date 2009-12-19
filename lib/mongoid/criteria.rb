@@ -151,16 +151,6 @@ module Mongoid #:nodoc:
       @options = extras; filter_options; self
     end
 
-    # Return the first result for the +Criteria+.
-    #
-    # Example:
-    #
-    # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
-    def one
-      attributes = @klass.collection.find_one(@selector, @options.dup)
-      attributes ? @klass.instantiate(attributes) : nil
-    end
-
     GROUP_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
     # Groups the criteria. This will take the internally built selector and options
     # and pass them on to the Ruby driver's +group()+ method on the collection. The
@@ -341,6 +331,16 @@ module Mongoid #:nodoc:
       @options[:skip]
     end
 
+    # Return the first result for the +Criteria+.
+    #
+    # Example:
+    #
+    # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
+    def one
+      attributes = @klass.collection.find_one(@selector, @options.dup)
+      attributes ? @klass.instantiate(attributes) : nil
+    end
+
     # Adds a criterion to the +Criteria+ that specifies the sort order of
     # the returned documents in the database. Similar to a SQL "ORDER BY".
     #
@@ -438,7 +438,10 @@ module Mongoid #:nodoc:
     def self.translate(*args)
       klass = args[0]
       params = args[1] || {}
-      return new(klass).id(params).one if params.is_a?(String)
+      if params.is_a?(String)
+        document = new(klass).id(params).one
+        return document ? document : (raise Errors::DocumentNotFound.new(klass, params))
+      end
       return new(klass).where(params.delete(:conditions) || {}).extras(params)
     end
 

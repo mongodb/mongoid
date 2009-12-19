@@ -83,6 +83,16 @@ describe Mongoid::Finders do
         Person.find(@id.to_s)
       end
 
+      context "when no document is found" do
+
+        it "raises an error" do
+          @error = Mongoid::Errors::DocumentNotFound.new(Person, @id.to_s)
+          Mongoid::Criteria.expects(:translate).with(Person, @id.to_s).raises(@error)
+          lambda { Person.find(@id.to_s) }.should raise_error
+        end
+
+      end
+
     end
 
     context "when finding first" do
