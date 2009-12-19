@@ -86,6 +86,17 @@ module Mongoid #:nodoc:
         process(attrs)
         notify
       end
+
+      protected
+      # Used when supplying a :reject_if block as an option to
+      # accepts_nested_attributes_for
+      def reject(attributes, options)
+        if rejector = options[:reject_if]
+          attributes.delete_if do |key, value|
+            rejector.call(value)
+          end
+        end
+      end
     end
 
     module ClassMethods
@@ -101,8 +112,11 @@ module Mongoid #:nodoc:
       #     accepts_nested_attributes_for :name, :addresses
       #   end
       def accepts_nested_attributes_for(*args)
-        args.flatten.each do |name|
+        associations = args.flatten
+        options = associations.last.is_a?(Hash) ? associations.pop : {}
+        associations.each do |name|
           define_method("#{name}_attributes=") do |attrs|
+            reject(attrs, options)
             association = send(name)
             update(association, true)
             association.nested_build(attrs)

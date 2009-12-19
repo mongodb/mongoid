@@ -16,6 +16,21 @@ describe Mongoid::Attributes do
 
       context "on a has many association" do
 
+        context "when a reject block supplied" do
+
+          before do
+            @attributes = {
+              "0" => { "city" => "San Francisco" }
+            }
+            @person.addresses_attributes = @attributes
+          end
+
+          it "removes the attributes that match" do
+            @person.addresses.should be_empty
+          end
+
+        end
+
         context "when association is empty" do
 
           before do

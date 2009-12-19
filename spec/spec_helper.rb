@@ -37,7 +37,8 @@ class Person < Mongoid::Document
   has_one :name
   has_one :pet, :class_name => "Animal"
 
-  accepts_nested_attributes_for :addresses, :name
+  accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
+  accepts_nested_attributes_for :name
 
   index :title
   index :dob
