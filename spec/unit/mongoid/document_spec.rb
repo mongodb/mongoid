@@ -338,6 +338,19 @@ describe Mongoid::Document do
 
   describe "#new" do
 
+    context "when passed a block" do
+
+      it "yields self to the block" do
+        person = Person.new do |p|
+          p.title = "Sir"
+          p.age = 60
+        end
+        person.title.should == "Sir"
+        person.age.should == 60
+      end
+
+    end
+
     context "with no attributes" do
 
       it "sets default attributes" do

@@ -181,7 +181,8 @@ module Mongoid #:nodoc:
       @attributes = {}.with_indifferent_access
       process(defaults.merge(attrs))
       @new_record = true if id.nil?
-      generate_key
+      document = yield self if block_given?
+      generate_key; document
     end
 
     # Returns the class name plus its attributes.
