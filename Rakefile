@@ -12,14 +12,14 @@ begin
     gem.homepage = "http://github.com/durran/mongoid"
     gem.authors = ["Durran Jordan"]
 
-    gem.add_dependency("durran-validatable", "1.8.3")
-    gem.add_dependency("leshill-will_paginate", "2.3.11")
-    gem.add_dependency("activesupport", "2.3.4")
-    gem.add_dependency("mongo", "0.18.1")
-    gem.add_dependency("mongo_ext", "0.18.1")
+    gem.add_dependency("durran-validatable", ">= 1.8.3")
+    gem.add_dependency("leshill-will_paginate", ">= 2.3.11")
+    gem.add_dependency("activesupport", ">= 2.3.4")
+    gem.add_dependency("mongo", ">= 0.18.1")
+    gem.add_dependency("mongo_ext", ">= 0.18.1")
 
-    gem.add_development_dependency("rspec", "1.2.9")
-    gem.add_development_dependency("mocha", "0.9.8")
+    gem.add_development_dependency("rspec", ">= 1.2.9")
+    gem.add_development_dependency("mocha", ">= 0.9.8")
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
