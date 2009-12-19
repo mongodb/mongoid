@@ -91,7 +91,8 @@ module Mongoid #:nodoc:
       # Used when supplying a :reject_if block as an option to
       # accepts_nested_attributes_for
       def reject(attributes, options)
-        if rejector = options[:reject_if]
+        rejector = options[:reject_if]
+        if rejector
           attributes.delete_if do |key, value|
             rejector.call(value)
           end
