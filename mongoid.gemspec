@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.9.9"
+  s.version = "0.9.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-12-13}
+  s.date = %q{2009-12-19}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/associations/has_one.rb",
      "lib/mongoid/associations/has_one_related.rb",
      "lib/mongoid/associations/options.rb",
+     "lib/mongoid/associations/proxy.rb",
      "lib/mongoid/attributes.rb",
      "lib/mongoid/commands.rb",
      "lib/mongoid/commands/create.rb",
@@ -70,6 +71,7 @@ Gem::Specification.new do |s|
      "perf/benchmark.rb",
      "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
+     "spec/integration/mongoid/finders_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/unit/mongoid/associations/belongs_to_related_spec.rb",
@@ -124,6 +126,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
+     "spec/integration/mongoid/finders_spec.rb",
      "spec/spec_helper.rb",
      "spec/unit/mongoid/associations/belongs_to_related_spec.rb",
      "spec/unit/mongoid/associations/belongs_to_spec.rb",
@@ -175,30 +178,30 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<durran-validatable>, ["= 1.8.3"])
-      s.add_runtime_dependency(%q<leshill-will_paginate>, ["= 2.3.11"])
-      s.add_runtime_dependency(%q<activesupport>, ["= 2.3.4"])
-      s.add_runtime_dependency(%q<mongo>, ["= 0.18.1"])
-      s.add_runtime_dependency(%q<mongo_ext>, ["= 0.18.1"])
-      s.add_development_dependency(%q<rspec>, ["= 1.2.9"])
-      s.add_development_dependency(%q<mocha>, ["= 0.9.8"])
+      s.add_runtime_dependency(%q<durran-validatable>, [">= 1.8.3"])
+      s.add_runtime_dependency(%q<leshill-will_paginate>, [">= 2.3.11"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 2.3.4"])
+      s.add_runtime_dependency(%q<mongo>, [">= 0.18.1"])
+      s.add_runtime_dependency(%q<mongo_ext>, [">= 0.18.1"])
+      s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
-      s.add_dependency(%q<durran-validatable>, ["= 1.8.3"])
-      s.add_dependency(%q<leshill-will_paginate>, ["= 2.3.11"])
-      s.add_dependency(%q<activesupport>, ["= 2.3.4"])
-      s.add_dependency(%q<mongo>, ["= 0.18.1"])
-      s.add_dependency(%q<mongo_ext>, ["= 0.18.1"])
-      s.add_dependency(%q<rspec>, ["= 1.2.9"])
-      s.add_dependency(%q<mocha>, ["= 0.9.8"])
+      s.add_dependency(%q<durran-validatable>, [">= 1.8.3"])
+      s.add_dependency(%q<leshill-will_paginate>, [">= 2.3.11"])
+      s.add_dependency(%q<activesupport>, [">= 2.3.4"])
+      s.add_dependency(%q<mongo>, [">= 0.18.1"])
+      s.add_dependency(%q<mongo_ext>, [">= 0.18.1"])
+      s.add_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_dependency(%q<mocha>, [">= 0.9.8"])
     end
   else
-    s.add_dependency(%q<durran-validatable>, ["= 1.8.3"])
-    s.add_dependency(%q<leshill-will_paginate>, ["= 2.3.11"])
-    s.add_dependency(%q<activesupport>, ["= 2.3.4"])
-    s.add_dependency(%q<mongo>, ["= 0.18.1"])
-    s.add_dependency(%q<mongo_ext>, ["= 0.18.1"])
-    s.add_dependency(%q<rspec>, ["= 1.2.9"])
-    s.add_dependency(%q<mocha>, ["= 0.9.8"])
+    s.add_dependency(%q<durran-validatable>, [">= 1.8.3"])
+    s.add_dependency(%q<leshill-will_paginate>, [">= 2.3.11"])
+    s.add_dependency(%q<activesupport>, [">= 2.3.4"])
+    s.add_dependency(%q<mongo>, [">= 0.18.1"])
+    s.add_dependency(%q<mongo_ext>, [">= 0.18.1"])
+    s.add_dependency(%q<rspec>, [">= 1.2.9"])
+    s.add_dependency(%q<mocha>, [">= 0.9.8"])
   end
 end
 
