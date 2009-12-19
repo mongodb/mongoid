@@ -2,6 +2,26 @@ require "spec_helper"
 
 describe Mongoid::Errors do
 
+  describe Mongoid::Errors::DocumentNotFound do
+
+    describe "#message" do
+
+      context "default" do
+
+        before do
+          @error = Mongoid::Errors::DocumentNotFound.new(Person, "3")
+        end
+
+        it "contains document not found" do
+          @error.message.should include("Document not found")
+        end
+
+      end
+
+    end
+
+  end
+
   describe Mongoid::Errors::InvalidOptions do
 
     describe "#message" do

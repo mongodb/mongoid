@@ -1,6 +1,17 @@
 module Mongoid #:nodoc
   module Errors #:nodoc
 
+    # Raised when querying the database for a document by a specific id which
+    # does not exist.
+    class DocumentNotFound < RuntimeError
+      def initialize(klass, id)
+        @klass, @id = klass, @id
+      end
+      def message
+        "Document not found for class #{@klass} and id #{@id}"
+      end
+    end
+
     # Raised when invalid options are passed into a constructor.
     class InvalidOptions < RuntimeError; end
 
