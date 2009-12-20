@@ -274,6 +274,15 @@ module Mongoid #:nodoc:
       notify
     end
 
+    # Needs to run the appropriate callbacks the delegate up to the validatable
+    # gem.
+    def valid?
+      run_callbacks(:before_validation)
+      result = super
+      run_callbacks(:after_validation)
+      result
+    end
+
     protected
     def generate_key
       if primary_key

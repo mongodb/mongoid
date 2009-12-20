@@ -134,6 +134,7 @@ class Comment < Mongoid::Document
   include Mongoid::Versioning
   field :text
   key :text
+  validates_presence_of :text
 end
 
 class Post < Mongoid::Document

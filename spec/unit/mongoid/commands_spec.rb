@@ -177,4 +177,23 @@ describe Mongoid::Commands do
 
   end
 
+  describe "#valid?" do
+
+    before do
+      @comment = Comment.new
+    end
+
+    it "validates the document" do
+      @comment.valid?.should be_false
+    end
+
+    it "runs the validation callbacks" do
+      @comment.expects(:run_callbacks).with(:validate)
+      @comment.expects(:run_callbacks).with(:before_validation)
+      @comment.expects(:run_callbacks).with(:after_validation)
+      @comment.valid?
+    end
+
+  end
+
 end

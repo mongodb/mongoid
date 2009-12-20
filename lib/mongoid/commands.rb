@@ -5,7 +5,6 @@ require "mongoid/commands/delete_all"
 require "mongoid/commands/destroy"
 require "mongoid/commands/destroy_all"
 require "mongoid/commands/save"
-require "mongoid/commands/validate"
 
 module Mongoid #:nodoc:
 
