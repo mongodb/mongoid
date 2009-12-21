@@ -10,10 +10,10 @@ describe Mongoid::Extensions::Date::Conversions do
 
     context "when string provided" do
 
-      context "when string is a utc time" do
+      context "when string is a non utc time" do
 
-        it "returns a time from the string" do
-          Date.set(@time.utc.to_s).should == @time
+        it "returns a utc time from the string" do
+          Date.set(@time.to_s).should == @time.utc
         end
 
       end
@@ -21,7 +21,7 @@ describe Mongoid::Extensions::Date::Conversions do
       context "when string is a date" do
 
         it "returns a time from the string" do
-          Date.set("01/15/2007").should == Date.new(2007, 1, 15).at_midnight
+          Date.set("01/15/2007").should == Date.new(2007, 1, 15).at_midnight.utc
         end
 
       end
@@ -39,7 +39,7 @@ describe Mongoid::Extensions::Date::Conversions do
     context "when time provided" do
 
       it "returns the time" do
-        Date.set(@time).should == @time
+        Date.set(@time).should == @time.utc
       end
 
     end
