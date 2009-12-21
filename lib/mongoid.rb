@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require "rubygems"
 
-gem "activesupport", ">= 2.3.4"
+gem "activesupport", ">= 2.2.2"
 gem "mongo", ">= 0.18.1"
 gem "mongo_ext", ">= 0.18.1"
 gem "durran-validatable", ">= 1.8.3"
