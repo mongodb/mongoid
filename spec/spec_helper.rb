@@ -132,6 +132,7 @@ end
 
 class Comment < Mongoid::Document
   include Mongoid::Versioning
+  include Mongoid::Timestamps
   field :text
   key :text
   validates_presence_of :text
@@ -139,6 +140,7 @@ end
 
 class Post < Mongoid::Document
   include Mongoid::Versioning
+  include Mongoid::Timestamps
   field :title
   belongs_to_related :person
 end
