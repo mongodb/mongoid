@@ -78,4 +78,14 @@ describe Mongoid::Extensions::Symbol::Inflections do
 
   end
 
+  describe "#gt" do
+
+    it 'returns :"foo $gt"' do
+      ret = :foo.gt
+      ret.key.should == :foo
+      ret.operator.should == "gt"
+    end
+
+  end
+
 end

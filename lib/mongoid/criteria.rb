@@ -465,7 +465,7 @@ module Mongoid #:nodoc:
       when String
         @selector.update("$where" => selector)
       else
-        @selector.update(selector || {})
+        @selector.update(selector ? selector.expand_complex_criteria : {})
       end
       self
     end

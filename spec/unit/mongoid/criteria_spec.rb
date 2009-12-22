@@ -885,9 +885,23 @@ describe Mongoid::Criteria do
 
     context "when provided a hash" do
 
-      it "adds the clause to the selector" do
-        @criteria.where(:title => "Title", :text => "Text")
-        @criteria.selector.should == { :title => "Title", :text => "Text" }
+      context "with simple hash keys" do
+
+        it "adds the clause to the selector" do
+          @criteria.where(:title => "Title", :text => "Text")
+          @criteria.selector.should == { :title => "Title", :text => "Text" }
+        end
+
+      end
+
+      context "with complex hash keys" do
+
+        it "adds the correct clause to the selector" do
+          dob = 40.years.ago
+          @criteria.where(:age.gt => 40, :title => "Title", :dob.lt => dob)
+          @criteria.selector.should == {:age => {"$gt" => 40}, :title => "Title", :dob => {"$lt" => dob}}
+        end
+
       end
 
     end

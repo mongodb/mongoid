@@ -23,6 +23,13 @@ module Mongoid #:nodoc:
           to_s.plural?
         end
 
+        ["gt", "lt", "gte", "lte", "ne", "in", "nin", "mod", "all", "size", "exists"].each do |oper|
+          class_eval <<-OPERATORS
+            def #{oper}
+              ComplexCriterion.new(:key => self, :operator => "#{oper}")
+            end
+          OPERATORS
+        end
       end
     end
   end

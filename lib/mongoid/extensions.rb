@@ -10,6 +10,7 @@ require "mongoid/extensions/float/conversions"
 require "mongoid/extensions/hash/accessors"
 require "mongoid/extensions/hash/assimilation"
 require "mongoid/extensions/hash/conversions"
+require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/string/conversions"
@@ -44,6 +45,7 @@ class Hash #:nodoc
   include Mongoid::Extensions::Hash::Accessors
   include Mongoid::Extensions::Hash::Assimilation
   extend Mongoid::Extensions::Hash::Conversions
+  include Mongoid::Extensions::Hash::CriteriaHelpers
 end
 
 class Integer #:nodoc
