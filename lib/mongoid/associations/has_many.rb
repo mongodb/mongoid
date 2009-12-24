@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor.
       #
       # Returns the newly created object.
-      def build(attributes)
+      def build(attributes = {})
         object = @klass.instantiate(attributes)
         object.parentize(@parent, @association_name)
         push(object)

@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
       # Builds a new Document and sets it as the association.
       #
       # Returns the newly created object.
-      def build(attributes)
+      def build(attributes = {})
         @document = @klass.instantiate(attributes)
         @document.send("#{@foreign_key}=", @parent.id)
       end
