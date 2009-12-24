@@ -1,0 +1,109 @@
+require "spec_helper"
+
+describe Mongoid::Criteria do
+
+  before do
+    @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"])
+  end
+
+  after do
+    Person.delete_all
+  end
+
+  describe "#where" do
+
+    context "with complex criterion" do
+
+      context "#all" do
+
+        it "returns those matching an all clause" do
+          Person.criteria.where(:title.all => ["Sir"]).should == [@person]
+        end
+
+      end
+
+      context "#exists" do
+
+        it "returns those matching an exists clause" do
+          Person.criteria.where(:title.exists => true).should == [@person]
+        end
+
+      end
+
+      context "#gt" do
+
+        it "returns those matching a gt clause" do
+          Person.criteria.where(:age.gt => 30).should == [@person]
+        end
+
+      end
+
+      context "#gte" do
+
+        it "returns those matching a gte clause" do
+          Person.criteria.where(:age.gte => 33).should == [@person]
+        end
+
+      end
+
+      context "#in" do
+
+        it "returns those matching an in clause" do
+          Person.criteria.where(:title.in => ["Sir", "Madam"]).should == [@person]
+        end
+
+      end
+
+      context "#lt" do
+
+        it "returns those matching a lt clause" do
+          Person.criteria.where(:age.lt => 34).should == [@person]
+        end
+
+      end
+
+      context "#lte" do
+
+        it "returns those matching a lte clause" do
+          Person.criteria.where(:age.lte => 33).should == [@person]
+        end
+
+      end
+
+      context "#mod" do
+
+        it "returns those matching a mod clause" do
+          Person.criteria.where(:age.lte => 33).should == [@person]
+        end
+
+      end
+
+      context "#ne" do
+
+        it "returns those matching a ne clause" do
+          Person.criteria.where(:age.ne => 50).should == [@person]
+        end
+
+      end
+
+      context "#nin" do
+
+        it "returns those matching a nin clause" do
+          Person.criteria.where(:title.nin => ["Esquire", "Congressman"]).should == [@person]
+        end
+
+      end
+
+      context "#size" do
+
+        it "returns those matching a size clause" do
+          Person.criteria.where(:aliases.size => 2).should == [@person]
+        end
+
+      end
+
+    end
+
+  end
+
+end

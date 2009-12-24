@@ -30,6 +30,7 @@ class Person < Mongoid::Document
   field :mixed_drink, :type => MixedDrink
   field :employer_id
   field :lunch_time, :type => Time
+  field :aliases, :type => Array
 
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
