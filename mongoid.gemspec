@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.9.12"
+  s.version = "0.10.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-12-21}
+  s.date = %q{2009-12-24}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/commands/destroy.rb",
      "lib/mongoid/commands/destroy_all.rb",
      "lib/mongoid/commands/save.rb",
+     "lib/mongoid/complex_criterion.rb",
      "lib/mongoid/criteria.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/dynamic_finder.rb",
@@ -55,6 +56,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/hash/accessors.rb",
      "lib/mongoid/extensions/hash/assimilation.rb",
      "lib/mongoid/extensions/hash/conversions.rb",
+     "lib/mongoid/extensions/hash/criteria_helpers.rb",
      "lib/mongoid/extensions/integer/conversions.rb",
      "lib/mongoid/extensions/object/casting.rb",
      "lib/mongoid/extensions/object/conversions.rb",
@@ -69,6 +71,7 @@ Gem::Specification.new do |s|
      "mongoid.gemspec",
      "perf/benchmark.rb",
      "spec/integration/mongoid/associations_spec.rb",
+     "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
      "spec/spec.opts",
@@ -104,6 +107,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
      "spec/unit/mongoid/extensions/hash/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/hash/criteria_helpers_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
@@ -123,6 +127,7 @@ Gem::Specification.new do |s|
   s.summary = %q{ODM framework for MongoDB}
   s.test_files = [
     "spec/integration/mongoid/associations_spec.rb",
+     "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
      "spec/spec_helper.rb",
@@ -157,6 +162,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/hash/accessors_spec.rb",
      "spec/unit/mongoid/extensions/hash/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/hash/criteria_helpers_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
