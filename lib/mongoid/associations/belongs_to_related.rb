@@ -2,9 +2,9 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class BelongsToRelated #:nodoc:
+      include Proxy
 
-      delegate :==, :to => :document
-      attr_reader :document
+      attr_reader :document, :options
 
       # Initializing a related association only requires looking up the object
       # by its id.
