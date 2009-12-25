@@ -107,6 +107,14 @@ describe Mongoid::Associations::BelongsToRelated do
       Mongoid::Associations::BelongsToRelated.update(@related, @child, @options).should == @related
     end
 
+    context "when related is nil" do
+
+      it "returns nil" do
+        Mongoid::Associations::BelongsToRelated.update(nil, @child, @options).should be_nil
+      end
+
+    end
+
   end
 
 end

@@ -54,7 +54,8 @@ module Mongoid #:nodoc:
         #
         # <tt>BelongsToRelated.update(game, person, options)</tt>
         def update(related, parent, options)
-          parent.send("#{options.foreign_key}=", related.id); related
+          parent.send("#{options.foreign_key}=", related.id) if related
+          related
         end
       end
 
