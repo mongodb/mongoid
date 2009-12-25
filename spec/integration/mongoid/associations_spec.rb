@@ -31,17 +31,6 @@ describe Mongoid::Associations do
       @game.person.should == @person
     end
 
-    context "when the association has not been set" do
-
-      it "returns nil" do
-        @game.person_id = "12342314213"
-        @game.save
-        @from_db = Game.find(@game.id)
-        @from_db.person.should be_nil
-      end
-
-    end
-
   end
 
   context "one-to-many relational associations" do
