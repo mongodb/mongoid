@@ -82,8 +82,8 @@ module Mongoid #:nodoc:
       #
       # This will also cause the observing +Document+ to notify it's parent if
       # there is any.
-      def write_attributes(attrs)
-        process(attrs)
+      def write_attributes(attrs = nil)
+        process(attrs || {})
         notify
       end
 

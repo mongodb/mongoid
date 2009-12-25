@@ -265,6 +265,11 @@ describe Mongoid::Attributes do
         @person.age.should == 50
       end
 
+      it "allows passing of nil" do
+        @person.write_attributes(nil)
+        @person.age.should == 100
+      end
+
     end
 
     context "on a parent document" do
