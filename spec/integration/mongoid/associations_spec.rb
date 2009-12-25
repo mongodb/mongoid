@@ -58,6 +58,19 @@ describe Mongoid::Associations do
       @from_db.posts.should == [@post]
     end
 
+    context "when building" do
+
+      before do
+        @person = Person.new(:title => "Mr")
+        @post = @person.posts.build(:title => "First")
+      end
+
+      it "sets the reverse association" do
+        @post.person.should == @person
+      end
+
+    end
+
   end
 
   context "nested embedded associations" do

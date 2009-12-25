@@ -270,7 +270,7 @@ describe Mongoid::Document do
     context "when unique options are not provided" do
 
       it "delegates to collection with unique => false" do
-        @collection.expects(:create_index).with(:title, :unique => false)
+        @collection.expects(:create_index).with(:title, false)
         Person.index :title
       end
 
@@ -279,7 +279,7 @@ describe Mongoid::Document do
     context "when unique option is provided" do
 
       it "delegates to collection with unique option" do
-        @collection.expects(:create_index).with(:title, :unique => true)
+        @collection.expects(:create_index).with(:title, true)
         Person.index :title, :unique => true
       end
 

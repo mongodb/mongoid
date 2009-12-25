@@ -18,11 +18,13 @@ describe Mongoid::Document do
   describe "#count" do
 
     before do
-      Person.create(:title => "Sir")
+      5.times do |n|
+        Person.create(:title => "Sir")
+      end
     end
 
     it "returns the count" do
-      Person.count.should == 1
+      Person.count.should == 5
     end
 
   end
