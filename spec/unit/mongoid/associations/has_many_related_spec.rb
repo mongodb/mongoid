@@ -162,6 +162,30 @@ describe Mongoid::Associations::HasManyRelated do
 
   end
 
+  describe "#find" do
+
+    before do
+      @parent = stub(:id => "5", :class => Person)
+      Post.expects(:all).returns([])
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+    end
+
+    context "when finding by id" do
+
+      before do
+        @post = stub
+      end
+
+      it "returns the document in the array with that id" do
+        Post.expects(:find).with("5").returns(@post)
+        post = @association.find("5")
+        post.should == @post
+      end
+
+    end
+
+  end
+
   describe ".initialize" do
 
     context "when related id has been set" do

@@ -42,6 +42,12 @@ module Mongoid #:nodoc:
         object.save
       end
 
+      # Finds a document in this association.
+      # If an id is passed, will return the document for that id.
+      def find(id)
+        @klass.find(id)
+      end
+
       # Initializing a related association only requires looking up the objects
       # by their ids.
       #

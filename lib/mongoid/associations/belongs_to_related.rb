@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
         # options: The association +Options+.
         def instantiate(document, options)
           foreign_key = document.send(options.foreign_key)
-          foreign_key.nil? ? nil : new(document, foreign_key, options)
+          foreign_key.blank? ? nil : new(document, foreign_key, options)
         end
 
         # Returns the macro used to create the association.
