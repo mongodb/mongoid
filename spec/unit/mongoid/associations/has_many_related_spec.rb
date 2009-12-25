@@ -86,6 +86,11 @@ describe Mongoid::Associations::HasManyRelated do
       @association.build(:title => "Sassy").title.should == "Sassy"
     end
 
+    it "sets the parent object reference on the child" do
+      @association.build(:title => "Sassy")
+      @association.first.person.should == @parent
+    end
+
   end
 
   describe "#concat" do

@@ -22,7 +22,11 @@ describe Mongoid::Associations do
       @from_db.game.should == @game
     end
 
-    it "sets the reverse association" do
+    it "sets the reverse association before save" do
+      @game.person.should == @person
+    end
+
+    it "sets the reverse association after save" do
       @from_db = Game.find(@game.id)
       @game.person.should == @person
     end

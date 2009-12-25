@@ -21,7 +21,8 @@ module Mongoid #:nodoc:
       #
       # Returns the newly created object.
       def build(attributes = {})
-        object = @klass.instantiate(attributes.merge(@foreign_key => @parent.id))
+        name = @parent.class.to_s.underscore
+        object = @klass.instantiate(attributes.merge(name => @parent))
         @documents << object
         object
       end

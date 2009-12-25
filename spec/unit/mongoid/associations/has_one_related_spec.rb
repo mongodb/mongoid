@@ -23,6 +23,11 @@ describe Mongoid::Associations::HasOneRelated do
       @association.person_id.should == @parent.id
     end
 
+    it "sets the parent object reference on the child" do
+      @association.build(:score => 100)
+      @association.person.should == @parent
+    end
+
   end
 
   describe "#create" do
