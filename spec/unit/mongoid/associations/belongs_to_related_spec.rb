@@ -14,7 +14,7 @@ describe Mongoid::Associations::BelongsToRelated do
       end
 
       it "finds the object by id" do
-        Person.expects(:find).with(:conditions => { :_id => @document.person_id }).returns(@criteria)
+        Person.expects(:find).with(:conditions => { :id => @document.person_id }).returns(@criteria)
         association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
         association.should == @related
       end
@@ -61,7 +61,7 @@ describe Mongoid::Associations::BelongsToRelated do
       @document = stub(:person_id => "5")
       @options = Mongoid::Associations::Options.new(:name => :person)
       @criteria = stub(:one => @person)
-      Person.expects(:find).with(:conditions => { :_id => @document.person_id }).returns(@criteria)
+      Person.expects(:find).with(:conditions => { :id => @document.person_id }).returns(@criteria)
       @association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
     end
 
