@@ -101,6 +101,7 @@ end
 class PetOwner < Mongoid::Document
   field :title
   has_one :pet
+  has_one :address
 end
 
 class Pet < Mongoid::Document

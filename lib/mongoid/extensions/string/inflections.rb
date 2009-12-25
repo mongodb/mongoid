@@ -4,6 +4,12 @@ module Mongoid #:nodoc:
     module String #:nodoc:
       module Inflections #:nodoc:
 
+        ActiveSupport::Inflector.inflections do |inflect|
+          inflect.singular "address", "address"
+          inflect.singular "addresses", "address"
+          inflect.plural "address", "addresses"
+        end
+
         REVERSALS = {
           "asc" => "desc",
           "ascending" => "descending",

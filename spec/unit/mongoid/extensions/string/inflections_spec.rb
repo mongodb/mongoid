@@ -10,12 +10,28 @@ describe Mongoid::Extensions::String::Inflections do
         "bat".singular?.should be_true
       end
 
+      context "when string is added to inflections" do
+
+        it "returns true" do
+          "address".singular?.should be_true
+        end
+
+      end
+
     end
 
     context "when plural" do
 
       it "returns false" do
         "bats".singular?.should be_false
+      end
+
+      context "when string is added to inflections" do
+
+        it "returns true" do
+          "addresses".singular?.should be_false
+        end
+
       end
 
     end
