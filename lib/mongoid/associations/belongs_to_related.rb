@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, foreign_key, options)
-        @document = options.klass.find(foreign_key)
+        @document = options.klass.first(:conditions => { :_id => foreign_key })
       end
 
       # Delegate all missing methods over to the +Document+.
