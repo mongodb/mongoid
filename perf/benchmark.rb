@@ -7,7 +7,7 @@ class Person < Mongoid::Document
   include Mongoid::Versioning
   field :birth_date, :type => Date
   has_one :name
-  has_many :addresses
+  has_one :address
   has_many :phones
 end
 
@@ -26,7 +26,7 @@ class Address < Mongoid::Document
   field :state
   field :post_code
   field :type
-  belongs_to :person, :inverse_of => :addresses
+  belongs_to :person, :inverse_of => :address
 end
 
 class Phone < Mongoid::Document
@@ -58,7 +58,7 @@ puts "Starting benchmark..."
   )
   phone = Phone.new(:country_code => 1, :number => "415-555-1212", :type => "Mobile")
   person.name = name
-  person.addresses << address
+  person.address = address
   person.phones << phone
   person.save
 end
