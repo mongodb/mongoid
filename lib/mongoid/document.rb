@@ -192,7 +192,8 @@ module Mongoid #:nodoc:
 
     # Returns the class name plus its attributes.
     def inspect
-      "#{self.class.name} : #{@attributes.inspect}"
+      attrs = @attributes.map { |key, value| "#{key}: #{value}" } * ", "
+      "#<#{self.class.name} #{attrs}>"
     end
 
     # Returns true is the +Document+ has not been persisted to the database,

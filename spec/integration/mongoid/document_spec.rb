@@ -190,6 +190,18 @@ describe Mongoid::Document do
 
   end
 
+  describe "#inspect" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "returns a pretty string of class name and attributes" do
+      @person.inspect.should == "#<Person _id: #{@person.id}, age: #{@person.age}>"
+    end
+
+  end
+
   describe "#paginate" do
 
     before do
