@@ -28,7 +28,7 @@ describe Mongoid::Extensions::String::Inflections do
 
       context "when string is added to inflections" do
 
-        it "returns true" do
+        it "returns false" do
           "addresses".singular?.should be_false
         end
 
@@ -46,12 +46,28 @@ describe Mongoid::Extensions::String::Inflections do
         "bat".plural?.should be_false
       end
 
+      context "when string is added to inflections" do
+
+        it "returns false" do
+          "address".plural?.should be_false
+        end
+
+      end
+
     end
 
     context "when plural" do
 
       it "returns true" do
         "bats".plural?.should be_true
+      end
+
+      context "when string is added to inflections" do
+
+        it "returns true" do
+          "addresses".plural?.should be_true
+        end
+
       end
 
     end

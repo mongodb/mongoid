@@ -5,9 +5,8 @@ module Mongoid #:nodoc:
       module Inflections #:nodoc:
 
         ActiveSupport::Inflector.inflections do |inflect|
-          inflect.singular "address", "address"
-          inflect.singular "addresses", "address"
-          inflect.plural "address", "addresses"
+          inflect.singular("address", "address")
+          inflect.singular("addresses", "address")
         end
 
         REVERSALS = {
