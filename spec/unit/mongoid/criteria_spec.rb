@@ -239,6 +239,10 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#each_index" do
+
+  end
+
   describe "#excludes" do
 
     it "adds the $ne query to the selector" do

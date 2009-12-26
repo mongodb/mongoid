@@ -197,7 +197,8 @@ describe Mongoid::Document do
     end
 
     it "returns a pretty string of class name and attributes" do
-      @person.inspect.should == "#<Person _id: #{@person.id}, age: #{@person.age}>"
+      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name] || 'nil'}" } * ", "
+      @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
     end
 
   end
