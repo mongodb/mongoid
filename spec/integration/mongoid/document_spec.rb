@@ -174,6 +174,22 @@ describe Mongoid::Document do
 
   end
 
+  context "when address is a has one" do
+
+    before do
+      @owner = PetOwner.create(:title => "AKC")
+      @address = Address.new(:street => "Fido Street")
+      @owner.address = @address
+      @owner.save
+    end
+
+    it "is a single object and not an array" do
+      @from_db = PetOwner.find(@owner.id)
+      @from_db.address.should == @address
+    end
+
+  end
+
   describe "#paginate" do
 
     before do
