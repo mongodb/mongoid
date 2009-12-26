@@ -249,6 +249,11 @@ module Mongoid #:nodoc:
       object || self
     end
 
+    # Return an array with this +Document+ only in it.
+    def to_a
+      [ self ]
+    end
+
     # Returns the id of the Document, used in Rails compatibility.
     def to_param
       id

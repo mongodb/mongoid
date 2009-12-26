@@ -527,6 +527,15 @@ describe Mongoid::Document do
 
   end
 
+  describe "#to_a" do
+
+    it "returns an array with the document in it" do
+      person = Person.new
+      person.to_a.should == [ person ]
+    end
+
+  end
+
   describe "#to_param" do
 
     it "returns the id" do
