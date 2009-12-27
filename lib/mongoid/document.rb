@@ -26,6 +26,11 @@ module Mongoid #:nodoc:
         @collection ||= Mongoid.database.collection(@collection_name)
       end
 
+      # Set the collection name for the +Document+.
+      def collection_name(name)
+        @collection_name = name
+      end
+
       # Returns a hash of all the default values
       def defaults
         @defaults

@@ -153,6 +153,10 @@ class Game < Mongoid::Document
   belongs_to_related :person
 end
 
+class Patient < Mongoid::Document
+  collection_name "population"
+end
+
 if RUBY_VERSION == '1.8.6'
   class Array
     alias :count :size

@@ -109,6 +109,19 @@ describe Mongoid::Document do
 
   end
 
+  describe ".collection_name" do
+
+    before do
+      @coll = stub(:name => "population")
+    end
+
+    it "sets the collection name on the document class" do
+      Mongoid.database.expects(:collection).with("population").returns(@coll)
+      Patient.collection.should == @coll
+    end
+
+  end
+
   describe ".defaults" do
 
     it "returns a hash of all the default values" do
