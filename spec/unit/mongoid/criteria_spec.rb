@@ -898,12 +898,96 @@ describe Mongoid::Criteria do
 
       end
 
-      context "with complex hash keys" do
+      context "with complex criterion" do
 
-        it "adds the correct clause to the selector" do
-          dob = 40.years.ago
-          @criteria.where(:age.gt => 40, :title => "Title", :dob.lt => dob)
-          @criteria.selector.should == {:age => {"$gt" => 40}, :title => "Title", :dob => {"$lt" => dob}}
+        context "#all" do
+
+          it "returns those matching an all clause" do
+            @criteria.where(:title.all => ["Sir"])
+            @criteria.selector.should == { :title => { "$all" => ["Sir"] } }
+          end
+
+        end
+
+        context "#exists" do
+
+          it "returns those matching an exists clause" do
+            @criteria.where(:title.exists => true)
+            @criteria.selector.should == { :title => { "$exists" => true } }
+          end
+
+        end
+
+        context "#gt" do
+
+          it "returns those matching a gt clause" do
+            @criteria.where(:age.gt => 30)
+            @criteria.selector.should == { :age => { "$gt" => 30 } }
+          end
+
+        end
+
+        context "#gte" do
+
+          it "returns those matching a gte clause" do
+            @criteria.where(:age.gte => 33)
+            @criteria.selector.should == { :age => { "$gte" => 33 } }
+          end
+
+        end
+
+        context "#in" do
+
+          it "returns those matching an in clause" do
+            @criteria.where(:title.in => ["Sir", "Madam"])
+            @criteria.selector.should == { :title => { "$in" => ["Sir", "Madam"] } }
+          end
+
+        end
+
+        context "#lt" do
+
+          it "returns those matching a lt clause" do
+            @criteria.where(:age.lt => 34)
+            @criteria.selector.should == { :age => { "$lt" => 34 } }
+          end
+
+        end
+
+        context "#lte" do
+
+          it "returns those matching a lte clause" do
+            @criteria.where(:age.lte => 33)
+            @criteria.selector.should == { :age => { "$lte" => 33 } }
+          end
+
+        end
+
+        context "#ne" do
+
+          it "returns those matching a ne clause" do
+            @criteria.where(:age.ne => 50)
+            @criteria.selector.should == { :age => { "$ne" => 50 } }
+          end
+
+        end
+
+        context "#nin" do
+
+          it "returns those matching a nin clause" do
+            @criteria.where(:title.nin => ["Esquire", "Congressman"])
+            @criteria.selector.should == { :title => { "$nin" => ["Esquire", "Congressman"] } }
+          end
+
+        end
+
+        context "#size" do
+
+          it "returns those matching a size clause" do
+            @criteria.where(:aliases.size => 2)
+            @criteria.selector.should == { :aliases => { "$size" => 2 } }
+          end
+
         end
 
       end

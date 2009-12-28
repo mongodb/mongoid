@@ -70,14 +70,6 @@ describe Mongoid::Criteria do
 
       end
 
-      context "#mod" do
-
-        it "returns those matching a mod clause" do
-          Person.criteria.where(:age.lte => 33).should == [@person]
-        end
-
-      end
-
       context "#ne" do
 
         it "returns those matching a ne clause" do
