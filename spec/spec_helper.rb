@@ -16,11 +16,13 @@ Spec::Runner.configure do |config|
   Mocha::Configuration.prevent(:stubbing_non_existent_method)
 end
 
-class MixedDrink < Mongoid::Document
+class MixedDrink
+  include Mongoid::Document
   field :name
 end
 
-class Person < Mongoid::Document
+class Person
+  include Mongoid::Document
   include Mongoid::Timestamps
 
   field :title
@@ -73,50 +75,61 @@ class Person < Mongoid::Document
 
 end
 
+class Admin < Person
+  field :code
+end
+
 class Employer
   def id
     "1"
   end
 end
 
-class CountryCode < Mongoid::Document
+class CountryCode
+  include Mongoid::Document
   field :code, :type => Integer
   key :code
   belongs_to :phone_number, :inverse_of => :country_codes
 end
 
-class Phone < Mongoid::Document
+class Phone
+  include Mongoid::Document
   field :number
   key :number
   belongs_to :person, :inverse_of => :phone_numbers
   has_one :country_code
 end
 
-class Animal < Mongoid::Document
+class Animal
+  include Mongoid::Document
   field :name
   key :name
   belongs_to :person, :inverse_of => :pet
 end
 
-class PetOwner < Mongoid::Document
+class PetOwner
+  include Mongoid::Document
   field :title
   has_one :pet
   has_one :address
 end
 
-class Pet < Mongoid::Document
+class Pet
+  include Mongoid::Document
   field :name
   field :weight, :type => Float, :default => 0.0
   has_many :vet_visits
   belongs_to :pet_owner, :inverse_of => :pet
 end
 
-class VetVisit < Mongoid::Document
+class VetVisit
+  include Mongoid::Document
   field :date, :type => Date
   belongs_to :pet, :inverse_of => :vet_visits
 end
 
-class Address < Mongoid::Document
+class Address
+  include Mongoid::Document
   field :street
   field :city
   field :state
@@ -125,14 +138,16 @@ class Address < Mongoid::Document
   belongs_to :addressable, :inverse_of => :addresses
 end
 
-class Name < Mongoid::Document
+class Name
+  include Mongoid::Document
   field :first_name
   field :last_name
   key :first_name, :last_name
   belongs_to :person, :inverse_of => :name
 end
 
-class Comment < Mongoid::Document
+class Comment
+  include Mongoid::Document
   include Mongoid::Versioning
   include Mongoid::Timestamps
   field :text
@@ -140,20 +155,23 @@ class Comment < Mongoid::Document
   validates_presence_of :text
 end
 
-class Post < Mongoid::Document
+class Post
+  include Mongoid::Document
   include Mongoid::Versioning
   include Mongoid::Timestamps
   field :title
   belongs_to_related :person
 end
 
-class Game < Mongoid::Document
+class Game
+  include Mongoid::Document
   field :high_score, :default => 500
   field :score, :type => Integer, :default => 0
   belongs_to_related :person
 end
 
-class Patient < Mongoid::Document
+class Patient
+  include Mongoid::Document
   collection_name "population"
 end
 

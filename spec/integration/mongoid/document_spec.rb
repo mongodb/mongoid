@@ -159,7 +159,7 @@ describe Mongoid::Document do
   describe "#group" do
 
     before do
-      30.times do |num|
+      5.times do |num|
         Person.create(:title => "Sir", :age => num)
       end
     end
