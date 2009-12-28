@@ -14,4 +14,16 @@ describe Mongoid do
 
   end
 
+  describe ".raise_not_found_error" do
+
+    before do
+      Mongoid.raise_not_found_error = false
+    end
+
+    it "sets the not found error flag" do
+      Mongoid.raise_not_found_error.should == false
+    end
+
+  end
+
 end

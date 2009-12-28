@@ -57,12 +57,24 @@ module Mongoid
   # Sets the Mongo::DB to be used.
   def self.database=(db)
     raise Errors::InvalidDatabase.new("Database should be a Mongo::DB, not #{db.class.name}") unless db.kind_of?(Mongo::DB)
-    @database = db
+    @@database = db
   end
 
   # Returns the Mongo::DB to use or raise an error if none was set.
   def self.database
-    @database || (raise Errors::InvalidDatabase.new("No database has been set, please use Mongoid.database="))
+    @@database || (raise Errors::InvalidDatabase.new("No database has been set, please use Mongoid.database="))
+  end
+
+  # Sets whether or not an Errors::DocumentNotFound error is raised when
+  # finding a document by its id returns none.
+  def self.raise_not_found_error=(error)
+    @@raise_not_found_error = error
+  end
+
+  # Return whether or not an error is raised when finding by an id does not
+  # return anything from the database.
+  def self.raise_not_found_error
+    @@raise_not_found_error
   end
 
 end
