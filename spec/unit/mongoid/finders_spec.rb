@@ -278,11 +278,20 @@ describe Mongoid::Finders do
 
   end
 
-  describe ".select" do
+  describe ".only" do
 
     it "returns a new criteria with select conditions added" do
-      criteria = Person.select(:title, :age)
+      criteria = Person.only(:title, :age)
       criteria.options.should == { :fields => [ :title, :age ] }
+    end
+
+  end
+
+  describe ".where" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Person.where(:title => "Sir")
+      criteria.selector.should == { :title => "Sir" }
     end
 
   end

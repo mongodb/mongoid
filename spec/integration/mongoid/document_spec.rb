@@ -165,7 +165,7 @@ describe Mongoid::Document do
     end
 
     it "returns grouped documents" do
-      grouped = Person.select(:title).group
+      grouped = Person.only(:title).group
       people = grouped.first["group"]
       person = people.first
       person.should be_a_kind_of(Person)

@@ -43,7 +43,7 @@ describe Mongoid::Criteria do
 
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {}, {:count => 0}, @reduce)
-        @criteria.select(:field1).aggregate
+        @criteria.only(:field1).aggregate
       end
 
     end
@@ -58,7 +58,7 @@ describe Mongoid::Criteria do
 
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {}, {:count => 0}, @reduce)
-        @criteria.select(:field1).aggregate(Person)
+        @criteria.only(:field1).aggregate(Person)
       end
 
     end
@@ -319,7 +319,7 @@ describe Mongoid::Criteria do
 
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {}, {:group => []}, @reduce).returns(@grouping)
-        @criteria.select(:field1).group
+        @criteria.only(:field1).group
       end
 
     end
@@ -334,7 +334,7 @@ describe Mongoid::Criteria do
 
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {}, {:group => []}, @reduce).returns(@grouping)
-        @criteria.select(:field1).group
+        @criteria.only(:field1).group
       end
 
     end
@@ -699,7 +699,7 @@ describe Mongoid::Criteria do
     before do
       @collection = mock
       Person.expects(:collection).returns(@collection)
-      @criteria = Person.select.where(:_id => "1").skip(60).limit(20)
+      @criteria = Person.where(:_id => "1").skip(60).limit(20)
       @collection.expects(:find).with({:_id => "1"}, :skip => 60, :limit => 20).returns([])
       @results = @criteria.paginate
     end
@@ -739,17 +739,17 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#select" do
+  describe "#only" do
 
     context "when args are provided" do
 
       it "adds the options for limiting by fields" do
-        @criteria.select(:title, :text)
+        @criteria.only(:title, :text)
         @criteria.options.should == { :fields => [ :title, :text ] }
       end
 
       it "returns self" do
-        @criteria.select.should == @criteria
+        @criteria.only.should == @criteria
       end
 
     end
@@ -757,7 +757,7 @@ describe Mongoid::Criteria do
     context "when no args provided" do
 
       it "does not add the field option" do
-        @criteria.select
+        @criteria.only
         @criteria.options[:fields].should be_nil
       end
 

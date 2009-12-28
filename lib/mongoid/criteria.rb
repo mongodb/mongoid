@@ -11,7 +11,7 @@ module Mongoid #:nodoc:
   #
   # <tt>criteria = Criteria.new</tt>
   #
-  # <tt>criteria.select(:field => "value").only(:field).skip(20).limit(20)</tt>
+  # <tt>criteria.only(:field).where(:field => "value").skip(20).limit(20)</tt>
   #
   # <tt>criteria.execute</tt>
   class Criteria
@@ -341,6 +341,23 @@ module Mongoid #:nodoc:
       attributes ? @klass.instantiate(attributes) : nil
     end
 
+    # Adds a criterion to the +Criteria+ that specifies the fields that will
+    # get returned from the Document. Used mainly for list views that do not
+    # require all fields to be present. This is similar to SQL "SELECT" values.
+    #
+    # Options:
+    #
+    # args: A list of field names to retrict the returned fields to.
+    #
+    # Example:
+    #
+    # <tt>criteria.only(:field1, :field2, :field3)</tt>
+    #
+    # Returns: <tt>self</tt>
+    def only(*args)
+      @options[:fields] = args.flatten if args.any?; self
+    end
+
     # Adds a criterion to the +Criteria+ that specifies the sort order of
     # the returned documents in the database. Similar to a SQL "ORDER BY".
     #
@@ -379,23 +396,6 @@ module Mongoid #:nodoc:
     # Returns the number of results per page or the default of 20.
     def per_page
       (@options[:limit] || 20).to_i
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies the fields that will
-    # get returned from the Document. Used mainly for list views that do not
-    # require all fields to be present. This is similar to SQL "SELECT" values.
-    #
-    # Options:
-    #
-    # args: A list of field names to retrict the returned fields to.
-    #
-    # Example:
-    #
-    # <tt>criteria.select(:field1, :field2, :field3)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def select(*args)
-      @options[:fields] = args.flatten if args.any?; self
     end
 
     # Adds a criterion to the +Criteria+ that specifies how many results to skip

@@ -120,11 +120,28 @@ module Mongoid #:nodoc:
     #
     # Example:
     #
-    # <tt>Person.select(:field1, :field2, :field3)</tt>
+    # <tt>Person.only(:field1, :field2, :field3)</tt>
     #
     # Returns: <tt>Criteria</tt>
-    def select(*args)
-      Criteria.new(self).select(*args)
+    def only(*args)
+      Criteria.new(self).only(*args)
+    end
+
+    # Entry point for creating a new criteria from a Document. This will
+    # instantiate a new +Criteria+ object with the supplied select criterion
+    # already added to it.
+    #
+    # Options:
+    #
+    # selector: A where criteria to initialize.
+    #
+    # Example:
+    #
+    # <tt>Person.where(:field1 => "Value")</tt>
+    #
+    # Returns: <tt>Criteria</tt>
+    def where(selector = nil)
+      Criteria.new(self).where(selector)
     end
 
   end
