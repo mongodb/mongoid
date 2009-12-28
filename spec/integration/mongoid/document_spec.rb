@@ -257,6 +257,30 @@ describe Mongoid::Document do
 
     end
 
+    context "without validation" do
+
+      before do
+        @comment = Comment.new
+      end
+
+      it "always persists" do
+        @comment.save(false).should be_true
+      end
+
+    end
+
+    context "with failing validation" do
+
+      before do
+        @comment = Comment.new
+      end
+
+      it "returns false" do
+        @comment.save.should_not be_valid
+      end
+
+    end
+
   end
 
   context "when has many exists through a has one" do
