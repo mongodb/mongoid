@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
      "README.textile",
      "Rakefile",
      "VERSION",
-     "install.rb",
      "lib/mongoid.rb",
      "lib/mongoid/associations.rb",
      "lib/mongoid/associations/belongs_to.rb",
