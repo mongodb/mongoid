@@ -239,7 +239,37 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#each_index" do
+  describe "#first" do
+
+    context "when documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
+      end
+
+      it "calls find on the collection with the selector and options" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.first.should be_a_kind_of(Person)
+      end
+
+    end
+
+    context "when no documents exist" do
+
+      before do
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(nil)
+      end
+
+      it "returns nil" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.first.should be_nil
+      end
+
+    end
 
   end
 

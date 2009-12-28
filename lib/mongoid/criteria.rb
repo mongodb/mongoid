@@ -341,6 +341,8 @@ module Mongoid #:nodoc:
       attributes ? @klass.instantiate(attributes) : nil
     end
 
+    alias :first :one
+
     # Adds a criterion to the +Criteria+ that specifies the fields that will
     # get returned from the Document. Used mainly for list views that do not
     # require all fields to be present. This is similar to SQL "SELECT" values.
