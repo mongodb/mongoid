@@ -2,26 +2,16 @@ require "spec_helper"
 
 describe Mongoid do
 
-  describe ".database=" do
-
-    context "when object provided is not a Mongo::DB" do
-
-      it "raises an error" do
-        lambda { Mongoid.database = "Test" }.should raise_error
-      end
-
-    end
-
-  end
-
-  describe ".raise_not_found_error" do
+  describe ".method_missing" do
 
     before do
-      Mongoid.raise_not_found_error = false
+      @config = mock
+      Mongoid::Config.expects(:instance).returns(@config)
     end
 
-    it "sets the not found error flag" do
-      Mongoid.raise_not_found_error.should == false
+    it "delegates all calls to the config singleton" do
+      @config.expects(:raise_not_found_error=).with(false)
+      Mongoid.raise_not_found_error = false
     end
 
   end

@@ -440,7 +440,10 @@ module Mongoid #:nodoc:
       params = args[1] || {}
       if params.is_a?(String)
         document = new(klass).id(params).one
-        return document ? document : (raise Errors::DocumentNotFound.new(klass, params))
+        if Mongoid.raise_not_found_error
+          raise Errors::DocumentNotFound.new(klass, params) unless document
+        end
+        return document
       end
       return new(klass).where(params.delete(:conditions) || {}).extras(params)
     end
