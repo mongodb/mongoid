@@ -1,0 +1,18 @@
+=== 0.10.4
+
+- Documents no longer inherit from Mongoid::Document.
+  Please include Mongoid::Document in all your models now.
+
+- Config module added, you can now set one option:
+  Mongoid.raise_not_found_error = (true|false)
+
+  - When set to false, a Mongoid::Errors::DocumentNotFound
+    will NOT get thrown when performing a Document.find(id)
+    that does not return a document from the database.
+    This defaults to true.
+
+- Mongoid::Document.collection_name macro added. You can
+  now set the name of the database collection to persist to.
+
+- Mongoid::Criteria#select becomes Mongoid::Criteria#only
+
