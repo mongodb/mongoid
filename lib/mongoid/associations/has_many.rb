@@ -18,10 +18,12 @@ module Mongoid #:nodoc:
 
       # Clears the association, and notifies the parents of the removal.
       def clear
-        object = @documents.first
-        object.changed(true)
-        object.notify_observers(object, true)
-        @documents.clear
+        unless @documents.empty?
+          object = @documents.first
+          object.changed(true)
+          object.notify_observers(object, true)
+          @documents.clear
+        end
       end
 
       # Appends the object to the +Array+, setting its parent in

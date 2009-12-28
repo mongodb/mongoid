@@ -104,7 +104,10 @@ describe Mongoid::Associations::HasMany do
   describe "#concat" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
       @address = Address.new
     end
 
@@ -112,6 +115,24 @@ describe Mongoid::Associations::HasMany do
       @association.concat [@address]
       @association.length.should == 3
       @address.parent.should == @document
+    end
+
+  end
+
+  describe "#clear" do
+
+    before do
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+      @address = Address.new
+      @association << @address
+    end
+
+    it "clears out the association" do
+      @association.clear
+      @association.size.should == 0
     end
 
   end
