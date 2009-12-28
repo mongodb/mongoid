@@ -72,6 +72,18 @@ describe Mongoid::Commands::Save do
 
     end
 
+    context "when saving without validation" do
+
+      before do
+        @document.stubs(:valid?).returns(false)
+      end
+
+      it "ignores validation and returns true" do
+        Mongoid::Commands::Save.execute(@document, false).should be_true
+      end
+
+    end
+
   end
 
   context "when the document is embedded" do
