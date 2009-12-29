@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.10.4"
+  s.version = "0.10.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/commands/create.rb",
      "lib/mongoid/commands/delete.rb",
      "lib/mongoid/commands/delete_all.rb",
+     "lib/mongoid/commands/deletion.rb",
      "lib/mongoid/commands/destroy.rb",
      "lib/mongoid/commands/destroy_all.rb",
      "lib/mongoid/commands/save.rb",
