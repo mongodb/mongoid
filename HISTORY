@@ -1,3 +1,11 @@
+=== 0.10.5
+
+- Documents that are embedded not properly respond to
+  Document#destroy and Document#delete.
+
+- Documents can now be saved sans validation with
+  Document#save(false)
+
 === 0.10.4
 
 - Documents no longer inherit from Mongoid::Document.
@@ -15,4 +23,3 @@
   now set the name of the database collection to persist to.
 
 - Mongoid::Criteria#select becomes Mongoid::Criteria#only
-
