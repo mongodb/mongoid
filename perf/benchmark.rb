@@ -2,7 +2,8 @@ require "rubygems"
 require "ruby-prof"
 require "mongoid"
 
-class Person < Mongoid::Document
+class Person
+  include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Versioning
   field :birth_date, :type => Date
@@ -11,7 +12,8 @@ class Person < Mongoid::Document
   has_many :phones
 end
 
-class Name < Mongoid::Document
+class Name
+  include Mongoid::Document
   include Mongoid::Timestamps
   field :given
   field :family
@@ -19,7 +21,8 @@ class Name < Mongoid::Document
   belongs_to :person, :inverse_of => :name
 end
 
-class Address < Mongoid::Document
+class Address
+  include Mongoid::Document
   include Mongoid::Timestamps
   field :street
   field :city
@@ -29,7 +32,8 @@ class Address < Mongoid::Document
   belongs_to :person, :inverse_of => :address
 end
 
-class Phone < Mongoid::Document
+class Phone
+  include Mongoid::Document
   include Mongoid::Timestamps
   field :country_code, :type => Integer
   field :number
