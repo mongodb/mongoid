@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
       # put into the document's attributes.
       def process(attrs = {})
         attrs.each_pair do |key, value|
-          send("#{key}=", value)
+          send("#{key}=", value) unless value.blank?
         end
       end
 

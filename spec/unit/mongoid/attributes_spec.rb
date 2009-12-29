@@ -99,6 +99,7 @@ describe Mongoid::Attributes do
           :title => "value",
           :age => "30",
           :terms => "true",
+          :score => "",
           :name => {
             :_id => "2", :first_name => "Test", :last_name => "User"
           },
@@ -109,11 +110,12 @@ describe Mongoid::Attributes do
         }
       end
 
-      it "returns a properly cast the attributes" do
+      it "returns properly cast attributes" do
         attrs = Person.new(@attributes).attributes
         attrs[:age].should == 30
         attrs[:terms].should == true
         attrs[:_id].should == "1"
+        attrs[:score].should be_nil
       end
 
     end
