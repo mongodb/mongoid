@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc:
   class ComplexCriterion
     attr_accessor :key, :operator

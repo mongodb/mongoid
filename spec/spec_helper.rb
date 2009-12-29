@@ -74,8 +74,8 @@ class Person
 
 end
 
-class Admin < Person
-  field :code
+class Doctor < Person
+  field :specialty
 end
 
 class Employer

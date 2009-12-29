@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid #:nodoc
   class Config #:nodoc
     include Singleton
