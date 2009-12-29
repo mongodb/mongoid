@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/commands/create"
+require "mongoid/commands/deletion"
 require "mongoid/commands/delete"
 require "mongoid/commands/delete_all"
 require "mongoid/commands/destroy"
