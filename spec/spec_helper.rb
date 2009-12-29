@@ -32,6 +32,9 @@ class Person
   field :employer_id
   field :lunch_time, :type => Time
   field :aliases, :type => Array
+  field :score, :type => Integer
+
+  attr_reader :rescored
 
   has_many :addresses
   has_many :phone_numbers, :class_name => "Phone"
@@ -49,6 +52,13 @@ class Person
 
   has_one_related :game
   has_many_related :posts
+
+  def score_with_rescoring=(score)
+    @rescored = score + 20
+    self.score_without_rescoring = score
+  end
+
+  alias_method_chain :score=, :rescoring
 
   def update_addresses
     addresses.each do |address|

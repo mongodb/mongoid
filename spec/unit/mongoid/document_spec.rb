@@ -56,6 +56,23 @@ describe Mongoid::Document do
 
   end
 
+  describe "#alias_method_chain" do
+
+    context "on a field setter" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "chains the method properly" do
+        @person.score = 10
+        @person.rescored.should == 30
+      end
+
+    end
+
+  end
+
   describe "#assimilate" do
 
     before do
