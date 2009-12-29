@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.10.5"
+  s.version = "0.10.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2009-12-28}
+  s.date = %q{2009-12-29}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -61,7 +61,6 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/hash/conversions.rb",
      "lib/mongoid/extensions/hash/criteria_helpers.rb",
      "lib/mongoid/extensions/integer/conversions.rb",
-     "lib/mongoid/extensions/object/casting.rb",
      "lib/mongoid/extensions/object/conversions.rb",
      "lib/mongoid/extensions/string/conversions.rb",
      "lib/mongoid/extensions/string/inflections.rb",
