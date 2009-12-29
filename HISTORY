@@ -1,3 +1,10 @@
+=== 0.10.6
+- Fixed bug when trying to set empty strings on number
+  fields. (TypeError: can't convert Fixnum into String)
+
+- Document.delete_all now drops the collection if
+  conditions are empty or nil.
+
 === 0.10.5
 
 - Documents that are embedded not properly respond to
