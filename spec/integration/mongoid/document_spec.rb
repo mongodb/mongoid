@@ -70,6 +70,41 @@ describe Mongoid::Document do
 
   end
 
+  context "#destroy" do
+
+    context "on a root document" do
+
+      before do
+        @person = Person.create(:title => "Sir")
+      end
+
+      it "deletes the document" do
+        @person.destroy
+        lambda { Person.find(@person.id) }.should raise_error
+      end
+
+    end
+
+    context "on an embedded document" do
+
+      before do
+        @person = Person.create(:title => "Lead")
+        @person.addresses.create(:street => "1st Street")
+        @person.name.create(:first_name => "Emmanuel")
+        @person.save
+      end
+
+      it "deletes the document" do
+        @person.addresses.first.destroy
+        @person.name.destroy
+        @person.addresses.first.should be_nil
+        @person.name.document.should be_nil
+      end
+
+    end
+
+  end
+
   context "using dynamic finders" do
 
     before do
