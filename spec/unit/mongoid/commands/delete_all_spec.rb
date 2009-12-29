@@ -38,6 +38,20 @@ describe Mongoid::Commands::DeleteAll do
 
     end
 
+    context "when empty conditions supplied" do
+
+      before do
+        @collection = mock
+      end
+
+      it "drops the collection" do
+        @klass.expects(:collection).returns(@collection)
+        @collection.expects(:drop)
+        Mongoid::Commands::DeleteAll.execute(@klass, {})
+      end
+
+    end
+
   end
 
 end

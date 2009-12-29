@@ -13,8 +13,8 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>DeleteAll.execute(Person, :conditions => { :field => "value" })</tt>
-      def self.execute(klass, params = nil)
-        params ? klass.find(:all, params).each do
+      def self.execute(klass, params = {})
+        params.any? ? klass.find(:all, params).each do
           |doc| Delete.execute(doc)
         end : klass.collection.drop
       end
