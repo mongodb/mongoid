@@ -253,6 +253,15 @@ module Mongoid #:nodoc:
         @attributes = collection.find_one(:_id => id).with_indifferent_access
       end
 
+      # Remove a child document from this parent +Document+. Will reset the
+      # memoized association and notify the parent of the change.
+      def remove(child)
+        name = child.association_name
+        @attributes.remove(name, child.attributes)
+        remove_instance_variable("@#{name}")
+        notify
+      end
+
       # Return the root +Document+ in the object graph. If the current +Document+
       # is the root object in the graph it will return self.
       def root

@@ -10,7 +10,8 @@ module Mongoid #:nodoc:
       # doc: A new +Document+ that is going to be destroyed.
       def self.execute(doc)
         doc.run_callbacks :before_destroy
-        doc.collection.remove(:_id => doc.id)
+        parent = doc.parent
+        parent ? parent.remove(doc) : doc.collection.remove(:_id => doc.id)
         doc.run_callbacks :after_destroy
       end
     end

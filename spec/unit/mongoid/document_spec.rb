@@ -504,6 +504,40 @@ describe Mongoid::Document do
 
   end
 
+  describe "#remove" do
+
+    context "when removing an element from a has many" do
+
+      before do
+        @person = Person.new
+        @address = Address.new(:street => "Testing")
+        @person.addresses << @address
+      end
+
+      it "removes the child document attributes" do
+        @person.remove(@address)
+        @person.addresses.size.should == 0
+      end
+
+    end
+
+    context "when removing a has one" do
+
+      before do
+        @person = Person.new
+        @name = Name.new(:first_name => "Neytiri")
+        @person.name = @name
+      end
+
+      it "removes the child document attributes" do
+        @person.remove(@name)
+        @person.name.document.should be_nil
+      end
+
+    end
+
+  end
+
   describe "#root" do
 
     before do
