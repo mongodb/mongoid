@@ -8,7 +8,8 @@ module Mongoid #:nodoc:
       #
       # doc: A new +Document+ that is going to be deleted.
       def self.execute(doc)
-        doc.collection.remove(:_id => doc.id)
+        parent = doc.parent
+        parent ? parent.remove(doc) : doc.collection.remove(:_id => doc.id)
       end
     end
   end
