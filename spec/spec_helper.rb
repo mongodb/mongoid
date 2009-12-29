@@ -187,3 +187,39 @@ class Object
     end
   end
 end
+
+# Inhertiance test models:
+class Canvas
+  include Mongoid::Document
+  field :size, :type => Integer, :default => 0
+  has_many :shapes
+
+  def render
+    shapes.each { |shape| render }
+  end
+end
+
+class Browser < Canvas
+  def render; end
+end
+
+class Firefox < Browser
+  def render; end
+end
+
+class Shape
+  include Mongoid::Document
+  field :x, :type => Integer, :default => 0
+  field :y, :type => Integer, :default => 0
+
+  def render; end
+end
+
+class Square < Shape
+  field :width, :type => Integer, :default => 0
+  field :height, :type => Integer, :default => 0
+end
+
+class Circle < Shape
+  field :radius, :type => Integer, :default => 0
+end
