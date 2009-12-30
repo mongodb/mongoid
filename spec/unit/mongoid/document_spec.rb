@@ -4,14 +4,13 @@ describe Mongoid::Document do
 
   before do
     @collection = stub(:name => "people")
-    @database = stub(:collection => @collection)
+    @database = mock
     Mongoid.stubs(:database).returns(@database)
+    @database.stubs(:collection).with("people").returns(@collection)
   end
 
   after do
-    Person.instance_variable_set(:@collection, nil)
-    @database = nil
-    @collection = nil
+    Person._collection = nil
   end
 
   describe "#==" do
@@ -50,6 +49,14 @@ describe Mongoid::Document do
 
       it "returns false" do
         Person.new.==("Test").should be_false
+      end
+
+    end
+
+    context "when comapring parent to its subclass" do
+
+      it "returns false" do
+        Canvas.new.should_not == Firefox.new
       end
 
     end
@@ -126,15 +133,11 @@ describe Mongoid::Document do
 
   end
 
-  describe ".collection_name" do
-
-    before do
-      @coll = stub(:name => "population")
-    end
+  describe ".collection_name=" do
 
     it "sets the collection name on the document class" do
-      Mongoid.database.expects(:collection).with("population").returns(@coll)
-      Patient.collection.should == @coll
+      Patient.collection_name = "pats"
+      Patient.collection_name.should == "pats"
     end
 
   end
@@ -587,6 +590,18 @@ describe Mongoid::Document do
         @country_code.root.should == @person
       end
 
+    end
+
+  end
+
+  describe ".store_in" do
+
+    before do
+      Patient.store_in :population
+    end
+
+    it "sets the collection name for the document" do
+      Patient.collection_name.should == "population"
     end
 
   end

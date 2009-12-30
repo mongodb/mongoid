@@ -181,7 +181,7 @@ end
 
 class Patient
   include Mongoid::Document
-  collection_name "population"
+  store_in :inpatient
 end
 
 if RUBY_VERSION == '1.8.6'

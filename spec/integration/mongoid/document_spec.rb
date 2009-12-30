@@ -6,6 +6,18 @@ describe Mongoid::Document do
     Mongoid.database.collection(:people).drop
   end
 
+  describe ".collection" do
+
+    context "on a subclass of a root document" do
+
+      it "returns the root document collection" do
+        Browser.collection.should == Canvas.collection
+      end
+
+    end
+
+  end
+
   describe "#new" do
 
     it "gets a new or current database connection" do

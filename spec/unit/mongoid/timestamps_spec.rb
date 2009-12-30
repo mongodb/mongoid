@@ -9,7 +9,7 @@ describe Mongoid::Timestamps do
     end
 
     it "adds created_at and updated_at to the document" do
-      fields = Person.instance_variable_get(:@fields)
+      fields = Person.fields
       fields[:created_at].should_not be_nil
       fields[:updated_at].should_not be_nil
     end

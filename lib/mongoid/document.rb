@@ -10,11 +10,26 @@ module Mongoid #:nodoc:
         extend ClassMethods
         extend Finders
 
+        # Set up the class attributes that must be available to all subclasses.
+        # These include defaults, fields
+        class_inheritable_accessor :collection_name, :defaults, :fields
+
+        # The same collection is used for the entire class hierarchy.
+        cattr_accessor :_collection
+
+        # Set the initial values. Defaults and fields get set to a
+        # +HashWithIndifferentAccess+ while the collection name will get set to
+        # the demodulized class.
+        self.defaults = {}.with_indifferent_access
+        self.fields = {}.with_indifferent_access
+        self.collection_name ||= self.to_s.demodulize.tableize
+
         attr_accessor :association_name, :parent
         attr_reader :attributes, :new_record
 
         delegate :collection, :defaults, :embedded?, :fields, :primary_key, :to => :klass
 
+        # Define all the callbacks that are accepted by the document.
         define_callbacks :before_create, :before_destroy, :before_save, :before_update, :before_validation
         define_callbacks :after_create, :after_destroy, :after_save, :after_update, :after_validation
       end
@@ -28,18 +43,7 @@ module Mongoid #:nodoc:
       # Returns: <tt>Mongo::Collection</tt>
       def collection
         raise Errors::InvalidCollection.new(self) if embedded?
-        @collection_name ||= self.to_s.demodulize.tableize
-        @collection ||= Mongoid.database.collection(@collection_name)
-      end
-
-      # Set the collection name for the +Document+.
-      def collection_name(name)
-        @collection_name = name
-      end
-
-      # Returns a hash of all the default values
-      def defaults
-        @defaults
+        self._collection ||= Mongoid.database.collection(self.collection_name)
       end
 
       # return true if the +Document+ is embedded in another +Documnet+.
@@ -62,11 +66,6 @@ module Mongoid #:nodoc:
       def field(name, options = {})
         set_field(name, options)
         set_default(name, options)
-      end
-
-      # Returns all the fields for the Document as a +Hash+ with names as keys.
-      def fields
-        @fields
       end
 
       # Returns a human readable version of the class.
@@ -107,13 +106,17 @@ module Mongoid #:nodoc:
         @primary_key
       end
 
+      # Macro for setting the collection name to store in.
+      def store_in(name)
+        self.collection_name = name.to_s
+      end
+
       protected
 
       # Define a field attribute for the +Document+.
       def set_field(name, options = {})
         meth = options.delete(:as) || name
-        @fields ||= {}.with_indifferent_access
-        @fields[name] = Field.new(name.to_s, options)
+        fields[name] = Field.new(name.to_s, options)
         create_accessors(name, meth, options)
       end
 
@@ -127,8 +130,7 @@ module Mongoid #:nodoc:
       # Set up a default value for a field.
       def set_default(name, options = {})
         value = options[:default]
-        @defaults ||= {}.with_indifferent_access
-        @defaults[name] = value if value
+        defaults[name] = value if value
       end
 
     end
