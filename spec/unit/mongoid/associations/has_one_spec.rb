@@ -42,7 +42,7 @@ describe Mongoid::Associations::HasOne do
       end
 
       it "replaces and saves the existing has_one" do
-        Mongoid::Commands::Create.expects(:execute).returns(@drink)
+        Mongoid::Commands::Save.expects(:execute).returns(true)
         drink = @association.create({ :name => "Sapphire and Tonic" })
         drink.name.should == "Sapphire and Tonic"
       end

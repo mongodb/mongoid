@@ -313,7 +313,7 @@ describe Mongoid::Document do
       end
 
       it "returns false" do
-        @comment.save.should_not be_valid
+        @comment.should_not be_valid
       end
 
     end

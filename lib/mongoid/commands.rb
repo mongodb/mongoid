@@ -48,17 +48,16 @@ module Mongoid #:nodoc:
 
       # Save the +Document+. Delegates to the Save command.
       def save(validate = true)
-        new_record? ? Create.execute(self, validate) : Save.execute(self, validate)
+        run_callbacks(:before_create) if new_record?
+        saved = Save.execute(self, validate)
+        run_callbacks(:after_create) if new_record?
+        saved
       end
 
       # Save the +Document+. Delegates to the Save command. If the command
       # returns false then a +ValidationError+ will be raised.
       def save!
-        if new_record?
-          return Create.execute(self, true) || (raise Errors::Validations.new(self.errors))
-        else
-          return Save.execute(self, true) || (raise Errors::Validations.new(self.errors))
-        end
+        return Save.execute(self, true) || (raise Errors::Validations.new(self.errors))
       end
 
       # Update the attributes of the +Document+. Will call save after the

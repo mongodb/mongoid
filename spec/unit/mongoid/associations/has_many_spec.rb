@@ -93,7 +93,7 @@ describe Mongoid::Associations::HasMany do
     end
 
     it "builds and saves a new object" do
-      Mongoid::Commands::Create.expects(:execute).returns(@address)
+      Mongoid::Commands::Save.expects(:execute).returns(true)
       address = @association.create({ :street => "Yet Another" })
       address.should be_a_kind_of(Address)
       address.street.should == "Yet Another"
