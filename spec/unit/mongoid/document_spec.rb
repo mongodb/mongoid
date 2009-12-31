@@ -4,13 +4,16 @@ describe Mongoid::Document do
 
   before do
     @collection = stub(:name => "people")
+    @canvas_collection = stub(:name => "canvases")
     @database = mock
     Mongoid.stubs(:database).returns(@database)
     @database.stubs(:collection).with("people").returns(@collection)
+    @database.stubs(:collection).with("canvases").returns(@canvas_collection)
   end
 
   after do
     Person._collection = nil
+    Canvas._collection = nil
   end
 
   describe "#==" do
@@ -135,9 +138,26 @@ describe Mongoid::Document do
 
   describe ".collection_name=" do
 
-    it "sets the collection name on the document class" do
-      Patient.collection_name = "pats"
-      Patient.collection_name.should == "pats"
+    context "on a parent class" do
+
+      it "sets the collection name on the document class" do
+        Patient.collection_name = "pats"
+        Patient.collection_name.should == "pats"
+      end
+
+    end
+
+    context "on a subclass" do
+
+      after do
+        Canvas.collection_name = "canvases"
+      end
+
+      it "sets the collection name for the entire hierarchy" do
+        Firefox.collection_name = "browsers"
+        Canvas.collection_name.should == "browsers"
+      end
+
     end
 
   end
@@ -152,12 +172,28 @@ describe Mongoid::Document do
 
   describe "#defaults" do
 
-    before do
-      @game = Game.new
+    context "on parent classes" do
+
+      before do
+        @shape = Shape.new
+      end
+
+      it "does not return subclass defaults" do
+        @shape.defaults.should == { "x" => 0, "y" => 0 }
+      end
+
     end
 
-    it "returns the class defaults" do
-      @game.defaults.should == { "high_score" => 500, "score" => 0 }
+    context "on subclasses" do
+
+      before do
+        @circle = Circle.new
+      end
+
+      it "has the parent and child defaults" do
+        @circle.defaults.should == { "x" => 0, "y" => 0, "radius" => 0 }
+      end
+
     end
 
   end
@@ -198,6 +234,15 @@ describe Mongoid::Document do
       it "returns false" do
         person = Person.new
         person.embedded?.should be_false
+      end
+
+    end
+
+    context "when a subclass is embedded" do
+
+      it "returns true" do
+        circle = Circle.new
+        circle.should be_embedded
       end
 
     end
@@ -278,6 +323,38 @@ describe Mongoid::Document do
 
   end
 
+  describe "#fields" do
+
+    context "on parent classes" do
+
+      before do
+        @shape = Shape.new
+      end
+
+      it "does not return subclass fields" do
+        @shape.fields.keys.should include("x")
+        @shape.fields.keys.should include("y")
+        @shape.fields.keys.should_not include("radius")
+      end
+
+    end
+
+    context "on subclasses" do
+
+      before do
+        @circle = Circle.new
+      end
+
+      it "has the parent and child fields" do
+        @circle.fields.keys.should include("x")
+        @circle.fields.keys.should include("y")
+        @circle.fields.keys.should include("radius")
+      end
+
+    end
+
+  end
+
   describe ".human_name" do
 
     it "returns the class name underscored and humanized" do
@@ -314,6 +391,15 @@ describe Mongoid::Document do
       it "delegates to collection with unique option" do
         @collection.expects(:create_index).with(:title, true)
         Person.index :title, :unique => true
+      end
+
+    end
+
+    context "when indexing a subclass" do
+
+      it "sets the index on the root class collection" do
+        @canvas_collection.expects(:create_index).with(:name, true)
+        Firefox.index :name, :unique => true
       end
 
     end
@@ -363,6 +449,18 @@ describe Mongoid::Document do
       it "combines all fields" do
         @address.save
         @address.id.should == "testing-street-name-94123"
+      end
+
+    end
+
+    context "when key is on a subclass" do
+
+      before do
+        Firefox.key :name
+      end
+
+      it "sets the key for the entire hierarchy" do
+        Canvas.primary_key.should == [:name]
       end
 
     end

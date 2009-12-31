@@ -12,10 +12,10 @@ module Mongoid #:nodoc:
 
         # Set up the class attributes that must be available to all subclasses.
         # These include defaults, fields
-        class_inheritable_accessor :collection_name, :defaults, :fields
+        class_inheritable_accessor :defaults, :fields
 
         # The same collection is used for the entire class hierarchy.
-        cattr_accessor :_collection
+        cattr_accessor :_collection, :collection_name, :embedded, :primary_key
 
         # Set the initial values. Defaults and fields get set to a
         # +HashWithIndifferentAccess+ while the collection name will get set to
@@ -48,7 +48,7 @@ module Mongoid #:nodoc:
 
       # return true if the +Document+ is embedded in another +Documnet+.
       def embedded?
-        @embedded == true
+        self.embedded == true
       end
 
       # Defines all the fields that are accessable on the Document
@@ -97,13 +97,8 @@ module Mongoid #:nodoc:
       # web applications and *MUST* be defined on documents that are embedded
       # in order for proper updates in has_may associations.
       def key(*fields)
-        @primary_key = fields
+        self.primary_key = fields
         before_save :generate_key
-      end
-
-      # Returns the primary key field of the +Document+
-      def primary_key
-        @primary_key
       end
 
       # Macro for setting the collection name to store in.

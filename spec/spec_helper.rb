@@ -201,6 +201,7 @@ end
 # Inhertiance test models:
 class Canvas
   include Mongoid::Document
+  field :name
   field :size, :type => Integer, :default => 0
   has_many :shapes
 
@@ -221,6 +222,8 @@ class Shape
   include Mongoid::Document
   field :x, :type => Integer, :default => 0
   field :y, :type => Integer, :default => 0
+
+  belongs_to :canvas, :inverse_of => :shapes
 
   def render; end
 end
