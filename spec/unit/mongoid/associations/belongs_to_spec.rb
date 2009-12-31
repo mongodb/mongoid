@@ -54,7 +54,7 @@ describe Mongoid::Associations::BelongsTo do
 
       before do
         @parent = Name.new(:first_name => "Drexel")
-        @document = stub(:parent => @parent)
+        @document = stub(:_parent => @parent)
         @options = Mongoid::Associations::Options.new(:name => :person)
       end
 
@@ -68,7 +68,7 @@ describe Mongoid::Associations::BelongsTo do
     context "when parent is nil" do
 
       before do
-        @document = stub(:parent => nil)
+        @document = stub(:_parent => nil)
         @options = Mongoid::Associations::Options.new(:name => :person)
       end
 

@@ -6,7 +6,7 @@ describe Mongoid::Commands::Delete do
 
     before do
       @collection = mock
-      @document = stub(:collection => @collection, :id => "1", :parent => false)
+      @document = stub(:collection => @collection, :id => "1", :_parent => false)
     end
 
     it "removes the document from its collection" do

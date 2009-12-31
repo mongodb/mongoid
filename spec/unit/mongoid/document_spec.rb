@@ -565,7 +565,7 @@ describe Mongoid::Document do
 
   end
 
-  describe "#parent" do
+  describe "#_parent" do
 
     before do
       @attributes = { :title => "Sir",
@@ -578,7 +578,7 @@ describe Mongoid::Document do
     context "when document is embedded" do
 
       it "returns the parent document" do
-        @person.addresses.first.parent.should == @person
+        @person.addresses.first._parent.should == @person
       end
 
     end
@@ -586,7 +586,7 @@ describe Mongoid::Document do
     context "when document is root" do
 
       it "returns nil" do
-        @person.parent.should be_nil
+        @person._parent.should be_nil
       end
 
     end
@@ -602,7 +602,7 @@ describe Mongoid::Document do
 
     it "sets the parent on each element" do
       @child.parentize(@parent, :child)
-      @child.parent.should == @parent
+      @child._parent.should == @parent
     end
 
   end
@@ -669,7 +669,7 @@ describe Mongoid::Document do
     context "when document is the root" do
 
       it "returns self" do
-        @person.root.should == @person
+        @person._root.should == @person
       end
 
     end
@@ -677,7 +677,7 @@ describe Mongoid::Document do
     context "when document is embedded one level" do
 
       it "returns the parent" do
-        @phone_number.root.should == @person
+        @phone_number._root.should == @person
       end
 
     end
@@ -685,7 +685,7 @@ describe Mongoid::Document do
     context "when document is embedded multiple levels" do
 
       it "returns the top level parent" do
-        @country_code.root.should == @person
+        @country_code._root.should == @person
       end
 
     end

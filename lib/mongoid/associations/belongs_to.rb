@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
         # document: The parent +Document+
         # options: The association options
         def instantiate(document, options)
-          parent = document.parent
+          parent = document._parent
           parent.nil? ? nil : new(parent, options)
         end
 

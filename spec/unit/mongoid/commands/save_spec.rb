@@ -10,12 +10,12 @@ describe Mongoid::Commands::Save do
       @parent = stub(:collection => @parent_collection,
                      :valid? => true,
                      :run_callbacks => true,
-                     :parent => nil,
+                     :_parent => nil,
                      :attributes => {},
                      :new_record= => false)
       @document = stub(:collection => @doc_collection,
                        :run_callbacks => true,
-                       :parent => @parent,
+                       :_parent => @parent,
                        :attributes => {},
                        :new_record= => false)
     end
@@ -48,7 +48,7 @@ describe Mongoid::Commands::Save do
       context "when the document has no parent" do
 
         before do
-          @document.expects(:parent).returns(nil)
+          @document.expects(:_parent).returns(nil)
         end
 
         it "calls save on the document collection" do

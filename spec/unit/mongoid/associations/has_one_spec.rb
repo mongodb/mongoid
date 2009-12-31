@@ -168,7 +168,7 @@ describe Mongoid::Associations::HasOne do
     end
 
     it "parentizes the child document" do
-      @name.parent.should == @person
+      @name._parent.should == @person
     end
 
     it "sets the attributes of the child on the parent" do

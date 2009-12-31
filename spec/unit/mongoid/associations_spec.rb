@@ -25,7 +25,7 @@ describe Mongoid::Associations do
       end
 
       it "parentizes the association" do
-        @name.parent.should == @person
+        @name._parent.should == @person
       end
 
       it "sets the child attributes on the parent" do
@@ -46,7 +46,7 @@ describe Mongoid::Associations do
         end
 
         it "re-parentizes the association" do
-          @address.parent.should == @person
+          @address._parent.should == @person
         end
 
         it "adds the child attributes to the parent" do

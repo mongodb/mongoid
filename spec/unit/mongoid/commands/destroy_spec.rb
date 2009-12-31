@@ -9,7 +9,7 @@ describe Mongoid::Commands::Destroy do
       @document = stub(:run_callbacks => true,
                        :collection => @collection,
                        :id => "1",
-                       :parent => false)
+                       :_parent => false)
     end
 
     it "runs the before and after destroy callbacks" do

@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
         self.fields = {}.with_indifferent_access
         self.collection_name ||= self.to_s.demodulize.tableize
 
-        attr_accessor :association_name, :parent
+        attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
 
         delegate :collection, :defaults, :embedded?, :fields, :primary_key, :to => :klass
@@ -206,7 +206,7 @@ module Mongoid #:nodoc:
       end
 
       # Returns true is the +Document+ has not been persisted to the database,
-      # false if it has. This is determined by the instance variable @new_record
+      # false if it has. This is determined by the variable @new_record
       # and NOT if the object has an id.
       def new_record?
         @new_record == true
@@ -240,7 +240,7 @@ module Mongoid #:nodoc:
       #
       # <tt>address.parentize(person, :addresses)</tt>
       def parentize(object, association_name)
-        self.parent = object
+        self._parent = object
         self.association_name = association_name
         add_observer(object)
       end
@@ -261,9 +261,9 @@ module Mongoid #:nodoc:
 
       # Return the root +Document+ in the object graph. If the current +Document+
       # is the root object in the graph it will return self.
-      def root
+      def _root
         object = self
-        while (object.parent) do object = object.parent; end
+        while (object._parent) do object = object._parent; end
         object || self
       end
 

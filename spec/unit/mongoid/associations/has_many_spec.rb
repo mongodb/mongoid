@@ -47,7 +47,7 @@ describe Mongoid::Associations::HasMany do
     it "adds the parent document before appending to the array" do
       @association << @address
       @association.length.should == 3
-      @address.parent.should == @document
+      @address._parent.should == @document
     end
 
     it "allows multiple additions" do
@@ -114,7 +114,7 @@ describe Mongoid::Associations::HasMany do
     it "adds the parent document before appending to the array" do
       @association.concat [@address]
       @association.length.should == 3
-      @address.parent.should == @document
+      @address._parent.should == @document
     end
 
   end
@@ -260,7 +260,7 @@ describe Mongoid::Associations::HasMany do
     it "adds the parent document before appending to the array" do
       @association.push @address
       @association.length.should == 3
-      @address.parent.should == @document
+      @address._parent.should == @document
     end
 
     it "appends the document to the end of the array" do
@@ -279,7 +279,7 @@ describe Mongoid::Associations::HasMany do
     end
 
     it "parentizes the child document" do
-      @address.parent.should == @person
+      @address._parent.should == @person
     end
 
     it "sets the attributes of the child on the parent" do
