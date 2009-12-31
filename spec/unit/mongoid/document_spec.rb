@@ -656,7 +656,7 @@ describe Mongoid::Document do
 
   end
 
-  describe "#root" do
+  describe "#_root" do
 
     before do
       @person = Person.new(:title => "Mr")
@@ -694,12 +694,32 @@ describe Mongoid::Document do
 
   describe ".store_in" do
 
-    before do
-      Patient.store_in :population
+    context "on a parent class" do
+
+      before do
+        Patient.store_in :population
+      end
+
+      it "sets the collection name for the document" do
+        Patient.collection_name.should == "population"
+      end
+
     end
 
-    it "sets the collection name for the document" do
-      Patient.collection_name.should == "population"
+    context "on a subclass" do
+
+      before do
+        Firefox.store_in :browsers
+      end
+
+      after do
+        Firefox.store_in :canvases
+      end
+
+      it "changes the collection name for the entire hierarchy" do
+        Canvas.collection_name.should == "browsers"
+      end
+
     end
 
   end
