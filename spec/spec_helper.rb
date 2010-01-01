@@ -211,10 +211,12 @@ class Canvas
 end
 
 class Browser < Canvas
+  field :version, :type => Integer
   def render; end
 end
 
 class Firefox < Browser
+  field :user_agent
   def render; end
 end
 
