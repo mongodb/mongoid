@@ -26,6 +26,12 @@ describe Mongoid::Associations::HasOne do
 
     end
 
+    context "when a type is supplied" do
+
+      it "instantiates a class of that type"
+
+    end
+
   end
 
   describe "#create" do
@@ -46,6 +52,12 @@ describe Mongoid::Associations::HasOne do
         drink = @association.create({ :name => "Sapphire and Tonic" })
         drink.name.should == "Sapphire and Tonic"
       end
+
+    end
+
+    context "when a type is supplied" do
+
+      it "instantiates a class of that type"
 
     end
 

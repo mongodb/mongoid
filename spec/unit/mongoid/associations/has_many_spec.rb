@@ -80,6 +80,12 @@ describe Mongoid::Associations::HasMany do
       address.street.should == "Yet Another"
     end
 
+    context "when a type is provided" do
+
+      it "instantiates a class of the type"
+
+    end
+
   end
 
   describe "#create" do
@@ -97,6 +103,12 @@ describe Mongoid::Associations::HasMany do
       address = @association.create({ :street => "Yet Another" })
       address.should be_a_kind_of(Address)
       address.street.should == "Yet Another"
+    end
+
+    context "when a type is provided" do
+
+      it "instantiates a class of that type"
+
     end
 
   end

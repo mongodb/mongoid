@@ -202,7 +202,6 @@ end
 class Canvas
   include Mongoid::Document
   field :name
-  field :size, :type => Integer, :default => 0
   has_many :shapes
 
   def render
