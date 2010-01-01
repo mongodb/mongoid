@@ -102,7 +102,7 @@ describe Mongoid::Associations::BelongsTo do
       it "updates the parent document" do
         @person.name.should == @name
         @person.attributes[:name].except(:_id).should ==
-          { "first_name" => "Test", "last_name" => "User" }
+          { "first_name" => "Test", "last_name" => "User", "_type" => "Name" }
       end
 
     end

@@ -3,7 +3,10 @@ require "spec_helper"
 describe Mongoid::Associations::HasOne do
 
   before do
-    @attributes = { :mixed_drink => { :name => "Jack and Coke" }, :writer => { :speed => 50 } }
+    @attributes = { :mixed_drink => {
+      :name => "Jack and Coke", :_type => "MixedDrink" },
+      :writer => { :speed => 50, :_type => "HtmlWriter" }
+    }
     @document = stub(:attributes => @attributes, :update => true)
   end
 
@@ -84,6 +87,19 @@ describe Mongoid::Associations::HasOne do
         writer.speed.should == 500
       end
 
+    end
+
+  end
+
+  describe "#initialize" do
+
+    before do
+      @document = stub(:attributes => { :writer => { :speed => 500, :_type => "HtmlWriter" } }, :update => true)
+      @options = Mongoid::Associations::Options.new(:name => :writer)
+    end
+
+    it "delegates to new" do
+      Mongoid::Associations::HasOne.new(@document, @document.attributes[:writer], @options)
     end
 
   end
@@ -210,7 +226,7 @@ describe Mongoid::Associations::HasOne do
 
     it "sets the attributes of the child on the parent" do
       @person.attributes[:name].should ==
-        { "_id" => "donald", "first_name" => "Donald" }
+        { "_id" => "donald", "first_name" => "Donald", "_type" => "Name" }
     end
 
   end

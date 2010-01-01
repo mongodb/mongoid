@@ -280,7 +280,8 @@ describe Mongoid::Document do
 
       it "allows proper access to the object" do
         @person.mixed_drink.should == @drink
-        @person.attributes[:mixed_drink].except(:_id).should == { "name" => "Jack and Coke" }
+        @person.attributes[:mixed_drink].except(:_id).except(:_type).should ==
+          { "name" => "Jack and Coke" }
       end
 
     end
@@ -409,7 +410,7 @@ describe Mongoid::Document do
   describe ".instantiate" do
 
     before do
-      @attributes = { :_id => "1", :title => "Sir", :age => 30 }
+      @attributes = { :_id => "1", :_type => "Person", :title => "Sir", :age => 30 }
       @person = Person.new(@attributes)
     end
 
@@ -531,6 +532,14 @@ describe Mongoid::Document do
           @address.id.should == "test"
         end
 
+      end
+
+    end
+
+    context "without a type specified" do
+
+      it "sets the type" do
+        Person.new._type.should == "Person"
       end
 
     end

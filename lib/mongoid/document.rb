@@ -196,7 +196,7 @@ module Mongoid #:nodoc:
         process(defaults.merge(attrs))
         @new_record = true if id.nil?
         document = yield self if block_given?
-        generate_key; document
+        generate_key; generate_type; document
       end
 
       # Returns the class name plus its attributes.
@@ -277,6 +277,16 @@ module Mongoid #:nodoc:
         id
       end
 
+      # Returns the object type.
+      def _type
+        @attributes[:_type]
+      end
+
+      # Set the type.
+      def _type=(new_type)
+        @attributes[:_type] = new_type
+      end
+
       # Observe a notify call from a child +Document+. This will either update
       # existing attributes on the +Document+ or clear them out for the child if
       # the clear boolean is provided.
@@ -315,6 +325,10 @@ module Mongoid #:nodoc:
         else
           @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
         end
+      end
+
+      def generate_type
+        @attributes[:_type] = self.class.name unless @attributes[:_type]
       end
 
       # Convenience method to get the document's class

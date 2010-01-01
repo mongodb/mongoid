@@ -34,7 +34,8 @@ module Mongoid #:nodoc:
       def initialize(document, attributes, options)
         @parent, @options, @association_name = document, options, options.name
         unless attributes.nil?
-          @document = attributes.assimilate(@parent, @options)
+          klass = attributes[:_type] ? attributes[:_type].constantize : nil
+          @document = attributes.assimilate(@parent, @options, klass)
         end
       end
 

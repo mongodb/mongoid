@@ -6,7 +6,7 @@ describe Mongoid::Extensions::Object::Conversions do
 
     it "returns its attributes" do
       Person.new(:_id => 1, :title => "Sir").mongoidize.should ==
-        { "_id" => 1, "title" => "Sir", "age" => 100 }
+        { "_id" => 1, "title" => "Sir", "age" => 100, "_type" => "Person" }
     end
 
   end
@@ -28,7 +28,7 @@ describe Mongoid::Extensions::Object::Conversions do
     context "when object has attributes" do
 
       before do
-        @attributes = { "_id" => "test", "title" => "Sir", "age" => 100 }
+        @attributes = { "_id" => "test", "title" => "Sir", "age" => 100, "_type" => "Person" }
         @person = Person.new(@attributes)
       end
 

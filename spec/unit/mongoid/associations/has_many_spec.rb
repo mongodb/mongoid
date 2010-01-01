@@ -327,7 +327,7 @@ describe Mongoid::Associations::HasMany do
 
     it "sets the attributes of the child on the parent" do
       @person.attributes[:addresses].should ==
-        [{ "_id" => "madison-ave", "street" => "Madison Ave" }]
+        [{ "_id" => "madison-ave", "street" => "Madison Ave", "_type" => "Address" }]
     end
 
   end
