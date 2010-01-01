@@ -9,7 +9,7 @@ begin
     gem.name = "mongoid"
     gem.summary = "ODM framework for MongoDB"
     gem.email = "durran@gmail.com"
-    gem.homepage = "http://github.com/durran/mongoid"
+    gem.homepage = "http://mongoid.org"
     gem.authors = ["Durran Jordan"]
 
     gem.add_dependency("activesupport", ">= 2.2.2")
