@@ -60,29 +60,44 @@ describe Mongoid::Associations::HasMany do
 
   describe "#build" do
 
-    before do
-      @association = Mongoid::Associations::HasMany.new(
-        @document,
-        Mongoid::Associations::Options.new(:name => :addresses)
-      )
-    end
+    context "when a type is not provided" do
 
-    it "adds a new document to the array with the suppied parameters" do
-      @association.build({ :street => "Street 1" })
-      @association.length.should == 3
-      @association[2].should be_a_kind_of(Address)
-      @association[2].street.should == "Street 1"
-    end
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+      end
 
-    it "returns the newly built object in the association" do
-      address = @association.build({ :street => "Yet Another" })
-      address.should be_a_kind_of(Address)
-      address.street.should == "Yet Another"
+      it "adds a new document to the array with the suppied parameters" do
+        @association.build({ :street => "Street 1" })
+        @association.length.should == 3
+        @association[2].should be_a_kind_of(Address)
+        @association[2].street.should == "Street 1"
+      end
+
+      it "returns the newly built object in the association" do
+        address = @association.build({ :street => "Yet Another" })
+        address.should be_a_kind_of(Address)
+        address.street.should == "Yet Another"
+      end
+
     end
 
     context "when a type is provided" do
 
-      it "instantiates a class of the type"
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :shapes)
+        )
+      end
+
+      it "instantiates a class of the type" do
+        circle = @association.build({ :radius => 100 }, Circle)
+        circle.should be_a_kind_of(Circle)
+        circle.radius.should == 100
+      end
 
     end
 
@@ -90,24 +105,40 @@ describe Mongoid::Associations::HasMany do
 
   describe "#create" do
 
-    before do
-      @association = Mongoid::Associations::HasMany.new(
-        @document,
-        Mongoid::Associations::Options.new(:name => :addresses)
-      )
-      @address = Address.new(:street => "Yet Another")
-    end
+    context "when a type is not provided" do
 
-    it "builds and saves a new object" do
-      Mongoid::Commands::Save.expects(:execute).returns(true)
-      address = @association.create({ :street => "Yet Another" })
-      address.should be_a_kind_of(Address)
-      address.street.should == "Yet Another"
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+        @address = Address.new(:street => "Yet Another")
+      end
+
+      it "builds and saves a new object" do
+        Mongoid::Commands::Save.expects(:execute).returns(true)
+        address = @association.create({ :street => "Yet Another" })
+        address.should be_a_kind_of(Address)
+        address.street.should == "Yet Another"
+      end
+
     end
 
     context "when a type is provided" do
 
-      it "instantiates a class of that type"
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :shapes)
+        )
+      end
+
+      it "instantiates a class of that type" do
+        Mongoid::Commands::Save.expects(:execute).returns(true)
+        circle = @association.create({ :radius => 100 }, Circle)
+        circle.should be_a_kind_of(Circle)
+        circle.radius.should == 100
+      end
 
     end
 

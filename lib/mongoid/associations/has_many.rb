@@ -37,8 +37,8 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor.
       #
       # Returns the newly created object.
-      def build(attributes = {})
-        object = @klass.instantiate(attributes)
+      def build(attrs = {}, type = nil)
+        object = type ? type.instantiate(attrs) : @klass.instantiate(attrs)
         push(object)
         object
       end
@@ -49,8 +49,8 @@ module Mongoid #:nodoc:
       # the new object will then be saved.
       #
       # Returns the newly created object.
-      def create(attributes)
-        object = build(attributes)
+      def create(attrs = {}, type = nil)
+        object = build(attrs, type)
         object.save
         object
       end
