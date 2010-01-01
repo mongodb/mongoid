@@ -240,6 +240,24 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe "#initialize" do
+
+    before do
+      @canvas = stub(:attributes => { :shapes => [{ :_type => "Circle", :radius => 5 }] }, :update => true)
+      @association = Mongoid::Associations::HasMany.new(
+        @canvas,
+        Mongoid::Associations::Options.new(:name => :shapes)
+      )
+    end
+
+    it "creates the classes based on their types" do
+      circle = @association.first
+      circle.should be_a_kind_of(Circle)
+      circle.radius.should == 5
+    end
+
+  end
+
   describe ".instantiate" do
 
     it "delegates to new" do

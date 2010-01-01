@@ -73,8 +73,9 @@ module Mongoid #:nodoc:
       def initialize(document, options)
         @parent, @association_name, @klass, @options = document, options.name, options.klass, options
         attributes = document.attributes[@association_name]
-        @documents = attributes ? attributes.collect do |attribute|
-          child = @klass.instantiate(attribute)
+        @documents = attributes ? attributes.collect do |attrs|
+          type = attrs[:_type]
+          child = type ? type.constantize.instantiate(attrs) : @klass.instantiate(attrs)
           child.parentize(@parent, @association_name)
           child
         end : []
