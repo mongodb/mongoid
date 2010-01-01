@@ -7,14 +7,14 @@ module Mongoid #:nodoc:
       attr_reader :association_name, :document, :parent, :options
 
       # Build a new object for the association.
-      def build(attributes = {})
-        @document = attributes.assimilate(@parent, @options)
+      def build(attrs = {}, type = nil)
+        @document = attrs.assimilate(@parent, @options, type)
         self
       end
 
       # Create a new object for the association and save it.
-      def create(attributes)
-        build(attributes)
+      def create(attrs = {}, type = nil)
+        build(attrs, type)
         @document.save
         self
       end

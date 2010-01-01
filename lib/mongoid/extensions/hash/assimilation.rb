@@ -17,9 +17,8 @@ module Mongoid #:nodoc:
         # <tt>{:first_name => "Hank", :last_name => "Moody"}.assimilate(name, options)</tt>
         #
         # Returns: The child +Document+.
-        def assimilate(parent, options)
-          klass = options.klass
-          child = klass.instantiate(self)
+        def assimilate(parent, options, type = nil)
+          child = type ? type.instantiate(self) : options.klass.instantiate(self)
           child.assimilate(parent, options)
         end
       end

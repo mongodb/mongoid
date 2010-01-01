@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Associations::HasOne do
 
   before do
-    @attributes = { :mixed_drink => { :name => "Jack and Coke" } }
+    @attributes = { :mixed_drink => { :name => "Jack and Coke" }, :writer => { :speed => 50 } }
     @document = stub(:attributes => @attributes, :update => true)
   end
 
@@ -28,7 +28,19 @@ describe Mongoid::Associations::HasOne do
 
     context "when a type is supplied" do
 
-      it "instantiates a class of that type"
+      before do
+        @association = Mongoid::Associations::HasOne.new(
+          @document,
+          @attributes[:writer],
+          Mongoid::Associations::Options.new(:name => :writer)
+        )
+      end
+
+      it "instantiates a class of that type" do
+        writer = @association.build({ :speed => 500 }, HtmlWriter)
+        writer.should be_a_kind_of(HtmlWriter)
+        writer.speed.should == 500
+      end
 
     end
 
@@ -57,7 +69,20 @@ describe Mongoid::Associations::HasOne do
 
     context "when a type is supplied" do
 
-      it "instantiates a class of that type"
+      before do
+        @association = Mongoid::Associations::HasOne.new(
+          @document,
+          @attributes[:writer],
+          Mongoid::Associations::Options.new(:name => :writer)
+        )
+      end
+
+      it "instantiates a class of that type" do
+        Mongoid::Commands::Save.expects(:execute).returns(true)
+        writer = @association.create({ :speed => 500 }, HtmlWriter)
+        writer.should be_a_kind_of(HtmlWriter)
+        writer.speed.should == 500
+      end
 
     end
 

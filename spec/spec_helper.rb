@@ -203,6 +203,7 @@ class Canvas
   include Mongoid::Document
   field :name
   has_many :shapes
+  has_one :writer
 
   def render
     shapes.each { |shape| render }
@@ -217,6 +218,20 @@ end
 class Firefox < Browser
   field :user_agent
   def render; end
+end
+
+class Writer
+  include Mongoid::Document
+  field :speed, :type => Integer, :default => 0
+  def write; end
+end
+
+class HtmlWriter < Writer
+  def write; end
+end
+
+class PdfWriter < Writer
+  def write; end
 end
 
 class Shape
