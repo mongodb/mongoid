@@ -223,6 +223,9 @@ end
 class Writer
   include Mongoid::Document
   field :speed, :type => Integer, :default => 0
+
+  belongs_to :canvas, :inverse_of => :writer
+
   def write; end
 end
 
