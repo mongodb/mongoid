@@ -44,8 +44,8 @@ end
 class Hash #:nodoc
   include Mongoid::Extensions::Hash::Accessors
   include Mongoid::Extensions::Hash::Assimilation
-  extend Mongoid::Extensions::Hash::Conversions
   include Mongoid::Extensions::Hash::CriteriaHelpers
+  extend Mongoid::Extensions::Hash::Conversions
 end
 
 class Integer #:nodoc
@@ -57,8 +57,8 @@ class Object #:nodoc:
 end
 
 class String #:nodoc
-  extend Mongoid::Extensions::String::Conversions
   include Mongoid::Extensions::String::Inflections
+  extend Mongoid::Extensions::String::Conversions
 end
 
 class Symbol #:nodoc

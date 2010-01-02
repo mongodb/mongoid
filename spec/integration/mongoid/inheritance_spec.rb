@@ -38,4 +38,34 @@ describe Mongoid::Document do
 
   end
 
+  context "when document has associations" do
+
+    before do
+      Firefox.delete_all
+      @firefox = Firefox.new(:name => "firefox")
+      @writer = HtmlWriter.new(:speed => 100)
+      @circle = Circle.new(:radius => 50)
+      @square = Square.new(:width => 300, :height => 150)
+      @firefox.writer = @writer
+      @firefox.shapes << [ @circle, @square ]
+      @firefox.save
+    end
+
+    it "properly saves a has one subclass" do
+      from_db = Firefox.find(@firefox.id)
+      from_db.should be_a_kind_of(Firefox)
+      from_db.writer.should be_a_kind_of(HtmlWriter)
+      from_db.writer.should == @writer
+    end
+
+    it "properly saves a has many subclass" do
+      from_db = Firefox.find(@firefox.id)
+      from_db.shapes.first.should == @circle
+      from_db.shapes.first.should be_a_kind_of(Circle)
+      from_db.shapes.last.should == @square
+      from_db.shapes.last.should be_a_kind_of(Square)
+    end
+
+  end
+
 end
