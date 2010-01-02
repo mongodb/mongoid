@@ -7,18 +7,19 @@ describe Mongoid::Commands::DeleteAll do
     before do
       @doc = mock
       @docs = [@doc]
-      @klass = mock
+      @klass = stub(:name => "Person")
     end
 
     context "when conditions supplied" do
 
       before do
+        @collection = mock
         @conditions = { :conditions => { :title => "Sir" } }
       end
 
       it "deletes each document that the criteria finds" do
-        @klass.expects(:find).with(:all, @conditions).returns(@docs)
-        Mongoid::Commands::Delete.expects(:execute).with(@doc)
+        @klass.expects(:collection).returns(@collection)
+        @collection.expects(:remove).with(@conditions[:conditions].merge(:_type => "Person"))
         Mongoid::Commands::DeleteAll.execute(@klass, @conditions)
       end
 
