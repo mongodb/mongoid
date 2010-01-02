@@ -70,6 +70,13 @@ describe Mongoid::Document do
       from_db.shapes.last.should be_a_kind_of(Square)
     end
 
+    it "properly sets up the belongs to" do
+      from_db = Firefox.find(@firefox.id)
+      circle = from_db.shapes.first
+      circle.should == @circle
+      circle.canvas.should == @firefox
+    end
+
   end
 
   context "deleting subclasses" do
