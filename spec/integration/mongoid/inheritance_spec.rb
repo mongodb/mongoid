@@ -51,6 +51,10 @@ describe Mongoid::Document do
       @firefox.save
     end
 
+    after do
+      Firefox.delete_all
+    end
+
     it "properly saves a has one subclass" do
       from_db = Firefox.find(@firefox.id)
       from_db.should be_a_kind_of(Firefox)
@@ -64,6 +68,29 @@ describe Mongoid::Document do
       from_db.shapes.first.should be_a_kind_of(Circle)
       from_db.shapes.last.should == @square
       from_db.shapes.last.should be_a_kind_of(Square)
+    end
+
+  end
+
+  context "deleting subclasses" do
+
+    before do
+      @firefox = Firefox.create(:name => "firefox")
+      @browser = Browser.create(:name => "browser")
+      @canvas = Canvas.create(:name => "canvas")
+    end
+
+    after do
+      Firefox.delete_all
+      Browser.delete_all
+      Canvas.delete_all
+    end
+
+    it "deletes from the parent class collection" do
+      @firefox.delete
+      Firefox.count.should == 0
+      Browser.count.should == 1
+      Canvas.count.should == 1
     end
 
   end
