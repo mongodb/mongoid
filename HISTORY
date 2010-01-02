@@ -1,3 +1,32 @@
+=== 0.11.0
+- Set the collection name to store a document in via:
+  Document.store_in :collection_name
+
+- Initial inheritance support:
+
+  - Documents and their associations can now have an
+    infinite number of subclasses.
+
+  - Has many and has one associations can build or
+    create specific subclasses by providing an optional
+    class as the last parameter to the #create and
+    #build methods on the respective associations.
+
+  - Querying for specific subclasses will only return
+    those documents which were saved as that subclass,
+    even though the hierarchy is stored in the same
+    collection.
+
+  - Deletion of subclass documents will only delete
+    documents of that type, even though they all exist
+    in the same collection. #delete_all and #destroy_all
+    also support this behavoir.
+
+- Updated mongo and mongo_ext dependencies to 0.18.2
+
+- Fixed save on new documents to return true instead
+  of the document itself.
+
 === 0.10.6
 - Fixed bug when trying to set empty strings on number
   fields. (TypeError: can't convert Fixnum into String)
