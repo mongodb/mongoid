@@ -875,10 +875,14 @@ describe Mongoid::Document do
 
       before do
         @person = Person.new
+        @canvas = Canvas.new
+        @firefox = Firefox.new
       end
 
       after do
         Person.validations.clear
+        Canvas.validations.clear
+        Firefox.validations.clear
       end
 
       describe "#validates_acceptance_of" do
@@ -985,12 +989,35 @@ describe Mongoid::Document do
 
       describe "#validates_presence_of" do
 
-        it "fails if the field is nil" do
-          Person.class_eval do
-            validates_presence_of :title
+        context "on a parent class" do
+
+          it "fails if the field is nil on the parent" do
+            Person.class_eval do
+              validates_presence_of :title
+            end
+            @person.valid?.should be_false
+            @person.errors.on(:title).should_not be_nil
           end
-          @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
+
+          it "fails if the field is nil on a subclass" do
+            Canvas.class_eval do
+              validates_presence_of :name
+            end
+            @firefox.valid?.should be_false
+            @firefox.errors.on(:name).should_not be_nil
+          end
+
+        end
+
+        context "on a subclass" do
+
+          it "parent class does not get subclass validations" do
+            Firefox.class_eval do
+              validates_presence_of :name
+            end
+            @canvas.valid?.should be_true
+          end
+
         end
 
       end
