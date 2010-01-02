@@ -18,7 +18,7 @@ require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
 require "mongoid/extensions/time/conversions"
 
-class Array #:nodoc:
+class Array #:nodoc
   include Mongoid::Extensions::Array::Accessors
   include Mongoid::Extensions::Array::Assimilation
   include Mongoid::Extensions::Array::Conversions
