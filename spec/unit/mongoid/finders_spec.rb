@@ -291,7 +291,7 @@ describe Mongoid::Finders do
 
     it "returns a new criteria with select conditions added" do
       criteria = Person.where(:title => "Sir")
-      criteria.selector.should == { :title => "Sir" }
+      criteria.selector.should == { :_type => "Person", :title => "Sir" }
     end
 
   end
