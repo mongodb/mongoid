@@ -91,6 +91,66 @@ describe Mongoid::Attributes do
 
   describe "#process" do
 
+    context "when attributes dont have fields defined" do
+
+      before do
+        @attributes = {
+          :nofieldstring => "Testing",
+          :nofieldint => 5
+        }
+      end
+
+      context "when allowing dynamic fields" do
+
+        before do
+          @person = Person.new(@attributes)
+        end
+
+        context "when attribute is a string" do
+
+          it "adds a string field" do
+            @person.nofieldstring.should == "Testing"
+            @person.nofieldstring = "Test"
+            @person.nofieldstring.should == "Test"
+          end
+
+        end
+
+
+        context "when attribute is not a string" do
+
+          it "adds a properly typed field" do
+            @person.nofieldint.should == 5
+            @person.nofieldint = 50
+            @person.nofieldint.should == 50
+          end
+
+        end
+
+      end
+
+      context "when not allowing dynamic fields" do
+
+        before do
+          Mongoid.allow_dynamic_fields = false
+          Person.fields.delete(:nofieldstring)
+          @attributes = {
+            :nofieldstring => "Testing"
+          }
+        end
+
+        after do
+          Mongoid.allow_dynamic_fields = true
+        end
+
+        it "raises an error" do
+          lambda { Person.new(@attributes) }.should raise_error
+        end
+
+      end
+
+    end
+
     context "when supplied hash has values" do
 
       before do
@@ -157,7 +217,7 @@ describe Mongoid::Attributes do
 
       before do
         @employer = Employer.new
-        @attributes = { :employer => @employer, :title => "Sir" }
+        @attributes = { :employer_id => @employer.id, :title => "Sir" }
         @person = Person.new(@attributes)
       end
 
