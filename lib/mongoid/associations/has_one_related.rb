@@ -13,6 +13,7 @@ module Mongoid #:nodoc:
         @document = @klass.instantiate(attributes)
         name = @parent.class.to_s.underscore
         @document.send("#{name}=", @parent)
+        @document
       end
 
       # Builds a new Document and sets it as the association, then saves the

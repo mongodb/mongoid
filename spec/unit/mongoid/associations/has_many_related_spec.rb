@@ -165,6 +165,10 @@ describe Mongoid::Associations::HasManyRelated do
       @association.create(:title => "Sassy")
     end
 
+    it "returns the new object" do
+      @association.create(:title => "Sassy").should be_a_kind_of(Post)
+    end
+
   end
 
   describe "#find" do

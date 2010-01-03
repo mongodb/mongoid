@@ -41,6 +41,7 @@ module Mongoid #:nodoc:
       def create(attributes)
         object = build(attributes)
         object.save
+        object
       end
 
       # Finds a document in this association.

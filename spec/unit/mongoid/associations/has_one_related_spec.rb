@@ -49,6 +49,10 @@ describe Mongoid::Associations::HasOneRelated do
       @association.person_id.should == @parent.id
     end
 
+    it "returns the new document" do
+      @association.create(:score => 100).should be_a_kind_of(Game)
+    end
+
   end
 
   describe ".initialize" do
