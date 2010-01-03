@@ -36,6 +36,14 @@ describe Mongoid::Document do
       attributes["_id"].should == @firefox.id
     end
 
+    it "returns the document when querying for superclass" do
+      Browser.where(:name => "Testy").first.should == @firefox
+    end
+
+    it "returns the document when querying for root class" do
+      Canvas.where(:name => "Testy").first.should == @firefox
+    end
+
   end
 
   context "when document has associations" do
