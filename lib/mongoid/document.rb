@@ -335,7 +335,7 @@ module Mongoid #:nodoc:
       end
 
       def generate_type
-        @attributes[:_type] = self.class.name unless @attributes[:_type]
+        @attributes[:_type] ||= self.class.name
       end
 
       # Convenience method to get the document's class
