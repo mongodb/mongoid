@@ -1,3 +1,8 @@
+=== 0.11.2
+- Fixing bug where has many and has one relational
+  associations create method did not return the
+  associated document
+
 === 0.11.1
 - Querying for classes that have subclasses will also
   return the subclasses as well, similar to
