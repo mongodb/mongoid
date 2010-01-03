@@ -1,3 +1,13 @@
+=== 0.11.1
+- Querying for classes that have subclasses will also
+  return the subclasses as well, similar to
+  ActiveRecord.
+
+- Adding configuration option allow_dynamic_fields. This
+  defaults to true and if set to false will raise an
+  error when trying to set an attribute on an object
+  that does not have a corresponding field defined.
+
 === 0.11.0
 - Set the collection name to store a document in via:
   Document.store_in :collection_name
