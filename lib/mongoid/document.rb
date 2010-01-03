@@ -32,6 +32,8 @@ module Mongoid #:nodoc:
         # Define all the callbacks that are accepted by the document.
         define_callbacks :before_create, :before_destroy, :before_save, :before_update, :before_validation
         define_callbacks :after_create, :after_destroy, :after_save, :after_update, :after_validation
+
+        index :_type
       end
     end
 
@@ -104,6 +106,11 @@ module Mongoid #:nodoc:
       # Macro for setting the collection name to store in.
       def store_in(name)
         self.collection_name = name.to_s
+      end
+
+      # Returns all types to query for when using this class as the base.
+      def _types
+        @_type ||= (self.subclasses + [ self.name ])
       end
 
       protected

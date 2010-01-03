@@ -97,7 +97,7 @@ describe Mongoid::Document do
       @firefox.delete
       Firefox.count.should == 0
       Browser.count.should == 1
-      Canvas.count.should == 1
+      Canvas.count.should == 2
     end
 
   end
