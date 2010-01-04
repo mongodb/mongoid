@@ -1,3 +1,11 @@
+=== 0.11.4
+- Fixed issue with dynamic fields: checking whether
+  the document responded to the attribute's method
+  should have checked the setter and not the getter
+
+- Fixed has_one associations not being able to be
+  set to nil.
+
 === 0.11.3
 - Fixed issue with Document#save! not calling before
   and after create callbacks if document is new
