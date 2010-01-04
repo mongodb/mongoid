@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
       # put into the document's attributes.
       def process(attrs = {})
         attrs.each_pair do |key, value|
-          unless respond_to?(key)
+          unless respond_to?("#{key}=")
             self.class.field key, :type => value.class if Mongoid.allow_dynamic_fields
           end
           send("#{key}=", value) unless value.blank?

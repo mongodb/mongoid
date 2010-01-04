@@ -96,7 +96,8 @@ describe Mongoid::Attributes do
       before do
         @attributes = {
           :nofieldstring => "Testing",
-          :nofieldint => 5
+          :nofieldint => 5,
+          :employer => Employer.new
         }
       end
 
@@ -123,6 +124,15 @@ describe Mongoid::Attributes do
             @person.nofieldint.should == 5
             @person.nofieldint = 50
             @person.nofieldint.should == 50
+          end
+
+        end
+
+        context "when a method has been defined for the attribute" do
+
+          it "does not create the field" do
+            @person.fields.keys.should_not include("employer")
+            @person.fields.keys.should_not include("employer=")
           end
 
         end
