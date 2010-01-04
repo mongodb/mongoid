@@ -210,23 +210,45 @@ describe Mongoid::Associations::HasOne do
 
   describe ".update" do
 
-    before do
-      @name = Name.new(:first_name => "Donald")
-      @person = Person.new(:title => "Sir")
-      Mongoid::Associations::HasOne.update(
-        @name,
-        @person,
-        Mongoid::Associations::Options.new(:name => :name)
-      )
+    context "when setting to a non-nil value" do
+
+      before do
+        @name = Name.new(:first_name => "Donald")
+        @person = Person.new(:title => "Sir")
+        Mongoid::Associations::HasOne.update(
+          @name,
+          @person,
+          Mongoid::Associations::Options.new(:name => :name)
+        )
+      end
+
+      it "parentizes the child document" do
+        @name._parent.should == @person
+      end
+
+      it "sets the attributes of the child on the parent" do
+        @person.attributes[:name].should ==
+          { "_id" => "donald", "first_name" => "Donald", "_type" => "Name" }
+      end
+
     end
 
-    it "parentizes the child document" do
-      @name._parent.should == @person
-    end
+    context "when setting the object to nil" do
 
-    it "sets the attributes of the child on the parent" do
-      @person.attributes[:name].should ==
-        { "_id" => "donald", "first_name" => "Donald", "_type" => "Name" }
+      before do
+        @name = Name.new(:first_name => "Donald")
+        @person = Person.new(:title => "Sir")
+        Mongoid::Associations::HasOne.update(
+          nil,
+          @person,
+          Mongoid::Associations::Options.new(:name => :name)
+        )
+      end
+
+      it "clears out the association" do
+        @person.name.should be_nil
+      end
+
     end
 
   end

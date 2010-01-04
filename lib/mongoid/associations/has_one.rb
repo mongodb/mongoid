@@ -36,19 +36,30 @@ module Mongoid #:nodoc:
         unless attributes.nil?
           klass = attributes[:_type] ? attributes[:_type].constantize : nil
           @document = attributes.assimilate(@parent, @options, klass)
+        else
+          @document = nil
         end
       end
 
       # Delegate all missing methods over to the +Document+.
       def method_missing(name, *args, &block)
-        @document = {}.assimilate(@parent, @options) if @document.nil?
-        @document.send(name, *args, &block)
+        @document.send(name, *args, &block) unless @document.nil?
       end
 
       # Used for setting the association via a nested attributes setter on the
       # parent +Document+.
       def nested_build(attributes)
         build(attributes)
+      end
+
+      # This should delegate to the document.
+      def nil?
+        @document.nil?
+      end
+
+      # This will get deprecated
+      def to_a
+        [@document]
       end
 
       # Need to override here for when the underlying document is nil.
@@ -87,7 +98,11 @@ module Mongoid #:nodoc:
         #
         # <tt>HasOne.update({:first_name => "Hank"}, person, options)</tt>
         def update(child, parent, options)
-          child.assimilate(parent, options)
+          if child.nil?
+            return parent.attributes[options.name] = nil
+          else
+            return child.assimilate(parent, options)
+          end
         end
       end
 
