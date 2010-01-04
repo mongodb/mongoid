@@ -1,3 +1,7 @@
+=== 0.11.3
+- Fixed issue with Document#save! not calling before
+  and after create callbacks if document is new
+
 === 0.11.2
 - Fixing bug where has many and has one relational
   associations create method did not return the
