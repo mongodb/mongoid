@@ -42,6 +42,13 @@ describe Mongoid::Commands do
         @person.save
       end
 
+      it "runs the before and after create callbacks" do
+        @person.expects(:run_callbacks).with(:before_create)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        @person.expects(:run_callbacks).with(:after_create)
+        @person.save
+      end
+
     end
 
     context "when not validating" do
@@ -97,6 +104,13 @@ describe Mongoid::Commands do
           lambda { @person.save! }.should raise_error
         end
 
+      end
+
+      it "runs the before and after create callbacks" do
+        @person.expects(:run_callbacks).with(:before_create)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        @person.expects(:run_callbacks).with(:after_create)
+        @person.save!
       end
 
     end

@@ -60,9 +60,10 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes, false if not.
       def save(validate = true)
-        run_callbacks(:before_create) if new_record?
+        new = new_record?
+        run_callbacks(:before_create) if new
         saved = Save.execute(self, validate)
-        run_callbacks(:after_create) if new_record?
+        run_callbacks(:after_create) if new
         saved
       end
 
@@ -75,7 +76,7 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes
       def save!
-        return Save.execute(self, true) || (raise Errors::Validations.new(self.errors))
+        return save(true) || (raise Errors::Validations.new(self.errors))
       end
 
       # Update the document attributes and persist the document to the
