@@ -35,6 +35,22 @@ describe Mongoid::Associations do
 
     end
 
+    context "when child and parent are namespaced" do
+
+      before do
+        @patient = Medical::Patient.new(:name => "Ridley")
+        @prescription = Medical::Prescription.new(:name => "Zoloft")
+        @patient.prescriptions << @prescription
+        @second = @patient.prescriptions.build(:name => "Codeine")
+      end
+
+      it "sets the correct association classes" do
+        @patient.prescriptions.first.should == @prescription
+        @patient.prescriptions.last.should == @second
+      end
+
+    end
+
     context "when setting a parent" do
 
       context "when the child is one level deep" do

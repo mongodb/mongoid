@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
         # Set the initial values. Defaults and fields get set to a
         # +HashWithIndifferentAccess+ while the collection name will get set to
         # the demodulized class.
-        self.collection_name = self.to_s.demodulize.tableize
+        self.collection_name = self.to_s.underscore.tableize.gsub("/", "_")
         self.defaults = {}.with_indifferent_access
         self.fields = {}.with_indifferent_access
         self.indexed = false

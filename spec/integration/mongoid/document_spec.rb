@@ -16,6 +16,10 @@ describe Mongoid::Document do
 
     end
 
+    context "on a namespaced document" do
+      Medical::Patient.collection.name.should == "medical_patients"
+    end
+
   end
 
   describe "#new" do
