@@ -1,3 +1,21 @@
+=== 0.11.6
+- Allow namespaced documents to default with:
+  "namespace_modelname"
+
+- Fixed indexing of _type field to only happen on root
+  classes.
+
+- Fixed creation of empty collections for embedded documents.
+
+- Document.store_in now properly resets the collection
+  if the collection had already been accessed.
+
+- Document.find(nil) now raises
+  Mongoid::Errors::InvalidOptions
+
+=== 0.11.5
+- Removed dependency on mongo_ext, since latest version
+  was breaking on various operating systems.
 === 0.11.4
 - Fixed issue with dynamic fields: checking whether
   the document responded to the attribute's method
