@@ -332,6 +332,20 @@ describe Mongoid::Document do
 
   end
 
+  context ".store_in" do
+
+    after do
+      Canvas.store_in(:canvases)
+    end
+
+    it "switches the database collection" do
+      Canvas.collection.name.should == "canvases"
+      Canvas.store_in(:browsers)
+      Canvas.collection.name.should == "browsers"
+    end
+
+  end
+
   context "when has many exists through a has one" do
 
     before do

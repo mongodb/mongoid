@@ -705,11 +705,9 @@ describe Mongoid::Document do
 
     context "on a parent class" do
 
-      before do
+      it "sets the collection name and collection for the document" do
+        @database.expects(:collection).with("population").returns(@collection)
         Patient.store_in :population
-      end
-
-      it "sets the collection name for the document" do
         Patient.collection_name.should == "population"
       end
 
@@ -717,15 +715,13 @@ describe Mongoid::Document do
 
     context "on a subclass" do
 
-      before do
-        Firefox.store_in :browsers
-      end
-
       after do
         Firefox.store_in :canvases
       end
 
       it "changes the collection name for the entire hierarchy" do
+        @database.expects(:collection).with("browsers").returns(@collection)
+        Firefox.store_in :browsers
         Canvas.collection_name.should == "browsers"
       end
 

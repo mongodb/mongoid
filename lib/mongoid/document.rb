@@ -22,7 +22,6 @@ module Mongoid #:nodoc:
         # the demodulized class.
         self.defaults = {}.with_indifferent_access
         self.fields = {}.with_indifferent_access
-        self.collection_name ||= self.to_s.demodulize.tableize
 
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
@@ -45,7 +44,8 @@ module Mongoid #:nodoc:
       # Returns: <tt>Mongo::Collection</tt>
       def collection
         raise Errors::InvalidCollection.new(self) if embedded?
-        self._collection ||= Mongoid.database.collection(self.collection_name)
+        name = self.collection_name ||= self.to_s.demodulize.tableize
+        self._collection ||= Mongoid.database.collection(name)
       end
 
       # return true if the +Document+ is embedded in another +Documnet+.
@@ -106,6 +106,7 @@ module Mongoid #:nodoc:
       # Macro for setting the collection name to store in.
       def store_in(name)
         self.collection_name = name.to_s
+        self._collection = Mongoid.database.collection(name.to_s)
       end
 
       # Returns all types to query for when using this class as the base.
