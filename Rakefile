@@ -14,7 +14,6 @@ begin
 
     gem.add_dependency("activesupport", ">= 2.2.2")
     gem.add_dependency("mongo", ">= 0.18.2")
-    gem.add_dependency("mongo_ext", ">= 0.18.2")
     gem.add_dependency("durran-validatable", ">= 1.8.4")
     gem.add_dependency("leshill-will_paginate", ">= 2.3.11")
 

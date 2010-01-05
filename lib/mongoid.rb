@@ -23,7 +23,6 @@ require "rubygems"
 
 gem "activesupport", ">= 2.2.2"
 gem "mongo", ">= 0.18.2"
-gem "mongo_ext", ">= 0.18.2"
 gem "durran-validatable", ">= 1.8.4"
 gem "leshill-will_paginate", ">= 2.3.11"
 
