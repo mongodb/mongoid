@@ -15,13 +15,15 @@ module Mongoid #:nodoc:
         class_inheritable_accessor :defaults, :fields
 
         # The same collection is used for the entire class hierarchy.
-        cattr_accessor :_collection, :collection_name, :embedded, :primary_key
+        cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :indexed
 
         # Set the initial values. Defaults and fields get set to a
         # +HashWithIndifferentAccess+ while the collection name will get set to
         # the demodulized class.
+        self.collection_name = self.to_s.demodulize.tableize
         self.defaults = {}.with_indifferent_access
         self.fields = {}.with_indifferent_access
+        self.indexed = false
 
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
@@ -31,12 +33,19 @@ module Mongoid #:nodoc:
         # Define all the callbacks that are accepted by the document.
         define_callbacks :before_create, :before_destroy, :before_save, :before_update, :before_validation
         define_callbacks :after_create, :after_destroy, :after_save, :after_update, :after_validation
-
-        index :_type
       end
     end
 
     module ClassMethods
+      # Add the default indexes to the root document if they do not already
+      # exist. Currently this is only _type.
+      def add_indexes
+        unless indexed
+          self._collection.create_index(:_type, false)
+          self.indexed = true
+        end
+      end
+
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
       # with it.
@@ -44,8 +53,8 @@ module Mongoid #:nodoc:
       # Returns: <tt>Mongo::Collection</tt>
       def collection
         raise Errors::InvalidCollection.new(self) if embedded?
-        name = self.collection_name ||= self.to_s.demodulize.tableize
-        self._collection ||= Mongoid.database.collection(name)
+        self._collection ||= Mongoid.database.collection(self.collection_name)
+        add_indexes; self._collection
       end
 
       # return true if the +Document+ is embedded in another +Documnet+.

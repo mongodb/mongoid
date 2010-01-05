@@ -230,6 +230,10 @@ describe Mongoid::Document do
       @owner.save
     end
 
+    after do
+      PetOwner.delete_all
+    end
+
     it "is a single object and not an array" do
       @from_db = PetOwner.find(@owner.id)
       @from_db.address.should == @address

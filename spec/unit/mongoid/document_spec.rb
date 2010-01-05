@@ -3,12 +3,14 @@ require "spec_helper"
 describe Mongoid::Document do
 
   before do
-    @collection = stub(:name => "people")
-    @canvas_collection = stub(:name => "canvases")
     @database = mock
     Mongoid.stubs(:database).returns(@database)
+    @collection = stub(:name => "people")
+    @canvas_collection = stub(:name => "canvases")
     @database.stubs(:collection).with("people").returns(@collection)
     @database.stubs(:collection).with("canvases").returns(@canvas_collection)
+    @collection.stubs(:create_index).with(:_type, false)
+    @canvas_collection.stubs(:create_index).with(:_type, false)
   end
 
   after do

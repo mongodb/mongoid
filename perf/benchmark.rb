@@ -2,6 +2,11 @@ require "rubygems"
 require "ruby-prof"
 require "mongoid"
 
+connection = Mongo::Connection.new
+Mongoid.database = connection.db("mongoid_perf_test")
+
+Mongoid.database.collection("people").drop
+
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -28,7 +33,7 @@ class Address
   field :city
   field :state
   field :post_code
-  field :type
+  field :address_type
   belongs_to :person, :inverse_of => :address
 end
 
@@ -37,14 +42,9 @@ class Phone
   include Mongoid::Timestamps
   field :country_code, :type => Integer
   field :number
-  field :type
+  field :phone_type
   belongs_to :person, :inverse_of => :phones
 end
-
-connection = Mongo::Connection.new
-Mongoid.database = connection.db("mongoid_perf_test")
-
-Mongoid.database.collection("people").drop
 
 RubyProf.start
 
@@ -71,4 +71,4 @@ result = RubyProf.stop
 printer = RubyProf::FlatPrinter.new(result)
 printer.print(STDOUT, 0)
 
-Mongoid.database.collection("people").drop
+# Mongoid.database.collection("people").drop
