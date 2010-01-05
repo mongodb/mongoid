@@ -95,6 +95,14 @@ describe Mongoid::Finders do
 
     end
 
+    context "when nil passed in" do
+
+      it "raises an error" do
+        lambda { Person.find(nil) }.should raise_error
+      end
+
+    end
+
     context "when finding first" do
 
       it "delegates to criteria" do

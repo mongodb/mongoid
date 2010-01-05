@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
     def all(*args)
-      find(*args)
+      find(:all, *args)
     end
 
     # Returns a count of matching records in the database based on the
@@ -43,6 +43,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
     def find(*args)
+      raise Errors::InvalidOptions.new("Calling Document#find with nil is invalid") if args[0].nil?
       type = args.delete_at(0) if args[0].is_a?(Symbol)
       criteria = Criteria.translate(self, *args)
       case type
@@ -61,7 +62,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.first(:conditions => { :attribute => "value" })</tt>
     def first(*args)
-      find(*args).one
+      find(:first, *args)
     end
 
     # Find the last +Document+ given the conditions.
@@ -72,7 +73,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.last(:conditions => { :attribute => "value" })</tt>
     def last(*args)
-      find(*args).last
+      find(:last, *args)
     end
 
     # Will execute a +Criteria+ based on the +DynamicFinder+ that gets

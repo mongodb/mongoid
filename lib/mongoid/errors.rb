@@ -13,7 +13,7 @@ module Mongoid #:nodoc
       end
     end
 
-    # Raised when invalid options are passed into a constructor.
+    # Raised when invalid options are passed into a constructor or method.
     class InvalidOptions < RuntimeError; end
 
     # Raised when the database connection has not been set up.

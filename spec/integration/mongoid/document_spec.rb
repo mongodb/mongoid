@@ -474,22 +474,22 @@ describe Mongoid::Document do
       end
 
       it "handles comparisons with todays date"do
-        people = Person.select.where("this.dob < new Date()")
+        people = Person.where("this.dob < new Date()")
         people.first.should == @person
       end
 
       it "handles conparisons with a date range" do
-        people = Person.select.where("new Date(1976, 10, 31) < this.dob && this.dob < new Date()")
+        people = Person.where("new Date(1976, 10, 31) < this.dob && this.dob < new Date()")
         people.first.should == @person
       end
 
       it "handles false comparisons in a date range" do
-        people = Person.select.where("new Date(2005, 10, 31) < this.dob && this.dob < new Date()")
+        people = Person.where("new Date(2005, 10, 31) < this.dob && this.dob < new Date()")
         people.should be_empty
       end
 
       it "handles comparisons with date objects"do
-        people = Person.select.where(:dob => { "$lt" => Date.today.midnight })
+        people = Person.where(:dob => { "$lt" => Date.today.midnight })
         people.first.should == @person
       end
 
