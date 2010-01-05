@@ -13,6 +13,9 @@ Mongoid.database = connection.db("mongoid_test")
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
+  config.after :suite do
+    Mongoid.database.collections.each(&:drop)
+  end
 end
 
 class MixedDrink
