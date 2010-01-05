@@ -198,22 +198,16 @@ module Mongoid # :nodoc:
 
       protected
       # Adds the association to the associations hash with the type as the key,
-      # then adds the accessors for the association.
+      # then adds the accessors for the association. The defined setters and
+      # getters for the associations will perform the necessary memoization.
       def add_association(type, options)
         name = options.name
         associations[name] = type
         define_method(name) do
-          return instance_variable_get("@#{name}") if instance_variable_defined?("@#{name}")
-          proxy = type.instantiate(self, options)
-          instance_variable_set("@#{name}", proxy)
+          memoized(name) { type.instantiate(self, options) }
         end
         define_method("#{name}=") do |object|
-          proxy = type.update(object, self, options)
-          if instance_variable_defined?("@#{name}")
-            remove_instance_variable("@#{name}")
-          else
-            instance_variable_set("@#{name}", proxy)
-          end
+          reset(name) { type.update(object, self, options) }
         end
       end
     end

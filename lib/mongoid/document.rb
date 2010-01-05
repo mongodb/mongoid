@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     def self.included(base)
       base.class_eval do
         include ActiveSupport::Callbacks
-        include Associations, Attributes, Commands, Observable, Validatable
+        include Associations, Attributes, Commands, Memoization, Observable, Validatable
         include InstanceMethods
 
         extend ClassMethods
