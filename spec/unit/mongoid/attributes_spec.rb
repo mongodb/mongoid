@@ -104,6 +104,7 @@ describe Mongoid::Attributes do
       context "when allowing dynamic fields" do
 
         before do
+          Mongoid.allow_dynamic_fields = true
           @person = Person.new(@attributes)
         end
 
