@@ -197,6 +197,20 @@ describe Mongoid::Finders do
 
   end
 
+  describe ".max" do
+
+    before do
+      @criteria = mock
+    end
+
+    it "returns the sum of a new criteria" do
+      Mongoid::Criteria.expects(:new).returns(@criteria)
+      @criteria.expects(:max).with(:age).returns(50.0)
+      Person.max(:age).should == 50.0
+    end
+
+  end
+
   describe ".method_missing" do
 
     context "with a finder method name" do
@@ -246,6 +260,20 @@ describe Mongoid::Finders do
 
       end
 
+    end
+
+  end
+
+  describe ".min" do
+
+    before do
+      @criteria = mock
+    end
+
+    it "returns the sum of a new criteria" do
+      Mongoid::Criteria.expects(:new).returns(@criteria)
+      @criteria.expects(:min).with(:age).returns(50.0)
+      Person.min(:age).should == 50.0
     end
 
   end

@@ -563,7 +563,7 @@ module Mongoid #:nodoc:
     end
 
     # Common functionality for grouping operations. Currently used by min, max
-    # and sum.
+    # and sum. Will gsub the field name in the supplied reduce function.
     def grouped(start, field, reduce)
       collection = @klass.collection.group(
         nil,

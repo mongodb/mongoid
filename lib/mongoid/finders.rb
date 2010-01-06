@@ -76,6 +76,21 @@ module Mongoid #:nodoc:
       find(:last, *args)
     end
 
+    # Convenience method for returning the max value of a field.
+    #
+    # Options:
+    #
+    # field: The field to use when calculating the max.
+    #
+    # Example:
+    #
+    # <tt>Person.max(:age)</tt>
+    #
+    # Returns: <tt>Float</tt> of the sum.
+    def max(field)
+      Criteria.new(self).max(field)
+    end
+
     # Will execute a +Criteria+ based on the +DynamicFinder+ that gets
     # generated.
     #
@@ -92,6 +107,21 @@ module Mongoid #:nodoc:
       finder, conditions = dyna.finder, dyna.conditions
       results = find(finder, :conditions => conditions)
       results ? results : dyna.create(self)
+    end
+
+    # Convenience method for returning the min value of a field.
+    #
+    # Options:
+    #
+    # field: The field to use when calculating the min.
+    #
+    # Example:
+    #
+    # <tt>Person.min(:age)</tt>
+    #
+    # Returns: <tt>Float</tt> of the sum.
+    def min(field)
+      Criteria.new(self).min(field)
     end
 
     # Find all documents in paginated fashion given the supplied arguments.
