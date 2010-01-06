@@ -4,6 +4,7 @@ describe Mongoid::Criteria do
 
   before do
     @criteria = Mongoid::Criteria.new(Person)
+    @canvas_criteria = Mongoid::Criteria.new(Canvas)
   end
 
   describe "#[]" do
@@ -246,7 +247,9 @@ describe Mongoid::Criteria do
       before do
         @collection = mock
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(
+          { "title" => "Sir", "_type" => "Person" }
+        )
       end
 
       it "calls find on the collection with the selector and options" do
@@ -267,6 +270,23 @@ describe Mongoid::Criteria do
       it "returns nil" do
         criteria = Mongoid::Criteria.new(Person)
         criteria.first.should be_nil
+      end
+
+    end
+
+    context "when document is a subclass of the class queried from" do
+
+      before do
+        @collection = mock
+        Canvas.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with(@canvas_criteria.selector, @canvas_criteria.options).returns(
+          { "name" => "Firefox", "_type" => "Firefox" }
+        )
+      end
+
+      it "instantiates the subclass" do
+        criteria = Mongoid::Criteria.new(Canvas)
+        criteria.first.should be_a_kind_of(Firefox)
       end
 
     end
@@ -335,7 +355,7 @@ describe Mongoid::Criteria do
   describe "#group" do
 
     before do
-      @grouping = [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30 }] }]
+      @grouping = [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30, "_type" => "Person" }] }]
     end
 
     context "when klass provided" do
@@ -415,7 +435,9 @@ describe Mongoid::Criteria do
       before do
         @collection = mock
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:title, :desc]] }).returns({ :title => "Sir" })
+        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:title, :desc]] }).returns(
+          { "title" => "Sir", "_type" => "Person" }
+        )
       end
 
       it "calls find on the collection with the selector and sort options reversed" do
@@ -446,7 +468,9 @@ describe Mongoid::Criteria do
       before do
         @collection = mock
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:_id, :desc]] }).returns({ :title => "Sir" })
+        @collection.expects(:find_one).with(@criteria.selector, { :sort => [[:_id, :desc]] }).returns(
+          { "title" => "Sir", "_type" => "Person" }
+        )
       end
 
       it "defaults to sort by id" do
@@ -661,7 +685,9 @@ describe Mongoid::Criteria do
       before do
         @collection = mock
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns({ :title => "Sir" })
+        @collection.expects(:find_one).with(@criteria.selector, @criteria.options).returns(
+          { "title"=> "Sir", "_type" => "Person" }
+        )
       end
 
       it "calls find on the collection with the selector and options" do

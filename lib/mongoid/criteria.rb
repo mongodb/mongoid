@@ -168,7 +168,10 @@ module Mongoid #:nodoc:
         GROUP_REDUCE,
         true
       ).collect do |docs|
-        docs["group"] = docs["group"].collect { |attrs| @klass.instantiate(attrs) }; docs
+        docs["group"] = docs["group"].collect do |attrs|
+          attrs["_type"].constantize.instantiate(attrs)
+        end
+        docs
       end
     end
 
@@ -231,7 +234,7 @@ module Mongoid #:nodoc:
       sorting = [[:_id, :asc]] unless sorting
       opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
       attributes = @klass.collection.find_one(@selector, opts)
-      attributes ? @klass.instantiate(attributes) : nil
+      attributes ? attributes["_type"].constantize.instantiate(attributes) : nil
     end
 
     # Adds a criterion to the +Criteria+ that specifies the maximum number of
@@ -339,7 +342,7 @@ module Mongoid #:nodoc:
     # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
     def one
       attributes = @klass.collection.find_one(@selector, @options.dup)
-      attributes ? @klass.instantiate(attributes) : nil
+      attributes ? attributes["_type"].constantize.instantiate(attributes) : nil
     end
 
     alias :first :one
@@ -491,7 +494,7 @@ module Mongoid #:nodoc:
       attributes = @klass.collection.find(@selector, @options.dup)
       if attributes
         @count = attributes.count
-        attributes.collect { |doc| @klass.instantiate(doc) }
+        attributes.collect { |doc| doc["_type"].constantize.instantiate(doc) }
       else
         []
       end

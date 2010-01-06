@@ -87,6 +87,25 @@ describe Mongoid::Document do
 
   end
 
+  context "when document has subclasses" do
+
+    before do
+      @firefox = Firefox.create(:name => "firefox")
+    end
+
+    after do
+      Firefox.delete_all
+    end
+
+    it "returns subclasses for querying parents" do
+      firefox = Canvas.where(:name => "firefox").first
+      firefox.should be_a_kind_of(Firefox)
+      firefox.should == @firefox
+    end
+
+
+  end
+
   context "deleting subclasses" do
 
     before do
