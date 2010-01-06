@@ -28,6 +28,7 @@ gem "leshill-will_paginate", ">= 2.3.11"
 
 require "delegate"
 require "observer"
+require "singleton"
 require "time"
 require "validatable"
 require "active_support/callbacks"
