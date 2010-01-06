@@ -10,6 +10,7 @@ require "spec"
 
 connection = Mongo::Connection.new
 Mongoid.database = connection.db("mongoid_test")
+Mongoid.allow_dynamic_fields = true
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
