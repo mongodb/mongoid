@@ -422,23 +422,48 @@ module Mongoid #:nodoc:
     end
 
     SUM_REDUCE = "function(obj, prev) { prev.sum += obj.[field]; }"
-    # Sum the criteria. This will take the internally built selector and options
+    # Sum the criteria.
+    #
+    # This will take the internally built selector and options
     # and pass them on to the Ruby driver's +group()+ method on the collection. The
     # collection itself will be retrieved from the class provided, and once the
     # query has returned it will provided a grouping of keys with sums.
     #
     # Example:
     #
-    # <tt>criteria.select(:field1).where(:field1 => "Title").sum</tt>
+    # <tt>criteria.sum(:age)</tt>
     def sum(field)
-      collection = @klass.collection.group(
-        @options[:fields],
-        @selector,
-        { :sum => 0 },
-        SUM_REDUCE.gsub("[field]", field.to_s),
-        true
-      )
-      collection.first["sum"]
+      grouped(:sum, field.to_s, SUM_REDUCE)
+    end
+
+    MIN_REDUCE = "function(obj, prev) { if (prev.max > obj.[field]) { prev.max = obj.[field]; } }"
+    # Return the min value for a field.
+    #
+    # This will take the internally built selector and options
+    # and pass them on to the Ruby driver's +group()+ method on the collection. The
+    # collection itself will be retrieved from the class provided, and once the
+    # query has returned it will provided a grouping of keys with sums.
+    #
+    # Example:
+    #
+    # <tt>criteria.min(:age)</tt>
+    def min(field)
+      grouped(:min, field.to_s, MIN_REDUCE)
+    end
+
+    MAX_REDUCE = "function(obj, prev) { if (prev.max < obj.[field]) { prev.max = obj.[field]; } }"
+    # Return the max value for a field.
+    #
+    # This will take the internally built selector and options
+    # and pass them on to the Ruby driver's +group()+ method on the collection. The
+    # collection itself will be retrieved from the class provided, and once the
+    # query has returned it will provided a grouping of keys with sums.
+    #
+    # Example:
+    #
+    # <tt>criteria.max(:age)</tt>
+    def max(field)
+      grouped(:max, field.to_s, MAX_REDUCE)
     end
 
     # Translate the supplied arguments into a +Criteria+ object.
@@ -535,6 +560,19 @@ module Mongoid #:nodoc:
     # supplied attributes +Hash+.
     def update_selector(attributes, operator)
       attributes.each { |key, value| @selector[key] = { operator => value } }; self
+    end
+
+    # Common functionality for grouping operations. Currently used by min, max
+    # and sum.
+    def grouped(start, field, reduce)
+      collection = @klass.collection.group(
+        nil,
+        @selector,
+        { start => 0 },
+        reduce.gsub("[field]", field),
+        true
+      )
+      collection.first[start.to_s]
     end
   end
 end

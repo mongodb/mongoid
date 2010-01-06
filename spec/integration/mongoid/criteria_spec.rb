@@ -2,6 +2,42 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
+  describe "#max" do
+
+    before do
+      10.times do |n|
+        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"])
+      end
+    end
+
+    after do
+      Person.delete_all
+    end
+
+    it "provides sums for all the fields provided" do
+      Person.criteria.max(:age).should == 90.0
+    end
+
+  end
+
+  describe "#min" do
+
+    before do
+      10.times do |n|
+        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"])
+      end
+    end
+
+    after do
+      Person.delete_all
+    end
+
+    it "provides sums for all the fields provided" do
+      Person.criteria.min(:age).should == 0.0
+    end
+
+  end
+
   describe "#sum" do
 
     before do

@@ -492,6 +492,27 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#max" do
+
+    before do
+      @reduce = "function(obj, prev) { if (prev.max < obj.age) { prev.max = obj.age; } }"
+      @collection = mock
+      Person.expects(:collection).returns(@collection)
+    end
+
+    it "calls group on the collection with the aggregate js" do
+      @collection.expects(:group).with(
+        nil,
+        {:_type => { "$in" => ["Doctor", "Person"] } },
+        {:max => 0},
+        @reduce,
+        true
+      ).returns([{"max" => 200.0}])
+      @criteria.max(:age).should == 200.0
+    end
+
+  end
+
   describe "#merge" do
 
     before do
@@ -591,11 +612,36 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#min" do
+
+    before do
+      @reduce = "function(obj, prev) { if (prev.max > obj.age) { prev.max = obj.age; } }"
+      @collection = mock
+      Person.expects(:collection).returns(@collection)
+    end
+
+    it "calls group on the collection with the aggregate js" do
+      @collection.expects(:group).with(
+        nil,
+        {:_type => { "$in" => ["Doctor", "Person"] } },
+        {:min => 0},
+        @reduce,
+        true
+      ).returns([{"min" => 4.0}])
+      @criteria.min(:age).should == 4.0
+    end
+
+  end
+
   describe "#not_in" do
 
     it "adds the exclusion to the selector" do
       @criteria.not_in(:title => ["title1", "title2"], :text => ["test"])
-      @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => { "$nin" => ["title1", "title2"] }, :text => { "$nin" => ["test"] } }
+      @criteria.selector.should == {
+        :_type => { "$in" => ["Doctor", "Person"] },
+        :title => { "$nin" => ["title1", "title2"] },
+        :text => { "$nin" => ["test"] }
+      }
     end
 
     it "returns self" do
@@ -851,8 +897,14 @@ describe Mongoid::Criteria do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with(nil, {:_type => { "$in" => ["Doctor", "Person"] }}, {:sum => 0}, @reduce, true).returns([{"sum" => 50.0}])
-        @criteria.sum(:age)
+        @collection.expects(:group).with(
+          nil,
+          {:_type => { "$in" => ["Doctor", "Person"] } },
+          {:sum => 0},
+          @reduce,
+          true
+        ).returns([{"sum" => 50.0}])
+        @criteria.sum(:age).should == 50.0
       end
 
     end
