@@ -1,3 +1,16 @@
+=== 0.11.7
+- Added #sum to criteria which takes a single field
+  to aggregate on. Example: Person.sum(:age) would
+  return a float that was the sum of all people's
+  ages in the db.
+
+- Fixed issue with queries from parent classes always
+  casting the returned documents to the parent.
+
+- Fixed singleton require issue.
+
+- Group queries now run as db commands
+
 === 0.11.6
 - Allow namespaced documents to default with:
   "namespace_modelname"
