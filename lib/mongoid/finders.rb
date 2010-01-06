@@ -128,6 +128,22 @@ module Mongoid #:nodoc:
       Criteria.new(self).only(*args)
     end
 
+    # Convenience method for returning the sum of a specified field for all
+    # documents in the database.
+    #
+    # Options:
+    #
+    # field: The field to use when calculating the sum.
+    #
+    # Example:
+    #
+    # <tt>Person.sum(:age)</tt>
+    #
+    # Returns: <tt>Float</tt> of the sum.
+    def sum(field)
+      Criteria.new(self).sum(field)
+    end
+
     # Entry point for creating a new criteria from a Document. This will
     # instantiate a new +Criteria+ object with the supplied select criterion
     # already added to it.

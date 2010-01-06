@@ -2,15 +2,33 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
-  before do
-    @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"])
-  end
+  describe "#sum" do
 
-  after do
-    Person.delete_all
+    before do
+      10.times do |n|
+        Person.create(:title => "Sir", :age => 5, :aliases => ["D", "Durran"])
+      end
+    end
+
+    after do
+      Person.delete_all
+    end
+
+    it "provides sums for all the fields provided" do
+      Person.where(:age.gt => 3).sum(:age).should == 50.0
+    end
+
   end
 
   describe "#where" do
+
+    before do
+      @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"])
+    end
+
+    after do
+      Person.delete_all
+    end
 
     context "with complex criterion" do
 

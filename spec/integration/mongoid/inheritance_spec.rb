@@ -103,7 +103,6 @@ describe Mongoid::Document do
       firefox.should == @firefox
     end
 
-
   end
 
   context "deleting subclasses" do

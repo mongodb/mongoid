@@ -295,6 +295,21 @@ describe Mongoid::Finders do
 
   end
 
+  describe ".sum" do
+
+    before do
+      @criteria = mock
+    end
+
+    it "returns the sum of a new criteria" do
+      Mongoid::Criteria.expects(:new).returns(@criteria)
+      @criteria.expects(:sum).with(:age).returns(50.0)
+      sum = Person.sum(:age)
+      sum.should == 50.0
+    end
+
+  end
+
   describe ".where" do
 
     it "returns a new criteria with select conditions added" do

@@ -33,22 +33,6 @@ describe Mongoid::Criteria do
 
   describe "#aggregate" do
 
-    context "when klass provided" do
-
-      before do
-        @reduce = "function(obj, prev) { prev.count++; }"
-        @criteria = Mongoid::Criteria.new(Person)
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-      end
-
-      it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:count => 0}, @reduce, true)
-        @criteria.only(:field1).aggregate
-      end
-
-    end
-
     context "when klass not provided" do
 
       before do
@@ -59,7 +43,7 @@ describe Mongoid::Criteria do
 
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:count => 0}, @reduce, true)
-        @criteria.only(:field1).aggregate(Person)
+        @criteria.only(:field1).aggregate
       end
 
     end
@@ -852,6 +836,25 @@ describe Mongoid::Criteria do
 
     it "returns self" do
       @criteria.skip.should == @criteria
+    end
+
+  end
+
+  describe "#sum" do
+
+    context "when klass not provided" do
+
+      before do
+        @reduce = "function(obj, prev) { prev.sum += obj.age; }"
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
+      end
+
+      it "calls group on the collection with the aggregate js" do
+        @collection.expects(:group).with(nil, {:_type => { "$in" => ["Doctor", "Person"] }}, {:sum => 0}, @reduce, true).returns([{"sum" => 50.0}])
+        @criteria.sum(:age)
+      end
+
     end
 
   end

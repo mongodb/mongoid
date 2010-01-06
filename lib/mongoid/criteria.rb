@@ -48,8 +48,7 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>criteria.select(:field1).where(:field1 => "Title").aggregate(Person)</tt>
-    def aggregate(klass = nil)
-      @klass = klass if klass
+    def aggregate
       @klass.collection.group(@options[:fields], @selector, { :count => 0 }, AGGREGATE_REDUCE, true)
     end
 
@@ -420,6 +419,26 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def skip(value = 0)
       @options[:skip] = value; self
+    end
+
+    SUM_REDUCE = "function(obj, prev) { prev.sum += obj.[field]; }"
+    # Sum the criteria. This will take the internally built selector and options
+    # and pass them on to the Ruby driver's +group()+ method on the collection. The
+    # collection itself will be retrieved from the class provided, and once the
+    # query has returned it will provided a grouping of keys with sums.
+    #
+    # Example:
+    #
+    # <tt>criteria.select(:field1).where(:field1 => "Title").sum</tt>
+    def sum(field)
+      collection = @klass.collection.group(
+        @options[:fields],
+        @selector,
+        { :sum => 0 },
+        SUM_REDUCE.gsub("[field]", field.to_s),
+        true
+      )
+      collection.first["sum"]
     end
 
     # Translate the supplied arguments into a +Criteria+ object.
