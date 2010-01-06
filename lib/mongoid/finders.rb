@@ -86,7 +86,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.max(:age)</tt>
     #
-    # Returns: <tt>Float</tt> of the sum.
+    # Returns: <tt>Float</tt> max value.
     def max(field)
       Criteria.new(self).max(field)
     end
@@ -119,7 +119,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.min(:age)</tt>
     #
-    # Returns: <tt>Float</tt> of the sum.
+    # Returns: <tt>Float</tt> min value.
     def min(field)
       Criteria.new(self).min(field)
     end
