@@ -50,7 +50,7 @@ module Mongoid #:nodoc:
     # <tt>criteria.select(:field1).where(:field1 => "Title").aggregate(Person)</tt>
     def aggregate(klass = nil)
       @klass = klass if klass
-      @klass.collection.group(@options[:fields], @selector, { :count => 0 }, AGGREGATE_REDUCE)
+      @klass.collection.group(@options[:fields], @selector, { :count => 0 }, AGGREGATE_REDUCE, true)
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that must all
@@ -165,7 +165,8 @@ module Mongoid #:nodoc:
         @options[:fields],
         @selector,
         { :group => [] },
-        GROUP_REDUCE
+        GROUP_REDUCE,
+        true
       ).collect do |docs|
         docs["group"] = docs["group"].collect { |attrs| @klass.instantiate(attrs) }; docs
       end

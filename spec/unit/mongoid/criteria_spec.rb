@@ -42,7 +42,7 @@ describe Mongoid::Criteria do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:count => 0}, @reduce)
+        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:count => 0}, @reduce, true)
         @criteria.only(:field1).aggregate
       end
 
@@ -57,7 +57,7 @@ describe Mongoid::Criteria do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:count => 0}, @reduce)
+        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:count => 0}, @reduce, true)
         @criteria.only(:field1).aggregate(Person)
       end
 
@@ -348,7 +348,7 @@ describe Mongoid::Criteria do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:group => []}, @reduce).returns(@grouping)
+        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:group => []}, @reduce, true).returns(@grouping)
         @criteria.only(:field1).group
       end
 
@@ -363,7 +363,7 @@ describe Mongoid::Criteria do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:group => []}, @reduce).returns(@grouping)
+        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:group => []}, @reduce, true).returns(@grouping)
         @criteria.only(:field1).group
       end
 
