@@ -11,6 +11,10 @@ module Mongoid # :nodoc:
   module Associations #:nodoc:
     def self.included(base)
       base.class_eval do
+        # Associations need to inherit down the chain.
+        class_inheritable_accessor :associations
+        self.associations = {}.with_indifferent_access
+
         include InstanceMethods
         extend ClassMethods
       end
@@ -35,9 +39,6 @@ module Mongoid # :nodoc:
     end
 
     module ClassMethods
-      def associations
-        @associations ||= {}.with_indifferent_access
-      end
       # Adds the association back to the parent document. This macro is
       # necessary to set the references from the child back to the parent
       # document. If a child does not define this association calling
