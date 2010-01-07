@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
         end
         def get(value)
           return nil if value.blank?
-          ::Time.zone ? ::Time.zone.parse(value.to_s).getlocal : value
+          ::Time.zone ? value.getlocal : value
         end
       end
     end
