@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
 
-        delegate :collection, :defaults, :embedded?, :fields, :primary_key, :to => :klass
+        delegate :collection, :defaults, :embedded?, :primary_key, :to => :klass
 
         # Define all the callbacks that are accepted by the document.
         define_callbacks :before_create, :before_destroy, :before_save, :before_update, :before_validation
@@ -351,6 +351,10 @@ module Mongoid #:nodoc:
       # Convenience method to get the document's class
       def klass
         self.class
+      end
+
+      def fields
+        self.class.fields.merge(@fields || {})
       end
 
     end

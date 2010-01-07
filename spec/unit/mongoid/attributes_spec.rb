@@ -111,20 +111,15 @@ describe Mongoid::Attributes do
         context "when attribute is a string" do
 
           it "adds a string field" do
-            @person.nofieldstring.should == "Testing"
-            @person.nofieldstring = "Test"
-            @person.nofieldstring.should == "Test"
+            @person.attributes[:nofieldstring].should == "Testing"
           end
 
         end
 
-
         context "when attribute is not a string" do
 
           it "adds a properly typed field" do
-            @person.nofieldint.should == 5
-            @person.nofieldint = 50
-            @person.nofieldint.should == 50
+            @person.attributes[:nofieldint].should == 5
           end
 
         end
