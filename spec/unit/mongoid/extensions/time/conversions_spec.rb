@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Extensions::Time::Conversions do
 
   before do
-    Time.zone = "Eastern Time (US & Canada)"
+    Time.zone = "Canberra"
     @time = Time.local(1976, 11, 19)
   end
 
