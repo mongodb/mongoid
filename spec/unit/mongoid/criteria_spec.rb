@@ -495,7 +495,7 @@ describe Mongoid::Criteria do
   describe "#max" do
 
     before do
-      @reduce = "function(obj, prev) { if (prev.max < obj.age) { prev.max = obj.age; } }"
+      @reduce = Mongoid::Criteria::MAX_REDUCE.gsub("[field]", "age")
       @collection = mock
       Person.expects(:collection).returns(@collection)
     end
@@ -504,7 +504,7 @@ describe Mongoid::Criteria do
       @collection.expects(:group).with(
         nil,
         {:_type => { "$in" => ["Doctor", "Person"] } },
-        {:max => 0},
+        {:max => "start"},
         @reduce,
         true
       ).returns([{"max" => 200.0}])
@@ -615,7 +615,7 @@ describe Mongoid::Criteria do
   describe "#min" do
 
     before do
-      @reduce = "function(obj, prev) { if (prev.max > obj.age) { prev.max = obj.age; } }"
+      @reduce = Mongoid::Criteria::MIN_REDUCE.gsub("[field]", "age")
       @collection = mock
       Person.expects(:collection).returns(@collection)
     end
@@ -624,7 +624,7 @@ describe Mongoid::Criteria do
       @collection.expects(:group).with(
         nil,
         {:_type => { "$in" => ["Doctor", "Person"] } },
-        {:min => 0},
+        {:min => "start"},
         @reduce,
         true
       ).returns([{"min" => 4.0}])
@@ -891,7 +891,7 @@ describe Mongoid::Criteria do
     context "when klass not provided" do
 
       before do
-        @reduce = "function(obj, prev) { prev.sum += obj.age; }"
+        @reduce = Mongoid::Criteria::SUM_REDUCE.gsub("[field]", "age")
         @collection = mock
         Person.expects(:collection).returns(@collection)
       end
@@ -900,7 +900,7 @@ describe Mongoid::Criteria do
         @collection.expects(:group).with(
           nil,
           {:_type => { "$in" => ["Doctor", "Person"] } },
-          {:sum => 0},
+          {:sum => "start"},
           @reduce,
           true
         ).returns([{"sum" => 50.0}])

@@ -48,10 +48,11 @@ class Person
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name
 
-  index :title
-  index :dob
+  index :age
   index :addresses
+  index :dob
   index :name
+  index :title
 
   has_one_related :game
   has_many_related :posts

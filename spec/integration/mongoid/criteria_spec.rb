@@ -24,7 +24,7 @@ describe Mongoid::Criteria do
 
     before do
       10.times do |n|
-        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"])
+        Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"])
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Criteria do
     end
 
     it "provides min for the field provided" do
-      Person.min(:age).should == 0.0
+      Person.min(:age).should == 10.0
     end
 
   end
