@@ -131,7 +131,7 @@ describe Mongoid::Associations::HasOne do
 
     end
 
-    context "when the document is nil" do
+    context "when the document is empty" do
 
       before do
         @association = Mongoid::Associations::HasOne.new(

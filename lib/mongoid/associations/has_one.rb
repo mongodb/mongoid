@@ -52,11 +52,6 @@ module Mongoid #:nodoc:
         build(attributes)
       end
 
-      # This should delegate to the document.
-      def nil?
-        @document.nil?
-      end
-
       # This will get deprecated
       def to_a
         [@document]
@@ -98,11 +93,7 @@ module Mongoid #:nodoc:
         #
         # <tt>HasOne.update({:first_name => "Hank"}, person, options)</tt>
         def update(child, parent, options)
-          if child.nil?
-            return parent.attributes[options.name] = nil
-          else
-            return child.assimilate(parent, options)
-          end
+          child.assimilate(parent, options)
         end
       end
 

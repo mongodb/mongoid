@@ -12,6 +12,7 @@ require "mongoid/extensions/hash/assimilation"
 require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/integer/conversions"
+require "mongoid/extensions/nil/assimilation"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
@@ -50,6 +51,10 @@ end
 
 class Integer #:nodoc
   extend Mongoid::Extensions::Integer::Conversions
+end
+
+class NilClass #:nodoc
+  include Mongoid::Extensions::Nil::Assimilation
 end
 
 class Object #:nodoc:
