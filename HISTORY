@@ -2,6 +2,21 @@
 - Fixed issue with non-us time zones and formats
   parsing incorrectly.
 
+- Fixed error when specifying field restrictions
+  in criteria and not providing the _type. It
+  will now automaticall get added if it is not
+  present.
+
+- Slight cleanup of delegated methods in Document.
+
+- Dynamic attributes no longer create setters and
+  getters on the class. They can be accessed from
+  the attributes hash directly. If they are used
+  frequently it is preferrable to just add a field
+  to the class manually.
+
+- Criteria#min no longer always returns 0.0.
+
 === 0.11.8
 - Added #min and #max to criteria which takes a
   single field argument.
