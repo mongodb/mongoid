@@ -29,6 +29,14 @@ describe Mongoid::Extensions::Time::Conversions do
 
     end
 
+    context "when value is already a utc time" do
+
+      it "returns the time" do
+        Time.set(@time.utc).should == @time.utc
+      end
+
+    end
+
     context "when value is nil" do
 
       it "returns nil" do

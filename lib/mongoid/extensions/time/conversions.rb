@@ -5,7 +5,8 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def set(value)
           return nil if value.blank?
-          ::Time.parse(value.to_s).utc
+          time = ::Time.parse(value.to_s)
+          time.utc? ? time : time.utc
         end
         def get(value)
           return nil if value.blank?
