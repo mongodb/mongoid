@@ -193,6 +193,15 @@ describe Mongoid::Document do
 
     end
 
+    context "limiting result fields" do
+
+      it "adds the type field to the options" do
+        people = Person.all(:fields => [ :title ])
+        people.first.title.should == "Test"
+      end
+
+    end
+
   end
 
   describe "#find_by_id" do

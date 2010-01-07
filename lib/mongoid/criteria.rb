@@ -100,7 +100,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Integer</tt>
     def count
-      @count ||= @klass.collection.find(@selector, @options.dup).count
+      @count ||= @klass.collection.find(@selector, process_options).count
     end
 
     # Iterate over each +Document+ in the results. This can take an optional
@@ -228,7 +228,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Criteria.select(:name).where(:name = "Chrissy").last</tt>
     def last
-      opts = @options.dup
+      opts = process_options
       sorting = opts[:sort]
       sorting = [[:_id, :asc]] unless sorting
       opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
@@ -372,7 +372,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
     def one
-      attributes = @klass.collection.find_one(@selector, @options.dup)
+      attributes = @klass.collection.find_one(@selector, process_options)
       attributes ? attributes["_type"].constantize.instantiate(attributes) : nil
     end
 
@@ -537,13 +537,24 @@ module Mongoid #:nodoc:
     # If this is a +Criteria+ to find multiple results, will return an +Array+ of
     # objects of the type of class provided.
     def execute
-      attributes = @klass.collection.find(@selector, @options.dup)
+      attributes = @klass.collection.find(@selector, process_options)
       if attributes
         @count = attributes.count
         attributes.collect { |doc| doc["_type"].constantize.instantiate(doc) }
       else
         []
       end
+    end
+
+    # Filters the field list. If no fields have been supplied, then it will be
+    # empty. If fields have been defined then _type will be included as well.
+    def process_options
+      fields = @options[:fields]
+      if fields && fields.size > 0 && !fields.include?(:_type)
+        fields << :_type
+        @options[:fields] = fields
+      end
+      @options.dup
     end
 
     # Filters the unused options out of the options +Hash+. Currently this
@@ -558,12 +569,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Update the selector setting the operator on the value for each key in the
-    # supplied attributes +Hash+.
-    def update_selector(attributes, operator)
-      attributes.each { |key, value| @selector[key] = { operator => value } }; self
-    end
-
     # Common functionality for grouping operations. Currently used by min, max
     # and sum. Will gsub the field name in the supplied reduce function.
     def grouped(start, field, reduce)
@@ -576,5 +581,12 @@ module Mongoid #:nodoc:
       )
       collection.first[start.to_s]
     end
+
+    # Update the selector setting the operator on the value for each key in the
+    # supplied attributes +Hash+.
+    def update_selector(attributes, operator)
+      attributes.each { |key, value| @selector[key] = { operator => value } }; self
+    end
+
   end
 end
