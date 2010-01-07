@@ -14,8 +14,8 @@ describe Mongoid::Criteria do
       Person.delete_all
     end
 
-    it "provides sums for all the fields provided" do
-      Person.criteria.max(:age).should == 90.0
+    it "provides max for the field provided" do
+      Person.max(:age).should == 90.0
     end
 
   end
@@ -32,8 +32,8 @@ describe Mongoid::Criteria do
       Person.delete_all
     end
 
-    it "provides sums for all the fields provided" do
-      Person.criteria.min(:age).should == 0.0
+    it "provides min for the field provided" do
+      Person.min(:age).should == 0.0
     end
 
   end
@@ -50,7 +50,7 @@ describe Mongoid::Criteria do
       Person.delete_all
     end
 
-    it "provides sums for all the fields provided" do
+    it "provides sum for the field provided" do
       Person.where(:age.gt => 3).sum(:age).should == 50.0
     end
 
