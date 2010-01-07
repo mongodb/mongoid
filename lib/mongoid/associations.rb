@@ -50,11 +50,13 @@ module Mongoid # :nodoc:
       #
       # Example:
       #
-      #   class Person < Mongoid::Document
+      #   class Person
+      #     include Mongoid::Document
       #     has_many :addresses
       #   end
       #
-      #   class Address < Mongoid::Document
+      #   class Address
+      #     include Mongoid::Document
       #     belongs_to :person, :inverse_of => :addresses
       #   end
       def belongs_to(name, options = {})
@@ -77,7 +79,8 @@ module Mongoid # :nodoc:
       #
       # Example:
       #
-      #   class Game < Mongoid::Document
+      #   class Game
+      #     include Mongoid::Document
       #     belongs_to_related :person
       #   end
       #
@@ -99,11 +102,13 @@ module Mongoid # :nodoc:
       #
       # Example:
       #
-      #   class Person < Mongoid::Document
+      #   class Person
+      #     include Mongoid::Document
       #     has_many :addresses
       #   end
       #
-      #   class Address < Mongoid::Document
+      #   class Address
+      #     include Mongoid::Document
       #     belongs_to :person, :inverse_of => :addresses
       #   end
       def has_many(name, options = {})
@@ -122,7 +127,8 @@ module Mongoid # :nodoc:
       #
       # Example:
       #
-      #   class Person < Mongoid::Document
+      #   class Person
+      #     include Mongoid::Document
       #     has_many_related :posts
       #   end
       #
@@ -146,11 +152,13 @@ module Mongoid # :nodoc:
       #
       # Example:
       #
-      #   class Person < Mongoid::Document
+      #   class Person
+      #     include Mongoid::Document
       #     has_many :addresses
       #   end
       #
-      #   class Address < Mongoid::Document
+      #   class Address
+      #     include Mongoid::Document
       #     belongs_to :person
       #   end
       def has_one(name, options = {})
@@ -170,7 +178,8 @@ module Mongoid # :nodoc:
       #
       # Example:
       #
-      #   class Person < Mongoid::Document
+      #   class Person
+      #     include Mongoid::Document
       #     has_one_related :game
       #   end
       def has_one_related(name, options = {})

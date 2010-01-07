@@ -311,7 +311,8 @@ module Mongoid #:nodoc:
     #
     # Example:
     #
-    #   class Person < Mongoid::Document
+    #   class Person
+    #     include Mongoid::Document
     #     field :title
     #     field :terms, :type => Boolean, :default => false
     #

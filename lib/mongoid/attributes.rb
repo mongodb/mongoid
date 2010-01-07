@@ -110,7 +110,8 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      #   class Person < Mongoid::Document
+      #   class Person
+      #     include Mongoid::Document
       #     has_one :name
       #     has_many :addresses
       #
