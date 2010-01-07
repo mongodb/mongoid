@@ -1,3 +1,7 @@
+=== 0.11.8
+- Added #min and #max to criteria which takes a
+  single field argument.
+
 === 0.11.7
 - Added #sum to criteria which takes a single field
   to aggregate on. Example: Person.sum(:age) would
