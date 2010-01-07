@@ -210,7 +210,7 @@ describe Mongoid::Associations do
 
     it "adds a new Association to the document" do
       person = Person.new
-      person.name.first_name.should be_nil
+      person.name.should be_nil
     end
 
     it "creates a reader for the association" do
