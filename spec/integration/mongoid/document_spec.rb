@@ -6,6 +6,21 @@ describe Mongoid::Document do
     Mongoid.database.collection(:people).drop
   end
 
+  context "when document contains a hash field" do
+
+    before do
+      @map = { "first" => 10, "second" => "Blah" }
+      @person = Person.create(:map => @map)
+    end
+
+    it "properly gets and sets the has attributes" do
+      @person.map.should == @map
+      @from_db = Person.find(@person.id)
+      @from_db.map.should == @map
+    end
+
+  end
+
   describe ".collection" do
 
     context "on a subclass of a root document" do
