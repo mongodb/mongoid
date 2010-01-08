@@ -140,16 +140,74 @@ describe Mongoid::Finders do
 
   end
 
-  describe ".find_by_id" do
+  describe ".find_or_create_by" do
 
     before do
+      @person = Person.new(:age => 30)
       @criteria = mock
     end
 
-    it "delegates to find with an id parameter" do
-      Mongoid::Criteria.expects(:translate).with(Person, :conditions => { "_id" => "1" }).returns(@criteria)
-      @criteria.expects(:one).returns(Person.new)
-      Person.find_by_id("1")
+    context "when the document is found" do
+
+      it "returns the document" do
+        Mongoid::Criteria.expects(:translate).with(
+          Person, :conditions => { :age => 30 }
+        ).returns(@criteria)
+        @criteria.expects(:one).returns(@person)
+        Person.find_or_create_by(:age => 30).should == @person
+      end
+
+    end
+
+    context "when the document is not found" do
+
+      it "creates a new document" do
+        Mongoid::Criteria.expects(:translate).with(
+          Person, :conditions => { :age => 30 }
+        ).returns(@criteria)
+        @criteria.expects(:one).returns(nil)
+        Person.expects(:create).returns(@person)
+        person = Person.find_or_create_by(:age => 30)
+        person.should be_a_kind_of(Person)
+        person.age.should == 30
+      end
+
+    end
+
+  end
+
+  describe ".find_or_initialize_by" do
+
+    before do
+      @person = Person.new(:age => 30)
+      @criteria = mock
+    end
+
+    context "when the document is found" do
+
+      it "returns the document" do
+        Mongoid::Criteria.expects(:translate).with(
+          Person, :conditions => { :age => 30 }
+        ).returns(@criteria)
+        @criteria.expects(:one).returns(@person)
+        Person.find_or_initialize_by(:age => 30).should == @person
+      end
+
+    end
+
+    context "when the document is not found" do
+
+      it "returns a new document with the conditions" do
+        Mongoid::Criteria.expects(:translate).with(
+          Person, :conditions => { :age => 30 }
+        ).returns(@criteria)
+        @criteria.expects(:one).returns(nil)
+        person = Person.find_or_initialize_by(:age => 30)
+        person.should be_a_kind_of(Person)
+        person.should be_a_new_record
+        person.age.should == 30
+      end
+
     end
 
   end
@@ -207,59 +265,6 @@ describe Mongoid::Finders do
       Mongoid::Criteria.expects(:new).returns(@criteria)
       @criteria.expects(:max).with(:age).returns(50.0)
       Person.max(:age).should == 50.0
-    end
-
-  end
-
-  describe ".method_missing" do
-
-    context "with a finder method name" do
-
-      before do
-        @criteria = stub
-        @document = stub
-        @conditions = { "title" => "Sir", "age" => 30 }
-      end
-
-      it "executes the finder" do
-        Mongoid::Criteria.expects(:translate).with(Person, :conditions => @conditions).returns(@criteria)
-        @criteria.expects(:one).returns(@document)
-        Person.find_by_title_and_age("Sir", 30)
-      end
-
-    end
-
-    context "with a finder or creation method name" do
-
-      before do
-        @criteria = stub
-        @document = stub
-        @conditions = { "title" => "Sir", "age" => 30 }
-      end
-
-      context "when document is found" do
-
-        it "returns the document" do
-          Mongoid::Criteria.expects(:translate).with(Person, :conditions => @conditions).returns(@criteria)
-          @criteria.expects(:one).returns(@document)
-          Person.find_or_initialize_by_title_and_age("Sir", 30).should == @document
-        end
-
-      end
-
-      context "when document is not found" do
-
-        it "instantiates a new document" do
-          Mongoid::Criteria.expects(:translate).with(Person, :conditions => @conditions).returns(@criteria)
-          @criteria.expects(:one).returns(nil)
-          new_doc = Person.find_or_initialize_by_title_and_age("Sir", 30)
-          new_doc.new_record?.should be_true
-          new_doc.title.should == "Sir"
-          new_doc.age.should == 30
-        end
-
-      end
-
     end
 
   end

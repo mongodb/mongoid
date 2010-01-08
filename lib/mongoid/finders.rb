@@ -54,6 +54,30 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Find the first +Document+ given the conditions, or creates a new document
+    # with the conditions that were supplied
+    #
+    # Options:
+    #
+    # args: A +Hash+ of attributes
+    #
+    # <tt>Person.find_or_create_by(:attribute => "value")</tt>
+    def find_or_create_by(attrs = {})
+      first(:conditions => attrs) || self.create(attrs)
+    end
+
+    # Find the first +Document+ given the conditions, or instantiates a new document
+    # with the conditions that were supplied
+    #
+    # Options:
+    #
+    # args: A +Hash+ of attributes
+    #
+    # <tt>Person.find_or_initialize_by(:attribute => "value")</tt>
+    def find_or_initialize_by(attrs = {})
+      first(:conditions => attrs) || self.new(attrs)
+    end
+
     # Find the first +Document+ given the conditions.
     #
     # Options:
@@ -102,12 +126,12 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>Person.find_all_by_title_and_age("Sir", 30)</tt>
-    def method_missing(name, *args)
-      dyna = DynamicFinder.new(name, *args)
-      finder, conditions = dyna.finder, dyna.conditions
-      results = find(finder, :conditions => conditions)
-      results ? results : dyna.create(self)
-    end
+    # def method_missing(name, *args)
+      # dyna = DynamicFinder.new(name, *args)
+      # finder, conditions = dyna.finder, dyna.conditions
+      # results = find(finder, :conditions => conditions)
+      # results ? results : dyna.create(self)
+    # end
 
     # Convenience method for returning the min value of a field.
     #

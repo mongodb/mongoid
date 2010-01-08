@@ -121,43 +121,56 @@ describe Mongoid::Document do
 
   end
 
-  context "using dynamic finders" do
+  context ".find_or_create_by" do
 
     before do
-      @person = Person.create(:title => "Mr", :age => 25)
+      @person = Person.create(:title => "Senior")
     end
 
-    context "finding by a single attribute" do
+    context "when the document is found" do
 
-      it "returns found documents" do
-        Person.find_by_title("Mr").should == @person
+      it "returns the document" do
+        Person.find_or_create_by(:title => "Senior").should == @person
       end
 
     end
 
-    context "finding by multiple attributes" do
+    context "when the document is not found" do
 
-      it "returns found documents" do
-        Person.find_by_title_and_age("Mr", 25).should == @person
+      it "creates a new document" do
+        person = Person.find_or_create_by(:title => "Senorita")
+        person.title.should == "Senorita"
+        person.should_not be_a_new_record
       end
 
     end
 
-    context "finding all by a single attribute" do
+  end
 
-      it "returns found documents" do
-        Person.find_all_by_title("Mr").should == [@person]
+  context ".find_or_initialize_by" do
+
+    before do
+      @person = Person.create(:title => "Senior")
+    end
+
+    context "when the document is found" do
+
+      it "returns the document" do
+        Person.find_or_initialize_by(:title => "Senior").should == @person
       end
 
     end
 
-    context "finding all by multiple attributes" do
+    context "when the document is not found" do
 
-      it "returns found documents" do
-        Person.find_all_by_title_and_age("Mr", 25).should == [@person]
+      it "returns a new document" do
+        person = Person.find_or_initialize_by(:title => "Senorita")
+        person.title.should == "Senorita"
+        person.should be_a_new_record
       end
 
     end
+
   end
 
   describe "#find" do
@@ -200,18 +213,6 @@ describe Mongoid::Document do
         people.first.title.should == "Test"
       end
 
-    end
-
-  end
-
-  describe "#find_by_id" do
-
-    before do
-      @person = Person.create
-    end
-
-    it "returns the document with the matching id" do
-      Person.find_by_id(@person.id).should == @person
     end
 
   end
