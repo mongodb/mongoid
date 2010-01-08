@@ -233,6 +233,36 @@ describe Mongoid::Attributes do
 
     end
 
+    context "when an empty array is provided in the attributes" do
+
+      before do
+        @attributes = {
+          :aliases => []
+        }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the empty array" do
+        @person.aliases.should == []
+      end
+
+    end
+
+    context "when an empty hash is provided in the attributes" do
+
+      before do
+        @attributes = {
+          :map => {}
+        }
+        @person = Person.new(@attributes)
+      end
+
+      it "sets the empty hash" do
+        @person.map.should == {}
+      end
+
+    end
+
   end
 
   context "updating when attributes already exist" do

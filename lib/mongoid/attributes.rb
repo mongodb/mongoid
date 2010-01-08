@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
           if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
             @attributes[key] = value
           else
-            send("#{key}=", value) unless value.blank?
+            send("#{key}=", value) unless (value.is_a?(String) && value.blank?)
           end
         end
       end

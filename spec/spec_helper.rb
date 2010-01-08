@@ -35,6 +35,7 @@ class Person
   field :employer_id
   field :lunch_time, :type => Time
   field :aliases, :type => Array
+  field :map, :type => Hash
   field :score, :type => Integer
 
   attr_reader :rescored
