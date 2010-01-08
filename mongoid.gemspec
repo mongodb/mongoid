@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "0.11.9"
+  s.version = "0.12.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-01-07}
+  s.date = %q{2010-01-08}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.textile"
@@ -45,7 +45,6 @@ Gem::Specification.new do |s|
      "lib/mongoid/config.rb",
      "lib/mongoid/criteria.rb",
      "lib/mongoid/document.rb",
-     "lib/mongoid/dynamic_finder.rb",
      "lib/mongoid/errors.rb",
      "lib/mongoid/extensions.rb",
      "lib/mongoid/extensions/array/accessors.rb",
@@ -61,6 +60,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/hash/conversions.rb",
      "lib/mongoid/extensions/hash/criteria_helpers.rb",
      "lib/mongoid/extensions/integer/conversions.rb",
+     "lib/mongoid/extensions/nil/assimilation.rb",
      "lib/mongoid/extensions/object/conversions.rb",
      "lib/mongoid/extensions/string/conversions.rb",
      "lib/mongoid/extensions/string/inflections.rb",
@@ -100,7 +100,6 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/config_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
-     "spec/unit/mongoid/dynamic_finder_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
      "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
@@ -115,6 +114,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/criteria_helpers_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/nil/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
@@ -159,7 +159,6 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/config_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
-     "spec/unit/mongoid/dynamic_finder_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
      "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
@@ -174,6 +173,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/criteria_helpers_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/nil/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
