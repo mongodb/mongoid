@@ -112,6 +112,7 @@ describe Mongoid::Document do
 
       it "deletes the document" do
         @person.addresses.first.destroy
+        @person.name.should_not be_nil
         @person.name.destroy
         @person.addresses.first.should be_nil
         @person.name.should be_nil

@@ -1,3 +1,43 @@
+=== 0.12.0
+- Has one now works as expected:
+
+  - Has one associations will return nil, instead
+    of the proxy if the association has not been
+    set.
+
+  - Building/creating a has one is no longer handled
+    by calling the Document#association#build() or create(),
+    this is now handled by Document#build_name and
+    Document#create_name where "name" is the name
+    of the has one association.
+
+  - Passing a _type attribute to the #build_name
+    and #create_name methods will build/create
+    objects of that type, useful for creating
+    specific subclasses.
+
+  - The existing #build and #create methods will be
+    removed in the next release.
+
+- Removed all dynamic finders. If you need to have
+  functionality similar to "find_or_(create|initialize)_by"
+  you can use the 2 new finders:
+
+  - Document.find_or_create_by(attributes): Will
+    look for a document in the database with the
+    supplied attributes, if found it will return the
+    document otherwise will create a new one with
+    the supplied attributes.
+
+  - Document.find_or_initialize_by(attributes): Will
+    look for a document in the database with the
+    supplied attributes, if found it will return the
+    document otherwise will instantiate a new one with
+    the supplied attributes.
+
+- Fixed issue with empty hashes and arrays not getting
+  set on document instantiation.
+
 === 0.11.9
 - Fixed issue with non-us time zones and formats
   parsing incorrectly.
