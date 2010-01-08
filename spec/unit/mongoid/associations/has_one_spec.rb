@@ -91,15 +91,52 @@ describe Mongoid::Associations::HasOne do
 
   end
 
-  describe "#initialize" do
+  describe ".instantiate" do
 
-    before do
-      @document = stub(:attributes => { :writer => { :speed => 500, :_type => "HtmlWriter" } }, :update => true)
-      @options = Mongoid::Associations::Options.new(:name => :writer)
+    context "when the attributes are nil" do
+
+      before do
+        @document = Person.new
+        @association = Mongoid::Associations::HasOne.instantiate(
+          @document,
+          Mongoid::Associations::Options.new(:name => :name)
+        )
+      end
+
+      it "returns nil" do
+        @association.should be_nil
+      end
+
     end
 
-    it "delegates to new" do
-      Mongoid::Associations::HasOne.new(@document, @document.attributes[:writer], @options)
+    context "when attributes are empty" do
+
+      before do
+        @document = stub(:attributes => { :name => {} })
+        @association = Mongoid::Associations::HasOne.instantiate(
+          @document,
+          Mongoid::Associations::Options.new(:name => :name)
+        )
+      end
+
+      it "returns nil" do
+        @association.should be_nil
+      end
+
+    end
+
+    context "when attributes exist" do
+
+      before do
+        @document = stub(:attributes => { :name => { :first_name => "Test" } })
+        @options = Mongoid::Associations::Options.new(:name => :name)
+      end
+
+      it "delegates to new" do
+        Mongoid::Associations::HasOne.expects(:new).with(@document, { :first_name => "Test" }, @options)
+        Mongoid::Associations::HasOne.instantiate(@document, @options)
+      end
+
     end
 
   end
@@ -131,34 +168,6 @@ describe Mongoid::Associations::HasOne do
 
     end
 
-    context "when the document is empty" do
-
-      before do
-        @association = Mongoid::Associations::HasOne.new(
-          @document,
-          {},
-          Mongoid::Associations::Options.new(:name => :mixed_drink)
-        )
-      end
-
-      describe "#new_record?" do
-
-        it "returns true" do
-          @association.should be_new_record
-        end
-
-      end
-
-      context "attribute getters" do
-
-        it "returns nil" do
-          @association.name.should be_nil
-        end
-
-      end
-
-    end
-
   end
 
   describe "#nested_build" do
@@ -176,24 +185,6 @@ describe Mongoid::Associations::HasOne do
       it "replaces the existing has_one" do
         drink = @association.nested_build({ :name => "Sapphire and Tonic" })
         drink.name.should == "Sapphire and Tonic"
-      end
-
-    end
-
-  end
-
-  describe ".instantiate" do
-
-    context "when attributes exist" do
-
-      before do
-        @document = stub(:attributes => { :name => { :first_name => "Test" } })
-        @options = Mongoid::Associations::Options.new(:name => :name)
-      end
-
-      it "delegates to new" do
-        Mongoid::Associations::HasOne.expects(:new).with(@document, { :first_name => "Test" }, @options)
-        Mongoid::Associations::HasOne.instantiate(@document, @options)
       end
 
     end
@@ -254,20 +245,6 @@ describe Mongoid::Associations::HasOne do
   end
 
   describe "#valid?" do
-
-    context "when the document is nil" do
-
-      before do
-        @document = stub(:attributes => {})
-        @options = Mongoid::Associations::Options.new(:name => :name)
-        @association = Mongoid::Associations::HasOne.instantiate(@document, @options)
-      end
-
-      it "returns false" do
-        @association.valid?.should be_false
-      end
-
-    end
 
     context "when the document is not nil" do
 

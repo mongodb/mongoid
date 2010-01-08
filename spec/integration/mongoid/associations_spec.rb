@@ -72,7 +72,7 @@ describe Mongoid::Associations do
 
       before do
         @address = @person.addresses.create(:street => "Oxford St")
-        @name = @person.name.create(:first_name => "Gordon")
+        @name = @person.create_name(:first_name => "Gordon")
       end
 
       it "persists all the associations properly" do
@@ -91,7 +91,7 @@ describe Mongoid::Associations do
       it "persists all the associations properly" do
         from_db = Person.find(@person.id)
         phone = from_db.phone_numbers.first
-        phone.country_code.create(:code => 1)
+        phone.create_country_code(:code => 1)
         from_db.phone_numbers.first.country_code.code.should == 1
       end
 

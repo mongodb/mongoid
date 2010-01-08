@@ -33,12 +33,8 @@ module Mongoid #:nodoc:
       # options: The association options.
       def initialize(document, attributes, options)
         @parent, @options, @association_name = document, options, options.name
-        unless attributes.nil?
-          klass = attributes[:_type] ? attributes[:_type].constantize : nil
-          @document = attributes.assimilate(@parent, @options, klass)
-        else
-          @document = nil
-        end
+        klass = attributes[:_type] ? attributes[:_type].constantize : nil
+        @document = attributes.assimilate(@parent, @options, klass)
       end
 
       # Delegate all missing methods over to the +Document+.
@@ -59,7 +55,7 @@ module Mongoid #:nodoc:
 
       # Need to override here for when the underlying document is nil.
       def valid?
-        @document ? @document.valid? : false
+        @document.valid?
       end
 
       class << self
@@ -72,6 +68,7 @@ module Mongoid #:nodoc:
         # options: The association options.
         def instantiate(document, options)
           attributes = document.attributes[options.name]
+          return nil if attributes.blank?
           new(document, attributes, options)
         end
 

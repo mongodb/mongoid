@@ -139,6 +139,104 @@ describe Mongoid::Associations do
 
   end
 
+  describe "#build_*" do
+
+    before do
+      @canvas = Canvas.new
+    end
+
+    context "when type is passed in" do
+
+      before do
+        @writer = @canvas.build_writer(:speed => 250, :_type => "HtmlWriter")
+      end
+
+      it "returns a new document" do
+        @writer.should_not be_nil
+      end
+
+      it "returns the properly typed document" do
+        @writer.should be_a_kind_of(HtmlWriter)
+      end
+
+      it "sets the appropriate attributes" do
+        @writer.speed.should == 250
+      end
+
+    end
+
+    context "when type is not passed in" do
+
+      before do
+        @writer = @canvas.build_writer(:speed => 250)
+      end
+
+      it "returns a new document" do
+        @writer.should_not be_nil
+      end
+
+      it "returns the properly typed document" do
+        @writer.should be_a_kind_of(Writer)
+      end
+
+      it "sets the appropriate attributes" do
+        @writer.speed.should == 250
+      end
+
+    end
+
+  end
+
+  describe "#create_*" do
+
+    before do
+      @canvas = Canvas.new
+    end
+
+    context "when type is passed in" do
+
+      before do
+        Mongoid::Commands::Save.expects(:execute)
+        @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
+      end
+
+      it "returns a new document" do
+        @writer.should_not be_nil
+      end
+
+      it "returns the properly typed document" do
+        @writer.should be_a_kind_of(HtmlWriter)
+      end
+
+      it "sets the appropriate attributes" do
+        @writer.speed.should == 250
+      end
+
+    end
+
+    context "when type is not passed in" do
+
+      before do
+        Mongoid::Commands::Save.expects(:execute)
+        @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
+      end
+
+      it "returns a new document" do
+        @writer.should_not be_nil
+      end
+
+      it "returns the properly typed document" do
+        @writer.should be_a_kind_of(Writer)
+      end
+
+      it "sets the appropriate attributes" do
+        @writer.speed.should == 250
+      end
+
+    end
+
+  end
+
   describe ".has_many" do
 
     it "adds a new Association to the collection" do
@@ -208,19 +306,28 @@ describe Mongoid::Associations do
 
   describe ".has_one" do
 
+    before do
+      @person = Person.new
+    end
+
     it "adds a new Association to the document" do
-      person = Person.new
-      person.name.should be_nil
+      @person.name.should be_nil
     end
 
     it "creates a reader for the association" do
-      person = Person.new
-      person.should respond_to(:name)
+      @person.should respond_to(:name)
     end
 
     it "creates a writer for the association" do
-      person = Person.new
-      person.should respond_to(:name=)
+      @person.should respond_to(:name=)
+    end
+
+    it "creates a builder for the association" do
+      @person.should respond_to(:build_name)
+    end
+
+    it "creates a creator for the association" do
+      @person.should respond_to(:create_name)
     end
 
     context "when setting the association directly" do

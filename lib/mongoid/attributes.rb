@@ -123,8 +123,12 @@ module Mongoid #:nodoc:
           define_method("#{name}_attributes=") do |attrs|
             reject(attrs, options)
             association = send(name)
-            update(association, true)
-            association.nested_build(attrs)
+            if association
+              update(association, true)
+              association.nested_build(attrs)
+            else
+              send("build_#{name}", attrs)
+            end
           end
         end
       end

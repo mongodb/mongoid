@@ -660,7 +660,7 @@ describe Mongoid::Document do
 
       it "removes the child document attributes" do
         @person.remove(@name)
-        @person.name.document.should be_nil
+        @person.name.should be_nil
       end
 
     end

@@ -154,10 +154,11 @@ module Mongoid # :nodoc:
       #     belongs_to :person
       #   end
       def has_one(name, options = {})
-        add_association(
-          Associations::HasOne,
-          Associations::Options.new(options.merge(:name => name))
-        )
+        opts = Associations::Options.new(options.merge(:name => name))
+        type = Associations::HasOne
+        add_association(type, opts)
+        add_builder(type, opts)
+        add_creator(type, opts)
       end
 
       # Adds a relational association from the Document to one Document in
@@ -209,6 +210,25 @@ module Mongoid # :nodoc:
         end
         define_method("#{name}=") do |object|
           reset(name) { type.update(object, self, options) }
+        end
+      end
+
+      # Adds a builder for a has_one association. This comes in the form of
+      # build_name(attributes)
+      def add_builder(type, options)
+        name = options.name
+        define_method("build_#{name}") do |attrs|
+          reset(name) { type.new(self, attrs, options) }
+        end
+      end
+
+      # Adds a creator for a has_one association. This comes in the form of
+      # create_name(attributes)
+      def add_creator(type, options)
+        name = options.name
+        define_method("create_#{name}") do |attrs|
+          document = send("build_#{name}", attrs)
+          document.save; document
         end
       end
     end

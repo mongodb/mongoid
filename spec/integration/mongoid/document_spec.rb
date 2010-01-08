@@ -106,7 +106,7 @@ describe Mongoid::Document do
       before do
         @person = Person.create(:title => "Lead")
         @person.addresses.create(:street => "1st Street")
-        @person.name.create(:first_name => "Emmanuel")
+        @person.create_name(:first_name => "Emmanuel")
         @person.save
       end
 
@@ -114,7 +114,7 @@ describe Mongoid::Document do
         @person.addresses.first.destroy
         @person.name.destroy
         @person.addresses.first.should be_nil
-        @person.name.document.should be_nil
+        @person.name.should be_nil
       end
 
     end
