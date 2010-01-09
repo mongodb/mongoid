@@ -3,11 +3,9 @@ module Mongoid #:nodoc:
   module Document
     def self.included(base)
       base.class_eval do
-        include Associations, Attributes, Callbacks, Commands, Memoization, Observable, Validatable
+        include Components
         include InstanceMethods
-
         extend ClassMethods
-        extend Finders
 
         # Set up the class attributes that must be available to all subclasses.
         # These include defaults, fields

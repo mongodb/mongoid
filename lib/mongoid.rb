@@ -52,6 +52,7 @@ require "mongoid/finders"
 require "mongoid/memoization"
 require "mongoid/timestamps"
 require "mongoid/versioning"
+require "mongoid/components"
 require "mongoid/document"
 
 module Mongoid #:nodoc
