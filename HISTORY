@@ -1,3 +1,15 @@
+=== 1.0.0
+- Validations cleanup: Only before_validation and
+  after_validation callbacks are supported now.
+
+- Dynamic fields have reader and writer methods
+  again, but only for instances where the dynamic
+  attribute exists.
+
+- Lots of refactoring, mostly coverting common
+  fucntionality into modules for the upcoming rails
+  2 and 3 gem split.
+
 === 0.12.0
 - Has one now works as expected:
 

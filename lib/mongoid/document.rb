@@ -30,17 +30,31 @@ module Mongoid #:nodoc:
         add_indexes; self._collection
       end
 
-      # return true if the +Document+ is embedded in another +Documnet+.
+      # return true if the +Document+ is embedded in another +Documnet+. The
+      # embedded flag is set by declaring a belongs_to association.
+      #
+      # Example:
+      #
+      # <tt>Address.embedded?</tt>
       def embedded?
         self.embedded == true
       end
 
       # Returns a human readable version of the class.
+      #
+      # Example:
+      #
+      # <tt>MixedDrink.human_name # returns "Mixed Drink"</tt>
       def human_name
         name.underscore.humanize
       end
 
-      # Instantiate a new object, only when loaded from the database.
+      # Instantiate a new object, only when loaded from the database or when
+      # the attributes have already been typecast.
+      #
+      # Example:
+      #
+      # <tt>Person.instantiate(:title => "Sir", :age => 30)</tt>
       def instantiate(attrs = {}, allocating = false)
         attributes = attrs.with_indifferent_access
         if attributes[:_id] || allocating
@@ -55,14 +69,26 @@ module Mongoid #:nodoc:
       # Defines the field that will be used for the id of this +Document+. This
       # set the id of this +Document+ before save to a parameterized version of
       # the field that was supplied. This is good for use for readable URLS in
-      # web applications and *MUST* be defined on documents that are embedded
-      # in order for proper updates in has_may associations.
+      # web applications.
+      #
+      # Example:
+      #
+      #   class Person
+      #     include Mongoid::Document
+      #     field :first_name
+      #     field :last_name
+      #     key :first_name, :last_name
+      #   end
       def key(*fields)
         self.primary_key = fields
         before_save :generate_key
       end
 
       # Macro for setting the collection name to store in.
+      #
+      # Example:
+      #
+      # <tt>Person.store_in :populdation</tt>
       def store_in(name)
         self.collection_name = name.to_s
         self._collection = Mongoid.database.collection(name.to_s)
