@@ -215,7 +215,6 @@ describe Mongoid::Commands do
     end
 
     it "runs the validation callbacks" do
-      @comment.expects(:run_callbacks).with(:validate)
       @comment.expects(:run_callbacks).with(:before_validation)
       @comment.expects(:run_callbacks).with(:after_validation)
       @comment.valid?
