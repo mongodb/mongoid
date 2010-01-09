@@ -9,12 +9,13 @@ module Mongoid #:nodoc:
 
         cattr_accessor :_collection, :collection_name, :embedded, :primary_key
 
+        self.embedded = false
         self.collection_name = self.name.collectionize
 
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
 
-        delegate :collection, :embedded?, :primary_key, :to => "self.class"
+        delegate :collection, :embedded, :primary_key, :to => "self.class"
       end
     end
 
@@ -25,19 +26,9 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>Mongo::Collection</tt>
       def collection
-        raise Errors::InvalidCollection.new(self) if embedded?
+        raise Errors::InvalidCollection.new(self) if embedded
         self._collection ||= Mongoid.database.collection(self.collection_name)
         add_indexes; self._collection
-      end
-
-      # return true if the +Document+ is embedded in another +Documnet+. The
-      # embedded flag is set by declaring a belongs_to association.
-      #
-      # Example:
-      #
-      # <tt>Address.embedded?</tt>
-      def embedded?
-        self.embedded == true
       end
 
       # Returns a human readable version of the class.

@@ -164,12 +164,12 @@ describe Mongoid::Document do
 
   end
 
-  describe ".embedded?" do
+  describe ".embedded" do
 
     context "when the document is embedded" do
 
       it "returns true" do
-        Address.embedded?.should be_true
+        Address.embedded.should be_true
       end
 
     end
@@ -177,7 +177,7 @@ describe Mongoid::Document do
     context "when the document is not embedded" do
 
       it "returns false" do
-        Person.embedded?.should be_false
+        Person.embedded.should be_false
       end
 
     end
@@ -190,7 +190,7 @@ describe Mongoid::Document do
 
       it "returns true" do
         address = Address.new
-        address.embedded?.should be_true
+        address.embedded.should be_true
       end
 
     end
@@ -199,7 +199,7 @@ describe Mongoid::Document do
 
       it "returns false" do
         person = Person.new
-        person.embedded?.should be_false
+        person.embedded.should be_false
       end
 
     end
@@ -208,7 +208,7 @@ describe Mongoid::Document do
 
       it "returns true" do
         circle = Circle.new
-        circle.should be_embedded
+        circle.embedded.should be_true
       end
 
     end
