@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Document
     def self.included(base)
       base.class_eval do
-        include ActiveSupport::Callbacks
-        include Associations, Attributes, Commands, Memoization, Observable, Validatable
+        include Associations, Attributes, Callbacks, Commands, Memoization, Observable, Validatable
         include InstanceMethods
 
         extend ClassMethods
@@ -29,10 +28,6 @@ module Mongoid #:nodoc:
         attr_reader :attributes, :new_record
 
         delegate :collection, :defaults, :embedded?, :fields, :primary_key, :to => "self.class"
-
-        # Define all the callbacks that are accepted by the document.
-        define_callbacks :before_create, :before_destroy, :before_save, :before_update, :before_validation
-        define_callbacks :after_create, :after_destroy, :after_save, :after_update, :after_validation
       end
     end
 
