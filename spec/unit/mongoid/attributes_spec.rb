@@ -115,6 +115,31 @@ describe Mongoid::Attributes do
 
   end
 
+  describe "#method_missing" do
+
+    before do
+      Mongoid.allow_dynamic_fields = true
+      @attributes = {
+        :testing => "Testing"
+      }
+      @person = Person.new(@attributes)
+    end
+
+    context "when an attribute exists" do
+
+      it "allows the getter" do
+        @person.testing.should == "Testing"
+      end
+
+      it "allows the setter" do
+        @person.testing = "Test"
+        @person.testing.should == "Test"
+      end
+
+    end
+
+  end
+
   describe "#process" do
 
     context "when attributes dont have fields defined" do
@@ -136,7 +161,7 @@ describe Mongoid::Attributes do
 
         context "when attribute is a string" do
 
-          it "adds a string field" do
+          it "adds the string to the attributes" do
             @person.attributes[:nofieldstring].should == "Testing"
           end
 
@@ -144,17 +169,8 @@ describe Mongoid::Attributes do
 
         context "when attribute is not a string" do
 
-          it "adds a properly typed field" do
+          it "adds a cast value to the attributes" do
             @person.attributes[:nofieldint].should == 5
-          end
-
-        end
-
-        context "when a method has been defined for the attribute" do
-
-          it "does not create the field" do
-            @person.fields.keys.should_not include("employer")
-            @person.fields.keys.should_not include("employer=")
           end
 
         end

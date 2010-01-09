@@ -28,6 +28,14 @@ module Mongoid #:nodoc:
         def plural?
           pluralize == self
         end
+
+        def reader
+          writer? ? gsub("=", "") : self
+        end
+
+        def writer?
+          include?("=")
+        end
       end
     end
   end

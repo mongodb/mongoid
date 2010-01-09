@@ -109,4 +109,45 @@ describe Mongoid::Extensions::String::Inflections do
     end
 
   end
+
+  describe "#reader" do
+
+    context "when string is a reader" do
+
+      it "returns self" do
+        "attribute".reader.should == "attribute"
+      end
+
+    end
+
+    context "when string is a writer" do
+
+      it "returns the reader" do
+        "attribute=".reader.should == "attribute"
+      end
+
+    end
+
+  end
+
+  describe "#writer?" do
+
+    context "when string is a reader" do
+
+      it "returns false" do
+        "attribute".writer?.should be_false
+      end
+
+    end
+
+    context "when string is a writer" do
+
+      it "returns true" do
+        "attribute=".writer?.should be_true
+      end
+
+    end
+
+  end
+
 end

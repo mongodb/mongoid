@@ -22,6 +22,13 @@ module Mongoid #:nodoc:
       alias :_id :id
       alias :_id= :id=
 
+      # Used for allowing accessor methods for dynamic attributes.
+      def method_missing(name, *args)
+        attr = name.to_s
+        return super unless @attributes.has_key?(attr.reader)
+        attr.writer? ? (@attributes[attr.reader] = *args) : @attributes[attr.reader]
+      end
+
       # Process the provided attributes casting them to their proper values if a
       # field exists for them on the +Document+. This will be limited to only the
       # attributes provided in the suppied +Hash+ so that no extra nil values get
@@ -31,7 +38,7 @@ module Mongoid #:nodoc:
           if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
             @attributes[key] = value
           else
-            send("#{key}=", value) unless (value.is_a?(String) && value.blank?)
+            set_unless_blank(key, value)
           end
         end
       end
@@ -127,6 +134,11 @@ module Mongoid #:nodoc:
             rejector.call(value)
           end
         end
+      end
+
+      # Sets the attirbute value unless it is a blank string.
+      def set_unless_blank(name, value)
+        send("#{name}=", value) unless (value.is_a?(String) && value.blank?)
       end
     end
 
