@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
       #
       # <tt>MixedDrink.human_name # returns "Mixed Drink"</tt>
       def human_name
-        name.underscore.humanize
+        name.labelize
       end
 
       # Instantiate a new object, only when loaded from the database or when

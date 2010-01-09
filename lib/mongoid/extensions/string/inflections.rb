@@ -21,6 +21,10 @@ module Mongoid #:nodoc:
           underscore.tableize.gsub("/", "_")
         end
 
+        def labelize
+          underscore.humanize
+        end
+
         def invert
           REVERSALS[self]
         end

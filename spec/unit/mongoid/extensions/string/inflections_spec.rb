@@ -22,6 +22,14 @@ describe Mongoid::Extensions::String::Inflections do
 
   end
 
+  describe "#labelize" do
+
+    it "returns the underscored name humanized" do
+      MixedDrink.name.labelize.should == "Mixed drink"
+    end
+
+  end
+
   describe "#singular?" do
 
     context "when singular" do
