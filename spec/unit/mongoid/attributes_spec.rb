@@ -89,6 +89,32 @@ describe Mongoid::Attributes do
 
   end
 
+  describe "#_id" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "delegates to #id" do
+      @person._id.should == @person.id
+    end
+
+  end
+
+  describe "#_id=" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "delegates to #id=" do
+      @id = Mongo::ObjectID.new.to_s
+      @person._id = @id
+      @person.id.should == @id
+    end
+
+  end
+
   describe "#process" do
 
     context "when attributes dont have fields defined" do

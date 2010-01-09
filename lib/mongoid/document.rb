@@ -157,20 +157,6 @@ module Mongoid #:nodoc:
         self.class.instantiate(@attributes.except(:_id).except(:versions).dup, true)
       end
 
-      # Get the id associated with this object. This will pull the _id value out
-      # of the attributes +Hash+.
-      def id
-        @attributes[:_id]
-      end
-
-      # Set the id
-      def id=(new_id)
-        @attributes[:_id] = new_id
-      end
-
-      alias :_id :id
-      alias :_id= :id=
-
       # Instantiate a new +Document+, setting the Document's attributes if
       # given. If no attributes are provided, they will be initialized with
       # an empty +Hash+.
@@ -268,16 +254,6 @@ module Mongoid #:nodoc:
       # Returns the id of the Document, used in Rails compatibility.
       def to_param
         id
-      end
-
-      # Returns the object type.
-      def _type
-        @attributes[:_type]
-      end
-
-      # Set the type.
-      def _type=(new_type)
-        @attributes[:_type] = new_type
       end
 
       # Observe a notify call from a child +Document+. This will either update

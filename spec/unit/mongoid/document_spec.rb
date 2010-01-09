@@ -366,18 +366,6 @@ describe Mongoid::Document do
 
   end
 
-  describe "#_id" do
-
-    before do
-      @person = Person.new
-    end
-
-    it "delegates to #id" do
-      @person._id.should == @person.id
-    end
-
-  end
-
   describe ".instantiate" do
 
     before do
