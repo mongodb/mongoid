@@ -2,6 +2,26 @@ require "spec_helper"
 
 describe Mongoid::Extensions::String::Inflections do
 
+  describe "#collectionize" do
+
+    context "when class is namepaced" do
+
+      it "returns an underscored tableized name" do
+        Medical::Patient.name.collectionize.should == "medical_patients"
+      end
+
+    end
+
+    context "when class is not namespaced" do
+
+      it "returns an underscored tableized name" do
+        MixedDrink.name.collectionize.should == "mixed_drinks"
+      end
+
+    end
+
+  end
+
   describe "#singular?" do
 
     context "when singular" do

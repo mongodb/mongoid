@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
 
         cattr_accessor :_collection, :collection_name, :embedded, :primary_key
 
-        self.collection_name = self.to_s.underscore.tableize.gsub("/", "_")
+        self.collection_name = self.name.collectionize
 
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record

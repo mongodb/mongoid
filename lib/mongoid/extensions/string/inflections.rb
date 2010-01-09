@@ -17,6 +17,10 @@ module Mongoid #:nodoc:
           "descending" => "ascending"
         }
 
+        def collectionize
+          underscore.tableize.gsub("/", "_")
+        end
+
         def invert
           REVERSALS[self]
         end
