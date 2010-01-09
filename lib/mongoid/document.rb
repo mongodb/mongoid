@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
         class_inheritable_accessor :defaults, :fields
 
         # The same collection is used for the entire class hierarchy.
-        cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :indexed
+        cattr_accessor :_collection, :collection_name, :embedded, :primary_key
 
         # Set the initial values. Defaults and fields get set to a
         # +HashWithIndifferentAccess+ while the collection name will get set to
@@ -20,7 +20,6 @@ module Mongoid #:nodoc:
         self.collection_name = self.to_s.underscore.tableize.gsub("/", "_")
         self.defaults = {}.with_indifferent_access
         self.fields = {}.with_indifferent_access
-        self.indexed = false
 
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
