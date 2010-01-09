@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
         }
 
         def collectionize
-          underscore.tableize.gsub("/", "_")
+          tableize.gsub("/", "_")
         end
 
         def identify
