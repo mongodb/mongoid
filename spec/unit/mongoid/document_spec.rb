@@ -378,37 +378,6 @@ describe Mongoid::Document do
 
   end
 
-  describe ".index" do
-
-    context "when unique options are not provided" do
-
-      it "delegates to collection with unique => false" do
-        @collection.expects(:create_index).with(:title, false)
-        Person.index :title
-      end
-
-    end
-
-    context "when unique option is provided" do
-
-      it "delegates to collection with unique option" do
-        @collection.expects(:create_index).with(:title, true)
-        Person.index :title, :unique => true
-      end
-
-    end
-
-    context "when indexing a subclass" do
-
-      it "sets the index on the root class collection" do
-        @canvas_collection.expects(:create_index).with(:name, true)
-        Firefox.index :name, :unique => true
-      end
-
-    end
-
-  end
-
   describe ".instantiate" do
 
     before do

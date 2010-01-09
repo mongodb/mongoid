@@ -30,15 +30,6 @@ module Mongoid #:nodoc:
     end
 
     module ClassMethods
-      # Add the default indexes to the root document if they do not already
-      # exist. Currently this is only _type.
-      def add_indexes
-        unless indexed
-          self._collection.create_index(:_type, false)
-          self.indexed = true
-        end
-      end
-
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
       # with it.
@@ -75,12 +66,6 @@ module Mongoid #:nodoc:
       # Returns a human readable version of the class.
       def human_name
         name.underscore.humanize
-      end
-
-      # Adds an index on the field specified. Options can be :unique => true or
-      # :unique => false. It will default to the latter.
-      def index(name, options = { :unique => false })
-        collection.create_index(name, options[:unique])
       end
 
       # Instantiate a new object, only when loaded from the database.
