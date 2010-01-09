@@ -7,11 +7,7 @@ module Mongoid #:nodoc:
         include InstanceMethods
         extend ClassMethods
 
-        cattr_accessor \
-          :_collection,
-          :collection_name,
-          :embedded,
-          :primary_key
+        cattr_accessor :_collection, :collection_name, :embedded, :primary_key
 
         self.collection_name = self.to_s.underscore.tableize.gsub("/", "_")
 
