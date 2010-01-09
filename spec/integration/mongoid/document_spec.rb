@@ -457,6 +457,34 @@ describe Mongoid::Document do
 
   end
 
+  describe "#to_json" do
+
+    before do
+      @person = Person.new(:title => "Sir", :age => 30)
+      @address = Address.new(:street => "Nan Jing Dong Lu")
+      @person.addresses << @address
+    end
+
+    context "on a new document" do
+
+      it "returns the json string" do
+        @person.to_json.should == @person.attributes.to_json
+      end
+
+    end
+
+    context "on a persisted document" do
+
+      it "returns the json string" do
+        @person.save
+        from_db = Person.find(@person.id)
+        from_db.to_json.should == from_db.attributes.to_json
+      end
+
+    end
+
+  end
+
   context "typecasting" do
 
     before do

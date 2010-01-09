@@ -219,6 +219,17 @@ module Mongoid #:nodoc:
         [ self ]
       end
 
+      # Return this document as a JSON string. Nothing special is required here
+      # since Mongoid bubbles up all the child associations to the parent
+      # attribute +Hash+ using observers throughout the +Document+ lifecycle.
+      #
+      # Example:
+      #
+      # <tt>person.to_json</tt>
+      def to_json
+        @attributes.to_json
+      end
+
       # Returns the id of the Document, used in Rails compatibility.
       def to_param
         id
