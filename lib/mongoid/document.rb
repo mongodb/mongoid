@@ -7,24 +7,18 @@ module Mongoid #:nodoc:
         include InstanceMethods
         extend ClassMethods
 
-        # Set up the class attributes that must be available to all subclasses.
-        # These include defaults, fields
-        class_inheritable_accessor :defaults, :fields
+        cattr_accessor \
+          :_collection,
+          :collection_name,
+          :embedded,
+          :primary_key
 
-        # The same collection is used for the entire class hierarchy.
-        cattr_accessor :_collection, :collection_name, :embedded, :primary_key
-
-        # Set the initial values. Defaults and fields get set to a
-        # +HashWithIndifferentAccess+ while the collection name will get set to
-        # the demodulized class.
         self.collection_name = self.to_s.underscore.tableize.gsub("/", "_")
-        self.defaults = {}.with_indifferent_access
-        self.fields = {}.with_indifferent_access
 
         attr_accessor :association_name, :_parent
         attr_reader :attributes, :new_record
 
-        delegate :collection, :defaults, :embedded?, :fields, :primary_key, :to => "self.class"
+        delegate :collection, :embedded?, :primary_key, :to => "self.class"
       end
     end
 
@@ -43,23 +37,6 @@ module Mongoid #:nodoc:
       # return true if the +Document+ is embedded in another +Documnet+.
       def embedded?
         self.embedded == true
-      end
-
-      # Defines all the fields that are accessable on the Document
-      # For each field that is defined, a getter and setter will be
-      # added as an instance method to the Document.
-      #
-      # Options:
-      #
-      # name: The name of the field, as a +Symbol+.
-      # options: A +Hash+ of options to supply to the +Field+.
-      #
-      # Example:
-      #
-      # <tt>field :score, :default => 0</tt>
-      def field(name, options = {})
-        set_field(name, options)
-        set_default(name, options)
       end
 
       # Returns a human readable version of the class.
@@ -98,28 +75,6 @@ module Mongoid #:nodoc:
       # Returns all types to query for when using this class as the base.
       def _types
         @_type ||= (self.subclasses + [ self.name ])
-      end
-
-      protected
-
-      # Define a field attribute for the +Document+.
-      def set_field(name, options = {})
-        meth = options.delete(:as) || name
-        fields[name] = Field.new(name.to_s, options)
-        create_accessors(name, meth, options)
-      end
-
-      # Create the field accessors.
-      def create_accessors(name, meth, options = {})
-        define_method(meth) { read_attribute(name) }
-        define_method("#{meth}=") { |value| write_attribute(name, value) }
-        define_method("#{meth}?") { read_attribute(name) == true } if options[:type] == Boolean
-      end
-
-      # Set up a default value for a field.
-      def set_default(name, options = {})
-        value = options[:default]
-        defaults[name] = value if value
       end
 
     end
