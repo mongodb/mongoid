@@ -257,8 +257,7 @@ module Mongoid #:nodoc:
       protected
       def generate_key
         if primary_key
-          values = primary_key.collect { |key| @attributes[key] }
-          @attributes[:_id] = values.join(" ").parameterize.to_s
+          @attributes[:_id] = extract_keys.join(" ").identify
         else
           @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
         end
@@ -266,6 +265,10 @@ module Mongoid #:nodoc:
 
       def generate_type
         @attributes[:_type] ||= self.class.name
+      end
+
+      def extract_keys
+        primary_key.collect { |key| @attributes[key] }.reject { |val| val.nil? }
       end
 
     end

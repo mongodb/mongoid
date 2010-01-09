@@ -21,6 +21,10 @@ module Mongoid #:nodoc:
           underscore.tableize.gsub("/", "_")
         end
 
+        def identify
+          gsub(" ", "_").gsub(/\W/, "").dasherize.downcase
+        end
+
         def labelize
           underscore.humanize
         end

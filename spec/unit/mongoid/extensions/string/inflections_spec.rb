@@ -22,6 +22,14 @@ describe Mongoid::Extensions::String::Inflections do
 
   end
 
+  describe "#identify" do
+
+    it "converts the string to all lowercase and dashed" do
+      "A Midnight Summer Night's Dream".identify.should == "a-midnight-summer-nights-dream"
+    end
+
+  end
+
   describe "#labelize" do
 
     it "returns the underscored name humanized" do
