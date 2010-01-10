@@ -33,11 +33,18 @@ module Mongoid #:nodoc:
       EOT
     end
 
-    class CriteriaProxy
+    class CriteriaProxy #:nodoc
       attr_accessor :conditions, :klass, :parent_scope
 
       delegate :scopes, :to => :parent_scope
 
+      # Instantiate the new +CriteriaProxy+. If the conditions contains an
+      # extension, the proxy will extend from that module. If a block is given
+      # it will be extended as well.
+      #
+      # Example:
+      #
+      # <tt>CriteriaProxy.new(parent, :where => { :active => true })</tt>
       def initialize(parent_scope, conditions, &block)
         conditions ||= {}
         [ conditions.delete(:extend) ].flatten.each do |extension|
@@ -79,8 +86,7 @@ module Mongoid #:nodoc:
 
       def load_found
         @found = Criteria.new(klass)
-        @found.criteria(conditions)
-        @found
+        @found.criteria(conditions); @found
       end
     end
   end
