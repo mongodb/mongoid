@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
     def named_scope(name, options = {}, &block)
       name = name.to_sym
       scopes[name] = lambda do |parent_scope, *args|
-        CriteriaProxy.new(parent_scope, Hash === options ? options : options.call(*args), &block)
+        CriteriaProxy.new(parent_scope, options.is_a?(Hash) ? options : options.call(*args), &block)
       end
       (class << self; self; end).class_eval <<-EOT
         def #{name}(*args)
@@ -45,13 +45,10 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>CriteriaProxy.new(parent, :where => { :active => true })</tt>
-      def initialize(parent_scope, conditions, &block)
-        conditions ||= {}
-        [ conditions.delete(:extend) ].flatten.each do |extension|
-          extend extension
-        end if conditions.include?(:extend)
+      def initialize(parent_scope, conditions = {}, &block)
+        [ conditions.delete(:extend) ].flatten.each { | ext| extend ext } if conditions.include?(:extend)
         extend Module.new(&block) if block_given?
-        self.klass = parent_scope unless CriteriaProxy === parent_scope
+        self.klass = parent_scope unless parent_scope.is_a?(CriteriaProxy)
         self.parent_scope, self.conditions = parent_scope, conditions
       end
 
