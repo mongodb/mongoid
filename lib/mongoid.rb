@@ -23,7 +23,7 @@ require "rubygems"
 
 gem "activesupport", ">= 2.2.2"
 gem "mongo", ">= 0.18.2"
-gem "durran-validatable", ">= 2.0.0"
+gem "durran-validatable", ">= 2.0.1"
 gem "leshill-will_paginate", ">= 2.3.11"
 
 require "delegate"
