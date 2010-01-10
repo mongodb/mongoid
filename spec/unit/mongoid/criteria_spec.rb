@@ -1129,4 +1129,17 @@ describe Mongoid::Criteria do
 
   end
 
+  context "#criteria" do
+
+    it ":where => {:title => 'Test'} returns a criteria with the correct selector" do
+      @result = @criteria.criteria(:where => { :title => 'Test' })
+      @result.selector[:title].should == 'Test'
+    end
+
+    it ":where => {:title => 'Test'}, :skip => 10 returns a criteria with the correct selector and options" do
+      @result = @criteria.criteria(:where => { :title => 'Test' }, :skip => 10)
+      @result.selector[:title].should == 'Test'
+      @result.options.should == { :skip => 10 }
+    end
+  end
 end

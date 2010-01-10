@@ -103,6 +103,23 @@ module Mongoid #:nodoc:
       @count ||= @klass.collection.find(@selector, process_options).count
     end
 
+    # Translate the supplied argument hash
+    #
+    # Options:
+    #
+    # criteria_conditions: Hash of criteria keys, and parameter values
+    #
+    # Example:
+    #
+    # <tt>criteria.translate(:where => { :field => "value"}, :limit => 20)</tt>
+    #
+    # Returns <tt>self</tt>
+    def criteria(criteria_conditions = {})
+      criteria_conditions.inject(self) do |criteria, (key, value)|
+        criteria.send(key, value)
+      end
+    end
+
     # Iterate over each +Document+ in the results. This can take an optional
     # block to pass to each argument in the results.
     #
