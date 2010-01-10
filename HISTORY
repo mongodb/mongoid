@@ -1,3 +1,15 @@
+=== 1.0.1
+- Documents now have named_scopes similar to
+  ActiveRecord named scopes. Please see rdoc or
+  specs for examples.
+
+- Document#to_json properly works in all cases.
+
+- ActiveSupport calls for inflections have been
+  moved into the String::Inflections module.
+
+- Updated dependency on Validatable to 2.0.1
+
 === 1.0.0
 - Validations cleanup: Only before_validation and
   after_validation callbacks are supported now.
