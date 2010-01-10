@@ -11,7 +11,7 @@ describe Mongoid::Document do
 
     it "saves in the same collection as the root" do
       collection = Mongoid.database.collection("canvases")
-      attributes = collection.find({ :name => "Test"}, {}).first
+      attributes = collection.find({ :name => "Test"}, {}).next_document
       attributes["version"].should == 3
       attributes["name"].should == "Test"
       attributes["_type"].should == "Browser"
@@ -29,7 +29,7 @@ describe Mongoid::Document do
 
     it "saves in the same collection as the root" do
       collection = Mongoid.database.collection("canvases")
-      attributes = collection.find({ :name => "Testy"}, {}).first
+      attributes = collection.find({ :name => "Testy"}, {}).next_document
       attributes["version"].should == 2
       attributes["name"].should == "Testy"
       attributes["_type"].should == "Firefox"
