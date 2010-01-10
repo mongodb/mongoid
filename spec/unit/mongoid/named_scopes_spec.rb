@@ -20,8 +20,8 @@ describe Mongoid::NamedScopes do
           "extension method"
         end
       end
-      named_scope :count_gt_one, :where => {:count => {'$gt' => 1}}, :extend => Extension
-      named_scope :at_least_count, lambda {|count| {:where => {:count => {'$gt' => count}}}}
+      named_scope :count_gt_one, :where => { :count.gt => 1 }, :extend => Extension
+      named_scope :at_least_count, lambda { |count| { :where => { :count.gt => count } } }
     end
 
     context ".named_scope" do

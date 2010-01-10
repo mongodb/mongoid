@@ -1,10 +1,26 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module NamedScopes
+    # Return the scopes or default to an empty +Hash+.
     def scopes
       read_inheritable_attribute(:scopes) || write_inheritable_attribute(:scopes, {})
     end
 
+    # Creates a named_scope for the +Document+, similar to ActiveRecord's
+    # named_scopes. +NamedScopes+ are proxied +Criteria+ objects that can be
+    # chained.
+    #
+    # Example:
+    #
+    #   class Person
+    #     include Mongoid::Document
+    #     field :active, :type => Boolean
+    #     field :count, :type => Integer
+    #
+    #     named_scope :active, :where => { :active => true }
+    #     named_scope :count_gt_one, :where => { :count.gt => 1 }
+    #     named_scope :at_least_count, lambda { |count| { :where => { :count.gt => count } } }
+    #   end
     def named_scope(name, options = {}, &block)
       name = name.to_sym
       scopes[name] = lambda do |parent_scope, *args|
@@ -24,12 +40,16 @@ module Mongoid #:nodoc:
 
       def initialize(parent_scope, conditions, &block)
         conditions ||= {}
-        [conditions.delete(:extend)].flatten.each { |extension| extend extension } if conditions.include?(:extend)
+        [ conditions.delete(:extend) ].flatten.each do |extension|
+          extend extension
+        end if conditions.include?(:extend)
         extend Module.new(&block) if block_given?
         self.klass = parent_scope unless CriteriaProxy === parent_scope
         self.parent_scope, self.conditions = parent_scope, conditions
       end
 
+      # First check if the proxy has the scope defined, otherwise look to the
+      # parent scope.
       def respond_to?(method, include_private = false)
         super || if klass
           proxy_found.respond_to?(method, include_private)
