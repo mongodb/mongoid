@@ -20,7 +20,7 @@ describe Mongoid::NamedScopes do
           "extension method"
         end
       end
-      named_scope :count_gt_one, :where => { :count.gt => 1 }, :extend => Extension
+      named_scope :count_gt_one, :where => { :count.gt => 1 }
       named_scope :at_least_count, lambda { |count| { :where => { :count.gt => count } } }
     end
 
@@ -36,7 +36,7 @@ describe Mongoid::NamedScopes do
 
     context "accessing a named scope" do
       it "is a criteria proxy" do
-        Mongoid::NamedScopes::CriteriaProxy.should === NamedScopeTest.active
+        Mongoid::Scope.should === NamedScopeTest.active
       end
 
       it "responds like a criteria" do
@@ -55,10 +55,6 @@ describe Mongoid::NamedScopes do
 
       it "sets the association extension by block" do
         NamedScopeTest.active.extension_method.should == "extension method"
-      end
-
-      it "sets the association extension by :extend" do
-        NamedScopeTest.count_gt_one.extension_module_method.should == "extension module method"
       end
 
       context "when using a lambda" do
