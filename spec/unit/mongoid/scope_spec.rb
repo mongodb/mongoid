@@ -89,9 +89,10 @@ describe Mongoid::Scope do
 
         before do
           @parent = mock
+          @criteria = mock
           @parent.expects(:scopes).returns({})
           @parent.expects(:is_a?).with(Mongoid::Scope).returns(true)
-          @parent.expects(:where).with(nil)
+          @parent.expects(:fuse)
           @scope = Mongoid::Scope.new(@parent, {})
         end
 

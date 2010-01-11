@@ -103,7 +103,7 @@ module Mongoid #:nodoc:
       @count ||= @klass.collection.find(@selector, process_options).count
     end
 
-    # Translate the supplied argument hash
+    # Merges the supplied argument hash into a single criteria
     #
     # Options:
     #
@@ -111,10 +111,10 @@ module Mongoid #:nodoc:
     #
     # Example:
     #
-    # <tt>criteria.translate(:where => { :field => "value"}, :limit => 20)</tt>
+    # <tt>criteria.fuse(:where => { :field => "value"}, :limit => 20)</tt>
     #
     # Returns <tt>self</tt>
-    def criteria(criteria_conditions = {})
+    def fuse(criteria_conditions = {})
       criteria_conditions.inject(self) do |criteria, (key, value)|
         criteria.send(key, value)
       end

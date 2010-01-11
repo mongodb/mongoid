@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
     #     end
     #   end
     def initialize(parent, conditions, &block)
-      @parent, @conditions = parent, conditions[:where]
+      @parent, @conditions = parent, conditions
       extend Module.new(&block) if block_given?
     end
 
@@ -39,7 +39,7 @@ module Mongoid #:nodoc:
       elsif klass
         target.send(name, *args, &block)
       else
-        @parent.where(@conditions); @parent.send(name, *args, &block)
+        @parent.fuse(@conditions); @parent.send(name, *args, &block)
       end
     end
 
@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
     # Returns the target criteria if it has already been set or creates a new
     # criteria from the parent class.
     def target
-      @target ||= klass.where(@conditions)
+      @target ||= klass.criteria.fuse(@conditions)
     end
   end
 end
