@@ -15,7 +15,7 @@ module Mongoid #:nodoc
         include Observable
         include Validatable
         extend Finders
-        extend NamedScopes
+        extend NamedScope
       end
     end
   end

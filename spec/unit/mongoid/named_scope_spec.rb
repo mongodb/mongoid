@@ -1,13 +1,8 @@
 require "spec_helper"
 
-describe Mongoid::NamedScopes do
+describe Mongoid::NamedScope do
 
   context "AR2 scopes" do
-    module Extension
-      def extension_module_method
-        "extension module method"
-      end
-    end
 
     class NamedScopeTest
       include Mongoid::Document

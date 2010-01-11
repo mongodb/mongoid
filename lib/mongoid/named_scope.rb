@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
-  module NamedScopes
+  module NamedScope
     # Creates a named_scope for the +Document+, similar to ActiveRecord's
     # named_scopes. +NamedScopes+ are proxied +Criteria+ objects that can be
     # chained.

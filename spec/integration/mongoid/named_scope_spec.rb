@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::NamedScopes do
+describe Mongoid::NamedScope do
 
   describe ".named_scope" do
 
