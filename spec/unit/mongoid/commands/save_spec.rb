@@ -5,8 +5,8 @@ describe Mongoid::Commands::Save do
   describe "#execute" do
 
     before do
-      @parent_collection = stub(:save)
-      @doc_collection = stub(:save)
+      @parent_collection = stub(:save => true)
+      @doc_collection = stub(:save => true)
       @parent = stub(:collection => @parent_collection,
                      :valid? => true,
                      :run_callbacks => true,
