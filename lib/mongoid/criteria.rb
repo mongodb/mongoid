@@ -453,6 +453,12 @@ module Mongoid #:nodoc:
       (@options[:limit] || 20).to_i
     end
 
+    # Returns the selector and options as a +Hash+ that would be passed to a
+    # scope for use with named scopes.
+    def scoped
+      { :where => @selector }.merge(@options)
+    end
+
     # Adds a criterion to the +Criteria+ that specifies how many results to skip
     # when returning Documents. This is mostly used in conjunction with
     # <tt>limit()</tt> to handle paginated results, and is similar to the

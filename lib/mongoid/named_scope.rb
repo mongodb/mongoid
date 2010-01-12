@@ -18,8 +18,8 @@ module Mongoid #:nodoc:
     #   end
     def named_scope(name, options = {}, &block)
       name = name.to_sym
-      scopes[name] = lambda do |parent_scope, *args|
-        Scope.new(parent_scope, options.is_a?(Hash) ? options : options.call(*args), &block)
+      scopes[name] = lambda do |parent, *args|
+        Scope.new(parent, options.scoped(*args), &block)
       end
       (class << self; self; end).class_eval <<-EOT
         def #{name}(*args)

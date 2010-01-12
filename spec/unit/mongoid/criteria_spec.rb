@@ -860,6 +860,19 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#scoped" do
+
+    before do
+      @criteria = Person.where(:title => "Sir").skip(20)
+    end
+
+    it "returns the selector plus the options" do
+      @criteria.scoped.should ==
+        { :where => { :title => "Sir", :_type=>{ "$in" => [ "Doctor", "Person" ] } }, :skip => 20 }
+    end
+
+  end
+
   describe "#skip" do
 
     context "when value provided" do
