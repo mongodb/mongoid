@@ -234,7 +234,8 @@ module Mongoid #:nodoc:
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
     def initialize(klass)
-      @selector, @options, @klass = { :_type => { "$in" => klass._types } }, {}, klass
+      @selector = klass.hereditary ? { :_type => { "$in" => klass._types } } : {}
+      @options, @klass = {}, klass
     end
 
     # Return the last result for the +Criteria+. Essentially does a find_one on

@@ -7,9 +7,15 @@ module Mongoid #:nodoc:
         include InstanceMethods
         extend ClassMethods
 
-        cattr_accessor :_collection, :collection_name, :embedded, :primary_key
+        cattr_accessor \
+          :_collection,
+          :collection_name,
+          :embedded,
+          :primary_key,
+          :hereditary
 
         self.embedded = false
+        self.hereditary = false
         self.collection_name = self.name.collectionize
 
         attr_accessor :association_name, :_parent
@@ -29,6 +35,12 @@ module Mongoid #:nodoc:
         raise Errors::InvalidCollection.new(self) if embedded
         self._collection ||= Mongoid.database.collection(self.collection_name)
         add_indexes; self._collection
+      end
+
+      # Perform default behavior but mark the hierarchy as being hereditary.
+      def inherited(subclass)
+        super(subclass)
+        self.hereditary = true
       end
 
       # Returns a human readable version of the class.

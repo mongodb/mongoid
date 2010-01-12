@@ -169,26 +169,6 @@ describe Mongoid::Document do
     context "when the document is embedded" do
 
       it "returns true" do
-        Address.embedded.should be_true
-      end
-
-    end
-
-    context "when the document is not embedded" do
-
-      it "returns false" do
-        Person.embedded.should be_false
-      end
-
-    end
-
-  end
-
-  describe "#embedded?" do
-
-    context "when the document is embedded" do
-
-      it "returns true" do
         address = Address.new
         address.embedded.should be_true
       end
@@ -209,6 +189,26 @@ describe Mongoid::Document do
       it "returns true" do
         circle = Circle.new
         circle.embedded.should be_true
+      end
+
+    end
+
+  end
+
+  describe ".hereditary" do
+
+    context "when the class is part of a hierarchy" do
+
+      it "returns true" do
+        Canvas.hereditary.should be_true
+      end
+
+    end
+
+    context "when the class is not part of a hierarchy" do
+
+      it "returns false" do
+        Game.hereditary.should be_false
       end
 
     end

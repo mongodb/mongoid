@@ -405,9 +405,22 @@ describe Mongoid::Criteria do
 
   describe "#initialize" do
 
-    it "sets the _type value on the selector" do
-      criteria = Mongoid::Criteria.new(Person)
-      criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] } }
+    context "when class is hereditary" do
+
+      it "sets the _type value on the selector" do
+        criteria = Mongoid::Criteria.new(Person)
+        criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] } }
+      end
+
+    end
+
+    context "when class is not hereditary" do
+
+      it "sets no _type value on the selector" do
+        criteria = Mongoid::Criteria.new(Game)
+        criteria.selector.should == {}
+      end
+
     end
 
   end
