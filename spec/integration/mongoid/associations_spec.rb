@@ -84,15 +84,19 @@ describe Mongoid::Associations do
 
     context "multiple levels nested" do
 
-      before do
-        @person.phone_numbers.create(:number => "4155551212")
-      end
+      context "when a has-many to has_one" do
 
-      it "persists all the associations properly" do
-        from_db = Person.find(@person.id)
-        phone = from_db.phone_numbers.first
-        phone.create_country_code(:code => 1)
-        from_db.phone_numbers.first.country_code.code.should == 1
+        before do
+          @person.phone_numbers.create(:number => "4155551212")
+        end
+
+        it "persists all the associations properly" do
+          from_db = Person.find(@person.id)
+          phone = from_db.phone_numbers.first
+          phone.create_country_code(:code => 1)
+          from_db.phone_numbers.first.country_code.code.should == 1
+        end
+
       end
 
     end

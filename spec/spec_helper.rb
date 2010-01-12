@@ -37,6 +37,7 @@ class Person
   field :aliases, :type => Array
   field :map, :type => Hash
   field :score, :type => Integer
+  field :blood_alcohol_content, :type => Float
 
   attr_reader :rescored
 
@@ -150,6 +151,12 @@ class Address
   field :post_code
   key :street
   belongs_to :addressable, :inverse_of => :addresses
+end
+
+class AddressType
+  include Mongoid::Document
+  field :name
+  belongs_to :address, :inverse_of => :address_types
 end
 
 class Name
