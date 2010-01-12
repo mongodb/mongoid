@@ -1,3 +1,11 @@
+=== 1.0.4
+- Modified criteria to use the querying class
+  when instantiating documents if there are no
+  subclasses.
+
+- Floats that are empty strings or nil get
+  defaulted to 0.0
+
 === 1.0.3
 - Small performance improvements on finders
 
