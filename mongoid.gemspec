@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "1.0.3"
+  s.version = "1.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -85,6 +85,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/commands_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
+     "spec/integration/mongoid/extensions_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
      "spec/integration/mongoid/inheritance_spec.rb",
      "spec/integration/mongoid/named_scope_spec.rb",
@@ -153,6 +154,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/commands_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
+     "spec/integration/mongoid/extensions_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
      "spec/integration/mongoid/inheritance_spec.rb",
      "spec/integration/mongoid/named_scope_spec.rb",
