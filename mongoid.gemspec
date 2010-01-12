@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "1.0.1"
+  s.version = "1.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-01-10}
+  s.date = %q{2010-01-11}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -61,19 +61,22 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/hash/assimilation.rb",
      "lib/mongoid/extensions/hash/conversions.rb",
      "lib/mongoid/extensions/hash/criteria_helpers.rb",
+     "lib/mongoid/extensions/hash/scoping.rb",
      "lib/mongoid/extensions/integer/conversions.rb",
      "lib/mongoid/extensions/nil/assimilation.rb",
      "lib/mongoid/extensions/object/conversions.rb",
+     "lib/mongoid/extensions/proc/scoping.rb",
      "lib/mongoid/extensions/string/conversions.rb",
      "lib/mongoid/extensions/string/inflections.rb",
      "lib/mongoid/extensions/symbol/inflections.rb",
      "lib/mongoid/extensions/time/conversions.rb",
+     "lib/mongoid/field.rb",
      "lib/mongoid/fields.rb",
-     "lib/mongoid/fields/field.rb",
      "lib/mongoid/finders.rb",
      "lib/mongoid/indexes.rb",
      "lib/mongoid/memoization.rb",
-     "lib/mongoid/named_scopes.rb",
+     "lib/mongoid/named_scope.rb",
+     "lib/mongoid/scope.rb",
      "lib/mongoid/timestamps.rb",
      "lib/mongoid/versioning.rb",
      "mongoid.gemspec",
@@ -84,7 +87,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
      "spec/integration/mongoid/inheritance_spec.rb",
-     "spec/integration/mongoid/named_scopes_spec.rb",
+     "spec/integration/mongoid/named_scope_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/unit/mongoid/associations/belongs_to_related_spec.rb",
@@ -120,9 +123,11 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/hash/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/criteria_helpers_spec.rb",
+     "spec/unit/mongoid/extensions/hash/scoping_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/nil/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/proc/scoping_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
@@ -132,7 +137,8 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/finders_spec.rb",
      "spec/unit/mongoid/indexes_spec.rb",
      "spec/unit/mongoid/memoization_spec.rb",
-     "spec/unit/mongoid/named_scopes_spec.rb",
+     "spec/unit/mongoid/named_scope_spec.rb",
+     "spec/unit/mongoid/scope_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb",
      "spec/unit/mongoid_spec.rb"
@@ -149,7 +155,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
      "spec/integration/mongoid/inheritance_spec.rb",
-     "spec/integration/mongoid/named_scopes_spec.rb",
+     "spec/integration/mongoid/named_scope_spec.rb",
      "spec/spec_helper.rb",
      "spec/unit/mongoid/associations/belongs_to_related_spec.rb",
      "spec/unit/mongoid/associations/belongs_to_spec.rb",
@@ -184,9 +190,11 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/hash/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/hash/conversions_spec.rb",
      "spec/unit/mongoid/extensions/hash/criteria_helpers_spec.rb",
+     "spec/unit/mongoid/extensions/hash/scoping_spec.rb",
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/nil/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/proc/scoping_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
@@ -196,7 +204,8 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/finders_spec.rb",
      "spec/unit/mongoid/indexes_spec.rb",
      "spec/unit/mongoid/memoization_spec.rb",
-     "spec/unit/mongoid/named_scopes_spec.rb",
+     "spec/unit/mongoid/named_scope_spec.rb",
+     "spec/unit/mongoid/scope_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb",
      "spec/unit/mongoid_spec.rb"
