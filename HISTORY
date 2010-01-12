@@ -1,3 +1,10 @@
+=== 1.0.3
+- Small performance improvements on finders
+
+- Float.set allows setting of non-numeric string
+  in order for validates_numericality_of to fail
+  properly.
+
 === 1.0.2
 - Named scopes get added functionality:
 
