@@ -1,3 +1,17 @@
+=== 1.0.2
+- Named scopes get added functionality:
+
+  - named scopes can now be criteria objects.
+
+  - named scoped can now be procs with criteria.
+
+  - named scopes and class methods that return
+    criteria can be chained with each other.
+
+- When calling save on an embedded document whose
+  validation passes but the parent's validation
+  fails, it will properly return false.
+
 === 1.0.1
 - Documents now have named_scopes similar to
   ActiveRecord named scopes. Please see rdoc or
