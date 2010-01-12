@@ -185,7 +185,7 @@ module Mongoid #:nodoc:
         true
       ).collect do |docs|
         docs["group"] = docs["group"].collect do |attrs|
-          attrs["_type"].constantize.instantiate(attrs)
+          instantiate(attrs)
         end
         docs
       end
@@ -234,8 +234,11 @@ module Mongoid #:nodoc:
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
     def initialize(klass)
-      @selector = klass.hereditary ? { :_type => { "$in" => klass._types } } : {}
-      @options, @klass = {}, klass
+      @selector, @options, @klass = {}, {}, klass
+      if klass.hereditary
+        @selector = { :_type => { "$in" => klass._types } }
+        @hereditary = true
+      end
     end
 
     # Return the last result for the +Criteria+. Essentially does a find_one on
@@ -251,7 +254,7 @@ module Mongoid #:nodoc:
       sorting = [[:_id, :asc]] unless sorting
       opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
       attributes = @klass.collection.find_one(@selector, opts)
-      attributes ? attributes["_type"].constantize.instantiate(attributes) : nil
+      attributes ? instantiate(attributes) : nil
     end
 
     # Adds a criterion to the +Criteria+ that specifies the maximum number of
@@ -392,7 +395,7 @@ module Mongoid #:nodoc:
     # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
     def one
       attributes = @klass.collection.find_one(@selector, process_options)
-      attributes ? attributes["_type"].constantize.instantiate(attributes) : nil
+      attributes ? instantiate(attributes) : nil
     end
 
     alias :first :one
@@ -565,21 +568,10 @@ module Mongoid #:nodoc:
       attributes = @klass.collection.find(@selector, process_options)
       if attributes
         @count = attributes.count
-        attributes.collect { |doc| doc["_type"].constantize.instantiate(doc) }
+        attributes.collect { |doc| instantiate(doc) }
       else
         []
       end
-    end
-
-    # Filters the field list. If no fields have been supplied, then it will be
-    # empty. If fields have been defined then _type will be included as well.
-    def process_options
-      fields = @options[:fields]
-      if fields && fields.size > 0 && !fields.include?(:_type)
-        fields << :_type
-        @options[:fields] = fields
-      end
-      @options.dup
     end
 
     # Filters the unused options out of the options +Hash+. Currently this
@@ -605,6 +597,22 @@ module Mongoid #:nodoc:
         true
       )
       collection.first[start.to_s]
+    end
+
+    # If hereditary instantiate by _type otherwise use the klass.
+    def instantiate(attrs)
+      @hereditary ? attrs["_type"].constantize.instantiate(attrs) : @klass.instantiate(attrs)
+    end
+
+    # Filters the field list. If no fields have been supplied, then it will be
+    # empty. If fields have been defined then _type will be included as well.
+    def process_options
+      fields = @options[:fields]
+      if fields && fields.size > 0 && !fields.include?(:_type)
+        fields << :_type
+        @options[:fields] = fields
+      end
+      @options.dup
     end
 
     # Update the selector setting the operator on the value for each key in the

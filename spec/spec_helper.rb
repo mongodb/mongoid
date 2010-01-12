@@ -150,13 +150,14 @@ class Address
   field :state
   field :post_code
   key :street
+  has_many :locations
   belongs_to :addressable, :inverse_of => :addresses
 end
 
-class AddressType
+class Location
   include Mongoid::Document
   field :name
-  belongs_to :address, :inverse_of => :address_types
+  belongs_to :address, :inverse_of => :locations
 end
 
 class Name

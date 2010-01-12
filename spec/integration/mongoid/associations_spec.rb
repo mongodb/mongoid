@@ -99,6 +99,23 @@ describe Mongoid::Associations do
 
       end
 
+      context "when a has-many to has-many" do
+
+        before do
+          @address = Address.new(:street => "Upper Street")
+          @person.addresses << @address
+        end
+
+        it "bubbles the child association up to root" do
+          location = Location.new(:name => "Home")
+          @address.locations << location
+          location.stubs(:valid?).returns(false)
+          @person.save
+          @person.addresses.first.locations.first.should == location
+        end
+
+      end
+
     end
 
   end
