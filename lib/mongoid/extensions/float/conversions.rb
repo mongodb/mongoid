@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Float #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value.to_f
+          value =~ /\d/ ? value.to_f : value
         end
         def get(value)
           value
