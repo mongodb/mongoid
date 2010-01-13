@@ -149,9 +149,14 @@ class Address
   field :city
   field :state
   field :post_code
+  field :parent_title
   key :street
   has_many :locations
   belongs_to :addressable, :inverse_of => :addresses
+
+  def set_parent=(set = false)
+    self.parent_title = addressable.title if set
+  end
 end
 
 class Location

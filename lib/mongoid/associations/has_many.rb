@@ -38,8 +38,10 @@ module Mongoid #:nodoc:
       #
       # Returns the newly created object.
       def build(attrs = {}, type = nil)
-        object = type ? type.instantiate(attrs) : @klass.instantiate(attrs)
-        push(object)
+        object = type ? type.instantiate : @klass.instantiate
+        object.parentize(@parent, @association_name)
+        object.write_attributes(attrs)
+        @documents << object
         object
       end
 

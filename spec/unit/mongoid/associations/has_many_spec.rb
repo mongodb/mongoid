@@ -60,6 +60,20 @@ describe Mongoid::Associations::HasMany do
 
   describe "#build" do
 
+    context "setting the parent relationship" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "happens before any other operation" do
+        address = @person.addresses.build(:set_parent => true, :street => "Madison Ave")
+        address._parent.should == @person
+        @person.addresses.first.should == address
+      end
+
+    end
+
     context "when a type is not provided" do
 
       before do
