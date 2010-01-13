@@ -10,7 +10,7 @@ describe Mongoid::Associations::HasOne do
     @document = stub(:attributes => @attributes, :update => true)
   end
 
-  describe "#build" do
+  describe "#build_*" do
 
     context "when attributes provided" do
 
@@ -23,7 +23,7 @@ describe Mongoid::Associations::HasOne do
       end
 
       it "replaces the existing has_one" do
-        drink = @association.build({ :name => "Sapphire and Tonic" })
+        drink = @association.send(:build, { :name => "Sapphire and Tonic" })
         drink.name.should == "Sapphire and Tonic"
       end
 
@@ -40,51 +40,23 @@ describe Mongoid::Associations::HasOne do
       end
 
       it "instantiates a class of that type" do
-        writer = @association.build({ :speed => 500 }, HtmlWriter)
+        writer = @association.send(:build, { :speed => 500 }, HtmlWriter)
         writer.should be_a_kind_of(HtmlWriter)
         writer.speed.should == 500
       end
 
     end
 
-  end
-
-  describe "#create" do
-
-    context "when attributes provided" do
+    context "setting the parent relationship" do
 
       before do
-        @association = Mongoid::Associations::HasOne.new(
-          @document,
-          @attributes[:mixed_drink],
-          Mongoid::Associations::Options.new(:name => :mixed_drink)
-        )
-        @drink = MixedDrink.new(:name => "Sapphire and Tonic")
+        @person = Person.new
       end
 
-      it "replaces and saves the existing has_one" do
-        Mongoid::Commands::Save.expects(:execute).returns(true)
-        drink = @association.create({ :name => "Sapphire and Tonic" })
-        drink.name.should == "Sapphire and Tonic"
-      end
-
-    end
-
-    context "when a type is supplied" do
-
-      before do
-        @association = Mongoid::Associations::HasOne.new(
-          @document,
-          @attributes[:writer],
-          Mongoid::Associations::Options.new(:name => :writer)
-        )
-      end
-
-      it "instantiates a class of that type" do
-        Mongoid::Commands::Save.expects(:execute).returns(true)
-        writer = @association.create({ :speed => 500 }, HtmlWriter)
-        writer.should be_a_kind_of(HtmlWriter)
-        writer.speed.should == 500
+      it "happens before any other operation" do
+        name = @person.build_name(:set_parent => true, :street => "Madison Ave")
+        name._parent.should == @person
+        @person.name.should == name
       end
 
     end

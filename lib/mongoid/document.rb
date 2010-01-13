@@ -137,6 +137,15 @@ module Mongoid #:nodoc:
         self.class.instantiate(@attributes.except(:_id).except(:versions).dup, true)
       end
 
+      # Generate an id for this +Document+.
+      def generate_key
+        if primary_key
+          @attributes[:_id] = extract_keys.join(" ").identify
+        else
+          @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
+        end
+      end
+
       # Instantiate a new +Document+, setting the Document's attributes if
       # given. If no attributes are provided, they will be initialized with
       # an empty +Hash+.
@@ -269,14 +278,6 @@ module Mongoid #:nodoc:
       end
 
       protected
-      def generate_key
-        if primary_key
-          @attributes[:_id] = extract_keys.join(" ").identify
-        else
-          @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
-        end
-      end
-
       def generate_type
         @attributes[:_type] ||= self.class.name
       end

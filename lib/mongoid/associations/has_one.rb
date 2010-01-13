@@ -6,19 +6,6 @@ module Mongoid #:nodoc:
 
       attr_reader :association_name, :document, :parent, :options
 
-      # Build a new object for the association.
-      def build(attrs = {}, type = nil)
-        @document = attrs.assimilate(@parent, @options, type)
-        self
-      end
-
-      # Create a new object for the association and save it.
-      def create(attrs = {}, type = nil)
-        build(attrs, type)
-        @document.save
-        self
-      end
-
       # Creates the new association by finding the attributes in
       # the parent document with its name, and instantiating a
       # new document for it.
@@ -56,6 +43,13 @@ module Mongoid #:nodoc:
       # Need to override here for when the underlying document is nil.
       def valid?
         @document.valid?
+      end
+
+      protected
+      # Build a new object for the association.
+      def build(attrs = {}, type = nil)
+        @document = attrs.assimilate(@parent, @options, type)
+        self
       end
 
       class << self

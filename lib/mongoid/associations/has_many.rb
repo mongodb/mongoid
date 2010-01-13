@@ -41,6 +41,7 @@ module Mongoid #:nodoc:
         object = type ? type.instantiate : @klass.instantiate
         object.parentize(@parent, @association_name)
         object.write_attributes(attrs)
+        object.generate_key
         @documents << object
         object
       end
