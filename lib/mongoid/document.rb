@@ -84,7 +84,7 @@ module Mongoid #:nodoc:
       #   end
       def key(*fields)
         self.primary_key = fields
-        before_save :generate_key
+        before_save :identify
       end
 
       # Macro for setting the collection name to store in.
@@ -138,12 +138,8 @@ module Mongoid #:nodoc:
       end
 
       # Generate an id for this +Document+.
-      def generate_key
-        if primary_key
-          @attributes[:_id] = extract_keys.join(" ").identify
-        else
-          @attributes[:_id] = Mongo::ObjectID.new.to_s unless id
-        end
+      def identify
+        Identity.create(self)
       end
 
       # Instantiate a new +Document+, setting the Document's attributes if
@@ -165,7 +161,7 @@ module Mongoid #:nodoc:
         process(defaults.merge(attrs))
         @new_record = true if id.nil?
         document = yield self if block_given?
-        generate_key; generate_type; document
+        identify
       end
 
       # Returns the class name plus its attributes.
@@ -276,16 +272,6 @@ module Mongoid #:nodoc:
         clear ? @attributes.delete(name) : @attributes.insert(name, child.attributes)
         notify
       end
-
-      protected
-      def generate_type
-        @attributes[:_type] ||= self.class.name
-      end
-
-      def extract_keys
-        primary_key.collect { |key| @attributes[key] }.reject { |val| val.nil? }
-      end
-
     end
 
   end

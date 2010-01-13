@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
           klass = type ? type : options.klass
           child = klass.instantiate(:_parent => parent)
           child.write_attributes(self.merge(:_type => klass.name))
-          child.generate_key
+          child.identify
           child.assimilate(parent, options)
         end
       end
