@@ -166,7 +166,7 @@ module Mongoid #:nodoc:
 
       # Returns the class name plus its attributes.
       def inspect
-        attrs = fields.map { |name, field| "#{name}: #{@attributes[name] || 'nil'}" } * ", "
+        attrs = fields.map { |name, field| "#{name}: #{@attributes[name].inspect}" } * ", "
         "#<#{self.class.name} _id: #{id}, #{attrs}>"
       end
 
