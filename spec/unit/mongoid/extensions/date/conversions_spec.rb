@@ -21,7 +21,8 @@ describe Mongoid::Extensions::Date::Conversions do
       context "when string is a date" do
 
         it "returns a time from the string" do
-          Date.set("01/15/2007").should == Date.new(2007, 1, 15).at_midnight.utc
+          date = RUBY_VERSION.start_with?("1.9") ? "15/01/2007" : "01/15/2007"
+          Date.set(date).should == Date.new(2007, 1, 15).at_midnight.utc
         end
 
       end
