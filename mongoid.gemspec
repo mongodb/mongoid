@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "1.0.5"
+  s.version = "1.0.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-01-13}
+  s.date = %q{2010-01-14}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -73,6 +73,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/field.rb",
      "lib/mongoid/fields.rb",
      "lib/mongoid/finders.rb",
+     "lib/mongoid/identity.rb",
      "lib/mongoid/indexes.rb",
      "lib/mongoid/memoization.rb",
      "lib/mongoid/named_scope.rb",
@@ -136,6 +137,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/field_spec.rb",
      "spec/unit/mongoid/fields_spec.rb",
      "spec/unit/mongoid/finders_spec.rb",
+     "spec/unit/mongoid/identity_spec.rb",
      "spec/unit/mongoid/indexes_spec.rb",
      "spec/unit/mongoid/memoization_spec.rb",
      "spec/unit/mongoid/named_scope_spec.rb",
@@ -204,6 +206,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/field_spec.rb",
      "spec/unit/mongoid/fields_spec.rb",
      "spec/unit/mongoid/finders_spec.rb",
+     "spec/unit/mongoid/identity_spec.rb",
      "spec/unit/mongoid/indexes_spec.rb",
      "spec/unit/mongoid/memoization_spec.rb",
      "spec/unit/mongoid/named_scope_spec.rb",
