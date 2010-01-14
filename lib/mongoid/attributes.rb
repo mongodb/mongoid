@@ -26,7 +26,12 @@ module Mongoid #:nodoc:
       def method_missing(name, *args)
         attr = name.to_s
         return super unless @attributes.has_key?(attr.reader)
-        attr.writer? ? (@attributes[attr.reader] = *args) : @attributes[attr.reader]
+        if attr.writer?
+          # "args.size > 1" allows to simulate 1.8 behavior of "*args"
+          @attributes[attr.reader] = (args.size > 1) ? args : args.first
+        else
+          @attributes[attr.reader]
+        end
       end
 
       # Process the provided attributes casting them to their proper values if a
