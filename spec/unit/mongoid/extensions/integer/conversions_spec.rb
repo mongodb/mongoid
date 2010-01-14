@@ -32,16 +32,16 @@ describe Mongoid::Extensions::Integer::Conversions do
 
       context "when the string is empty" do
 
-        it "returns 0.0" do
-          Integer.set("").should == 0
+        it "returns an empty string" do
+          Integer.set("").should be_blank
         end
 
       end
 
       context "when the string is nil" do
 
-        it "returns 0.0" do
-          Integer.set(nil).should == 0
+        it "returns nil" do
+          Integer.set(nil).should be_nil
         end
 
       end
