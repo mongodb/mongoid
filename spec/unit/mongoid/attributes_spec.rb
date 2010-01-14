@@ -223,7 +223,7 @@ describe Mongoid::Attributes do
         attrs[:age].should == 30
         attrs[:terms].should == true
         attrs[:_id].should == "1"
-        attrs[:score].should be_nil
+        attrs[:score].should == 0
       end
 
     end

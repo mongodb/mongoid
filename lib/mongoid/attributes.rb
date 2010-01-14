@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
           if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
             @attributes[key] = value
           else
-            set_unless_blank(key, value)
+            send("#{key}=", value)
           end
         end
       end
@@ -136,10 +136,6 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Sets the attirbute value unless it is a blank string.
-      def set_unless_blank(name, value)
-        send("#{name}=", value) unless (value.is_a?(String) && value.blank?)
-      end
     end
 
     module ClassMethods

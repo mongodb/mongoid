@@ -60,7 +60,7 @@ class Person
   has_many_related :posts
 
   def score_with_rescoring=(score)
-    @rescored = score + 20
+    @rescored = score.to_i + 20
     self.score_without_rescoring = score
   end
 
