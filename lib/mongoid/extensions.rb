@@ -74,6 +74,7 @@ class String #:nodoc
 end
 
 class Symbol #:nodoc
+  remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
   include Mongoid::Extensions::Symbol::Inflections
 end
 
