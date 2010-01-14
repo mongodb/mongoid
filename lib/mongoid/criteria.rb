@@ -357,7 +357,7 @@ module Mongoid #:nodoc:
         new_scope.merge(self)
         return new_scope
       else
-        return collect.send(name, *args)
+        return entries.send(name, *args)
       end
     end
 

@@ -89,7 +89,7 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#collect" do
+  describe "#entries" do
 
     context "filtering" do
 
@@ -101,7 +101,7 @@ describe Mongoid::Criteria do
       end
 
       it "filters out unused params" do
-        @criteria.collect
+        @criteria.entries
         @criteria.options[:page].should be_nil
         @criteria.options[:per_page].should be_nil
       end
@@ -119,7 +119,7 @@ describe Mongoid::Criteria do
       end
 
       it "adds the count instance variable" do
-        @criteria.collect.should == []
+        @criteria.entries.should == []
         @criteria.count.should == 44
       end
 
@@ -132,7 +132,7 @@ describe Mongoid::Criteria do
         collection = mock
         Person.expects(:collection).returns(collection)
         collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
-        criteria.collect.should == []
+        criteria.entries.should == []
       end
 
     end
@@ -605,7 +605,7 @@ describe Mongoid::Criteria do
       describe "#[]" do
 
         it "collects the criteria and calls []" do
-          @criteria.expects(:collect).returns([@document])
+          @criteria.expects(:entries).returns([@document])
           @criteria[0].should == @document
         end
 
@@ -614,7 +614,7 @@ describe Mongoid::Criteria do
       describe "#rand" do
 
         it "collects the criteria and call rand" do
-          @criteria.expects(:collect).returns(@array)
+          @criteria.expects(:entries).returns(@array)
           @array.expects(:send).with(:rand).returns(@document)
           @criteria.rand
         end
