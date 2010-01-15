@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require "rubygems"
 
-gem "activesupport", ">= 2.2.2"
+gem "activemodel", ">= 3.0.pre"
 gem "mongo", ">= 0.18.2"
 gem "durran-validatable", ">= 2.0.1"
 gem "leshill-will_paginate", ">= 2.3.11"
@@ -31,7 +31,7 @@ require "observer"
 require "singleton"
 require "time"
 require "validatable"
-require "active_support/callbacks"
+require "active_model/callbacks"
 require "active_support/core_ext"
 require "active_support/inflector"
 require "active_support/time_with_zone"
