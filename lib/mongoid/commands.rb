@@ -60,11 +60,11 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes, false if not.
       def save(validate = true)
-        new = new_record?
-        run_callbacks(:before_create) if new
-        saved = Save.execute(self, validate)
-        run_callbacks(:after_create) if new
-        saved
+        if new_record?
+          run_callbacks(:create) { Save.execute(self, validate) }
+        else
+          Save.execute(self, validate)
+        end
       end
 
       # Save the +Document+, dangerously. Before and after save callbacks will

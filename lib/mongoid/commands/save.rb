@@ -12,15 +12,13 @@ module Mongoid #:nodoc:
       # Returns: +Document+ if validation passes, +false+ if not.
       def self.execute(doc, validate = true)
         return false if validate && !doc.valid?
-        doc.run_callbacks :before_save
-        parent = doc._parent
-        doc.new_record = false
-        if parent ? Save.execute(parent, validate) : doc.collection.save(doc.attributes)
-          doc.run_callbacks :after_save
-          return true
-        else
-          return false
+        doc.run_callbacks :save do
+          parent = doc._parent
+          doc.new_record = false
+          saved = parent ? Save.execute(parent, validate) : doc.collection.save(doc.attributes)
+          return false unless saved
         end
+        return true
       end
     end
   end

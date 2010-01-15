@@ -10,9 +10,7 @@ module Mongoid #:nodoc:
       #
       # doc: A new +Document+ that is going to be destroyed.
       def self.execute(doc)
-        doc.run_callbacks :before_destroy
-        delete(doc)
-        doc.run_callbacks :after_destroy
+        doc.run_callbacks(:destroy) { delete(doc) }
       end
     end
   end
