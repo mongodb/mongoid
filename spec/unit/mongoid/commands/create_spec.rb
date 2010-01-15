@@ -14,9 +14,8 @@ describe Mongoid::Commands::Create do
     end
 
     it "runs the before and after create callbacks" do
-      @document.expects(:run_callbacks).with(:before_create)
+      @document.expects(:run_callbacks).with(:create)
       Mongoid::Commands::Save.expects(:execute).with(@document, true).returns(@document)
-      @document.expects(:run_callbacks).with(:after_create)
       Mongoid::Commands::Create.execute(@document)
     end
 

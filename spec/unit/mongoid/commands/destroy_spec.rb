@@ -13,8 +13,7 @@ describe Mongoid::Commands::Destroy do
     end
 
     it "runs the before and after destroy callbacks" do
-      @document.expects(:run_callbacks).with(:before_destroy)
-      @document.expects(:run_callbacks).with(:after_destroy)
+      @document.expects(:run_callbacks).with(:destroy)
       Mongoid::Commands::Destroy.execute(@document)
     end
 

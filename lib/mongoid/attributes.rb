@@ -104,9 +104,7 @@ module Mongoid #:nodoc:
       # This will also cause the observing +Document+ to notify it's parent if
       # there is any.
       def write_attribute(name, value)
-        run_callbacks(:before_update)
-        @attributes[name] = fields[name].set(value)
-        run_callbacks(:after_update)
+        run_callbacks(:update) { @attributes[name] = fields[name].set(value) }
         notify
       end
 

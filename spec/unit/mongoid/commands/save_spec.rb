@@ -27,8 +27,7 @@ describe Mongoid::Commands::Save do
       end
 
       it "runs the before and after callbacks" do
-        @document.expects(:run_callbacks).with(:before_save)
-        @document.expects(:run_callbacks).with(:after_save)
+        @document.expects(:run_callbacks).with(:save)
         Mongoid::Commands::Save.execute(@document)
       end
 
