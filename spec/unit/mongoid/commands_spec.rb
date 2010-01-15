@@ -43,7 +43,7 @@ describe Mongoid::Commands do
       end
 
       it "runs the before and after create callbacks" do
-        @person.expects(:run_callbacks).with(:create)
+        @person.expects(:run_callbacks).with(:create).yields
         Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
         @person.save
       end
