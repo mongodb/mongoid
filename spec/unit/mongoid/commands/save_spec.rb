@@ -38,6 +38,8 @@ describe Mongoid::Commands::Save do
       context "when the document has a parent" do
 
         it "executes a save on the parent" do
+          @document.expects(:run_callbacks).yields
+          @parent.expects(:run_callbacks).yields
           @parent_collection.expects(:save).with(@parent.attributes)
           Mongoid::Commands::Save.execute(@document)
         end
@@ -51,6 +53,7 @@ describe Mongoid::Commands::Save do
         end
 
         it "calls save on the document collection" do
+          @document.expects(:run_callbacks).yields
           @doc_collection.expects(:save).with(@document.attributes)
           Mongoid::Commands::Save.execute(@document)
         end

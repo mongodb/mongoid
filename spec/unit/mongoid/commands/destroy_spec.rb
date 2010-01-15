@@ -18,6 +18,7 @@ describe Mongoid::Commands::Destroy do
     end
 
     it "removes the document from its collection" do
+      @document.expects(:run_callbacks).yields
       @collection.expects(:remove).with({ :_id => @document.id })
       Mongoid::Commands::Destroy.execute(@document)
     end
