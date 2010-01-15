@@ -193,6 +193,48 @@ describe Mongoid::Associations::HasManyRelated do
 
     end
 
+    context "when finding all with conditions" do
+
+      before do
+        @post = stub
+      end
+
+      it "passes the conditions to the association class" do
+        Post.expects(:find).with(:all, :conditions => { :title => "Testing", :person_id => @parent.id }).returns([@post])
+        posts = @association.find(:all, :conditions => { :title => "Testing" })
+        posts.should == [@post]
+      end
+
+    end
+
+    context "when finding first with conditions" do
+
+      before do
+        @post = stub
+      end
+
+      it "passes the conditions to the association class" do
+        Post.expects(:find).with(:first, :conditions => { :title => "Testing", :person_id => @parent.id }).returns(@post)
+        post = @association.find(:first, :conditions => { :title => "Testing" })
+        post.should == @post
+      end
+
+    end
+
+    context "when finding last with conditions" do
+
+      before do
+        @post = stub
+      end
+
+      it "passes the conditions to the association class" do
+        Post.expects(:find).with(:last, :conditions => { :title => "Testing", :person_id => @parent.id }).returns(@post)
+        post = @association.find(:last, :conditions => { :title => "Testing" })
+        post.should == @post
+      end
+
+    end
+
   end
 
   describe ".initialize" do

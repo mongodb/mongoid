@@ -1,7 +1,8 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasManyRelated < DelegateClass(Array) #:nodoc:
+    class HasManyRelated #:nodoc:
+      include Proxy
 
       attr_reader :klass
 
@@ -46,8 +47,9 @@ module Mongoid #:nodoc:
 
       # Finds a document in this association.
       # If an id is passed, will return the document for that id.
-      def find(id)
-        @klass.find(id)
+      def find(*args)
+        args[1][:conditions].merge!(@foreign_key.to_sym => @parent.id) if args.size > 1
+        @klass.find(*args)
       end
 
       # Initializing a related association only requires looking up the objects
@@ -61,7 +63,11 @@ module Mongoid #:nodoc:
         @parent, @klass = document, options.klass
         @foreign_key = document.class.to_s.foreign_key
         @documents = @klass.all(:conditions => { @foreign_key => document.id })
-        super(@documents)
+      end
+
+      # Delegate all missing methods over to the documents array.
+      def method_missing(name, *args, &block)
+        @documents.send(name, *args, &block)
       end
 
       # Delegates to <<

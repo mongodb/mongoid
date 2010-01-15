@@ -43,8 +43,8 @@ describe Mongoid::Associations do
     end
 
     it "sets the association on save" do
-      @from_db = Person.find(@person.id)
-      @from_db.posts.should == [@post]
+      from_db = Person.find(@person.id)
+      from_db.posts.should == [@post]
     end
 
     context "when building" do
@@ -56,6 +56,20 @@ describe Mongoid::Associations do
 
       it "sets the reverse association" do
         @post.person.should == @person
+      end
+
+    end
+
+    context "finding associated objects" do
+
+      before do
+        @extra_post = Post.create(:title => "Orphan")
+      end
+
+      it "returns only those objects scoped to the parent" do
+        from_db = Person.find(@person.id)
+        Post.all.size.should == 2
+        from_db.posts.all.size.should == 1
       end
 
     end
