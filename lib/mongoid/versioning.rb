@@ -4,13 +4,11 @@ module Mongoid #:nodoc:
   # This will add a version field to the +Document+ and a has_many association
   # with all the versions contained in it.
   module Versioning
-    def self.included(base)
-      base.class_eval do
-        field :version, :type => Integer, :default => 1
-        has_many :versions, :class_name => self.name
-        before_save :revise
-        include InstanceMethods
-      end
+    extend ActiveSupport::Concern
+    included do
+      field :version, :type => Integer, :default => 1
+      has_many :versions, :class_name => self.name
+      before_save :revise
     end
     module InstanceMethods
       # Create a new version of the +Document+. This will load the previous

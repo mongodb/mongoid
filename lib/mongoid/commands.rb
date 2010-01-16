@@ -12,13 +12,7 @@ module Mongoid #:nodoc:
   # This module is included in the +Document+ to provide all the persistence
   # methods required on the +Document+ object and class.
   module Commands
-    def self.included(base)
-      base.class_eval do
-        include InstanceMethods
-        extend ClassMethods
-      end
-    end
-
+    extend ActiveSupport::Concern
     module InstanceMethods
 
       # Delete the +Document+ from the database. This method is an optimized

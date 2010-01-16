@@ -1,18 +1,16 @@
 # encoding: utf-8
 module Mongoid #:nodoc
   module Fields #:nodoc
-    def self.included(base)
-      base.class_eval do
-        extend ClassMethods
-        # Set up the class attributes that must be available to all subclasses.
-        # These include defaults, fields
-        class_inheritable_accessor :defaults, :fields
+    extend ActiveSupport::Concern
+    included do
+      # Set up the class attributes that must be available to all subclasses.
+      # These include defaults, fields
+      class_inheritable_accessor :defaults, :fields
 
-        self.defaults = {}.with_indifferent_access
-        self.fields = {}.with_indifferent_access
+      self.defaults = {}.with_indifferent_access
+      self.fields = {}.with_indifferent_access
 
-        delegate :defaults, :fields, :to => "self.class"
-      end
+      delegate :defaults, :fields, :to => "self.class"
     end
 
     module ClassMethods #:nodoc

@@ -9,15 +9,11 @@ require "mongoid/associations/has_one_related"
 
 module Mongoid # :nodoc:
   module Associations #:nodoc:
-    def self.included(base)
-      base.class_eval do
-        # Associations need to inherit down the chain.
-        class_inheritable_accessor :associations
-        self.associations = {}.with_indifferent_access
-
-        include InstanceMethods
-        extend ClassMethods
-      end
+    extend ActiveSupport::Concern
+    included do
+      # Associations need to inherit down the chain.
+      class_inheritable_accessor :associations
+      self.associations = {}.with_indifferent_access
     end
 
     module InstanceMethods

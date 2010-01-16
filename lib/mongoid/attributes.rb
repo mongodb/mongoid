@@ -1,12 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Attributes
-    def self.included(base)
-      base.class_eval do
-        include InstanceMethods
-        extend ClassMethods
-      end
-    end
+    extend ActiveSupport::Concern
     module InstanceMethods
       # Get the id associated with this object. This will pull the _id value out
       # of the attributes +Hash+.

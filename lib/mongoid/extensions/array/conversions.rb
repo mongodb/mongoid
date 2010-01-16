@@ -4,18 +4,16 @@ module Mongoid #:nodoc:
     module Array #:nodoc:
       # This module converts arrays into mongoid related objects.
       module Conversions #:nodoc:
-        # Converts this array into an array of hashes.
-        def mongoidize
-          collect { |obj| obj.attributes }
-        end
+        extend ActiveSupport::Concern
 
-        def self.included(base)
-          base.class_eval do
-            extend ClassMethods
+        module InstanceMethods #:nodoc:
+          # Converts this array into an array of hashes.
+          def mongoidize
+            collect { |obj| obj.attributes }
           end
         end
 
-        module ClassMethods
+        module ClassMethods #:nodoc:
           def get(value)
             value
           end

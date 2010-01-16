@@ -1,28 +1,25 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Document
-    def self.included(base)
-      base.class_eval do
-        include Components
-        include InstanceMethods
-        extend ClassMethods
+    extend ActiveSupport::Concern
+    included do
+      include Components
 
-        cattr_accessor \
-          :_collection,
-          :collection_name,
-          :embedded,
-          :primary_key,
-          :hereditary
+      cattr_accessor \
+        :_collection,
+        :collection_name,
+        :embedded,
+        :primary_key,
+        :hereditary
 
-        self.embedded = false
-        self.hereditary = false
-        self.collection_name = self.name.collectionize
+      self.embedded = false
+      self.hereditary = false
+      self.collection_name = self.name.collectionize
 
-        attr_accessor :association_name, :_parent
-        attr_reader :attributes, :new_record
+      attr_accessor :association_name, :_parent
+      attr_reader :attributes, :new_record
 
-        delegate :collection, :embedded, :primary_key, :to => "self.class"
-      end
+      delegate :collection, :embedded, :primary_key, :to => "self.class"
     end
 
     module ClassMethods
@@ -41,15 +38,6 @@ module Mongoid #:nodoc:
       def inherited(subclass)
         super(subclass)
         self.hereditary = true
-      end
-
-      # Returns a human readable version of the class.
-      #
-      # Example:
-      #
-      # <tt>MixedDrink.human_name # returns "Mixed Drink"</tt>
-      def human_name
-        name.labelize
       end
 
       # Instantiate a new object, only when loaded from the database or when
