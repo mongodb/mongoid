@@ -318,6 +318,8 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
     def merge(other)
+      # TODO: If an embedded documents array exists on the criteria merge it in
+      # as well.
       @selector.update(other.selector)
       @options.update(other.options)
     end

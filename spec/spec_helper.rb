@@ -145,11 +145,13 @@ end
 
 class Address
   include Mongoid::Document
+  field :number, :type => Integer
   field :street
   field :city
   field :state
   field :post_code
   field :parent_title
+  field :services, :type => Array
   key :street
   has_many :locations
   belongs_to :addressable, :inverse_of => :addresses
