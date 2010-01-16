@@ -17,6 +17,8 @@ module Mongoid #:nodoc:
   class Criteria
     include Enumerable
 
+    attr_accessor :documents
+
     attr_reader :klass, :options, :selector
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
@@ -234,7 +236,7 @@ module Mongoid #:nodoc:
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
     def initialize(klass)
-      @selector, @options, @klass = {}, {}, klass
+      @selector, @options, @klass, @documents = {}, {}, klass, []
       if klass.hereditary
         @selector = { :_type => { "$in" => klass._types } }
         @hereditary = true
@@ -318,10 +320,9 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
     def merge(other)
-      # TODO: If an embedded documents array exists on the criteria merge it in
-      # as well.
       @selector.update(other.selector)
       @options.update(other.options)
+      @documents = other.documents
     end
 
     # Used for chaining +Criteria+ scopes together in the for of class methods

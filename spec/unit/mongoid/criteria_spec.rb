@@ -564,6 +564,22 @@ describe Mongoid::Criteria do
           @criteria.selector.should == @selector
           @criteria.options.should == @options
         end
+
+      end
+
+      context "when the other has a document collection" do
+
+        before do
+          @documents = [ stub ]
+          @other = Mongoid::Criteria.new(Person)
+          @other.documents = @documents
+        end
+
+        it "merges the documents collection in" do
+          @criteria.merge(@other)
+          @criteria.documents.should == @documents
+        end
+
       end
 
     end
