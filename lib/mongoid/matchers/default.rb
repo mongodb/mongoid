@@ -10,6 +10,11 @@ module Mongoid #:nodoc:
       def matches?(value)
         @attribute == value
       end
+
+      protected
+      def first(value)
+        value.values.first
+      end
     end
   end
 end
