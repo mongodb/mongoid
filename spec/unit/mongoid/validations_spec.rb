@@ -5,9 +5,7 @@ describe Mongoid::Validations do
   describe ".validates_associated" do
 
     before do
-      @class = Class.new do
-        include Mongoid::Document
-      end
+      @class = MixedDrink
     end
 
     it "adds the associated validator" do
@@ -20,9 +18,7 @@ describe Mongoid::Validations do
   describe ".validates_uniqueness_of" do
 
     before do
-      @class = Class.new do
-        include Mongoid::Document
-      end
+      @class = MixedDrink
     end
 
     it "adds the uniqueness validator" do
