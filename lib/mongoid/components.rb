@@ -16,8 +16,8 @@ module Mongoid #:nodoc
       include Mongoid::Indexes
       include Mongoid::Matchers
       include Mongoid::Memoization
-      include Mongoid::Observable
       include Mongoid::Validations
+      include Observable
       extend ActiveModel::Translation
       extend Mongoid::Finders
       extend Mongoid::NamedScope
