@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
       self.collection_name = self.name.collectionize
 
       attr_accessor :association_name, :_parent
-      attr_reader :attributes, :new_record
+      attr_reader :new_record
 
       delegate :collection, :embedded, :primary_key, :to => "self.class"
     end
@@ -47,13 +47,12 @@ module Mongoid #:nodoc:
       #
       # <tt>Person.instantiate(:title => "Sir", :age => 30)</tt>
       def instantiate(attrs = {}, allocating = false)
-        attributes = attrs.with_indifferent_access
-        if attributes[:_id] || allocating
+        if attrs["_id"] || allocating
           document = allocate
-          document.instance_variable_set(:@attributes, attributes)
+          document.instance_variable_set(:@attributes, attrs)
           return document
         else
-          return new(attributes)
+          return new(attrs)
         end
       end
 
@@ -97,7 +96,7 @@ module Mongoid #:nodoc:
       # all attributes excluding timestamps on the object.
       def ==(other)
         return false unless other.is_a?(Document)
-        @attributes.except(:modified_at).except(:created_at) ==
+        attributes.except(:modified_at).except(:created_at) ==
           other.attributes.except(:modified_at).except(:created_at)
       end
 
@@ -119,10 +118,15 @@ module Mongoid #:nodoc:
         parentize(parent, options.name); notify; self
       end
 
+      # Return the attributes hash with indifferent access.
+      def attributes
+        @attributes.with_indifferent_access
+      end
+
       # Clone the current +Document+. This will return all attributes with the
       # exception of the document's id and versions.
       def clone
-        self.class.instantiate(@attributes.except(:_id).except(:versions).dup, true)
+        self.class.instantiate(@attributes.except("_id").except("versions").dup, true)
       end
 
       # Generate an id for this +Document+.
@@ -145,8 +149,9 @@ module Mongoid #:nodoc:
       #
       # <tt>Person.new(:title => "Mr", :age => 30)</tt>
       def initialize(attrs = {})
-        @attributes = {}.with_indifferent_access
-        process(defaults.merge(attrs))
+        @attributes = {}
+        process(attrs)
+        @attributes = defaults.merge(@attributes)
         @new_record = true if id.nil?
         document = yield self if block_given?
         identify
@@ -194,13 +199,13 @@ module Mongoid #:nodoc:
       # <tt>address.parentize(person, :addresses)</tt>
       def parentize(object, association_name)
         self._parent = object
-        self.association_name = association_name
+        self.association_name = association_name.to_s
         add_observer(object)
       end
 
       # Reloads the +Document+ attributes from the database.
       def reload
-        @attributes = collection.find_one(:_id => id).with_indifferent_access
+        @attributes = collection.find_one(:_id => id)
       end
 
       # Remove a child document from this parent +Document+. Will reset the
@@ -232,7 +237,7 @@ module Mongoid #:nodoc:
       #
       # <tt>person.to_json</tt>
       def to_json
-        @attributes.to_json
+        attributes.to_json
       end
 
       # Returns the id of the Document, used in Rails compatibility.

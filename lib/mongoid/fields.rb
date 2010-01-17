@@ -7,8 +7,8 @@ module Mongoid #:nodoc
       # These include defaults, fields
       class_inheritable_accessor :defaults, :fields
 
-      self.defaults = {}.with_indifferent_access
-      self.fields = {}.with_indifferent_access
+      self.defaults = {}
+      self.fields = {}
 
       delegate :defaults, :fields, :to => "self.class"
     end
@@ -27,15 +27,16 @@ module Mongoid #:nodoc
       #
       # <tt>field :score, :default => 0</tt>
       def field(name, options = {})
-        set_field(name, options)
-        set_default(name, options)
+        access = name.to_s
+        set_field(access, options)
+        set_default(access, options)
       end
 
       protected
       # Define a field attribute for the +Document+.
       def set_field(name, options = {})
         meth = options.delete(:as) || name
-        fields[name] = Field.new(name.to_s, options)
+        fields[name] = Field.new(name, options)
         create_accessors(name, meth, options)
       end
 

@@ -28,9 +28,9 @@ module Mongoid #:nodoc:
     def matcher(key, value)
       if value.is_a?(Hash)
         name = "Mongoid::Matchers::#{value.keys.first.gsub("$", "").camelize}"
-        return name.constantize.new(@attributes[key])
+        return name.constantize.new(attributes[key])
       end
-      Default.new(@attributes[key])
+      Default.new(attributes[key])
     end
   end
 end

@@ -19,7 +19,7 @@ describe Mongoid::Identity do
 
       before do
         @address = Address.allocate
-        @address.instance_variable_set(:@attributes, { :street => "Market St"})
+        @address.instance_variable_set(:@attributes, { "street" => "Market St"})
       end
 
       it "sets the id to the composite key" do
@@ -51,7 +51,7 @@ describe Mongoid::Identity do
 
         before do
           @person = Person.allocate
-          @person.instance_variable_set(:@attributes, { :_id => "5" })
+          @person.instance_variable_set(:@attributes, { "_id" => "5" })
         end
 
         it "returns the existing id" do

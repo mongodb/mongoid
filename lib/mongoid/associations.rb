@@ -13,7 +13,7 @@ module Mongoid # :nodoc:
     included do
       # Associations need to inherit down the chain.
       class_inheritable_accessor :associations
-      self.associations = {}.with_indifferent_access
+      self.associations = {}
     end
 
     module InstanceMethods
@@ -199,7 +199,7 @@ module Mongoid # :nodoc:
       #
       # <tt>Person.reflect_on_association(:addresses)</tt>
       def reflect_on_association(name)
-        association = associations[name]
+        association = associations[name.to_s]
         association ? association.macro : nil
       end
 
@@ -208,7 +208,7 @@ module Mongoid # :nodoc:
       # then adds the accessors for the association. The defined setters and
       # getters for the associations will perform the necessary memoization.
       def add_association(type, options)
-        name = options.name
+        name = options.name.to_s
         associations[name] = type
         define_method(name) do
           memoized(name) { type.instantiate(self, options) }
@@ -221,7 +221,7 @@ module Mongoid # :nodoc:
       # Adds a builder for a has_one association. This comes in the form of
       # build_name(attributes)
       def add_builder(type, options)
-        name = options.name
+        name = options.name.to_s
         define_method("build_#{name}") do |attrs|
           reset(name) { type.new(self, attrs, options) }
         end
@@ -230,7 +230,7 @@ module Mongoid # :nodoc:
       # Adds a creator for a has_one association. This comes in the form of
       # create_name(attributes)
       def add_creator(type, options)
-        name = options.name
+        name = options.name.to_s
         define_method("create_#{name}") do |attrs|
           document = send("build_#{name}", attrs)
           document.save; document

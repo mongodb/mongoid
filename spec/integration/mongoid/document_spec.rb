@@ -120,7 +120,7 @@ describe Mongoid::Document do
 
       before do
         @person = Person.create(:title => "Lead")
-        @person.addresses.create(:street => "1st Street")
+        address = @person.addresses.create(:street => "1st Street")
         @person.create_name(:first_name => "Emmanuel")
         @person.save
       end
