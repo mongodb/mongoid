@@ -106,7 +106,7 @@ describe Mongoid::Commands do
       end
 
       it "runs the before and after create callbacks" do
-        @person.expects(:run_callbacks).with(:create)
+        @person.expects(:run_callbacks).with(:create).yields.returns(true)
         Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
         @person.save!
       end
@@ -213,8 +213,7 @@ describe Mongoid::Commands do
     end
 
     it "runs the validation callbacks" do
-      @comment.expects(:run_callbacks).with(:validate)
-      @comment.expects(:run_callbacks).with(:validation)
+      @comment.expects(:_run_validate_callbacks)
       @comment.valid?
     end
 

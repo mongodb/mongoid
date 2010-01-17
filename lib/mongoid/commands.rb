@@ -70,7 +70,7 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes
       def save!
-        return save(true) || (raise Errors::Validations.new(self.errors))
+        save(true) || (raise Errors::Validations.new(self.errors))
       end
 
       # Update the document attributes and persist the document to the

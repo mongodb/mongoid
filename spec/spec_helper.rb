@@ -227,6 +227,7 @@ end
 class Canvas
   include Mongoid::Document
   field :name
+  field :version, :type => Integer
   has_many :shapes
   has_one :writer
 
