@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
     included do
-      include Components
+      include Mongoid::Components
 
       cattr_accessor \
         :_collection,
