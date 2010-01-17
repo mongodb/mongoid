@@ -10,8 +10,8 @@ describe Mongoid::Timestamps do
 
     it "adds created_at and updated_at to the document" do
       fields = Person.fields
-      fields[:created_at].should_not be_nil
-      fields[:updated_at].should_not be_nil
+      fields["created_at"].should_not be_nil
+      fields["updated_at"].should_not be_nil
     end
 
     it "forces the timestamps to UTC" do

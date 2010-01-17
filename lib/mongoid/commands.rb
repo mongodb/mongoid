@@ -86,7 +86,7 @@ module Mongoid #:nodoc:
       #
       # <tt>document.update_attributes(:title => "Test")</tt>
       def update_attributes(attrs = {})
-        write_attributes(attrs); save
+        set_attributes(attrs); save
       end
 
       # Update the document attributes and persist the document to the
@@ -96,7 +96,13 @@ module Mongoid #:nodoc:
       #
       # <tt>document.update_attributes!(:title => "Test")</tt>
       def update_attributes!(attrs = {})
-        write_attributes(attrs); save!
+        set_attributes(attrs); save!
+      end
+
+      protected
+      def set_attributes(attrs = {})
+        run_callbacks(:before_update)
+        write_attributes(attrs)
       end
 
     end

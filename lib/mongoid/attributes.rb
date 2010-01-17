@@ -11,12 +11,12 @@ module Mongoid #:nodoc:
       # Get the id associated with this object. This will pull the _id value out
       # of the attributes +Hash+.
       def id
-        @attributes[:_id]
+        @attributes["_id"]
       end
 
       # Set the id of the +Document+ to a new one.
       def id=(new_id)
-        @attributes[:_id] = new_id
+        @attributes["_id"] = new_id
       end
 
       alias :_id :id
@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
       def process(attrs = {})
         attrs.each_pair do |key, value|
           if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
-            @attributes[key] = value
+            @attributes[key.to_s] = value
           else
             send("#{key}=", value)
           end
@@ -59,7 +59,8 @@ module Mongoid #:nodoc:
       #
       # <tt>person.read_attribute(:title)</tt>
       def read_attribute(name)
-        fields[name].get(@attributes[name])
+        access = name.to_s
+        fields[access].get(@attributes[access])
       end
 
       # Remove a value from the +Document+ attributes. If the value does not exist
@@ -73,19 +74,19 @@ module Mongoid #:nodoc:
       #
       # <tt>person.remove_attribute(:title)</tt>
       def remove_attribute(name)
-        @attributes.delete(name)
+        @attributes.delete(name.to_s)
       end
 
       # Returns the object type. This corresponds to the name of the class that
       # this +Document+ is, which is used in determining the class to
       # instantiate in various cases.
       def _type
-        @attributes[:_type]
+        @attributes["_type"]
       end
 
       # Set the type of the +Document+. This should be the name of the class.
       def _type=(new_type)
-        @attributes[:_type] = new_type
+        @attributes["_type"] = new_type
       end
 
       # Write a single attribute to the +Document+ attribute +Hash+. This will
@@ -104,10 +105,9 @@ module Mongoid #:nodoc:
       # This will also cause the observing +Document+ to notify it's parent if
       # there is any.
       def write_attribute(name, value)
-        run_callbacks(:before_update)
-        @attributes[name] = fields[name].set(value)
-        run_callbacks(:after_update)
-        notify
+        access = name.to_s
+        @attributes[access] = fields[access].set(value)
+        notify unless id.blank?
       end
 
       # Writes the supplied attributes +Hash+ to the +Document+. This will only
@@ -126,6 +126,7 @@ module Mongoid #:nodoc:
       # there is any.
       def write_attributes(attrs = nil)
         process(attrs || {})
+        identify if id.blank?
         notify
       end
 

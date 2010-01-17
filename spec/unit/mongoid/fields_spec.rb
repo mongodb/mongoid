@@ -95,17 +95,17 @@ describe Mongoid::Fields do
       end
 
       it "uses the alias to write the attribute" do
-        @person.expects(:write_attribute).with(:aliased, true)
+        @person.expects(:write_attribute).with("aliased", true)
         @person.alias = true
       end
 
       it "uses the alias to read the attribute" do
-        @person.expects(:read_attribute).with(:aliased)
+        @person.expects(:read_attribute).with("aliased")
         @person.alias
       end
 
       it "uses the alias for the query method" do
-        @person.expects(:read_attribute).with(:aliased)
+        @person.expects(:read_attribute).with("aliased")
         @person.alias?
       end
 
