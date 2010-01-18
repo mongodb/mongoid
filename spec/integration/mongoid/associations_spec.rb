@@ -113,6 +113,24 @@ describe Mongoid::Associations do
 
       end
 
+      context "when a has-one to has-many" do
+
+        before do
+          @person = Person.new(:title => "Sir")
+          @name = Name.new(:first_name => "Syd")
+          @person.name = @name
+          @person.save
+        end
+
+        it "persists all the associations properly" do
+          from_db = Person.find(@person.id)
+          translation = Translation.new(:language => "fr")
+          from_db.name.translations << translation
+          from_db.attributes[:name][:translations].should_not be_nil
+        end
+
+      end
+
       context "when a has-many to has-many" do
 
         before do

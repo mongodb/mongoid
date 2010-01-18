@@ -173,11 +173,18 @@ class Name
   field :last_name
   field :parent_title
   key :first_name, :last_name
+  has_many :translations
   belongs_to :person, :inverse_of => :name
 
   def set_parent=(set = false)
     self.parent_title = person.title if set
   end
+end
+
+class Translation
+  include Mongoid::Document
+  field :language
+  belongs_to :name, :inverse_of => :translations
 end
 
 class Comment

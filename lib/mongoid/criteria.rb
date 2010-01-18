@@ -21,6 +21,18 @@ module Mongoid #:nodoc:
 
     attr_reader :klass, :options, :selector
 
+    # Concatinate the criteria with another enumerable. If the other is a
+    # +Criteria+ then it needs to get the collection from it.
+    def +(other)
+      collect + (other.is_a?(Criteria) ? other.collect : other)
+    end
+
+    # Returns the difference between the criteria and another enumerable. If
+    # the other is a +Criteria+ then it needs to get the collection from it.
+    def -(other)
+      collect - (other.is_a?(Criteria) ? other.collect : other)
+    end
+
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.
     #
@@ -498,6 +510,9 @@ module Mongoid #:nodoc:
     def sum(field)
       grouped(:sum, field.to_s, SUM_REDUCE)
     end
+
+    alias :to_a :collect
+    alias :to_ary :collect
 
     # Translate the supplied arguments into a +Criteria+ object.
     #

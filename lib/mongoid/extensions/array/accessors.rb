@@ -9,6 +9,8 @@ module Mongoid #:nodoc:
           delete_if { |e| attributes["_id"] && (e["_id"] == attributes["_id"]) }
           self.<< attributes
         end
+
+        alias :merge! :update
       end
     end
   end

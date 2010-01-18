@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
         def insert(key, attrs)
           elements = self[key]
           if elements
-            elements.update(attrs)
+            elements.merge!(attrs)
           else
             self[key] = key.singular? ? attrs : [attrs]
           end
