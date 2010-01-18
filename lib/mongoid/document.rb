@@ -274,7 +274,8 @@ module Mongoid #:nodoc:
       # there is any.
       def update(child, clear = false)
         name = child.association_name
-        clear ? @attributes.delete(name) : @attributes.insert(name, child.attributes)
+        attrs = child.instance_variable_get(:@attributes)
+        clear ? @attributes.delete(name) : @attributes.insert(name, attrs)
         notify
       end
     end
