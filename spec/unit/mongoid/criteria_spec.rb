@@ -7,6 +7,111 @@ describe Mongoid::Criteria do
     @canvas_criteria = Mongoid::Criteria.new(Canvas)
   end
 
+  describe "#+" do
+
+    before do
+      @sir = Person.new(:title => "Sir")
+      @madam = Person.new(:title => "Madam")
+      @canvas = Canvas.new
+    end
+
+    context "when the criteria has not been executed" do
+
+      before do
+        @collection = mock
+        @cursor = stub(:count => 1, :collect => [ @sir, @madam ])
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find).returns(@cursor)
+      end
+
+      it "executes the criteria and concats the results" do
+        results = @criteria + [ @canvas ]
+        results.should == [ @sir, @madam, @canvas ]
+      end
+
+    end
+
+    context "when the criteria has been executed" do
+
+      before do
+        @criteria.instance_variable_set(:@collection, [ @sir, @madam ])
+      end
+
+      it "concats the results" do
+        results = @criteria + [ @canvas ]
+        results.should == [ @sir, @madam, @canvas ]
+      end
+
+    end
+
+    context "when the other is a criteria" do
+
+      before do
+        @criteria.instance_variable_set(:@collection, [ @sir, @madam ])
+        @canvas_criteria.instance_variable_set(:@collection, [ @canvas ])
+      end
+
+      it "concats the results" do
+        results = @criteria + @canvas_criteria
+        results.should == [ @sir, @madam, @canvas ]
+      end
+
+    end
+
+  end
+
+  describe "#-" do
+
+    before do
+      @sir = Person.new(:title => "Sir")
+      @madam = Person.new(:title => "Madam")
+    end
+
+    context "when the criteria has not been executed" do
+
+      before do
+        @collection = mock
+        @cursor = stub(:count => 1, :collect => [ @sir, @sir, @madam ])
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find).returns(@cursor)
+      end
+
+      it "executes the criteria and returns the difference" do
+        results = @criteria - [ @sir ]
+        results.should == [ @madam ]
+      end
+
+    end
+
+    context "when the criteria has been executed" do
+
+      before do
+        @criteria.instance_variable_set(:@collection, [@sir, @sir, @madam])
+      end
+
+      it "returns the difference" do
+        results = @criteria - [ @sir ]
+        results.should == [ @madam ]
+      end
+
+    end
+
+    context "when the other is a criteria" do
+
+      before do
+        @criteria.instance_variable_set(:@collection, [@sir, @sir, @madam])
+        @canvas_criteria.instance_variable_set(:@collection, [@sir])
+      end
+
+      it "returns the difference" do
+        results = @criteria - @canvas_criteria
+        results.should == [ @madam ]
+      end
+
+    end
+
+  end
+
   describe "#[]" do
 
     before do
