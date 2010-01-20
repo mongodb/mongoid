@@ -83,13 +83,15 @@ module Mongoid #:nodoc:
         end : []
       end
 
-      # Delegate all missing methods over to the documents array.
+      # Delegate all missing methods over to the documents array unless a
+      # criteria or named scope exists on the association class. If that is the
+      # case then call that method.
       def method_missing(name, *args, &block)
-        # TODO: Support for criteria class methods and named scopes:
-        # 1. Check if the @klass has a method defined by the name.
-        # 2. If so, then call the method to return the criteria or scope.
-        # 3. Inject @documents into the criteria or scope.
-        # 4. Return the criteria.
+        unless @documents.respond_to?(name)
+          criteria = @klass.send(name, *args)
+          criteria.documents = @documents
+          return criteria
+        end
         @documents.send(name, *args, &block)
       end
 

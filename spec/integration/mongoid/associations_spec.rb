@@ -8,6 +8,36 @@ describe Mongoid::Associations do
     Mongoid.database.collection(:posts).drop
   end
 
+  context "criteria on has many embedded associations" do
+
+    before do
+      @person = Person.new(:title => "Sir")
+      @sf_apartment = Address.new(:street => "Genoa Pl", :state => "CA", :address_type => "Apartment")
+      @la_home = Address.new(:street => "Rodeo Dr", :state => "CA", :address_type => "Home")
+      @sf_home = Address.new(:street => "Pacific", :state => "CA", :address_type => "Home")
+      @person.addresses << [ @sf_apartment, @la_home, @sf_home ]
+    end
+
+    it "handles a single criteria" do
+      cas = @person.addresses.california
+      cas.size.should == 3
+      cas.should == [ @sf_apartment, @la_home, @sf_home ]
+    end
+
+    it "handles chained criteria" do
+      ca_homes = @person.addresses.california.homes
+      ca_homes.size.should == 2
+      ca_homes.should == [ @la_home, @sf_home ]
+    end
+
+    it "handles chained criteria with named scopes" do
+      ca_homes = @person.addresses.california.homes.rodeo
+      ca_homes.size.should == 1
+      ca_homes.should == [ @la_home ]
+    end
+
+  end
+
   context "one-to-one relational associations" do
 
     before do

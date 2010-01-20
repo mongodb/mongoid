@@ -4,7 +4,7 @@ describe Mongoid::Associations::HasMany do
 
   before do
     @attributes = { :addresses => [
-      { :_id => "street-1", :street => "Street 1" },
+      { :_id => "street-1", :street => "Street 1", :state => "CA" },
       { :_id => "street-2", :street => "Street 2" } ] }
     @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
   end
@@ -333,8 +333,20 @@ describe Mongoid::Associations::HasMany do
         )
       end
 
-      it "returns the criteria with the documents injected" do
+      it "returns the criteria" do
+        @association.california.should be_a_kind_of(Mongoid::Criteria)
+      end
 
+      it "sets the documents on the criteria" do
+        criteria = @association.california
+        criteria.documents.should == @association.collect
+      end
+
+      it "returns the scoped documents" do
+        addresses = @association.california
+        addresses.size.should == 1
+        addresses.first.should be_a_kind_of(Address)
+        addresses.first.state.should == "CA"
       end
 
     end
