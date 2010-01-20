@@ -18,8 +18,22 @@ module Mongoid #:nodoc:
     include Enumerable
 
     attr_accessor :documents
-
     attr_reader :klass, :options, :selector
+
+    delegate \
+      :aggregate,
+      :count,
+      :execute,
+      :first,
+      :group,
+      :last,
+      :max,
+      :min,
+      :one,
+      :page,
+      :paginate,
+      :per_page,
+      :sum, :to => :context
 
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.
@@ -51,19 +65,6 @@ module Mongoid #:nodoc:
       else
         return false
       end
-    end
-
-    AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
-    # Aggregate the criteria. This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +group()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned it will provided a grouping of keys with counts.
-    #
-    # Example:
-    #
-    # <tt>criteria.select(:field1).where(:field1 => "Title").aggregate(Person)</tt>
-    def aggregate
-      @klass.collection.group(@options[:fields], @selector, { :count => 0 }, AGGREGATE_REDUCE, true)
     end
 
     # Adds a criterion to the +Criteria+ that specifies values that must all
@@ -106,15 +107,12 @@ module Mongoid #:nodoc:
       where(selector)
     end
 
-    # Get the count of matching documents in the database for the +Criteria+.
+    # Return or create the context in which this criteria should be executed.
     #
-    # Example:
-    #
-    # <tt>criteria.count</tt>
-    #
-    # Returns: <tt>Integer</tt>
-    def count
-      @count ||= @klass.collection.find(@selector, process_options).count
+    # This will return an Enumerable context if the class is embedded,
+    # otherwise it will return a Mongo context for root classes.
+    def context
+      @context ||= determine_context
     end
 
     # Merges the supplied argument hash into a single criteria
@@ -181,30 +179,6 @@ module Mongoid #:nodoc:
       @options = extras; filter_options; self
     end
 
-    GROUP_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
-    # Groups the criteria. This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +group()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned it will provided a grouping of keys with objects.
-    #
-    # Example:
-    #
-    # <tt>criteria.select(:field1).where(:field1 => "Title").group(Person)</tt>
-    def group
-      @klass.collection.group(
-        @options[:fields],
-        @selector,
-        { :group => [] },
-        GROUP_REDUCE,
-        true
-      ).collect do |docs|
-        docs["group"] = docs["group"].collect do |attrs|
-          instantiate(attrs)
-        end
-        docs
-      end
-    end
-
     # Adds a criterion to the +Criteria+ that specifies values where any can
     # be matched in order to return results. This is similar to an SQL "IN"
     # clause. The MongoDB conditional operator that will be used is "$in".
@@ -255,22 +229,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Return the last result for the +Criteria+. Essentially does a find_one on
-    # the collection with the sorting reversed. If no sorting parameters have
-    # been provided it will default to ids.
-    #
-    # Example:
-    #
-    # <tt>Criteria.select(:name).where(:name = "Chrissy").last</tt>
-    def last
-      opts = process_options
-      sorting = opts[:sort]
-      sorting = [[:_id, :asc]] unless sorting
-      opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
-      attributes = @klass.collection.find_one(@selector, opts)
-      attributes ? instantiate(attributes) : nil
-    end
-
     # Adds a criterion to the +Criteria+ that specifies the maximum number of
     # results to return. This is mostly used in conjunction with <tt>skip()</tt>
     # to handle paginated results.
@@ -286,38 +244,6 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def limit(value = 20)
       @options[:limit] = value; self
-    end
-
-    MIN_REDUCE = "function(obj, prev) { if (prev.min == 'start') { prev.min = obj.[field]; } " +
-      "if (prev.min > obj.[field]) { prev.min = obj.[field]; } }"
-    # Return the min value for a field.
-    #
-    # This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +group()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned it will provided a grouping of keys with sums.
-    #
-    # Example:
-    #
-    # <tt>criteria.min(:age)</tt>
-    def min(field)
-      grouped(:min, field.to_s, MIN_REDUCE)
-    end
-
-    MAX_REDUCE = "function(obj, prev) { if (prev.max == 'start') { prev.max = obj.[field]; } " +
-      "if (prev.max < obj.[field]) { prev.max = obj.[field]; } }"
-    # Return the max value for a field.
-    #
-    # This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +group()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned it will provided a grouping of keys with sums.
-    #
-    # Example:
-    #
-    # <tt>criteria.max(:age)</tt>
-    def max(field)
-      grouped(:max, field.to_s, MAX_REDUCE)
     end
 
     # Merges another object into this +Criteria+. The other object may be a
@@ -403,18 +329,6 @@ module Mongoid #:nodoc:
       @options[:skip]
     end
 
-    # Return the first result for the +Criteria+.
-    #
-    # Example:
-    #
-    # <tt>Criteria.select(:name).where(:name = "Chrissy").one</tt>
-    def one
-      attributes = @klass.collection.find_one(@selector, process_options)
-      attributes ? instantiate(attributes) : nil
-    end
-
-    alias :first :one
-
     # Adds a criterion to the +Criteria+ that specifies the fields that will
     # get returned from the Document. Used mainly for list views that do not
     # require all fields to be present. This is similar to SQL "SELECT" values.
@@ -448,30 +362,6 @@ module Mongoid #:nodoc:
       @options[:sort] = params; self
     end
 
-    # Either returns the page option and removes it from the options, or
-    # returns a default value of 1.
-    def page
-      skips, limits = @options[:skip], @options[:limit]
-      (skips && limits) ? (skips + limits) / limits : 1
-    end
-
-    # Executes the +Criteria+ and paginates the results.
-    #
-    # Example:
-    #
-    # <tt>criteria.paginate</tt>
-    def paginate
-      @collection ||= execute
-      WillPaginate::Collection.create(page, per_page, count) do |pager|
-        pager.replace(@collection)
-      end
-    end
-
-    # Returns the number of results per page or the default of 20.
-    def per_page
-      (@options[:limit] || 20).to_i
-    end
-
     # Returns the selector and options as a +Hash+ that would be passed to a
     # scope for use with named scopes.
     def scoped
@@ -494,21 +384,6 @@ module Mongoid #:nodoc:
     # Returns: <tt>self</tt>
     def skip(value = 0)
       @options[:skip] = value; self
-    end
-
-    SUM_REDUCE = "function(obj, prev) { if (prev.sum == 'start') { prev.sum = 0; } prev.sum += obj.[field]; }"
-    # Sum the criteria.
-    #
-    # This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +group()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned it will provided a grouping of keys with sums.
-    #
-    # Example:
-    #
-    # <tt>criteria.sum(:age)</tt>
-    def sum(field)
-      grouped(:sum, field.to_s, SUM_REDUCE)
     end
 
     alias :to_a :collect
@@ -572,24 +447,12 @@ module Mongoid #:nodoc:
     end
 
     protected
-    # Execute the criteria. This will take the internally built selector and options
-    # and pass them on to the Ruby driver's +find()+ method on the collection. The
-    # collection itself will be retrieved from the class provided, and once the
-    # query has returned new documents of the type of class provided will be instantiated.
-    #
-    # If this is a +Criteria+ to only find the first object, this will return a
-    # single object of the type of class provided.
-    #
-    # If this is a +Criteria+ to find multiple results, will return an +Array+ of
-    # objects of the type of class provided.
-    def execute
-      attributes = @klass.collection.find(@selector, process_options)
-      if attributes
-        @count = attributes.count
-        attributes.collect { |doc| instantiate(doc) }
-      else
-        []
+    # Determines the context to be used for this criteria.
+    def determine_context
+      if @klass.embedded
+        return Contexts::Enumerable.new(@selector, @options, @documents)
       end
+      Contexts::Mongo.new(@selector, @options, @klass)
     end
 
     # Filters the unused options out of the options +Hash+. Currently this
@@ -602,35 +465,6 @@ module Mongoid #:nodoc:
         @options[:limit] = limits = (per_page_num || 20).to_i
         @options[:skip] = (page_num || 1).to_i * limits - limits
       end
-    end
-
-    # Common functionality for grouping operations. Currently used by min, max
-    # and sum. Will gsub the field name in the supplied reduce function.
-    def grouped(start, field, reduce)
-      collection = @klass.collection.group(
-        nil,
-        @selector,
-        { start => "start" },
-        reduce.gsub("[field]", field),
-        true
-      )
-      collection.first[start.to_s]
-    end
-
-    # If hereditary instantiate by _type otherwise use the klass.
-    def instantiate(attrs)
-      @hereditary ? attrs["_type"].constantize.instantiate(attrs) : @klass.instantiate(attrs)
-    end
-
-    # Filters the field list. If no fields have been supplied, then it will be
-    # empty. If fields have been defined then _type will be included as well.
-    def process_options
-      fields = @options[:fields]
-      if fields && fields.size > 0 && !fields.include?(:_type)
-        fields << :_type
-        @options[:fields] = fields
-      end
-      @options.dup
     end
 
     # Update the selector setting the operator on the value for each key in the

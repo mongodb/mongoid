@@ -6,6 +6,30 @@ describe Mongoid::Document do
     Mongoid.database.collection(:people).drop
   end
 
+  context "yo" do
+    class Campaign
+      include Mongoid::Document
+      field :name
+      index :name, :unique => true
+
+      validates_presence_of :name
+      validates_uniqueness_of :name
+    end
+
+
+    describe Campaign do
+      context "validation" do
+        it "should validate uniqueness of name" do
+          campaign_a = Campaign.new(:name => 'Testing')
+          campaign_b = Campaign.new(:name => 'Testing')
+          campaign_a.save
+          campaign_b.valid?.should be_false
+        end
+      end
+    end
+
+  end
+
   context "when document contains a hash field" do
 
     before do

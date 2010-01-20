@@ -322,6 +322,33 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe "#method_missing" do
+
+    context "when the association class has a criteria class method" do
+
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+      end
+
+      it "returns the criteria with the documents injected" do
+
+      end
+
+    end
+
+    context "when no class method exists" do
+
+      it "delegates to the array" do
+
+      end
+
+    end
+
+  end
+
   describe "#push" do
 
     before do
