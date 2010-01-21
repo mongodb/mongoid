@@ -4,7 +4,7 @@ describe Mongoid::Associations::HasMany do
 
   before do
     @attributes = { :addresses => [
-      { :_id => "street-1", :street => "Street 1" },
+      { :_id => "street-1", :street => "Street 1", :state => "CA" },
       { :_id => "street-2", :street => "Street 2" } ] }
     @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
   end
@@ -318,6 +318,45 @@ describe Mongoid::Associations::HasMany do
       @association.nested_build({ "0" => { :street => "Yet Another" } })
       @association.size.should == 3
       @association.last.street.should == "Yet Another"
+    end
+
+  end
+
+  describe "#method_missing" do
+
+    context "when the association class has a criteria class method" do
+
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+      end
+
+      it "returns the criteria" do
+        @association.california.should be_a_kind_of(Mongoid::Criteria)
+      end
+
+      it "sets the documents on the criteria" do
+        criteria = @association.california
+        criteria.documents.should == @association.entries
+      end
+
+      it "returns the scoped documents" do
+        addresses = @association.california
+        addresses.size.should == 1
+        addresses.first.should be_a_kind_of(Address)
+        addresses.first.state.should == "CA"
+      end
+
+    end
+
+    context "when no class method exists" do
+
+      it "delegates to the array" do
+
+      end
+
     end
 
   end

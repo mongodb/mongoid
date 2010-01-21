@@ -2,6 +2,76 @@ require "spec_helper"
 
 describe Mongoid::Scope do
 
+  describe "#==" do
+
+    before do
+      @scope = Mongoid::Scope.new(Person, {})
+    end
+
+    context "when other is a scope" do
+
+      context "when the parent and conditions match" do
+
+        before do
+          @other = Mongoid::Scope.new(Person, {})
+        end
+
+        it "returns true" do
+          @scope.should == @other
+        end
+
+      end
+
+      context "when the conditions do not match" do
+
+        before do
+          @other = Mongoid::Scope.new(Person, { :where => { :field => "value" } })
+        end
+
+        it "returns false" do
+          @scope.should_not == @other
+        end
+      end
+
+    end
+
+    context "when other is an enumerable" do
+
+      context "when the array contents are equal" do
+
+        before do
+          @other = []
+        end
+
+        it "returns true" do
+          @scope.should == @other
+        end
+
+      end
+
+      context "when the array contents are not equal" do
+
+        before do
+          @other = [ stub ]
+        end
+
+        it "returns false" do
+          @scope.should_not == @other
+        end
+
+      end
+    end
+
+    context "when other is an invalid type" do
+
+      it "returns false" do
+        Mongoid::Scope.new(Person, {}).should_not == stub
+      end
+
+    end
+
+  end
+
   describe ".initialize" do
 
     before do

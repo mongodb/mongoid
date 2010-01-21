@@ -194,6 +194,58 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#context" do
+
+    context "when the context has been set" do
+
+      before do
+        @context = stub
+        @criteria.instance_variable_set(:@context, @context)
+      end
+
+      it "returns the memoized context" do
+        @criteria.context.should == @context
+      end
+
+    end
+
+    context "when the context has not been set" do
+
+      before do
+        @context = stub
+      end
+
+      it "creates a new context" do
+        Mongoid::Contexts::Mongo.expects(:new).with(
+          @criteria.selector, @criteria.options, @criteria.klass
+        ).returns(@context)
+        @criteria.context.should == @context
+      end
+
+    end
+
+    context "when the class is embedded" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(Address)
+      end
+
+      it "returns an enumerable context" do
+        @criteria.context.should be_a_kind_of(Mongoid::Contexts::Enumerable)
+      end
+
+    end
+
+    context "when the class is not embedded" do
+
+      it "returns a mongo context" do
+        @criteria.context.should be_a_kind_of(Mongoid::Contexts::Mongo)
+      end
+
+    end
+
+  end
+
   describe "#entries" do
 
     context "filtering" do
@@ -245,18 +297,6 @@ describe Mongoid::Criteria do
   end
 
   describe "#count" do
-
-    context "when criteria has not been executed" do
-
-      before do
-        @criteria.instance_variable_set(:@count, 34)
-      end
-
-      it "returns a count from the cursor" do
-        @criteria.count.should == 34
-      end
-
-    end
 
     context "when criteria has been executed" do
 
@@ -613,7 +653,7 @@ describe Mongoid::Criteria do
   describe "#max" do
 
     before do
-      @reduce = Mongoid::Criteria::MAX_REDUCE.gsub("[field]", "age")
+      @reduce = Mongoid::Contexts::Mongo::MAX_REDUCE.gsub("[field]", "age")
       @collection = mock
       Person.expects(:collection).returns(@collection)
     end
@@ -749,7 +789,7 @@ describe Mongoid::Criteria do
   describe "#min" do
 
     before do
-      @reduce = Mongoid::Criteria::MIN_REDUCE.gsub("[field]", "age")
+      @reduce = Mongoid::Contexts::Mongo::MIN_REDUCE.gsub("[field]", "age")
       @collection = mock
       Person.expects(:collection).returns(@collection)
     end
@@ -1038,7 +1078,7 @@ describe Mongoid::Criteria do
     context "when klass not provided" do
 
       before do
-        @reduce = Mongoid::Criteria::SUM_REDUCE.gsub("[field]", "age")
+        @reduce = Mongoid::Contexts::Mongo::SUM_REDUCE.gsub("[field]", "age")
         @collection = mock
         Person.expects(:collection).returns(@collection)
       end

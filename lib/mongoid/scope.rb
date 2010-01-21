@@ -2,7 +2,23 @@
 module Mongoid #:nodoc:
   class Scope #:nodoc:
 
-    delegate :scopes, :to => "@parent"
+    delegate :scopes, :to => :parent
+
+    attr_reader :parent, :conditions
+
+    # If the other is a scope then compare the parent and conditions, otherwise
+    # if its enumerable collect and compare.
+    def ==(other)
+      case other
+      when Scope
+        @parent == other.parent && @conditions == other.conditions
+      when Enumerable
+        @collection ||= entries
+        return (@collection == other)
+      else
+        return false
+      end
+    end
 
     # Create the new +Scope+. If a block is passed in, this Scope will extend
     # the block.
