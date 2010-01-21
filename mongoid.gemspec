@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "1.0.6"
+  s.version = "1.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-01-14}
+  s.date = %q{2010-01-21}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -45,6 +45,10 @@ Gem::Specification.new do |s|
      "lib/mongoid/complex_criterion.rb",
      "lib/mongoid/components.rb",
      "lib/mongoid/config.rb",
+     "lib/mongoid/contexts.rb",
+     "lib/mongoid/contexts/enumerable.rb",
+     "lib/mongoid/contexts/mongo.rb",
+     "lib/mongoid/contexts/paging.rb",
      "lib/mongoid/criteria.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/errors.rb",
@@ -75,6 +79,18 @@ Gem::Specification.new do |s|
      "lib/mongoid/finders.rb",
      "lib/mongoid/identity.rb",
      "lib/mongoid/indexes.rb",
+     "lib/mongoid/matchers.rb",
+     "lib/mongoid/matchers/all.rb",
+     "lib/mongoid/matchers/default.rb",
+     "lib/mongoid/matchers/exists.rb",
+     "lib/mongoid/matchers/gt.rb",
+     "lib/mongoid/matchers/gte.rb",
+     "lib/mongoid/matchers/in.rb",
+     "lib/mongoid/matchers/lt.rb",
+     "lib/mongoid/matchers/lte.rb",
+     "lib/mongoid/matchers/ne.rb",
+     "lib/mongoid/matchers/nin.rb",
+     "lib/mongoid/matchers/size.rb",
      "lib/mongoid/memoization.rb",
      "lib/mongoid/named_scope.rb",
      "lib/mongoid/scope.rb",
@@ -83,6 +99,7 @@ Gem::Specification.new do |s|
      "mongoid.gemspec",
      "perf/benchmark.rb",
      "spec/integration/mongoid/associations_spec.rb",
+     "spec/integration/mongoid/attributes_spec.rb",
      "spec/integration/mongoid/commands_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
@@ -110,6 +127,8 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands/save_spec.rb",
      "spec/unit/mongoid/commands_spec.rb",
      "spec/unit/mongoid/config_spec.rb",
+     "spec/unit/mongoid/contexts/enumerable_spec.rb",
+     "spec/unit/mongoid/contexts/mongo_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
@@ -139,6 +158,18 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/finders_spec.rb",
      "spec/unit/mongoid/identity_spec.rb",
      "spec/unit/mongoid/indexes_spec.rb",
+     "spec/unit/mongoid/matchers/all_spec.rb",
+     "spec/unit/mongoid/matchers/default_spec.rb",
+     "spec/unit/mongoid/matchers/exists_spec.rb",
+     "spec/unit/mongoid/matchers/gt_spec.rb",
+     "spec/unit/mongoid/matchers/gte_spec.rb",
+     "spec/unit/mongoid/matchers/in_spec.rb",
+     "spec/unit/mongoid/matchers/lt_spec.rb",
+     "spec/unit/mongoid/matchers/lte_spec.rb",
+     "spec/unit/mongoid/matchers/ne_spec.rb",
+     "spec/unit/mongoid/matchers/nin_spec.rb",
+     "spec/unit/mongoid/matchers/size_spec.rb",
+     "spec/unit/mongoid/matchers_spec.rb",
      "spec/unit/mongoid/memoization_spec.rb",
      "spec/unit/mongoid/named_scope_spec.rb",
      "spec/unit/mongoid/scope_spec.rb",
@@ -153,6 +184,7 @@ Gem::Specification.new do |s|
   s.summary = %q{ODM framework for MongoDB}
   s.test_files = [
     "spec/integration/mongoid/associations_spec.rb",
+     "spec/integration/mongoid/attributes_spec.rb",
      "spec/integration/mongoid/commands_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
@@ -179,6 +211,8 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/commands/save_spec.rb",
      "spec/unit/mongoid/commands_spec.rb",
      "spec/unit/mongoid/config_spec.rb",
+     "spec/unit/mongoid/contexts/enumerable_spec.rb",
+     "spec/unit/mongoid/contexts/mongo_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
@@ -208,6 +242,18 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/finders_spec.rb",
      "spec/unit/mongoid/identity_spec.rb",
      "spec/unit/mongoid/indexes_spec.rb",
+     "spec/unit/mongoid/matchers/all_spec.rb",
+     "spec/unit/mongoid/matchers/default_spec.rb",
+     "spec/unit/mongoid/matchers/exists_spec.rb",
+     "spec/unit/mongoid/matchers/gt_spec.rb",
+     "spec/unit/mongoid/matchers/gte_spec.rb",
+     "spec/unit/mongoid/matchers/in_spec.rb",
+     "spec/unit/mongoid/matchers/lt_spec.rb",
+     "spec/unit/mongoid/matchers/lte_spec.rb",
+     "spec/unit/mongoid/matchers/ne_spec.rb",
+     "spec/unit/mongoid/matchers/nin_spec.rb",
+     "spec/unit/mongoid/matchers/size_spec.rb",
+     "spec/unit/mongoid/matchers_spec.rb",
      "spec/unit/mongoid/memoization_spec.rb",
      "spec/unit/mongoid/named_scope_spec.rb",
      "spec/unit/mongoid/scope_spec.rb",
@@ -221,14 +267,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<activesupport>, [">= 2.2.2"])
+      s.add_runtime_dependency(%q<activesupport>, ["<= 2.3.5"])
       s.add_runtime_dependency(%q<mongo>, [">= 0.18.2"])
       s.add_runtime_dependency(%q<durran-validatable>, [">= 2.0.1"])
       s.add_runtime_dependency(%q<leshill-will_paginate>, [">= 2.3.11"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
-      s.add_dependency(%q<activesupport>, [">= 2.2.2"])
+      s.add_dependency(%q<activesupport>, ["<= 2.3.5"])
       s.add_dependency(%q<mongo>, [">= 0.18.2"])
       s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
       s.add_dependency(%q<leshill-will_paginate>, [">= 2.3.11"])
@@ -236,7 +282,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<mocha>, [">= 0.9.8"])
     end
   else
-    s.add_dependency(%q<activesupport>, [">= 2.2.2"])
+    s.add_dependency(%q<activesupport>, ["<= 2.3.5"])
     s.add_dependency(%q<mongo>, [">= 0.18.2"])
     s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
     s.add_dependency(%q<leshill-will_paginate>, [">= 2.3.11"])
