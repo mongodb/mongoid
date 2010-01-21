@@ -133,7 +133,7 @@ module Mongoid #:nodoc:
       # Returns: the +Document+.
       def create!(attributes = {})
         document = Create.execute(new(attributes), true, true)
-        raise Errors::Validations.new(self.errors) unless document.errors.empty?
+        raise Errors::Validations.new(document.errors) unless document.errors.empty?
         return document
       end
 

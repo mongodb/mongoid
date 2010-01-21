@@ -179,7 +179,7 @@ describe Mongoid::Commands do
       it "raises an error" do
         person = stub(:errors => stub(:empty? => false))
         Mongoid::Commands::Create.expects(:execute).returns(person)
-        lambda { Person.create! }.should raise_error
+        lambda { Person.create! }.should raise_error(Mongoid::Errors::Validations)
       end
 
     end
