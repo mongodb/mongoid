@@ -33,7 +33,7 @@ describe Mongoid::Extensions::Integer::Conversions do
       context "when the string is empty" do
 
         it "returns an empty string" do
-          Integer.set("").should be_blank
+          Integer.set("").should be_nil
         end
 
       end

@@ -12,9 +12,9 @@ describe Mongoid::Extensions::Float::Conversions do
 
     end
 
-    context "when the string is not a number" do
+    context "when the value is not a number" do
 
-      context "when the string is non numerical" do
+      context "when the value is non numerical" do
 
         it "returns the string" do
           Float.set("foo").should == "foo"
@@ -33,7 +33,7 @@ describe Mongoid::Extensions::Float::Conversions do
       context "when the string is empty" do
 
         it "returns 0.0" do
-          Float.set("").should == 0.0
+          Float.set("").should be_nil
         end
 
       end
@@ -41,7 +41,7 @@ describe Mongoid::Extensions::Float::Conversions do
       context "when the string is nil" do
 
         it "returns 0.0" do
-          Float.set(nil).should == 0.0
+          Float.set(nil).should be_nil
         end
 
       end
