@@ -5,7 +5,7 @@ describe Mongoid::Finders do
   describe "#find" do
 
     before do
-      @document = Person.create(:title => "Mrs.")
+      @document = Person.create(:title => "Mrs.", :ssn => "another")
     end
 
     after do

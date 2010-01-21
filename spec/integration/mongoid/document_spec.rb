@@ -3,31 +3,7 @@ require "spec_helper"
 describe Mongoid::Document do
 
   before do
-    Mongoid.database.collection(:people).drop
-  end
-
-  context "yo" do
-    class Campaign
-      include Mongoid::Document
-      field :name
-      index :name, :unique => true
-
-      validates_presence_of :name
-      validates_uniqueness_of :name
-    end
-
-
-    describe Campaign do
-      context "validation" do
-        it "should validate uniqueness of name" do
-          campaign_a = Campaign.new(:name => 'Testing')
-          campaign_b = Campaign.new(:name => 'Testing')
-          campaign_a.save
-          campaign_b.valid?.should be_false
-        end
-      end
-    end
-
+    Person.delete_all
   end
 
   context "when document contains a hash field" do
@@ -74,7 +50,7 @@ describe Mongoid::Document do
 
     before do
       5.times do |n|
-        Person.create(:title => "Sir")
+        Person.create(:title => "Sir", :ssn => "#{n}")
       end
     end
 
@@ -111,10 +87,10 @@ describe Mongoid::Document do
   context "chaining criteria scopes" do
 
     before do
-      @one = Person.create(:title => "Mr", :age => 55, :terms => true)
-      @two = Person.create(:title => "Sir", :age => 55, :terms => true)
-      @three = Person.create(:title => "Sir", :age => 35, :terms => true)
-      @four = Person.create(:title => "Sir", :age => 55, :terms => false)
+      @one = Person.create(:title => "Mr", :age => 55, :terms => true, :ssn => "q")
+      @two = Person.create(:title => "Sir", :age => 55, :terms => true, :ssn => "w")
+      @three = Person.create(:title => "Sir", :age => 35, :terms => true, :ssn => "e")
+      @four = Person.create(:title => "Sir", :age => 55, :terms => false, :ssn => "r")
     end
 
     it "finds by the merged criteria" do
@@ -312,7 +288,7 @@ describe Mongoid::Document do
 
     before do
       10.times do |num|
-        Person.create(:title => "Test-#{num}")
+        Person.create(:title => "Test-#{num}", :ssn => "55#{num}")
       end
     end
 

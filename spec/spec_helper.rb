@@ -317,3 +317,19 @@ module Medical
     field :name
   end
 end
+
+###################################
+
+class Author
+  include Mongoid::Document
+  field :name
+  has_many :books
+end
+
+class Book
+  include Mongoid::Document
+  field :title
+  belongs_to :author, :inverse_of => :books
+end
+
+
