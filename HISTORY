@@ -1,3 +1,42 @@
+=== 1.0.7
+- Nil attributes no longer persist nil values to the
+  database - the field will just not exist.
+
+- create! and save! will now properly raise an error
+  when a database operation fails. This is handled
+  by using :safe => true as an option to
+  collection.save.
+
+- Setting blank numbers casts to nil.
+
+- Criteria and named scopes can now be used on has
+  many relationships. They can be chained with each
+  other off the association chain.
+
+- Mongoid can now determine if a document matches a
+  mongodb selector without hitting the database via
+  Document#matches?(selector).
+
+- Overall performance improvements in all areas.
+
+- Ruby 1.9 compatibility fixes.
+
+- Has many related now supports finding by id or
+  by an optional :all, :first, :last with a
+  conditions hash.
+
+=== 1.0.6
+
+- Preventing the setting of empty values in attributes.
+
+- Better inspect formatting
+
+=== 1.0.5
+
+- Has one and has many associations now set the parent
+  object first before writing the attributes on
+  #build and #create.
+
 === 1.0.4
 - Modified criteria to use the querying class
   when instantiating documents if there are no
