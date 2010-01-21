@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
       # <tt>DeleteAll.execute(Person, :conditions => { :field => "value" })</tt>
       def self.execute(klass, params = {})
         collection = klass.collection
-        params.any? ? collection.remove(params[:conditions].merge(:_type => klass.name)) : collection.drop
+        collection.remove((params[:conditions] || {}).merge(:_type => klass.name))
       end
     end
   end

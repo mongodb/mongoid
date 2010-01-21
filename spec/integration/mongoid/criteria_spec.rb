@@ -6,7 +6,7 @@ describe Mongoid::Criteria do
 
     before do
       10.times do |n|
-        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"])
+        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
       end
     end
 
@@ -24,7 +24,7 @@ describe Mongoid::Criteria do
 
     before do
       10.times do |n|
-        Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"])
+        Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
       end
     end
 
@@ -42,7 +42,7 @@ describe Mongoid::Criteria do
 
     before do
       10.times do |n|
-        Person.create(:title => "Sir", :age => 5, :aliases => ["D", "Durran"])
+        Person.create(:title => "Sir", :age => 5, :aliases => ["D", "Durran"], :ssn => "#{n}")
       end
     end
 

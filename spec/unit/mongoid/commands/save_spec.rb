@@ -39,7 +39,7 @@ describe Mongoid::Commands::Save do
       context "when the document has a parent" do
 
         it "executes a save on the parent" do
-          @parent_collection.expects(:save).with(@parent.attributes)
+          @parent_collection.expects(:save).with(@parent.attributes, :safe => false)
           Mongoid::Commands::Save.execute(@document)
         end
 
@@ -52,7 +52,7 @@ describe Mongoid::Commands::Save do
         end
 
         it "calls save on the document collection" do
-          @doc_collection.expects(:save).with(@document.attributes)
+          @doc_collection.expects(:save).with(@document.attributes, :safe => false)
           Mongoid::Commands::Save.execute(@document)
         end
 

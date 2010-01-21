@@ -38,6 +38,14 @@ class Person
   field :map, :type => Hash
   field :score, :type => Integer
   field :blood_alcohol_content, :type => Float
+  field :ssn
+
+  index :age
+  index :addresses
+  index :dob
+  index :name
+  index :title
+  index :ssn, :unique => true
 
   attr_reader :rescored
 
@@ -49,12 +57,6 @@ class Person
 
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name
-
-  index :age
-  index :addresses
-  index :dob
-  index :name
-  index :title
 
   has_one_related :game
   has_many_related :posts

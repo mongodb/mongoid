@@ -33,7 +33,7 @@ describe Mongoid::Commands::DeleteAll do
 
       it "drops the collection" do
         @klass.expects(:collection).returns(@collection)
-        @collection.expects(:drop)
+        @collection.expects(:remove).with(:_type => "Person")
         Mongoid::Commands::DeleteAll.execute(@klass)
       end
 
@@ -47,7 +47,7 @@ describe Mongoid::Commands::DeleteAll do
 
       it "drops the collection" do
         @klass.expects(:collection).returns(@collection)
-        @collection.expects(:drop)
+        @collection.expects(:remove).with(:_type => "Person")
         Mongoid::Commands::DeleteAll.execute(@klass, {})
       end
 
