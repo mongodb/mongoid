@@ -305,6 +305,7 @@ describe Mongoid::Document do
         person = Person.new
         person.attributes.empty?.should be_false
         person.age.should == 100
+        person.blood_alcohol_content.should == 0.0
       end
 
     end

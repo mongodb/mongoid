@@ -37,7 +37,7 @@ class Person
   field :aliases, :type => Array
   field :map, :type => Hash
   field :score, :type => Integer
-  field :blood_alcohol_content, :type => Float
+  field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :ssn
 
   index :age
