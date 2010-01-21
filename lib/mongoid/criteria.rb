@@ -38,13 +38,13 @@ module Mongoid #:nodoc:
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.
     def +(other)
-      collect + (other.is_a?(Criteria) ? other.collect : other)
+      entries + (other.is_a?(Criteria) ? other.entries : other)
     end
 
     # Returns the difference between the criteria and another enumerable. If
     # the other is a +Criteria+ then it needs to get the collection from it.
     def -(other)
-      collect - (other.is_a?(Criteria) ? other.collect : other)
+      entries - (other.is_a?(Criteria) ? other.entries : other)
     end
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
@@ -386,8 +386,7 @@ module Mongoid #:nodoc:
       @options[:skip] = value; self
     end
 
-    alias :to_a :collect
-    alias :to_ary :collect
+    alias :to_ary :to_a
 
     # Translate the supplied arguments into a +Criteria+ object.
     #

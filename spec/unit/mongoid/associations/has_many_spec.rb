@@ -339,7 +339,7 @@ describe Mongoid::Associations::HasMany do
 
       it "sets the documents on the criteria" do
         criteria = @association.california
-        criteria.documents.should == @association.collect
+        criteria.documents.should == @association.entries
       end
 
       it "returns the scoped documents" do

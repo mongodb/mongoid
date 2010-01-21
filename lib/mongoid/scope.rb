@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
       when Scope
         @parent == other.parent && @conditions == other.conditions
       when Enumerable
-        @collection ||= collect
+        @collection ||= entries
         return (@collection == other)
       else
         return false
