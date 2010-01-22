@@ -151,10 +151,18 @@ module Mongoid #:nodoc:
       def initialize(attrs = {})
         @attributes = {}
         process(attrs)
-        @attributes = defaults.merge(@attributes)
+        @attributes = attributes_with_defaults(@attributes)
         @new_record = true if id.nil?
         document = yield self if block_given?
         identify
+      end
+
+      # apply default values to attributes - calling procs as required
+      def attributes_with_defaults(attributes = {})
+        default_values = defaults.merge(attributes)
+        default_values.each do |key, val|
+          default_values[key] = val.call if val.respond_to?(:call)
+        end
       end
 
       # Returns the class name plus its attributes.

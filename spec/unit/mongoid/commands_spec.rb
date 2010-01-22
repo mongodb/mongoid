@@ -27,7 +27,7 @@ describe Mongoid::Commands do
   describe "#save" do
 
     it "delegates to the Save command" do
-      Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+      Mongoid::Commands::Save.expects(:execute).with(@person, true, false).returns(true)
       @person.save
     end
 
@@ -38,13 +38,13 @@ describe Mongoid::Commands do
       end
 
       it "delegates to the save command" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, false).returns(true)
         @person.save
       end
 
       it "runs the before and after create callbacks" do
         @person.expects(:run_callbacks).with(:create).yields
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, false).returns(true)
         @person.save
       end
 
@@ -57,7 +57,7 @@ describe Mongoid::Commands do
       end
 
       it "passes the validate param to the command" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, false).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, false, false).returns(true)
         @person.save(false)
       end
 
@@ -70,7 +70,7 @@ describe Mongoid::Commands do
     context "when validation passes" do
 
       it "it returns the person" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, true).returns(true)
         @person.save!
       end
 
@@ -79,7 +79,7 @@ describe Mongoid::Commands do
     context "when validation fails" do
 
       it "it raises an error" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, true).returns(false)
         lambda { @person.save! }.should raise_error
       end
 
@@ -92,14 +92,14 @@ describe Mongoid::Commands do
       end
 
       it "delegates to the save command" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, true).returns(true)
         @person.save!
       end
 
       context "when validation fails" do
 
         it "it raises an error " do
-          Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+          Mongoid::Commands::Save.expects(:execute).with(@person, true, true).returns(false)
           lambda { @person.save! }.should raise_error
         end
 
@@ -107,7 +107,7 @@ describe Mongoid::Commands do
 
       it "runs the before and after create callbacks" do
         @person.expects(:run_callbacks).with(:create).yields.returns(true)
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, true).returns(true)
         @person.save!
       end
 
@@ -118,7 +118,7 @@ describe Mongoid::Commands do
   describe "#update_attributes" do
 
     it "delegates to the Save command" do
-      Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+      Mongoid::Commands::Save.expects(:execute).with(@person, true, false).returns(true)
       @person.update_attributes({})
     end
 
@@ -129,7 +129,7 @@ describe Mongoid::Commands do
     context "when validation passes" do
 
       it "it returns the person" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, false).returns(true)
         @person.update_attributes({}).should be_true
       end
 
@@ -138,7 +138,7 @@ describe Mongoid::Commands do
     context "when validation fails" do
 
       it "it raises an error" do
-        Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+        Mongoid::Commands::Save.expects(:execute).with(@person, true, true).returns(false)
         lambda { @person.update_attributes!({}) }.should raise_error
       end
 
@@ -177,7 +177,7 @@ describe Mongoid::Commands do
       it "raises an error" do
         person = stub(:errors => stub(:empty? => false))
         Mongoid::Commands::Create.expects(:execute).returns(person)
-        lambda { Person.create! }.should raise_error
+        lambda { Person.create! }.should raise_error(Mongoid::Errors::Validations)
       end
 
     end

@@ -10,12 +10,16 @@ module Mongoid #:nodoc:
       # doc: A +Document+ that is going to be persisted.
       #
       # Returns: +Document+ if validation passes, +false+ if not.
-      def self.execute(doc, validate = true)
+      def self.execute(doc, validate = true, safe = false)
         return false if validate && !doc.valid?
         doc.run_callbacks :save do
           parent = doc._parent
           doc.new_record = false
-          saved = parent ? Save.execute(parent, validate) : doc.collection.save(doc.attributes)
+          saved = if parent
+            Save.execute(parent, validate, safe)
+          else
+            doc.collection.save(doc.attributes, :safe => safe)
+          end
           return false unless saved
         end
         return true

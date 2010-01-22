@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
           if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
             @attributes[key.to_s] = value
           else
-            send("#{key}=", value)
+            send("#{key}=", value) if value
           end
         end
       end

@@ -10,8 +10,8 @@ module Mongoid #:nodoc:
       # doc: A new +Document+ that is going to be persisted.
       #
       # Returns: +Document+.
-      def self.execute(doc, validate = true)
-        doc.run_callbacks(:create) { Save.execute(doc, validate) }
+      def self.execute(doc, validate = true, safe = false)
+        doc.run_callbacks(:create) { Save.execute(doc, validate, safe) }
         return doc
       end
     end

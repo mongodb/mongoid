@@ -3,9 +3,9 @@ require "spec_helper"
 describe Mongoid::Associations do
 
   before do
-    Mongoid.database.collection(:people).drop
-    Mongoid.database.collection(:games).drop
-    Mongoid.database.collection(:posts).drop
+    Person.delete_all
+    Game.delete_all
+    Post.delete_all
   end
 
   context "criteria on has many embedded associations" do
@@ -146,7 +146,7 @@ describe Mongoid::Associations do
       context "when a has-one to has-many" do
 
         before do
-          @person = Person.new(:title => "Sir")
+          @person = Person.new(:title => "Sir", :ssn => "1")
           @name = Name.new(:first_name => "Syd")
           @person.name = @name
           @person.save

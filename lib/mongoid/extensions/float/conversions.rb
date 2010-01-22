@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Float #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          return 0.0 if value.blank?
+          return nil if value.blank?
           value =~ /\d/ ? value.to_f : value
         end
         def get(value)

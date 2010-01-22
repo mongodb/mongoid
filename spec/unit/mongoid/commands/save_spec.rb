@@ -40,7 +40,7 @@ describe Mongoid::Commands::Save do
         it "executes a save on the parent" do
           @document.expects(:run_callbacks).yields
           @parent.expects(:run_callbacks).yields
-          @parent_collection.expects(:save).with(@parent.attributes)
+          @parent_collection.expects(:save).with(@parent.attributes, :safe => false)
           Mongoid::Commands::Save.execute(@document)
         end
 
@@ -54,7 +54,7 @@ describe Mongoid::Commands::Save do
 
         it "calls save on the document collection" do
           @document.expects(:run_callbacks).yields
-          @doc_collection.expects(:save).with(@document.attributes)
+          @doc_collection.expects(:save).with(@document.attributes, :safe => false)
           Mongoid::Commands::Save.execute(@document)
         end
 

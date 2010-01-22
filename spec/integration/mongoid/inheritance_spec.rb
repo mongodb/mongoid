@@ -2,6 +2,12 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
+  before do
+    Browser.delete_all
+    Firefox.delete_all
+    Canvas.delete_all
+  end
+
   context "when document is a subclass of a root class" do
 
     before do
