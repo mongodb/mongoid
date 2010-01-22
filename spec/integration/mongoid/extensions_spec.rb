@@ -6,7 +6,7 @@ describe Mongoid::Extensions do
 
     context "when value is an empty string" do
 
-      let(:person) { Person.new }
+      let(:person) { Person.new(:ssn => "555555555555555") }
 
       before do
         Person.validates_numericality_of :blood_alcohol_content, :allow_blank => true
