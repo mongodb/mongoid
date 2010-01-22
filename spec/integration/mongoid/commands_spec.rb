@@ -43,34 +43,108 @@ describe Mongoid::Commands do
 
   describe "#delete" do
 
-    before do
-      @person.save
+    context "deleting a root document" do
+
+      before do
+        @person.save
+      end
+
+      it "deletes the document" do
+        @person.delete
+        lambda { Person.find(@person.id) }.should raise_error
+      end
+
+      it "returns true" do
+        @person.delete.should be_true
+      end
+
     end
 
-    it "deletes the document" do
-      @person.delete
-      lambda { Person.find(@person.id) }.should raise_error
-    end
+    context "deleting an embedded document" do
 
-    it "returns true" do
-      @person.delete.should be_true
+      before do
+        @address = Address.new(:street => "Bond Street")
+        @person.addresses << @address
+      end
+
+      context "when the document is not yet saved" do
+
+        it "removes the document from the parent" do
+          @address.delete
+          @person.addresses.should be_empty
+          @person.attributes[:addresses].should be_empty
+        end
+
+      end
+
+      context "when the document has been saved" do
+
+        before do
+          @address.save
+        end
+
+        it "removes the object from the parent and database" do
+          @address.delete
+          from_db = Person.find(@person.id)
+          from_db.addresses.should be_empty
+        end
+
+      end
+
     end
 
   end
 
   describe "#destroy" do
 
-    before do
-      @person.save
+    context "destroying a root document" do
+
+      before do
+        @person.save
+      end
+
+      it "destroys the document" do
+        @person.destroy
+        lambda { Person.find(@person.id) }.should raise_error
+      end
+
+      it "returns true" do
+        @person.destroy.should be_true
+      end
+
     end
 
-    it "deletes the document" do
-      @person.destroy
-      lambda { Person.find(@person.id) }.should raise_error
-    end
+    context "deleting an embedded document" do
 
-    it "returns true" do
-      @person.destroy.should be_true
+      before do
+        @address = Address.new(:street => "Bond Street")
+        @person.addresses << @address
+      end
+
+      context "when the document is not yet saved" do
+
+        it "removes the document from the parent" do
+          @address.destroy
+          @person.addresses.should be_empty
+          @person.attributes[:addresses].should be_empty
+        end
+
+      end
+
+      context "when the document has been saved" do
+
+        before do
+          @address.save
+        end
+
+        it "removes the object from the parent and database" do
+          @address.destroy
+          from_db = Person.find(@person.id)
+          from_db.addresses.should be_empty
+        end
+
+      end
+
     end
 
   end

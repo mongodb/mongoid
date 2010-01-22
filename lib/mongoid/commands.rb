@@ -53,9 +53,14 @@ module Mongoid #:nodoc:
       # <tt>document.save(false) # save without validations</tt>
       #
       # Returns: true if validation passes, false if not.
-      def save(validate = true, safe = false)
-        save = lambda { Save.execute(self, validate, safe) }
-        new_record? ? run_callbacks(:create, &save) : save.call
+      def save(validate = true)
+        save = lambda { Save.execute(self, validate) }
+        begin
+          return new_record? ? run_callbacks(:create, &save) : save.call
+        rescue Mongo::OperationFailure => e
+          errors.add(:mongoid, e.message)
+          return false
+        end
       end
 
       # Save the +Document+, dangerously. Before and after save callbacks will
@@ -67,7 +72,7 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes
       def save!
-        save(true, true) || (raise Errors::Validations.new(self.errors))
+        save(true) || (raise Errors::Validations.new(self.errors))
       end
 
       # Update the document attributes and persist the document to the
@@ -109,7 +114,13 @@ module Mongoid #:nodoc:
       #
       # Returns: the +Document+.
       def create(attributes = {})
-        Create.execute(new(attributes))
+        document = new(attributes)
+        begin
+          Create.execute(document)
+        rescue Mongo::OperationFailure => e
+          document.errors.add(:mongoid, e.message)
+        end
+        document
       end
 
       # Create a new +Document+. This will instantiate a new document and save
@@ -122,9 +133,9 @@ module Mongoid #:nodoc:
       #
       # Returns: the +Document+.
       def create!(attributes = {})
-        document = Create.execute(new(attributes), true, true)
+        document = Create.execute(new(attributes), true)
         raise Errors::Validations.new(document.errors) unless document.errors.empty?
-        return document
+        document
       end
 
       # Delete all documents given the supplied conditions. If no conditions

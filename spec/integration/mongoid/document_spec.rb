@@ -154,7 +154,7 @@ describe Mongoid::Document do
     context "when the document is not found" do
 
       it "creates a new document" do
-        person = Person.find_or_create_by(:title => "Senorita")
+        person = Person.find_or_create_by(:title => "Senorita", :ssn => "1234567")
         person.title.should == "Senorita"
         person.should_not be_a_new_record
       end

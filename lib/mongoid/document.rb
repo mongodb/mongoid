@@ -211,6 +211,11 @@ module Mongoid #:nodoc:
         add_observer(object)
       end
 
+      # Return the attributes hash.
+      def raw_attributes
+        @attributes
+      end
+
       # Reloads the +Document+ attributes from the database.
       def reload
         @attributes = collection.find_one(:_id => id)

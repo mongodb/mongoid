@@ -73,9 +73,20 @@ require "mongoid/document"
 module Mongoid #:nodoc
 
   class << self
-    #direct all calls to the configuration
-    def method_missing(name, *args)
-      Config.instance.send(name, *args)
+
+    delegate \
+      :allow_dynamic_fields,
+      :allow_dynamic_fields=,
+      :database,
+      :database=,
+      :persist_in_safe_mode,
+      :persist_in_safe_mode=,
+      :raise_not_found_error,
+      :raise_not_found_error=, :to => :config
+
+    protected
+    def config
+      Config.instance
     end
   end
 

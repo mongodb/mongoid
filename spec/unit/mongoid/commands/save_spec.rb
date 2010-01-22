@@ -11,12 +11,12 @@ describe Mongoid::Commands::Save do
                      :valid? => true,
                      :run_callbacks => true,
                      :_parent => nil,
-                     :attributes => {},
+                     :raw_attributes => {},
                      :new_record= => false)
       @document = stub(:collection => @doc_collection,
                        :run_callbacks => true,
                        :_parent => @parent,
-                       :attributes => {},
+                       :raw_attributes => {},
                        :new_record= => false)
     end
 
@@ -40,7 +40,7 @@ describe Mongoid::Commands::Save do
         it "executes a save on the parent" do
           @document.expects(:run_callbacks).yields
           @parent.expects(:run_callbacks).yields
-          @parent_collection.expects(:save).with(@parent.attributes, :safe => false)
+          @parent_collection.expects(:save).with(@parent.raw_attributes, :safe => true)
           Mongoid::Commands::Save.execute(@document)
         end
 
@@ -54,7 +54,7 @@ describe Mongoid::Commands::Save do
 
         it "calls save on the document collection" do
           @document.expects(:run_callbacks).yields
-          @doc_collection.expects(:save).with(@document.attributes, :safe => false)
+          @doc_collection.expects(:save).with(@document.raw_attributes, :safe => true)
           Mongoid::Commands::Save.execute(@document)
         end
 
