@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
       #
       # doc: A +Document+ that is going to be persisted.
       #
-      # Returns: +Document+ if validation passes, +false+ if not.
+      # Returns: +true+ if validation passes, +false+ if not.
       def self.execute(doc, validate = true)
         return false if validate && !doc.valid?
         doc.run_callbacks :save do
