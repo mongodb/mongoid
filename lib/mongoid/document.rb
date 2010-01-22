@@ -171,9 +171,10 @@ module Mongoid #:nodoc:
 
       # apply default values to attributes - calling procs as required
       def attributes_with_defaults(attributes = {})
-        default_values = {}
-        defaults.each{|key, val| default_values[key] = val.respond_to?(:call) ? val.call() : val}
-        default_values.merge(attributes)
+        default_values = defaults.merge(attributes)
+        default_values.each do |key, val|
+          default_values[key] = val.call if val.respond_to?(:call)
+        end
       end
 
       # Returns the class name plus its attributes.
