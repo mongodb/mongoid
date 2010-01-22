@@ -20,6 +20,34 @@ describe Mongoid::Config do
 
   end
 
+  describe "#persist_in_safe_mode=" do
+
+    context "when setting to true" do
+
+      before do
+        config.persist_in_safe_mode = true
+      end
+
+      it "sets the value" do
+        config.persist_in_safe_mode.should == true
+      end
+
+    end
+
+    context "when setting to false" do
+
+      before do
+        config.persist_in_safe_mode = false
+      end
+
+      it "sets the value" do
+        config.persist_in_safe_mode.should == false
+      end
+
+    end
+
+  end
+
   describe "#raise_not_found_error=" do
 
     context "when setting to true" do

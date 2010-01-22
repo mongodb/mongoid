@@ -3,11 +3,16 @@ module Mongoid #:nodoc
   class Config #:nodoc
     include Singleton
 
-    attr_accessor :raise_not_found_error, :allow_dynamic_fields
+    attr_accessor \
+      :allow_dynamic_fields,
+      :persist_in_safe_mode,
+      :raise_not_found_error
 
+    # Defaults the configuration options to true.
     def initialize
-      @raise_not_found_error = true
       @allow_dynamic_fields = true
+      @persist_in_safe_mode = true
+      @raise_not_found_error = true
     end
 
     # Sets the Mongo::DB to be used.
