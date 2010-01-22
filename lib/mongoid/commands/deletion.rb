@@ -6,7 +6,12 @@ module Mongoid #:nodoc
       # otherwise delete it from it's collection.
       def delete(doc)
         parent = doc._parent
-        parent ? parent.remove(doc) : doc.collection.remove(:_id => doc.id)
+        if parent
+          parent.remove(doc)
+          parent.save
+        else
+          doc.collection.remove(:_id => doc.id)
+        end
       end
     end
   end
