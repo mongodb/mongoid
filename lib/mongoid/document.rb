@@ -58,10 +58,11 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>Person.instantiate(:title => "Sir", :age => 30)</tt>
-      def instantiate(attrs = {}, allocating = false)
-        if attrs["_id"] || allocating
+      def instantiate(attrs = nil, allocating = false)
+        attributes = attrs || {}
+        if attributes["_id"] || allocating
           document = allocate
-          document.instance_variable_set(:@attributes, attrs)
+          document.instance_variable_set(:@attributes, attributes)
           return document
         else
           return new(attrs)
@@ -160,7 +161,7 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>Person.new(:title => "Mr", :age => 30)</tt>
-      def initialize(attrs = {})
+      def initialize(attrs = nil)
         @attributes = {}
         process(attrs)
         @attributes = attributes_with_defaults(@attributes)
@@ -172,7 +173,7 @@ module Mongoid #:nodoc:
       # apply default values to attributes - calling procs as required
       def attributes_with_defaults(attributes = {})
         default_values = defaults.merge(attributes)
-        default_values.each do |key, val|
+        default_values.each_pair do |key, val|
           default_values[key] = val.call if val.respond_to?(:call)
         end
       end
