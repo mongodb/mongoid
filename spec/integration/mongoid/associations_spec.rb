@@ -94,12 +94,75 @@ describe Mongoid::Associations do
 
       before do
         @extra_post = Post.create(:title => "Orphan")
+        @from_db = Person.find(@person.id)
       end
 
-      it "returns only those objects scoped to the parent" do
-        from_db = Person.find(@person.id)
-        Post.all.size.should == 2
-        from_db.posts.all.size.should == 1
+      context "finding all" do
+
+        it "returns only those objects scoped to the parent" do
+          Post.all.size.should == 2
+          @from_db.posts.all.size.should == 1
+        end
+
+      end
+
+      context "finding with conditions" do
+
+        context "finding all" do
+
+          it "returns only those objects scoped to the parent" do
+            posts = @from_db.posts.find(:all, :conditions => { :title => "Testing" })
+            posts.size.should == 1
+          end
+
+        end
+
+        context "finding first" do
+
+          it "returns only those objects scoped to the parent" do
+            post = @from_db.posts.find(:first, :conditions => { :title => "Testing" })
+            post.should == @post
+          end
+
+        end
+
+        context "finding last" do
+
+          it "returns only those objects scoped to the parent" do
+            post = @from_db.posts.find(:last, :conditions => { :title => "Testing" })
+            post.should == @post
+          end
+
+        end
+
+        context "using a named scope" do
+
+          before do
+            @post.created_at = 15.days.ago
+            @post.save
+          end
+
+          it "returns only those scoped to the parent plus the named scope" do
+            posts = @from_db.posts.recent
+            posts.size.should == 1
+          end
+
+        end
+
+        context "using a criteria class method" do
+
+          before do
+            @post.created_at = 45.days.ago
+            @post.save
+          end
+
+          it "returns only those scoped to the parent plus the named scope" do
+            posts = @from_db.posts.old
+            posts.size.should == 1
+          end
+
+        end
+
       end
 
     end
