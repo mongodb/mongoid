@@ -353,8 +353,15 @@ describe Mongoid::Associations::HasMany do
 
     context "when no class method exists" do
 
-      it "delegates to the array" do
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+      end
 
+      it "delegates to the array" do
+        @association.entries.size.should == 2
       end
 
     end
