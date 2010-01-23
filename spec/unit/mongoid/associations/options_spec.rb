@@ -10,7 +10,7 @@ describe Mongoid::Associations::Options do
     end
 
     it "returns the association name" do
-      @options.name.should == :addresses
+      @options.name.should == "addresses"
     end
 
   end

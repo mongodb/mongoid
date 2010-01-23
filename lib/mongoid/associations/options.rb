@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
 
       # Returns the association name of the options.
       def name
-        @attributes[:name]
+        @attributes[:name].to_s
       end
 
       # Returns the parent foreign key association name.

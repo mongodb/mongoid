@@ -74,9 +74,9 @@ module Mongoid #:nodoc:
       # essentially a proxy to an array itself.
       def initialize(document, options)
         @parent, @association_name, @klass, @options = document, options.name, options.klass, options
-        attributes = document.attributes[@association_name]
+        attributes = document.raw_attributes[@association_name]
         @documents = attributes ? attributes.collect do |attrs|
-          type = attrs[:_type]
+          type = attrs["_type"]
           child = type ? type.constantize.instantiate(attrs) : @klass.instantiate(attrs)
           child.parentize(@parent, @association_name)
           child

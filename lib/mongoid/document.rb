@@ -237,7 +237,7 @@ module Mongoid #:nodoc:
       # memoized association and notify the parent of the change.
       def remove(child)
         name = child.association_name
-        reset(name) { @attributes.remove(name, child.attributes) }
+        reset(name) { @attributes.remove(name, child.raw_attributes) }
         notify
       end
 

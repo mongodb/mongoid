@@ -3,11 +3,11 @@ require "spec_helper"
 describe Mongoid::Associations::HasOne do
 
   before do
-    @attributes = { :mixed_drink => {
-      :name => "Jack and Coke", :_type => "MixedDrink" },
-      :writer => { :speed => 50, :_type => "HtmlWriter" }
+    @attributes = { "mixed_drink" => {
+      "name" => "Jack and Coke", "_type" => "MixedDrink" },
+      "writer" => { "speed" => 50, "_type" => "HtmlWriter" }
     }
-    @document = stub(:attributes => @attributes, :update => true)
+    @document = stub(:raw_attributes => @attributes, :update => true)
   end
 
   describe "#build_*" do
@@ -17,7 +17,7 @@ describe Mongoid::Associations::HasOne do
       before do
         @association = Mongoid::Associations::HasOne.new(
           @document,
-          @attributes[:mixed_drink],
+          @attributes["mixed_drink"],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
         )
       end
@@ -34,7 +34,7 @@ describe Mongoid::Associations::HasOne do
       before do
         @association = Mongoid::Associations::HasOne.new(
           @document,
-          @attributes[:writer],
+          @attributes["writer"],
           Mongoid::Associations::Options.new(:name => :writer)
         )
       end
@@ -84,7 +84,7 @@ describe Mongoid::Associations::HasOne do
     context "when attributes are empty" do
 
       before do
-        @document = stub(:attributes => { :name => {} })
+        @document = stub(:raw_attributes => { "name" => {} })
         @association = Mongoid::Associations::HasOne.instantiate(
           @document,
           Mongoid::Associations::Options.new(:name => :name)
@@ -100,12 +100,12 @@ describe Mongoid::Associations::HasOne do
     context "when attributes exist" do
 
       before do
-        @document = stub(:attributes => { :name => { :first_name => "Test" } })
+        @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } })
         @options = Mongoid::Associations::Options.new(:name => :name)
       end
 
       it "delegates to new" do
-        Mongoid::Associations::HasOne.expects(:new).with(@document, { :first_name => "Test" }, @options)
+        Mongoid::Associations::HasOne.expects(:new).with(@document, { "first_name" => "Test" }, @options)
         Mongoid::Associations::HasOne.instantiate(@document, @options)
       end
 
@@ -118,7 +118,7 @@ describe Mongoid::Associations::HasOne do
     before do
       @association = Mongoid::Associations::HasOne.new(
         @document,
-        @attributes[:mixed_drink],
+        @attributes["mixed_drink"],
         Mongoid::Associations::Options.new(:name => :mixed_drink)
       )
     end
@@ -149,7 +149,7 @@ describe Mongoid::Associations::HasOne do
       before do
         @association = Mongoid::Associations::HasOne.new(
           @document,
-          @attributes[:mixed_drink],
+          @attributes["mixed_drink"],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
         )
       end
@@ -221,7 +221,7 @@ describe Mongoid::Associations::HasOne do
     context "when the document is not nil" do
 
       before do
-        @document = stub(:attributes => { :name => { :first_name => "Test" } }, :update => true)
+        @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } }, :update => true)
         @options = Mongoid::Associations::Options.new(:name => :name)
         @association = Mongoid::Associations::HasOne.instantiate(@document, @options)
       end

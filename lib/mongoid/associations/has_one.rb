@@ -20,8 +20,9 @@ module Mongoid #:nodoc:
       # options: The association options.
       def initialize(document, attributes, options)
         @parent, @options, @association_name = document, options, options.name
-        klass = attributes[:_type] ? attributes[:_type].constantize : nil
-        @document = attributes.assimilate(@parent, @options, klass)
+        attrs = attributes.stringify_keys
+        klass = attrs["_type"] ? attrs["_type"].constantize : nil
+        @document = attrs.assimilate(@parent, @options, klass)
       end
 
       # Delegate all missing methods over to the +Document+.
@@ -61,7 +62,7 @@ module Mongoid #:nodoc:
         # document: The parent +Document+
         # options: The association options.
         def instantiate(document, options)
-          attributes = document.attributes[options.name]
+          attributes = document.raw_attributes[options.name]
           return nil if attributes.blank?
           new(document, attributes, options)
         end

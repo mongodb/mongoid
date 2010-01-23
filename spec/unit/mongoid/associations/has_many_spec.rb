@@ -3,16 +3,19 @@ require "spec_helper"
 describe Mongoid::Associations::HasMany do
 
   before do
-    @attributes = { :addresses => [
-      { :_id => "street-1", :street => "Street 1", :state => "CA" },
-      { :_id => "street-2", :street => "Street 2" } ] }
-    @document = stub(:attributes => @attributes, :add_observer => true, :update => true)
+    @attributes = { "addresses" => [
+      { "_id" => "street-1", "street" => "Street 1", "state" => "CA" },
+      { "_id" => "street-2", "street" => "Street 2" } ] }
+    @document = stub(:raw_attributes => @attributes, :add_observer => true, :update => true)
   end
 
   describe "#[]" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
     end
 
     context "when the index is present in the association" do
@@ -257,7 +260,7 @@ describe Mongoid::Associations::HasMany do
   describe "#initialize" do
 
     before do
-      @canvas = stub(:attributes => { :shapes => [{ :_type => "Circle", :radius => 5 }] }, :update => true)
+      @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :update => true)
       @association = Mongoid::Associations::HasMany.new(
         @canvas,
         Mongoid::Associations::Options.new(:name => :shapes)
