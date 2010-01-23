@@ -522,15 +522,34 @@ describe Mongoid::Criteria do
 
   describe "#id" do
 
-    it "adds the _id query to the selector" do
-      id = Mongo::ObjectID.new.to_s
-      @criteria.id(id)
-      @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :_id => id }
+    context "when passing a single id" do
+
+      it "adds the _id query to the selector" do
+        id = Mongo::ObjectID.new.to_s
+        @criteria.id(id)
+        @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :_id => id }
+      end
+
+      it "returns self" do
+        id = Mongo::ObjectID.new.to_s
+        @criteria.id(id.to_s).should == @criteria
+      end
+
     end
 
-    it "returns self" do
-      id = Mongo::ObjectID.new.to_s
-      @criteria.id(id.to_s).should == @criteria
+    context "when passing in an array of ids" do
+
+      before do
+        @ids = []
+        3.times { @ids << Mongo::ObjectID.new.to_s }
+      end
+
+      it "adds the _id query to the selector" do
+        @criteria.id(@ids)
+        @criteria.selector.should ==
+          { :_type => { "$in" => ["Doctor", "Person"] }, :_id => { "$in" => @ids } }
+      end
+
     end
 
   end
@@ -539,7 +558,12 @@ describe Mongoid::Criteria do
 
     it "adds the $in clause to the selector" do
       @criteria.in(:title => ["title1", "title2"], :text => ["test"])
-      @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] } }
+      @criteria.selector.should ==
+        { :_type =>
+          { "$in" =>
+            ["Doctor", "Person"]
+          }, :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
+        }
     end
 
     it "returns self" do
@@ -969,7 +993,11 @@ describe Mongoid::Criteria do
       @collection = mock
       Person.expects(:collection).returns(@collection)
       @criteria = Person.where(:_id => "1").skip(60).limit(20)
-      @collection.expects(:find).with({:_type => { "$in" => ["Doctor", "Person"] }, :_id => "1"}, :skip => 60, :limit => 20).returns([])
+      @collection.expects(:find).with(
+        { :_type =>
+          { "$in" => ["Doctor", "Person"] },
+            :_id => "1"
+        }, :skip => 60, :limit => 20).returns([])
       @results = @criteria.paginate
     end
 
