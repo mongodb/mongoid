@@ -210,8 +210,9 @@ module Mongoid #:nodoc:
     # <tt>criteria.id("4ab2bc4b8ad548971900005c")</tt>
     #
     # Returns: <tt>self</tt>
-    def id(object_id)
-      @selector[:_id] = object_id; self
+    def id(*args)
+      (args.flatten.size > 1) ? self.in(:_id => args.flatten) : (@selector[:_id] = *args)
+      self
     end
 
     # Create the new +Criteria+ object. This will initialize the selector
@@ -410,12 +411,8 @@ module Mongoid #:nodoc:
     def self.translate(*args)
       klass = args[0]
       params = args[1] || {}
-      if params.is_a?(String)
-        document = new(klass).id(params).one
-        if Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, params) unless document
-        end
-        return document
+      unless params.is_a?(Hash)
+        return id_criteria(klass, params)
       end
       return new(klass).where(params.delete(:conditions) || {}).extras(params)
     end
@@ -472,5 +469,16 @@ module Mongoid #:nodoc:
       attributes.each { |key, value| @selector[key] = { operator => value } }; self
     end
 
+    class << self
+      # Return a criteria or single document based on an id search.
+      def id_criteria(klass, params)
+        criteria = new(klass).id(params)
+        result = params.is_a?(String) ? criteria.one : criteria.entries
+        if Mongoid.raise_not_found_error
+          raise Errors::DocumentNotFound.new(klass, params) if result.blank?
+        end
+        return result
+      end
+    end
   end
 end

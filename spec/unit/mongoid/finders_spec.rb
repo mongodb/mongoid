@@ -95,6 +95,19 @@ describe Mongoid::Finders do
 
     end
 
+    context "when an array of ids is passed in" do
+
+      before do
+        @ids = []
+        3.times { @ids << Mongo::ObjectID.new.to_s }
+      end
+
+      it "delegates to the criteria" do
+
+      end
+
+    end
+
     context "when nil passed in" do
 
       it "raises an error" do

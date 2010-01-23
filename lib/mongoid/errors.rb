@@ -5,11 +5,11 @@ module Mongoid #:nodoc
     # Raised when querying the database for a document by a specific id which
     # does not exist.
     class DocumentNotFound < RuntimeError
-      def initialize(klass, identifier)
-        @klass, @identifier = klass, identifier
+      def initialize(klass, ids)
+        @klass, @identifier = klass, ids.is_a?(Array) ? ids.join(", ") : ids
       end
       def message
-        "Document not found for class #{@klass} and id #{@identifier}"
+        "Document not found for class #{@klass} and id(s) #{@identifier}"
       end
     end
 
