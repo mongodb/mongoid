@@ -55,6 +55,21 @@ describe Mongoid::Associations::HasOneRelated do
 
   end
 
+  describe "#id" do
+
+    before do
+      @parent = stub(:id => "5", :class => Person)
+      @game = Game.new
+      Game.expects(:first).returns(@game)
+      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+    end
+
+    it "delegates to the proxied document" do
+      @association.id.should == @game.id
+    end
+
+  end
+
   describe ".initialize" do
 
     before do

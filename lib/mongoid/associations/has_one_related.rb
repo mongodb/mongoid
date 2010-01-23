@@ -2,6 +2,7 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     class HasOneRelated #:nodoc:
+      include Proxy
 
       delegate :==, :nil?, :to => :document
       attr_reader :klass, :document
