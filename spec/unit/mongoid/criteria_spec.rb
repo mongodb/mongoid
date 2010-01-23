@@ -1142,16 +1142,36 @@ describe Mongoid::Criteria do
           Person.expects(:collection).returns(@collection)
         end
 
-        it "returns an ids criteria" do
-          @collection.expects(:find).with(
-            { :_type =>
-              { "$in" =>
-                ["Doctor", "Person"]
-              },
-              :_id =>
-              { "$in" => @ids }
-          }, {}).returns([{ "_id" => "4", "title" => "Sir", "_type" => "Person" }])
-          @criteria = Mongoid::Criteria.translate(Person, @ids)
+        context "when documents are found" do
+
+          it "returns an ids criteria" do
+            @collection.expects(:find).with(
+              { :_type =>
+                { "$in" =>
+                  ["Doctor", "Person"]
+                },
+                :_id =>
+                { "$in" => @ids }
+            }, {}).returns([{ "_id" => "4", "title" => "Sir", "_type" => "Person" }])
+            @criteria = Mongoid::Criteria.translate(Person, @ids)
+          end
+
+        end
+
+        context "when documents are not found" do
+
+          it "returns an ids criteria" do
+            @collection.expects(:find).with(
+              { :_type =>
+                { "$in" =>
+                  ["Doctor", "Person"]
+                },
+                :_id =>
+                { "$in" => @ids }
+            }, {}).returns([])
+            lambda { Mongoid::Criteria.translate(Person, @ids) }.should raise_error
+          end
+
         end
 
       end
