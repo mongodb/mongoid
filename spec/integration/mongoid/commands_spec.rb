@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Commands do
 
   before do
-    @person = Person.new(:title => "Sir")
+    @person = Person.new(:title => "Sir", :ssn => "6969696")
   end
 
   after do
@@ -13,7 +13,7 @@ describe Mongoid::Commands do
   describe ".create" do
 
     it "saves and returns the document" do
-      person = Person.create(:title => "Sensei")
+      person = Person.create(:title => "Sensei", :ssn => "666-66-6666")
       person.should be_a_kind_of(Person)
       person.should_not be_a_new_record
     end
