@@ -268,7 +268,7 @@ describe Mongoid::Associations::HasManyRelated do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::HasManyRelated.expects(:new).with(@document, options)
+        Mongoid::Associations::HasManyRelated.expects(:new).with(@document, options, nil)
         association = Mongoid::Associations::HasManyRelated.instantiate(@document, options)
       end
 
@@ -359,7 +359,8 @@ describe Mongoid::Associations::HasManyRelated do
     end
 
     it "returns the related objects" do
-      Mongoid::Associations::HasManyRelated.update(@related, @parent, options).should == @related
+      @proxy = Mongoid::Associations::HasManyRelated.update(@related, @parent, options)
+      @proxy.target.should == @related
     end
 
   end

@@ -33,8 +33,8 @@ module Mongoid #:nodoc:
       # field exists for them on the +Document+. This will be limited to only the
       # attributes provided in the suppied +Hash+ so that no extra nil values get
       # put into the document's attributes.
-      def process(attrs = {})
-        attrs.each_pair do |key, value|
+      def process(attrs = nil)
+        (attrs || {}).each_pair do |key, value|
           if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
             @attributes[key.to_s] = value
           else

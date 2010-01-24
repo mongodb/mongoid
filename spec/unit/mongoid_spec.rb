@@ -2,16 +2,34 @@ require "spec_helper"
 
 describe Mongoid do
 
-  describe ".method_missing" do
+  describe ".config" do
 
-    before do
-      @config = mock
-      Mongoid::Config.expects(:instance).returns(@config)
+    context "when no block supplied" do
+
+      it "returns the config singleton" do
+        Mongoid.config.should == Mongoid::Config.instance
+      end
+
     end
 
-    it "delegates all calls to the config singleton" do
-      @config.expects(:raise_not_found_error=).with(false)
-      Mongoid.raise_not_found_error = false
+    context "when a block is supplied" do
+
+      before do
+        Mongoid.config do |config|
+          config.allow_dynamic_fields = false
+        end
+      end
+
+      after do
+        Mongoid.config do |config|
+          config.allow_dynamic_fields = true
+        end
+      end
+
+      it "sets the values on the config instance" do
+        Mongoid.allow_dynamic_fields.should be_false
+      end
+
     end
 
   end

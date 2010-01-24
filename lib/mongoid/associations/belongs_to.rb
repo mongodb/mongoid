@@ -4,10 +4,8 @@ module Mongoid #:nodoc:
     class BelongsTo #:nodoc:
       include Proxy
 
-      attr_reader :document, :options
-
       # Creates the new association by setting the internal
-      # document as the passed in Document. This should be the
+      # target as the passed in Document. This should be the
       # parent.
       #
       # All method calls on this object will then be delegated
@@ -15,22 +13,17 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # document: The parent +Document+
+      # target: The parent +Document+
       # options: The association options
-      def initialize(document, options)
-        @document, @options = document, options
+      def initialize(target, options)
+        @target, @options = target, options
       end
 
       # Returns the parent document. The id param is present for
       # compatibility with rails, however this could be overwritten
       # in the future.
       def find(id)
-        @document
-      end
-
-      # Delegate all missing methods over to the parent +Document+.
-      def method_missing(name, *args, &block)
-        @document.send(name, *args, &block)
+        @target
       end
 
       class << self
@@ -43,8 +36,8 @@ module Mongoid #:nodoc:
         # document: The parent +Document+
         # options: The association options
         def instantiate(document, options)
-          parent = document._parent
-          parent.nil? ? nil : new(parent, options)
+          target = document._parent
+          target.nil? ? nil : new(target, options)
         end
 
         # Returns the macro used to create the association.
@@ -55,10 +48,14 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
         # +Document+. Will properly set a has_one or a has_many.
-        def update(parent, child, options)
-          child.parentize(parent, options.inverse_of)
+        #
+        # Returns:
+        #
+        # A new +BelongsTo+ association proxy.
+        def update(target, child, options)
+          child.parentize(target, options.inverse_of)
           child.notify
-          parent
+          instantiate(child, options)
         end
       end
     end

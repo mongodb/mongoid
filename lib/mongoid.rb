@@ -84,10 +84,10 @@ module Mongoid #:nodoc
       :raise_not_found_error,
       :raise_not_found_error=, :to => :config
 
-    protected
     def config
-      Config.instance
+      yield Config.instance if block_given?; Config.instance
     end
+
   end
 
 end
