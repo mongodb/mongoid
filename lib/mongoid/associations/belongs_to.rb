@@ -4,8 +4,6 @@ module Mongoid #:nodoc:
     class BelongsTo #:nodoc:
       include Proxy
 
-      attr_reader :options, :target
-
       # Creates the new association by setting the internal
       # document as the passed in Document. This should be the
       # parent.
@@ -55,10 +53,10 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
         # +Document+. Will properly set a has_one or a has_many.
-        def update(parent, child, options)
-          child.parentize(parent, options.inverse_of)
+        def update(target, child, options)
+          child.parentize(target, options.inverse_of)
           child.notify
-          parent
+          instantiate(child, options)
         end
       end
     end

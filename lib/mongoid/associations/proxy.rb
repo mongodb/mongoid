@@ -7,7 +7,13 @@ module Mongoid #:nodoc
           instance_methods.each do |method|
             undef_method(method) unless method =~ /(^__|^nil\?$|^send$|^object_id$)/
           end
+          include InstanceMethods
         end
+      end
+      module InstanceMethods #:nodoc:
+        attr_reader \
+          :options,
+          :target
       end
     end
   end
