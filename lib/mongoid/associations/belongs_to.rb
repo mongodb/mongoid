@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class BelongsTo #:nodoc:
       include Proxy
 
-      attr_reader :document, :options
+      attr_reader :options, :target
 
       # Creates the new association by setting the internal
       # document as the passed in Document. This should be the
@@ -17,20 +17,20 @@ module Mongoid #:nodoc:
       #
       # document: The parent +Document+
       # options: The association options
-      def initialize(document, options)
-        @document, @options = document, options
+      def initialize(target, options)
+        @target, @options = target, options
       end
 
       # Returns the parent document. The id param is present for
       # compatibility with rails, however this could be overwritten
       # in the future.
       def find(id)
-        @document
+        @target
       end
 
       # Delegate all missing methods over to the parent +Document+.
       def method_missing(name, *args, &block)
-        @document.send(name, *args, &block)
+        @target.send(name, *args, &block)
       end
 
       class << self
@@ -43,8 +43,8 @@ module Mongoid #:nodoc:
         # document: The parent +Document+
         # options: The association options
         def instantiate(document, options)
-          parent = document._parent
-          parent.nil? ? nil : new(parent, options)
+          target = document._parent
+          target.nil? ? nil : new(target, options)
         end
 
         # Returns the macro used to create the association.

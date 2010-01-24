@@ -2,46 +2,23 @@ require "spec_helper"
 
 describe Mongoid::Associations::BelongsTo do
 
+  let(:child) { Name.new(:first_name => "Drexel", :last_name => "Spivey") }
+  let(:target) { Person.new(:title => "Pimp") }
+
+  let(:options) do
+    Mongoid::Associations::Options.new(:name => :person)
+  end
+
   describe "#find" do
 
     before do
-      @parent = Name.new(:first_name => "Drexel")
-      @options = Mongoid::Associations::Options.new(:name => :person)
-      @association = Mongoid::Associations::BelongsTo.new(@parent, @options)
+      @association = Mongoid::Associations::BelongsTo.new(target, options)
     end
 
     context "when finding by id" do
 
-      it "returns the document in the array with that id" do
-        name = @association.find(Mongo::ObjectID.new.to_s)
-        name.should == @parent
-      end
-
-    end
-
-  end
-
-  context "when decorating" do
-
-    before do
-      @parent = Name.new(:first_name => "Drexel")
-      @options = Mongoid::Associations::Options.new(:name => :person)
-      @association = Mongoid::Associations::BelongsTo.new(@parent, @options)
-    end
-
-    context "when getting values" do
-
-      it "delegates to the document" do
-        @association.first_name.should == "Drexel"
-      end
-
-    end
-
-    context "when setting values" do
-
-      it "delegates to the document" do
-        @association.first_name = "Test"
-        @association.first_name.should == "Test"
+      it "always returns the target document" do
+        @association.find("").should == target
       end
 
     end
@@ -53,14 +30,13 @@ describe Mongoid::Associations::BelongsTo do
     context "when parent exists" do
 
       before do
-        @parent = Name.new(:first_name => "Drexel")
-        @document = stub(:_parent => @parent)
-        @options = Mongoid::Associations::Options.new(:name => :person)
+        @parent = stub
+        @target = stub(:_parent => @parent)
+        @association = Mongoid::Associations::BelongsTo.instantiate(@target, options)
       end
 
-      it "delegates to new" do
-        Mongoid::Associations::BelongsTo.expects(:new).with(@parent, @options)
-        Mongoid::Associations::BelongsTo.instantiate(@document, @options)
+      it "sets the parent to the target" do
+        @association.target.should == @parent
       end
 
     end
@@ -69,11 +45,10 @@ describe Mongoid::Associations::BelongsTo do
 
       before do
         @document = stub(:_parent => nil)
-        @options = Mongoid::Associations::Options.new(:name => :person)
       end
 
       it "returns nil" do
-        Mongoid::Associations::BelongsTo.instantiate(@document, @options).should be_nil
+        Mongoid::Associations::BelongsTo.instantiate(@document, options).should be_nil
       end
 
     end
@@ -84,6 +59,42 @@ describe Mongoid::Associations::BelongsTo do
 
     it "returns :belongs_to" do
       Mongoid::Associations::BelongsTo.macro.should == :belongs_to
+    end
+
+  end
+
+  describe "#method_missing" do
+
+    before do
+      @association = Mongoid::Associations::BelongsTo.new(target, options)
+    end
+
+    context "when method is a getter" do
+
+      it "delegates to the target" do
+        @association.title.should == "Pimp"
+      end
+
+    end
+
+    context "when method is a setter" do
+
+      before do
+        @association.title = "Dealer"
+      end
+
+      it "delegates to the target" do
+        @association.title.should == "Dealer"
+      end
+
+    end
+
+    context "when method does not exist" do
+
+      it "raises an error" do
+        lambda { @association.nothing }.should raise_error(NoMethodError)
+      end
+
     end
 
   end
