@@ -4,8 +4,6 @@ module Mongoid #:nodoc:
     class BelongsToRelated #:nodoc:
       include Proxy
 
-      attr_reader :document, :options
-
       # Initializing a related association only requires looking up the object
       # by its id.
       #
@@ -13,13 +11,9 @@ module Mongoid #:nodoc:
       #
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
-      def initialize(document, foreign_key, options)
-        @document = options.klass.find(foreign_key)
-      end
-
-      # Delegate all missing methods over to the +Document+.
-      def method_missing(name, *args)
-        @document.send(name, *args)
+      def initialize(document, foreign_key, options, target = nil)
+        @options = options
+        @target = target || options.klass.find(foreign_key)
       end
 
       class << self
@@ -31,9 +25,9 @@ module Mongoid #:nodoc:
         #
         # document: The +Document+ that contains the relationship.
         # options: The association +Options+.
-        def instantiate(document, options)
+        def instantiate(document, options, target = nil)
           foreign_key = document.send(options.foreign_key)
-          foreign_key.blank? ? nil : new(document, foreign_key, options)
+          foreign_key.blank? ? nil : new(document, foreign_key, options, target)
         end
 
         # Returns the macro used to create the association.
@@ -53,9 +47,12 @@ module Mongoid #:nodoc:
         # Example:
         #
         # <tt>BelongsToRelated.update(game, person, options)</tt>
-        def update(related, parent, options)
-          parent.send("#{options.foreign_key}=", related.id) if related
-          related
+        def update(target, parent, options)
+          if target
+            parent.send("#{options.foreign_key}=", target.id)
+            return instantiate(parent, options, target)
+          end
+          target
         end
       end
 
