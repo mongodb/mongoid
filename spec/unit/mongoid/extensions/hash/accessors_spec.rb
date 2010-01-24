@@ -21,6 +21,26 @@ describe Mongoid::Extensions::Hash::Accessors do
     }
   end
 
+  describe "#klass" do
+
+    context "when _type exists" do
+
+      it "returns the class" do
+        { "_type" => "Person" }.klass.should == Person
+      end
+
+    end
+
+    context "when _type does not exist" do
+
+      it "returns nil" do
+        {}.klass.should be_nil
+      end
+
+    end
+
+  end
+
   describe "#remove" do
 
     context "when removing from an array" do

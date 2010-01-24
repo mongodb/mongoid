@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       include Proxy
 
       # Creates the new association by setting the internal
-      # document as the passed in Document. This should be the
+      # target as the passed in Document. This should be the
       # parent.
       #
       # All method calls on this object will then be delegated
@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # document: The parent +Document+
+      # target: The parent +Document+
       # options: The association options
       def initialize(target, options)
         @target, @options = target, options
@@ -24,11 +24,6 @@ module Mongoid #:nodoc:
       # in the future.
       def find(id)
         @target
-      end
-
-      # Delegate all missing methods over to the parent +Document+.
-      def method_missing(name, *args, &block)
-        @target.send(name, *args, &block)
       end
 
       class << self
@@ -53,6 +48,10 @@ module Mongoid #:nodoc:
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
         # +Document+. Will properly set a has_one or a has_many.
+        #
+        # Returns:
+        #
+        # A new +BelongsTo+ association proxy.
         def update(target, child, options)
           child.parentize(target, options.inverse_of)
           child.notify
