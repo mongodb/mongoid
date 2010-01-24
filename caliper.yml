@@ -1,0 +1,6 @@
+directories_to_calculate: ---
+- lib
+
+test_directories_to_calculate: ---
+- spec/unit
+- spec/integration
