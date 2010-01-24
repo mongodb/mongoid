@@ -17,6 +17,7 @@ module Mongoid #:nodoc:
       # options: The association options
       def initialize(target, options)
         @target, @options = target, options
+        extends(options)
       end
 
       # Returns the parent document. The id param is present for

@@ -20,6 +20,27 @@ describe Mongoid::Associations::BelongsToRelated do
 
     end
 
+    context "when options have an extension" do
+
+      before do
+        @document = stub(:person_id => "5")
+        @block = Proc.new {
+          def extension
+            "Testing"
+          end
+        }
+        @options = Mongoid::Associations::Options.new(:name => :person, :extend => @block)
+        @related = stub
+        Person.expects(:find).with(@document.person_id).returns(@related)
+        @association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
+      end
+
+      it "adds the extension module" do
+        @association.extension.should == "Testing"
+      end
+
+    end
+
   end
 
   describe ".instantiate" do

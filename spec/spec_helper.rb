@@ -49,17 +49,42 @@ class Person
 
   attr_reader :rescored
 
-  has_many :addresses
+  has_many :addresses do
+    def extension
+      "Testing"
+    end
+    def find_by_street(street)
+      @target.select { |doc| doc.street == street }
+    end
+  end
+
   has_many :phone_numbers, :class_name => "Phone"
 
-  has_one :name
+  has_one :name do
+    def extension
+      "Testing"
+    end
+    def dawkins?
+      first_name == "Richard" && last_name == "Dawkins"
+    end
+  end
+
   has_one :pet, :class_name => "Animal"
 
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name
 
-  has_one_related :game
-  has_many_related :posts
+  has_one_related :game do
+    def extension
+      "Testing"
+    end
+  end
+
+  has_many_related :posts do
+    def extension
+      "Testing"
+    end
+  end
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
@@ -157,7 +182,15 @@ class Address
   field :services, :type => Array
   key :street
   has_many :locations
-  belongs_to :addressable, :inverse_of => :addresses
+
+  belongs_to :addressable, :inverse_of => :addresses do
+    def extension
+      "Testing"
+    end
+    def doctor?
+      title == "Dr"
+    end
+  end
 
   named_scope :rodeo, where(:street => "Rodeo Dr")
 

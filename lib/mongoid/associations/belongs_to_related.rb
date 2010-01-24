@@ -14,6 +14,7 @@ module Mongoid #:nodoc:
       def initialize(document, foreign_key, options, target = nil)
         @options = options
         @target = target || options.klass.find(foreign_key)
+        extends(options)
       end
 
       class << self

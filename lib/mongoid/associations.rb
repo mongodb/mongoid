@@ -59,14 +59,16 @@ module Mongoid # :nodoc:
       #     include Mongoid::Document
       #     belongs_to :person, :inverse_of => :addresses
       #   end
-      def belongs_to(name, options = {})
+      def belongs_to(name, options = {}, &block)
         unless options.has_key?(:inverse_of)
           raise Errors::InvalidOptions.new("Options for belongs_to association must include :inverse_of")
         end
         self.embedded = true
         add_association(
           Associations::BelongsTo,
-          Associations::Options.new(options.merge(:name => name))
+          Associations::Options.new(
+            options.merge(:name => name, :extend => block)
+          )
         )
       end
 
@@ -84,11 +86,13 @@ module Mongoid # :nodoc:
       #     belongs_to_related :person
       #   end
       #
-      def belongs_to_related(name, options = {})
+      def belongs_to_related(name, options = {}, &block)
         field "#{name.to_s}_id"
         add_association(
           Associations::BelongsToRelated,
-          Associations::Options.new(options.merge(:name => name))
+          Associations::Options.new(
+            options.merge(:name => name, :extend => block)
+          )
         )
       end
 
@@ -111,10 +115,12 @@ module Mongoid # :nodoc:
       #     include Mongoid::Document
       #     belongs_to :person, :inverse_of => :addresses
       #   end
-      def has_many(name, options = {})
+      def has_many(name, options = {}, &block)
         add_association(
           Associations::HasMany,
-          Associations::Options.new(options.merge(:name => name))
+          Associations::Options.new(
+            options.merge(:name => name, :extend => block)
+          )
         )
       end
 
@@ -132,10 +138,12 @@ module Mongoid # :nodoc:
       #     has_many_related :posts
       #   end
       #
-      def has_many_related(name, options = {})
+      def has_many_related(name, options = {}, &block)
         add_association(
           Associations::HasManyRelated,
-          Associations::Options.new(options.merge(:name => name, :parent_key => self.name.foreign_key))
+          Associations::Options.new(
+            options.merge(:name => name, :parent_key => self.name.foreign_key, :extend => block)
+          )
         )
         before_save do |document|
           document.update_associations(name)
@@ -161,8 +169,10 @@ module Mongoid # :nodoc:
       #     include Mongoid::Document
       #     belongs_to :person
       #   end
-      def has_one(name, options = {})
-        opts = Associations::Options.new(options.merge(:name => name))
+      def has_one(name, options = {}, &block)
+        opts = Associations::Options.new(
+          options.merge(:name => name, :extend => block)
+        )
         type = Associations::HasOne
         add_association(type, opts)
         add_builder(type, opts)
@@ -182,10 +192,12 @@ module Mongoid # :nodoc:
       #     include Mongoid::Document
       #     has_one_related :game
       #   end
-      def has_one_related(name, options = {})
+      def has_one_related(name, options = {}, &block)
         add_association(
           Associations::HasOneRelated,
-          Associations::Options.new(options.merge(:name => name, :parent_key => self.name.foreign_key))
+          Associations::Options.new(
+            options.merge(:name => name, :parent_key => self.name.foreign_key, :extend => block)
+          )
         )
         before_save do |document|
           document.update_association(name)
