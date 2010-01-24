@@ -70,14 +70,9 @@ module Mongoid #:nodoc:
       # This then delegated all methods to the array class since this is
       # essentially a proxy to an array itself.
       def initialize(document, options)
-        @parent, @association_name, @klass, @options = document, options.name, options.klass, options
-        attributes = document.raw_attributes[@association_name]
-        @target = attributes ? attributes.collect do |attrs|
-          klass = attrs.klass
-          child = klass ? klass.instantiate(attrs) : @klass.instantiate(attrs)
-          child.parentize(@parent, @association_name)
-          child
-        end : []
+        @parent, @association_name = document, options.name
+        @klass, @options = options.klass, options
+        initialize_each(document.raw_attributes[@association_name])
       end
 
       # Delegate all missing methods over to the documents array unless a
@@ -102,6 +97,17 @@ module Mongoid #:nodoc:
         attributes.values.each do |attrs|
           build(attrs)
         end
+      end
+
+      protected
+      # Initializes each of the attributes in the hash.
+      def initialize_each(attributes)
+        @target = attributes ? attributes.collect do |attrs|
+          klass = attrs.klass
+          child = klass ? klass.instantiate(attrs) : @klass.instantiate(attrs)
+          child.parentize(@parent, @association_name)
+          child
+        end : []
       end
 
       class << self
