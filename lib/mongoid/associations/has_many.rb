@@ -33,7 +33,9 @@ module Mongoid #:nodoc:
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
       #
-      # Returns the newly created object.
+      # Returns:
+      #
+      # The newly created Document.
       def build(attrs = {}, type = nil)
         object = type ? type.instantiate : @klass.instantiate
         object.parentize(@parent, @association_name)
@@ -47,7 +49,9 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor and
       # the new object will then be saved.
       #
-      # Returns the newly created object.
+      # Returns:
+      #
+      # Rhe newly created Document.
       def create(attrs = {}, type = nil)
         object = build(attrs, type)
         object.save
@@ -55,8 +59,14 @@ module Mongoid #:nodoc:
       end
 
       # Finds a document in this association.
+      #
       # If :all is passed, returns all the documents
+      #
       # If an id is passed, will return the document for that id.
+      #
+      # Returns:
+      #
+      # Array or single Document.
       def find(param)
         return @target if param == :all
         return detect { |document| document.id == param }
@@ -69,15 +79,21 @@ module Mongoid #:nodoc:
       #
       # This then delegated all methods to the array class since this is
       # essentially a proxy to an array itself.
-      def initialize(document, options)
-        @parent, @association_name = document, options.name
+      #
+      # Options:
+      #
+      # parent: The parent document to the association.
+      # options: The association options.
+      def initialize(parent, options)
+        @parent, @association_name = parent, options.name
         @klass, @options = options.klass, options
-        initialize_each(document.raw_attributes[@association_name])
+        initialize_each(parent.raw_attributes[@association_name])
       end
 
-      # Delegate all missing methods over to the documents array unless a
-      # criteria or named scope exists on the association class. If that is the
-      # case then call that method.
+      # If the target array does not respond to the supplied method then try to
+      # find a named scope or criteria on the class and send the call there.
+      #
+      # If the method exists on the array, use the default proxy behavior.
       def method_missing(name, *args, &block)
         unless @target.respond_to?(name)
           criteria = @klass.send(name, *args)
@@ -93,6 +109,10 @@ module Mongoid #:nodoc:
       # Options:
       #
       # attributes: A +Hash+ of integer keys and +Hash+ values.
+      #
+      # Returns:
+      #
+      # The newly build target Document.
       def nested_build(attributes)
         attributes.values.each do |attrs|
           build(attrs)
