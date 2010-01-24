@@ -87,7 +87,7 @@ describe Mongoid::Associations::HasOneRelated do
   describe ".instantiate" do
 
     it "delegates to new" do
-      Mongoid::Associations::HasOneRelated.expects(:new).with(document, options)
+      Mongoid::Associations::HasOneRelated.expects(:new).with(document, options, nil)
       Mongoid::Associations::HasOneRelated.instantiate(document, options)
     end
 
@@ -144,9 +144,10 @@ describe Mongoid::Associations::HasOneRelated do
       Mongoid::Associations::HasOneRelated.update(@game, @person, options)
     end
 
-    it "returns the child" do
+    it "returns the proxy" do
       @game.expects(:person=).with(@person)
-      Mongoid::Associations::HasOneRelated.update(@game, @person, options).should == @game
+      @proxy = Mongoid::Associations::HasOneRelated.update(@game, @person, options)
+      @proxy.target.should == @game
     end
 
   end
