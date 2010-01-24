@@ -52,6 +52,10 @@ module Mongoid #:nodoc:
         #
         # document: The parent +Document+
         # options: The association options.
+        #
+        # Returns:
+        #
+        # A new +HasOne+ association proxy.
         def instantiate(document, options)
           attributes = document.raw_attributes[options.name]
           return nil if attributes.blank?

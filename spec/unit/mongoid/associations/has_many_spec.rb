@@ -399,7 +399,11 @@ describe Mongoid::Associations::HasMany do
     before do
       @address = Address.new(:street => "Madison Ave")
       @person = Person.new(:title => "Sir")
-      Mongoid::Associations::HasMany.update([@address], @person, Mongoid::Associations::Options.new(:name => :addresses))
+      @association = Mongoid::Associations::HasMany.update(
+        [@address],
+        @person,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
     end
 
     it "parentizes the child document" do
@@ -409,6 +413,10 @@ describe Mongoid::Associations::HasMany do
     it "sets the attributes of the child on the parent" do
       @person.attributes[:addresses].should ==
         [{ "_id" => "madison-ave", "street" => "Madison Ave", "_type" => "Address" }]
+    end
+
+    it "returns the association proxy" do
+      @association.target.size.should == 1
     end
 
   end
