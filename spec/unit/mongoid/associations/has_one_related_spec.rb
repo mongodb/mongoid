@@ -3,7 +3,16 @@ require "spec_helper"
 describe Mongoid::Associations::HasOneRelated do
 
   let(:document) { stub(:id => "1") }
-  let(:options) { Mongoid::Associations::Options.new(:name => :game) }
+  let(:block) do
+    Proc.new do
+      def extension
+        "Testing"
+      end
+    end
+  end
+  let(:options) do
+    Mongoid::Associations::Options.new(:name => :game, :extend => block)
+  end
 
   describe "#build" do
 
@@ -80,6 +89,21 @@ describe Mongoid::Associations::HasOneRelated do
     it "finds the association game by the parent key" do
       Game.expects(:first).with(:conditions => { "person_id"=> @person.id }).returns(@game)
       @person.game.should == @game
+    end
+
+    context "when the options have an extension" do
+
+      before do
+        @parent = stub(:id => "5", :class => Person)
+        @game = Game.new
+        Game.expects(:first).returns(@game)
+        @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+      end
+
+      it "adds the extension to the module" do
+        @association.extension.should == "Testing"
+      end
+
     end
 
   end

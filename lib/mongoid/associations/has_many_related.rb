@@ -61,6 +61,7 @@ module Mongoid #:nodoc:
         @parent, @klass = document, options.klass
         @foreign_key = document.class.to_s.foreign_key
         @target = target || @klass.all(:conditions => { @foreign_key => document.id })
+        extends(options)
       end
 
       # Delegates to <<

@@ -211,7 +211,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>self</tt>
     def id(*args)
-      (args.flatten.size > 1) ? self.in(:_id => args.flatten) : (@selector[:_id] = *args)
+      (args.flatten.size > 1) ? self.in(:_id => args.flatten) : (@selector[:_id] = args.first)
       self
     end
 

@@ -88,6 +88,7 @@ module Mongoid #:nodoc:
         @parent, @association_name = parent, options.name
         @klass, @options = options.klass, options
         initialize_each(parent.raw_attributes[@association_name])
+        extends(options)
       end
 
       # If the target array does not respond to the supplied method then try to

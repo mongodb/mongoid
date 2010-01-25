@@ -50,6 +50,31 @@ describe Mongoid::Associations::BelongsTo do
 
   end
 
+  describe "#initialize" do
+
+    before do
+      @parent = Person.new(:title => "Dr")
+      @name = Name.new(:first_name => "Richard", :last_name => "Dawkins")
+      @parent.name = @name
+      @block = Proc.new {
+        def extension
+          "Testing"
+        end
+      }
+      @options = Mongoid::Associations::Options.new(:name => :person, :extend => @block)
+      @association = Mongoid::Associations::BelongsTo.new(@parent, @options)
+    end
+
+    context "when the options have an extension" do
+
+      it "adds the extension module" do
+        @association.extension.should == "Testing"
+      end
+
+    end
+
+  end
+
   describe ".instantiate" do
 
     context "when parent exists" do

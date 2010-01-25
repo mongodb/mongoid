@@ -8,6 +8,47 @@ describe Mongoid::Associations do
     Post.delete_all
   end
 
+  context "anonymous extensions" do
+
+    before do
+      @person = Person.new(:title => "Dr")
+      @address_one = Address.new(:street => "Oxford")
+      @address_two = Address.new(:street => "Bond")
+      @name = Name.new(:first_name => "Richard", :last_name => "Dawkins")
+      @person.addresses << [ @address_one, @address_two ]
+      @person.name = @name
+      @person.save
+    end
+
+    context "when defined on a has_many" do
+
+      it "applies the extension" do
+        addresses = @person.addresses.find_by_street("Oxford")
+        addresses.size.should == 1
+        addresses.first.should == @address_one
+      end
+
+    end
+
+    context "when defined on a has_one" do
+
+      it "applies the extension" do
+        name = @person.name
+        name.dawkins?.should be_true
+      end
+
+    end
+
+    context "when defined on a belongs_to" do
+
+      it "applies the extension" do
+        @address_two.addressable.doctor?.should be_true
+      end
+
+    end
+
+  end
+
   context "criteria on has many embedded associations" do
 
     before do

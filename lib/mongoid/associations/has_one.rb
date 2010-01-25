@@ -28,6 +28,7 @@ module Mongoid #:nodoc:
       def initialize(document, attrs, options)
         @parent, @options  = document, options
         @target = attrs.assimilate(@parent, @options, attrs.klass)
+        extends(options)
       end
 
       # Used for setting the association via a nested attributes setter on the
