@@ -26,6 +26,12 @@ module Mongoid #:nodoc:
             self[key] = key.singular? ? attrs : [attrs]
           end
         end
+
+        # If a _type key exists in the hash, return the class for the value.
+        def klass
+          class_name = self["_type"]
+          class_name ? class_name.constantize : nil
+        end
       end
     end
   end

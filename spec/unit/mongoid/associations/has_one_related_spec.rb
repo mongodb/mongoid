@@ -3,7 +3,16 @@ require "spec_helper"
 describe Mongoid::Associations::HasOneRelated do
 
   let(:document) { stub(:id => "1") }
-  let(:options) { Mongoid::Associations::Options.new(:name => :game) }
+  let(:block) do
+    Proc.new do
+      def extension
+        "Testing"
+      end
+    end
+  end
+  let(:options) do
+    Mongoid::Associations::Options.new(:name => :game, :extend => block)
+  end
 
   describe "#build" do
 
@@ -82,12 +91,27 @@ describe Mongoid::Associations::HasOneRelated do
       @person.game.should == @game
     end
 
+    context "when the options have an extension" do
+
+      before do
+        @parent = stub(:id => "5", :class => Person)
+        @game = Game.new
+        Game.expects(:first).returns(@game)
+        @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+      end
+
+      it "adds the extension to the module" do
+        @association.extension.should == "Testing"
+      end
+
+    end
+
   end
 
   describe ".instantiate" do
 
     it "delegates to new" do
-      Mongoid::Associations::HasOneRelated.expects(:new).with(document, options)
+      Mongoid::Associations::HasOneRelated.expects(:new).with(document, options, nil)
       Mongoid::Associations::HasOneRelated.instantiate(document, options)
     end
 
@@ -144,9 +168,10 @@ describe Mongoid::Associations::HasOneRelated do
       Mongoid::Associations::HasOneRelated.update(@game, @person, options)
     end
 
-    it "returns the child" do
+    it "returns the proxy" do
       @game.expects(:person=).with(@person)
-      Mongoid::Associations::HasOneRelated.update(@game, @person, options).should == @game
+      @proxy = Mongoid::Associations::HasOneRelated.update(@game, @person, options)
+      @proxy.target.should == @game
     end
 
   end

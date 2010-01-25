@@ -1,0 +1,4 @@
+test_directories_to_calculate:
+  - spec/unit
+  - spec/integration
+  - spec/integration/mongoid

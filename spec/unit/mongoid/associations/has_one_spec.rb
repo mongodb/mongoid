@@ -63,6 +63,31 @@ describe Mongoid::Associations::HasOne do
 
   end
 
+  describe "#initialize" do
+
+    before do
+      @parent = Person.new(:title => "Dr")
+      @name = Name.new(:first_name => "Richard", :last_name => "Dawkins")
+      @parent.name = @name
+      @block = Proc.new {
+        def extension
+          "Testing"
+        end
+      }
+      @options = Mongoid::Associations::Options.new(:name => :name, :extend => @block)
+      @association = Mongoid::Associations::HasOne.new(@parent, {}, @options)
+    end
+
+    context "when the options have an extension" do
+
+      it "adds the extension module" do
+        @association.extension.should == "Testing"
+      end
+
+    end
+
+  end
+
   describe ".instantiate" do
 
     context "when the attributes are nil" do
@@ -178,7 +203,7 @@ describe Mongoid::Associations::HasOne do
       before do
         @name = Name.new(:first_name => "Donald")
         @person = Person.new(:title => "Sir")
-        Mongoid::Associations::HasOne.update(
+        @association = Mongoid::Associations::HasOne.update(
           @name,
           @person,
           Mongoid::Associations::Options.new(:name => :name)
@@ -192,6 +217,10 @@ describe Mongoid::Associations::HasOne do
       it "sets the attributes of the child on the parent" do
         @person.attributes[:name].should ==
           { "_id" => "donald", "first_name" => "Donald", "_type" => "Name" }
+      end
+
+      it "returns the proxy" do
+        @association.target.should == @name
       end
 
     end
@@ -212,6 +241,22 @@ describe Mongoid::Associations::HasOne do
         @person.name.should be_nil
       end
 
+    end
+
+  end
+
+  describe "#to_a" do
+
+    before do
+      @association = Mongoid::Associations::HasOne.new(
+        @document,
+        @attributes["mixed_drink"],
+        Mongoid::Associations::Options.new(:name => :mixed_drink)
+      )
+    end
+
+    it "returns the target in a new array" do
+      @association.to_a.first.should be_a_kind_of(MixedDrink)
     end
 
   end

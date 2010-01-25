@@ -4,44 +4,43 @@ module Mongoid #:nodoc:
     class HasMany
       include Proxy
 
-      attr_accessor :association_name, :klass, :options
+      attr_accessor :association_name, :klass
 
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def <<(*objects)
         objects.flatten.each do |object|
           object.parentize(@parent, @association_name)
-          @documents << object
+          @target << object
           object.notify
         end
       end
 
+      alias :concat :<<
+      alias :push :<<
+
       # Clears the association, and notifies the parents of the removal.
       def clear
-        unless @documents.empty?
-          object = @documents.first
+        unless @target.empty?
+          object = @target.first
           object.changed(true)
           object.notify_observers(object, true)
-          @documents.clear
+          @target.clear
         end
-      end
-
-      # Appends the object to the +Array+, setting its parent in
-      # the process.
-      def concat(*objects)
-        self << objects
       end
 
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
       #
-      # Returns the newly created object.
+      # Returns:
+      #
+      # The newly created Document.
       def build(attrs = {}, type = nil)
         object = type ? type.instantiate : @klass.instantiate
         object.parentize(@parent, @association_name)
         object.write_attributes(attrs)
-        @documents << object
+        @target << object
         object
       end
 
@@ -50,7 +49,9 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor and
       # the new object will then be saved.
       #
-      # Returns the newly created object.
+      # Returns:
+      #
+      # Rhe newly created Document.
       def create(attrs = {}, type = nil)
         object = build(attrs, type)
         object.save
@@ -58,10 +59,16 @@ module Mongoid #:nodoc:
       end
 
       # Finds a document in this association.
+      #
       # If :all is passed, returns all the documents
+      #
       # If an id is passed, will return the document for that id.
+      #
+      # Returns:
+      #
+      # Array or single Document.
       def find(param)
-        return @documents if param == :all
+        return @target if param == :all
         return detect { |document| document.id == param }
       end
 
@@ -72,27 +79,29 @@ module Mongoid #:nodoc:
       #
       # This then delegated all methods to the array class since this is
       # essentially a proxy to an array itself.
-      def initialize(document, options)
-        @parent, @association_name, @klass, @options = document, options.name, options.klass, options
-        attributes = document.raw_attributes[@association_name]
-        @documents = attributes ? attributes.collect do |attrs|
-          type = attrs["_type"]
-          child = type ? type.constantize.instantiate(attrs) : @klass.instantiate(attrs)
-          child.parentize(@parent, @association_name)
-          child
-        end : []
+      #
+      # Options:
+      #
+      # parent: The parent document to the association.
+      # options: The association options.
+      def initialize(parent, options)
+        @parent, @association_name = parent, options.name
+        @klass, @options = options.klass, options
+        initialize_each(parent.raw_attributes[@association_name])
+        extends(options)
       end
 
-      # Delegate all missing methods over to the documents array unless a
-      # criteria or named scope exists on the association class. If that is the
-      # case then call that method.
+      # If the target array does not respond to the supplied method then try to
+      # find a named scope or criteria on the class and send the call there.
+      #
+      # If the method exists on the array, use the default proxy behavior.
       def method_missing(name, *args, &block)
-        unless @documents.respond_to?(name)
+        unless @target.respond_to?(name)
           criteria = @klass.send(name, *args)
-          criteria.documents = @documents
+          criteria.documents = @target
           return criteria
         end
-        @documents.send(name, *args, &block)
+        super
       end
 
       # Used for setting associations via a nested attributes setter from the
@@ -101,16 +110,25 @@ module Mongoid #:nodoc:
       # Options:
       #
       # attributes: A +Hash+ of integer keys and +Hash+ values.
+      #
+      # Returns:
+      #
+      # The newly build target Document.
       def nested_build(attributes)
         attributes.values.each do |attrs|
           build(attrs)
         end
       end
 
-      # Appends the object to the +Array+, setting its parent in
-      # the process.
-      def push(*objects)
-        self << objects
+      protected
+      # Initializes each of the attributes in the hash.
+      def initialize_each(attributes)
+        @target = attributes ? attributes.collect do |attrs|
+          klass = attrs.klass
+          child = klass ? klass.instantiate(attrs) : @klass.instantiate(attrs)
+          child.parentize(@parent, @association_name)
+          child
+        end : []
       end
 
       class << self
@@ -137,7 +155,7 @@ module Mongoid #:nodoc:
         def update(children, parent, options)
           parent.remove_attribute(options.name)
           children.assimilate(parent, options)
-          new(parent, options)
+          instantiate(parent, options)
         end
       end
 

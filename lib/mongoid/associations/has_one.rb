@@ -4,7 +4,10 @@ module Mongoid #:nodoc:
     class HasOne #:nodoc:
       include Proxy
 
-      attr_reader :association_name, :document, :parent, :options
+      # Build a new object for the association.
+      def build(attrs = {}, type = nil)
+        @target = attrs.assimilate(@parent, @options, type); self
+      end
 
       # Creates the new association by finding the attributes in
       # the parent document with its name, and instantiating a
@@ -16,41 +19,30 @@ module Mongoid #:nodoc:
       # Options:
       #
       # document: The parent +Document+
-      # attributes: The attributes of the decorated object.
+      # attributes: The attributes of the target object.
       # options: The association options.
-      def initialize(document, attributes, options)
-        @parent, @options, @association_name = document, options, options.name
-        attrs = attributes.stringify_keys
-        klass = attrs["_type"] ? attrs["_type"].constantize : nil
-        @document = attrs.assimilate(@parent, @options, klass)
-      end
-
-      # Delegate all missing methods over to the +Document+.
-      def method_missing(name, *args, &block)
-        @document.send(name, *args, &block)
+      #
+      # Returns:
+      #
+      # A new +HashOne+ association proxy.
+      def initialize(document, attrs, options)
+        @parent, @options  = document, options
+        @target = attrs.assimilate(@parent, @options, attrs.klass)
+        extends(options)
       end
 
       # Used for setting the association via a nested attributes setter on the
-      # parent +Document+.
+      # parent +Document+. Called when using accepts_nested_attributes_for.
+      #
+      # Options:
+      #
+      # attributes: The attributes for the new association
+      #
+      # Returns:
+      #
+      # A new target document.
       def nested_build(attributes)
         build(attributes)
-      end
-
-      # This will get deprecated
-      def to_a
-        [@document]
-      end
-
-      # Need to override here for when the underlying document is nil.
-      def valid?
-        @document.valid?
-      end
-
-      protected
-      # Build a new object for the association.
-      def build(attrs = {}, type = nil)
-        @document = attrs.assimilate(@parent, @options, type)
-        self
       end
 
       class << self
@@ -61,6 +53,10 @@ module Mongoid #:nodoc:
         #
         # document: The parent +Document+
         # options: The association options.
+        #
+        # Returns:
+        #
+        # A new +HasOne+ association proxy.
         def instantiate(document, options)
           attributes = document.raw_attributes[options.name]
           return nil if attributes.blank?
@@ -84,8 +80,13 @@ module Mongoid #:nodoc:
         # Example:
         #
         # <tt>HasOne.update({:first_name => "Hank"}, person, options)</tt>
+        #
+        # Returns:
+        #
+        # A new +HasOne+ association proxy.
         def update(child, parent, options)
           child.assimilate(parent, options)
+          instantiate(parent, options)
         end
       end
 

@@ -9,6 +9,16 @@ module Mongoid #:nodoc:
         @attributes = attributes
       end
 
+      # Returns the extension if it exists, nil if not.
+      def extension
+        @attributes[:extend]
+      end
+
+      # Returns true is the options have extensions.
+      def extension?
+        !extension.nil?
+      end
+
       # Return the foreign key based off the association name.
       def foreign_key
         name.to_s.foreign_key

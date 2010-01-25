@@ -200,7 +200,10 @@ describe Mongoid::Associations::HasMany do
   describe "#find" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(@document, Mongoid::Associations::Options.new(:name => :addresses))
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
     end
 
     context "when finding all" do
@@ -259,18 +262,43 @@ describe Mongoid::Associations::HasMany do
 
   describe "#initialize" do
 
-    before do
-      @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :update => true)
-      @association = Mongoid::Associations::HasMany.new(
-        @canvas,
-        Mongoid::Associations::Options.new(:name => :shapes)
-      )
+    context "when no extension exists" do
+
+      before do
+        @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :update => true)
+        @association = Mongoid::Associations::HasMany.new(
+          @canvas,
+          Mongoid::Associations::Options.new(:name => :shapes)
+        )
+      end
+
+      it "creates the classes based on their types" do
+        circle = @association.first
+        circle.should be_a_kind_of(Circle)
+        circle.radius.should == 5
+      end
+
     end
 
-    it "creates the classes based on their types" do
-      circle = @association.first
-      circle.should be_a_kind_of(Circle)
-      circle.radius.should == 5
+    context "when an extension is in the options" do
+
+      before do
+        @person = Person.new
+        @block = Proc.new do
+          def extension
+            "Testing"
+          end
+        end
+        @association = Mongoid::Associations::HasMany.new(
+          @person,
+          Mongoid::Associations::Options.new(:name => :addresses, :extend => @block)
+        )
+      end
+
+      it "adds the extension module" do
+        @association.extension.should == "Testing"
+      end
+
     end
 
   end
@@ -399,7 +427,11 @@ describe Mongoid::Associations::HasMany do
     before do
       @address = Address.new(:street => "Madison Ave")
       @person = Person.new(:title => "Sir")
-      Mongoid::Associations::HasMany.update([@address], @person, Mongoid::Associations::Options.new(:name => :addresses))
+      @association = Mongoid::Associations::HasMany.update(
+        [@address],
+        @person,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
     end
 
     it "parentizes the child document" do
@@ -409,6 +441,10 @@ describe Mongoid::Associations::HasMany do
     it "sets the attributes of the child on the parent" do
       @person.attributes[:addresses].should ==
         [{ "_id" => "madison-ave", "street" => "Madison Ave", "_type" => "Address" }]
+    end
+
+    it "returns the association proxy" do
+      @association.target.size.should == 1
     end
 
   end

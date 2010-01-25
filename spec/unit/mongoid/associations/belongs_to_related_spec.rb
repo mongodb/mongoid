@@ -20,6 +20,27 @@ describe Mongoid::Associations::BelongsToRelated do
 
     end
 
+    context "when options have an extension" do
+
+      before do
+        @document = stub(:person_id => "5")
+        @block = Proc.new {
+          def extension
+            "Testing"
+          end
+        }
+        @options = Mongoid::Associations::Options.new(:name => :person, :extend => @block)
+        @related = stub
+        Person.expects(:find).with(@document.person_id).returns(@related)
+        @association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
+      end
+
+      it "adds the extension module" do
+        @association.extension.should == "Testing"
+      end
+
+    end
+
   end
 
   describe ".instantiate" do
@@ -32,7 +53,7 @@ describe Mongoid::Associations::BelongsToRelated do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::BelongsToRelated.expects(:new).with(@document, "5", @options)
+        Mongoid::Associations::BelongsToRelated.expects(:new).with(@document, "5", @options, nil)
         Mongoid::Associations::BelongsToRelated.instantiate(@document, @options)
       end
 
@@ -96,18 +117,18 @@ describe Mongoid::Associations::BelongsToRelated do
       @related = stub(:id => "5")
       @child = Game.new
       @options = Mongoid::Associations::Options.new(:name => :person)
+      @association = Mongoid::Associations::BelongsToRelated.update(@related, @child, @options)
     end
 
     it "sets the related object id on the parent" do
-      Mongoid::Associations::BelongsToRelated.update(@related, @child, @options)
       @child.person_id.should == "5"
     end
 
-    it "returns the related object" do
-      Mongoid::Associations::BelongsToRelated.update(@related, @child, @options).should == @related
+    it "returns the proxy" do
+      @association.target.should == @related
     end
 
-    context "when related is nil" do
+    context "when target is nil" do
 
       it "returns nil" do
         Mongoid::Associations::BelongsToRelated.update(nil, @child, @options).should be_nil
