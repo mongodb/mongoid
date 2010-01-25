@@ -176,7 +176,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>self</tt>
     def extras(extras)
-      @options = extras; filter_options; self
+      @options.merge!(extras); filter_options; self
     end
 
     # Adds a criterion to the +Criteria+ that specifies values where any can

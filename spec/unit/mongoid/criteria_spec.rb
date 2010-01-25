@@ -471,8 +471,8 @@ describe Mongoid::Criteria do
     end
 
     it "adds the extras to the options" do
-      @criteria.extras({ :skip => 10 })
-      @criteria.options.should == { :skip => 10 }
+      @criteria.limit(10).extras({ :skip => 10 })
+      @criteria.options.should == { :skip => 10, :limit => 10 }
     end
 
     it "returns self" do
