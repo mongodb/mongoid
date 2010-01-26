@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
         def expand_complex_criteria
           hsh = {}
           self.each_pair do |k,v|
-            if k.class == Mongoid::ComplexCriterion
+            if k.class == Mongoid::Criterion::Complex
               hsh[k.key] = {"$#{k.operator}" => v}
             else
               hsh[k] = v

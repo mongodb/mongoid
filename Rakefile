@@ -17,6 +17,7 @@ begin
     gem.add_dependency("durran-validatable", ">= 2.0.1")
     gem.add_dependency("leshill-will_paginate", ">= 2.3.11")
 
+    gem.add_development_dependency("factory_girl", ">= 1.2.3")
     gem.add_development_dependency("rspec", ">= 1.2.9")
     gem.add_development_dependency("mocha", ">= 0.9.8")
   end

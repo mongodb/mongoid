@@ -1,4 +1,9 @@
 # encoding: utf-8
+require "mongoid/criterion/complex"
+require "mongoid/criterion/exclusion"
+require "mongoid/criterion/inclusion"
+require "mongoid/criterion/optional"
+
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
   # objects from the database. It is a DSL that essentially sets up the
@@ -15,6 +20,9 @@ module Mongoid #:nodoc:
   #
   # <tt>criteria.execute</tt>
   class Criteria
+    include Criterion::Exclusion
+    include Criterion::Inclusion
+    include Criterion::Optional
     include Enumerable
 
     attr_accessor :documents
@@ -67,46 +75,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Adds a criterion to the +Criteria+ that specifies values that must all
-    # be matched in order to return results. Similar to an "in" clause but the
-    # underlying conditional logic is an "AND" and not an "OR". The MongoDB
-    # conditional operator that will be used is "$all".
-    #
-    # Options:
-    #
-    # attributes: A +Hash+ where the key is the field name and the value is an
-    # +Array+ of values that must all match.
-    #
-    # Example:
-    #
-    # <tt>criteria.all(:field => ["value1", "value2"])</tt>
-    #
-    # <tt>criteria.all(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
-    #
-    # Returns: <tt>self</tt>
-    def all(attributes = {})
-      update_selector(attributes, "$all")
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies values that must
-    # be matched in order to return results. This is similar to a SQL "WHERE"
-    # clause. This is the actual selector that will be provided to MongoDB,
-    # similar to the Javascript object that is used when performing a find()
-    # in the MongoDB console.
-    #
-    # Options:
-    #
-    # selectior: A +Hash+ that must match the attributes of the +Document+.
-    #
-    # Example:
-    #
-    # <tt>criteria.and(:field1 => "value1", :field2 => 15)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def and(selector = nil)
-      where(selector)
-    end
-
     # Return or create the context in which this criteria should be executed.
     #
     # This will return an Enumerable context if the class is embedded,
@@ -143,78 +111,6 @@ module Mongoid #:nodoc:
       block_given? ? @collection.each { |doc| yield doc } : self
     end
 
-    # Adds a criterion to the +Criteria+ that specifies values that are not allowed
-    # to match any document in the database. The MongoDB conditional operator that
-    # will be used is "$ne".
-    #
-    # Options:
-    #
-    # attributes: A +Hash+ where the key is the field name and the value is a
-    # value that must not be equal to the corresponding field value in the database.
-    #
-    # Example:
-    #
-    # <tt>criteria.excludes(:field => "value1")</tt>
-    #
-    # <tt>criteria.excludes(:field1 => "value1", :field2 => "value1")</tt>
-    #
-    # Returns: <tt>self</tt>
-    def excludes(attributes = {})
-      update_selector(attributes, "$ne")
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies additional options
-    # to be passed to the Ruby driver, in the exact format for the driver.
-    #
-    # Options:
-    #
-    # extras: A +Hash+ that gets set to the driver options.
-    #
-    # Example:
-    #
-    # <tt>criteria.extras(:limit => 20, :skip => 40)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def extras(extras)
-      @options.merge!(extras); filter_options; self
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies values where any can
-    # be matched in order to return results. This is similar to an SQL "IN"
-    # clause. The MongoDB conditional operator that will be used is "$in".
-    #
-    # Options:
-    #
-    # attributes: A +Hash+ where the key is the field name and the value is an
-    # +Array+ of values that any can match.
-    #
-    # Example:
-    #
-    # <tt>criteria.in(:field => ["value1", "value2"])</tt>
-    #
-    # <tt>criteria.in(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
-    #
-    # Returns: <tt>self</tt>
-    def in(attributes = {})
-      update_selector(attributes, "$in")
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
-    #
-    # Options:
-    #
-    # object_id: A +String+ representation of a <tt>Mongo::ObjectID</tt>
-    #
-    # Example:
-    #
-    # <tt>criteria.id("4ab2bc4b8ad548971900005c")</tt>
-    #
-    # Returns: <tt>self</tt>
-    def id(*args)
-      (args.flatten.size > 1) ? self.in(:_id => args.flatten) : (@selector[:_id] = args.first)
-      self
-    end
-
     # Create the new +Criteria+ object. This will initialize the selector
     # and options hashes, as well as the type of criteria.
     #
@@ -228,23 +124,6 @@ module Mongoid #:nodoc:
         @selector = { :_type => { "$in" => klass._types } }
         @hereditary = true
       end
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies the maximum number of
-    # results to return. This is mostly used in conjunction with <tt>skip()</tt>
-    # to handle paginated results.
-    #
-    # Options:
-    #
-    # value: An +Integer+ specifying the max number of results. Defaults to 20.
-    #
-    # Example:
-    #
-    # <tt>criteria.limit(100)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def limit(value = 20)
-      @options[:limit] = value; self
     end
 
     # Merges another object into this +Criteria+. The other object may be a
@@ -303,91 +182,13 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Adds a criterion to the +Criteria+ that specifies values where none
-    # should match in order to return results. This is similar to an SQL "NOT IN"
-    # clause. The MongoDB conditional operator that will be used is "$nin".
-    #
-    # Options:
-    #
-    # exclusions: A +Hash+ where the key is the field name and the value is an
-    # +Array+ of values that none can match.
-    #
-    # Example:
-    #
-    # <tt>criteria.not_in(:field => ["value1", "value2"])</tt>
-    #
-    # <tt>criteria.not_in(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
-    #
-    # Returns: <tt>self</tt>
-    def not_in(exclusions)
-      exclusions.each { |key, value| @selector[key] = { "$nin" => value } }; self
-    end
-
-    # Returns the offset option. If a per_page option is in the list then it
-    # will replace it with a skip parameter and return the same value. Defaults
-    # to 20 if nothing was provided.
-    def offset
-      @options[:skip]
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies the fields that will
-    # get returned from the Document. Used mainly for list views that do not
-    # require all fields to be present. This is similar to SQL "SELECT" values.
-    #
-    # Options:
-    #
-    # args: A list of field names to retrict the returned fields to.
-    #
-    # Example:
-    #
-    # <tt>criteria.only(:field1, :field2, :field3)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def only(*args)
-      @options[:fields] = args.flatten if args.any?; self
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies the sort order of
-    # the returned documents in the database. Similar to a SQL "ORDER BY".
-    #
-    # Options:
-    #
-    # params: An +Array+ of [field, direction] sorting pairs.
-    #
-    # Example:
-    #
-    # <tt>criteria.order_by([[:field1, :asc], [:field2, :desc]])</tt>
-    #
-    # Returns: <tt>self</tt>
-    def order_by(params = [])
-      @options[:sort] = params; self
-    end
+    alias :to_ary :to_a
 
     # Returns the selector and options as a +Hash+ that would be passed to a
     # scope for use with named scopes.
     def scoped
       { :where => @selector }.merge(@options)
     end
-
-    # Adds a criterion to the +Criteria+ that specifies how many results to skip
-    # when returning Documents. This is mostly used in conjunction with
-    # <tt>limit()</tt> to handle paginated results, and is similar to the
-    # traditional "offset" parameter.
-    #
-    # Options:
-    #
-    # value: An +Integer+ specifying the number of results to skip. Defaults to 0.
-    #
-    # Example:
-    #
-    # <tt>criteria.skip(20)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def skip(value = 0)
-      @options[:skip] = value; self
-    end
-
-    alias :to_ary :to_a
 
     # Translate the supplied arguments into a +Criteria+ object.
     #
@@ -415,31 +216,6 @@ module Mongoid #:nodoc:
         return id_criteria(klass, params)
       end
       return new(klass).where(params.delete(:conditions) || {}).extras(params)
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies values that must
-    # be matched in order to return results. This is similar to a SQL "WHERE"
-    # clause. This is the actual selector that will be provided to MongoDB,
-    # similar to the Javascript object that is used when performing a find()
-    # in the MongoDB console.
-    #
-    # Options:
-    #
-    # selectior: A +Hash+ that must match the attributes of the +Document+.
-    #
-    # Example:
-    #
-    # <tt>criteria.where(:field1 => "value1", :field2 => 15)</tt>
-    #
-    # Returns: <tt>self</tt>
-    def where(selector = nil)
-      case selector
-      when String
-        @selector.update("$where" => selector)
-      else
-        @selector.update(selector ? selector.expand_complex_criteria : {})
-      end
-      self
     end
 
     protected
