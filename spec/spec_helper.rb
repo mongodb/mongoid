@@ -12,10 +12,8 @@ require "mocha"
 require "mongoid"
 require "spec"
 
-connection = Mongo::Connection.new
-
 Mongoid.config do |config|
-  config.database = connection.db("mongoid_test")
+  config.database = Mongo::Connection.new.db("mongoid_test")
 end
 
 Dir[File.join(MODELS, "*.rb")].each {|file| require File.basename(file) }
