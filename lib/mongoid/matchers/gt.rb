@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class Gt < Default
       # Return true if the attribute is greater than the value.
       def matches?(value)
-        @attribute ? @attribute > first(value) : false
+        determine(value, :>)
       end
     end
   end

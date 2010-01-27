@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class Lte < Default
       # Return true if the attribute is less than or equal to the value.
       def matches?(value)
-        @attribute ? @attribute <= first(value) : false
+        determine(value, :<=)
       end
     end
   end
