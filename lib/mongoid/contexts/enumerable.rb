@@ -61,10 +61,7 @@ module Mongoid #:nodoc:
       #
       # The numerical largest value.
       def max(field)
-        largest = @documents.inject(nil) do |memo, doc|
-          value = doc.send(field)
-          (memo && memo >= value) ? memo : value
-        end
+        determine(field, :>=)
       end
 
       # Get the smallest value for the field in all the documents.
@@ -73,10 +70,7 @@ module Mongoid #:nodoc:
       #
       # The numerical smallest value.
       def min(field)
-        smallest = @documents.inject(nil) do |memo, doc|
-          value = doc.send(field)
-          (memo && memo <= value) ? memo : value
-        end
+        determine(field, :<=)
       end
 
       # Get one document.
@@ -100,6 +94,14 @@ module Mongoid #:nodoc:
         end
       end
 
+      protected
+      # If the field exists, perform the comparison and set if true.
+      def determine(field, operator)
+        matching = @documents.inject(nil) do |memo, doc|
+          value = doc.send(field)
+          (memo && memo.send(operator, value)) ? memo : value
+        end
+      end
     end
   end
 end

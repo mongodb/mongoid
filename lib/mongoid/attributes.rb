@@ -126,7 +126,7 @@ module Mongoid #:nodoc:
       end
 
       protected
-      # Return true if setting the attribute is allowed.
+      # Return true if dynamic field setting is enabled.
       def set_allowed?(key)
         Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
       end

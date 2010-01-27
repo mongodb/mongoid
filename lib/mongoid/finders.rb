@@ -63,7 +63,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find_or_create_by(:attribute => "value")</tt>
     def find_or_create_by(attrs = {})
-      first(:conditions => attrs) || self.create(attrs)
+      find_or(:create, attrs)
     end
 
     # Find the first +Document+ given the conditions, or instantiates a new document
@@ -75,7 +75,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find_or_initialize_by(:attribute => "value")</tt>
     def find_or_initialize_by(attrs = {})
-      first(:conditions => attrs) || self.new(attrs)
+      find_or(:new, attrs)
     end
 
     # Find the first +Document+ given the conditions.
@@ -215,5 +215,10 @@ module Mongoid #:nodoc:
       Criteria.new(self).where(selector)
     end
 
+    protected
+    # Find the first object or create/initialize it.
+    def find_or(method, attrs = {})
+      first(:conditions => attrs) || send(method, attrs)
+    end
   end
 end

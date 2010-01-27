@@ -12,8 +12,14 @@ module Mongoid #:nodoc:
       end
 
       protected
+      # Return the first value in the hash.
       def first(value)
         value.values.first
+      end
+
+      # If object exists then compare, else return false
+      def determine(value, operator)
+        @attribute ? @attribute.send(operator, first(value)) : false
       end
     end
   end

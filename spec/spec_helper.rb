@@ -16,7 +16,7 @@ Mongoid.config do |config|
   config.database = Mongo::Connection.new.db("mongoid_test")
 end
 
-Dir[File.join(MODELS, "*.rb")].each {|file| require File.basename(file) }
+Dir[File.join(MODELS, "*.rb")].sort.each {|file| require File.basename(file) }
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
