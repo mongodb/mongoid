@@ -1,4 +1,39 @@
-=== 1.0.7
+=== 1.1.4
+- Refactorings in preparation for next feature push.
+
+- Associations may now have anonymous extensions.
+
+- Ruby 1.9 compatibility updates. (brainopia)
+
+- Document.to_json accepts options. (jsmestad)
+
+=== 1.1.3
+- Nil can be passed into methods that set attributes.
+
+- Mongoid.config can now take a block.
+
+- Allow named_scopes and criteria class methods on
+  has_many_related if related is a Mongoid document.
+
+- Document.find can now take an array of ids.
+
+=== 1.1.2
+- Fixing issues with updates to parents.
+
+=== 1.1.1
+- Document.create raises validations error, not no
+  method error on self.errors (Rick Frankel)
+
+- Support default values that respond_to?(:call)
+  (procs/lambda) (ahoward)
+
+- Added Mongoid.persist_in_safe_mode global config
+  option.
+
+- Minor optimization: don't evaluate default procs
+  if it's not needed (brainopia)
+
+=== 1.1.0
 - Nil attributes no longer persist nil values to the
   database - the field will just not exist.
 

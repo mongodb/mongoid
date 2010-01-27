@@ -250,8 +250,8 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>person.to_json</tt>
-      def to_json
-        attributes.to_json
+      def to_json(options=nil)
+        attributes.to_json(options)
       end
 
       # Returns the id of the Document, used in Rails compatibility.
