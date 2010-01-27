@@ -46,13 +46,13 @@ module Mongoid #:nodoc:
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.
     def +(other)
-      entries + (other.is_a?(Criteria) ? other.entries : other)
+      entries + comparable(other)
     end
 
     # Returns the difference between the criteria and another enumerable. If
     # the other is a +Criteria+ then it needs to get the collection from it.
     def -(other)
-      entries - (other.is_a?(Criteria) ? other.entries : other)
+      entries - comparable(other)
     end
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
@@ -237,6 +237,11 @@ module Mongoid #:nodoc:
         @options[:limit] = limits = (per_page_num || 20).to_i
         @options[:skip] = (page_num || 1).to_i * limits - limits
       end
+    end
+
+    # Return the entries of the other criteria or the object.
+    def comparable(other)
+      other.is_a?(Criteria) ? other.entries : other
     end
 
     # Update the selector setting the operator on the value for each key in the
