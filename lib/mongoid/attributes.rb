@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
       # put into the document's attributes.
       def process(attrs = nil)
         (attrs || {}).each_pair do |key, value|
-          if Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
+          if set_allowed?(key)
             @attributes[key.to_s] = value
           else
             send("#{key}=", value) if value
@@ -131,6 +131,11 @@ module Mongoid #:nodoc:
       end
 
       protected
+      # Return true is dynamic field setting is enabled.
+      def set_allowed?(key)
+        Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
+      end
+
       # Used when supplying a :reject_if block as an option to
       # accepts_nested_attributes_for
       def reject(attributes, options)
