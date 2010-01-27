@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
       #     validates_associated :name, :addresses
       #   end
       def validates_associated(*args)
-        validates_with(Associated, _merge_attributes(args))
+        validates_with(AssociatedValidator, _merge_attributes(args))
       end
 
       # Validates whether or not a field is unique against the documents in the
@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
       #     validates_uniqueness_of :title
       #   end
       def validates_uniqueness_of(*args)
-        validates_with(Uniqueness, _merge_attributes(args))
+        validates_with(UniquenessValidator, _merge_attributes(args))
       end
     end
   end

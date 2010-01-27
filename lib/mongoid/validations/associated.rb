@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
     #
     #     validates_associated :name, :addresses
     #   end
-    class Associated < ActiveModel::EachValidator
+    class AssociatedValidator < ActiveModel::EachValidator
 
       # Validates that the associations provided are either all nil or all
       # valid. If neither is true then the appropriate errors will be added to

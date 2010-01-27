@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::Associated do
+describe Mongoid::Validations::AssociatedValidator do
 
   describe "#validate_each" do
 
@@ -8,7 +8,7 @@ describe Mongoid::Validations::Associated do
       @document = Person.new
     end
 
-    let(:validator) { Mongoid::Validations::Associated.new(:attributes => @document.attributes) }
+    let(:validator) { Mongoid::Validations::AssociatedValidator.new(:attributes => @document.attributes) }
 
     context "when the association is a has one" do
 

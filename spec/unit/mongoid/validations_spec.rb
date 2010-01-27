@@ -9,8 +9,13 @@ describe Mongoid::Validations do
     end
 
     it "adds the associated validator" do
-      @class.expects(:validates_with).with(Mongoid::Validations::Associated, { :attributes => [ :name ] })
+      @class.expects(:validates_with).with(Mongoid::Validations::AssociatedValidator, { :attributes => [ :name ] })
       @class.validates_associated(:name)
+    end
+
+    it "is picked up by validates method" do
+      @class.expects(:validates_with).with(Mongoid::Validations::AssociatedValidator, { :attributes => [ :name ] })
+      @class.validates(:name, :associated => true)
     end
 
   end
@@ -22,8 +27,13 @@ describe Mongoid::Validations do
     end
 
     it "adds the uniqueness validator" do
-      @class.expects(:validates_with).with(Mongoid::Validations::Uniqueness, { :attributes => [ :title ] })
+      @class.expects(:validates_with).with(Mongoid::Validations::UniquenessValidator, { :attributes => [ :title ] })
       @class.validates_uniqueness_of(:title)
+    end
+
+    it "is picked up by validates method" do
+      @class.expects(:validates_with).with(Mongoid::Validations::UniquenessValidator, { :attributes => [ :title ] })
+      @class.validates(:title, :uniqueness => true)
     end
 
   end

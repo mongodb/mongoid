@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
     #
     #     validates_uniqueness_of :title
     #   end
-    class Uniqueness < ActiveModel::EachValidator
+    class UniquenessValidator < ActiveModel::EachValidator
       def validate_each(document, attribute, value)
         return if document.class.where(attribute => value).empty?
         document.errors.add(

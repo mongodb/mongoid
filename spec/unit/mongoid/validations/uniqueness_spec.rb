@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::Uniqueness do
+describe Mongoid::Validations::UniquenessValidator do
 
   describe "#validate_each" do
 
@@ -8,7 +8,7 @@ describe Mongoid::Validations::Uniqueness do
       @document = Person.new
     end
 
-    let(:validator) { Mongoid::Validations::Uniqueness.new(:attributes => @document.attributes) }
+    let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes) }
 
     context "when a document exists with the attribute value" do
 
