@@ -1,8 +1,10 @@
 # encoding: utf-8
+require "mongoid/criterion/temp_collection"
 require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/optional"
+require "mongoid/criterion/union"
 
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
@@ -23,6 +25,7 @@ module Mongoid #:nodoc:
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Optional
+    include Criterion::Union
     include Enumerable
 
     attr_accessor :documents
