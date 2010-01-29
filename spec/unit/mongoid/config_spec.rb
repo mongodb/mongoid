@@ -104,4 +104,12 @@ describe Mongoid::Config do
 
   end
 
+  describe "#temp_collection_size" do
+
+    it "defaults to 1MB" do
+      config.temp_collection_size.should == 1048576
+    end
+
+  end
+
 end
