@@ -139,6 +139,19 @@ describe Mongoid::Criterion::Optional do
 
     end
 
+    context "when an argument is provided" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(Person)
+        @criteria.offset(40)
+      end
+
+      it "delegates to skip" do
+        @criteria.options[:skip].should == 40
+      end
+
+    end
+
     context "when no option exists" do
 
       context "when page option exists" do

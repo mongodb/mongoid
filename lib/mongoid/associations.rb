@@ -84,6 +84,7 @@ module Mongoid # :nodoc:
       #
       def belongs_to_related(name, options = {}, &block)
         field "#{name.to_s}_id"
+        index "#{name.to_s}_id" unless self.embedded
         add_association(
           Associations::BelongsToRelated,
           Associations::Options.new(

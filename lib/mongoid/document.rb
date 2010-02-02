@@ -158,14 +158,6 @@ module Mongoid #:nodoc:
         identify
       end
 
-      # apply default values to attributes - calling procs as required
-      def attributes_with_defaults(attributes = {})
-        default_values = defaults.merge(attributes)
-        default_values.each_pair do |key, val|
-          default_values[key] = val.call if val.respond_to?(:call)
-        end
-      end
-
       # Returns the class name plus its attributes.
       def inspect
         attrs = fields.map { |name, field| "#{name}: #{@attributes[name].inspect}" } * ", "
@@ -250,7 +242,7 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>person.to_json</tt>
-      def to_json(options=nil)
+      def to_json(options = nil)
         attributes.to_json(options)
       end
 
@@ -280,8 +272,15 @@ module Mongoid #:nodoc:
         clear ? @attributes.delete(name) : @attributes.insert(name, attrs)
         notify
       end
+
+      protected
+      # apply default values to attributes - calling procs as required
+      def attributes_with_defaults(attributes = {})
+        default_values = defaults.merge(attributes)
+        default_values.each_pair do |key, val|
+          default_values[key] = val.call if val.respond_to?(:call)
+        end
+      end
     end
-
   end
-
 end

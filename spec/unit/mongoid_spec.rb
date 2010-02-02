@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe Mongoid do
 
-  describe ".config" do
+  describe ".configure" do
 
     context "when no block supplied" do
 
       it "returns the config singleton" do
-        Mongoid.config.should == Mongoid::Config.instance
+        Mongoid.configure.should == Mongoid::Config.instance
       end
 
     end
@@ -15,13 +15,13 @@ describe Mongoid do
     context "when a block is supplied" do
 
       before do
-        Mongoid.config do |config|
+        Mongoid.configure do |config|
           config.allow_dynamic_fields = false
         end
       end
 
       after do
-        Mongoid.config do |config|
+        Mongoid.configure do |config|
           config.allow_dynamic_fields = true
         end
       end

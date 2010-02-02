@@ -231,9 +231,9 @@ describe Mongoid::Criteria do
         @collection.expects(:find).with(@criteria.selector, @criteria.options).returns(@cursor)
       end
 
-      it "adds the count instance variable" do
+      it "does not add the count instance variable" do
         @criteria.entries.should == []
-        @criteria.count.should == 44
+        @criteria.instance_variable_get(:@count).should be_nil
       end
 
     end
@@ -520,6 +520,10 @@ describe Mongoid::Criteria do
       @context.expects(:min).with(:field).returns(100)
       @criteria.min(:field).should == 100
     end
+
+  end
+
+  describe "#offset" do
 
   end
 

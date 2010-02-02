@@ -13,6 +13,7 @@ module Mongoid #:nodoc:
       # A collection of documents paginated.
       def paginate
         @collection ||= execute
+        @count = @collection.count
         WillPaginate::Collection.create(page, per_page, count) do |pager|
           pager.replace(@collection)
         end

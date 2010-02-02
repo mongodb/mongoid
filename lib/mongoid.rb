@@ -81,10 +81,13 @@ module Mongoid #:nodoc
       :persist_in_safe_mode,
       :persist_in_safe_mode=,
       :raise_not_found_error,
-      :raise_not_found_error=, :to => :config
+      :raise_not_found_error=,
+      :temp_collection_size,
+      :temp_collection_size=, :to => :configure
 
-    def config
-      yield Config.instance if block_given?; Config.instance
+    def configure
+      config = Config.instance
+      block_given? ? yield(config) : config
     end
 
   end

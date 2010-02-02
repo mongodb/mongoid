@@ -27,6 +27,32 @@ describe Mongoid::Criterion::Exclusion do
       @criteria.excludes(:title => "Bad").should == @criteria
     end
 
+    context "when passing an id" do
+
+      it "accepts id" do
+        @criteria.excludes(:id => "1")
+        @criteria.selector.should ==
+          { :_type =>
+              { "$in" =>
+                ["Doctor", "Person"]
+              },
+            :_id => { "$ne" => "1" }
+          }
+      end
+
+      it "accepts _id" do
+        @criteria.excludes(:_id => "1")
+        @criteria.selector.should ==
+          { :_type =>
+              { "$in" =>
+                ["Doctor", "Person"]
+              },
+            :_id => { "$ne" => "1" }
+          }
+      end
+
+    end
+
   end
 
   describe "#not_in" do

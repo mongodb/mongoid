@@ -417,6 +417,15 @@ describe Mongoid::Associations do
       @game.should respond_to(:person)
     end
 
+    context "when document is root level" do
+
+      it "puts an index on the foreign key" do
+        Game.expects(:index).with("person_id")
+        Game.belongs_to_related :person
+      end
+
+    end
+
   end
 
   describe ".has_one_related" do

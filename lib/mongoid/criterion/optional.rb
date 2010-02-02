@@ -54,8 +54,8 @@ module Mongoid #:nodoc:
       # Returns the offset option. If a per_page option is in the list then it
       # will replace it with a skip parameter and return the same value. Defaults
       # to 20 if nothing was provided.
-      def offset
-        @options[:skip]
+      def offset(*args)
+        args.size > 0 ? skip(args.first) : @options[:skip]
       end
 
       # Adds a criterion to the +Criteria+ that specifies the sort order of

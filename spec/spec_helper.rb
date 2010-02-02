@@ -12,7 +12,7 @@ require "mocha"
 require "mongoid"
 require "spec"
 
-Mongoid.config do |config|
+Mongoid.configure do |config|
   config.database = Mongo::Connection.new.db("mongoid_test")
 end
 
