@@ -78,7 +78,6 @@ module Mongoid #:nodoc:
       def execute
         attributes = @klass.collection.find(@selector, process_options)
         if attributes
-          @count = attributes.count
           attributes.collect { |doc| instantiate(doc) }
         else
           []
