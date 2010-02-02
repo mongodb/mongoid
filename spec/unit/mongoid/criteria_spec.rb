@@ -523,6 +523,10 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#offset" do
+
+  end
+
   describe "#one" do
 
     before do
