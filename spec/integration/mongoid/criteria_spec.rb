@@ -2,6 +2,34 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
+  describe "#excludes" do
+
+    before do
+      @person = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
+    end
+
+    after do
+      Person.delete_all
+    end
+
+    context "when passed id" do
+
+      it "it properly excludes ids" do
+        Person.criteria.excludes(:id => @person.id).collect.should be_empty
+      end
+
+    end
+
+    context "when passed _id" do
+
+      it "it properly excludes ids" do
+        Person.criteria.excludes(:_id => @person.id).collect.should be_empty
+      end
+
+    end
+
+  end
+
   describe "#max" do
 
     before do

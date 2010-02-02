@@ -19,6 +19,8 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def excludes(attributes = {})
+        mongo_id = attributes.delete(:id)
+        attributes = attributes.merge(:_id => mongo_id) if mongo_id
         update_selector(attributes, "$ne")
       end
 
