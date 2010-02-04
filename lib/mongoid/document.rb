@@ -87,9 +87,23 @@ module Mongoid #:nodoc:
 
       # Returns all types to query for when using this class as the base.
       def _types
-        @_type ||= (self.subclasses + [ self.name ])
+        @_type ||= (subclasses_of(self).map { |o| o.to_s } + [ self.name ])
       end
+      
+      # return the list of subclassses for an object
+      def subclasses_of(*superclasses) #:nodoc:
+        subclasses = []
 
+        superclasses.each do |sup|
+          ObjectSpace.each_object(class << sup; self; end) do |k|
+            if k != sup && (k.name.blank? || eval("defined?(::#{k}) && ::#{k}.object_id == k.object_id"))
+              subclasses << k
+            end
+          end
+        end
+
+        subclasses
+      end
     end
 
     module InstanceMethods
