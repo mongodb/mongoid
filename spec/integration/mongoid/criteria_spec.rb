@@ -15,7 +15,7 @@ describe Mongoid::Criteria do
     context "when passed id" do
 
       it "it properly excludes ids" do
-        Person.criteria.excludes(:id => @person.id).collect.should be_empty
+        Person.criteria.excludes(:id => @person.id).entries.should be_empty
       end
 
     end
@@ -23,7 +23,7 @@ describe Mongoid::Criteria do
     context "when passed _id" do
 
       it "it properly excludes ids" do
-        Person.criteria.excludes(:_id => @person.id).collect.should be_empty
+        Person.criteria.excludes(:_id => @person.id).entries.should be_empty
       end
 
     end
