@@ -75,9 +75,10 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # An +Array+ of documents
-      def execute
+      def execute(paginating = false)
         attributes = @klass.collection.find(@selector, process_options)
         if attributes
+          @count = attributes.count if paginating
           attributes.collect { |doc| instantiate(doc) }
         else
           []
@@ -192,7 +193,6 @@ module Mongoid #:nodoc:
         grouped(:sum, field.to_s, SUM_REDUCE)
       end
 
-      protected
       # Common functionality for grouping operations. Currently used by min, max
       # and sum. Will gsub the field name in the supplied reduce function.
       def grouped(start, field, reduce)

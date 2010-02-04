@@ -65,6 +65,57 @@ describe Mongoid::Contexts::Mongo do
 
   end
 
+  describe "#execute" do
+
+    let(:selector) { { :field => "value"  } }
+    let(:options) { { :skip => 20 } }
+
+    before do
+      @cursor = stub(:count => 500)
+      @collection = mock
+      @person = mock
+      @klass = stub(:collection => @collection, :hereditary => false, :instantiate => @person)
+      @context = Mongoid::Contexts::Mongo.new(selector, options, @klass)
+    end
+
+    it "calls find on the collection" do
+      @collection.expects(:find).with(selector, options).returns(@cursor)
+      @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
+      @context.execute.should == [@person]
+    end
+
+    context "when paginating" do
+
+      it "should find the count from the cursor" do
+        @collection.expects(:find).with(selector, options).returns(@cursor)
+        @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
+        @context.execute(true).should == [@person]
+        @context.count.should == 500
+      end
+
+    end
+
+    context "when field options are supplied" do
+
+      context "when _type not in the field list" do
+
+        before do
+          options[:fields] = [ :title ]
+          @expected_options = { :skip => 20, :fields => [ :title, :_type ] }
+        end
+
+        it "adds _type to the fields" do
+          @collection.expects(:find).with(selector, @expected_options).returns(@cursor)
+          @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
+          @context.execute.should == [@person]
+        end
+
+      end
+
+    end
+
+  end
+
   describe "#group" do
 
     before do
@@ -85,46 +136,6 @@ describe Mongoid::Contexts::Mongo do
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:group => []}, @reduce, true).returns(@grouping)
         @context.group
-      end
-
-    end
-
-  end
-
-  describe "#execute" do
-
-    let(:selector) { { :field => "value"  } }
-    let(:options) { { :skip => 20 } }
-
-    before do
-      @cursor = stub(:count => 500)
-      @collection = mock
-      @person = mock
-      @klass = stub(:collection => @collection, :hereditary => false, :instantiate => @person)
-      @context = Mongoid::Contexts::Mongo.new(selector, options, @klass)
-    end
-
-    it "calls find on the collection" do
-      @collection.expects(:find).with(selector, options).returns(@cursor)
-      @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
-      @context.execute.should == [@person]
-    end
-
-    context "when field options are supplied" do
-
-      context "when _type not in the field list" do
-
-        before do
-          options[:fields] = [ :title ]
-          @expected_options = { :skip => 20, :fields => [ :title, :_type ] }
-        end
-
-        it "adds _type to the fields" do
-          @collection.expects(:find).with(selector, @expected_options).returns(@cursor)
-          @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
-          @context.execute.should == [@person]
-        end
-
       end
 
     end

@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
 
       # Gets the number of documents in the array. Delegates to size.
       def count
-        @documents.size
+        @count ||= @documents.size
       end
 
       # Groups the documents by the first field supplied in the field options.
@@ -40,8 +40,10 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # An +Array+ of documents that matched the selector.
-      def execute
-        @documents.select { |document| document.matches?(@selector) }
+      def execute(paginating = false)
+        matching = @documents.select { |document| document.matches?(@selector) }
+        @count = matching.size if paginating
+        matching
       end
 
       # Create the new enumerable context. This will need the selector and
