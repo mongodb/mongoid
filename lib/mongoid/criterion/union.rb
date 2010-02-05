@@ -9,7 +9,9 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.or(other_criteria)</tt>
       def or(other)
-        @collection ||= (execute + other.execute); self
+        @collection ||= execute
+        @collection.concat(other.execute)
+        self
       end
 
       alias :union :or

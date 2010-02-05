@@ -6,41 +6,70 @@ describe Mongoid::Criterion::Union do
     stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
   end
 
-  let(:left) do
+  let(:first) do
     criteria = Mongoid::Criteria.new(Person)
     criteria.where(:title => "Sir")
   end
 
-  let(:right) do
+  let(:second) do
     criteria = Mongoid::Criteria.new(Person)
     criteria.where(:title => "Mam")
+  end
+
+  let(:third) do
+    criteria = Mongoid::Criteria.new(Person)
+    criteria.where(:title => "Mr")
+  end
+
+  let(:fourth) do
+    criteria = Mongoid::Criteria.new(Person)
+    criteria.where(:title => "Mrs")
   end
 
   before do
     @sir = Person.new(:title => "Sir")
     @mam = Person.new(:title => "Mam")
-    Mongoid::Contexts::Mongo.expects(:new).twice.returns(context)
+    @mrs = Person.new(:title => "Mrs")
+    @mr = Person.new(:title => "Mr")
   end
 
   describe "#or" do
 
-    before do
-      context.expects(:execute).twice.returns([@sir], [@mam])
+    context "when unioning 2 criteria" do
+
+      before do
+        Mongoid::Contexts::Mongo.expects(:new).twice.returns(context)
+        context.expects(:execute).twice.returns([@sir], [@mam])
+      end
+
+      it "unions the criteria" do
+        first.or(second).should == [ @sir, @mam ]
+      end
     end
 
-    it "executes the criteria" do
-      left.or(right).should == [ @sir, @mam ]
+    context "when unioning more than 2 criteria" do
+
+      before do
+        Mongoid::Contexts::Mongo.expects(:new).times(4).returns(context)
+        context.expects(:execute).times(4).returns([@sir], [@mam], [@mrs], [@mr])
+      end
+
+      it "unions all the criteria" do
+        first.or(second).or(third).or(fourth).should == [ @sir, @mam, @mrs, @mr ]
+      end
     end
+
   end
 
   describe "#union" do
 
     before do
+      Mongoid::Contexts::Mongo.expects(:new).twice.returns(context)
       context.expects(:execute).twice.returns([@sir], [@mam])
     end
 
     it "aliases to #or" do
-      left.union(right).should == [ @sir, @mam ]
+      first.union(second).should == [ @sir, @mam ]
     end
   end
 end
