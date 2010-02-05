@@ -222,7 +222,18 @@ module Mongoid #:nodoc:
     end
 
     protected
-    # Determines the context to be used for this criteria.
+    # Determines the context to be used for this criteria. If the class is an
+    # embedded document, then thw context will be the array in the has_many
+    # association it is in. If the class is a root, then the database itself
+    # will be the context.
+    #
+    # Example:
+    #
+    # <tt>criteria#determine_context</tt>
+    #
+    # Returns:
+    #
+    # A enumerable or mongo context.
     def determine_context
       if @klass.embedded
         return Contexts::Enumerable.new(@selector, @options, @documents)
@@ -233,6 +244,12 @@ module Mongoid #:nodoc:
     # Filters the unused options out of the options +Hash+. Currently this
     # takes into account the "page" and "per_page" options that would be passed
     # in if using will_paginate.
+    #
+    # Example:
+    #
+    # Given a criteria with a selector of { :page => 1, :per_page => 40 }
+    #
+    # <tt>criteria.filter_options</tt> # selector: { :skip => 0, :limit => 40 }
     def filter_options
       page_num = @options.delete(:page)
       per_page_num = @options.delete(:per_page)
@@ -242,19 +259,33 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Return the entries of the other criteria or the object.
+    # Return the entries of the other criteria or the object. Used for
+    # comparing criteria or an enumerable.
     def comparable(other)
       other.is_a?(Criteria) ? other.entries : other
     end
 
     # Update the selector setting the operator on the value for each key in the
     # supplied attributes +Hash+.
+    #
+    # Example:
+    #
+    # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
     def update_selector(attributes, operator)
       attributes.each { |key, value| @selector[key] = { operator => value } }; self
     end
 
     class << self
-      # Return a criteria or single document based on an id search.
+      # Create a criteria or single document based on an id search. Will handle
+      # if a single id has been passed or mulitple ids.
+      #
+      # Example:
+      #
+      #   Criteria.id_criteria(Person, [1, 2, 3])
+      #
+      # Returns:
+      #
+      # The single or multiple documents.
       def id_criteria(klass, params)
         criteria = new(klass).id(params)
         result = params.is_a?(String) ? criteria.one : criteria.entries

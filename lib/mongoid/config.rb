@@ -6,15 +6,13 @@ module Mongoid #:nodoc
     attr_accessor \
       :allow_dynamic_fields,
       :persist_in_safe_mode,
-      :raise_not_found_error,
-      :temp_collection_size
+      :raise_not_found_error
 
     # Defaults the configuration options to true.
     def initialize
       @allow_dynamic_fields = true
       @persist_in_safe_mode = true
       @raise_not_found_error = true
-      @temp_collection_size = 1048576
     end
 
     # Sets the Mongo::DB to be used.

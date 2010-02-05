@@ -18,6 +18,9 @@ module Mongoid #:nodoc:
       # Perform a union of 2 criteria and return the new criteria. The first
       # pass executes both sides and merges the collections together.
       #
+      # Note this operation can we extremely memory instensive for large
+      # collections - use with caution.
+      #
       # Example:
       #
       # <tt>criteria.or(other_criteria)</tt>

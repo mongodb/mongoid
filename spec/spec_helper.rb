@@ -13,7 +13,16 @@ require "mongoid"
 require "spec"
 
 Mongoid.configure do |config|
-  config.database = Mongo::Connection.new.db("mongoid_test")
+  name = "mongoid_test"
+  config.database = Mongo::Connection.new.db(name)
+  # config.masters = [
+    # Mongo::Connection.new(host, port).db(name),
+    # Mongo::Connection.new(host, port).db(name)
+  # ]
+  # config.slaves = [
+    # Mongo::Connection.new(host, port, :slave_ok => true).db(name),
+    # Mongo::Connection.new(host, port, :slave_ok => true).db(name)
+  # ]
 end
 
 Dir[File.join(MODELS, "*.rb")].sort.each {|file| require File.basename(file) }
