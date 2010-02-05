@@ -3,6 +3,7 @@ require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/optional"
+require "mongoid/criterion/union"
 
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
@@ -23,10 +24,12 @@ module Mongoid #:nodoc:
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Optional
+    include Criterion::Union
     include Enumerable
 
+    attr_reader :collection, :klass, :options, :selector
+
     attr_accessor :documents
-    attr_reader :klass, :options, :selector
 
     delegate \
       :aggregate,
