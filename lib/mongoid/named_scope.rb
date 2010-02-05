@@ -27,6 +27,8 @@ module Mongoid #:nodoc:
         end
       EOT
     end
+    
+    alias :scope :named_scope 
 
     # Return the scopes or default to an empty +Hash+.
     def scopes
