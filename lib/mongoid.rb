@@ -22,8 +22,8 @@
 require "rubygems"
 
 gem "activemodel", ">= 3.0.pre"
+gem "will_paginate", ">= 3.0.pre"
 gem "mongo", ">= 0.18.2"
-gem "leshill-will_paginate", ">= 2.3.11"
 
 require "delegate"
 require "observer"
