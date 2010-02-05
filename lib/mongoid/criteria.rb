@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
     include Criterion::Union
     include Enumerable
 
-    attr_reader :collection, :klass, :options, :selector
+    attr_reader :collection, :ids, :klass, :options, :selector
 
     attr_accessor :documents
 

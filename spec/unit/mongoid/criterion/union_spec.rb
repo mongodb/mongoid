@@ -33,6 +33,18 @@ describe Mongoid::Criterion::Union do
     @mr = Person.new(:title => "Mr")
   end
 
+  describe "#identifiers" do
+
+    before do
+      Mongoid::Contexts::Mongo.expects(:new).returns(context)
+      context.expects(:execute).returns([@sir])
+    end
+
+    it "returns the ids of the found documents" do
+      first.identifiers.should == [ @sir.id ]
+    end
+  end
+
   describe "#or" do
 
     context "when unioning 2 criteria" do
