@@ -20,15 +20,37 @@ describe Mongoid::Collection do
 
   describe "#initialize" do
 
-    let(:collection) do
-      Mongoid::Collection.new(master, slaves, "mongoid_test")
+    before do
+      Mongoid.expects(:master).returns(master)
     end
 
-    it "sets the master db"
+    context "when slaves exist" do
 
-    it "sets the slave dbs"
+      before do
+        Mongoid.expects(:slaves).returns(slaves)
+        Mongoid::Collections::Writer.expects(:new).with(master, "mongoid_test")
+      end
 
-    it "sets the name"
+      it "sets the reader with slaves" do
+        Mongoid::Collections::Reader.expects(:new).with(slaves, "mongoid_test")
+        Mongoid::Collection.new("mongoid_test")
+      end
+
+    end
+
+    context "when slaves do not exist" do
+
+      before do
+        Mongoid.expects(:slaves).returns(nil)
+        Mongoid::Collections::Writer.expects(:new).with(master, "mongoid_test")
+      end
+
+      it "sets the reader to an array with the master" do
+        Mongoid::Collections::Reader.expects(:new).with([ master ], "mongoid_test")
+        Mongoid::Collection.new("mongoid_test")
+      end
+    end
+
   end
 
 end

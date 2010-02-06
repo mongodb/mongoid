@@ -6,6 +6,8 @@ require "mongoid/collections/writer"
 module Mongoid #:nodoc
   class Collection
 
+    attr_reader :master, :name, :slaves
+
     # Initialize a new Mongoid::Collection, setting up the master, slave, and
     # name attributes. Masters will be used for writes, slaves for reads.
     #
@@ -13,9 +15,9 @@ module Mongoid #:nodoc
     #
     # <tt>Mongoid::Collection.new(masters, slaves, "test")</tt>
     def initialize(name)
-      # Get all the master db -> Mongoid.master
-      # Get all the slave dbs -> Mongoid.slaves
-      @name = name
+      @master, @slaves, @name = Mongoid.master, Mongoid.slaves, name
+      @writer = Collections::Writer.new(@master, name)
+      @reader = Collections::Reader.new((@slaves || [ @master ]), name)
     end
   end
 end

@@ -118,7 +118,7 @@ describe Mongoid::Attributes do
   describe "#method_missing" do
 
     before do
-      Mongoid.allow_dynamic_fields = true
+      Mongoid.configure.allow_dynamic_fields = true
       @attributes = {
         :testing => "Testing"
       }
@@ -155,7 +155,7 @@ describe Mongoid::Attributes do
       context "when allowing dynamic fields" do
 
         before do
-          Mongoid.allow_dynamic_fields = true
+          Mongoid.configure.allow_dynamic_fields = true
           @person = Person.new(@attributes)
         end
 
@@ -180,7 +180,7 @@ describe Mongoid::Attributes do
       context "when not allowing dynamic fields" do
 
         before do
-          Mongoid.allow_dynamic_fields = false
+          Mongoid.configure.allow_dynamic_fields = false
           Person.fields.delete(:nofieldstring)
           @attributes = {
             :nofieldstring => "Testing"
@@ -188,7 +188,7 @@ describe Mongoid::Attributes do
         end
 
         after do
-          Mongoid.allow_dynamic_fields = true
+          Mongoid.configure.allow_dynamic_fields = true
         end
 
         it "raises an error" do

@@ -15,10 +15,7 @@ require "spec"
 Mongoid.configure do |config|
   name = "mongoid_test"
   config.database = Mongo::Connection.new.db(name)
-  # config.masters = [
-    # Mongo::Connection.new(host, port).db(name),
-    # Mongo::Connection.new(host, port).db(name)
-  # ]
+  # config.master = Mongo::Connection.new(host, port).db(name)
   # config.slaves = [
     # Mongo::Connection.new(host, port, :slave_ok => true).db(name),
     # Mongo::Connection.new(host, port, :slave_ok => true).db(name)

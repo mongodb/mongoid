@@ -68,15 +68,12 @@ module Mongoid #:nodoc
 
     delegate \
       :allow_dynamic_fields,
-      :allow_dynamic_fields=,
       :database,
-      :database=,
+      :master,
       :persist_in_safe_mode,
-      :persist_in_safe_mode=,
       :raise_not_found_error,
-      :raise_not_found_error=,
-      :temp_collection_size,
-      :temp_collection_size=, :to => :configure
+      :slaves,
+      :temp_collection_size, :to => :configure
 
     def configure
       config = Config.instance

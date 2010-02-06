@@ -4,18 +4,6 @@ module Mongoid #:nodoc:
     class Writer
       attr_reader :collection
 
-      delegate \
-        :<<,
-        :create_index,
-        :drop,
-        :drop_index,
-        :drop_indexes,
-        :insert,
-        :remove,
-        :rename,
-        :save,
-        :update, :to => :collection
-
       # Create the new database writer. Will create a collection from the
       # master database.
       #
@@ -24,6 +12,15 @@ module Mongoid #:nodoc:
       # <tt>Writer.new(master, "mongoid_people")</tt>
       def initialize(master_db, name)
         @collection = master_db.collection(name)
+      end
+
+      # Send every method call to the master collection.
+      #
+      # Example:
+      #
+      # <tt>writer.find({})</tt>
+      def method_missing(name, *args, &block)
+        @collection.send(name, *args, &block)
       end
     end
   end
