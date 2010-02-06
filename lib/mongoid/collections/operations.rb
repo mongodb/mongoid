@@ -1,0 +1,39 @@
+# encoding: utf-8
+module Mongoid #:nodoc:
+  module Collections #:nodoc:
+    module Operations #:nodoc:
+      # Constant definining all the read operations available for a
+      # Mongo:Collection. This is used in delegation.
+      READ = [
+        :[],
+        :count,
+        :distinct,
+        :find,
+        :find_one,
+        :group,
+        :index_information,
+        :map_reduce,
+        :mapreduce,
+        :options
+      ]
+
+      # Constant definining all the write operations available for a
+      # Mongo:Collection. This is used in delegation.
+      WRITE = [
+        :<<,
+        :create_index,
+        :drop,
+        :drop_index,
+        :drop_indexes,
+        :insert,
+        :remove,
+        :rename,
+        :save,
+        :update
+      ]
+
+      # Convenience constant for getting back all collection operations.
+      ALL = (READ + WRITE)
+    end
+  end
+end

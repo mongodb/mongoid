@@ -5,12 +5,14 @@ module Mongoid #:nodoc
 
     attr_accessor \
       :allow_dynamic_fields,
+      :max_successive_reads,
       :persist_in_safe_mode,
       :raise_not_found_error
 
     # Defaults the configuration options to true.
     def initialize
       @allow_dynamic_fields = true
+      @max_successive_reads = 5
       @persist_in_safe_mode = true
       @raise_not_found_error = true
     end

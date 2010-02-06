@@ -66,15 +66,6 @@ module Mongoid #:nodoc
 
   class << self
 
-    delegate \
-      :allow_dynamic_fields,
-      :database,
-      :master,
-      :persist_in_safe_mode,
-      :raise_not_found_error,
-      :slaves,
-      :temp_collection_size, :to => :configure
-
     # Sets the Mongoid configuration options. Best used by passing a block.
     #
     # Example:
@@ -89,12 +80,26 @@ module Mongoid #:nodoc
     #       Mongo::Connection.new(host, 27019, :slave_ok => true).db(name)
     #     ]
     #   end
+    #
+    # Returns:
+    #
+    # The Mongoid +Config+ singleton instance.
     def configure
       config = Config.instance
       block_given? ? yield(config) : config
     end
 
     alias :config :configure
+
+    delegate \
+      :allow_dynamic_fields,
+      :database,
+      :master,
+      :max_successive_reads,
+      :persist_in_safe_mode,
+      :raise_not_found_error,
+      :slaves,
+      :temp_collection_size, :to => :configure
   end
 
 end
