@@ -75,11 +75,26 @@ module Mongoid #:nodoc
       :slaves,
       :temp_collection_size, :to => :configure
 
+    # Sets the Mongoid configuration options. Best used by passing a block.
+    #
+    # Example:
+    #
+    #   Mongoid.configure do |config|
+    #     name = "mongoid_test"
+    #     host = "localhost"
+    #     config.allow_dynamic_fields = false
+    #     config.master = Mongo::Connection.new.db(name)
+    #     config.slaves = [
+    #       Mongo::Connection.new(host, 27018, :slave_ok => true).db(name),
+    #       Mongo::Connection.new(host, 27019, :slave_ok => true).db(name)
+    #     ]
+    #   end
     def configure
       config = Config.instance
       block_given? ? yield(config) : config
     end
 
+    alias :config :configure
   end
 
 end

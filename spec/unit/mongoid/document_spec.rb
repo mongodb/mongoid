@@ -4,11 +4,10 @@ describe Mongoid::Document do
 
   before do
     @database = mock
-    Mongoid.stubs(:master).returns(@database)
     @collection = stub(:name => "people")
     @canvas_collection = stub(:name => "canvases")
-    @database.stubs(:collection).with("people").returns(@collection)
-    @database.stubs(:collection).with("canvases").returns(@canvas_collection)
+    Mongoid::Collection.stubs(:new).with("people").returns(@collection)
+    Mongoid::Collection.stubs(:new).with("canvases").returns(@canvas_collection)
     @collection.stubs(:create_index).with(:_type, false)
     @canvas_collection.stubs(:create_index).with(:_type, false)
   end
@@ -553,7 +552,7 @@ describe Mongoid::Document do
     context "on a parent class" do
 
       it "sets the collection name and collection for the document" do
-        @database.expects(:collection).with("population").returns(@collection)
+        Mongoid::Collection.expects(:new).with("population").returns(@collection)
         Patient.store_in :population
         Patient.collection_name.should == "population"
       end
@@ -567,7 +566,7 @@ describe Mongoid::Document do
       end
 
       it "changes the collection name for the entire hierarchy" do
-        @database.expects(:collection).with("browsers").returns(@collection)
+        Mongoid::Collection.expects(:new).with("browsers").returns(@collection)
         Firefox.store_in :browsers
         Canvas.collection_name.should == "browsers"
       end
