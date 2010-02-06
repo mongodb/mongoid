@@ -4,7 +4,7 @@ describe Mongoid::Document do
 
   before do
     @database = mock
-    Mongoid.stubs(:database).returns(@database)
+    Mongoid.stubs(:master).returns(@database)
     @collection = stub(:name => "people")
     @canvas_collection = stub(:name => "canvases")
     @database.stubs(:collection).with("people").returns(@collection)
