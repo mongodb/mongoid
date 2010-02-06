@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/collections/operations"
 require "mongoid/collections/cyclic_iterator"
+require "mongoid/collections/mimic"
 require "mongoid/collections/master"
 require "mongoid/collections/slaves"
 

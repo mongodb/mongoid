@@ -2,6 +2,8 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Master
+      extend Mimic
+
       attr_reader :collection
 
       # All read and write operations should delegate to the master connection.
@@ -10,11 +12,7 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
-      Operations::ALL.each do |name|
-        define_method(name) do |*args|
-          collection.send(name, *args)
-        end
-      end
+      proxy Operations::ALL
 
       # Create the new database writer. Will create a collection from the
       # master database.
