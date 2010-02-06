@@ -12,7 +12,7 @@ module Mongoid #:nodoc
     # Defaults the configuration options to true.
     def initialize
       @allow_dynamic_fields = true
-      @max_successive_reads = 5
+      @max_successive_reads = 10
       @persist_in_safe_mode = true
       @raise_not_found_error = true
     end

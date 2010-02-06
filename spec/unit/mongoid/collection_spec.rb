@@ -62,7 +62,7 @@ describe Mongoid::Collection do
 
       before do
         slaves.expects(:empty?).returns(false)
-        collection.instance_variable_set(:@counter, 5)
+        collection.instance_variable_set(:@counter, 10)
       end
 
       it "delegates to the slave" do
@@ -78,7 +78,7 @@ describe Mongoid::Collection do
     context "when the slave does not exist" do
 
       before do
-        collection.instance_variable_set(:@counter, 5)
+        collection.instance_variable_set(:@counter, 10)
         slaves.expects(:empty?).returns(true)
       end
 

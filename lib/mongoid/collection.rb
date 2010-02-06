@@ -15,9 +15,7 @@ module Mongoid #:nodoc
     #
     # <tt>collection.save({ :name => "Al" })</tt>
     Collections::Operations::WRITE.each do |name|
-      define_method(name) do |*args|
-        master.send(name, *args)
-      end
+      define_method(name) { |*args| master.send(name, *args) }
     end
 
     # All read operations should be intelligently directed to either the master
@@ -28,9 +26,7 @@ module Mongoid #:nodoc
     #
     # <tt>collection.find({ :name => "Al" })</tt>
     Collections::Operations::READ.each do |name|
-      define_method(name) do |*args|
-        directed.send(name, *args)
-      end
+      define_method(name) { |*args| directed.send(name, *args) }
     end
 
     # Determines where to send the next read query. If the slaves are not
