@@ -3,7 +3,12 @@ module Mongoid #:nodoc
   module Errors #:nodoc
 
     # Raised when querying the database for a document by a specific id which
-    # does not exist.
+    # does not exist. If multiple ids were passed then it will display all of
+    # those.
+    #
+    # Example:
+    #
+    # <tt>DocumentNotFound.new(Person, ["1", "2"])</tt>
     class DocumentNotFound < RuntimeError
       def initialize(klass, ids)
         @klass, @identifier = klass, ids.is_a?(Array) ? ids.join(", ") : ids
@@ -14,12 +19,34 @@ module Mongoid #:nodoc
     end
 
     # Raised when invalid options are passed into a constructor or method.
+    #
+    # Example:
+    #
+    # <tt>InvalidOptions.new</tt>
     class InvalidOptions < RuntimeError; end
 
-    # Raised when the database connection has not been set up.
-    class InvalidDatabase < RuntimeError; end
+    # Raised when the database connection has not been set up properly, either
+    # by attempting to set an object on the db that is not a +Mongo::DB+, or
+    # not setting anything at all.
+    #
+    # Example:
+    #
+    # <tt>InvalidDatabase.new("Not a DB")</tt>
+    class InvalidDatabase < RuntimeError
+      def initialize(database)
+        @database = database
+      end
+      def message
+        "Database should be a Mongo::DB, not #{@database.class.name}"
+      end
+    end
 
-    # Raised when a persisence method ending in ! fails validation.
+    # Raised when a persisence method ending in ! fails validation. The message
+    # will contain the full error messages from the +Document+ in question.
+    #
+    # Example:
+    #
+    # <tt>Validations.new(person.errors)</tt>
     class Validations < RuntimeError
       def initialize(errors)
         @errors = errors
@@ -31,6 +58,10 @@ module Mongoid #:nodoc
 
     # This error is raised when trying to access a Mongo::Collection from an
     # embedded document.
+    #
+    # Example:
+    #
+    # <tt>InvalidCollection.new(Address)</tt>
     class InvalidCollection < RuntimeError
       def initialize(klass)
         @klass = klass

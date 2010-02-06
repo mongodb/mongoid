@@ -8,12 +8,24 @@ describe Mongoid::Config do
 
   let(:config) { Mongoid::Config.instance }
 
-  describe ".database=" do
+  describe "#database=" do
 
     context "when object provided is not a Mongo::DB" do
 
       it "raises an error" do
         lambda { config.database = "Test" }.should raise_error
+      end
+
+    end
+
+  end
+
+  describe "#master=" do
+
+    context "when object provided is not a Mongo::DB" do
+
+      it "raises an error" do
+        lambda { config.master = "Test" }.should raise_error
       end
 
     end
@@ -70,6 +82,18 @@ describe Mongoid::Config do
 
       it "sets the value" do
         config.raise_not_found_error.should == false
+      end
+
+    end
+
+  end
+
+  describe "#slaves=" do
+
+    context "when object provided is not a Mongo::DB" do
+
+      it "raises an error" do
+        lambda { config.slaves = ["Test"] }.should raise_error
       end
 
     end
