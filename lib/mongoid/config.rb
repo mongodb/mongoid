@@ -5,8 +5,10 @@ module Mongoid #:nodoc
 
     attr_accessor \
       :allow_dynamic_fields,
+      :master,
       :persist_in_safe_mode,
-      :raise_not_found_error
+      :raise_not_found_error,
+      :slaves
 
     # Defaults the configuration options to true.
     def initialize

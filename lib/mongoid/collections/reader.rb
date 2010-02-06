@@ -6,6 +6,7 @@ module Mongoid #:nodoc:
       attr_reader :iterator
 
       delegate \
+        :[],
         :count,
         :distinct,
         :find,
