@@ -7,6 +7,7 @@ require "mongoid/collections/slaves"
 
 module Mongoid #:nodoc
   class Collection
+    extend Collections::Mimic
     attr_reader :counter, :name
 
     # All write operations should delegate to the master connection. These
@@ -15,9 +16,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>collection.save({ :name => "Al" })</tt>
-    Collections::Operations::WRITE.each do |name|
-      define_method(name) { |*args| master.send(name, *args) }
-    end
+    proxy(:master, Collections::Operations::WRITE)
 
     # All read operations should be intelligently directed to either the master
     # or the slave, depending on where the read counter is and what it's
@@ -26,9 +25,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>collection.find({ :name => "Al" })</tt>
-    Collections::Operations::READ.each do |name|
-      define_method(name) { |*args| directed.send(name, *args) }
-    end
+    proxy(:directed, Collections::Operations::READ)
 
     # Determines where to send the next read query. If the slaves are not
     # defined then send to master. If the read counter is under the configured

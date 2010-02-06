@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
-      proxy Operations::ALL
+      proxy(:collection, Operations::ALL)
 
       # Create the new database writer. Will create a collection from the
       # master database.

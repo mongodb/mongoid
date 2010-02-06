@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
-      proxy Operations::READ
+      proxy(:collection, Operations::READ)
 
       # Is the collection of slaves empty or not?
       #
