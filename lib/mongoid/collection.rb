@@ -7,7 +7,7 @@ require "mongoid/collections/slaves"
 
 module Mongoid #:nodoc
   class Collection
-    extend Collections::Mimic
+    include Collections::Mimic
     attr_reader :counter, :name
 
     # All write operations should delegate to the master connection. These

@@ -2,7 +2,7 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Master
-      extend Mimic
+      include Mimic
 
       attr_reader :collection
 

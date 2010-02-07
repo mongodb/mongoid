@@ -2,7 +2,7 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Slaves
-      extend Mimic
+      include Mimic
 
       attr_reader :iterator
 
