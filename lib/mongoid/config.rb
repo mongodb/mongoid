@@ -6,6 +6,7 @@ module Mongoid #:nodoc
     attr_accessor \
       :allow_dynamic_fields,
       :max_successive_reads,
+      :reconnect_time,
       :persist_in_safe_mode,
       :raise_not_found_error
 
@@ -15,6 +16,7 @@ module Mongoid #:nodoc
       @max_successive_reads = 10
       @persist_in_safe_mode = true
       @raise_not_found_error = true
+      @reconnect_time = 3
     end
 
     # Sets the Mongo::DB master database to be used. If the object trying to me

@@ -88,6 +88,26 @@ describe Mongoid::Config do
 
   end
 
+  describe "#reconnect_time" do
+
+    it "defaults to 3" do
+      config.reconnect_time.should == 3
+    end
+
+  end
+
+  describe "#reconnect_time=" do
+
+    after do
+      config.reconnect_time = 3
+    end
+
+    it "sets the time" do
+      config.reconnect_time = 5
+      config.reconnect_time.should == 5
+    end
+  end
+
   describe "#slaves=" do
 
     context "when object provided is not a Mongo::DB" do
