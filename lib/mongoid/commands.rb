@@ -107,6 +107,7 @@ module Mongoid #:nodoc:
       def set_attributes(attrs = {})
         run_callbacks(:before_update)
         write_attributes(attrs)
+        run_callbacks(:after_update)
       end
 
     end

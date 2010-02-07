@@ -138,6 +138,13 @@ describe Mongoid::Commands do
       @person.update_attributes({})
     end
 
+    it "executes the before and after update callbacks" do
+      @person.expects(:run_callbacks).with(:before_update)
+      Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
+      @person.expects(:run_callbacks).with(:after_update)
+      @person.update_attributes({})
+    end
+
   end
 
   describe "#update_attributes!" do
