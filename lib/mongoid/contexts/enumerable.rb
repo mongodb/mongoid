@@ -41,9 +41,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ of documents that matched the selector.
       def execute(paginating = false)
-        matching = @documents.select { |document| document.matches?(@selector) }
-        @count = matching.size if paginating
-        matching
+        limit(@documents.select { |document| document.matches?(@selector) })
       end
 
       # Create the new enumerable context. This will need the selector and
@@ -101,6 +99,15 @@ module Mongoid #:nodoc:
           value = doc.send(field)
           (memo && memo.send(operator, value)) ? memo : value
         end
+      end
+
+      # Limits the result set if skip and limit options.
+      def limit(documents)
+        skip, limit = @options[:skip], @options[:limit]
+        if skip && limit
+          return documents.slice(skip, limit)
+        end
+        documents
       end
     end
   end

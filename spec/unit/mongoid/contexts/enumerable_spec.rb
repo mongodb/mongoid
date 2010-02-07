@@ -44,6 +44,29 @@ describe Mongoid::Contexts::Enumerable do
       @context.execute.should == [ @melbourne ]
     end
 
+    context "when selector is empty" do
+
+      before do
+        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+      end
+
+      it "returns all the documents" do
+        @context.execute.should == @docs
+      end
+    end
+
+    context "when skip and limit are in the options" do
+
+      before do
+        @options = { :skip => 2, :limit => 2 }
+        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+      end
+
+      it "properly narrows down the matching results" do
+        @context.execute.should == [ @melbourne, @new_york ]
+      end
+    end
+
   end
 
   describe "#first" do
@@ -164,14 +187,14 @@ describe Mongoid::Contexts::Enumerable do
   describe "#paginate" do
 
     before do
-      @criteria = Person.where(:_id => "1").skip(60).limit(20)
-      @context = Mongoid::Contexts::Enumerable.new(@criteria.selector, @criteria.options, [])
+      @criteria = Person.criteria.skip(2).limit(2)
+      @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, @docs)
       @results = @context.paginate
     end
 
     it "executes and paginates the results" do
-      @results.current_page.should == 4
-      @results.per_page.should == 20
+      @results.current_page.should == 2
+      @results.per_page.should == 2
     end
 
   end
