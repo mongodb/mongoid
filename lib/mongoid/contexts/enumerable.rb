@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       include Paging
       attr_reader :selector, :options, :documents
 
-      delegate :first, :last, :to => :documents
+      delegate :first, :last, :to => :execute
 
       # Return aggregation counts of the grouped documents. This will count by
       # the first field provided in the fields array.
@@ -80,9 +80,7 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # The first document in the +Array+
-      def one
-        @documents.first
-      end
+      alias :one :first
 
       # Get the sum of the field values for all the documents.
       #
