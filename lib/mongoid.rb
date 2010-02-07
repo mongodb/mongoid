@@ -33,6 +33,7 @@ require "active_support/core_ext"
 require 'active_support/json'
 require "active_support/inflector"
 require "active_support/time_with_zone"
+require "active_model"
 require "active_model/callbacks"
 require "active_model/conversion"
 require "active_model/deprecated_error_methods"
