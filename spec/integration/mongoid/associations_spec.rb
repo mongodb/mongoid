@@ -118,6 +118,18 @@ describe Mongoid::Associations do
       from_db.posts.should == [@post]
     end
 
+    context "when adding a new association" do
+
+      before do
+        @new_post = Post.new(:title => "New")
+        @person.posts << @new_post
+      end
+
+      it "rememoizes the new association" do
+        @person.posts.should == [ @post, @new_post ]
+      end
+    end
+
     context "when building" do
 
       before do
