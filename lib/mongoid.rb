@@ -90,16 +90,19 @@ module Mongoid #:nodoc
     end
 
     alias :config :configure
-
-    delegate \
-      :allow_dynamic_fields,
-      :database,
-      :master,
-      :max_successive_reads,
-      :persist_in_safe_mode,
-      :raise_not_found_error,
-      :slaves,
-      :temp_collection_size, :to => :configure
   end
 
+  # Take all the public instance methods from the Config singleton and allow
+  # them to be accessed through the Mongoid module directly.
+  #
+  # Example:
+  #
+  # <tt>Mongoid.database = Mongo::Connection.new.db("test")</tt>
+  Config.public_instance_methods(false).each do |name|
+    (class << self; self; end).class_eval <<-EOT
+      def #{name}(*args)
+        configure.send("#{name}", *args)
+      end
+    EOT
+  end
 end
