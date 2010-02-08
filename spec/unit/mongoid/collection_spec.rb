@@ -42,16 +42,43 @@ describe Mongoid::Collection do
 
   describe "#directed" do
 
-    context "when a write token exists" do
+    context "when the counter is less than the maximum" do
+
+      before do
+        collection.instance_variable_set(:@counter, 0)
+      end
 
       it "delegates to the master" do
-        collection.directed("token").should == master
+        collection.directed.should == master
+      end
+
+      it "increments the counter" do
+        collection.directed
+        collection.counter.should == 1
+      end
+    end
+
+    context "when the counter is at the max" do
+
+      before do
+        slaves.expects(:empty?).returns(false)
+        collection.instance_variable_set(:@counter, 10)
+      end
+
+      it "delegates to the slave" do
+        collection.directed.should == slaves
+      end
+
+      it "resets the counter" do
+        collection.directed
+        collection.counter.should == 0
       end
     end
 
     context "when the slave does not exist" do
 
       before do
+        collection.instance_variable_set(:@counter, 10)
         slaves.expects(:empty?).returns(true)
       end
 
@@ -67,7 +94,6 @@ describe Mongoid::Collection do
       @cursor = stub.quacks_like(Mongoid::Cursor.allocate)
       master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
       Mongoid::Cursor.expects(:new).with(collection, @mongo_cursor).returns(@cursor)
-      slaves.expects(:empty?).returns(true)
     end
 
     it "finds are returns a cursor" do
@@ -81,33 +107,6 @@ describe Mongoid::Collection do
         collection.find({ :test => "value" }) do |cur|
           cur.should == @cursor
         end
-      end
-    end
-  end
-
-  describe "#find_one" do
-
-    context "when a token exists" do
-
-      before do
-        master.expects(:find_one).with({ :test => "value" }, {})
-        slaves.stubs(:empty?).returns(false)
-      end
-
-      it "delegates to master" do
-        collection.find_one({ :test => "value"}, {}, "token")
-      end
-    end
-
-    context "when a token does not exist" do
-
-      before do
-        slaves.expects(:find_one).with({ :test => "value" }, {})
-        slaves.stubs(:empty?).returns(false)
-      end
-
-      it "delegates to slave" do
-        collection.find_one({ :test => "value"})
       end
     end
   end

@@ -8,7 +8,7 @@ require "mongoid/collections/slaves"
 module Mongoid #:nodoc
   class Collection
     include Collections::Mimic
-    attr_reader :name
+    attr_reader :counter, :name
 
     # All write operations should delegate to the master connection. These
     # operations mimic the methods on a Mongo:Collection.
@@ -25,7 +25,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>collection.find({ :name => "Al" })</tt>
-    proxy(:directed, (Collections::Operations::READ - [:find, :find_one]))
+    proxy(:directed, (Collections::Operations::READ - [:find]))
 
     # Determines where to send the next read query. If the slaves are not
     # defined then send to master. If the read counter is under the configured
@@ -38,8 +38,14 @@ module Mongoid #:nodoc
     # Return:
     #
     # Either a +Master+ or +Slaves+ collection.
-    def directed(token = nil)
-      (token || slaves.empty?) ? master : slaves
+    def directed
+      if under_max_counter? || slaves.empty?
+        @counter = @counter + 1
+        master
+      else
+        @counter = 0
+        slaves
+      end
     end
 
     # Find documents from the database given a selector and options.
@@ -48,33 +54,17 @@ module Mongoid #:nodoc
     #
     # selector: A +Hash+ selector that is the query.
     # options: The options to pass to the db.
-    # token: String from a previous write.
     #
     # Example:
     #
     # <tt>collection.find({ :test => "value" })</tt>
-    def find(selector = {}, options = {}, token = nil)
-      cursor = Mongoid::Cursor.new(self, directed(token).find(selector, options))
+    def find(selector = {}, options = {})
+      cursor = Mongoid::Cursor.new(self, directed.find(selector, options))
       if block_given?
         yield cursor; cursor.close
       else
         cursor
       end
-    end
-
-    # Find the first from the database given a selector and options.
-    #
-    # Options:
-    #
-    # selector: A +Hash+ selector that is the query.
-    # options: The options to pass to the db.
-    # toekn: String from a previous write.
-    #
-    # Example:
-    #
-    # <tt>collection.find({ :test => "value" })</tt>
-    def find_one(selector = nil, options = {}, token = nil)
-      directed(token).find_one(selector, options)
     end
 
     # Initialize a new Mongoid::Collection, setting up the master, slave, and
@@ -84,7 +74,7 @@ module Mongoid #:nodoc
     #
     # <tt>Mongoid::Collection.new(masters, slaves, "test")</tt>
     def initialize(name)
-      @name = name
+      @name, @counter = name, 0
     end
 
     # Return the object responsible for reading documents from the database.
@@ -106,6 +96,11 @@ module Mongoid #:nodoc
     # <tt>collection.writer</tt>
     def master
       @master ||= Collections::Master.new(Mongoid.master, @name)
+    end
+
+    protected
+    def under_max_counter?
+      @counter < Mongoid.max_successive_reads
     end
   end
 end
