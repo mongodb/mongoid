@@ -41,7 +41,7 @@ module Mongoid #:nodoc
     # <tt>cursor.each { |doc| p doc.title }</tt>
     def each
       @cursor.each do |document|
-        yield init(document)
+        yield Mongoid::Factory.build(document)
       end
     end
 
@@ -66,7 +66,7 @@ module Mongoid #:nodoc
     #
     # <tt>cursor.next_document</tt>
     def next_document
-      init(@cursor.next_document)
+      Mongoid::Factory.build(@cursor.next_document)
     end
 
     # Returns an array of all the documents in the cursor.
@@ -75,13 +75,7 @@ module Mongoid #:nodoc
     #
     # <tt>cursor.to_a</tt>
     def to_a
-      @cursor.to_a.collect { |attrs| init(attrs) }
-    end
-
-    protected
-    # Create the new document from the _type in the attributes.
-    def init(attrs)
-      attrs["_type"].constantize.instantiate(attrs)
+      @cursor.to_a.collect { |attrs| Mongoid::Factory.build(attrs) }
     end
   end
 end

@@ -80,7 +80,7 @@ describe Mongoid::Contexts::Mongo do
 
     it "calls find on the collection" do
       @collection.expects(:find).with(selector, options).returns(@cursor)
-      @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
+      @cursor.expects(:collect).yields({ "_type" => "Person", "title" => "Sir" }).returns([@person])
       @context.execute.should == [@person]
     end
 
@@ -88,7 +88,7 @@ describe Mongoid::Contexts::Mongo do
 
       it "should find the count from the cursor" do
         @collection.expects(:find).with(selector, options).returns(@cursor)
-        @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
+        @cursor.expects(:collect).yields({ "_type" => "Person", "title" => "Sir" }).returns([@person])
         @context.execute(true).should == [@person]
         @context.count.should == 500
       end
@@ -106,7 +106,7 @@ describe Mongoid::Contexts::Mongo do
 
         it "adds _type to the fields" do
           @collection.expects(:find).with(selector, @expected_options).returns(@cursor)
-          @cursor.expects(:collect).yields({ :title => "Sir" }).returns([@person])
+          @cursor.expects(:collect).yields({ "_type" => "Person", "title" => "Sir" }).returns([@person])
           @context.execute.should == [@person]
         end
 

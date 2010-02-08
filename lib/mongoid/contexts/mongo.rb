@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
           true
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
-            instantiate(attrs)
+            Mongoid::Factory.build(attrs)
           end
           docs
         end
@@ -79,7 +79,7 @@ module Mongoid #:nodoc:
         attributes = @klass.collection.find(@selector, process_options)
         if attributes
           @count = attributes.count if paginating
-          attributes.collect { |doc| instantiate(doc) }
+          attributes.collect { |doc| Mongoid::Factory.build(doc) }
         else
           []
         end
@@ -115,7 +115,7 @@ module Mongoid #:nodoc:
         sorting = [[:_id, :asc]] unless sorting
         opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
         attributes = @klass.collection.find_one(@selector, opts)
-        attributes ? instantiate(attributes) : nil
+        attributes ? Mongoid::Factory.build(attributes) : nil
       end
 
       MAX_REDUCE = "function(obj, prev) { if (prev.max == 'start') { prev.max = obj.[field]; } " +
@@ -169,7 +169,7 @@ module Mongoid #:nodoc:
       # The first document in the collection.
       def one
         attributes = @klass.collection.find_one(@selector, process_options)
-        attributes ? instantiate(attributes) : nil
+        attributes ? Mongoid::Factory.build(attributes) : nil
       end
 
       alias :first :one
@@ -204,11 +204,6 @@ module Mongoid #:nodoc:
           true
         )
         collection.first[start.to_s]
-      end
-
-      # If hereditary instantiate by _type otherwise use the klass.
-      def instantiate(attrs)
-        @hereditary ? attrs["_type"].constantize.instantiate(attrs) : @klass.instantiate(attrs)
       end
 
       # Filters the field list. If no fields have been supplied, then it will be
