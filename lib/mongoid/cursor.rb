@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc
   class Cursor
+    include Enumerable
     # Operations on the Mongo::Cursor object that will not get overriden by the
     # Mongoid::Cursor are defined here.
     OPERATIONS = [
