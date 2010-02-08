@@ -24,8 +24,27 @@ describe Mongoid::Extensions::String::Inflections do
 
   describe "#identify" do
 
-    it "converts the string to all lowercase and dashed" do
-      "A Midnight Summer Night's Dream".identify.should == "a-midnight-summer-nights-dream"
+    context "when parameterizing composite keys" do
+
+      it "converts the string to all lowercase and dashed" do
+        "A Midsummer Night's Dream".identify.should == "a-midsummer-night-quo-s-dream"
+      end
+
+    end
+
+    context "when not parameterizing keys" do
+
+      before do
+        Mongoid.parameterize_keys = false
+      end
+
+      after do
+        Mongoid.parameterize_keys = true
+      end
+
+      it "does nothing to the keys" do
+        "A Midsummer Night's Dream".identify.should == "A Midsummer Night's Dream"
+      end
     end
 
   end

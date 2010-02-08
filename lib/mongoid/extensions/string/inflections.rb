@@ -10,6 +10,44 @@ module Mongoid #:nodoc:
           inflect.irregular("canvas", "canvases")
         end
 
+        # Represents how special characters will get converted when creating a
+        # composite key that should be unique and part of a url.
+        CHAR_CONV = {
+          " " => "-",
+          "!" => "-excl-",
+          "\"" => "-bckslsh-",
+          "#" => "-hash-",
+          "$" => "-dol-",
+          "%" => "-perc-",
+          "&" => "-and-",
+          "'" => "-quo-",
+          "(" => "-oparen-",
+          ")" => "-cparen-",
+          "*" => "-astx-",
+          "+" => "-plus-",
+          "," => "-comma-",
+          "-" => "-dash-",
+          "." => "-period-",
+          "/" => "-fwdslsh-",
+          ":" => "-colon-",
+          ";" => "-semicol-",
+          "<" => "-lt-",
+          "=" => "-eq-",
+          ">" => "-gt-",
+          "?" => "-ques-",
+          "@" => "-at-",
+          "[" => "-obrck-",
+          "\\" => "-bckslsh-",
+          "]" => "-clbrck-",
+          "^" => "-carat-",
+          "_" => "-undscr-",
+          "`" => "-bcktick-",
+          "{" => "-ocurly-",
+          "|" => "-pipe-",
+          "}" => "-clcurly-",
+          "~" => "-tilda-"
+        }
+
         REVERSALS = {
           "asc" => "desc",
           "ascending" => "descending",
@@ -22,7 +60,12 @@ module Mongoid #:nodoc:
         end
 
         def identify
-          gsub(" ", "_").gsub(/\W/, "").dasherize.downcase
+          if Mongoid.parameterize_keys
+            key = ""
+            each_char { |c| key += (CHAR_CONV[c] || c.downcase) }; key
+          else
+            self
+          end
         end
 
         def labelize
