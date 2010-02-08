@@ -22,7 +22,7 @@
 require "rubygems"
 
 gem "activesupport", ">= 2.2.2", "<3.0.pre"
-gem "mongo", ">= 0.18.2"
+gem "mongo", ">= 0.18.3"
 gem "durran-validatable", ">= 2.0.1"
 gem "will_paginate", ">= 2.3.11", "<3.0.pre"
 
