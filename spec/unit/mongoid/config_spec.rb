@@ -32,6 +32,13 @@ describe Mongoid::Config do
 
   end
 
+  describe "#parameterize_keys" do
+
+    it "defaults to true" do
+      config.parameterize_keys.should == true
+    end
+  end
+
   describe "#persist_in_safe_mode=" do
 
     context "when setting to true" do

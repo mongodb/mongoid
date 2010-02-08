@@ -7,6 +7,7 @@ module Mongoid #:nodoc
       :allow_dynamic_fields,
       :max_successive_reads,
       :reconnect_time,
+      :parameterize_keys,
       :persist_in_safe_mode,
       :raise_not_found_error
 
@@ -14,6 +15,7 @@ module Mongoid #:nodoc
     def initialize
       @allow_dynamic_fields = true
       @max_successive_reads = 10
+      @parameterize_keys = true
       @persist_in_safe_mode = true
       @raise_not_found_error = true
       @reconnect_time = 3
