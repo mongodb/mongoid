@@ -70,7 +70,7 @@ module Mongoid #:nodoc:
         self.selector == other.selector && self.options == other.options
       when Enumerable
         @collection ||= execute
-        return (@collection.collect == other)
+        return (@collection.entries == other)
       else
         return false
       end
