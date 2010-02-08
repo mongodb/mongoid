@@ -152,6 +152,36 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#blank?" do
+
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+    end
+
+    context "when the count is 0" do
+
+      before do
+        @context.expects(:count).returns(0)
+      end
+
+      it "returns true" do
+        @criteria.blank?.should be_true
+      end
+    end
+
+    context "when the count is greater than 0" do
+
+      before do
+        @context.expects(:count).returns(10)
+      end
+
+      it "returns false" do
+        @criteria.blank?.should be_false
+      end
+    end
+  end
+
   describe "#context" do
 
     context "when the context has been set" do

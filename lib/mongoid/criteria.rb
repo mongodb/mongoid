@@ -76,6 +76,17 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Returns true if the criteria is empty.
+    #
+    # Example:
+    #
+    # <tt>criteria.blank?</tt>
+    def blank?
+      count < 1
+    end
+
+    alias :empty? :blank?
+
     # Return or create the context in which this criteria should be executed.
     #
     # This will return an Enumerable context if the class is embedded,
@@ -110,8 +121,7 @@ module Mongoid #:nodoc:
     def each(&block)
       @collection ||= execute
       if block_given?
-        docs = []
-        @collection.each { |doc| docs << doc; yield doc }
+        @collection.each { |doc| yield doc }
       end
       self
     end
@@ -155,26 +165,6 @@ module Mongoid #:nodoc:
     #
     # name: The name of the class method on the +Document+ to chain.
     # args: The arguments passed to the method.
-    #
-    # Example:
-    #
-    #   class Person
-    #     include Mongoid::Document
-    #     field :title
-    #     field :terms, :type => Boolean, :default => false
-    #
-    #     class << self
-    #       def knights
-    #         all(:conditions => { :title => "Sir" })
-    #       end
-    #
-    #       def accepted
-    #         all(:conditions => { :terms => true })
-    #       end
-    #     end
-    #   end
-    #
-    #   Person.accepted.knights #returns a merged criteria of the 2 scopes.
     #
     # Returns: <tt>Criteria</tt>
     def method_missing(name, *args)
