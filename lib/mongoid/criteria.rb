@@ -3,7 +3,6 @@ require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/optional"
-require "mongoid/criterion/union"
 
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
@@ -24,7 +23,6 @@ module Mongoid #:nodoc:
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Optional
-    include Criterion::Union
     include Enumerable
 
     attr_reader :collection, :ids, :klass, :options, :selector
@@ -72,7 +70,7 @@ module Mongoid #:nodoc:
         self.selector == other.selector && self.options == other.options
       when Enumerable
         @collection ||= execute
-        return (@collection == other)
+        return (@collection.collect == other)
       else
         return false
       end
@@ -111,7 +109,11 @@ module Mongoid #:nodoc:
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
       @collection ||= execute
-      block_given? ? @collection.each { |doc| yield doc } : self
+      if block_given?
+        docs = []
+        @collection.each { |doc| docs << doc; yield doc }
+      end
+      self
     end
 
     # Create the new +Criteria+ object. This will initialize the selector

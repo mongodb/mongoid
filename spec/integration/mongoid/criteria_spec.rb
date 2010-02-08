@@ -30,34 +30,6 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#or" do
-
-    let(:first) { Person.where(:ssn => "1") }
-    let(:second) { Person.where(:ssn => "3") }
-    let(:third) { Person.where(:ssn => "5") }
-    let(:fourth) { Person.where(:ssn => "7") }
-
-    before do
-      10.times do |n|
-        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
-      end
-    end
-
-    after do
-      Person.delete_all
-    end
-
-    it "unions all the criteria together" do
-      documents = first.or(second).or(third).or(fourth)
-      documents.size.should == 4
-      documents[0].ssn.should == "1"
-      documents[1].ssn.should == "3"
-      documents[2].ssn.should == "5"
-      documents[3].ssn.should == "7"
-    end
-
-  end
-
   describe "#max" do
 
     before do

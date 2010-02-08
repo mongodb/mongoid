@@ -25,7 +25,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>collection.find({ :name => "Al" })</tt>
-    proxy(:directed, Collections::Operations::READ)
+    proxy(:directed, (Collections::Operations::READ - [:find]))
 
     # Determines where to send the next read query. If the slaves are not
     # defined then send to master. If the read counter is under the configured
@@ -45,6 +45,25 @@ module Mongoid #:nodoc
       else
         @counter = 0
         slaves
+      end
+    end
+
+    # Find documents from the database given a selector and options.
+    #
+    # Options:
+    #
+    # selector: A +Hash+ selector that is the query.
+    # options: The options to pass to the db.
+    #
+    # Example:
+    #
+    # <tt>collection.find({ :test => "value" })</tt>
+    def find(selector = {}, options = {})
+      cursor = Mongoid::Cursor.new(self, directed.find(selector, options))
+      if block_given?
+        yield cursor; cursor.close
+      else
+        cursor
       end
     end
 

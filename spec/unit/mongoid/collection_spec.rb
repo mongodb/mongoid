@@ -87,4 +87,27 @@ describe Mongoid::Collection do
       end
     end
   end
+
+  describe "#find" do
+
+    before do
+      @cursor = stub.quacks_like(Mongoid::Cursor.allocate)
+      master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
+      Mongoid::Cursor.expects(:new).with(collection, @mongo_cursor).returns(@cursor)
+    end
+
+    it "finds are returns a cursor" do
+      collection.find({ :test => "value"}).should == @cursor
+    end
+
+    context "when a block is supplied" do
+
+      it "yields to the cursor and closes it" do
+        @cursor.expects(:close).returns(true)
+        collection.find({ :test => "value" }) do |cur|
+          cur.should == @cursor
+        end
+      end
+    end
+  end
 end
