@@ -69,8 +69,7 @@ module Mongoid #:nodoc:
       when Criteria
         self.selector == other.selector && self.options == other.options
       when Enumerable
-        @collection ||= execute
-        return (@collection.entries == other)
+        return (execute.entries == other)
       else
         return false
       end
@@ -119,9 +118,8 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      @collection ||= execute
       if block_given?
-        @collection.each { |doc| yield doc }
+        execute.each { |doc| yield doc }
       end
       self
     end
