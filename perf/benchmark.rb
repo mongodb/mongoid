@@ -3,10 +3,12 @@ require "ruby-prof"
 require "benchmark"
 require "mongoid"
 
-connection = Mongo::Connection.new
-Mongoid.database = connection.db("mongoid_perf_test")
+Mongoid.configure do |config|
+  config.persist_in_safe_mode = false
+  config.master = Mongo::Connection.new.db("mongoid_perf_test")
+end
 
-Mongoid.database.collection("people").drop
+Mongoid.master.collection("people").drop
 
 class Person
   include Mongoid::Document

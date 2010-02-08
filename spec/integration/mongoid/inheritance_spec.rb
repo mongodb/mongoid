@@ -16,7 +16,7 @@ describe Mongoid::Document do
     end
 
     it "saves in the same collection as the root" do
-      collection = Mongoid.database.collection("canvases")
+      collection = Mongoid.master.collection("canvases")
       attributes = collection.find({ :name => "Test"}, {}).next_document
       attributes["version"].should == 3
       attributes["name"].should == "Test"
@@ -34,7 +34,7 @@ describe Mongoid::Document do
     end
 
     it "saves in the same collection as the root" do
-      collection = Mongoid.database.collection("canvases")
+      collection = Mongoid.master.collection("canvases")
       attributes = collection.find({ :name => "Testy"}, {}).next_document
       attributes["version"].should == 2
       attributes["name"].should == "Testy"

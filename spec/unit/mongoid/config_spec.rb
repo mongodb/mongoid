@@ -8,7 +8,7 @@ describe Mongoid::Config do
 
   let(:config) { Mongoid::Config.instance }
 
-  describe ".database=" do
+  describe "#database=" do
 
     context "when object provided is not a Mongo::DB" do
 
@@ -18,6 +18,25 @@ describe Mongoid::Config do
 
     end
 
+  end
+
+  describe "#master=" do
+
+    context "when object provided is not a Mongo::DB" do
+
+      it "raises an error" do
+        lambda { config.master = "Test" }.should raise_error
+      end
+
+    end
+
+  end
+
+  describe "#parameterize_keys" do
+
+    it "defaults to true" do
+      config.parameterize_keys.should == true
+    end
   end
 
   describe "#persist_in_safe_mode=" do
@@ -76,6 +95,38 @@ describe Mongoid::Config do
 
   end
 
+  describe "#reconnect_time" do
+
+    it "defaults to 3" do
+      config.reconnect_time.should == 3
+    end
+
+  end
+
+  describe "#reconnect_time=" do
+
+    after do
+      config.reconnect_time = 3
+    end
+
+    it "sets the time" do
+      config.reconnect_time = 5
+      config.reconnect_time.should == 5
+    end
+  end
+
+  describe "#slaves=" do
+
+    context "when object provided is not a Mongo::DB" do
+
+      it "raises an error" do
+        lambda { config.slaves = ["Test"] }.should raise_error
+      end
+
+    end
+
+  end
+
   describe "#allow_dynamic_fields=" do
 
     context "when setting to true" do
@@ -100,14 +151,6 @@ describe Mongoid::Config do
         config.allow_dynamic_fields.should == false
       end
 
-    end
-
-  end
-
-  describe "#temp_collection_size" do
-
-    it "defaults to 1MB" do
-      config.temp_collection_size.should == 1048576
     end
 
   end

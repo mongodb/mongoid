@@ -11,7 +11,6 @@ describe Mongoid::Criteria do
 
     before do
       @sir = Person.new(:title => "Sir")
-      @madam = Person.new(:title => "Madam")
       @canvas = Canvas.new
     end
 
@@ -19,14 +18,15 @@ describe Mongoid::Criteria do
 
       before do
         @collection = mock
-        @cursor = stub(:count => 1, :collect => [ @sir, @madam ])
+        @cursor = stub(:count => 1)
+        @cursor.expects(:each).yields(@sir)
         Person.expects(:collection).returns(@collection)
         @collection.expects(:find).returns(@cursor)
       end
 
       it "executes the criteria and concats the results" do
         results = @criteria + [ @canvas ]
-        results.should == [ @sir, @madam, @canvas ]
+        results.should == [ @sir, @canvas ]
       end
 
     end
@@ -71,7 +71,8 @@ describe Mongoid::Criteria do
 
       before do
         @collection = mock
-        @cursor = stub(:count => 1, :collect => [ @sir, @sir, @madam ])
+        @cursor = stub(:count => 1)
+        @cursor.expects(:each).yields(@madam)
         Person.expects(:collection).returns(@collection)
         @collection.expects(:find).returns(@cursor)
       end
@@ -118,7 +119,8 @@ describe Mongoid::Criteria do
       @criteria.where(:title => "Sir")
       @collection = stub
       @person = Person.new(:title => "Sir")
-      @cursor = stub(:count => 10, :collect => [@person])
+      @cursor = stub(:count => 10)
+      @cursor.expects(:each).yields(@person)
     end
 
     context "when the criteria has not been executed" do
@@ -227,7 +229,8 @@ describe Mongoid::Criteria do
         @collection = mock
         Person.expects(:collection).returns(@collection)
         @criteria = Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
-        @cursor = stub(:count => 44, :collect => [])
+        @cursor = stub(:count => 44)
+        @cursor.expects(:each)
         @collection.expects(:find).with(@criteria.selector, @criteria.options).returns(@cursor)
       end
 
@@ -272,7 +275,7 @@ describe Mongoid::Criteria do
       @criteria.where(:title => "Sir")
       @collection = stub
       @person = Person.new(:title => "Sir")
-      @cursor = stub(:count => 10, :collect => [@person])
+      @cursor = stub(:count => 10)
     end
 
     context "when the criteria has not been executed" do
@@ -280,11 +283,12 @@ describe Mongoid::Criteria do
       before do
         Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @cursor.expects(:each).yields(@person)
       end
 
       it "executes the criteria" do
-        @criteria.each do |person|
-          person.should == @person
+        @criteria.each do |doc|
+          doc.should == @person
         end
       end
 
@@ -295,10 +299,10 @@ describe Mongoid::Criteria do
       before do
         Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @cursor.expects(:each).yields(@person)
       end
 
       it "calls each on the existing results" do
-        @criteria.each
         @criteria.each do |person|
           person.should == @person
         end

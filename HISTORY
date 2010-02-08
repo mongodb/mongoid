@@ -1,3 +1,36 @@
+=== 1.2.0
+- Fixed composite key generation not to replace all
+  special chars with dashes.
+
+- Memory optimizations, now wrapping the mongo cursor.
+
+- Fixed memoization on has_many_related assocations.
+
+- Fixed pagination on embedded associations
+
+- Fixed after_update callback not getting fired.
+
+- When a connection failure occurs, Mongoid tried to
+  retry the operation up to a configurable time.
+
+- Mongoid now supports a configuration with a master
+  and multiple read slaves. It will direct all writes
+  to the master and all reads to the slaves. In the case
+  of a write, subsequent reads will be directed to the
+  master up to configurable number to try and counter
+  the 2 second slave sync delay.
+
+- Fixed issue with criteria exclusion queries with ids.
+
+- Mongoid only executes a count when explicitly paginating.
+
+- Fixed Criteria offset to be a getter or setter
+
+- Added indexes to foreign keys on belongs_to_related
+  associations.
+
+- General code refactorings/cleanup
+
 === 1.1.4
 - Refactorings in preparation for next feature push.
 

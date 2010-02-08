@@ -13,14 +13,19 @@ require "mongoid"
 require "spec"
 
 Mongoid.configure do |config|
-  config.database = Mongo::Connection.new.db("mongoid_test")
+  name = "mongoid_test"
+  host = "localhost"
+  config.master = Mongo::Connection.new.db(name)
+  # config.slaves = [
+    # Mongo::Connection.new(host, 27018, :slave_ok => true).db(name)
+  # ]
 end
 
-Dir[File.join(MODELS, "*.rb")].sort.each {|file| require File.basename(file) }
+Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
   config.after :suite do
-    Mongoid.database.collections.each(&:drop)
+    Mongoid.master.collections.each(&:drop)
   end
 end

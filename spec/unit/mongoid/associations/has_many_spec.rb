@@ -399,6 +399,25 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe "#paginate" do
+
+    before do
+      @association = Mongoid::Associations::HasMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+      @options = { :page => 1, :per_page => 10 }
+      @criteria = mock
+    end
+
+    it "creates a criteria and paginates it" do
+      Mongoid::Criteria.expects(:translate).with(Address, @options).returns(@criteria)
+      @criteria.expects(:documents=).with(@association.target)
+      @criteria.expects(:paginate).returns([])
+      @association.paginate(@options).should == []
+    end
+  end
+
   describe "#push" do
 
     before do

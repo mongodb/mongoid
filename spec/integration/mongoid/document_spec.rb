@@ -41,7 +41,7 @@ describe Mongoid::Document do
 
     it "gets a new or current database connection" do
       person = Person.new
-      person.collection.should be_a_kind_of(Mongo::Collection)
+      person.collection.should be_a_kind_of(Mongoid::Collection)
     end
 
   end

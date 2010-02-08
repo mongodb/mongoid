@@ -97,9 +97,9 @@ module Mongoid #:nodoc:
       # If the method exists on the array, use the default proxy behavior.
       def method_missing(name, *args, &block)
         unless @target.respond_to?(name)
-          criteria = @klass.send(name, *args)
-          criteria.documents = @target
-          return criteria
+          object = @klass.send(name, *args)
+          object.documents = @target
+          return object
         end
         super
       end
@@ -118,6 +118,22 @@ module Mongoid #:nodoc:
         attributes.values.each do |attrs|
           build(attrs)
         end
+      end
+
+      # Paginate the association. Will create a new criteria, set the documents
+      # on it and execute in an enumerable context.
+      #
+      # Options:
+      #
+      # options: A +Hash+ of pagination options.
+      #
+      # Returns:
+      #
+      # A +WillPaginate::Collection+.
+      def paginate(options)
+        criteria = Mongoid::Criteria.translate(@klass, options)
+        criteria.documents = @target
+        criteria.paginate
       end
 
       protected

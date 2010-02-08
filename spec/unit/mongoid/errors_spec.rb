@@ -46,16 +46,12 @@ describe Mongoid::Errors do
 
     describe "#message" do
 
-      context "default" do
+      before do
+        @error = Mongoid::Errors::InvalidDatabase.new("Test")
+      end
 
-        before do
-          @error = Mongoid::Errors::InvalidDatabase.new
-        end
-
-        it "returns the class name" do
-          @error.message.should == @error.class.name
-        end
-
+      it "returns a message with the bad db object class" do
+        @error.message.should include("String")
       end
 
     end

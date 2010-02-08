@@ -8,7 +8,7 @@ describe Mongoid::Contexts::Enumerable do
     @melbourne = Address.new(:number => 20, :street => "Bourke Street")
     @new_york = Address.new(:number => 20, :street => "Broadway")
     @docs = [ @london, @shanghai, @melbourne, @new_york ]
-    @selector = { :street => "Bond Street" }
+    @selector = { :street => "Bourke Street" }
     @options = { :fields => [ :number ] }
     @context = Mongoid::Contexts::Enumerable.new(@selector, @options, @docs)
   end
@@ -41,15 +41,41 @@ describe Mongoid::Contexts::Enumerable do
   describe "#execute" do
 
     it "returns the matching documents from the array" do
-      @context.execute.should == [ @london ]
+      @context.execute.should == [ @melbourne ]
+    end
+
+    context "when selector is empty" do
+
+      before do
+        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+      end
+
+      it "returns all the documents" do
+        @context.execute.should == @docs
+      end
+    end
+
+    context "when skip and limit are in the options" do
+
+      before do
+        @options = { :skip => 2, :limit => 2 }
+        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+      end
+
+      it "properly narrows down the matching results" do
+        @context.execute.should == [ @melbourne, @new_york ]
+      end
     end
 
   end
 
   describe "#first" do
 
-    it "returns the first in the enumerable" do
-      @context.first.should == @london
+    context "when a selector is present" do
+
+      it "returns the first that matches the selector" do
+        @context.first.should == @melbourne
+      end
     end
 
   end
@@ -98,8 +124,8 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#last" do
 
-    it "returns the last in the enumerable" do
-      @context.last.should == @new_york
+    it "returns the last matching in the enumerable" do
+      @context.last.should == @melbourne
     end
 
   end
@@ -122,8 +148,8 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#one" do
 
-    it "returns the first in the enumerable" do
-      @context.one.should == @london
+    it "returns the first matching in the enumerable" do
+      @context.one.should == @melbourne
     end
 
   end
@@ -161,14 +187,14 @@ describe Mongoid::Contexts::Enumerable do
   describe "#paginate" do
 
     before do
-      @criteria = Person.where(:_id => "1").skip(60).limit(20)
-      @context = Mongoid::Contexts::Enumerable.new(@criteria.selector, @criteria.options, [])
+      @criteria = Person.criteria.skip(2).limit(2)
+      @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, @docs)
       @results = @context.paginate
     end
 
     it "executes and paginates the results" do
-      @results.current_page.should == 4
-      @results.per_page.should == 20
+      @results.current_page.should == 2
+      @results.per_page.should == 2
     end
 
   end

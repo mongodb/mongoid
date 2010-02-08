@@ -48,12 +48,15 @@ require "mongoid/associations"
 require "mongoid/associations/options"
 require "mongoid/attributes"
 require "mongoid/callbacks"
+require "mongoid/collection"
 require "mongoid/commands"
 require "mongoid/config"
 require "mongoid/contexts"
 require "mongoid/criteria"
+require "mongoid/cursor"
 require "mongoid/extensions"
 require "mongoid/errors"
+require "mongoid/factory"
 require "mongoid/field"
 require "mongoid/fields"
 require "mongoid/finders"
@@ -73,23 +76,43 @@ module Mongoid #:nodoc
 
   class << self
 
-    delegate \
-      :allow_dynamic_fields,
-      :allow_dynamic_fields=,
-      :database,
-      :database=,
-      :persist_in_safe_mode,
-      :persist_in_safe_mode=,
-      :raise_not_found_error,
-      :raise_not_found_error=,
-      :temp_collection_size,
-      :temp_collection_size=, :to => :configure
-
+    # Sets the Mongoid configuration options. Best used by passing a block.
+    #
+    # Example:
+    #
+    #   Mongoid.configure do |config|
+    #     name = "mongoid_test"
+    #     host = "localhost"
+    #     config.allow_dynamic_fields = false
+    #     config.master = Mongo::Connection.new.db(name)
+    #     config.slaves = [
+    #       Mongo::Connection.new(host, 27018, :slave_ok => true).db(name),
+    #       Mongo::Connection.new(host, 27019, :slave_ok => true).db(name)
+    #     ]
+    #   end
+    #
+    # Returns:
+    #
+    # The Mongoid +Config+ singleton instance.
     def configure
       config = Config.instance
       block_given? ? yield(config) : config
     end
 
+    alias :config :configure
   end
 
+  # Take all the public instance methods from the Config singleton and allow
+  # them to be accessed through the Mongoid module directly.
+  #
+  # Example:
+  #
+  # <tt>Mongoid.database = Mongo::Connection.new.db("test")</tt>
+  Config.public_instance_methods(false).each do |name|
+    (class << self; self; end).class_eval <<-EOT
+      def #{name}(*args)
+        configure.send("#{name}", *args)
+      end
+    EOT
+  end
 end

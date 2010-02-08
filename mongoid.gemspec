@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-02-04}
+  s.date = %q{2010-02-07}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -35,6 +35,12 @@ Gem::Specification.new do |s|
      "lib/mongoid/associations/proxy.rb",
      "lib/mongoid/attributes.rb",
      "lib/mongoid/callbacks.rb",
+     "lib/mongoid/collection.rb",
+     "lib/mongoid/collections/cyclic_iterator.rb",
+     "lib/mongoid/collections/master.rb",
+     "lib/mongoid/collections/mimic.rb",
+     "lib/mongoid/collections/operations.rb",
+     "lib/mongoid/collections/slaves.rb",
      "lib/mongoid/commands.rb",
      "lib/mongoid/commands/create.rb",
      "lib/mongoid/commands/delete.rb",
@@ -54,6 +60,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/criterion/exclusion.rb",
      "lib/mongoid/criterion/inclusion.rb",
      "lib/mongoid/criterion/optional.rb",
+     "lib/mongoid/cursor.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/errors.rb",
      "lib/mongoid/extensions.rb",
@@ -79,6 +86,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/string/inflections.rb",
      "lib/mongoid/extensions/symbol/inflections.rb",
      "lib/mongoid/extensions/time/conversions.rb",
+     "lib/mongoid/factory.rb",
      "lib/mongoid/field.rb",
      "lib/mongoid/fields.rb",
      "lib/mongoid/finders.rb",
@@ -109,6 +117,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/attributes_spec.rb",
      "spec/integration/mongoid/commands_spec.rb",
+     "spec/integration/mongoid/contexts/enumerable_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/extensions_spec.rb",
@@ -146,6 +155,11 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/callbacks_spec.rb",
+     "spec/unit/mongoid/collection_spec.rb",
+     "spec/unit/mongoid/collections/cyclic_iterator_spec.rb",
+     "spec/unit/mongoid/collections/master_spec.rb",
+     "spec/unit/mongoid/collections/mimic_spec.rb",
+     "spec/unit/mongoid/collections/slaves_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
      "spec/unit/mongoid/commands/delete_all_spec.rb",
      "spec/unit/mongoid/commands/delete_spec.rb",
@@ -161,6 +175,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/exclusion_spec.rb",
      "spec/unit/mongoid/criterion/inclusion_spec.rb",
      "spec/unit/mongoid/criterion/optional_spec.rb",
+     "spec/unit/mongoid/cursor_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
@@ -184,6 +199,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
+     "spec/unit/mongoid/factory_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
      "spec/unit/mongoid/fields_spec.rb",
      "spec/unit/mongoid/finders_spec.rb",
@@ -220,6 +236,7 @@ Gem::Specification.new do |s|
     "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/attributes_spec.rb",
      "spec/integration/mongoid/commands_spec.rb",
+     "spec/integration/mongoid/contexts/enumerable_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/extensions_spec.rb",
@@ -256,6 +273,11 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/associations_spec.rb",
      "spec/unit/mongoid/attributes_spec.rb",
      "spec/unit/mongoid/callbacks_spec.rb",
+     "spec/unit/mongoid/collection_spec.rb",
+     "spec/unit/mongoid/collections/cyclic_iterator_spec.rb",
+     "spec/unit/mongoid/collections/master_spec.rb",
+     "spec/unit/mongoid/collections/mimic_spec.rb",
+     "spec/unit/mongoid/collections/slaves_spec.rb",
      "spec/unit/mongoid/commands/create_spec.rb",
      "spec/unit/mongoid/commands/delete_all_spec.rb",
      "spec/unit/mongoid/commands/delete_spec.rb",
@@ -271,6 +293,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/exclusion_spec.rb",
      "spec/unit/mongoid/criterion/inclusion_spec.rb",
      "spec/unit/mongoid/criterion/optional_spec.rb",
+     "spec/unit/mongoid/cursor_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
@@ -294,6 +317,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
      "spec/unit/mongoid/extensions/time/conversions_spec.rb",
+     "spec/unit/mongoid/factory_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
      "spec/unit/mongoid/fields_spec.rb",
      "spec/unit/mongoid/finders_spec.rb",
@@ -331,6 +355,10 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<will_paginate>, [">= 3.0.pre"])
       s.add_runtime_dependency(%q<mongo>, [">= 0.18.2"])
       s.add_runtime_dependency(%q<durran-validatable>, [">= 2.0.1"])
+<<<<<<< HEAD
+=======
+      s.add_runtime_dependency(%q<will_paginate>, [">= 2.3.11"])
+>>>>>>> master
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
@@ -338,6 +366,10 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<will_paginate>, [">= 3.0.pre"])
       s.add_dependency(%q<mongo>, [">= 0.18.2"])
       s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
+<<<<<<< HEAD
+=======
+      s.add_dependency(%q<will_paginate>, [">= 2.3.11"])
+>>>>>>> master
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_dependency(%q<mocha>, [">= 0.9.8"])
     end
@@ -346,6 +378,10 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<will_paginate>, [">= 3.0.pre"])
     s.add_dependency(%q<mongo>, [">= 0.18.2"])
     s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
+<<<<<<< HEAD
+=======
+    s.add_dependency(%q<will_paginate>, [">= 2.3.11"])
+>>>>>>> master
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
     s.add_dependency(%q<mocha>, [">= 0.9.8"])
   end
