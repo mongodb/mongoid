@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-02-07}
+  s.date = %q{2010-02-08}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -354,22 +354,12 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activemodel>, [">= 3.0.pre"])
       s.add_runtime_dependency(%q<will_paginate>, [">= 3.0.pre"])
       s.add_runtime_dependency(%q<mongo>, [">= 0.18.2"])
-      s.add_runtime_dependency(%q<durran-validatable>, [">= 2.0.1"])
-<<<<<<< HEAD
-=======
-      s.add_runtime_dependency(%q<will_paginate>, [">= 2.3.11"])
->>>>>>> master
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
       s.add_dependency(%q<activemodel>, [">= 3.0.pre"])
       s.add_dependency(%q<will_paginate>, [">= 3.0.pre"])
       s.add_dependency(%q<mongo>, [">= 0.18.2"])
-      s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
-<<<<<<< HEAD
-=======
-      s.add_dependency(%q<will_paginate>, [">= 2.3.11"])
->>>>>>> master
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_dependency(%q<mocha>, [">= 0.9.8"])
     end
@@ -377,11 +367,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<activemodel>, [">= 3.0.pre"])
     s.add_dependency(%q<will_paginate>, [">= 3.0.pre"])
     s.add_dependency(%q<mongo>, [">= 0.18.2"])
-    s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
-<<<<<<< HEAD
-=======
-    s.add_dependency(%q<will_paginate>, [">= 2.3.11"])
->>>>>>> master
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
     s.add_dependency(%q<mocha>, [">= 0.9.8"])
   end
