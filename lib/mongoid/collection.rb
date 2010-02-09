@@ -59,7 +59,7 @@ module Mongoid #:nodoc
     #
     # <tt>collection.find({ :test => "value" })</tt>
     def find(selector = {}, options = {})
-      cursor = Mongoid::Cursor.new(self, directed.find(selector, options))
+      cursor = Mongoid::Cursor.new(@klass, self, directed.find(selector, options))
       if block_given?
         yield cursor; cursor.close
       else
@@ -73,8 +73,8 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>Mongoid::Collection.new(masters, slaves, "test")</tt>
-    def initialize(name)
-      @name, @counter = name, 0
+    def initialize(klass, name)
+      @klass, @name, @counter = klass, name, 0
     end
 
     # Return the object responsible for reading documents from the database.

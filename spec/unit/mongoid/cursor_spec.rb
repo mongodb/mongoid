@@ -11,7 +11,7 @@ describe Mongoid::Cursor do
   end
 
   let(:cursor) do
-    Mongoid::Cursor.new(collection, proxy)
+    Mongoid::Cursor.new(Person, collection, proxy)
   end
 
   (Mongoid::Cursor::OPERATIONS - [ :timeout ]).each do |name|

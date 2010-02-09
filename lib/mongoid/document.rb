@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
       # Returns: <tt>Mongo::Collection</tt>
       def collection
         raise Errors::InvalidCollection.new(self) if embedded
-        self._collection ||= Mongoid::Collection.new(self.collection_name)
+        self._collection ||= Mongoid::Collection.new(self, self.collection_name)
         add_indexes; self._collection
       end
 
@@ -94,7 +94,7 @@ module Mongoid #:nodoc:
       # <tt>Person.store_in :populdation</tt>
       def store_in(name)
         self.collection_name = name.to_s
-        self._collection = Mongoid::Collection.new(name.to_s)
+        self._collection = Mongoid::Collection.new(self, name.to_s)
       end
 
       # Returns all types to query for when using this class as the base.

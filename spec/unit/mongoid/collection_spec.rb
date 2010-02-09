@@ -11,7 +11,7 @@ describe Mongoid::Collection do
   end
 
   let(:collection) do
-    Mongoid::Collection.new("people")
+    Mongoid::Collection.new(Person, "people")
   end
 
   before do
@@ -93,7 +93,7 @@ describe Mongoid::Collection do
     before do
       @cursor = stub.quacks_like(Mongoid::Cursor.allocate)
       master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
-      Mongoid::Cursor.expects(:new).with(collection, @mongo_cursor).returns(@cursor)
+      Mongoid::Cursor.expects(:new).with(Person, collection, @mongo_cursor).returns(@cursor)
     end
 
     it "finds are returns a cursor" do
