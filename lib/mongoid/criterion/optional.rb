@@ -9,17 +9,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.enslave</tt>
       def enslave
-        @enslaved = true; self
-      end
-
-      # Returns whether or not the criteria is flagged to execute against a
-      # read-only slave in the pool.
-      #
-      # Example:
-      #
-      # <tt>criteria.enslaved?</tt>
-      def enslaved?
-        @enslaved == true
+        @options.merge!(:enslaved => true); self
       end
 
       # Adds a criterion to the +Criteria+ that specifies additional options
