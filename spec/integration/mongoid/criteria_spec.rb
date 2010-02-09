@@ -2,6 +2,14 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
+  before do
+    Person.delete_all
+  end
+
+  after do
+    Person.delete_all
+  end
+
   describe "#excludes" do
 
     before do
@@ -28,6 +36,26 @@ describe Mongoid::Criteria do
 
     end
 
+  end
+
+  describe "#execute" do
+
+    context "when reiterating" do
+
+      before do
+        @person = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
+      end
+
+      after do
+        Person.delete_all
+      end
+
+      it "executes the query again" do
+        criteria = Person.all
+        criteria.size.should == 1
+        criteria.should_not be_empty
+      end
+    end
   end
 
   describe "#max" do

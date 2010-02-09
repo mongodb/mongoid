@@ -69,12 +69,22 @@ module Mongoid #:nodoc:
       when Criteria
         self.selector == other.selector && self.options == other.options
       when Enumerable
-        @collection ||= execute
-        return (@collection.entries == other)
+        return (execute.entries == other)
       else
         return false
       end
     end
+
+    # Returns true if the criteria is empty.
+    #
+    # Example:
+    #
+    # <tt>criteria.blank?</tt>
+    def blank?
+      count < 1
+    end
+
+    alias :empty? :blank?
 
     # Return or create the context in which this criteria should be executed.
     #
@@ -108,10 +118,8 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      @collection ||= execute
       if block_given?
-        docs = []
-        @collection.each { |doc| docs << doc; yield doc }
+        execute.each { |doc| yield doc }
       end
       self
     end
@@ -155,26 +163,6 @@ module Mongoid #:nodoc:
     #
     # name: The name of the class method on the +Document+ to chain.
     # args: The arguments passed to the method.
-    #
-    # Example:
-    #
-    #   class Person
-    #     include Mongoid::Document
-    #     field :title
-    #     field :terms, :type => Boolean, :default => false
-    #
-    #     class << self
-    #       def knights
-    #         all(:conditions => { :title => "Sir" })
-    #       end
-    #
-    #       def accepted
-    #         all(:conditions => { :terms => true })
-    #       end
-    #     end
-    #   end
-    #
-    #   Person.accepted.knights #returns a merged criteria of the 2 scopes.
     #
     # Returns: <tt>Criteria</tt>
     def method_missing(name, *args)

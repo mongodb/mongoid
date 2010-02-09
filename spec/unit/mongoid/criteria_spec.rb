@@ -19,9 +19,9 @@ describe Mongoid::Criteria do
       before do
         @collection = mock
         @cursor = stub(:count => 1)
-        @cursor.expects(:each).yields(@sir)
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).returns(@cursor)
+        @cursor.expects(:each).at_least_once.yields(@sir)
+        Person.expects(:collection).at_least_once.returns(@collection)
+        @collection.expects(:find).at_least_once.returns(@cursor)
       end
 
       it "executes the criteria and concats the results" do
@@ -31,29 +31,24 @@ describe Mongoid::Criteria do
 
     end
 
-    context "when the criteria has been executed" do
-
-      before do
-        @criteria.instance_variable_set(:@collection, [ @sir, @madam ])
-      end
-
-      it "concats the results" do
-        results = @criteria + [ @canvas ]
-        results.should == [ @sir, @madam, @canvas ]
-      end
-
-    end
-
     context "when the other is a criteria" do
 
       before do
-        @criteria.instance_variable_set(:@collection, [ @sir, @madam ])
-        @canvas_criteria.instance_variable_set(:@collection, [ @canvas ])
+        @collection = mock
+        @canvas_collection = mock
+        @cursor = stub(:count => 1)
+        @canvas_cursor = stub(:count => 1)
+        @cursor.expects(:each).at_least_once.yields(@sir)
+        @canvas_cursor.expects(:each).at_least_once.yields(@canvas)
+        Person.expects(:collection).at_least_once.returns(@collection)
+        @collection.expects(:find).at_least_once.returns(@cursor)
+        Canvas.expects(:collection).at_least_once.returns(@canvas_collection)
+        @canvas_collection.expects(:find).at_least_once.returns(@canvas_cursor)
       end
 
       it "concats the results" do
         results = @criteria + @canvas_criteria
-        results.should == [ @sir, @madam, @canvas ]
+        results.should == [ @sir, @canvas ]
       end
 
     end
@@ -79,33 +74,6 @@ describe Mongoid::Criteria do
 
       it "executes the criteria and returns the difference" do
         results = @criteria - [ @sir ]
-        results.should == [ @madam ]
-      end
-
-    end
-
-    context "when the criteria has been executed" do
-
-      before do
-        @criteria.instance_variable_set(:@collection, [@sir, @sir, @madam])
-      end
-
-      it "returns the difference" do
-        results = @criteria - [ @sir ]
-        results.should == [ @madam ]
-      end
-
-    end
-
-    context "when the other is a criteria" do
-
-      before do
-        @criteria.instance_variable_set(:@collection, [@sir, @sir, @madam])
-        @canvas_criteria.instance_variable_set(:@collection, [@sir])
-      end
-
-      it "returns the difference" do
-        results = @criteria - @canvas_criteria
         results.should == [ @madam ]
       end
 
@@ -150,6 +118,36 @@ describe Mongoid::Criteria do
       @criteria.aggregate
     end
 
+  end
+
+  describe "#blank?" do
+
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+    end
+
+    context "when the count is 0" do
+
+      before do
+        @context.expects(:count).returns(0)
+      end
+
+      it "returns true" do
+        @criteria.blank?.should be_true
+      end
+    end
+
+    context "when the count is greater than 0" do
+
+      before do
+        @context.expects(:count).returns(10)
+      end
+
+      it "returns false" do
+        @criteria.blank?.should be_false
+      end
+    end
   end
 
   describe "#context" do

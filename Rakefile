@@ -15,7 +15,6 @@ begin
     gem.add_dependency("activemodel", ">= 3.0.pre")
     gem.add_dependency("will_paginate", ">= 3.0.pre")
     gem.add_dependency("mongo", ">= 0.18.2")
-
     gem.add_development_dependency("rspec", ">= 1.2.9")
     gem.add_development_dependency("mocha", ">= 0.9.8")
   end
