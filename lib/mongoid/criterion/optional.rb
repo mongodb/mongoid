@@ -14,6 +14,16 @@ module Mongoid #:nodoc:
         @options.merge!(:cache => true); self
       end
 
+      # Will return true if the cache option has been set.
+      #
+      # Example:
+      #
+      # <tt>criteria.cached?</tt>
+      def cached?
+        @cached ||= @options.delete(:cache)
+        @cached == true
+      end
+
       # Flags the criteria to execute against a read-only slave in the pool
       # instead of master.
       #
