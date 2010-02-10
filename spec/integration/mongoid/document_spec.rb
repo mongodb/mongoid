@@ -6,6 +6,13 @@ describe Mongoid::Document do
     Person.delete_all
   end
 
+  describe "#db" do
+
+    it "returns the mongo database" do
+      Person.db.should == Mongoid.master
+    end
+  end
+
   context "when document contains a hash field" do
 
     before do

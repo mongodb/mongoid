@@ -21,11 +21,16 @@ module Mongoid #:nodoc:
         attr_accessor :association_name, :_parent
         attr_reader :new_record
 
-        delegate :collection, :embedded, :primary_key, :to => "self.class"
+        delegate :collection, :db, :embedded, :primary_key, :to => "self.class"
       end
     end
 
     module ClassMethods
+      # Return the database associated with this class.
+      def db
+        collection.db
+      end
+
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
       # with it.
@@ -125,8 +130,6 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>name.assimilate(person, options)</tt>
-      #
-      # Returns: The child +Document+.
       def assimilate(parent, options)
         parentize(parent, options.name); notify; self
       end
@@ -157,10 +160,6 @@ module Mongoid #:nodoc:
       # Options:
       #
       # attrs: The attributes +Hash+ to set up the document with.
-      #
-      # Example:
-      #
-      # <tt>Person.new(:title => "Mr", :age => 30)</tt>
       def initialize(attrs = nil)
         @attributes = {}
         process(attrs)
@@ -271,10 +270,6 @@ module Mongoid #:nodoc:
       #
       # child: The child +Document+ that sent the notification.
       # clear: Will clear out the child's attributes if set to true.
-      #
-      # Example:
-      #
-      # <tt>person.notify_observers(self)</tt> will cause this method to execute.
       #
       # This will also cause the observing +Document+ to notify it's parent if
       # there is any.

@@ -6,6 +6,7 @@ module Mongoid #:nodoc:
       # Mongo:Collection. This is used in delegation.
       READ = [
         :[],
+        :db,
         :count,
         :distinct,
         :find,

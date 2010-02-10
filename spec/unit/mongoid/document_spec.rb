@@ -99,6 +99,18 @@ describe Mongoid::Document do
 
   end
 
+  describe ".db" do
+
+    before do
+      @db = stub
+      @collection.expects(:db).returns(@db)
+    end
+
+    it "returns the database from the collection" do
+      Person.db.should == @db
+    end
+  end
+
   describe "#clone" do
 
     before do
