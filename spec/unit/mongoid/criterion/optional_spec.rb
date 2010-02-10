@@ -11,7 +11,7 @@ describe Mongoid::Criterion::Optional do
 
     it "sets the enslaved option on the criteria" do
       @criteria.enslave
-      @criteria.options[:enslaved].should be_true
+      @criteria.options[:enslave].should be_true
     end
 
     it "returns self" do

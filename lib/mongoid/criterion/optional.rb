@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.enslave</tt>
       def enslave
-        @options.merge!(:enslaved => true); self
+        @options.merge!(:enslave => true); self
       end
 
       # Adds a criterion to the +Criteria+ that specifies additional options

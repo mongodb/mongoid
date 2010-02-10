@@ -34,6 +34,7 @@ module Mongoid #:nodoc:
 
       # Convenience constant for getting back all collection operations.
       ALL = (READ + WRITE)
+      PROXIED = ALL - [ :find, :find_one, :map_reduce, :mapreduce ]
     end
   end
 end

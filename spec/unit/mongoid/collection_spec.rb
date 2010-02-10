@@ -40,73 +40,99 @@ describe Mongoid::Collection do
     end
   end
 
-  describe "#directed" do
-
-    context "when the counter is less than the maximum" do
-
-      before do
-        collection.instance_variable_set(:@counter, 0)
-      end
-
-      it "delegates to the master" do
-        collection.directed.should == master
-      end
-
-      it "increments the counter" do
-        collection.directed
-        collection.counter.should == 1
-      end
-    end
-
-    context "when the counter is at the max" do
-
-      before do
-        slaves.expects(:empty?).returns(false)
-        collection.instance_variable_set(:@counter, 10)
-      end
-
-      it "delegates to the slave" do
-        collection.directed.should == slaves
-      end
-
-      it "resets the counter" do
-        collection.directed
-        collection.counter.should == 0
-      end
-    end
-
-    context "when the slave does not exist" do
-
-      before do
-        collection.instance_variable_set(:@counter, 10)
-        slaves.expects(:empty?).returns(true)
-      end
-
-      it "delegates to the master" do
-        collection.directed.should == master
-      end
-    end
-  end
-
   describe "#find" do
 
     before do
       @cursor = stub.quacks_like(Mongoid::Cursor.allocate)
-      master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
       Mongoid::Cursor.expects(:new).with(Person, collection, @mongo_cursor).returns(@cursor)
     end
 
-    it "finds are returns a cursor" do
-      collection.find({ :test => "value"}).should == @cursor
+    context "when no block supplied" do
+
+      before do
+        master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
+      end
+
+      it "finds return a cursor" do
+        collection.find({ :test => "value"}).should == @cursor
+      end
+
     end
 
     context "when a block is supplied" do
+
+      before do
+        master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
+      end
 
       it "yields to the cursor and closes it" do
         @cursor.expects(:close).returns(true)
         collection.find({ :test => "value" }) do |cur|
           cur.should == @cursor
         end
+      end
+    end
+
+    context "when an enslave option exists" do
+
+      before do
+        @options = { :enslave => true }
+        slaves.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
+      end
+
+      it "sends the query to the slave pool" do
+        collection.find({ :test => "value"}, @options).should == @cursor
+      end
+
+      it "deletes the enslave option" do
+        collection.find({ :test => "value"}, @options)
+        @options[:enslave].should be_nil
+      end
+    end
+
+    context "when an enslave option does not exist" do
+
+      before do
+        master.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
+      end
+
+      it "sends the query to the master" do
+        collection.find({ :test => "value"}).should == @cursor
+      end
+    end
+  end
+
+  describe "#find_one" do
+
+    before do
+      @person = stub
+    end
+
+    context "when an enslave option exists" do
+
+      before do
+        @options = { :enslave => true }
+        slaves.expects(:find_one).with({ :test => "value" }, {}).returns(@person)
+      end
+
+      it "sends the query to the slave pool" do
+        collection.find_one({ :test => "value"}, @options).should == @person
+      end
+
+      it "deletes the enslave option" do
+        collection.find_one({ :test => "value"}, @options)
+        @options[:enslave].should be_nil
+      end
+    end
+
+    context "when an enslave option does not exist" do
+
+      before do
+        master.expects(:find_one).with({ :test => "value" }, {}).returns(@person)
+      end
+
+      it "sends the query to the master" do
+        collection.find_one({ :test => "value"}).should == @person
       end
     end
   end
