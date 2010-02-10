@@ -77,6 +77,7 @@ describe Mongoid::Collection do
 
       before do
         @options = { :enslave => true }
+        slaves.expects(:empty?).returns(false)
         slaves.expects(:find).with({ :test => "value" }, {}).returns(@mongo_cursor)
       end
 
@@ -112,6 +113,7 @@ describe Mongoid::Collection do
 
       before do
         @options = { :enslave => true }
+        slaves.expects(:empty?).returns(false)
         slaves.expects(:find_one).with({ :test => "value" }, {}).returns(@person)
       end
 

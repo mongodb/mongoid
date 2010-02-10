@@ -31,7 +31,7 @@ module Mongoid #:nodoc
     # Either a +Master+ or +Slaves+ collection.
     def directed(options = {})
       enslave = options.delete(:enslave)
-      enslave ? slaves : master
+      enslave ? master_or_slaves : master
     end
 
     # Find documents from the database given a selector and options.
@@ -108,6 +108,11 @@ module Mongoid #:nodoc
     # <tt>collection.reader</tt>
     def slaves
       @slaves ||= Collections::Slaves.new(Mongoid.slaves, @name)
+    end
+
+    protected
+    def master_or_slaves
+      slaves.empty? ? master : slaves
     end
   end
 end
