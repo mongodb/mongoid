@@ -94,6 +94,20 @@ module Mongoid #:nodoc:
       @context ||= determine_context
     end
 
+    # Iterate over each +Document+ in the results. This can take an optional
+    # block to pass to each argument in the results.
+    #
+    # Example:
+    #
+    # <tt>criteria.each { |doc| p doc }</tt>
+    def each(&block)
+      return each_cached(&block) if cached?
+      if block_given?
+        execute.each { |doc| yield doc }
+      end
+      self
+    end
+
     # Merges the supplied argument hash into a single criteria
     #
     # Options:
@@ -109,19 +123,6 @@ module Mongoid #:nodoc:
       criteria_conditions.inject(self) do |criteria, (key, value)|
         criteria.send(key, value)
       end
-    end
-
-    # Iterate over each +Document+ in the results. This can take an optional
-    # block to pass to each argument in the results.
-    #
-    # Example:
-    #
-    # <tt>criteria.each { |doc| p doc }</tt>
-    def each(&block)
-      if block_given?
-        execute.each { |doc| yield doc }
-      end
-      self
     end
 
     # Create the new +Criteria+ object. This will initialize the selector
@@ -198,10 +199,7 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>Criteria.translate(Person, "4ab2bc4b8ad548971900005c")</tt>
-    #
     # <tt>Criteria.translate(Person, :conditions => { :field => "value"}, :limit => 20)</tt>
-    #
-    # Returns a new +Criteria+ object.
     def self.translate(*args)
       klass = args[0]
       params = args[1] || {}
@@ -220,15 +218,25 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>criteria#determine_context</tt>
-    #
-    # Returns:
-    #
-    # A enumerable or mongo context.
     def determine_context
       if @klass.embedded
         return Contexts::Enumerable.new(@selector, @options, @documents)
       end
       Contexts::Mongo.new(@selector, @options, @klass)
+    end
+
+    # Iterate over each +Document+ in the results and cache the collection.
+    def each_cached(&block)
+      @collection ||= execute
+      if block_given?
+        docs = []
+        @collection.each do |doc|
+          docs << doc
+          yield doc
+        end
+        @collection = docs
+      end
+      self
     end
 
     # Filters the unused options out of the options +Hash+. Currently this

@@ -2,6 +2,28 @@
 module Mongoid #:nodoc:
   module Criterion #:nodoc:
     module Optional
+      # Tells the criteria that the cursor that gets returned needs to be
+      # cached. This is so multiple iterations don't hit the database multiple
+      # times, however this is not advisable when working with large data sets
+      # as the entire results will get stored in memory.
+      #
+      # Example:
+      #
+      # <tt>criteria.cache</tt>
+      def cache
+        @options.merge!(:cache => true); self
+      end
+
+      # Will return true if the cache option has been set.
+      #
+      # Example:
+      #
+      # <tt>criteria.cached?</tt>
+      def cached?
+        @cached ||= @options.delete(:cache)
+        @cached == true
+      end
+
       # Flags the criteria to execute against a read-only slave in the pool
       # instead of master.
       #
