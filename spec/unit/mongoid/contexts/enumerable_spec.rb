@@ -8,9 +8,10 @@ describe Mongoid::Contexts::Enumerable do
     @melbourne = Address.new(:number => 20, :street => "Bourke Street")
     @new_york = Address.new(:number => 20, :street => "Broadway")
     @docs = [ @london, @shanghai, @melbourne, @new_york ]
-    @selector = { :street => "Bourke Street" }
-    @options = { :fields => [ :number ] }
-    @context = Mongoid::Contexts::Enumerable.new(@selector, @options, @docs)
+    @criteria = Mongoid::Criteria.new(Address)
+    @criteria.documents = @docs
+    @criteria.where(:street => "Bourke Street").only(:number)
+    @context = Mongoid::Contexts::Enumerable.new(@criteria)
   end
 
   describe "#aggregate" do
@@ -40,6 +41,11 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#execute" do
 
+    before do
+      @criteria = Mongoid::Criteria.new(Address)
+      @criteria.documents = @docs
+    end
+
     it "returns the matching documents from the array" do
       @context.execute.should == [ @melbourne ]
     end
@@ -47,7 +53,8 @@ describe Mongoid::Contexts::Enumerable do
     context "when selector is empty" do
 
       before do
-        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+        @criteria.only(:number)
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns all the documents" do
@@ -58,8 +65,8 @@ describe Mongoid::Contexts::Enumerable do
     context "when skip and limit are in the options" do
 
       before do
-        @options = { :skip => 2, :limit => 2 }
-        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+        @criteria.skip(2).limit(2)
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "properly narrows down the matching results" do
@@ -105,7 +112,10 @@ describe Mongoid::Contexts::Enumerable do
     let(:documents) { [stub] }
 
     before do
-      @context = Mongoid::Contexts::Enumerable.new(selector, options, documents)
+      @criteria = Mongoid::Criteria.new(Address)
+      @criteria.documents = documents
+      @criteria.where(selector).skip(20)
+      @context = Mongoid::Contexts::Enumerable.new(@criteria)
     end
 
     it "sets the selector" do
@@ -160,7 +170,8 @@ describe Mongoid::Contexts::Enumerable do
 
       before do
         @criteria = Mongoid::Criteria.new(Person).extras({ :page => 5 })
-        @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, [])
+        @criteria.documents = []
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns the page option" do
@@ -173,7 +184,8 @@ describe Mongoid::Contexts::Enumerable do
 
       before do
         @criteria = Mongoid::Criteria.new(Person)
-        @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, [])
+        @criteria.documents = []
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns 1" do
@@ -188,7 +200,7 @@ describe Mongoid::Contexts::Enumerable do
 
     before do
       @criteria = Person.criteria.skip(2).limit(2)
-      @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, @docs)
+      @context = Mongoid::Contexts::Enumerable.new(@criteria)
       @results = @context.paginate
     end
 
@@ -212,7 +224,9 @@ describe Mongoid::Contexts::Enumerable do
     context "when a limit option does not exist" do
 
       before do
-        @context = Mongoid::Contexts::Enumerable.new({}, { :limit => 50 }, [])
+        @criteria = Person.criteria.limit(50)
+        @criteria.documents = []
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns the limit" do

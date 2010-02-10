@@ -91,7 +91,7 @@ module Mongoid #:nodoc:
     # This will return an Enumerable context if the class is embedded,
     # otherwise it will return a Mongo context for root classes.
     def context
-      @context ||= determine_context
+      @context ||= Contexts.context_for(self)
     end
 
     # Iterate over each +Document+ in the results. This can take an optional
@@ -210,20 +210,6 @@ module Mongoid #:nodoc:
     end
 
     protected
-    # Determines the context to be used for this criteria. If the class is an
-    # embedded document, then thw context will be the array in the has_many
-    # association it is in. If the class is a root, then the database itself
-    # will be the context.
-    #
-    # Example:
-    #
-    # <tt>criteria#determine_context</tt>
-    def determine_context
-      if @klass.embedded
-        return Contexts::Enumerable.new(@selector, @options, @documents)
-      end
-      Contexts::Mongo.new(@selector, @options, @klass)
-    end
 
     # Iterate over each +Document+ in the results and cache the collection.
     def each_cached(&block)

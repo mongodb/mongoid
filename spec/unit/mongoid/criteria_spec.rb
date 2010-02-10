@@ -172,9 +172,7 @@ describe Mongoid::Criteria do
       end
 
       it "creates a new context" do
-        Mongoid::Contexts::Mongo.expects(:new).with(
-          @criteria.selector, @criteria.options, @criteria.klass
-        ).returns(@context)
+        Mongoid::Contexts::Mongo.expects(:new).with(@criteria).returns(@context)
         @criteria.context.should == @context
       end
 

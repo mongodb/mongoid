@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Mongo
       include Paging
-      attr_reader :selector, :options, :klass
+      attr_reader :criteria
 
       AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
       # Aggregate the context. This will take the internally built selector and options
@@ -19,7 +19,7 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, counts as values
       def aggregate
-        @klass.collection.group(@options[:fields], @selector, { :count => 0 }, AGGREGATE_REDUCE, true)
+        klass.collection.group(options[:fields], selector, { :count => 0 }, AGGREGATE_REDUCE, true)
       end
 
       # Get the count of matching documents in the database for the context.
@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
       #
       # An +Integer+ count of documents.
       def count
-        @count ||= @klass.collection.find(@selector, process_options).count
+        @count ||= klass.collection.find(selector, process_options).count
       end
 
       # Execute the context. This will take the selector and options
@@ -48,7 +48,7 @@ module Mongoid #:nodoc:
       #
       # An enumerable +Cursor+.
       def execute(paginating = false)
-        cursor = @klass.collection.find(@selector, process_options)
+        cursor = klass.collection.find(selector, process_options)
         if cursor
           @count = cursor.count if paginating
           cursor
@@ -71,15 +71,15 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, arrays of documents as values.
       def group
-        @klass.collection.group(
-          @options[:fields],
-          @selector,
+        klass.collection.group(
+          options[:fields],
+          selector,
           { :group => [] },
           GROUP_REDUCE,
           true
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
-            Mongoid::Factory.build(@klass, attrs)
+            Mongoid::Factory.build(klass, attrs)
           end
           docs
         end
@@ -90,12 +90,21 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>Mongoid::Contexts::Mongo.new(selector, options, klass)</tt>
-      def initialize(selector, options, klass)
-        @selector, @options, @klass = selector, options, klass
+      # <tt>Mongoid::Contexts::Mongo.new(criteria)</tt>
+      def initialize(criteria)
+        @criteria = criteria
         if klass.hereditary
           @hereditary = true
         end
+      end
+
+      # Target class from the criteria
+      #
+      # Returns:
+      #
+      # The target class from the criteria
+      def klass
+        criteria.klass
       end
 
       # Return the last result for the +Context+. Essentially does a find_one on
@@ -114,8 +123,8 @@ module Mongoid #:nodoc:
         sorting = opts[:sort]
         sorting = [[:_id, :asc]] unless sorting
         opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
-        attributes = @klass.collection.find_one(@selector, opts)
-        attributes ? Mongoid::Factory.build(@klass, attributes) : nil
+        attributes = klass.collection.find_one(selector, opts)
+        attributes ? Mongoid::Factory.build(klass, attributes) : nil
       end
 
       MAX_REDUCE = "function(obj, prev) { if (prev.max == 'start') { prev.max = obj.[field]; } " +
@@ -168,11 +177,29 @@ module Mongoid #:nodoc:
       #
       # The first document in the collection.
       def one
-        attributes = @klass.collection.find_one(@selector, process_options)
-        attributes ? Mongoid::Factory.build(@klass, attributes) : nil
+        attributes = klass.collection.find_one(selector, process_options)
+        attributes ? Mongoid::Factory.build(klass, attributes) : nil
       end
 
       alias :first :one
+
+      # Options from the criteria
+      #
+      # Returns:
+      #
+      # The options from the criteria
+      def options
+        criteria.options
+      end
+
+      # Selector from the criteria
+      #
+      # Returns:
+      #
+      # The selector from the criteria
+      def selector
+        criteria.selector
+      end
 
       SUM_REDUCE = "function(obj, prev) { if (prev.sum == 'start') { prev.sum = 0; } prev.sum += obj.[field]; }"
       # Sum the context.
@@ -196,9 +223,9 @@ module Mongoid #:nodoc:
       # Common functionality for grouping operations. Currently used by min, max
       # and sum. Will gsub the field name in the supplied reduce function.
       def grouped(start, field, reduce)
-        collection = @klass.collection.group(
+        collection = klass.collection.group(
           nil,
-          @selector,
+          selector,
           { start => "start" },
           reduce.gsub("[field]", field),
           true
@@ -209,12 +236,12 @@ module Mongoid #:nodoc:
       # Filters the field list. If no fields have been supplied, then it will be
       # empty. If fields have been defined then _type will be included as well.
       def process_options
-        fields = @options[:fields]
+        fields = options[:fields]
         if fields && fields.size > 0 && !fields.include?(:_type)
           fields << :_type
-          @options[:fields] = fields
+          options[:fields] = fields
         end
-        @options.dup
+        options.dup
       end
 
     end

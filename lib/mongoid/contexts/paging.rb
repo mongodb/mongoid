@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
       #
       # An +Integer+ page number.
       def page
-        skips, limits = @options[:skip], @options[:limit]
+        skips, limits = options[:skip], options[:limit]
         (skips && limits) ? (skips + limits) / limits : 1
       end
 
@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
       #
       # The +Integer+ number of documents in each page.
       def per_page
-        (@options[:limit] || 20).to_i
+        (options[:limit] || 20).to_i
       end
     end
   end

@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
       include Paging
-      attr_reader :selector, :options, :documents
+      attr_reader :criteria
 
       delegate :first, :last, :to => :execute
 
@@ -21,7 +21,17 @@ module Mongoid #:nodoc:
 
       # Gets the number of documents in the array. Delegates to size.
       def count
-        @count ||= @documents.size
+        @count ||= documents.size
+      end
+
+      # Target documents array from the criteria. Set by the association
+      # macros directly onto the criteria.
+      #
+      # Returns:
+      #
+      # The target documents array from the criteria
+      def documents
+        @criteria.documents
       end
 
       # Groups the documents by the first field supplied in the field options.
@@ -30,8 +40,8 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, arrays of documents as values.
       def group
-        field = @options[:fields].first
-        @documents.group_by { |doc| doc.send(field) }
+        field = options[:fields].first
+        documents.group_by { |doc| doc.send(field) }
       end
 
       # Enumerable implementation of execute. Returns matching documents for
@@ -41,7 +51,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ of documents that matched the selector.
       def execute(paginating = false)
-        limit(@documents.select { |document| document.matches?(@selector) })
+        limit(documents.select { |document| document.matches?(selector) })
       end
 
       # Create the new enumerable context. This will need the selector and
@@ -50,9 +60,9 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>Mongoid::Contexts::Enumerable.new(selector, options, docs)</tt>
-      def initialize(selector, options, documents)
-        @selector, @options, @documents = selector, options, documents
+      # <tt>Mongoid::Contexts::Enumerable.new(criteria)</tt>
+      def initialize(criteria)
+        @criteria = criteria
       end
 
       # Get the largest value for the field in all the documents.
@@ -80,13 +90,31 @@ module Mongoid #:nodoc:
       # The first document in the +Array+
       alias :one :first
 
+      # Options from the criteria
+      #
+      # Returns:
+      #
+      # The options from the criteria
+      def options
+        criteria.options
+      end
+
+      # Selector from the criteria
+      #
+      # Returns:
+      #
+      # The selector from the criteria
+      def selector
+        criteria.selector
+      end
+
       # Get the sum of the field values for all the documents.
       #
       # Returns:
       #
       # The numerical sum of all the document field values.
       def sum(field)
-        sum = @documents.inject(nil) do |memo, doc|
+        sum = documents.inject(nil) do |memo, doc|
           value = doc.send(field)
           memo ? memo += value : value
         end
@@ -95,7 +123,7 @@ module Mongoid #:nodoc:
       protected
       # If the field exists, perform the comparison and set if true.
       def determine(field, operator)
-        matching = @documents.inject(nil) do |memo, doc|
+        matching = documents.inject(nil) do |memo, doc|
           value = doc.send(field)
           (memo && memo.send(operator, value)) ? memo : value
         end
@@ -103,7 +131,7 @@ module Mongoid #:nodoc:
 
       # Limits the result set if skip and limit options.
       def limit(documents)
-        skip, limit = @options[:skip], @options[:limit]
+        skip, limit = options[:skip], options[:limit]
         if skip && limit
           return documents.slice(skip, limit)
         end
