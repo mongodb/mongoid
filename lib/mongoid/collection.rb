@@ -16,16 +16,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>collection.save({ :name => "Al" })</tt>
-    proxy(:master, Collections::Operations::WRITE)
-
-    # All read operations should be intelligently directed to either the master
-    # or the slave, depending on where the read counter is and what it's
-    # maximum was configured at.
-    #
-    # Example:
-    #
-    # <tt>collection.find({ :name => "Al" })</tt>
-    proxy(:directed, (Collections::Operations::READ - [:find]))
+    proxy(:master, Collections::Operations::PROXIED)
 
     # Determines where to send the next read query. If the slaves are not
     # defined then send to master. If the read counter is under the configured
@@ -38,14 +29,9 @@ module Mongoid #:nodoc
     # Return:
     #
     # Either a +Master+ or +Slaves+ collection.
-    def directed
-      if under_max_counter? || slaves.empty?
-        @counter = @counter + 1
-        master
-      else
-        @counter = 0
-        slaves
-      end
+    def directed(options = {})
+      enslave = options.delete(:enslave)
+      enslave ? slaves : master
     end
 
     # Find documents from the database given a selector and options.
@@ -59,12 +45,26 @@ module Mongoid #:nodoc
     #
     # <tt>collection.find({ :test => "value" })</tt>
     def find(selector = {}, options = {})
-      cursor = Mongoid::Cursor.new(self, directed.find(selector, options))
+      cursor = Mongoid::Cursor.new(@klass, self, directed(options).find(selector, options))
       if block_given?
         yield cursor; cursor.close
       else
         cursor
       end
+    end
+
+    # Find the first document from the database given a selector and options.
+    #
+    # Options:
+    #
+    # selector: A +Hash+ selector that is the query.
+    # options: The options to pass to the db.
+    #
+    # Example:
+    #
+    # <tt>collection.find_one({ :test => "value" })</tt>
+    def find_one(selector = {}, options = {})
+      directed(options).find_one(selector, options)
     end
 
     # Initialize a new Mongoid::Collection, setting up the master, slave, and
@@ -73,20 +73,21 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>Mongoid::Collection.new(masters, slaves, "test")</tt>
-    def initialize(name)
-      @name, @counter = name, 0
+    def initialize(klass, name)
+      @klass, @name = klass, name
     end
 
-    # Return the object responsible for reading documents from the database.
-    # This is usually the slave databases, but in their absence the master will
-    # handle the task.
+    # Perform a map/reduce on the documents.
     #
-    # Example:
+    # Options:
     #
-    # <tt>collection.reader</tt>
-    def slaves
-      @slaves ||= Collections::Slaves.new(Mongoid.slaves, @name)
+    # map: The map javascript funcdtion.
+    # reduce: The reduce javascript function.
+    def map_reduce(map, reduce, options = {})
+      directed(options).map_reduce(map, reduce, options)
     end
+
+    alias :mapreduce :map_reduce
 
     # Return the object responsible for writes to the database. This will
     # always return a collection associated with the Master DB.
@@ -98,9 +99,15 @@ module Mongoid #:nodoc
       @master ||= Collections::Master.new(Mongoid.master, @name)
     end
 
-    protected
-    def under_max_counter?
-      @counter < Mongoid.max_successive_reads
+    # Return the object responsible for reading documents from the database.
+    # This is usually the slave databases, but in their absence the master will
+    # handle the task.
+    #
+    # Example:
+    #
+    # <tt>collection.reader</tt>
+    def slaves
+      @slaves ||= Collections::Slaves.new(Mongoid.slaves, @name)
     end
   end
 end

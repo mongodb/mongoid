@@ -42,7 +42,7 @@ module Mongoid #:nodoc
     # <tt>cursor.each { |doc| p doc.title }</tt>
     def each
       @cursor.each do |document|
-        yield Mongoid::Factory.build(document)
+        yield Mongoid::Factory.build(@klass, document)
       end
     end
 
@@ -55,9 +55,9 @@ module Mongoid #:nodoc
     #
     # Example:
     #
-    # <tt>Mongoid::Cursor.new(collection, cursor)</tt>
-    def initialize(collection, cursor)
-      @collection, @cursor = collection, cursor
+    # <tt>Mongoid::Cursor.new(Person, cursor)</tt>
+    def initialize(klass, collection, cursor)
+      @klass, @collection, @cursor = klass, collection, cursor
     end
 
     # Return the next document in the cursor. Will instantiate a new Mongoid
@@ -67,7 +67,7 @@ module Mongoid #:nodoc
     #
     # <tt>cursor.next_document</tt>
     def next_document
-      Mongoid::Factory.build(@cursor.next_document)
+      Mongoid::Factory.build(@klass, @cursor.next_document)
     end
 
     # Returns an array of all the documents in the cursor.
@@ -76,7 +76,7 @@ module Mongoid #:nodoc
     #
     # <tt>cursor.to_a</tt>
     def to_a
-      @cursor.to_a.collect { |attrs| Mongoid::Factory.build(attrs) }
+      @cursor.to_a.collect { |attrs| Mongoid::Factory.build(@klass, attrs) }
     end
   end
 end

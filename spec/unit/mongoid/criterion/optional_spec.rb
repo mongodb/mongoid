@@ -7,6 +7,18 @@ describe Mongoid::Criterion::Optional do
     @canvas_criteria = Mongoid::Criteria.new(Canvas)
   end
 
+  describe "#enslave" do
+
+    it "sets the enslaved option on the criteria" do
+      @criteria.enslave
+      @criteria.options[:enslave].should be_true
+    end
+
+    it "returns self" do
+      @criteria.enslave.should == @criteria
+    end
+  end
+
   describe "#extras" do
 
     context "filtering" do

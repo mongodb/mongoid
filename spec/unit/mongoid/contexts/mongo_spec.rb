@@ -337,7 +337,9 @@ describe Mongoid::Contexts::Mongo do
       Person.expects(:collection).returns(@collection)
       @criteria = Person.where(:_id => "1").skip(60).limit(20)
       @context = Mongoid::Contexts::Mongo.new(@criteria.selector, @criteria.options, Person)
-      @collection.expects(:find).with({:_type => { "$in" => ["Doctor", "Person"] }, :_id => "1"}, :skip => 60, :limit => 20).returns([])
+      @collection.expects(:find).with(
+        {:_type => { "$in" => ["Doctor", "Person"] }, :_id => "1"}, :skip => 60, :limit => 20
+      ).returns([])
       @results = @context.paginate
     end
 

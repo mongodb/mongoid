@@ -19,10 +19,15 @@ module Mongoid #:nodoc:
       attr_accessor :association_name, :_parent
       attr_reader :new_record
 
-      delegate :collection, :embedded, :primary_key, :to => "self.class"
+      delegate :collection, :db, :embedded, :primary_key, :to => "self.class"
     end
 
     module ClassMethods
+      # Return the database associated with this class.
+      def db
+        collection.db
+      end
+
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
       # with it.
@@ -30,7 +35,7 @@ module Mongoid #:nodoc:
       # Returns: <tt>Mongo::Collection</tt>
       def collection
         raise Errors::InvalidCollection.new(self) if embedded
-        self._collection ||= Mongoid::Collection.new(self.collection_name)
+        self._collection ||= Mongoid::Collection.new(self, self.collection_name)
         add_indexes; self._collection
       end
 
@@ -82,7 +87,7 @@ module Mongoid #:nodoc:
       # <tt>Person.store_in :populdation</tt>
       def store_in(name)
         self.collection_name = name.to_s
-        self._collection = Mongoid::Collection.new(name.to_s)
+        self._collection = Mongoid::Collection.new(self, name.to_s)
       end
 
       # Returns all types to query for when using this class as the base.
@@ -127,8 +132,6 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>name.assimilate(person, options)</tt>
-      #
-      # Returns: The child +Document+.
       def assimilate(parent, options)
         parentize(parent, options.name); notify; self
       end
@@ -159,10 +162,6 @@ module Mongoid #:nodoc:
       # Options:
       #
       # attrs: The attributes +Hash+ to set up the document with.
-      #
-      # Example:
-      #
-      # <tt>Person.new(:title => "Mr", :age => 30)</tt>
       def initialize(attrs = nil)
         @attributes = {}
         process(attrs)
@@ -273,10 +272,6 @@ module Mongoid #:nodoc:
       #
       # child: The child +Document+ that sent the notification.
       # clear: Will clear out the child's attributes if set to true.
-      #
-      # Example:
-      #
-      # <tt>person.notify_observers(self)</tt> will cause this method to execute.
       #
       # This will also cause the observing +Document+ to notify it's parent if
       # there is any.

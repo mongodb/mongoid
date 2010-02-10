@@ -2,6 +2,16 @@
 module Mongoid #:nodoc:
   module Criterion #:nodoc:
     module Optional
+      # Flags the criteria to execute against a read-only slave in the pool
+      # instead of master.
+      #
+      # Example:
+      #
+      # <tt>criteria.enslave</tt>
+      def enslave
+        @options.merge!(:enslave => true); self
+      end
+
       # Adds a criterion to the +Criteria+ that specifies additional options
       # to be passed to the Ruby driver, in the exact format for the driver.
       #

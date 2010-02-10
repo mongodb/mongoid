@@ -5,7 +5,6 @@ module Mongoid #:nodoc
 
     attr_accessor \
       :allow_dynamic_fields,
-      :max_successive_reads,
       :reconnect_time,
       :parameterize_keys,
       :persist_in_safe_mode,
@@ -14,7 +13,6 @@ module Mongoid #:nodoc
     # Defaults the configuration options to true.
     def initialize
       @allow_dynamic_fields = true
-      @max_successive_reads = 10
       @parameterize_keys = true
       @persist_in_safe_mode = true
       @raise_not_found_error = true
