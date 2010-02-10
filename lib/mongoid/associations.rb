@@ -240,7 +240,7 @@ module Mongoid # :nodoc:
       def add_builder(type, options)
         name = options.name.to_s
         define_method("build_#{name}") do |attrs|
-          reset(name) { type.new(self, attrs.stringify_keys, options) }
+          reset(name) { type.new(self, (attrs || {}).stringify_keys, options) }
         end
       end
 

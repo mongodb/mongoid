@@ -199,6 +199,18 @@ describe Mongoid::Associations do
 
     end
 
+    context "when attributes are nil" do
+
+      before do
+        @writer = @canvas.build_writer(nil)
+      end
+
+      it "defaults them to empty" do
+        @writer.should be_a_kind_of(Writer)
+      end
+
+    end
+
   end
 
   describe "#create_*" do
