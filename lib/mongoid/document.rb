@@ -7,12 +7,7 @@ module Mongoid #:nodoc:
         include InstanceMethods
         extend ClassMethods
 
-        cattr_accessor \
-          :_collection,
-          :collection_name,
-          :embedded,
-          :primary_key,
-          :hereditary
+        cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :hereditary
 
         self.embedded = false
         self.hereditary = false
