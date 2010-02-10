@@ -93,9 +93,6 @@ module Mongoid #:nodoc:
       # <tt>Mongoid::Contexts::Mongo.new(criteria)</tt>
       def initialize(criteria)
         @criteria = criteria
-        if klass.hereditary
-          @hereditary = true
-        end
       end
 
       # Target class from the criteria
