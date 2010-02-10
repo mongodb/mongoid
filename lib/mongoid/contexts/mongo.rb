@@ -203,7 +203,7 @@ module Mongoid #:nodoc:
           reduce.gsub("[field]", field),
           true
         )
-        collection.first[start.to_s]
+        collection.empty? ? nil : collection.first[start.to_s]
       end
 
       # Filters the field list. If no fields have been supplied, then it will be

@@ -52,44 +52,65 @@ describe Mongoid::Criteria do
 
   describe "#max" do
 
-    before do
-      10.times do |n|
-        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+    context "without results" do
+      it "should return nil" do
+        Person.max(:age).should == nil
       end
     end
 
-    it "provides max for the field provided" do
-      Person.max(:age).should == 90.0
-    end
+    context "with results" do
+      before do
+        10.times do |n|
+          Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+        end
+      end
 
+      it "provides max for the field provided" do
+        Person.max(:age).should == 90.0
+      end
+    end
   end
 
   describe "#min" do
 
-    before do
-      10.times do |n|
-        Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+    context "without results" do
+      it "should return nil" do
+        Person.min(:age).should == nil
       end
     end
 
-    it "provides min for the field provided" do
-      Person.min(:age).should == 10.0
-    end
+    context "with results" do
+      before do
+        10.times do |n|
+          Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+        end
+      end
 
+      it "provides min for the field provided" do
+        Person.min(:age).should == 10.0
+      end
+    end
   end
 
   describe "#sum" do
 
-    before do
-      10.times do |n|
-        Person.create(:title => "Sir", :age => 5, :aliases => ["D", "Durran"], :ssn => "#{n}")
+    context "without results" do
+      it "should return nil" do
+        Person.sum(:age).should == nil
       end
     end
 
-    it "provides sum for the field provided" do
-      Person.where(:age.gt => 3).sum(:age).should == 50.0
-    end
+    context "with results" do
+      before do
+        10.times do |n|
+          Person.create(:title => "Sir", :age => 5, :aliases => ["D", "Durran"], :ssn => "#{n}")
+        end
+      end
 
+      it "provides sum for the field provided" do
+        Person.where(:age.gt => 3).sum(:age).should == 50.0
+      end
+    end
   end
 
   describe "#where" do
