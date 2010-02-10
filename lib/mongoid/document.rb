@@ -118,6 +118,17 @@ module Mongoid #:nodoc:
           other.attributes.except(:modified_at).except(:created_at)
       end
 
+      # Delegates to ==
+      def eql?(comparison_object)
+        self == (comparison_object)
+      end
+
+      # Delegates to id in order to allow two records of the same type and id to work with something like:
+      #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
+      def hash
+        id.hash
+      end
+
       # Introduces a child object into the +Document+ object graph. This will
       # set up the relationships between the parent and child and update the
       # attributes of the parent +Document+.

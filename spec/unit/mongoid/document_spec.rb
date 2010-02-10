@@ -67,6 +67,73 @@ describe Mongoid::Document do
 
   end
 
+  describe "#eql?" do
+
+    context "when other object is a Document" do
+
+      context "when attributes are equal" do
+
+        before do
+          @document = Person.new(:_id => 1, :title => "Sir")
+          @other = Person.new(:_id => 1, :title => "Sir")
+        end
+
+        it "returns true" do
+          @document.eql?(@other).should be_true
+        end
+
+      end
+
+      context "when attributes are not equal" do
+
+        before do
+          @document = Person.new(:title => "Sir")
+          @other = Person.new(:title => "Madam")
+        end
+
+        it "returns false" do
+          @document.eql?(@other).should_not be_true
+        end
+
+      end
+
+    end
+
+    context "when other object is not a Document" do
+
+      it "returns false" do
+        Person.new.eql?("Test").should be_false
+      end
+
+    end
+
+    context "when comapring parent to its subclass" do
+
+      it "returns false" do
+        Canvas.new.eql?(Firefox.new).should_not be_true
+      end
+
+    end
+
+  end
+
+  describe "#hash" do
+
+    before do
+      @document = Person.new(:_id => 1, :title => "Sir")
+      @other = Person.new(:_id => 2, :title => "Sir")
+    end
+
+    it "deligates to id" do
+      @document.hash.should == @document.id.hash
+    end
+
+    it "has unique hash per id" do
+      @document.hash.should_not == @other.hash
+    end
+
+  end
+
   describe "#alias_method_chain" do
 
     context "on a field setter" do
