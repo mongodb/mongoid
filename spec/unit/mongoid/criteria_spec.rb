@@ -316,6 +316,30 @@ describe Mongoid::Criteria do
 
     end
 
+    context "when caching" do
+
+      before do
+        Person.expects(:collection).returns(@collection)
+        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @cursor.expects(:each).yields(@person)
+        @criteria.cache
+        @criteria.each do |doc|
+          doc.should == @person
+        end
+      end
+
+      it "caches the results of the cursor iteration" do
+        @criteria.each do |doc|
+          doc.should == @person
+        end
+        # Do it again for sanity's sake.
+        @criteria.each do |doc|
+          doc.should == @person
+        end
+      end
+
+    end
+
   end
 
   describe "#first" do
