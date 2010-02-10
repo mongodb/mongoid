@@ -16,10 +16,6 @@ describe Mongoid::Criteria do
       @person = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
     end
 
-    after do
-      Person.delete_all
-    end
-
     context "when passed id" do
 
       it "it properly excludes ids" do
@@ -46,10 +42,6 @@ describe Mongoid::Criteria do
         @person = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
       end
 
-      after do
-        Person.delete_all
-      end
-
       it "executes the query again" do
         criteria = Person.all
         criteria.size.should == 1
@@ -66,10 +58,6 @@ describe Mongoid::Criteria do
       end
     end
 
-    after do
-      Person.delete_all
-    end
-
     it "provides max for the field provided" do
       Person.max(:age).should == 90.0
     end
@@ -82,10 +70,6 @@ describe Mongoid::Criteria do
       10.times do |n|
         Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
       end
-    end
-
-    after do
-      Person.delete_all
     end
 
     it "provides min for the field provided" do
@@ -102,10 +86,6 @@ describe Mongoid::Criteria do
       end
     end
 
-    after do
-      Person.delete_all
-    end
-
     it "provides sum for the field provided" do
       Person.where(:age.gt => 3).sum(:age).should == 50.0
     end
@@ -116,10 +96,6 @@ describe Mongoid::Criteria do
 
     before do
       @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"])
-    end
-
-    after do
-      Person.delete_all
     end
 
     context "with complex criterion" do
@@ -206,6 +182,22 @@ describe Mongoid::Criteria do
 
     end
 
+  end
+
+  context "when caching" do
+
+    before do
+      10.times do |n|
+        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+      end
+    end
+
+    it "iterates over the cursor only once" do
+      criteria = Person.where(:title => "Sir").cache
+      criteria.collect.size.should == 10
+      # Do it again!
+      criteria.collect.size.should == 10
+    end
   end
 
 end
