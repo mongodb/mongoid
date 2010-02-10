@@ -7,6 +7,18 @@ describe Mongoid::Criterion::Optional do
     @canvas_criteria = Mongoid::Criteria.new(Canvas)
   end
 
+  describe "#cache" do
+
+    it "sets the cache option on the criteria" do
+      @criteria.cache
+      @criteria.options[:cache].should be_true
+    end
+
+    it "returns self" do
+      @criteria.cache.should == @criteria
+    end
+  end
+
   describe "#enslave" do
 
     it "sets the enslaved option on the criteria" do
