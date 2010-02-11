@@ -215,9 +215,9 @@ describe Mongoid::Criteria do
 
     it "iterates over the cursor only once" do
       criteria = Person.where(:title => "Sir").cache
-      criteria.collect.size.should == 10
+      criteria.collect.to_a.size.should == 10
       # Do it again!
-      criteria.collect.size.should == 10
+      criteria.collect.to_a.size.should == 10
     end
   end
 
