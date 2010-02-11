@@ -22,6 +22,10 @@ describe Mongoid::Validations::UniquenessValidator do
         @document.errors[:title].should_not be_empty
       end
 
+      it "should translate the error in english" do
+        @document.errors[:title][0].should == "is already taken"
+      end
+
     end
 
     context "when no document exists with the attribute" do

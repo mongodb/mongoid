@@ -2,6 +2,10 @@
 require "mongoid/validations/associated"
 require "mongoid/validations/uniqueness"
 
+I18n.load_path << File.join(
+  File.dirname(__FILE__), "validations", "locale", "en.yml"
+)
+
 module Mongoid #:nodoc:
   # This module provides additional validations that ActiveModel does not
   # provide: validates_associated and validates_uniqueness_of

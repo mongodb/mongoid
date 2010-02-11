@@ -48,6 +48,10 @@ describe Mongoid::Validations::AssociatedValidator do
           @document.errors[:name].should_not be_empty
         end
 
+        it "translates the error in english" do
+          @document.errors[:name][0].should == "is invalid"
+        end
+
       end
 
     end
