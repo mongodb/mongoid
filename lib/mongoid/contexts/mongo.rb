@@ -5,6 +5,8 @@ module Mongoid #:nodoc:
       include Paging
       attr_reader :criteria
 
+      delegate :klass, :options, :selector, :to => :criteria
+
       AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
       # Aggregate the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
@@ -95,15 +97,6 @@ module Mongoid #:nodoc:
         @criteria = criteria
       end
 
-      # Target class from the criteria
-      #
-      # Returns:
-      #
-      # The target class from the criteria
-      def klass
-        criteria.klass
-      end
-
       # Return the last result for the +Context+. Essentially does a find_one on
       # the collection with the sorting reversed. If no sorting parameters have
       # been provided it will default to ids.
@@ -179,24 +172,6 @@ module Mongoid #:nodoc:
       end
 
       alias :first :one
-
-      # Options from the criteria
-      #
-      # Returns:
-      #
-      # The options from the criteria
-      def options
-        criteria.options
-      end
-
-      # Selector from the criteria
-      #
-      # Returns:
-      #
-      # The selector from the criteria
-      def selector
-        criteria.selector
-      end
 
       SUM_REDUCE = "function(obj, prev) { if (prev.sum == 'start') { prev.sum = 0; } prev.sum += obj.[field]; }"
       # Sum the context.

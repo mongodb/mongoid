@@ -6,6 +6,7 @@ module Mongoid #:nodoc:
       attr_reader :criteria
 
       delegate :first, :last, :to => :execute
+      delegate :documents, :options, :selector, :to => :criteria
 
       # Return aggregation counts of the grouped documents. This will count by
       # the first field provided in the fields array.
@@ -22,16 +23,6 @@ module Mongoid #:nodoc:
       # Gets the number of documents in the array. Delegates to size.
       def count
         @count ||= documents.size
-      end
-
-      # Target documents array from the criteria. Set by the association
-      # macros directly onto the criteria.
-      #
-      # Returns:
-      #
-      # The target documents array from the criteria
-      def documents
-        @criteria.documents
       end
 
       # Groups the documents by the first field supplied in the field options.
@@ -89,24 +80,6 @@ module Mongoid #:nodoc:
       #
       # The first document in the +Array+
       alias :one :first
-
-      # Options from the criteria
-      #
-      # Returns:
-      #
-      # The options from the criteria
-      def options
-        criteria.options
-      end
-
-      # Selector from the criteria
-      #
-      # Returns:
-      #
-      # The selector from the criteria
-      def selector
-        criteria.selector
-      end
 
       # Get the sum of the field values for all the documents.
       #
