@@ -14,8 +14,9 @@ module Mongoid #:nodoc:
       #
       # <tt>DeleteAll.execute(Person, :conditions => { :field => "value" })</tt>
       def self.execute(klass, params = {})
+        safe = Mongoid.persist_in_safe_mode
         collection = klass.collection
-        collection.remove((params[:conditions] || {}).merge(:_type => klass.name))
+        collection.remove((params[:conditions] || {}).merge(:_type => klass.name), :safe => safe)
       end
     end
   end
