@@ -136,7 +136,6 @@ module Mongoid #:nodoc:
       @selector, @options, @klass, @documents = {}, {}, klass, []
       if klass.hereditary
         @selector = { :_type => { "$in" => klass._types } }
-        @hereditary = true
       end
     end
 
