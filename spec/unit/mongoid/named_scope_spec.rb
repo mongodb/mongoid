@@ -17,6 +17,7 @@ describe Mongoid::NamedScope do
     named_scope :inactive, :where => { :active => false }
     named_scope :frags_over, lambda { |count| { :where => { :frags.gt => count } } }
     named_scope :deaths_under, lambda { |count| criteria.where(:deaths.lt => count) }
+    scope :deaths_over, lambda { |count| criteria.where(:deaths.gt => count) }
 
     class << self
       def alive
@@ -73,10 +74,22 @@ describe Mongoid::NamedScope do
 
     context "when a block is supplied" do
 
-      it "adds the block as an extension" do
-        Player.active.extension.should == "extension"
+      it "adds a class method for the scope" do
+        Player.should respond_to(:deaths_over)
       end
 
+      it "adds the scope to the scopes" do
+        Player.scopes.should include(:deaths_over)
+      end
+
+    end
+
+  end
+
+  describe ".scope" do
+
+    it "aliases to named_scope" do
+      Player.should respond_to(:deaths_over)
     end
 
   end
