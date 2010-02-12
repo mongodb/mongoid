@@ -9,6 +9,7 @@ module Mongoid #:nodoc
         include Attributes
         include Callbacks
         include Commands
+        include Enslavement
         include Fields
         include Indexes
         include Matchers

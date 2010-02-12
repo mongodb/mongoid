@@ -40,6 +40,36 @@ describe Mongoid::Collection do
     end
   end
 
+  describe "#directed" do
+
+    before do
+      slaves.expects(:empty?).returns(false)
+    end
+
+    context "when an enslave option is not passed" do
+
+      before do
+        Person.enslave
+      end
+
+      after do
+        Person.enslaved = false
+      end
+
+      it "uses the default" do
+        collection.directed.should == slaves
+      end
+    end
+
+    context "when an enslave option is passed" do
+
+      it "overwrites the default" do
+        collection.directed(:enslave => true).should == slaves
+      end
+    end
+
+  end
+
   describe "#find" do
 
     before do
