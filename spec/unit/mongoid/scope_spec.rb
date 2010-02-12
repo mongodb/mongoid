@@ -232,7 +232,7 @@ describe Mongoid::Scope do
 
     it "returns the conditions criteria" do
       @scope.target.selector.should ==
-        { :title => "Sir", :_type => { "$in" => [ "Doctor", "Person" ] } }
+        { :title => "Sir" }
     end
 
   end

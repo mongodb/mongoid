@@ -115,7 +115,7 @@ describe Mongoid::Criterion::Optional do
       it "adds the _id query to the selector" do
         id = Mongo::ObjectID.new.to_s
         @criteria.id(id)
-        @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :_id => id }
+        @criteria.selector.should == { :_id => id }
       end
 
       it "returns self" do
@@ -135,7 +135,7 @@ describe Mongoid::Criterion::Optional do
       it "adds the _id query to the selector" do
         @criteria.id(@ids)
         @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] }, :_id => { "$in" => @ids } }
+          { :_id => { "$in" => @ids } }
       end
 
     end

@@ -243,7 +243,7 @@ describe Mongoid::Criteria do
         criteria = Mongoid::Criteria.new(Person)
         collection = mock
         Person.expects(:collection).returns(collection)
-        collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
+        collection.expects(:find).with(criteria.selector, criteria.options).returns([])
         criteria.entries.should == []
       end
 
@@ -370,24 +370,23 @@ describe Mongoid::Criteria do
 
   describe "#initialize" do
 
-    context "when class is hereditary" do
+    let(:criteria) { Mongoid::Criteria.new(Person) }
 
-      it "sets the _type value on the selector" do
-        criteria = Mongoid::Criteria.new(Person)
-        criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] } }
-      end
-
+    it "sets the selector to an empty hash" do
+      criteria.selector.should == {}
     end
 
-    context "when class is not hereditary" do
-
-      it "sets no _type value on the selector" do
-        criteria = Mongoid::Criteria.new(Game)
-        criteria.selector.should == {}
-      end
-
+    it "sets the options to an empty hash" do
+      criteria.options.should == {}
     end
 
+    it "sets the documents to an empty array" do
+      criteria.documents.should == []
+    end
+
+    it "sets the klass to the given class" do
+      criteria.klass.should == Person
+    end
   end
 
   describe "#last" do
@@ -431,7 +430,7 @@ describe Mongoid::Criteria do
         before do
           @other = Mongoid::Criteria.new(Person)
           @other.where(:name => "Chloe").order_by([[:name, :asc]])
-          @selector = { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :age => 30, :name => "Chloe" }
+          @selector = { :title => "Sir", :age => 30, :name => "Chloe" }
           @options = { :skip => 40, :limit => 20, :sort => [[:name, :asc]] }
         end
 
@@ -447,7 +446,7 @@ describe Mongoid::Criteria do
 
         before do
           @other = Mongoid::Criteria.new(Person)
-          @selector = { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :age => 30 }
+          @selector = { :title => "Sir", :age => 30 }
           @options = { :skip => 40, :limit => 20 }
         end
 
@@ -487,7 +486,7 @@ describe Mongoid::Criteria do
 
     it "merges the criteria with the next one" do
       @new_criteria = @criteria.accepted
-      @new_criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :terms => true }
+      @new_criteria.selector.should == { :title => "Sir", :terms => true }
     end
 
     context "chaining more than one scope" do
@@ -497,8 +496,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the final merged criteria" do
-        @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+        @criteria.selector.should == { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
       end
 
     end
@@ -614,8 +612,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the selector plus the options" do
-      @criteria.scoped.should ==
-        { :where => { :title => "Sir", :_type=>{ "$in" => [ "Doctor", "Person" ] } }, :skip => 20 }
+      @criteria.scoped.should == { :where => { :title => "Sir" }, :skip => 20 }
     end
 
   end
@@ -719,7 +716,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
@@ -735,7 +732,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
@@ -751,7 +748,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
@@ -766,7 +763,7 @@ describe Mongoid::Criteria do
         end
 
         it "adds the criteria and the options" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
           @criteria.options.should == { :skip => 10 }
         end
 

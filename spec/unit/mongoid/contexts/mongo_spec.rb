@@ -164,6 +164,9 @@ describe Mongoid::Contexts::Mongo do
       @context.klass.should == klass
     end
 
+    it "set the selector to query across the _type of the Criteria's klass when it is hereditary" do
+      @context.selector[:_type].should == {'$in' => Person._types}
+    end
   end
 
   describe "#last" do

@@ -95,6 +95,9 @@ module Mongoid #:nodoc:
       # <tt>Mongoid::Contexts::Mongo.new(criteria)</tt>
       def initialize(criteria)
         @criteria = criteria
+        if criteria.klass.hereditary
+          criteria.in(:_type => criteria.klass._types)
+        end
       end
 
       # Return the last result for the +Context+. Essentially does a find_one on

@@ -360,7 +360,7 @@ describe Mongoid::Finders do
 
     it "returns a new criteria with select conditions added" do
       criteria = Person.where(:title => "Sir")
-      criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }
+      criteria.selector.should == { :title => "Sir" }
     end
 
   end

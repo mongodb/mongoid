@@ -12,10 +12,7 @@ describe Mongoid::Criterion::Exclusion do
     it "adds the $ne query to the selector" do
       @criteria.excludes(:title => "Bad Title", :text => "Bad Text")
       @criteria.selector.should ==
-        { :_type =>
-            { "$in" =>
-              ["Doctor", "Person"]
-            },
+        {
           :title =>
             { "$ne" => "Bad Title"},
           :text =>
@@ -32,10 +29,7 @@ describe Mongoid::Criterion::Exclusion do
       it "accepts id" do
         @criteria.excludes(:id => "1")
         @criteria.selector.should ==
-          { :_type =>
-              { "$in" =>
-                ["Doctor", "Person"]
-              },
+          {
             :_id => { "$ne" => "1" }
           }
       end
@@ -43,10 +37,7 @@ describe Mongoid::Criterion::Exclusion do
       it "accepts _id" do
         @criteria.excludes(:_id => "1")
         @criteria.selector.should ==
-          { :_type =>
-              { "$in" =>
-                ["Doctor", "Person"]
-              },
+          {
             :_id => { "$ne" => "1" }
           }
       end
@@ -60,7 +51,6 @@ describe Mongoid::Criterion::Exclusion do
     it "adds the exclusion to the selector" do
       @criteria.not_in(:title => ["title1", "title2"], :text => ["test"])
       @criteria.selector.should == {
-        :_type => { "$in" => ["Doctor", "Person"] },
         :title => { "$nin" => ["title1", "title2"] },
         :text => { "$nin" => ["test"] }
       }

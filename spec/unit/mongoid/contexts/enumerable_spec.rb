@@ -130,6 +130,12 @@ describe Mongoid::Contexts::Enumerable do
       @context.documents.should == documents
     end
 
+    it "set the selector to query across the _type of the Criteria's klass when it is hereditary" do
+      criteria = Mongoid::Criteria.new(Person)
+      context = Mongoid::Contexts::Enumerable.new(criteria)
+      context.selector[:_type].should == {'$in' => Person._types}
+    end
+
   end
 
   describe "#last" do

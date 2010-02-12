@@ -134,9 +134,6 @@ module Mongoid #:nodoc:
     # klass: The class to execute on.
     def initialize(klass)
       @selector, @options, @klass, @documents = {}, {}, klass, []
-      if klass.hereditary
-        @selector = { :_type => { "$in" => klass._types } }
-      end
     end
 
     # Merges another object into this +Criteria+. The other object may be a
