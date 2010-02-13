@@ -54,9 +54,6 @@ module Mongoid #:nodoc:
       # <tt>Mongoid::Contexts::Enumerable.new(criteria)</tt>
       def initialize(criteria)
         @criteria = criteria
-        if criteria.klass.hereditary
-          criteria.in(:_type => criteria.klass._types)
-        end
       end
 
       # Get the largest value for the field in all the documents.
