@@ -14,7 +14,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
       before do
         @criteria = stub(:empty? => false)
-        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        Person.expects(:where).with(all_of(has_entry(:title, "Sir"), has_value(@document._id))).returns(@criteria)
         validator.validate_each(@document, :title, "Sir")
       end
 
@@ -28,11 +28,11 @@ describe Mongoid::Validations::UniquenessValidator do
 
     end
 
-    context "when no document exists with the attribute" do
+    context "when no other document exists with the attribute value" do
 
       before do
         @criteria = stub(:empty? => true)
-        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        Person.expects(:where).with(all_of(has_entry(:title, "Sir"), has_value(@document._id))).returns(@criteria)
         validator.validate_each(@document, :title, "Sir")
       end
 

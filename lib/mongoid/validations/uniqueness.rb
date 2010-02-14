@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
     #   end
     class UniquenessValidator < ActiveModel::EachValidator
       def validate_each(document, attribute, value)
-        return if document.class.where(attribute => value).empty?
+        return if document.class.where(attribute => value, :_id.ne => document._id).empty?
         document.errors.add(
           attribute,
           :taken,
