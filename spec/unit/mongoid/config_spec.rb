@@ -155,4 +155,11 @@ describe Mongoid::Config do
 
   end
 
+  describe "#use_object_ids" do
+
+    it "defaults to false" do
+      config.use_object_ids.should == false
+    end
+  end
+
 end
