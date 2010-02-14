@@ -325,6 +325,10 @@ describe Mongoid::Document do
       @person.age.should == 35
     end
 
+    it "reload should return self" do
+      @person.reload.should == @from_db
+    end
+
   end
 
   describe "#save" do

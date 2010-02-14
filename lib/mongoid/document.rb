@@ -229,6 +229,7 @@ module Mongoid #:nodoc:
       # Reloads the +Document+ attributes from the database.
       def reload
         @attributes = collection.find_one(:_id => id)
+        self
       end
 
       # Remove a child document from this parent +Document+. Will reset the
