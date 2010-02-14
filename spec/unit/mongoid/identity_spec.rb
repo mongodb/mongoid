@@ -40,9 +40,29 @@ describe Mongoid::Identity do
           Mongo::ObjectID.expects(:new).returns(@object_id)
         end
 
-        it "sets the id to a mongo object id" do
-          Mongoid::Identity.create(@person)
-          @person.id.should == "1"
+        context "when using object ids" do
+
+          before do
+            Mongoid.use_object_ids = true
+          end
+
+          after do
+            Mongoid.use_object_ids = false
+          end
+
+          it "sets the id to a mongo object id" do
+            Mongoid::Identity.create(@person)
+            @person.id.should == @object_id
+          end
+        end
+
+        context "when not using object ids" do
+
+          it "sets the id to a mongo object id string" do
+            Mongoid::Identity.create(@person)
+            @person.id.should == "1"
+          end
+
         end
 
       end
