@@ -723,6 +723,22 @@ describe Mongoid::Criteria do
 
       end
 
+      context "when Person, :conditions => {:id => id}" do
+
+        before do
+          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :id => "1234e567" })
+        end
+
+        it "returns a criteria with a selector from the conditions" do
+          @criteria.selector.should == { :_id => "1234e567" }
+        end
+
+        it "returns a criteria with klass Person" do
+          @criteria.klass.should == Person
+        end
+
+      end
+
       context "when :all, :conditions => {}" do
 
         before do

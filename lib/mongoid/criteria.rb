@@ -205,7 +205,12 @@ module Mongoid #:nodoc:
       unless params.is_a?(Hash)
         return new(klass).id_criteria(params)
       end
-      return new(klass).where(params.delete(:conditions) || {}).extras(params)
+      conditions = params.delete(:conditions) || {}
+      if conditions.include?(:id)
+        conditions[:_id] = conditions[:id]
+        conditions.delete(:id)
+      end
+      return new(klass).where(conditions).extras(params)
     end
 
     protected
