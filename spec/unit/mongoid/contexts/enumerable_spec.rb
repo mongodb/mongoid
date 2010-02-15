@@ -245,4 +245,84 @@ describe Mongoid::Contexts::Enumerable do
 
   end
 
+  context "#id_criteria" do
+
+    let(:criteria) do
+      criteria = Mongoid::Criteria.new(Address)
+      criteria.documents = []
+      criteria
+    end
+    let(:context) { criteria.context }
+
+    context "with a single argument" do
+
+      let(:id) { Mongo::ObjectID.new.to_s }
+
+      before do
+        criteria.expects(:id).with(id).returns(criteria)
+      end
+
+      context "when the document is found" do
+
+        let(:document) { stub }
+
+        it "returns a matching document" do
+          context.expects(:one).returns(document)
+          document.expects(:blank? => false)
+          context.id_criteria(id).should == document
+        end
+
+      end
+
+      context "when the document is not found" do
+
+        it "raises an error" do
+          context.expects(:one).returns(nil)
+          lambda { context.id_criteria(id) }.should raise_error
+        end
+
+      end
+
+    end
+
+    context "multiple arguments" do
+
+      context "when an array of ids" do
+
+        let(:ids) do
+          (0..2).inject([]) { |ary, i| ary << Mongo::ObjectID.new.to_s }
+        end
+
+        context "when documents are found" do
+
+          let(:docs) do
+            (0..2).inject([]) { |ary, i| ary << stub }
+          end
+
+          before do
+            criteria.expects(:id).with(ids).returns(criteria)
+          end
+
+          it "returns matching documents" do
+            context.expects(:execute).returns(docs)
+            context.id_criteria(ids).should == docs
+          end
+
+        end
+
+        context "when documents are not found" do
+
+          it "raises an error" do
+            context.expects(:execute).returns([])
+            lambda { context.id_criteria(ids) }.should raise_error
+          end
+
+        end
+
+      end
+
+    end
+
+  end
+
 end

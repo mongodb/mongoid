@@ -45,6 +45,25 @@ module Mongoid #:nodoc:
         limit(documents.select { |document| document.matches?(selector) })
       end
 
+      # Return documents based on an id search. Will handle if a single id has
+      # been passed or mulitple ids.
+      #
+      # Example:
+      #
+      #   context.id_criteria([1, 2, 3])
+      #
+      # Returns:
+      #
+      # The single or multiple documents.
+      def id_criteria(params)
+        criteria.id(params)
+        result = params.is_a?(String) ? one : criteria.entries
+        if Mongoid.raise_not_found_error
+          raise Errors::DocumentNotFound.new(klass, params) if result.blank?
+        end
+        return result
+      end
+
       # Create the new enumerable context. This will need the selector and
       # options from a +Criteria+ and a documents array that is the underlying
       # array of embedded documents from a has many association.

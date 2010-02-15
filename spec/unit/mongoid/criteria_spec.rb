@@ -640,22 +640,11 @@ describe Mongoid::Criteria do
         @document = stub
         @criteria = mock
         Mongoid::Criteria.expects(:new).returns(@criteria)
-        @criteria.expects(:id).with(@id).returns(@criteria)
       end
 
-      it "creates a criteria for a string" do
-        @criteria.expects(:one).returns(@document)
-        @document.expects(:blank? => false)
-        Mongoid::Criteria.translate(Person, @id)
-      end
-
-      context "when the document is not found" do
-
-        it "raises an error" do
-          @criteria.expects(:one).returns(nil)
-          lambda { Mongoid::Criteria.translate(Person, @id) }.should raise_error
-        end
-
+      it "delegates to #id_criteria" do
+        @criteria.expects(:id_criteria).with(@id).returns(@document)
+        Mongoid::Criteria.translate(Person, @id).should == @document
       end
 
     end
@@ -671,40 +660,13 @@ describe Mongoid::Criteria do
             @ids << Mongo::ObjectID.new.to_s
             @documents << stub
           end
-          @collection = stub
-          Person.expects(:collection).returns(@collection)
+          @criteria = mock
+          Mongoid::Criteria.expects(:new).returns(@criteria)
         end
 
-        context "when documents are found" do
-
-          it "returns an ids criteria" do
-            @collection.expects(:find).with(
-              { :_type =>
-                { "$in" =>
-                  ["Doctor", "Person"]
-                },
-                :_id =>
-                { "$in" => @ids }
-            }, {}).returns([{ "_id" => "4", "title" => "Sir", "_type" => "Person" }])
-            @criteria = Mongoid::Criteria.translate(Person, @ids)
-          end
-
-        end
-
-        context "when documents are not found" do
-
-          it "returns an ids criteria" do
-            @collection.expects(:find).with(
-              { :_type =>
-                { "$in" =>
-                  ["Doctor", "Person"]
-                },
-                :_id =>
-                { "$in" => @ids }
-            }, {}).returns([])
-            lambda { Mongoid::Criteria.translate(Person, @ids) }.should raise_error
-          end
-
+        it "delegates to #id_criteria" do
+          @criteria.expects(:id_criteria).with(@ids).returns(@documents)
+          Mongoid::Criteria.translate(Person, @ids).should == @documents
         end
 
       end
