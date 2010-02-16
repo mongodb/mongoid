@@ -167,7 +167,7 @@ module Mongoid #:nodoc:
     # Returns: <tt>Criteria</tt>
     def method_missing(name, *args)
       if @klass.respond_to?(name)
-        new_scope = @klass.send(name)
+        new_scope = @klass.send(name, *args)
         new_scope.merge(self)
         return new_scope
       else
