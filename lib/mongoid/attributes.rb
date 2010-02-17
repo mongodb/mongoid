@@ -129,6 +129,7 @@ module Mongoid #:nodoc:
         identify if id.blank?
         notify
       end
+      alias :attributes= write_attributes
 
       protected
       # Return true is dynamic field setting is enabled.
