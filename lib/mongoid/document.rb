@@ -258,6 +258,30 @@ module Mongoid #:nodoc:
       def to_json(options = nil)
         attributes.to_json(options)
       end
+      
+      # Return an object to be encoded into a JSON string.
+      # Used by Rails 3's object->JSON chain to create JSON 
+      # in a backend-agnostic way
+      #
+      # Example:
+      #
+      # <tt>person.as_json</tt>
+      def as_json(options = nil)
+        attributes
+      end
+      
+      # Return this document as an object to be encoded as JSON,
+      # with any particular items modified on a per-encoder basis.
+      # Nothing special is required here since Mongoid bubbles up 
+      # all the child associations to the parent attribute +Hash+ 
+      # using observers throughout the +Document+ lifecycle.
+      #
+      # Example:
+      #
+      # <tt>person.encode_json(encoder)</tt>
+      def encode_json(encoder)
+        attributes
+      end
 
       # Returns the id of the Document, used in Rails compatibility.
       def to_param
