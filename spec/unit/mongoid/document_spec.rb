@@ -554,6 +554,10 @@ describe Mongoid::Document do
       @person.attributes.should == @attributes
     end
 
+    it 'should return a person object' do
+      @person.reload.should be_kind_of(Person)
+    end
+
   end
 
   describe "#remove" do

@@ -35,6 +35,7 @@ module Mongoid #:nodoc:
       :execute,
       :first,
       :group,
+      :id_criteria,
       :last,
       :max,
       :min,
@@ -200,7 +201,7 @@ module Mongoid #:nodoc:
       klass = args[0]
       params = args[1] || {}
       unless params.is_a?(Hash)
-        return id_criteria(klass, params)
+        return new(klass).id_criteria(params)
       end
       return new(klass).where(params.delete(:conditions) || {}).extras(params)
     end
@@ -253,27 +254,6 @@ module Mongoid #:nodoc:
     # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
     def update_selector(attributes, operator)
       attributes.each { |key, value| @selector[key] = { operator => value } }; self
-    end
-
-    class << self
-      # Create a criteria or single document based on an id search. Will handle
-      # if a single id has been passed or mulitple ids.
-      #
-      # Example:
-      #
-      #   Criteria.id_criteria(Person, [1, 2, 3])
-      #
-      # Returns:
-      #
-      # The single or multiple documents.
-      def id_criteria(klass, params)
-        criteria = new(klass).id(params)
-        result = params.is_a?(String) ? criteria.one : criteria.entries
-        if Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, params) if result.blank?
-        end
-        return result
-      end
     end
   end
 end
