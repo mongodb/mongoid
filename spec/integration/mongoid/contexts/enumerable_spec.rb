@@ -17,4 +17,17 @@ describe Mongoid::Contexts::Enumerable do
       addresses.size.should == 5
     end
   end
+
+  describe "limit and skip" do
+
+    it "limits" do
+      @person.addresses.criteria.limit(5).size.should == 5
+    end
+
+    it "skips" do
+      @person.addresses.criteria.skip(5).limit(10).
+        map(&:number).should == [5, 6, 7, 8, 9]
+    end
+
+  end
 end

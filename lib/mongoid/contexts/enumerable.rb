@@ -126,6 +126,8 @@ module Mongoid #:nodoc:
         skip, limit = options[:skip], options[:limit]
         if skip && limit
           return documents.slice(skip, limit)
+        elsif limit
+          return documents.first(limit)
         end
         documents
       end

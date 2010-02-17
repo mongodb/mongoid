@@ -74,6 +74,19 @@ describe Mongoid::Contexts::Enumerable do
       end
     end
 
+    context "when limit is set without skip in the options" do
+
+      before do
+        @criteria.limit(2)
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
+
+      it "properly narrows down the matching results" do
+        @context.execute.size.should == 2
+      end
+
+  end
+
   end
 
   describe "#first" do
