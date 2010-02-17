@@ -67,7 +67,7 @@ module Mongoid #:nodoc:
         rescue Mongo::OperationFailure => e
           errors.add(:mongoid, e.message)
         end
-        run_callbacks(:after_create) if new
+        run_callbacks(:after_create) if new && saved
         saved
       end
 

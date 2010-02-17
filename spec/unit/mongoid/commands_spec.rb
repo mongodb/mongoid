@@ -37,6 +37,22 @@ describe Mongoid::Commands do
         @person = Person.new
       end
 
+      context "when validation fails" do
+
+        it "it raises an error" do
+          Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+          @person.save.should be_false
+        end
+
+        it "should run callback before_create and no after_create" do
+          @person.expects(:run_callbacks).with(:before_create)
+          Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+          @person.expects(:run_callbacks).with(:after_create).never
+          @person.save.should be_false
+        end
+
+      end
+
       it "delegates to the save command" do
         Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
         @person.save
