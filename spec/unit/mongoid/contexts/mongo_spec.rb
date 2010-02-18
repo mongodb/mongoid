@@ -132,7 +132,13 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => { "$in" => ["Doctor", "Person"] }}, {:group => []}, @reduce, true).returns(@grouping)
+        @collection.expects(:group).with(
+          [:field1],
+          {:_type => { "$in" => ["Doctor", "Person"] }},
+          {:group => []},
+          @reduce,
+          true
+        ).returns(@grouping)
         @context.group
       end
 
@@ -459,6 +465,39 @@ describe Mongoid::Contexts::Mongo do
 
       end
 
+      context "when an array of object ids" do
+
+        let(:ids) do
+          (0..2).inject([]) { |ary, i| ary << Mongo::ObjectID.new }
+        end
+
+        context "when documents are found" do
+
+          let(:docs) do
+            (0..2).inject([]) { |ary, i| ary << stub }
+          end
+
+          before do
+            criteria.expects(:id).with(ids).returns(criteria)
+          end
+
+          it "returns matching documents" do
+            context.expects(:execute).returns(docs)
+            context.id_criteria(ids).should == docs
+          end
+
+        end
+
+        context "when documents are not found" do
+
+          it "raises an error" do
+            context.expects(:execute).returns([])
+            lambda { context.id_criteria(ids) }.should raise_error
+          end
+
+        end
+
+      end
     end
 
   end

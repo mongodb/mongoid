@@ -112,15 +112,32 @@ describe Mongoid::Criterion::Optional do
 
     context "when passing a single id" do
 
-      it "adds the _id query to the selector" do
-        id = Mongo::ObjectID.new.to_s
-        @criteria.id(id)
-        @criteria.selector.should == { :_id => id }
+      context "when the id is a string" do
+
+        it "adds the _id query to the selector" do
+          id = Mongo::ObjectID.new.to_s
+          @criteria.id(id)
+          @criteria.selector.should == { :_id => id }
+        end
+
+        it "returns self" do
+          id = Mongo::ObjectID.new.to_s
+          @criteria.id(id).should == @criteria
+        end
       end
 
-      it "returns self" do
-        id = Mongo::ObjectID.new.to_s
-        @criteria.id(id.to_s).should == @criteria
+      context "when the id is an object id" do
+
+        it "adds the _id query to the selector" do
+          id = Mongo::ObjectID.new
+          @criteria.id(id)
+          @criteria.selector.should == { :_id => id }
+        end
+
+        it "returns self" do
+          id = Mongo::ObjectID.new
+          @criteria.id(id).should == @criteria
+        end
       end
 
     end

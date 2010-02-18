@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-02-10}
+  s.date = %q{2010-02-17}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -62,6 +62,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/criterion/optional.rb",
      "lib/mongoid/cursor.rb",
      "lib/mongoid/document.rb",
+     "lib/mongoid/enslavement.rb",
      "lib/mongoid/errors.rb",
      "lib/mongoid/extensions.rb",
      "lib/mongoid/extensions/array/accessors.rb",
@@ -167,6 +168,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/config_spec.rb",
      "spec/unit/mongoid/contexts/enumerable_spec.rb",
      "spec/unit/mongoid/contexts/mongo_spec.rb",
+     "spec/unit/mongoid/contexts_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/criterion/complex_spec.rb",
      "spec/unit/mongoid/criterion/exclusion_spec.rb",
@@ -174,6 +176,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/optional_spec.rb",
      "spec/unit/mongoid/cursor_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
+     "spec/unit/mongoid/enslavement_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
      "spec/unit/mongoid/extensions/array/assimilation_spec.rb",
@@ -282,6 +285,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/config_spec.rb",
      "spec/unit/mongoid/contexts/enumerable_spec.rb",
      "spec/unit/mongoid/contexts/mongo_spec.rb",
+     "spec/unit/mongoid/contexts_spec.rb",
      "spec/unit/mongoid/criteria_spec.rb",
      "spec/unit/mongoid/criterion/complex_spec.rb",
      "spec/unit/mongoid/criterion/exclusion_spec.rb",
@@ -289,6 +293,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/optional_spec.rb",
      "spec/unit/mongoid/cursor_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
+     "spec/unit/mongoid/enslavement_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
      "spec/unit/mongoid/extensions/array/assimilation_spec.rb",

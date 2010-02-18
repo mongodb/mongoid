@@ -635,18 +635,35 @@ describe Mongoid::Criteria do
 
     context "with a single argument" do
 
-      before do
-        @id = Mongo::ObjectID.new.to_s
-        @document = stub
-        @criteria = mock
-        Mongoid::Criteria.expects(:new).returns(@criteria)
+      context "when the arg is a string" do
+
+        before do
+          @id = Mongo::ObjectID.new.to_s
+          @document = stub
+          @criteria = mock
+          Mongoid::Criteria.expects(:new).returns(@criteria)
+        end
+
+        it "delegates to #id_criteria" do
+          @criteria.expects(:id_criteria).with(@id).returns(@document)
+          Mongoid::Criteria.translate(Person, @id).should == @document
+        end
       end
 
-      it "delegates to #id_criteria" do
-        @criteria.expects(:id_criteria).with(@id).returns(@document)
-        Mongoid::Criteria.translate(Person, @id).should == @document
-      end
+      context "when the arg is an object id" do
 
+        before do
+          @id = Mongo::ObjectID.new
+          @document = stub
+          @criteria = mock
+          Mongoid::Criteria.expects(:new).returns(@criteria)
+        end
+
+        it "delegates to #id_criteria" do
+          @criteria.expects(:id_criteria).with(@id).returns(@document)
+          Mongoid::Criteria.translate(Person, @id).should == @document
+        end
+      end
     end
 
     context "multiple arguments" do

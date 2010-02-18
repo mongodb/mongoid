@@ -102,7 +102,7 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      return each_cached(&block) if cached?
+      return caching(&block) if cached?
       if block_given?
         execute.each { |doc| yield doc }
       end
@@ -209,7 +209,7 @@ module Mongoid #:nodoc:
     protected
 
     # Iterate over each +Document+ in the results and cache the collection.
-    def each_cached(&block)
+    def caching(&block)
       @collection ||= execute
       if block_given?
         docs = []
