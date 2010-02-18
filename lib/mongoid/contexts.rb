@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/contexts/ids"
 require "mongoid/contexts/paging"
 require "mongoid/contexts/enumerable"
 require "mongoid/contexts/mongo"

@@ -2,7 +2,7 @@
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Mongo
-      include Paging
+      include Ids, Paging
       attr_reader :criteria
 
       delegate :klass, :options, :selector, :to => :criteria
@@ -85,25 +85,6 @@ module Mongoid #:nodoc:
           end
           docs
         end
-      end
-
-      # Return documents based on an id search. Will handle if a single id has
-      # been passed or mulitple ids.
-      #
-      # Example:
-      #
-      #   context.id_criteria([1, 2, 3])
-      #
-      # Returns:
-      #
-      # The single or multiple documents.
-      def id_criteria(params)
-        criteria.id(params)
-        result = params.is_a?(Array) ? criteria.entries : one
-        if Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, params) if result.blank?
-        end
-        return result
       end
 
       # Create the new mongo context. This will execute the queries given the
