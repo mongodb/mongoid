@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Commands do
 
   before do
-    @person = Person.new(:title => "Sir", :ssn => "6969696")
+    @person = Person.new(:title => "Sir", :ssn => "6969696", :pets => true)
   end
 
   after do
@@ -188,9 +188,11 @@ describe Mongoid::Commands do
       end
 
       it "saves the attributes" do
-        @person.update_attributes(:ssn => "555-55-1235", :title => "Blah")
+        @person.update_attributes(:ssn => "555-55-1235", :pets => false, :title => nil)
         @from_db = Person.find(@person.id)
-        @from_db.title.should == "Blah"
+        @from_db.ssn.should == "555-55-1235"
+        @from_db.pets.should == false
+        @from_db.title.should be_nil
       end
 
     end

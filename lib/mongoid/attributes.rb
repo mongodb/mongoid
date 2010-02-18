@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
           if set_allowed?(key)
             @attributes[key.to_s] = value
           else
-            send("#{key}=", value) if value
+            send("#{key}=", value)
           end
         end
       end
