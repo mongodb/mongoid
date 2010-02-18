@@ -46,10 +46,9 @@ module Mongoid #:nodoc
       def create_accessors(name, meth, options = {})
         define_method(meth) { read_attribute(name) }
         define_method("#{meth}=") { |value| write_attribute(name, value) }
-        if options[:type] == Boolean
-          define_method("#{meth}?") { read_attribute(name) == true }
-        else
-          define_method("#{meth}?") { read_attribute(name).present? }
+        define_method("#{meth}?") do
+          attr = read_attribute(name)
+          (options[:type] == Boolean) ? attr == true : attr.present?
         end
       end
 
