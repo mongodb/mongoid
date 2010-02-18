@@ -53,6 +53,7 @@ module Mongoid #:nodoc:
       # <tt>Person.instantiate(:title => "Sir", :age => 30)</tt>
       def instantiate(attrs = nil, allocating = false)
         attributes = attrs || {}
+        attributes.delete_if {|key, value| value.nil? }
         if attributes["_id"] || allocating
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
