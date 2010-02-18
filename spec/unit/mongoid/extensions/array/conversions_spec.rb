@@ -10,8 +10,8 @@ describe Mongoid::Extensions::Array::Conversions do
         Person.new(:_id => 2, :title => "Madam")
       ]
       array.mongoidize.should ==
-        [ HashWithIndifferentAccess.new({ :_id => 1, :title => "Sir", :age => 100, :_type => "Person", "blood_alcohol_content" => 0.0 }),
-          HashWithIndifferentAccess.new({ :_id => 2, :title => "Madam", :age => 100, :_type => "Person", "blood_alcohol_content" => 0.0 }) ]
+        [ HashWithIndifferentAccess.new({ :_id => 1, :title => "Sir", :age => 100, :_type => "Person", "blood_alcohol_content" => 0.0, :pets => false }),
+          HashWithIndifferentAccess.new({ :_id => 2, :title => "Madam", :age => 100, :_type => "Person", "blood_alcohol_content" => 0.0, :pets => false }) ]
     end
 
   end

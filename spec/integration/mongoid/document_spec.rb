@@ -285,7 +285,7 @@ describe Mongoid::Document do
     end
 
     it "returns a pretty string of class name and attributes" do
-      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name] || 'nil'}" } * ", "
+      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name].nil? ? 'nil' : @person.attributes[name]}" } * ", "
       @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
     end
 

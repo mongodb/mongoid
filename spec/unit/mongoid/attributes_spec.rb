@@ -331,6 +331,7 @@ describe Mongoid::Attributes do
 
       it "returns the default value" do
         @person.age.should == 100
+        @person.pets.should == false
       end
 
     end

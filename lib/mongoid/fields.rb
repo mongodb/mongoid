@@ -55,7 +55,7 @@ module Mongoid #:nodoc
       # Set up a default value for a field.
       def set_default(name, options = {})
         value = options[:default]
-        defaults[name] = value if value
+        defaults[name] = value unless value.nil?
       end
     end
   end

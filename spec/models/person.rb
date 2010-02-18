@@ -4,6 +4,7 @@ class Person
 
   field :title
   field :terms, :type => Boolean
+  field :pets, :type => Boolean, :default => false
   field :age, :type => Integer, :default => 100
   field :dob, :type => Date
   field :mixed_drink, :type => MixedDrink
