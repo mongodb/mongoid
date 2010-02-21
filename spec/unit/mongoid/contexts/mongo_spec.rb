@@ -73,7 +73,13 @@ describe Mongoid::Contexts::Mongo do
     before do
       @cursor = stub(:count => 500)
       @collection = mock
-      @klass = stub(:collection => @collection, :hereditary => false, :instantiate => @person)
+      @klass = stub(
+        :collection => @collection,
+        :hereditary => false,
+        :instantiate => @person,
+        :enslaved? => false,
+        :cached? => false
+      )
       @criteria = Mongoid::Criteria.new(@klass)
       @criteria.where(selector).skip(20)
       @context = Mongoid::Contexts::Mongo.new(@criteria)

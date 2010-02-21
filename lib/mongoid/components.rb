@@ -7,6 +7,7 @@ module Mongoid #:nodoc
         # module, to keep the document class from getting too cluttered.
         include Associations
         include Attributes
+        include Caching
         include Callbacks
         include Commands
         include Enslavement

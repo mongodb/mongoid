@@ -318,7 +318,12 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @collection.expects(:find).with(
+          { :_type => { "$in" => ["Doctor", "Person"] },
+            :title => "Sir"
+          },
+          { :cache => true }
+        ).returns(@cursor)
         @cursor.expects(:each).yields(@person)
         @criteria.cache
         @criteria.each do |doc|
@@ -386,6 +391,20 @@ describe Mongoid::Criteria do
 
     it "sets the klass to the given class" do
       criteria.klass.should == Person
+    end
+
+    context "when the class is enslaved" do
+
+      it "enslaves the criteria" do
+        Mongoid::Criteria.new(Game).should be_enslaved
+      end
+    end
+
+    context "when the class is cached" do
+
+      it "caches the criteria" do
+        Mongoid::Criteria.new(Game).should be_cached
+      end
     end
   end
 

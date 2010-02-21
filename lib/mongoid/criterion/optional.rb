@@ -20,8 +20,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.cached?</tt>
       def cached?
-        @cached ||= @options.delete(:cache)
-        @cached == true
+        @options[:cache] == true
       end
 
       # Flags the criteria to execute against a read-only slave in the pool
@@ -32,6 +31,15 @@ module Mongoid #:nodoc:
       # <tt>criteria.enslave</tt>
       def enslave
         @options.merge!(:enslave => true); self
+      end
+
+      # Will return true if the criteria is enslaved.
+      #
+      # Example:
+      #
+      # <tt>criteria.enslaved?</tt>
+      def enslaved?
+        @options[:enslave] == true
       end
 
       # Adds a criterion to the +Criteria+ that specifies additional options

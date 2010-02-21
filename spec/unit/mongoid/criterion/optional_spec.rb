@@ -30,16 +30,6 @@ describe Mongoid::Criterion::Optional do
       it "returns true" do
         @criteria.cached?.should be_true
       end
-
-      it "removes cache from the options" do
-        @criteria.cached?
-        @criteria.options[:cache].should be_nil
-      end
-
-      it "sets the cache instance variable" do
-        @criteria.cached?
-        @criteria.instance_variable_get(:@cached).should be_true
-      end
     end
 
     context "when the criteria has no cache option" do

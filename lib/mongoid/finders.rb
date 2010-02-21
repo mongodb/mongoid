@@ -112,26 +112,8 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Float</tt> max value.
     def max(field)
-      Criteria.new(self).max(field)
+      criteria.max(field)
     end
-
-    # Will execute a +Criteria+ based on the +DynamicFinder+ that gets
-    # generated.
-    #
-    # Options:
-    #
-    # name: The finder method name
-    # args: The arguments to pass to the method.
-    #
-    # Example:
-    #
-    # <tt>Person.find_all_by_title_and_age("Sir", 30)</tt>
-    # def method_missing(name, *args)
-      # dyna = DynamicFinder.new(name, *args)
-      # finder, conditions = dyna.finder, dyna.conditions
-      # results = find(finder, :conditions => conditions)
-      # results ? results : dyna.create(self)
-    # end
 
     # Convenience method for returning the min value of a field.
     #
@@ -145,7 +127,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Float</tt> min value.
     def min(field)
-      Criteria.new(self).min(field)
+      criteria.min(field)
     end
 
     # Find all documents in paginated fashion given the supplied arguments.
@@ -179,7 +161,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Criteria</tt>
     def only(*args)
-      Criteria.new(self).only(*args)
+      criteria.only(*args)
     end
 
     # Convenience method for returning the sum of a specified field for all
@@ -195,7 +177,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Float</tt> of the sum.
     def sum(field)
-      Criteria.new(self).sum(field)
+      criteria.sum(field)
     end
 
     # Entry point for creating a new criteria from a Document. This will
@@ -212,7 +194,7 @@ module Mongoid #:nodoc:
     #
     # Returns: <tt>Criteria</tt>
     def where(selector = nil)
-      Criteria.new(self).where(selector)
+      criteria.where(selector)
     end
 
     protected

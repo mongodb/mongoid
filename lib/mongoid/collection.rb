@@ -30,6 +30,7 @@ module Mongoid #:nodoc
     #
     # Either a +Master+ or +Slaves+ collection.
     def directed(options = {})
+      options.delete(:cache)
       enslave = options.delete(:enslave) || @klass.enslaved?
       enslave ? master_or_slaves : master
     end
