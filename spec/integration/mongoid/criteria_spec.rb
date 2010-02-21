@@ -50,6 +50,33 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#in" do
+
+    context "when searching nil values" do
+
+      before do
+        @person = Person.create(:title => nil)
+      end
+
+      it "returns the correct document" do
+        from_db = Person.criteria.in(:title => [ true, false, nil ]).first
+        from_db.should == @person
+      end
+    end
+
+    context "when searching false values" do
+
+      before do
+        @person = Person.create(:terms => false)
+      end
+
+      it "returns the correct document" do
+        from_db = Person.criteria.in(:terms => [ true, false, nil ]).first
+        from_db.should == @person
+      end
+    end
+  end
+
   describe "#max" do
 
     context "without results" do
