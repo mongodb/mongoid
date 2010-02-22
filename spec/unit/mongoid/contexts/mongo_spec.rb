@@ -157,27 +157,40 @@ describe Mongoid::Contexts::Mongo do
     let(:selector) { { :field => "value"  } }
     let(:options) { { :skip => 20 } }
     let(:klass) { Person }
+    let(:criteria) { Mongoid::Criteria.new(klass) }
+    let(:context) { Mongoid::Contexts::Mongo.new(criteria) }
 
     before do
-      @criteria = Mongoid::Criteria.new(klass)
-      @criteria.where(selector).skip(20)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+      criteria.where(selector).skip(20)
     end
 
     it "sets the selector" do
-      @context.selector.should == @criteria.selector
+      context.selector.should == criteria.selector
     end
 
     it "sets the options" do
-      @context.options.should == options
+      context.options.should == options
     end
 
     it "sets the klass" do
-      @context.klass.should == klass
+      context.klass.should == klass
     end
 
     it "set the selector to query across the _type of the Criteria's klass when it is hereditary" do
-      @context.selector[:_type].should == {'$in' => Person._types}
+      context.selector[:_type].should == {'$in' => Person._types}
+    end
+
+    context "enslaved and cached classes" do
+
+      let(:klass) { Game }
+
+      it "enslaves the criteria" do
+        context.criteria.should be_enslaved
+      end
+
+      it "caches the criteria" do
+        context.criteria.should be_cached
+      end
     end
   end
 
