@@ -6,12 +6,13 @@ module Mongoid #:nodoc
         extend ClassMethods
         # Set up the class attributes that must be available to all subclasses.
         # These include defaults, fields
-        class_inheritable_accessor :defaults, :fields
+        class_inheritable_accessor :defaults, :fields, :required
 
         self.defaults = {}
         self.fields = {}
+        self.required = []
 
-        delegate :defaults, :fields, :to => "self.class"
+        delegate :defaults, :fields, :required, :to => "self.class"
       end
     end
 
@@ -32,6 +33,7 @@ module Mongoid #:nodoc
         access = name.to_s
         set_field(access, options)
         set_default(access, options)
+        set_required(access) if options[:required]
       end
 
       protected
@@ -50,6 +52,14 @@ module Mongoid #:nodoc
           attr = read_attribute(name)
           (options[:type] == Boolean) ? attr == true : attr.present?
         end
+      end
+
+      ##
+      # Add fields like required by validates_presence_of
+      #
+      def set_required(name)
+        required << name
+        validates_presence_of name.to_sym
       end
 
       # Set up a default value for a field.

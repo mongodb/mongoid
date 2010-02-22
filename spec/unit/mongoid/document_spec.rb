@@ -768,6 +768,13 @@ describe Mongoid::Document do
           Person.validations.first.should be_a_kind_of(Validatable::ValidatesPresenceOf)
         end
 
+        it 'add by :required => true option' do
+          Person.class_eval do
+            field :title, :required => true
+          end
+          Person.validations.first.should be_a_kind_of(Validatable::ValidatesPresenceOf)
+        end
+
       end
 
       describe "#validates_uniqueness_of" do

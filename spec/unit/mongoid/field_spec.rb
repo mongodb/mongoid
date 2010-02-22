@@ -14,6 +14,19 @@ describe Mongoid::Field do
 
   end
 
+  describe '#required' do
+
+    it 'returns that required if :required => true' do
+      field = Mongoid::Field.new(:score, :required => true)
+      field.required.should be_true
+    end
+
+    it 'returns that required if :required => false' do
+      field = Mongoid::Field.new(:score, :required => false)
+      field.required.should be_false
+    end
+  end
+
   describe "#name" do
 
     before do
