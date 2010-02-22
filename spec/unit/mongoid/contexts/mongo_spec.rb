@@ -176,8 +176,28 @@ describe Mongoid::Contexts::Mongo do
       context.klass.should == klass
     end
 
-    it "set the selector to query across the _type of the Criteria's klass when it is hereditary" do
-      context.selector[:_type].should == {'$in' => Person._types}
+    context "when persisting type" do
+
+      it "set the selector to query across the _type when it is hereditary" do
+        context.selector[:_type].should == {'$in' => Person._types}
+      end
+
+    end
+
+    context "when not persisting type" do
+
+      before do
+        Mongoid.persist_types = false
+      end
+
+      after do
+        Mongoid.persist_types = true
+      end
+
+      it "does not add the type to the selector" do
+        context.selector[:_type].should be_nil
+      end
+
     end
 
     context "enslaved and cached classes" do
