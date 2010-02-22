@@ -6,6 +6,8 @@ require "mongoid/associations/has_many"
 require "mongoid/associations/has_many_related"
 require "mongoid/associations/has_one"
 require "mongoid/associations/has_one_related"
+require "mongoid/associations/options"
+require "mongoid/associations/meta_data"
 
 module Mongoid # :nodoc:
   module Associations #:nodoc:
