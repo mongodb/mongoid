@@ -11,7 +11,11 @@ describe Mongoid::Associations::HasManyRelated do
   end
 
   let(:options) do
-    Mongoid::Associations::Options.new(:name => :posts, :extend => block)
+    Mongoid::Associations::Options.new(
+      :name => :posts,
+      :foreign_key => "person_id",
+      :extend => block
+    )
   end
 
   describe "#<<" do

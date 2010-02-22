@@ -59,7 +59,7 @@ module Mongoid #:nodoc:
       # options: The association +Options+.
       def initialize(document, options, target = nil)
         @parent, @klass = document, options.klass
-        @foreign_key = document.class.to_s.foreign_key
+        @foreign_key = options.foreign_key
         @target = target || @klass.all(:conditions => { @foreign_key => document.id })
         extends(options)
       end

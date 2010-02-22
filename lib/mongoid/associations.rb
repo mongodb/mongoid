@@ -140,10 +140,9 @@ module Mongoid # :nodoc:
       #   end
       #
       def has_many_related(name, options = {}, &block)
-        add_association(
-          Associations::HasManyRelated,
+        add_association(Associations::HasManyRelated,
           Associations::Options.new(
-            options.merge(:name => name, :parent_key => self.name.foreign_key, :extend => block)
+            options.merge(:name => name, :foreign_key => foreign_key(options), :extend => block)
           )
         )
         before_save do |document|
@@ -197,7 +196,7 @@ module Mongoid # :nodoc:
         add_association(
           Associations::HasOneRelated,
           Associations::Options.new(
-            options.merge(:name => name, :parent_key => self.name.foreign_key, :extend => block)
+            options.merge(:name => name, :foreign_key => foreign_key(options), :extend => block)
           )
         )
         before_save do |document|
@@ -252,6 +251,11 @@ module Mongoid # :nodoc:
           document = send("build_#{name}", attrs)
           document.save; document
         end
+      end
+
+      # Find the foreign key.
+      def foreign_key(options)
+        options[:foreign_key] || self.name.foreign_key
       end
     end
   end
