@@ -227,7 +227,7 @@ module Mongoid # :nodoc:
       # getters for the associations will perform the necessary memoization.
       def add_association(type, options)
         name = options.name.to_s
-        associations[name] = type
+        associations[name] = MetaData.new(type, options)
         define_method(name) do
           memoized(name) { type.instantiate(self, options) }
         end

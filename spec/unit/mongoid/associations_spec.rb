@@ -94,6 +94,17 @@ describe Mongoid::Associations do
 
   end
 
+  describe "#associations" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "is a hash with name keys and meta data values" do
+      @person.associations["addresses"].should be_a_kind_of(Mongoid::Associations::MetaData)
+    end
+  end
+
   describe ".belongs_to" do
 
     it "creates a reader for the association" do
