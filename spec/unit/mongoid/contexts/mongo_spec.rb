@@ -242,7 +242,7 @@ describe Mongoid::Contexts::Mongo do
   describe "#max" do
 
     before do
-      @reduce = Mongoid::Contexts::Mongo::MAX_REDUCE.gsub("[field]", "age")
+      @reduce = Mongoid::Javascript.max.gsub("[field]", "age")
       @collection = mock
       Person.expects(:collection).returns(@collection)
       @criteria = Mongoid::Criteria.new(Person)
@@ -265,7 +265,7 @@ describe Mongoid::Contexts::Mongo do
   describe "#min" do
 
     before do
-      @reduce = Mongoid::Contexts::Mongo::MIN_REDUCE.gsub("[field]", "age")
+      @reduce = Mongoid::Javascript.min.gsub("[field]", "age")
       @collection = mock
       Person.expects(:collection).returns(@collection)
       @criteria = Mongoid::Criteria.new(Person)
@@ -377,7 +377,7 @@ describe Mongoid::Contexts::Mongo do
     context "when klass not provided" do
 
       before do
-        @reduce = Mongoid::Contexts::Mongo::SUM_REDUCE.gsub("[field]", "age")
+        @reduce = Mongoid::Javascript.sum.gsub("[field]", "age")
         @collection = mock
         @criteria = Mongoid::Criteria.new(Person)
         @context = Mongoid::Contexts::Mongo.new(@criteria)

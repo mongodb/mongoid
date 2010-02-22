@@ -7,7 +7,6 @@ module Mongoid #:nodoc:
 
       delegate :klass, :options, :selector, :to => :criteria
 
-      AGGREGATE_REDUCE = "function(obj, prev) { prev.count++; }"
       # Aggregate the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the
@@ -21,7 +20,7 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, counts as values
       def aggregate
-        klass.collection.group(options[:fields], selector, { :count => 0 }, AGGREGATE_REDUCE, true)
+        klass.collection.group(options[:fields], selector, { :count => 0 }, Javascript.aggregate, true)
       end
 
       # Get the count of matching documents in the database for the context.
@@ -59,7 +58,6 @@ module Mongoid #:nodoc:
         end
       end
 
-      GROUP_REDUCE = "function(obj, prev) { prev.group.push(obj); }"
       # Groups the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the
@@ -77,7 +75,7 @@ module Mongoid #:nodoc:
           options[:fields],
           selector,
           { :group => [] },
-          GROUP_REDUCE,
+          Javascript.group,
           true
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
@@ -120,8 +118,6 @@ module Mongoid #:nodoc:
         attributes ? Mongoid::Factory.build(klass, attributes) : nil
       end
 
-      MAX_REDUCE = "function(obj, prev) { if (prev.max == 'start') { prev.max = obj.[field]; } " +
-        "if (prev.max < obj.[field]) { prev.max = obj.[field]; } }"
       # Return the max value for a field.
       #
       # This will take the internally built selector and options
@@ -137,11 +133,9 @@ module Mongoid #:nodoc:
       #
       # A numeric max value.
       def max(field)
-        grouped(:max, field.to_s, MAX_REDUCE)
+        grouped(:max, field.to_s, Javascript.max)
       end
 
-      MIN_REDUCE = "function(obj, prev) { if (prev.min == 'start') { prev.min = obj.[field]; } " +
-        "if (prev.min > obj.[field]) { prev.min = obj.[field]; } }"
       # Return the min value for a field.
       #
       # This will take the internally built selector and options
@@ -157,7 +151,7 @@ module Mongoid #:nodoc:
       #
       # A numeric minimum value.
       def min(field)
-        grouped(:min, field.to_s, MIN_REDUCE)
+        grouped(:min, field.to_s, Javascript.min)
       end
 
       # Return the first result for the +Context+.
@@ -176,7 +170,6 @@ module Mongoid #:nodoc:
 
       alias :first :one
 
-      SUM_REDUCE = "function(obj, prev) { if (prev.sum == 'start') { prev.sum = 0; } prev.sum += obj.[field]; }"
       # Sum the context.
       #
       # This will take the internally built selector and options
@@ -192,7 +185,7 @@ module Mongoid #:nodoc:
       #
       # A numeric value that is the sum.
       def sum(field)
-        grouped(:sum, field.to_s, SUM_REDUCE)
+        grouped(:sum, field.to_s, Javascript.sum)
       end
 
       # Common functionality for grouping operations. Currently used by min, max
