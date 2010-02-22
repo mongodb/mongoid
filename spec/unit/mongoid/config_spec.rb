@@ -39,6 +39,13 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#persist_types" do
+
+    it "defaults to true" do
+      config.persist_types.should == true
+    end
+  end
+
   describe "#persist_in_safe_mode=" do
 
     context "when setting to true" do
