@@ -393,19 +393,6 @@ describe Mongoid::Criteria do
       criteria.klass.should == Person
     end
 
-    context "when the class is enslaved" do
-
-      it "enslaves the criteria" do
-        Mongoid::Criteria.new(Game).should be_enslaved
-      end
-    end
-
-    context "when the class is cached" do
-
-      it "caches the criteria" do
-        Mongoid::Criteria.new(Game).should be_cached
-      end
-    end
   end
 
   describe "#last" do
