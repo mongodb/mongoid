@@ -66,6 +66,14 @@ describe Mongoid::Criterion::Inclusion do
         }
     end
 
+    it "#any_in is aliased to #in" do
+      @criteria.any_in(:title => ["title1", "title2"], :text => ["test"])
+      @criteria.selector.should ==
+        {
+          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
+        }
+    end
+
     it "returns self" do
       @criteria.in(:title => ["title1"]).should == @criteria
     end

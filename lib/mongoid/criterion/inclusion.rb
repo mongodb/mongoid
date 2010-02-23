@@ -61,6 +61,7 @@ module Mongoid #:nodoc:
       def in(attributes = {})
         update_selector(attributes, "$in")
       end
+      alias any_in in
 
       # Adds a criterion to the +Criteria+ that specifies values that must
       # be matched in order to return results. This is similar to a SQL "WHERE"
