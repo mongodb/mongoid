@@ -5,8 +5,7 @@ module Mongoid #:nodoc:
     attr_reader \
       :default,
       :name,
-      :type,
-      :required
+      :type
 
     # Create the new field with a name and optional additional options. Valid
     # options are :default
@@ -23,7 +22,6 @@ module Mongoid #:nodoc:
       @name = name
       @default = options[:default]
       @type = options[:type] || String
-      @required = options[:required]
     end
 
     # Used for setting an object in the attributes hash. If nil is provided the

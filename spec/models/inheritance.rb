@@ -21,8 +21,8 @@ end
 
 class Shape
   include Mongoid::Document
-  field :x, :type => Integer, :default => 0, :required => true
-  field :y, :type => Integer, :default => 0, :required => true
+  field :x, :type => Integer, :default => 0
+  field :y, :type => Integer, :default => 0
 
   belongs_to :canvas, :inverse_of => :shapes
 
@@ -35,7 +35,7 @@ class Square < Shape
 end
 
 class Circle < Shape
-  field :radius, :type => Integer, :default => 0, :required => true
+  field :radius, :type => Integer, :default => 0
 end
 
 class Writer

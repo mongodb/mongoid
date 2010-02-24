@@ -10,12 +10,6 @@ describe Mongoid::Fields do
 
   end
 
-  describe '.required' do
-    it 'returns an Array of all required value' do
-      Game.required.should == ['high_score']
-    end
-  end
-
   describe "#defaults" do
 
     context "on parent classes" do
@@ -38,34 +32,6 @@ describe Mongoid::Fields do
 
       it "has the parent and child defaults" do
         @circle.defaults.should == { "x" => 0, "y" => 0, "radius" => 0 }
-      end
-
-    end
-
-  end
-
-  describe "#required" do
-
-    context "on parent classes" do
-
-      before do
-        @shape = Shape.new
-      end
-
-      it "does not return subclass defaults" do
-        @shape.required.should == ['x', 'y']
-      end
-
-    end
-
-    context "on subclasses" do
-
-      before do
-        @circle = Circle.new
-      end
-
-      it "has the parent and child defaults" do
-        @circle.required.should == ['x', 'y', 'radius']
       end
 
     end
