@@ -505,15 +505,34 @@ describe Mongoid::Associations do
 
     context "when associations exist" do
 
-      before do
-        @related = stub(:id => "100", :person= => true)
-        @person = Person.new
-        @person.posts = [@related]
+      context "when the document is a new record" do
+
+        before do
+          @related = stub(:id => "100", :person= => true)
+          @person = Person.new
+          @person.posts = [@related]
+        end
+
+        it "saves each association" do
+          @related.expects(:save).returns(@related)
+          @person.update_associations(:posts)
+        end
+
       end
 
-      it "saves each association" do
-        @related.expects(:save).returns(@related)
-        @person.update_associations(:posts)
+      context "when the document is not new" do
+
+        before do
+          @related = stub(:id => "100", :person= => true)
+          @person = Person.new
+          @person.instance_variable_set(:@new_record, false)
+          @person.posts = [@related]
+        end
+
+        it "does not save each association" do
+          @person.update_associations(:posts)
+        end
+
       end
 
     end
