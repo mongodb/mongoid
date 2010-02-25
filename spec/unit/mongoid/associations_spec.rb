@@ -440,6 +440,10 @@ describe Mongoid::Associations do
       @game.should respond_to(:person)
     end
 
+    it "defaults the foreign_key option to the name_id" do
+      @game.associations["person"].foreign_key.should == "person_id"
+    end
+
     context "when document is root level" do
 
       it "puts an index on the foreign key" do
