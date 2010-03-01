@@ -214,6 +214,65 @@ describe Mongoid::Contexts::Mongo do
     end
   end
 
+  describe "#iterate" do
+    before do
+      @criteria = Mongoid::Criteria.new(Person)
+      @context = Mongoid::Contexts::Mongo.new(@criteria)
+      @person = Person.new(:title => "Sir")
+      @cursor = stub('cursor')
+      @cursor.stubs(:each).yields(@person)
+    end
+
+    context "when not caching" do
+
+      it "executes the criteria" do
+        @context.expects(:execute).returns(@cursor)
+        @context.iterate do |person|
+          person.should == @person
+        end
+
+      end
+
+    end
+
+    context "when caching" do
+      before do
+        @criteria.cache
+      end
+
+      it "executes the criteria" do
+        @context.expects(:execute).returns(@cursor)
+        @context.iterate do |person|
+          person.should == @person
+        end
+      end
+
+      it "executes only once and it caches the result" do
+        @context.expects(:execute).once.returns(@cursor)
+        @context.iterate do |person|
+          person.should == @person
+        end
+        @context.iterate do |person|
+          person.should == @person
+        end
+      end
+
+      it "executes even if there is no block" do
+        @context.expects(:execute).once.returns(@cursor)
+        @context.iterate
+      end
+
+      it "caches even if there is no block" do
+        @context.expects(:execute).once.returns(@cursor)
+        @context.iterate
+        @context.iterate do |person|
+          person.should == @person
+        end
+      end
+    end
+
+  end
+
   describe "#last" do
 
     before do

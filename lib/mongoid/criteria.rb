@@ -102,10 +102,7 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      return caching(&block) if cached?
-      if block_given?
-        execute.each { |doc| yield doc }
-      end
+      context.iterate(&block)
       self
     end
 
@@ -212,20 +209,6 @@ module Mongoid #:nodoc:
     end
 
     protected
-
-    # Iterate over each +Document+ in the results and cache the collection.
-    def caching(&block)
-      @collection ||= execute
-      if block_given?
-        docs = []
-        @collection.each do |doc|
-          docs << doc
-          yield doc
-        end
-        @collection = docs
-      end
-      self
-    end
 
     # Filters the unused options out of the options +Hash+. Currently this
     # takes into account the "page" and "per_page" options that would be passed

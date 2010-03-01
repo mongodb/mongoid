@@ -145,6 +145,22 @@ describe Mongoid::Contexts::Enumerable do
 
   end
 
+  describe "#iterate" do
+    before do
+      @criteria.where(:street => "Bourke Street")
+      @criteria.documents = @docs
+      @context = Mongoid::Contexts::Enumerable.new(@criteria)
+    end
+
+    it "executes the criteria" do
+      acc = []
+      @context.iterate do |doc|
+        acc << doc
+      end
+      acc.should == [@melbourne]
+    end
+  end
+
   describe "#last" do
 
     it "returns the last matching in the enumerable" do

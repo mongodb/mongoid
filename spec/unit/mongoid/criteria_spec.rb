@@ -274,6 +274,13 @@ describe Mongoid::Criteria do
       @cursor = stub(:count => 10)
     end
 
+    it "delegates to the context#iterate" do
+      @context = stub('context')
+      @criteria.stubs(:context).returns(@context)
+      @context.expects(:iterate)
+      @criteria.each
+    end
+
     context "when the criteria has not been executed" do
 
       before do

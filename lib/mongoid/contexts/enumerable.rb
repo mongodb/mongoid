@@ -56,6 +56,16 @@ module Mongoid #:nodoc:
         @criteria = criteria
       end
 
+      # Iterate over each +Document+ in the results. This can take an optional
+      # block to pass to each argument in the results.
+      #
+      # Example:
+      #
+      # <tt>context.iterate { |doc| p doc }</tt>
+      def iterate(&block)
+        execute.each(&block)
+      end
+
       # Get the largest value for the field in all the documents.
       #
       # Returns:

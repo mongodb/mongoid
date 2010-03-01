@@ -100,6 +100,19 @@ module Mongoid #:nodoc:
         criteria.cache if klass.cached?
       end
 
+      # Iterate over each +Document+ in the results. This can take an optional
+      # block to pass to each argument in the results.
+      #
+      # Example:
+      #
+      # <tt>context.iterate { |doc| p doc }</tt>
+      def iterate(&block)
+        return caching(&block) if criteria.cached?
+        if block_given?
+          execute.each { |doc| yield doc }
+        end
+      end
+
       # Return the last result for the +Context+. Essentially does a find_one on
       # the collection with the sorting reversed. If no sorting parameters have
       # been provided it will default to ids.
@@ -214,6 +227,20 @@ module Mongoid #:nodoc:
         options.dup
       end
 
+      protected
+
+      # Iterate over each +Document+ in the results and cache the collection.
+      def caching(&block)
+        if defined? @collection
+          @collection.each(&block)
+        else
+          @collection = []
+          execute.each do |doc|
+            @collection << doc
+            yield doc if block_given?
+          end
+        end
+      end
     end
   end
 end
