@@ -25,16 +25,6 @@ module Mongoid #:nodoc:
         @count ||= documents.size
       end
 
-      # Groups the documents by the first field supplied in the field options.
-      #
-      # Returns:
-      #
-      # A +Hash+ with field values as keys, arrays of documents as values.
-      def group
-        field = options[:fields].first
-        documents.group_by { |doc| doc.send(field) }
-      end
-
       # Enumerable implementation of execute. Returns matching documents for
       # the selector, and adds options if supplied.
       #
@@ -43,6 +33,16 @@ module Mongoid #:nodoc:
       # An +Array+ of documents that matched the selector.
       def execute(paginating = false)
         limit(documents.select { |document| document.matches?(selector) })
+      end
+
+      # Groups the documents by the first field supplied in the field options.
+      #
+      # Returns:
+      #
+      # A +Hash+ with field values as keys, arrays of documents as values.
+      def group
+        field = options[:fields].first
+        documents.group_by { |doc| doc.send(field) }
       end
 
       # Create the new enumerable context. This will need the selector and
