@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>mongo.execute</tt>
+      # <tt>context.execute</tt>
       #
       # Returns:
       #
