@@ -31,7 +31,9 @@ module Mongoid #:nodoc:
 
     delegate \
       :aggregate,
+      :blank?,
       :count,
+      :empty?,
       :execute,
       :first,
       :group,
@@ -75,17 +77,6 @@ module Mongoid #:nodoc:
         return false
       end
     end
-
-    # Returns true if the criteria is empty.
-    #
-    # Example:
-    #
-    # <tt>criteria.blank?</tt>
-    def blank?
-      count < 1
-    end
-
-    alias :empty? :blank?
 
     # Return or create the context in which this criteria should be executed.
     #

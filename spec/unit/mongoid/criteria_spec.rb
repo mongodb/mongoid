@@ -127,10 +127,10 @@ describe Mongoid::Criteria do
       @criteria.instance_variable_set(:@context, @context)
     end
 
-    context "when the count is 0" do
+    context "when the context is blank" do
 
       before do
-        @context.expects(:count).returns(0)
+        @context.expects(:blank?).returns(true)
       end
 
       it "returns true" do
@@ -138,10 +138,10 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when the count is greater than 0" do
+    context "when the context is not blank" do
 
       before do
-        @context.expects(:count).returns(10)
+        @context.expects(:blank?).returns(false)
       end
 
       it "returns false" do

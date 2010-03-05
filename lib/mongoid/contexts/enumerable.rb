@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       include Ids, Paging
       attr_reader :criteria
 
-      delegate :first, :last, :to => :execute
+      delegate :blank?, :empty?, :first, :last, :to => :execute
       delegate :documents, :options, :selector, :to => :criteria
 
       # Return aggregation counts of the grouped documents. This will count by

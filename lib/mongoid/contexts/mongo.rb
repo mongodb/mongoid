@@ -23,6 +23,18 @@ module Mongoid #:nodoc:
         klass.collection.group(options[:fields], selector, { :count => 0 }, Javascript.aggregate, true)
       end
 
+      # Determine if the context is empty or blank given the criteria. Will
+      # perform a quick has_one asking only for the id.
+      #
+      # Example:
+      #
+      # <tt>context.blank?</tt>
+      def blank?
+        klass.collection.find_one(selector, { :fields => [ :_id ] }).nil?
+      end
+
+      alias :empty? :blank?
+
       # Get the count of matching documents in the database for the context.
       #
       # Example:

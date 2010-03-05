@@ -27,6 +27,43 @@ describe Mongoid::Contexts::Mongo do
 
   end
 
+  describe "blank?" do
+
+    before do
+      @criteria = Mongoid::Criteria.new(Game)
+      @criteria.where(:test => 'Testing')
+      @context = Mongoid::Contexts::Mongo.new(@criteria)
+    end
+
+    context "when a document exists" do
+
+      before do
+        @doc = mock
+        @collection = mock
+        Game.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with({ :test => "Testing" }, { :fields => [ :_id ] }).returns(@doc)
+      end
+
+      it "returns false" do
+        @context.blank?.should be_false
+      end
+    end
+
+    context "when a document does not exist" do
+
+      before do
+        @doc = mock
+        @collection = mock
+        Game.expects(:collection).returns(@collection)
+        @collection.expects(:find_one).with({ :test => "Testing" }, { :fields => [ :_id ] }).returns(nil)
+      end
+
+      it "returns true" do
+        @context.blank?.should be_true
+      end
+    end
+  end
+
   describe "#count" do
 
     before do
