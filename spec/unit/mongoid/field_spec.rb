@@ -12,6 +12,32 @@ describe Mongoid::Field do
       @field.default.should == 0
     end
 
+    context "when the field is an array" do
+
+      before do
+        @field = Mongoid::Field.new(:vals, :type => Array, :default => [ "first" ])
+      end
+
+      it "dups the array" do
+        array = @field.default
+        array << "second"
+        @field.default.should == [ "first" ]
+      end
+    end
+
+    context "when the field is a hash" do
+
+      before do
+        @field = Mongoid::Field.new(:vals, :type => Hash, :default => { :key => "value" })
+      end
+
+      it "dups the hash" do
+        hash = @field.default
+        hash[:key_two] = "value2"
+        @field.default.should == { :key => "value" }
+      end
+    end
+
   end
 
   describe "#name" do

@@ -2,10 +2,12 @@
 module Mongoid #:nodoc:
   class Field
 
-    attr_reader \
-      :default,
-      :name,
-      :type
+    attr_reader :name, :type
+
+    # Return the default value - if the value can be duplicated, dup it.
+    def default
+      (@default.is_a?(Array) || @default.is_a?(Hash)) ? @default.dup : @default
+    end
 
     # Create the new field with a name and optional additional options. Valid
     # options are :default
