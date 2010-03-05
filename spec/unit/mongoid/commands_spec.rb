@@ -86,10 +86,9 @@ describe Mongoid::Commands do
         @person = Person.new
       end
 
-      it "returns false" do
+      it "lets the error bubble up" do
         Mongoid::Commands::Save.expects(:execute).raises(Mongo::OperationFailure.new("Operation Failed"))
-        @person.save
-        @person.errors.on(:mongoid).should == "Operation Failed"
+        lambda { @person.save }.should raise_error
       end
 
     end
@@ -204,14 +203,8 @@ describe Mongoid::Commands do
         Mongoid::Commands::Save.expects(:execute).raises(Mongo::OperationFailure.new("Operation Failed"))
       end
 
-      it "returns the document with errors" do
-        person = Person.create
-        person.errors.on(:mongoid).should == "Operation Failed"
-      end
-
-      it "keeps the document's new record flag" do
-        person = Person.create
-        person.should be_a_new_record
+      it "lets the error bubble up" do
+        lambda { Person.create }.should raise_error
       end
 
     end

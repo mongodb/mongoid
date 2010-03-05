@@ -244,7 +244,7 @@ describe Mongoid::Document do
 
     before do
       5.times do |num|
-        Person.create(:title => "Sir", :age => num)
+        Person.create(:title => "Sir", :age => num, :ssn => num)
       end
     end
 
