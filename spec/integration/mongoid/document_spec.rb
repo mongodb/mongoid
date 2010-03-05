@@ -121,6 +121,12 @@ describe Mongoid::Document do
         lambda { Person.find(@person.id) }.should raise_error
       end
 
+      it "marks the document as destroyed" do
+        @person.should_not be_destroyed
+        @person.destroy
+        @person.should be_destroyed
+      end
+
     end
 
     context "on an embedded document" do
