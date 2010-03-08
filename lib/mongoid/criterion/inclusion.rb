@@ -22,6 +22,7 @@ module Mongoid #:nodoc:
       def all(attributes = {})
         update_selector(attributes, "$all")
       end
+      alias :all_in :all
 
       # Adds a criterion to the +Criteria+ that specifies values that must
       # be matched in order to return results. This is similar to a SQL "WHERE"
@@ -61,7 +62,7 @@ module Mongoid #:nodoc:
       def in(attributes = {})
         update_selector(attributes, "$in")
       end
-      alias any_in in
+      alias :any_in :in
 
       # Adds a criterion to the +Criteria+ that specifies values that must
       # be matched in order to return results. This is similar to a SQL "WHERE"

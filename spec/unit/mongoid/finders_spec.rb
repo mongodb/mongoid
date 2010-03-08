@@ -40,6 +40,24 @@ describe Mongoid::Finders do
 
   end
 
+  describe ".all_in" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Person.all_in(:aliases => [ "Bond", "007" ])
+      criteria.selector.should == { :aliases => { "$all" => [ "Bond", "007" ] } }
+    end
+
+  end
+
+  describe ".any_in" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Person.any_in(:aliases => [ "Bond", "007" ])
+      criteria.selector.should == { :aliases => { "$in" => [ "Bond", "007" ] } }
+    end
+
+  end
+
   describe ".count" do
 
     before do
@@ -61,6 +79,15 @@ describe Mongoid::Finders do
         Person.count.should == 10
       end
 
+    end
+
+  end
+
+  describe ".excludes" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Person.excludes(:title => "Sir")
+      criteria.selector.should == { :title => { "$ne" => "Sir" } }
     end
 
   end
@@ -292,6 +319,15 @@ describe Mongoid::Finders do
       Mongoid::Criteria.expects(:new).returns(@criteria)
       @criteria.expects(:min).with(:age).returns(50.0)
       Person.min(:age).should == 50.0
+    end
+
+  end
+
+  describe ".not_in" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Person.not_in(:aliases => [ "Bond", "007" ])
+      criteria.selector.should == { :aliases => { "$nin" => [ "Bond", "007" ] } }
     end
 
   end
