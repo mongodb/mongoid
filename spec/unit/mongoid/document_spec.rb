@@ -499,6 +499,17 @@ describe Mongoid::Document do
 
   end
 
+  describe "#persisted?" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "delegates to new_record?" do
+      @person.persisted?.should be_false
+    end
+  end
+
   describe "#_parent" do
 
     before do

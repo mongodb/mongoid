@@ -78,8 +78,6 @@ module Mongoid #:nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     field :first_name
-      #     field :last_name
       #     key :first_name, :last_name
       #   end
       def key(*fields)
@@ -132,10 +130,6 @@ module Mongoid #:nodoc:
       #
       # parent: The +Document+ to assimilate with.
       # options: The association +Options+ for the child.
-      #
-      # Example:
-      #
-      # <tt>name.assimilate(person, options)</tt>
       def assimilate(parent, options)
         parentize(parent, options.name); notify; self
       end
@@ -191,6 +185,11 @@ module Mongoid #:nodoc:
       # Sets the new_record boolean - used after document is saved.
       def new_record=(saved)
         @new_record = saved
+      end
+
+      # Checks if the document has been saved to the database.
+      def persisted?
+        !new_record?
       end
 
       # Set the changed state of the +Document+ then notify observers that it has changed.
