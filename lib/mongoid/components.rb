@@ -5,20 +5,20 @@ module Mongoid #:nodoc
       base.class_eval do
         # All modules that a +Document+ is composed of are defined in this
         # module, to keep the document class from getting too cluttered.
-        include Associations
-        include Attributes
-        include Caching
-        include Callbacks
-        include Commands
-        include Enslavement
-        include Fields
-        include Indexes
-        include Matchers
-        include Memoization
+        include Mongoid::Associations
+        include Mongoid::Attributes
+        include Mongoid::Caching
+        include Mongoid::Callbacks
+        include Mongoid::Commands
+        include Mongoid::Extras
+        include Mongoid::Fields
+        include Mongoid::Indexes
+        include Mongoid::Matchers
+        include Mongoid::Memoization
         include Observable
         include Validatable
-        extend Finders
-        extend NamedScope
+        extend Mongoid::Finders
+        extend Mongoid::NamedScope
       end
     end
   end

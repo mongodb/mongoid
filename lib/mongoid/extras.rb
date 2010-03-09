@@ -1,13 +1,14 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
-  module Caching #:nodoc:
+  module Extras #:nodoc:
     def self.included(base)
       base.class_eval do
         extend ClassMethods
-        class_inheritable_accessor :cached
+        class_inheritable_accessor :cached, :enslaved
         self.cached = false
+        self.enslaved = false
 
-        delegate :cached?, :to => "self.class"
+        delegate :cached?, :enslaved?, :to => "self.class"
       end
     end
 
@@ -35,6 +36,28 @@ module Mongoid #:nodoc:
       # True if cached, false if not.
       def cached?
         self.cached == true
+      end
+
+      # Set whether or not this documents read operations should delegate to
+      # the slave database by default.
+      #
+      # Example:
+      #
+      #   class Person
+      #     include Mongoid::Document
+      #     enslave
+      #   end
+      def enslave
+        self.enslaved = true
+      end
+
+      # Determines if the class is enslaved or not.
+      #
+      # Returns:
+      #
+      # True if enslaved, false if not.
+      def enslaved?
+        self.enslaved == true
       end
     end
   end
