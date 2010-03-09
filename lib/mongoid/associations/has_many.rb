@@ -54,7 +54,9 @@ module Mongoid #:nodoc:
       # Rhe newly created Document.
       def create(attrs = {}, type = nil)
         object = build(attrs, type)
+        object.run_callbacks(:before_create)
         object.save
+        object.run_callbacks(:after_create)
         object
       end
 

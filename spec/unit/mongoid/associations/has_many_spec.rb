@@ -129,14 +129,16 @@ describe Mongoid::Associations::HasMany do
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
-        @address = Address.new(:street => "Yet Another")
+        @address = mock(:parentize => true, :write_attributes => true)
+        Address.expects(:instantiate).returns(@address)
+        @address.expects(:run_callbacks).with(:before_create)
+        @address.expects(:run_callbacks).with(:after_create)
       end
 
       it "builds and saves a new object" do
-        Mongoid::Commands::Save.expects(:execute).returns(true)
+        @address.expects(:save).returns(true)
         address = @association.create({ :street => "Yet Another" })
-        address.should be_a_kind_of(Address)
-        address.street.should == "Yet Another"
+        address.should == @address
       end
 
     end
@@ -148,13 +150,16 @@ describe Mongoid::Associations::HasMany do
           @document,
           Mongoid::Associations::Options.new(:name => :shapes)
         )
+        @circle = mock(:parentize => true, :write_attributes => true)
+        Circle.expects(:instantiate).returns(@circle)
+        @circle.expects(:run_callbacks).with(:before_create)
+        @circle.expects(:run_callbacks).with(:after_create)
       end
 
       it "instantiates a class of that type" do
-        Mongoid::Commands::Save.expects(:execute).returns(true)
+        @circle.expects(:save).returns(true)
         circle = @association.create({ :radius => 100 }, Circle)
-        circle.should be_a_kind_of(Circle)
-        circle.radius.should == 100
+        circle.should == @circle
       end
 
     end
