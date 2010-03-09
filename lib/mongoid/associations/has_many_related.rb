@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def <<(*objects)
-        @target = @target.entries if @parent.new_record?
+        load_target
         objects.flatten.each do |object|
           object.send("#{@foreign_key}=", @parent.id)
           @target << object
@@ -21,6 +21,7 @@ module Mongoid #:nodoc:
       #
       # Returns the newly created object.
       def build(attributes = {})
+        load_target
         name = @parent.class.to_s.underscore
         object = @klass.instantiate(attributes.merge(name => @parent))
         @target << object
@@ -68,6 +69,12 @@ module Mongoid #:nodoc:
       # Delegates to <<
       def push(*objects)
         self << objects
+      end
+
+      protected
+      # Load the target entries if the document is new.
+      def load_target
+        @target = @target.entries if @parent.new_record?
       end
 
       class << self

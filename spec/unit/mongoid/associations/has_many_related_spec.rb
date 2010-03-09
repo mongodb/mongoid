@@ -101,8 +101,10 @@ describe Mongoid::Associations::HasManyRelated do
   describe "#build" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
-      Post.expects(:all).returns([])
+      @criteria = mock
+      @criteria.expects(:entries).returns([])
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      Post.expects(:all).returns(@criteria)
       @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
     end
 
@@ -189,7 +191,7 @@ describe Mongoid::Associations::HasManyRelated do
   describe "#create" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
       Mongoid::Commands::Save.expects(:execute)
       @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
