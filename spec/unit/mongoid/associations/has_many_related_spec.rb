@@ -45,16 +45,36 @@ describe Mongoid::Associations::HasManyRelated do
 
     context "when parent document has not been saved" do
 
-      before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
-        Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      context "when appending a non mongoid object" do
+
+        before do
+          @parent = stub(:id => "1", :new_record? => true, :class => Person)
+          Post.expects(:all).returns([])
+          @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        end
+
+        it "appends the child document" do
+          @child.expects(:person_id=).with(@parent.id)
+          @association << @child
+          @association.size.should == 1
+        end
       end
 
-      it "appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
-        @association << @child
-        @association.size.should == 1
+      context "when appending a mongoid document" do
+
+        before do
+          @criteria = mock
+          @parent = stub(:id => "1", :new_record? => true, :class => Person)
+          Post.expects(:all).returns(@criteria)
+          @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        end
+
+        it "appends the child document" do
+          @criteria.expects(:entries).returns([])
+          @child.expects(:person_id=).with(@parent.id)
+          @association << @child
+          @association.size.should == 1
+        end
       end
 
     end

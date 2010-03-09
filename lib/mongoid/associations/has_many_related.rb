@@ -9,6 +9,7 @@ module Mongoid #:nodoc:
       def <<(*objects)
         objects.flatten.each do |object|
           object.send("#{@foreign_key}=", @parent.id)
+          @target = @target.entries if @parent.new_record?
           @target << object
           object.save unless @parent.new_record?
         end
