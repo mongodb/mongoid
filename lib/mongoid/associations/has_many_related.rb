@@ -41,7 +41,9 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def create(attributes)
         object = build(attributes)
+        object.run_callbacks(:before_create)
         object.save
+        object.run_callbacks(:after_create)
         object
       end
 
