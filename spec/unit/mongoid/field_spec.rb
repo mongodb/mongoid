@@ -2,6 +2,42 @@ require "spec_helper"
 
 describe Mongoid::Field do
 
+  describe "#accessible?" do
+
+    context "when value is not set" do
+
+      before do
+        @field = Mongoid::Field.new(:name)
+      end
+
+      it "defaults to true" do
+        @field.accessible?.should be_true
+      end
+    end
+
+    context "when set to true" do
+
+      before do
+        @field = Mongoid::Field.new(:name, :accessible => true)
+      end
+
+      it "returns true" do
+        @field.accessible?.should be_true
+      end
+    end
+
+    context "when set to false" do
+
+      before do
+        @field = Mongoid::Field.new(:name, :accessible => false)
+      end
+
+      it "returns false" do
+        @field.accessible?.should be_false
+      end
+    end
+  end
+
   describe "#default" do
 
     before do
