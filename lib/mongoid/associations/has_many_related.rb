@@ -7,9 +7,9 @@ module Mongoid #:nodoc:
       # Appends the object to the +Array+, setting its parent in
       # the process.
       def <<(*objects)
+        @target = @target.entries if @parent.new_record?
         objects.flatten.each do |object|
           object.send("#{@foreign_key}=", @parent.id)
-          @target = @target.entries if @parent.new_record?
           @target << object
           object.save unless @parent.new_record?
         end
