@@ -20,13 +20,6 @@ describe Mongoid::Extras do
 
   end
 
-  describe ".cached" do
-
-    it "defaults to false" do
-      @klass.cached.should be_false
-    end
-  end
-
   describe ".cached?" do
 
     context "when the class is cached" do
@@ -71,13 +64,6 @@ describe Mongoid::Extras do
       @klass.enslaved.should be_true
     end
 
-  end
-
-  describe ".enslaved" do
-
-    it "defaults to false" do
-      @klass.enslaved.should be_false
-    end
   end
 
   describe ".enslaved?" do
