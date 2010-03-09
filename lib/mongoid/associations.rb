@@ -249,7 +249,9 @@ module Mongoid # :nodoc:
         name = options.name.to_s
         define_method("create_#{name}") do |attrs|
           document = send("build_#{name}", attrs)
-          document.save; document
+          document.run_callbacks(:before_create)
+          document.save
+          document.run_callbacks(:after_create); document
         end
       end
 
