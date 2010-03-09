@@ -2,6 +2,42 @@ require "spec_helper"
 
 describe Mongoid::Field do
 
+  describe "#accessible?" do
+
+    context "when value is not set" do
+
+      before do
+        @field = Mongoid::Field.new(:name)
+      end
+
+      it "defaults to true" do
+        @field.accessible?.should be_true
+      end
+    end
+
+    context "when set to true" do
+
+      before do
+        @field = Mongoid::Field.new(:name, :accessible => true)
+      end
+
+      it "returns true" do
+        @field.accessible?.should be_true
+      end
+    end
+
+    context "when set to false" do
+
+      before do
+        @field = Mongoid::Field.new(:name, :accessible => false)
+      end
+
+      it "returns false" do
+        @field.accessible?.should be_false
+      end
+    end
+  end
+
   describe "#default" do
 
     before do
@@ -10,6 +46,32 @@ describe Mongoid::Field do
 
     it "returns the default option" do
       @field.default.should == 0
+    end
+
+    context "when the field is an array" do
+
+      before do
+        @field = Mongoid::Field.new(:vals, :type => Array, :default => [ "first" ])
+      end
+
+      it "dups the array" do
+        array = @field.default
+        array << "second"
+        @field.default.should == [ "first" ]
+      end
+    end
+
+    context "when the field is a hash" do
+
+      before do
+        @field = Mongoid::Field.new(:vals, :type => Hash, :default => { :key => "value" })
+      end
+
+      it "dups the hash" do
+        hash = @field.default
+        hash[:key_two] = "value2"
+        @field.default.should == { :key => "value" }
+      end
     end
 
   end

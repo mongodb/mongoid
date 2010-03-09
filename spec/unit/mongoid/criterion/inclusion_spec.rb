@@ -12,7 +12,7 @@ describe Mongoid::Criterion::Inclusion do
     it "adds the $all query to the selector" do
       @criteria.all(:title => ["title1", "title2"])
       @criteria.selector.should ==
-        { :_type => { "$in" => ["Doctor", "Person"] },
+        {
           :title => { "$all" => ["title1", "title2"] }
         }
     end
@@ -30,7 +30,7 @@ describe Mongoid::Criterion::Inclusion do
       it "adds the clause to the selector" do
         @criteria.and(:title => "Title", :text => "Text")
         @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] },
+          {
             :title => "Title",
             :text => "Text"
           }
@@ -43,7 +43,7 @@ describe Mongoid::Criterion::Inclusion do
       it "adds the $where clause to the selector" do
         @criteria.and("this.date < new Date()")
         @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] },
+          {
             "$where" => "this.date < new Date()"
           }
       end
@@ -61,10 +61,16 @@ describe Mongoid::Criterion::Inclusion do
     it "adds the $in clause to the selector" do
       @criteria.in(:title => ["title1", "title2"], :text => ["test"])
       @criteria.selector.should ==
-        { :_type =>
-          { "$in" =>
-            ["Doctor", "Person"]
-          }, :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
+        {
+          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
+        }
+    end
+
+    it "#any_in is aliased to #in" do
+      @criteria.any_in(:title => ["title1", "title2"], :text => ["test"])
+      @criteria.selector.should ==
+        {
+          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
         }
     end
 
@@ -83,7 +89,7 @@ describe Mongoid::Criterion::Inclusion do
         it "adds the clause to the selector" do
           @criteria.where(:title => "Title", :text => "Text")
           @criteria.selector.should ==
-            { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Title", :text => "Text" }
+            { :title => "Title", :text => "Text" }
         end
 
       end
@@ -95,7 +101,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching an all clause" do
             @criteria.where(:title.all => ["Sir"])
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :title => { "$all" => ["Sir"] } }
+              { :title => { "$all" => ["Sir"] } }
           end
 
         end
@@ -105,7 +111,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching an exists clause" do
             @criteria.where(:title.exists => true)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :title => { "$exists" => true } }
+              { :title => { "$exists" => true } }
           end
 
         end
@@ -115,7 +121,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a gt clause" do
             @criteria.where(:age.gt => 30)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :age => { "$gt" => 30 } }
+              { :age => { "$gt" => 30 } }
           end
 
         end
@@ -125,7 +131,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a gte clause" do
             @criteria.where(:age.gte => 33)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :age => { "$gte" => 33 } }
+              { :age => { "$gte" => 33 } }
           end
 
         end
@@ -135,7 +141,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching an in clause" do
             @criteria.where(:title.in => ["Sir", "Madam"])
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :title => { "$in" => ["Sir", "Madam"] } }
+              { :title => { "$in" => ["Sir", "Madam"] } }
           end
 
         end
@@ -145,7 +151,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a lt clause" do
             @criteria.where(:age.lt => 34)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :age => { "$lt" => 34 } }
+              { :age => { "$lt" => 34 } }
           end
 
         end
@@ -155,7 +161,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a lte clause" do
             @criteria.where(:age.lte => 33)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :age => { "$lte" => 33 } }
+              { :age => { "$lte" => 33 } }
           end
 
         end
@@ -165,7 +171,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a ne clause" do
             @criteria.where(:age.ne => 50)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :age => { "$ne" => 50 } }
+              { :age => { "$ne" => 50 } }
           end
 
         end
@@ -175,7 +181,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a nin clause" do
             @criteria.where(:title.nin => ["Esquire", "Congressman"])
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :title => { "$nin" => ["Esquire", "Congressman"] } }
+              { :title => { "$nin" => ["Esquire", "Congressman"] } }
           end
 
         end
@@ -185,7 +191,7 @@ describe Mongoid::Criterion::Inclusion do
           it "returns those matching a size clause" do
             @criteria.where(:aliases.size => 2)
             @criteria.selector.should ==
-              { :_type => { "$in" => ["Doctor", "Person"] }, :aliases => { "$size" => 2 } }
+              { :aliases => { "$size" => 2 } }
           end
 
         end
@@ -199,7 +205,7 @@ describe Mongoid::Criterion::Inclusion do
       it "adds the $where clause to the selector" do
         @criteria.where("this.date < new Date()")
         @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] }, "$where" => "this.date < new Date()" }
+          { "$where" => "this.date < new Date()" }
       end
 
     end

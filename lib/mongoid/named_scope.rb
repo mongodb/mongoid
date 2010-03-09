@@ -30,6 +30,8 @@ module Mongoid #:nodoc:
     
     alias :scope :named_scope 
 
+    alias :scope :named_scope
+
     # Return the scopes or default to an empty +Hash+.
     def scopes
       read_inheritable_attribute(:scopes) || write_inheritable_attribute(:scopes, {})

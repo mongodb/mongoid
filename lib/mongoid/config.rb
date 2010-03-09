@@ -8,15 +8,19 @@ module Mongoid #:nodoc
       :reconnect_time,
       :parameterize_keys,
       :persist_in_safe_mode,
-      :raise_not_found_error
+      :persist_types,
+      :raise_not_found_error,
+      :use_object_ids
 
     # Defaults the configuration options to true.
     def initialize
       @allow_dynamic_fields = true
       @parameterize_keys = true
       @persist_in_safe_mode = true
+      @persist_types = true
       @raise_not_found_error = true
       @reconnect_time = 3
+      @use_object_ids = false
     end
 
     # Sets the Mongo::DB master database to be used. If the object trying to me

@@ -55,12 +55,7 @@ module Mongoid #:nodoc:
       # Returns: true if validation passes, false if not.
       def save(validate = true)
         save = lambda { Save.execute(self, validate) }
-        begin
-          return new_record? ? run_callbacks(:create, &save) : save.call
-        rescue Mongo::OperationFailure => e
-          errors.add(:mongoid, e.message)
-          return false
-        end
+        new_record? ? run_callbacks(:create, &save) : save.call
       end
 
       # Save the +Document+, dangerously. Before and after save callbacks will
@@ -115,11 +110,7 @@ module Mongoid #:nodoc:
       # Returns: the +Document+.
       def create(attributes = {})
         document = new(attributes)
-        begin
-          Create.execute(document)
-        rescue Mongo::OperationFailure => e
-          document.errors.add(:mongoid, e.message)
-        end
+        Create.execute(document)
         document
       end
 
@@ -165,8 +156,6 @@ module Mongoid #:nodoc:
       def destroy_all(conditions = {})
         DestroyAll.execute(self, conditions)
       end
-
     end
-
   end
 end

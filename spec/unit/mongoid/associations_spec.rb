@@ -94,6 +94,17 @@ describe Mongoid::Associations do
 
   end
 
+  describe "#associations" do
+
+    before do
+      @person = Person.new
+    end
+
+    it "is a hash with name keys and meta data values" do
+      @person.associations["addresses"].should be_a_kind_of(Mongoid::Associations::MetaData)
+    end
+  end
+
   describe ".belongs_to" do
 
     it "creates a reader for the association" do
@@ -195,6 +206,18 @@ describe Mongoid::Associations do
 
       it "sets the appropriate attributes" do
         @writer.speed.should == 250
+      end
+
+    end
+
+    context "when attributes are nil" do
+
+      before do
+        @writer = @canvas.build_writer(nil)
+      end
+
+      it "defaults them to empty" do
+        @writer.should be_a_kind_of(Writer)
       end
 
     end
@@ -417,6 +440,10 @@ describe Mongoid::Associations do
       @game.should respond_to(:person)
     end
 
+    it "defaults the foreign_key option to the name_id" do
+      @game.associations["person"].foreign_key.should == "person_id"
+    end
+
     context "when document is root level" do
 
       it "puts an index on the foreign key" do
@@ -424,6 +451,22 @@ describe Mongoid::Associations do
         Game.belongs_to_related :person
       end
 
+    end
+
+    context "when using object ids" do
+
+      before do
+        Mongoid.use_object_ids = true
+      end
+
+      after do
+        Mongoid.use_object_ids = false
+      end
+
+      it "sets the foreign key as an object id" do
+        Game.expects(:field).with("person_id", :type => Mongo::ObjectID)
+        Game.belongs_to_related :person
+      end
     end
 
   end
@@ -482,15 +525,34 @@ describe Mongoid::Associations do
 
     context "when associations exist" do
 
-      before do
-        @related = stub(:id => "100", :person= => true)
-        @person = Person.new
-        @person.posts = [@related]
+      context "when the document is a new record" do
+
+        before do
+          @related = stub(:id => "100", :person= => true)
+          @person = Person.new
+          @person.posts = [@related]
+        end
+
+        it "saves each association" do
+          @related.expects(:save).returns(@related)
+          @person.update_associations(:posts)
+        end
+
       end
 
-      it "saves each association" do
-        @related.expects(:save).returns(@related)
-        @person.update_associations(:posts)
+      context "when the document is not new" do
+
+        before do
+          @related = stub(:id => "100", :person= => true)
+          @person = Person.new
+          @person.instance_variable_set(:@new_record, false)
+          @person.posts = [@related]
+        end
+
+        it "does not save each association" do
+          @person.update_associations(:posts)
+        end
+
       end
 
     end

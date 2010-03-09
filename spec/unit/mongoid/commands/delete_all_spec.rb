@@ -19,7 +19,7 @@ describe Mongoid::Commands::DeleteAll do
 
       it "deletes each document that the criteria finds" do
         @klass.expects(:collection).returns(@collection)
-        @collection.expects(:remove).with(@conditions[:conditions].merge(:_type => "Person"))
+        @collection.expects(:remove).with(@conditions[:conditions].merge(:_type => "Person"), :safe => true)
         Mongoid::Commands::DeleteAll.execute(@klass, @conditions)
       end
 
@@ -33,7 +33,7 @@ describe Mongoid::Commands::DeleteAll do
 
       it "drops the collection" do
         @klass.expects(:collection).returns(@collection)
-        @collection.expects(:remove).with(:_type => "Person")
+        @collection.expects(:remove).with({ :_type => "Person" }, { :safe => true })
         Mongoid::Commands::DeleteAll.execute(@klass)
       end
 
@@ -47,7 +47,7 @@ describe Mongoid::Commands::DeleteAll do
 
       it "drops the collection" do
         @klass.expects(:collection).returns(@collection)
-        @collection.expects(:remove).with(:_type => "Person")
+        @collection.expects(:remove).with({ :_type => "Person" }, { :safe => true })
         Mongoid::Commands::DeleteAll.execute(@klass, {})
       end
 

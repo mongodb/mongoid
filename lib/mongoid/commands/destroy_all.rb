@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
       def self.execute(klass, params)
         conditions = params[:conditions] || {}
         params[:conditions] = conditions.merge(:_type => klass.name)
-        klass.find(:all, params).each { |doc| Destroy.execute(doc) }
+        klass.find(:all, params).each { |doc| Destroy.execute(doc) }; true
       end
     end
   end

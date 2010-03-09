@@ -11,7 +11,11 @@ describe Mongoid::Associations::HasManyRelated do
   end
 
   let(:options) do
-    Mongoid::Associations::Options.new(:name => :posts, :extend => block)
+    Mongoid::Associations::Options.new(
+      :name => :posts,
+      :foreign_key => "person_id",
+      :extend => block
+    )
   end
 
   describe "#<<" do
@@ -41,16 +45,36 @@ describe Mongoid::Associations::HasManyRelated do
 
     context "when parent document has not been saved" do
 
-      before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
-        Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      context "when appending a non mongoid object" do
+
+        before do
+          @parent = stub(:id => "1", :new_record? => true, :class => Person)
+          Post.expects(:all).returns([])
+          @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        end
+
+        it "appends the child document" do
+          @child.expects(:person_id=).with(@parent.id)
+          @association << @child
+          @association.size.should == 1
+        end
       end
 
-      it "appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
-        @association << @child
-        @association.size.should == 1
+      context "when appending a mongoid document" do
+
+        before do
+          @criteria = mock
+          @parent = stub(:id => "1", :new_record? => true, :class => Person)
+          Post.expects(:all).returns(@criteria)
+          @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        end
+
+        it "appends the child document" do
+          @criteria.expects(:entries).returns([])
+          @child.expects(:person_id=).with(@parent.id)
+          @association << @child
+          @association.size.should == 1
+        end
       end
 
     end
@@ -77,8 +101,10 @@ describe Mongoid::Associations::HasManyRelated do
   describe "#build" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
-      Post.expects(:all).returns([])
+      @criteria = mock
+      @criteria.expects(:entries).returns([])
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      Post.expects(:all).returns(@criteria)
       @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
     end
 
@@ -165,18 +191,23 @@ describe Mongoid::Associations::HasManyRelated do
   describe "#create" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @post = mock
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
-      Mongoid::Commands::Save.expects(:execute)
       @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      Post.expects(:instantiate).returns(@post)
     end
 
     it "builds and saves the new object" do
+      @post.expects(:run_callbacks).with(:create).yields
+      @post.expects(:save).returns(true)
       @association.create(:title => "Sassy")
     end
 
     it "returns the new object" do
-      @association.create(:title => "Sassy").should be_a_kind_of(Post)
+      @post.expects(:run_callbacks).with(:create).yields
+      @post.expects(:save).returns(true)
+      @association.create(:title => "Sassy").should == @post
     end
 
   end

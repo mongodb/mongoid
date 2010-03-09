@@ -30,16 +30,6 @@ describe Mongoid::Criterion::Optional do
       it "returns true" do
         @criteria.cached?.should be_true
       end
-
-      it "removes cache from the options" do
-        @criteria.cached?
-        @criteria.options[:cache].should be_nil
-      end
-
-      it "sets the cache instance variable" do
-        @criteria.cached?
-        @criteria.instance_variable_get(:@cached).should be_true
-      end
     end
 
     context "when the criteria has no cache option" do
@@ -112,15 +102,32 @@ describe Mongoid::Criterion::Optional do
 
     context "when passing a single id" do
 
-      it "adds the _id query to the selector" do
-        id = Mongo::ObjectID.new.to_s
-        @criteria.id(id)
-        @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :_id => id }
+      context "when the id is a string" do
+
+        it "adds the _id query to the selector" do
+          id = Mongo::ObjectID.new.to_s
+          @criteria.id(id)
+          @criteria.selector.should == { :_id => id }
+        end
+
+        it "returns self" do
+          id = Mongo::ObjectID.new.to_s
+          @criteria.id(id).should == @criteria
+        end
       end
 
-      it "returns self" do
-        id = Mongo::ObjectID.new.to_s
-        @criteria.id(id.to_s).should == @criteria
+      context "when the id is an object id" do
+
+        it "adds the _id query to the selector" do
+          id = Mongo::ObjectID.new
+          @criteria.id(id)
+          @criteria.selector.should == { :_id => id }
+        end
+
+        it "returns self" do
+          id = Mongo::ObjectID.new
+          @criteria.id(id).should == @criteria
+        end
       end
 
     end
@@ -135,7 +142,7 @@ describe Mongoid::Criterion::Optional do
       it "adds the _id query to the selector" do
         @criteria.id(@ids)
         @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] }, :_id => { "$in" => @ids } }
+          { :_id => { "$in" => @ids } }
       end
 
     end

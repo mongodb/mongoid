@@ -29,10 +29,13 @@ describe Mongoid::Commands::Destroy do
         @parent = Person.new
         @address = Address.new(:street => "Genoa Pl")
         @parent.addresses << @address
+        @collection = mock
+        Person.expects(:collection).returns(@collection)
       end
 
       it "removes the document from the parent attributes" do
         @parent.addresses.should == [@address]
+        @collection.expects(:save).returns(true)
         Mongoid::Commands::Destroy.execute(@address)
         @parent.addresses.should be_empty
       end

@@ -37,6 +37,22 @@ describe Mongoid::Commands do
         @person = Person.new
       end
 
+      context "when validation fails" do
+
+        it "it raises an error" do
+          Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+          @person.save.should be_false
+        end
+
+        it "should run callback before_create and no after_create" do
+          @person.expects(:run_callbacks).with(:create).yields
+          Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
+          @person.expects(:run_callbacks).with(:after_create).never
+          @person.save.should be_false
+        end
+
+      end
+
       it "delegates to the save command" do
         Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
         @person.save
@@ -69,10 +85,9 @@ describe Mongoid::Commands do
         @person = Person.new
       end
 
-      it "returns false" do
+      it "lets the error bubble up" do
         Mongoid::Commands::Save.expects(:execute).raises(Mongo::OperationFailure.new("Operation Failed"))
-        @person.save
-        @person.errors[:mongoid].should == [ "Operation Failed" ]
+        lambda { @person.save }.should raise_error
       end
 
     end
@@ -185,14 +200,8 @@ describe Mongoid::Commands do
         Mongoid::Commands::Save.expects(:execute).raises(Mongo::OperationFailure.new("Operation Failed"))
       end
 
-      it "returns the document with errors" do
-        person = Person.create
-        person.errors[:mongoid].should == [ "Operation Failed" ]
-      end
-
-      it "keeps the document's new record flag" do
-        person = Person.create
-        person.should be_a_new_record
+      it "lets the error bubble up" do
+        lambda { Person.create }.should raise_error
       end
 
     end

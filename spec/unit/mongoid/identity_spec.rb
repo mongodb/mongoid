@@ -6,9 +6,30 @@ describe Mongoid::Identity do
 
     let(:name) { Name.new }
 
-    it "sets the document _type to the class name" do
-      Mongoid::Identity.create(name)
-      name._type.should == "Name"
+    context "when persisting types" do
+
+      it "sets the document _type to the class name" do
+        Mongoid::Identity.create(name)
+        name._type.should == "Name"
+      end
+
+    end
+
+    context "when not persisting types" do
+
+      before do
+        Mongoid.persist_types = false
+        @name = Name.new
+      end
+
+      after do
+        Mongoid.persist_types = true
+      end
+
+      it "does not set the type" do
+        @name._type.should be_nil
+      end
+
     end
 
     it "returns the document" do
@@ -40,9 +61,29 @@ describe Mongoid::Identity do
           Mongo::ObjectID.expects(:new).returns(@object_id)
         end
 
-        it "sets the id to a mongo object id" do
-          Mongoid::Identity.create(@person)
-          @person.id.should == "1"
+        context "when using object ids" do
+
+          before do
+            Mongoid.use_object_ids = true
+          end
+
+          after do
+            Mongoid.use_object_ids = false
+          end
+
+          it "sets the id to a mongo object id" do
+            Mongoid::Identity.create(@person)
+            @person.id.should == @object_id
+          end
+        end
+
+        context "when not using object ids" do
+
+          it "sets the id to a mongo object id string" do
+            Mongoid::Identity.create(@person)
+            @person.id.should == "1"
+          end
+
         end
 
       end

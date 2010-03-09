@@ -44,13 +44,16 @@ module Mongoid #:nodoc
       def create_accessors(name, meth, options = {})
         define_method(meth) { read_attribute(name) }
         define_method("#{meth}=") { |value| write_attribute(name, value) }
-        define_method("#{meth}?") { read_attribute(name) == true } if options[:type] == Boolean
+        define_method("#{meth}?") do
+          attr = read_attribute(name)
+          (options[:type] == Boolean) ? attr == true : attr.present?
+        end
       end
 
       # Set up a default value for a field.
       def set_default(name, options = {})
         value = options[:default]
-        defaults[name] = value if value
+        defaults[name] = value unless value.nil?
       end
     end
   end

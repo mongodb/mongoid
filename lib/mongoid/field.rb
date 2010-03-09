@@ -1,11 +1,25 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   class Field
+    attr_reader :name, :type
 
-    attr_reader \
-      :default,
-      :name,
-      :type
+    # Determine if the field is able to be accessible via a mass update.
+    #
+    # Returns:
+    #
+    # true if accessible, false if not.
+    def accessible?
+      !!@accessible
+    end
+
+    # Get the default value for the field.
+    #
+    # Returns:
+    #
+    # The primitive value or a copy of the default.
+    def default
+      (@default.is_a?(Array) || @default.is_a?(Hash)) ? @default.dup : @default
+    end
 
     # Create the new field with a name and optional additional options. Valid
     # options are :default
@@ -19,9 +33,9 @@ module Mongoid #:nodoc:
     #
     # <tt>Field.new(:score, :default => 0)</tt>
     def initialize(name, options = {})
-      @name = name
-      @default = options[:default]
+      @name, @default = name, options[:default]
       @type = options[:type] || String
+      @accessible = options.has_key?(:accessible) ? options[:accessible] : true
     end
 
     # Used for setting an object in the attributes hash. If nil is provided the
@@ -34,6 +48,5 @@ module Mongoid #:nodoc:
     def get(object)
       type.get(object)
     end
-
   end
 end

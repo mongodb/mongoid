@@ -134,6 +134,10 @@ describe Mongoid::Associations::BelongsToRelated do
         Mongoid::Associations::BelongsToRelated.update(nil, @child, @options).should be_nil
       end
 
+      it "removes the association" do
+        Mongoid::Associations::BelongsToRelated.update(nil, @child, @options)
+        @child.person.should be_nil
+      end
     end
 
   end

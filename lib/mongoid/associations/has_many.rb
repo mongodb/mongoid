@@ -54,8 +54,7 @@ module Mongoid #:nodoc:
       # Rhe newly created Document.
       def create(attrs = {}, type = nil)
         object = build(attrs, type)
-        object.save
-        object
+        object.run_callbacks(:create) { object.save }; object
       end
 
       # Finds a document in this association.

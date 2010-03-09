@@ -13,15 +13,21 @@ module Mongoid #:nodoc:
       end
 
       protected
+      # Return the proper id for the document.
+      def generate_id
+        id = Mongo::ObjectID.new
+        Mongoid.use_object_ids ? id : id.to_s
+      end
+
       # Set the id for the document.
       def identify(doc)
         doc.id = compose(doc).join(" ").identify if doc.primary_key
-        doc.id = Mongo::ObjectID.new.to_s unless doc.id
+        doc.id = generate_id unless doc.id
       end
 
       # Set the _type field on the document.
       def type(doc)
-        doc._type = doc.class.name
+        doc._type = doc.class.name if Mongoid.persist_types
       end
 
       # Generates the composite key for a document.

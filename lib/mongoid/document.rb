@@ -5,12 +5,7 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor \
-        :_collection,
-        :collection_name,
-        :embedded,
-        :primary_key,
-        :hereditary
+      cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :hereditary
 
       self.embedded = false
       self.hereditary = false
@@ -53,7 +48,6 @@ module Mongoid #:nodoc:
       # <tt>Person.instantiate(:title => "Sir", :age => 30)</tt>
       def instantiate(attrs = nil, allocating = false)
         attributes = attrs || {}
-        attributes.delete_if {|key, value| value.nil? }
         if attributes["_id"] || allocating
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
@@ -72,8 +66,6 @@ module Mongoid #:nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     field :first_name
-      #     field :last_name
       #     key :first_name, :last_name
       #   end
       def key(*fields)
@@ -95,7 +87,7 @@ module Mongoid #:nodoc:
       def _types
         @_type ||= (subclasses_of(self).map { |o| o.to_s } + [ self.name ])
       end
-      
+
       # return the list of subclassses for an object
       def subclasses_of(*superclasses) #:nodoc:
         subclasses = []
@@ -121,6 +113,17 @@ module Mongoid #:nodoc:
           other.attributes.except(:modified_at).except(:created_at)
       end
 
+      # Delegates to ==
+      def eql?(comparison_object)
+        self == (comparison_object)
+      end
+
+      # Delegates to id in order to allow two records of the same type and id to work with something like:
+      #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
+      def hash
+        id.hash
+      end
+
       # Introduces a child object into the +Document+ object graph. This will
       # set up the relationships between the parent and child and update the
       # attributes of the parent +Document+.
@@ -129,10 +132,6 @@ module Mongoid #:nodoc:
       #
       # parent: The +Document+ to assimilate with.
       # options: The association +Options+ for the child.
-      #
-      # Example:
-      #
-      # <tt>name.assimilate(person, options)</tt>
       def assimilate(parent, options)
         parentize(parent, options.name); notify; self
       end
@@ -190,6 +189,11 @@ module Mongoid #:nodoc:
         @new_record = saved
       end
 
+      # Checks if the document has been saved to the database.
+      def persisted?
+        !new_record?
+      end
+
       # Set the changed state of the +Document+ then notify observers that it has changed.
       #
       # Example:
@@ -226,6 +230,7 @@ module Mongoid #:nodoc:
       # Reloads the +Document+ attributes from the database.
       def reload
         @attributes = collection.find_one(:_id => id)
+        self
       end
 
       # Remove a child document from this parent +Document+. Will reset the
@@ -259,9 +264,9 @@ module Mongoid #:nodoc:
       def to_json(options = nil)
         attributes.to_json(options)
       end
-      
+
       # Return an object to be encoded into a JSON string.
-      # Used by Rails 3's object->JSON chain to create JSON 
+      # Used by Rails 3's object->JSON chain to create JSON
       # in a backend-agnostic way
       #
       # Example:
@@ -270,11 +275,11 @@ module Mongoid #:nodoc:
       def as_json(options = nil)
         attributes
       end
-      
+
       # Return this document as an object to be encoded as JSON,
       # with any particular items modified on a per-encoder basis.
-      # Nothing special is required here since Mongoid bubbles up 
-      # all the child associations to the parent attribute +Hash+ 
+      # Nothing special is required here since Mongoid bubbles up
+      # all the child associations to the parent attribute +Hash+
       # using observers throughout the +Document+ lifecycle.
       #
       # Example:

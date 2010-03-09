@@ -142,6 +142,17 @@ describe Mongoid::Attributes do
 
   describe "#process" do
 
+    context "when passing non accessible fields" do
+
+      before do
+        @person = Person.new(:owner_id => 6)
+      end
+
+      it "does not set the value" do
+        @person.owner_id.should be_nil
+      end
+    end
+
     context "when attributes dont have fields defined" do
 
       before do
@@ -331,8 +342,21 @@ describe Mongoid::Attributes do
 
       it "returns the default value" do
         @person.age.should == 100
+        @person.pets.should == false
       end
 
+    end
+
+    context "when attribute is not accessible" do
+
+      before do
+        @person = Person.new
+        @person.owner_id = 5
+      end
+
+      it "returns the value" do
+        @person.read_attribute(:owner_id).should == 5
+      end
     end
 
   end
@@ -391,83 +415,91 @@ describe Mongoid::Attributes do
 
   end
 
-  describe "#write_attributes" do
-
-    context "typecasting" do
-
-      before do
-        @person = Person.new
-        @attributes = { :age => "50" }
-      end
-
-      it "properly casts values" do
-        @person.write_attributes(@attributes)
-        @person.age.should == 50
-      end
-
-      it "allows passing of nil" do
-        @person.write_attributes(nil)
-        @person.age.should == 100
-      end
+  describe "#attributes=" do
+    it 'should be a alias of write_attributes' do
 
     end
+  end
 
-    context "on a parent document" do
+  [:attributes=, :write_attributes].each do |method|
+    describe "##{method}" do
 
-      context "when the parent has a has many through a has one" do
+      context "typecasting" do
 
         before do
-          @owner = PetOwner.new(:title => "Mr")
-          @pet = Pet.new(:name => "Fido")
-          @owner.pet = @pet
-          @vet_visit = VetVisit.new(:date => Date.today)
-          @pet.vet_visits = [@vet_visit]
+          @person = Person.new
+          @attributes = { :age => "50" }
         end
 
-        it "does not overwrite child attributes if not in the hash" do
-          @owner.write_attributes({ :pet => { :name => "Bingo" } })
-          @owner.pet.name.should == "Bingo"
-          @owner.pet.vet_visits.size.should == 1
+        it "properly casts values" do
+          @person.send(method, @attributes)
+          @person.age.should == 50
+        end
+
+        it "allows passing of nil" do
+          @person.send(method, nil)
+          @person.age.should == 100
         end
 
       end
 
-    end
+      context "on a parent document" do
 
-    context "on a child document" do
+        context "when the parent has a has many through a has one" do
 
-      context "when child is part of a has one" do
+          before do
+            @owner = PetOwner.new(:title => "Mr")
+            @pet = Pet.new(:name => "Fido")
+            @owner.pet = @pet
+            @vet_visit = VetVisit.new(:date => Date.today)
+            @pet.vet_visits = [@vet_visit]
+          end
 
-        before do
-          @person = Person.new(:title => "Sir", :age => 30)
-          @name = Name.new(:first_name => "Test", :last_name => "User")
-          @person.name = @name
-        end
+          it "does not overwrite child attributes if not in the hash" do
+            @owner.send(method, { :pet => { :name => "Bingo" } })
+            @owner.pet.name.should == "Bingo"
+            @owner.pet.vet_visits.size.should == 1
+          end
 
-        it "sets the child attributes on the parent" do
-          @name.write_attributes(:first_name => "Test2", :last_name => "User2")
-          @person.attributes[:name].should ==
-            { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2", "_type" => "Name" }
-        end
-
-      end
-
-      context "when child is part of a has many" do
-
-        before do
-          @person = Person.new(:title => "Sir")
-          @address = Address.new(:street => "Test")
-          @person.addresses << @address
-        end
-
-        it "updates the child attributes on the parent" do
-          @address.write_attributes("street" => "Test2")
-          @person.attributes[:addresses].should ==
-            [ { "_id" => "test", "street" => "Test2", "_type" => "Address" } ]
         end
 
       end
 
+      context "on a child document" do
+
+        context "when child is part of a has one" do
+
+          before do
+            @person = Person.new(:title => "Sir", :age => 30)
+            @name = Name.new(:first_name => "Test", :last_name => "User")
+            @person.name = @name
+          end
+
+          it "sets the child attributes on the parent" do
+            @name.send(method, :first_name => "Test2", :last_name => "User2")
+            @person.attributes[:name].should ==
+              { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2", "_type" => "Name" }
+          end
+
+        end
+
+        context "when child is part of a has many" do
+
+          before do
+            @person = Person.new(:title => "Sir")
+            @address = Address.new(:street => "Test")
+            @person.addresses << @address
+          end
+
+          it "updates the child attributes on the parent" do
+            @address.send(method, "street" => "Test2")
+            @person.attributes[:addresses].should ==
+              [ { "_id" => "test", "street" => "Test2", "_type" => "Address" } ]
+          end
+
+        end
+
+      end
     end
 
   end

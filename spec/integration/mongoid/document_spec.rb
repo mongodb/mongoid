@@ -244,7 +244,7 @@ describe Mongoid::Document do
 
     before do
       5.times do |num|
-        Person.create(:title => "Sir", :age => num)
+        Person.create(:title => "Sir", :age => num, :ssn => num)
       end
     end
 
@@ -285,7 +285,7 @@ describe Mongoid::Document do
     end
 
     it "returns a pretty string of class name and attributes" do
-      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name] || 'nil'}" } * ", "
+      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name].nil? ? 'nil' : @person.attributes[name]}" } * ", "
       @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
     end
 
@@ -323,6 +323,10 @@ describe Mongoid::Document do
     it "reloads the obejct attributes from the db" do
       @person.reload
       @person.age.should == 35
+    end
+
+    it "reload should return self" do
+      @person.reload.should == @from_db
     end
 
   end

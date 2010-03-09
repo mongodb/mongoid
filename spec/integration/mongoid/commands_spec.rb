@@ -202,7 +202,7 @@ describe Mongoid::Commands do
   describe ".delete_all" do
 
     it "returns true" do
-      Person.delete_all.should be_true
+      Person.delete_all.should == true
     end
 
   end
@@ -210,7 +210,7 @@ describe Mongoid::Commands do
   describe ".destroy_all" do
 
     it "returns true" do
-      Person.destroy_all.should be_true
+      Person.destroy_all.should == true
     end
 
   end

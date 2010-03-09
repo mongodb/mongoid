@@ -50,6 +50,33 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#in" do
+
+    context "when searching nil values" do
+
+      before do
+        @person = Person.create(:title => nil)
+      end
+
+      it "returns the correct document" do
+        from_db = Person.any_in(:title => [ true, false, nil ]).first
+        from_db.should == @person
+      end
+    end
+
+    context "when searching false values" do
+
+      before do
+        @person = Person.create(:terms => false)
+      end
+
+      it "returns the correct document" do
+        from_db = Person.criteria.in(:terms => [ true, false, nil ]).first
+        from_db.should == @person
+      end
+    end
+  end
+
   describe "#max" do
 
     context "without results" do
@@ -69,7 +96,6 @@ describe Mongoid::Criteria do
         Person.max(:age).should == 90.0
       end
     end
-
   end
 
   describe "#min" do
@@ -216,9 +242,9 @@ describe Mongoid::Criteria do
 
     it "iterates over the cursor only once" do
       criteria = Person.where(:title => "Sir").cache
-      criteria.collect.size.should == 10
+      criteria.collect.to_a.size.should == 10
       # Do it again!
-      criteria.collect.size.should == 10
+      criteria.collect.to_a.size.should == 10
     end
   end
 

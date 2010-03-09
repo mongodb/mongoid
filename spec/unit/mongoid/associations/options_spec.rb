@@ -75,15 +75,29 @@ describe Mongoid::Associations::Options do
 
   describe "#foreign_key" do
 
-    before do
-      @attributes = { :name => :game }
-      @options = Mongoid::Associations::Options.new(@attributes)
+    context "when no custom key defined" do
+
+      before do
+        @attributes = { :name => :posts }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns the association foreign_key" do
+        @options.foreign_key.should == "post_id"
+      end
     end
 
-    it "returns the association foreign_key" do
-      @options.foreign_key.should == "game_id"
-    end
+    context "when a custom key is defined" do
 
+      before do
+        @attributes = { :name => :posts, :foreign_key => "blog_post_id" }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns the custom foreign_key" do
+        @options.foreign_key.should == "blog_post_id"
+      end
+    end
   end
 
   describe "#inverse_of" do
@@ -142,19 +156,6 @@ describe Mongoid::Associations::Options do
 
       end
 
-    end
-
-  end
-
-  describe "#parent_key" do
-
-    before do
-      @attributes = { :parent_key => :person_id }
-      @options = Mongoid::Associations::Options.new(@attributes)
-    end
-
-    it "returns the parent's foreign key value" do
-      @options.parent_key.should == :person_id
     end
 
   end

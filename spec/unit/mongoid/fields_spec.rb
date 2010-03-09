@@ -57,6 +57,12 @@ describe Mongoid::Fields do
         @person.testing.should == "Testy"
       end
 
+      it "adds an reader method with a question mark" do
+        @person = Person.new(:testing => "Test")
+        @person.testing?.should be_true
+        Person.new.testing?.should be_false
+      end
+
     end
 
     context "when type is an object" do
@@ -71,6 +77,10 @@ describe Mongoid::Fields do
         @person.mixed_drink.should == @drink
         @person.attributes[:mixed_drink].except(:_id).except(:_type).should ==
           { "name" => "Jack and Coke" }
+      end
+
+      it "adds an reader method with a question mark" do
+        @person.mixed_drink?.should be_true
       end
 
     end

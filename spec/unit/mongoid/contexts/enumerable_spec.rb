@@ -8,9 +8,10 @@ describe Mongoid::Contexts::Enumerable do
     @melbourne = Address.new(:number => 20, :street => "Bourke Street")
     @new_york = Address.new(:number => 20, :street => "Broadway")
     @docs = [ @london, @shanghai, @melbourne, @new_york ]
-    @selector = { :street => "Bourke Street" }
-    @options = { :fields => [ :number ] }
-    @context = Mongoid::Contexts::Enumerable.new(@selector, @options, @docs)
+    @criteria = Mongoid::Criteria.new(Address)
+    @criteria.documents = @docs
+    @criteria.where(:street => "Bourke Street").only(:number)
+    @context = Mongoid::Contexts::Enumerable.new(@criteria)
   end
 
   describe "#aggregate" do
@@ -40,6 +41,11 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#execute" do
 
+    before do
+      @criteria = Mongoid::Criteria.new(Address)
+      @criteria.documents = @docs
+    end
+
     it "returns the matching documents from the array" do
       @context.execute.should == [ @melbourne ]
     end
@@ -47,7 +53,8 @@ describe Mongoid::Contexts::Enumerable do
     context "when selector is empty" do
 
       before do
-        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+        @criteria.only(:number)
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns all the documents" do
@@ -58,14 +65,27 @@ describe Mongoid::Contexts::Enumerable do
     context "when skip and limit are in the options" do
 
       before do
-        @options = { :skip => 2, :limit => 2 }
-        @context = Mongoid::Contexts::Enumerable.new({}, @options, @docs)
+        @criteria.skip(2).limit(2)
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "properly narrows down the matching results" do
         @context.execute.should == [ @melbourne, @new_york ]
       end
     end
+
+    context "when limit is set without skip in the options" do
+
+      before do
+        @criteria.limit(2)
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
+
+      it "properly narrows down the matching results" do
+        @context.execute.size.should == 2
+      end
+
+  end
 
   end
 
@@ -105,7 +125,10 @@ describe Mongoid::Contexts::Enumerable do
     let(:documents) { [stub] }
 
     before do
-      @context = Mongoid::Contexts::Enumerable.new(selector, options, documents)
+      @criteria = Mongoid::Criteria.new(Address)
+      @criteria.documents = documents
+      @criteria.where(selector).skip(20)
+      @context = Mongoid::Contexts::Enumerable.new(@criteria)
     end
 
     it "sets the selector" do
@@ -120,6 +143,22 @@ describe Mongoid::Contexts::Enumerable do
       @context.documents.should == documents
     end
 
+  end
+
+  describe "#iterate" do
+    before do
+      @criteria.where(:street => "Bourke Street")
+      @criteria.documents = @docs
+      @context = Mongoid::Contexts::Enumerable.new(@criteria)
+    end
+
+    it "executes the criteria" do
+      acc = []
+      @context.iterate do |doc|
+        acc << doc
+      end
+      acc.should == [@melbourne]
+    end
   end
 
   describe "#last" do
@@ -160,7 +199,8 @@ describe Mongoid::Contexts::Enumerable do
 
       before do
         @criteria = Mongoid::Criteria.new(Person).extras({ :page => 5 })
-        @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, [])
+        @criteria.documents = []
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns the page option" do
@@ -173,7 +213,8 @@ describe Mongoid::Contexts::Enumerable do
 
       before do
         @criteria = Mongoid::Criteria.new(Person)
-        @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, [])
+        @criteria.documents = []
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns 1" do
@@ -188,7 +229,7 @@ describe Mongoid::Contexts::Enumerable do
 
     before do
       @criteria = Person.criteria.skip(2).limit(2)
-      @context = Mongoid::Contexts::Enumerable.new({}, @criteria.options, @docs)
+      @context = Mongoid::Contexts::Enumerable.new(@criteria)
       @results = @context.paginate
     end
 
@@ -212,7 +253,9 @@ describe Mongoid::Contexts::Enumerable do
     context "when a limit option does not exist" do
 
       before do
-        @context = Mongoid::Contexts::Enumerable.new({}, { :limit => 50 }, [])
+        @criteria = Person.criteria.limit(50)
+        @criteria.documents = []
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
       end
 
       it "returns the limit" do
@@ -227,6 +270,119 @@ describe Mongoid::Contexts::Enumerable do
 
     it "returns the sum of all the field values" do
       @context.sum(:number).should == 51
+    end
+
+  end
+
+  context "#id_criteria" do
+
+    let(:criteria) do
+      criteria = Mongoid::Criteria.new(Address)
+      criteria.documents = []
+      criteria
+    end
+    let(:context) { criteria.context }
+
+    context "with a single argument" do
+
+      let(:id) { Mongo::ObjectID.new.to_s }
+
+      before do
+        criteria.expects(:id).with(id).returns(criteria)
+      end
+
+      context "when the document is found" do
+
+        let(:document) { stub }
+
+        it "returns a matching document" do
+          context.expects(:one).returns(document)
+          document.expects(:blank? => false)
+          context.id_criteria(id).should == document
+        end
+
+      end
+
+      context "when the document is not found" do
+
+        it "raises an error" do
+          context.expects(:one).returns(nil)
+          lambda { context.id_criteria(id) }.should raise_error
+        end
+
+      end
+
+    end
+
+    context "multiple arguments" do
+
+      context "when an array of ids" do
+
+        let(:ids) do
+          (0..2).inject([]) { |ary, i| ary << Mongo::ObjectID.new.to_s }
+        end
+
+        context "when documents are found" do
+
+          let(:docs) do
+            (0..2).inject([]) { |ary, i| ary << stub }
+          end
+
+          before do
+            criteria.expects(:id).with(ids).returns(criteria)
+          end
+
+          it "returns matching documents" do
+            context.expects(:execute).returns(docs)
+            context.id_criteria(ids).should == docs
+          end
+
+        end
+
+        context "when documents are not found" do
+
+          it "raises an error" do
+            context.expects(:execute).returns([])
+            lambda { context.id_criteria(ids) }.should raise_error
+          end
+
+        end
+
+      end
+
+      context "when an array of object ids" do
+
+        let(:ids) do
+          (0..2).inject([]) { |ary, i| ary << Mongo::ObjectID.new }
+        end
+
+        context "when documents are found" do
+
+          let(:docs) do
+            (0..2).inject([]) { |ary, i| ary << stub }
+          end
+
+          before do
+            criteria.expects(:id).with(ids).returns(criteria)
+          end
+
+          it "returns matching documents" do
+            context.expects(:execute).returns(docs)
+            context.id_criteria(ids).should == docs
+          end
+
+        end
+
+        context "when documents are not found" do
+
+          it "raises an error" do
+            context.expects(:execute).returns([])
+            lambda { context.id_criteria(ids) }.should raise_error
+          end
+
+        end
+
+      end
     end
 
   end

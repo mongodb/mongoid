@@ -12,6 +12,7 @@ module Mongoid #:nodoc
       include Mongoid::Attributes
       include Mongoid::Callbacks
       include Mongoid::Commands
+      include Mongoid::Extras
       include Mongoid::Fields
       include Mongoid::Indexes
       include Mongoid::Matchers

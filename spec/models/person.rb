@@ -4,6 +4,7 @@ class Person
 
   field :title
   field :terms, :type => Boolean
+  field :pets, :type => Boolean, :default => false
   field :age, :type => Integer, :default => 100
   field :dob, :type => Date
   field :mixed_drink, :type => MixedDrink
@@ -14,6 +15,7 @@ class Person
   field :score, :type => Integer
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :ssn
+  field :owner_id, :accessible => false, :type => Integer
 
   index :age
   index :addresses

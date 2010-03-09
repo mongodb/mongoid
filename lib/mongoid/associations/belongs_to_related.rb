@@ -41,19 +41,16 @@ module Mongoid #:nodoc:
         #
         # Options:
         #
-        # related: The related object
-        # parent: The parent +Document+ to update.
+        # target: The target(parent) object
+        # document: The +Document+ to update.
         # options: The association +Options+
         #
         # Example:
         #
-        # <tt>BelongsToRelated.update(game, person, options)</tt>
-        def update(target, parent, options)
-          if target
-            parent.send("#{options.foreign_key}=", target.id)
-            return instantiate(parent, options, target)
-          end
-          target
+        # <tt>BelongsToRelated.update(person, game, options)</tt>
+        def update(target, document, options)
+          document.send("#{options.foreign_key}=", target ? target.id : nil)
+          instantiate(document, options, target)
         end
       end
 

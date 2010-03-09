@@ -31,10 +31,13 @@ module Mongoid #:nodoc:
 
     delegate \
       :aggregate,
+      :blank?,
       :count,
+      :empty?,
       :execute,
       :first,
       :group,
+      :id_criteria,
       :last,
       :max,
       :min,
@@ -75,23 +78,12 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Returns true if the criteria is empty.
-    #
-    # Example:
-    #
-    # <tt>criteria.blank?</tt>
-    def blank?
-      count < 1
-    end
-
-    alias :empty? :blank?
-
     # Return or create the context in which this criteria should be executed.
     #
     # This will return an Enumerable context if the class is embedded,
     # otherwise it will return a Mongo context for root classes.
     def context
-      @context ||= determine_context
+      @context ||= Contexts.context_for(self)
     end
 
     # Iterate over each +Document+ in the results. This can take an optional
@@ -101,10 +93,7 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      return each_cached(&block) if cached?
-      if block_given?
-        execute.each { |doc| yield doc }
-      end
+      context.iterate(&block)
       self
     end
 
@@ -134,10 +123,6 @@ module Mongoid #:nodoc:
     # klass: The class to execute on.
     def initialize(klass)
       @selector, @options, @klass, @documents = {}, {}, klass, []
-      if klass.hereditary
-        @selector = { :_type => { "$in" => klass._types } }
-        @hereditary = true
-      end
     end
 
     # Merges another object into this +Criteria+. The other object may be a
@@ -168,7 +153,7 @@ module Mongoid #:nodoc:
     # Returns: <tt>Criteria</tt>
     def method_missing(name, *args)
       if @klass.respond_to?(name)
-        new_scope = @klass.send(name)
+        new_scope = @klass.send(name, *args)
         new_scope.merge(self)
         return new_scope
       else
@@ -204,40 +189,17 @@ module Mongoid #:nodoc:
       klass = args[0]
       params = args[1] || {}
       unless params.is_a?(Hash)
-        return id_criteria(klass, params)
+        return new(klass).id_criteria(params)
       end
-      return new(klass).where(params.delete(:conditions) || {}).extras(params)
+      conditions = params.delete(:conditions) || {}
+      if conditions.include?(:id)
+        conditions[:_id] = conditions[:id]
+        conditions.delete(:id)
+      end
+      return new(klass).where(conditions).extras(params)
     end
 
     protected
-    # Determines the context to be used for this criteria. If the class is an
-    # embedded document, then thw context will be the array in the has_many
-    # association it is in. If the class is a root, then the database itself
-    # will be the context.
-    #
-    # Example:
-    #
-    # <tt>criteria#determine_context</tt>
-    def determine_context
-      if @klass.embedded
-        return Contexts::Enumerable.new(@selector, @options, @documents)
-      end
-      Contexts::Mongo.new(@selector, @options, @klass)
-    end
-
-    # Iterate over each +Document+ in the results and cache the collection.
-    def each_cached(&block)
-      @collection ||= execute
-      if block_given?
-        docs = []
-        @collection.each do |doc|
-          docs << doc
-          yield doc
-        end
-        @collection = docs
-      end
-      self
-    end
 
     # Filters the unused options out of the options +Hash+. Currently this
     # takes into account the "page" and "per_page" options that would be passed
@@ -271,27 +233,6 @@ module Mongoid #:nodoc:
     # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
     def update_selector(attributes, operator)
       attributes.each { |key, value| @selector[key] = { operator => value } }; self
-    end
-
-    class << self
-      # Create a criteria or single document based on an id search. Will handle
-      # if a single id has been passed or mulitple ids.
-      #
-      # Example:
-      #
-      #   Criteria.id_criteria(Person, [1, 2, 3])
-      #
-      # Returns:
-      #
-      # The single or multiple documents.
-      def id_criteria(klass, params)
-        criteria = new(klass).id(params)
-        result = params.is_a?(String) ? criteria.one : criteria.entries
-        if Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, params) if result.blank?
-        end
-        return result
-      end
     end
   end
 end

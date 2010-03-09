@@ -40,6 +40,52 @@ describe Mongoid::Collection do
     end
   end
 
+  describe "#directed" do
+
+    context "when an enslave option is not passed" do
+
+      before do
+        slaves.expects(:empty?).returns(false)
+      end
+
+      before do
+        Person.enslave
+      end
+
+      after do
+        Person.enslaved = false
+      end
+
+      it "uses the default" do
+        collection.directed.should == slaves
+      end
+    end
+
+    context "when an enslave option is passed" do
+
+      before do
+        slaves.expects(:empty?).returns(false)
+      end
+
+      it "overwrites the default" do
+        collection.directed(:enslave => true).should == slaves
+      end
+    end
+
+    context "when cached option is passed" do
+
+      let(:options) do
+        { :cache => true }
+      end
+
+      it "removed the cache option" do
+        collection.directed(options).should == master
+        options[:cache].should be_nil
+      end
+    end
+
+  end
+
   describe "#find" do
 
     before do

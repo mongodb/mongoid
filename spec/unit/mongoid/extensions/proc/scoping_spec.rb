@@ -24,7 +24,7 @@ describe Mongoid::Extensions::Proc::Scoping do
 
       it "returns the criteria scoped" do
         @proc.scoped("Sir").should ==
-          { :where => { :_type => { "$in" => [ "Doctor", "Person" ] }, :title => "Sir" } }
+          { :where => { :title => "Sir" } }
       end
 
     end

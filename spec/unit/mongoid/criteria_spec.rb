@@ -127,10 +127,10 @@ describe Mongoid::Criteria do
       @criteria.instance_variable_set(:@context, @context)
     end
 
-    context "when the count is 0" do
+    context "when the context is blank" do
 
       before do
-        @context.expects(:count).returns(0)
+        @context.expects(:blank?).returns(true)
       end
 
       it "returns true" do
@@ -138,10 +138,10 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when the count is greater than 0" do
+    context "when the context is not blank" do
 
       before do
-        @context.expects(:count).returns(10)
+        @context.expects(:blank?).returns(false)
       end
 
       it "returns false" do
@@ -172,9 +172,7 @@ describe Mongoid::Criteria do
       end
 
       it "creates a new context" do
-        Mongoid::Contexts::Mongo.expects(:new).with(
-          @criteria.selector, @criteria.options, @criteria.klass
-        ).returns(@context)
+        Mongoid::Contexts::Mongo.expects(:new).with(@criteria).returns(@context)
         @criteria.context.should == @context
       end
 
@@ -245,7 +243,7 @@ describe Mongoid::Criteria do
         criteria = Mongoid::Criteria.new(Person)
         collection = mock
         Person.expects(:collection).returns(collection)
-        collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
+        collection.expects(:find).with(criteria.selector, criteria.options).returns([])
         criteria.entries.should == []
       end
 
@@ -274,6 +272,13 @@ describe Mongoid::Criteria do
       @collection = stub
       @person = Person.new(:title => "Sir")
       @cursor = stub(:count => 10)
+    end
+
+    it "delegates to the context#iterate" do
+      @context = stub('context')
+      @criteria.stubs(:context).returns(@context)
+      @context.expects(:iterate)
+      @criteria.each
     end
 
     context "when the criteria has not been executed" do
@@ -320,7 +325,12 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @collection.expects(:find).with(
+          { :_type => { "$in" => ["Doctor", "Person"] },
+            :title => "Sir"
+          },
+          { :cache => true }
+        ).returns(@cursor)
         @cursor.expects(:each).yields(@person)
         @criteria.cache
         @criteria.each do |doc|
@@ -372,22 +382,22 @@ describe Mongoid::Criteria do
 
   describe "#initialize" do
 
-    context "when class is hereditary" do
+    let(:criteria) { Mongoid::Criteria.new(Person) }
 
-      it "sets the _type value on the selector" do
-        criteria = Mongoid::Criteria.new(Person)
-        criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] } }
-      end
-
+    it "sets the selector to an empty hash" do
+      criteria.selector.should == {}
     end
 
-    context "when class is not hereditary" do
+    it "sets the options to an empty hash" do
+      criteria.options.should == {}
+    end
 
-      it "sets no _type value on the selector" do
-        criteria = Mongoid::Criteria.new(Game)
-        criteria.selector.should == {}
-      end
+    it "sets the documents to an empty array" do
+      criteria.documents.should == []
+    end
 
+    it "sets the klass to the given class" do
+      criteria.klass.should == Person
     end
 
   end
@@ -433,7 +443,7 @@ describe Mongoid::Criteria do
         before do
           @other = Mongoid::Criteria.new(Person)
           @other.where(:name => "Chloe").order_by([[:name, :asc]])
-          @selector = { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :age => 30, :name => "Chloe" }
+          @selector = { :title => "Sir", :age => 30, :name => "Chloe" }
           @options = { :skip => 40, :limit => 20, :sort => [[:name, :asc]] }
         end
 
@@ -449,7 +459,7 @@ describe Mongoid::Criteria do
 
         before do
           @other = Mongoid::Criteria.new(Person)
-          @selector = { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :age => 30 }
+          @selector = { :title => "Sir", :age => 30 }
           @options = { :skip => 40, :limit => 20 }
         end
 
@@ -489,7 +499,7 @@ describe Mongoid::Criteria do
 
     it "merges the criteria with the next one" do
       @new_criteria = @criteria.accepted
-      @new_criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :terms => true }
+      @new_criteria.selector.should == { :title => "Sir", :terms => true }
     end
 
     context "chaining more than one scope" do
@@ -499,8 +509,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the final merged criteria" do
-        @criteria.selector.should ==
-          { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+        @criteria.selector.should == { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
       end
 
     end
@@ -616,8 +625,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the selector plus the options" do
-      @criteria.scoped.should ==
-        { :where => { :title => "Sir", :_type=>{ "$in" => [ "Doctor", "Person" ] } }, :skip => 20 }
+      @criteria.scoped.should == { :where => { :title => "Sir" }, :skip => 20 }
     end
 
   end
@@ -640,29 +648,35 @@ describe Mongoid::Criteria do
 
     context "with a single argument" do
 
-      before do
-        @id = Mongo::ObjectID.new.to_s
-        @document = stub
-        @criteria = mock
-        Mongoid::Criteria.expects(:new).returns(@criteria)
-        @criteria.expects(:id).with(@id).returns(@criteria)
-      end
+      context "when the arg is a string" do
 
-      it "creates a criteria for a string" do
-        @criteria.expects(:one).returns(@document)
-        @document.expects(:blank? => false)
-        Mongoid::Criteria.translate(Person, @id)
-      end
-
-      context "when the document is not found" do
-
-        it "raises an error" do
-          @criteria.expects(:one).returns(nil)
-          lambda { Mongoid::Criteria.translate(Person, @id) }.should raise_error
+        before do
+          @id = Mongo::ObjectID.new.to_s
+          @document = stub
+          @criteria = mock
+          Mongoid::Criteria.expects(:new).returns(@criteria)
         end
 
+        it "delegates to #id_criteria" do
+          @criteria.expects(:id_criteria).with(@id).returns(@document)
+          Mongoid::Criteria.translate(Person, @id).should == @document
+        end
       end
 
+      context "when the arg is an object id" do
+
+        before do
+          @id = Mongo::ObjectID.new
+          @document = stub
+          @criteria = mock
+          Mongoid::Criteria.expects(:new).returns(@criteria)
+        end
+
+        it "delegates to #id_criteria" do
+          @criteria.expects(:id_criteria).with(@id).returns(@document)
+          Mongoid::Criteria.translate(Person, @id).should == @document
+        end
+      end
     end
 
     context "multiple arguments" do
@@ -676,40 +690,13 @@ describe Mongoid::Criteria do
             @ids << Mongo::ObjectID.new.to_s
             @documents << stub
           end
-          @collection = stub
-          Person.expects(:collection).returns(@collection)
+          @criteria = mock
+          Mongoid::Criteria.expects(:new).returns(@criteria)
         end
 
-        context "when documents are found" do
-
-          it "returns an ids criteria" do
-            @collection.expects(:find).with(
-              { :_type =>
-                { "$in" =>
-                  ["Doctor", "Person"]
-                },
-                :_id =>
-                { "$in" => @ids }
-            }, {}).returns([{ "_id" => "4", "title" => "Sir", "_type" => "Person" }])
-            @criteria = Mongoid::Criteria.translate(Person, @ids)
-          end
-
-        end
-
-        context "when documents are not found" do
-
-          it "returns an ids criteria" do
-            @collection.expects(:find).with(
-              { :_type =>
-                { "$in" =>
-                  ["Doctor", "Person"]
-                },
-                :_id =>
-                { "$in" => @ids }
-            }, {}).returns([])
-            lambda { Mongoid::Criteria.translate(Person, @ids) }.should raise_error
-          end
-
+        it "delegates to #id_criteria" do
+          @criteria.expects(:id_criteria).with(@ids).returns(@documents)
+          Mongoid::Criteria.translate(Person, @ids).should == @documents
         end
 
       end
@@ -721,7 +708,23 @@ describe Mongoid::Criteria do
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
+        end
+
+        it "returns a criteria with klass Person" do
+          @criteria.klass.should == Person
+        end
+
+      end
+
+      context "when Person, :conditions => {:id => id}" do
+
+        before do
+          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :id => "1234e567" })
+        end
+
+        it "returns a criteria with a selector from the conditions" do
+          @criteria.selector.should == { :_id => "1234e567" }
         end
 
         it "returns a criteria with klass Person" do
@@ -737,7 +740,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
@@ -753,7 +756,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
@@ -768,7 +771,7 @@ describe Mongoid::Criteria do
         end
 
         it "adds the criteria and the options" do
-          @criteria.selector.should == { :_type => { "$in" => ["Doctor", "Person"] }, :title => "Test" }
+          @criteria.selector.should == { :title => "Test" }
           @criteria.options.should == { :skip => 10 }
         end
 

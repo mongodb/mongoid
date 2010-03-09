@@ -12,9 +12,9 @@ describe Mongoid::Attributes do
       Person.delete_all
     end
 
-    it "the field should not exist" do
+    it "the field should exist with a nil value" do
       from_db = Person.find(@person.id)
-      from_db.attributes.has_key?(:score).should be_false
+      from_db.attributes.has_key?(:score).should be_true
     end
 
   end
