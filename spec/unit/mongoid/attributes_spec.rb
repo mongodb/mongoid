@@ -142,6 +142,17 @@ describe Mongoid::Attributes do
 
   describe "#process" do
 
+    context "when passing non accessible fields" do
+
+      before do
+        @person = Person.new(:owner_id => 6)
+      end
+
+      it "does not set the value" do
+        @person.owner_id.should be_nil
+      end
+    end
+
     context "when attributes dont have fields defined" do
 
       before do
@@ -334,6 +345,18 @@ describe Mongoid::Attributes do
         @person.pets.should == false
       end
 
+    end
+
+    context "when attribute is not accessible" do
+
+      before do
+        @person = Person.new
+        @person.owner_id = 5
+      end
+
+      it "returns the value" do
+        @person.read_attribute(:owner_id).should == 5
+      end
     end
 
   end

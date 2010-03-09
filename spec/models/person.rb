@@ -15,6 +15,7 @@ class Person
   field :score, :type => Integer
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :ssn
+  field :owner_id, :accessible => false, :type => Integer
 
   index :age
   index :addresses

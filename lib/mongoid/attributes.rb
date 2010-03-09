@@ -42,7 +42,7 @@ module Mongoid #:nodoc:
         (attrs || {}).each_pair do |key, value|
           if set_allowed?(key)
             @attributes[key.to_s] = value
-          else
+          elsif write_allowed?(key)
             send("#{key}=", value)
           end
         end
@@ -148,6 +148,11 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Return true if writing to the given field is allowed
+      def write_allowed?(key)
+        return true unless fields[key.to_s]
+        fields[key.to_s].accessible?
+      end
     end
 
     module ClassMethods
