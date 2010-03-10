@@ -23,6 +23,7 @@ require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
 require "mongoid/extensions/time/conversions"
+require "mongoid/extensions/objectid/conversions"
 
 class Array #:nodoc
   include Mongoid::Extensions::Array::Accessors
@@ -91,4 +92,8 @@ end
 
 class Time #:nodoc
   extend Mongoid::Extensions::Time::Conversions
+end
+
+class Mongo::ObjectID #:nodoc
+  extend Mongoid::Extensions::ObjectID::Conversions
 end
