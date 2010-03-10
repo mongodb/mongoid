@@ -6,9 +6,8 @@ module Mongoid #:nodoc
         extend ClassMethods
         # Set up the class attributes that must be available to all subclasses.
         # These include defaults, fields
-        class_inheritable_accessor :defaults, :fields
+        class_inheritable_accessor :fields
 
-        self.defaults = {}
         self.fields = {}
 
         delegate :defaults, :fields, :to => "self.class"
@@ -31,7 +30,15 @@ module Mongoid #:nodoc
       def field(name, options = {})
         access = name.to_s
         set_field(access, options)
-        set_default(access, options)
+      end
+
+      # Returns the default values for the fields on the document
+      def defaults
+        fields.inject({}) do |defs,(field_name,field)|
+          next(defs) if field.default.nil?
+          defs[field_name.to_s] = field.default
+          defs
+        end
       end
 
       protected
@@ -52,11 +59,6 @@ module Mongoid #:nodoc
         end
       end
 
-      # Set up a default value for a field.
-      def set_default(name, options = {})
-        value = options[:default]
-        defaults[name] = value unless value.nil?
-      end
     end
   end
 end
