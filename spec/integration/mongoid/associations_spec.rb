@@ -240,6 +240,12 @@ describe Mongoid::Associations do
         @person.name.last_name.should == "Brown"
       end
 
+      it "sets the new_record values properly" do
+        from_db = Person.find(@person.id)
+        new_name = from_db.create_name(:first_name => "Flash")
+        new_name.new_record?.should be_false
+      end
+
     end
 
     context "multiple levels nested" do
