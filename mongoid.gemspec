@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "1.2.12"
+  s.version = "1.2.13"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
@@ -114,6 +114,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/memoization.rb",
      "lib/mongoid/named_scope.rb",
      "lib/mongoid/scope.rb",
+     "lib/mongoid/state.rb",
      "lib/mongoid/timestamps.rb",
      "lib/mongoid/versioning.rb",
      "mongoid.gemspec",
@@ -232,6 +233,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/memoization_spec.rb",
      "spec/unit/mongoid/named_scope_spec.rb",
      "spec/unit/mongoid/scope_spec.rb",
+     "spec/unit/mongoid/state_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb",
      "spec/unit/mongoid_spec.rb"
@@ -355,6 +357,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/memoization_spec.rb",
      "spec/unit/mongoid/named_scope_spec.rb",
      "spec/unit/mongoid/scope_spec.rb",
+     "spec/unit/mongoid/state_spec.rb",
      "spec/unit/mongoid/timestamps_spec.rb",
      "spec/unit/mongoid/versioning_spec.rb",
      "spec/unit/mongoid_spec.rb"
