@@ -166,6 +166,49 @@ describe Mongoid::Associations::HasMany do
 
   end
 
+  describe "#create!" do
+
+    context "when validations pass" do
+
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+        @address = mock(:parentize => true, :write_attributes => true, :errors => [])
+        Address.expects(:instantiate).returns(@address)
+        @address.expects(:run_callbacks).with(:before_create)
+        @address.expects(:run_callbacks).with(:after_create)
+      end
+
+      it "builds and saves a new object" do
+        @address.expects(:save).returns(true)
+        address = @association.create!({ :street => "Yet Another" })
+        address.should == @address
+      end
+    end
+
+    context "when validations fail" do
+
+      before do
+        @association = Mongoid::Associations::HasMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+        @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ])
+        Address.expects(:instantiate).returns(@address)
+        @address.expects(:run_callbacks).with(:before_create)
+      end
+
+      it "builds and saves a new object" do
+        @address.expects(:save).returns(false)
+        lambda {
+          @association.create!({ :street => "Yet Another" })
+        }.should raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
+
   describe "#concat" do
 
     before do
