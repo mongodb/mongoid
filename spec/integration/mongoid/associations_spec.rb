@@ -216,10 +216,33 @@ describe Mongoid::Associations do
 
         end
 
+        context "calling criteria methods" do
+
+          before do
+            @post.title = "New Title"
+            @post.save
+          end
+
+          it "returns the proper object for the criteria" do
+            posts = @from_db.posts.where(:title => "New Title")
+            posts.size.should == 1
+          end
+
+          context "when calling with a new criteria" do
+
+            before do
+              @from_db.posts.create(:title => "Other Title")
+            end
+
+            it "does not retain the old criteria" do
+              @from_db.posts.where(:title => "New Title").size.should == 1
+              @from_db.posts.size.should == 2
+              @from_db.posts.where(:title => "Other Title").size.should == 1
+            end
+          end
+        end
       end
-
     end
-
   end
 
   context "nested embedded associations" do
