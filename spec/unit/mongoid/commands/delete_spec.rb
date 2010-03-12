@@ -14,6 +14,12 @@ describe Mongoid::Commands::Delete do
       Mongoid::Commands::Delete.execute(@document)
     end
 
+    it "sets the destroyed flag to true" do
+      @collection.expects(:remove).with({ :_id => @document.id }).returns(true)
+      @document.expects(:destroyed=).with(true)
+      Mongoid::Commands::Delete.execute(@document)
+    end
+
     context "when the document is embedded" do
 
       before do
@@ -27,9 +33,6 @@ describe Mongoid::Commands::Delete do
         Mongoid::Commands::Delete.execute(@address)
         @parent.addresses.should be_empty
       end
-
     end
-
   end
-
 end

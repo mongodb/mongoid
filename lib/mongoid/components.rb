@@ -14,6 +14,7 @@ module Mongoid #:nodoc
         include Mongoid::Indexes
         include Mongoid::Matchers
         include Mongoid::Memoization
+        include Mongoid::State
         include Observable
         include Validatable
         extend Mongoid::Finders

@@ -471,45 +471,6 @@ describe Mongoid::Document do
 
   end
 
-  describe "#new_record?" do
-
-    context "when the object has been saved" do
-
-      before do
-        @person = Person.new(:_id => "1")
-      end
-
-      it "returns false" do
-        @person.new_record?.should be_false
-      end
-
-    end
-
-    context "when the object has not been saved" do
-
-      before do
-        @person = Person.new
-      end
-
-      it "returns true" do
-        @person.new_record?.should be_true
-      end
-
-    end
-
-  end
-
-  describe "#persisted?" do
-
-    before do
-      @person = Person.new
-    end
-
-    it "delegates to new_record?" do
-      @person.persisted?.should be_false
-    end
-  end
-
   describe "#_parent" do
 
     before do
@@ -600,9 +561,7 @@ describe Mongoid::Document do
         @person.remove(@name)
         @person.name.should be_nil
       end
-
     end
-
   end
 
   describe "#_root" do
@@ -620,7 +579,6 @@ describe Mongoid::Document do
       it "returns self" do
         @person._root.should == @person
       end
-
     end
 
     context "when document is embedded one level" do
@@ -628,7 +586,6 @@ describe Mongoid::Document do
       it "returns the parent" do
         @phone_number._root.should == @person
       end
-
     end
 
     context "when document is embedded multiple levels" do
@@ -636,9 +593,7 @@ describe Mongoid::Document do
       it "returns the top level parent" do
         @country_code._root.should == @person
       end
-
     end
-
   end
 
   describe ".store_in" do
