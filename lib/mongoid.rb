@@ -54,6 +54,7 @@ require "mongoid/config"
 require "mongoid/contexts"
 require "mongoid/criteria"
 require "mongoid/cursor"
+require "mongoid/deprecation"
 require "mongoid/extensions"
 require "mongoid/extras"
 require "mongoid/errors"
@@ -97,8 +98,18 @@ module Mongoid #:nodoc
     #
     # The Mongoid +Config+ singleton instance.
     def configure
-      config = Config.instance
+      config = Mongoid::Config.instance
       block_given? ? yield(config) : config
+    end
+
+    # Easy convenience method for having an alert generated from the
+    # deprecation module.
+    #
+    # Example:
+    #
+    # <tt>Mongoid.deprecate("Method no longer used")</tt>
+    def deprecate(message)
+      Mongoid::Deprecation.instance.alert(message)
     end
 
     alias :config :configure
@@ -110,7 +121,7 @@ module Mongoid #:nodoc
   # Example:
   #
   # <tt>Mongoid.database = Mongo::Connection.new.db("test")</tt>
-  Config.public_instance_methods(false).each do |name|
+  Mongoid::Config.public_instance_methods(false).each do |name|
     (class << self; self; end).class_eval <<-EOT
       def #{name}(*args)
         configure.send("#{name}", *args)

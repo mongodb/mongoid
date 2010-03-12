@@ -12,6 +12,23 @@ describe Mongoid::Fields do
 
   describe "#defaults" do
 
+    context "with defaults specified as a non-primitive" do
+      before do
+        Person.field(:hash_testing, :type => Hash, :default => {})
+        Person.field(:array_testing, :type => Array, :default => [])
+        @first_person = Person.new
+        @second_person = Person.new
+      end
+
+      it "should not return the same object when calling defaults with a default hash" do
+        @first_person.hash_testing.object_id.should_not == @second_person.hash_testing.object_id
+      end
+
+      it "should not return the same object when calling defaults with a default array" do
+        @first_person.array_testing.object_id.should_not == @second_person.array_testing.object_id
+      end
+    end
+
     context "on parent classes" do
 
       before do

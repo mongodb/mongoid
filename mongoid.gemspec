@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-03-09}
+  s.date = %q{2010-03-12}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -62,6 +62,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/criterion/inclusion.rb",
      "lib/mongoid/criterion/optional.rb",
      "lib/mongoid/cursor.rb",
+     "lib/mongoid/deprecation.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/errors.rb",
      "lib/mongoid/extensions.rb",
@@ -185,6 +186,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/inclusion_spec.rb",
      "spec/unit/mongoid/criterion/optional_spec.rb",
      "spec/unit/mongoid/cursor_spec.rb",
+     "spec/unit/mongoid/deprecation_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
@@ -309,6 +311,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/inclusion_spec.rb",
      "spec/unit/mongoid/criterion/optional_spec.rb",
      "spec/unit/mongoid/cursor_spec.rb",
+     "spec/unit/mongoid/deprecation_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",

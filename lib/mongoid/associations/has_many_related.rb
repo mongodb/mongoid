@@ -61,8 +61,25 @@ module Mongoid #:nodoc:
       def initialize(document, options, target = nil)
         @parent, @klass = document, options.klass
         @foreign_key = options.foreign_key
-        @target = target || @klass.all(:conditions => { @foreign_key => document.id })
+        @base = lambda { @klass.all(:conditions => { @foreign_key => document.id }) }
+        @target = target || @base.call
         extends(options)
+      end
+
+      # Override the default behavior to allow the criteria to get reset on
+      # each call into the association.
+      #
+      # Example:
+      #
+      #   person.posts.where(:title => "New")
+      #   person.posts # resets the criteria
+      #
+      # Returns:
+      #
+      # A Criteria object or Array.
+      def method_missing(name, *args, &block)
+        @target = @base.call unless @target.is_a?(Array)
+        @target.send(name, *args, &block)
       end
 
       # Delegates to <<

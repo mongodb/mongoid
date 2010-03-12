@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
       #
       # True if cached, false if not.
       def cached?
-        self.cached == true
+        !!self.cached
       end
 
       # Set whether or not this documents read operations should delegate to
@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
       #
       # True if enslaved, false if not.
       def enslaved?
-        self.enslaved == true
+        !!self.enslaved
       end
     end
   end
