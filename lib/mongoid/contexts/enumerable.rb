@@ -30,7 +30,8 @@ module Mongoid #:nodoc:
       #
       # A numeric value that is the average.
       def avg(field)
-        (total = sum(field)) ? (total.to_f / count) : nil
+        total = sum(field)
+        total ? (total.to_f / count) : nil
       end
 
       # Gets the number of documents in the array. Delegates to size.
