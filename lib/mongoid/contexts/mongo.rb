@@ -48,6 +48,16 @@ module Mongoid #:nodoc:
         @count ||= klass.collection.find(selector, process_options).count
       end
 
+      # Gets an array of distinct values for the supplied field across the
+      # entire collection or the susbset given the criteria.
+      #
+      # Example:
+      #
+      # <tt>context.distinct(:title)</tt>
+      def distinct(field)
+        klass.collection.distinct(field, selector)
+      end
+
       # Execute the context. This will take the selector and options
       # and pass them on to the Ruby driver's +find()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the

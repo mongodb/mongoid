@@ -39,6 +39,30 @@ describe Mongoid::Contexts::Enumerable do
 
   end
 
+  describe "#distinct" do
+
+    context "when the criteria is limited" do
+
+      it "returns an array of distinct values for the field" do
+        @context.distinct(:street).should == [ "Bourke Street" ]
+      end
+    end
+
+    context "when the criteria is not limited" do
+
+      before do
+        @criteria = Mongoid::Criteria.new(Address)
+        @criteria.documents = @docs
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
+
+      it "returns an array of distinct values for the field" do
+        @context.distinct(:street).should ==
+          [ "Bond Street", "Nan Jing Dong Lu", "Bourke Street", "Broadway" ]
+      end
+    end
+  end
+
   describe "#execute" do
 
     before do

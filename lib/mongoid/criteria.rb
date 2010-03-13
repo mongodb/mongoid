@@ -26,13 +26,13 @@ module Mongoid #:nodoc:
     include Enumerable
 
     attr_reader :collection, :ids, :klass, :options, :selector
-
     attr_accessor :documents
 
     delegate \
       :aggregate,
       :blank?,
       :count,
+      :distinct,
       :empty?,
       :execute,
       :first,

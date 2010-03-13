@@ -25,6 +25,16 @@ module Mongoid #:nodoc:
         @count ||= documents.size
       end
 
+      # Gets an array of distinct values for the supplied field across the
+      # entire array or the susbset given the criteria.
+      #
+      # Example:
+      #
+      # <tt>context.distinct(:title)</tt>
+      def distinct(field)
+        execute.collect { |doc| doc.send(field) }.uniq
+      end
+
       # Enumerable implementation of execute. Returns matching documents for
       # the selector, and adds options if supplied.
       #

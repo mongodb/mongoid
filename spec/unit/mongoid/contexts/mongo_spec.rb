@@ -102,6 +102,22 @@ describe Mongoid::Contexts::Mongo do
 
   end
 
+  describe "#distinct" do
+
+    before do
+      @criteria = Mongoid::Criteria.new(Person)
+      @criteria.where(:test => 'Testing')
+      @context = Mongoid::Contexts::Mongo.new(@criteria)
+      @collection = mock
+      Person.expects(:collection).returns(@collection)
+    end
+
+    it "returns delegates to distinct on the collection" do
+      @collection.expects(:distinct).with(:title, @criteria.selector).returns(["Sir"])
+      @context.distinct(:title).should == ["Sir"]
+    end
+  end
+
   describe "#execute" do
 
     let(:selector) { { :field => "value"  } }

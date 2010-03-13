@@ -23,7 +23,7 @@ watch("spec/.*/*_spec\.rb") do |match|
   spec(match[0])
 end
 
-watch('lib/(.*/.*)\.rb') do |match|
+watch("lib/(.*/.*)\.rb") do |match|
   p match[1]
   spec("spec/unit/#{match[1]}_spec.rb")
 end

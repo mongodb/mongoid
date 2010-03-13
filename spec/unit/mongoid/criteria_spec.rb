@@ -200,6 +200,19 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#distinct" do
+
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+    end
+
+    it "delegates to the context" do
+      @context.expects(:distinct).with(:title)
+      @criteria.distinct(:title)
+    end
+  end
+
   describe "#entries" do
 
     context "filtering" do
