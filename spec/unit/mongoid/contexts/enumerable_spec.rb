@@ -31,6 +31,13 @@ describe Mongoid::Contexts::Enumerable do
     end
   end
 
+  describe "#avg" do
+
+    it "returns the avg value for the supplied field" do
+      @context.avg(:number).should == 12.75
+    end
+  end
+
   describe "#count" do
 
     it "returns the size of the enumerable" do

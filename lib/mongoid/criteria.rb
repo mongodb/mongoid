@@ -30,6 +30,7 @@ module Mongoid #:nodoc:
 
     delegate \
       :aggregate,
+      :avg,
       :blank?,
       :count,
       :distinct,

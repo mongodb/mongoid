@@ -20,6 +20,19 @@ module Mongoid #:nodoc:
         counts
       end
 
+      # Get the average value for the supplied field.
+      #
+      # Example:
+      #
+      # <tt>context.avg(:age)</tt>
+      #
+      # Returns:
+      #
+      # A numeric value that is the average.
+      def avg(field)
+        (total = sum(field)) ? (total.to_f / count) : nil
+      end
+
       # Gets the number of documents in the array. Delegates to size.
       def count
         @count ||= documents.size

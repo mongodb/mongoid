@@ -23,6 +23,25 @@ module Mongoid #:nodoc:
         klass.collection.group(options[:fields], selector, { :count => 0 }, Javascript.aggregate, true)
       end
 
+      # Get the average value for the supplied field.
+      #
+      # This will take the internally built selector and options
+      # and pass them on to the Ruby driver's +group()+ method on the collection. The
+      # collection itself will be retrieved from the class provided, and once the
+      # query has returned it will provided a grouping of keys with averages.
+      #
+      # Example:
+      #
+      # <tt>context.avg(:age)</tt>
+      #
+      # Returns:
+      #
+      # A numeric value that is the average.
+      def avg(field)
+        total = sum(field)
+        total ? (total / count) : nil
+      end
+
       # Determine if the context is empty or blank given the criteria. Will
       # perform a quick has_one asking only for the id.
       #

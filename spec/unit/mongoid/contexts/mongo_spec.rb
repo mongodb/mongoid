@@ -22,9 +22,31 @@ describe Mongoid::Contexts::Mongo do
         @collection.expects(:group).with([:field1], {:_type => {'$in' => ['Doctor', 'Person']}}, {:count => 0}, @reduce, true)
         @context.aggregate
       end
+    end
+  end
 
+  describe "#avg" do
+
+    before do
+      @reduce = Mongoid::Javascript.sum.gsub("[field]", "age")
+      @collection = mock
+      Person.expects(:collection).twice.returns(@collection)
+      @criteria = Mongoid::Criteria.new(Person)
+      @context = Mongoid::Contexts::Mongo.new(@criteria)
     end
 
+    it "calls group on the collection with the aggregate js" do
+      @collection.expects(:group).with(
+        nil,
+        {:_type => {'$in' => ['Doctor', 'Person']}},
+        {:sum => "start"},
+        @reduce,
+        true
+      ).returns([{"sum" => 100.0}])
+      @cursor = mock(:count => 10)
+      @collection.expects(:find).returns(@cursor)
+      @context.avg(:age).should == 10
+    end
   end
 
   describe "blank?" do
@@ -339,7 +361,10 @@ describe Mongoid::Contexts::Mongo do
         @criteria = Mongoid::Criteria.new(Person)
         @criteria.order_by([[:title, :asc]])
         @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with({:_type => {'$in' => ['Doctor', 'Person']}}, { :sort => [[:title, :desc]] }).returns(
+        @collection.expects(:find_one).with(
+          {:_type => {'$in' => ['Doctor', 'Person']}},
+          { :sort => [[:title, :desc]] }
+        ).returns(
           { "title" => "Sir", "_type" => "Person" }
         )
       end
@@ -356,7 +381,10 @@ describe Mongoid::Contexts::Mongo do
         @criteria = Mongoid::Criteria.new(Person)
         @criteria.order_by([[:_id, :asc]])
         @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with({:_type => {'$in' => ['Doctor', 'Person']}}, { :sort => [[:_id, :desc]] }).returns(nil)
+        @collection.expects(:find_one).with(
+          {:_type => {'$in' => ['Doctor', 'Person']}},
+          { :sort => [[:_id, :desc]] }
+        ).returns(nil)
       end
 
       it "returns nil" do
@@ -371,7 +399,10 @@ describe Mongoid::Contexts::Mongo do
         @criteria = Mongoid::Criteria.new(Person)
         @criteria.order_by([[:_id, :asc]])
         @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with({:_type => {'$in' => ['Doctor', 'Person']}}, { :sort => [[:_id, :desc]] }).returns(
+        @collection.expects(:find_one).with(
+          {:_type => {'$in' => ['Doctor', 'Person']}},
+          { :sort => [[:_id, :desc]] }
+        ).returns(
           { "title" => "Sir", "_type" => "Person" }
         )
       end
