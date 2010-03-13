@@ -116,8 +116,7 @@ module Mongoid #:nodoc:
           options[:fields],
           selector,
           { :group => [] },
-          Javascript.group,
-          true
+          Javascript.group
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
             Mongoid::Factory.build(klass, attrs)
@@ -251,8 +250,7 @@ module Mongoid #:nodoc:
           nil,
           selector,
           { start => "start" },
-          reduce.gsub("[field]", field),
-          true
+          reduce.gsub("[field]", field)
         )
         collection.empty? ? nil : collection.first[start.to_s]
       end
