@@ -49,6 +49,16 @@ describe Mongoid::Associations do
 
   end
 
+  context "creation of an embedded association on a callback" do
+
+    it "allows the use of create!" do
+      artist = Artist.create!(:name => "Depeche Mode")
+      artist.songs.size.should == 2
+      artist.songs.first.title.should == "0"
+      artist.songs.last.title.should == "1"
+    end
+  end
+
   context "criteria on has many embedded associations" do
 
     before do

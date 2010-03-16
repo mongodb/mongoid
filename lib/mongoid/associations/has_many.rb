@@ -8,11 +8,11 @@ module Mongoid #:nodoc:
 
       # Appends the object to the +Array+, setting its parent in
       # the process.
-      def <<(*objects)
-        objects.flatten.each do |object|
-          object.parentize(@parent, @association_name)
-          @target << object
-          object.notify
+      def <<(*documents)
+        documents.flatten.each do |doc|
+          doc.parentize(@parent, @association_name)
+          @target << doc
+          doc.notify
         end
       end
 
@@ -22,9 +22,9 @@ module Mongoid #:nodoc:
       # Clears the association, and notifies the parents of the removal.
       def clear
         unless @target.empty?
-          object = @target.first
-          object.changed(true)
-          object.notify_observers(object, true)
+          document = @target.first
+          document.changed(true)
+          document.notify_observers(document, true)
           @target.clear
         end
       end
@@ -37,11 +37,11 @@ module Mongoid #:nodoc:
       #
       # The newly created Document.
       def build(attrs = {}, type = nil)
-        object = type ? type.instantiate : @klass.instantiate
-        object.parentize(@parent, @association_name)
-        object.write_attributes(attrs)
-        @target << object
-        object
+        document = type ? type.instantiate : @klass.instantiate
+        document.parentize(@parent, @association_name)
+        document.write_attributes(attrs)
+        @target << document
+        document
       end
 
       # Creates a new Document and adds it to the association collection. The
@@ -51,10 +51,26 @@ module Mongoid #:nodoc:
       #
       # Returns:
       #
-      # Rhe newly created Document.
+      # The newly created Document.
       def create(attrs = {}, type = nil)
         object = build(attrs, type)
         object.run_callbacks(:create) { object.save }; object
+      end
+
+      # Creates a new Document and adds it to the association collection. The
+      # document created will be of the same class as the others in the
+      # association, and the attributes will be passed into the constructor and
+      # the new object will then be saved. If validation fails an error will
+      # get raised.
+      #
+      # Returns:
+      #
+      # The newly created Document.
+      def create!(attrs = {}, type = nil)
+        document = create(attrs, type)
+        errors = document.errors
+        raise Errors::Validations.new(errors) unless errors.empty?
+        document
       end
 
       # Finds a document in this association.
@@ -173,7 +189,6 @@ module Mongoid #:nodoc:
           instantiate(parent, options)
         end
       end
-
     end
   end
 end

@@ -120,6 +120,19 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#avg" do
+
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+    end
+
+    it "delegates to the context" do
+      @context.expects(:avg).with(:age)
+      @criteria.avg(:age)
+    end
+  end
+
   describe "#blank?" do
 
     before do
@@ -198,6 +211,19 @@ describe Mongoid::Criteria do
 
     end
 
+  end
+
+  describe "#distinct" do
+
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+    end
+
+    it "delegates to the context" do
+      @context.expects(:distinct).with(:title)
+      @criteria.distinct(:title)
+    end
   end
 
   describe "#entries" do

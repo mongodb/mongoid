@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
       #
       # doc: A new +Document+ that is going to be deleted.
       def self.execute(doc)
-        delete(doc)
+        doc.destroyed = true if delete(doc)
       end
     end
   end

@@ -10,6 +10,27 @@ describe Mongoid::Criteria do
     Person.delete_all
   end
 
+  describe "#avg" do
+
+    context "without results" do
+      it "should return nil" do
+        Person.avg(:age).should == nil
+      end
+    end
+
+    context "with results" do
+      before do
+        10.times do |n|
+          Person.create(:title => "Sir", :age => ((n + 1) * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+        end
+      end
+
+      it "provides min for the field provided" do
+        Person.avg(:age).should == 55
+      end
+    end
+  end
+
   describe "#excludes" do
 
     before do

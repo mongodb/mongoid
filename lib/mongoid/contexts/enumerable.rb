@@ -20,9 +20,33 @@ module Mongoid #:nodoc:
         counts
       end
 
+      # Get the average value for the supplied field.
+      #
+      # Example:
+      #
+      # <tt>context.avg(:age)</tt>
+      #
+      # Returns:
+      #
+      # A numeric value that is the average.
+      def avg(field)
+        total = sum(field)
+        total ? (total.to_f / count) : nil
+      end
+
       # Gets the number of documents in the array. Delegates to size.
       def count
         @count ||= documents.size
+      end
+
+      # Gets an array of distinct values for the supplied field across the
+      # entire array or the susbset given the criteria.
+      #
+      # Example:
+      #
+      # <tt>context.distinct(:title)</tt>
+      def distinct(field)
+        execute.collect { |doc| doc.send(field) }.uniq
       end
 
       # Enumerable implementation of execute. Returns matching documents for
