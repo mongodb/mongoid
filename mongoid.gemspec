@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "1.2.13"
+  s.version = "1.2.14"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-03-12}
+  s.date = %q{2010-03-17}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -85,6 +85,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/integer/conversions.rb",
      "lib/mongoid/extensions/nil/assimilation.rb",
      "lib/mongoid/extensions/object/conversions.rb",
+     "lib/mongoid/extensions/objectid/conversions.rb",
      "lib/mongoid/extensions/proc/scoping.rb",
      "lib/mongoid/extensions/string/conversions.rb",
      "lib/mongoid/extensions/string/inflections.rb",
@@ -369,14 +370,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<activesupport>, ["<= 2.3.5"])
-      s.add_runtime_dependency(%q<mongo>, [">= 0.18.3"])
+      s.add_runtime_dependency(%q<mongo>, [">= 0.19.1"])
       s.add_runtime_dependency(%q<durran-validatable>, [">= 2.0.1"])
       s.add_runtime_dependency(%q<will_paginate>, ["< 2.9"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
       s.add_dependency(%q<activesupport>, ["<= 2.3.5"])
-      s.add_dependency(%q<mongo>, [">= 0.18.3"])
+      s.add_dependency(%q<mongo>, [">= 0.19.1"])
       s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
       s.add_dependency(%q<will_paginate>, ["< 2.9"])
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
@@ -384,7 +385,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<activesupport>, ["<= 2.3.5"])
-    s.add_dependency(%q<mongo>, [">= 0.18.3"])
+    s.add_dependency(%q<mongo>, [">= 0.19.1"])
     s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
     s.add_dependency(%q<will_paginate>, ["< 2.9"])
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
