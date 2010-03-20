@@ -177,13 +177,12 @@ module Mongoid #:nodoc:
         "#<#{self.class.name} _id: #{id}, #{attrs}>"
       end
 
-      # Set the changed state of the +Document+ then notify observers that it has changed.
+      # Notify observers of an update.
       #
       # Example:
       #
       # <tt>person.notify</tt>
       def notify
-        changed(true)
         notify_observers(self)
       end
 
