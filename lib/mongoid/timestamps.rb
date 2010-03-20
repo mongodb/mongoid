@@ -1,14 +1,11 @@
 # encoding: utf-8
-module Mongoid
+module Mongoid #:nodoc:
   module Timestamps
-
-    def self.included(base)
-      base.class_eval do
-        include InstanceMethods
-        field :created_at, :type => Time
-        field :updated_at, :type => Time
-        before_save :set_created_at, :set_updated_at
-      end
+    extend ActiveSupport::Concern
+    included do
+      field :created_at, :type => Time
+      field :updated_at, :type => Time
+      before_save :set_created_at, :set_updated_at
     end
 
     module InstanceMethods

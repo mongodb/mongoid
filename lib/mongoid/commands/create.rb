@@ -11,10 +11,8 @@ module Mongoid #:nodoc:
       #
       # Returns: +Document+.
       def self.execute(doc, validate = true)
-        doc.run_callbacks :before_create
-        Save.execute(doc, validate)
-        doc.run_callbacks :after_create
-        return doc
+        doc.run_callbacks(:create) { Save.execute(doc, validate) }
+        doc
       end
     end
   end

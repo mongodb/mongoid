@@ -8,8 +8,8 @@ require 'rubygems'
 
 gem "mocha", ">= 0.9.8"
 
-require "mocha"
 require "mongoid"
+require "mocha"
 require "spec"
 
 Mongoid.configure do |config|

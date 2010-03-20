@@ -1,23 +1,20 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Document
-    def self.included(base)
-      base.class_eval do
-        include Components
-        include InstanceMethods
-        extend ClassMethods
+    extend ActiveSupport::Concern
+    included do
+      include Mongoid::Components
 
-        cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :hereditary
+      cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :hereditary
 
-        self.embedded = false
-        self.hereditary = false
-        self.collection_name = self.name.collectionize
+      self.embedded = false
+      self.hereditary = false
+      self.collection_name = self.name.collectionize
 
-        attr_accessor :association_name, :_parent
-        attr_reader :new_record
+      attr_accessor :association_name, :_parent
+      attr_reader :new_record
 
-        delegate :collection, :db, :embedded, :primary_key, :to => "self.class"
-      end
+      delegate :collection, :db, :embedded, :primary_key, :to => "self.class"
     end
 
     module ClassMethods
@@ -41,15 +38,6 @@ module Mongoid #:nodoc:
       def inherited(subclass)
         super(subclass)
         self.hereditary = true
-      end
-
-      # Returns a human readable version of the class.
-      #
-      # Example:
-      #
-      # <tt>MixedDrink.human_name # returns "Mixed Drink"</tt>
-      def human_name
-        name.labelize
       end
 
       # Instantiate a new object, only when loaded from the database or when
@@ -97,9 +85,23 @@ module Mongoid #:nodoc:
 
       # Returns all types to query for when using this class as the base.
       def _types
-        @_type ||= (self.subclasses + [ self.name ])
+        @_type ||= (subclasses_of(self).map { |o| o.to_s } + [ self.name ])
       end
 
+      # return the list of subclassses for an object
+      def subclasses_of(*superclasses) #:nodoc:
+        subclasses = []
+
+        superclasses.each do |sup|
+          ObjectSpace.each_object(class << sup; self; end) do |k|
+            if k != sup && (k.name.blank? || eval("defined?(::#{k}) && ::#{k}.object_id == k.object_id"))
+              subclasses << k
+            end
+          end
+        end
+
+        subclasses
+      end
     end
 
     module InstanceMethods
@@ -244,6 +246,30 @@ module Mongoid #:nodoc:
       # <tt>person.to_json</tt>
       def to_json(options = nil)
         attributes.to_json(options)
+      end
+
+      # Return an object to be encoded into a JSON string.
+      # Used by Rails 3's object->JSON chain to create JSON
+      # in a backend-agnostic way
+      #
+      # Example:
+      #
+      # <tt>person.as_json</tt>
+      def as_json(options = nil)
+        attributes
+      end
+
+      # Return this document as an object to be encoded as JSON,
+      # with any particular items modified on a per-encoder basis.
+      # Nothing special is required here since Mongoid bubbles up
+      # all the child associations to the parent attribute +Hash+
+      # using observers throughout the +Document+ lifecycle.
+      #
+      # Example:
+      #
+      # <tt>person.encode_json(encoder)</tt>
+      def encode_json(encoder)
+        attributes
       end
 
       # Returns the id of the Document, used in Rails compatibility.

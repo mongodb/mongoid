@@ -4,13 +4,7 @@ module Mongoid #:nodoc:
     module Object #:nodoc:
       # This module converts objects into mongoid related objects.
       module Conversions #:nodoc:
-        def self.included(base)
-          base.class_eval do
-            include InstanceMethods
-            extend ClassMethods
-          end
-        end
-
+        extend ActiveSupport::Concern
         module InstanceMethods
           # Converts this object to a hash of attributes
           def mongoidize

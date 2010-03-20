@@ -53,10 +53,8 @@ module Mongoid #:nodoc:
       #
       # The newly created Document.
       def create(attrs = {}, type = nil)
-        document = build(attrs, type)
-        document.run_callbacks(:before_create)
-        document.run_callbacks(:after_create) if document.save
-        document
+        object = build(attrs, type)
+        object.run_callbacks(:create) { object.save }; object
       end
 
       # Creates a new Document and adds it to the association collection. The

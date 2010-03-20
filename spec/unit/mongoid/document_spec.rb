@@ -296,7 +296,7 @@ describe Mongoid::Document do
   describe ".human_name" do
 
     it "returns the class name underscored and humanized" do
-      MixedDrink.human_name.should == "Mixed drink"
+      MixedDrink.model_name.human.should == "Mixed drink"
     end
 
   end
@@ -664,124 +664,6 @@ describe Mongoid::Document do
 
   context "validations" do
 
-    context "when defining using macros" do
-
-      after do
-        Person.validations.clear
-      end
-
-      describe "#validates_acceptance_of" do
-
-        it "adds the acceptance validation" do
-          Person.class_eval do
-            validates_acceptance_of :terms
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesAcceptanceOf)
-        end
-
-      end
-
-      describe "#validates_associated" do
-
-        it "adds the associated validation" do
-          Person.class_eval do
-            validates_associated :name
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesAssociated)
-        end
-
-      end
-
-      describe "#validates_format_of" do
-
-        it "adds the format validation" do
-          Person.class_eval do
-            validates_format_of :title, :with => /[A-Za-z]/
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesFormatOf)
-        end
-
-      end
-
-      describe "#validates_length_of" do
-
-        it "adds the length validation" do
-          Person.class_eval do
-            validates_length_of :title, :minimum => 10
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesLengthOf)
-        end
-
-      end
-
-      describe "#validates_numericality_of" do
-
-        it "adds the numericality validation" do
-          Person.class_eval do
-            validates_numericality_of :age
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesNumericalityOf)
-        end
-
-      end
-
-      describe "#validates_presence_of" do
-
-        it "adds the presence validation" do
-          Person.class_eval do
-            validates_presence_of :title
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesPresenceOf)
-        end
-
-      end
-
-      describe "#validates_uniqueness_of" do
-
-        it "adds the uniqueness validation" do
-          Person.class_eval do
-            validates_uniqueness_of :title
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesUniquenessOf)
-        end
-
-      end
-
-      describe "#validates_inclusion_of" do
-
-        it "adds the inclusion validation" do
-          Person.class_eval do
-            validates_inclusion_of :title, :within => ["test"]
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesInclusionOf)
-        end
-
-      end
-
-      describe "#validates_exclusion_of" do
-
-        it "adds the exclusion validation" do
-          Person.class_eval do
-            validates_exclusion_of :title, :within => ["test"]
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesExclusionOf)
-        end
-
-      end
-
-      describe "#validates_true_for" do
-
-        it "adds the true validation" do
-          Person.class_eval do
-            validates_true_for :title, :logic => lambda { title == "Esquire" }
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesTrueFor)
-        end
-
-      end
-
-    end
-
     context "when running validations" do
 
       before do
@@ -790,20 +672,14 @@ describe Mongoid::Document do
         @firefox = Firefox.new
       end
 
-      after do
-        Person.validations.clear
-        Canvas.validations.clear
-        Firefox.validations.clear
-      end
-
       describe "#validates_acceptance_of" do
 
         it "fails if field not accepted" do
           Person.class_eval do
-            validates_acceptance_of :terms
+            validates_acceptance_of :terms, :allow_nil => false
           end
           @person.valid?.should be_false
-          @person.errors.on(:terms).should_not be_nil
+          @person.errors[:terms].should_not be_nil
         end
 
       end
@@ -821,7 +697,7 @@ describe Mongoid::Document do
             end
             @person.addresses << Address.new
             @person.valid?.should be_false
-            @person.errors.on(:addresses).should_not be_nil
+            @person.errors[:addresses].should_not be_nil
           end
 
         end
@@ -839,7 +715,7 @@ describe Mongoid::Document do
               end
               @person.name = Name.new
               @person.valid?.should be_false
-              @person.errors.on(:name).should_not be_nil
+              @person.errors[:name].should_not be_nil
             end
 
           end
@@ -850,7 +726,8 @@ describe Mongoid::Document do
               Person.class_eval do
                 validates_associated :name
               end
-              @person.valid?.should be_true
+              @person.valid?
+              @person.errors[:name].should be_empty
             end
 
           end
@@ -867,7 +744,7 @@ describe Mongoid::Document do
           end
           @person.title = 10
           @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
+          @person.errors[:title].should_not be_nil
         end
 
       end
@@ -880,7 +757,7 @@ describe Mongoid::Document do
           end
           @person.title = "Testing"
           @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
+          @person.errors[:title].should_not be_nil
         end
 
       end
@@ -893,7 +770,7 @@ describe Mongoid::Document do
           end
           @person.age = "foo"
           @person.valid?.should be_false
-          @person.errors.on(:age).should_not be_nil
+          @person.errors[:age].should_not be_nil
         end
 
       end
@@ -907,7 +784,7 @@ describe Mongoid::Document do
               validates_presence_of :title
             end
             @person.valid?.should be_false
-            @person.errors.on(:title).should_not be_nil
+            @person.errors[:title].should_not be_nil
           end
 
           it "fails if the field is nil on a subclass" do
@@ -915,7 +792,7 @@ describe Mongoid::Document do
               validates_presence_of :name
             end
             @firefox.valid?.should be_false
-            @firefox.errors.on(:name).should_not be_nil
+            @firefox.errors[:name].should_not be_nil
           end
 
         end
@@ -924,23 +801,12 @@ describe Mongoid::Document do
 
           it "parent class does not get subclass validations" do
             Firefox.class_eval do
-              validates_presence_of :name
+              validates_presence_of :version
             end
+            @canvas.name = "Testing"
             @canvas.valid?.should be_true
           end
 
-        end
-
-      end
-
-      describe "#validates_true_for" do
-
-        it "fails if the logic returns false" do
-          Person.class_eval do
-            validates_true_for :title, :logic => lambda { title == "Esquire" }
-          end
-          @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
         end
 
       end

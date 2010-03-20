@@ -45,7 +45,7 @@ describe Mongoid::Commands do
         end
 
         it "should run callback before_create and no after_create" do
-          @person.expects(:run_callbacks).with(:before_create)
+          @person.expects(:run_callbacks).with(:create).yields
           Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
           @person.expects(:run_callbacks).with(:after_create).never
           @person.save.should be_false
@@ -59,9 +59,8 @@ describe Mongoid::Commands do
       end
 
       it "runs the before and after create callbacks" do
-        @person.expects(:run_callbacks).with(:before_create)
+        @person.expects(:run_callbacks).with(:create).yields
         Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
-        @person.expects(:run_callbacks).with(:after_create)
         @person.save
       end
 
@@ -136,9 +135,8 @@ describe Mongoid::Commands do
       end
 
       it "runs the before and after create callbacks" do
-        @person.expects(:run_callbacks).with(:before_create)
+        @person.expects(:run_callbacks).with(:create).yields.returns(true)
         Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
-        @person.expects(:run_callbacks).with(:after_create)
         @person.save!
       end
 
@@ -154,9 +152,8 @@ describe Mongoid::Commands do
     end
 
     it "executes the before and after update callbacks" do
-      @person.expects(:run_callbacks).with(:before_update)
+      @person.expects(:run_callbacks).with(:update).yields.returns(true)
       Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(true)
-      @person.expects(:run_callbacks).with(:after_update)
       @person.update_attributes({})
     end
 
@@ -264,9 +261,7 @@ describe Mongoid::Commands do
     end
 
     it "runs the validation callbacks" do
-      @comment.expects(:run_callbacks).with(:validate)
-      @comment.expects(:run_callbacks).with(:before_validation)
-      @comment.expects(:run_callbacks).with(:after_validation)
+      @comment.expects(:_run_validate_callbacks)
       @comment.valid?
     end
 

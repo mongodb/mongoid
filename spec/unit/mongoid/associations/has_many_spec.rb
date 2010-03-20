@@ -131,8 +131,7 @@ describe Mongoid::Associations::HasMany do
         )
         @address = mock(:parentize => true, :write_attributes => true)
         Address.expects(:instantiate).returns(@address)
-        @address.expects(:run_callbacks).with(:before_create)
-        @address.expects(:run_callbacks).with(:after_create)
+        @address.expects(:run_callbacks).with(:create).yields
       end
 
       it "builds and saves a new object" do
@@ -152,8 +151,7 @@ describe Mongoid::Associations::HasMany do
         )
         @circle = mock(:parentize => true, :write_attributes => true)
         Circle.expects(:instantiate).returns(@circle)
-        @circle.expects(:run_callbacks).with(:before_create)
-        @circle.expects(:run_callbacks).with(:after_create)
+        @circle.expects(:run_callbacks).with(:create).yields
       end
 
       it "instantiates a class of that type" do
@@ -177,8 +175,7 @@ describe Mongoid::Associations::HasMany do
         )
         @address = mock(:parentize => true, :write_attributes => true, :errors => [])
         Address.expects(:instantiate).returns(@address)
-        @address.expects(:run_callbacks).with(:before_create)
-        @address.expects(:run_callbacks).with(:after_create)
+        @address.expects(:run_callbacks).with(:create).yields
       end
 
       it "builds and saves a new object" do
@@ -197,7 +194,7 @@ describe Mongoid::Associations::HasMany do
         )
         @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ])
         Address.expects(:instantiate).returns(@address)
-        @address.expects(:run_callbacks).with(:before_create)
+        @address.expects(:run_callbacks).with(:create).yields
       end
 
       it "builds and saves a new object" do

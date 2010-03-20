@@ -11,15 +11,11 @@ require "mongoid/associations/meta_data"
 
 module Mongoid # :nodoc:
   module Associations #:nodoc:
-    def self.included(base)
-      base.class_eval do
-        # Associations need to inherit down the chain.
-        class_inheritable_accessor :associations
-        self.associations = {}
-
-        include InstanceMethods
-        extend ClassMethods
-      end
+    extend ActiveSupport::Concern
+    included do
+      # Associations need to inherit down the chain.
+      class_inheritable_accessor :associations
+      self.associations = {}
     end
 
     module InstanceMethods
@@ -249,9 +245,7 @@ module Mongoid # :nodoc:
         name = options.name.to_s
         define_method("create_#{name}") do |attrs|
           document = send("build_#{name}", attrs)
-          document.run_callbacks(:before_create)
-          document.save
-          document.run_callbacks(:after_create); document
+          document.run_callbacks(:create) { document.save }; document
         end
       end
 

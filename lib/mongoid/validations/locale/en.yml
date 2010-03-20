@@ -1,0 +1,4 @@
+en:
+  errors:
+    messages:
+      taken: "is already taken"

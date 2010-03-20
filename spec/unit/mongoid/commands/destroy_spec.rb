@@ -13,17 +13,18 @@ describe Mongoid::Commands::Destroy do
     end
 
     it "runs the before and after destroy callbacks" do
-      @document.expects(:run_callbacks).with(:before_destroy)
-      @document.expects(:run_callbacks).with(:after_destroy)
+      @document.expects(:run_callbacks).with(:destroy)
       Mongoid::Commands::Destroy.execute(@document)
     end
 
     it "removes the document from its collection" do
+      @document.expects(:run_callbacks).yields
       @collection.expects(:remove).with({ :_id => @document.id })
       Mongoid::Commands::Destroy.execute(@document)
     end
 
     it "sets the destroy flag on the document" do
+      @document.expects(:run_callbacks).with(:destroy).yields
       @collection.expects(:remove).with({ :_id => @document.id }).returns(true)
       @document.expects(:destroyed=).with(true)
       Mongoid::Commands::Destroy.execute(@document)

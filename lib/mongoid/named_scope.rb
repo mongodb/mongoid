@@ -27,6 +27,8 @@ module Mongoid #:nodoc:
         end
       EOT
     end
+    
+    alias :scope :named_scope 
 
     alias :scope :named_scope
 

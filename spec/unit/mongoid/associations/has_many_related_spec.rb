@@ -199,16 +199,14 @@ describe Mongoid::Associations::HasManyRelated do
     end
 
     it "builds and saves the new object" do
-      @post.expects(:run_callbacks).with(:before_create)
+      @post.expects(:run_callbacks).with(:create).yields
       @post.expects(:save).returns(true)
-      @post.expects(:run_callbacks).with(:after_create)
       @association.create(:title => "Sassy")
     end
 
     it "returns the new object" do
-      @post.expects(:run_callbacks).with(:before_create)
+      @post.expects(:run_callbacks).with(:create).yields
       @post.expects(:save).returns(true)
-      @post.expects(:run_callbacks).with(:after_create)
       @association.create(:title => "Sassy").should == @post
     end
 

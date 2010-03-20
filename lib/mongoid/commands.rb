@@ -12,13 +12,7 @@ module Mongoid #:nodoc:
   # This module is included in the +Document+ to provide all the persistence
   # methods required on the +Document+ object and class.
   module Commands
-    def self.included(base)
-      base.class_eval do
-        include InstanceMethods
-        extend ClassMethods
-      end
-    end
-
+    extend ActiveSupport::Concern
     module InstanceMethods
 
       # Delete the +Document+ from the database. This method is an optimized
@@ -60,11 +54,8 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes, false if not.
       def save(validate = true)
-        new = new_record?
-        run_callbacks(:before_create) if new
-        saved = Save.execute(self, validate)
-        run_callbacks(:after_create) if new && saved
-        saved
+        save = lambda { Save.execute(self, validate) }
+        new_record? ? run_callbacks(:create, &save) : save.call
       end
 
       # Save the +Document+, dangerously. Before and after save callbacks will
@@ -76,7 +67,7 @@ module Mongoid #:nodoc:
       #
       # Returns: true if validation passes
       def save!
-        return save(true) || (raise Errors::Validations.new(self.errors))
+        save(true) || (raise Errors::Validations.new(self.errors))
       end
 
       # Update the document attributes and persist the document to the
@@ -101,9 +92,7 @@ module Mongoid #:nodoc:
 
       protected
       def set_attributes(attrs = {})
-        run_callbacks(:before_update)
-        write_attributes(attrs)
-        run_callbacks(:after_update)
+        run_callbacks(:update) { write_attributes(attrs) }
       end
 
     end
@@ -167,8 +156,6 @@ module Mongoid #:nodoc:
       def destroy_all(conditions = {})
         DestroyAll.execute(self, conditions)
       end
-
     end
-
   end
 end

@@ -1,13 +1,10 @@
 # encoding: utf-8
 module Mongoid #:nodoc
   module Indexes #:nodoc
-    def self.included(base)
-      base.class_eval do
-        extend ClassMethods
-
-        cattr_accessor :indexed
-        self.indexed = false
-      end
+    extend ActiveSupport::Concern
+    included do
+      cattr_accessor :indexed
+      self.indexed = false
     end
 
     module ClassMethods #:nodoc

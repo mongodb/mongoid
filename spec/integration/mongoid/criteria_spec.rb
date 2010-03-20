@@ -80,7 +80,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the correct document" do
-        from_db = Person.criteria.in(:title => [ true, false, nil ]).first
+        from_db = Person.any_in(:title => [ true, false, nil ]).first
         from_db.should == @person
       end
     end

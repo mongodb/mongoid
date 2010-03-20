@@ -1,12 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Attributes
-    def self.included(base)
-      base.class_eval do
-        include InstanceMethods
-        extend ClassMethods
-      end
-    end
+    extend ActiveSupport::Concern
     module InstanceMethods
       # Get the id associated with this object. This will pull the _id value out
       # of the attributes +Hash+.
@@ -129,10 +124,10 @@ module Mongoid #:nodoc:
         identify if id.blank?
         notify
       end
-      alias :attributes= write_attributes
+      alias :attributes= :write_attributes
 
       protected
-      # Return true is dynamic field setting is enabled.
+      # Return true if dynamic field setting is enabled.
       def set_allowed?(key)
         Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
       end
