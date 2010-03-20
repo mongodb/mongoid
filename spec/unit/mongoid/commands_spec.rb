@@ -45,7 +45,7 @@ describe Mongoid::Commands do
         end
 
         it "should run callback before_create and no after_create" do
-          @person.expects(:run_callbacks).with(:create).yields
+          @person.expects(:run_callbacks).with(:create).yields.returns(false)
           Mongoid::Commands::Save.expects(:execute).with(@person, true).returns(false)
           @person.expects(:run_callbacks).with(:after_create).never
           @person.save.should be_false
