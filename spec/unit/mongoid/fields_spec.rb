@@ -63,26 +63,6 @@ describe Mongoid::Fields do
 
   describe ".field" do
 
-    context "when accessors are already defined" do
-
-      before do
-        @person = Person.new
-      end
-
-      it "does not override the reader" do
-        @person.testy.should == "Testy"
-      end
-
-      it "does not override the writer" do
-        @person.testy = "blah"
-        @person.read_attribute("testy").should be_nil
-      end
-
-      it "does not override the existance check" do
-        @person.should be_testy
-      end
-    end
-
     context "with no options" do
 
       before do
