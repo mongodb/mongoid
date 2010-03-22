@@ -2,6 +2,17 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  def testy
+    "Testy"
+  end
+
+  def testy=(value)
+  end
+
+  def testy?
+    true
+  end
+
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
@@ -16,6 +27,7 @@ class Person
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :ssn
   field :owner_id, :accessible => false, :type => Integer
+  field :testy
 
   index :age
   index :addresses

@@ -48,14 +48,15 @@ module Mongoid #:nodoc
 
       # Create the field accessors.
       def create_accessors(name, meth, options = {})
-        define_method(meth) { read_attribute(name) }
-        define_method("#{meth}=") { |value| write_attribute(name, value) }
+        define_method(meth) { read_attribute(name) } unless method_defined?(meth)
+        define_method("#{meth}=") do |value|
+          write_attribute(name, value)
+        end unless method_defined?("#{meth}=")
         define_method("#{meth}?") do
           attr = read_attribute(name)
           (options[:type] == Boolean) ? attr == true : attr.present?
-        end
+        end unless method_defined?("#{meth}?")
       end
-
     end
   end
 end
