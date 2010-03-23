@@ -14,13 +14,18 @@ module Mongoid #:nodoc:
       #
       # <tt>address.path # returns "addresses"</tt>
       def path
-        return route if route
+        self.route ||= generate
+      end
+
+      protected
+      # If the path has not been set, then we need to generate it once.
+      def generate
         object, json = self, ""
         while (object._parent) do
           json = "#{object.association_name}#{"." + json unless json.blank?}"
           object = object._parent
         end
-        self.route ||= json
+        json
       end
     end
   end
