@@ -15,7 +15,7 @@ module Mongoid #:nodoc
       include Mongoid::Matchers
       include Mongoid::Memoization
       include Mongoid::Observable
-      include Mongoid::Path
+      include Mongoid::Paths
       include Mongoid::State
       include Validatable
       extend Mongoid::Finders
