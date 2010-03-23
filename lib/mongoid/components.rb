@@ -21,7 +21,6 @@ module Mongoid #:nodoc
       include Mongoid::Path
       include Mongoid::State
       include Mongoid::Validations
-      include Observable
       extend ActiveModel::Translation
       extend Mongoid::Finders
       extend Mongoid::NamedScope
