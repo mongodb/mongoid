@@ -1,15 +1,12 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Extras #:nodoc:
-    def self.included(base)
-      base.class_eval do
-        extend ClassMethods
-        class_inheritable_accessor :cached, :enslaved
-        self.cached = false
-        self.enslaved = false
-
-        delegate :cached?, :enslaved?, :to => "self.class"
-      end
+    extend ActiveSupport::Concern
+    included do
+      class_inheritable_accessor :cached, :enslaved
+      self.cached = false
+      self.enslaved = false
+      delegate :cached?, :enslaved?, :to => "self.class"
     end
 
     module ClassMethods #:nodoc
