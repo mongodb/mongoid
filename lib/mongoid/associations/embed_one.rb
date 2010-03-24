@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasOne #:nodoc:
+    class EmbedOne #:nodoc:
       include Proxy
 
       # Build a new object for the association.
@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
       end
 
       class << self
-        # Preferred method of instantiating a new +HasOne+, since nil values
+        # Preferred method of instantiating a new +EmbedOne+, since nil values
         # will be handled properly.
         #
         # Options:
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
         #
         # Returns:
         #
-        # A new +HasOne+ association proxy.
+        # A new +EmbedOne+ association proxy.
         def instantiate(document, options)
           attributes = document.raw_attributes[options.name]
           return nil if attributes.blank?
@@ -65,7 +65,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :has_one
+          :embed_one
         end
 
         # Perform an update of the relationship of the parent and child. This
@@ -79,11 +79,11 @@ module Mongoid #:nodoc:
         #
         # Example:
         #
-        # <tt>HasOne.update({:first_name => "Hank"}, person, options)</tt>
+        # <tt>EmbedOne.update({:first_name => "Hank"}, person, options)</tt>
         #
         # Returns:
         #
-        # A new +HasOne+ association proxy.
+        # A new +EmbedOne+ association proxy.
         def update(child, parent, options)
           child.assimilate(parent, options)
           instantiate(parent, options)

@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class BelongsTo #:nodoc:
+    class EmbeddedIn #:nodoc:
       include Proxy
 
       # Creates the new association by setting the internal
@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :belongs_to
+          :embedded_in
         end
 
         # Perform an update of the relationship of the parent and child. This
@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
         #
         # Returns:
         #
-        # A new +BelongsTo+ association proxy.
+        # A new +EmbeddedIn+ association proxy.
         def update(target, child, options)
           child.parentize(target, options.inverse_of)
           child.notify
