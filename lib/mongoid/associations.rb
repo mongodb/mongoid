@@ -1,10 +1,10 @@
 # encoding: utf-8
 require "mongoid/associations/proxy"
-require "mongoid/associations/belongs_to"
 require "mongoid/associations/belongs_to_related"
-require "mongoid/associations/has_many"
+require "mongoid/associations/embedded_in"
+require "mongoid/associations/embed_many"
+require "mongoid/associations/embed_one"
 require "mongoid/associations/has_many_related"
-require "mongoid/associations/has_one"
 require "mongoid/associations/has_one_related"
 require "mongoid/associations/options"
 require "mongoid/associations/meta_data"
@@ -70,7 +70,7 @@ module Mongoid # :nodoc:
         end
         self.embedded = true
         add_association(
-          Associations::BelongsTo,
+          Associations::EmbeddedIn,
           Associations::Options.new(
             options.merge(:name => name, :extend => block)
           )
@@ -127,7 +127,7 @@ module Mongoid # :nodoc:
       #   end
       def embed_many(name, options = {}, &block)
         add_association(
-          Associations::HasMany,
+          Associations::EmbedMany,
           Associations::Options.new(
             options.merge(:name => name, :extend => block)
           )
@@ -188,7 +188,7 @@ module Mongoid # :nodoc:
         opts = Associations::Options.new(
           options.merge(:name => name, :extend => block)
         )
-        type = Associations::HasOne
+        type = Associations::EmbedOne
         add_association(type, opts)
         add_builder(type, opts)
         add_creator(type, opts)

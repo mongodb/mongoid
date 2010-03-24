@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Associations::HasMany do
+describe Mongoid::Associations::EmbedMany do
 
   before do
     @attributes = { "addresses" => [
@@ -12,7 +12,7 @@ describe Mongoid::Associations::HasMany do
   describe "#[]" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -40,7 +40,7 @@ describe Mongoid::Associations::HasMany do
   describe "#<<" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -80,7 +80,7 @@ describe Mongoid::Associations::HasMany do
     context "when a type is not provided" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -104,7 +104,7 @@ describe Mongoid::Associations::HasMany do
     context "when a type is provided" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :shapes)
         )
@@ -125,7 +125,7 @@ describe Mongoid::Associations::HasMany do
     context "when a type is not provided" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -145,7 +145,7 @@ describe Mongoid::Associations::HasMany do
     context "when a type is provided" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :shapes)
         )
@@ -169,7 +169,7 @@ describe Mongoid::Associations::HasMany do
     context "when validations pass" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -188,7 +188,7 @@ describe Mongoid::Associations::HasMany do
     context "when validations fail" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -209,7 +209,7 @@ describe Mongoid::Associations::HasMany do
   describe "#concat" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -227,7 +227,7 @@ describe Mongoid::Associations::HasMany do
   describe "#clear" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -245,7 +245,7 @@ describe Mongoid::Associations::HasMany do
   describe "#find" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -275,7 +275,7 @@ describe Mongoid::Associations::HasMany do
     context "when there are elements in the array" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -291,7 +291,7 @@ describe Mongoid::Associations::HasMany do
     context "when the array is empty" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           Person.new,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -311,7 +311,7 @@ describe Mongoid::Associations::HasMany do
 
       before do
         @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :update => true)
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @canvas,
           Mongoid::Associations::Options.new(:name => :shapes)
         )
@@ -334,7 +334,7 @@ describe Mongoid::Associations::HasMany do
             "Testing"
           end
         end
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @person,
           Mongoid::Associations::Options.new(:name => :addresses, :extend => @block)
         )
@@ -351,8 +351,8 @@ describe Mongoid::Associations::HasMany do
   describe ".instantiate" do
 
     it "delegates to new" do
-      Mongoid::Associations::HasMany.expects(:new).with(@document, @options)
-      Mongoid::Associations::HasMany.instantiate(@document, @options)
+      Mongoid::Associations::EmbedMany.expects(:new).with(@document, @options)
+      Mongoid::Associations::EmbedMany.instantiate(@document, @options)
     end
 
   end
@@ -362,7 +362,7 @@ describe Mongoid::Associations::HasMany do
     context "#length" do
 
       it "returns the length of the delegated array" do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -375,8 +375,8 @@ describe Mongoid::Associations::HasMany do
 
   describe ".macro" do
 
-    it "returns :has_many" do
-      Mongoid::Associations::HasMany.macro.should == :has_many
+    it "returns :embed_many" do
+      Mongoid::Associations::EmbedMany.macro.should == :embed_many
     end
 
   end
@@ -384,7 +384,7 @@ describe Mongoid::Associations::HasMany do
   describe "#nested_build" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -403,7 +403,7 @@ describe Mongoid::Associations::HasMany do
     context "when the association class has a criteria class method" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -430,7 +430,7 @@ describe Mongoid::Associations::HasMany do
     context "when no class method exists" do
 
       before do
-        @association = Mongoid::Associations::HasMany.new(
+        @association = Mongoid::Associations::EmbedMany.new(
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
@@ -447,7 +447,7 @@ describe Mongoid::Associations::HasMany do
   describe "#paginate" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -466,7 +466,7 @@ describe Mongoid::Associations::HasMany do
   describe "#push" do
 
     before do
-      @association = Mongoid::Associations::HasMany.new(
+      @association = Mongoid::Associations::EmbedMany.new(
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
@@ -491,7 +491,7 @@ describe Mongoid::Associations::HasMany do
     before do
       @address = Address.new(:street => "Madison Ave")
       @person = Person.new(:title => "Sir")
-      @association = Mongoid::Associations::HasMany.update(
+      @association = Mongoid::Associations::EmbedMany.update(
         [@address],
         @person,
         Mongoid::Associations::Options.new(:name => :addresses)
