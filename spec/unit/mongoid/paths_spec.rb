@@ -84,4 +84,41 @@ describe Mongoid::Paths do
       end
     end
   end
+
+  describe "#position" do
+
+    context "when the document is a parent" do
+
+      it "returns an empty string" do
+        person.position.should == ""
+      end
+    end
+
+    context "when the document is embedded" do
+
+      before do
+        person.addresses << address
+      end
+
+      it "returns the path plus $" do
+        address.position.should == "addresses.$"
+      end
+    end
+
+    context "when document embedded multiple levels" do
+
+      before do
+        address.locations << location
+        person.addresses << address
+      end
+
+      it "returns the path plus $" do
+        location.position.should == "addresses.locations.$"
+      end
+
+      it "sets the matcher class instance var" do
+        Location._position.should == "addresses.locations.$"
+      end
+    end
+  end
 end
