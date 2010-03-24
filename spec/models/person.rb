@@ -26,7 +26,7 @@ class Person
 
   attr_reader :rescored
 
-  has_many :addresses do
+  embed_many :addresses do
     def extension
       "Testing"
     end
@@ -35,9 +35,9 @@ class Person
     end
   end
 
-  has_many :phone_numbers, :class_name => "Phone"
+  embed_many :phone_numbers, :class_name => "Phone"
 
-  has_one :name do
+  embed_one :name do
     def extension
       "Testing"
     end
@@ -46,7 +46,7 @@ class Person
     end
   end
 
-  has_one :pet, :class_name => "Animal"
+  embed_one :pet, :class_name => "Animal"
 
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name

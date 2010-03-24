@@ -37,6 +37,13 @@ module Mongoid # :nodoc:
     end
 
     module ClassMethods
+
+      # Deprecated: Document.belongs_to will become Document.embedded_in
+      def belongs_to(name, options = {}, &block)
+        Mongoid.deprecate("Document.belongs_to will become Document.embedded_in")
+        embedded_in(name, options, &block)
+      end
+
       # Adds the association back to the parent document. This macro is
       # necessary to set the references from the child back to the parent
       # document. If a child does not define this association calling
@@ -50,14 +57,14 @@ module Mongoid # :nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     has_many :addresses
+      #     embed_many :addresses
       #   end
       #
       #   class Address
       #     include Mongoid::Document
-      #     belongs_to :person, :inverse_of => :addresses
+      #     embedded_in :person, :inverse_of => :addresses
       #   end
-      def belongs_to(name, options = {}, &block)
+      def embedded_in(name, options = {}, &block)
         unless options.has_key?(:inverse_of)
           raise Errors::InvalidOptions.new("Options for belongs_to association must include :inverse_of")
         end
@@ -93,6 +100,12 @@ module Mongoid # :nodoc:
         index(opts.foreign_key) unless self.embedded
       end
 
+      # Deprecated: Document.has_many will become Document.embed_many
+      def has_many(name, options = {}, &block)
+        Mongoid.deprecate("Document.has_many will become Document.embed_many")
+        embed_many(name, options, &block)
+      end
+
       # Adds the association from a parent document to its children. The name
       # of the association needs to be a pluralized form of the child class
       # name.
@@ -105,14 +118,14 @@ module Mongoid # :nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     has_many :addresses
+      #     embed_many :addresses
       #   end
       #
       #   class Address
       #     include Mongoid::Document
-      #     belongs_to :person, :inverse_of => :addresses
+      #     embedded_in :person, :inverse_of => :addresses
       #   end
-      def has_many(name, options = {}, &block)
+      def embed_many(name, options = {}, &block)
         add_association(
           Associations::HasMany,
           Associations::Options.new(
@@ -146,6 +159,12 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Deprecated: Document.has_one will become Document.embed_one
+      def has_one(name, options = {}, &block)
+        Mongoid.deprecate("Document.has_one will become Document.embed_one")
+        embed_one(name, options, &block)
+      end
+
       # Adds the association from a parent document to its child. The name
       # of the association needs to be a singular form of the child class
       # name.
@@ -158,14 +177,14 @@ module Mongoid # :nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     has_many :addresses
+      #     embed_one :name
       #   end
       #
-      #   class Address
+      #   class Name
       #     include Mongoid::Document
-      #     belongs_to :person
+      #     embedded_in :person
       #   end
-      def has_one(name, options = {}, &block)
+      def embed_one(name, options = {}, &block)
         opts = Associations::Options.new(
           options.merge(:name => name, :extend => block)
         )

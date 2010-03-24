@@ -8,8 +8,8 @@ module Mongoid #:nodoc:
     #
     #   class Person
     #     include Mongoid::Document
-    #     has_one :name
-    #     has_many :addresses
+    #     embed_one :name
+    #     embed_many :addresses
     #
     #     validates_associated :name, :addresses
     #   end

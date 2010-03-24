@@ -20,7 +20,7 @@ describe Mongoid::Associations do
       @person.save
     end
 
-    context "when defined on a has_many" do
+    context "when defined on an embed_many" do
 
       it "applies the extension" do
         addresses = @person.addresses.find_by_street("Oxford")

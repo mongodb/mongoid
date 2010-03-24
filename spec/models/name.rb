@@ -4,8 +4,8 @@ class Name
   field :last_name
   field :parent_title
   key :first_name, :last_name
-  has_many :translations
-  belongs_to :person, :inverse_of => :name
+  embed_many :translations
+  embedded_in :person, :inverse_of => :name
 
   def set_parent=(set = false)
     self.parent_title = person.title if set

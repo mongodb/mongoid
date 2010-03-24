@@ -9,9 +9,9 @@ class Address
   field :parent_title
   field :services, :type => Array
   key :street
-  has_many :locations
+  embed_many :locations
 
-  belongs_to :addressable, :inverse_of => :addresses do
+  embedded_in :addressable, :inverse_of => :addresses do
     def extension
       "Testing"
     end

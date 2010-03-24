@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     included do
       field :version, :type => Integer, :default => 1
-      has_many :versions, :class_name => self.name
+      embed_many :versions, :class_name => self.name
       before_save :revise
     end
     module InstanceMethods

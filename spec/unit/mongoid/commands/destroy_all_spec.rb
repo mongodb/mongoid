@@ -17,7 +17,5 @@ describe Mongoid::Commands::DestroyAll do
       Mongoid::Commands::Destroy.expects(:execute).with(@doc)
       Mongoid::Commands::DestroyAll.execute(@klass, @conditions)
     end
-
   end
-
 end

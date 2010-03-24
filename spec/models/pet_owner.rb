@@ -1,6 +1,6 @@
 class PetOwner
   include Mongoid::Document
   field :title
-  has_one :pet
-  has_one :address
+  embed_one :pet
+  embed_one :address
 end

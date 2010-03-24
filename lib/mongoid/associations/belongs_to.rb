@@ -48,7 +48,7 @@ module Mongoid #:nodoc:
 
         # Perform an update of the relationship of the parent and child. This
         # is initialized by setting a parent object as the association on the
-        # +Document+. Will properly set a has_one or a has_many.
+        # +Document+. Will properly set an embed_one or an embed_many.
         #
         # Returns:
         #
