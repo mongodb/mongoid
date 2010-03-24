@@ -3,8 +3,8 @@ module Mongoid #:nodoc:
   module Paths #:nodoc:
     extend ActiveSupport::Concern
     included do
-      cattr_accessor :_path
-      delegate :_path, :to => "self.class"
+      cattr_accessor :_path, :_position
+      delegate :_path, :_position, :to => "self.class"
     end
     module InstanceMethods
       # Return the path to this +Document+ in JSON notation, used for atomic
@@ -17,6 +17,15 @@ module Mongoid #:nodoc:
         self._path ||= climb("") do |document, value|
           value = "#{document.association_name}#{"." + value unless value.blank?}"
         end
+      end
+
+      # Returns the positional operator of this document for modification.
+      #
+      # Example:
+      #
+      # <tt>address.position</tt>
+      def position
+        self._position ||= (path.blank? ? "" : "#{path}.$")
       end
 
       # Return the selector for this document to be matched exactly for use
