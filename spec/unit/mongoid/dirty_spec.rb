@@ -188,7 +188,31 @@ describe Mongoid::Dirty do
     end
   end
 
-  describe "#reset_(attribute)!" do
+  describe "#reset_attribute!" do
 
+    context "when the attribute has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "resets the value to the original" do
+        @person.reset_attribute!("title")
+        @person.title.should == "Grand Poobah"
+      end
+    end
+
+    context "when the attribute has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "does nothing" do
+        @person.reset_attribute!("title")
+        @person.title.should == "Grand Poobah"
+      end
+    end
   end
 end
