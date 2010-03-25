@@ -31,6 +31,23 @@ module Mongoid #:nodoc:
       !@modifications.empty?
     end
 
+    # Gets all the modifications that have happened to the object as a +Hash+
+    # with the keys being the names of the fields, and the values being an
+    # +Array+ with the old value and new value.
+    #
+    # Example:
+    #
+    #   person = Person.new(:title => "Sir")
+    #   person.title = "Madam"
+    #   person.changes # returns { "title" => [ "Sir", "Madam" ] }
+    #
+    # Returns:
+    #
+    # A +Hash+ of changes.
+    def changes
+      @modifications
+    end
+
     # Sets up the modifications hash. This occurs just after the document is
     # instantiated.
     #
