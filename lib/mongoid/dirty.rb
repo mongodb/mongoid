@@ -1,6 +1,21 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Dirty #:nodoc:
+    # Determines if a specific field has chaged.
+    #
+    # Example:
+    #
+    #   person = Person.new(:title => "Sir")
+    #   person.title = "Madam"
+    #   person.attribute_changed?(:title) # true
+    #
+    # Returns:
+    #
+    # +true+ if changed, +false+ if not.
+    def attribute_changed?(name)
+      @modifications.include?(name)
+    end
+
     # Gets the names of all the fields that have changed in the document.
     #
     # Example:

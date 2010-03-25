@@ -6,8 +6,30 @@ describe Mongoid::Dirty do
 
   end
 
-  describe "#(attribute)_changed?" do
+  describe "#attribute_changed?" do
 
+    context "when the attribute has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "returns true" do
+        @person.attribute_changed?("title").should == true
+      end
+    end
+
+    context "when the attribute has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "returns false" do
+        @person.attribute_changed?("title").should == false
+      end
+    end
   end
 
   describe "#(attribute)_was" do
