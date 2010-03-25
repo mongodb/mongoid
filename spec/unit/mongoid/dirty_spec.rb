@@ -16,6 +16,28 @@ describe Mongoid::Dirty do
 
   describe "#changed" do
 
+    context "when the document has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "returns an array of changed field names" do
+        @person.changed.should == [ "title" ]
+      end
+    end
+
+    context "when the document has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "returns an empty array" do
+        @person.changed.should == []
+      end
+    end
   end
 
   describe "#changed?" do
