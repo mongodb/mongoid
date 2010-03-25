@@ -51,6 +51,7 @@ module Mongoid #:nodoc:
         if attributes["_id"] || allocating
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
+          document.setup_modifications
           return document
         else
           return new(attrs)

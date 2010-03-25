@@ -95,6 +95,30 @@ describe Mongoid::Dirty do
 
   describe "#previous_changes" do
 
+    before do
+      @person = Person.new(:title => "Grand Poobah")
+      @person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+
+      before do
+        @person.collection.expects(:save).returns(true)
+        @person.save!
+      end
+
+      it "returns the changes before the save" do
+        @person.previous_changes["title"].should ==
+          [ "Grand Poobah", "Captain Obvious" ]
+      end
+    end
+
+    context "when the document has not been saved" do
+
+      it "returns an empty hash" do
+        @person.previous_changes.should == {}
+      end
+    end
   end
 
   describe "#reset_(attribute)!" do

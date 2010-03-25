@@ -20,6 +20,7 @@ module Mongoid #:nodoc:
           else
             doc.collection.save(doc.raw_attributes, :safe => Mongoid.persist_in_safe_mode)
           end
+          doc.move_changes if saved
           return false unless saved
         end
         return true
