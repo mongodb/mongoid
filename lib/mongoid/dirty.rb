@@ -1,6 +1,21 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Dirty #:nodoc:
+    # Gets the changes for a specific field.
+    #
+    # Example:
+    #
+    #   person = Person.new(:title => "Sir")
+    #   person.title = "Madam"
+    #   person.attribute_change(:title) # [ "Sir", "Madam" ]
+    #
+    # Returns:
+    #
+    # An +Array+ containing the old and new values.
+    def attribute_change(name)
+      @modifications[name]
+    end
+
     # Determines if a specific field has chaged.
     #
     # Example:
@@ -14,6 +29,22 @@ module Mongoid #:nodoc:
     # +true+ if changed, +false+ if not.
     def attribute_changed?(name)
       @modifications.include?(name)
+    end
+
+    # Gets the old value for a specific field.
+    #
+    # Example:
+    #
+    #   person = Person.new(:title => "Sir")
+    #   person.title = "Madam"
+    #   person.attribute_was(:title) # "Sir"
+    #
+    # Returns:
+    #
+    # The old field value.
+    def attribute_was(name)
+      change = @modifications[name]
+      change ? change[0] : nil
     end
 
     # Gets the names of all the fields that have changed in the document.
