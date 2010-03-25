@@ -41,6 +41,7 @@ module Mongoid #:nodoc:
             send("#{key}=", value)
           end
         end
+        @modified_attributes ||= []
       end
 
       # Read a value from the +Document+ attributes. If the value does not exist
@@ -101,7 +102,9 @@ module Mongoid #:nodoc:
       # there is any.
       def write_attribute(name, value)
         access = name.to_s
-        @attributes[access] = fields[access].set(value)
+        value = fields[access].set(value)
+        @attributes[access] = value
+        @modified_attributes << name if @modified_attributes
         notify unless id.blank?
       end
 
