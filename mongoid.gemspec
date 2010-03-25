@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid}
-  s.version = "2.0.0.alpha"
+  s.version = "2.0.0.beta1"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-03-24}
+  s.date = %q{2010-03-25}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -63,6 +63,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/criterion/optional.rb",
      "lib/mongoid/cursor.rb",
      "lib/mongoid/deprecation.rb",
+     "lib/mongoid/dirty.rb",
      "lib/mongoid/document.rb",
      "lib/mongoid/errors.rb",
      "lib/mongoid/extensions.rb",
@@ -131,6 +132,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/commands_spec.rb",
      "spec/integration/mongoid/contexts/enumerable_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
+     "spec/integration/mongoid/dirty_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/extensions_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
@@ -192,6 +194,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/optional_spec.rb",
      "spec/unit/mongoid/cursor_spec.rb",
      "spec/unit/mongoid/deprecation_spec.rb",
+     "spec/unit/mongoid/dirty_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
@@ -261,6 +264,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/commands_spec.rb",
      "spec/integration/mongoid/contexts/enumerable_spec.rb",
      "spec/integration/mongoid/criteria_spec.rb",
+     "spec/integration/mongoid/dirty_spec.rb",
      "spec/integration/mongoid/document_spec.rb",
      "spec/integration/mongoid/extensions_spec.rb",
      "spec/integration/mongoid/finders_spec.rb",
@@ -321,6 +325,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/criterion/optional_spec.rb",
      "spec/unit/mongoid/cursor_spec.rb",
      "spec/unit/mongoid/deprecation_spec.rb",
+     "spec/unit/mongoid/dirty_spec.rb",
      "spec/unit/mongoid/document_spec.rb",
      "spec/unit/mongoid/errors_spec.rb",
      "spec/unit/mongoid/extensions/array/accessors_spec.rb",
