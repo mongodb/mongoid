@@ -102,7 +102,7 @@ module Mongoid #:nodoc:
       # there is any.
       def write_attribute(name, value)
         access = name.to_s
-        modify(access, @attributes[name], fields[access].set(value))
+        modify(access, @attributes[access], fields[access].set(value))
         notify unless id.blank?
       end
 

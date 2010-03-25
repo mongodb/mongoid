@@ -92,7 +92,6 @@ module Mongoid #:nodoc:
       # return the list of subclassses for an object
       def subclasses_of(*superclasses) #:nodoc:
         subclasses = []
-
         superclasses.each do |sup|
           ObjectSpace.each_object(class << sup; self; end) do |k|
             if k != sup && (k.name.blank? || eval("defined?(::#{k}) && ::#{k}.object_id == k.object_id"))
@@ -100,7 +99,6 @@ module Mongoid #:nodoc:
             end
           end
         end
-
         subclasses
       end
     end

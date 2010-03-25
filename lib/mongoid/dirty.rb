@@ -137,7 +137,10 @@ module Mongoid #:nodoc:
       # The old field value.
       def reset_attribute!(name)
         value = attribute_was(name)
-        @attributes[name] = value if value
+        if value
+          @attributes[name] = value
+          @modifications.delete(name)
+        end
       end
 
       # Sets up the modifications hash. This occurs just after the document is
