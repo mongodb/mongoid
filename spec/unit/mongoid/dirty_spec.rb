@@ -68,6 +68,29 @@ describe Mongoid::Dirty do
 
   describe "#changes" do
 
+    context "when the document has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "returns a hash of changes" do
+        @person.changes.should ==
+          { "title" => [ "Grand Poobah", "Captain Obvious" ] }
+      end
+    end
+
+    context "when the document has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "returns an empty hash" do
+        @person.changes.should == {}
+      end
+    end
   end
 
   describe "#previous_changes" do
