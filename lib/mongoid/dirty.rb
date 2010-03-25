@@ -159,7 +159,17 @@ module Mongoid #:nodoc:
       end
     end
     module ClassMethods #:nodoc:
-      # Add the dynamic dirty methods.
+      # Add the dynamic dirty methods. These are custom methods defined on a
+      # field by field basis that wrap the dirty attribute methods.
+      #
+      # Example:
+      #
+      #   person = Person.new(:title => "Sir")
+      #   person.title = "Madam"
+      #   person.title_change # [ "Sir", "Madam" ]
+      #   person.title_changed? # true
+      #   person.title_was # "Sir"
+      #   person.reset_title!
       def add_dirty_methods(name)
         define_method("#{name}_change") { attribute_change(name) }
         define_method("#{name}_changed?") { attribute_changed?(name) }
