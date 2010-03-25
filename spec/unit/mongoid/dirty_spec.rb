@@ -15,6 +15,11 @@ describe Mongoid::Dirty do
         @person.attribute_change("title").should ==
           [ "Grand Poobah", "Captain Obvious" ]
       end
+
+      it "allows access via (attribute)_change" do
+        @person.title_change.should ==
+          [ "Grand Poobah", "Captain Obvious" ]
+      end
     end
 
     context "when the attribute has not changed" do
@@ -41,6 +46,10 @@ describe Mongoid::Dirty do
       it "returns true" do
         @person.attribute_changed?("title").should == true
       end
+
+      it "allows access via (attribute)_changed?" do
+        @person.title_changed?.should == true
+      end
     end
 
     context "when the attribute has not changed" do
@@ -66,6 +75,10 @@ describe Mongoid::Dirty do
 
       it "returns the old value" do
         @person.attribute_was("title").should == "Grand Poobah"
+      end
+
+      it "allows access via (attribute)_was" do
+        @person.title_was.should == "Grand Poobah"
       end
     end
 
@@ -199,6 +212,11 @@ describe Mongoid::Dirty do
 
       it "resets the value to the original" do
         @person.reset_attribute!("title")
+        @person.title.should == "Grand Poobah"
+      end
+
+      it "allows access via reset_(attribute)!" do
+        @person.reset_title!
         @person.title.should == "Grand Poobah"
       end
     end
