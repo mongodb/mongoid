@@ -2,8 +2,31 @@ require "spec_helper"
 
 describe Mongoid::Dirty do
 
-  describe "#(attribute)_change" do
+  describe "#attribute_change" do
 
+    context "when the attribute has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "returns an array of the old value and new value" do
+        @person.attribute_change("title").should ==
+          [ "Grand Poobah", "Captain Obvious" ]
+      end
+    end
+
+    context "when the attribute has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "returns an empty array" do
+        @person.attribute_change("title").should be_nil
+      end
+    end
   end
 
   describe "#attribute_changed?" do
@@ -32,8 +55,30 @@ describe Mongoid::Dirty do
     end
   end
 
-  describe "#(attribute)_was" do
+  describe "#attribute_was" do
 
+    context "when the attribute has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "returns the old value" do
+        @person.attribute_was("title").should == "Grand Poobah"
+      end
+    end
+
+    context "when the attribute has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "returns nil" do
+        @person.attribute_was("title").should be_nil
+      end
+    end
   end
 
   describe "#changed" do
