@@ -44,6 +44,7 @@ module Mongoid #:nodoc
         meth = options.delete(:as) || name
         fields[name] = Field.new(name, options)
         create_accessors(name, meth, options)
+        add_dirty_methods(name)
       end
 
       # Create the field accessors.
