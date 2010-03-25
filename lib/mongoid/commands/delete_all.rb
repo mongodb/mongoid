@@ -16,7 +16,9 @@ module Mongoid #:nodoc:
       def self.execute(klass, params = {})
         safe = Mongoid.persist_in_safe_mode
         collection = klass.collection
-        collection.remove((params[:conditions] || {}).merge(:_type => klass.name), :safe => safe)
+        selector = (params[:conditions] || {}).merge(:_type => klass.name)
+        matching = collection.find(selector).count
+        collection.remove(selector, :safe => safe) ? matching : 0
       end
     end
   end
