@@ -106,6 +106,24 @@ module Mongoid #:nodoc:
         @modifications = {}
       end
 
+      # Gets all the new values for each of the changed fields, to be passed to
+      # a MongoDB $set modifier.
+      #
+      # Example:
+      #
+      #   person = Person.new(:title => "Sir")
+      #   person.title = "Madam"
+      #   person.new_values # returns { "title" => "Madam" }
+      #
+      # Returns:
+      #
+      # A +Hash+ of new values.
+      def new_values
+        @modifications.inject({}) do |sets, (field, changes)|
+          sets[field] = changes[1]; sets
+        end
+      end
+
       # Gets all the modifications that have happened to the object before the
       # object was saved.
       #

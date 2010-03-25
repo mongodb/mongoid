@@ -173,6 +173,33 @@ describe Mongoid::Dirty do
     end
   end
 
+  describe "#new_values" do
+
+    context "when the document has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+      end
+
+      it "returns a hash of field names and new values" do
+        @person.new_values.should ==
+          { "title" => "Captain Obvious" }
+      end
+    end
+
+    context "when the document has not changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+      end
+
+      it "returns an empty hash" do
+        @person.new_values.should == {}
+      end
+    end
+  end
+
   describe "#previous_changes" do
 
     before do
