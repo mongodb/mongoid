@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
     #
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
-    #   person.attribute_change(:title) # [ "Sir", "Madam" ]
+    #   person.attribute_change("title") # [ "Sir", "Madam" ]
     #
     # Returns:
     #
@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
     #
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
-    #   person.attribute_changed?(:title) # true
+    #   person.attribute_changed?("title") # true
     #
     # Returns:
     #
@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
     #
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
-    #   person.attribute_was(:title) # "Sir"
+    #   person.attribute_was("title") # "Sir"
     #
     # Returns:
     #
@@ -119,6 +119,23 @@ module Mongoid #:nodoc:
     # A +Hash+ of changes before save.
     def previous_changes
       @previous_modifications
+    end
+
+    # Resets a changed field back to its old value.
+    #
+    # Example:
+    #
+    #   person = Person.new(:title => "Sir")
+    #   person.title = "Madam"
+    #   person.reset_attribute!("title")
+    #   person.title # "Sir"
+    #
+    # Returns:
+    #
+    # The old field value.
+    def reset_attribute!(name)
+      value = attribute_was(name)
+      @attributes[name] = value if value
     end
 
     # Sets up the modifications hash. This occurs just after the document is
