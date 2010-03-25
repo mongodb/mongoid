@@ -15,44 +15,45 @@ describe Mongoid::Commands::DeleteAll do
       before do
         @collection = mock
         @conditions = { :conditions => { :title => "Sir" } }
+        @cursor = stub(:count => 30)
       end
 
       it "deletes each document that the criteria finds" do
         @klass.expects(:collection).returns(@collection)
+        @collection.expects(:find).with(@conditions[:conditions].merge(:_type => "Person")).returns(@cursor)
         @collection.expects(:remove).with(@conditions[:conditions].merge(:_type => "Person"), :safe => true)
         Mongoid::Commands::DeleteAll.execute(@klass, @conditions)
       end
-
     end
 
     context "when no conditions supplied" do
 
       before do
         @collection = mock
+        @cursor = stub(:count => 30)
       end
 
       it "drops the collection" do
         @klass.expects(:collection).returns(@collection)
+        @collection.expects(:find).with({ :_type => "Person" }).returns(@cursor)
         @collection.expects(:remove).with({ :_type => "Person" }, { :safe => true })
         Mongoid::Commands::DeleteAll.execute(@klass)
       end
-
     end
 
     context "when empty conditions supplied" do
 
       before do
         @collection = mock
+        @cursor = stub(:count => 30)
       end
 
       it "drops the collection" do
         @klass.expects(:collection).returns(@collection)
+        @collection.expects(:find).with({ :_type => "Person" }).returns(@cursor)
         @collection.expects(:remove).with({ :_type => "Person" }, { :safe => true })
         Mongoid::Commands::DeleteAll.execute(@klass, {})
       end
-
     end
-
   end
-
 end

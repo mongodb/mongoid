@@ -146,18 +146,6 @@ describe Mongoid::Commands do
     end
   end
 
-  describe "#destroy_all" do
-
-    before do
-      @person.save
-    end
-
-    it "destroys all the documents" do
-      Person.destroy_all
-      Person.count.should == 0
-    end
-  end
-
   describe "#save" do
 
     context "when validation passes" do
@@ -208,20 +196,35 @@ describe Mongoid::Commands do
 
   end
 
-  describe ".delete_all" do
+  describe "#delete_all" do
 
-    it "returns true" do
-      Person.delete_all.should == true
+    before do
+      @person.save
     end
 
-  end
-
-  describe ".destroy_all" do
-
-    it "returns true" do
-      Person.destroy_all.should == true
+    it "deletes all the documents" do
+      Person.delete_all
+      Person.count.should == 0
     end
 
+    it "returns the number of documents deleted" do
+      Person.delete_all.should == 1
+    end
   end
 
+  describe "#destroy_all" do
+
+    before do
+      @person.save
+    end
+
+    it "destroys all the documents" do
+      Person.destroy_all
+      Person.count.should == 0
+    end
+
+    it "returns the number of documents destroyed" do
+      Person.destroy_all.should == 1
+    end
+  end
 end
