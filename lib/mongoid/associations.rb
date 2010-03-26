@@ -122,6 +122,8 @@ module Mongoid # :nodoc:
         )
       end
 
+      alias :embed_many :embeds_many
+
       # Adds a relational association from the Document to many Documents in
       # another database or collection.
       #
@@ -175,6 +177,8 @@ module Mongoid # :nodoc:
         add_builder(type, opts)
         add_creator(type, opts)
       end
+
+      alias :embed_one :embeds_one
 
       # Adds a relational association from the Document to one Document in
       # another database or collection.
