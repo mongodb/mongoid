@@ -27,9 +27,8 @@ module Mongoid #:nodoc:
     #     false
     #   );
     #
-    class Update #:nodoc:
-
-      attr_reader :collection, :document, :options, :validate
+    class Update
+      include Persistence::Command
 
       # Create the new update persister.
       #
@@ -42,9 +41,7 @@ module Mongoid #:nodoc:
       #
       # <tt>Update.new(document)</tt>
       def initialize(document, validate = true)
-        @collection = document.embedded ? document._root.collection : document.collection
-        @document = document
-        @validate = validate
+        init(document, validate)
         @options = { :multi => false, :safe => Mongoid.persist_in_safe_mode }
       end
 
