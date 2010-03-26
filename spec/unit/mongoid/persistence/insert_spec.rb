@@ -110,10 +110,29 @@ describe Mongoid::Persistence::Insert do
 
       context "when the embedded document is an embeds_one" do
 
+        context "when the parent is new" do
+
+          it "inserts the parent"
+
+        end
+
+        context "when the parent is not new" do
+
+          it "performs an in place $set on the embedded document"
+        end
       end
 
       context "when the embedded document is an embeds_many" do
 
+        context "when the parent is new" do
+
+          it "inserts the parent"
+        end
+
+        context "when the parent is not new" do
+
+          it "performs a $push on the embedded array"
+        end
       end
     end
   end
