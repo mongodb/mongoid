@@ -12,11 +12,21 @@ module Mongoid #:nodoc:
     # following MongoDB query:
     #
     #   collection.update(
-    #     { "_id" : "testing" },
+    #     { "_id" : 1,
     #     { "$set" : { "field" : "value" },
     #     false,
     #     false
     #   );
+    #
+    # For embedded documents it will use the positional locator:
+    #
+    #   collection.update(
+    #     { "_id" : 1, "addresses._id" : 2 },
+    #     { "$set" : { "addresses.$.field" : "value" },
+    #     false,
+    #     false
+    #   );
+    #
     class Update #:nodoc:
 
       attr_reader :collection, :document, :options, :validate
