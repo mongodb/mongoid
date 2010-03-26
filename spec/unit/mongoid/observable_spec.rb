@@ -27,7 +27,7 @@ describe Mongoid::Observable do
     context "when observers exist" do
 
       it "calls update on each observer with the args" do
-        person.expects(:update).with("Testing")
+        person.expects(:observe).with("Testing")
         address.notify_observers("Testing")
       end
     end
