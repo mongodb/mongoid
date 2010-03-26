@@ -1,9 +1,17 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
-    class Insert #:nodoc:
-
-      attr_reader :collection, :document, :options, :validate
+    # Insert is a persistence command responsible for taking a document that
+    # has not been saved to the database and saving it.
+    #
+    # The underlying query resembles the following MongoDB query:
+    #
+    #   collection.insert(
+    #     { "_id" : 1, "field" : "value" },
+    #     false
+    #   );
+    class Insert
+      include Persistence::Command
 
       # Create the new insert persister.
       #
@@ -16,9 +24,7 @@ module Mongoid #:nodoc:
       #
       # <tt>Insert.new(document)</tt>
       def initialize(document, validate = true)
-        @collection = document.collection
-        @document = document
-        @validate = validate
+        init(document, validate)
         @options = { :safe => Mongoid.persist_in_safe_mode }
       end
 
