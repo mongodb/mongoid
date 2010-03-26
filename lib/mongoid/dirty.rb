@@ -113,14 +113,15 @@ module Mongoid #:nodoc:
       #
       #   person = Person.new(:title => "Sir")
       #   person.title = "Madam"
-      #   person.new_values # returns { "title" => "Madam" }
+      #   person.setters # returns { "title" => "Madam" }
       #
       # Returns:
       #
       # A +Hash+ of new values.
-      def new_values
+      def setters
         @modifications.inject({}) do |sets, (field, changes)|
-          sets[field] = changes[1]; sets
+          key = embedded ? "#{position}.#{field}" : field
+          sets[key] = changes[1]; sets
         end
       end
 

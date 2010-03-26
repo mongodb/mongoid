@@ -173,18 +173,36 @@ describe Mongoid::Dirty do
     end
   end
 
-  describe "#new_values" do
+  describe "#setters" do
 
     context "when the document has changed" do
 
-      before do
-        @person = Person.new(:title => "Grand Poobah")
-        @person.title = "Captain Obvious"
+      context "when the document is a root document" do
+
+        before do
+          @person = Person.new(:title => "Grand Poobah")
+          @person.title = "Captain Obvious"
+        end
+
+        it "returns a hash of field names and new values" do
+          @person.setters.should ==
+            { "title" => "Captain Obvious" }
+        end
       end
 
-      it "returns a hash of field names and new values" do
-        @person.new_values.should ==
-          { "title" => "Captain Obvious" }
+      context "when the document is embedded" do
+
+        before do
+          @person = Person.new(:title => "Grand Poobah")
+          @address = Address.new(:street => "Oxford St")
+          @person.addresses << @address
+          @address.street = "Bond St"
+        end
+
+        it "returns a hash of field names and new values" do
+          @address.setters.should ==
+            { "addresses.$.street" => "Bond St" }
+        end
       end
     end
 
@@ -195,7 +213,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty hash" do
-        @person.new_values.should == {}
+        @person.setters.should == {}
       end
     end
   end
