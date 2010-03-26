@@ -44,7 +44,7 @@ describe Mongoid::Persistence::Update do
       lambda {
         collection.expects(:update).with(
           { "_id" => document.id },
-          { "$set" => document.new_values },
+          { "$set" => document.setters },
           :multi => false,
           :safe => true
         ).returns("Object")
