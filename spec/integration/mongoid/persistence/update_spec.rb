@@ -33,6 +33,14 @@ describe Mongoid::Persistence::Update do
 
     context "when the document has not changed" do
 
+      before do
+        @person = Person.find(person.id)
+      end
+
+      it "returns true" do
+        update = Mongoid::Persistence::Update.new(@person)
+        update.persist.should == true
+      end
     end
   end
 end
