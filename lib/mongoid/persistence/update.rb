@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
       #
       # <tt>Update.new(document)</tt>
       def initialize(document, validate = true)
-        @collection = document.collection
+        @collection = document.embedded ? document._root.collection : document.collection
         @document = document
         @validate = validate
         @options = { :multi => false, :safe => Mongoid.persist_in_safe_mode }

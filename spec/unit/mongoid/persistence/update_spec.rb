@@ -6,6 +6,10 @@ describe Mongoid::Persistence::Update do
     Patient.new(:_id => Mongo::ObjectID.new.to_s)
   end
 
+  let(:address) do
+    Address.new(:_id => Mongo::ObjectID.new.to_s, :street => "Oxford St")
+  end
+
   let(:collection) do
     stub.quacks_like(Mongoid::Collection.allocate)
   end
@@ -40,11 +44,22 @@ describe Mongoid::Persistence::Update do
 
   describe "#persist" do
 
-    def mongo_expects
+    def root_set_expectation
       lambda {
         collection.expects(:update).with(
           { "_id" => document.id },
           { "$set" => document.setters },
+          :multi => false,
+          :safe => true
+        ).returns("Object")
+      }
+    end
+
+    def embedded_set_expectation
+      lambda {
+        collection.expects(:update).with(
+          { "_id" => document.id, "addresses._id" => address.id },
+          { "$set" => address.setters },
           :multi => false,
           :safe => true
         ).returns("Object")
@@ -64,12 +79,12 @@ describe Mongoid::Persistence::Update do
       context "when the document is valid" do
 
         it "performs a $set for changed fields" do
-          mongo_expects.call
+          root_set_expectation.call
           update.persist.should == true
         end
 
         it "moves the changed fields to previously changed" do
-          mongo_expects.call
+          root_set_expectation.call
           update.persist
           document.changed?.should == false
         end
@@ -99,8 +114,26 @@ describe Mongoid::Persistence::Update do
         end
 
         it "updates the document in the database" do
-          mongo_expects.call
+          root_set_expectation.call
           update.persist.should == true
+        end
+      end
+
+      context "when the document is embedded" do
+
+        let(:embedded) do
+          Mongoid::Persistence::Update.new(address)
+        end
+
+        before do
+          # TODO: What to do about composite keys?
+          document.addresses << address
+          address.city = "London"
+        end
+
+        it "performs a $set for the embedded changed fields" do
+          embedded_set_expectation.call
+          embedded.persist
         end
       end
     end
