@@ -1,6 +1,22 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
+    # Update is a persistence command responsible for taking a document that
+    # has already been saved to the database and saving it, depending on
+    # whether or not the document has been modified.
+    #
+    # Before persisting the command will check via dirty attributes if the
+    # document has changed, if not, it will simply return true. If it has it
+    # will go through the validation steps, run callbacks, and set the changed
+    # fields atomically on the document. The underlying query resembles the
+    # following MongoDB query:
+    #
+    #   collection.update(
+    #     { "_id" : "testing" },
+    #     { "$set" : { "field" : "value" },
+    #     false,
+    #     false
+    #   );
     class Update #:nodoc:
 
       attr_reader :collection, :document, :options, :validate
