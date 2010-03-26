@@ -61,7 +61,7 @@ module Mongoid #:nodoc:
       def persist
         if @document.changed?
           return false if validate && !@document.valid?
-          @document.run_callbacks(:save) do
+          @document.run_callbacks(:save, :update) do
             if update
               @document.move_changes
             else
