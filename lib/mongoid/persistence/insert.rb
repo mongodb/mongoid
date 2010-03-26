@@ -60,14 +60,10 @@ module Mongoid #:nodoc:
       def insert_embedded
         parent = @document._parent
         if parent.new_record?
-          @document.notify_observers(document, true)
-          parent.insert
+          @document.notify_observers(document, true); parent.insert
         else
-          collection.update(
-            parent.selector,
-            { @document.path => { "$push" => @document.raw_attributes } },
-            @options
-          )
+          update = { @document.path => { "$push" => @document.raw_attributes } }
+          collection.update(parent.selector, update, @options)
         end
       end
     end
