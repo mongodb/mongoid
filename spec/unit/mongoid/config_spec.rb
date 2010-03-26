@@ -66,6 +66,10 @@ describe Mongoid::Config do
         config.persist_in_safe_mode = false
       end
 
+      after do
+        config.persist_in_safe_mode = true
+      end
+
       it "sets the value" do
         config.persist_in_safe_mode.should == false
       end
