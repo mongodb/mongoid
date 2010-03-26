@@ -9,7 +9,7 @@ class Address
   field :parent_title
   field :services, :type => Array
   key :street
-  embed_many :locations
+  embeds_many :locations
 
   embedded_in :addressable, :inverse_of => :addresses do
     def extension

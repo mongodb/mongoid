@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Associations::EmbedOne do
+describe Mongoid::Associations::EmbedsOne do
 
   before do
     @attributes = { "mixed_drink" => {
@@ -15,7 +15,7 @@ describe Mongoid::Associations::EmbedOne do
     context "when attributes provided" do
 
       before do
-        @association = Mongoid::Associations::EmbedOne.new(
+        @association = Mongoid::Associations::EmbedsOne.new(
           @document,
           @attributes["mixed_drink"],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
@@ -32,7 +32,7 @@ describe Mongoid::Associations::EmbedOne do
     context "when a type is supplied" do
 
       before do
-        @association = Mongoid::Associations::EmbedOne.new(
+        @association = Mongoid::Associations::EmbedsOne.new(
           @document,
           @attributes["writer"],
           Mongoid::Associations::Options.new(:name => :writer)
@@ -75,7 +75,7 @@ describe Mongoid::Associations::EmbedOne do
         end
       }
       @options = Mongoid::Associations::Options.new(:name => :name, :extend => @block)
-      @association = Mongoid::Associations::EmbedOne.new(@parent, {}, @options)
+      @association = Mongoid::Associations::EmbedsOne.new(@parent, {}, @options)
     end
 
     context "when the options have an extension" do
@@ -94,7 +94,7 @@ describe Mongoid::Associations::EmbedOne do
 
       before do
         @document = Person.new
-        @association = Mongoid::Associations::EmbedOne.instantiate(
+        @association = Mongoid::Associations::EmbedsOne.instantiate(
           @document,
           Mongoid::Associations::Options.new(:name => :name)
         )
@@ -110,7 +110,7 @@ describe Mongoid::Associations::EmbedOne do
 
       before do
         @document = stub(:raw_attributes => { "name" => {} })
-        @association = Mongoid::Associations::EmbedOne.instantiate(
+        @association = Mongoid::Associations::EmbedsOne.instantiate(
           @document,
           Mongoid::Associations::Options.new(:name => :name)
         )
@@ -130,8 +130,8 @@ describe Mongoid::Associations::EmbedOne do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::EmbedOne.expects(:new).with(@document, { "first_name" => "Test" }, @options)
-        Mongoid::Associations::EmbedOne.instantiate(@document, @options)
+        Mongoid::Associations::EmbedsOne.expects(:new).with(@document, { "first_name" => "Test" }, @options)
+        Mongoid::Associations::EmbedsOne.instantiate(@document, @options)
       end
 
     end
@@ -141,7 +141,7 @@ describe Mongoid::Associations::EmbedOne do
   describe "#method_missing" do
 
     before do
-      @association = Mongoid::Associations::EmbedOne.new(
+      @association = Mongoid::Associations::EmbedsOne.new(
         @document,
         @attributes["mixed_drink"],
         Mongoid::Associations::Options.new(:name => :mixed_drink)
@@ -172,7 +172,7 @@ describe Mongoid::Associations::EmbedOne do
     context "when attributes provided" do
 
       before do
-        @association = Mongoid::Associations::EmbedOne.new(
+        @association = Mongoid::Associations::EmbedsOne.new(
           @document,
           @attributes["mixed_drink"],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
@@ -190,8 +190,8 @@ describe Mongoid::Associations::EmbedOne do
 
   describe ".macro" do
 
-    it "returns :embed_one" do
-      Mongoid::Associations::EmbedOne.macro.should == :embed_one
+    it "returns :embeds_one" do
+      Mongoid::Associations::EmbedsOne.macro.should == :embeds_one
     end
 
   end
@@ -203,7 +203,7 @@ describe Mongoid::Associations::EmbedOne do
       before do
         @name = Name.new(:first_name => "Donald")
         @person = Person.new(:title => "Sir")
-        @association = Mongoid::Associations::EmbedOne.update(
+        @association = Mongoid::Associations::EmbedsOne.update(
           @name,
           @person,
           Mongoid::Associations::Options.new(:name => :name)
@@ -230,7 +230,7 @@ describe Mongoid::Associations::EmbedOne do
       before do
         @name = Name.new(:first_name => "Donald")
         @person = Person.new(:title => "Sir")
-        Mongoid::Associations::EmbedOne.update(
+        Mongoid::Associations::EmbedsOne.update(
           nil,
           @person,
           Mongoid::Associations::Options.new(:name => :name)
@@ -248,7 +248,7 @@ describe Mongoid::Associations::EmbedOne do
   describe "#to_a" do
 
     before do
-      @association = Mongoid::Associations::EmbedOne.new(
+      @association = Mongoid::Associations::EmbedsOne.new(
         @document,
         @attributes["mixed_drink"],
         Mongoid::Associations::Options.new(:name => :mixed_drink)
@@ -268,7 +268,7 @@ describe Mongoid::Associations::EmbedOne do
       before do
         @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } }, :update => true)
         @options = Mongoid::Associations::Options.new(:name => :name)
-        @association = Mongoid::Associations::EmbedOne.instantiate(@document, @options)
+        @association = Mongoid::Associations::EmbedsOne.instantiate(@document, @options)
       end
 
       it "validates the document" do

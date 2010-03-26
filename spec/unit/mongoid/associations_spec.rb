@@ -274,7 +274,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".embed_many" do
+  describe ".embeds_many" do
 
     it "adds a new Association to the collection" do
       person = Person.new
@@ -350,7 +350,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".embed_one" do
+  describe ".embeds_one" do
 
     before do
       @person = Person.new
@@ -421,7 +421,7 @@ describe Mongoid::Associations do
   describe ".reflect_on_association" do
 
     it "returns the association class for the name" do
-      Person.reflect_on_association(:addresses).should == :embed_many
+      Person.reflect_on_association(:addresses).should == :embeds_many
     end
 
   end

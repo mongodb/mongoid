@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class EmbedMany
+    class EmbedsMany
       include Proxy
 
       attr_accessor :association_name, :klass
@@ -163,7 +163,7 @@ module Mongoid #:nodoc:
 
       class << self
 
-        # Preferred method of creating a new +EmbedMany+ association. It will
+        # Preferred method of creating a new +EmbedsMany+ association. It will
         # delegate to new.
         #
         # Options:
@@ -176,7 +176,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :embed_many
+          :embeds_many
         end
 
         # Perform an update of the relationship of the parent and child. This

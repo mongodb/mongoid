@@ -105,5 +105,16 @@ describe Mongoid::Persistence::Insert do
         document.new_record?.should == false
       end
     end
+
+    context "when the document is embedded" do
+
+      context "when the embedded document is an embeds_one" do
+
+      end
+
+      context "when the embedded document is an embeds_many" do
+
+      end
+    end
   end
 end

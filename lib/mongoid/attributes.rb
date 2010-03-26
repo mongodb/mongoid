@@ -159,8 +159,8 @@ module Mongoid #:nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     embed_one :name
-      #     embed_many :addresses
+      #     embeds_one :name
+      #     embeds_many :addresses
       #
       #     accepts_nested_attributes_for :name, :addresses
       #   end
