@@ -49,11 +49,25 @@ module Mongoid #:nodoc:
       protected
       # Insert the document into the database.
       def insert
-        if @document.embedded && @document._parent.new_record?
-          @document.notify_observers(document, true)
-          @document._parent.insert
+        if @document.embedded
+          insert_embedded
         else
           collection.insert(@document.raw_attributes, options)
+        end
+      end
+
+      # Logic for determining how to insert the embedded doc.
+      def insert_embedded
+        parent = @document._parent
+        if parent.new_record?
+          @document.notify_observers(document, true)
+          parent.insert
+        else
+          collection.update(
+            parent.selector,
+            { @document.path => { "$push" => @document.raw_attributes } },
+            @options
+          )
         end
       end
     end
