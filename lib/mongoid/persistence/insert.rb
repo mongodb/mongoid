@@ -49,7 +49,12 @@ module Mongoid #:nodoc:
       protected
       # Insert the document into the database.
       def insert
-        collection.insert(@document.raw_attributes, options)
+        if @document.embedded && @document._parent.new_record?
+          @document.notify_observers(document, true)
+          @document._parent.insert
+        else
+          collection.insert(@document.raw_attributes, options)
+        end
       end
     end
   end

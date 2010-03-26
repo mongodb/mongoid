@@ -20,6 +20,7 @@ module Mongoid #:nodoc
       include Mongoid::Memoization
       include Mongoid::Observable
       include Mongoid::Paths
+      include Mongoid::Persistence
       include Mongoid::State
       include Mongoid::Validations
       extend ActiveModel::Translation

@@ -6,7 +6,7 @@ describe Mongoid::Associations::EmbedsMany do
     @attributes = { "addresses" => [
       { "_id" => "street-1", "street" => "Street 1", "state" => "CA" },
       { "_id" => "street-2", "street" => "Street 2" } ] }
-    @document = stub(:raw_attributes => @attributes, :add_observer => true, :update => true)
+    @document = stub(:raw_attributes => @attributes, :add_observer => true, :observe => true)
   end
 
   describe "#[]" do
@@ -310,7 +310,7 @@ describe Mongoid::Associations::EmbedsMany do
     context "when no extension exists" do
 
       before do
-        @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :update => true)
+        @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :observe => true)
         @association = Mongoid::Associations::EmbedsMany.new(
           @canvas,
           Mongoid::Associations::Options.new(:name => :shapes)

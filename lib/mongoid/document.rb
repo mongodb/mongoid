@@ -286,7 +286,7 @@ module Mongoid #:nodoc:
       #
       # This will also cause the observing +Document+ to notify it's parent if
       # there is any.
-      def update(child, clear = false)
+      def observe(child, clear = false)
         name = child.association_name
         attrs = child.instance_variable_get(:@attributes)
         clear ? @attributes.delete(name) : @attributes.insert(name, attrs)

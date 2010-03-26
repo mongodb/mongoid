@@ -6,6 +6,10 @@ describe Mongoid::Persistence::Insert do
     Patient.new(:title => "Mr")
   end
 
+  let(:address) do
+    Address.new(:street => "Oxford St")
+  end
+
   let(:collection) do
     stub.quacks_like(Mongoid::Collection.allocate)
   end
@@ -112,7 +116,7 @@ describe Mongoid::Persistence::Insert do
 
         context "when the parent is new" do
 
-          it "inserts the parent"
+          it "notifies its changes to parent and inserts the parent"
 
         end
 
@@ -124,9 +128,20 @@ describe Mongoid::Persistence::Insert do
 
       context "when the embedded document is an embeds_many" do
 
+        before do
+          document.addresses << address
+        end
+
         context "when the parent is new" do
 
-          it "inserts the parent"
+          let(:insert) do
+            Mongoid::Persistence::Insert.new(address)
+          end
+
+          it "notifies its changes to the parent and inserts the parent" do
+            root_set_expectation.call
+            insert.persist.should == address
+          end
         end
 
         context "when the parent is not new" do

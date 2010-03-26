@@ -172,7 +172,7 @@ module Mongoid #:nodoc:
             reject(attrs, options)
             association = send(name)
             if association
-              update(association, true)
+              observe(association, true)
               association.nested_build(attrs)
             else
               send("build_#{name}", attrs)

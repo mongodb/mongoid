@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
     #
     # <tt>document.notify_observers(self)</tt>
     def notify_observers(*args)
-      @observers.dup.each { |observer| observer.update(*args) } if @observers
+      @observers.dup.each { |observer| observer.observe(*args) } if @observers
     end
   end
 end
