@@ -53,6 +53,16 @@ describe Mongoid::Persistence::Insert do
       }
     end
 
+    def root_push_expectation
+      lambda {
+        collection.expects(:update).with(
+          { "_id" => document.id },
+          { "addresses" => { "$push" => address.raw_attributes } },
+          :safe => true
+        ).returns("Object")
+      }
+    end
+
     let(:insert) do
       Mongoid::Persistence::Insert.new(document)
     end
@@ -146,7 +156,18 @@ describe Mongoid::Persistence::Insert do
 
         context "when the parent is not new" do
 
-          it "performs a $push on the embedded array"
+          let(:insert) do
+            Mongoid::Persistence::Insert.new(address)
+          end
+
+          before do
+            document.instance_variable_set(:@new_record, false)
+          end
+
+          it "performs a $push on the embedded array" do
+            root_push_expectation.call
+            insert.persist.should == address
+          end
         end
       end
     end
