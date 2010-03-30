@@ -78,6 +78,7 @@ require "mongoid/validations"
 require "mongoid/versioning"
 require "mongoid/components"
 require "mongoid/document"
+require "mongoid/railtie"
 
 module Mongoid #:nodoc
 
