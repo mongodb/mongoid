@@ -201,7 +201,7 @@ describe Mongoid::Dirty do
 
         it "returns a hash of field names and new values" do
           @address.setters.should ==
-            { "addresses.$.street" => "Bond St" }
+            { "addresses.0.street" => "Bond St" }
         end
       end
     end
