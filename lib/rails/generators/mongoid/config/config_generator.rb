@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'rails/generators/mongoid_generator'
 
 module Mongoid

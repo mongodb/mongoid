@@ -1,20 +1,20 @@
+# encoding: utf-8
 if defined?(Rails::Railtie)
-  module Rails
-    module Mongoid
-
+  module Rails #:nodoc:
+    module Mongoid #:nodoc:
       class Railtie < Rails::Railtie
-        
+
         # do we want a custom log subscriber for mongoid?
         # log_subscriber :mongoid, ::Mongoid::Railties::LogSubscriber.new
 
         config.generators.orm :mongoid, :migration => false
-      
+
         rake_tasks do
-          load 'mongoid/railties/database.rake'
+          load "mongoid/railties/database.rake"
         end
-        
-        initializer "setup database" do 
-          config_file = Rails.root.join('config', 'database.mongo.yml')
+
+        initializer "setup database" do
+          config_file = Rails.root.join("config", "mongoid.yml")
           if config_file.file?
             settings = YAML.load(ERB.new(config_file.read).result)[Rails.env]
             if settings.present?
@@ -31,7 +31,7 @@ if defined?(Rails::Railtie)
                 if settings.has_key?("max_successive_reads")
                   config.max_successive_reads = settings["max_successive_reads"].to_i
                 end
-                
+
                 if settings.has_key?("parameterize_keys")
                   config.parameterize_keys = !!settings["parameterize_keys"]
                 end
@@ -50,7 +50,11 @@ if defined?(Rails::Railtie)
 
                 config.slaves = []
                 settings["slaves"].to_a.each do |slave_config|
-                  config.slaves << Mongo::Connection.new(slave_config["host"] || host, slave_config["port"] || port, :slave_ok => true).db(database)
+                  config.slaves << Mongo::Connection.new(
+                    slave_config["host"] || host,
+                    slave_config["port"] || port,
+                    :slave_ok => true
+                  ).db(database)
                 end
               end
             end
@@ -62,8 +66,8 @@ if defined?(Rails::Railtie)
             begin
               ::Mongoid.master
             rescue ::Mongoid::Errors::InvalidDatabase => e
-              unless Rails.root.join("config", "database.mongo.yml").file?
-                puts "\nMongoid config not found. Create a config file at: config/database.mongo.yml"
+              unless Rails.root.join("config", "mongoid.yml").file?
+                puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
                 puts "to generate one run: script/rails generate mongoid:config\n\n"
               end
             end

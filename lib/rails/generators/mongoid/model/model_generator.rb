@@ -1,10 +1,10 @@
-require 'rails/generators/mongoid_generator'
+# encoding: utf-8
+require "rails/generators/mongoid_generator"
 
-module Mongoid
-  module Generators
+module Mongoid #:nodoc:
+  module Generators #:nodoc:
+    class ModelGenerator < Base #:nodoc:
 
-    class ModelGenerator < Base
-      
       desc "Creates a Mongoid model"
       argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
 
@@ -14,12 +14,10 @@ module Mongoid
       class_option :parent,     :type => :string, :desc => "The parent class for the generated model"
 
       def create_model_file
-        template 'model.rb', File.join('app/models', class_path, "#{file_name}.rb")
+        template "model.rb", File.join("app/models", class_path, "#{file_name}.rb")
       end
 
       hook_for :test_framework
-
     end
-
   end
 end

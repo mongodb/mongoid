@@ -1,9 +1,9 @@
-require 'rails/generators/named_base'
-require 'rails/generators/active_model'
+# encoding: utf-8
+require "rails/generators/named_base"
+require "rails/generators/active_model"
 
-module Mongoid
-  module Generators
-
+module Mongoid #:nodoc:
+  module Generators #:nodoc:
     class Base < ::Rails::Generators::NamedBase #:nodoc:
 
       def self.source_root
@@ -52,8 +52,8 @@ module Rails
   module Generators
     class GeneratedAttribute #:nodoc:
       def type_class
-        return 'Time' if type.to_s == 'datetime'
-        return 'String' if type.to_s == 'text'
+        return "Time" if type.to_s == "datetime"
+        return "String" if type.to_s == "text"
         return type.to_s.camelcase
       end
     end

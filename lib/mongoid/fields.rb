@@ -56,7 +56,6 @@ module Mongoid #:nodoc
           (options[:type] == Boolean) ? attr == true : attr.present?
         end
       end
-
     end
   end
 end
