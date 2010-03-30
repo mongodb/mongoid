@@ -2,7 +2,8 @@
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
     # Insert is a persistence command responsible for taking a document that
-    # has not been saved to the database and saving it.
+    # has not been saved to the database and saving it. This specific class
+    # handles the case when the document is embedded in another.
     #
     # The underlying query resembles the following MongoDB query:
     #
@@ -10,7 +11,7 @@ module Mongoid #:nodoc:
     #     { "_id" : 1, "field" : "value" },
     #     false
     #   );
-    class Insert
+    class InsertEmbedded
       include Persistence::Command
 
       # Create the new insert persister.
@@ -28,8 +29,9 @@ module Mongoid #:nodoc:
         @options = { :safe => Mongoid.persist_in_safe_mode }
       end
 
-      # Insert the new document in the database. This delegates to the standard
-      # MongoDB collection's insert command.
+      # Insert the new document in the database. If the document's parent is a
+      # new record, we will call save on the parent, otherwise we will $push
+      # the document onto the parent.
       #
       # Example:
       #
@@ -39,21 +41,14 @@ module Mongoid #:nodoc:
       #
       # The +Document+, whether the insert succeeded or not.
       def persist
-        return @document if @validate && !@document.valid?
-        @document.run_callbacks(:create, :save) do
-          @document.new_record = false if insert
-          @document
-        end
-      end
-
-      protected
-      # Insert the document into the database.
-      def insert
-        if @document.embedded
-          Persistence::InsertEmbedded.new(@document, @validate).persist
+        parent = @document._parent
+        if parent.new_record?
+          parent.insert
         else
-          collection.insert(@document.raw_attributes, options)
+          update = { @document.path => { "$push" => @document.raw_attributes } }
+          collection.update(parent.selector, update, @options)
         end
+        @document
       end
     end
   end
