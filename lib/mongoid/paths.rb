@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Paths #:nodoc:
     extend ActiveSupport::Concern
     included do
-      cattr_accessor :_path, :_position
-      delegate :_path, :_position, :to => "self.class"
+      cattr_accessor :_path
     end
     module InstanceMethods
       # Return the path to this +Document+ in JSON notation, used for atomic
@@ -14,9 +13,9 @@ module Mongoid #:nodoc:
       #
       # <tt>address.path # returns "addresses"</tt>
       def path
-        self._path ||= climb("") do |document, value|
-          value = "#{document.association_name}#{"." + value unless value.blank?}"
-        end
+        self._path ||= lambda do
+          embedded ? "#{_parent.path}#{"." unless _parent.path.blank?}#{@association_name}" : ""
+        end.call
       end
 
       # Returns the positional operator of this document for modification.
@@ -25,7 +24,10 @@ module Mongoid #:nodoc:
       #
       # <tt>address.position</tt>
       def position
-        self._position ||= (path.blank? ? "" : "#{path}.$")
+        # TODO: Need to find the appropriate index in the array... Would be
+        # nice if we had: http://jira.mongodb.org/browse/SERVER-831
+        index = 0
+        embedded ? "#{_parent.position}#{"." unless _parent.position.blank?}#{@association_name}.#{index}" : ""
       end
 
       # Return the selector for this document to be matched exactly for use
@@ -35,19 +37,7 @@ module Mongoid #:nodoc:
       #
       # <tt>address.selector</tt>
       def selector
-        @selector ||= climb({ "_id" => _root.id }) do |document, value|
-          value["#{document.path}._id"] = document.id; value
-        end
-      end
-
-      protected
-      def climb(value, &block)
-        document = self;
-        while (document._parent) do
-          value = yield document, value
-          document = document._parent
-        end
-        value
+        embedded ? _parent.selector.merge("#{path}._id" => id) : { "_id" => id }
       end
     end
   end

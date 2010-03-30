@@ -101,7 +101,7 @@ describe Mongoid::Paths do
       end
 
       it "returns the path plus $" do
-        address.position.should == "addresses.$"
+        address.position.should == "addresses.0"
       end
     end
 
@@ -113,11 +113,7 @@ describe Mongoid::Paths do
       end
 
       it "returns the path plus $" do
-        location.position.should == "addresses.locations.$"
-      end
-
-      it "sets the matcher class instance var" do
-        Location._position.should == "addresses.locations.$"
+        location.position.should == "addresses.0.locations.0"
       end
     end
   end
