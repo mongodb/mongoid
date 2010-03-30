@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/persistence/command"
 require "mongoid/persistence/insert"
+require "mongoid/persistence/insert_embedded"
 require "mongoid/persistence/update"
 
 module Mongoid #:nodoc:

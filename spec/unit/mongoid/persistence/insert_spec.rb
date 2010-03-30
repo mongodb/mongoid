@@ -122,53 +122,22 @@ describe Mongoid::Persistence::Insert do
 
     context "when the document is embedded" do
 
-      context "when the embedded document is an embeds_one" do
-
-        context "when the parent is new" do
-
-          it "notifies its changes to parent and inserts the parent"
-
-        end
-
-        context "when the parent is not new" do
-
-          it "performs an in place $set on the embedded document"
-        end
+      before do
+        document.addresses << address
       end
 
-      context "when the embedded document is an embeds_many" do
+      let(:insert) do
+        Mongoid::Persistence::Insert.new(address)
+      end
 
-        before do
-          document.addresses << address
-        end
+      let(:persister) do
+        stub.quacks_like(Mongoid::Persistence::InsertEmbedded.allocate)
+      end
 
-        context "when the parent is new" do
-
-          let(:insert) do
-            Mongoid::Persistence::Insert.new(address)
-          end
-
-          it "notifies its changes to the parent and inserts the parent" do
-            root_set_expectation.call
-            insert.persist.should == address
-          end
-        end
-
-        context "when the parent is not new" do
-
-          let(:insert) do
-            Mongoid::Persistence::Insert.new(address)
-          end
-
-          before do
-            document.instance_variable_set(:@new_record, false)
-          end
-
-          it "performs a $push on the embedded array" do
-            root_push_expectation.call
-            insert.persist.should == address
-          end
-        end
+      it "delegates to the embedded persister" do
+        Mongoid::Persistence::InsertEmbedded.expects(:new).with(address, true).returns(persister)
+        persister.expects(:persist).returns(address)
+        insert.persist.should == address
       end
     end
   end
