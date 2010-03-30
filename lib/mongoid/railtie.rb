@@ -56,6 +56,19 @@ if defined?(Rails::Railtie)
             end
           end
         end
+
+        initializer "verify that mongoid is configured" do
+          config.after_initialize do
+            begin
+              ::Mongoid.master
+            rescue ::Mongoid::Errors::InvalidDatabase => e
+              unless Rails.root.join("config", "database.mongo.yml").file?
+                puts "\nMongoid config not found. Create a config file at: config/database.mongo.yml"
+                puts "to generate one run: script/rails generate mongoid:config\n\n"
+              end
+            end
+          end
+        end
       end
     end
   end
