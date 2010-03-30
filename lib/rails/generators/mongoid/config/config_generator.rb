@@ -5,7 +5,7 @@ module Mongoid
   module Generators
 
     class ConfigGenerator < Rails::Generators::Base
-      desc "Creates a Mongoid configuration file at config/database.mongo.yml"
+      desc "Creates a Mongoid configuration file at config/mongoid.yml"
       
       argument :database_name, :type => :string, :optional => true
       
@@ -20,7 +20,7 @@ module Mongoid
       end
       
       def create_config_file
-        template 'database.mongo.yml', File.join('config', "database.mongo.yml")
+        template 'mongoid.yml', File.join('config', "mongoid.yml")
       end
       
     end
