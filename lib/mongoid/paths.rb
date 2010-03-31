@@ -7,6 +7,16 @@ module Mongoid #:nodoc:
       attr_accessor :_index
     end
     module InstanceMethods
+      # Get the insertion modifier for the document. Will be nil on root
+      # documents, $set on embeds_one, $push on embeds_many.
+      #
+      # Example:
+      #
+      # <tt>name.inserter</tt>
+      def inserter
+        embedded ? (_index ? "$push" : "$set") : nil
+      end
+
       # Return the path to this +Document+ in JSON notation, used for atomic
       # updates via $set in MongoDB.
       #
