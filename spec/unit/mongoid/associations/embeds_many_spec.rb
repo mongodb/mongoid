@@ -59,6 +59,12 @@ describe Mongoid::Associations::EmbedsMany do
       @association.length.should == 4
     end
 
+    it "sets the index of the document in the array" do
+      addr = Address.new
+      @association << addr
+      addr._index.should == 2
+    end
+
   end
 
   describe "#build" do
@@ -306,6 +312,21 @@ describe Mongoid::Associations::EmbedsMany do
   end
 
   describe "#initialize" do
+
+    context "setting position" do
+
+      before do
+        @canvas = stub(:raw_attributes => { "shapes" => [{ "_type" => "Circle", "radius" => 5 }] }, :observe => true)
+        @association = Mongoid::Associations::EmbedsMany.new(
+          @canvas,
+          Mongoid::Associations::Options.new(:name => :shapes)
+        )
+      end
+
+      it "sets the index of each document" do
+        @association.first._index.should == 0
+      end
+    end
 
     context "when no extension exists" do
 

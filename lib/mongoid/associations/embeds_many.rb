@@ -12,6 +12,7 @@ module Mongoid #:nodoc:
         documents.flatten.each do |doc|
           doc.parentize(@parent, @association_name)
           @target << doc
+          doc._index = @target.size - 1
           doc.notify
         end
       end
@@ -153,12 +154,16 @@ module Mongoid #:nodoc:
       protected
       # Initializes each of the attributes in the hash.
       def initialize_each(attributes)
-        @target = attributes ? attributes.collect do |attrs|
-          klass = attrs.klass
-          child = klass ? klass.instantiate(attrs) : @klass.instantiate(attrs)
-          child.parentize(@parent, @association_name)
-          child
-        end : []
+        @target = []
+        if attributes
+          attributes.each_with_index do |attrs, index|
+            klass = attrs.klass
+            child = klass ? klass.instantiate(attrs) : @klass.instantiate(attrs)
+            child.parentize(@parent, @association_name)
+            child._index = index
+            @target << child
+          end
+        end
       end
 
       class << self

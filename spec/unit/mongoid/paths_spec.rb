@@ -100,7 +100,7 @@ describe Mongoid::Paths do
         person.addresses << address
       end
 
-      it "returns the path plus $" do
+      it "returns the path plus index" do
         address.position.should == "addresses.0"
       end
     end
@@ -108,12 +108,13 @@ describe Mongoid::Paths do
     context "when document embedded multiple levels" do
 
       before do
-        address.locations << location
+        @other = Location.new
+        address.locations << [ @other, location ]
         person.addresses << address
       end
 
-      it "returns the path plus $" do
-        location.position.should == "addresses.0.locations.0"
+      it "returns the path plus index" do
+        location.position.should == "addresses.0.locations.1"
       end
     end
   end
