@@ -26,6 +26,10 @@ module Mongoid #:nodoc:
       def position
         # TODO: Need to find the appropriate index in the array... Would be
         # nice if we had: http://jira.mongodb.org/browse/SERVER-831
+        #
+        # If I am embedded in an embeds_one, index is blank
+        # If I am embedded in an embeds_many, index is . plus my index in the
+        # array.
         index = 0
         embedded ? "#{_parent.position}#{"." unless _parent.position.blank?}#{@association_name}.#{index}" : ""
       end
