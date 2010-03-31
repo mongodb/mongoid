@@ -11,24 +11,7 @@ module Mongoid #:nodoc:
     #     { "_id" : 1, "field" : "value" },
     #     false
     #   );
-    class InsertEmbedded
-      include Persistence::Command
-
-      # Create the new insert persister.
-      #
-      # Options:
-      #
-      # document: The +Document+ to persist.
-      # validate: +Boolean+ to validate or not.
-      #
-      # Example:
-      #
-      # <tt>Insert.new(document)</tt>
-      def initialize(document, validate = true)
-        init(document, validate)
-        @options = { :safe => Mongoid.persist_in_safe_mode }
-      end
-
+    class InsertEmbedded < Command
       # Insert the new document in the database. If the document's parent is a
       # new record, we will call save on the parent, otherwise we will $push
       # the document onto the parent.
