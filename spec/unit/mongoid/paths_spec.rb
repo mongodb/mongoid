@@ -14,6 +14,39 @@ describe Mongoid::Paths do
     Location.new
   end
 
+  let(:name) do
+    Name.new
+  end
+
+  describe "#inserter" do
+
+    before do
+      person.addresses << address
+      person.name = name
+    end
+
+    context "when document is root" do
+
+      it "returns nil" do
+        person.inserter.should be_nil
+      end
+    end
+
+    context "when document is an embeds_one" do
+
+      it "returns $set" do
+        name.inserter.should == "$set"
+      end
+    end
+
+    context "when document is an embeds_many" do
+
+      it "returns $push" do
+        address.inserter.should == "$push"
+      end
+    end
+  end
+
   describe "#path" do
 
     context "when the document is a parent" do
