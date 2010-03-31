@@ -22,7 +22,19 @@ if defined?(Rails::Railtie)
                 database = settings["database"]
                 host = settings["host"]
                 port = settings["port"]
-                config.master = Mongo::Connection.new(host, port).db(database)
+                opts = {}
+
+                # allow passing in of connection options
+                if settings["connection"].is_a?(Hash)
+                  opts = settings["connection"]
+                end
+
+                config.master = Mongo::Connection.new(host, port, opts).db(database)
+
+                # handle authentication is a username is specified
+                if settings.has_key?("username")
+                  config.master.authenticate(settings["username"].to_s, settings["password"].to_s)
+                end
 
                 if settings.has_key?("allow_dynamic_fields")
                   config.allow_dynamic_fields = !!settings["allow_dynamic_fields"]
