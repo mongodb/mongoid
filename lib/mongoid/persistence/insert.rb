@@ -10,24 +10,7 @@ module Mongoid #:nodoc:
     #     { "_id" : 1, "field" : "value" },
     #     false
     #   );
-    class Insert
-      include Persistence::Command
-
-      # Create the new insert persister.
-      #
-      # Options:
-      #
-      # document: The +Document+ to persist.
-      # validate: +Boolean+ to validate or not.
-      #
-      # Example:
-      #
-      # <tt>Insert.new(document)</tt>
-      def initialize(document, validate = true)
-        init(document, validate)
-        @options = { :safe => Mongoid.persist_in_safe_mode }
-      end
-
+    class Insert < Command
       # Insert the new document in the database. This delegates to the standard
       # MongoDB collection's insert command.
       #

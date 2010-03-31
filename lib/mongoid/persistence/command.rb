@@ -1,8 +1,9 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
-    # Mixin for common functionality for all persistence commands.
-    module Command
+    # Persistence commands extend from this class to get basic functionality on
+    # initialization.
+    class Command
       attr_reader :collection, :document, :options, :validate
       # Initialize the persistence +Command+.
       #
@@ -10,10 +11,11 @@ module Mongoid #:nodoc:
       #
       # document: The +Document+ to be persisted.
       # validate: Is the document to be validated.
-      def init(document, validate)
+      def initialize(document, validate = true)
         @collection = document.embedded ? document._root.collection : document.collection
         @document = document
         @validate = validate
+        @options = { :safe => Mongoid.persist_in_safe_mode }
       end
     end
   end

@@ -35,11 +35,6 @@ describe Mongoid::Persistence::Update do
     it "defaults validation to true" do
       update.validate.should == true
     end
-
-    it "sets the options" do
-      update.options.should ==
-        { :multi => false, :safe => Mongoid.persist_in_safe_mode }
-    end
   end
 
   describe "#persist" do

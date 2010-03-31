@@ -27,24 +27,7 @@ module Mongoid #:nodoc:
     #     false
     #   );
     #
-    class Update
-      include Persistence::Command
-
-      # Create the new update persister.
-      #
-      # Options:
-      #
-      # document: The +Document+ to persist.
-      # validate: +Boolean+ to validate or not.
-      #
-      # Example:
-      #
-      # <tt>Update.new(document)</tt>
-      def initialize(document, validate = true)
-        init(document, validate)
-        @options = { :multi => false, :safe => Mongoid.persist_in_safe_mode }
-      end
-
+    class Update < Command
       # Persist the document that is to be updated to the database. This will
       # only write changed fields via MongoDB's $set modifier operation.
       #
@@ -71,7 +54,7 @@ module Mongoid #:nodoc:
       protected
       # Update the document in the database atomically.
       def update
-        collection.update(@document.selector, { "$set" => @document.setters }, @options)
+        collection.update(@document.selector, { "$set" => @document.setters }, @options.merge(:multi => false))
       end
     end
   end
