@@ -257,7 +257,7 @@ describe Mongoid::Attributes do
 
       end
 
-      context "when association is a belongs_to" do
+      context "when association is a embedded_in" do
 
         before do
           @person = Person.new

@@ -458,7 +458,7 @@ describe Mongoid::Document do
 
   end
 
-  context "setting belongs_to" do
+  context "setting embedded_in" do
 
     before do
       @person = Person.new(:title => "Mr")

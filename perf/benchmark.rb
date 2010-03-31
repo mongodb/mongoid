@@ -14,9 +14,9 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   field :birth_date, :type => Date
-  has_one :name
-  has_one :address
-  has_many :phones
+  embeds_on :name
+  embeds_on :address
+  embeds_many :phones
 end
 
 class Name
@@ -24,7 +24,7 @@ class Name
   field :given
   field :family
   field :middle
-  belongs_to :person, :inverse_of => :name
+  embedded_in :person, :inverse_of => :name
 end
 
 class Address
@@ -34,7 +34,7 @@ class Address
   field :state
   field :post_code
   field :address_type
-  belongs_to :person, :inverse_of => :address
+  embedded_in :person, :inverse_of => :address
 end
 
 class Phone
@@ -42,7 +42,7 @@ class Phone
   field :country_code, :type => Integer
   field :number
   field :phone_type
-  belongs_to :person, :inverse_of => :phones
+  embedded_in :person, :inverse_of => :phones
 end
 
 # RubyProf.start

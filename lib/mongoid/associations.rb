@@ -60,7 +60,7 @@ module Mongoid # :nodoc:
       #   end
       def embedded_in(name, options = {}, &block)
         unless options.has_key?(:inverse_of)
-          raise Errors::InvalidOptions.new("Options for belongs_to association must include :inverse_of")
+          raise Errors::InvalidOptions.new("Options for embedded_in association must include :inverse_of")
         end
         self.embedded = true
         add_association(
@@ -206,7 +206,7 @@ module Mongoid # :nodoc:
       end
 
       # Returns the macro associated with the supplied association name. This
-      # will return has_one, has_many, belongs_to or nil.
+      # will return embeds_on, embeds_many, embedded_in or nil.
       #
       # Options:
       #

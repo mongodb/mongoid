@@ -39,7 +39,7 @@ describe Mongoid::Associations do
 
     end
 
-    context "when defined on a belongs_to" do
+    context "when defined on an embedded_in" do
 
       it "applies the extension" do
         @address_two.addressable.doctor?.should be_true
