@@ -326,7 +326,7 @@ describe Mongoid::Document do
       @from_db.save
     end
 
-    it "reloads the obejct attributes from the db" do
+    it "reloads the object attributes from the db" do
       @person.reload
       @person.age.should == 35
     end
@@ -334,6 +334,21 @@ describe Mongoid::Document do
     it "reload should return self" do
       @person.reload.should == @from_db
     end
+
+		context "when embedded documents change" do
+			
+			before do
+				@address = @person.addresses.create(:number => 27, :street => "Maiden Lane")
+			end	
+				
+			it "should reload (unmemoize) the associations" do
+				@person.addresses.should == [ @address ]
+				Person.collection.update({ '_id' => @person.id }, { '$pull' => { 'addresses' => { '_id' => @address.id } } })
+				@person.reload
+				@person.addresses.should == [ ]
+			end
+
+		end
 
   end
 
