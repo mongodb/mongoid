@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
         #
         # Returns: The child +Document+.
         def assimilate(parent, options, type = nil)
-          klass = type ? type : options.klass
+          klass = self.klass || (type ? type : options.klass)
           child = klass.instantiate(:_parent => parent)
           child.write_attributes(self.merge("_type" => klass.name))
           child.identify
