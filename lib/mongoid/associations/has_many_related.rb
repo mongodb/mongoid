@@ -54,7 +54,8 @@ module Mongoid #:nodoc:
       #
       # The number of objects deleted.
       def delete_all
-        @klass.delete_all(:conditions => { @foreign_key => @parent.id })
+        deleted = @klass.delete_all(:conditions => { @foreign_key => @parent.id })
+        reset; deleted
       end
 
       # Destroy all the associated objects.
@@ -67,7 +68,8 @@ module Mongoid #:nodoc:
       #
       # The number of objects destroyed.
       def destroy_all
-        @klass.destroy_all(:conditions => { @foreign_key => @parent.id })
+        destroyed = @klass.destroy_all(:conditions => { @foreign_key => @parent.id })
+        reset; destroyed
       end
 
       # Finds a document in this association.
@@ -85,7 +87,7 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options, target = nil)
-        @parent, @klass = document, options.klass
+        @parent, @klass, @options = document, options.klass, options
         @foreign_key = options.foreign_key
         @base = lambda { @klass.all(:conditions => { @foreign_key => document.id }) }
         @target = target || @base.call
@@ -117,6 +119,11 @@ module Mongoid #:nodoc:
       # Load the target entries if the document is new.
       def load_target
         @target = @target.entries if @parent.new_record?
+      end
+
+      # Reset the memoized association on the parent.
+      def reset
+        @parent.send(:reset, @options.name) { @base.call }
       end
 
       class << self

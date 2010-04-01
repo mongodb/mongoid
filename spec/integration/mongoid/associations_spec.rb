@@ -128,6 +128,36 @@ describe Mongoid::Associations do
       from_db.posts.should == [@post]
     end
 
+    describe "#delete_all" do
+
+      context "without conditions" do
+
+        before do
+          @person.posts.delete_all
+        end
+
+        it "deletes all the related objects" do
+          Post.count.should == 0
+          @person.posts.size.should == 0
+        end
+      end
+    end
+
+    describe "#destroy_all" do
+
+      context "without conditions" do
+
+        before do
+          @person.posts.destroy_all
+        end
+
+        it "deletes all the related objects" do
+          Post.count.should == 0
+          @person.posts.size.should == 0
+        end
+      end
+    end
+
     context "when adding a new association" do
 
       before do
