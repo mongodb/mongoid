@@ -20,15 +20,6 @@ module Mongoid #:nodoc:
       alias :concat :<<
       alias :push :<<
 
-      # Clears the association, and notifies the parents of the removal.
-      def clear
-        unless @target.empty?
-          document = @target.first
-          document.notify_observers(document, true)
-          @target.clear
-        end
-      end
-
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
@@ -42,6 +33,15 @@ module Mongoid #:nodoc:
         document.write_attributes(attrs)
         @target << document
         document
+      end
+
+      # Clears the association, and notifies the parents of the removal.
+      def clear
+        unless @target.empty?
+          document = @target.first
+          document.notify_observers(document, true)
+          @target.clear
+        end
       end
 
       # Creates a new Document and adds it to the association collection. The
@@ -71,6 +71,34 @@ module Mongoid #:nodoc:
         errors = document.errors
         raise Errors::Validations.new(errors) unless errors.empty?
         document
+      end
+
+      # Delete all the documents in the association without running callbacks.
+      #
+      # Example:
+      #
+      # <tt>addresses.delete_all</tt>
+      #
+      # Returns:
+      #
+      # The number of documents deleted.
+      def delete_all
+        count = @target.size; clear; @parent.save; count
+      end
+
+      # Delete all the documents in the association and run destroy callbacks.
+      #
+      # Example:
+      #
+      # <tt>addresses.destroy_all</tt>
+      #
+      # Returns:
+      #
+      # The number of documents destroyed.
+      def destroy_all
+        count = @target.size
+        @target.each { |doc| doc.destroy }
+        clear; count
       end
 
       # Finds a document in this association.

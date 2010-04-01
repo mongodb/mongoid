@@ -248,6 +248,51 @@ describe Mongoid::Associations::EmbedsMany do
 
   end
 
+  describe "#delete_all" do
+
+    before do
+      @association = Mongoid::Associations::EmbedsMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+      @address = Address.new
+      @association << @address
+      @document.expects(:save).returns(true)
+    end
+
+    it "aliases to clear" do
+      @association.delete_all
+      @association.size.should == 0
+    end
+
+    it "returns the number of documents deleted" do
+      @association.delete_all.should == 3
+    end
+  end
+
+  describe "#destroy_all" do
+
+    before do
+      @association = Mongoid::Associations::EmbedsMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+      @address = Address.new
+      @association << @address
+      @document.expects(:remove).times(3)
+      @document.expects(:save).times(3)
+    end
+
+    it "aliases to clear" do
+      @association.destroy_all
+      @association.size.should == 0
+    end
+
+    it "returns the number of documents deleted" do
+      @association.destroy_all.should == 3
+    end
+  end
+
   describe "#find" do
 
     before do
