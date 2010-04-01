@@ -44,6 +44,32 @@ module Mongoid #:nodoc:
         object.run_callbacks(:create) { object.save }; object
       end
 
+      # Delete all the associated objects.
+      #
+      # Example:
+      #
+      # <tt>person.posts.delete_all</tt>
+      #
+      # Returns:
+      #
+      # The number of objects deleted.
+      def delete_all
+        @klass.delete_all(:conditions => { @foreign_key => @parent.id })
+      end
+
+      # Destroy all the associated objects.
+      #
+      # Example:
+      #
+      # <tt>person.posts.destroy_all</tt>
+      #
+      # Returns:
+      #
+      # The number of objects destroyed.
+      def destroy_all
+        @klass.destroy_all(:conditions => { @foreign_key => @parent.id })
+      end
+
       # Finds a document in this association.
       # If an id is passed, will return the document for that id.
       def find(*args)
