@@ -3,6 +3,7 @@ class Canvas
   field :name
   embeds_many :shapes
   embeds_one :writer
+  embeds_one :palette
 
   def render
     shapes.each { |shape| render }
@@ -54,3 +55,18 @@ end
 class PdfWriter < Writer
   def write; end
 end
+
+class Palette
+  include Mongoid::Document
+  embedded_in :canvas, :inverse_of => :palette
+  embeds_many :tools
+end
+
+class Tool
+  include Mongoid::Document
+  embedded_in :palette, :inverse_of => :tools
+end
+
+class Pencil < Tool; end
+
+class Eraser < Tool; end
