@@ -129,6 +129,36 @@ describe Mongoid::Associations::HasManyRelated do
 
   end
 
+  describe "#delete_all" do
+
+    before do
+      @criteria = mock
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      Post.expects(:all).returns(@criteria)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+    end
+
+    it "deletes all of the associated object" do
+      Post.expects(:delete_all).with(:conditions => { "person_id" => "5" }).returns(3)
+      @association.delete_all.should == 3
+    end
+  end
+
+  describe "#destroy_all" do
+
+    before do
+      @criteria = mock
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      Post.expects(:all).returns(@criteria)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+    end
+
+    it "destroys all of the associated objects" do
+      Post.expects(:destroy_all).with(:conditions => { "person_id" => "5" }).returns(3)
+      @association.destroy_all.should == 3
+    end
+  end
+
   describe "#concat" do
 
     before do
