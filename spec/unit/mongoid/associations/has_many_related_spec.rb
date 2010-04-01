@@ -134,7 +134,8 @@ describe Mongoid::Associations::HasManyRelated do
     before do
       @criteria = mock
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
-      Post.expects(:all).returns(@criteria)
+      Post.expects(:all).twice.returns(@criteria)
+      @parent.expects(:reset).with("posts").yields
       @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
     end
 
@@ -149,7 +150,8 @@ describe Mongoid::Associations::HasManyRelated do
     before do
       @criteria = mock
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
-      Post.expects(:all).returns(@criteria)
+      Post.expects(:all).twice.returns(@criteria)
+      @parent.expects(:reset).with("posts").yields
       @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
     end
 
