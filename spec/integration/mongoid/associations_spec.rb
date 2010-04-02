@@ -333,6 +333,21 @@ describe Mongoid::Associations do
         new_name.new_record?.should be_false
       end
 
+      context "#delete_all" do
+
+        it "removes the appropriate documents" do
+          @person.addresses.delete_all(:conditions => { :street => "Oxford St" }).should == 1
+          @person.addresses.size.should == 0
+        end
+      end
+
+      context "#destroy_all" do
+
+        it "removes the appropriate documents" do
+          @person.addresses.destroy_all(:conditions => { :street => "Oxford St" }).should == 1
+          @person.addresses.size.should == 0
+        end
+      end
     end
 
     context "multiple levels nested" do
@@ -384,11 +399,7 @@ describe Mongoid::Associations do
           @person.save
           @person.addresses.first.locations.first.should == location
         end
-
       end
-
     end
-
   end
-
 end
