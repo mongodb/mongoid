@@ -257,16 +257,29 @@ describe Mongoid::Associations::EmbedsMany do
       )
       @address = Address.new
       @association << @address
-      @document.expects(:save).returns(true)
     end
 
     it "aliases to clear" do
+      @document.expects(:save).times(3).returns(true)
+      @document.expects(:remove).times(3)
       @association.delete_all
       @association.size.should == 0
     end
 
     it "returns the number of documents deleted" do
+      @document.expects(:save).times(3).returns(true)
+      @document.expects(:remove).times(3)
       @association.delete_all.should == 3
+    end
+
+    context "when conditions passed" do
+
+      it "deletes the correct documents" do
+        @document.expects(:save).returns(true)
+        @document.expects(:remove)
+        @association.delete_all(:conditions => { :street => "Street 1" }).should == 1
+        @association.size.should == 2
+      end
     end
   end
 
@@ -279,17 +292,29 @@ describe Mongoid::Associations::EmbedsMany do
       )
       @address = Address.new
       @association << @address
-      @document.expects(:remove).times(3)
-      @document.expects(:save).times(3)
     end
 
     it "aliases to clear" do
+      @document.expects(:remove).times(3)
+      @document.expects(:save).times(3)
       @association.destroy_all
       @association.size.should == 0
     end
 
     it "returns the number of documents deleted" do
+      @document.expects(:remove).times(3)
+      @document.expects(:save).times(3)
       @association.destroy_all.should == 3
+    end
+
+    context "when conditions passed" do
+
+      it "deletes the correct documents" do
+        @document.expects(:remove)
+        @document.expects(:save)
+        @association.destroy_all(:conditions => { :street => "Street 1" }).should == 1
+        @association.size.should == 2
+      end
     end
   end
 

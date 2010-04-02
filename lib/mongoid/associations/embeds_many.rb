@@ -82,8 +82,8 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # The number of documents deleted.
-      def delete_all
-        count = @target.size; clear; @parent.save; count
+      def delete_all(conditions = {})
+        remove(:delete, conditions)
       end
 
       # Delete all the documents in the association and run destroy callbacks.
@@ -95,10 +95,8 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # The number of documents destroyed.
-      def destroy_all
-        count = @target.size
-        @target.each { |doc| doc.destroy }
-        clear; count
+      def destroy_all(conditions = {})
+        remove(:destroy, conditions)
       end
 
       # Finds a document in this association.
@@ -192,6 +190,16 @@ module Mongoid #:nodoc:
             @target << child
           end
         end
+      end
+
+      # Removes documents based on a method.
+      def remove(method, conditions)
+        criteria = @klass.find(conditions || {})
+        criteria.documents = @target
+        count = criteria.size
+        criteria.each do |doc|
+          @target.delete(doc); doc.destroy
+        end; count
       end
 
       class << self
