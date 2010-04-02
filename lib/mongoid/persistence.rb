@@ -18,6 +18,17 @@ module Mongoid #:nodoc:
   # <tt>document.upsert</tt>
   module Persistence
 
+    # Remove the +Document+ from the datbase with callbacks.
+    #
+    # Example:
+    #
+    # <tt>document._destroy</tt>
+    #
+    # TODO: Will get rid of other #destroy once new persistence complete.
+    def _destroy
+      run_callbacks(:destroy) { self.destroyed = true if _remove }
+    end
+
     # Insert a new +Document+ into the database. Will return the document
     # itself whether or not the save was successful.
     #
