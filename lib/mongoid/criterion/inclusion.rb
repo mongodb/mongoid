@@ -64,6 +64,23 @@ module Mongoid #:nodoc:
       end
       alias :any_in :in
 
+      # Adds a criterion to the +Criteria+ that specifies values to do
+      # geospacial searches by. The field must be indexed with the "2d" option.
+      #
+      # Options:
+      #
+      # attributes: A +Hash+ where the keys are the field names and the values are
+      # +Arrays+ of [latitude, longitude] pairs.
+      #
+      # Example:
+      #
+      # <tt>criteria.near(:field1 => [30, -44])</tt>
+      #
+      # Returns: <tt>self</tt>
+      def near(attributes = {})
+        update_selector(attributes, "$near")
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values that must
       # be matched in order to return results. This is similar to a SQL "WHERE"
       # clause. This is the actual selector that will be provided to MongoDB,

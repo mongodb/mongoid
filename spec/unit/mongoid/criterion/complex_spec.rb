@@ -13,7 +13,5 @@ describe Mongoid::Criterion::Complex do
     it "sets the operator" do
       complex.operator.should == "$gt"
     end
-
   end
-
 end
