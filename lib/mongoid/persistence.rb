@@ -52,6 +52,21 @@ module Mongoid #:nodoc:
 
     alias :_delete :_remove
 
+    # Save the document - will perform an insert if the document is new, and
+    # update if not. If a validation error occurs a
+    # Mongoid::Errors::Validations error will get raised.
+    #
+    # Example:
+    #
+    # <tt>document._save!</tt>
+    #
+    # Returns:
+    #
+    # +true+ if validation passed, will raise error otherwise.
+    def _save!
+      validation_failed! unless upsert; true
+    end
+
     # Update the +Document+ in the datbase.
     #
     # Example:
@@ -70,14 +85,36 @@ module Mongoid #:nodoc:
     #
     # Returns:
     #
-    # A +Boolean+ for updates, the +Document+ for inserts.
+    # A +Boolean+ for updates.
     def upsert(validate = true)
+      validate = parse_validate(validate)
+      if new_record?
+        insert(validate).errors.any? ? false : true
+      else
+        update(validate)
+      end
+    end
+
+    # Save is aliased so that users familiar with active record can have some
+    # semblance of a familiar API.
+    #
+    # Example:
+    #
+    # <tt>document._save</tt>
+    alias :_save :upsert
+
+    protected
+    # Alternative validation params.
+    def parse_validate(validate)
       if validate.is_a?(Hash) && validate.has_key?(:validate)
         validate = validate[:validate]
       end
-      new_record? ? insert(validate) : update(validate)
+      validate
     end
 
-    alias :_save :upsert
+    # Raise an error if validation failed.
+    def validation_failed!
+      raise Errors::Validations.new(self.errors.full_messages)
+    end
   end
 end

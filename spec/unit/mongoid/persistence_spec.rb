@@ -88,9 +88,9 @@ describe Mongoid::Persistence do
         person._save
       end
 
-      it "returns the document" do
+      it "returns a boolean" do
         insert.expects(:persist).returns(person)
-        person._save.should == person
+        person._save.should == true
       end
     end
 
@@ -113,6 +113,43 @@ describe Mongoid::Persistence do
       it "returns a boolean" do
         update.expects(:persist).returns(true)
         person._save.should == true
+      end
+    end
+  end
+
+  describe "#_save!" do
+
+    context "when validation passes" do
+
+      let(:update) do
+        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
+        update.expects(:persist).returns(true)
+      end
+
+      it "returns true" do
+        person._save!.should == true
+      end
+    end
+
+    context "when validation failes" do
+
+      let(:update) do
+        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
+        update.expects(:persist).returns(false)
+      end
+
+      it "raises an error" do
+        lambda { person._save! }.should raise_error(Mongoid::Errors::Validations)
       end
     end
   end
@@ -157,18 +194,34 @@ describe Mongoid::Persistence do
         stub.quacks_like(Mongoid::Persistence::Insert.allocate)
       end
 
-      before do
-        Mongoid::Persistence::Insert.expects(:new).with(person, true).returns(insert)
+      context "when validation passes" do
+
+        before do
+          Mongoid::Persistence::Insert.expects(:new).with(person, true).returns(insert)
+        end
+
+        it "delegates to the insert persistence command" do
+          insert.expects(:persist).returns(person)
+          person.upsert
+        end
+
+        it "returns a boolean" do
+          insert.expects(:persist).returns(person)
+          person.upsert.should == true
+        end
       end
 
-      it "delegates to the insert persistence command" do
-        insert.expects(:persist).returns(person)
-        person.upsert
-      end
+      context "when validation fails" do
 
-      it "returns the document" do
-        insert.expects(:persist).returns(person)
-        person.upsert.should == person
+        before do
+          Mongoid::Persistence::Insert.expects(:new).with(person, true).returns(insert)
+        end
+
+        it "returns false" do
+          insert.expects(:persist).returns(person)
+          person.expects(:errors).returns([ "Message" ])
+          person.upsert.should == false
+        end
       end
     end
 

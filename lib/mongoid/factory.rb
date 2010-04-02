@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
     # attributes: The +Document+ attributes.
     def self.build(klass, attrs)
       type = attrs["_type"]
-      type ? type.constantize.fastload(attrs) : klass.fastload(attrs)
+      type ? type.constantize.instantiate(attrs) : klass.instantiate(attrs)
     end
   end
 end
