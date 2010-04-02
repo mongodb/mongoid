@@ -17,6 +17,7 @@ module Mongoid #:nodoc:
   # <tt>document.update</tt>
   # <tt>document.upsert</tt>
   module Persistence
+
     # Insert a new +Document+ into the database. Will return the document
     # itself whether or not the save was successful.
     #
@@ -37,6 +38,8 @@ module Mongoid #:nodoc:
     def _remove
       Remove.new(self).persist
     end
+
+    alias :_delete :_remove
 
     # Update the +Document+ in the datbase.
     #
