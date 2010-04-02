@@ -65,12 +65,12 @@ describe Mongoid::Errors do
       context "default" do
 
         before do
-          @errors = stub(:full_messages => "Testing")
+          @errors = stub(:full_messages => [ "Error 1", "Error 2" ])
           @error = Mongoid::Errors::Validations.new(@errors)
         end
 
         it "contains the errors' full messages" do
-          @error.message.should include("Testing")
+          @error.message.should == "Validation Failed: Error 1, Error 2"
         end
 
       end

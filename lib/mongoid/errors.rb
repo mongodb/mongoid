@@ -52,7 +52,7 @@ module Mongoid #:nodoc
         @errors = errors
       end
       def message
-        "Validation failed: #{@errors.full_messages}"
+        "Validation Failed: " + @errors.full_messages.join(", ")
       end
     end
 
