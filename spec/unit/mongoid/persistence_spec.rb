@@ -46,7 +46,7 @@ describe Mongoid::Persistence do
     end
 
     before do
-      Mongoid::Persistence::Insert.expects(:new).with(person).returns(insert)
+      Mongoid::Persistence::Insert.expects(:new).with(person, true).returns(insert)
     end
 
     it "delegates to the insert persistence command" do
@@ -71,6 +71,52 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#_save" do
+
+    context "when the document is new" do
+
+      let(:insert) do
+        stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+      end
+
+      before do
+        Mongoid::Persistence::Insert.expects(:new).with(person, true).returns(insert)
+      end
+
+      it "delegates to the insert persistence command" do
+        insert.expects(:persist).returns(person)
+        person._save
+      end
+
+      it "returns the document" do
+        insert.expects(:persist).returns(person)
+        person._save.should == person
+      end
+    end
+
+    context "when the document is not new" do
+
+      let(:update) do
+        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
+      end
+
+      it "delegates to the update persistence command" do
+        update.expects(:persist).returns(true)
+        person._save
+      end
+
+      it "returns a boolean" do
+        update.expects(:persist).returns(true)
+        person._save.should == true
+      end
+    end
+  end
+
   describe "#update" do
 
     let(:update) do
@@ -78,7 +124,7 @@ describe Mongoid::Persistence do
     end
 
     before do
-      Mongoid::Persistence::Update.expects(:new).with(person).returns(update)
+      Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
     end
 
     it "delegates to the update persistence command" do
@@ -89,6 +135,22 @@ describe Mongoid::Persistence do
 
   describe "#upsert" do
 
+    context "when passing a hash as a validation parameter" do
+
+      let(:insert) do
+        stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+      end
+
+      before do
+        Mongoid::Persistence::Insert.expects(:new).with(person, false).returns(insert)
+      end
+
+      it "delegates to the insert persistence command" do
+        insert.expects(:persist).returns(person)
+        person.upsert(:validate => false)
+      end
+    end
+
     context "when the document is new" do
 
       let(:insert) do
@@ -96,7 +158,7 @@ describe Mongoid::Persistence do
       end
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(person).returns(insert)
+        Mongoid::Persistence::Insert.expects(:new).with(person, true).returns(insert)
       end
 
       it "delegates to the insert persistence command" do
@@ -118,7 +180,7 @@ describe Mongoid::Persistence do
 
       before do
         person.instance_variable_set(:@new_record, false)
-        Mongoid::Persistence::Update.expects(:new).with(person).returns(update)
+        Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
       end
 
       it "delegates to the update persistence command" do
