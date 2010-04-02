@@ -64,7 +64,7 @@ module Mongoid #:nodoc:
     #
     # +true+ if validation passed, will raise error otherwise.
     def _save!
-      validation_failed! unless upsert; true
+      fail_validate! unless upsert; true
     end
 
     # Update the +Document+ in the datbase.
@@ -74,6 +74,35 @@ module Mongoid #:nodoc:
     # <tt>document.update</tt>
     def update(validate = true)
       Update.new(self, validate).persist
+    end
+
+    # Update the +Document+ attributes in the datbase.
+    #
+    # Example:
+    #
+    # <tt>document._update_attributes(:title => "Sir")</tt>
+    #
+    # Returns:
+    #
+    # +true+ if validation passed, +false+ if not.
+    def _update_attributes(attributes = {})
+      write_attributes(attributes); update
+    end
+
+    # Update the +Document+ attributes in the datbase.
+    #
+    # Example:
+    #
+    # <tt>document._update_attributes(:title => "Sir")</tt>
+    #
+    # Returns:
+    #
+    # +true+ if validation passed, raises an error if not
+    def _update_attributes!(attributes = {})
+      write_attributes(attributes)
+      result = update
+      fail_validate! unless result
+      result
     end
 
     # Upsert the document - will perform an insert if the document is new, and
@@ -113,7 +142,7 @@ module Mongoid #:nodoc:
     end
 
     # Raise an error if validation failed.
-    def validation_failed!
+    def fail_validate!
       raise Errors::Validations.new(self.errors.full_messages)
     end
   end
