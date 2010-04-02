@@ -35,8 +35,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.insert</tt>
-    def insert
-      Insert.new(self).persist
+    def insert(validate = true)
+      Insert.new(self, validate).persist
     end
 
     # Remove the +Document+ from the datbase.
@@ -57,8 +57,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.update</tt>
-    def update
-      Update.new(self).persist
+    def update(validate = true)
+      Update.new(self, validate).persist
     end
 
     # Upsert the document - will perform an insert if the document is new, and
@@ -71,8 +71,13 @@ module Mongoid #:nodoc:
     # Returns:
     #
     # A +Boolean+ for updates, the +Document+ for inserts.
-    def upsert
-      new_record? ? insert : update
+    def upsert(validate = true)
+      if validate.is_a?(Hash) && validate.has_key?(:validate)
+        validate = validate[:validate]
+      end
+      new_record? ? insert(validate) : update(validate)
     end
+
+    alias :_save :upsert
   end
 end
