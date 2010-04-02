@@ -27,6 +27,17 @@ module Mongoid #:nodoc:
       Insert.new(self).persist
     end
 
+    # Remove the +Document+ from the datbase.
+    #
+    # Example:
+    #
+    # <tt>document._remove</tt>
+    #
+    # TODO: Will get rid of other #remove once observable pattern killed.
+    def _remove
+      Remove.new(self).persist
+    end
+
     # Update the +Document+ in the datbase.
     #
     # Example:
