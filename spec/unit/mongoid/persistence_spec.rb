@@ -22,6 +22,23 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#_destroy" do
+
+    let(:remove) do
+      stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+    end
+
+    before do
+      Mongoid::Persistence::Remove.expects(:new).with(person).returns(remove)
+    end
+
+    it "delegates to the remove persistence command" do
+      person.expects(:run_callbacks).with(:destroy).yields.returns(true)
+      remove.expects(:persist).returns(true)
+      person._destroy.should == true
+    end
+  end
+
   describe "#insert" do
 
     let(:insert) do
