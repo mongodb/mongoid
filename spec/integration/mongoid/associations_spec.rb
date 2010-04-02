@@ -141,6 +141,18 @@ describe Mongoid::Associations do
           @person.posts.size.should == 0
         end
       end
+
+      context "with conditions" do
+
+        before do
+          @person.posts.delete_all(:conditions => { :title => "Testing" })
+        end
+
+        it "deletes the appropriate objects" do
+          Post.count.should == 0
+          @person.posts.size.should == 0
+        end
+      end
     end
 
     describe "#destroy_all" do
@@ -152,6 +164,18 @@ describe Mongoid::Associations do
         end
 
         it "deletes all the related objects" do
+          Post.count.should == 0
+          @person.posts.size.should == 0
+        end
+      end
+
+      context "with conditions" do
+
+        before do
+          @person.posts.destroy_all(:conditions => { :title => "Testing" })
+        end
+
+        it "deletes the appropriate objects" do
           Post.count.should == 0
           @person.posts.size.should == 0
         end
