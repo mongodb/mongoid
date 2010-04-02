@@ -18,6 +18,35 @@ describe Mongoid::Paths do
     Name.new
   end
 
+  describe "#remover" do
+
+    before do
+      person.addresses << address
+      person.name = name
+    end
+
+    context "when document is root" do
+
+      it "returns nil" do
+        person.remover.should be_nil
+      end
+    end
+
+    context "when document is an embeds_one" do
+
+      it "returns $unset" do
+        name.remover.should == "$unset"
+      end
+    end
+
+    context "when document is an embeds_many" do
+
+      it "returns $set" do
+        address.remover.should == "$set"
+      end
+    end
+  end
+
   describe "#inserter" do
 
     before do

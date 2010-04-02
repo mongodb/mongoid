@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Insert do
+describe Mongoid::Persistence::Remove do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -24,31 +24,22 @@ describe Mongoid::Persistence::Insert do
 
   describe "#persist" do
 
-    def root_insert_expectation
-      lambda {
-        collection.expects(:insert).with(
-          document.raw_attributes,
-          :safe => true
-        ).returns("Object")
-      }
-    end
-
-    def root_push_expectation
+    def root_set_expectation
       lambda {
         collection.expects(:update).with(
           { "_id" => document.id },
-          { "$push" => { "addresses" => address.raw_attributes } },
+          { "$set" => { "addresses" => [] } },
           :multi => false,
           :safe => true
         ).returns("Object")
       }
     end
 
-    def root_set_expectation
+    def root_unset_expectation
       lambda {
         collection.expects(:update).with(
           { "_id" => document.id },
-          { "$set" => { "email" => email.raw_attributes } },
+          { "$unset" => { "email" => true } },
           :multi => false,
           :safe => true
         ).returns("Object")
@@ -63,20 +54,20 @@ describe Mongoid::Persistence::Insert do
 
       context "when the parent is new" do
 
-        let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(email)
+        let(:remove) do
+          Mongoid::Persistence::RemoveEmbedded.new(email)
         end
 
-        it "notifies its changes to parent and inserts the parent" do
-          root_insert_expectation.call
-          insert.persist.should == email
+        it "notifies its changes to parent and removes the parent" do
+          remove.persist.should == true
+          document.email.should be_nil
         end
       end
 
       context "when the parent is not new" do
 
-        let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(email)
+        let(:remove) do
+          Mongoid::Persistence::RemoveEmbedded.new(email)
         end
 
         before do
@@ -84,8 +75,8 @@ describe Mongoid::Persistence::Insert do
         end
 
         it "performs an in place $set on the embedded document" do
-          root_set_expectation.call
-          insert.persist.should == email
+          root_unset_expectation.call
+          remove.persist.should == true
         end
       end
     end
@@ -98,20 +89,20 @@ describe Mongoid::Persistence::Insert do
 
       context "when the parent is new" do
 
-        let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(address)
+        let(:remove) do
+          Mongoid::Persistence::RemoveEmbedded.new(address)
         end
 
-        it "notifies its changes to the parent and inserts the parent" do
-          root_insert_expectation.call
-          insert.persist.should == address
+        it "notifies its changes to the parent and removes the parent" do
+          remove.persist.should == true
+          document.addresses.should == []
         end
       end
 
       context "when the parent is not new" do
 
-        let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(address)
+        let(:remove) do
+          Mongoid::Persistence::RemoveEmbedded.new(address)
         end
 
         before do
@@ -119,8 +110,8 @@ describe Mongoid::Persistence::Insert do
         end
 
         it "performs a $push on the embedded array" do
-          root_push_expectation.call
-          insert.persist.should == address
+          root_set_expectation.call
+          remove.persist.should == true
         end
       end
     end

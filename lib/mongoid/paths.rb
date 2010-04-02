@@ -39,6 +39,16 @@ module Mongoid #:nodoc:
         embedded ? "#{_parent.position}#{"." unless _parent.position.blank?}#{@association_name}#{locator}" : ""
       end
 
+      # Get the removal modifier for the document. Will be nil on root
+      # documents, $unset on embeds_one, $set on embeds_many.
+      #
+      # Example:
+      #
+      # <tt>name.remover</tt>
+      def remover
+        embedded ? (_index ? "$set" : "$unset") : nil
+      end
+
       # Return the selector for this document to be matched exactly for use
       # with MongoDB's $ operator.
       #
