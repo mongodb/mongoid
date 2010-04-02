@@ -47,6 +47,10 @@ module Mongoid #:nodoc:
         @attributes[:polymorphic] == true
       end
 
+      # Used with has_many_related to save as array of ids.
+      def stored_as
+        @attributes[:stored_as]
+      end
     end
   end
 end
