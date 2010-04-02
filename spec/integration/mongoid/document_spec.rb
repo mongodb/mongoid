@@ -291,7 +291,7 @@ describe Mongoid::Document do
     end
 
     it "returns a pretty string of class name and attributes" do
-      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name].nil? ? 'nil' : @person.attributes[name]}" } * ", "
+      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name]}" } * ", "
       @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
     end
 
@@ -343,9 +343,9 @@ describe Mongoid::Document do
 
       it "should reload (unmemoize) the associations" do
         @person.addresses.should == [ @address ]
-        Person.collection.update({ '_id' => @person.id }, { '$pull' => { 'addresses' => { '_id' => @address.id } } })
+        Person.collection.update({ "_id" => @person.id }, { "$set" => { "addresses" => [] } })
         @person.reload
-        @person.addresses.should == [ ]
+        @person.addresses.should == []
       end
     end
   end
