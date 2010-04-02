@@ -80,6 +80,15 @@ describe Mongoid::Criterion::Inclusion do
 
   end
 
+  describe "#near" do
+
+    it "adds the $near modifier to the selector" do
+      @criteria.near(:field => [ 72, -44 ])
+      @criteria.selector.should ==
+        { :field => { "$near" => [ 72, -44 ] } }
+    end
+  end
+
   describe "#where" do
 
     context "when provided a hash" do
@@ -172,6 +181,16 @@ describe Mongoid::Criterion::Inclusion do
             @criteria.where(:age.ne => 50)
             @criteria.selector.should ==
               { :age => { "$ne" => 50 } }
+          end
+
+        end
+
+        context "#ne" do
+
+          it "returns those matching a ne clause" do
+            @criteria.where(:location.near => [ 50, 40 ])
+            @criteria.selector.should ==
+              { :location => { "$near" => [ 50, 40 ] } }
           end
 
         end
