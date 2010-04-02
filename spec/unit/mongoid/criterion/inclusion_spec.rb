@@ -185,7 +185,7 @@ describe Mongoid::Criterion::Inclusion do
 
         end
 
-        context "#ne" do
+        context "#near" do
 
           it "returns those matching a ne clause" do
             @criteria.where(:location.near => [ 50, 40 ])
