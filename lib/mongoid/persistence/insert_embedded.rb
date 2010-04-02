@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
         if parent.new_record?
           parent.insert
         else
-          update = { @document.path => { @document.inserter => @document.raw_attributes } }
+          update = { @document.inserter => { @document.path => @document.raw_attributes } }
           collection.update(parent.selector, update, @options.merge(:multi => false))
         end
         @document
