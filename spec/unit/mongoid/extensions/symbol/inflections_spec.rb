@@ -95,4 +95,13 @@ describe Mongoid::Extensions::Symbol::Inflections do
       ret.operator.should == "near"
     end
   end
+
+  describe "#within" do
+
+    it "returns :foo $within" do
+      ret = :foo.within
+      ret.key.should == :foo
+      ret.operator.should == "within"
+    end
+  end
 end

@@ -215,8 +215,15 @@ describe Mongoid::Criterion::Inclusion do
 
         end
 
-      end
+        context "#near" do
 
+          it "returns those matching a ne clause" do
+            @criteria.where(:location.within => { "$center" => [ [ 50, -40 ], 1 ] })
+            @criteria.selector.should ==
+              { :location => { "$within" => { "$center" => [ [ 50, -40 ], 1 ] } } }
+          end
+        end
+      end
     end
 
     context "when provided a string" do
