@@ -170,6 +170,55 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#_update_attributes" do
+
+    let(:update) do
+      stub.quacks_like(Mongoid::Persistence::Update.allocate)
+    end
+
+    before do
+      person.instance_variable_set(:@new_record, false)
+      Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
+    end
+
+    it "writes attributes and performs an update" do
+      update.expects(:persist).returns(true)
+      person._update_attributes(:title => "Mam")
+      person.title.should == "Mam"
+    end
+  end
+
+  describe "#_update_attributes!" do
+
+    let(:update) do
+      stub.quacks_like(Mongoid::Persistence::Update.allocate)
+    end
+
+    before do
+      person.instance_variable_set(:@new_record, false)
+      Mongoid::Persistence::Update.expects(:new).with(person, true).returns(update)
+    end
+
+    context "when validation passes" do
+
+      it "writes attributes and performs an update" do
+        update.expects(:persist).returns(true)
+        person._update_attributes!(:title => "Mam").should be_true
+        person.title.should == "Mam"
+      end
+    end
+
+    context "when validation fails" do
+
+      it "raises an error" do
+        update.expects(:persist).returns(false)
+        lambda {
+          person._update_attributes!(:title => "Mam")
+        }.should raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
+
   describe "#upsert" do
 
     context "when passing a hash as a validation parameter" do
