@@ -2,6 +2,19 @@ require "spec_helper"
 
 describe Mongoid::Associations::Options do
 
+  describe "#stored_as" do
+
+    before do
+      @attributes = { :stored_as => :array }
+      @options = Mongoid::Associations::Options.new(@attributes)
+    end
+
+    it "returns the association storage" do
+      @options.stored_as.should == :array
+    end
+
+  end
+
   describe "#name" do
 
     before do
