@@ -133,9 +133,9 @@ describe Mongoid::Document do
     end
 
   end
-  
+
   context "when document is a subclass and its parent is an embedded document" do
-    
+
     before do
       @canvas = Canvas.new(:name => "canvas")
       @canvas.build_palette({})
@@ -143,16 +143,16 @@ describe Mongoid::Document do
       @canvas.palette.tools << Eraser.new
       @canvas.save
     end
-    
+
     after do
       Canvas.delete_all
     end
-    
+
     it "properly saves the subclasses" do
       from_db = Canvas.find(@canvas.id)
       from_db.palette.tools.map(&:class).should == [Pencil, Eraser]
     end
-    
+
   end
 
 end

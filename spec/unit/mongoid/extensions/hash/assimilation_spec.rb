@@ -48,16 +48,12 @@ describe Mongoid::Extensions::Hash::Assimilation do
         @parent = Canvas.new()
         @options = Mongoid::Associations::Options.new(:name => :shapes, :class_name => "Shape")
       end
-      
+
       it "should use the _type information from the child object" do
         @child.assimilate(@parent, @options)
         @parent.shapes.first.should be_a_kind_of(Circle)
         @parent.shapes.first.radius.should == 10
       end
-    
     end
-
-
   end
-
 end
