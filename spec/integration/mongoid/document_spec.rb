@@ -335,21 +335,19 @@ describe Mongoid::Document do
       @person.reload.should == @from_db
     end
 
-		context "when embedded documents change" do
-			
-			before do
-				@address = @person.addresses.create(:number => 27, :street => "Maiden Lane")
-			end	
-				
-			it "should reload (unmemoize) the associations" do
-				@person.addresses.should == [ @address ]
-				Person.collection.update({ '_id' => @person.id }, { '$pull' => { 'addresses' => { '_id' => @address.id } } })
-				@person.reload
-				@person.addresses.should == [ ]
-			end
+    context "when embedded documents change" do
 
-		end
+      before do
+        @address = @person.addresses.create(:number => 27, :street => "Maiden Lane")
+      end
 
+      it "should reload (unmemoize) the associations" do
+        @person.addresses.should == [ @address ]
+        Person.collection.update({ '_id' => @person.id }, { '$pull' => { 'addresses' => { '_id' => @address.id } } })
+        @person.reload
+        @person.addresses.should == [ ]
+      end
+    end
   end
 
   describe "#save" do
@@ -516,7 +514,7 @@ describe Mongoid::Document do
     end
 
   end
-  
+
   describe "#as_json" do
 
     before do
@@ -544,7 +542,7 @@ describe Mongoid::Document do
     end
 
   end
-  
+
   describe "#encode_json" do
 
     before do
