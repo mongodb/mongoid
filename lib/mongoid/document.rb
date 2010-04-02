@@ -296,10 +296,11 @@ module Mongoid #:nodoc:
       protected
       # apply default values to attributes - calling procs as required
       def attributes_with_defaults(attributes = {})
-        default_values = defaults.merge(attributes)
+        default_values = defaults
         default_values.each_pair do |key, val|
           default_values[key] = val.call if val.respond_to?(:call)
         end
+        default_values.merge(attributes)
       end
     end
   end

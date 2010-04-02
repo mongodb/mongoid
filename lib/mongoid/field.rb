@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
     #
     # The primitive value or a copy of the default.
     def default
-      (@default.is_a?(Array) || @default.is_a?(Hash)) ? @default.dup : @default
+      copy
     end
 
     # Create the new field with a name and optional additional options. Valid
@@ -34,6 +34,7 @@ module Mongoid #:nodoc:
     # <tt>Field.new(:score, :default => 0)</tt>
     def initialize(name, options = {})
       @name, @default = name, options[:default]
+      @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
       @type = options[:type] || String
       @accessible = options.has_key?(:accessible) ? options[:accessible] : true
     end
@@ -47,6 +48,12 @@ module Mongoid #:nodoc:
     # Used for retrieving the object out of the attributes hash.
     def get(object)
       type.get(object)
+    end
+
+    protected
+    # Slightly faster default check.
+    def copy
+      @copyable ? @default.dup : @default
     end
   end
 end

@@ -146,8 +146,10 @@ module Mongoid #:nodoc:
 
       # Return true if writing to the given field is allowed
       def write_allowed?(key)
-        return true unless fields[key.to_s]
-        fields[key.to_s].accessible?
+        name = key.to_s
+        existing = fields[name]
+        return true unless existing
+        existing.accessible?
       end
     end
 
