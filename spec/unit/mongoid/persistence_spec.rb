@@ -6,6 +6,157 @@ describe Mongoid::Persistence do
     Person.new
   end
 
+  describe "._create" do
+
+    let(:insert) do
+      stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+    end
+
+    let(:patient) do
+      stub.quacks_like(Patient.allocate)
+    end
+
+    before do
+      Patient.expects(:new).returns(patient)
+      patient.expects(:insert).returns(patient)
+    end
+
+    it "delegates to the insert persistence command" do
+      Patient._create
+    end
+
+    it "returns the new document" do
+      Patient._create.should == patient
+    end
+  end
+
+  describe "._create!" do
+
+    let(:insert) do
+      stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+    end
+
+    let(:patient) do
+      stub.quacks_like(Patient.allocate)
+    end
+
+    before do
+      Patient.expects(:new).returns(patient)
+      patient.expects(:insert).returns(patient)
+    end
+
+    context "when validation passes" do
+
+      before do
+        patient.expects(:errors).returns([])
+      end
+
+      it "returns the new document" do
+        Patient._create!.should == patient
+      end
+    end
+
+    context "when validation fails" do
+
+      before do
+        errors = stub(:any? => true, :full_messages => [ "Message" ])
+        patient.expects(:errors).at_least_once.returns(errors)
+      end
+
+      it "raises an error" do
+        lambda { Patient._create! }.should raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
+
+  describe "._delete_all" do
+
+    context "when conditions provided" do
+
+      let(:remove_all) do
+        stub.quacks_like(Mongoid::Persistence::RemoveAll.allocate)
+      end
+
+      before do
+        Mongoid::Persistence::RemoveAll.expects(:new).with(
+          Person, false, { :field => "value" }
+        ).returns(remove_all)
+        remove_all.expects(:persist).returns(30)
+      end
+
+      it "removes all documents from the collection for the conditions" do
+        Person._delete_all(:conditions => { :field => "value" })
+      end
+
+      it "returns the number of documents removed" do
+        Person._delete_all(:conditions => { :field => "value" }).should == 30
+      end
+    end
+
+    context "when conditions not provided" do
+
+      let(:remove_all) do
+        stub.quacks_like(Mongoid::Persistence::RemoveAll.allocate)
+      end
+
+      before do
+        Mongoid::Persistence::RemoveAll.expects(:new).with(Person, false, {}).returns(remove_all)
+        remove_all.expects(:persist).returns(30)
+      end
+
+      it "removes all documents from the collection" do
+        Person._delete_all
+      end
+
+      it "returns the number of documents removed" do
+        Person._delete_all.should == 30
+      end
+    end
+  end
+
+  describe "._destroy_all" do
+
+    let(:remove) do
+      stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+    end
+
+    context "when conditions provided" do
+
+      before do
+        Person.expects(:all).with(:conditions => { :title => "Sir" }).returns([ person ])
+        person.expects(:run_callbacks).with(:destroy).yields
+        Mongoid::Persistence::Remove.expects(:new).with(person).returns(remove)
+        remove.expects(:persist).returns(true)
+      end
+
+      it "destroys each found document" do
+        Person._destroy_all(:conditions => { :title => "Sir" })
+      end
+
+      it "returns the number destroyed" do
+        Person._destroy_all(:conditions => { :title => "Sir" }).should == 1
+      end
+    end
+
+    context "when conditions not provided" do
+
+      before do
+        Person.expects(:all).with({}).returns([ person ])
+        person.expects(:run_callbacks).with(:destroy).yields
+        Mongoid::Persistence::Remove.expects(:new).with(person).returns(remove)
+        remove.expects(:persist).returns(true)
+      end
+
+      it "destroys each found document" do
+        Person._destroy_all
+      end
+
+      it "returns the number destroyed" do
+        Person._destroy_all.should == 1
+      end
+    end
+  end
+
   describe "#_delete" do
 
     let(:remove) do
