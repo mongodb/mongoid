@@ -3,6 +3,7 @@ require "mongoid/persistence/command"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
 require "mongoid/persistence/remove"
+require "mongoid/persistence/remove_all"
 require "mongoid/persistence/remove_embedded"
 require "mongoid/persistence/update"
 
@@ -65,7 +66,7 @@ module Mongoid #:nodoc:
       #
       # +true+ if validation passed, will raise error otherwise.
       def _save!
-        fail_validate!(self) unless upsert; true
+        self.class.fail_validate!(self) unless upsert; true
       end
 
       # Update the +Document+ in the datbase.
@@ -102,7 +103,7 @@ module Mongoid #:nodoc:
       def _update_attributes!(attributes = {})
         write_attributes(attributes)
         result = update
-        fail_validate!(self) unless result
+        self.class.fail_validate!(self) unless result
         result
       end
 
@@ -141,15 +142,75 @@ module Mongoid #:nodoc:
         end
         validate
       end
+    end
+
+    module ClassMethods #:nodoc:
+
+      # Create a new +Document+. This will instantiate a new document and
+      # insert it in a single call. Will always return the document
+      # whether save passed or not.
+      #
+      # Example:
+      #
+      # <tt>Person._create(:title => "Mr")</tt>
+      #
+      # Returns: the +Document+.
+      def _create(attributes = {})
+        document = new(attributes); document.insert
+      end
+
+      # Create a new +Document+. This will instantiate a new document and
+      # insert it in a single call. Will always return the document
+      # whether save passed or not, and if validation fails an error will be
+      # raise.
+      #
+      # Example:
+      #
+      # <tt>Person._create!(:title => "Mr")</tt>
+      #
+      # Returns: the +Document+.
+      def _create!(attributes = {})
+        document = new(attributes)
+        fail_validate!(document) if document.insert.errors.any?
+        document
+      end
+
+      # Delete all documents given the supplied conditions. If no conditions
+      # are passed, the entire collection will be dropped for performance
+      # benefits. Does not fire any callbacks.
+      #
+      # Example:
+      #
+      # <tt>Person.delete_all(:conditions => { :title => "Sir" })</tt>
+      # <tt>Person.delete_all</tt>
+      #
+      # Returns: true or raises an error.
+      def _delete_all(conditions = {})
+        RemoveAll.new(
+          self,
+          false,
+          conditions[:conditions] || {}
+        ).persist
+      end
+
+      # Delete all documents given the supplied conditions. If no conditions
+      # are passed, the entire collection will be dropped for performance
+      # benefits. Fires the destroy callbacks if conditions were passed.
+      #
+      # Example:
+      #
+      # <tt>Person.destroy_all(:conditions => { :title => "Sir" })</tt>
+      # <tt>Person.destroy_all</tt>
+      #
+      # Returns: true or raises an error.
+      def _destroy_all(conditions = {})
+        all(conditions).each { |doc| doc._destroy }.count
+      end
 
       # Raise an error if validation failed.
       def fail_validate!(document)
         raise Errors::Validations.new(document.errors.full_messages)
       end
-    end
-
-    module ClassMethods #:nodoc:
-
     end
   end
 end
