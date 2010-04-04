@@ -270,6 +270,11 @@ module Mongoid #:nodoc:
         attributes
       end
 
+      # Returns nil if document is new, or an array of primary keys if not.
+      def to_key
+        new_record? ? nil : [ id ]
+      end
+
       # Returns the id of the Document, used in Rails compatibility.
       def to_param
         id
@@ -291,16 +296,6 @@ module Mongoid #:nodoc:
         attrs = child.instance_variable_get(:@attributes)
         clear ? @attributes.delete(name) : @attributes.insert(name, attrs)
         notify
-      end
-
-      protected
-      # apply default values to attributes - calling procs as required
-      def attributes_with_defaults(attributes = {})
-        default_values = defaults
-        default_values.each_pair do |key, val|
-          default_values[key] = val.call if val.respond_to?(:call)
-        end
-        default_values.merge(attributes)
       end
     end
   end

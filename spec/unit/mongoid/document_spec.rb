@@ -644,6 +644,32 @@ describe Mongoid::Document do
 
   end
 
+  describe "#to_key" do
+
+    context "when the document is new" do
+
+      before do
+        @person = Person.new
+      end
+
+      it "returns nil" do
+        @person.to_key.should be_nil
+      end
+    end
+
+    context "when the document is not new" do
+
+      before do
+        @id = Mongo::ObjectID.new.to_s
+        @person = Person.new(:_id => @id)
+      end
+
+      it "returns the id in an array" do
+        @person.to_key.should == [ @id ]
+      end
+    end
+  end
+
   describe "#to_param" do
 
     it "returns the id" do

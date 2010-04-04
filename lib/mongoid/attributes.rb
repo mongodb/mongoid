@@ -128,6 +128,15 @@ module Mongoid #:nodoc:
       alias :attributes= :write_attributes
 
       protected
+      # apply default values to attributes - calling procs as required
+      def attributes_with_defaults(attributes = {})
+        default_values = defaults
+        default_values.each_pair do |key, val|
+          default_values[key] = val.call if val.respond_to?(:call)
+        end
+        default_values.merge(attributes)
+      end
+
       # Return true if dynamic field setting is enabled.
       def set_allowed?(key)
         Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
