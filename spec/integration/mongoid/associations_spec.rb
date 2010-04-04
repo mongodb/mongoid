@@ -27,7 +27,6 @@ describe Mongoid::Associations do
         addresses.size.should == 1
         addresses.first.should == @address_one
       end
-
     end
 
     context "when defined on a has_one" do
@@ -36,7 +35,6 @@ describe Mongoid::Associations do
         name = @person.name
         name.dawkins?.should be_true
       end
-
     end
 
     context "when defined on an embedded_in" do
@@ -44,9 +42,7 @@ describe Mongoid::Associations do
       it "applies the extension" do
         @address_two.addressable.doctor?.should be_true
       end
-
     end
-
   end
 
   context "creation of an embedded association on a callback" do
@@ -86,7 +82,6 @@ describe Mongoid::Associations do
       ca_homes.size.should == 1
       ca_homes.should == [ @la_home ]
     end
-
   end
 
   context "one-to-one relational associations" do
@@ -331,6 +326,21 @@ describe Mongoid::Associations do
         from_db = Person.find(@person.id)
         new_name = from_db.create_name(:first_name => "Flash")
         new_name.new_record?.should be_false
+      end
+
+      context "updating embedded arrays" do
+
+        before do
+          @person.addresses.create(:street => "Picadilly Circus")
+          @from_db = Person.find(@person.id)
+          @first = @from_db.addresses[0]
+          @second = @from_db.addresses[1]
+        end
+
+        it "does not change the internal order of the array" do
+          @from_db.addresses.first.update_attributes(:city => "London")
+          @from_db.addresses.should == [ @first, @second ]
+        end
       end
 
       context "#delete_all" do
