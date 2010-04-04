@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents an relational one-to-one association with an object in a
     # separate collection or database.
-    class HasOneRelated
-      include Proxy
+    class HasOneRelated < Proxy
 
       delegate :nil?, :to => :target
 

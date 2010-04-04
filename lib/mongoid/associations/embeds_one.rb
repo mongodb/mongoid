@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents an association that is embedded in a parent document as a
     # one-to-one relationship.
-    class EmbedsOne
-      include Proxy
+    class EmbedsOne < Proxy
 
       # Build a new object for the association.
       def build(attrs = {}, type = nil)
