@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
           @collection = @document.embedded ? @document._root.collection : @document.collection
         else
           @klass = document_or_class
-          @collection = @klass._collection
+          @collection = @klass.collection
         end
         @selector, @validate = selector, validate
         @options = { :safe => Mongoid.persist_in_safe_mode }
