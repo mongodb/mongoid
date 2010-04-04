@@ -1,7 +1,9 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class EmbeddedIn #:nodoc:
+    # Represents an association that is embedded within another document in the
+    # database, eithwe as one or many.
+    class EmbeddedIn
       include Proxy
 
       # Creates the new association by setting the internal

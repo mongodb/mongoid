@@ -1,7 +1,8 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class MetaData #:nodoc:
+    # This class contains metadata about association proxies.
+    class MetaData
 
       attr_reader :association, :options
 

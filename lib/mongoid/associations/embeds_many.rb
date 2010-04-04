@@ -1,6 +1,8 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
+    # Represents embedding many documents within a parent document, which will
+    # be an array as the underlying storage mechanism.
     class EmbedsMany
       include Proxy
 
