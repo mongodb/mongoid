@@ -8,12 +8,6 @@ describe Mongoid::Finders do
     Mongoid.stubs(:database).returns(@database)
   end
 
-  after do
-    Person.instance_variable_set(:@collection, nil)
-    @database = nil
-    @collection = nil
-  end
-
   describe ".all" do
 
     before do

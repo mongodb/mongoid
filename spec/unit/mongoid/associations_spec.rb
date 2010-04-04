@@ -8,12 +8,6 @@ describe Mongoid::Associations do
     Mongoid.stubs(:database).returns(@database)
   end
 
-  after do
-    Person.instance_variable_set(:@collection, nil)
-    @database = nil
-    @collection = nil
-  end
-
   describe "#association=" do
 
     context "when child is a has one" do
