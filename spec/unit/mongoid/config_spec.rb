@@ -13,11 +13,10 @@ describe Mongoid::Config do
     context "when object provided is not a Mongo::DB" do
 
       it "raises an error" do
-        lambda { config.database = "Test" }.should raise_error
+        lambda { config.database = "Test" }.should
+          raise_error(Mongoid::Errors::InvalidDatabase)
       end
-
     end
-
   end
 
   describe "#master=" do
@@ -25,11 +24,36 @@ describe Mongoid::Config do
     context "when object provided is not a Mongo::DB" do
 
       it "raises an error" do
-        lambda { config.master = "Test" }.should raise_error
+        lambda { config.master = "Test" }.should
+          raise_error(Mongoid::Errors::InvalidDatabase)
       end
-
     end
 
+    context "when the database version is not supported" do
+
+      let(:database) do
+        stub.quacks_like(Mongo::DB.allocate)
+      end
+
+      let(:connection) do
+        stub.quacks_like(Mongo::Connection.allocate)
+      end
+
+      let(:version) do
+        Mongo::ServerVersion.new("1.3.0")
+      end
+
+      before do
+        database.stubs(:kind_of?).returns(true)
+        database.stubs(:connection).returns(connection)
+        connection.stubs(:server_version).returns(version)
+      end
+
+      it "raises an error" do
+        lambda { config.master = database }.should
+          raise_error(Mongoid::Errors::UnsupportedVersion)
+      end
+    end
   end
 
   describe "#parameterize_keys" do
@@ -133,9 +157,33 @@ describe Mongoid::Config do
       it "raises an error" do
         lambda { config.slaves = ["Test"] }.should raise_error
       end
-
     end
 
+    context "when the database version is not supported" do
+
+      let(:database) do
+        stub.quacks_like(Mongo::DB.allocate)
+      end
+
+      let(:connection) do
+        stub.quacks_like(Mongo::Connection.allocate)
+      end
+
+      let(:version) do
+        Mongo::ServerVersion.new("1.3.0")
+      end
+
+      before do
+        database.stubs(:kind_of?).returns(true)
+        database.stubs(:connection).returns(connection)
+        connection.stubs(:server_version).returns(version)
+      end
+
+      it "raises an error" do
+        lambda { config.slaves = [ database ] }.should
+          raise_error(Mongoid::Errors::UnsupportedVersion)
+      end
+    end
   end
 
   describe "#allow_dynamic_fields=" do

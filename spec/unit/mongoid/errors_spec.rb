@@ -15,11 +15,8 @@ describe Mongoid::Errors do
         it "contains document not found" do
           @error.message.should include("Document not found")
         end
-
       end
-
     end
-
   end
 
   describe Mongoid::Errors::InvalidOptions do
@@ -35,11 +32,8 @@ describe Mongoid::Errors do
         it "returns the class name" do
           @error.message.should == @error.class.name
         end
-
       end
-
     end
-
   end
 
   describe Mongoid::Errors::InvalidDatabase do
@@ -53,9 +47,23 @@ describe Mongoid::Errors do
       it "returns a message with the bad db object class" do
         @error.message.should include("String")
       end
-
     end
+  end
 
+  describe Mongoid::Errors::UnsupportedVersion do
+
+    describe "#message" do
+
+      before do
+        @version = Mongo::ServerVersion.new("1.2.4")
+        @error = Mongoid::Errors::UnsupportedVersion.new(@version)
+      end
+
+      it "returns a message with the bad version and good version" do
+        @error.message.should ==
+          "MongoDB 1.2.4 not supported, please upgrade to #{Mongoid::MONGODB_VERSION}"
+      end
+    end
   end
 
   describe Mongoid::Errors::Validations do
@@ -72,11 +80,8 @@ describe Mongoid::Errors do
         it "contains the errors' full messages" do
           @error.message.should == "Validation Failed: Error 1, Error 2"
         end
-
       end
-
     end
-
   end
 
   describe Mongoid::Errors::InvalidCollection do
@@ -93,11 +98,7 @@ describe Mongoid::Errors do
         it "contains class is not allowed" do
           @error.message.should include("Address is not allowed")
         end
-
       end
-
     end
-
   end
-
 end
