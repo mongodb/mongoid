@@ -26,6 +26,8 @@ class Person
 
   attr_reader :rescored
 
+  embeds_many :videos
+
   embeds_many :addresses do
     def extension
       "Testing"
