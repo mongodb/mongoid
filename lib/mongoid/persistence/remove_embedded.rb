@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
       #
       # Remove the document from the database. If the parent is a new record,
       # it will get removed in Ruby only. If the parent is not a new record
-      # then either an $unset or $pop will occur, depending if it's an
+      # then either an $unset or $set will occur, depending if it's an
       # embeds_one or embeds_many.
       #
       # Example:
