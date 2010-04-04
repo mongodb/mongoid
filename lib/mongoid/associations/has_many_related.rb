@@ -1,7 +1,9 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasManyRelated #:nodoc:
+    # Represents an relational one-to-many association with an object in a
+    # separate collection or database.
+    class HasManyRelated
       include Proxy
 
       # Appends the object to the +Array+, setting its parent in

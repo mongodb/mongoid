@@ -1,7 +1,9 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class HasOneRelated #:nodoc:
+    # Represents an relational one-to-one association with an object in a
+    # separate collection or database.
+    class HasOneRelated
       include Proxy
 
       delegate :nil?, :to => :target

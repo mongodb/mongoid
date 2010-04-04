@@ -1,7 +1,8 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class BelongsToRelated #:nodoc:
+    # Represents a relational association to a "parent" object.
+    class BelongsToRelated
       include Proxy
 
       # Initializing a related association only requires looking up the object
