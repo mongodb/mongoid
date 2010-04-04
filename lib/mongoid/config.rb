@@ -34,7 +34,7 @@ module Mongoid #:nodoc
     #
     # The Master DB instance.
     def master=(db)
-      raise Errors::InvalidDatabase.new(db) unless db.kind_of?(Mongo::DB)
+      check_database!(db)
       @master = db
     end
 
@@ -66,7 +66,9 @@ module Mongoid #:nodoc
     #
     # The slaves DB instances.
     def slaves=(dbs)
-      dbs.each { |db| raise Errors::InvalidDatabase.new(db) unless db.kind_of?(Mongo::DB) }
+      dbs.each do |db|
+        check_database!(db)
+      end
       @slaves = dbs
     end
 
@@ -81,6 +83,13 @@ module Mongoid #:nodoc
     # The slave +Mongo::DBs+
     def slaves
       @slaves
+    end
+
+    protected
+    def check_database!(database)
+      raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
+      version = database.connection.server_version
+      raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
     end
   end
 end

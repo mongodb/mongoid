@@ -41,6 +41,20 @@ module Mongoid #:nodoc
       end
     end
 
+    # Raised when the database version is not supported by Mongoid.
+    #
+    # Example:
+    #
+    # <tt>UnsupportedVersion.new(Mongo::ServerVersion.new("1.3.1"))</tt>
+    class UnsupportedVersion < RuntimeError
+      def initialize(version)
+        @version = version
+      end
+      def message
+        "MongoDB #{@version} not supported, please upgrade to #{Mongoid::MONGODB_VERSION}"
+      end
+    end
+
     # Raised when a persisence method ending in ! fails validation. The message
     # will contain the full error messages from the +Document+ in question.
     #

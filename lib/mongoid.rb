@@ -72,6 +72,8 @@ require "mongoid/document"
 
 module Mongoid #:nodoc
 
+  MONGODB_VERSION = "1.4.0"
+
   class << self
 
     # Sets the Mongoid configuration options. Best used by passing a block.
