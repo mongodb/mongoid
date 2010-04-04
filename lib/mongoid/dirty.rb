@@ -177,7 +177,7 @@ module Mongoid #:nodoc:
       # Audit the change of a field's value.
       def modify(name, old_value, new_value)
         @attributes[name] = new_value
-        @modifications[name] = [ old_value, new_value ] if @modifications
+        @modifications[name] = [ old_value, new_value ] if @modifications && (old_value != new_value)
       end
     end
     module ClassMethods #:nodoc:

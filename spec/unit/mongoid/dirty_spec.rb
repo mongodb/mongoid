@@ -32,6 +32,18 @@ describe Mongoid::Dirty do
         @person.attribute_change("title").should be_nil
       end
     end
+
+    context "when the attribute has been set with the same value" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Grand Poobah"
+      end
+
+      it "returns an empty array" do
+        @person.attribute_change("title").should be_nil
+      end
+    end
   end
 
   describe "#attribute_changed?" do
