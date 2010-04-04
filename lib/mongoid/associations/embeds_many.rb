@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents embedding many documents within a parent document, which will
     # be an array as the underlying storage mechanism.
-    class EmbedsMany
-      include Proxy
+    class EmbedsMany < Proxy
 
       attr_accessor :association_name, :klass
 

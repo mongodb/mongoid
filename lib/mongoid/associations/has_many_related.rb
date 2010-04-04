@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents an relational one-to-many association with an object in a
     # separate collection or database.
-    class HasManyRelated
-      include Proxy
+    class HasManyRelated < Proxy
 
       # Appends the object to the +Array+, setting its parent in
       # the process.

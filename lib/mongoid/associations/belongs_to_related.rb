@@ -2,8 +2,7 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents a relational association to a "parent" object.
-    class BelongsToRelated
-      include Proxy
+    class BelongsToRelated < Proxy
 
       # Initializing a related association only requires looking up the object
       # by its id.

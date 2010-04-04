@@ -3,8 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents an association that is embedded within another document in the
     # database, eithwe as one or many.
-    class EmbeddedIn
-      include Proxy
+    class EmbeddedIn < Proxy
 
       # Creates the new association by setting the internal
       # target as the passed in Document. This should be the
