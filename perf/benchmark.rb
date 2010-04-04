@@ -138,5 +138,13 @@ end
 # Updating The Root Dcoument 10k Times        13.500000   0.480000  13.980000 ( 15.101454)
 # Updating An Embedded Dcoument 10k Times     16.580000   0.570000  17.150000 ( 18.471384)
 # Appending A New Embedded Dcoument 10k Times 16.720000   0.560000  17.280000 ( 18.491286)
+# ---------------------------------------------------------------------------------------
+# Write in place:
+#
+# Saving 10k New Documents                    24.070000   0.430000  24.500000 ( 24.651677)
+# Querying & Iterating 10k Documents           3.000000   0.110000   3.110000 (  3.135015)
+# Updating The Root Dcoument 10k Times        11.980000   0.470000  12.450000 ( 13.569498)
+# Updating An Embedded Dcoument 10k Times     13.230000   0.560000  13.790000 ( 14.985528)
+# Appending A New Embedded Dcoument 10k Times 13.140000   0.580000  13.720000 ( 14.937596)
 
 # Mongoid.database.collection("people").drop
