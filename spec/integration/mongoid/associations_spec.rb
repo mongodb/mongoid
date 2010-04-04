@@ -343,7 +343,22 @@ describe Mongoid::Associations do
         end
       end
 
-      context "#delete_all" do
+      describe "#first" do
+
+        let(:person) do
+          Person.create(:ssn => "444-33-7777")
+        end
+
+        before do
+          @video_id = person.videos.create(:title => "Oldboy").id
+        end
+
+        it "does not generate a new id each time" do
+          5.times { person.videos.first.id.should == @video_id }
+        end
+      end
+
+      describe "#delete_all" do
 
         it "removes the appropriate documents" do
           @person.addresses.delete_all(:conditions => { :street => "Oxford St" }).should == 1
@@ -351,7 +366,7 @@ describe Mongoid::Associations do
         end
       end
 
-      context "#destroy_all" do
+      describe "#destroy_all" do
 
         it "removes the appropriate documents" do
           @person.addresses.destroy_all(:conditions => { :street => "Oxford St" }).should == 1
