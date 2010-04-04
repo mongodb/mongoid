@@ -10,7 +10,7 @@ describe Mongoid::NamedScope do
     end
 
     before do
-      @document = Person.create(:title => "Dr.", :age => 65, :terms => true)
+      @document = Person.create(:title => "Dr.", :age => 65, :terms => true, :ssn => "123-22-8346")
     end
 
     after do
