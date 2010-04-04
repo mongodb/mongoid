@@ -15,6 +15,7 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   field :birth_date, :type => Date
+  field :title
   embeds_one :name
   embeds_many :addresses
   embeds_many :phones
@@ -94,24 +95,25 @@ Benchmark.bm do |bm|
     Person.all.each { |person| person.birth_date }
   end
   bm.report("Updating The Root Document 10k Times") do
+    person = Person.first
     10000.times do |n|
-      person = Person.first
-      person.birth_date = Date.new(1976, 1, 1)
+      person.title = "#{n}"
       person.save
     end
   end
   bm.report("Updating An Embedded Document 10k Times") do
+    person = Person.first
     10000.times do |n|
-      person = Person.first
-      person.name.family = "Kirk II"
+      person.name.family = "Kirk #{n}"
       person.name.save
     end
   end
   bm.report("Appending A New Embedded Document 10k Times") do
+    person = Person.first
     10000.times do |n|
-      person = Person.first
+      person.addresses.clear
       address = Address.new(
-        :street => "1 Market St.",
+        :street => "#{n} Market St.",
         :city => "San Francisco",
         :state => "CA",
         :post_code => "94123",
@@ -146,3 +148,12 @@ end
 # Updating The Root Document 10k Times        11.550000   0.440000  11.990000 ( 13.047147)
 # Updating An Embedded Document 10k Times     12.250000   0.500000  12.750000 ( 13.786223)
 # Appending A New Embedded Document 10k Times 12.320000   0.510000  12.830000 ( 14.392891)
+# ---------------------------------------------------------------------------------------
+# Master:
+#
+# Saving 10k New Documents                    23.890000   0.380000  24.270000 ( 24.332954)
+# Querying & Iterating 10k Documents           2.980000   0.100000   3.080000 (  3.105810)
+# Updating The Root Document 10k Times         4.870000   0.110000   4.980000 (  4.976892)
+# Updating An Embedded Document 10k Times      3.430000   0.100000   3.530000 (  3.536181)
+# Appending A New Embedded Document 10k Times  7.030000   0.220000   7.250000 ( 12.238345)
+
