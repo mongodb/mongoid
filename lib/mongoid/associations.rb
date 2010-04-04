@@ -249,8 +249,7 @@ module Mongoid # :nodoc:
       def add_creator(type, options)
         name = options.name.to_s
         define_method("create_#{name}") do |attrs|
-          document = send("build_#{name}", attrs)
-          document.run_callbacks(:create) { document.save }; document
+          send("build_#{name}", attrs).tap(&:save)
         end
       end
 

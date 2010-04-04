@@ -231,15 +231,35 @@ describe Mongoid::Associations::HasManyRelated do
     end
 
     it "builds and saves the new object" do
-      @post.expects(:run_callbacks).with(:create).yields
       @post.expects(:save).returns(true)
       @association.create(:title => "Sassy")
     end
 
     it "returns the new object" do
-      @post.expects(:run_callbacks).with(:create).yields
       @post.expects(:save).returns(true)
       @association.create(:title => "Sassy").should == @post
+    end
+
+  end
+
+  describe "#create!" do
+
+    before do
+      @post = mock
+      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      Post.expects(:all).returns([])
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      Post.expects(:instantiate).returns(@post)
+    end
+
+    it "builds and saves the new object" do
+      @post.expects(:save!).returns(true)
+      @association.create!(:title => "Sassy")
+    end
+
+    it "returns the new object" do
+      @post.expects(:save!).returns(true)
+      @association.create!(:title => "Sassy").should == @post
     end
 
   end
