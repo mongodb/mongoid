@@ -162,8 +162,22 @@ describe Mongoid::Paths do
         person.addresses << address
       end
 
-      it "returns the path plus index" do
-        address.position.should == "addresses.0"
+      context "when the document is new" do
+
+        it "returns the path without index" do
+          address.position.should == "addresses"
+        end
+      end
+
+      context "when the document is not new" do
+
+        before do
+          address.instance_variable_set(:@new_record, false)
+        end
+
+        it "returns the path plus index" do
+          address.position.should == "addresses.0"
+        end
       end
     end
 
@@ -172,11 +186,26 @@ describe Mongoid::Paths do
       before do
         @other = Location.new
         address.locations << [ @other, location ]
+        address.instance_variable_set(:@new_record, false)
         person.addresses << address
       end
 
-      it "returns the path plus index" do
-        location.position.should == "addresses.0.locations.1"
+      context "when the document is new" do
+
+        it "returns the path with parent indexes" do
+          location.position.should == "addresses.0.locations"
+        end
+      end
+
+      context "when the document is not new" do
+
+        before do
+          location.instance_variable_set(:@new_record, false)
+        end
+
+        it "returns the path plus index" do
+          location.position.should == "addresses.0.locations.1"
+        end
       end
     end
   end

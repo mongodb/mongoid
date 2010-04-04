@@ -5,7 +5,8 @@ module Mongoid #:nodoc:
     included do
       field :created_at, :type => Time
       field :updated_at, :type => Time
-      before_save :set_created_at, :set_updated_at
+      set_callback :create, :before, :set_created_at
+      set_callback :save, :before, :set_updated_at
     end
 
     module InstanceMethods

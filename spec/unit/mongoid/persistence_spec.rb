@@ -6,7 +6,7 @@ describe Mongoid::Persistence do
     Person.new
   end
 
-  describe "._create" do
+  describe ".create" do
 
     let(:insert) do
       stub.quacks_like(Mongoid::Persistence::Insert.allocate)
@@ -22,15 +22,15 @@ describe Mongoid::Persistence do
     end
 
     it "delegates to the insert persistence command" do
-      Patient._create
+      Patient.create
     end
 
     it "returns the new document" do
-      Patient._create.should == patient
+      Patient.create.should == patient
     end
   end
 
-  describe "._create!" do
+  describe ".create!" do
 
     let(:insert) do
       stub.quacks_like(Mongoid::Persistence::Insert.allocate)
@@ -52,7 +52,7 @@ describe Mongoid::Persistence do
       end
 
       it "returns the new document" do
-        Patient._create!.should == patient
+        Patient.create!.should == patient
       end
     end
 
@@ -64,12 +64,12 @@ describe Mongoid::Persistence do
       end
 
       it "raises an error" do
-        lambda { Patient._create! }.should raise_error(Mongoid::Errors::Validations)
+        lambda { Patient.create! }.should raise_error(Mongoid::Errors::Validations)
       end
     end
   end
 
-  describe "._delete_all" do
+  describe ".delete_all" do
 
     context "when conditions provided" do
 
@@ -85,11 +85,11 @@ describe Mongoid::Persistence do
       end
 
       it "removes all documents from the collection for the conditions" do
-        Person._delete_all(:conditions => { :field => "value" })
+        Person.delete_all(:conditions => { :field => "value" })
       end
 
       it "returns the number of documents removed" do
-        Person._delete_all(:conditions => { :field => "value" }).should == 30
+        Person.delete_all(:conditions => { :field => "value" }).should == 30
       end
     end
 
@@ -105,16 +105,16 @@ describe Mongoid::Persistence do
       end
 
       it "removes all documents from the collection" do
-        Person._delete_all
+        Person.delete_all
       end
 
       it "returns the number of documents removed" do
-        Person._delete_all.should == 30
+        Person.delete_all.should == 30
       end
     end
   end
 
-  describe "._destroy_all" do
+  describe ".destroy_all" do
 
     let(:remove) do
       stub.quacks_like(Mongoid::Persistence::Remove.allocate)
@@ -130,11 +130,11 @@ describe Mongoid::Persistence do
       end
 
       it "destroys each found document" do
-        Person._destroy_all(:conditions => { :title => "Sir" })
+        Person.destroy_all(:conditions => { :title => "Sir" })
       end
 
       it "returns the number destroyed" do
-        Person._destroy_all(:conditions => { :title => "Sir" }).should == 1
+        Person.destroy_all(:conditions => { :title => "Sir" }).should == 1
       end
     end
 
@@ -148,16 +148,16 @@ describe Mongoid::Persistence do
       end
 
       it "destroys each found document" do
-        Person._destroy_all
+        Person.destroy_all
       end
 
       it "returns the number destroyed" do
-        Person._destroy_all.should == 1
+        Person.destroy_all.should == 1
       end
     end
   end
 
-  describe "#_delete" do
+  describe "#delete" do
 
     let(:remove) do
       stub.quacks_like(Mongoid::Persistence::Remove.allocate)
@@ -169,11 +169,11 @@ describe Mongoid::Persistence do
 
     it "delegates to the remove persistence command" do
       remove.expects(:persist).returns(true)
-      person._delete.should == true
+      person.delete.should == true
     end
   end
 
-  describe "#_destroy" do
+  describe "#destroy" do
 
     let(:remove) do
       stub.quacks_like(Mongoid::Persistence::Remove.allocate)
@@ -186,7 +186,7 @@ describe Mongoid::Persistence do
     it "delegates to the remove persistence command" do
       person.expects(:run_callbacks).with(:destroy).yields.returns(true)
       remove.expects(:persist).returns(true)
-      person._destroy.should == true
+      person.destroy.should == true
     end
   end
 
@@ -222,7 +222,7 @@ describe Mongoid::Persistence do
     end
   end
 
-  describe "#_save" do
+  describe "#save" do
 
     context "when the document is new" do
 
@@ -236,12 +236,12 @@ describe Mongoid::Persistence do
 
       it "delegates to the insert persistence command" do
         insert.expects(:persist).returns(person)
-        person._save
+        person.save
       end
 
       it "returns a boolean" do
         insert.expects(:persist).returns(person)
-        person._save.should == true
+        person.save.should == true
       end
     end
 
@@ -258,17 +258,17 @@ describe Mongoid::Persistence do
 
       it "delegates to the update persistence command" do
         update.expects(:persist).returns(true)
-        person._save
+        person.save
       end
 
       it "returns a boolean" do
         update.expects(:persist).returns(true)
-        person._save.should == true
+        person.save.should == true
       end
     end
   end
 
-  describe "#_save!" do
+  describe "#save!" do
 
     context "when validation passes" do
 
@@ -283,7 +283,7 @@ describe Mongoid::Persistence do
       end
 
       it "returns true" do
-        person._save!.should == true
+        person.save!.should == true
       end
     end
 
@@ -300,7 +300,7 @@ describe Mongoid::Persistence do
       end
 
       it "raises an error" do
-        lambda { person._save! }.should raise_error(Mongoid::Errors::Validations)
+        lambda { person.save! }.should raise_error(Mongoid::Errors::Validations)
       end
     end
   end
@@ -321,7 +321,7 @@ describe Mongoid::Persistence do
     end
   end
 
-  describe "#_update_attributes" do
+  describe "#update_attributes" do
 
     let(:update) do
       stub.quacks_like(Mongoid::Persistence::Update.allocate)
@@ -334,12 +334,12 @@ describe Mongoid::Persistence do
 
     it "writes attributes and performs an update" do
       update.expects(:persist).returns(true)
-      person._update_attributes(:title => "Mam")
+      person.update_attributes(:title => "Mam")
       person.title.should == "Mam"
     end
   end
 
-  describe "#_update_attributes!" do
+  describe "#update_attributes!" do
 
     let(:update) do
       stub.quacks_like(Mongoid::Persistence::Update.allocate)
@@ -354,7 +354,7 @@ describe Mongoid::Persistence do
 
       it "writes attributes and performs an update" do
         update.expects(:persist).returns(true)
-        person._update_attributes!(:title => "Mam").should be_true
+        person.update_attributes!(:title => "Mam").should be_true
         person.title.should == "Mam"
       end
     end
@@ -364,7 +364,7 @@ describe Mongoid::Persistence do
       it "raises an error" do
         update.expects(:persist).returns(false)
         lambda {
-          person._update_attributes!(:title => "Mam")
+          person.update_attributes!(:title => "Mam")
         }.should raise_error(Mongoid::Errors::Validations)
       end
     end

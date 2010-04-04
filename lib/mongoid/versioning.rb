@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
     included do
       field :version, :type => Integer, :default => 1
       embeds_many :versions, :class_name => self.name
-      before_save :revise
+      set_callback :save, :before, :revise
     end
     module InstanceMethods
       # Create a new version of the +Document+. This will load the previous
@@ -19,6 +19,7 @@ module Mongoid #:nodoc:
         if last_version
           self.versions << last_version.clone
           self.version = version + 1
+          @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
         end
       end
     end

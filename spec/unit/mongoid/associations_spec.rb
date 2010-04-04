@@ -233,7 +233,9 @@ describe Mongoid::Associations do
     context "when type is passed in" do
 
       before do
-        Mongoid::Commands::Save.expects(:execute)
+        @insert = stub
+        Mongoid::Persistence::Insert.expects(:new).returns(@insert)
+        @insert.expects(:persist).returns(HtmlWriter.new(:speed => 250))
         @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
       end
 
@@ -254,7 +256,9 @@ describe Mongoid::Associations do
     context "when type is not passed in" do
 
       before do
-        Mongoid::Commands::Save.expects(:execute)
+        @insert = stub
+        Mongoid::Persistence::Insert.expects(:new).returns(@insert)
+        @insert.expects(:persist).returns(HtmlWriter.new(:speed => 250))
         @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
       end
 

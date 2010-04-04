@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
       #
       # <tt>address.position</tt>
       def position
-        locator = _index ? ".#{_index}" : ""
+        locator = _index ? (new_record? ? "" : ".#{_index}") : ""
         embedded ? "#{_parent.position}#{"." unless _parent.position.blank?}#{@association_name}#{locator}" : ""
       end
 

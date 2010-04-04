@@ -15,6 +15,7 @@ describe Mongoid::Timestamps do
     end
 
     it "forces the timestamps to UTC" do
+      @person.run_callbacks(:create)
       @person.run_callbacks(:save)
       @person.created_at.should be_close(Time.now.utc, 10.seconds)
       @person.updated_at.should be_close(Time.now.utc, 10.seconds)

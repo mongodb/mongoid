@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
         parent.remove(@document)
         unless parent.new_record?
           update = { @document.remover => { @document.path => setter } }
-          collection.update(parent.selector, update, @options.merge(:multi => false))
+          @collection.update(parent.selector, update, @options.merge(:multi => false))
         end; true
       end
 

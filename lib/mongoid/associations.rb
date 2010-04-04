@@ -144,7 +144,7 @@ module Mongoid # :nodoc:
             options.merge(:name => name, :foreign_key => foreign_key(self.name, options), :extend => block)
           )
         )
-        before_save do |document|
+        set_callback :save, :before do |document|
           document.update_associations(name)
         end
       end
@@ -200,7 +200,7 @@ module Mongoid # :nodoc:
             options.merge(:name => name, :foreign_key => foreign_key(name, options), :extend => block)
           )
         )
-        before_save do |document|
+        set_callback :save, :before do |document|
           document.update_association(name)
         end
       end

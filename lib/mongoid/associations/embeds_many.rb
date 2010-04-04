@@ -32,6 +32,7 @@ module Mongoid #:nodoc:
         document.parentize(@parent, @association_name)
         document.write_attributes(attrs)
         @target << document
+        document._index = @target.size - 1
         document
       end
 
@@ -198,7 +199,7 @@ module Mongoid #:nodoc:
         criteria.documents = @target
         count = criteria.size
         criteria.each do |doc|
-          @target.delete(doc); doc.destroy
+          @target.delete(doc); doc.send(method)
         end; count
       end
 

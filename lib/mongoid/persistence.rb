@@ -24,10 +24,10 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>document._destroy</tt>
+      # <tt>document.destroy</tt>
       #
       # TODO: Will get rid of other #destroy once new persistence complete.
-      def _destroy
+      def destroy
         run_callbacks(:destroy) { self.destroyed = true if _remove }
       end
 
@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
         Remove.new(self).persist
       end
 
-      alias :_delete :_remove
+      alias :delete :_remove
 
       # Save the document - will perform an insert if the document is new, and
       # update if not. If a validation error occurs a
@@ -60,12 +60,12 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>document._save!</tt>
+      # <tt>document.save!</tt>
       #
       # Returns:
       #
       # +true+ if validation passed, will raise error otherwise.
-      def _save!
+      def save!
         self.class.fail_validate!(self) unless upsert; true
       end
 
@@ -82,12 +82,12 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>document._update_attributes(:title => "Sir")</tt>
+      # <tt>document.update_attributes(:title => "Sir")</tt>
       #
       # Returns:
       #
       # +true+ if validation passed, +false+ if not.
-      def _update_attributes(attributes = {})
+      def update_attributes(attributes = {})
         write_attributes(attributes); update
       end
 
@@ -95,12 +95,12 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>document._update_attributes(:title => "Sir")</tt>
+      # <tt>document.update_attributes(:title => "Sir")</tt>
       #
       # Returns:
       #
       # +true+ if validation passed, raises an error if not
-      def _update_attributes!(attributes = {})
+      def update_attributes!(attributes = {})
         write_attributes(attributes)
         result = update
         self.class.fail_validate!(self) unless result
@@ -131,8 +131,8 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>document._save</tt>
-      alias :_save :upsert
+      # <tt>document.save</tt>
+      alias :save :upsert
 
       protected
       # Alternative validation params.
@@ -152,10 +152,10 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>Person._create(:title => "Mr")</tt>
+      # <tt>Person.create(:title => "Mr")</tt>
       #
       # Returns: the +Document+.
-      def _create(attributes = {})
+      def create(attributes = {})
         document = new(attributes); document.insert
       end
 
@@ -166,10 +166,10 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>Person._create!(:title => "Mr")</tt>
+      # <tt>Person.create!(:title => "Mr")</tt>
       #
       # Returns: the +Document+.
-      def _create!(attributes = {})
+      def create!(attributes = {})
         document = new(attributes)
         fail_validate!(document) if document.insert.errors.any?
         document
@@ -185,7 +185,7 @@ module Mongoid #:nodoc:
       # <tt>Person.delete_all</tt>
       #
       # Returns: true or raises an error.
-      def _delete_all(conditions = {})
+      def delete_all(conditions = {})
         RemoveAll.new(
           self,
           false,
@@ -203,8 +203,10 @@ module Mongoid #:nodoc:
       # <tt>Person.destroy_all</tt>
       #
       # Returns: true or raises an error.
-      def _destroy_all(conditions = {})
-        all(conditions).each { |doc| doc._destroy }.count
+      def destroy_all(conditions = {})
+        documents = all(conditions)
+        count = documents.count
+        documents.each { |doc| doc.destroy }; count
       end
 
       # Raise an error if validation failed.
