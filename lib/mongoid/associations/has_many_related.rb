@@ -42,10 +42,16 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def create(attributes)
         object = build(attributes)
-        object.run_callbacks(:before_create)
-        object.save
-        object.run_callbacks(:after_create)
-        object
+        object.save; object
+      end
+
+      # Creates a new Document and adds it to the association collection. If
+      # validation fails an error is raised.
+      #
+      # Returns the newly created object.
+      def create!(attributes)
+        object = build(attributes)
+        object.save!; object
       end
 
       # Delete all the associated objects.
