@@ -90,7 +90,6 @@ module Mongoid #:nodoc:
           instantiate(parent, options)
         end
       end
-
     end
   end
 end

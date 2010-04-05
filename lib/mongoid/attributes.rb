@@ -122,8 +122,10 @@ module Mongoid #:nodoc:
       # there is any.
       def write_attributes(attrs = nil)
         process(attrs || {})
-        identify if id.blank?
-        notify
+        identified = !id.blank?
+        unless identified
+          identify; notify
+        end
       end
       alias :attributes= :write_attributes
 

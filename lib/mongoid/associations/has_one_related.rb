@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
       #
       # Returns the newly created object.
       def create(attributes)
-        build(attributes); @target.save; @target
+        build(attributes).tap(&:save)
       end
 
       # Initializing a related association only requires looking up the objects

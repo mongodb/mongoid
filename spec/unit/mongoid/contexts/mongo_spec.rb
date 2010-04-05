@@ -19,7 +19,13 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with([:field1], {:_type => {'$in' => ['Doctor', 'Person']}}, {:count => 0}, @reduce, true)
+        @collection.expects(:group).with(
+          [:field1],
+          {:_type => {'$in' => ['Doctor', 'Person']}},
+          {:count => 0},
+          @reduce,
+          true
+        )
         @context.aggregate
       end
     end
