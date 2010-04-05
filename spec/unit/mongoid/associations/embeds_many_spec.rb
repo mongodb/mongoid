@@ -137,8 +137,6 @@ describe Mongoid::Associations::EmbedsMany do
         )
         @address = mock(:parentize => true, :write_attributes => true, :_index= => true)
         Address.expects(:instantiate).returns(@address)
-        @address.expects(:run_callbacks).with(:before_create)
-        @address.expects(:run_callbacks).with(:after_create)
       end
 
       it "builds and saves a new object" do
@@ -158,8 +156,6 @@ describe Mongoid::Associations::EmbedsMany do
         )
         @circle = mock(:parentize => true, :write_attributes => true, :_index= => true)
         Circle.expects(:instantiate).returns(@circle)
-        @circle.expects(:run_callbacks).with(:before_create)
-        @circle.expects(:run_callbacks).with(:after_create)
       end
 
       it "instantiates a class of that type" do
@@ -183,8 +179,6 @@ describe Mongoid::Associations::EmbedsMany do
         )
         @address = mock(:parentize => true, :write_attributes => true, :errors => [], :_index= => true)
         Address.expects(:instantiate).returns(@address)
-        @address.expects(:run_callbacks).with(:before_create)
-        @address.expects(:run_callbacks).with(:after_create)
       end
 
       it "builds and saves a new object" do
@@ -203,7 +197,10 @@ describe Mongoid::Associations::EmbedsMany do
         )
         @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ], :_index= => true)
         Address.expects(:instantiate).returns(@address)
+<<<<<<< HEAD
         @address.expects(:run_callbacks).with(:before_create)
+=======
+>>>>>>> 7e57617... Removing double-create callback on embeds_many: the create persistence command will handle it
       end
 
       it "builds and saves a new object" do
