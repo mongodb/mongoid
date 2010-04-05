@@ -427,7 +427,7 @@ describe Mongoid::Document do
       @person.addresses << @business
     end
 
-    it "allows adding multiples on an embed_many in a row" do
+    it "allows adding multiples on an embeds_many in a row" do
       @person.addresses.length.should == 2
     end
 
@@ -444,13 +444,13 @@ describe Mongoid::Document do
 
     end
 
-    context "when saving on an embed_many" do
+    context "when saving on an embeds_many" do
 
       before do
         @home.save
       end
 
-      it "saves the entire graph up from the embed_many" do
+      it "saves the entire graph up from the embeds_many" do
         person = Person.first(:conditions => { :title => "Sir" })
         person.should == @person
       end

@@ -1,7 +1,7 @@
 class Artist
   include Mongoid::Document
   field :name
-  embed_many :songs
+  embeds_many :songs
 
   after_create :create_songs
 

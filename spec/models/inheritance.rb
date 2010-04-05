@@ -1,8 +1,8 @@
 class Canvas
   include Mongoid::Document
   field :name
-  embed_many :shapes
-  embed_one :writer
+  embeds_many :shapes
+  embeds_one :writer
 
   def render
     shapes.each { |shape| render }
