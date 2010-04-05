@@ -219,6 +219,11 @@ describe Mongoid::Dirty do
         @person.reset_title!
         @person.title.should == "Grand Poobah"
       end
+
+      it "removes the field from the changes" do
+        @person.reset_title!
+        @person.changed.should == []
+      end
     end
 
     context "when the attribute has not changed" do
