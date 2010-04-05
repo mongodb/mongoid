@@ -5,33 +5,21 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor :_collection, :collection_name, :embedded, :primary_key, :hereditary
+      cattr_accessor :embedded, :primary_key, :hereditary
 
       self.embedded = false
       self.hereditary = false
-      self.collection_name = self.name.collectionize
 
       attr_accessor :association_name, :_parent
       attr_reader :new_record
 
-      delegate :collection, :db, :embedded, :primary_key, :to => "self.class"
+      delegate :db, :embedded, :primary_key, :to => "self.class"
     end
 
     module ClassMethods
       # Return the database associated with this class.
       def db
         collection.db
-      end
-
-      # Returns the collection associated with this +Document+. If the
-      # document is embedded, there will be no collection associated
-      # with it.
-      #
-      # Returns: <tt>Mongo::Collection</tt>
-      def collection
-        raise Errors::InvalidCollection.new(self) if embedded
-        self._collection ||= Mongoid::Collection.new(self, self.collection_name)
-        add_indexes; self._collection
       end
 
       # Perform default behavior but mark the hierarchy as being hereditary.
@@ -72,16 +60,6 @@ module Mongoid #:nodoc:
       def key(*fields)
         self.primary_key = fields
         set_callback :save, :before, :identify
-      end
-
-      # Macro for setting the collection name to store in.
-      #
-      # Example:
-      #
-      # <tt>Person.store_in :populdation</tt>
-      def store_in(name)
-        self.collection_name = name.to_s
-        self._collection = Mongoid::Collection.new(self, name.to_s)
       end
 
       # Returns all types to query for when using this class as the base.

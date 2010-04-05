@@ -9,6 +9,7 @@ module Mongoid #:nodoc
   # The Mongoid wrapper to the Mongo Ruby driver's collection object.
   class Collection
     include Collections::Mimic
+
     attr_reader :counter, :name
 
     # All write operations should delegate to the master connection. These
