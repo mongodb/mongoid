@@ -13,7 +13,7 @@ describe Mongoid::Commands::Save do
                      :_parent => nil,
                      :raw_attributes => {},
                      :new_record= => false)
-      @document = stub(:collection => @doc_collection,
+      @document = stub_everything(:collection => @doc_collection,
                        :run_callbacks => true,
                        :_parent => @parent,
                        :raw_attributes => {},

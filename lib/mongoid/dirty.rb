@@ -48,6 +48,33 @@ module Mongoid #:nodoc:
       @modifications
     end
 
+    # Call this method after save, so the changes can be properly switched.
+    #
+    # Example:
+    #
+    # <tt>person.move_changes</tt>
+    def move_changes
+      @previous_modifications = @modifications.dup
+      @modifications = {}
+    end
+
+    # Gets all the modifications that have happened to the object before the
+    # object was saved.
+    #
+    # Example:
+    #
+    #   person = Person.new(:title => "Sir")
+    #   person.title = "Madam"
+    #   person.save!
+    #   person.previous_changes # returns { "title" => [ "Sir", "Madam" ] }
+    #
+    # Returns:
+    #
+    # A +Hash+ of changes before save.
+    def previous_changes
+      @previous_modifications
+    end
+
     # Sets up the modifications hash. This occurs just after the document is
     # instantiated.
     #
@@ -56,6 +83,7 @@ module Mongoid #:nodoc:
     # <tt>document.setup_notifications</tt>
     def setup_modifications
       @modifications ||= {}
+      @previous_modifications ||= {}
     end
 
     protected
