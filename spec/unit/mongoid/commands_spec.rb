@@ -78,6 +78,11 @@ describe Mongoid::Commands do
         @person.save(false)
       end
 
+      it "passes the validate param to the command" do
+        Mongoid::Commands::Save.expects(:execute).with(@person, false).returns(true)
+        @person.save(:validate => false)
+      end
+
     end
 
     context "when the database raises an error" do

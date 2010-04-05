@@ -57,9 +57,13 @@ module Mongoid #:nodoc:
       #
       # <tt>document.save # save with validations</tt>
       # <tt>document.save(false) # save without validations</tt>
+      # <tt>document.save(:validate => false) # save without validations</tt>
       #
       # Returns: true if validation passes, false if not.
       def save(validate = true)
+        if validate.is_a?(Hash) && validate.has_key?(:validate)
+          validate = validate[:validate]
+        end
         new = new_record?
         run_callbacks(:before_create) if new
         saved = Save.execute(self, validate)
