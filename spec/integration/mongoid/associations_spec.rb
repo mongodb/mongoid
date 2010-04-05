@@ -398,16 +398,35 @@ describe Mongoid::Associations do
           @person = Person.new(:title => "Sir", :ssn => "1")
           @name = Name.new(:first_name => "Syd")
           @person.name = @name
-          @person.save
         end
 
-        it "persists all the associations properly" do
-          from_db = Person.find(@person.id)
-          translation = Translation.new(:language => "fr")
-          from_db.name.translations << translation
-          from_db.attributes[:name][:translations].should_not be_nil
+        context "when saving from root" do
+
+          before do
+            @person.save
+          end
+
+          it "persists all the associations properly" do
+            from_db = Person.find(@person.id)
+            translation = Translation.new(:language => "fr")
+            from_db.name.translations << translation
+            from_db.attributes[:name][:translations].should_not be_nil
+          end
         end
 
+        context "when saving from children" do
+
+          before do
+            @translation = Translation.new(:language => "fr")
+            @name.translations << @translation
+            @translation.save!
+          end
+
+          it "persists the entire graph" do
+            from_db = Person.find(@person.id)
+            from_db.name.translations.first.should == @translation
+          end
+        end
       end
 
       context "when a has-many to has-many" do
