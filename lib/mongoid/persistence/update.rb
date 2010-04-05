@@ -39,11 +39,13 @@ module Mongoid #:nodoc:
       #
       # +true+ or +false+, depending on validation.
       def persist
+        parent = @document._parent
         return false if validate && !@document.valid?
         @document.run_callbacks(:before_save)
         @document.run_callbacks(:before_update)
         if update
           @document.move_changes
+          parent.update if parent
           @document.run_callbacks(:after_save)
           @document.run_callbacks(:after_update)
         else
