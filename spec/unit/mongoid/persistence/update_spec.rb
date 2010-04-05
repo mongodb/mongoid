@@ -126,8 +126,9 @@ describe Mongoid::Persistence::Update do
           address.city = "London"
         end
 
-        it "performs a $set for the embedded changed fields" do
+        it "performs a $set for the embedded changed fields and saves the parent" do
           embedded_set_expectation.call
+          root_set_expectation.call
           embedded.persist
         end
       end
