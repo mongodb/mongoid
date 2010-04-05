@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-04-04}
+  s.date = %q{2010-04-05}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -36,6 +36,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/attributes.rb",
      "lib/mongoid/callbacks.rb",
      "lib/mongoid/collection.rb",
+     "lib/mongoid/collections.rb",
      "lib/mongoid/collections/cyclic_iterator.rb",
      "lib/mongoid/collections/master.rb",
      "lib/mongoid/collections/mimic.rb",
@@ -166,6 +167,7 @@ Gem::Specification.new do |s|
      "spec/models/post.rb",
      "spec/models/translation.rb",
      "spec/models/vet_visit.rb",
+     "spec/models/video.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
      "spec/unit/mongoid/associations/belongs_to_related_spec.rb",
@@ -184,6 +186,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/collections/master_spec.rb",
      "spec/unit/mongoid/collections/mimic_spec.rb",
      "spec/unit/mongoid/collections/slaves_spec.rb",
+     "spec/unit/mongoid/collections_spec.rb",
      "spec/unit/mongoid/config_spec.rb",
      "spec/unit/mongoid/contexts/enumerable_spec.rb",
      "spec/unit/mongoid/contexts/mongo_spec.rb",
@@ -299,6 +302,7 @@ Gem::Specification.new do |s|
      "spec/models/post.rb",
      "spec/models/translation.rb",
      "spec/models/vet_visit.rb",
+     "spec/models/video.rb",
      "spec/spec_helper.rb",
      "spec/unit/mongoid/associations/belongs_to_related_spec.rb",
      "spec/unit/mongoid/associations/embedded_in_spec.rb",
@@ -316,6 +320,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/collections/master_spec.rb",
      "spec/unit/mongoid/collections/mimic_spec.rb",
      "spec/unit/mongoid/collections/slaves_spec.rb",
+     "spec/unit/mongoid/collections_spec.rb",
      "spec/unit/mongoid/config_spec.rb",
      "spec/unit/mongoid/contexts/enumerable_spec.rb",
      "spec/unit/mongoid/contexts/mongo_spec.rb",
@@ -399,20 +404,20 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<activemodel>, [">= 3.0.pre"])
+      s.add_runtime_dependency(%q<activemodel>, [">= 3.0.0.beta2"])
       s.add_runtime_dependency(%q<will_paginate>, [">= 3.0.pre"])
       s.add_runtime_dependency(%q<mongo>, [">= 0.19.1"])
       s.add_development_dependency(%q<rspec>, [">= 1.3.0"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
-      s.add_dependency(%q<activemodel>, [">= 3.0.pre"])
+      s.add_dependency(%q<activemodel>, [">= 3.0.0.beta2"])
       s.add_dependency(%q<will_paginate>, [">= 3.0.pre"])
       s.add_dependency(%q<mongo>, [">= 0.19.1"])
       s.add_dependency(%q<rspec>, [">= 1.3.0"])
       s.add_dependency(%q<mocha>, [">= 0.9.8"])
     end
   else
-    s.add_dependency(%q<activemodel>, [">= 3.0.pre"])
+    s.add_dependency(%q<activemodel>, [">= 3.0.0.beta2"])
     s.add_dependency(%q<will_paginate>, [">= 3.0.pre"])
     s.add_dependency(%q<mongo>, [">= 0.19.1"])
     s.add_dependency(%q<rspec>, [">= 1.3.0"])

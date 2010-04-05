@@ -12,7 +12,7 @@ begin
     gem.homepage = "http://mongoid.org"
     gem.authors = ["Durran Jordan"]
 
-    gem.add_dependency("activemodel", ">= 3.0.pre")
+    gem.add_dependency("activemodel", ">= 3.0.0.beta2")
     gem.add_dependency("will_paginate", ">= 3.0.pre")
     gem.add_dependency("mongo", ">= 0.19.1")
 
