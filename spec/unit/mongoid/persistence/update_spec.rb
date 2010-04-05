@@ -128,6 +128,7 @@ describe Mongoid::Persistence::Update do
 
         it "performs a $set for the embedded changed fields" do
           embedded_set_expectation.call
+          root_set_expectation.call
           embedded.persist
         end
       end
