@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
       attr_reader :criteria
 
       delegate :blank?, :empty?, :first, :last, :to => :execute
-      delegate :documents, :options, :selector, :to => :criteria
+      delegate :klass, :documents, :options, :selector, :to => :criteria
 
       # Return aggregation counts of the grouped documents. This will count by
       # the first field provided in the fields array.
