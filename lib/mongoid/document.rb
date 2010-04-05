@@ -71,7 +71,7 @@ module Mongoid #:nodoc:
       #   end
       def key(*fields)
         self.primary_key = fields
-        before_save :identify
+        set_callback :save, :before, :identify
       end
 
       # Macro for setting the collection name to store in.

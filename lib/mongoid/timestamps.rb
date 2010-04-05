@@ -23,6 +23,5 @@ module Mongoid #:nodoc:
         self.updated_at = Time.now.utc
       end
     end
-
   end
 end
