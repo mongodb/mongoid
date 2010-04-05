@@ -197,10 +197,6 @@ describe Mongoid::Associations::EmbedsMany do
         )
         @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ], :_index= => true)
         Address.expects(:instantiate).returns(@address)
-<<<<<<< HEAD
-        @address.expects(:run_callbacks).with(:before_create)
-=======
->>>>>>> 7e57617... Removing double-create callback on embeds_many: the create persistence command will handle it
       end
 
       it "builds and saves a new object" do

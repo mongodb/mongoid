@@ -124,8 +124,9 @@ describe Mongoid::Persistence do
 
       before do
         Person.expects(:all).with(:conditions => { :title => "Sir" }).returns([ person ])
-        person.expects(:run_callbacks).with(:destroy).yields
+        person.expects(:run_callbacks).with(:before_destroy)
         Mongoid::Persistence::Remove.expects(:new).with(person).returns(remove)
+        person.expects(:run_callbacks).with(:after_destroy)
         remove.expects(:persist).returns(true)
       end
 
@@ -142,8 +143,9 @@ describe Mongoid::Persistence do
 
       before do
         Person.expects(:all).with({}).returns([ person ])
-        person.expects(:run_callbacks).with(:destroy).yields
+        person.expects(:run_callbacks).with(:before_destroy)
         Mongoid::Persistence::Remove.expects(:new).with(person).returns(remove)
+        person.expects(:run_callbacks).with(:after_destroy)
         remove.expects(:persist).returns(true)
       end
 
@@ -184,7 +186,8 @@ describe Mongoid::Persistence do
     end
 
     it "delegates to the remove persistence command" do
-      person.expects(:run_callbacks).with(:destroy).yields.returns(true)
+      person.expects(:run_callbacks).with(:before_destroy)
+      person.expects(:run_callbacks).with(:after_destroy)
       remove.expects(:persist).returns(true)
       person.destroy.should == true
     end

@@ -28,7 +28,11 @@ module Mongoid #:nodoc:
       #
       # TODO: Will get rid of other #destroy once new persistence complete.
       def destroy
-        run_callbacks(:destroy) { self.destroyed = true if _remove }
+        run_callbacks(:before_destroy)
+        if _remove
+          self.destroyed = true
+          run_callbacks(:after_destroy)
+        end; true
       end
 
       # Insert a new +Document+ into the database. Will return the document

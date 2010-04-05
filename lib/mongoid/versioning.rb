@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
     included do
       field :version, :type => Integer, :default => 1
       embeds_many :versions, :class_name => self.name
-      set_callback :save, :before, :revise
+      before_save :revise
     end
     module InstanceMethods
       # Create a new version of the +Document+. This will load the previous

@@ -378,7 +378,7 @@ describe Mongoid::Document do
       end
 
       it "adds the callback for primary key generation" do
-        @address.run_callbacks(:save)
+        @address.run_callbacks(:before_save)
         @address.id.should == "testing-street-name"
       end
 
@@ -392,7 +392,7 @@ describe Mongoid::Document do
       end
 
       it "combines all fields" do
-        @address.run_callbacks(:save)
+        @address.run_callbacks(:before_save)
         @address.id.should == "testing-street-name-94123"
       end
 
