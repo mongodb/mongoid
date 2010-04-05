@@ -10,7 +10,6 @@ module Mongoid #:nodoc:
       self.hereditary = false
 
       attr_accessor :association_name, :_parent
-      attr_reader :new_record
 
       delegate :db, :embedded, :primary_key, :to => "self.class"
     end
@@ -151,7 +150,7 @@ module Mongoid #:nodoc:
         @attributes = {}
         process(attrs)
         @attributes = attributes_with_defaults(@attributes)
-        @new_record = true if id.nil?
+        id.nil? ? @new_record = true : @new_record = false
         document = yield self if block_given?
         identify
       end
