@@ -62,9 +62,6 @@ describe Mongoid::Extensions::DateTime::Conversions do
       it "returns nil" do
         DateTime.get(nil).should be_nil
       end
-
     end
-
   end
-
 end

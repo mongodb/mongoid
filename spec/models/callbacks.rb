@@ -1,7 +1,7 @@
 class Artist
   include Mongoid::Document
   field :name
-  has_many :songs
+  embed_many :songs
 
   after_create :create_songs
 
@@ -14,5 +14,5 @@ end
 class Song
   include Mongoid::Document
   field :title
-  belongs_to :artist, :inverse_of => :songs
+  embedded_in :artist, :inverse_of => :songs
 end

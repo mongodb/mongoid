@@ -142,11 +142,20 @@ describe Mongoid::Commands do
           from_db = Person.find(@person.id)
           from_db.addresses.should be_empty
         end
-
       end
+    end
+  end
 
+  describe "#destroy_all" do
+
+    before do
+      @person.save
     end
 
+    it "destroys all the documents" do
+      Person.destroy_all
+      Person.count.should == 0
+    end
   end
 
   describe "#save" do

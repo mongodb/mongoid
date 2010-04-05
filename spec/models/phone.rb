@@ -2,6 +2,6 @@ class Phone
   include Mongoid::Document
   field :number
   key :number
-  belongs_to :person, :inverse_of => :phone_numbers
-  has_one :country_code
+  embed_one :country_code
+  embedded_in :person, :inverse_of => :phone_numbers
 end

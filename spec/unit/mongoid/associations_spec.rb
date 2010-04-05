@@ -105,7 +105,7 @@ describe Mongoid::Associations do
     end
   end
 
-  describe ".belongs_to" do
+  describe ".embedded_in" do
 
     it "creates a reader for the association" do
       address = Address.new
@@ -141,7 +141,7 @@ describe Mongoid::Associations do
     context "when inverse_of not supplied" do
 
       it "raises an error" do
-        lambda { Person.class_eval { belongs_to :nothing } }.should raise_error
+        lambda { Person.class_eval { embedded_in :nothing } }.should raise_error
       end
 
     end
@@ -274,7 +274,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".has_many" do
+  describe ".embed_many" do
 
     it "adds a new Association to the collection" do
       person = Person.new
@@ -350,7 +350,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".has_one" do
+  describe ".embed_one" do
 
     before do
       @person = Person.new
