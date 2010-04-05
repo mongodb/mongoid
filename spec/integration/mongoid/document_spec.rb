@@ -335,21 +335,19 @@ describe Mongoid::Document do
       @person.reload.should == @from_db
     end
 
-		context "when embedded documents change" do
-			
-			before do
-				@address = @person.addresses.create(:number => 27, :street => "Maiden Lane")
-			end	
-				
-			it "should reload (unmemoize) the associations" do
-				@person.addresses.should == [ @address ]
-				Person.collection.update({ '_id' => @person.id }, { '$pull' => { 'addresses' => { '_id' => @address.id } } })
-				@person.reload
-				@person.addresses.should == [ ]
-			end
+    context "when embedded documents change" do
 
-		end
+      before do
+        @address = @person.addresses.create(:number => 27, :street => "Maiden Lane")
+      end
 
+      it "should reload (unmemoize) the associations" do
+        @person.addresses.should == [ @address ]
+        Person.collection.update({ '_id' => @person.id }, { '$pull' => { 'addresses' => { '_id' => @address.id } } })
+        @person.reload
+        @person.addresses.should == [ ]
+      end
+    end
   end
 
   describe "#save" do
@@ -511,6 +509,63 @@ describe Mongoid::Document do
         @person.save
         from_db = Person.find(@person.id)
         from_db.to_json.should == from_db.attributes.to_json
+      end
+
+    end
+
+  end
+
+  describe "#as_json" do
+
+    before do
+      @person = Person.new(:title => "Sir", :age => 30)
+      @address = Address.new(:street => "Nan Jing Dong Lu")
+      @person.addresses << @address
+    end
+
+    context "on a new document" do
+
+      it "returns the attributes" do
+        @person.as_json.should == @person.attributes
+      end
+
+    end
+
+    context "on a persisted document" do
+
+      it "returns the attributes" do
+        @person.save
+        from_db = Person.find(@person.id)
+        from_db.as_json.should == from_db.attributes
+      end
+
+    end
+
+  end
+
+  describe "#encode_json" do
+
+    before do
+      @person = Person.new(:title => "Sir", :age => 30)
+      @address = Address.new(:street => "Nan Jing Dong Lu")
+      @person.addresses << @address
+      @encoder = Array.new
+    end
+
+    context "on a new document" do
+
+      it "returns the attributes" do
+        @person.encode_json(@encoder).should == @person.attributes
+      end
+
+    end
+
+    context "on a persisted document" do
+
+      it "returns the attributes" do
+        @person.save
+        from_db = Person.find(@person.id)
+        from_db.encode_json(@encoder).should == from_db.attributes
       end
 
     end

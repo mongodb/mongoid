@@ -12,11 +12,11 @@ module Mongoid #:nodoc
       instance_variable_set(var, value)
     end
 
-		# Removes an memozied association if it exists
-		def unmemoize(name)
-			var = "@#{name}"
-			remove_instance_variable(var) if instance_variable_defined?(var)
-		end
+    # Removes an memozied association if it exists
+    def unmemoize(name)
+      var = "@#{name}"
+      remove_instance_variable(var) if instance_variable_defined?(var)
+    end
 
     # Mongoid specific behavior is to remove the memoized object when setting
     # the association, or if it wasn't previously memoized it will get set.
