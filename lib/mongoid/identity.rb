@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
       # Set the id for the document.
       def identify(doc)
         doc.id = compose(doc).join(" ").identify if doc.primary_key
-        doc.id = generate_id unless doc.id
+        doc.id = generate_id if doc.id.blank?
       end
 
       # Set the _type field on the document.
