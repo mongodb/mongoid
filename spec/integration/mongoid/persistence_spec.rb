@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Commands do
+describe Mongoid::Persistence do
 
   before do
     @person = Person.new(:title => "Sir", :ssn => "6969696", :pets => true)
@@ -178,6 +178,10 @@ describe Mongoid::Commands do
 
   describe "#update_attributes" do
 
+    before do
+      @person.save
+    end
+
     context "when validation passes" do
 
       it "returns true" do
@@ -191,9 +195,7 @@ describe Mongoid::Commands do
         @from_db.pets.should == false
         @from_db.title.should be_nil
       end
-
     end
-
   end
 
   describe "#delete_all" do

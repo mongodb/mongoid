@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
       # Remove the document from the database.
       def remove
         count = @collection.find(@selector.merge(:_type => @klass.name)).count
-        collection.remove(@selector, @options)
+        @collection.remove(@selector, @options)
         count
       end
     end

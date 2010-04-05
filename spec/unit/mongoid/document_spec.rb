@@ -6,15 +6,10 @@ describe Mongoid::Document do
     @database = mock
     @collection = stub(:name => "people")
     @canvas_collection = stub(:name => "canvases")
-    Mongoid::Collection.stubs(:new).with(Person, "people").returns(@collection)
-    Mongoid::Collection.stubs(:new).with(Canvas, "canvases").returns(@canvas_collection)
+    Person.stubs(:collection).returns(@collection)
+    Canvas.stubs(:collection).returns(@canvas_collection)
     @collection.stubs(:create_index).with(:_type, false)
     @canvas_collection.stubs(:create_index).with(:_type, false)
-  end
-
-  after do
-    Person._collection = nil
-    Canvas._collection = nil
   end
 
   describe "#==" do
@@ -430,12 +425,10 @@ describe Mongoid::Document do
       before do
         Address.key :street
         @address = Address.new(:street => "Testing Street Name")
-        @address.expects(:collection).returns(@collection)
-        @collection.expects(:save)
       end
 
       it "adds the callback for primary key generation" do
-        @address.save
+        @address.run_callbacks(:save)
         @address.id.should == "testing-street-name"
       end
 
@@ -446,12 +439,10 @@ describe Mongoid::Document do
       before do
         Address.key :street, :post_code
         @address = Address.new(:street => "Testing Street Name", :post_code => "94123")
-        @address.expects(:collection).returns(@collection)
-        @collection.expects(:save)
       end
 
       it "combines all fields" do
-        @address.save
+        @address.run_callbacks(:save)
         @address.id.should == "testing-street-name-94123"
       end
 

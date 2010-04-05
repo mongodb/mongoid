@@ -43,8 +43,10 @@ describe Mongoid::Associations::HasOneRelated do
 
     before do
       @parent = stub(:id => "5", :class => Person)
+      @insert = stub
       Game.expects(:first).returns(nil)
-      Mongoid::Commands::Save.expects(:execute)
+      Mongoid::Persistence::Insert.expects(:new).returns(@insert)
+      @insert.expects(:persist).returns(Person.new)
       @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
     end
 

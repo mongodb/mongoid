@@ -196,6 +196,8 @@ describe Mongoid::Dirty do
           @person = Person.new(:title => "Grand Poobah")
           @address = Address.new(:street => "Oxford St")
           @person.addresses << @address
+          @person.instance_variable_set(:@new_record, false)
+          @address.instance_variable_set(:@new_record, false)
           @address.street = "Bond St"
         end
 
@@ -228,7 +230,7 @@ describe Mongoid::Dirty do
     context "when the document has been saved" do
 
       before do
-        @person.collection.expects(:save).returns(true)
+        @person.collection.expects(:insert).returns(true)
         @person.save!
       end
 

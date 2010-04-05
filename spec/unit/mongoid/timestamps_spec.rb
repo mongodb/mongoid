@@ -19,7 +19,5 @@ describe Mongoid::Timestamps do
       @person.created_at.should be_close(Time.now.utc, 10.seconds)
       @person.updated_at.should be_close(Time.now.utc, 10.seconds)
     end
-
   end
-
 end

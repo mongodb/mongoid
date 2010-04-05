@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
         if @document.embedded
           Persistence::RemoveEmbedded.new(@document, @validate).persist
         else
-          collection.remove({ :_id => @document.id }, options)
+          @collection.remove({ :_id => @document.id }, @options)
         end
       end
     end

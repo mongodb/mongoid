@@ -135,7 +135,7 @@ describe Mongoid::Associations::EmbedsMany do
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
-        @address = mock(:parentize => true, :write_attributes => true)
+        @address = mock(:parentize => true, :write_attributes => true, :_index= => true)
         Address.expects(:instantiate).returns(@address)
         @address.expects(:run_callbacks).with(:before_create)
         @address.expects(:run_callbacks).with(:after_create)
@@ -156,7 +156,7 @@ describe Mongoid::Associations::EmbedsMany do
           @document,
           Mongoid::Associations::Options.new(:name => :shapes)
         )
-        @circle = mock(:parentize => true, :write_attributes => true)
+        @circle = mock(:parentize => true, :write_attributes => true, :_index= => true)
         Circle.expects(:instantiate).returns(@circle)
         @circle.expects(:run_callbacks).with(:before_create)
         @circle.expects(:run_callbacks).with(:after_create)
@@ -181,7 +181,7 @@ describe Mongoid::Associations::EmbedsMany do
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
-        @address = mock(:parentize => true, :write_attributes => true, :errors => [])
+        @address = mock(:parentize => true, :write_attributes => true, :errors => [], :_index= => true)
         Address.expects(:instantiate).returns(@address)
         @address.expects(:run_callbacks).with(:before_create)
         @address.expects(:run_callbacks).with(:after_create)
@@ -201,7 +201,7 @@ describe Mongoid::Associations::EmbedsMany do
           @document,
           Mongoid::Associations::Options.new(:name => :addresses)
         )
-        @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ])
+        @address = mock(:parentize => true, :write_attributes => true, :errors => [ "test" ], :_index= => true)
         Address.expects(:instantiate).returns(@address)
         @address.expects(:run_callbacks).with(:before_create)
       end
@@ -258,30 +258,28 @@ describe Mongoid::Associations::EmbedsMany do
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
-      @address = Address.new
+      @association.clear
+      @address = stub(:parentize => true, :_index= => true, :notify => true, :matches? => true)
       @association << @address
     end
 
     it "aliases to clear" do
-      @document.expects(:save).times(3).returns(true)
-      @document.expects(:remove).times(3)
+      @address.expects(:delete)
       @association.delete_all
       @association.size.should == 0
     end
 
     it "returns the number of documents deleted" do
-      @document.expects(:save).times(3).returns(true)
-      @document.expects(:remove).times(3)
-      @association.delete_all.should == 3
+      @address.expects(:delete)
+      @association.delete_all.should == 1
     end
 
     context "when conditions passed" do
 
       it "deletes the correct documents" do
-        @document.expects(:save).returns(true)
-        @document.expects(:remove)
+        @address.expects(:delete)
         @association.delete_all(:conditions => { :street => "Street 1" }).should == 1
-        @association.size.should == 2
+        @association.size.should == 0
       end
     end
   end
@@ -293,30 +291,28 @@ describe Mongoid::Associations::EmbedsMany do
         @document,
         Mongoid::Associations::Options.new(:name => :addresses)
       )
-      @address = Address.new
+      @association.clear
+      @address = stub(:parentize => true, :_index= => true, :notify => true, :matches? => true)
       @association << @address
     end
 
     it "aliases to clear" do
-      @document.expects(:remove).times(3)
-      @document.expects(:save).times(3)
+      @address.expects(:destroy)
       @association.destroy_all
       @association.size.should == 0
     end
 
     it "returns the number of documents deleted" do
-      @document.expects(:remove).times(3)
-      @document.expects(:save).times(3)
-      @association.destroy_all.should == 3
+      @address.expects(:destroy)
+      @association.destroy_all.should == 1
     end
 
     context "when conditions passed" do
 
       it "deletes the correct documents" do
-        @document.expects(:remove)
-        @document.expects(:save)
+        @address.expects(:destroy)
         @association.destroy_all(:conditions => { :street => "Street 1" }).should == 1
-        @association.size.should == 2
+        @association.size.should == 0
       end
     end
   end

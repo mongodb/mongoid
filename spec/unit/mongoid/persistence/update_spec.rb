@@ -132,12 +132,5 @@ describe Mongoid::Persistence::Update do
         end
       end
     end
-
-    context "when the document is not changed" do
-
-      it "returns true" do
-        update.persist.should == true
-      end
-    end
   end
 end

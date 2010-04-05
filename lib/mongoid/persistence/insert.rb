@@ -23,9 +23,14 @@ module Mongoid #:nodoc:
       # The +Document+, whether the insert succeeded or not.
       def persist
         return @document if @validate && !@document.valid?
-        @document.run_callbacks(:create, :save) do
-          @document.new_record = false if insert
-          @document
+        @document.run_callbacks(:create) do
+          @document.run_callbacks(:save) do
+            if insert
+              @document.new_record = false
+              @document.move_changes
+            end
+            @document
+          end
         end
       end
 
@@ -35,7 +40,7 @@ module Mongoid #:nodoc:
         if @document.embedded
           Persistence::InsertEmbedded.new(@document, @validate).persist
         else
-          collection.insert(@document.raw_attributes, options)
+          @collection.insert(@document.raw_attributes, @options)
         end
       end
     end

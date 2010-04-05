@@ -270,7 +270,7 @@ describe Mongoid::Document do
       @owner = PetOwner.create(:title => "AKC")
       @address = Address.new(:street => "Fido Street")
       @owner.address = @address
-      @owner.save
+      @address.save
     end
 
     after do
@@ -291,7 +291,9 @@ describe Mongoid::Document do
     end
 
     it "returns a pretty string of class name and attributes" do
-      attrs = Person.fields.map { |name, field| "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name]}" } * ", "
+      attrs = Person.fields.map do |name, field|
+        "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name]}"
+      end * ", "
       @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
     end
 

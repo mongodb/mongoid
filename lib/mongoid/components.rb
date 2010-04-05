@@ -8,7 +8,6 @@ module Mongoid #:nodoc
       include Mongoid::Associations
       include Mongoid::Attributes
       include Mongoid::Callbacks
-      include Mongoid::Commands
       include Mongoid::Dirty
       include Mongoid::Extras
       include Mongoid::Fields
