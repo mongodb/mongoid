@@ -550,6 +550,24 @@ describe Mongoid::Contexts::Mongo do
 
   end
 
+  describe "#paginate use last passed arguments" do
+    before do
+      @collection = mock
+      Person.expects(:collection).returns(@collection)
+      @criteria = Person.where(:_id => "1").skip(60).limit(20)
+      @context = Mongoid::Contexts::Mongo.new(@criteria)
+      @collection.expects(:find).with(
+        {:_type => { "$in" => ["Doctor", "Person"] }, :_id => "1"}, :skip => 20, :limit => 10
+      ).returns([])
+      @results = @context.paginate(:page => 3, :per_page => 10)
+    end
+
+    it 'uses last passed per_page and page value' do
+      @results.current_page.should == 3
+      @results.per_page.should == 10
+    end
+  end
+
   describe "#sum" do
 
     context "when klass not provided" do

@@ -175,7 +175,7 @@ module Mongoid #:nodoc:
       def paginate(options)
         criteria = Mongoid::Criteria.translate(@klass, options)
         criteria.documents = @target
-        criteria.paginate
+        criteria.paginate(options)
       end
 
       protected
