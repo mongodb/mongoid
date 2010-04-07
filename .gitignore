@@ -5,3 +5,4 @@ scratch_directory/*
 tmp/*
 *.gem
 RAILS
+.bundle
