@@ -24,11 +24,11 @@ describe Mongoid::Persistence::Remove do
 
   describe "#persist" do
 
-    def root_set_expectation
+    def root_pull_expectation
       lambda {
         collection.expects(:update).with(
           { "_id" => document.id },
-          { "$set" => { "addresses" => [] } },
+          { "$pull" => { "addresses" => { "_id" => address.id } } },
           :multi => false,
           :safe => true
         ).returns("Object")
@@ -93,7 +93,7 @@ describe Mongoid::Persistence::Remove do
           Mongoid::Persistence::RemoveEmbedded.new(address)
         end
 
-        it "notifies its changes to the parent and removes the parent" do
+        it "notifies its changes to the parent and removes the document" do
           remove.persist.should == true
           document.addresses.should == []
         end
@@ -109,8 +109,8 @@ describe Mongoid::Persistence::Remove do
           document.instance_variable_set(:@new_record, false)
         end
 
-        it "performs a $push on the embedded array" do
-          root_set_expectation.call
+        it "performs a $pull on the embedded array" do
+          root_pull_expectation.call
           remove.persist.should == true
         end
       end

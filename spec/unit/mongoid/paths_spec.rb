@@ -41,8 +41,8 @@ describe Mongoid::Paths do
 
     context "when document is an embeds_many" do
 
-      it "returns $set" do
-        address.remover.should == "$set"
+      it "returns $pull" do
+        address.remover.should == "$pull"
       end
     end
   end

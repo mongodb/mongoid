@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
       #
       # <tt>name.remover</tt>
       def remover
-        embedded ? (_index ? "$set" : "$unset") : nil
+        embedded ? (_index ? "$pull" : "$unset") : nil
       end
 
       # Return the selector for this document to be matched exactly for use
