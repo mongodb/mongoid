@@ -44,6 +44,19 @@ describe Mongoid::Dirty do
         @person.attribute_change("title").should be_nil
       end
     end
+
+    context "when the attribute is removed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.remove_attribute(:title)
+      end
+
+      it "returns an empty array" do
+        @person.attribute_change("title").should ==
+          [ "Grand Poobah", nil ]
+      end
+    end
   end
 
   describe "#attribute_changed?" do

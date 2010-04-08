@@ -70,7 +70,8 @@ module Mongoid #:nodoc:
       #
       # <tt>person.remove_attribute(:title)</tt>
       def remove_attribute(name)
-        @attributes.delete(name.to_s)
+        access = name.to_s
+        modify(access, @attributes.delete(name.to_s), nil)
       end
 
       # Returns the object type. This corresponds to the name of the class that
