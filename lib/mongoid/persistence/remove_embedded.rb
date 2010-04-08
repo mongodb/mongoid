@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
         parent = @document._parent
         parent.remove(@document)
         unless parent.new_record?
-          update = { @document.remover => { @document.path => setter } }
+          update = { @document.remover => removal_selector }
           @collection.update(parent.selector, update, @options.merge(:multi => false))
         end; true
       end
@@ -39,7 +39,11 @@ module Mongoid #:nodoc:
       protected
       # Get the value to pass to the removal modifier.
       def setter
-        @document._index ? @document._parent.raw_attributes[@document.association_name] : true
+        @document._index ? @document.id : true
+      end
+
+      def removal_selector
+        @document._index ? { @document.path => { "_id" => @document.id } } : { @document.path => setter }
       end
     end
   end
