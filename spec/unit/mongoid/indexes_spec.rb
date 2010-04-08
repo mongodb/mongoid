@@ -36,7 +36,7 @@ describe Mongoid::Indexes do
 
       it "adds the _type index" do
         @class.expects(:_collection).returns(@collection)
-        @collection.expects(:create_index).with(:_type, false)
+        @collection.expects(:create_index).with(:_type, :unique => false)
         @class.add_indexes
         @class.indexed.should be_true
       end
@@ -73,7 +73,7 @@ describe Mongoid::Indexes do
     context "when unique" do
 
       it "creates a unique index on the collection" do
-        @collection.expects(:create_index).with(:name, true)
+        @collection.expects(:create_index).with(:name, :unique => true)
         @class.index(:name, :unique => true)
       end
 
@@ -82,7 +82,7 @@ describe Mongoid::Indexes do
     context "when not unique" do
 
       it "creates an index on the collection" do
-        @collection.expects(:create_index).with(:name, false)
+        @collection.expects(:create_index).with(:name, :unique => false)
         @class.index(:name)
       end
 
