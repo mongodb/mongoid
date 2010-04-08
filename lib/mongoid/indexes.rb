@@ -12,7 +12,7 @@ module Mongoid #:nodoc
       # exist. Currently this is only _type.
       def add_indexes
         unless indexed
-          self._collection.create_index(:_type, false)
+          self._collection.create_index(:_type, :unique => false)
           self.indexed = true
         end
       end
@@ -20,7 +20,7 @@ module Mongoid #:nodoc
       # Adds an index on the field specified. Options can be :unique => true or
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
-        collection.create_index(name, options[:unique])
+        collection.create_index(name, options)
       end
     end
   end
