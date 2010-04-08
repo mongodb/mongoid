@@ -3,8 +3,8 @@
 
 gem "activemodel", ">= 3.0.pre", :git => "git://github.com/rails/rails.git"
 gem "will_paginate", ">= 3.0.pre"
-gem "mongo", ">= 0.19.1"
-gem "mongo_ext", ">= 0.19.1"
+gem "mongo", "<= 0.19.3"
+gem "mongo_ext", "<= 0.19.3"
 
 gem "rspec", ">= 1.3.0"
 gem "mocha", ">= 0.9.8"
