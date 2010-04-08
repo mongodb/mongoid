@@ -18,7 +18,7 @@ describe Mongoid::Paths do
     Name.new
   end
 
-  describe "#remover" do
+  describe "#._remover" do
 
     before do
       person.addresses << address
@@ -28,26 +28,26 @@ describe Mongoid::Paths do
     context "when document is root" do
 
       it "returns nil" do
-        person.remover.should be_nil
+        person._remover.should be_nil
       end
     end
 
     context "when document is an embeds_one" do
 
       it "returns $unset" do
-        name.remover.should == "$unset"
+        name._remover.should == "$unset"
       end
     end
 
     context "when document is an embeds_many" do
 
       it "returns $pull" do
-        address.remover.should == "$pull"
+        address._remover.should == "$pull"
       end
     end
   end
 
-  describe "#inserter" do
+  describe "#._inserter" do
 
     before do
       person.addresses << address
@@ -57,31 +57,31 @@ describe Mongoid::Paths do
     context "when document is root" do
 
       it "returns nil" do
-        person.inserter.should be_nil
+        person._inserter.should be_nil
       end
     end
 
     context "when document is an embeds_one" do
 
       it "returns $set" do
-        name.inserter.should == "$set"
+        name._inserter.should == "$set"
       end
     end
 
     context "when document is an embeds_many" do
 
       it "returns $push" do
-        address.inserter.should == "$push"
+        address._inserter.should == "$push"
       end
     end
   end
 
-  describe "#path" do
+  describe "#._path" do
 
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person.path.should == ""
+        person._path.should == ""
       end
     end
 
@@ -92,7 +92,7 @@ describe Mongoid::Paths do
       end
 
       it "returns the inverse_of value of the association" do
-        address.path.should == "addresses"
+        address._path.should == "addresses"
       end
     end
 
@@ -104,21 +104,21 @@ describe Mongoid::Paths do
       end
 
       it "returns the JSON notation to the document" do
-        location.path.should == "addresses.locations"
+        location._path.should == "addresses.locations"
       end
 
       it "sets the route class instance var" do
-        Location._path.should == "addresses.locations"
+        Location.__path.should == "addresses.locations"
       end
     end
   end
 
-  describe "#selector" do
+  describe "#._selector" do
 
     context "when the document is a parent" do
 
-      it "returns an id selector" do
-        person.selector.should == { "_id" => person.id }
+      it "returns an id._selector" do
+        person._selector.should == { "_id" => person.id }
       end
     end
 
@@ -128,8 +128,8 @@ describe Mongoid::Paths do
         person.addresses << address
       end
 
-      it "returns the association with id selector" do
-        address.selector.should == { "_id" => person.id, "addresses._id" => address.id }
+      it "returns the association with id._selector" do
+        address._selector.should == { "_id" => person.id, "addresses._id" => address.id }
       end
     end
 
@@ -141,18 +141,18 @@ describe Mongoid::Paths do
       end
 
       it "returns the JSON notation to the document with ids" do
-        location.selector.should ==
+        location._selector.should ==
           { "_id" => person.id, "addresses._id" => address.id, "addresses.locations._id" => location.id }
       end
     end
   end
 
-  describe "#position" do
+  describe "#._position" do
 
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person.position.should == ""
+        person._position.should == ""
       end
     end
 
@@ -164,8 +164,8 @@ describe Mongoid::Paths do
 
       context "when the document is new" do
 
-        it "returns the path without index" do
-          address.position.should == "addresses"
+        it "returns the._path without index" do
+          address._position.should == "addresses"
         end
       end
 
@@ -175,8 +175,8 @@ describe Mongoid::Paths do
           address.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the path plus index" do
-          address.position.should == "addresses.0"
+        it "returns the._path plus index" do
+          address._position.should == "addresses.0"
         end
       end
     end
@@ -192,8 +192,8 @@ describe Mongoid::Paths do
 
       context "when the document is new" do
 
-        it "returns the path with parent indexes" do
-          location.position.should == "addresses.0.locations"
+        it "returns the._path with parent indexes" do
+          location._position.should == "addresses.0.locations"
         end
       end
 
@@ -203,8 +203,8 @@ describe Mongoid::Paths do
           location.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the path plus index" do
-          location.position.should == "addresses.0.locations.1"
+        it "returns the._path plus index" do
+          location._position.should == "addresses.0.locations.1"
         end
       end
     end
