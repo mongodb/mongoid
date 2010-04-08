@@ -458,7 +458,7 @@ describe Mongoid::Document do
 
     before do
       @attributes = { "title" => "Herr" }
-      @person = Person.new(:_id => Mongo::ObjectID.new.to_s)
+      @person = Person.new(:_id => BSON::ObjectID.new.to_s)
       @collection.expects(:find_one).with(:_id => @person.id).returns(@attributes)
     end
 
@@ -581,7 +581,7 @@ describe Mongoid::Document do
     context "when the document is not new" do
 
       before do
-        @id = Mongo::ObjectID.new.to_s
+        @id = BSON::ObjectID.new.to_s
         @person = Person.new(:_id => @id)
       end
 
@@ -594,7 +594,7 @@ describe Mongoid::Document do
   describe "#to_param" do
 
     it "returns the id" do
-      id = Mongo::ObjectID.new.to_s
+      id = BSON::ObjectID.new.to_s
       Person.new(:_id => id).to_param.should == id.to_s
     end
 

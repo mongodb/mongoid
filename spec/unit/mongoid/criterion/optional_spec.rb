@@ -105,13 +105,13 @@ describe Mongoid::Criterion::Optional do
       context "when the id is a string" do
 
         it "adds the _id query to the selector" do
-          id = Mongo::ObjectID.new.to_s
+          id = BSON::ObjectID.new.to_s
           @criteria.id(id)
           @criteria.selector.should == { :_id => id }
         end
 
         it "returns self" do
-          id = Mongo::ObjectID.new.to_s
+          id = BSON::ObjectID.new.to_s
           @criteria.id(id).should == @criteria
         end
       end
@@ -119,13 +119,13 @@ describe Mongoid::Criterion::Optional do
       context "when the id is an object id" do
 
         it "adds the _id query to the selector" do
-          id = Mongo::ObjectID.new
+          id = BSON::ObjectID.new
           @criteria.id(id)
           @criteria.selector.should == { :_id => id }
         end
 
         it "returns self" do
-          id = Mongo::ObjectID.new
+          id = BSON::ObjectID.new
           @criteria.id(id).should == @criteria
         end
       end
@@ -136,7 +136,7 @@ describe Mongoid::Criterion::Optional do
 
       before do
         @ids = []
-        3.times { @ids << Mongo::ObjectID.new.to_s }
+        3.times { @ids << BSON::ObjectID.new.to_s }
       end
 
       it "adds the _id query to the selector" do

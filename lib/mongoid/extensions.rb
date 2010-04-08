@@ -94,6 +94,6 @@ class Time #:nodoc
   extend Mongoid::Extensions::Time::Conversions
 end
 
-class Mongo::ObjectID #:nodoc
+class BSON::ObjectID #:nodoc
   extend Mongoid::Extensions::ObjectID::Conversions
 end

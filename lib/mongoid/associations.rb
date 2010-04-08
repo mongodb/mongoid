@@ -90,7 +90,7 @@ module Mongoid # :nodoc:
             options.merge(:name => name, :extend => block, :foreign_key => foreign_key(name, options))
           )
         add_association(Associations::BelongsToRelated, opts)
-        field(opts.foreign_key, :type => Mongoid.use_object_ids ? Mongo::ObjectID : String)
+        field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
         index(opts.foreign_key) unless self.embedded
       end
 

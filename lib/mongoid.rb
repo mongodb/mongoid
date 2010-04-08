@@ -23,7 +23,8 @@ require "rubygems"
 
 gem "activemodel", ">= 3.0.0.beta2"
 gem "will_paginate", ">= 3.0.pre"
-gem "mongo", ">= 0.19.1"
+gem "mongo", "0.20.1"
+gem "bson", "0.20.1"
 
 require "delegate"
 require "singleton"
