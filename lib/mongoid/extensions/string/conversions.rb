@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module String #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value.to_s
+          value.to_s unless value.nil?
         end
         def get(value)
           value

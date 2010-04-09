@@ -4,10 +4,17 @@ module Mongoid #:nodoc:
     module Date #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value.to_date.at_midnight.to_time unless value.blank?
+          if value.blank?
+            nil
+          else
+            date = (value.is_a?(::Date) || value.is_a?(::Time)) ? value : ::Date.parse(value.to_s)
+            ::Time.utc(date.year, date.month, date.day)
+          end
+        rescue ArgumentError
+          value
         end
         def get(value)
-          value ? value.getlocal.to_date : value
+          value.utc.to_date if value
         end
       end
     end

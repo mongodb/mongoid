@@ -5,7 +5,9 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def set(value)
           return nil if value.blank?
-          value =~ /\d/ ? value.to_f : value
+          Kernel.Float(value)
+        rescue ArgumentError
+          value
         end
         def get(value)
           value
