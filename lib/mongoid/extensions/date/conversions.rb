@@ -4,16 +4,9 @@ module Mongoid #:nodoc:
     module Date #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          begin
-            if value.blank?
-              nil
-            else
-              date = (value.is_a?(::Date) || value.is_a?(::Time)) ? value : ::Date.parse(value.to_s)
-              ::Time.utc(date.year, date.month, date.day)
-            end
-          rescue ArgumentError => e
-            value
-          end
+          return nil if value.blank?
+          date = (value.is_a?(::Date) || value.is_a?(::Time)) ? value : ::Date.parse(value.to_s)
+          ::Time.utc(date.year, date.month, date.day)
         end
         def get(value)
           value.utc.to_date if value
