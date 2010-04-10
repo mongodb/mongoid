@@ -12,6 +12,7 @@ module Mongoid #:nodoc:
 
       class_option :timestamps, :type => :boolean
       class_option :parent,     :type => :string, :desc => "The parent class for the generated model"
+      class_option :versioning, :type => :boolean, :default => false, :desc => "Enable mongoid versioning"
 
       def create_model_file
         template "model.rb", File.join("app/models", class_path, "#{file_name}.rb")
