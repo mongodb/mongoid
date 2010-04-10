@@ -5,7 +5,11 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def set(value)
           return nil if value.blank?
-          begin Integer(value); rescue; value; end
+          begin
+            Integer(value)
+          rescue ArgumentError => e
+            puts(e.message); value
+          end
         end
         def get(value)
           value
