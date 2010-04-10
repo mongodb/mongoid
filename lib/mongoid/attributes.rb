@@ -104,7 +104,7 @@ module Mongoid #:nodoc:
       def write_attribute(name, value)
         access = name.to_s
         modify(access, @attributes[access], fields[access].set(value))
-        notify unless id.blank?
+        notify if !id.blank? && new_record?
       end
 
       # Writes the supplied attributes +Hash+ to the +Document+. This will only
@@ -124,7 +124,7 @@ module Mongoid #:nodoc:
       def write_attributes(attrs = nil)
         process(attrs || {})
         identified = !id.blank?
-        unless identified
+        if new_record? && !identified
           identify; notify
         end
       end
