@@ -6,6 +6,9 @@ class <%= class_name %><%= " < #{options[:parent].classify}" if options[:parent]
 <% if options[:timestamps] -%>
   include Mongoid::Timestamps
 <% end %>
+
+<%= 'include Mongoid::Versioning' if options[:versioning] %>
+
 <% attributes.each do |attribute| -%>
   field :<%= attribute.name -%>, :type => <%= attribute.type_class %>
 <% end %>
