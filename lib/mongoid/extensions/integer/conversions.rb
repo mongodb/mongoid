@@ -4,12 +4,8 @@ module Mongoid #:nodoc:
     module Integer #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          begin
-            return nil if value.blank?
-            Kernel.Integer(value)
-          rescue ArgumentError => e
-            value
-          end
+          return nil if value.blank?
+          begin Integer(value); rescue; value; end
         end
         def get(value)
           value
