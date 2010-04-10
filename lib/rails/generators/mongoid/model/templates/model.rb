@@ -14,7 +14,7 @@ class <%= class_name %><%= " < #{options[:parent].classify}" if options[:parent]
 <% end -%>
 
 <% attributes.select{|attr| attr.reference? }.each do |attribute| -%>
-  belongs_to :<%= attribute.name%>, :inverse_of => :<%= class_name.tableize %>
+  embedded_in :<%= attribute.name%>, :inverse_of => :<%= class_name.tableize %>
 <% end -%>
 
 
