@@ -86,8 +86,8 @@ module Mongoid #:nodoc:
       # all attributes excluding timestamps on the object.
       def ==(other)
         return false unless other.is_a?(Document)
-        attributes.except(:modified_at).except(:created_at) ==
-          other.attributes.except(:modified_at).except(:created_at)
+        raw_attributes.except(:modified_at).except(:created_at) ==
+          other.raw_attributes.except(:modified_at).except(:created_at)
       end
 
       # Delegates to ==
@@ -188,7 +188,7 @@ module Mongoid #:nodoc:
 
       # Reloads the +Document+ attributes from the database.
       def reload
-        @attributes = collection.find_one(:_id => id)
+        @attributes = {}.merge(collection.find_one(:_id => id))
         self.associations.each { |association_name, association| unmemoize(association_name) }; self
       end
 

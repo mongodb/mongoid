@@ -11,7 +11,8 @@ module Mongoid #:nodoc:
     #
     # klass: The class to instantiate from if _type is not present.
     # attributes: The +Document+ attributes.
-    def self.build(klass, attrs)
+    def self.build(klass, attributes)
+      attrs = {}.merge(attributes)
       type = attrs["_type"]
       type ? type.constantize.instantiate(attrs) : klass.instantiate(attrs)
     end
