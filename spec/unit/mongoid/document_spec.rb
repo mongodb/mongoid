@@ -295,12 +295,12 @@ describe Mongoid::Document do
           :age => "30",
           :terms => "true",
           :name => {
-            :_id => "2", :first_name => "Test", :last_name => "User"
-          },
+          :_id => "2", :first_name => "Test", :last_name => "User"
+        },
           :addresses => [
             { :_id => "3", :street => "First Street" },
             { :_id => "4", :street => "Second Street" }
-          ]
+        ]
         }
       end
 
@@ -568,7 +568,7 @@ describe Mongoid::Document do
   describe "#to_param" do
 
     it "returns the id" do
-      id = Mongo::ObjectID.new.to_s
+      id = BSON::ObjectID.new.to_s
       Person.new(:_id => id).to_param.should == id.to_s
     end
 
@@ -602,261 +602,258 @@ describe Mongoid::Document do
           Person.validations.first.should be_a_kind_of(Validatable::ValidatesAssociated)
         end
 
-      describe "#validates_format_of" do
+        describe "#validates_format_of" do
 
-        it "adds the format validation" do
-          Person.class_eval do
-            validates_format_of :title, :with => /[A-Za-z]/
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesFormatOf)
-        end
-
-      end
-
-      describe "#validates_length_of" do
-
-        it "adds the length validation" do
-          Person.class_eval do
-            validates_length_of :title, :minimum => 10
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesLengthOf)
-        end
-
-      end
-
-      describe "#validates_numericality_of" do
-
-        it "adds the numericality validation" do
-          Person.class_eval do
-            validates_numericality_of :age
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesNumericalityOf)
-        end
-
-      end
-
-      describe "#validates_presence_of" do
-
-        it "adds the presence validation" do
-          Person.class_eval do
-            validates_presence_of :title
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesPresenceOf)
-        end
-
-      end
-
-      describe "#validates_uniqueness_of" do
-
-        it "adds the uniqueness validation" do
-          Person.class_eval do
-            validates_uniqueness_of :title
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesUniquenessOf)
-        end
-
-      end
-
-      describe "#validates_inclusion_of" do
-
-        it "adds the inclusion validation" do
-          Person.class_eval do
-            validates_inclusion_of :title, :within => ["test"]
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesInclusionOf)
-        end
-
-      end
-
-      describe "#validates_exclusion_of" do
-
-        it "adds the exclusion validation" do
-          Person.class_eval do
-            validates_exclusion_of :title, :within => ["test"]
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesExclusionOf)
-        end
-
-      end
-
-      describe "#validates_true_for" do
-
-        it "adds the true validation" do
-          Person.class_eval do
-            validates_true_for :title, :logic => lambda { title == "Esquire" }
-          end
-          Person.validations.first.should be_a_kind_of(Validatable::ValidatesTrueFor)
-        end
-
-      end
-
-    end
-
-    context "when running validations" do
-
-      before do
-        @person = Person.new
-        @canvas = Canvas.new
-        @firefox = Firefox.new
-      end
-
-      after do
-        Person.validations.clear
-        Canvas.validations.clear
-        Firefox.validations.clear
-      end
-
-      describe "#validates_acceptance_of" do
-
-        it "fails if field not accepted" do
-          Person.class_eval do
-            validates_acceptance_of :terms
-          end
-          @person.valid?.should be_false
-          @person.errors.on(:terms).should_not be_nil
-        end
-
-      end
-
-      describe "#validates_associated" do
-
-        context "when association is a has_many" do
-
-          it "fails when any association fails validation" do
+          it "adds the format validation" do
             Person.class_eval do
-              validates_associated :addresses
+              validates_format_of :title, :with => /[A-Za-z]/
             end
-            Address.class_eval do
-              validates_presence_of :street
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesFormatOf)
+          end
+
+        end
+
+        describe "#validates_length_of" do
+
+          it "adds the length validation" do
+            Person.class_eval do
+              validates_length_of :title, :minimum => 10
             end
-            @person.addresses << Address.new
-            @person.valid?.should be_false
-            @person.errors.on(:addresses).should_not be_nil
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesLengthOf)
           end
 
         end
 
-        context "when association is a has_one" do
+        describe "#validates_numericality_of" do
 
-          context "when the associated is not nil" do
-
-            it "fails when the association fails validation" do
-              Person.class_eval do
-                validates_associated :name
-              end
-              Name.class_eval do
-                validates_presence_of :first_name
-              end
-              @person.name = Name.new
-              @person.valid?.should be_false
-              @person.errors.on(:name).should_not be_nil
+          it "adds the numericality validation" do
+            Person.class_eval do
+              validates_numericality_of :age
             end
-
-          end
-
-          context "when the associated is nil" do
-
-            it "returns true" do
-              Person.class_eval do
-                validates_associated :name
-              end
-              @person.valid?.should be_true
-            end
-
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesNumericalityOf)
           end
 
         end
 
-      end
+        describe "#validates_presence_of" do
 
-      describe "#validates_format_of" do
-
-        it "fails if the field is in the wrong format" do
-          Person.class_eval do
-            validates_format_of :title, :with => /[A-Za-z]/
-          end
-          @person.title = 10
-          @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
-        end
-
-      end
-
-      describe "#validates_length_of" do
-
-        it "fails if the field is the wrong length" do
-          Person.class_eval do
-            validates_length_of :title, :minimum => 10
-          end
-          @person.title = "Testing"
-          @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
-        end
-
-      end
-
-      describe "#validates_numericality_of" do
-
-        it "fails if the field is not a number" do
-          Person.class_eval do
-            validates_numericality_of :age
-          end
-          @person.age = "foo"
-          @person.valid?.should be_false
-          @person.errors.on(:age).should_not be_nil
-        end
-
-      end
-
-      describe "#validates_presence_of" do
-
-        context "on a parent class" do
-
-          it "fails if the field is nil on the parent" do
+          it "adds the presence validation" do
             Person.class_eval do
               validates_presence_of :title
             end
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesPresenceOf)
+          end
+
+        end
+
+        describe "#validates_uniqueness_of" do
+
+          it "adds the uniqueness validation" do
+            Person.class_eval do
+              validates_uniqueness_of :title
+            end
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesUniquenessOf)
+          end
+
+        end
+
+        describe "#validates_inclusion_of" do
+
+          it "adds the inclusion validation" do
+            Person.class_eval do
+              validates_inclusion_of :title, :within => ["test"]
+            end
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesInclusionOf)
+          end
+
+        end
+
+        describe "#validates_exclusion_of" do
+
+          it "adds the exclusion validation" do
+            Person.class_eval do
+              validates_exclusion_of :title, :within => ["test"]
+            end
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesExclusionOf)
+          end
+
+        end
+
+        describe "#validates_true_for" do
+
+          it "adds the true validation" do
+            Person.class_eval do
+              validates_true_for :title, :logic => lambda { title == "Esquire" }
+            end
+            Person.validations.first.should be_a_kind_of(Validatable::ValidatesTrueFor)
+          end
+
+        end
+
+      end
+
+      context "when running validations" do
+
+        before do
+          @person = Person.new
+          @canvas = Canvas.new
+          @firefox = Firefox.new
+        end
+
+        after do
+          Person.validations.clear
+          Canvas.validations.clear
+          Firefox.validations.clear
+        end
+
+        describe "#validates_acceptance_of" do
+
+          it "fails if field not accepted" do
+            Person.class_eval do
+              validates_acceptance_of :terms
+            end
+            @person.valid?.should be_false
+            @person.errors.on(:terms).should_not be_nil
+          end
+
+        end
+
+        describe "#validates_associated" do
+
+          context "when association is a has_many" do
+
+            it "fails when any association fails validation" do
+              Person.class_eval do
+                validates_associated :addresses
+              end
+              Address.class_eval do
+                validates_presence_of :street
+              end
+              @person.addresses << Address.new
+              @person.valid?.should be_false
+              @person.errors.on(:addresses).should_not be_nil
+            end
+
+          end
+
+          context "when association is a has_one" do
+
+            context "when the associated is not nil" do
+
+              it "fails when the association fails validation" do
+                Person.class_eval do
+                  validates_associated :name
+                end
+                Name.class_eval do
+                  validates_presence_of :first_name
+                end
+                @person.name = Name.new
+                @person.valid?.should be_false
+                @person.errors.on(:name).should_not be_nil
+              end
+
+            end
+
+            context "when the associated is nil" do
+
+              it "returns true" do
+                Person.class_eval do
+                  validates_associated :name
+                end
+                @person.valid?.should be_true
+              end
+
+            end
+
+          end
+
+        end
+
+        describe "#validates_format_of" do
+
+          it "fails if the field is in the wrong format" do
+            Person.class_eval do
+              validates_format_of :title, :with => /[A-Za-z]/
+            end
+            @person.title = 10
             @person.valid?.should be_false
             @person.errors.on(:title).should_not be_nil
           end
 
-          it "fails if the field is nil on a subclass" do
-            Canvas.class_eval do
-              validates_presence_of :name
+        end
+
+        describe "#validates_length_of" do
+
+          it "fails if the field is the wrong length" do
+            Person.class_eval do
+              validates_length_of :title, :minimum => 10
             end
-            @firefox.valid?.should be_false
-            @firefox.errors.on(:name).should_not be_nil
+            @person.title = "Testing"
+            @person.valid?.should be_false
+            @person.errors.on(:title).should_not be_nil
           end
 
         end
 
-        context "on a subclass" do
+        describe "#validates_numericality_of" do
 
-          it "parent class does not get subclass validations" do
-            Firefox.class_eval do
-              validates_presence_of :name
+          it "fails if the field is not a number" do
+            Person.class_eval do
+              validates_numericality_of :age
             end
-            @canvas.valid?.should be_true
+            @person.age = "foo"
+            @person.valid?.should be_false
+            @person.errors.on(:age).should_not be_nil
           end
 
         end
 
-      end
+        describe "#validates_presence_of" do
 
-      describe "#validates_true_for" do
+          context "on a parent class" do
 
-        it "fails if the logic returns false" do
-          Person.class_eval do
-            validates_true_for :title, :logic => lambda { title == "Esquire" }
+            it "fails if the field is nil on the parent" do
+              Person.class_eval do
+                validates_presence_of :title
+              end
+              @person.valid?.should be_false
+              @person.errors.on(:title).should_not be_nil
+            end
+
+            it "fails if the field is nil on a subclass" do
+              Canvas.class_eval do
+                validates_presence_of :name
+              end
+              @firefox.valid?.should be_false
+              @firefox.errors.on(:name).should_not be_nil
+            end
+
           end
-          @person.valid?.should be_false
-          @person.errors.on(:title).should_not be_nil
+
+          context "on a subclass" do
+
+            it "parent class does not get subclass validations" do
+              Firefox.class_eval do
+                validates_presence_of :name
+              end
+              @canvas.valid?.should be_true
+            end
+
+          end
+
         end
 
-      end
+        describe "#validates_true_for" do
 
+          it "fails if the logic returns false" do
+            Person.class_eval do
+              validates_true_for :title, :logic => lambda { title == "Esquire" }
+            end
+            @person.valid?.should be_false
+            @person.errors.on(:title).should_not be_nil
+          end
+        end
+      end
     end
-
   end
-
 end
