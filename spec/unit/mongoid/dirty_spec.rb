@@ -52,7 +52,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an array of the old value and nil" do
-        @person.attribute_change("title").should == 
+        @person.attribute_change("title").should ==
           [ "Grand Poobah", nil ]
       end
     end
