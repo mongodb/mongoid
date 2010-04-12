@@ -4,3 +4,4 @@ pkg/*
 scratch_directory/*
 tmp/*
 *.gem
+.bundle
