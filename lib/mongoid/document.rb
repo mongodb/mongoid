@@ -86,8 +86,7 @@ module Mongoid #:nodoc:
       # all attributes excluding timestamps on the object.
       def ==(other)
         return false unless other.is_a?(Document)
-        raw_attributes.except(:modified_at).except(:created_at) ==
-          other.raw_attributes.except(:modified_at).except(:created_at)
+        id == other.id
       end
 
       # Delegates to ==
