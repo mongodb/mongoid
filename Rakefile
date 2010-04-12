@@ -13,9 +13,10 @@ begin
     gem.authors = ["Durran Jordan"]
 
     gem.add_dependency("activesupport", "<= 2.3.5")
-    gem.add_dependency("mongo", ">= 0.19.1")
     gem.add_dependency("durran-validatable", ">= 2.0.1")
     gem.add_dependency("will_paginate", "< 2.9")
+    gem.add_dependency("mongo", "0.20.1")
+    gem.add_dependency("bson", "0.20.1")
 
     gem.add_development_dependency("rspec", ">= 1.2.9")
     gem.add_development_dependency("mocha", ">= 0.9.8")

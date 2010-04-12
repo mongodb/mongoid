@@ -62,7 +62,7 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # object_id: A +String+ representation of a <tt>Mongo::ObjectID</tt>
+      # object_id: A +String+ representation of a <tt>BSON::ObjectID</tt>
       #
       # Example:
       #

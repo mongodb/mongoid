@@ -108,7 +108,7 @@ describe Mongoid::Attributes do
     end
 
     it "delegates to #id=" do
-      @id = Mongo::ObjectID.new.to_s
+      @id = BSON::ObjectID.new.to_s
       @person._id = @id
       @person.id.should == @id
     end

@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
       protected
       # Return the proper id for the document.
       def generate_id
-        id = Mongo::ObjectID.new
+        id = BSON::ObjectID.new
         Mongoid.use_object_ids ? id : id.to_s
       end
 

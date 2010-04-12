@@ -3,11 +3,11 @@ require "spec_helper"
 describe Mongoid::Persistence::Update do
 
   let(:document) do
-    Patient.new(:_id => Mongo::ObjectID.new.to_s)
+    Patient.new(:_id => BSON::ObjectID.new.to_s)
   end
 
   let(:address) do
-    Address.new(:_id => Mongo::ObjectID.new.to_s, :street => "Oxford St")
+    Address.new(:_id => BSON::ObjectID.new.to_s, :street => "Oxford St")
   end
 
   let(:collection) do

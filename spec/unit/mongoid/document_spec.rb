@@ -458,7 +458,7 @@ describe Mongoid::Document do
 
     before do
       @attributes = { "title" => "Herr" }
-      @person = Person.new(:_id => Mongo::ObjectID.new.to_s)
+      @person = Person.new(:_id => BSON::ObjectID.new.to_s)
       @collection.expects(:find_one).with(:_id => @person.id).returns(@attributes)
     end
 
@@ -601,8 +601,6 @@ describe Mongoid::Document do
           end
           Person.validations.first.should be_a_kind_of(Validatable::ValidatesAssociated)
         end
-
-      end
 
       describe "#validates_format_of" do
 

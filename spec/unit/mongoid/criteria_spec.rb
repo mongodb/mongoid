@@ -677,7 +677,7 @@ describe Mongoid::Criteria do
       context "when the arg is a string" do
 
         before do
-          @id = Mongo::ObjectID.new.to_s
+          @id = BSON::ObjectID.new.to_s
           @document = stub
           @criteria = mock
           Mongoid::Criteria.expects(:new).returns(@criteria)
@@ -692,7 +692,7 @@ describe Mongoid::Criteria do
       context "when the arg is an object id" do
 
         before do
-          @id = Mongo::ObjectID.new
+          @id = BSON::ObjectID.new
           @document = stub
           @criteria = mock
           Mongoid::Criteria.expects(:new).returns(@criteria)
@@ -713,7 +713,7 @@ describe Mongoid::Criteria do
           @ids = []
           @documents = []
           3.times do
-            @ids << Mongo::ObjectID.new.to_s
+            @ids << BSON::ObjectID.new.to_s
             @documents << stub
           end
           @criteria = mock
