@@ -82,8 +82,8 @@ module Mongoid #:nodoc:
     end
 
     module InstanceMethods
-      # Performs equality checking on the attributes. For now we chack against
-      # all attributes excluding timestamps on the object.
+      # Performs equality checking on the document ids. For more robust
+      # equality checking please override this method.
       def ==(other)
         return false unless other.is_a?(Document)
         id == other.id
