@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-04-08}
+  s.date = %q{2010-04-12}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -210,6 +210,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/nil/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/objectid/conversions_spec.rb",
      "spec/unit/mongoid/extensions/proc/scoping_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
@@ -341,6 +342,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/integer/conversions_spec.rb",
      "spec/unit/mongoid/extensions/nil/assimilation_spec.rb",
      "spec/unit/mongoid/extensions/object/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/objectid/conversions_spec.rb",
      "spec/unit/mongoid/extensions/proc/scoping_spec.rb",
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
@@ -390,24 +392,27 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<activesupport>, ["<= 2.3.5"])
-      s.add_runtime_dependency(%q<mongo>, [">= 0.19.1"])
       s.add_runtime_dependency(%q<durran-validatable>, [">= 2.0.1"])
       s.add_runtime_dependency(%q<will_paginate>, ["< 2.9"])
+      s.add_runtime_dependency(%q<mongo>, ["= 0.20.1"])
+      s.add_runtime_dependency(%q<bson>, ["= 0.20.1"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
     else
       s.add_dependency(%q<activesupport>, ["<= 2.3.5"])
-      s.add_dependency(%q<mongo>, [">= 0.19.1"])
       s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
       s.add_dependency(%q<will_paginate>, ["< 2.9"])
+      s.add_dependency(%q<mongo>, ["= 0.20.1"])
+      s.add_dependency(%q<bson>, ["= 0.20.1"])
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_dependency(%q<mocha>, [">= 0.9.8"])
     end
   else
     s.add_dependency(%q<activesupport>, ["<= 2.3.5"])
-    s.add_dependency(%q<mongo>, [">= 0.19.1"])
     s.add_dependency(%q<durran-validatable>, [">= 2.0.1"])
     s.add_dependency(%q<will_paginate>, ["< 2.9"])
+    s.add_dependency(%q<mongo>, ["= 0.20.1"])
+    s.add_dependency(%q<bson>, ["= 0.20.1"])
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
     s.add_dependency(%q<mocha>, [">= 0.9.8"])
   end
