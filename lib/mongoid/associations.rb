@@ -13,9 +13,13 @@ module Mongoid # :nodoc:
   module Associations #:nodoc:
     extend ActiveSupport::Concern
     included do
-      # Associations need to inherit down the chain.
+      cattr_accessor :embedded
+      self.embedded = false
+
       class_inheritable_accessor :associations
       self.associations = {}
+
+      delegate :embedded, :embedded?, :to => "self.class"
     end
 
     module InstanceMethods
@@ -24,19 +28,52 @@ module Mongoid # :nodoc:
         self.class.associations
       end
 
-      # Updates all the one-to-many relational associations for the name.
-      def update_associations(name)
-        send(name).each { |doc| doc.save } if new_record?
-      end
-
       # Update the one-to-one relational association for the name.
       def update_association(name)
         association = send(name)
         association.save if new_record? && !association.nil?
       end
+
+      # Updates all the one-to-many relational associations for the name.
+      def update_associations(name)
+        send(name).each { |doc| doc.save } if new_record?
+      end
     end
 
     module ClassMethods
+      # Adds a relational association from the child Document to a Document in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name.
+      #
+      # Example:
+      #
+      #   class Game
+      #     include Mongoid::Document
+      #     belongs_to_related :person
+      #   end
+      #
+      def belongs_to_related(name, options = {}, &block)
+        opts = optionize(name, options, fk(name, options), &block)
+        associate(Associations::BelongsToRelated, opts)
+        field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
+        index(opts.foreign_key) unless self.embedded
+      end
+
+      # Gets whether or not the document is embedded.
+      #
+      # Example:
+      #
+      # <tt>Person.embedded?</tt>
+      #
+      # Returns:
+      #
+      # <tt>true</tt> if embedded, <tt>false</tt> if not.
+      def embedded?
+        !!self.embedded
+      end
 
       # Adds the association back to the parent document. This macro is
       # necessary to set the references from the child back to the parent
@@ -63,35 +100,7 @@ module Mongoid # :nodoc:
           raise Errors::InvalidOptions.new("Options for embedded_in association must include :inverse_of")
         end
         self.embedded = true
-        add_association(
-          Associations::EmbeddedIn,
-          Associations::Options.new(
-            options.merge(:name => name, :extend => block)
-          )
-        )
-      end
-
-      # Adds a relational association from the child Document to a Document in
-      # another database or collection.
-      #
-      # Options:
-      #
-      # name: A +Symbol+ that is the related class name.
-      #
-      # Example:
-      #
-      #   class Game
-      #     include Mongoid::Document
-      #     belongs_to_related :person
-      #   end
-      #
-      def belongs_to_related(name, options = {}, &block)
-        opts = Associations::Options.new(
-            options.merge(:name => name, :extend => block, :foreign_key => foreign_key(name, options))
-          )
-        add_association(Associations::BelongsToRelated, opts)
-        field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
-        index(opts.foreign_key) unless self.embedded
+        associate(Associations::EmbeddedIn, optionize(name, options, nil, &block))
       end
 
       # Adds the association from a parent document to its children. The name
@@ -114,40 +123,10 @@ module Mongoid # :nodoc:
       #     embedded_in :person, :inverse_of => :addresses
       #   end
       def embeds_many(name, options = {}, &block)
-        add_association(
-          Associations::EmbedsMany,
-          Associations::Options.new(
-            options.merge(:name => name, :extend => block)
-          )
-        )
+        associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
       end
 
       alias :embed_many :embeds_many
-
-      # Adds a relational association from the Document to many Documents in
-      # another database or collection.
-      #
-      # Options:
-      #
-      # name: A +Symbol+ that is the related class name pluralized.
-      #
-      # Example:
-      #
-      #   class Person
-      #     include Mongoid::Document
-      #     has_many_related :posts
-      #   end
-      #
-      def has_many_related(name, options = {}, &block)
-        add_association(Associations::HasManyRelated,
-          Associations::Options.new(
-            options.merge(:name => name, :foreign_key => foreign_key(self.name, options), :extend => block)
-          )
-        )
-        set_callback :save, :before do |document|
-          document.update_associations(name)
-        end
-      end
 
       # Adds the association from a parent document to its child. The name
       # of the association needs to be a singular form of the child class
@@ -169,16 +148,35 @@ module Mongoid # :nodoc:
       #     embedded_in :person
       #   end
       def embeds_one(name, options = {}, &block)
-        opts = Associations::Options.new(
-          options.merge(:name => name, :extend => block)
-        )
+        opts = optionize(name, options, nil, &block)
         type = Associations::EmbedsOne
-        add_association(type, opts)
+        associate(type, opts)
         add_builder(type, opts)
         add_creator(type, opts)
       end
 
       alias :embed_one :embeds_one
+
+      # Adds a relational association from the Document to many Documents in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name pluralized.
+      #
+      # Example:
+      #
+      #   class Person
+      #     include Mongoid::Document
+      #     has_many_related :posts
+      #   end
+      #
+      def has_many_related(name, options = {}, &block)
+        associate(Associations::HasManyRelated, optionize(name, options, fk(self.name, options), &block))
+        set_callback :save, :before do |document|
+          document.update_associations(name)
+        end
+      end
 
       # Adds a relational association from the Document to one Document in
       # another database or collection.
@@ -194,12 +192,7 @@ module Mongoid # :nodoc:
       #     has_one_related :game
       #   end
       def has_one_related(name, options = {}, &block)
-        add_association(
-          Associations::HasOneRelated,
-          Associations::Options.new(
-            options.merge(:name => name, :foreign_key => foreign_key(name, options), :extend => block)
-          )
-        )
+        associate(Associations::HasOneRelated, optionize(name, options, fk(name, options), &block))
         set_callback :save, :before do |document|
           document.update_association(name)
         end
@@ -224,15 +217,15 @@ module Mongoid # :nodoc:
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association. The defined setters and
       # getters for the associations will perform the necessary memoization.
-      def add_association(type, options)
+      #
+      # Example:
+      #
+      # <tt>Person.associate(EmbedsMany, { :name => :addresses })</tt>
+      def associate(type, options)
         name = options.name.to_s
         associations[name] = MetaData.new(type, options)
-        define_method(name) do
-          memoized(name) { type.instantiate(self, options) }
-        end
-        define_method("#{name}=") do |object|
-          reset(name) { type.update(object, self, options) }
-        end
+        define_method(name) { memoized(name) { type.instantiate(self, options) } }
+        define_method("#{name}=") { |object| reset(name) { type.update(object, self, options) } }
       end
 
       # Adds a builder for a has_one association. This comes in the form of
@@ -253,8 +246,15 @@ module Mongoid # :nodoc:
         end
       end
 
+      # build the options given the params.
+      def optionize(name, options, foreign_key, &block)
+        Associations::Options.new(
+          options.merge(:name => name, :foreign_key => foreign_key, :extend => block)
+        )
+      end
+
       # Find the foreign key.
-      def foreign_key(name, options)
+      def fk(name, options)
         options[:foreign_key] || name.to_s.foreign_key
       end
     end

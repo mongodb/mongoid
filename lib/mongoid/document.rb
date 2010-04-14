@@ -5,15 +5,13 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor :embedded, :primary_key, :hereditary
-
-      self.embedded = false
+      cattr_accessor :primary_key, :hereditary
       self.hereditary = false
 
       attr_accessor :association_name, :_parent
       attr_reader :new_record
 
-      delegate :db, :embedded, :primary_key, :to => "self.class"
+      delegate :db, :primary_key, :to => "self.class"
     end
 
     module ClassMethods
