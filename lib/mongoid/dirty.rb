@@ -120,7 +120,7 @@ module Mongoid #:nodoc:
       # A +Hash+ of new values.
       def setters
         @modifications.inject({}) do |sets, (field, changes)|
-          key = embedded ? "#{_position}.#{field}" : field
+          key = embedded? ? "#{_position}.#{field}" : field
           sets[key] = changes[1]; sets
         end
       end

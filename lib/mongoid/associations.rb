@@ -59,7 +59,7 @@ module Mongoid # :nodoc:
         opts = optionize(name, options, fk(name, options), &block)
         associate(Associations::BelongsToRelated, opts)
         field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
-        index(opts.foreign_key) unless self.embedded
+        index(opts.foreign_key) unless embedded?
       end
 
       # Gets whether or not the document is embedded.

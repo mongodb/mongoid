@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
       def initialize(document_or_class, validate = true, selector = {})
         if document_or_class.is_a?(Mongoid::Document)
           @document = document_or_class
-          @collection = @document.embedded ? @document._root.collection : @document.collection
+          @collection = @document.embedded? ? @document._root.collection : @document.collection
         else
           @klass = document_or_class
           @collection = @klass.collection
