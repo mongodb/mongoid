@@ -22,6 +22,29 @@ describe Mongoid::Dirty do
       end
     end
 
+    context "when the attribute changes multiple times" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+        @person.title = "Dark Helmet"
+      end
+
+      it "returns an array of the original value and new value" do
+        @person.attribute_change("title").should ==
+          [ "Grand Poobah", "Dark Helmet" ]
+      end
+
+      it "allows access via (attribute)_change" do
+        @person.title_change.should ==
+          [ "Grand Poobah", "Dark Helmet" ]
+      end
+    end
+
+    context "when the attribute is modified in place" do
+
+    end
+
     context "when the attribute has not changed" do
 
       before do
