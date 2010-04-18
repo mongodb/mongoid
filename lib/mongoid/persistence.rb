@@ -211,7 +211,7 @@ module Mongoid #:nodoc:
 
       # Raise an error if validation failed.
       def fail_validate!(document)
-        raise Errors::Validations.new(document.errors.full_messages)
+        raise Errors::Validations.new(document.errors)
       end
     end
   end
