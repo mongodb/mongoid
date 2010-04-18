@@ -117,14 +117,14 @@ describe Mongoid::Persistence do
     context "deleting an embedded document" do
 
       before do
-        @address = Address.new(:street => "Bond Street")
+        @address = Address.new(:street => "Bond Street", :city => "London", :country => "UK")
         @person.addresses << @address
       end
 
       context "when the document is not yet saved" do
 
         it "removes the document from the parent" do
-          @address.destroy
+          @address.delete
           @person.addresses.should be_empty
           @person.attributes[:addresses].should be_empty
         end
@@ -138,9 +138,33 @@ describe Mongoid::Persistence do
         end
 
         it "removes the object from the parent and database" do
-          @address.destroy
+          @address.delete
           from_db = Person.find(@person.id)
           from_db.addresses.should be_empty
+        end
+      end
+    end
+
+    context "deleting deeply embedded documents" do
+
+      before do
+        @address = Address.new(:street => "Bond Street", :city => "London", :country => "UK")
+        @person.addresses << @address
+      end
+
+      context "when the document has been saved" do
+
+        before do
+          @address.save
+          @location = Location.new(:name => "Home")
+          @address.locations << @location
+          @location.save
+        end
+
+        it "removes the object from the parent and database" do
+          @location.delete
+          from_db = Person.find(@person.id)
+          from_db.addresses.first.locations.should be_empty
         end
       end
     end

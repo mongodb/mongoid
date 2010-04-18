@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
       end
 
       def removal_selector
-        @document._index ? { @document._path => { "_id" => @document.id } } : { @document._path => setter }
+        @document._index ? { @document._pull => { "_id" => @document.id } } : { @document._path => setter }
       end
     end
   end

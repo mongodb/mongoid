@@ -39,6 +39,17 @@ module Mongoid #:nodoc:
         embedded? ? "#{_parent._position}#{"." unless _parent._position.blank?}#{@association_name}#{locator}" : ""
       end
 
+      # Return the path to this +Document+ in JSON notation, used for atomic
+      # updates via $set in MongoDB.
+      #
+      # Example:
+      #
+      # <tt>address.path # returns "addresses"</tt>
+      def _pull
+        period = _position[_position.length - 2, 1]
+        (period == ".") ? _position[0, _position.length - 2] : _position
+      end
+
       # Get the removal modifier for the document. Will be nil on root
       # documents, $unset on embeds_one, $set on embeds_many.
       #

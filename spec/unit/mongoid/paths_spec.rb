@@ -209,4 +209,53 @@ describe Mongoid::Paths do
       end
     end
   end
+
+  describe "#._pull" do
+
+    context "when the document is a parent" do
+
+      it "returns an empty string" do
+        person._pull.should == ""
+      end
+    end
+
+    context "when the document is embedded" do
+
+      before do
+        person.addresses << address
+      end
+
+      context "when the document is not new" do
+
+        before do
+          address.instance_variable_set(:@new_record, false)
+        end
+
+        it "returns the._path plus index" do
+          address._pull.should == "addresses"
+        end
+      end
+    end
+
+    context "when document embedded multiple levels" do
+
+      before do
+        @other = Location.new
+        address.locations << [ @other, location ]
+        address.instance_variable_set(:@new_record, false)
+        person.addresses << address
+      end
+
+      context "when the document is not new" do
+
+        before do
+          location.instance_variable_set(:@new_record, false)
+        end
+
+        it "returns the._path plus index" do
+          location._pull.should == "addresses.0.locations"
+        end
+      end
+    end
+  end
 end
