@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
       # <tt>person.read_attribute(:title)</tt>
       def read_attribute(name)
         access = name.to_s
-        fields[access].get(@attributes[access])
+        accessed(access, fields[access].get(@attributes[access]))
       end
 
       # Remove a value from the +Document+ attributes. If the value does not exist
