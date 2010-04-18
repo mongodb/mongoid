@@ -59,6 +59,18 @@ describe Mongoid::Dirty do
           @person.aliases_change.should ==
             [ [ "Grand Poobah" ],  [ "Dark Helmet" ] ]
         end
+
+        context "when the attribute changes multiple times" do
+
+          before do
+            @person.aliases << "Colonel Sanders"
+          end
+
+          it "returns an array of the original value and new value" do
+            @person.attribute_change("aliases").should ==
+              [ [ "Grand Poobah" ],  [ "Dark Helmet", "Colonel Sanders" ] ]
+          end
+        end
       end
 
       context "when the attribute is a hash" do
@@ -76,6 +88,18 @@ describe Mongoid::Dirty do
         it "allows access via (attribute)_change" do
           @person.map_change.should ==
             [ { :location => "Home" }, { :location => "Work" } ]
+        end
+
+        context "when the attribute changes multiple times" do
+
+          before do
+            @person.map[:lat] = 20.0
+          end
+
+          it "returns an array of the original value and new value" do
+            @person.attribute_change("map").should ==
+              [ { :location => "Home" }, { :location => "Work", :lat => 20.0 } ]
+          end
         end
       end
     end
