@@ -43,6 +43,41 @@ describe Mongoid::Dirty do
 
     context "when the attribute is modified in place" do
 
+      context "when the attribute is an array" do
+
+        before do
+          @person = Person.new(:aliases => [ "Grand Poobah" ])
+          @person.aliases[0] = "Dark Helmet"
+        end
+
+        it "returns an array of the original value and new value" do
+          @person.attribute_change("aliases").should ==
+            [ [ "Grand Poobah" ],  [ "Dark Helmet" ] ]
+        end
+
+        it "allows access via (attribute)_change" do
+          @person.aliases_change.should ==
+            [ [ "Grand Poobah" ],  [ "Dark Helmet" ] ]
+        end
+      end
+
+      context "when the attribute is a hash" do
+
+        before do
+          @person = Person.new(:map => { :location => "Home" })
+          @person.map[:location] = "Work"
+        end
+
+        it "returns an array of the original value and new value" do
+          @person.attribute_change("map").should ==
+            [ { :location => "Home" }, { :location => "Work" } ]
+        end
+
+        it "allows access via (attribute)_change" do
+          @person.map_change.should ==
+            [ { :location => "Home" }, { :location => "Work" } ]
+        end
+      end
     end
 
     context "when the attribute has not changed" do

@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ containing the old and new values.
       def attribute_change(name)
-        @modifications[name]
+        modifications[name]
       end
 
       # Determines if a specific field has chaged.
@@ -30,7 +30,7 @@ module Mongoid #:nodoc:
       #
       # +true+ if changed, +false+ if not.
       def attribute_changed?(name)
-        @modifications.include?(name)
+        modifications.include?(name)
       end
 
       # Gets the old value for a specific field.
@@ -45,7 +45,7 @@ module Mongoid #:nodoc:
       #
       # The old field value.
       def attribute_was(name)
-        change = @modifications[name]
+        change = modifications[name]
         change ? change[0] : nil
       end
 
@@ -61,7 +61,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ of changed field names.
       def changed
-        @modifications.keys
+        modifications.keys
       end
 
       # Alerts to whether the document has been modified or not.
@@ -76,7 +76,7 @@ module Mongoid #:nodoc:
       #
       # +true+ if changed, +false+ if not.
       def changed?
-        !@modifications.empty?
+        !modifications.empty?
       end
 
       # Gets all the modifications that have happened to the object as a +Hash+
@@ -93,7 +93,7 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ of changes.
       def changes
-        @modifications
+        modifications
       end
 
       # Call this method after save, so the changes can be properly switched.
@@ -102,7 +102,7 @@ module Mongoid #:nodoc:
       #
       # <tt>person.move_changes</tt>
       def move_changes
-        @previous_modifications = @modifications.dup
+        @previous_modifications = modifications.dup
         @modifications = {}
       end
 
@@ -119,7 +119,7 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ of new values.
       def setters
-        @modifications.inject({}) do |sets, (field, changes)|
+        modifications.inject({}) do |sets, (field, changes)|
           key = embedded? ? "#{_position}.#{field}" : field
           sets[key] = changes[1]; sets
         end
@@ -158,7 +158,7 @@ module Mongoid #:nodoc:
         value = attribute_was(name)
         if value
           @attributes[name] = value
-          @modifications.delete(name)
+          modifications.delete(name)
         end
       end
 
@@ -169,12 +169,46 @@ module Mongoid #:nodoc:
       #
       # <tt>document.setup_notifications</tt>
       def setup_modifications
+        @accessed ||= {}
         @modifications ||= {}
         @previous_modifications ||= {}
       end
 
       protected
+
+      # Audit the original value for a field that can be modified in place.
+      #
+      # Example:
+      #
+      # <tt>person.accessed("aliases", [ "007" ])</tt>
+      def accessed(name, value)
+        @accessed[name] = value.dup if value.is_a?(Array) || value.is_a?(Hash)
+        value
+      end
+
+      # Get all normal modifications plus in place potential changes.
+      #
+      # Example:
+      #
+      # <tt>person.modifications</tt>
+      #
+      # Returns:
+      #
+      # All changes to the document.
+      def modifications
+        @accessed.each_pair do |field, value|
+          current = @attributes[field]
+          @modifications[field] = [ value, current ] if current != value
+        end
+        @accessed.clear
+        @modifications
+      end
+
       # Audit the change of a field's value.
+      #
+      # Example:
+      #
+      # <tt>person.modify("name", "Jack", "John")</tt>
       def modify(name, old_value, new_value)
         @attributes[name] = new_value
         if @modifications && (old_value != new_value)
@@ -183,6 +217,7 @@ module Mongoid #:nodoc:
         end
       end
     end
+
     module ClassMethods #:nodoc:
       # Add the dynamic dirty methods. These are custom methods defined on a
       # field by field basis that wrap the dirty attribute methods.
