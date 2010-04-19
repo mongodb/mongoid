@@ -16,9 +16,8 @@ module Mongoid # :nodoc:
       cattr_accessor :embedded
       self.embedded = false
 
-      class_inheritable_accessor :associations, :_child_names
+      class_inheritable_accessor :associations
       self.associations = {}
-      self._child_names = []
 
       delegate :embedded, :embedded?, :to => "self.class"
     end
@@ -29,21 +28,10 @@ module Mongoid # :nodoc:
         self.class.associations
       end
 
-      # Get all the child documents for this particular document.
-      #
-      # Example:
-      #
-      # <tt>person._children</tt>
-      #
-      # Returns:
-      #
-      # The +Document+s for each embedded association, if they exist.
-      def _children
-        self._child_names.inject([]) do |children, name|
-          association = send(name)
-          children.concat(association.to_a) unless association.blank?
-          children
-        end
+      # Update all the dirty child documents after an update.
+      def update_embedded(name)
+        association = send(name)
+        association.to_a.each { |doc| doc.save if doc.changed? } unless association.blank?
       end
 
       # Update the one-to-one relational association for the name.
@@ -141,8 +129,8 @@ module Mongoid # :nodoc:
       #     embedded_in :person, :inverse_of => :addresses
       #   end
       def embeds_many(name, options = {}, &block)
-        self._child_names << name
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
+        set_callback(:update, :after) { |document| document.update_embedded(name) }
       end
 
       alias :embed_many :embeds_many
@@ -167,12 +155,12 @@ module Mongoid # :nodoc:
       #     embedded_in :person
       #   end
       def embeds_one(name, options = {}, &block)
-        self._child_names << name
         opts = optionize(name, options, nil, &block)
         type = Associations::EmbedsOne
         associate(type, opts)
         add_builder(type, opts)
         add_creator(type, opts)
+        set_callback(:update, :after) { |document| document.update_embedded(name) }
       end
 
       alias :embed_one :embeds_one
