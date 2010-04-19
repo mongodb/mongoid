@@ -85,6 +85,25 @@ module Mongoid #:nodoc
       @slaves
     end
 
+    # Return field names that could cause destructive things to happen if
+    # defined in a Mongoid::Document
+    #
+    # Example:
+    #
+    # <tt>Config.destructive_fields</tt>
+    #
+    # Returns:
+    #
+    # An array of bad field names.
+    def destructive_fields
+      @destructive_fields ||= lambda {
+        klass = Class.new do
+          include Mongoid::Document
+        end
+        klass.instance_methods(true)
+      }.call
+    end
+
     protected
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
