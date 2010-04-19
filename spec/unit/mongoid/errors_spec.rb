@@ -101,4 +101,21 @@ describe Mongoid::Errors do
       end
     end
   end
+
+  describe Mongoid::Errors::InvalidField do
+
+    describe "#message" do
+
+      context "default" do
+
+        before do
+          @error = Mongoid::Errors::InvalidField.new("collection")
+        end
+
+        it "contains class is not allowed" do
+          @error.message.should include("field named 'collection' is not allowed")
+        end
+      end
+    end
+  end
 end

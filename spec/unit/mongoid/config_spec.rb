@@ -19,6 +19,13 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#destructive_fields" do
+
+    it "returns an array of bad field names" do
+      config.destructive_fields.should include("collection")
+    end
+  end
+
   describe "#master=" do
 
     context "when object provided is not a Mongo::DB" do

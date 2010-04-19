@@ -76,6 +76,16 @@ describe Mongoid::Field do
 
   end
 
+  describe "#initialize" do
+
+    context "when the field name is invalid" do
+
+      it "raises an error" do
+        lambda { Mongoid::Field.new(:collection) }.should raise_error(Mongoid::Errors::InvalidField)
+      end
+    end
+  end
+
   describe "#name" do
 
     before do

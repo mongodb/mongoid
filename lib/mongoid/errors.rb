@@ -87,5 +87,22 @@ module Mongoid #:nodoc
       end
     end
 
+    # This error is raised when trying to create a field that conflicts with
+    # a Mongoid internal attribute or method.
+    #
+    # Example:
+    #
+    # <tt>InvalidField.new('collection')</tt>
+    class InvalidField < RuntimeError
+      def initialize(name)
+        @name = name
+      end
+      def message
+        "Defining a field named '#{@name}' is not allowed. " +
+          "Do not define fields that conflict with Mongoid internal attributes " +
+          "or method names. Use Document#instance_methods to see what " +
+          "names this includes."
+      end
+    end
   end
 end
