@@ -16,8 +16,9 @@ module Mongoid # :nodoc:
       cattr_accessor :embedded
       self.embedded = false
 
-      class_inheritable_accessor :associations
+      class_inheritable_accessor :associations, :_child_names
       self.associations = {}
+      self._child_names = []
 
       delegate :embedded, :embedded?, :to => "self.class"
     end
@@ -26,6 +27,23 @@ module Mongoid # :nodoc:
       # Returns the associations for the +Document+.
       def associations
         self.class.associations
+      end
+
+      # Get all the child documents for this particular document.
+      #
+      # Example:
+      #
+      # <tt>person._children</tt>
+      #
+      # Returns:
+      #
+      # The +Document+s for each embedded association, if they exist.
+      def _children
+        self._child_names.inject([]) do |children, name|
+          association = send(name)
+          children.concat(association.to_a) unless association.blank?
+          children
+        end
       end
 
       # Update the one-to-one relational association for the name.
@@ -123,6 +141,7 @@ module Mongoid # :nodoc:
       #     embedded_in :person, :inverse_of => :addresses
       #   end
       def embeds_many(name, options = {}, &block)
+        self._child_names << name
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
       end
 
@@ -148,6 +167,7 @@ module Mongoid # :nodoc:
       #     embedded_in :person
       #   end
       def embeds_one(name, options = {}, &block)
+        self._child_names << name
         opts = optionize(name, options, nil, &block)
         type = Associations::EmbedsOne
         associate(type, opts)

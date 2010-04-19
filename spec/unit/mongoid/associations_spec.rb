@@ -99,6 +99,34 @@ describe Mongoid::Associations do
     end
   end
 
+  describe "#_children" do
+
+    before do
+      @person = Person.new
+    end
+
+    context "when the associations exist" do
+
+      before do
+        @address = Address.new
+        @name = Name.new
+        @person.addresses << @address
+        @person.name = @name
+      end
+
+      it "returns all embeds_one and embeds_many associations" do
+        @person._children.size.should == 2
+      end
+    end
+
+    context "when associations are empty" do
+
+      it "does not include them" do
+        @person._children.should be_empty
+      end
+    end
+  end
+
   describe ".embedded?" do
 
     context "when the class is embedded" do
