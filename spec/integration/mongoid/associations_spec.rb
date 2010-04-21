@@ -107,6 +107,17 @@ describe Mongoid::Associations do
       @game.person.should == @person
     end
 
+    context "when defining a class name and foreign key" do
+
+      before do
+        @user = User.new(:name => "Don Julio")
+        @account = @user.account.build(:number => "1234567890")
+      end
+
+      it "sets the name of the association properly" do
+        @account.creator.should == @user
+      end
+    end
   end
 
   context "one-to-many relational associations" do

@@ -200,7 +200,7 @@ module Mongoid # :nodoc:
       #     has_one_related :game
       #   end
       def has_one_related(name, options = {}, &block)
-        associate(Associations::HasOneRelated, optionize(name, options, fk(name, options), &block))
+        associate(Associations::HasOneRelated, optionize(name, options, fk(self.name, options), &block))
         set_callback :save, :before do |document|
           document.update_association(name)
         end

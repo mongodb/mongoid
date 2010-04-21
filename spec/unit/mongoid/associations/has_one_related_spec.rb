@@ -11,7 +11,7 @@ describe Mongoid::Associations::HasOneRelated do
     end
   end
   let(:options) do
-    Mongoid::Associations::Options.new(:name => :game, :extend => block)
+    Mongoid::Associations::Options.new(:name => :game, :extend => block, :foreign_key => "person_id")
   end
 
   describe "#build" do
