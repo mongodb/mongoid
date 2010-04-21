@@ -100,7 +100,7 @@ module Mongoid #:nodoc
         klass = Class.new do
           include Mongoid::Document
         end
-        klass.instance_methods(true)
+        klass.instance_methods(true).collect { |method| method.to_s }
       }.call
     end
 
