@@ -18,7 +18,12 @@ describe Mongoid::Extensions::Nil::Assimilation do
     it "returns nil" do
       nil.assimilate(@parent, @options).should be_nil
     end
-
   end
 
+  describe "#collectionize" do
+
+    it "returns ''" do
+      nil.collectionize.should == ""
+    end
+  end
 end

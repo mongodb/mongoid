@@ -6,6 +6,24 @@ describe Mongoid::Document do
     Person.delete_all
   end
 
+  context "creating anonymous documents" do
+
+    context "when defining collection" do
+
+      before do
+        @model = Class.new do
+          include Mongoid::Document
+          store_in :anonymous
+          field :gender
+        end
+      end
+
+      it "allows the creation" do
+        Object.const_set "Anonymous", @model
+      end
+    end
+  end
+
   describe "#db" do
 
     it "returns the mongo database" do
