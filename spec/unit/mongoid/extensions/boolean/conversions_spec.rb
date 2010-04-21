@@ -36,6 +36,12 @@ describe Mongoid::Extensions::Boolean::Conversions do
 
     end
 
+    context "when nil" do
+
+      it "returns nil" do
+        Boolean.set(nil).should be_nil
+      end
+    end
   end
 
   describe "#get" do

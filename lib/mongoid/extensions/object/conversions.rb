@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
           end
 
           def get(value)
-            self.new(value)
+            value ? self.new(value) : value
           end
         end
       end

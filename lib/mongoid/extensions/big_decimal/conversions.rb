@@ -7,11 +7,11 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         # Get the string as a +BigDecimal+
         def get(value)
-          ::BigDecimal.new(value)
+          value ? ::BigDecimal.new(value) : value
         end
         # Set the value in the hash as a string.
         def set(value)
-          value.to_s
+          value ? value.to_s : value
         end
       end
     end

@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
     # Used for setting an object in the attributes hash. If nil is provided the
     # default will get returned if it exists.
     def set(object)
-      object.nil? ? default : type.set(object)
+      type.set(object)
     end
 
     # Used for retrieving the object out of the attributes hash.
