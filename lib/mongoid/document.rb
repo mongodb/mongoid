@@ -146,8 +146,12 @@ module Mongoid #:nodoc:
 
       # Returns the class name plus its attributes.
       def inspect
-        attrs = fields.map { |name, field| "#{name}: #{@attributes[name].inspect}" } * ", "
-        "#<#{self.class.name} _id: #{id}, #{attrs}>"
+        attrs = fields.map { |name, field| "#{name}: #{@attributes[name].inspect}" }
+        if Mongoid.allow_dynamic_fields
+          dynamic_keys = @attributes.keys - fields.keys - ["_id", "_type"]
+          attrs += dynamic_keys.map { |name| "#{name}: #{@attributes[name].inspect}" }
+        end
+        "#<#{self.class.name} _id: #{id}, #{attrs * ', '}>"
       end
 
       # Notify observers of an update.
