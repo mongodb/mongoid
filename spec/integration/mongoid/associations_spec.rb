@@ -321,7 +321,7 @@ describe Mongoid::Associations do
       @person = Person.create(:title => "Mr")
     end
 
-    context "saving an existing parent document" do
+    context "saving an existing parent document with existing children" do
 
       before do
         @address = @person.addresses.create(:street => "Oxford St")
@@ -332,6 +332,36 @@ describe Mongoid::Associations do
       it "saves all dirty children" do
         from_db = Person.find(@person.id)
         from_db.addresses.first.city.should == "London"
+      end
+    end
+
+    context "saving an existing parent document with new children" do
+
+      context "when building" do
+
+        before do
+          @address = @person.addresses.build(:street => "Oxford St")
+          @person.save
+        end
+
+        it "saves all new children" do
+          from_db = Person.find(@person.id)
+          from_db.addresses.first.should == @address
+        end
+      end
+
+      context "when appending" do
+
+        before do
+          @address = Address.new(:street => "Oxford St")
+          @person.addresses << @address
+          @person.save
+        end
+
+        it "saves all new children" do
+          from_db = Person.find(@person.id)
+          from_db.addresses.first.should == @address
+        end
       end
     end
 
