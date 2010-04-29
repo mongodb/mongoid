@@ -587,7 +587,7 @@ describe Mongoid::Associations::EmbedsMany do
 
     it "sets the attributes of the child on the parent" do
       @person.attributes[:addresses].should ==
-        [{ "_id" => "madison-ave", "street" => "Madison Ave", "_type" => "Address" }]
+        [{ "_id" => "madison-ave", "street" => "Madison Ave" }]
     end
 
     it "returns the association proxy" do

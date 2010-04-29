@@ -98,6 +98,15 @@ module Mongoid #:nodoc:
         id.hash
       end
 
+      # Is inheritance in play here?
+      #
+      # Returns:
+      #
+      # <tt>true</tt> if inheritance used, <tt>false</tt> if not.
+      def hereditary?
+        !!self.hereditary
+      end
+
       # Introduces a child object into the +Document+ object graph. This will
       # set up the relationships between the parent and child and update the
       # attributes of the parent +Document+.

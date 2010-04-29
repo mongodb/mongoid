@@ -482,7 +482,7 @@ describe Mongoid::Attributes do
           it "sets the child attributes on the parent" do
             @name.send(method, :first_name => "Test2", :last_name => "User2")
             @person.attributes[:name].should ==
-              { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2", "_type" => "Name" }
+              { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2" }
           end
 
         end
@@ -498,7 +498,7 @@ describe Mongoid::Attributes do
           it "updates the child attributes on the parent" do
             @address.send(method, "street" => "Test2")
             @person.attributes[:addresses].should ==
-              [ { "_id" => "test", "street" => "Test2", "_type" => "Address" } ]
+              [ { "_id" => "test", "street" => "Test2" } ]
           end
 
         end

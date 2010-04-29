@@ -59,10 +59,6 @@ describe Mongoid::Config do
       config.persist_in_safe_mode.should == false
     end
 
-    it "sets persist_types" do
-      config.persist_types.should == false
-    end
-
     it "sets raise_not_found_error" do
       config.raise_not_found_error.should == false
     end
@@ -113,13 +109,6 @@ describe Mongoid::Config do
 
     it "defaults to true" do
       config.parameterize_keys.should == true
-    end
-  end
-
-  describe "#persist_types" do
-
-    it "defaults to true" do
-      config.persist_types.should == true
     end
   end
 

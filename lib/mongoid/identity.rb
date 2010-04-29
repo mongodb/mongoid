@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
 
       # Set the _type field on the document.
       def type(doc)
-        doc._type = doc.class.name if Mongoid.persist_types
+        doc._type = doc.class.name if doc.hereditary?
       end
 
       # Generates the composite key for a document.
