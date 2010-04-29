@@ -6,28 +6,32 @@ describe Mongoid::Identity do
 
     let(:name) { Name.new }
 
-    context "when persisting types" do
+    context "when class is inherited" do
+
+      let(:canvas) { Canvas.new }
 
       it "sets the document _type to the class name" do
-        Mongoid::Identity.create(name)
-        name._type.should == "Name"
+        Mongoid::Identity.create(canvas)
+        canvas._type.should == "Canvas"
       end
 
     end
 
-    context "when not persisting types" do
+    context "when class is a subclass" do
 
-      before do
-        Mongoid.persist_types = false
-        @name = Name.new
+      let(:browser) { Browser.new }
+
+      it "sets the document _type to the class name" do
+        Mongoid::Identity.create(browser)
+        browser._type.should == "Browser"
       end
 
-      after do
-        Mongoid.persist_types = true
-      end
+    end
+
+    context "when not using inheritance" do
 
       it "does not set the type" do
-        @name._type.should be_nil
+        name._type.should be_nil
       end
 
     end

@@ -165,7 +165,7 @@ describe Mongoid::Associations::EmbeddedIn do
 
       it "updates the parent attributes" do
         @person.attributes[:name].except(:_id).should ==
-          { "first_name" => "Test", "last_name" => "User", "_type" => "Name" }
+          { "first_name" => "Test", "last_name" => "User" }
       end
 
       it "returns the proxy association" do

@@ -216,7 +216,7 @@ describe Mongoid::Associations::EmbedsOne do
 
       it "sets the attributes of the child on the parent" do
         @person.attributes[:name].should ==
-          { "_id" => "donald", "first_name" => "Donald", "_type" => "Name" }
+          { "_id" => "donald", "first_name" => "Donald" }
       end
 
       it "returns the proxy" do

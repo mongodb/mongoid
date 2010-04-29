@@ -24,7 +24,7 @@ describe Mongoid::Associations do
 
       it "sets the child attributes on the parent" do
         @person.attributes[:name].should ==
-          { "_id" => "test-user", "first_name" => "Test", "last_name" => "User", "_type" => "Name" }
+          { "_id" => "test-user", "first_name" => "Test", "last_name" => "User" }
       end
 
     end
@@ -61,7 +61,7 @@ describe Mongoid::Associations do
 
         it "adds the child attributes to the parent" do
           @person.attributes[:addresses].should ==
-            [{ "_id" => "picadilly-circus", "street" => "Picadilly Circus", "_type" => "Address" }]
+            [{ "_id" => "picadilly-circus", "street" => "Picadilly Circus" }]
         end
 
       end
