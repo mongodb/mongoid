@@ -14,13 +14,7 @@ module Mongoid #:nodoc
 
     # Defaults the configuration options to true.
     def initialize
-      @allow_dynamic_fields = true
-      @parameterize_keys = true
-      @persist_in_safe_mode = true
-      @persist_types = true
-      @raise_not_found_error = true
-      @reconnect_time = 3
-      @use_object_ids = false
+      reset
     end
 
     # Sets the Mongo::DB master database to be used. If the object trying to me
@@ -104,11 +98,84 @@ module Mongoid #:nodoc
       }.call
     end
 
+    # Confiure mongoid from a hash that was usually parsed out of yml.
+    #
+    # Example:
+    #
+    # <tt>Mongoid::Config.instance.from_hash({})</tt>
+    def from_hash(settings)
+      _master(settings)
+      _slaves(settings)
+      settings.except("database").each_pair do |name, value|
+        send("#{name}=", value) if respond_to?(name)
+      end
+    end
+
+    # Reset the configuration options to the defaults.
+    #
+    # Example:
+    #
+    # <tt>config.reset</tt>
+    def reset
+      @allow_dynamic_fields = true
+      @parameterize_keys = true
+      @persist_in_safe_mode = true
+      @persist_types = true
+      @raise_not_found_error = true
+      @reconnect_time = 3
+      @use_object_ids = false
+    end
+
     protected
+
+    # Check if the database is valid and the correct version.
+    #
+    # Example:
+    #
+    # <tt>config.check_database!</tt>
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
       version = database.connection.server_version
       raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+    end
+
+    # Get a Rails logger or stdout logger.
+    #
+    # Example:
+    #
+    # <tt>config.logger</tt>
+    def logger
+      defined?(Rails) ? Rails.logger : Logger.new($stdout)
+    end
+
+    # Get a master database from settings.
+    #
+    # Example:
+    #
+    # <tt>config._master({}, "test")</tt>
+    def _master(settings)
+      name = settings["database"]
+      host = settings.delete("host") || "localhost"
+      port = settings.delete("port") || 27017
+      self.master = Mongo::Connection.new(host, port, :logger => logger).db(name)
+    end
+
+    # Get a bunch-o-slaves from settings and names.
+    #
+    # Example:
+    #
+    # <tt>config._slaves({}, "test")</tt>
+    def _slaves(settings)
+      name = settings["database"]
+      self.slaves = []
+      slaves = settings.delete("slaves")
+      slaves.to_a.each do |slave|
+        self.slaves << Mongo::Connection.new(
+          slave["host"],
+          slave["port"],
+          :slave_ok => true
+        ).db(name)
+      end
     end
   end
 end
