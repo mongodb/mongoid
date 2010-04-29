@@ -36,7 +36,7 @@ if defined?(Rails::Railtie)
           config_file = Rails.root.join("config", "mongoid.yml")
           if config_file.file?
             settings = YAML.load(ERB.new(config_file.read).result)[Rails.env]
-            Mongoid.from_hash(settings) if settings.present?
+            ::Mongoid.from_hash(settings) if settings.present?
           end
         end
 
