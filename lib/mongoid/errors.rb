@@ -104,5 +104,21 @@ module Mongoid #:nodoc
           "names this includes."
       end
     end
+
+    # This error is raised when trying to create set nested records above the
+    # specified :limit
+    #
+    # Example:
+    #
+    #<tt>TooManyNestedAttributeRecords.new('association', limit)
+    class TooManyNestedAttributeRecords < RuntimeError
+      def initialize(association, limit)
+        @association = association.to_s.humanize.capitalize
+        @limit = limit
+      end
+      def message
+        "Accept Nested Attributes for #{@association} is limited to #{@limit} records"
+      end
+    end
   end
 end

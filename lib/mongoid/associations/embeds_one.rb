@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
       #
       # A new target document.
       def nested_build(attributes, options = nil)
-        build(attributes)
+        build(attributes) unless @target.blank? && options[:update_only]
       end
 
       class << self
