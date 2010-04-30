@@ -14,8 +14,8 @@ begin
 
     gem.add_dependency("activemodel", "3.0.0.beta3")
     gem.add_dependency("will_paginate", "3.0.pre")
-    gem.add_dependency("mongo", "0.20.1")
-    gem.add_dependency("bson", "0.20.1")
+    gem.add_dependency("mongo", "~> 1.0")
+    gem.add_dependency("bson", "~> 1.0")
 
     gem.add_development_dependency("rspec", "1.3.0")
     gem.add_development_dependency("mocha", "0.9.8")

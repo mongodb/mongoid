@@ -4,9 +4,9 @@ source "http://gemcutter.org"
 
 gem "activemodel", "3.0.0.beta3"
 gem "will_paginate", "3.0.pre"
-gem "mongo", "0.20.1"
-gem "bson", "0.20.1"
-gem "bson_ext", "0.20.1"
+gem "mongo", "~> 1.0"
+gem "bson", "~> 1.0"
+gem "bson_ext", "~> 1.0"
 
 gem "rspec", "1.3.0"
 gem "mocha", "0.9.8"
