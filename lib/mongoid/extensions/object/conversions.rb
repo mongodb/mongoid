@@ -8,17 +8,17 @@ module Mongoid #:nodoc:
         module InstanceMethods
           # Converts this object to a hash of attributes
           def mongoidize
-            self.attributes
+            self.raw_attributes
           end
         end
 
         module ClassMethods
           def set(value)
-            value.respond_to?(:attributes) ? value.attributes : value
+            value.respond_to?(:raw_attributes) ? value.raw_attributes : value
           end
 
           def get(value)
-            value ? self.new(value) : value
+            value ? self.instantiate(value) : value
           end
         end
       end

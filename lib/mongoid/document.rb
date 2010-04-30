@@ -147,7 +147,7 @@ module Mongoid #:nodoc:
       # attrs: The attributes +Hash+ to set up the document with.
       def initialize(attrs = nil)
         @attributes = default_attributes
-        process(attrs)
+        process(attrs ? attrs.except("_id") : attrs)
         @new_record = true if id.nil?
         document = yield self if block_given?
         identify

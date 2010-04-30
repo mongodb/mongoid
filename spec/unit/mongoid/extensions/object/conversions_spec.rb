@@ -50,7 +50,7 @@ describe Mongoid::Extensions::Object::Conversions do
           "blood_alcohol_content" => 0.0,
           "pets" => false
         }
-        @person = Person.new(@attributes)
+        @person = Person.instantiate(@attributes)
       end
 
       it "converts the object to a hash" do

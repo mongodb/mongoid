@@ -286,6 +286,17 @@ describe Mongoid::Document do
 
     end
 
+    context "with attributes from another document" do
+
+      let(:person) do
+        Person.new(Person.new.attributes)
+      end
+
+      it "is a new record with a new id" do
+        person.new_record?.should be_true
+      end
+    end
+
     context "with attributes" do
 
       before do
