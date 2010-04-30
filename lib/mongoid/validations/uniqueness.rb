@@ -14,8 +14,17 @@ module Mongoid #:nodoc:
     #   end
     class UniquenessValidator < ActiveModel::EachValidator
       def validate_each(document, attribute, value)
-        return if document.class.where(attribute => value, :_id.ne => document._id).empty?
-        document.errors.add(attribute, :taken, :default => options[:message], :value => value)
+        return if document.class.where(attribute => value).empty?
+        if document.new_record? || key_changed?(document)
+          document.errors.add(attribute, :taken, :default => options[:message], :value => value)
+        end
+      end
+
+      protected
+      def key_changed?(document)
+        (document.primary_key || {}).each do |key|
+          return true if document.send("#{key}_changed?")
+        end; false
       end
     end
   end
