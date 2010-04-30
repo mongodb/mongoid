@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-04-20}
+  s.date = %q{2010-04-29}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -136,6 +136,7 @@ Gem::Specification.new do |s|
      "lib/rails/generators/mongoid_generator.rb",
      "mongoid.gemspec",
      "perf/benchmark.rb",
+     "spec/config/mongoid.yml",
      "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/attributes_spec.rb",
      "spec/integration/mongoid/contexts/enumerable_spec.rb",
@@ -413,23 +414,23 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<activemodel>, ["= 3.0.0.beta3"])
       s.add_runtime_dependency(%q<will_paginate>, ["= 3.0.pre"])
-      s.add_runtime_dependency(%q<mongo>, ["= 0.20.1"])
-      s.add_runtime_dependency(%q<bson>, ["= 0.20.1"])
+      s.add_runtime_dependency(%q<mongo>, ["~> 1.0"])
+      s.add_runtime_dependency(%q<bson>, ["~> 1.0"])
       s.add_development_dependency(%q<rspec>, ["= 1.3.0"])
       s.add_development_dependency(%q<mocha>, ["= 0.9.8"])
     else
       s.add_dependency(%q<activemodel>, ["= 3.0.0.beta3"])
       s.add_dependency(%q<will_paginate>, ["= 3.0.pre"])
-      s.add_dependency(%q<mongo>, ["= 0.20.1"])
-      s.add_dependency(%q<bson>, ["= 0.20.1"])
+      s.add_dependency(%q<mongo>, ["~> 1.0"])
+      s.add_dependency(%q<bson>, ["~> 1.0"])
       s.add_dependency(%q<rspec>, ["= 1.3.0"])
       s.add_dependency(%q<mocha>, ["= 0.9.8"])
     end
   else
     s.add_dependency(%q<activemodel>, ["= 3.0.0.beta3"])
     s.add_dependency(%q<will_paginate>, ["= 3.0.pre"])
-    s.add_dependency(%q<mongo>, ["= 0.20.1"])
-    s.add_dependency(%q<bson>, ["= 0.20.1"])
+    s.add_dependency(%q<mongo>, ["~> 1.0"])
+    s.add_dependency(%q<bson>, ["~> 1.0"])
     s.add_dependency(%q<rspec>, ["= 1.3.0"])
     s.add_dependency(%q<mocha>, ["= 0.9.8"])
   end
