@@ -42,7 +42,7 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # A new target document.
-      def nested_build(attributes)
+      def nested_build(attributes, options = nil)
         build(attributes)
       end
 

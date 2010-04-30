@@ -18,5 +18,16 @@ describe Mongoid::Attributes do
     end
 
   end
+  
+  context "when persisting nested attributes" do
+    
+    before do
+      @survey = Survey.new
+      3.times do
+        @question = @survey.questions.build
+        4.times { @question.answers.build }
+      end
+    end
+  end
 
 end

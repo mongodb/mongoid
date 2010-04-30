@@ -14,7 +14,7 @@ describe Mongoid::Attributes do
 
     describe "#association_attributes=" do
 
-      context "on a has many association" do
+      context "on a embeds many association" do
 
         context "when a reject block supplied" do
 
@@ -61,11 +61,58 @@ describe Mongoid::Attributes do
 
           it "updates the existing attributes on the association" do
             @person.addresses.size.should == 1
-            @person.addresses.first.street.should == "Folsom"
-            @person.addresses.first.city.should == "San Francisco"
+          end
+
+        end
+
+        context "when :allow_destroy is enabled" do
+          before do
+            @person = Person.new(:title => "Sir", :ssn => "555-66-9999")
+            @person.favorites.build(:title => "Ice Cream")
+            @person.favorites.build(:title => "Jello")
+            @attributes = {
+              "0" => { "_destroy" => "true" }
+            }
+            @person.favorites_attributes = @attributes
+          end
+
+          it "removes the items that have _destroy => true set" do
+            @person.favorites.size.should == 1
+            @person.favorites.first.title.should == "Jello"
+          end
+
+          it "removes the items that have _destroy => true set" do
+            pending
+            @person.favorites.size.should == 1
+            @person.favorites.first.title == "Ice Cream"
           end
         end
 
+        context "when :limit is set to 5" do
+          before do
+            @person = Person.new
+            # .....
+          end
+
+          it "allows adding 5 favorites" do
+            pending
+          end
+
+          it "it raises exception when adding more than 5 favorites" do
+            pending
+          end
+        end
+
+        context "when :update_only is set to true" do
+          before do
+            @person = Person.new
+            # ....
+          end
+
+          it "only updates but doesnt add or delete" do
+            pending
+          end
+        end
       end
 
       context "on a has one association" do

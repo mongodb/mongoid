@@ -156,10 +156,15 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # The newly build target Document.
-      def nested_build(attributes)
+      def nested_build(attributes, options = {})
         attributes.each do |index, attrs|
           if document = detect { |document| document._index == index.to_i }
-            document.write_attributes(attrs)
+            if options && options[:allow_destroy] && attrs['_destroy']
+              @target.delete(document)
+              document.destroy
+            else
+              document.write_attributes(attrs)
+            end
           else
             build(attrs)
           end

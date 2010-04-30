@@ -52,6 +52,9 @@ class Person
 
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name
+  
+  embeds_many :favorites
+  accepts_nested_attributes_for :favorites, :allow_destroy => true
 
   has_one_related :game do
     def extension
