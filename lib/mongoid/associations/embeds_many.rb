@@ -157,8 +157,12 @@ module Mongoid #:nodoc:
       #
       # The newly build target Document.
       def nested_build(attributes)
-        attributes.values.each do |attrs|
-          build(attrs)
+        attributes.each do |index, attrs|
+          if document = detect { |document| document._index == index.to_i }
+            document.write_attributes(attrs)
+          else
+            build(attrs)
+          end
         end
       end
 

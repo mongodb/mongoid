@@ -60,9 +60,10 @@ describe Mongoid::Attributes do
           end
 
           it "updates the existing attributes on the association" do
-            @person.addresses.size.should == 2
+            @person.addresses.size.should == 1
+            @person.addresses.first.street.should == "Folsom"
+            @person.addresses.first.city.should == "San Francisco"
           end
-
         end
 
       end

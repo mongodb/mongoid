@@ -92,7 +92,7 @@ describe Mongoid::Associations::EmbedsMany do
         )
       end
 
-      it "adds a new document to the array with the suppied parameters" do
+      it "adds a new document to the array with the supplied parameters" do
         @association.build({ :street => "Street 1" })
         @association.length.should == 3
         @association[2].should be_a_kind_of(Address)
@@ -472,11 +472,17 @@ describe Mongoid::Associations::EmbedsMany do
         Mongoid::Associations::Options.new(:name => :addresses)
       )
     end
-
-    it "returns the newly built object in the association" do
+    
+    it "should update existing documents" do
       @association.nested_build({ "0" => { :street => "Yet Another" } })
+      @association.size.should == 2
+      @association[0].street.should == "Yet Another"
+    end
+    
+    it "should create new documents" do
+      @association.nested_build({ "2" => { :street => "Yet Another" } })
       @association.size.should == 3
-      @association.last.street.should == "Yet Another"
+      @association[2].street.should == "Yet Another"
     end
 
   end
