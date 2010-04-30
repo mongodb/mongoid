@@ -217,7 +217,14 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
     def update_selector(attributes, operator)
-      attributes.each { |key, value| @selector[key] = { operator => value } }; self
+      attributes.each do |key, value|
+        unless @selector[key]
+          @selector[key] = { operator => value }
+        else
+          new_value = @selector[key].values.first + value
+          @selector[key] = { operator => new_value }
+        end
+      end; self
     end
   end
 end

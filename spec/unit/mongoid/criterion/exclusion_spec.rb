@@ -41,9 +41,25 @@ describe Mongoid::Criterion::Exclusion do
             :_id => { "$ne" => "1" }
           }
       end
-
     end
 
+    context "when existing ne criteria exists" do
+
+      before do
+        @criteria.excludes(:title => "Bad Title")
+        @criteria.excludes(:text => "Bad Text")
+      end
+
+      it "appends to the selector" do
+        @criteria.selector.should ==
+          {
+            :title =>
+              { "$ne" => "Bad Title"},
+            :text =>
+              { "$ne" => "Bad Text" }
+          }
+      end
+    end
   end
 
   describe "#not_in" do
@@ -60,6 +76,20 @@ describe Mongoid::Criterion::Exclusion do
       @criteria.not_in(:title => ["title1"]).should == @criteria
     end
 
+    context "when existing nin criteria exists" do
+
+      before do
+        @criteria.not_in(:title => ["title1", "title2"])
+        @criteria.not_in(:title => ["title3"], :text => ["test"])
+      end
+
+      it "appends to the nin selector" do
+        @criteria.selector.should == {
+          :title => { "$nin" => ["title1", "title2", "title3"] },
+          :text => { "$nin" => ["test"] }
+        }
+      end
+    end
   end
 
   describe "#only" do

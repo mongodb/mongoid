@@ -21,6 +21,21 @@ describe Mongoid::Criterion::Inclusion do
       @criteria.all(:title => [ "title1" ]).should == @criteria
     end
 
+    context "when all criteria exists" do
+
+      before do
+        @criteria.all(:title => ["title1", "title2"])
+        @criteria.all(:title => ["title3"], :another => ["value"])
+      end
+
+      it "appends to the existing criteria" do
+        @criteria.selector.should ==
+          {
+            :title => { "$all" => [ "title1", "title2", "title3" ] },
+            :another => { "$all" => [ "value" ] }
+          }
+      end
+    end
   end
 
   describe "#and" do
@@ -78,6 +93,20 @@ describe Mongoid::Criterion::Inclusion do
       @criteria.in(:title => ["title1"]).should == @criteria
     end
 
+    context "when existing in criteria exists" do
+
+      before do
+        @criteria.in(:title => ["title1", "title2"])
+        @criteria.in(:title => ["title3"], :text => ["test"])
+      end
+
+      it "appends to the existing criteria" do
+        @criteria.selector.should ==
+          {
+            :title => { "$in" => ["title1", "title2", "title3"] }, :text => { "$in" => ["test"] }
+          }
+      end
+    end
   end
 
   describe "#near" do

@@ -30,7 +30,7 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # exclusions: A +Hash+ where the key is the field name and the value is an
+      # attributes: A +Hash+ where the key is the field name and the value is an
       # +Array+ of values that none can match.
       #
       # Example:
@@ -40,8 +40,8 @@ module Mongoid #:nodoc:
       # <tt>criteria.not_in(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
       #
       # Returns: <tt>self</tt>
-      def not_in(exclusions)
-        exclusions.each { |key, value| @selector[key] = { "$nin" => value } }; self
+      def not_in(attributes)
+        update_selector(attributes, "$nin")
       end
 
       # Adds a criterion to the +Criteria+ that specifies the fields that will
