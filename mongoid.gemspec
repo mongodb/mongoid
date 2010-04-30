@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-04-29}
+  s.date = %q{2010-04-30}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -149,6 +149,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/named_scope_spec.rb",
      "spec/integration/mongoid/persistence/update_spec.rb",
      "spec/integration/mongoid/persistence_spec.rb",
+     "spec/integration/mongoid/validations/uniqueness_spec.rb",
      "spec/models/account.rb",
      "spec/models/address.rb",
      "spec/models/animal.rb",
@@ -159,6 +160,7 @@ Gem::Specification.new do |s|
      "spec/models/game.rb",
      "spec/models/inheritance.rb",
      "spec/models/location.rb",
+     "spec/models/login.rb",
      "spec/models/mixed_drink.rb",
      "spec/models/name.rb",
      "spec/models/namespacing.rb",
@@ -170,6 +172,7 @@ Gem::Specification.new do |s|
      "spec/models/post.rb",
      "spec/models/translation.rb",
      "spec/models/user.rb",
+     "spec/models/user_accout.rb",
      "spec/models/vet_visit.rb",
      "spec/models/video.rb",
      "spec/spec.opts",
@@ -287,6 +290,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/named_scope_spec.rb",
      "spec/integration/mongoid/persistence/update_spec.rb",
      "spec/integration/mongoid/persistence_spec.rb",
+     "spec/integration/mongoid/validations/uniqueness_spec.rb",
      "spec/models/account.rb",
      "spec/models/address.rb",
      "spec/models/animal.rb",
@@ -297,6 +301,7 @@ Gem::Specification.new do |s|
      "spec/models/game.rb",
      "spec/models/inheritance.rb",
      "spec/models/location.rb",
+     "spec/models/login.rb",
      "spec/models/mixed_drink.rb",
      "spec/models/name.rb",
      "spec/models/namespacing.rb",
@@ -308,6 +313,7 @@ Gem::Specification.new do |s|
      "spec/models/post.rb",
      "spec/models/translation.rb",
      "spec/models/user.rb",
+     "spec/models/user_accout.rb",
      "spec/models/vet_visit.rb",
      "spec/models/video.rb",
      "spec/spec_helper.rb",
