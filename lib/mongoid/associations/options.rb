@@ -21,7 +21,8 @@ module Mongoid #:nodoc:
 
       # Return the foreign key based off the association name.
       def foreign_key
-        @attributes[:foreign_key] || klass.name.to_s.foreign_key
+        key = @attributes[:foreign_key] || klass.name.to_s.foreign_key
+        key.to_s
       end
 
       # Returns the name of the inverse_of association
