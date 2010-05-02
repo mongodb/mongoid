@@ -28,6 +28,12 @@ module Mongoid # :nodoc:
         self.class.associations
       end
 
+      # Update all the dirty child documents after an update.
+      def update_embedded(name)
+        association = send(name)
+        association.to_a.each { |doc| doc.save if doc.changed? } unless association.blank?
+      end
+
       # Update the one-to-one relational association for the name.
       def update_association(name)
         association = send(name)
@@ -124,6 +130,9 @@ module Mongoid # :nodoc:
       #   end
       def embeds_many(name, options = {}, &block)
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
+        after_update do |document|
+          document.update_embedded(name)
+        end
       end
 
       alias :embed_many :embeds_many
@@ -153,6 +162,9 @@ module Mongoid # :nodoc:
         associate(type, opts)
         add_builder(type, opts)
         add_creator(type, opts)
+        after_update do |document|
+          document.update_embedded(name)
+        end
       end
 
       alias :embed_one :embeds_one

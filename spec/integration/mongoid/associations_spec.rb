@@ -310,6 +310,20 @@ describe Mongoid::Associations do
       @person = Person.create(:title => "Mr")
     end
 
+    context "saving an existing parent document" do
+
+      before do
+        @address = @person.addresses.create(:street => "Oxford St")
+        @address.city = "London"
+        @person.save
+      end
+
+      it "saves all dirty children" do
+        from_db = Person.find(@person.id)
+        from_db.addresses.first.city.should == "London"
+      end
+    end
+
     context "one level nested" do
 
       before do
