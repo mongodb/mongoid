@@ -15,7 +15,7 @@ module Mongoid
     #
     # <tt>Contexts.context_for(criteria)</tt>
     def self.context_for(criteria)
-      if criteria.klass.embedded
+      if criteria.klass.embedded?
         return Contexts::Enumerable.new(criteria)
       end
       Contexts::Mongo.new(criteria)

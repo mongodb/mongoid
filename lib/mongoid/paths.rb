@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
       #
       # <tt>name.inserter</tt>
       def _inserter
-        embedded ? (_index ? "$push" : "$set") : nil
+        embedded? ? (_index ? "$push" : "$set") : nil
       end
 
       # Return the path to this +Document+ in JSON notation, used for atomic
@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
       # <tt>address.path # returns "addresses"</tt>
       def _path
         self.__path ||= lambda do
-          embedded ? "#{_parent._path}#{"." unless _parent._path.blank?}#{@association_name}" : ""
+          embedded? ? "#{_parent._path}#{"." unless _parent._path.blank?}#{@association_name}" : ""
         end.call
       end
 
@@ -36,7 +36,7 @@ module Mongoid #:nodoc:
       # <tt>address.position</tt>
       def _position
         locator = _index ? (new_record? ? "" : ".#{_index}") : ""
-        embedded ? "#{_parent._position}#{"." unless _parent._position.blank?}#{@association_name}#{locator}" : ""
+        embedded? ? "#{_parent._position}#{"." unless _parent._position.blank?}#{@association_name}#{locator}" : ""
       end
 
       # Get the removal modifier for the document. Will be nil on root
@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
       #
       # <tt>name.remover</tt>
       def _remover
-        embedded ? (_index ? "$pull" : "$unset") : nil
+        embedded? ? (_index ? "$pull" : "$unset") : nil
       end
 
       # Return the selector for this document to be matched exactly for use
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
       #
       # <tt>address.selector</tt>
       def _selector
-        embedded ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }
+        embedded? ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }
       end
     end
   end
