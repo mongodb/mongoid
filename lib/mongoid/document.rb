@@ -4,14 +4,14 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include Mongoid::Components
     included do
-      cattr_accessor :embedded, :primary_key, :hereditary
+      include Mongoid::Components
 
-      self.embedded = false
+      cattr_accessor :primary_key, :hereditary
       self.hereditary = false
 
       attr_accessor :association_name, :_parent
 
-      delegate :db, :embedded, :primary_key, :to => "self.class"
+      delegate :db, :primary_key, :to => "self.class"
     end
 
     module ClassMethods

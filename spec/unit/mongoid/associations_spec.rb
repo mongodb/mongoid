@@ -99,6 +99,40 @@ describe Mongoid::Associations do
     end
   end
 
+  describe ".embedded?" do
+
+    context "when the class is embedded" do
+
+      it "returns true" do
+        Address.embedded?.should be_true
+      end
+    end
+
+    context "when the class is not embedded" do
+
+      it "returns false" do
+        Person.embedded?.should be_false
+      end
+    end
+  end
+
+  describe "#embedded?" do
+
+    context "when the class is embedded" do
+
+      it "returns true" do
+        Address.new.embedded?.should be_true
+      end
+    end
+
+    context "when the class is not embedded" do
+
+      it "returns false" do
+        Person.new.embedded?.should be_false
+      end
+    end
+  end
+
   describe ".embedded_in" do
 
     it "creates a reader for the association" do
