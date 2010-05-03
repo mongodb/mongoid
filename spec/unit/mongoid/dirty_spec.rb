@@ -312,6 +312,21 @@ describe Mongoid::Dirty do
           @address.setters.should ==
             { "addresses.0.street" => "Bond St" }
         end
+
+        context "when the document is embedded multiple levels" do
+
+          before do
+            @location = Location.new(:name => "Home")
+            @location.instance_variable_set(:@new_record, false)
+            @address.locations << @location
+            @location.name = "Work"
+          end
+
+          it "returns the proper hash with locations" do
+            @location.setters.should ==
+              { "addresses.0.locations.0.name" => "Work" }
+          end
+        end
       end
     end
 

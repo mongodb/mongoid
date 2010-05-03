@@ -87,6 +87,11 @@ describe Mongoid::Persistence::Insert do
           root_set_expectation.call
           insert.persist.should == email
         end
+
+        it "sets new_record to false" do
+          root_set_expectation.call
+          insert.persist.new_record?.should be_false
+        end
       end
     end
 
@@ -105,6 +110,11 @@ describe Mongoid::Persistence::Insert do
         it "notifies its changes to the parent and inserts the parent" do
           root_insert_expectation.call
           insert.persist.should == address
+        end
+
+        it "sets new_record to false" do
+          root_insert_expectation.call
+          insert.persist.new_record?.should be_false
         end
       end
 

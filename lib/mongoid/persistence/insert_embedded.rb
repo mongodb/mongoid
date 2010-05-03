@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
           update = { @document._inserter => { @document._position => @document.raw_attributes } }
           @collection.update(parent._selector, update, @options.merge(:multi => false))
         end
-        @document
+        @document.new_record = false; @document
       end
     end
   end
