@@ -396,6 +396,36 @@ describe Mongoid::Document do
         @person.addresses.should == []
       end
     end
+
+    context "with relational associations" do
+
+      context "for a has_one_related" do
+
+        before do
+          @game = @person.game.create(:score => 50)
+        end
+
+        it "should reload the association" do
+          @person.game.should == @game
+          Game.collection.update({ "_id" => @game.id }, { "$set" => { "score" => 75 } })
+          @person.reload
+          @person.game.score.should == 75
+        end
+      end
+
+      context "for a belongs_to_related" do
+
+        before do
+          @game = @person.game.create(:score => 50)
+        end
+
+        it "should reload the association" do
+          Person.collection.update({ "_id" => @person.id }, { "$set" => { "title" => "Mam" } })
+          @game.reload
+          @game.person.title.should == "Mam"
+        end
+      end
+    end
   end
 
   describe "#save" do
