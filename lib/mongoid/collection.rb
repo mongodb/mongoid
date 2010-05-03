@@ -1,15 +1,12 @@
 # encoding: utf-8
 require "mongoid/collections/operations"
 require "mongoid/collections/cyclic_iterator"
-require "mongoid/collections/mimic"
 require "mongoid/collections/master"
 require "mongoid/collections/slaves"
 
 module Mongoid #:nodoc
   # The Mongoid wrapper to the Mongo Ruby driver's collection object.
   class Collection
-    include Collections::Mimic
-
     attr_reader :counter, :name
 
     # All write operations should delegate to the master connection. These
@@ -18,7 +15,9 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>collection.save({ :name => "Al" })</tt>
-    proxy(:master, Collections::Operations::PROXIED)
+    Collections::Operations::PROXIED.each do |name|
+      define_method(name) { |*args| master.send(name, *args) }
+    end
 
     # Determines where to send the next read query. If the slaves are not
     # defined then send to master. If the read counter is under the configured

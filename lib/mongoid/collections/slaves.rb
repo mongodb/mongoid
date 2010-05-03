@@ -2,7 +2,6 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Slaves
-      include Mimic
 
       attr_reader :iterator
 
@@ -12,7 +11,9 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
-      proxy(:collection, Operations::READ)
+      Operations::READ.each do |name|
+        define_method(name) { |*args| collection.send(name, *args) }
+      end
 
       # Is the collection of slaves empty or not?
       #

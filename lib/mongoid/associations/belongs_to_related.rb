@@ -53,7 +53,6 @@ module Mongoid #:nodoc:
           instantiate(document, options, target)
         end
       end
-
     end
   end
 end
