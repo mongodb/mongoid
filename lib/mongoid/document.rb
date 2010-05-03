@@ -157,7 +157,7 @@ module Mongoid #:nodoc:
       def inspect
         attrs = fields.map { |name, field| "#{name}: #{@attributes[name].inspect}" }
         if Mongoid.allow_dynamic_fields
-          dynamic_keys = @attributes.keys - fields.keys - ["_id", "_type"]
+          dynamic_keys = @attributes.keys - fields.keys - associations.keys - ["_id", "_type"]
           attrs += dynamic_keys.map { |name| "#{name}: #{@attributes[name].inspect}" }
         end
         "#<#{self.class.name} _id: #{id}, #{attrs * ', '}>"
@@ -197,8 +197,12 @@ module Mongoid #:nodoc:
 
       # Reloads the +Document+ attributes from the database.
       def reload
-        @attributes = {}.merge(collection.find_one(:_id => id))
-        self.associations.each { |association_name, association| unmemoize(association_name) }; self
+        reloaded = collection.find_one(:_id => id)
+        if Mongoid.raise_not_found_error
+          raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
+        end
+        @attributes = {}.merge(reloaded || {})
+        self.associations.keys.each { |association_name| unmemoize(association_name) }; self
       end
 
       # Remove a child document from this parent +Document+. Will reset the
