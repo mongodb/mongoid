@@ -120,7 +120,8 @@ describe Mongoid::Field do
     context "nil is provided" do
 
       it "returns the default value" do
-        @field.set(nil).should == 10
+        @type.expects(:set).with(nil).returns(nil)
+        @field.set(nil).should == nil
       end
 
     end

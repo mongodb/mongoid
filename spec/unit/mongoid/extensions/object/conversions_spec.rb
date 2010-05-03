@@ -28,6 +28,13 @@ describe Mongoid::Extensions::Object::Conversions do
       Person.get(@attributes).should == Person.new(@attributes)
     end
 
+    context "when the value is nil" do
+
+      it "returns nil" do
+        Person.get(nil).should be_nil
+      end
+    end
+
   end
 
   describe "#set" do

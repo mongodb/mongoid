@@ -3,9 +3,15 @@ module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Boolean #:nodoc:
       module Conversions #:nodoc:
-        BOOLEAN_MAP = {true => true, "true" => true, "TRUE" => true, "1" => true, 1 => true, 1.0 => true}
+
+        BOOLEAN_MAP = {
+          true => true, "true" => true, "TRUE" => true, "1" => true, 1 => true, 1.0 => true,
+          false => false, "false" => false, "FALSE" => false, "0" => false, 0 => false, 0.0 => false
+        }
+
         def set(value)
-          BOOLEAN_MAP.include?(value)
+          value = BOOLEAN_MAP[value]
+          value.nil? ? nil : value
         end
         def get(value)
           value
