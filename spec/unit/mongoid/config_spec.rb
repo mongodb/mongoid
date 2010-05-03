@@ -31,7 +31,7 @@ describe Mongoid::Config do
     before do
       file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
       file = File.new(file_name)
-      @settings = YAML.load(ERB.new(file.read).result)["test"]
+      @settings = YAML.load(file.read)["test"]
       config.from_hash(@settings)
     end
 
