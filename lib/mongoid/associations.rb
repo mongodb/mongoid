@@ -109,6 +109,8 @@ module Mongoid # :nodoc:
         associate(Associations::EmbeddedIn, optionize(name, options, nil, &block))
       end
 
+      alias :belongs_to :embedded_in
+
       # Adds the association from a parent document to its children. The name
       # of the association needs to be a pluralized form of the child class
       # name.
@@ -136,6 +138,7 @@ module Mongoid # :nodoc:
       end
 
       alias :embed_many :embeds_many
+      alias :has_many :embeds_many
 
       # Adds the association from a parent document to its child. The name
       # of the association needs to be a singular form of the child class
@@ -168,6 +171,7 @@ module Mongoid # :nodoc:
       end
 
       alias :embed_one :embeds_one
+      alias :has_one :embeds_one
 
       # Adds a relational association from the Document to many Documents in
       # another database or collection.
