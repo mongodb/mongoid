@@ -304,7 +304,7 @@ describe Mongoid::Document do
 
   describe "#inspect" do
 
-    context "with allow_dynamic_fields=false" do
+    context "with allow_dynamic_fields = false" do
       before do
         Mongoid.configure.allow_dynamic_fields = false
         @person = Person.new :title => "CEO"
@@ -318,10 +318,11 @@ describe Mongoid::Document do
       end
     end
 
-    context "with allow_dynamic_fields=true" do
+    context "with allow_dynamic_fields = true" do
       before do
         Mongoid.configure.allow_dynamic_fields = true
-        @person = Person.new :title => "CEO", :some_attribute => "foo"
+        @person = Person.new(:title => "CEO", :some_attribute => "foo")
+        @person.addresses << Address.new(:street => "test")
       end
 
       it "returns a pretty string of class name, attributes, and dynamic attributes" do
@@ -370,6 +371,16 @@ describe Mongoid::Document do
 
     it "reload should return self" do
       @person.reload.should == @from_db
+    end
+
+    context "when document not saved" do
+
+      context "when raising not found error" do
+
+        it "raises an error" do
+          lambda { Person.new.reload }.should raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
     end
 
     context "when embedded documents change" do
