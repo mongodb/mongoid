@@ -2,7 +2,6 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Master
-      include Mimic
 
       attr_reader :collection
 
@@ -12,7 +11,9 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
-      proxy(:collection, Operations::ALL)
+      Operations::ALL.each do |name|
+        define_method(name) { |*args| collection.send(name, *args) }
+      end
 
       # Create the new database writer. Will create a collection from the
       # master database.
