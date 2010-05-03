@@ -29,6 +29,7 @@ gem "bson", "~>1.0"
 require "delegate"
 require "singleton"
 require "time"
+require "ostruct"
 require "active_support/core_ext"
 require 'active_support/json'
 require "active_support/inflector"

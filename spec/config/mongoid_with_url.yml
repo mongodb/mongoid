@@ -1,0 +1,9 @@
+defaults: &defaults
+  uri: "mongodb://localhost/sushi"
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+  database: sushi_test

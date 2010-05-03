@@ -59,6 +59,7 @@ module Mongoid #:nodoc
     #
     # The slaves DB instances.
     def slaves=(dbs)
+      return unless dbs
       dbs.each do |db|
         check_database!(db)
       end
@@ -152,10 +153,19 @@ module Mongoid #:nodoc
     #
     # <tt>config._master({}, "test")</tt>
     def _master(settings)
-      name = settings["database"]
-      host = settings.delete("host") || "localhost"
-      port = settings.delete("port") || 27017
-      self.master = Mongo::Connection.new(host, port, :logger => logger).db(name)
+      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
+
+      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
+      host = settings["host"] || mongo_uri.host || "localhost"
+      port = settings["port"] || mongo_uri.port || 27017
+      username = settings["username"] || mongo_uri.user
+      password = settings["password"] || mongo_uri.password
+
+      connection = Mongo::Connection.new(host, port, :logger => logger)
+      if username || password
+        connection.add_auth(name, username, password)
+      end
+      self.master = connection.db(name)
     end
 
     # Get a bunch-o-slaves from settings and names.
@@ -164,15 +174,25 @@ module Mongoid #:nodoc
     #
     # <tt>config._slaves({}, "test")</tt>
     def _slaves(settings)
-      name = settings["database"]
+      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
+      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
       self.slaves = []
-      slaves = settings.delete("slaves")
+      slaves = settings["slaves"]
       slaves.to_a.each do |slave|
-        self.slaves << Mongo::Connection.new(
-          slave["host"],
-          slave["port"],
+        slave_uri = slave["uri"].present? ? URI.parse(slave["uri"]) : OpenStruct.new
+        slave_username = slave["username"] || slave_uri.user
+        slave_password = slave["password"] || slave_uri.password
+
+        slave_connection = Mongo::Connection.new(
+          slave["host"] || slave_uri.host || "localhost",
+          slave["port"] || slave_uri.port,
           :slave_ok => true
-        ).db(name)
+        )
+
+        if slave_username || slave_password
+          slave_connection.add_auth(name, slave_username, slave_password)
+        end
+        self.slaves << slave_connection.db(name)
       end
     end
   end

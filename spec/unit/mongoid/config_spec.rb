@@ -27,45 +27,76 @@ describe Mongoid::Config do
   end
 
   describe "#from_hash" do
+    context "regular mongoid.yml" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
+        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+        config.from_hash(@settings["test"])
+      end
 
-    before do
-      file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
-      file = File.new(file_name)
-      @settings = YAML.load(ERB.new(file.read).result)["test"]
-      config.from_hash(@settings)
+      after do
+        config.reset
+      end
+
+      it "sets the master db" do
+        config.master.name.should == "mongoid_config_test"
+      end
+
+      it "sets allow_dynamic_fields" do
+        config.allow_dynamic_fields.should == false
+      end
+
+      it "sets reconnect_time" do
+        config.reconnect_time.should == 5
+      end
+
+      it "sets parameterize keys" do
+        config.parameterize_keys.should == false
+      end
+
+      it "sets persist_in_safe_mode" do
+        config.persist_in_safe_mode.should == false
+      end
+
+      it "sets raise_not_found_error" do
+        config.raise_not_found_error.should == false
+      end
+
+      it "sets use_object_ids" do
+        config.use_object_ids.should == true
+      end
     end
 
-    after do
-      config.reset
+    context "mongoid.yml with url" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_url.yml")
+        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+      end
+
+      context "in the development environment" do
+        before do
+          config.from_hash(@settings["development"])
+        end
+        it "sets the master db" do
+          config.master.name.should == "sushi"
+        end
+      end
+
+      context "in the test environment" do
+        before do
+          config.from_hash(@settings["test"])
+        end
+
+        it "sets the master db" do
+          config.master.name.should == "sushi_test"
+        end
+      end
+
+      after do
+        config.reset
+      end
     end
 
-    it "sets the master db" do
-      config.master.name.should == "mongoid_config_test"
-    end
-
-    it "sets allow_dynamic_fields" do
-      config.allow_dynamic_fields.should == false
-    end
-
-    it "sets reconnect_time" do
-      config.reconnect_time.should == 5
-    end
-
-    it "sets parameterize keys" do
-      config.parameterize_keys.should == false
-    end
-
-    it "sets persist_in_safe_mode" do
-      config.persist_in_safe_mode.should == false
-    end
-
-    it "sets raise_not_found_error" do
-      config.raise_not_found_error.should == false
-    end
-
-    it "sets use_object_ids" do
-      config.use_object_ids.should == true
-    end
   end
 
   describe "#master=" do
