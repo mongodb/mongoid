@@ -98,7 +98,7 @@ module Mongoid #:nodoc
       }.call
     end
 
-    # Confiure mongoid from a hash that was usually parsed out of yml.
+    # Configure mongoid from a hash that was usually parsed out of yml.
     #
     # Example:
     #
@@ -164,6 +164,7 @@ module Mongoid #:nodoc
       connection = Mongo::Connection.new(host, port, :logger => logger)
       if username || password
         connection.add_auth(name, username, password)
+        connection.apply_saved_authentication
       end
       self.master = connection.db(name)
     end
@@ -191,6 +192,7 @@ module Mongoid #:nodoc
 
         if slave_username || slave_password
           slave_connection.add_auth(name, slave_username, slave_password)
+          slave_connection.apply_saved_authentication
         end
         self.slaves << slave_connection.db(name)
       end
