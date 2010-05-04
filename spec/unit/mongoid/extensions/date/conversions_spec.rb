@@ -12,9 +12,8 @@ describe Mongoid::Extensions::Date::Conversions do
 
       context "when string is a non utc time" do
 
-        it "returns a utc time from the string" do
-          time_in_millis = Time.at((@time.to_f * 1000).round / 1000)
-          Date.set(@time.to_s).should == time_in_millis.utc.at_midnight
+        it "returns a utc date from the string" do
+          Date.set(@time.to_s).should == Time.utc(@time.year, @time.month, @time.day)
         end
 
       end
@@ -23,7 +22,7 @@ describe Mongoid::Extensions::Date::Conversions do
 
         it "returns a time from the string" do
           date = RUBY_VERSION.start_with?("1.9") ? "15/01/2007" : "01/15/2007"
-          Date.set(date).should == Date.civil(2007, 1, 15).to_time.utc.at_midnight
+          Date.set(date).should == Time.utc(2007, 1, 15)
         end
 
       end
@@ -41,7 +40,7 @@ describe Mongoid::Extensions::Date::Conversions do
     context "when time provided" do
 
       it "returns the date for the time" do
-        Date.set(@time).should == @time.utc.at_midnight
+        Date.set(@time).should == Time.utc(@time.year, @time.month, @time.day)
       end
 
     end
@@ -49,7 +48,7 @@ describe Mongoid::Extensions::Date::Conversions do
     context "when a date provided" do
 
       it "returns a time from the date" do
-        Date.set(@time.to_date).should == @time.utc.at_midnight
+        Date.set(@time.to_date).should == Time.utc(@time.year, @time.month, @time.day)
       end
 
     end
@@ -71,7 +70,7 @@ describe Mongoid::Extensions::Date::Conversions do
       context "when time is UTC" do
 
         before do
-          @utc = Date.new(1974, 12, 1).to_time.utc
+          @utc = Time.utc(1974, 12, 1)
         end
 
         context "when time zone is not utc" do
