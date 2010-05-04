@@ -133,6 +133,19 @@ module Mongoid #:nodoc:
         @attributes.with_indifferent_access
       end
 
+      # Gets all the directly embedded children for this document.
+      #
+      # Returns:
+      #
+      # An +Array+ of child documents.
+      def _children
+        self.embedded_associations.inject([]) do |children, name|
+          child = send(name)
+          children.concat(child.to_a) unless child.blank?
+          children
+        end
+      end
+
       # Clone the current +Document+. This will return all attributes with the
       # exception of the document's id and versions.
       def clone
@@ -199,6 +212,16 @@ module Mongoid #:nodoc:
         add_observer(object)
       end
 
+      # Mark the document and children as persisted.
+      #
+      # Example:
+      #
+      # <tt>document.persisted!</tt>
+      def persisted!
+        @new_record = false
+        _children.each(&:persisted!)
+      end
+
       # Return the attributes hash.
       def raw_attributes
         @attributes
@@ -218,7 +241,8 @@ module Mongoid #:nodoc:
       # memoized association and notify the parent of the change.
       def remove(child)
         name = child.association_name
-        reset(name) { @attributes.remove(name, child.raw_attributes) }
+        unmemoize(name)
+        @attributes.remove(name, child.raw_attributes)
         notify
       end
 
@@ -291,16 +315,6 @@ module Mongoid #:nodoc:
         attrs = child.instance_variable_get(:@attributes)
         clear ? @attributes.delete(name) : @attributes.insert(name, attrs)
         notify
-      end
-
-      protected
-      # apply default values to attributes - calling procs as required
-      def attributes_with_defaults(attributes = {})
-        default_values = defaults
-        default_values.each_pair do |key, val|
-          default_values[key] = val.call if val.respond_to?(:call)
-        end
-        default_values.merge(attributes)
       end
     end
   end

@@ -26,9 +26,7 @@ module Mongoid #:nodoc:
         @document.run_callbacks(:before_create)
         @document.run_callbacks(:before_save)
         if insert
-          @document.new_record = false
-          # TODO: All child document new_record flags must get set to false
-          # here or somewhere - this will cause problems.
+          @document.persisted!
           @document.move_changes
           @document.run_callbacks(:after_create)
           @document.run_callbacks(:after_save)

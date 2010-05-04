@@ -57,6 +57,7 @@ module Mongoid #:nodoc:
         def update(target, child, options)
           child.parentize(target, options.inverse_of)
           child.notify
+          target.unmemoize(options.inverse_of)
           instantiate(child, options)
         end
       end

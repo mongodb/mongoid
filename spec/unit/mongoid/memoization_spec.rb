@@ -47,7 +47,7 @@ describe Mongoid::Memoization do
 
       it "removes the memoized value" do
         @person.reset(:memo) { nil }
-        @person.instance_variable_defined?("@memo").should be_false
+        @person.instance_variable_get("@memo").should be_nil
       end
 
       it "returns the new value" do
