@@ -126,7 +126,7 @@ describe Mongoid::Associations::Options do
 
   end
 
-  describe "#klass" do
+  describe "#class_name" do
 
     context "when class_name provided" do
 
@@ -136,7 +136,7 @@ describe Mongoid::Associations::Options do
       end
 
       it "constantizes the class name" do
-        @options.klass.should == Person
+        @options.class_name.should == "Person"
       end
 
     end
@@ -151,7 +151,7 @@ describe Mongoid::Associations::Options do
         end
 
         it "classifies and constantizes the association name" do
-          @options.klass.should == Person
+          @options.class_name.should == "Person"
         end
 
       end
@@ -164,13 +164,23 @@ describe Mongoid::Associations::Options do
         end
 
         it "classifies and constantizes the association name" do
-          @options.klass.should == Person
+          @options.class_name.should == "Person"
         end
 
       end
 
     end
 
+  end
+
+  describe "#klass" do
+    before do
+      @options = Mongoid::Associations::Options.new(:name => :person)
+    end
+
+    it "constantizes the class_name" do
+      @options.klass.should == Person
+    end
   end
 
   describe "#polymorphic" do

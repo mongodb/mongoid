@@ -30,12 +30,16 @@ module Mongoid #:nodoc:
         @attributes[:inverse_of]
       end
 
-      # Return a +Class+ for the options. If a class_name was provided, then the
-      # constantized class_name will be returned. If not, a constant based on the
-      # association name will be returned.
+      # Return a +Class+ for the options. See #class_name
       def klass
-        class_name = @attributes[:class_name]
-        class_name ? class_name.constantize : name.to_s.classify.constantize
+        class_name.constantize
+      end
+
+      # Return a +String+ representing the associated class_name. If a class_name
+      # was provided, then the constantized class_name will be returned. If not,
+      # a constant based on the association name will be returned.
+      def class_name
+        @attributes[:class_name] || name.to_s.classify
       end
 
       # Returns the association name of the options.
