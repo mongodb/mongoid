@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
         @document.run_callbacks(:create) do
           @document.run_callbacks(:save) do
             if insert
-              @document.new_record = false
+              @document.persisted!
               @document.move_changes
             end
             @document
