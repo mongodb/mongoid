@@ -363,6 +363,17 @@ describe Mongoid::Associations do
           from_db.addresses.first.should == @address
         end
       end
+
+      context "when creating" do
+
+        before do
+          @address = @person.addresses.create(:street => "Oxford St")
+        end
+
+        it "saves all new children" do
+          @person.reload.addresses.first.should == @address
+        end
+      end
     end
 
     context "one level nested" do
