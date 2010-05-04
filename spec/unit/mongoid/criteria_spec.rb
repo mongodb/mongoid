@@ -680,7 +680,7 @@ describe Mongoid::Criteria do
           @id = BSON::ObjectID.new.to_s
           @document = stub
           @criteria = mock
-          Mongoid::Criteria.expects(:new).returns(@criteria)
+          Person.expects(:criteria).returns(@criteria)
         end
 
         it "delegates to #id_criteria" do
@@ -695,7 +695,7 @@ describe Mongoid::Criteria do
           @id = BSON::ObjectID.new
           @document = stub
           @criteria = mock
-          Mongoid::Criteria.expects(:new).returns(@criteria)
+          Person.expects(:criteria).returns(@criteria)
         end
 
         it "delegates to #id_criteria" do
@@ -717,7 +717,7 @@ describe Mongoid::Criteria do
             @documents << stub
           end
           @criteria = mock
-          Mongoid::Criteria.expects(:new).returns(@criteria)
+          Person.expects(:criteria).returns(@criteria)
         end
 
         it "delegates to #id_criteria" do
