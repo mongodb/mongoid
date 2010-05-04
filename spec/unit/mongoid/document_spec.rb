@@ -26,6 +26,7 @@ describe Mongoid::Document do
         it "returns true" do
           @document.should == @other
         end
+
       end
 
       context "when attributes are not equal" do
@@ -38,7 +39,9 @@ describe Mongoid::Document do
         it "returns false" do
           @document.should_not == @other
         end
+
       end
+
     end
 
     context "when other object is not a Document" do
@@ -46,6 +49,7 @@ describe Mongoid::Document do
       it "returns false" do
         Person.new.==("Test").should be_false
       end
+
     end
 
     context "when comapring parent to its subclass" do
@@ -56,22 +60,6 @@ describe Mongoid::Document do
 
     end
 
-  end
-
-  describe "#_children" do
-
-    before do
-      @person = Person.new
-      @address = Address.new(:street => "High St")
-      @name = Name.new(:first_name => "Chris")
-      @person.addresses << @address
-      @person.name = @name
-    end
-
-    it "returns the embedded children of the document" do
-      @person._children.should include(@address)
-      @person._children.should include(@name)
-    end
   end
 
   describe "#eql?" do
@@ -475,30 +463,6 @@ describe Mongoid::Document do
       @child._parent.should == @parent
     end
 
-  end
-
-  describe "#persisted!" do
-
-    before do
-      @person = Person.new
-      @address = Address.new(:street => "High St")
-      @name = Name.new(:first_name => "Chris")
-      @person.addresses << @address
-      @person.name = @name
-      @person.persisted!
-    end
-
-    it "sets new_record to false for parent" do
-      @person.new_record?.should == false
-    end
-
-    it "sets new_record to false for embeds_many" do
-      @address.new_record?.should == false
-    end
-
-    it "sets new_record to false for embeds_one" do
-      @name.new_record?.should == false
-    end
   end
 
   describe "#reload" do

@@ -16,9 +16,8 @@ module Mongoid # :nodoc:
       cattr_accessor :embedded
       self.embedded = false
 
-      class_inheritable_accessor :associations, :embedded_associations
+      class_inheritable_accessor :associations
       self.associations = {}
-      self.embedded_associations = []
 
       delegate :embedded, :embedded?, :to => "self.class"
     end
@@ -130,7 +129,6 @@ module Mongoid # :nodoc:
       #     embedded_in :person, :inverse_of => :addresses
       #   end
       def embeds_many(name, options = {}, &block)
-        self.embedded_associations << name
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
         set_callback(:update, :after) { |document| document.update_embedded(name) }
       end
@@ -157,7 +155,6 @@ module Mongoid # :nodoc:
       #     embedded_in :person
       #   end
       def embeds_one(name, options = {}, &block)
-        self.embedded_associations << name
         opts = optionize(name, options, nil, &block)
         type = Associations::EmbedsOne
         associate(type, opts)

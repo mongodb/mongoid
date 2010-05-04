@@ -23,7 +23,11 @@ module Mongoid #:nodoc
     def reset(name, &block)
       var = "@#{name}"
       value = yield
-      instance_variable_set(var, value)
+      if instance_variable_defined?(var)
+        remove_instance_variable(var)
+      else
+        instance_variable_set(var, value)
+      end
     end
   end
 end

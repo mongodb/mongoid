@@ -26,9 +26,9 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # A new +HashOne+ association proxy.
-      def initialize(document, attrs, options, target = nil)
+      def initialize(document, attrs, options)
         @parent, @options  = document, options
-        @target = target ? target : attrs.assimilate(@parent, @options, attrs.klass)
+        @target = attrs.assimilate(@parent, @options, attrs.klass)
         extends(options)
       end
 
@@ -58,10 +58,10 @@ module Mongoid #:nodoc:
         # Returns:
         #
         # A new +EmbedsOne+ association proxy.
-        def instantiate(document, options, target = nil)
+        def instantiate(document, options)
           attributes = document.raw_attributes[options.name]
           return nil if attributes.blank?
-          new(document, attributes, options, target)
+          new(document, attributes, options)
         end
 
         # Returns the macro used to create the association.
@@ -87,8 +87,7 @@ module Mongoid #:nodoc:
         # A new +EmbedsOne+ association proxy.
         def update(child, parent, options)
           child.assimilate(parent, options)
-          target = child.is_a?(Hash) ? nil : child
-          instantiate(parent, options, target)
+          instantiate(parent, options)
         end
       end
     end

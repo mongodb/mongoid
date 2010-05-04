@@ -34,8 +34,11 @@ describe Mongoid::Persistence do
           Person.create!(:ssn => "555-55-9999")
           lambda { Person.create!(:ssn => "555-55-9999") }.should raise_error
         end
+
       end
+
     end
+
   end
 
   describe "#delete" do
@@ -54,6 +57,7 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.delete.should be_true
       end
+
     end
 
     context "deleting an embedded document" do
@@ -84,8 +88,11 @@ describe Mongoid::Persistence do
           from_db = Person.find(@person.id)
           from_db.addresses.should be_empty
         end
+
       end
+
     end
+
   end
 
   describe "#destroy" do
@@ -171,22 +178,8 @@ describe Mongoid::Persistence do
         @person.save.should be_true
       end
 
-      context "when embedded documents are included" do
-
-        before do
-          @address = Address.new(:street => "High St")
-          @name = Name.new(:first_name => "Chris")
-          @person.addresses << @address
-          @person.name = @name
-          @person.save
-        end
-
-        it "sets the embedded new_record to false" do
-          @address.new_record?.should == false
-          @name.new_record?.should == false
-        end
-      end
     end
+
   end
 
   describe "save!" do
