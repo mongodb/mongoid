@@ -11,8 +11,7 @@ module Mongoid #:nodoc:
         :destroy,
         :save,
         :update,
-        :validate,
-        :terminator => false
+        :validate
     end
   end
 end
