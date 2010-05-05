@@ -13,6 +13,7 @@ defaults: &defaults
   use_object_ids: true
   persist_types: false
   option_no_exist: false
+  skip_version_check: false
 
 test:
   <<: *defaults

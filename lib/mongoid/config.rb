@@ -9,7 +9,8 @@ module Mongoid #:nodoc
       :parameterize_keys,
       :persist_in_safe_mode,
       :raise_not_found_error,
-      :use_object_ids
+      :use_object_ids,
+      :skip_version_check
 
     # Defaults the configuration options to true.
     def initialize
@@ -123,6 +124,7 @@ module Mongoid #:nodoc
       @raise_not_found_error = true
       @reconnect_time = 3
       @use_object_ids = false
+      @skip_version_check = false
     end
 
     protected
@@ -134,8 +136,10 @@ module Mongoid #:nodoc
     # <tt>config.check_database!</tt>
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
-      version = database.connection.server_version
-      raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+      unless Mongoid.skip_version_check
+        version = database.connection.server_version
+        raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+      end
     end
 
     # Get a Rails logger or stdout logger.
