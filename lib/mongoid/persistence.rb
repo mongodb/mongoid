@@ -120,7 +120,7 @@ module Mongoid #:nodoc:
       def upsert(validate = true)
         validate = parse_validate(validate)
         if new_record?
-          insert(validate).errors.any? ? false : true
+          insert(validate).persisted?
         else
           update(validate)
         end

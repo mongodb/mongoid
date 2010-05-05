@@ -240,6 +240,7 @@ describe Mongoid::Persistence do
       end
 
       it "returns a boolean" do
+        person.expects(:persisted?).returns(true)
         insert.expects(:persist).returns(person)
         person.save.should == true
       end
@@ -401,11 +402,13 @@ describe Mongoid::Persistence do
         end
 
         it "delegates to the insert persistence command" do
+          person.expects(:persisted?).returns(true)
           insert.expects(:persist).returns(person)
           person.upsert
         end
 
         it "returns a boolean" do
+          person.expects(:persisted?).returns(true)
           insert.expects(:persist).returns(person)
           person.upsert.should == true
         end
@@ -419,7 +422,6 @@ describe Mongoid::Persistence do
 
         it "returns false" do
           insert.expects(:persist).returns(person)
-          person.expects(:errors).returns([ "Message" ])
           person.upsert.should == false
         end
       end
