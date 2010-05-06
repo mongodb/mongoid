@@ -11,7 +11,8 @@ module Mongoid #:nodoc
       :parameterize_keys,
       :persist_in_safe_mode,
       :raise_not_found_error,
-      :use_object_ids
+      :use_object_ids,
+      :skip_version_check
 
     # Defaults the configuration options to true.
     def initialize
@@ -145,7 +146,7 @@ module Mongoid #:nodoc
       }.call
     end
 
-    # Confiure mongoid from a hash that was usually parsed out of yml.
+    # Configure mongoid from a hash that was usually parsed out of yml.
     #
     # Example:
     #
@@ -170,6 +171,7 @@ module Mongoid #:nodoc
       @raise_not_found_error = true
       @reconnect_time = 3
       @use_object_ids = false
+      @skip_version_check = false
     end
 
     protected
@@ -181,8 +183,10 @@ module Mongoid #:nodoc
     # <tt>config.check_database!</tt>
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
-      version = database.connection.server_version
-      raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+      unless Mongoid.skip_version_check
+        version = database.connection.server_version
+        raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+      end
     end
 
     # Get a Rails logger or stdout logger.
@@ -211,6 +215,7 @@ module Mongoid #:nodoc
       connection = Mongo::Connection.new(host, port, :logger => logger)
       if username || password
         connection.add_auth(name, username, password)
+        connection.apply_saved_authentication
       end
       self.master = connection.db(name)
     end
@@ -238,6 +243,7 @@ module Mongoid #:nodoc
 
         if slave_username || slave_password
           slave_connection.add_auth(name, slave_username, slave_password)
+          slave_connection.apply_saved_authentication
         end
         self.slaves << slave_connection.db(name)
       end

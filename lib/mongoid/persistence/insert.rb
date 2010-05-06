@@ -29,9 +29,8 @@ module Mongoid #:nodoc:
               @document.new_record = false
               @document.move_changes
             end
-            @document
           end
-        end
+        end; @document
       end
 
       protected

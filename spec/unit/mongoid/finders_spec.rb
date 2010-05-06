@@ -296,7 +296,7 @@ describe Mongoid::Finders do
     end
 
     it "returns the sum of a new criteria" do
-      Mongoid::Criteria.expects(:new).returns(@criteria)
+      Person.expects(:criteria).returns(@criteria)
       @criteria.expects(:max).with(:age).returns(50.0)
       Person.max(:age).should == 50.0
     end
@@ -310,7 +310,7 @@ describe Mongoid::Finders do
     end
 
     it "returns the sum of a new criteria" do
-      Mongoid::Criteria.expects(:new).returns(@criteria)
+      Person.expects(:criteria).returns(@criteria)
       @criteria.expects(:min).with(:age).returns(50.0)
       Person.min(:age).should == 50.0
     end
@@ -378,7 +378,7 @@ describe Mongoid::Finders do
     end
 
     it "returns the sum of a new criteria" do
-      Mongoid::Criteria.expects(:new).returns(@criteria)
+      Person.expects(:criteria).returns(@criteria)
       @criteria.expects(:sum).with(:age).returns(50.0)
       sum = Person.sum(:age)
       sum.should == 50.0

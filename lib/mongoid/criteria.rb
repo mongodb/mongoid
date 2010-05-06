@@ -174,14 +174,14 @@ module Mongoid #:nodoc:
       klass = args[0]
       params = args[1] || {}
       unless params.is_a?(Hash)
-        return new(klass).id_criteria(params)
+        return klass.criteria.id_criteria(params)
       end
       conditions = params.delete(:conditions) || {}
       if conditions.include?(:id)
         conditions[:_id] = conditions[:id]
         conditions.delete(:id)
       end
-      return new(klass).where(conditions).extras(params)
+      return klass.criteria.where(conditions).extras(params)
     end
 
     protected

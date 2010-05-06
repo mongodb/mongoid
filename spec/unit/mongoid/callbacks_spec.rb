@@ -52,4 +52,34 @@ describe Mongoid::Callbacks do
 
   end
 
+  describe ".before_create" do
+
+    before do
+      @artist = Artist.new(:name => "Depeche Mode")
+    end
+
+    context "callback returns true" do
+      before do
+        @artist.expects(:before_create_stub).returns(true)
+      end
+
+      it "should get saved" do
+        @artist.save.should == true
+        @artist.persisted?.should == true
+      end
+    end
+
+    context "callback returns false" do
+      before do
+        @artist.expects(:before_create_stub).returns(false)
+      end
+
+      it "should not get saved" do
+        @artist.save.should == false
+        @artist.persisted?.should == false
+      end
+    end
+
+  end
+
 end
