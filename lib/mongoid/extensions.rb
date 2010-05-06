@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/extensions/time_conversions"
 require "mongoid/extensions/array/accessors"
 require "mongoid/extensions/array/aliasing"
 require "mongoid/extensions/array/assimilation"
@@ -22,7 +23,6 @@ require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
-require "mongoid/extensions/time/conversions"
 require "mongoid/extensions/objectid/conversions"
 
 class Array #:nodoc
@@ -44,12 +44,14 @@ class Boolean #:nodoc
   extend Mongoid::Extensions::Boolean::Conversions
 end
 
-class Date #:nodoc
-  extend Mongoid::Extensions::Date::Conversions
+class DateTime #:nodoc
+  extend Mongoid::Extensions::TimeConversions
+  extend Mongoid::Extensions::DateTime::Conversions
 end
 
-class DateTime #:nodoc
-  extend Mongoid::Extensions::DateTime::Conversions
+class Date #:nodoc
+  extend Mongoid::Extensions::TimeConversions
+  extend Mongoid::Extensions::Date::Conversions
 end
 
 class Float #:nodoc
@@ -91,7 +93,7 @@ class Symbol #:nodoc
 end
 
 class Time #:nodoc
-  extend Mongoid::Extensions::Time::Conversions
+  extend Mongoid::Extensions::TimeConversions
 end
 
 class BSON::ObjectID #:nodoc
