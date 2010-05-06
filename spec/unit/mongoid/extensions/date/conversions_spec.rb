@@ -80,7 +80,7 @@ describe Mongoid::Extensions::Date::Conversions do
           end
 
           after do
-            Time.zone = "UTC"
+            Time.zone = nil
           end
 
           it "converts to the proper date" do

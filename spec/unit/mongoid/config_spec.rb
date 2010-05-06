@@ -65,6 +65,34 @@ describe Mongoid::Config do
       it "sets use_object_ids" do
         config.use_object_ids.should == true
       end
+
+      it "returns the default time_zone" do
+        gmt_offset_without_dst = Time.now.dst? ? Time.now.utc_offset - 3600 : Time.now.utc_offset
+        config.time_zone.should == ActiveSupport::TimeZone[gmt_offset_without_dst]
+      end
+    end
+
+    context "mongoid_with_time_zone.yml" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_time_zone.yml")
+        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+        config.from_hash(@settings["test"])
+      end
+
+      it "sets time_zone" do
+        config.time_zone.should == ActiveSupport::TimeZone["Alaska"]
+      end
+    end
+
+    context "mongoid_with_invalid_time_zone.yml" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_invalid_time_zone.yml")
+        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+      end
+
+      it "raises an argument error" do
+        expect { config.from_hash(@settings["test"]) }.to raise_error(ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}.")
+      end
     end
 
     context "mongoid.yml with url" do
