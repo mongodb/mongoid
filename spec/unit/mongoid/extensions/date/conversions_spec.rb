@@ -3,7 +3,13 @@ require "spec_helper"
 describe Mongoid::Extensions::Date::Conversions do
 
   before do
+    Mongoid::Config.instance.time_zone = nil
+    Time.zone = "Stockholm"
     @time = Date.today.to_time
+  end
+
+  after do
+    Time.zone = nil
   end
 
   describe "#set" do

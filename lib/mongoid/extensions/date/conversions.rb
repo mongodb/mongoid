@@ -3,13 +3,13 @@ module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Date #:nodoc:
       module Conversions #:nodoc:
-        def set(value)
-          return nil if value.blank?
-          date = (value.is_a?(::Date) || value.is_a?(::Time)) ? value : ::Date.parse(value.to_s)
-          ::Time.utc(date.year, date.month, date.day)
-        end
         def get(value)
-          value.utc.to_date if value
+          super.try(:to_date)
+        end
+
+        def convert_to_time(value)
+          value = ::Date.parse(value) if value.is_a?(::String)
+          ::Time.utc(value.year, value.month, value.day)
         end
       end
     end

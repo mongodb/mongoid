@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Extensions::Time::Conversions do
+describe Mongoid::Extensions::TimeConversions do
 
   before do
     Time.zone = "Canberra"
@@ -17,6 +17,10 @@ describe Mongoid::Extensions::Time::Conversions do
 
       it "converts to a utc time" do
         Time.set(@time.to_s).utc_offset.should == 0
+      end
+
+      it "returns the wrong day due to a limitation in Time.parse: it ignores the time zone" do
+        Time.set(@time.to_s).day.should == (@time.day - 1)
       end
 
     end
