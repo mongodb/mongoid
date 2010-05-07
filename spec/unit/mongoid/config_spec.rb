@@ -34,9 +34,7 @@ describe Mongoid::Config do
         config.from_hash(@settings["test"])
       end
 
-      after do
-        config.reset
-      end
+      after { config.reset }
 
       it "sets the master db" do
         config.master.name.should == "mongoid_config_test"
@@ -78,6 +76,8 @@ describe Mongoid::Config do
         config.from_hash(@settings["test"])
       end
 
+      after { config.reset }
+
       it "sets time_zone" do
         config.time_zone.should == ActiveSupport::TimeZone["Alaska"]
       end
@@ -88,6 +88,8 @@ describe Mongoid::Config do
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_invalid_time_zone.yml")
         @settings = YAML.load(ERB.new(File.new(file_name).read).result)
       end
+
+      after { config.reset }
 
       it "raises an argument error" do
         expect { config.from_hash(@settings["test"]) }.to raise_error(ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}.")
