@@ -174,6 +174,17 @@ module Mongoid #:nodoc:
         @previous_modifications ||= {}
       end
 
+      # Reset all modifications for the document. This will wipe all the marked
+      # changes, but not reset the values.
+      #
+      # Example:
+      #
+      # <tt>document.reset_modifications</tt>
+      def reset_modifications
+        @accessed = {}
+        @modifications = {}
+      end
+
       protected
 
       # Audit the original value for a field that can be modified in place.

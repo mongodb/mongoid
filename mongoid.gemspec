@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-05-06}
+  s.date = %q{2010-05-07}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -140,6 +140,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/persistence_spec.rb",
      "spec/models/account.rb",
      "spec/models/address.rb",
+     "spec/models/agent.rb",
      "spec/models/animal.rb",
      "spec/models/callbacks.rb",
      "spec/models/comment.rb",
@@ -274,6 +275,7 @@ Gem::Specification.new do |s|
      "spec/integration/mongoid/persistence_spec.rb",
      "spec/models/account.rb",
      "spec/models/address.rb",
+     "spec/models/agent.rb",
      "spec/models/animal.rb",
      "spec/models/callbacks.rb",
      "spec/models/comment.rb",
