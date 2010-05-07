@@ -66,9 +66,8 @@ describe Mongoid::Config do
         config.use_object_ids.should == true
       end
 
-      it "returns the default time_zone" do
-        gmt_offset_without_dst = Time.now.dst? ? Time.now.utc_offset - 3600 : Time.now.utc_offset
-        config.time_zone.should == ActiveSupport::TimeZone[gmt_offset_without_dst]
+      it "returns nil, which is interpreted as the local time_zone" do
+        config.time_zone.should be_nil
       end
     end
 
