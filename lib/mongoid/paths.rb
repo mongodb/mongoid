@@ -67,7 +67,8 @@ module Mongoid #:nodoc:
       #
       # <tt>address.selector</tt>
       def _selector
-        embedded? ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }
+        # embedded? ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }
+        { "_id" => embedded? ? _root.id : id }
       end
     end
   end

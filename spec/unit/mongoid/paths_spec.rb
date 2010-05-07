@@ -129,7 +129,8 @@ describe Mongoid::Paths do
       end
 
       it "returns the association with id._selector" do
-        address._selector.should == { "_id" => person.id, "addresses._id" => address.id }
+        # address._selector.should == { "_id" => person.id, "addresses._id" => address.id }
+        address._selector.should == { "_id" => person.id }
       end
     end
 
@@ -141,8 +142,8 @@ describe Mongoid::Paths do
       end
 
       it "returns the JSON notation to the document with ids" do
-        location._selector.should ==
-          { "_id" => person.id, "addresses._id" => address.id, "addresses.locations._id" => location.id }
+        location._selector.should == { "_id" => person.id }
+          # { "_id" => person.id, "addresses._id" => address.id, "addresses.locations._id" => location.id }
       end
     end
   end
