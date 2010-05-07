@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Extensions::Date::Conversions do
   before do
     Time.zone = "Canberra"
-    @time = Time.local(2010, 11, 19)
+    @time = Time.zone.local(2010, 11, 19)
   end
 
   after { Time.zone = nil }
@@ -51,7 +51,7 @@ describe Mongoid::Extensions::Date::Conversions do
       end
 
       it "returns utc times the same day, but at midnight" do
-        Date.set(@time.utc).should == Time.utc(@time.year, @time.month, @time.day)
+        Date.set(@time.utc).should == Time.utc(@time.utc.year, @time.utc.month, @time.utc.day)
       end
 
       it "returns the date for the time" do
@@ -60,10 +60,10 @@ describe Mongoid::Extensions::Date::Conversions do
     end
 
     context "when given an ActiveSupport::TimeWithZone" do
-      before { @time = 1.hour.ago }
+      before { @time = @time.in_time_zone("Canberra") }
 
       it "converts it to utc" do
-        Date.set(@time.in_time_zone("Alaska")).should == Time.utc(@time.year, @time.month, @time.day)
+        Date.set(@time).should == Time.utc(@time.year, @time.month, @time.day)
       end
     end
 
@@ -81,7 +81,7 @@ describe Mongoid::Extensions::Date::Conversions do
     before { @time = Time.now.utc }
 
     it "converts the time back to a date" do
-      Date.get(@time).should == @time.to_date
+      Date.get(@time).should be_a_kind_of(Date)
     end
 
     context "when the time zone is not defined" do
