@@ -321,6 +321,38 @@ describe Mongoid::Associations do
       @person = Person.create(:title => "Mr")
     end
 
+    context "having an embedded document as both an embeds_one and many" do
+
+      before do
+        @agent = Agent.new(:number => "007")
+        @person = Person.new(:title => "Dr", :ssn => "123-12-6666")
+        @agent_name = Name.new(:first_name => "James")
+        @person_name = Name.new(:first_name => "Jack")
+        @agent.names << @agent_name
+        @person.name = @person_name
+        @agent.save
+        @person.save
+      end
+
+      context "when the document is an embeds_one" do
+
+        it "sets the association_name" do
+          @agent_name.namable = @agent
+          @agent_name.namable.should == @agent
+          @agent_name.association_name.should == "names"
+        end
+      end
+
+      context "when the document is an embeds_many" do
+
+        it "sets the association_name" do
+          @person_name.namable = @person
+          @person_name.namable.should == @person
+          @person_name.association_name.should == "name"
+        end
+      end
+    end
+
     context "saving an existing parent document with existing children" do
 
       before do

@@ -55,9 +55,16 @@ module Mongoid #:nodoc:
         #
         # A new +EmbeddedIn+ association proxy.
         def update(target, child, options)
-          child.parentize(target, options.inverse_of)
+          child.parentize(target, determine_name(target, options))
           child.notify
           instantiate(child, options)
+        end
+
+        protected
+        def determine_name(target, options)
+          inverse = options.inverse_of
+          return inverse unless inverse.is_a?(Array)
+          inverse.detect { |name| target.respond_to?(name) }
         end
       end
     end
