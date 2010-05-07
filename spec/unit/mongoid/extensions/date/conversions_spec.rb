@@ -1,12 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Extensions::Date::Conversions do
-  before do
-    Time.zone = "Canberra"
-    @time = Time.zone.local(2010, 11, 19)
-  end
-
-  after { Time.zone = nil }
+  before { @time = Time.local(2010, 11, 19) }
 
   describe ".set" do
     context "when given nil" do
@@ -87,7 +82,6 @@ describe Mongoid::Extensions::Date::Conversions do
     context "when the time zone is not defined" do
       before do
         Mongoid::Config.instance.time_zone = nil
-        Time.zone = "Stockholm"
       end
 
       context "when the local time is not observing daylight saving" do
@@ -108,16 +102,13 @@ describe Mongoid::Extensions::Date::Conversions do
     end
 
     context "when the time zone is defined as something other than UTC" do
-      before do
-        Mongoid::Config.instance.time_zone = "Alaska"
-        Time.zone = "Stockholm"
-      end
+      before { Mongoid::Config.instance.time_zone = "Alaska" }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.utc(2010, 11, 19) }
 
         it "returns the same day" do
-          Date.get(@time).day.should == @time.day - 1
+          Date.get(@time).day.should == @time.day
         end
       end
 
@@ -125,7 +116,7 @@ describe Mongoid::Extensions::Date::Conversions do
         before { @time = Time.utc(2010, 9, 19) }
 
         it "returns the same day" do
-          Date.get(@time).day.should == @time.day - 1
+          Date.get(@time).day.should == @time.day
         end
       end
     end
@@ -152,6 +143,7 @@ describe Mongoid::Extensions::Date::Conversions do
         Mongoid::Config.instance.time_zone = nil
         Time.zone = "Stockholm"
       end
+      after { Time.zone = nil }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Date.set(Time.zone.local(2010, 11, 19, 0, 30)) }
@@ -175,22 +167,21 @@ describe Mongoid::Extensions::Date::Conversions do
         Mongoid::Config.instance.time_zone = "Alaska"
         Time.zone = "Stockholm"
       end
+      after { Time.zone = nil }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Date.set(Time.zone.local(2010, 11, 19)) }
 
-        it "returns the previous day since Alaska is behind Stockholm" do
-          Date.get(@time).day.should == @time.day - 1
+        it "always returns the same day even though Alaska is set" do
+          Date.get(@time).day.should == 19
         end
       end
 
       context "when the local time is observing daylight saving" do
-        before do
-          @time = Date.set(Time.zone.local(2010, 9, 19))
-        end
+        before { @time = Date.set(Time.zone.local(2010, 9, 19)) }
 
-        it "returns the previous day since Alaska is behind Stockholm" do
-          Date.get(@time).day.should == @time.day - 1
+        it "always returns the same day even though Alaska is set" do
+          Date.get(@time).day.should == 19
         end
       end
     end

@@ -9,7 +9,11 @@ module Mongoid #:nodoc:
 
       def get(value)
         return nil if value.blank?
-        value.in_time_zone(Mongoid::Config.instance.time_zone)
+        if Mongoid::Config.instance.time_zone.nil?
+          value.getlocal
+        else
+          value.in_time_zone(Mongoid::Config.instance.time_zone)
+        end
       end
 
       protected

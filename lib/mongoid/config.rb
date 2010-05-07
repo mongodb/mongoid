@@ -33,8 +33,8 @@ module Mongoid #:nodoc
     #
     # The ActiveSupport::TimeZone object.
     def time_zone=(value)
-      if value.blank?
-        @time_zone = ActiveSupport::TimeZone[gmt_offset_without_dst]
+      if value.nil?
+        @time_zone = nil
       elsif ActiveSupport::TimeZone[value].nil?
         raise ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}."
       else
@@ -53,15 +53,7 @@ module Mongoid #:nodoc
     #
     # The ActiveSupport::TimeZone object.
     def time_zone
-      @time_zone || ActiveSupport::TimeZone[gmt_offset_without_dst]
-    end
-
-    def gmt_offset_without_dst
-      raw = Time.now.getlocal.utc_offset
-      # according to wikipedia all countries use 1 hour DST if they use it at all,
-      # except for one island in australia which has 30 minues. We ignore them.
-      # "Australia's Lord Howe Island uses a half-hour shift" - wikipedia.
-      Time.new.dst? ? raw - 3600 : raw
+      @time_zone
     end
 
     # Sets the Mongo::DB master database to be used. If the object trying to be
