@@ -53,7 +53,7 @@ describe Mongoid::Persistence::Update do
     def embedded_set_expectation
       lambda {
         collection.expects(:update).with(
-          { "_id" => document.id },
+          { "_id" => document.id, "addresses._id" => address.id },
           { "$set" => address.setters },
           :multi => false,
           :safe => true

@@ -31,7 +31,7 @@ describe Mongoid::Persistence::Remove do
     def deep_pull_expectation
       lambda {
         collection.expects(:update).with(
-          { "_id" => document.id },
+          { "_id" => document.id, "addresses._id" => address.id },
           { "$pull" => { "addresses.0.locations" => { "_id" => location.id } } },
           :multi => false,
           :safe => true
