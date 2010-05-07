@@ -407,4 +407,24 @@ describe Mongoid::Dirty do
       end
     end
   end
+
+  describe "#reset_modifications" do
+
+    context "when the attribute has changed" do
+
+      before do
+        @person = Person.new(:title => "Grand Poobah")
+        @person.title = "Captain Obvious"
+        @person.reset_modifications
+      end
+
+      it "does not reset the value" do
+        @person.title.should == "Captain Obvious"
+      end
+
+      it "removes the note of the change" do
+        @person.changed?.should == false
+      end
+    end
+  end
 end

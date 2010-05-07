@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-05-03}
+  s.date = %q{2010-05-07}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -84,7 +84,7 @@ Gem::Specification.new do |s|
      "lib/mongoid/extensions/string/conversions.rb",
      "lib/mongoid/extensions/string/inflections.rb",
      "lib/mongoid/extensions/symbol/inflections.rb",
-     "lib/mongoid/extensions/time/conversions.rb",
+     "lib/mongoid/extensions/time_conversions.rb",
      "lib/mongoid/extras.rb",
      "lib/mongoid/factory.rb",
      "lib/mongoid/field.rb",
@@ -135,7 +135,10 @@ Gem::Specification.new do |s|
      "lib/rails/generators/mongoid_generator.rb",
      "mongoid.gemspec",
      "perf/benchmark.rb",
+     "rake_spec_several_time_zones.sh",
      "spec/config/mongoid.yml",
+     "spec/config/mongoid_with_invalid_time_zone.yml",
+     "spec/config/mongoid_with_time_zone.yml",
      "spec/config/mongoid_with_url.yml",
      "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/attributes_spec.rb",
@@ -234,7 +237,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
-     "spec/unit/mongoid/extensions/time/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/time_conversions_spec.rb",
      "spec/unit/mongoid/extras_spec.rb",
      "spec/unit/mongoid/factory_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
@@ -377,7 +380,7 @@ Gem::Specification.new do |s|
      "spec/unit/mongoid/extensions/string/conversions_spec.rb",
      "spec/unit/mongoid/extensions/string/inflections_spec.rb",
      "spec/unit/mongoid/extensions/symbol/inflections_spec.rb",
-     "spec/unit/mongoid/extensions/time/conversions_spec.rb",
+     "spec/unit/mongoid/extensions/time_conversions_spec.rb",
      "spec/unit/mongoid/extras_spec.rb",
      "spec/unit/mongoid/factory_spec.rb",
      "spec/unit/mongoid/field_spec.rb",
