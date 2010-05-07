@@ -8,4 +8,3 @@ export TZ=Europe/Stockholm
 rake spec
 export TZ=US/Pacific
 rake spec
-
