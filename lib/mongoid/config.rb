@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "uri"
+
 module Mongoid #:nodoc
   class Config #:nodoc
     include Singleton
@@ -16,8 +18,53 @@ module Mongoid #:nodoc
       reset
     end
 
-    # Sets the Mongo::DB master database to be used. If the object trying to me
-    # set is not a valid +Mongo::DB+, then an error will be raise.
+    # Sets the default time zone in which times are returned from the database. Often
+    # you will want to set UTC. If you give a value which is not a valid key to
+    # +ActiveSupport::TimeZone[]+, then an error will be raised.
+    # If you give a blank value, or omit it entirely, then times will be returned in
+    # the local time zone.
+    #
+    # Example:
+    #
+    # <tt>Config.time_zone = "UTC"</tt>
+    #
+    # Returns:
+    #
+    # The ActiveSupport::TimeZone object.
+    def time_zone=(value)
+      if value.blank?
+        @time_zone = ActiveSupport::TimeZone[gmt_offset_without_dst]
+      elsif ActiveSupport::TimeZone[value].nil?
+        raise ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}."
+      else
+        @time_zone = ActiveSupport::TimeZone[value]
+      end
+    end
+
+    # Returns the default time zone in which times are returns from the database, or if none has been set it will return
+    # the local time zone.
+    #
+    # Example:
+    #
+    # <tt>Config.time_zone</tt>
+    #
+    # Returns:
+    #
+    # The ActiveSupport::TimeZone object.
+    def time_zone
+      @time_zone || ActiveSupport::TimeZone[gmt_offset_without_dst]
+    end
+
+    def gmt_offset_without_dst
+      raw = Time.now.getlocal.utc_offset
+      # according to wikipedia all countries use 1 hour DST if they use it at all,
+      # except for one island in australia which has 30 minues. We ignore them.
+      # "Australia's Lord Howe Island uses a half-hour shift" - wikipedia.
+      Time.new.dst? ? raw - 3600 : raw
+    end
+
+    # Sets the Mongo::DB master database to be used. If the object trying to be
+    # set is not a valid +Mongo::DB+, then an error will be raised.
     #
     # Example:
     #

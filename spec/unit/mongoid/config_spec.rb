@@ -20,44 +20,77 @@ describe Mongoid::Config do
   end
 
   describe "#from_hash" do
+    context "regular mongoid.yml" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.from_hash(@settings)
+      end
 
-    before do
-      file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
-      file = File.new(file_name)
-      @settings = YAML.load(file.read)["test"]
-      config.from_hash(@settings)
+      after do
+        config.reset
+      end
+
+      it "sets the master db" do
+        config.master.name.should == "mongoid_config_test"
+      end
+
+      it "sets use_object_ids" do
+          config.use_object_ids.should == true
+      end
+
+      it "sets allow_dynamic_fields" do
+        config.allow_dynamic_fields.should == false
+      end
+
+      it "sets reconnect_time" do
+        config.reconnect_time.should == 5
+      end
+
+      it "sets parameterize keys" do
+        config.parameterize_keys.should == false
+      end
+
+      it "sets persist_in_safe_mode" do
+        config.persist_in_safe_mode.should == false
+      end
+
+      it "sets raise_not_found_error" do
+        config.raise_not_found_error.should == false
+      end
+
+      it "sets use_object_ids" do
+        config.use_object_ids.should == true
+      end
+
+      it "returns the default time_zone" do
+        gmt_offset_without_dst = Time.now.dst? ? Time.now.utc_offset - 3600 : Time.now.utc_offset
+        config.time_zone.should == ActiveSupport::TimeZone[gmt_offset_without_dst]
+      end
     end
 
-    after do
-      config.reset
+    context "mongoid_with_time_zone.yml" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_time_zone.yml")
+        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+        config.from_hash(@settings["test"])
+      end
+
+      it "sets time_zone" do
+        config.time_zone.should == ActiveSupport::TimeZone["Alaska"]
+      end
     end
 
-    it "sets the master db" do
-      config.master.name.should == "mongoid_config_test"
-    end
+    context "mongoid_with_invalid_time_zone.yml" do
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_invalid_time_zone.yml")
+        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+      end
 
-    it "sets allow_dynamic_fields" do
-      config.allow_dynamic_fields.should == false
-    end
-
-    it "sets reconnect_time" do
-      config.reconnect_time.should == 5
-    end
-
-    it "sets parameterize keys" do
-      config.parameterize_keys.should == false
-    end
-
-    it "sets persist_in_safe_mode" do
-      config.persist_in_safe_mode.should == false
-    end
-
-    it "sets raise_not_found_error" do
-      config.raise_not_found_error.should == false
-    end
-
-    it "sets use_object_ids" do
-      config.use_object_ids.should == true
+      it "raises an argument error" do
+        expect { config.from_hash(@settings["test"]) }.to raise_error(ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}.")
+      end
     end
   end
 

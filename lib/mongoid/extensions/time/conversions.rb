@@ -5,18 +5,27 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def set(value)
           return nil if value.blank?
-          time = convertable?(value) ? value.to_time : ::Time.parse(value.to_s)
-          # Convert time to milliseconds since BSON stores dates with that accurracy, but Ruby uses microseconds
-          ::Time.at((time.to_f * 1000).round / 1000.0).utc if time
-        end
-        def get(value)
-          return nil if value.blank?
-          ::Time.zone ? value.getlocal : value
+          time = convert_to_time(value)
+          strip_milliseconds(time).utc
         end
 
-        protected
-        def convertable?(value)
-          value.is_a?(::Time) || value.is_a?(::Date) || value.is_a?(::DateTime)
+        def get(value)
+          return nil if value.blank?
+          value.in_time_zone(Mongoid::Config.instance.time_zone)
+        end
+
+        private
+
+        def strip_milliseconds(time)
+          ::Time.at(time.to_i)
+        end
+
+        def convert_to_time(value)
+          case value
+            when String then ::Time.parse(value)
+            when ::Date then ::Time.utc(value.year, value.month, value.day)
+            else value
+          end
         end
       end
     end
