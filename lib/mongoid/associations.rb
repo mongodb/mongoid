@@ -130,7 +130,7 @@ module Mongoid # :nodoc:
       #   end
       def embeds_many(name, options = {}, &block)
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
-        set_callback(:update, :after) { |document| document.update_embedded(name) }
+        set_callback(:update, :after) { |document| document.update_embedded(name) } unless name == :versions
       end
 
       alias :embed_many :embeds_many
