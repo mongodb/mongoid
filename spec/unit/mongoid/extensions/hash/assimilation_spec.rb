@@ -4,6 +4,24 @@ describe Mongoid::Extensions::Hash::Assimilation do
 
   describe "#assimilate" do
 
+    context "when an id exists" do
+
+      before do
+        @child = { "_id" => "hank-moody", "first_name" => "Hank", "last_name" => "Moody" }
+        @parent = Person.new(:title => "Mr.")
+        @options = Mongoid::Associations::Options.new(:name => :name)
+        @document = @child.assimilate(@parent, @options)
+      end
+
+      it "sets the id" do
+        @document._id.should == "hank-moody"
+      end
+
+      it "considers the document persisted" do
+        @document.new_record?.should == false
+      end
+    end
+
     context "when a type is not provided" do
 
       before do
