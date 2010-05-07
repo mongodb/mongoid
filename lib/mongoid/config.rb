@@ -142,6 +142,7 @@ module Mongoid #:nodoc
       @raise_not_found_error = true
       @reconnect_time = 3
       @use_object_ids = false
+      @time_zone = nil
     end
 
     protected
