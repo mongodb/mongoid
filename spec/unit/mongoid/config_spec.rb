@@ -70,8 +70,9 @@ describe Mongoid::Config do
     context "mongoid_with_time_zone.yml" do
       before do
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_time_zone.yml")
-        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
-        config.from_hash(@settings["test"])
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.from_hash(@settings)
       end
 
       after { config.reset }
@@ -84,13 +85,14 @@ describe Mongoid::Config do
     context "mongoid_with_invalid_time_zone.yml" do
       before do
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_invalid_time_zone.yml")
-        @settings = YAML.load(ERB.new(File.new(file_name).read).result)
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
       end
 
       after { config.reset }
 
       it "raises an argument error" do
-        expect { config.from_hash(@settings["test"]) }.to raise_error(ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}.")
+        expect { config.from_hash(@settings) }.to raise_error(ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}.")
       end
     end
   end
