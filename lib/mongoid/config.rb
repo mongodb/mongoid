@@ -164,6 +164,7 @@ module Mongoid #:nodoc
       @reconnect_time = 3
       @use_object_ids = false
       @skip_version_check = false
+      @time_zone = nil
     end
 
     protected
