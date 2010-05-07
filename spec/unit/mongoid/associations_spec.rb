@@ -185,7 +185,7 @@ describe Mongoid::Associations do
       end
 
       it "allows referencing another child through the parent" do
-        @name.person.addresses.first.should == @address
+        @name.namable.addresses.first.should == @address
       end
 
     end
