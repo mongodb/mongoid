@@ -132,8 +132,10 @@ module Mongoid # :nodoc:
       #   end
       def embeds_many(name, options = {}, &block)
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
-        after_update do |document|
-          document.update_embedded(name)
+        unless name == :versions
+          after_update do |document|
+            document.update_embedded(name)
+          end
         end
       end
 
