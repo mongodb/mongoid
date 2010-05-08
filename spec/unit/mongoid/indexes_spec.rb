@@ -31,12 +31,15 @@ describe Mongoid::Indexes do
       before do
         @class = Class.new do
           include Mongoid::Indexes
+          def self.hereditary
+            true
+          end
         end
       end
 
       it "adds the _type index" do
         @class.expects(:_collection).returns(@collection)
-        @collection.expects(:create_index).with(:_type, :unique => false)
+        @collection.expects(:create_index).with(:_type, :unique => false, :background => true)
         @class.add_indexes
         @class.indexed.should be_true
       end
@@ -48,6 +51,9 @@ describe Mongoid::Indexes do
       before do
         @class = Class.new do
           include Mongoid::Indexes
+          def self.hereditary
+            true
+          end
         end
         @class.indexed = true
       end
