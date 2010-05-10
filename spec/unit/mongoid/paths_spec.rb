@@ -231,8 +231,22 @@ describe Mongoid::Paths do
           address.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the._path plus index" do
+        it "returns the._path without the index" do
           address._pull.should == "addresses"
+        end
+
+        context "and there are 10 or more documents" do
+
+          before do
+            10.times do
+              person.addresses << address
+            end
+          end
+
+          it "returns the._path without the index" do
+            address._pull.should == "addresses"
+          end
+
         end
       end
     end
@@ -255,6 +269,7 @@ describe Mongoid::Paths do
         it "returns the._path plus index" do
           location._pull.should == "addresses.0.locations"
         end
+
       end
     end
   end
