@@ -106,10 +106,6 @@ describe Mongoid::Paths do
       it "returns the JSON notation to the document" do
         location._path.should == "addresses.locations"
       end
-
-      it "sets the route class instance var" do
-        Location.__path.should == "addresses.locations"
-      end
     end
   end
 
