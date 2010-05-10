@@ -46,8 +46,7 @@ module Mongoid #:nodoc:
       #
       # <tt>address.path # returns "addresses"</tt>
       def _pull
-        period = _position[_position.length - 2, 1]
-        (period == ".") ? _position[0, _position.length - 2] : _position
+        _position.sub!(/\.\d+$/, '') || _position
       end
 
       # Get the removal modifier for the document. Will be nil on root
