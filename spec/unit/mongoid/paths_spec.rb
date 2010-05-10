@@ -18,6 +18,15 @@ describe Mongoid::Paths do
     Name.new
   end
 
+  let(:agent) do
+    Agent.new
+  end
+
+
+  let(:agent_name) do
+    Name.new(:first_name => "Agent")
+  end
+
   describe "#._remover" do
 
     before do
@@ -106,11 +115,23 @@ describe Mongoid::Paths do
       it "returns the JSON notation to the document" do
         location._path.should == "addresses.locations"
       end
+    end
 
-      it "sets the route class instance var" do
-        Location.__path.should == "addresses.locations"
+    context "when document has many inverse_of values" do
+      before do
+        agent.names << agent_name
+        person.name = name
+      end
+
+      it "selects the right inverse_of value for the first one" do
+        agent_name._path.should == "names"
+      end
+
+      it "selects the right inverse_of value for the second one" do
+        name._path.should == "name"
       end
     end
+
   end
 
   describe "#._selector" do

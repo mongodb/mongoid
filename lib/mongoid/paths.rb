@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Paths #:nodoc:
     extend ActiveSupport::Concern
     included do
-      cattr_accessor :__path
+      attr_accessor :__path
       attr_accessor :_index
     end
     module InstanceMethods
