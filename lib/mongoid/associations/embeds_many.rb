@@ -127,18 +127,12 @@ module Mongoid #:nodoc:
       #
       # parent: The parent document to the association.
       # options: The association options.
-      def initialize(parent, options, target_array = nil)
+      def initialize(parent, options)
         @parent, @association_name = parent, options.name
         @klass, @options = options.klass, options
-        if target_array
-          build_children_from_target_array(target_array)
-        else
-          build_children_from_attributes(parent.raw_attributes[@association_name])
-        end
+        initialize_each(parent.raw_attributes[@association_name])
         extends(options)
       end
-
-
 
       # If the target array does not respond to the supplied method then try to
       # find a named scope or criteria on the class and send the call there.
@@ -187,7 +181,7 @@ module Mongoid #:nodoc:
 
       protected
       # Initializes each of the attributes in the hash.
-      def build_children_from_attributes(attributes)
+      def initialize_each(attributes)
         @target = []
         if attributes
           attributes.each_with_index do |attrs, index|
@@ -197,13 +191,6 @@ module Mongoid #:nodoc:
             child._index = index
             @target << child
           end
-        end
-      end
-
-      def build_children_from_target_array(target_array)
-        @target = target_array
-        @target.each_with_index do |child, index|
-          child._index = index
         end
       end
 
@@ -226,8 +213,8 @@ module Mongoid #:nodoc:
         #
         # document: The parent +Document+
         # options: The association options
-        def instantiate(document, options, target_array = nil)
-          new(document, options, target_array)
+        def instantiate(document, options)
+          new(document, options)
         end
 
         # Returns the macro used to create the association.
@@ -241,11 +228,7 @@ module Mongoid #:nodoc:
         def update(children, parent, options)
           parent.raw_attributes.delete(options.name)
           children.assimilate(parent, options)
-          if children.first.is_a? Mongoid::Document
-            instantiate(parent, options, children)
-          else
-            instantiate(parent, options)
-          end
+          instantiate(parent, options)
         end
       end
     end

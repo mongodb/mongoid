@@ -406,17 +406,6 @@ describe Mongoid::Associations do
           @person.reload.addresses.first.should == @address
         end
       end
-
-      context "when overwriting" do
-        before do
-          @person.addresses.build(:street => "Oxford St")
-          @person.addresses = @person.addresses
-        end
-
-        it "still recognizes the embedded document as a new record" do
-          @person.addresses.first.should be_new_record
-        end
-      end
     end
 
     context "one level nested" do
