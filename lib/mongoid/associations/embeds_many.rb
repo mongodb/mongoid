@@ -234,7 +234,7 @@ module Mongoid #:nodoc:
         # is initialized by setting the has_many to the supplied +Enumerable+
         # and setting up the parentization.
         def update(children, parent, options)
-          parent.remove_attribute(options.name)
+          parent.raw_attributes.delete(options.name)
           children.assimilate(parent, options)
           instantiate(parent, options)
         end
