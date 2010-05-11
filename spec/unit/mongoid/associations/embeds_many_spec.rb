@@ -434,7 +434,7 @@ describe Mongoid::Associations::EmbedsMany do
   describe ".instantiate" do
 
     it "delegates to new" do
-      Mongoid::Associations::EmbedsMany.expects(:new).with(@document, @options)
+      Mongoid::Associations::EmbedsMany.expects(:new).with(@document, @options, nil)
       Mongoid::Associations::EmbedsMany.instantiate(@document, @options)
     end
 
