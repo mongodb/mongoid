@@ -10,12 +10,21 @@ describe Mongoid::Persistence::Update do
     Address.new(:_id => BSON::ObjectID.new.to_s, :street => "Oxford St")
   end
 
+  let(:root_category) do
+    RootCategory.new(:_id => BSON::ObjectID.new.to_s)
+  end
+
+  let(:category) do
+    Category.new(:_id => BSON::ObjectID.new.to_s, :name => 'Programming')
+  end
+
   let(:collection) do
     stub.quacks_like(Mongoid::Collection.allocate)
   end
 
   before do
     document.stubs(:collection).returns(collection)
+    root_category.stubs(:collection).returns(collection)
   end
 
   describe "#initialize" do
@@ -55,6 +64,17 @@ describe Mongoid::Persistence::Update do
         collection.expects(:update).with(
           { "_id" => document.id, "addresses._id" => address.id },
           { "$set" => address.setters },
+          :multi => false,
+          :safe => true
+        ).returns("Object")
+      }
+    end
+
+    def tree_set_expectation
+      lambda {
+        collection.expects(:update).with(
+          { "_id" => root_category.id, "categories._id" => category.id, "categories.0.categories._id" => leaf_category.id },
+          { "$set" => leaf_category.setters },
           :multi => false,
           :safe => true
         ).returns("Object")
@@ -128,6 +148,28 @@ describe Mongoid::Persistence::Update do
 
         it "performs a $set for the embedded changed fields" do
           embedded_set_expectation.call
+          embedded.persist
+        end
+      end
+
+      context "when the document is a tree" do
+        let(:leaf_category) do
+          Category.new(:_id => BSON::ObjectID.new.to_s, :name => 'Ruby')
+        end
+
+        let(:embedded) do
+          Mongoid::Persistence::Update.new(leaf_category)
+        end
+
+        before do
+          category.categories << leaf_category
+          root_category.categories << category
+          leaf_category.name = 'C++'
+        end
+
+        it "performs a $set for the embedded changed fields" do
+          tree_set_expectation.call
+          puts "Persisting leaf with path: #{leaf_category._path}"
           embedded.persist
         end
       end

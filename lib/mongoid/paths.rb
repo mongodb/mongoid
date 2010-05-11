@@ -24,10 +24,9 @@ module Mongoid #:nodoc:
       #
       # <tt>address.path # returns "addresses"</tt>
       def _path
-        self.__path ||= lambda do
-          embedded? ? "#{_parent._path}#{"." unless _parent._path.blank?}#{@association_name}" : ""
-        end.call
+        _position.sub!(/\.\d+$/, '') || _position
       end
+      alias :_pull :_path
 
       # Returns the positional operator of this document for modification.
       #
@@ -37,16 +36,6 @@ module Mongoid #:nodoc:
       def _position
         locator = _index ? (new_record? ? "" : ".#{_index}") : ""
         embedded? ? "#{_parent._position}#{"." unless _parent._position.blank?}#{@association_name}#{locator}" : ""
-      end
-
-      # Return the path to this +Document+ in JSON notation, used for atomic
-      # updates via $set in MongoDB.
-      #
-      # Example:
-      #
-      # <tt>address.path # returns "addresses"</tt>
-      def _pull
-        _position.sub!(/\.\d+$/, '') || _position
       end
 
       # Get the removal modifier for the document. Will be nil on root

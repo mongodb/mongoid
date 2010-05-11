@@ -131,7 +131,6 @@ describe Mongoid::Paths do
         name._path.should == "name"
       end
     end
-
   end
 
   describe "#._selector" do
