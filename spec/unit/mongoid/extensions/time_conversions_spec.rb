@@ -73,7 +73,7 @@ describe Mongoid::Extensions::TimeConversions do
 
   describe ".get" do
     context "when the time zone is not defined" do
-      before { Mongoid::Config.instance.time_zone = nil }
+      before { Mongoid::Config.instance.use_utc = false }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.utc(2010, 11, 19) }
@@ -100,41 +100,9 @@ describe Mongoid::Extensions::TimeConversions do
       end
     end
 
-    context "when the time zone is defined as something other than UTC" do
-      before { Mongoid::Config.instance.time_zone = "Alaska" }
-
-      context "when the local time is not observing daylight saving" do
-        before { @time = Time.utc(2010, 11, 19) }
-
-        it "returns Alaskan Time" do
-          Time.get(@time).utc_offset.should == ActiveSupport::TimeZone["Alaska"].utc_offset
-        end
-      end
-
-      context "when the local time is observing daylight saving" do
-        before { @time = Time.utc(2010, 9, 19) }
-
-        it "returns Alaskan time with daylight savings" do
-          Time.get(@time).utc_offset.should == ActiveSupport::TimeZone["Alaska"].utc_offset + 3600
-        end
-      end
-
-      context "when we have a time close to midnight" do
-        before do
-          Time.zone = "Stockholm"
-          @time = Time.zone.local(2010, 11, 19, 0, 30).utc
-        end
-        after { Time.zone = nil }
-
-        it "changes the day since Alaska is a long way behind Stockholm" do
-          Time.get(@time).day.should == 18
-        end
-      end
-    end
-
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.instance.time_zone = "UTC" }
-      after { Mongoid::Config.instance.time_zone = nil }
+      before { Mongoid::Config.instance.use_utc = true }
+      after { Mongoid::Config.instance.use_utc = false }
 
       it "returns utc" do
          Time.get(@time.dup.utc).utc_offset.should == 0
@@ -150,7 +118,7 @@ describe Mongoid::Extensions::TimeConversions do
 
   describe "round trip - set then get" do
     context "when the time zone is not defined" do
-      before { Mongoid::Config.instance.time_zone = nil }
+      before { Mongoid::Config.instance.use_utc = false }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.set(Time.local(2010, 11, 19)) }
@@ -180,14 +148,15 @@ describe Mongoid::Extensions::TimeConversions do
       end
     end
 
-    context "when the time zone is defined as something other than UTC" do
-      before { Mongoid::Config.instance.time_zone = "Alaska" }
+    context "when the time zone is defined as UTC" do
+      before { Mongoid::Config.instance.use_utc = true }
+      after { Mongoid::Config.instance.use_utc = false }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.set(Time.local(2010, 11, 19)) }
 
-        it "returns Alaskan Time" do
-          Time.get(@time).utc_offset.should == ActiveSupport::TimeZone["Alaska"].utc_offset
+        it "returns UTC" do
+          Time.get(@time).utc_offset.should == 0
         end
       end
 
@@ -196,8 +165,8 @@ describe Mongoid::Extensions::TimeConversions do
           @time = Time.set(Time.local(2010, 9, 19))
         end
 
-        it "returns Alaskan time with daylight savings" do
-          Time.get(@time).utc_offset.should == ActiveSupport::TimeZone["Alaska"].utc_offset + 3600
+        it "returns UTC" do
+          Time.get(@time).utc_offset.should == 0
         end
       end
 
@@ -208,7 +177,7 @@ describe Mongoid::Extensions::TimeConversions do
         end
         after { Time.zone = nil }
 
-        it "changes the day since Alaska is a long way behind Stockholm" do
+        it "changes the day since UTC is behind Stockholm" do
           Time.get(@time).day.should == 18
         end
       end

@@ -81,7 +81,7 @@ describe Mongoid::Extensions::Date::Conversions do
 
     context "when the time zone is not defined" do
       before do
-        Mongoid::Config.instance.time_zone = nil
+        Mongoid::Config.instance.use_utc = false
       end
 
       context "when the local time is not observing daylight saving" do
@@ -97,33 +97,13 @@ describe Mongoid::Extensions::Date::Conversions do
 
         it "returns the same day" do
           Date.get(@time).day.should == 19
-        end
-      end
-    end
-
-    context "when the time zone is defined as something other than UTC" do
-      before { Mongoid::Config.instance.time_zone = "Alaska" }
-
-      context "when the local time is not observing daylight saving" do
-        before { @time = Time.utc(2010, 11, 19) }
-
-        it "returns the same day" do
-          Date.get(@time).day.should == @time.day
-        end
-      end
-
-      context "when the local time is observing daylight saving" do
-        before { @time = Time.utc(2010, 9, 19) }
-
-        it "returns the same day" do
-          Date.get(@time).day.should == @time.day
         end
       end
     end
 
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.instance.time_zone = "UTC" }
-      after { Mongoid::Config.instance.time_zone = nil }
+      before { Mongoid::Config.instance.use_utc = true }
+      after { Mongoid::Config.instance.use_utc = false }
 
       it "returns the same day" do
          Date.get(@time.dup.utc).day.should == @time.day
@@ -140,7 +120,7 @@ describe Mongoid::Extensions::Date::Conversions do
   describe "round trip - set then get" do
     context "when the time zone is not defined" do
       before do
-        Mongoid::Config.instance.time_zone = nil
+        Mongoid::Config.instance.use_utc = false
         Time.zone = "Stockholm"
       end
       after { Time.zone = nil }
@@ -157,30 +137,6 @@ describe Mongoid::Extensions::Date::Conversions do
         before { @time = Date.set(Time.zone.local(2010, 9, 19, 0, 30)) }
 
         it "does not change the day" do
-          Date.get(@time).day.should == 19
-        end
-      end
-    end
-
-    context "when the time zone is defined as something other than UTC" do
-      before do
-        Mongoid::Config.instance.time_zone = "Alaska"
-        Time.zone = "Stockholm"
-      end
-      after { Time.zone = nil }
-
-      context "when the local time is not observing daylight saving" do
-        before { @time = Date.set(Time.zone.local(2010, 11, 19)) }
-
-        it "always returns the same day even though Alaska is set" do
-          Date.get(@time).day.should == 19
-        end
-      end
-
-      context "when the local time is observing daylight saving" do
-        before { @time = Date.set(Time.zone.local(2010, 9, 19)) }
-
-        it "always returns the same day even though Alaska is set" do
           Date.get(@time).day.should == 19
         end
       end

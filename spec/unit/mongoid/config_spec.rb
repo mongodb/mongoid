@@ -63,13 +63,13 @@ describe Mongoid::Config do
       end
 
       it "returns nil, which is interpreted as the local time_zone" do
-        config.time_zone.should be_nil
+        config.use_utc.should be_false
       end
     end
 
-    context "mongoid_with_time_zone.yml" do
+    context "mongoid_with_utc.yml" do
       before do
-        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_time_zone.yml")
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_utc.yml")
         file = File.new(file_name)
         @settings = YAML.load(file.read)["test"]
         config.from_hash(@settings)
@@ -78,21 +78,7 @@ describe Mongoid::Config do
       after { config.reset }
 
       it "sets time_zone" do
-        config.time_zone.should == ActiveSupport::TimeZone["Alaska"]
-      end
-    end
-
-    context "mongoid_with_invalid_time_zone.yml" do
-      before do
-        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_invalid_time_zone.yml")
-        file = File.new(file_name)
-        @settings = YAML.load(file.read)["test"]
-      end
-
-      after { config.reset }
-
-      it "raises an argument error" do
-        expect { config.from_hash(@settings) }.to raise_error(ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}.")
+        config.use_utc.should be_true
       end
     end
   end
