@@ -67,4 +67,16 @@ describe Mongoid::Dirty do
       end
     end
   end
+
+  context "when associations are getting changed" do
+
+    before do
+      @person = Person.create(:addresses => [Address.new])
+      @person.addresses = [Address.new]
+    end
+
+    it "should not set the association to nil when hitting the database" do
+      @person.setters.should_not == {"addresses" => nil}
+    end
+  end
 end
