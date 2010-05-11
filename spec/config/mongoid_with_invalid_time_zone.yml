@@ -1,3 +1,0 @@
-test:
-  time_zone: CEST
-  database: mongoid_config_test

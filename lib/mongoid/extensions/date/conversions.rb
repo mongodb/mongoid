@@ -5,10 +5,10 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def get(value)
           return nil if value.blank?
-          if Mongoid::Config.instance.time_zone.nil?
-            ::Date.new(value.year, value.month, value.day)
+          if Mongoid::Config.instance.use_utc?
+            value.to_date
           else
-            Mongoid::Config.instance.time_zone.local(value.year, value.month, value.day).to_date
+            ::Date.new(value.year, value.month, value.day)
           end
         end
 

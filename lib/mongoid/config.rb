@@ -19,42 +19,33 @@ module Mongoid #:nodoc
       reset
     end
 
-    # Sets the default time zone in which times are returned from the database. Often
-    # you will want to set UTC. If you give a value which is not a valid key to
-    # +ActiveSupport::TimeZone[]+, then an error will be raised.
-    # If you give a blank value, or omit it entirely, then times will be returned in
+    # Sets whether the times returned from the database are in UTC or local time.
+    # If you omit this setting, then times will be returned in
     # the local time zone.
     #
     # Example:
     #
-    # <tt>Config.time_zone = "UTC"</tt>
+    # <tt>Config.use_utc = true</tt>
     #
     # Returns:
     #
-    # The ActiveSupport::TimeZone object.
-    def time_zone=(value)
-      if value.nil?
-        @time_zone = nil
-      elsif ActiveSupport::TimeZone[value].nil?
-        raise ArgumentError, "Unsupported time zone. Supported time zones are: #{ActiveSupport::TimeZone.all.map(&:name).join(" ")}."
-      else
-        @time_zone = ActiveSupport::TimeZone[value]
-      end
+    # A boolean
+    def use_utc=(value)
+      @use_utc = value || false
     end
 
-    # Returns the default time zone in which times are returns from the database, or if none has been set it will return
-    # the local time zone.
+    # Returns whether times are return from the database in UTC. If
+    # this setting is false, then times will be returned in the local time zone.
     #
     # Example:
     #
-    # <tt>Config.time_zone</tt>
+    # <tt>Config.use_utc</tt>
     #
     # Returns:
     #
-    # The ActiveSupport::TimeZone object.
-    def time_zone
-      @time_zone
-    end
+    # A boolean
+    attr_reader :use_utc
+    alias_method :use_utc?, :use_utc
 
     # Sets the Mongo::DB master database to be used. If the object trying to be
     # set is not a valid +Mongo::DB+, then an error will be raised.
