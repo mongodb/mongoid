@@ -461,6 +461,30 @@ describe Mongoid::Associations do
           @from_db.addresses.first.update_attributes(:city => "London")
           @from_db.addresses.should == [ @first, @second ]
         end
+
+        it "does not change the internal order of the attributes in the parent" do
+          @from_db.addresses.first.update_attributes(:city => "London")
+          @from_db.attributes["addresses"].should == [@first.attributes, @second.attributes]
+        end
+
+        context "updating an element that is a new record" do
+          before do
+            @third = Address.new(:street => "Foo")
+            @fourth = Address.new(:street => "Bar")
+            @from_db.addresses << @third
+            @from_db.addresses << @fourth
+          end
+
+          it "does not change the internal order of the array" do
+            @third.update_attributes(:city => "London")
+            @from_db.addresses.should == [ @first, @second, @third, @fourth ]
+          end
+
+          it "does not change the internal order of the attributes in the parent" do
+            @third.update_attributes(:city => "London")
+            @from_db.attributes["addresses"].should == [@first.attributes, @second.attributes, @third.attributes, @fourth.attributes]
+          end
+        end
       end
 
       describe "#first" do
