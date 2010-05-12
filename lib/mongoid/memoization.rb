@@ -2,14 +2,14 @@ module Mongoid #:nodoc
   module Memoization
 
     # Handles cases when accessing an association that should be memoized in
-    # the Mongoid specific manner.
+    # the Mongoid specific manner. Does not memoize nil values though
     def memoized(name, &block)
       var = "@#{name}"
       if instance_variable_defined?(var)
         return instance_variable_get(var)
       end
       value = yield
-      instance_variable_set(var, value)
+      instance_variable_set(var, value) if value
     end
 
     # Removes an memozied association if it exists

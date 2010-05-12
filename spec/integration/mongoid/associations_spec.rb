@@ -519,6 +519,19 @@ describe Mongoid::Associations do
       end
     end
 
+    context "embedded_in instantiated and added later to parent" do
+      before do
+        @address = Address.new
+        @person = Person.new
+      end
+
+      it "doesn't memoize a nil parent" do
+        @address.addressable
+        @person.addresses << @address
+        @address.addressable.should == @person
+      end
+    end
+
     context "multiple levels nested" do
 
       context "when a has-many to has_one" do
