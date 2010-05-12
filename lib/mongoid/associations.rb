@@ -233,7 +233,10 @@ module Mongoid # :nodoc:
         name = options.name.to_s
         associations[name] = MetaData.new(type, options)
         define_method(name) { memoized(name) { type.instantiate(self, options) } }
-        define_method("#{name}=") { |object| reset(name) { type.update(object, self, options) } }
+        define_method("#{name}=") do |object|
+          unmemoize(name)
+          memoized(name) { type.update(object, self, options) }
+        end
       end
 
       # Adds a builder for a has_one association. This comes in the form of
