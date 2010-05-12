@@ -250,7 +250,11 @@ module Mongoid #:nodoc:
       def observe(child, clear = false)
         name = child.association_name
         attrs = child.instance_variable_get(:@attributes)
-        clear ? @attributes.delete(name) : @attributes.insert(name, attrs)
+        if clear
+          @attributes.delete(name)
+        else
+          @attributes.insert(name, attrs) unless @attributes.include?(name) && @attributes[name].include?(attrs)
+        end
         notify
       end
     end
