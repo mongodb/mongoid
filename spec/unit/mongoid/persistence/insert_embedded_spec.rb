@@ -132,6 +132,22 @@ describe Mongoid::Persistence::Insert do
           root_push_expectation.call
           insert.persist.should == address
         end
+
+        context "when we add the parent to the child" do
+          let(:other_address) do
+            Address.new(:street => "Oxford St", :addressable => document)
+          end
+
+          it "performs a $push on the embedded array" do
+            collection.expects(:update).with(
+              { "_id" => document.id },
+              { "$push" => { "addresses" => other_address.raw_attributes } },
+              :multi => false,
+              :safe => true
+            ).returns("Object")
+            Mongoid::Persistence::InsertEmbedded.new(other_address).persist.should == other_address
+          end
+        end
       end
     end
   end

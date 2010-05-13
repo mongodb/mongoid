@@ -28,6 +28,12 @@ module Mongoid # :nodoc:
         self.class.associations
       end
 
+      # are we in an embeds_many?
+      def embedded_many?
+        embedded? and _parent.associations[association_name].association == EmbedsMany
+      end
+
+
       # Update all the dirty child documents after an update.
       def update_embedded(name)
         association = send(name)
