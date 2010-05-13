@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
       #
       # <tt>name.inserter</tt>
       def _inserter
-        embedded? ? (_index ? "$push" : "$set") : nil
+        embedded? ? (embedded_many? ? "$push" : "$set") : nil
       end
 
       # Return the path to this +Document+ in JSON notation, used for atomic

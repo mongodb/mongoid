@@ -133,6 +133,31 @@ describe Mongoid::Associations do
     end
   end
 
+  describe "#embedded_many?" do
+    context "when the class is embedded" do
+
+      context "within an embeds_many" do
+        it "returns true" do
+          Address.new(:addressable => Person.new).embedded_many?.should be_true
+        end
+      end
+
+      context "within an embeds_one" do
+        it "returns false" do
+          Name.new(:namable => Person.new).embedded_many?.should be_false
+        end
+      end
+    end
+
+    context "when the class is not embedded" do
+
+      it "returns false" do
+        Person.new.embedded_many?.should be_false
+      end
+    end
+
+  end
+
   describe ".embedded_in" do
 
     it "creates a reader for the association" do
