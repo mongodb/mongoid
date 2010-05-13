@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Durran Jordan"]
-  s.date = %q{2010-05-08}
+  s.date = %q{2010-05-12}
   s.email = %q{durran@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -137,9 +137,8 @@ Gem::Specification.new do |s|
      "perf/benchmark.rb",
      "rake_spec_several_time_zones.sh",
      "spec/config/mongoid.yml",
-     "spec/config/mongoid_with_invalid_time_zone.yml",
-     "spec/config/mongoid_with_time_zone.yml",
      "spec/config/mongoid_with_url.yml",
+     "spec/config/mongoid_with_utc.yml",
      "spec/integration/mongoid/associations_spec.rb",
      "spec/integration/mongoid/attributes_spec.rb",
      "spec/integration/mongoid/contexts/enumerable_spec.rb",
