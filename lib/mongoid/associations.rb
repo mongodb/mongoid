@@ -103,7 +103,7 @@ module Mongoid # :nodoc:
       #   end
       def embedded_in(name, options = {}, &block)
         unless options.has_key?(:inverse_of)
-          raise Errors::InvalidOptions.new("Options for belongs_to association must include :inverse_of")
+          raise Errors::InvalidOptions.new("Options for embedded_in association must include :inverse_of")
         end
         self.embedded = true
         associate(Associations::EmbeddedIn, optionize(name, options, nil, &block))
