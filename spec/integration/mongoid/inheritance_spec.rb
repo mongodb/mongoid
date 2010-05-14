@@ -62,7 +62,7 @@ describe Mongoid::Document do
       @square = Square.new(:width => 300, :height => 150)
       @firefox.writer = @writer
       @firefox.shapes << [ @circle, @square ]
-      @firefox.save
+      @firefox.save!
     end
 
     after do

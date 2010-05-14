@@ -257,12 +257,13 @@ describe Mongoid::Criteria do
 
     before do
       10.times do |n|
-        Person.create(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+        Person.create!(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
       end
     end
 
     it "iterates over the cursor only once" do
       criteria = Person.where(:title => "Sir").cache
+
       criteria.collect.to_a.size.should == 10
       # Do it again!
       criteria.collect.to_a.size.should == 10

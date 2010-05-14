@@ -1,6 +1,17 @@
 require "spec_helper"
 
 describe Mongoid::Validations do
+  after(:all) do
+    Person._types.each do |t|
+      Object.send(:remove_const, t.to_s)
+    end
+    load 'models/person.rb'
+
+    Canvas._types.each do |t|
+      Object.send(:remove_const, t.to_s)
+    end
+    load 'models/inheritance.rb'
+  end
 
   describe ".validates_associated" do
 

@@ -4,9 +4,11 @@ describe Mongoid::NamedScope do
 
   describe ".named_scope" do
 
-    class ::Person
-      named_scope :doctors, {:where => {:title => 'Dr.'} }
-      named_scope :old, criteria.where(:age.gt => 50)
+    before(:all) do
+      Person.class_eval do
+        named_scope :doctors, {:where => {:title => 'Dr.'} }
+        named_scope :old, criteria.where(:age.gt => 50)
+      end
     end
 
     before do
