@@ -1,6 +1,11 @@
 require "spec_helper"
 
 describe Mongoid::Validations do
+
+  before(:all) do
+    Mongoid.master.connection.instance_variable_set(:@logger, nil)
+  end
+
   after(:all) do
     Person._types.each do |t|
       Object.send(:remove_const, t.to_s)
