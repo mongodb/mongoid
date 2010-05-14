@@ -23,9 +23,11 @@ module Mongoid #:nodoc:
           to_s.plural?
         end
 
-        ["gt", "lt", "gte", "lte", "ne", "near", "in", "nin", "mod", "all", "size", "exists", "within"].each do |oper|
+        ["gt", "lt", "gte", "lte", "ne", "near", "in", "nin", "mod", "all", "size", "exists", "within", ['match',"elemMatch"]].each do |oper|
+          m, oper = oper
+          oper = m unless oper
           class_eval <<-OPERATORS
-            def #{oper}
+            def #{m}
               Criterion::Complex.new(:key => self, :operator => "#{oper}")
             end
           OPERATORS
