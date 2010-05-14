@@ -668,7 +668,7 @@ describe Mongoid::Document do
   context "versioning" do
 
     before do
-      @comment = Comment.new(:text => "Testing")
+      @comment = Comment.new(:title => 'Old', :text => "Testing")
       @comment.save
     end
 
@@ -680,7 +680,7 @@ describe Mongoid::Document do
 
       it "creates a new version" do
         @from_db = Comment.find(@comment.id)
-        @from_db.text = "New"
+        @from_db.title = "New"
         @from_db.save
         @from_db.versions.size.should == 1
         @from_db.version.should == 2

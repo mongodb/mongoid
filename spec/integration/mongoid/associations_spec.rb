@@ -473,6 +473,7 @@ describe Mongoid::Associations do
             @fourth = Address.new(:street => "Bar")
             @from_db.addresses << @third
             @from_db.addresses << @fourth
+            @from_db.save!
           end
 
           it "does not change the internal order of the array" do
