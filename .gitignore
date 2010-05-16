@@ -6,3 +6,4 @@ tmp/*
 *.gem
 RAILS
 .bundle
+.rvmrc
