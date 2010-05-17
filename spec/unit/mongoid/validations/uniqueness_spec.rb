@@ -13,8 +13,8 @@ describe Mongoid::Validations::UniquenessValidator do
     context "when a document exists with the attribute value" do
 
       before do
-        @criteria = stub(:empty? => false)
-        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        @criteria = stub(:nil? => false)
+        Person.collection.expects(:find_one).with(:title => "Sir").returns(@criteria)
         validator.validate_each(@document, :title, "Sir")
       end
 
@@ -27,11 +27,24 @@ describe Mongoid::Validations::UniquenessValidator do
       end
     end
 
+    context "when a superclass document exists with the attribute value" do
+      before do
+        @drdocument = Doctor.new
+        @criteria = stub(:nil? => false)
+        Person.collection.expects(:find_one).with(:title => "Sir").returns(@criteria)
+        validator.validate_each(@drdocument, :title, "Sir")
+      end
+
+      it "adds the errors to the document" do
+        @drdocument.errors[:title].should_not be_empty
+      end
+    end
+
     context "when no other document exists with the attribute value" do
 
       before do
-        @criteria = stub(:empty? => true)
-        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        @criteria = stub(:nil? => true)
+        Person.collection.expects(:find_one).with(:title => "Sir").returns(@criteria)
         validator.validate_each(@document, :title, "Sir")
       end
 
@@ -51,7 +64,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           before do
-            Login.expects(:where).with(:username => "chitchins").returns([ login ])
+            Login.collection.expects(:find_one).with(:username => "chitchins").returns([ login ])
             validator.validate_each(login, :username, "chitchins")
           end
 
@@ -71,7 +84,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             before do
-              Login.expects(:where).with(:username => "chitchins").returns([ login ])
+              Login.collection.expects(:find_one).with(:username => "chitchins").returns([ login ])
               validator.validate_each(login, :username, "chitchins")
             end
 
@@ -90,7 +103,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             before do
-              Login.expects(:where).with(:username => "chitchins").returns([ login ])
+              Login.collection.expects(:find_one).with(:username => "chitchins").returns([ login ])
               validator.validate_each(login, :username, "chitchins")
             end
 
@@ -107,7 +120,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     before do
       @document = Person.new(:employer_id => 3, :terms => true, :title => "")
-      @criteria = stub(:empty? => false)
+      @criteria = stub(:nil? => false)
     end
 
     describe "as a symbol" do
@@ -116,7 +129,7 @@ describe Mongoid::Validations::UniquenessValidator do
                                                                       :scope => :employer_id) }
 
       it "should query only scoped documents" do
-        Person.expects(:where).with(:title => "Sir", 
+        Person.collection.expects(:find_one).with(:title => "Sir", 
                                     :employer_id => @document.attributes[:employer_id]).returns(@criteria)
         validator.validate_each(@document, :title, "Sir")
       end
@@ -128,13 +141,12 @@ describe Mongoid::Validations::UniquenessValidator do
       let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
                                                                       :scope => [:employer_id, :terms]) }
       it "should query only scoped documents" do
-        Person.expects(:where).with(:title => "Sir", 
+        Person.collection.expects(:find_one).with(:title => "Sir", 
                                     :employer_id => @document.attributes[:employer_id],
                                     :terms => true).returns(@criteria)
         validator.validate_each(@document, :title, "Sir")
       end
 
     end
-
   end
 end
