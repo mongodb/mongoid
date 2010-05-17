@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
       # The newly created Document.
       def create(attrs = {}, type = nil)
         document = build(attrs, type)
-        document.tap(&:save)
+        document.save; document
       end
 
       # Creates a new Document and adds it to the association collection. The
