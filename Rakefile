@@ -15,7 +15,7 @@ task :install => :build do
 end
 
 task :release => :build do
-  system "gem push mongoid-#{Mongoid::VERSION}"
+  system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
 Spec::Rake::SpecTask.new(:spec) do |spec|
