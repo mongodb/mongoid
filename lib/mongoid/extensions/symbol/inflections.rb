@@ -23,7 +23,8 @@ module Mongoid #:nodoc:
           to_s.plural?
         end
 
-        ["gt", "lt", "gte", "lte", "ne", "near", "in", "nin", "mod", "all", "size", "exists", "within", ['match',"elemMatch"]].each do |oper|
+        [ "gt", "lt", "gte", "lte", "ne", "near", "in", "nin", "mod", "all",
+          "size", "exists", "within", ["matches","elemMatch"] ].each do |oper|
           m, oper = oper
           oper = m unless oper
           class_eval <<-OPERATORS

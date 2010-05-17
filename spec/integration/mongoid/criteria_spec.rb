@@ -252,7 +252,7 @@ describe Mongoid::Criteria do
       context "#match" do
 
         it "returns those matching a partial element in a list" do
-          Person.criteria.where(:things.match => {:phone => 'HTC Incredible'}).should == [@person]
+          Person.where(:things.matches => { :phone => "HTC Incredible" }).should == [@person]
         end
 
       end
