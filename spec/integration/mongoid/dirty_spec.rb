@@ -13,9 +13,11 @@ describe Mongoid::Dirty do
   context "when fields are getting changed" do
 
     before do
-      @person = Person.create(:title => "MC", :ssn => "234-11-2533")
+      @person = Person.create(:title => "MC", :ssn => "234-11-2533", :some_dynamic_field => 'blah')
       @person.title = "DJ"
       @person.write_attribute(:ssn, "222-22-2222")
+
+      @person.some_dynamic_field = 'bloop'
     end
 
     it "marks the document as changed" do
@@ -25,12 +27,13 @@ describe Mongoid::Dirty do
     it "marks field changes" do
       @person.changes.should == {
         "title" => [ "MC", "DJ" ],
-        "ssn" => [ "234-11-2533", "222-22-2222" ]
+        "ssn" => [ "234-11-2533", "222-22-2222" ],
+        "some_dynamic_field" => [ "blah", "bloop" ]
       }
     end
 
     it "marks changed fields" do
-      @person.changed.should == [ "title", "ssn" ]
+      @person.changed.should == [ "title", "ssn", "some_dynamic_field" ]
     end
 
     it "marks the field as changed" do
@@ -48,7 +51,7 @@ describe Mongoid::Dirty do
     it "allows reset of field changes" do
       @person.reset_title!
       @person.title.should == "MC"
-      @person.changed.should == [ "ssn" ]
+      @person.changed.should == [ "ssn", "some_dynamic_field" ]
     end
 
     context "after a save" do

@@ -228,6 +228,7 @@ module Mongoid #:nodoc:
           @modifications[name] = [ (original || old_value), new_value ]
         end
       end
+
     end
 
     module ClassMethods #:nodoc:

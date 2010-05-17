@@ -23,9 +23,9 @@ module Mongoid #:nodoc:
         return super unless @attributes.has_key?(attr.reader)
         if attr.writer?
           # "args.size > 1" allows to simulate 1.8 behavior of "*args"
-          @attributes[attr.reader] = (args.size > 1) ? args : args.first
+          write_attribute(attr.reader, (args.size > 1) ? args : args.first)
         else
-          @attributes[attr.reader]
+          read_attribute(attr.reader)
         end
       end
 
@@ -36,7 +36,7 @@ module Mongoid #:nodoc:
       def process(attrs = nil)
         (attrs || {}).each_pair do |key, value|
           if set_allowed?(key)
-            @attributes[key.to_s] = value
+            write_attribute(key, value)
           elsif write_allowed?(key)
             send("#{key}=", value)
           end
@@ -56,7 +56,9 @@ module Mongoid #:nodoc:
       # <tt>person.read_attribute(:title)</tt>
       def read_attribute(name)
         access = name.to_s
-        accessed(access, fields[access].get(@attributes[access]))
+        value = @attributes[access]
+        typed_value = fields.has_key?(access) ? fields[access].get(value) : value
+        accessed(access, typed_value)
       end
 
       # Remove a value from the +Document+ attributes. If the value does not exist
@@ -103,7 +105,8 @@ module Mongoid #:nodoc:
       # there is any.
       def write_attribute(name, value)
         access = name.to_s
-        modify(access, @attributes[access], fields[access].set(value))
+        typed_value = fields.has_key?(access) ? fields[access].set(value) : value
+        modify(access, @attributes[access], typed_value)
         notify if !id.blank? && new_record?
       end
 
