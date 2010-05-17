@@ -134,6 +134,17 @@ describe Mongoid::Associations do
       from_db.posts.should == [@post]
     end
 
+    describe "#build" do
+
+      before do
+        @another = @person.posts.build(:title => "Another")
+      end
+
+      it "sets new_record to true" do
+        @another.new_record?.should == true
+      end
+    end
+
     describe "#delete_all" do
 
       context "without conditions" do

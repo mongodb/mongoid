@@ -11,11 +11,11 @@ describe Mongoid::Persistence::Update do
   end
 
   let(:root_category) do
-    RootCategory.new(:_id => BSON::ObjectID.new.to_s)
+    RootCategory.instantiate("_id" => BSON::ObjectID.new.to_s)
   end
 
   let(:category) do
-    Category.new(:_id => BSON::ObjectID.new.to_s, :name => 'Programming')
+    Category.instantiate("_id" => BSON::ObjectID.new.to_s, "name" => 'Programming')
   end
 
   let(:collection) do
@@ -154,7 +154,7 @@ describe Mongoid::Persistence::Update do
 
       context "when the document is a tree" do
         let(:leaf_category) do
-          Category.new(:_id => BSON::ObjectID.new.to_s, :name => 'Ruby')
+          Category.new("_id" => BSON::ObjectID.new.to_s, "name" => 'Ruby')
         end
 
         let(:embedded) do
@@ -169,7 +169,6 @@ describe Mongoid::Persistence::Update do
 
         it "performs a $set for the embedded changed fields" do
           tree_set_expectation.call
-          puts "Persisting leaf with path: #{leaf_category._path}"
           embedded.persist
         end
       end

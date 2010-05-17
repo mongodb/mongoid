@@ -33,7 +33,6 @@ module Mongoid # :nodoc:
         embedded? and _parent.associations[association_name].association == EmbedsMany
       end
 
-
       # Update all the dirty child documents after an update.
       def update_embedded(name)
         association = send(name)

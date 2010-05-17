@@ -157,7 +157,7 @@ module Mongoid #:nodoc:
       def initialize(attrs = nil)
         @attributes = default_attributes
         process(attrs)
-        @new_record = true if id.nil?
+        @new_record = true
         document = yield self if block_given?
         identify
       end
