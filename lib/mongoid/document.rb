@@ -253,7 +253,7 @@ module Mongoid #:nodoc:
         if clear
           @attributes.delete(name)
         else
-          @attributes.insert(name, attrs) unless @attributes.include?(name) && @attributes[name].include?(attrs)
+          @attributes.insert(name, attrs) unless @attributes[name] && @attributes[name].include?(attrs)
         end
         notify
       end
