@@ -106,17 +106,35 @@ describe Mongoid::Validations::UniquenessValidator do
   describe "#validate_each with :scope option given" do
 
     before do
-      @document = Person.new(:employer_id => 3)
+      @document = Person.new(:employer_id => 3, :terms => true, :title => "")
       @criteria = stub(:empty? => false)
     end
 
-    let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
-                                                                    :scope => :employer_id) }
+    describe "as a symbol" do
 
-    it "should query only scoped documents" do
-      Person.expects(:where).with(:title => "Sir", 
-                                  :employer_id => @document.attributes[:employer_id]).returns(@criteria)
-      validator.validate_each(@document, :title, "Sir")
+      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
+                                                                      :scope => :employer_id) }
+
+      it "should query only scoped documents" do
+        Person.expects(:where).with(:title => "Sir", 
+                                    :employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        validator.validate_each(@document, :title, "Sir")
+      end
+
     end
+
+    describe "as an array" do
+
+      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
+                                                                      :scope => [:employer_id, :terms]) }
+      it "should query only scoped documents" do
+        Person.expects(:where).with(:title => "Sir", 
+                                    :employer_id => @document.attributes[:employer_id],
+                                    :terms => true).returns(@criteria)
+        validator.validate_each(@document, :title, "Sir")
+      end
+
+    end
+
   end
 end
