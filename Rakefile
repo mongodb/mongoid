@@ -11,7 +11,7 @@ task :build do
 end
 
 task :install => :build do
-  system "gem install mongoid-#{Mongoid::VERSION}.gem"
+  system "sudo gem install mongoid-#{Mongoid::VERSION}.gem"
 end
 
 task :release => :build do
