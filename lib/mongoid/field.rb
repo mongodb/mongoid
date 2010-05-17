@@ -12,6 +12,15 @@ module Mongoid #:nodoc:
       !!@accessible
     end
 
+    # Get the declared options for this field
+    #
+    # Returns:
+    #
+    # a hash of options 
+    def options
+      @options
+    end
+
     # Get the default value for the field.
     #
     # Returns:
@@ -38,6 +47,8 @@ module Mongoid #:nodoc:
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
       @type = options[:type] || String
       @accessible = options.has_key?(:accessible) ? options[:accessible] : true
+
+      @options = options
     end
 
     # Used for setting an object in the attributes hash. If nil is provided the

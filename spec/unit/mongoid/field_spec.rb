@@ -151,4 +151,16 @@ describe Mongoid::Field do
 
   end
 
+  describe "#options" do
+    before do
+      @field = Mongoid::Field.new(:terrible_and_unsafe_html_goes_here, :sanitize => true, :hello => :goodbye)
+    end
+    
+    it "stores the arbitrary options" do
+      @field.options[:sanitize].should be_true
+      @field.options[:hello].should == :goodbye
+    end
+
+  end
+
 end
