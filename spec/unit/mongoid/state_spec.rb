@@ -4,10 +4,21 @@ describe Mongoid::State do
 
   describe "#new_record?" do
 
+    context "when calling new on the document" do
+
+      before do
+        @person = Person.new("_id" => "1")
+      end
+
+      it "returns true" do
+        @person.new_record?.should == true
+      end
+    end
+
     context "when the object has been saved" do
 
       before do
-        @person = Person.new(:_id => "1")
+        @person = Person.instantiate("_id" => "1")
       end
 
       it "returns false" do

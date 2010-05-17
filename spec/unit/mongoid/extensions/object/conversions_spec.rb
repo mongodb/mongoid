@@ -54,11 +54,8 @@ describe Mongoid::Extensions::Object::Conversions do
       end
 
       it "converts the object to a hash" do
-        Person.set(@person).should == @attributes
+        Person.set(@person).except("_id").should == @attributes.except("_id")
       end
-
     end
-
   end
-
 end

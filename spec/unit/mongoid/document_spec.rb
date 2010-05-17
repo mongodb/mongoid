@@ -321,6 +321,9 @@ describe Mongoid::Document do
         person.attributes[:terms].should be_true
       end
 
+      it "is a new record" do
+        Person.new(@attributes).new_record?.should == true
+      end
     end
 
     context "with a primary key" do

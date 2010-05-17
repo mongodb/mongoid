@@ -126,7 +126,6 @@ describe Mongoid::Associations::HasManyRelated do
       @association.build(:title => "Sassy")
       @association.first.person.should == @parent
     end
-
   end
 
   describe "#delete_all" do
