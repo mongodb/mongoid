@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Associations::HasManyRelated do
+describe Mongoid::Associations::ReferencesMany do
 
   let(:block) do
     Proc.new do
@@ -31,7 +31,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => false, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "saves and appends the child document" do
@@ -50,7 +50,7 @@ describe Mongoid::Associations::HasManyRelated do
         before do
           @parent = stub(:id => "1", :new_record? => true, :class => Person)
           Post.expects(:all).returns([])
-          @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+          @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
         end
 
         it "appends the child document" do
@@ -66,7 +66,7 @@ describe Mongoid::Associations::HasManyRelated do
           @criteria = mock
           @parent = stub(:id => "1", :new_record? => true, :class => Person)
           Post.expects(:all).returns(@criteria)
-          @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+          @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
         end
 
         it "appends the child document" do
@@ -84,7 +84,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "appends the child documents" do
@@ -105,7 +105,7 @@ describe Mongoid::Associations::HasManyRelated do
       @criteria.expects(:entries).returns([])
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns(@criteria)
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     it "adds a new object to the association" do
@@ -135,7 +135,7 @@ describe Mongoid::Associations::HasManyRelated do
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).twice.returns(@criteria)
       @parent.expects(:reset).with("posts").yields
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     it "deletes all of the associated object" do
@@ -151,7 +151,7 @@ describe Mongoid::Associations::HasManyRelated do
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).twice.returns(@criteria)
       @parent.expects(:reset).with("posts").yields
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     it "destroys all of the associated objects" do
@@ -172,7 +172,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => false, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "saves and appends the child document" do
@@ -189,7 +189,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "appends the child document" do
@@ -205,7 +205,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "appends the child documents" do
@@ -225,7 +225,7 @@ describe Mongoid::Associations::HasManyRelated do
       @post = mock
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       Post.expects(:instantiate).returns(@post)
     end
 
@@ -247,7 +247,7 @@ describe Mongoid::Associations::HasManyRelated do
       @post = mock
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       Post.expects(:instantiate).returns(@post)
     end
 
@@ -268,7 +268,7 @@ describe Mongoid::Associations::HasManyRelated do
     before do
       @parent = stub(:id => "5", :class => Person)
       Post.expects(:all).returns([])
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     context "when finding by id" do
@@ -343,7 +343,7 @@ describe Mongoid::Associations::HasManyRelated do
     context "when related id has been set" do
 
       it "finds the object by id" do
-        association = Mongoid::Associations::HasManyRelated.new(@document, options)
+        association = Mongoid::Associations::ReferencesMany.new(@document, options)
         association.should == @related
       end
 
@@ -352,7 +352,7 @@ describe Mongoid::Associations::HasManyRelated do
     context "when the options have an extension" do
 
       it "adds the extension module" do
-        association = Mongoid::Associations::HasManyRelated.new(@document, options)
+        association = Mongoid::Associations::ReferencesMany.new(@document, options)
         association.extension.should == "Testing"
       end
 
@@ -369,8 +369,8 @@ describe Mongoid::Associations::HasManyRelated do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::HasManyRelated.expects(:new).with(@document, options, nil)
-        association = Mongoid::Associations::HasManyRelated.instantiate(@document, options)
+        Mongoid::Associations::ReferencesMany.expects(:new).with(@document, options, nil)
+        association = Mongoid::Associations::ReferencesMany.instantiate(@document, options)
       end
 
     end
@@ -379,8 +379,8 @@ describe Mongoid::Associations::HasManyRelated do
 
   describe ".macro" do
 
-    it "returns :has_many_related" do
-      Mongoid::Associations::HasManyRelated.macro.should == :has_many_related
+    it "returns :references_many" do
+      Mongoid::Associations::ReferencesMany.macro.should == :references_many
     end
 
   end
@@ -424,7 +424,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => false, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "saves and appends the child document" do
@@ -441,7 +441,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "appends the child document" do
@@ -457,7 +457,7 @@ describe Mongoid::Associations::HasManyRelated do
       before do
         @parent = stub(:id => "1", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
-        @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
 
       it "appends the child documents" do
@@ -481,16 +481,14 @@ describe Mongoid::Associations::HasManyRelated do
     end
 
     it "sets the related object id on the parent" do
-      Mongoid::Associations::HasManyRelated.update(@related, @parent, options)
+      Mongoid::Associations::ReferencesMany.update(@related, @parent, options)
       @first.person_id.should == @parent.id
       @second.person_id.should == @parent.id
     end
 
     it "returns the related objects" do
-      @proxy = Mongoid::Associations::HasManyRelated.update(@related, @parent, options)
+      @proxy = Mongoid::Associations::ReferencesMany.update(@related, @parent, options)
       @proxy.target.should == @related
     end
-
   end
-
 end

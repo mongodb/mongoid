@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Associations::BelongsToRelated do
+describe Mongoid::Associations::ReferencedIn do
 
   describe ".initialize" do
 
@@ -14,7 +14,7 @@ describe Mongoid::Associations::BelongsToRelated do
 
       it "finds the object by id" do
         Person.expects(:find).with(@document.person_id).returns(@related)
-        association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
+        association = Mongoid::Associations::ReferencedIn.new(@document, "5", @options)
         association.should == @related
       end
 
@@ -32,7 +32,7 @@ describe Mongoid::Associations::BelongsToRelated do
         @options = Mongoid::Associations::Options.new(:name => :person, :extend => @block)
         @related = stub
         Person.expects(:find).with(@document.person_id).returns(@related)
-        @association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
+        @association = Mongoid::Associations::ReferencedIn.new(@document, "5", @options)
       end
 
       it "adds the extension module" do
@@ -53,8 +53,8 @@ describe Mongoid::Associations::BelongsToRelated do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::BelongsToRelated.expects(:new).with(@document, "5", @options, nil)
-        Mongoid::Associations::BelongsToRelated.instantiate(@document, @options)
+        Mongoid::Associations::ReferencedIn.expects(:new).with(@document, "5", @options, nil)
+        Mongoid::Associations::ReferencedIn.instantiate(@document, @options)
       end
 
     end
@@ -67,7 +67,7 @@ describe Mongoid::Associations::BelongsToRelated do
       end
 
       it "returns nil" do
-        Mongoid::Associations::BelongsToRelated.instantiate(@document, @options).should be_nil
+        Mongoid::Associations::ReferencedIn.instantiate(@document, @options).should be_nil
       end
 
     end
@@ -81,7 +81,7 @@ describe Mongoid::Associations::BelongsToRelated do
       @document = stub(:person_id => "5")
       @options = Mongoid::Associations::Options.new(:name => :person)
       Person.expects(:find).with(@document.person_id).returns(@person)
-      @association = Mongoid::Associations::BelongsToRelated.new(@document, "5", @options)
+      @association = Mongoid::Associations::ReferencedIn.new(@document, "5", @options)
     end
 
     context "when getting values" do
@@ -106,7 +106,7 @@ describe Mongoid::Associations::BelongsToRelated do
   describe ".macro" do
 
     it "returns :belongs_to_related" do
-      Mongoid::Associations::BelongsToRelated.macro.should == :belongs_to_related
+      Mongoid::Associations::ReferencedIn.macro.should == :referenced_in
     end
 
   end
@@ -117,7 +117,7 @@ describe Mongoid::Associations::BelongsToRelated do
       @related = stub(:id => "5")
       @child = Game.new
       @options = Mongoid::Associations::Options.new(:name => :person)
-      @association = Mongoid::Associations::BelongsToRelated.update(@related, @child, @options)
+      @association = Mongoid::Associations::ReferencedIn.update(@related, @child, @options)
     end
 
     it "sets the related object id on the parent" do
@@ -131,11 +131,11 @@ describe Mongoid::Associations::BelongsToRelated do
     context "when target is nil" do
 
       it "returns nil" do
-        Mongoid::Associations::BelongsToRelated.update(nil, @child, @options).should be_nil
+        Mongoid::Associations::ReferencedIn.update(nil, @child, @options).should be_nil
       end
 
       it "removes the association" do
-        Mongoid::Associations::BelongsToRelated.update(nil, @child, @options)
+        Mongoid::Associations::ReferencedIn.update(nil, @child, @options)
         @child.person.should be_nil
       end
     end

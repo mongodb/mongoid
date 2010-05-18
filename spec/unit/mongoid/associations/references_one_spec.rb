@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Associations::HasOneRelated do
+describe Mongoid::Associations::ReferencesOne do
 
   let(:document) { stub(:id => "1") }
   let(:block) do
@@ -19,7 +19,7 @@ describe Mongoid::Associations::HasOneRelated do
     before do
       @parent = stub(:id => "5", :class => Person)
       Game.expects(:first).returns(nil)
-      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
     end
 
     it "adds a new object to the association" do
@@ -47,7 +47,7 @@ describe Mongoid::Associations::HasOneRelated do
       Game.expects(:first).returns(nil)
       Mongoid::Persistence::Insert.expects(:new).returns(@insert)
       @insert.expects(:persist).returns(Person.new)
-      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
     end
 
     it "adds a new object to the association" do
@@ -72,7 +72,7 @@ describe Mongoid::Associations::HasOneRelated do
       @parent = stub(:id => "5", :class => Person)
       @game = Game.new
       Game.expects(:first).returns(@game)
-      @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
     end
 
     it "delegates to the proxied document" do
@@ -99,7 +99,7 @@ describe Mongoid::Associations::HasOneRelated do
         @parent = stub(:id => "5", :class => Person)
         @game = Game.new
         Game.expects(:first).returns(@game)
-        @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
       end
 
       it "adds the extension to the module" do
@@ -113,8 +113,8 @@ describe Mongoid::Associations::HasOneRelated do
   describe ".instantiate" do
 
     it "delegates to new" do
-      Mongoid::Associations::HasOneRelated.expects(:new).with(document, options, nil)
-      Mongoid::Associations::HasOneRelated.instantiate(document, options)
+      Mongoid::Associations::ReferencesOne.expects(:new).with(document, options, nil)
+      Mongoid::Associations::ReferencesOne.instantiate(document, options)
     end
 
   end
@@ -129,7 +129,7 @@ describe Mongoid::Associations::HasOneRelated do
     it "delegates to the documet" do
       Game.expects(:first).with(:conditions => { "person_id"=> @person.id }).returns(@game)
       @game.expects(:strange_method)
-      association = Mongoid::Associations::HasOneRelated.instantiate(@person, options)
+      association = Mongoid::Associations::ReferencesOne.instantiate(@person, options)
       association.strange_method
     end
 
@@ -161,7 +161,7 @@ describe Mongoid::Associations::HasOneRelated do
   describe ".macro" do
 
     it "returns :has_one_related" do
-      Mongoid::Associations::HasOneRelated.macro.should == :has_one_related
+      Mongoid::Associations::ReferencesOne.macro.should == :references_one
     end
 
   end
@@ -175,7 +175,7 @@ describe Mongoid::Associations::HasOneRelated do
     end
 
     it "delegates to the document" do
-      association = Mongoid::Associations::HasOneRelated.instantiate(@person, options)
+      association = Mongoid::Associations::ReferencesOne.instantiate(@person, options)
       association.should be_nil
     end
 
@@ -190,12 +190,12 @@ describe Mongoid::Associations::HasOneRelated do
 
     it "sets the parent on the child association" do
       @game.expects(:person=).with(@person)
-      Mongoid::Associations::HasOneRelated.update(@game, @person, options)
+      Mongoid::Associations::ReferencesOne.update(@game, @person, options)
     end
 
     it "returns the proxy" do
       @game.expects(:person=).with(@person)
-      @proxy = Mongoid::Associations::HasOneRelated.update(@game, @person, options)
+      @proxy = Mongoid::Associations::ReferencesOne.update(@game, @person, options)
       @proxy.target.should == @game
     end
 

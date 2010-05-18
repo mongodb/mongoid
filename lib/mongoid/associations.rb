@@ -1,11 +1,11 @@
 # encoding: utf-8
 require "mongoid/associations/proxy"
-require "mongoid/associations/belongs_to_related"
 require "mongoid/associations/embedded_in"
 require "mongoid/associations/embeds_many"
 require "mongoid/associations/embeds_one"
-require "mongoid/associations/has_many_related"
-require "mongoid/associations/has_one_related"
+require "mongoid/associations/references_many"
+require "mongoid/associations/references_one"
+require "mongoid/associations/referenced_in"
 require "mongoid/associations/options"
 require "mongoid/associations/meta_data"
 
@@ -165,7 +165,7 @@ module Mongoid # :nodoc:
       #
       def referenced_in(name, options = {}, &block)
         opts = optionize(name, options, fk(name, options), &block)
-        associate(Associations::BelongsToRelated, opts)
+        associate(Associations::ReferencedIn, opts)
         field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
         index(opts.foreign_key) unless embedded?
       end
@@ -187,7 +187,7 @@ module Mongoid # :nodoc:
       #   end
       #
       def references_many(name, options = {}, &block)
-        associate(Associations::HasManyRelated, optionize(name, options, fk(self.name, options), &block))
+        associate(Associations::ReferencesMany, optionize(name, options, fk(self.name, options), &block))
         set_callback :save, :before do |document|
           document.update_associations(name)
         end
@@ -209,7 +209,7 @@ module Mongoid # :nodoc:
       #     references_one :game
       #   end
       def references_one(name, options = {}, &block)
-        associate(Associations::HasOneRelated, optionize(name, options, fk(self.name, options), &block))
+        associate(Associations::ReferencesOne, optionize(name, options, fk(self.name, options), &block))
         set_callback :save, :before do |document|
           document.update_association(name)
         end

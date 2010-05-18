@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents an relational one-to-many association with an object in a
     # separate collection or database.
-    class HasManyRelated < Proxy
+    class ReferencesMany < Proxy
 
       # Appends the object to the +Array+, setting its parent in
       # the process.
@@ -166,7 +166,7 @@ module Mongoid #:nodoc:
       end
 
       class << self
-        # Preferred method for creating the new +HasManyRelated+ association.
+        # Preferred method for creating the new +ReferencesMany+ association.
         #
         # Options:
         #
@@ -178,7 +178,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :has_many_related
+          :references_many
         end
 
         # Perform an update of the relationship of the parent and child. This

@@ -7,7 +7,7 @@ describe Mongoid::Associations::MetaData do
   end
 
   let(:association) do
-    Mongoid::Associations::HasManyRelated
+    Mongoid::Associations::ReferencesMany
   end
 
   let(:options) do
@@ -54,7 +54,7 @@ describe Mongoid::Associations::MetaData do
   describe "#macro" do
 
     it "returns the association macro" do
-      metadata.macro.should == :has_many_related
+      metadata.macro.should == :references_many
     end
   end
 
@@ -82,7 +82,7 @@ describe Mongoid::Associations::MetaData do
   describe "#association" do
 
     it "returns the association type" do
-      metadata.association.should == Mongoid::Associations::HasManyRelated
+      metadata.association.should == Mongoid::Associations::ReferencesMany
     end
   end
 end

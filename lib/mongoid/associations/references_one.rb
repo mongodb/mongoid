@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents an relational one-to-one association with an object in a
     # separate collection or database.
-    class HasOneRelated < Proxy
+    class ReferencesOne < Proxy
 
       delegate :nil?, :to => :target
 
@@ -69,7 +69,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :has_one_related
+          :references_one
         end
 
         # Perform an update of the relationship of the parent and child. This

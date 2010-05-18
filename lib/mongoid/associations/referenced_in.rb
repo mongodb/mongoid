@@ -2,7 +2,7 @@
 module Mongoid #:nodoc:
   module Associations #:nodoc:
     # Represents a relational association to a "parent" object.
-    class BelongsToRelated < Proxy
+    class ReferencedIn < Proxy
 
       # Initializing a related association only requires looking up the object
       # by its id.
@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
       end
 
       class << self
-        # Instantiate a new +BelongsToRelated+ or return nil if the foreign key is
+        # Instantiate a new +ReferencedIn+ or return nil if the foreign key is
         # nil. It is preferrable to use this method over the traditional call
         # to new.
         #
@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
 
         # Returns the macro used to create the association.
         def macro
-          :belongs_to_related
+          :referenced_in
         end
 
         # Perform an update of the relationship of the parent and child. This
@@ -47,7 +47,7 @@ module Mongoid #:nodoc:
         #
         # Example:
         #
-        # <tt>BelongsToRelated.update(person, game, options)</tt>
+        # <tt>ReferencedIn.update(person, game, options)</tt>
         def update(target, document, options)
           document.send("#{options.foreign_key}=", target ? target.id : nil)
           instantiate(document, options, target)
