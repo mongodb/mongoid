@@ -26,8 +26,9 @@ class Person
 
   attr_reader :rescored
 
+  embeds_many :favorites
   embeds_many :videos
-
+  embeds_many :phone_numbers, :class_name => "Phone"
   embeds_many :addresses do
     def extension
       "Testing"
@@ -37,8 +38,7 @@ class Person
     end
   end
 
-  embeds_many :phone_numbers, :class_name => "Phone"
-
+  embeds_one :pet, :class_name => "Animal"
   embeds_one :name do
     def extension
       "Testing"
@@ -48,13 +48,9 @@ class Person
     end
   end
 
-  embeds_one :pet, :class_name => "Animal"
-
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name, :update_only => true
   accepts_nested_attributes_for :pet
-
-  embeds_many :favorites
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
 
   references_one :game do
@@ -68,6 +64,7 @@ class Person
       "Testing"
     end
   end
+  references_many :preferences, :stored_as => :array, :inverse_of => :people
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20

@@ -576,6 +576,28 @@ describe Mongoid::Associations do
 
     end
 
+    context "with a stored_as option provided" do
+
+      context "when stored_as is :array" do
+
+        it "creates a getter for the association" do
+          Person.allocate.should respond_to(:preferences)
+        end
+
+        it "creates a setter for the association" do
+          Person.allocate.should respond_to(:preferences=)
+        end
+
+        it "sets the association as a references many as array" do
+          metadata = Person.associations["preferences"]
+          metadata.association.should == Mongoid::Associations::ReferencesManyAsArray
+        end
+
+        it "creates the association_ids field" do
+
+        end
+      end
+    end
   end
 
   describe "#update_associations" do

@@ -188,7 +188,7 @@ module Mongoid # :nodoc:
       #   end
       #
       def references_many(name, options = {}, &block)
-        associate(Associations::ReferencesMany, optionize(name, options, fk(self.name, options), &block))
+        reference_many(name, options, &block)
         set_callback :save, :before do |document|
           document.update_associations(name)
         end
@@ -283,6 +283,20 @@ module Mongoid # :nodoc:
       # Find the foreign key.
       def fk(name, options)
         options[:foreign_key] || name.to_s.foreign_key
+      end
+
+      def reference_many(name, options, &block)
+        if (options[:stored_as] == :array)
+          associate(
+            Associations::ReferencesManyAsArray,
+            optionize(name, options, fk(self.name, options), &block)
+          )
+        else
+          associate(
+            Associations::ReferencesMany,
+            optionize(name, options, fk(self.name, options), &block)
+          )
+        end
       end
     end
   end
