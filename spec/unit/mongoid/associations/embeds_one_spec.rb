@@ -54,7 +54,7 @@ describe Mongoid::Associations::EmbedsOne do
       end
 
       it "happens before any other operation" do
-        name = @person.build_name(:set_parent => true, :street => "Madison Ave")
+        name = @person.build_name(:set_parent => true, :first_name => "Steve")
         name._parent.should == @person
         @person.name.should == name
       end
