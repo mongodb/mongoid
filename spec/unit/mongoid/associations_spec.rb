@@ -594,7 +594,7 @@ describe Mongoid::Associations do
         end
 
         it "creates the association_ids field" do
-
+          Person.allocate.should respond_to(:preference_ids)
         end
       end
     end
