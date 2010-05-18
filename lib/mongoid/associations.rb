@@ -52,27 +52,6 @@ module Mongoid # :nodoc:
     end
 
     module ClassMethods
-      # Adds a relational association from the child Document to a Document in
-      # another database or collection.
-      #
-      # Options:
-      #
-      # name: A +Symbol+ that is the related class name.
-      #
-      # Example:
-      #
-      #   class Game
-      #     include Mongoid::Document
-      #     belongs_to_related :person
-      #   end
-      #
-      def belongs_to_related(name, options = {}, &block)
-        opts = optionize(name, options, fk(name, options), &block)
-        associate(Associations::BelongsToRelated, opts)
-        field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
-        index(opts.foreign_key) unless embedded?
-      end
-
       # Gets whether or not the document is embedded.
       #
       # Example:
@@ -170,6 +149,29 @@ module Mongoid # :nodoc:
 
       alias :embed_one :embeds_one
 
+      # Adds a relational association from the child Document to a Document in
+      # another database or collection.
+      #
+      # Options:
+      #
+      # name: A +Symbol+ that is the related class name.
+      #
+      # Example:
+      #
+      #   class Game
+      #     include Mongoid::Document
+      #     referenced_in :person
+      #   end
+      #
+      def referenced_in(name, options = {}, &block)
+        opts = optionize(name, options, fk(name, options), &block)
+        associate(Associations::BelongsToRelated, opts)
+        field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
+        index(opts.foreign_key) unless embedded?
+      end
+
+      alias :belongs_to_related :referenced_in
+
       # Adds a relational association from the Document to many Documents in
       # another database or collection.
       #
@@ -181,15 +183,17 @@ module Mongoid # :nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     has_many_related :posts
+      #     references_many :posts
       #   end
       #
-      def has_many_related(name, options = {}, &block)
+      def references_many(name, options = {}, &block)
         associate(Associations::HasManyRelated, optionize(name, options, fk(self.name, options), &block))
         set_callback :save, :before do |document|
           document.update_associations(name)
         end
       end
+
+      alias :has_many_related :references_many
 
       # Adds a relational association from the Document to one Document in
       # another database or collection.
@@ -202,14 +206,16 @@ module Mongoid # :nodoc:
       #
       #   class Person
       #     include Mongoid::Document
-      #     has_one_related :game
+      #     references_one :game
       #   end
-      def has_one_related(name, options = {}, &block)
+      def references_one(name, options = {}, &block)
         associate(Associations::HasOneRelated, optionize(name, options, fk(self.name, options), &block))
         set_callback :save, :before do |document|
           document.update_association(name)
         end
       end
+
+      alias :has_one_related :references_one
 
       # Returns the macro associated with the supplied association name. This
       # will return embeds_on, embeds_many, embedded_in or nil.

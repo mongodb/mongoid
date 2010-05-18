@@ -483,7 +483,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".belongs_to_related" do
+  describe ".referenced_in" do
 
     before do
       @game = Game.new
@@ -505,7 +505,7 @@ describe Mongoid::Associations do
 
       it "puts an index on the foreign key" do
         Game.expects(:index).with("person_id")
-        Game.belongs_to_related :person
+        Game.referenced_in :person
       end
 
     end
@@ -522,13 +522,13 @@ describe Mongoid::Associations do
 
       it "sets the foreign key as an object id" do
         Game.expects(:field).with("person_id", :type => BSON::ObjectID)
-        Game.belongs_to_related :person
+        Game.referenced_in :person
       end
     end
 
   end
 
-  describe ".has_one_related" do
+  describe ".references_one" do
 
     before do
       @person = Person.new
@@ -554,7 +554,7 @@ describe Mongoid::Associations do
 
   end
 
-  describe ".has_many_related" do
+  describe ".references_many" do
 
     it "creates a getter for the association" do
       Person.new.should respond_to(:posts)
