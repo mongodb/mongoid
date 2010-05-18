@@ -1,7 +1,7 @@
 class Tag
   include Mongoid::Document
   field :text
-  belongs_to_related :post, :stored_as => :array
+  referenced_in :post, :stored_as => :array
 end
 
 class Post
@@ -9,9 +9,9 @@ class Post
   include Mongoid::Versioning
   include Mongoid::Timestamps
   field :title
-  belongs_to_related :person
+  referenced_in :person
 
-  has_many_related :tags, :stored_as => :array
+  references_many :tags, :stored_as => :array
 
   named_scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
 

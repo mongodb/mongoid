@@ -160,7 +160,7 @@ describe Mongoid::Associations::ReferencesOne do
 
   describe ".macro" do
 
-    it "returns :has_one_related" do
+    it "returns :references_one" do
       Mongoid::Associations::ReferencesOne.macro.should == :references_one
     end
 

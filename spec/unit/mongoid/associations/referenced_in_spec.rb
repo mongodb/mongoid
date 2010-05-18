@@ -105,7 +105,7 @@ describe Mongoid::Associations::ReferencedIn do
 
   describe ".macro" do
 
-    it "returns :belongs_to_related" do
+    it "returns :referenced_in" do
       Mongoid::Associations::ReferencedIn.macro.should == :referenced_in
     end
 

@@ -399,7 +399,7 @@ describe Mongoid::Document do
 
     context "with relational associations" do
 
-      context "for a has_one_related" do
+      context "for a references_one" do
 
         before do
           @game = @person.game.create(:score => 50)
@@ -413,7 +413,7 @@ describe Mongoid::Document do
         end
       end
 
-      context "for a belongs_to_related" do
+      context "for a referenced_in" do
 
         before do
           @game = @person.game.create(:score => 50)
