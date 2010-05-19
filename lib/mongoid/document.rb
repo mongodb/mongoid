@@ -65,7 +65,7 @@ module Mongoid #:nodoc:
       # causes the first call to only return direct children, hence
       # the double call and unique.
       def _types
-        @_type ||= [subclasses + subclasses + [self.name]].flatten.uniq
+        @_type ||= [*subclasses, *subclasses, self.name].uniq
       end
     end
 
