@@ -39,19 +39,6 @@ module Mongoid #:nodoc:
       def query
         @query ||= lambda { @klass.any_in(:_id => @parent.send(@foreign_key)) }
       end
-
-      class << self
-        # Preferred method for creating the new +ReferencesManyAsArray+
-        # association.
-        #
-        # Options:
-        #
-        # document: The +Document+ that contains the relationship.
-        # options: The association +Options+.
-        def instantiate(document, options, target = nil)
-          new(document, options, target)
-        end
-      end
     end
   end
 end

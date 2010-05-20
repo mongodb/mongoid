@@ -95,8 +95,7 @@ module Mongoid #:nodoc:
       def initialize(document, options, target = nil)
         @parent, @klass, @options = document, options.klass, options
         @foreign_key = options.foreign_key
-        @base = lambda { @klass.all(:conditions => { @foreign_key => document.id }) }
-        @target = target || @base.call
+        @target = target || query.call
         extends(options)
       end
 
@@ -112,7 +111,7 @@ module Mongoid #:nodoc:
       #
       # A Criteria object or Array.
       def method_missing(name, *args, &block)
-        @target = @base.call unless @target.is_a?(Array)
+        @target = query.call unless @target.is_a?(Array)
         @target.send(name, *args, &block)
       end
 
@@ -153,6 +152,11 @@ module Mongoid #:nodoc:
         @target = @target.entries if @parent.new_record?
       end
 
+      # The default query used for retrieving the documents from the database.
+      def query
+        @query ||= lambda { @klass.all(:conditions => { @foreign_key => @parent.id }) }
+      end
+
       # Remove the objects based on conditions.
       def remove(method, conditions)
         selector = { @foreign_key => @parent.id }.merge(conditions || {})
@@ -162,7 +166,7 @@ module Mongoid #:nodoc:
 
       # Reset the memoized association on the parent.
       def reset
-        @parent.send(:reset, @options.name) { @base.call }
+        @parent.send(:reset, @options.name) { query.call }
       end
 
       class << self
