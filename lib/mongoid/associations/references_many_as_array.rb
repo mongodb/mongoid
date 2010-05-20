@@ -18,10 +18,18 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options, target = nil)
+        setup(document, options)
+        @target = target || query.call
+      end
+
+      protected
+      # The default query used for retrieving the documents from the database.
+      def query
+        @query ||= lambda { @klass.any_in(:_id => @parent.send(@foreign_key)) }
       end
 
       class << self
-        # Preferred method for creating the new +ReferencesManyAsArrat+
+        # Preferred method for creating the new +ReferencesManyAsArray+
         # association.
         #
         # Options:
