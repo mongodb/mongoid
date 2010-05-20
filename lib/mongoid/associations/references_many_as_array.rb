@@ -6,18 +6,6 @@ module Mongoid #:nodoc:
     # document.
     class ReferencesManyAsArray < ReferencesMany
 
-      # Initializing a related association only requires looking up the objects
-      # by their ids.
-      #
-      # Options:
-      #
-      # document: The +Document+ that contains the relationship.
-      # options: The association +Options+.
-      def initialize(document, options, target = nil)
-        setup(document, options)
-        @target = target || query.call
-      end
-
       protected
       # The default query used for retrieving the documents from the database.
       def query
