@@ -16,6 +16,9 @@ module Mongoid #:nodoc:
         end
       end
 
+      alias :concat :<<
+      alias :push :<<
+
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
@@ -27,11 +30,6 @@ module Mongoid #:nodoc:
         object = @klass.instantiate(attributes.merge(name => @parent))
         @target << object
         object
-      end
-
-      # Delegates to <<
-      def concat(*objects)
-        self << objects
       end
 
       # Creates a new Document and adds it to the association collection. The
@@ -137,11 +135,6 @@ module Mongoid #:nodoc:
             build(attrs)
           end
         end
-      end
-
-      # Delegates to <<
-      def push(*objects)
-        self << objects
       end
 
       protected

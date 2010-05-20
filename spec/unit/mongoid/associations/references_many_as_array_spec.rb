@@ -116,6 +116,28 @@ describe Mongoid::Associations::ReferencesManyAsArray do
     end
   end
 
+  describe "#concat" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:preference) do
+      Preference.new(:name => "Brightness")
+    end
+
+    before do
+      @association = Mongoid::Associations::ReferencesManyAsArray.new(
+        person, options
+      )
+      @association.concat(preference)
+    end
+
+    it "delegates to <<" do
+      @association.target.first.should == preference
+    end
+  end
+
   describe ".instantiate" do
 
     let(:person) do
@@ -181,6 +203,28 @@ describe Mongoid::Associations::ReferencesManyAsArray do
 
     context "when target is an array" do
 
+    end
+  end
+
+  describe "#push" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:preference) do
+      Preference.new(:name => "Brightness")
+    end
+
+    before do
+      @association = Mongoid::Associations::ReferencesManyAsArray.new(
+        person, options
+      )
+      @association.push(preference)
+    end
+
+    it "delegates to <<" do
+      @association.target.first.should == preference
     end
   end
 end

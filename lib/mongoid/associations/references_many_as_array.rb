@@ -20,6 +20,9 @@ module Mongoid #:nodoc:
         end
       end
 
+      alias :concat :<<
+      alias :push :<<
+
       protected
       # The default query used for retrieving the documents from the database.
       def query
