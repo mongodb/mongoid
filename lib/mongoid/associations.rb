@@ -168,7 +168,7 @@ module Mongoid # :nodoc:
       #   end
       #
       def referenced_in(name, options = {}, &block)
-        opts = optionize(name, options, fk(name, options), &block)
+        opts = optionize(name, options, constraint(name, options, :in), &block)
         associate(Associations::ReferencedIn, opts)
         field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
         index(opts.foreign_key) unless embedded?
@@ -213,7 +213,8 @@ module Mongoid # :nodoc:
       #     references_one :game
       #   end
       def references_one(name, options = {}, &block)
-        associate(Associations::ReferencesOne, optionize(name, options, fk(self.name, options), &block))
+        opts = optionize(name, options, constraint(name, options, :one), &block)
+        associate(Associations::ReferencesOne, opts)
         set_callback :save, :before do |document|
           document.update_association(name)
         end
@@ -290,10 +291,12 @@ module Mongoid # :nodoc:
 
       def reference_many(name, options, &block)
         if (options[:stored_as] == :array)
+          opts = optionize(name, options, constraint(name, options, :many_as_array), &block)
           field "#{name.to_s.singularize}_ids", :type => Array
-          associate(Associations::ReferencesManyAsArray, optionize(name, options, fk(self.name, options), &block))
+          associate(Associations::ReferencesManyAsArray, opts)
         else
-          associate(Associations::ReferencesMany, optionize(name, options, fk(self.name, options), &block))
+          opts = optionize(name, options, constraint(name, options, :many), &block)
+          associate(Associations::ReferencesMany, opts)
         end
       end
     end
