@@ -3,6 +3,7 @@ require "mongoid/associations/proxy"
 require "mongoid/associations/embedded_in"
 require "mongoid/associations/embeds_many"
 require "mongoid/associations/embeds_one"
+require "mongoid/associations/foreign_key"
 require "mongoid/associations/references_many"
 require "mongoid/associations/references_many_as_array"
 require "mongoid/associations/references_one"
@@ -14,6 +15,8 @@ module Mongoid # :nodoc:
   module Associations #:nodoc:
     extend ActiveSupport::Concern
     included do
+      include ForeignKey
+
       cattr_accessor :embedded
       self.embedded = false
 
@@ -127,7 +130,7 @@ module Mongoid # :nodoc:
       # Options:
       #
       # name: A +Symbol+ that is the plural child class name.
-      #
+     #
       # Example:
       #
       #   class Person
