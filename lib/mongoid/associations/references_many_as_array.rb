@@ -6,10 +6,6 @@ module Mongoid #:nodoc:
     # document.
     class ReferencesManyAsArray < Proxy
 
-      def each(&block)
-        [].each(&block)
-      end
-
       # Initializing a related association only requires looking up the objects
       # by their ids.
       #
@@ -20,6 +16,22 @@ module Mongoid #:nodoc:
       def initialize(document, options, target = nil)
         setup(document, options)
         @target = target || query.call
+      end
+
+      # Override the default behavior to allow the criteria to get reset on
+      # each call into the association.
+      #
+      # Example:
+      #
+      #   person.posts.where(:title => "New")
+      #   person.posts # resets the criteria
+      #
+      # Returns:
+      #
+      # A Criteria object or Array.
+      def method_missing(name, *args, &block)
+        @target = query.call unless @target.is_a?(Array)
+        @target.send(name, *args, &block)
       end
 
       protected

@@ -292,7 +292,7 @@ module Mongoid # :nodoc:
       def reference_many(name, options, &block)
         if (options[:stored_as] == :array)
           opts = optionize(name, options, constraint(name, options, :many_as_array), &block)
-          field "#{name.to_s.singularize}_ids", :type => Array
+          field "#{name.to_s.singularize}_ids", :type => Array, :default => []
           associate(Associations::ReferencesManyAsArray, opts)
         else
           opts = optionize(name, options, constraint(name, options, :many), &block)

@@ -101,4 +101,30 @@ describe Mongoid::Associations::ReferencesManyAsArray do
       end
     end
   end
+
+  describe "#method_missing" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when target is a criteria" do
+
+      before do
+        person.preference_ids = ["1", "2", "3"]
+        @association = Mongoid::Associations::ReferencesManyAsArray.instantiate(
+          person, options
+        )
+      end
+
+      it "executes the criteria and sends to the result" do
+        Preference.expects(:any_in).with(:_id => ["1", "2", "3"]).returns([])
+        @association.entries.should == []
+      end
+    end
+
+    context "when target is an array" do
+
+    end
+  end
 end
