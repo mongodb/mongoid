@@ -145,12 +145,25 @@ module Mongoid #:nodoc:
       end
 
       protected
-      # Load the target entries if the document is new.
+      # Load the target entries if the parent document is new.
       def load_target
         @target = @target.entries if @parent.new_record?
       end
 
       # The default query used for retrieving the documents from the database.
+      # In this case we use the common API between Mongoid, ActiveRecord, and
+      # DataMapper so we can do one-to-many relationships with data in other
+      # databases.
+      #
+      # Example:
+      #
+      # <tt>association.query</tt>
+      #
+      # Returns:
+      #
+      #   A +Criteria+ if a Mongoid association.
+      #   An +Array+ of objects if an ActiveRecord association
+      #   A +Collection+ if a DataMapper association.
       def query
         @query ||= lambda { @klass.all(:conditions => { @foreign_key => @parent.id }) }
       end
@@ -162,7 +175,16 @@ module Mongoid #:nodoc:
         reset; removed
       end
 
-      # Reset the memoized association on the parent.
+      # Reset the memoized association on the parent. This will execute the
+      # database query again.
+      #
+      # Example:
+      #
+      # <tt>association.reset</tt>
+      #
+      # Returns:
+      #
+      # See #query rdoc for return values.
       def reset
         @parent.send(:reset, @options.name) { query.call }
       end
@@ -201,7 +223,6 @@ module Mongoid #:nodoc:
           instantiate(document, options, target)
         end
       end
-
     end
   end
 end

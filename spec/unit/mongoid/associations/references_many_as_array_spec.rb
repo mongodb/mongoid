@@ -18,6 +18,62 @@ describe Mongoid::Associations::ReferencesManyAsArray do
     )
   end
 
+  describe "#<<" do
+
+    context "when the parent document is new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:preference) do
+        Preference.new(:name => "Brightness")
+      end
+
+      before do
+        @association = Mongoid::Associations::ReferencesManyAsArray.new(
+          person, options
+        )
+        @association << preference
+      end
+
+      it "appends the document to the association" do
+        @association.target.first.should == preference
+      end
+
+      it "adds the id to the association ids" do
+        person.preference_ids.should include(preference.id)
+      end
+    end
+
+    context "when the parent document is not new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:preference) do
+        Preference.new(:name => "Brightness")
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        @association = Mongoid::Associations::ReferencesManyAsArray.new(
+          person, options, []
+        )
+        @association << preference
+      end
+
+      it "appends the document to the association" do
+        @association.target.first.should == preference
+      end
+
+      it "adds the id to the association ids" do
+        person.preference_ids.should include(preference.id)
+      end
+    end
+  end
+
   describe "#initialize" do
 
     let(:person) do
