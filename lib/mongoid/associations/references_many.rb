@@ -93,10 +93,8 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options, target = nil)
-        @parent, @klass, @options = document, options.klass, options
-        @foreign_key = options.foreign_key
+        setup(document, options)
         @target = target || query.call
-        extends(options)
       end
 
       # Override the default behavior to allow the criteria to get reset on
