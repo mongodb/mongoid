@@ -284,11 +284,6 @@ module Mongoid # :nodoc:
         )
       end
 
-      # Find the foreign key.
-      def fk(name, options)
-        options[:foreign_key] || name.to_s.foreign_key
-      end
-
       def reference_many(name, options, &block)
         if (options[:stored_as] == :array)
           opts = optionize(name, options, constraint(name, options, :many_as_array), &block)
