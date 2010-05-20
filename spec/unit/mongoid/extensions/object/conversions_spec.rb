@@ -12,7 +12,8 @@ describe Mongoid::Extensions::Object::Conversions do
           "age" => 100,
           "_type" => "Person",
           "blood_alcohol_content" => 0.0,
-          "pets" => false
+          "pets" => false,
+          "preference_ids" => []
         }
     end
 

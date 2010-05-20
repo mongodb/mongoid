@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     # Represents an relational one-to-many association with an object in a
     # separate collection or database, stored as an array of ids on the parent
     # document.
-    class ReferencesManyAsArray < Proxy
+    class ReferencesManyAsArray < ReferencesMany
 
       # Initializing a related association only requires looking up the objects
       # by their ids.
