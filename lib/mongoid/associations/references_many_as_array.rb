@@ -15,7 +15,12 @@ module Mongoid #:nodoc:
       def <<(*objects)
         load_target
         objects.flatten.each do |object|
+          # First set the documents id on the parent array of ids.
           @parent.send(@foreign_key) << object.id
+          # Then we need to set the parent's id on the documents array of ids
+          # to get the inverse side of the association as well.
+          reverse_key = object.send(@options.inverse_of).options.foreign_key
+          object.send(reverse_key) << @parent.id
           @target << object
         end
       end

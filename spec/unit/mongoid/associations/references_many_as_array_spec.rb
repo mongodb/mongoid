@@ -14,7 +14,8 @@ describe Mongoid::Associations::ReferencesManyAsArray do
     Mongoid::Associations::Options.new(
       :name => :preferences,
       :foreign_key => "preference_ids",
-      :extend => block
+      :extend => block,
+      :inverse_of => :people
     )
   end
 
@@ -44,6 +45,10 @@ describe Mongoid::Associations::ReferencesManyAsArray do
       it "adds the id to the association ids" do
         person.preference_ids.should include(preference.id)
       end
+
+      it "adds the reverse association id" do
+        preference.person_ids.should include(person.id)
+      end
     end
 
     context "when the parent document is not new" do
@@ -70,6 +75,10 @@ describe Mongoid::Associations::ReferencesManyAsArray do
 
       it "adds the id to the association ids" do
         person.preference_ids.should include(preference.id)
+      end
+
+      it "adds the reverse association id" do
+        preference.person_ids.should include(person.id)
       end
     end
   end
