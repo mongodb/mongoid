@@ -193,10 +193,11 @@ module Mongoid #:nodoc
       name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
       host = settings["host"] || mongo_uri.host || "localhost"
       port = settings["port"] || mongo_uri.port || 27017
+      pool_size = settings["pool_size"] || 1 
       username = settings["username"] || mongo_uri.user
       password = settings["password"] || mongo_uri.password
 
-      connection = Mongo::Connection.new(host, port, :logger => logger)
+      connection = Mongo::Connection.new(host, port, :logger => logger, :pool_size => pool_size)
       if username || password
         connection.add_auth(name, username, password)
         connection.apply_saved_authentication
