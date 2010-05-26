@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency("mongo", ["~> 1.0.1"])
   s.add_runtime_dependency("bson", ["~> 1.0.1"])
 
-  s.add_development_dependency(%q<rspec>, ["= 1.3.0"])
+  s.add_development_dependency(%q<rspec>, ["= 2.0.0.beta.8"])
   s.add_development_dependency(%q<mocha>, ["= 0.9.8"])
 
   s.files        = Dir.glob("lib/**/*") + %w(MIT_LICENSE README.rdoc)
