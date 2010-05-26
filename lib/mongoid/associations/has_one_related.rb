@@ -42,6 +42,20 @@ module Mongoid #:nodoc:
         extends(options)
       end
 
+      # Used for setting the association via a nested attributes setter on the
+      # parent +Document+. Called when using accepts_nested_attributes_for.
+      #
+      # Options:
+      #
+      # attributes: The attributes for the new association
+      #
+      # Returns:
+      #
+      # A new target document.
+      def nested_build(attributes, options = nil)
+        build(attributes) unless @target.blank? && options[:update_only]
+      end
+
       class << self
         # Preferred method for creating the new +RelatesToMany+ association.
         #

@@ -116,6 +116,32 @@ module Mongoid #:nodoc:
         @target.send(name, *args, &block)
       end
 
+      # Used for setting associations via a nested attributes setter from the
+      # parent +Document+.
+      #
+      # Options:
+      #
+      # attributes: A +Hash+ of integer keys and +Hash+ values.
+      #
+      # Returns:
+      #
+      # The newly build target Document.
+      def nested_build(attributes, options = {})
+        attributes.each do |index, attrs|
+          begin
+            document = find(index.to_i)
+            if options && options[:allow_destroy] && attrs['_destroy']
+              @target.delete(document)
+              document.destroy
+            else
+              document.write_attributes(attrs)
+            end
+          rescue Errors::DocumentNotFound
+            build(attrs)
+          end
+        end
+      end
+
       # Delegates to <<
       def push(*objects)
         self << objects

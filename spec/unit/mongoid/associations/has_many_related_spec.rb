@@ -385,6 +385,33 @@ describe Mongoid::Associations::HasManyRelated do
 
   end
 
+  describe "#nested_build" do
+
+    before do
+      @parent = stub(:id => "1", :new_record? => false, :class => Person)
+
+      @first = Post.new(:id => 0)
+      @second = Post.new(:id => 1)
+      @related = [@first, @second]
+      Post.expects(:all).returns(@related)
+      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+    end
+    
+    it "should update existing documents" do
+      Post.expects(:find).with(0).returns(@first)
+      @association.nested_build({ "0" => { :title => "Yet Another" } })
+      @association.size.should == 2
+      @association[0].title.should == "Yet Another"
+    end
+    
+    it "should create new documents" do
+      @association.nested_build({ "2" => { :title => "Yet Another" } })
+      @association.size.should == 3
+      @association[2].title.should == "Yet Another"
+    end
+
+  end
+
   describe "#push" do
 
     before do
