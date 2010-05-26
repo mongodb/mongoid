@@ -1,7 +1,7 @@
 require "rubygems"
 require "rake"
 require "rake/rdoctask"
-require "spec/rake/spectask"
+require "rspec/core/rake_task"
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
@@ -18,16 +18,9 @@ task :release => :build do
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
-Spec::Rake::SpecTask.new(:spec) do |spec|
+Rspec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = "spec/**/*_spec.rb"
-  spec.spec_opts = ["--options", "spec/spec.opts"]
-end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << "lib" << "spec"
-  spec.pattern = "spec/**/*_spec.rb"
-  spec.spec_opts = ["--options", "spec/spec.opts"]
-  spec.rcov = true
+  # spec.spec_opts = ["--options", "spec/spec.opts"]
 end
 
 Rake::RDocTask.new do |rdoc|

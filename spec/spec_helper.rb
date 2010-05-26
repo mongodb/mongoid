@@ -10,7 +10,7 @@ gem "mocha", ">= 0.9.8"
 
 require "mongoid"
 require "mocha"
-require "spec"
+require "rspec"
 
 Mongoid.configure do |config|
   name = "mongoid_test"
@@ -23,7 +23,7 @@ end
 
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
 
-Spec::Runner.configure do |config|
+Rspec.configure do |config|
   config.mock_with :mocha
   config.after :suite do
     Mongoid.master.collections.each(&:drop)
