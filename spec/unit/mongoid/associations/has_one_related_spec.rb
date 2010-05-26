@@ -135,6 +135,29 @@ describe Mongoid::Associations::HasOneRelated do
 
   end
 
+  describe "#nested_build" do
+
+    before do
+      @parent = stub(:id => "5", :class => Person)
+      @game = Game.new
+      Game.expects(:first).returns(@game)
+    end
+
+    context "when attributes provided" do
+
+      before do
+        @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+      end
+
+      it "replaces the existing has_one" do
+        game = @association.nested_build({ :score => 200 })
+        game.score.should == 200
+      end
+
+    end
+
+  end
+
   describe ".macro" do
 
     it "returns :has_one_related" do
