@@ -27,10 +27,21 @@ class Label
   include Mongoid::Document
   field :name
   embedded_in :artist, :inverse_of => :labels
-  before_validate :cleanup
+  before_validation :cleanup
 
   private
   def cleanup
     self.name = self.name.downcase.capitalize
   end
+end
+
+class ValidationCallback
+  include Mongoid::Document
+  field :history, :type => Array, :default => []
+  validate do
+    self.history << :validate
+  end
+
+  before_validation { self.history << :before_validation }
+  after_validation { self.history << :after_validation }
 end

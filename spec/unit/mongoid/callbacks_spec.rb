@@ -43,11 +43,11 @@ describe Mongoid::Callbacks do
     end
 
     it "includes the before_validation callback" do
-      @class.should respond_to(:before_validate)
+      @class.should respond_to(:before_validation)
     end
 
     it "includes the after_validation callback" do
-      @class.should respond_to(:after_validate)
+      @class.should respond_to(:after_validation)
     end
 
   end

@@ -11,7 +11,11 @@ module Mongoid #:nodoc:
         :destroy,
         :save,
         :update,
-        :validate
+        :validation
+    end
+
+    def valid?(*) #nodoc
+      _run_validation_callbacks { super }
     end
   end
 end
