@@ -1,3 +1,4 @@
+require "rails"
 module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
