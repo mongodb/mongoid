@@ -15,6 +15,11 @@ task :install => :build do
 end
 
 task :release => :build do
+  puts "Tagging #{Mongoid::VERSION}..."
+  system "git tag -a #{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
+  puts "Pushing to Github..."
+  system "git push --tags"
+  puts "Pushing to Gemcutter..."
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
