@@ -394,16 +394,16 @@ describe Mongoid::Associations::ReferencesMany do
       @second = Post.new(:id => 1)
       @related = [@first, @second]
       Post.expects(:all).returns(@related)
-      @association = Mongoid::Associations::HasManyRelated.new(@parent, options)
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
-    
+
     it "should update existing documents" do
       Post.expects(:find).with(0).returns(@first)
       @association.nested_build({ "0" => { :title => "Yet Another" } })
       @association.size.should == 2
       @association[0].title.should == "Yet Another"
     end
-    
+
     it "should create new documents" do
       @association.nested_build({ "2" => { :title => "Yet Another" } })
       @association.size.should == 3

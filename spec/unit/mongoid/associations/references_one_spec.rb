@@ -146,7 +146,7 @@ describe Mongoid::Associations::ReferencesOne do
     context "when attributes provided" do
 
       before do
-        @association = Mongoid::Associations::HasOneRelated.new(@parent, options)
+        @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
       end
 
       it "replaces the existing has_one" do
