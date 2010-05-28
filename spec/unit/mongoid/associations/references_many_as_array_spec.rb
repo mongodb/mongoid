@@ -203,6 +203,46 @@ describe Mongoid::Associations::ReferencesManyAsArray do
     end
   end
 
+  describe "#create!" do
+
+    context "when validation passes" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        @association = Mongoid::Associations::ReferencesManyAsArray.new(
+          person, options
+        )
+        @preference = @association.create!(:name => "Brightness")
+      end
+
+      it "saves the association" do
+        @preference.new_record?.should == false
+      end
+    end
+
+    context "when validation fails" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        @association = Mongoid::Associations::ReferencesManyAsArray.new(
+          person, options, []
+        )
+      end
+
+      it "raises an error" do
+        lambda { @association.create!(:name => "B") }.should
+          raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
+
   describe "#initialize" do
 
     let(:person) do
