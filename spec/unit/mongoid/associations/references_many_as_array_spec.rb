@@ -83,6 +83,62 @@ describe Mongoid::Associations::ReferencesManyAsArray do
     end
   end
 
+  describe "#build" do
+
+    context "when the parent is new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        @association = Mongoid::Associations::ReferencesManyAsArray.new(
+          person, options
+        )
+        @preference = @association.build(:name => "Brightness")
+      end
+
+      it "appends the document to the association" do
+        @association.target.first.should == @preference
+      end
+
+      it "adds the id to the association ids" do
+        person.preference_ids.should include(@preference.id)
+      end
+
+      it "adds the reverse association id" do
+        @preference.person_ids.should include(person.id)
+      end
+    end
+
+    context "when the parent is not new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        @association = Mongoid::Associations::ReferencesManyAsArray.new(
+          person, options, []
+        )
+        @preference = @association.build(:name => "Brightness")
+      end
+
+      it "appends the document to the association" do
+        @association.target.first.should == @preference
+      end
+
+      it "adds the id to the association ids" do
+        person.preference_ids.should include(@preference.id)
+      end
+
+      it "adds the reverse association id" do
+        @preference.person_ids.should include(person.id)
+      end
+    end
+  end
+
   describe "#initialize" do
 
     let(:person) do

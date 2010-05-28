@@ -19,8 +19,7 @@ module Mongoid #:nodoc:
           @parent.send(@foreign_key) << object.id
           # Then we need to set the parent's id on the documents array of ids
           # to get the inverse side of the association as well.
-          reverse_key = object.send(@options.inverse_of).options.foreign_key
-          object.send(reverse_key) << @parent.id
+          object.send(reverse_key(object)) << @parent.id
           @target << object
         end
       end
@@ -28,7 +27,23 @@ module Mongoid #:nodoc:
       alias :concat :<<
       alias :push :<<
 
+      # Builds a new Document and adds it to the association collection. The
+      # document created will be of the same class as the others in the
+      # association, and the attributes will be passed into the constructor.
+      #
+      # Returns the newly created object.
+      def build(attributes = nil)
+        load_target
+        document = @klass.instantiate(attributes || {})
+        push(document); document
+      end
+
       protected
+      # Find the inverse key for the supplied document.
+      def reverse_key(document)
+        document.send(@options.inverse_of).options.foreign_key
+      end
+
       # The default query used for retrieving the documents from the database.
       def query
         @query ||= lambda { @klass.any_in(:_id => @parent.send(@foreign_key)) }
