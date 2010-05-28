@@ -30,6 +30,14 @@ module Mongoid #:nodoc:
       Criteria.translate(self, *args).count
     end
 
+    # Returns true if there are on document in database based on the
+    # provided arguments.
+    #
+    # <tt>Person.exists?(:first, :conditions => { :attribute => "value" })</tt>
+    def exists?(*args)
+      Criteria.translate(self, *args).limit(1).count == 1
+    end
+
     # Helper to initialize a new +Criteria+ object for this class.
     #
     # Example:

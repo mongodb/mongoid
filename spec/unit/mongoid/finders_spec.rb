@@ -77,6 +77,47 @@ describe Mongoid::Finders do
 
   end
 
+  describe ".exists?" do
+
+    before do
+      @conditions = { :conditions => { :title => "Sir" } }
+      @criteria = mock
+    end
+
+    it "should be true if there are document in collection with options" do
+      Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
+      @criteria.expects(:limit).with(1).returns(@criteria)
+      @criteria.expects(:count).returns(1)
+      Person.exists?(@conditions).should be_true
+    end
+
+    it 'should false if there are no document in collection with options' do
+      Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
+      @criteria.expects(:limit).with(1).returns(@criteria)
+      @criteria.expects(:count).returns(0)
+      Person.exists?(@conditions).should be_false
+    end
+
+    context "when no options provided" do
+
+      it "should be true if there are document in collection" do
+        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
+        @criteria.expects(:limit).with(1).returns(@criteria)
+        @criteria.expects(:count).returns(1)
+        Person.exists?.should be_true
+      end
+
+      it "should be false if there are no document in collection" do
+        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
+        @criteria.expects(:limit).with(1).returns(@criteria)
+        @criteria.expects(:count).returns(1)
+        Person.exists?.should be_true
+      end
+
+    end
+
+  end
+
   describe ".excludes" do
 
     it "returns a new criteria with select conditions added" do
