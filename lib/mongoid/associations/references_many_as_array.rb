@@ -13,12 +13,15 @@ module Mongoid #:nodoc:
       #
       # <tt>person.preferences << Preference.new(:name => "VGA")</tt>
       def <<(*objects)
-        load_target
+        @target = @target.entries
         objects.flatten.each do |object|
           # First set the documents id on the parent array of ids.
           @parent.send(@foreign_key) << object.id
           # Then we need to set the parent's id on the documents array of ids
-          # to get the inverse side of the association as well.
+          # to get the inverse side of the association as well. Note, need a
+          # clean way to handle this with new documents - we want to set the
+          # actual objects as well, but dont want to get in an infinite loop
+          # while doing so.
           object.send(reverse_key(object)) << @parent.id
           @target << object
         end
