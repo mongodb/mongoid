@@ -126,6 +126,14 @@ describe Mongoid::Associations::ReferencesMany do
       @association.build(:title => "Sassy")
       @association.first.person.should == @parent
     end
+
+    context "when passing nil" do
+
+      it "builds an object with empty attributes" do
+        @association.build(nil)
+        @association.first.person.should == @parent
+      end
+    end
   end
 
   describe "#delete_all" do

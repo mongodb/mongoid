@@ -24,10 +24,10 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor.
       #
       # Returns the newly created object.
-      def build(attributes = {})
+      def build(attributes = nil)
         load_target
         name = @parent.class.to_s.underscore
-        object = @klass.instantiate(attributes.merge(name => @parent))
+        object = @klass.instantiate((attributes || {}).merge(name => @parent))
         @target << object
         object
       end
