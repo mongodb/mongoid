@@ -396,4 +396,29 @@ describe Mongoid::Associations::ReferencesManyAsArray do
       @association.target.first.should == preference
     end
   end
+
+  describe ".update" do
+
+    before do
+      @first = Preference.new
+      @second = Preference.new
+      @related = [@first, @second]
+      @parent = Person.new
+      @proxy = Mongoid::Associations::ReferencesManyAsArray.update(@related, @parent, options)
+    end
+
+    it "sets the related object id on the parent" do
+      @first.person_ids.should include(@parent.id)
+      @second.person_ids.should include(@parent.id)
+    end
+
+    it "sets the target" do
+      @proxy.target.should == @related
+    end
+
+    it "sets the reverse association ids" do
+      @parent.preference_ids.should include(@first.id)
+      @parent.preference_ids.should include(@second.id)
+    end
+  end
 end

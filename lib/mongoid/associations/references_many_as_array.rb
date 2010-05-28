@@ -48,6 +48,28 @@ module Mongoid #:nodoc:
       def query
         @query ||= lambda { @klass.any_in(:_id => @parent.send(@foreign_key)) }
       end
+
+      class << self
+        # Perform an update of the relationship of the parent and child. This
+        # will assimilate the child +Document+ into the parent's object graph.
+        #
+        # Options:
+        #
+        # related: The related object
+        # parent: The parent +Document+ to update.
+        # options: The association +Options+
+        #
+        # Example:
+        #
+        # <tt>RelatesToManyAsArray.update(preferences, person, options)</tt>
+        def update(target, document, options)
+          target.each do |child|
+            name = child.associations[options.inverse_of.to_s].options.name
+            child.send(name) << document
+          end
+          instantiate(document, options, target)
+        end
+      end
     end
   end
 end
