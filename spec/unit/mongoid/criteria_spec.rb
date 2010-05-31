@@ -291,6 +291,25 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#exists?" do
+
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+    end
+
+    it "call the count context and return true if there are element" do
+      @context.expects(:count).returns(10)
+      @criteria.exists?.should be_true
+    end
+
+    it "call the count context and return false if there are no element" do
+      @context.expects(:count).returns(0)
+      @criteria.exists?.should be_false
+    end
+
+  end
+
   describe "#each" do
 
     before do

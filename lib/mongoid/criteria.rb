@@ -82,6 +82,15 @@ module Mongoid #:nodoc:
       self
     end
 
+    # Return true if the criteria has some Document or not
+    #
+    # Example:
+    #
+    # <tt>criteria.exists?</tt>
+    def exists?
+      context.count > 0
+    end
+
     # Merges the supplied argument hash into a single criteria
     #
     # Options:
