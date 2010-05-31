@@ -286,11 +286,10 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "returns the document in the array with that id" do
-        Post.expects(:find).with("5").returns(@post)
+        @association.expects(:id_criteria).with("5").returns(@post)
         post = @association.find("5")
         post.should == @post
       end
-
     end
 
     context "when finding all with conditions" do
@@ -406,13 +405,14 @@ describe Mongoid::Associations::ReferencesMany do
     end
 
     it "should update existing documents" do
-      Post.expects(:find).with(0).returns(@first)
+      @association.expects(:find).with(0).returns(@first)
       @association.nested_build({ "0" => { :title => "Yet Another" } })
       @association.size.should == 2
       @association[0].title.should == "Yet Another"
     end
 
     it "should create new documents" do
+      @association.expects(:find).with(2).raises(Mongoid::Errors::DocumentNotFound.new(Post, 2))
       @association.nested_build({ "2" => { :title => "Yet Another" } })
       @association.size.should == 3
       @association[2].title.should == "Yet Another"

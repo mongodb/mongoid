@@ -78,9 +78,10 @@ module Mongoid #:nodoc:
 
       # Finds a document in this association.
       # If an id is passed, will return the document for that id.
-      def find(*args)
-        args[1][:conditions].merge!(@foreign_key.to_sym => @parent.id) if args.size > 1
-        @klass.find(*args)
+      def find(id_or_type, options = {})
+        return self.id_criteria(id_or_type) unless id_or_type.is_a?(Symbol)
+        options[:conditions] = (options[:conditions] || {}).merge(@foreign_key.to_sym => @parent.id)
+        @klass.find(id_or_type, options)
       end
 
       # Initializing a related association only requires looking up the objects
