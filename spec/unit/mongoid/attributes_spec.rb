@@ -317,6 +317,23 @@ describe Mongoid::Attributes do
 
       end
 
+      context "when association is a references_one" do
+
+        before do
+          @game = Game.new(:score => 100)
+          @attributes = {
+            :game => @game
+          }
+          @person = Person.new(@attributes)
+        end
+
+        it "sets the associations" do
+          @person.game.should == @game
+          @game.person.should == @person
+        end
+
+      end
+
       context "when association is a embedded_in" do
 
         before do

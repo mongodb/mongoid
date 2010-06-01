@@ -56,6 +56,30 @@ describe Mongoid::Associations do
     end
   end
 
+  context "passing a relational child to the parent constructor" do
+
+    before do
+      @game = Game.new(:score => 1)
+      @person = Person.new(:title => "Sir", :game => @game)
+      @person.save
+    end
+
+    it "sets the association on save" do
+      @from_db = Person.find(@person.id)
+      @from_db.game.should == @game
+    end
+
+    it "sets the reverse association before save" do
+      @game.person.should == @person
+    end
+
+    it "sets the reverse association after save" do
+      @from_db = Game.find(@game.id)
+      @game.person.should == @person
+    end
+
+  end
+
   context "criteria on has many embedded associations" do
 
     before do
@@ -119,6 +143,7 @@ describe Mongoid::Associations do
         @account.creator.should == @user
       end
     end
+
   end
 
   context "one-to-many relational associations" do

@@ -53,6 +53,17 @@ module Mongoid # :nodoc:
       def update_associations(name)
         send(name).each { |doc| doc.save } if new_record?
       end
+
+      def update_foreign_keys
+        associations.each do |name, association|
+          next unless association.macro == :referenced_in
+          foreign_key = association.options.foreign_key
+          if send(foreign_key).nil?
+            target = send(name)
+            send("#{foreign_key}=", target ? target.id : nil)
+          end
+        end
+      end
     end
 
     module ClassMethods
@@ -172,6 +183,7 @@ module Mongoid # :nodoc:
         associate(Associations::ReferencedIn, opts)
         field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
         index(opts.foreign_key) unless embedded?
+        set_callback(:save, :before) { |document| document.update_foreign_keys }
       end
 
       alias :belongs_to_related :referenced_in

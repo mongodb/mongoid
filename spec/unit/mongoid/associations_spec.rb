@@ -600,6 +600,20 @@ describe Mongoid::Associations do
     end
   end
 
+  describe "#update_foreign_keys" do
+
+    before do
+      @game = Game.new(:score => 1)
+      @person = Person.new(:title => "Sir", :game => @game)
+    end
+
+    it "updates blank foreign keys" do
+      @game.update_foreign_keys
+      @game.person_id.should == @person.id
+    end
+
+  end
+
   describe "#update_associations" do
 
     context "when associations exist" do
