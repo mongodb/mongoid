@@ -5,7 +5,7 @@ namespace :db do
     Mongoid.master.collections.each{|col| col.drop unless col.name == 'system.users' }
   end
 
-  if not task_defined?("db:seed")
+  if not Rake::Task.task_defined?("db:seed")
     # if another ORM has defined db:seed, don't run it twice.
     desc 'Load the seed data from db/seeds.rb'
     task :seed => :environment do
