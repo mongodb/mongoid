@@ -215,17 +215,6 @@ module Mongoid #:nodoc:
       def to_a
         [ self ]
       end
-
-      # Returns nil if document is new, or an array of primary keys if not.
-      def to_key
-        new_record? ? nil : [ id ]
-      end
-
-      # Returns the id of the Document, used in Rails compatibility.
-      def to_param
-        id
-      end
-
       # Observe a notify call from a child +Document+. This will either update
       # existing attributes on the +Document+ or clear them out for the child if
       # the clear boolean is provided.
