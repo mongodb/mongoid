@@ -605,6 +605,13 @@ describe Mongoid::Associations do
         it "creates the association_ids field" do
           Person.allocate.should respond_to(:preference_ids)
         end
+
+        context "when index is set to true" do
+
+          it "adds an index on the association field" do
+            Person.collection.index_information["preference_ids_1"].should_not be_nil
+          end
+        end
       end
     end
   end

@@ -68,7 +68,7 @@ class Person
     end
   end
   references_many :paranoid_posts
-  references_many :preferences, :stored_as => :array, :inverse_of => :people
+  references_many :preferences, :stored_as => :array, :inverse_of => :people, :index => true
   references_many :user_accounts, :stored_as => :array, :inverse_of => :person
 
   def score_with_rescoring=(score)

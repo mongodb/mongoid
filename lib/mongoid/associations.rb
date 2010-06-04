@@ -301,7 +301,7 @@ module Mongoid # :nodoc:
           foreign_key = "#{name.to_s.singularize}_ids"
           opts = optionize(name, options, constraint(name, options, :many_as_array), &block)
           field(foreign_key, :type => Array, :default => [])
-          index(foreign_key) if !embedded? && opts.index
+          index(foreign_key) if opts.index
           associate(Associations::ReferencesManyAsArray, opts)
         else
           opts = optionize(name, options, constraint(name, options, :many), &block)
