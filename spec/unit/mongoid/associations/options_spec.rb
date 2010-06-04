@@ -113,6 +113,60 @@ describe Mongoid::Associations::Options do
     end
   end
 
+  describe "#foreign_key_type" do
+
+    context "when none defined" do
+
+      before do
+        @attributes = { :name => :posts }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns BSON::ObjectID" do
+        @options.foreign_key_type.should == BSON::ObjectID
+      end
+    end
+
+    context "when a type defined" do
+
+      before do
+        @attributes = { :name => :posts, :foreign_key_type => Integer }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns the defined type" do
+        @options.foreign_key_type.should == Integer
+      end
+    end
+  end
+
+  describe "#index" do
+
+    context "when not defined" do
+
+      before do
+        @attributes = { :name => :posts }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "defaults to false" do
+        @options.index.should == false
+      end
+    end
+
+    context "when defined" do
+
+      before do
+        @attributes = { :name => :posts, :index => true }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns the defined value" do
+        @options.index.should == true
+      end
+    end
+  end
+
   describe "#inverse_of" do
 
     before do
