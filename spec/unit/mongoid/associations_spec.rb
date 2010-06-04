@@ -503,11 +503,20 @@ describe Mongoid::Associations do
 
     context "when document is root level" do
 
-      it "puts an index on the foreign key" do
-        Game.expects(:index).with("person_id")
-        Game.referenced_in :person
+      context "when index is not set" do
+
+        it "does not index the foreign_key" do
+          Post.collection.index_information["person_id_1"].should be_nil
+        end
       end
 
+      context "when index is set" do
+
+        it "puts an index on the foreign key" do
+          Game.expects(:index).with("person_id")
+          Game.referenced_in :person, :index => true
+        end
+      end
     end
 
     context "when using object ids" do
