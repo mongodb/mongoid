@@ -3,6 +3,7 @@ require "spec_helper"
 describe Mongoid::Associations do
 
   before do
+    Artist.delete_all
     Person.delete_all
     Game.delete_all
     Post.delete_all
@@ -77,7 +78,27 @@ describe Mongoid::Associations do
       @from_db = Game.find(@game.id)
       @game.person.should == @person
     end
+  end
 
+  context "creation of an embedded association via create" do
+
+    context "when passed a parent" do
+
+      before do
+        @artist = Artist.new(:name => "Placebo")
+        @label = Label.create(:artist => @artist, :name => "Island")
+      end
+
+      it "saves the parent and the child" do
+        from_db = Artist.find(@artist.id)
+        from_db.labels.first.should == @label
+      end
+
+      it "does not save the child more than once" do
+        from_db = Artist.find(@artist.id)
+        from_db.labels.size.should == 1
+      end
+    end
   end
 
   context "criteria on has many embedded associations" do
