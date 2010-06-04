@@ -30,4 +30,38 @@ Gem::Specification.new do |s|
 
   s.files        = Dir.glob("lib/**/*") + %w(MIT_LICENSE README.rdoc)
   s.require_path = 'lib'
+
+  s.post_install_message = <<-POST_INSTALL_MESSAGE
+   _________________________________
+  |:::::::::::::::::::::::::::::::::| "I find your lack of faith disturbing."
+  |:::::::::::::;;::::::::::::::::::|
+  |:::::::::::'~||~~~``:::::::::::::| This version of Mongoid introduces
+  |::::::::'   .':     o`:::::::::::| a different way of defining how
+  |:::::::' oo | |o  o    ::::::::::| ids are stored on documents, as
+  |::::::: 8  .'.'    8 o  :::::::::| well as how foreign key fields
+  |::::::: 8  | |     8    :::::::::| and indexes are stored.
+  |::::::: _._| |_,...8    :::::::::|
+  |::::::'~--.   .--. `.   `::::::::| If you were using String
+  |:::::'     =8     ~  \\ o ::::::::| representations of BSON::ObjectIDs
+  |::::'       8._ 88.   \\ o::::::::| as your document ids, all of your
+  |:::'   __. ,.ooo~~.    \\ o`::::::| documents will now need to tell
+  |:::   . -. 88`78o/:     \\  `:::::| Mongoid to use Strings like so:
+  |::'     /. o o \\ ::      \\88`::::|
+  |:;     o|| 8 8 |d.        `8 `:::| class User
+  |:.       - ^ ^ -'           `-`::|   include Mongoid::Document
+  |::.                          .:::|   identity :type => String
+  |:::::.....           ::'     ``::| end
+  |::::::::-'`-        88          `|
+  |:::::-'.          -       ::     | All ids will default to
+  |:-~. . .                   :     | BSON:ObjectIDs from now on, and
+  | .. .   ..:   o:8      88o       | Config#use_object_ids has been
+  |. .     :::   8:P     d888. . .  | removed.
+  |.   .   :88   88      888'  . .  |
+  |   o8  d88P . 88   ' d88P   ..   | Foreign key fields for relational
+  |  88P  888   d8P   ' 888         | associations no longer index by
+  |   8  d88P.'d:8  .- dP~ o8       | default - you will need to pass
+  |      888   888    d~ o888    LS | :index => true to the association
+  |_________________________________| definition to have the field indexed.
+
+  POST_INSTALL_MESSAGE
 end
