@@ -2,6 +2,12 @@
 module Mongoid #:nodoc
   module Hierarchy #:nodoc
     extend ActiveSupport::Concern
+    included do
+      cattr_accessor :hereditary
+      self.hereditary = false
+
+      attr_accessor :_parent
+    end
 
     module InstanceMethods #:nodoc:
 
@@ -29,6 +35,41 @@ module Mongoid #:nodoc
           end
           children
         end
+      end
+
+      # Is inheritance in play here?
+      #
+      # Returns:
+      #
+      # <tt>true</tt> if inheritance used, <tt>false</tt> if not.
+      def hereditary?
+        !!self.hereditary
+      end
+
+      # Sets up a child/parent association. This is used for newly created
+      # objects so they can be properly added to the graph and have the parent
+      # observers set up properly.
+      #
+      # Options:
+      #
+      # abject: The parent object that needs to be set for the child.
+      # association_name: The name of the association for the child.
+      #
+      # Example:
+      #
+      # <tt>address.parentize(person, :addresses)</tt>
+      def parentize(object, association_name)
+        self._parent = object
+        self.association_name = association_name.to_s
+        add_observer(object)
+      end
+
+      # Return the root +Document+ in the object graph. If the current +Document+
+      # is the root object in the graph it will return self.
+      def _root
+        object = self
+        while (object._parent) do object = object._parent; end
+        object || self
       end
     end
   end

@@ -5,22 +5,20 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor :primary_key, :hereditary
-      self.hereditary = false
+      cattr_accessor :primary_key
 
-      attr_accessor :association_name, :_parent
+      attr_accessor :association_name
       attr_reader :new_record
 
-      delegate :db, :primary_key, :to => "self.class"
+      delegate :primary_key, :to => "self.class"
     end
 
-    module ClassMethods
-      # Return the database associated with this class.
-      def db
-        collection.db
-      end
+    module ClassMethods #:nodoc:
 
       # Perform default behavior but mark the hierarchy as being hereditary.
+      #
+      # This method must remain in the +Document+ module, even though its
+      # behavior affects items in the Hierarchy module.
       def inherited(subclass)
         super(subclass)
         self.hereditary = true
@@ -85,15 +83,6 @@ module Mongoid #:nodoc:
     #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
     def hash
       id.hash
-    end
-
-    # Is inheritance in play here?
-    #
-    # Returns:
-    #
-    # <tt>true</tt> if inheritance used, <tt>false</tt> if not.
-    def hereditary?
-      !!self.hereditary
     end
 
     # Introduces a child object into the +Document+ object graph. This will
@@ -161,24 +150,6 @@ module Mongoid #:nodoc:
       notify_observers(self)
     end
 
-    # Sets up a child/parent association. This is used for newly created
-    # objects so they can be properly added to the graph and have the parent
-    # observers set up properly.
-    #
-    # Options:
-    #
-    # abject: The parent object that needs to be set for the child.
-    # association_name: The name of the association for the child.
-    #
-    # Example:
-    #
-    # <tt>address.parentize(person, :addresses)</tt>
-    def parentize(object, association_name)
-      self._parent = object
-      self.association_name = association_name.to_s
-      add_observer(object)
-    end
-
     # Return the attributes hash.
     def raw_attributes
       @attributes
@@ -202,18 +173,11 @@ module Mongoid #:nodoc:
       notify
     end
 
-    # Return the root +Document+ in the object graph. If the current +Document+
-    # is the root object in the graph it will return self.
-    def _root
-      object = self
-      while (object._parent) do object = object._parent; end
-      object || self
-    end
-
     # Return an array with this +Document+ only in it.
     def to_a
       [ self ]
     end
+
     # Observe a notify call from a child +Document+. This will either update
     # existing attributes on the +Document+ or clear them out for the child if
     # the clear boolean is provided.
