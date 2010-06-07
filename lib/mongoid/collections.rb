@@ -32,6 +32,15 @@ module Mongoid #:nodoc
         collection.db
       end
 
+      # Convenience method for getting index information from the collection.
+      #
+      # Example:
+      #
+      # <tt>Person.index_information</tt>
+      def index_information
+        collection.index_information
+      end
+
       # Macro for setting the collection name to store in.
       #
       # Example:

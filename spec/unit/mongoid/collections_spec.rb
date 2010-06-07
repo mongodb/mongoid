@@ -47,6 +47,13 @@ describe Mongoid::Collections do
     end
   end
 
+  describe ".index_information" do
+
+    it "returns index information from the collection" do
+      Person.index_information["title_1"].should_not be_nil
+    end
+  end
+
   describe ".store_in" do
 
     context "on a parent class" do
