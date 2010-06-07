@@ -6,7 +6,11 @@ module Mongoid #:nodoc
     module InstanceMethods #:nodoc:
 
       # Get all child +Documents+ to this +Document+, going n levels deep if
-      # necessary.
+      # necessary. This is used when calling update persistence operations from
+      # the root document, where changes in the entire tree need to be
+      # determined. Note that persistence from the embedded documents will
+      # always be preferred, since they are optimized calls... This operation
+      # can get expensive in domains with large hierarchies.
       #
       # Example:
       #
