@@ -13,6 +13,15 @@ module Mongoid #:nodoc:
         define_method(name) { |*args| @options.send(name) }
       end
 
+      # Return true if this meta data is for an embedded association.
+      #
+      # Example:
+      #
+      # <tt>metadata.embedded?</tt>
+      def embedded?
+        [ EmbedsOne, EmbedsMany ].include?(association)
+      end
+
       # Create the new associations MetaData object, which holds the type of
       # the association and its options, with convenience methods for getting
       # that information.

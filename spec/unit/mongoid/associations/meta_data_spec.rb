@@ -23,6 +23,28 @@ describe Mongoid::Associations::MetaData do
     Mongoid::Associations::MetaData.new(association, options)
   end
 
+  describe "#embedded?" do
+
+    context "when association is embedded" do
+
+      before do
+        @embedded = Mongoid::Associations::EmbedsOne
+        @meta = Mongoid::Associations::MetaData.new(@embedded, nil)
+      end
+
+      it "returns true" do
+        @meta.embedded?.should == true
+      end
+    end
+
+    context "when association is not embedded" do
+
+      it "returns false" do
+        metadata.embedded?.should == false
+      end
+    end
+  end
+
   describe "#extension" do
 
     it "delegates to the options" do

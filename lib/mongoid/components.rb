@@ -16,6 +16,7 @@ module Mongoid #:nodoc
       include Mongoid::Dirty
       include Mongoid::Extras
       include Mongoid::Fields
+      include Mongoid::Hierarchy
       include Mongoid::Indexes
       include Mongoid::Matchers
       include Mongoid::Memoization
