@@ -19,7 +19,9 @@ module Mongoid #:nodoc
         associations.inject([]) do |children, (name, metadata)|
           if metadata.embedded?
             child = send(name)
-            children.concat(child.to_a) unless child.blank?
+            child.to_a.each do |doc|
+              children.push(doc).concat(doc._children)
+            end unless child.blank?
           end
           children
         end

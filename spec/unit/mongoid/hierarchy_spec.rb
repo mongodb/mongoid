@@ -45,6 +45,24 @@ describe Mongoid::Hierarchy do
       let(:location) do
         Location.new(:name => "Work")
       end
+
+      before do
+        person.name = name
+        address.locations << location
+        person.addresses << address
+      end
+
+      it "includes embeds_one documents" do
+        person._children.should include(name)
+      end
+
+      it "includes embeds_many documents" do
+        person._children.should include(address)
+      end
+
+      it "includes embedded documents multiple levels deep" do
+        person._children.should include(location)
+      end
     end
   end
 end
