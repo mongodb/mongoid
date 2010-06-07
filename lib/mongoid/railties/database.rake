@@ -1,8 +1,10 @@
 namespace :db do
 
-  desc 'Drops all the collections for the database for the current Rails.env'
-  task :drop => :environment do
-    Mongoid.master.collections.each{|col| col.drop unless col.name == 'system.users' }
+  if not Rake::Task.task_defined?("db:drop")
+    desc 'Drops all the collections for the database for the current Rails.env'
+    task :drop => :environment do
+      Mongoid.master.collections.each{|col| col.drop unless col.name == 'system.users' || col.name == "system.indexes" }
+    end
   end
 
   if not Rake::Task.task_defined?("db:seed")
@@ -13,24 +15,34 @@ namespace :db do
       load(seed_file) if File.exist?(seed_file)
     end
   end
-  
-  desc 'Create the database, and initialize with the seed data'
-  task :setup => [ 'db:create', 'db:seed' ]
 
-  desc 'Delete data and seed'
-  task :reseed => [ 'db:drop', 'db:seed' ]
-
-  task :create => :environment do
-    # noop
+  if not Rake::Task.task_defined?("db:setup")
+    desc 'Create the database, and initialize with the seed data'
+    task :setup => [ 'db:create', 'db:seed' ]
   end
 
-  task :migrate => :environment do
-    # noop
+  if not Rake::Task.task_defined?("db:reseed")
+    desc 'Delete data and seed'
+    task :reseed => [ 'db:drop', 'db:seed' ]
   end
 
-  namespace :schema do
-    task :load do
+  if not Rake::Task.task_defined?("db:create")
+    task :create => :environment do
       # noop
+    end
+  end
+
+  if not Rake::Task.task_defined?("db:migrate")
+    task :migrate => :environment do
+      # noop
+    end
+  end
+
+  if not Rake::Task.task_defined?("db:schema:load")
+    namespace :schema do
+      task :load do
+        # noop
+      end
     end
   end
 
