@@ -19,129 +19,127 @@ module Mongoid #:nodoc:
   # <tt>document.upsert</tt>
   module Persistence
     extend ActiveSupport::Concern
-    module InstanceMethods #:nodoc:
-      # Remove the +Document+ from the datbase with callbacks.
-      #
-      # Example:
-      #
-      # <tt>document.destroy</tt>
-      #
-      # TODO: Will get rid of other #destroy once new persistence complete.
-      def destroy
-        run_callbacks(:destroy) { self.destroyed = true if _remove }
+    # Remove the +Document+ from the datbase with callbacks.
+    #
+    # Example:
+    #
+    # <tt>document.destroy</tt>
+    #
+    # TODO: Will get rid of other #destroy once new persistence complete.
+    def destroy
+      run_callbacks(:destroy) { self.destroyed = true if _remove }
+    end
+
+    # Insert a new +Document+ into the database. Will return the document
+    # itself whether or not the save was successful.
+    #
+    # Example:
+    #
+    # <tt>document.insert</tt>
+    def insert(validate = true)
+      Insert.new(self, validate).persist
+    end
+
+    # Remove the +Document+ from the datbase.
+    #
+    # Example:
+    #
+    # <tt>document._remove</tt>
+    #
+    # TODO: Will get rid of other #remove once observable pattern killed.
+    def _remove
+      Remove.new(self).persist
+    end
+
+    alias :delete :_remove
+
+    # Save the document - will perform an insert if the document is new, and
+    # update if not. If a validation error occurs a
+    # Mongoid::Errors::Validations error will get raised.
+    #
+    # Example:
+    #
+    # <tt>document.save!</tt>
+    #
+    # Returns:
+    #
+    # +true+ if validation passed, will raise error otherwise.
+    def save!
+      self.class.fail_validate!(self) unless upsert; true
+    end
+
+    # Update the +Document+ in the datbase.
+    #
+    # Example:
+    #
+    # <tt>document.update</tt>
+    def update(validate = true)
+      Update.new(self, validate).persist
+    end
+
+    # Update the +Document+ attributes in the datbase.
+    #
+    # Example:
+    #
+    # <tt>document.update_attributes(:title => "Sir")</tt>
+    #
+    # Returns:
+    #
+    # +true+ if validation passed, +false+ if not.
+    def update_attributes(attributes = {})
+      write_attributes(attributes); update
+    end
+
+    # Update the +Document+ attributes in the datbase.
+    #
+    # Example:
+    #
+    # <tt>document.update_attributes(:title => "Sir")</tt>
+    #
+    # Returns:
+    #
+    # +true+ if validation passed, raises an error if not
+    def update_attributes!(attributes = {})
+      write_attributes(attributes)
+      result = update
+      self.class.fail_validate!(self) unless result
+      result
+    end
+
+    # Upsert the document - will perform an insert if the document is new, and
+    # update if not.
+    #
+    # Example:
+    #
+    # <tt>document.upsert</tt>
+    #
+    # Returns:
+    #
+    # A +Boolean+ for updates.
+    def upsert(validate = true)
+      validate = parse_validate(validate)
+      if new_record?
+        insert(validate).persisted?
+      else
+        update(validate)
       end
+    end
 
-      # Insert a new +Document+ into the database. Will return the document
-      # itself whether or not the save was successful.
-      #
-      # Example:
-      #
-      # <tt>document.insert</tt>
-      def insert(validate = true)
-        Insert.new(self, validate).persist
+    # Save is aliased so that users familiar with active record can have some
+    # semblance of a familiar API.
+    #
+    # Example:
+    #
+    # <tt>document.save</tt>
+    alias :save :upsert
+
+    protected
+    # Alternative validation params.
+    def parse_validate(validate)
+      if validate.is_a?(Hash) && validate.has_key?(:validate)
+        validate = validate[:validate]
       end
-
-      # Remove the +Document+ from the datbase.
-      #
-      # Example:
-      #
-      # <tt>document._remove</tt>
-      #
-      # TODO: Will get rid of other #remove once observable pattern killed.
-      def _remove
-        Remove.new(self).persist
-      end
-
-      alias :delete :_remove
-
-      # Save the document - will perform an insert if the document is new, and
-      # update if not. If a validation error occurs a
-      # Mongoid::Errors::Validations error will get raised.
-      #
-      # Example:
-      #
-      # <tt>document.save!</tt>
-      #
-      # Returns:
-      #
-      # +true+ if validation passed, will raise error otherwise.
-      def save!
-        self.class.fail_validate!(self) unless upsert; true
-      end
-
-      # Update the +Document+ in the datbase.
-      #
-      # Example:
-      #
-      # <tt>document.update</tt>
-      def update(validate = true)
-        Update.new(self, validate).persist
-      end
-
-      # Update the +Document+ attributes in the datbase.
-      #
-      # Example:
-      #
-      # <tt>document.update_attributes(:title => "Sir")</tt>
-      #
-      # Returns:
-      #
-      # +true+ if validation passed, +false+ if not.
-      def update_attributes(attributes = {})
-        write_attributes(attributes); update
-      end
-
-      # Update the +Document+ attributes in the datbase.
-      #
-      # Example:
-      #
-      # <tt>document.update_attributes(:title => "Sir")</tt>
-      #
-      # Returns:
-      #
-      # +true+ if validation passed, raises an error if not
-      def update_attributes!(attributes = {})
-        write_attributes(attributes)
-        result = update
-        self.class.fail_validate!(self) unless result
-        result
-      end
-
-      # Upsert the document - will perform an insert if the document is new, and
-      # update if not.
-      #
-      # Example:
-      #
-      # <tt>document.upsert</tt>
-      #
-      # Returns:
-      #
-      # A +Boolean+ for updates.
-      def upsert(validate = true)
-        validate = parse_validate(validate)
-        if new_record?
-          insert(validate).persisted?
-        else
-          update(validate)
-        end
-      end
-
-      # Save is aliased so that users familiar with active record can have some
-      # semblance of a familiar API.
-      #
-      # Example:
-      #
-      # <tt>document.save</tt>
-      alias :save :upsert
-
-      protected
-      # Alternative validation params.
-      def parse_validate(validate)
-        if validate.is_a?(Hash) && validate.has_key?(:validate)
-          validate = validate[:validate]
-        end
-        validate
-      end
+      validate
     end
 
     module ClassMethods #:nodoc:

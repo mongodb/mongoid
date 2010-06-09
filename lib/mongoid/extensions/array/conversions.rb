@@ -6,11 +6,9 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         extend ActiveSupport::Concern
 
-        module InstanceMethods #:nodoc:
-          # Converts this array into an array of hashes.
-          def mongoidize
-            collect { |obj| obj.attributes }
-          end
+        # Converts this array into an array of hashes.
+        def mongoidize
+          collect { |obj| obj.attributes }
         end
 
         module ClassMethods #:nodoc:

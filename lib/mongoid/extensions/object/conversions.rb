@@ -5,11 +5,9 @@ module Mongoid #:nodoc:
       # This module converts objects into mongoid related objects.
       module Conversions #:nodoc:
         extend ActiveSupport::Concern
-        module InstanceMethods
-          # Converts this object to a hash of attributes
-          def mongoidize
-            self.raw_attributes
-          end
+        # Converts this object to a hash of attributes
+        def mongoidize
+          self.raw_attributes
         end
 
         module ClassMethods

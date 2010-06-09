@@ -10,17 +10,16 @@ module Mongoid #:nodoc:
       embeds_many :versions, :class_name => self.name
       set_callback :save, :before, :revise
     end
-    module InstanceMethods
-      # Create a new version of the +Document+. This will load the previous
-      # document from the database and set it as the next version before saving
-      # the current document. It then increments the version number.
-      def revise
-        last_version = self.class.first(:conditions => { :_id => id, :version => version })
-        if last_version
-          self.versions << last_version.clone
-          self.version = version + 1
-          @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
-        end
+
+    # Create a new version of the +Document+. This will load the previous
+    # document from the database and set it as the next version before saving
+    # the current document. It then increments the version number.
+    def revise
+      last_version = self.class.first(:conditions => { :_id => id, :version => version })
+      if last_version
+        self.versions << last_version.clone
+        self.version = version + 1
+        @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
       end
     end
   end
