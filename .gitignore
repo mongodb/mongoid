@@ -7,3 +7,4 @@ tmp/*
 RAILS
 .bundle
 .rvmrc
+Gemfile.lock
