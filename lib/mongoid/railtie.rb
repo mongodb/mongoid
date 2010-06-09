@@ -6,6 +6,8 @@ module Rails #:nodoc:
       # do we want a custom log subscriber for mongoid?
       # log_subscriber :mongoid, ::Mongoid::Railties::LogSubscriber.new
 
+      config.generators.orm :mongoid, :migration => false
+
       rake_tasks do
         load "mongoid/railties/database.rake"
       end
