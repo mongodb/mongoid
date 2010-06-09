@@ -1,0 +1,46 @@
+GEM
+  remote: http://gemcutter.org/
+  specs:
+    activemodel (3.0.0.beta4)
+      activesupport (= 3.0.0.beta4)
+      builder (~> 2.1.2)
+      i18n (~> 0.4.1)
+    activerecord (3.0.0.beta4)
+      activemodel (= 3.0.0.beta4)
+      activesupport (= 3.0.0.beta4)
+      arel (~> 0.4.0)
+      tzinfo (~> 0.3.16)
+    activesupport (3.0.0.beta4)
+    arel (0.4.0)
+      activesupport (>= 3.0.0.beta)
+    bson (1.0.2)
+    bson_ext (1.0.1)
+    builder (2.1.2)
+    i18n (0.4.1)
+    mocha (0.9.8)
+      rake
+    mongo (1.0.2)
+      bson (= 1.0.2)
+    rake (0.8.7)
+    rspec (2.0.0.beta.8)
+      rspec-core (= 2.0.0.beta.8)
+      rspec-expectations (= 2.0.0.beta.8)
+      rspec-mocks (= 2.0.0.beta.8)
+    rspec-core (2.0.0.beta.8)
+    rspec-expectations (2.0.0.beta.8)
+    rspec-mocks (2.0.0.beta.8)
+    tzinfo (0.3.22)
+    will_paginate (3.0.pre)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activemodel (~> 3.0.0.beta)
+  activerecord (~> 3.0.0.beta)
+  bson (~> 1.0)
+  bson_ext (~> 1.0)
+  mocha (= 0.9.8)
+  mongo (~> 1.0)
+  rspec (= 2.0.0.beta.8)
+  will_paginate (~> 3.0.pre)

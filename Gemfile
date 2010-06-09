@@ -2,9 +2,9 @@
 # Use `bundle exec rake` in order to run the specs using the bundle
 source "http://gemcutter.org"
 
-gem "activemodel", "3.0.0.beta3"
-gem "activerecord", "3.0.0.beta3"
-gem "will_paginate", "3.0.pre"
+gem "activemodel", "~>3.0.0.beta"
+gem "activerecord", "~>3.0.0.beta"
+gem "will_paginate", "~>3.0.pre"
 gem "mongo", "~> 1.0"
 gem "bson", "~> 1.0"
 gem "bson_ext", "~> 1.0"
