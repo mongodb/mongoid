@@ -81,6 +81,11 @@ require "mongoid/versioning"
 require "mongoid/components"
 require "mongoid/document"
 
+# add railtie
+if defined?(Rails)
+  require "mongoid/railtie"
+end
+
 module Mongoid #:nodoc
 
   MONGODB_VERSION = "1.4.0"
