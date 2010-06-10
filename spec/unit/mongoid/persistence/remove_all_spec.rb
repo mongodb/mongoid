@@ -53,7 +53,7 @@ describe Mongoid::Persistence::RemoveAll do
     def root_find_expectation
       lambda {
         collection.expects(:find).with(
-          selector.merge(:_type => "Patient")
+          selector
         ).returns(cursor)
       }
     end

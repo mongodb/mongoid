@@ -115,6 +115,7 @@ describe Mongoid::Document do
 
     before do
       @firefox = Firefox.create(:name => "firefox")
+      @firefox2 = Firefox.create(:name => "firefox 2")
       @browser = Browser.create(:name => "browser")
       @canvas = Canvas.create(:name => "canvas")
     end
@@ -127,6 +128,13 @@ describe Mongoid::Document do
 
     it "deletes from the parent class collection" do
       @firefox.delete
+      Firefox.count.should == 1
+      Browser.count.should == 2
+      Canvas.count.should == 3
+    end
+    
+    it "deletes all documents except for those belonging to parent class collection" do
+      Firefox.delete_all
       Firefox.count.should == 0
       Browser.count.should == 1
       Canvas.count.should == 2

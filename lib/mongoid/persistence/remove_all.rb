@@ -28,8 +28,9 @@ module Mongoid #:nodoc:
       protected
       # Remove the document from the database.
       def remove
-        count = @collection.find(@selector.merge(:_type => @klass.name)).count
-        @collection.remove(@selector, @options)
+        selector = (@klass.hereditary ? @selector.merge(:_type => @klass.name) : @selector)
+        count = @collection.find(selector).count
+        @collection.remove(selector, @options)
         count
       end
     end
