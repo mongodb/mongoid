@@ -13,8 +13,9 @@ describe Mongoid::Validations::UniquenessValidator do
     context "when a document exists with the attribute value" do
 
       before do
-        @criteria = stub(:nil? => false)
-        Person.collection.expects(:find_one).with(:title => "Sir").returns(@criteria)
+        @criteria = stub(:exists? => true)
+        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
       end
 
@@ -30,8 +31,9 @@ describe Mongoid::Validations::UniquenessValidator do
     context "when a superclass document exists with the attribute value" do
       before do
         @drdocument = Doctor.new
-        @criteria = stub(:nil? => false)
-        Person.collection.expects(:find_one).with(:title => "Sir").returns(@criteria)
+        @criteria = stub(:exists? => true)
+        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        validator.setup(Person)
         validator.validate_each(@drdocument, :title, "Sir")
       end
 
@@ -43,8 +45,9 @@ describe Mongoid::Validations::UniquenessValidator do
     context "when no other document exists with the attribute value" do
 
       before do
-        @criteria = stub(:nil? => true)
-        Person.collection.expects(:find_one).with(:title => "Sir").returns(@criteria)
+        @criteria = stub(:exists? => false)
+        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
       end
 
@@ -64,7 +67,9 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           before do
-            Login.collection.expects(:find_one).with(:username => "chitchins").returns([ login ])
+            @criteria = stub(:exists? => true)
+            Login.expects(:where).with(:username => "chitchins").returns(@criteria)
+            validator.setup(Login)
             validator.validate_each(login, :username, "chitchins")
           end
 
@@ -84,7 +89,10 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             before do
-              Login.collection.expects(:find_one).with(:username => "chitchins").returns([ login ])
+              @criteria = stub(:exists? => false)
+              Login.expects(:where).with(:username => "chitchins").returns(@criteria)
+              @criteria.expects(:where).with(:_id => {'$ne' => 'chitchins'}).returns(@criteria)
+              validator.setup(Login)
               validator.validate_each(login, :username, "chitchins")
             end
 
@@ -93,7 +101,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
           end
 
-          context "when the has changed since instantiation" do
+          context "when the id has changed since instantiation" do
 
             let(:login) do
               login = Login.new(:username => "rdawkins")
@@ -103,7 +111,10 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             before do
-              Login.collection.expects(:find_one).with(:username => "chitchins").returns([ login ])
+              @criteria = stub(:exists? => true)
+              Login.expects(:where).with(:username => "chitchins").returns(@criteria)
+              @criteria.expects(:where).with(:_id => {'$ne' => 'rdawkins'}).returns(@criteria)
+              validator.setup(Login)
               validator.validate_each(login, :username, "chitchins")
             end
 
@@ -120,7 +131,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     before do
       @document = Person.new(:employer_id => 3, :terms => true, :title => "")
-      @criteria = stub(:nil? => false)
+      @criteria = stub(:exists? => false)
     end
 
     describe "as a symbol" do
@@ -129,8 +140,9 @@ describe Mongoid::Validations::UniquenessValidator do
                                                                       :scope => :employer_id) }
 
       it "should query only scoped documents" do
-        Person.collection.expects(:find_one).with(:title => "Sir", 
-                                    :employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
       end
 
@@ -141,9 +153,10 @@ describe Mongoid::Validations::UniquenessValidator do
       let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
                                                                       :scope => [:employer_id, :terms]) }
       it "should query only scoped documents" do
-        Person.collection.expects(:find_one).with(:title => "Sir", 
-                                    :employer_id => @document.attributes[:employer_id],
-                                    :terms => true).returns(@criteria)
+        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        @criteria.expects(:where).with(:terms => true).returns(@criteria)
+        validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
       end
 

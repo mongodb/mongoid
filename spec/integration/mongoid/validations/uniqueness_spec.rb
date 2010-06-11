@@ -28,6 +28,7 @@ describe Mongoid::Validations::UniquenessValidator do
     context "with a record in the database" do
 
       before do
+        UserAccount.create(:username => "chitchins")
         UserAccount.create(:username => "rdawkins")
       end
 
@@ -39,6 +40,11 @@ describe Mongoid::Validations::UniquenessValidator do
 
         it "passes validation" do
           account.should be_valid
+        end
+
+        it "fails validation when another document has the same unique field" do
+          account.username = "chitchins"
+          account.should_not be_valid
         end
       end
 
@@ -127,6 +133,7 @@ describe Mongoid::Validations::UniquenessValidator do
             login.should be_valid
           end
         end
+
       end
     end
   end

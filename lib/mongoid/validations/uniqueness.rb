@@ -13,15 +13,23 @@ module Mongoid #:nodoc:
     #     validates_uniqueness_of :title
     #   end
     class UniquenessValidator < ActiveModel::EachValidator
+      # Unfortunately, we have to tie Uniqueness validators to a class.
+      def setup(klass)
+        @klass = klass
+      end
+      
       def validate_each(document, attribute, value)
-        conditions = {attribute => value}
+        criteria = @klass.where(attribute => value)
         
         Array.wrap(options[:scope]).each do |item|
-          conditions[item] = document.attributes[item]
+          criteria = criteria.where(item => document.attributes[item])
         end
-        return if document.collection.find_one(conditions).nil?
         
-        if document.new_record? || key_changed?(document)
+        unless document.new_record?
+          criteria = criteria.where(:_id => {'$ne' => document._id})
+        end
+        
+        if criteria.exists?
           document.errors.add(attribute, :taken, :default => options[:message], :value => value)
         end
       end
