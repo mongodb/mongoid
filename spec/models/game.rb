@@ -4,4 +4,6 @@ class Game
   field :score, :type => Integer, :default => 0
   referenced_in :person
   enslave and cache
+
+  attr_protected :_id
 end

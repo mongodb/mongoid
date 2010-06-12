@@ -159,6 +159,18 @@ describe Mongoid::Attributes do
         @person.security_code.should be_nil
       end
     end
+
+    context "when the field is _id" do
+
+      before do
+        @game = Game.new(:_id => "ABBA")
+      end
+
+      it "prevents setting via mass assignment" do
+        p @game._id
+        @game._id.should_not == "ABBA"
+      end
+    end
   end
 
   describe "#_id" do
