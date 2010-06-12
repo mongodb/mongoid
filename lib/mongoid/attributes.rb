@@ -2,6 +2,10 @@
 module Mongoid #:nodoc:
   module Attributes
     extend ActiveSupport::Concern
+    included do
+      class_inheritable_accessor :_protected_fields
+      self._protected_fields = []
+    end
 
     # Get the id associated with this object. This will pull the _id value out
     # of the attributes +Hash+.
@@ -179,15 +183,15 @@ module Mongoid #:nodoc:
 
     # Used when supplying a :limit as an option to accepts_nested_attributes_for
     def limit(attributes, name, options)
-      raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit]) if options[:limit] && attributes.size > options[:limit]
+      if options[:limit] && attributes.size > options[:limit]
+        raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit])
+      end
     end
 
     # Return true if writing to the given field is allowed
     def write_allowed?(key)
       name = key.to_s
-      existing = fields[name]
-      return true unless existing
-      existing.accessible?
+      !self._protected_fields.include?(name)
     end
 
     module ClassMethods
@@ -219,6 +223,19 @@ module Mongoid #:nodoc:
             end
           end
         end
+      end
+
+      # Defines fields that cannot be set via mass assignment.
+      #
+      # Example:
+      #
+      #   class Person
+      #     include Mongoid::Document
+      #     field :security_code
+      #     attr_protected :security_code
+      #   end
+      def attr_protected(*names)
+        _protected_fields.concat(names.flatten.map(&:to_s))
       end
     end
   end

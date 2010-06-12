@@ -16,6 +16,7 @@ class Person
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :ssn
   field :owner_id, :accessible => false, :type => Integer
+  field :security_code
 
   index :age
   index :addresses
@@ -25,6 +26,8 @@ class Person
   index :ssn, :unique => true
 
   attr_reader :rescored
+
+  attr_protected :security_code
 
   embeds_many :favorites
   embeds_many :videos
