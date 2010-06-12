@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "mongoid"
 
   s.add_runtime_dependency("activemodel", ["~>3.0.0.beta"])
+  s.add_runtime_dependency("tzinfo", ["~>0.3.22"])
   s.add_runtime_dependency("will_paginate", ["~>3.0.pre"])
   s.add_runtime_dependency("mongo", ["~>1.0.1"])
   s.add_runtime_dependency("bson", ["~>1.0.1"])

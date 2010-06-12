@@ -22,9 +22,11 @@
 require "rubygems"
 
 gem "activemodel", "~>3.0.0.beta"
+gem "tzinfo", "~>3.0.0.beta"
 gem "will_paginate", "~>3.0.pre"
 gem "mongo", "~>1.0.1"
 gem "bson", "~>1.0.1"
+gem "tzinfo", "~>0.3.22"
 
 require "delegate"
 require "singleton"
