@@ -9,6 +9,7 @@ module Mongoid #:nodoc
       include ActiveModel::Naming
       include ActiveModel::Serialization
       include ActiveModel::Serializers::JSON
+      include ActiveModel::Serializers::Xml
       include Mongoid::Associations
       include Mongoid::Attributes
       include Mongoid::Collections
