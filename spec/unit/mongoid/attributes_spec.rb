@@ -167,8 +167,18 @@ describe Mongoid::Attributes do
       end
 
       it "prevents setting via mass assignment" do
-        p @game._id
         @game._id.should_not == "ABBA"
+      end
+    end
+
+    context "when using instantiate" do
+
+      before do
+        @person = Person.instantiate("_id" => "1", "security_code" => "ABBA")
+      end
+
+      it "ignores any protected attribute" do
+        @person.security_code.should == "ABBA"
       end
     end
   end
