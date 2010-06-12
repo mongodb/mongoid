@@ -242,10 +242,10 @@ module Mongoid #:nodoc:
       #   person.title_was # "Sir"
       #   person.reset_title!
       def add_dirty_methods(name)
-        define_method("#{name}_change") { attribute_change(name) }
-        define_method("#{name}_changed?") { attribute_changed?(name) }
-        define_method("#{name}_was") { attribute_was(name) }
-        define_method("reset_#{name}!") { reset_attribute!(name) }
+        define_method("#{name}_change") { attribute_change(name) } unless instance_methods.include?("#{name}_change")
+        define_method("#{name}_changed?") { attribute_changed?(name) } unless instance_methods.include?("#{name}_changed?")
+        define_method("#{name}_was") { attribute_was(name) } unless instance_methods.include?("#{name}_was")
+        define_method("reset_#{name}!") { reset_attribute!(name) } unless instance_methods.include?("reset_#{name}!")
       end
     end
   end
