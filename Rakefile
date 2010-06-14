@@ -1,4 +1,3 @@
-require "rubygems"
 require "rake"
 require "rake/rdoctask"
 require "rspec"
