@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Validations do
 
   before(:all) do
-    Mongoid.master.connection.instance_variable_set(:@logger, nil)
+    Person.logger = nil
   end
 
   describe ".validates_associated" do
