@@ -41,6 +41,17 @@ module Mongoid #:nodoc
         collection.index_information
       end
 
+      # The MongoDB logger is not exposed through the driver to be changed
+      # after initialization of the connection, this is a hacky way around that
+      # if logging needs to be changed at runtime.
+      #
+      # Example:
+      #
+      # <tt>Person.logger = Logger.new($stdout)</tt>
+      def logger=(logger)
+        db.connection.instance_variable_set(:@logger, logger)
+      end
+
       # Macro for setting the collection name to store in.
       #
       # Example:
