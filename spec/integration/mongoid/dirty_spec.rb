@@ -3,11 +3,11 @@ require "spec_helper"
 describe Mongoid::Dirty do
 
   before do
-    Person.delete_all
+    Person.collection.remove
   end
 
   after do
-    Person.delete_all
+    Person.collection.remove
   end
 
   context "when fields are getting changed" do

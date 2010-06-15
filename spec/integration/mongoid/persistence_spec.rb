@@ -17,7 +17,6 @@ describe Mongoid::Persistence do
       person.should be_a_kind_of(Person)
       person.should_not be_a_new_record
     end
-
   end
 
   describe ".create!" do
@@ -34,11 +33,8 @@ describe Mongoid::Persistence do
           Person.create!(:ssn => "555-55-9999")
           lambda { Person.create!(:ssn => "555-55-9999") }.should raise_error
         end
-
       end
-
     end
-
   end
 
   describe "#delete" do
@@ -57,7 +53,6 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.delete.should be_true
       end
-
     end
 
     context "deleting an embedded document" do
@@ -74,7 +69,6 @@ describe Mongoid::Persistence do
           @person.addresses.should be_empty
           @person.attributes[:addresses].should be_empty
         end
-
       end
 
       context "when the document has been saved" do
@@ -88,11 +82,8 @@ describe Mongoid::Persistence do
           from_db = Person.find(@person.id)
           from_db.addresses.should be_empty
         end
-
       end
-
     end
-
   end
 
   describe "#destroy" do
@@ -111,7 +102,6 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.destroy.should be_true
       end
-
     end
 
     context "deleting an embedded document" do
@@ -128,7 +118,6 @@ describe Mongoid::Persistence do
           @person.addresses.should be_empty
           @person.attributes[:addresses].should be_empty
         end
-
       end
 
       context "when the document has been saved" do
@@ -177,9 +166,7 @@ describe Mongoid::Persistence do
       it "returns true" do
         @person.save.should be_true
       end
-
     end
-
   end
 
   describe "save!" do
@@ -193,11 +180,8 @@ describe Mongoid::Persistence do
           person = Person.new(:ssn => "555-55-9999")
           lambda { person.save!(:ssn => "555-55-9999") }.should raise_error
         end
-
       end
-
     end
-
   end
 
   describe "#update_attributes" do

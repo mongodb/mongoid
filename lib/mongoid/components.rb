@@ -11,6 +11,7 @@ module Mongoid #:nodoc
       include ActiveModel::Serializers::JSON
       include ActiveModel::Serializers::Xml
       include Mongoid::Associations
+      include Mongoid::Atomicity
       include Mongoid::Attributes
       include Mongoid::Collections
       include Mongoid::Dirty
