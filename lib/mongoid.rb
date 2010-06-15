@@ -22,8 +22,8 @@
 require "rubygems"
 
 gem "activesupport", ">= 2.2.2", "<3.0.pre"
-gem "mongo", "~>1.0"
-gem "bson", "~>1.0"
+gem "mongo", "~>1.0.1"
+gem "bson", "~>1.0.1"
 gem "durran-validatable", ">= 2.0.1"
 gem "will_paginate", ">= 2.3.11", "< 2.9"
 
