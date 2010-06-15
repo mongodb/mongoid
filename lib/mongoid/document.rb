@@ -110,7 +110,7 @@ module Mongoid #:nodoc:
 
     # Generate an id for this +Document+.
     def identify
-      Identity.create(self)
+      Identity.new(self).create
     end
 
     # Instantiate a new +Document+, setting the Document's attributes if

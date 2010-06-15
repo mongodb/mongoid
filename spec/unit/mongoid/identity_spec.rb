@@ -11,7 +11,7 @@ describe Mongoid::Identity do
       let(:canvas) { Canvas.new }
 
       it "sets the document _type to the class name" do
-        Mongoid::Identity.create(canvas)
+        Mongoid::Identity.new(canvas).create
         canvas._type.should == "Canvas"
       end
 
@@ -22,7 +22,7 @@ describe Mongoid::Identity do
       let(:browser) { Browser.new }
 
       it "sets the document _type to the class name" do
-        Mongoid::Identity.create(browser)
+        Mongoid::Identity.new(browser).create
         browser._type.should == "Browser"
       end
 
@@ -36,10 +36,6 @@ describe Mongoid::Identity do
 
     end
 
-    it "returns the document" do
-      Mongoid::Identity.create(name).should == name
-    end
-
     context "when the document has a primary key" do
 
       before do
@@ -48,7 +44,7 @@ describe Mongoid::Identity do
       end
 
       it "sets the id to the composite key" do
-        Mongoid::Identity.create(@address)
+        Mongoid::Identity.new(@address).create
         @address.id.should == "market-st"
       end
 
@@ -76,7 +72,7 @@ describe Mongoid::Identity do
           end
 
           it "sets the id to a mongo object id" do
-            Mongoid::Identity.create(@person)
+            Mongoid::Identity.new(@person).create
             @person.id.should == @object_id
           end
         end
@@ -84,7 +80,7 @@ describe Mongoid::Identity do
         context "when not using object ids" do
 
           it "sets the id to a mongo object id string" do
-            Mongoid::Identity.create(@person)
+            Mongoid::Identity.new(@person).create
             @person.id.should == "1"
           end
 
@@ -100,7 +96,7 @@ describe Mongoid::Identity do
         end
 
         it "returns the existing id" do
-          Mongoid::Identity.create(@person)
+          Mongoid::Identity.new(@person)
           @person.id.should == "5"
         end
 
