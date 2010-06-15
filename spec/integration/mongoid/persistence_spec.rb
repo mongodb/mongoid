@@ -167,6 +167,30 @@ describe Mongoid::Persistence do
         @person.save.should be_true
       end
     end
+
+    context "when modifying the entire hierarchy" do
+
+      before do
+        @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
+        @person.title = "King"
+        @person.addresses.build(:street => "Bond St")
+        @person.create_name(:first_name => "Tony")
+        @person.name.first_name = "Ryan"
+      end
+
+      after do
+        Person.logger = nil
+      end
+
+      it "persists all changes in a single call" do
+        Person.logger = Logger.new($stdout)
+        @person.save
+        @person.reload
+        @person.title.should == "King"
+        @person.name.first_name.should == "Ryan"
+        @person.addresses.first.street.should == "Bond St"
+      end
+    end
   end
 
   describe "save!" do
