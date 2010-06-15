@@ -32,7 +32,11 @@ module Mongoid #:nodoc:
 
     # Get all the attributes that need to be set.
     def _sets
-      (changed? && !new_record?) ? setters : {}
+      if changed? && !new_record?
+        setters
+      else
+        !embedded_many? ? { _path => raw_attributes } : {}
+      end
     end
   end
 end

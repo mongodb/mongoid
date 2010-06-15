@@ -19,17 +19,38 @@ describe Mongoid::Atomicity do
 
       context "with a new embedded document" do
 
-        before do
-          @address = Address.new(:street => "Oxford St")
-          @person.addresses << @address
+        context "when the document is an embeds many" do
+
+          before do
+            @address = Address.new(:street => "Oxford St")
+            @person.addresses << @address
+          end
+
+          it "returns a hash of field names and new values" do
+            @person._updates.should ==
+              {
+                "$set" => { "title" => "Sir" },
+                "$push" => { "addresses" => { "_id" => "oxford-st", "street" => "Oxford St" } }
+              }
+          end
         end
 
-        it "returns a hash of field names and new values" do
-          @person._updates.should ==
-            {
-              "$set" => { "title" => "Sir" },
-              "$push" => { "addresses" => { "_id" => "oxford-st", "street" => "Oxford St" } }
-            }
+        context "when the document is an embeds one" do
+
+          before do
+            @name = Name.new(:first_name => "Lionel")
+            @person.name = @name
+          end
+
+          it "returns a hash of field names and new values" do
+            @person._updates.should ==
+              {
+                "$set" => {
+                  "title" => "Sir",
+                  "name" => { "_id" => "lionel", "first_name" => "Lionel" }
+                },
+              }
+          end
         end
       end
 
