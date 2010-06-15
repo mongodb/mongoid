@@ -3,11 +3,7 @@ require "spec_helper"
 describe Mongoid::Associations do
 
   before do
-    Artist.delete_all
-    Person.delete_all
-    Game.delete_all
-    Post.delete_all
-    Preference.delete_all
+    [ Artist, Person, Game, Post, Preference ].each { |klass| klass.collection.remove }
   end
 
   context "anonymous extensions" do
@@ -648,53 +644,53 @@ describe Mongoid::Associations do
 
     context "with a saved parent" do
 
-      let(:person) do
-        Person.create!(:ssn => "992-33-1010")
+      before do
+        @person = Person.create!(:ssn => "992-33-1010")
       end
 
       context "appending a new document" do
 
         before do
           @preference = Preference.new(:name => "test")
-          person.preferences << @preference
+          @person.preferences << @preference
         end
 
         it "adds the document to the array" do
-          person.preferences.first.should == @preference
+          @person.preferences.first.should == @preference
         end
 
         it "adds the parent document to the reverse association" do
-          @preference.people.first.should == person
+          @preference.people.first.should == @person
         end
       end
 
       context "building a document" do
 
         before do
-          @preference = person.preferences.build(:name => "test")
+          @preference = @person.preferences.build(:name => "test")
         end
 
         it "adds the document to the array" do
-          person.preferences.first.should == @preference
+          @person.preferences.first.should == @preference
         end
 
         it "adds the parent document to the reverse association" do
-          @preference.people.first.should == person
+          @preference.people.first.should == @person
         end
       end
 
       context "creating a document" do
 
         before do
-          @preference = person.preferences.create(:name => "test")
+          @preference = @person.preferences.create(:name => "test")
         end
 
         it "adds the document to the array" do
-          person.preferences.first.should == @preference
+          @person.preferences.first.should == @preference
         end
 
         it "adds the parent document to the reverse association" do
-          @preference.people.first.should == person
+          @preference.people.first.should == @person
         end
       end
     end

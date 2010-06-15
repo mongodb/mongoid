@@ -33,13 +33,12 @@ module Mongoid # :nodoc:
 
     # are we in an embeds_many?
     def embedded_many?
-      embedded? and _parent.associations[association_name].association == EmbedsMany
+      embedded? && _parent.associations[association_name].association == EmbedsMany
     end
 
-    # Update all the dirty child documents after an update.
-    def update_embedded(name)
-      association = send(name)
-      association.to_a.each { |doc| doc.save if doc.changed? || doc.new_record? } unless association.blank?
+    # are we in an embeds_one?
+    def embedded_one?
+      embedded? && !embedded_many?
     end
 
     # Update the one-to-one relational association for the name.
@@ -127,7 +126,6 @@ module Mongoid # :nodoc:
       #   end
       def embeds_many(name, options = {}, &block)
         associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
-        set_callback(:update, :after) { |document| document.update_embedded(name) } unless name == :versions
       end
 
       alias :embed_many :embeds_many
@@ -157,7 +155,6 @@ module Mongoid # :nodoc:
         associate(type, opts)
         add_builder(type, opts)
         add_creator(type, opts)
-        set_callback(:update, :after) { |document| document.update_embedded(name) }
       end
 
       alias :embed_one :embeds_one
