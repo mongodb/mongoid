@@ -168,6 +168,22 @@ describe Mongoid::Persistence do
       end
     end
 
+    context "when validation fails" do
+
+      before do
+        @address = @person.addresses.create(:city => "London")
+      end
+
+      it "returns false" do
+        @address.save.should == false
+      end
+
+      it "has the appropriate errors" do
+        @address.save
+        @address.errors[:street].should == ["can't be blank"]
+      end
+    end
+
     context "when modifying the entire hierarchy" do
 
       before do
