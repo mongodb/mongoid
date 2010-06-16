@@ -24,12 +24,17 @@ module Mongoid #:nodoc:
       #
       # The +Document+, whether the insert succeeded or not.
       def persist
+        return @document if @validate && @document.invalid?(:create)
         parent = @document._parent
-        if parent.new_record?
-          parent.insert
-        else
-          update = { @document._inserter => { @document._position => @document.raw_attributes } }
-          @collection.update(parent._selector, update, @options.merge(:multi => false))
+        @document.run_callbacks(:create) do
+          @document.run_callbacks(:save) do
+            if parent.new_record?
+              parent.insert
+            else
+              update = { @document._inserter => { @document._position => @document.raw_attributes } }
+              @collection.update(parent._selector, update, @options.merge(:multi => false))
+            end
+          end
         end
         @document.new_record = false; @document
       end

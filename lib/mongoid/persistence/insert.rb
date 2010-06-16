@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
       #
       # The +Document+, whether the insert succeeded or not.
       def persist
-        return @document if @validate && !@document.valid?
+        return @document if @validate && @document.invalid?(:create)
         @document.run_callbacks(:create) do
           @document.run_callbacks(:save) do
             if insert

@@ -10,4 +10,5 @@ class Patient
   store_in :inpatient
   embeds_many :addresses
   embeds_one :email
+  validates_presence_of :title, :on => :create
 end

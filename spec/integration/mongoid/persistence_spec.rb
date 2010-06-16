@@ -178,12 +178,7 @@ describe Mongoid::Persistence do
         @person.name.first_name = "Ryan"
       end
 
-      after do
-        Person.logger = nil
-      end
-
       it "persists all changes in a single call" do
-        Person.logger = Logger.new($stdout)
         @person.save
         @person.reload
         @person.title.should == "King"

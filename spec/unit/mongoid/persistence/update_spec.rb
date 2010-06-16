@@ -7,7 +7,7 @@ describe Mongoid::Persistence::Update do
   end
 
   let(:address) do
-    Address.instantiate("_id" => "oxford-st", :street => "Oxford St")
+    Address.instantiate("_id" => "oxford-st", "street" => "Oxford St")
   end
 
   let(:root_category) do

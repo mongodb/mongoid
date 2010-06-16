@@ -22,6 +22,8 @@ class Address
 
   named_scope :rodeo, where(:street => "Rodeo Dr")
 
+  validates_presence_of :street, :on => :update
+
   def set_parent=(set = false)
     self.parent_title = addressable.title if set
   end
@@ -34,6 +36,5 @@ class Address
     def homes
       where(:address_type => "Home")
     end
-
   end
 end
