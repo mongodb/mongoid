@@ -191,20 +191,27 @@ describe Mongoid::Persistence do
         before do
           @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
           @person.title = "King"
-          @person.addresses.build(:street => "Bond St")
+          @address = @person.addresses.build(:street => "Bond St")
           @person.create_name(:first_name => "Tony")
           @person.name.first_name = "Ryan"
-          @person.save
         end
 
         it "saves the hierarchy" do
+          @person.save
           @person.reload
           @person.title.should == "King"
           @person.name.first_name.should == "Ryan"
           @person.addresses.first.street.should == "Bond St"
         end
 
-        it "persists with proper set and push modifiers"
+        it "persists with proper set and push modifiers" do
+          @person._updates.should == {
+            "$set" => { "title" => "King", "name.first_name" => "Ryan" },
+            "$push"=> { "addresses" => { "_id" => @address.id, "street"=>"Bond St" }}
+          }
+          @person.save
+          @person._updates.should == {}
+        end
 
       end
 

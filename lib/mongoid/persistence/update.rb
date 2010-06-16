@@ -44,6 +44,10 @@ module Mongoid #:nodoc:
           @document.run_callbacks(:update) do
             if update
               @document.move_changes
+              @document._children.each do |child|
+                child.move_changes
+                child.new_record = false if child.new_record?
+              end
             else
               return false
             end

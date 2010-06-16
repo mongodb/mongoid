@@ -130,7 +130,12 @@ describe Mongoid::Associations::EmbedsOne do
       end
 
       it "delegates to new" do
-        Mongoid::Associations::EmbedsOne.expects(:new).with(@document, { "first_name" => "Test" }, @options)
+        Mongoid::Associations::EmbedsOne.expects(:new).with(
+          @document,
+          { "first_name" => "Test" },
+          @options,
+          nil
+        )
         Mongoid::Associations::EmbedsOne.instantiate(@document, @options)
       end
 

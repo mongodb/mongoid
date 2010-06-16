@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
       if changed? && !new_record?
         setters
       else
-        embedded_one? ? { _path => raw_attributes } : {}
+        embedded_one? && new_record? ? { _path => raw_attributes } : {}
       end
     end
   end
