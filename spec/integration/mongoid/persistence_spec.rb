@@ -186,20 +186,33 @@ describe Mongoid::Persistence do
 
     context "when modifying the entire hierarchy" do
 
-      before do
-        @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
-        @person.title = "King"
-        @person.addresses.build(:street => "Bond St")
-        @person.create_name(:first_name => "Tony")
-        @person.name.first_name = "Ryan"
+      context "when performing modification and insert ops" do
+
+        before do
+          @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
+          @person.title = "King"
+          @person.addresses.build(:street => "Bond St")
+          @person.create_name(:first_name => "Tony")
+          @person.name.first_name = "Ryan"
+          @person.save
+        end
+
+        it "saves the hierarchy" do
+          @person.reload
+          @person.title.should == "King"
+          @person.name.first_name.should == "Ryan"
+          @person.addresses.first.street.should == "Bond St"
+        end
+
+        it "persists with proper set and push modifiers"
+
       end
 
-      it "persists all changes in a single call" do
-        @person.save
-        @person.reload
-        @person.title.should == "King"
-        @person.name.first_name.should == "Ryan"
-        @person.addresses.first.street.should == "Bond St"
+      context "when removing elements without using delete or destroy" do
+
+        it "saves the hierarchy"
+
+        it "persists with proper unset and pull modifiers"
       end
     end
   end
