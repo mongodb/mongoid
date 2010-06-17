@@ -112,15 +112,12 @@ module Mongoid #:nodoc:
       # Returns: <tt>self</tt>
       def order_by(*args)
         @options[:sort] = []
-        arg = args.first
-        case arg
-        when Hash
-          arg.each { |field, direction| @options[:sort] << [ field, direction ] }
-        when Array
-          @options[:sort] = arg
+        arguments = args.first
+        case arguments
+        when Hash then arguments.each { |field, direction| @options[:sort] << [ field, direction ] }
+        when Array then @options[:sort] = arguments
         when Complex
           args.flatten.each { |complex| @options[:sort] << [ complex.key, complex.operator.to_sym ] }
-        else
         end; self
       end
 
