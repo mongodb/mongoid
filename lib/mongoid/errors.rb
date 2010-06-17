@@ -61,10 +61,10 @@ module Mongoid #:nodoc
     #
     # <tt>Validations.new(person.errors)</tt>
     class Validations < MongoidError
-      attr_reader :errors
-      def initialize(errors)
-        @errors = errors
-        super("Validation Failed: #{@errors.full_messages.join(", ")}")
+      attr_reader :document
+      def initialize(document)
+        @document = document
+        super("Validation Failed: #{@document.errors.full_messages.join(", ")}")
       end
     end
 

@@ -215,7 +215,8 @@ describe Mongoid::Associations::EmbedsMany do
           Mongoid::Associations::Options.new(:name => :addresses)
         )
         @errors  = mock(:full_messages => ["test"], :empty? => false)
-        @address = mock(:parentize => true, :write_attributes => true, :errors => @errors, :_index= => true)
+        @address = mock(:parentize => true, :write_attributes => true, :_index= => true)
+        @address.expects(:errors).twice.returns(@errors)
         Address.expects(:instantiate).returns(@address)
       end
 
@@ -492,13 +493,13 @@ describe Mongoid::Associations::EmbedsMany do
         Mongoid::Associations::Options.new(:name => :addresses)
       )
     end
-    
+
     it "should update existing documents" do
       @association.nested_build({ "0" => { :street => "Yet Another" } })
       @association.size.should == 2
       @association[0].street.should == "Yet Another"
     end
-    
+
     it "should create new documents" do
       @association.nested_build({ "2" => { :street => "Yet Another" } })
       @association.size.should == 3

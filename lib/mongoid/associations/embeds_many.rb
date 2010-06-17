@@ -82,8 +82,7 @@ module Mongoid #:nodoc:
       # The newly created Document.
       def create!(attrs = {}, type = nil)
         document = create(attrs, type)
-        errors = document.errors
-        raise Errors::Validations.new(errors) unless errors.empty?
+        raise Errors::Validations.new(document) unless document.errors.empty?
         document
       end
 
