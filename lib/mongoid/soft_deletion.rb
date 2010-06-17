@@ -16,38 +16,36 @@ module Mongoid
       where(:deleted_at.ne => nil)
     end
   end
-  
+
   module SoftDeletion
-    def self.included(base)
+    extend ActiveSupport::Concern
+
+    included do
       Mongoid::Criteria.send(:include, Mongoid::SoftDeleteAddition)
-      base.field :deleted_at, :type => Time
-      base.extend ClassMethods
-      base.send :include, InstanceMethods
+      field :deleted_at, :type => Time
     end
-    
-    module InstanceMethods
-      # Hard-delete a document.
-      def hard_destroy
-        Mongoid::Persistence::Remove.new(self).persist
-      end
-      
-      # Soft-delete a document.
-      def _remove
-        self.class.collection.update({:_id => self.id}, { '$set' => {:deleted_at => (now = Time.now)} }) && true
-      end
-      alias :delete :_remove
-    
-      # Determines if this document is destroyed.
-      def destroyed
-        !!deleted_at
-      end
-      
-      # Restores a previously soft-deleted document.
-      def restore
-        self.class.collection.update({:_id => self.id}, { '$set' => {:deleted_at => nil} })
-      end
+
+    # Hard-delete a document.
+    def hard_destroy
+      Mongoid::Persistence::Remove.new(self).persist
     end
-    
+
+    # Soft-delete a document.
+    def _remove
+      collection.update({:_id => self.id}, { '$set' => {:deleted_at => (now = Time.now)} }) && true
+    end
+    alias :delete :_remove
+
+    # Determines if this document is destroyed.
+    def destroyed
+      !!deleted_at
+    end
+
+    # Restores a previously soft-deleted document.
+    def restore
+      collection.update({:_id => self.id}, { '$set' => {:deleted_at => nil} })
+    end
+
     module ClassMethods
       def criteria
         super.where(:deleted_at => nil)
