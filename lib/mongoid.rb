@@ -74,8 +74,8 @@ require "mongoid/state"
 require "mongoid/timestamps"
 require "mongoid/validations"
 require "mongoid/versioning"
-require "mongoid/soft_deletion"
 require "mongoid/components"
+require "mongoid/paranoia"
 require "mongoid/document"
 
 # add railtie

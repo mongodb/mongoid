@@ -2,7 +2,7 @@ class ParanoidPost
   include Mongoid::Document
   include Mongoid::Versioning
   include Mongoid::Timestamps
-  include Mongoid::SoftDeletion
+  include Mongoid::Paranoia
   field :title
   referenced_in :person
 

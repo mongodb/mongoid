@@ -1,10 +1,7 @@
 # encoding: utf-8
 require "mongoid/persistence/remove"
 module Mongoid #:nodoc:
-  # Include this module to get soft deletion of root level documents.
-  # This will add a deleted_at field to the +Document+, managed automatically.
-  # Potentially incompatible with unique indices. (if collisions with deleted items)
-  module SoftDeleteAddition
+  module Paranoid #:nodoc:
     # Find deleted documents
     #
     # Examples:
@@ -13,15 +10,24 @@ module Mongoid #:nodoc:
     #   <tt>Company.first.employees.deleted</tt>  # works with a join
     #   <tt>Person.deleted.find("4c188dea7b17235a2a000001").first</tt>  # retrieve by id a deleted person
     def deleted
-      where(:deleted_at.ne => nil)
+      where(:deleted_at.exists => false)
     end
   end
 
-  module SoftDeletion #:nodoc:
+  # Include this module to get soft deletion of root level documents.
+  # This will add a deleted_at field to the +Document+, managed automatically.
+  # Potentially incompatible with unique indices. (if collisions with deleted items)
+  #
+  # To use:
+  #
+  #   class Person
+  #     include Mongoid::Paranoia
+  #   end
+  module Paranoia
     extend ActiveSupport::Concern
 
     included do
-      Mongoid::Criteria.send(:include, Mongoid::SoftDeleteAddition)
+      Mongoid::Criteria.send(:include, Mongoid::Paranoid)
       field :deleted_at, :type => Time
     end
 
