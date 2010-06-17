@@ -110,8 +110,18 @@ module Mongoid #:nodoc:
       # <tt>criteria.order_by([[:field1, :asc], [:field2, :desc]])</tt>
       #
       # Returns: <tt>self</tt>
-      def order_by(params = [])
-        @options[:sort] = params; self
+      def order_by(*args)
+        @options[:sort] = []
+        arg = args.first
+        case arg
+        when Hash
+          arg.each { |field, direction| @options[:sort] << [ field, direction ] }
+        when Array
+          @options[:sort] = arg
+        when Complex
+          args.flatten.each { |complex| @options[:sort] << [ complex.key, complex.operator.to_sym ] }
+        else
+        end; self
       end
 
       # Adds a criterion to the +Criteria+ that specifies how many results to skip

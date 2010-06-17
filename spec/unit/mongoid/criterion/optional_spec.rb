@@ -250,11 +250,35 @@ describe Mongoid::Criterion::Optional do
 
     context "when field names and direction specified" do
 
-      it "adds the sort to the options" do
+      before do
         @criteria.order_by([[:title, :asc], [:text, :desc]])
-        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
       end
 
+      it "adds the sort to the options" do
+        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+      end
+    end
+
+    context "when providing a hash of options" do
+
+      before do
+        @criteria.order_by(:title => :asc, :text => :desc)
+      end
+
+      it "adds the sort to the options" do
+        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+      end
+    end
+
+    context "when providing multiple symbols" do
+
+      before do
+        @criteria.order_by(:title.asc, :text.desc)
+      end
+
+      it "adds the sort to the options" do
+        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+      end
     end
 
     it "returns self" do
