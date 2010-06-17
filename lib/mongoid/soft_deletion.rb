@@ -1,6 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistence/remove"
-module Mongoid
+module Mongoid #:nodoc:
   # Include this module to get soft deletion of root level documents.
   # This will add a deleted_at field to the +Document+, managed automatically.
   # Potentially incompatible with unique indices. (if collisions with deleted items)
@@ -17,7 +17,7 @@ module Mongoid
     end
   end
 
-  module SoftDeletion
+  module SoftDeletion #:nodoc:
     extend ActiveSupport::Concern
 
     included do
@@ -25,30 +25,75 @@ module Mongoid
       field :deleted_at, :type => Time
     end
 
-    # Hard-delete a document.
-    def hard_destroy
+    # Delete the paranoid +Document+ from the database completely. This will
+    # run the destroy callbacks.
+    #
+    # Example:
+    #
+    # <tt>document.destroy!</tt>
+    def destroy!
+      run_callbacks(:destroy) { delete! }
+    end
+
+    # Delete the paranoid +Document+ from the database completely.
+    #
+    # Example:
+    #
+    # <tt>document.delete!</tt>
+    def delete!
+      @destroyed = true
       Mongoid::Persistence::Remove.new(self).persist
     end
 
-    # Soft-delete a document.
+    # Delete the +Document+, will set the deleted_at timestamp and not actually
+    # delete it.
+    #
+    # Example:
+    #
+    # <tt>document._remove</tt>
+    #
+    # Returns:
+    #
+    # true
     def _remove
-      collection.update({:_id => self.id}, { '$set' => {:deleted_at => (now = Time.now)} }) && true
+      now = Time.now
+      collection.update({ :_id => self.id }, { '$set' => { :deleted_at => Time.now } })
+      @attributes["deleted_at"] = now
+      true
     end
+
     alias :delete :_remove
 
     # Determines if this document is destroyed.
-    def destroyed
-      !!deleted_at
+    #
+    # Returns:
+    #
+    # true if the +Document+ was destroyed.
+    def destroyed?
+      @destroyed || !!deleted_at
     end
 
-    # Restores a previously soft-deleted document.
+    # Restores a previously soft-deleted document. Handles this by removing the
+    # deleted_at flag.
+    #
+    # Example:
+    #
+    # <tt>document.restore</tt>
     def restore
-      collection.update({:_id => self.id}, { '$set' => {:deleted_at => nil} })
+      collection.update({ :_id => self.id }, { '$unset' => { :deleted_at => true } })
+      @attributes.delete("deleted_at")
     end
 
-    module ClassMethods
+    module ClassMethods #:nodoc:
+
+      # Override the default +Criteria+ accessor to only get existing
+      # documents.
+      #
+      # Returns:
+      #
+      # A +Criteria+ for deleted_at not existing.
       def criteria
-        super.where(:deleted_at => nil)
+        super.where(:deleted_at.exists => false)
       end
     end
   end
