@@ -20,6 +20,7 @@ module Mongoid #:nodoc:
   # To use:
   #
   #   class Person
+  #     include Mongoid::Document
   #     include Mongoid::Paranoia
   #   end
   module Paranoia
