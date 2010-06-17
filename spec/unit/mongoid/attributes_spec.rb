@@ -437,6 +437,29 @@ describe Mongoid::Attributes do
     end
 
   end
+  
+  describe "#attribute_present?" do
+    context "when attribute does not exist" do
+      before do
+        @person = Person.new
+      end
+      
+      it "returns false" do
+        @person.attribute_present?(:owner_id).should be_false
+      end
+    end
+    
+    context "when attribute does exist" do
+      before do
+        @person = Person.new
+        @person.owner_id = 5
+      end
+      
+      it "returns true" do
+        @person.attribute_present?(:owner_id).should be_true
+      end
+    end
+  end
 
   describe "#remove_attribute" do
 
