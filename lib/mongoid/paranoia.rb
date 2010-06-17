@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/persistence/remove"
 module Mongoid #:nodoc:
   module Paranoid #:nodoc:
     # Find deleted documents
