@@ -7,6 +7,9 @@ module Mongoid #:nodoc:
       field :updated_at, :type => Time
       set_callback :create, :before, :set_created_at
       set_callback :save, :before, :set_updated_at
+
+      class_inheritable_accessor :record_timestamps, :instance_writer => false
+      self.record_timestamps = true
     end
 
     # Update the created_at field on the Document to the current time. This is
