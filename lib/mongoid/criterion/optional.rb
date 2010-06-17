@@ -2,6 +2,21 @@
 module Mongoid #:nodoc:
   module Criterion #:nodoc:
     module Optional
+
+      # Adds fields to be sorted in ascending order. Will add them in the order
+      # they were passed into the method.
+      #
+      # Example:
+      #
+      # <tt>criteria.ascending(:title, :dob)</tt>
+      def ascending(*fields)
+        @options[:sort] = [] unless @options[:sort] || fields.first.nil?
+        fields.flatten.each { |field| @options[:sort] << [ field, :asc ] }
+        self
+      end
+
+      alias :asc :ascending
+
       # Tells the criteria that the cursor that gets returned needs to be
       # cached. This is so multiple iterations don't hit the database multiple
       # times, however this is not advisable when working with large data sets
@@ -22,6 +37,20 @@ module Mongoid #:nodoc:
       def cached?
         @options[:cache] == true
       end
+
+      # Adds fields to be sorted in descending order. Will add them in the order
+      # they were passed into the method.
+      #
+      # Example:
+      #
+      # <tt>criteria.descending(:title, :dob)</tt>
+      def descending(*fields)
+        @options[:sort] = [] unless @options[:sort] || fields.first.nil?
+        fields.flatten.each { |field| @options[:sort] << [ field, :desc ] }
+        self
+      end
+
+      alias :desc :descending
 
       # Flags the criteria to execute against a read-only slave in the pool
       # instead of master.
@@ -111,11 +140,11 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def order_by(*args)
-        @options[:sort] = []
+        @options[:sort] = [] unless @options[:sort] || args.first.nil?
         arguments = args.first
         case arguments
         when Hash then arguments.each { |field, direction| @options[:sort] << [ field, direction ] }
-        when Array then @options[:sort] = arguments
+        when Array then @options[:sort].concat(arguments)
         when Complex
           args.flatten.each { |complex| @options[:sort] << [ complex.key, complex.operator.to_sym ] }
         end; self

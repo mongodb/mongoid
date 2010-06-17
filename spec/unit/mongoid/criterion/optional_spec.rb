@@ -7,6 +7,56 @@ describe Mongoid::Criterion::Optional do
     @canvas_criteria = Mongoid::Criteria.new(Canvas)
   end
 
+  describe "#ascending" do
+
+    context "when providing a field" do
+
+      before do
+        @criteria.ascending(:title)
+      end
+
+      it "adds the ascending sort criteria" do
+        @criteria.options[:sort].should == [[ :title, :asc ]]
+      end
+    end
+
+    context "when providing nothing" do
+
+      before do
+        @criteria.ascending
+      end
+
+      it "does not modify the sort criteria" do
+        @criteria.options[:sort].should be_nil
+      end
+    end
+  end
+
+  describe "#asc" do
+
+    context "when providing a field" do
+
+      before do
+        @criteria.asc(:title, :dob)
+      end
+
+      it "adds the ascending sort criteria" do
+        @criteria.options[:sort].should == [[ :title, :asc ], [ :dob, :asc ]]
+      end
+    end
+
+    context "when providing nothing" do
+
+      before do
+        @criteria.asc
+      end
+
+      it "does not modify the sort criteria" do
+        @criteria.options[:sort].should be_nil
+      end
+    end
+  end
+
   describe "#cache" do
 
     it "sets the cache option on the criteria" do
@@ -36,6 +86,68 @@ describe Mongoid::Criterion::Optional do
 
       it "returns false" do
         @criteria.cached?.should be_false
+      end
+    end
+  end
+
+  context "when chaining sort criteria" do
+
+    before do
+      @criteria.asc(:title).desc(:dob, :name).order_by(:score.asc)
+    end
+
+    it "does not overwrite any previous criteria" do
+      @criteria.options[:sort].should ==
+        [[ :title, :asc ], [ :dob, :desc ], [ :name, :desc ], [ :score, :asc ]]
+    end
+  end
+
+  describe "#descending" do
+
+    context "when providing a field" do
+
+      before do
+        @criteria.descending(:title)
+      end
+
+      it "adds the descending sort criteria" do
+        @criteria.options[:sort].should == [[ :title, :desc ]]
+      end
+    end
+
+    context "when providing nothing" do
+
+      before do
+        @criteria.descending
+      end
+
+      it "does not modify the sort criteria" do
+        @criteria.options[:sort].should be_nil
+      end
+    end
+  end
+
+  describe "#desc" do
+
+    context "when providing a field" do
+
+      before do
+        @criteria.desc(:title, :dob)
+      end
+
+      it "adds the descending sort criteria" do
+        @criteria.options[:sort].should == [[ :title, :desc ], [ :dob, :desc ]]
+      end
+    end
+
+    context "when providing nothing" do
+
+      before do
+        @criteria.desc
+      end
+
+      it "does not modify the sort criteria" do
+        @criteria.options[:sort].should be_nil
       end
     end
   end
@@ -251,7 +363,7 @@ describe Mongoid::Criterion::Optional do
     context "when field names and direction specified" do
 
       before do
-        @criteria.order_by([[:title, :asc], [:text, :desc]])
+        @criteria.order_by([[:title, :asc]]).order_by([[:text, :desc]])
       end
 
       it "adds the sort to the options" do
