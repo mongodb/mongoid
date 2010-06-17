@@ -46,6 +46,19 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Returns a count of the number of documents in the association that have
+      # actually been persisted to the database.
+      #
+      # Use #size if you want the total number of documents.
+      #
+      # Returns:
+      #
+      # The total number of persisted embedded docs, as flagged by the
+      # #persisted? method.
+      def count
+        @target.select(&:persisted?).size
+      end
+
       # Creates a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor and

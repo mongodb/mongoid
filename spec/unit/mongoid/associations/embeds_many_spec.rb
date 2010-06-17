@@ -126,6 +126,25 @@ describe Mongoid::Associations::EmbedsMany do
 
   end
 
+  context "#count and #size" do
+
+    before do
+      @association = Mongoid::Associations::EmbedsMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+      @association.target.first.new_record = true
+    end
+
+    it "count returns the number of persisted elements" do
+      @association.count.should == 1
+    end
+
+    it "size returns the total number of elements" do
+      @association.size.should == 2
+    end
+  end
+
   describe "#create" do
 
     context "when a type is not provided" do
