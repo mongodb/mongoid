@@ -75,6 +75,11 @@ module Mongoid #:nodoc:
       access = name.to_s
       modify(access, @attributes.delete(name.to_s), nil)
     end
+    
+    def attribute_present?(attribute)
+      value = read_attribute(attribute)
+      !value.blank?
+    end
 
     # Returns the object type. This corresponds to the name of the class that
     # this +Document+ is, which is used in determining the class to
