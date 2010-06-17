@@ -1,7 +1,7 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
-
+  
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
@@ -64,6 +64,7 @@ class Person
       "Testing"
     end
   end
+  references_many :paranoid_posts
   references_many :preferences, :stored_as => :array, :inverse_of => :people
 
   def score_with_rescoring=(score)

@@ -29,3 +29,4 @@ Rspec.configure do |config|
     Mongoid.master.collections.each(&:drop)
   end
 end
+
