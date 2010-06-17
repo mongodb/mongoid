@@ -2,6 +2,9 @@
 module Mongoid #:nodoc
   module Errors #:nodoc
 
+    # Default parent Mongoid error for all custom errors
+    class MongoidError < StandardError; end
+
     # Raised when querying the database for a document by a specific id which
     # does not exist. If multiple ids were passed then it will display all of
     # those.
@@ -9,7 +12,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>DocumentNotFound.new(Person, ["1", "2"])</tt>
-    class DocumentNotFound < RuntimeError
+    class DocumentNotFound < MongoidError
       def initialize(klass, ids)
         @klass, @identifier = klass, ids.is_a?(Array) ? ids.join(", ") : ids
       end
@@ -23,7 +26,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>InvalidOptions.new</tt>
-    class InvalidOptions < RuntimeError; end
+    class InvalidOptions < MongoidError; end
 
     # Raised when the database connection has not been set up properly, either
     # by attempting to set an object on the db that is not a +Mongo::DB+, or
@@ -32,7 +35,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>InvalidDatabase.new("Not a DB")</tt>
-    class InvalidDatabase < RuntimeError
+    class InvalidDatabase < MongoidError
       def initialize(database)
         @database = database
       end
@@ -46,7 +49,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>UnsupportedVersion.new(Mongo::ServerVersion.new("1.3.1"))</tt>
-    class UnsupportedVersion < RuntimeError
+    class UnsupportedVersion < MongoidError
       def initialize(version)
         @version = version
       end
@@ -61,7 +64,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>Validations.new(person.errors)</tt>
-    class Validations < RuntimeError
+    class Validations < MongoidError
       def initialize(errors)
         @errors = errors
       end
@@ -76,7 +79,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>InvalidCollection.new(Address)</tt>
-    class InvalidCollection < RuntimeError
+    class InvalidCollection < MongoidError
       def initialize(klass)
         @klass = klass
       end
@@ -93,7 +96,7 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>InvalidField.new('collection')</tt>
-    class InvalidField < RuntimeError
+    class InvalidField < MongoidError
       def initialize(name)
         @name = name
       end
@@ -111,7 +114,7 @@ module Mongoid #:nodoc
     # Example:
     #
     #<tt>TooManyNestedAttributeRecords.new('association', limit)
-    class TooManyNestedAttributeRecords < RuntimeError
+    class TooManyNestedAttributeRecords < MongoidError
       def initialize(association, limit)
         @association = association.to_s.humanize.capitalize
         @limit = limit
