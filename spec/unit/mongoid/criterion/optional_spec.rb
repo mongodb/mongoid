@@ -378,7 +378,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+        @criteria.options[:sort].should include([:title, :asc], [:text, :desc])
       end
     end
 
