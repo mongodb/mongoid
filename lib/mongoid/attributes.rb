@@ -38,15 +38,7 @@ module Mongoid #:nodoc:
         if set_allowed?(key)
           write_attribute(key, value)
         elsif write_allowed?(key)
-          if associations.include?(key.to_s) and associations[key.to_s].embedded? and value.is_a?(Hash)
-            if association = send(key)
-              association.nested_build(value)
-            else
-              send("build_#{key}", value)
-            end          
-          else
-            send("#{key}=", value)
-          end
+          send("#{key}=", value)
         end
       end
       setup_modifications
