@@ -2,8 +2,8 @@ require "spec_helper"
 
 describe Mongoid::Config do
 
-  after :all do
-    config.raise_not_found_error = true
+  after do
+    Mongoid::Config.instance.reset
   end
 
   let(:config) { Mongoid::Config.instance }
