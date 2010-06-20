@@ -21,7 +21,11 @@ module Mongoid #:nodoc:
         def insert(key, attrs)
           elements = self[key]
           if elements
-            elements.merge!(attrs)
+            if elements.kind_of?(::Array)
+              elements.merge!(attrs)
+            else
+              self[key] = attrs.reverse_merge!(elements)
+            end
           else
             self[key] = key.singular? ? attrs : [attrs]
           end

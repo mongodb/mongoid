@@ -47,8 +47,7 @@ module Mongoid #:nodoc
       end
 
       # Sets up a child/parent association. This is used for newly created
-      # objects so they can be properly added to the graph and have the parent
-      # observers set up properly.
+      # objects so they can be properly added to the graph.
       #
       # Options:
       #

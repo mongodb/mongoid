@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
       def clear
         unless @target.empty?
           document = @target.first
-          document.notify_observers(document, true)
+          document._parent.update_child(document, true) if (document._parent)
           @target.clear
         end
       end

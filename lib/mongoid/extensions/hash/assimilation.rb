@@ -27,11 +27,12 @@ module Mongoid #:nodoc:
         protected
 
         def init(parent, child, options)
-          child._parent = parent
+          child.parentize(parent, options.name)
           child.write_attributes(self)
           child.identify
           child.reset_modifications
-          child.assimilate(parent, options)
+          child.notify
+          child
         end
       end
     end
