@@ -60,7 +60,6 @@ module Mongoid #:nodoc
       def parentize(object, association_name)
         self._parent = object
         self.association_name = association_name.to_s
-        add_observer(object)
       end
 
       # Return the root +Document+ in the object graph. If the current +Document+
