@@ -99,7 +99,15 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def id(*args)
-        (args.flatten.size > 1) ? self.in(:_id => args.flatten) : (@selector[:_id] = args.first)
+        safe_args = args.flatten.map do |id_arg|
+          if Mongoid.use_object_ids
+            id_arg = BSON::ObjectID.from_string(id_arg) unless id_arg.is_a?(BSON::ObjectID)
+          else
+            id_arg = id_arg.to_s
+          end
+          id_arg
+        end 
+        (safe_args.size > 1) ? self.in(:_id => safe_args) : (@selector[:_id] = safe_args.first)
         self
       end
 
