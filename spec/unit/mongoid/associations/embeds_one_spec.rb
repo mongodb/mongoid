@@ -17,7 +17,6 @@ describe Mongoid::Associations::EmbedsOne do
       before do
         @association = Mongoid::Associations::EmbedsOne.new(
           @document,
-          @attributes["mixed_drink"],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
         )
       end
@@ -34,7 +33,6 @@ describe Mongoid::Associations::EmbedsOne do
       before do
         @association = Mongoid::Associations::EmbedsOne.new(
           @document,
-          @attributes["writer"],
           Mongoid::Associations::Options.new(:name => :writer)
         )
       end
@@ -75,7 +73,7 @@ describe Mongoid::Associations::EmbedsOne do
         end
       }
       @options = Mongoid::Associations::Options.new(:name => :name, :extend => @block)
-      @association = Mongoid::Associations::EmbedsOne.new(@parent, {}, @options)
+      @association = Mongoid::Associations::EmbedsOne.new(@parent, @options)
     end
 
     context "when the options have an extension" do
@@ -88,67 +86,11 @@ describe Mongoid::Associations::EmbedsOne do
 
   end
 
-  describe ".instantiate" do
-
-    context "when the attributes are nil" do
-
-      before do
-        @document = Person.new
-        @association = Mongoid::Associations::EmbedsOne.instantiate(
-          @document,
-          Mongoid::Associations::Options.new(:name => :name)
-        )
-      end
-
-      it "returns nil" do
-        @association.should be_nil
-      end
-
-    end
-
-    context "when attributes are empty" do
-
-      before do
-        @document = stub(:raw_attributes => { "name" => {} })
-        @association = Mongoid::Associations::EmbedsOne.instantiate(
-          @document,
-          Mongoid::Associations::Options.new(:name => :name)
-        )
-      end
-
-      it "returns nil" do
-        @association.should be_nil
-      end
-
-    end
-
-    context "when attributes exist" do
-
-      before do
-        @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } })
-        @options = Mongoid::Associations::Options.new(:name => :name)
-      end
-
-      it "delegates to new" do
-        Mongoid::Associations::EmbedsOne.expects(:new).with(
-          @document,
-          { "first_name" => "Test" },
-          @options,
-          nil
-        )
-        Mongoid::Associations::EmbedsOne.instantiate(@document, @options)
-      end
-
-    end
-
-  end
-
   describe "#method_missing" do
 
     before do
       @association = Mongoid::Associations::EmbedsOne.new(
         @document,
-        @attributes["mixed_drink"],
         Mongoid::Associations::Options.new(:name => :mixed_drink)
       )
     end
@@ -179,7 +121,6 @@ describe Mongoid::Associations::EmbedsOne do
       before do
         @association = Mongoid::Associations::EmbedsOne.new(
           @document,
-          @attributes["mixed_drink"],
           Mongoid::Associations::Options.new(:name => :mixed_drink)
         )
       end
@@ -255,7 +196,6 @@ describe Mongoid::Associations::EmbedsOne do
     before do
       @association = Mongoid::Associations::EmbedsOne.new(
         @document,
-        @attributes["mixed_drink"],
         Mongoid::Associations::Options.new(:name => :mixed_drink)
       )
     end
@@ -273,7 +213,7 @@ describe Mongoid::Associations::EmbedsOne do
       before do
         @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } }, :observe => true, :update_child => nil)
         @options = Mongoid::Associations::Options.new(:name => :name)
-        @association = Mongoid::Associations::EmbedsOne.instantiate(@document, @options)
+        @association = Mongoid::Associations::EmbedsOne.new(@document, @options)
       end
 
       it "validates the document" do

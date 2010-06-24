@@ -27,6 +27,18 @@ describe Mongoid::Associations do
           { "_id" => "test-user", "first_name" => "Test", "last_name" => "User" }
       end
 
+      context "when child is nil" do
+
+        it "makes the association nil" do
+          @person.game.should be_nil
+        end
+
+        it "makes the association false" do
+          (!!@person.game).should == false
+        end
+
+      end
+
     end
 
     context "when child and parent are namespaced" do
@@ -219,58 +231,83 @@ describe Mongoid::Associations do
 
   describe "#build_*" do
 
-    before do
-      @canvas = Canvas.new
-    end
-
-    context "when type is passed in" do
+    context "embeds_one" do
 
       before do
-        @writer = @canvas.build_writer(:speed => 250, :_type => "HtmlWriter")
+        @canvas = Canvas.new
+      end
+
+      context "when type is passed in" do
+
+        before do
+          @writer = @canvas.build_writer(:speed => 250, :_type => "HtmlWriter")
+        end
+
+        it "returns a new document" do
+          @writer.should_not be_nil
+        end
+
+        it "returns the properly typed document" do
+          @writer.should be_a_kind_of(HtmlWriter)
+        end
+
+        it "sets the appropriate attributes" do
+          @writer.speed.should == 250
+        end
+
+      end
+
+      context "when type is not passed in" do
+
+        before do
+          @writer = @canvas.build_writer(:speed => 250)
+        end
+
+        it "returns a new document" do
+          @writer.should_not be_nil
+        end
+
+        it "returns the properly typed document" do
+          @writer.should be_a_kind_of(Writer)
+        end
+
+        it "sets the appropriate attributes" do
+          @writer.speed.should == 250
+        end
+
+      end
+
+      context "when attributes are nil" do
+
+        before do
+          @writer = @canvas.build_writer(nil)
+        end
+
+        it "defaults them to empty" do
+          @writer.should be_a_kind_of(Writer)
+        end
+
+      end
+
+    end
+
+    context "references_one" do
+
+      before do
+        @person = Person.new
+        @game = @person.build_game(:score => 100)
       end
 
       it "returns a new document" do
-        @writer.should_not be_nil
+        @game.should_not be_nil
       end
 
       it "returns the properly typed document" do
-        @writer.should be_a_kind_of(HtmlWriter)
+        @game.should be_a_kind_of(Game)
       end
 
       it "sets the appropriate attributes" do
-        @writer.speed.should == 250
-      end
-
-    end
-
-    context "when type is not passed in" do
-
-      before do
-        @writer = @canvas.build_writer(:speed => 250)
-      end
-
-      it "returns a new document" do
-        @writer.should_not be_nil
-      end
-
-      it "returns the properly typed document" do
-        @writer.should be_a_kind_of(Writer)
-      end
-
-      it "sets the appropriate attributes" do
-        @writer.speed.should == 250
-      end
-
-    end
-
-    context "when attributes are nil" do
-
-      before do
-        @writer = @canvas.build_writer(nil)
-      end
-
-      it "defaults them to empty" do
-        @writer.should be_a_kind_of(Writer)
+        @game.score.should == 100
       end
 
     end
@@ -279,52 +316,80 @@ describe Mongoid::Associations do
 
   describe "#create_*" do
 
-    before do
-      @canvas = Canvas.new
-    end
-
-    context "when type is passed in" do
+    context "embeds_one" do
 
       before do
+        @canvas = Canvas.new
+      end
+
+      context "when type is passed in" do
+
+        before do
+          @insert = stub
+          Mongoid::Persistence::Insert.expects(:new).returns(@insert)
+          @insert.expects(:persist).returns(HtmlWriter.new(:speed => 250))
+          @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
+        end
+
+        it "returns a new document" do
+          @writer.should_not be_nil
+        end
+
+        it "returns the properly typed document" do
+          @writer.should be_a_kind_of(HtmlWriter)
+        end
+
+        it "sets the appropriate attributes" do
+          @writer.speed.should == 250
+        end
+
+      end
+
+      context "when type is not passed in" do
+
+        before do
+          @insert = stub
+          Mongoid::Persistence::Insert.expects(:new).returns(@insert)
+          @insert.expects(:persist).returns(HtmlWriter.new(:speed => 250))
+          @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
+        end
+
+        it "returns a new document" do
+          @writer.should_not be_nil
+        end
+
+        it "returns the properly typed document" do
+          @writer.should be_a_kind_of(Writer)
+        end
+
+        it "sets the appropriate attributes" do
+          @writer.speed.should == 250
+        end
+
+      end
+
+    end
+
+    context "references_one" do
+
+      before do
+        @person = Person.new
         @insert = stub
         Mongoid::Persistence::Insert.expects(:new).returns(@insert)
-        @insert.expects(:persist).returns(HtmlWriter.new(:speed => 250))
-        @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
+        @insert.expects(:persist).returns(Game.new(:score => 100))
+        @game = @person.create_game(:score => 100)
       end
 
       it "returns a new document" do
-        @writer.should_not be_nil
+        @game.should_not be_nil
       end
 
       it "returns the properly typed document" do
-        @writer.should be_a_kind_of(HtmlWriter)
+        @game.should be_a_kind_of(Game)
       end
 
       it "sets the appropriate attributes" do
-        @writer.speed.should == 250
-      end
-
-    end
-
-    context "when type is not passed in" do
-
-      before do
-        @insert = stub
-        Mongoid::Persistence::Insert.expects(:new).returns(@insert)
-        @insert.expects(:persist).returns(HtmlWriter.new(:speed => 250))
-        @writer = @canvas.create_writer(:speed => 250, :_type => "HtmlWriter")
-      end
-
-      it "returns a new document" do
-        @writer.should_not be_nil
-      end
-
-      it "returns the properly typed document" do
-        @writer.should be_a_kind_of(Writer)
-      end
-
-      it "sets the appropriate attributes" do
-        @writer.speed.should == 250
+        @game.score.should == 100
       end
 
     end
@@ -691,13 +756,13 @@ describe Mongoid::Associations do
     context "when the association exists" do
 
       before do
-        @related = stub(:id => "100", :person= => true)
+        @game = Game.new(:id => "100")
         @person = Person.new
-        @person.game = @related
+        @person.game = @game
       end
 
       it "saves each association" do
-        @related.expects(:save).returns(@related)
+        @game.expects(:save).returns(@game)
         @person.update_association(:game)
       end
 

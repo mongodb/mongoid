@@ -178,7 +178,7 @@ describe Mongoid::Associations do
 
       before do
         @user = User.new(:name => "Don Julio")
-        @account = @user.account.build(:number => "1234567890")
+        @account = @user.build_account(:number => "1234567890")
       end
 
       it "sets the name of the association properly" do

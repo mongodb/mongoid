@@ -250,18 +250,6 @@ module Mongoid #:nodoc:
       end
 
       class << self
-
-        # Preferred method of creating a new +EmbedsMany+ association. It will
-        # delegate to new.
-        #
-        # Options:
-        #
-        # document: The parent +Document+
-        # options: The association options
-        def instantiate(document, options, target_array = nil)
-          new(document, options, target_array)
-        end
-
         # Returns the macro used to create the association.
         def macro
           :embeds_many
@@ -274,9 +262,9 @@ module Mongoid #:nodoc:
           parent.raw_attributes.delete(options.name)
           children.assimilate(parent, options)
           if children && children.first.is_a?(Mongoid::Document)
-            instantiate(parent, options, children)
+            new(parent, options, children)
           else
-            instantiate(parent, options)
+            new(parent, options)
           end
         end
       end

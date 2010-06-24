@@ -386,7 +386,7 @@ describe Mongoid::Document do
       context "for a references_one" do
 
         before do
-          @game = @person.game.create(:score => 50)
+          @game = @person.create_game(:score => 50)
         end
 
         it "should reload the association" do
@@ -400,7 +400,7 @@ describe Mongoid::Document do
       context "for a referenced_in" do
 
         before do
-          @game = @person.game.create(:score => 50)
+          @game = @person.create_game(:score => 50)
         end
 
         it "should reload the association" do
