@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
     # Returns a count of matching records in the database based on the
     # provided arguments.
     #
-    # <tt>Person.count(:first, :conditions => { :attribute => "value" })</tt>
+    # <tt>Person.count(:conditions => { :attribute => "value" })</tt>
     def count(*args)
       Criteria.translate(self, *args).count
     end
@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
     # Returns true if there are on document in database based on the
     # provided arguments.
     #
-    # <tt>Person.exists?(:first, :conditions => { :attribute => "value" })</tt>
+    # <tt>Person.exists?(:conditions => { :attribute => "value" })</tt>
     def exists?(*args)
       Criteria.translate(self, *args).limit(1).count == 1
     end
