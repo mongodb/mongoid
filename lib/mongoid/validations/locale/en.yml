@@ -1,4 +1,5 @@
 en:
-  errors:
-    messages:
-      taken: "is already taken"
+  mongoid:
+    errors:
+      messages:
+        taken: "is already taken"

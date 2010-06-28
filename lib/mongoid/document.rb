@@ -113,6 +113,11 @@ module Mongoid #:nodoc:
       Identity.new(self).create
     end
 
+    # Set the i18n scope to overwrite ActiveModel.
+    def i18n_scope #:nodoc:
+      :mongoid
+    end
+
     # Instantiate a new +Document+, setting the Document's attributes if
     # given. If no attributes are provided, they will be initialized with
     # an empty +Hash+.
