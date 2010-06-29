@@ -564,9 +564,7 @@ describe Mongoid::Attributes do
             @owner.pet.name.should == "Bingo"
             @owner.pet.vet_visits.size.should == 1
           end
-
         end
-
       end
 
       context "on a child document" do

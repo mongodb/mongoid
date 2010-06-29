@@ -186,7 +186,7 @@ module Mongoid #:nodoc:
           else
             build(attrs)
           end
-        end
+        end; self
       end
 
       # Paginate the association. Will create a new criteria, set the documents

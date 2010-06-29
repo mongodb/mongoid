@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
               association.nested_build(value)
             else
               send("build_#{key}", value)
-            end          
+            end
           else
             send("#{key}=", value)
           end
@@ -83,7 +83,7 @@ module Mongoid #:nodoc:
       access = name.to_s
       modify(access, @attributes.delete(name.to_s), nil)
     end
-    
+
     # Returns true when attribute is present.
     #
     # Options:
