@@ -160,7 +160,10 @@ module Mongoid #:nodoc:
     # Returns the selector and options as a +Hash+ that would be passed to a
     # scope for use with named scopes.
     def scoped
-      { :where => @selector }.merge(@options)
+      scope_options = @options.dup
+      sorting = scope_options.delete(:sort)
+      scope_options[:order_by] = sorting if sorting
+      { :where => @selector }.merge(scope_options)
     end
 
     # Translate the supplied arguments into a +Criteria+ object.

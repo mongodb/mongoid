@@ -665,12 +665,15 @@ describe Mongoid::Criteria do
 
   describe "#scoped" do
 
-    before do
-      @criteria = Person.where(:title => "Sir").skip(20)
-    end
+    context "when the options contain sort criteria" do
 
-    it "returns the selector plus the options" do
-      @criteria.scoped.should == { :where => { :title => "Sir" }, :skip => 20 }
+      before do
+        @criteria = Person.where(:title => "Sir").asc(:score)
+      end
+
+      it "changes sort to order_by" do
+        @criteria.scoped.should == { :where => { :title => "Sir" }, :order_by => [[:score, :asc]] }
+      end
     end
 
   end
