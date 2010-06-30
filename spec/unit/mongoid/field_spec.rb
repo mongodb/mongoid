@@ -41,7 +41,7 @@ describe Mongoid::Field do
   describe "#default" do
 
     before do
-      @field = Mongoid::Field.new(:score, :default => 0)
+      @field = Mongoid::Field.new(:score, :type => Integer, :default => 0)
     end
 
     it "returns the default option" do
@@ -84,12 +84,21 @@ describe Mongoid::Field do
         lambda { Mongoid::Field.new(:collection) }.should raise_error(Mongoid::Errors::InvalidField)
       end
     end
+
+    context "when the default value does not match the type" do
+
+      it "raises an error" do
+        lambda {
+          Mongoid::Field.new(:names, :type => Integer, :default => "Jacob")
+        }.should raise_error(Mongoid::Errors::InvalidType)
+      end
+    end
   end
 
   describe "#name" do
 
     before do
-      @field = Mongoid::Field.new(:score, :default => 0)
+      @field = Mongoid::Field.new(:score, :type => Integer, :default => 0)
     end
 
     it "returns the name" do
@@ -113,14 +122,12 @@ describe Mongoid::Field do
   describe "#set" do
 
     before do
-      @type = mock
-      @field = Mongoid::Field.new(:score, :default => 10, :type => @type)
+      @field = Mongoid::Field.new(:score, :default => 10, :type => Integer)
     end
 
     context "nil is provided" do
 
       it "returns the default value" do
-        @type.expects(:set).with(nil).returns(nil)
         @field.set(nil).should == nil
       end
 
@@ -129,7 +136,6 @@ describe Mongoid::Field do
     context "value is provided" do
 
       it "sets the value" do
-        @type.expects(:set).with("30").returns(30)
         @field.set("30").should == 30
       end
 
@@ -140,22 +146,19 @@ describe Mongoid::Field do
   describe "#get" do
 
     before do
-      @type = mock
-      @field = Mongoid::Field.new(:score, :default => 10, :type => @type)
+      @field = Mongoid::Field.new(:score, :default => 10, :type => Integer)
     end
 
     it "returns the value" do
-      @type.expects(:get).with(30).returns(30)
       @field.get(30).should == 30
     end
-
   end
 
   describe "#options" do
     before do
       @field = Mongoid::Field.new(:terrible_and_unsafe_html_goes_here, :sanitize => true, :hello => :goodbye)
     end
-    
+
     it "stores the arbitrary options" do
       @field.options[:sanitize].should be_true
       @field.options[:hello].should == :goodbye

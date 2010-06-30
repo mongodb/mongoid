@@ -43,12 +43,12 @@ module Mongoid #:nodoc:
     # <tt>Field.new(:score, :default => 0)</tt>
     def initialize(name, options = {})
       check_name!(name)
+      @type = options[:type] || String
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
-      @type = options[:type] || String
       @accessible = options.has_key?(:accessible) ? options[:accessible] : true
-
       @options = options
+      check_default!
     end
 
     # Used for setting an object in the attributes hash. If nil is provided the
@@ -70,7 +70,14 @@ module Mongoid #:nodoc:
 
     # Check if the name is valid.
     def check_name!(name)
-      raise Errors::InvalidField.new(name) if Mongoid.destructive_fields.include?(name.to_s)
+      raise Mongoid::Errors::InvalidField.new(name) if Mongoid.destructive_fields.include?(name.to_s)
+    end
+
+    def check_default!
+      return if @default.is_a?(Proc)
+      if !@default.nil? && !@default.is_a?(@type)
+        raise Mongoid::Errors::InvalidType.new(@type, @default)
+      end
     end
   end
 end
