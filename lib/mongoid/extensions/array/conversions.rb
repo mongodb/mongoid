@@ -6,18 +6,14 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         extend ActiveSupport::Concern
 
-        # Converts this array into an array of hashes.
-        def mongoidize
-          collect { |obj| obj.attributes }
-        end
-
         module ClassMethods #:nodoc:
-          def get(value)
+          def raise_or_return(value)
+            raise Mongoid::Errors::InvalidType.new(::Array, value) unless value.is_a?(::Array)
             value
           end
-          def set(value)
-            value
-          end
+
+          alias :get :raise_or_return
+          alias :set :raise_or_return
         end
       end
     end
