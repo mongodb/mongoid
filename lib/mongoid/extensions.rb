@@ -11,6 +11,7 @@ require "mongoid/extensions/binary/conversions"
 require "mongoid/extensions/boolean/conversions"
 require "mongoid/extensions/date/conversions"
 require "mongoid/extensions/datetime/conversions"
+require "mongoid/extensions/false_class/equality"
 require "mongoid/extensions/float/conversions"
 require "mongoid/extensions/hash/accessors"
 require "mongoid/extensions/hash/assimilation"
@@ -24,6 +25,7 @@ require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
+require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/objectid/conversions"
 
 class Array #:nodoc
@@ -57,6 +59,10 @@ end
 class Date #:nodoc
   extend Mongoid::Extensions::TimeConversions
   extend Mongoid::Extensions::Date::Conversions
+end
+
+class FalseClass #:nodoc
+  include Mongoid::Extensions::FalseClass::Equality
 end
 
 class Float #:nodoc
@@ -99,6 +105,10 @@ end
 
 class Time #:nodoc
   extend Mongoid::Extensions::TimeConversions
+end
+
+class TrueClass #:nodoc
+  include Mongoid::Extensions::TrueClass::Equality
 end
 
 class BSON::ObjectID #:nodoc

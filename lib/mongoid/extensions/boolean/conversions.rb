@@ -12,15 +12,6 @@ module Mongoid #:nodoc:
 
         module ClassMethods #:nodoc
 
-          def is_a?(other)
-            if other.name == "Boolean" ||
-               other.name == "FalseClass" ||
-               other.name == "TrueClass"
-              return true
-            end
-            false
-          end
-
           def set(value)
             value = BOOLEAN_MAP[value]
             value.nil? ? nil : value
