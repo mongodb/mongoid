@@ -1,7 +1,7 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
-  
+
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
