@@ -46,7 +46,7 @@ class Binary #:nodoc
 end
 
 class Boolean #:nodoc
-  extend Mongoid::Extensions::Boolean::Conversions
+  include Mongoid::Extensions::Boolean::Conversions
 end
 
 class DateTime #:nodoc
