@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
           begin
             Float(value)
           rescue ArgumentError => e
-            puts(e.message); value
+            value
           end
         end
         def get(value)
