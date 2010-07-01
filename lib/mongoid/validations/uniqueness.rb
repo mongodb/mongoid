@@ -30,7 +30,7 @@ module Mongoid #:nodoc:
         end
         
         if criteria.exists?
-          document.errors.add(attribute, :taken, :default => options[:message], :value => value)
+          document.errors.add(attribute, :taken, options.merge!(:value => value))
         end
       end
 
