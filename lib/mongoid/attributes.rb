@@ -2,6 +2,10 @@
 module Mongoid #:nodoc:
   module Attributes
     extend ActiveSupport::Concern
+    included do
+      class_inheritable_accessor :_protected_fields
+      self._protected_fields = []
+    end
 
     # Get the id associated with this object. This will pull the _id value out
     # of the attributes +Hash+.
@@ -38,7 +42,15 @@ module Mongoid #:nodoc:
         if set_allowed?(key)
           write_attribute(key, value)
         elsif write_allowed?(key)
-          send("#{key}=", value)
+          if associations.include?(key.to_s) and associations[key.to_s].embedded? and value.is_a?(Hash)
+            if association = send(key)
+              association.nested_build(value)
+            else
+              send("build_#{key}", value)
+            end
+          else
+            send("#{key}=", value)
+          end
         end
       end
       setup_modifications
@@ -75,7 +87,7 @@ module Mongoid #:nodoc:
       access = name.to_s
       modify(access, @attributes.delete(name.to_s), nil)
     end
-    
+
     # Returns true when attribute is present.
     #
     # Options:
@@ -171,15 +183,15 @@ module Mongoid #:nodoc:
 
     # Used when supplying a :limit as an option to accepts_nested_attributes_for
     def limit(attributes, name, options)
-      raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit]) if options[:limit] && attributes.size > options[:limit]
+      if options[:limit] && attributes.size > options[:limit]
+        raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit])
+      end
     end
 
     # Return true if writing to the given field is allowed
     def write_allowed?(key)
       name = key.to_s
-      existing = fields[name]
-      return true unless existing
-      existing.accessible?
+      !self._protected_fields.include?(name)
     end
 
     module ClassMethods
@@ -211,6 +223,19 @@ module Mongoid #:nodoc:
             end
           end
         end
+      end
+
+      # Defines fields that cannot be set via mass assignment.
+      #
+      # Example:
+      #
+      #   class Person
+      #     include Mongoid::Document
+      #     field :security_code
+      #     attr_protected :security_code
+      #   end
+      def attr_protected(*names)
+        _protected_fields.concat(names.flatten.map(&:to_s))
       end
     end
   end

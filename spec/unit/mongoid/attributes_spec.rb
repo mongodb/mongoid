@@ -108,7 +108,8 @@ describe Mongoid::Attributes do
               "4" => { "title" => "Tim Tams" },
               "5" => { "title" => "Milo" }
             }
-            lambda { @person.favorites_attributes = @attributes }.should raise_error(Mongoid::Errors::TooManyNestedAttributeRecords)
+            lambda { @person.favorites_attributes = @attributes }.should
+              raise_error(Mongoid::Errors::TooManyNestedAttributeRecords)
           end
         end
 
@@ -119,12 +120,12 @@ describe Mongoid::Attributes do
         before do
           @person = Person.new
         end
-        
+
         it "can be added if :update_only is false" do
           @person.pet_attributes = { "name" => "Darwin" }
           @person.pet.name.should == "Darwin"
         end
-        
+
         it "can be updated if :update_only is false" do
           @person.pet_attributes = { "name" => "Darwin" }
           @person.pet_attributes = { "name" => "Zulu" }
@@ -142,11 +143,44 @@ describe Mongoid::Attributes do
           @person.name.first_name.should == "Fernando"
           @person.name.last_name.should == "Torres"
         end
+      end
+    end
+  end
 
+  describe ".attr_protected" do
+
+    context "when the field is not _id" do
+
+      before do
+        @person = Person.new(:security_code => "ABBA")
       end
 
+      it "prevents setting via mass assignment" do
+        @person.security_code.should be_nil
+      end
     end
 
+    context "when the field is _id" do
+
+      before do
+        @game = Game.new(:_id => "ABBA")
+      end
+
+      it "prevents setting via mass assignment" do
+        @game._id.should_not == "ABBA"
+      end
+    end
+
+    context "when using instantiate" do
+
+      before do
+        @person = Person.instantiate("_id" => "1", "security_code" => "ABBA")
+      end
+
+      it "ignores any protected attribute" do
+        @person.security_code.should == "ABBA"
+      end
+    end
   end
 
   describe "#_id" do
@@ -564,9 +598,7 @@ describe Mongoid::Attributes do
             @owner.pet.name.should == "Bingo"
             @owner.pet.vet_visits.size.should == 1
           end
-
         end
-
       end
 
       context "on a child document" do

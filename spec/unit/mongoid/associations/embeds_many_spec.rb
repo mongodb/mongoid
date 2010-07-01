@@ -6,7 +6,7 @@ describe Mongoid::Associations::EmbedsMany do
     @attributes = { "addresses" => [
       { "_id" => "street-1", "street" => "Street 1", "state" => "CA" },
       { "_id" => "street-2", "street" => "Street 2" } ] }
-    @document = stub(:raw_attributes => @attributes, :add_observer => true, :observe => true)
+    @document = stub(:raw_attributes => @attributes, :add_observer => true, :observe => true, :update_child => nil)
   end
 
   describe "#[]" do

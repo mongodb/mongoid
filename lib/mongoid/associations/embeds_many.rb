@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
       def clear
         unless @target.empty?
           document = @target.first
-          document.notify_observers(document, true)
+          document._parent.update_child(document, true) if (document._parent)
           @target.clear
         end
       end
@@ -186,7 +186,7 @@ module Mongoid #:nodoc:
           else
             build(attrs)
           end
-        end
+        end; self
       end
 
       # Paginate the association. Will create a new criteria, set the documents

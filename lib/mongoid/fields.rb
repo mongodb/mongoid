@@ -27,6 +27,7 @@ module Mongoid #:nodoc
       def field(name, options = {})
         access = name.to_s
         set_field(access, options)
+        attr_protected name if options[:accessible] == false
       end
 
       # Returns the default values for the fields on the document

@@ -2,23 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Object::Conversions do
 
-  describe "#mongoidize" do
-
-    it "returns its attributes" do
-      Person.new(:_id => 1, :title => "Sir").mongoidize.should ==
-        {
-          "_id" => 1,
-          "title" => "Sir",
-          "age" => 100,
-          "_type" => "Person",
-          "blood_alcohol_content" => 0.0,
-          "pets" => false,
-          "preference_ids" => []
-        }
-    end
-
-  end
-
   describe "#get" do
 
     before do
@@ -35,7 +18,6 @@ describe Mongoid::Extensions::Object::Conversions do
         Person.get(nil).should be_nil
       end
     end
-
   end
 
   describe "#set" do
