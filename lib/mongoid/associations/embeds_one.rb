@@ -44,9 +44,7 @@ module Mongoid #:nodoc:
       # A new target document.
       def nested_build(attributes, options = nil)
         unless @target.blank? && options[:update_only]
-          (attributes || {}).each do |key, value|
-            @target.write_attribute(key, value)
-          end
+          @target.write_attributes(attributes)
         end; @target
       end
 

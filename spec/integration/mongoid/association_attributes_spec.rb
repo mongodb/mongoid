@@ -23,14 +23,16 @@ describe Mongoid::Associations do
 
     context "with a normal hash" do
       describe "creating associated document" do
-        let(:person) { Person.create!( :ssn => "1234", :pet => { :name => 'odie' } ) }
+        let(:person) { Person.create!( :ssn => "1234", :pet => { :name => 'odie', :tag_list => "dog, beagle" } ) }
         specify { person.reload.pet.name.should == 'odie' }
+        specify { person.reload.pet.tags.should == ["dog", "beagle"] }    
       end
 
       describe "updating associated document" do
-        let(:person) { Person.create!( :ssn => "1234", :pet => { :name => 'garfield' }) }
-        before { person.update_attributes!(:pet => { :name => 'odie' } ) }
+        let(:person) { Person.create!( :ssn => "1234", :pet => { :name => 'garfield', :tag_list => "cat" } ) }
+        before { person.update_attributes!(:pet => { :name => 'odie', :tag_list => "dog, beagle" } ) }
         specify { person.reload.pet.name.should == 'odie' }
+        specify { person.reload.pet.tags.should == ["dog", "beagle"] }               
       end
     end
 
