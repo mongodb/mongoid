@@ -6,8 +6,15 @@ describe Mongoid::Extensions::Array::Conversions do
 
     context "when the value is not an array" do
 
-      it "returns the array" do
+      it "raises an error" do
         lambda { Array.get("test") }.should raise_error(Mongoid::Errors::InvalidType)
+      end
+    end
+
+    context "when the value is nil" do
+
+      it "returns nil" do
+        Array.get(nil).should be_nil
       end
     end
 
@@ -23,8 +30,15 @@ describe Mongoid::Extensions::Array::Conversions do
 
     context "when the value is not an array" do
 
-      it "returns the array" do
+      it "raises an error" do
         lambda { Array.set("test") }.should raise_error(Mongoid::Errors::InvalidType)
+      end
+    end
+
+    context "when the value is nil" do
+
+      it "returns nil" do
+        Array.get(nil).should be_nil
       end
     end
 

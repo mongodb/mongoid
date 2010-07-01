@@ -8,7 +8,9 @@ module Mongoid #:nodoc:
 
         module ClassMethods #:nodoc:
           def raise_or_return(value)
-            raise Mongoid::Errors::InvalidType.new(::Array, value) unless value.is_a?(::Array)
+            unless value.nil? || value.is_a?(::Array)
+              raise Mongoid::Errors::InvalidType.new(::Array, value)
+            end
             value
           end
 
