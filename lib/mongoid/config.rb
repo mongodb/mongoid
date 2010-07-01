@@ -142,6 +142,16 @@ module Mongoid #:nodoc
       end
     end
 
+    # Convenience method for connecting to the master database after forking a
+    # new process.
+    #
+    # Example:
+    #
+    # <tt>Mongoid.reconnect!</tt>
+    def reconnect!
+      master.connection.connect_to_master
+    end
+
     # Reset the configuration options to the defaults.
     #
     # Example:
@@ -184,6 +194,8 @@ module Mongoid #:nodoc
 
     # Get a master database from settings.
     #
+    # TODO: Durran: This code's a bit hairy, refactor.
+    #
     # Example:
     #
     # <tt>config._master({}, "test")</tt>
@@ -206,6 +218,8 @@ module Mongoid #:nodoc
     end
 
     # Get a bunch-o-slaves from settings and names.
+    #
+    # TODO: Durran: This code's a bit hairy, refactor.
     #
     # Example:
     #

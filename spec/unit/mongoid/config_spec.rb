@@ -190,6 +190,21 @@ describe Mongoid::Config do
 
   end
 
+  describe "#reconnect!" do
+
+    before do
+      @connection = mock
+      @master = mock
+      config.expects(:master).returns(@master)
+      @master.expects(:connection).returns(@connection)
+    end
+
+    it "reconnects on the master connection" do
+      @connection.expects(:connect_to_master).returns(true)
+      config.reconnect!
+    end
+  end
+
   describe "#reconnect_time" do
 
     it "defaults to 3" do
