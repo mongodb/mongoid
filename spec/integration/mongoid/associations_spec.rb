@@ -507,6 +507,30 @@ describe Mongoid::Associations do
         end
       end
 
+      context "when overwriting with empty Array" do
+        before do
+          @person.addresses << Address.new(:street => 'hello')
+          @person.save
+          @person.addresses = []
+        end
+
+        it "sets the association to an empty array" do
+          @person.addresses.should == []
+        end
+      end
+
+      context "when delete_all" do
+        before do
+          @person.addresses << Address.new(:street => 'hello')
+          @person.save
+          @person.addresses.delete_all
+        end
+
+        it "sets the association to an empty array" do
+          @person.addresses.should == []
+        end
+      end
+
     end
 
     context "one level nested" do
