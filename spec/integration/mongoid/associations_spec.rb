@@ -436,7 +436,7 @@ describe Mongoid::Associations do
         end
       end
 
-      context "when appending" do
+      context "when appending one elements" do
 
         before do
           @address = Address.new(:street => "Oxford St")
@@ -447,6 +447,24 @@ describe Mongoid::Associations do
         it "saves all new children" do
           from_db = Person.find(@person.id)
           from_db.addresses.first.should == @address
+        end
+      end
+
+      context "when appending several elements" do
+
+        before do
+          @address = Address.new(:street => "Oxford St")
+          @address2 = Address.new(:street => "Cambridge St")
+          @person.addresses << @address
+          @person.addresses << @address2
+          @person.save
+        end
+
+        it "saves all new children" do
+          from_db = Person.find(@person.id)
+          from_db.addresses.count.should == 2
+          from_db.addresses.first.should == @address
+          from_db.addresses.second.should == @address2
         end
       end
 
