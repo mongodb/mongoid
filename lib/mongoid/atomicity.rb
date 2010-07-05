@@ -15,9 +15,15 @@ module Mongoid #:nodoc:
     #
     # A +Hash+ of all atomic updates that need to occur.
     def _updates
-      _children.inject({ "$set" => _sets, "$push" => {}}) do |updates, child|
+      _children.inject({ "$set" => _sets, "$pushAll" => {}}) do |updates, child|
         updates["$set"].update(child._sets)
-        updates["$push"].update(child._pushes)
+        child._pushes.each do |attr, val|
+          if updates["$pushAll"].has_key?(attr)
+            updates["$pushAll"][attr] << val
+          else
+            updates["$pushAll"].update({attr => [val]})
+          end
+        end
         updates
       end.delete_if do |key, value|
         value.empty?

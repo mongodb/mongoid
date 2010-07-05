@@ -30,7 +30,7 @@ describe Mongoid::Atomicity do
             @person._updates.should ==
               {
                 "$set" => { "title" => "Sir" },
-                "$push" => { "addresses" => { "_id" => "oxford-st", "street" => "Oxford St" } }
+                "$pushAll" => { "addresses" => [{ "_id" => "oxford-st", "street" => "Oxford St" }]}
               }
           end
         end
@@ -102,8 +102,8 @@ describe Mongoid::Atomicity do
                   "title" => "Sir",
                   "addresses.0.street" => "Bond St"
                 },
-                "$push" => {
-                  "addresses.0.locations" => { "_id" => @location.id, "name" => "Work" }
+                "$pushAll" => {
+                  "addresses.0.locations" => [{ "_id" => @location.id, "name" => "Work" }]
                 }
               }
           end
@@ -125,15 +125,15 @@ describe Mongoid::Atomicity do
                   "title" => "Sir",
                   "addresses.0.street" => "Bond St"
                 },
-                "$push" => {
-                  "addresses" => {
+                "$pushAll" => {
+                  "addresses" => [{
                     "_id" => @new_address.id,
                     "street" => "Another",
                     "locations" => [
                       "_id" => @location.id,
                       "name" => "Home"
                     ]
-                  }
+                  }]
                 }
               }
           end
