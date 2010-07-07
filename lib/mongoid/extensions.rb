@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/extensions/time_conversions"
 require "mongoid/extensions/array/accessors"
-require "mongoid/extensions/array/aliasing"
 require "mongoid/extensions/array/assimilation"
 require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/array/parentization"
