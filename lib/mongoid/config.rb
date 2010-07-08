@@ -158,7 +158,7 @@ module Mongoid #:nodoc
     def from_hash(settings)
       _master(settings)
       _slaves(settings)
-      settings.except("database").each_pair do |name, value|
+      settings.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?(name)
       end
     end
