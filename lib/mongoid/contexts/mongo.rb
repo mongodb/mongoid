@@ -133,7 +133,7 @@ module Mongoid #:nodoc:
       # <tt>Mongoid::Contexts::Mongo.new(criteria)</tt>
       def initialize(criteria)
         @criteria = criteria
-        if klass.hereditary
+        if klass.hereditary && !criteria.selector.keys.include?(:_type)
           criteria.in(:_type => criteria.klass._types)
         end
         criteria.enslave if klass.enslaved?
