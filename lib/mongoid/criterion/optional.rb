@@ -167,6 +167,23 @@ module Mongoid #:nodoc:
       def skip(value = 0)
         @options[:skip] = value; self
       end
+
+      # Adds a criterion to the +Criteria+ that specifies a type or an Array of type that must be matched.
+      #
+      # Options:
+      #
+      # types : An +Array+ of types of a +String+ representing the Type of you search
+      #
+      # Example:
+      #
+      # <tt>criteria.type('Browser')</tt>
+      # <tt>criteria.type(['Firefox', 'Browser'])</tt>
+      #
+      # Returns: <tt>self</tt>
+      def type(types)
+        types = [types] unless types.is_a?(Array)
+        self.in(:_type => types)
+      end
     end
   end
 end

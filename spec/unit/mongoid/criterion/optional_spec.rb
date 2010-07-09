@@ -452,4 +452,32 @@ describe Mongoid::Criterion::Optional do
     end
 
   end
+
+  describe "#type" do
+
+    context "when the type is a string" do
+
+      it "adds the _type query to the selector" do
+        @criteria.type('Browser')
+        @criteria.selector.should == { :_type => { '$in' => ['Browser'] } }
+      end
+
+      it "returns self" do
+        @criteria.type('Browser').should == @criteria
+      end
+    end
+
+    context "when the type is an Array of type" do
+
+      it "adds the _type query to the selector" do
+        @criteria.type(['Browser', 'Firefox'])
+        @criteria.selector.should == { :_type => { '$in' => ['Browser', 'Firefox'] } }
+      end
+
+      it "returns self" do
+        @criteria.type(['Browser', 'Firefox']).should == @criteria
+      end
+    end
+
+  end
 end
