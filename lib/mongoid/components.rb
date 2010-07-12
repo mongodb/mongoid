@@ -8,6 +8,7 @@ module Mongoid #:nodoc
       include ActiveModel::Conversion
       include ActiveModel::Naming
       include ActiveModel::Serialization
+      include ActiveModel::MassAssignmentSecurity
       include ActiveModel::Serializers::JSON
       include ActiveModel::Serializers::Xml
       include Mongoid::Associations

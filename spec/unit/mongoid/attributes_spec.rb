@@ -150,6 +150,42 @@ describe Mongoid::Attributes do
     end
   end
 
+  describe ".attr_accessible" do
+
+    context "when the field is not _id" do
+
+      before do
+        @account = Account.new(:balance => 999999)
+      end
+
+      it "prevents setting via mass assignment" do
+        @account.balance.should be_nil
+      end
+    end
+
+    context "when the field is _id" do
+
+      before do
+        @account = Account.new(:_id => "ABBA")
+      end
+
+      it "prevents setting via mass assignment" do
+        @account._id.should_not == "ABBA"
+      end
+    end
+
+    context "when using instantiate" do
+
+      before do
+        @account = Account.instantiate("_id" => "1", "balance" => "ABBA")
+      end
+
+      it "ignores any protected attribute" do
+        @account.balance.should == "ABBA"
+      end
+    end
+  end
+
   describe ".attr_protected" do
 
     context "when the field is not _id" do
