@@ -236,6 +236,27 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#convert_to_object_id" do
+    it "should return args if use_object_ids is false" do
+      Mongoid.use_object_ids = false
+      Mongoid.convert_to_object_id("foo").should == "foo"
+    end
+
+    it "should transform args String to BSON::ObjectID if use_object_ids is true" do
+      Mongoid.use_object_ids = true
+      id = BSON::ObjectID.new
+      Mongoid.convert_to_object_id(id.to_s).should == id
+      Mongoid.use_object_ids = false
+    end
+
+    it "should transform all String inside Array pass like args if use_object_ids is true" do
+      Mongoid.use_object_ids = true
+      ids = [BSON::ObjectID.new, BSON::ObjectID.new]
+      Mongoid.convert_to_object_id(ids.map(&:to_s)).should == ids
+      Mongoid.use_object_ids = false
+    end
+  end
+
   describe "#reconnect_time" do
 
     it "defaults to 3" do

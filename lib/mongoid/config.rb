@@ -189,6 +189,41 @@ module Mongoid #:nodoc
       @time_zone = nil
     end
 
+    ##
+    # If Mongoid.user_object_ids = true
+    #   Convert args to BSON::ObjectID
+    #   If this args is an array, convert all args inside
+    # Else
+    #   return args
+    #
+    # Options:
+    #
+    #  args : A +String+ or an +Array+ convert to +BSON::ObjectID+
+    #
+    # Example:
+    #
+    # <tt>Mongoid.convert_to_object_id("4ab2bc4b8ad548971900005c")</tt>
+    # <tt>Mongoid.convert_to_object_id(["4ab2bc4b8ad548971900005c", "4ab2bc4b8ad548971900005d"])</tt>
+    #
+    # Returns:
+    #
+    # If Mongoid.use_object_ids = true
+    #   An +Array+ of +BSON::ObjectID+ of each element if params is an +Array+
+    #   A +BSON::ObjectID+ from params if params is +String+
+    # Else
+    #   <tt>args</tt>
+    #
+    def convert_to_object_id(args)
+      return args if !use_object_ids || args.is_a?(BSON::ObjectID)
+      if args.is_a?(String)
+        BSON::ObjectID(args)
+      else
+        args.map{ |a|
+          a.is_a?(BSON::ObjectID) ? a : BSON::ObjectID(a)
+        }
+      end
+    end
+
     protected
 
     # Check if the database is valid and the correct version.
@@ -217,7 +252,7 @@ module Mongoid #:nodoc
       name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
       host = settings["host"] || mongo_uri.host || "localhost"
       port = settings["port"] || mongo_uri.port || 27017
-      pool_size = settings["pool_size"] || 1 
+      pool_size = settings["pool_size"] || 1
       username = settings["username"] || mongo_uri.user
       password = settings["password"] || mongo_uri.password
 
