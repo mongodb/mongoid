@@ -75,12 +75,32 @@ describe Mongoid::Finders do
         Person.delete_all
       end
 
-      context "with an id as an argument" do
+      context "with an id in BSON::ObjectID as an argument" do
 
         context "when the document is found" do
 
           it "returns the document" do
             Person.find(@document.id).should == @document
+          end
+
+        end
+
+        context "when the document is not found" do
+
+          it "raises an error" do
+            lambda { Person.find(BSON::ObjectID.new) }.should raise_error
+          end
+
+        end
+
+      end
+
+      context "with a params in String as an argument" do
+
+        context "when the document is found" do
+
+          it "returns the document" do
+            Person.find(@document.id.to_s).should == @document
           end
 
         end

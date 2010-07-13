@@ -278,4 +278,44 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#id" do
+    context "with Mongoid.use_object_ids is true" do
+      before :all do
+        Mongoid.use_object_ids = true
+      end
+
+      before :each do
+        @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
+      end
+
+      it 'should find object with String args' do
+        Person.criteria.id(@person.id.to_s).first.should == @person
+      end
+
+      it 'should find object with BSON::ObjectID  args' do
+        Person.criteria.id(@person.id).first.should == @person
+      end
+
+      after :all do
+        Mongoid.use_object_ids = false
+      end
+
+    end
+    context "with Mongoid.use_object_ids is false" do
+
+      before :each do
+        @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
+      end
+
+      it 'should find object with String args' do
+        Person.criteria.id(@person.id.to_s).first.should == @person
+      end
+
+      it 'should not find object with BSON::ObjectID  args' do
+        Person.criteria.id(BSON::ObjectID(@person.id)).first.should == nil
+      end
+
+    end
+  end
+
 end
