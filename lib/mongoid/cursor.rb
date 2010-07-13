@@ -5,7 +5,6 @@ module Mongoid #:nodoc
     # Operations on the Mongo::Cursor object that will not get overriden by the
     # Mongoid::Cursor are defined here.
     OPERATIONS = [
-      :admin,
       :close,
       :closed?,
       :count,
