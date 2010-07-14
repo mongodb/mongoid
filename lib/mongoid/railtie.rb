@@ -1,4 +1,6 @@
+require "singleton"
 require "rails"
+require "mongoid/config"
 module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
@@ -19,9 +21,7 @@ module Rails #:nodoc:
       #       config.mongoid.reconnect_time = 10
       #     end
       #   end
-      initializer "mongoid.configuration" do |app|
-        app.config.mongoid = ::Mongoid.config
-      end
+      config.mongoid = ::Mongoid::Config.instance
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
