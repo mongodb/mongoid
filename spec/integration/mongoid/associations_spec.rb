@@ -164,204 +164,211 @@ describe Mongoid::Associations do
   end
 
   context "one-to-many relational associations" do
-
-    before do
-      @person = Person.new(:title => "Sir")
-      @post = Post.new(:title => "Testing")
-      @person.posts = [@post]
-      @person.save
-    end
-
-    it "sets the association on save" do
-      from_db = Person.find(@person.id)
-      from_db.posts.should == [@post]
-    end
-
-    describe "#build" do
-
-      before do
-        @another = @person.posts.build(:title => "Another")
-      end
-
-      it "sets new_record to true" do
-        @another.new_record?.should == true
-      end
-    end
-
-    describe "#delete_all" do
-
-      context "without conditions" do
-
+    [
+      ["with default naming scheme", Person, :person],
+      ["with custom naming scheme and :inverse_of", User, :author],
+      ["with custom naming scheme and no :inverse_of", Agent, :poster]
+    ].each do |description, parent_class, association_name|
+      context description do
         before do
-          @person.posts.delete_all
+          @person = parent_class.new(:title => "Sir")
+          @post = Post.new(:title => "Testing")
+          @person.posts = [@post]
+          @person.save
         end
 
-        it "deletes all the related objects" do
-          Post.count.should == 0
-          @person.posts.size.should == 0
-        end
-      end
-
-      context "with conditions" do
-
-        before do
-          @person.posts.delete_all(:conditions => { :title => "Testing" })
+        it "sets the association on save" do
+          from_db = parent_class.find(@person.id)
+          from_db.posts.should == [@post]
         end
 
-        it "deletes the appropriate objects" do
-          Post.count.should == 0
-          @person.posts.size.should == 0
-        end
-      end
-    end
-
-    describe "#destroy_all" do
-
-      context "without conditions" do
-
-        before do
-          @person.posts.destroy_all
-        end
-
-        it "deletes all the related objects" do
-          Post.count.should == 0
-          @person.posts.size.should == 0
-        end
-      end
-
-      context "with conditions" do
-
-        before do
-          @person.posts.destroy_all(:conditions => { :title => "Testing" })
-        end
-
-        it "deletes the appropriate objects" do
-          Post.count.should == 0
-          @person.posts.size.should == 0
-        end
-      end
-    end
-
-    context "when adding a new association" do
-
-      before do
-        @new_post = Post.new(:title => "New")
-        @person.posts << @new_post
-      end
-
-      it "rememoizes the new association" do
-        @person.posts.should == [ @post, @new_post ]
-      end
-    end
-
-    context "when building" do
-
-      before do
-        @person = Person.new(:title => "Mr")
-        @post = @person.posts.build(:title => "First")
-      end
-
-      it "sets the reverse association" do
-        @post.person.should == @person
-      end
-
-    end
-
-    context "finding associated objects" do
-
-      before do
-        @extra_post = Post.create(:title => "Orphan")
-        @from_db = Person.find(@person.id)
-      end
-
-      context "finding all" do
-
-        it "returns only those objects scoped to the parent" do
-          Post.all.size.should == 2
-          @from_db.posts.all.size.should == 1
-        end
-
-      end
-
-      context "finding with conditions" do
-
-        context "finding all" do
-
-          it "returns only those objects scoped to the parent" do
-            posts = @from_db.posts.find(:all, :conditions => { :title => "Testing" })
-            posts.size.should == 1
-          end
-
-        end
-
-        context "finding first" do
-
-          it "returns only those objects scoped to the parent" do
-            post = @from_db.posts.find(:first, :conditions => { :title => "Testing" })
-            post.should == @post
-          end
-
-        end
-
-        context "finding last" do
-
-          it "returns only those objects scoped to the parent" do
-            post = @from_db.posts.find(:last, :conditions => { :title => "Testing" })
-            post.should == @post
-          end
-
-        end
-
-        context "using a named scope" do
+        describe "#build" do
 
           before do
-            @post.created_at = 15.days.ago
-            @post.save
+            @another = @person.posts.build(:title => "Another")
           end
 
-          it "returns only those scoped to the parent plus the named scope" do
-            posts = @from_db.posts.recent
-            posts.size.should == 1
+          it "sets new_record to true" do
+            @another.new_record?.should == true
           end
-
         end
 
-        context "using a criteria class method" do
+        describe "#delete_all" do
 
-          before do
-            @post.created_at = 45.days.ago
-            @post.save
-          end
-
-          it "returns only those scoped to the parent plus the named scope" do
-            posts = @from_db.posts.old
-            posts.size.should == 1
-          end
-
-        end
-
-        context "calling criteria methods" do
-
-          before do
-            @post.title = "New Title"
-            @post.save
-          end
-
-          it "returns the proper object for the criteria" do
-            posts = @from_db.posts.where(:title => "New Title")
-            posts.size.should == 1
-          end
-
-          context "when calling with a new criteria" do
+          context "without conditions" do
 
             before do
-              @from_db.posts.create(:title => "Other Title")
+              @person.posts.delete_all
             end
 
-            it "does not retain the old criteria" do
-              @from_db.posts.where(:title => "New Title").size.should == 1
-              @from_db.posts.size.should == 2
-              @from_db.posts.where(:title => "Other Title").size.should == 1
+            it "deletes all the related objects" do
+              Post.count.should == 0
+              @person.posts.size.should == 0
+            end
+          end
+
+          context "with conditions" do
+
+            before do
+              @person.posts.delete_all(:conditions => { :title => "Testing" })
+            end
+
+            it "deletes the appropriate objects" do
+              Post.count.should == 0
+              @person.posts.size.should == 0
+            end
+          end
+        end
+
+        describe "#destroy_all" do
+
+          context "without conditions" do
+
+            before do
+              @person.posts.destroy_all
+            end
+
+            it "deletes all the related objects" do
+              Post.count.should == 0
+              @person.posts.size.should == 0
+            end
+          end
+
+          context "with conditions" do
+
+            before do
+              @person.posts.destroy_all(:conditions => { :title => "Testing" })
+            end
+
+            it "deletes the appropriate objects" do
+              Post.count.should == 0
+              @person.posts.size.should == 0
+            end
+          end
+        end
+
+        context "when adding a new association" do
+
+          before do
+            @new_post = Post.new(:title => "New")
+            @person.posts << @new_post
+          end
+
+          it "rememoizes the new association" do
+            @person.posts.should == [ @post, @new_post ]
+          end
+        end
+
+        context "when building" do
+
+          before do
+            @person = parent_class.new(:title => "Mr")
+            @post = @person.posts.build(:title => "First")
+          end
+
+          it "sets the reverse association" do
+            @post.send(association_name).should == @person
+          end
+
+        end
+
+        context "finding associated objects" do
+
+          before do
+            @extra_post = Post.create(:title => "Orphan")
+            @from_db = parent_class.find(@person.id)
+          end
+
+          context "finding all" do
+
+            it "returns only those objects scoped to the parent" do
+              Post.all.size.should == 2
+              @from_db.posts.all.size.should == 1
+            end
+
+          end
+
+          context "finding with conditions" do
+
+            context "finding all" do
+
+              it "returns only those objects scoped to the parent" do
+                posts = @from_db.posts.find(:all, :conditions => { :title => "Testing" })
+                posts.size.should == 1
+              end
+
+            end
+
+            context "finding first" do
+
+              it "returns only those objects scoped to the parent" do
+                post = @from_db.posts.find(:first, :conditions => { :title => "Testing" })
+                post.should == @post
+              end
+
+            end
+
+            context "finding last" do
+
+              it "returns only those objects scoped to the parent" do
+                post = @from_db.posts.find(:last, :conditions => { :title => "Testing" })
+                post.should == @post
+              end
+
+            end
+
+            context "using a named scope" do
+
+              before do
+                @post.created_at = 15.days.ago
+                @post.save
+              end
+
+              it "returns only those scoped to the parent plus the named scope" do
+                posts = @from_db.posts.recent
+                posts.size.should == 1
+              end
+
+            end
+
+            context "using a criteria class method" do
+
+              before do
+                @post.created_at = 45.days.ago
+                @post.save
+              end
+
+              it "returns only those scoped to the parent plus the named scope" do
+                posts = @from_db.posts.old
+                posts.size.should == 1
+              end
+
+            end
+
+            context "calling criteria methods" do
+
+              before do
+                @post.title = "New Title"
+                @post.save
+              end
+
+              it "returns the proper object for the criteria" do
+                posts = @from_db.posts.where(:title => "New Title")
+                posts.size.should == 1
+              end
+
+              context "when calling with a new criteria" do
+
+                before do
+                  @from_db.posts.create(:title => "Other Title")
+                end
+
+                it "does not retain the old criteria" do
+                  @from_db.posts.where(:title => "New Title").size.should == 1
+                  @from_db.posts.size.should == 2
+                  @from_db.posts.where(:title => "Other Title").size.should == 1
+                end
+              end
             end
           end
         end
