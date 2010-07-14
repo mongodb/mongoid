@@ -1,12 +1,11 @@
 require "spec_helper"
 
 describe Mongoid::Config do
+  let(:config) { Mongoid::Config.instance }
 
   after do
-    Mongoid::Config.instance.reset
+    config.reset
   end
-
-  let(:config) { Mongoid::Config.instance }
 
   describe "#database=" do
 
