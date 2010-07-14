@@ -110,6 +110,26 @@ module Mongoid #:nodoc
       @slaves
     end
 
+    # Returns the logger, or defaults to Rails logger or stdout logger.
+    #
+    # Example:
+    #
+    # <tt>Config.logger</tt>
+    def logger
+      return @logger if defined?(@logger)
+
+      @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+    end
+
+    # Sets the logger for Mongoid to use
+    #
+    # Example:
+    #
+    # <tt>Config.logger = Logger.new($stdout, :warn)</tt>
+    def logger=(logger)
+      @logger = logger
+    end
+
     # Return field names that could cause destructive things to happen if
     # defined in a Mongoid::Document
     #
@@ -183,15 +203,6 @@ module Mongoid #:nodoc
       end
     end
 
-    # Get a Rails logger or stdout logger.
-    #
-    # Example:
-    #
-    # <tt>config.logger</tt>
-    def logger
-      defined?(Rails) ? Rails.logger : Logger.new($stdout)
-    end
-
     # Get a master database from settings.
     #
     # TODO: Durran: This code's a bit hairy, refactor.
@@ -209,7 +220,7 @@ module Mongoid #:nodoc
       username = settings["username"] || mongo_uri.user
       password = settings["password"] || mongo_uri.password
 
-      connection = Mongo::Connection.new(host, port, :logger => logger, :pool_size => pool_size)
+      connection = Mongo::Connection.new(host, port, :logger => Mongoid::Logger.new, :pool_size => pool_size)
       if username || password
         connection.add_auth(name, username, password)
         connection.apply_saved_authentication

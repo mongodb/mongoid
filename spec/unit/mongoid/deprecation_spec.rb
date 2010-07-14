@@ -7,7 +7,7 @@ describe Mongoid::Deprecation do
   end
 
   before do
-    Logger.expects(:new).with($stdout).returns(logger)
+    Mongoid::Logger.expects(:new).returns(logger)
   end
 
   describe "#alert" do

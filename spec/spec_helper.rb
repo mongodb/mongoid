@@ -16,6 +16,7 @@ Mongoid.configure do |config|
   name = "mongoid_test"
   host = "localhost"
   config.master = Mongo::Connection.new.db(name)
+  config.logger = nil
   # config.slaves = [
     # Mongo::Connection.new(host, 27018, :slave_ok => true).db(name)
   # ]
