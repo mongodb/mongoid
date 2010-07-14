@@ -19,7 +19,8 @@ module Mongoid #:nodoc:
         !extension.nil?
       end
 
-      # Return the foreign key based off the association name.
+      # Return the foreign key if it exists, otherwise inflect it from the
+      # associated class name.
       def foreign_key
         key = @attributes[:foreign_key] || klass.name.to_s.foreign_key
         key.to_s

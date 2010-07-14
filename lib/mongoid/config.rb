@@ -14,7 +14,7 @@ module Mongoid #:nodoc
       :use_object_ids,
       :skip_version_check
 
-    # Defaults the configuration options to true.
+    # Initializes the configuration with default settings.
     def initialize
       reset
     end
@@ -56,7 +56,7 @@ module Mongoid #:nodoc
     #
     # Returns:
     #
-    # The Master DB instance.
+    # The master +Mongo::DB+ instance.
     def master=(db)
       check_database!(db)
       @master = db
@@ -79,8 +79,8 @@ module Mongoid #:nodoc
     alias :database :master
     alias :database= :master=
 
-    # Sets the Mongo::DB slave databases to be used. If the objects trying to me
-    # set are not valid +Mongo::DBs+, then an error will be raise.
+    # Sets the Mongo::DB slave databases to be used. If the objects provided
+    # are not valid +Mongo::DBs+ an error will be raised.
     #
     # Example:
     #
@@ -88,7 +88,7 @@ module Mongoid #:nodoc
     #
     # Returns:
     #
-    # The slaves DB instances.
+    # The slave DB instances.
     def slaves=(dbs)
       return unless dbs
       dbs.each do |db|
@@ -97,7 +97,7 @@ module Mongoid #:nodoc
       @slaves = dbs
     end
 
-    # Returns the slave databases, or if none has been set nil
+    # Returns the slave databases or nil if none have been set.
     #
     # Example:
     #
@@ -121,7 +121,7 @@ module Mongoid #:nodoc
       @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
     end
 
-    # Sets the logger for Mongoid to use
+    # Sets the logger for Mongoid to use.
     #
     # Example:
     #
@@ -149,7 +149,8 @@ module Mongoid #:nodoc
       }.call
     end
 
-    # Configure mongoid from a hash that was usually parsed out of yml.
+    # Configure mongoid from a hash. This is usually called after parsing a
+    # yaml config file such as mongoid.yml.
     #
     # Example:
     #

@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     # Get all the atomic updates that need to happen for the current
-    # +Document+. This will include all changes that need to happen in the
+    # +Document+. This includes all changes that need to happen in the
     # entire hierarchy that exists below where the save call was made.
     #
     # Example:
