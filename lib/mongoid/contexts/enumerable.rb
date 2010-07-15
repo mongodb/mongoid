@@ -36,7 +36,7 @@ module Mongoid #:nodoc:
 
       # Gets the number of documents in the array. Delegates to size.
       def count
-        @count ||= documents.size
+        @count ||= filter.size
       end
 
       # Gets an array of distinct values for the supplied field across the
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ of documents that matched the selector.
       def execute(paginating = false)
-        limit(documents.select { |document| document.matches?(selector) })
+        limit(filter) || []
       end
 
       # Groups the documents by the first field supplied in the field options.
@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
       # A +Hash+ with field values as keys, arrays of documents as values.
       def group
         field = options[:fields].first
-        documents.group_by { |doc| doc.send(field) }
+        execute.group_by { |doc| doc.send(field) }
       end
 
       # Create the new enumerable context. This will need the selector and
@@ -121,13 +121,18 @@ module Mongoid #:nodoc:
       #
       # The numerical sum of all the document field values.
       def sum(field)
-        sum = documents.inject(nil) do |memo, doc|
+        sum = execute.inject(nil) do |memo, doc|
           value = doc.send(field)
           memo ? memo += value : value
         end
       end
 
       protected
+      # Filters the documents against the criteria's selector
+      def filter
+        documents.select { |document| document.matches?(selector) }
+      end
+
       # If the field exists, perform the comparison and set if true.
       def determine(field, operator)
         matching = documents.inject(nil) do |memo, doc|

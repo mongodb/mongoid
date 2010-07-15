@@ -10,7 +10,7 @@ describe Mongoid::Contexts::Enumerable do
     @docs = [ @london, @shanghai, @melbourne, @new_york ]
     @criteria = Mongoid::Criteria.new(Address)
     @criteria.documents = @docs
-    @criteria.where(:street => "Bourke Street").only(:number)
+    @criteria.only(:number)
     @context = Mongoid::Contexts::Enumerable.new(@criteria)
   end
 
@@ -50,6 +50,10 @@ describe Mongoid::Contexts::Enumerable do
 
     context "when the criteria is limited" do
 
+      before do
+        @criteria.where(:street => "Bourke Street")
+      end
+
       it "returns an array of distinct values for the field" do
         @context.distinct(:street).should == [ "Bourke Street" ]
       end
@@ -77,8 +81,14 @@ describe Mongoid::Contexts::Enumerable do
       @criteria.documents = @docs
     end
 
-    it "returns the matching documents from the array" do
-      @context.execute.should == [ @melbourne ]
+    context "when the selector is present" do
+      before do
+        @criteria.where(:street => "Bourke Street")
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
+      it "returns the matching documents from the array" do
+        @context.execute.should == [ @melbourne ]
+      end
     end
 
     context "when selector is empty" do
@@ -123,6 +133,10 @@ describe Mongoid::Contexts::Enumerable do
   describe "#first" do
 
     context "when a selector is present" do
+      before do
+        @criteria.where(:street => "Bourke Street")
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
 
       it "returns the first that matches the selector" do
         @context.first.should == @melbourne
@@ -194,8 +208,14 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#last" do
 
-    it "returns the last matching in the enumerable" do
-      @context.last.should == @melbourne
+    context "when the selector is present" do
+      before do
+        @criteria.where(:street => "Bourke Street")
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
+      it "returns the last matching in the enumerable" do
+        @context.last.should == @melbourne
+      end
     end
 
   end
@@ -218,8 +238,14 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#one" do
 
-    it "returns the first matching in the enumerable" do
-      @context.one.should == @melbourne
+    context "when the selector is present" do
+      before do
+        @criteria.where(:street => "Bourke Street")
+        @context = Mongoid::Contexts::Enumerable.new(@criteria)
+      end
+      it "returns the first matching in the enumerable" do
+        @context.one.should == @melbourne
+      end
     end
 
   end
