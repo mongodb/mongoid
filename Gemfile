@@ -2,6 +2,8 @@
 # Use `bundle exec rake` in order to run the specs using the bundle
 source "http://gemcutter.org"
 
+gem "bundler", "~>1.0.0.beta"
+
 gem "activemodel", "~>3.0.0.beta"
 gem "tzinfo", "~>0.3.22"
 gem "will_paginate", "~>3.0.pre"
