@@ -5,11 +5,15 @@ describe Mongoid::Validations::UniquenessValidator do
   before do
     UserAccount.delete_all
     Login.delete_all
+    Person.delete_all
+    Patient.delete_all
   end
 
   after do
     UserAccount.delete_all
     Login.delete_all
+    Person.delete_all
+    Patient.delete_all
   end
 
   context "when the document has no composite keys defined" do
@@ -134,6 +138,68 @@ describe Mongoid::Validations::UniquenessValidator do
           end
         end
 
+      end
+    end
+  end
+
+  context "when the parent document embeds_many" do
+    let(:person) { Person.create }
+    context "when no record in the database" do
+      let(:favorite) { person.favorites.build(:title => "pizza") }
+
+      it "passes validation" do
+        favorite.should be_valid
+      end
+    end
+
+    context "with a record in the database" do
+      before do
+        person.favorites.create(:title => "pizza")
+        person.favorites.create(:title => "doritos")
+      end
+
+      context "when document is not new" do
+        let(:favorite) { person.favorites.where(:title => "pizza").first }
+
+        it "passes validation" do
+          favorite.should be_valid
+        end
+
+        it "fails validation when another document has the same unique field" do
+          favorite.title = "doritos"
+          favorite.should_not be_valid
+        end
+      end
+
+      context "when document is new" do
+        let(:favorite) { person.favorites.build(:title => "pizza") }
+
+        it "fails validation" do
+          favorite.should_not be_valid
+        end
+
+        it "contains uniqueness errors" do
+          favorite.valid?
+          favorite.errors[:title].should == ["is already taken"]
+        end
+      end
+    end
+  end
+
+  context "when the parent document embeds_one" do
+    let(:patient) { Patient.create }
+    let(:email) { Email.new(:address => "joe@example.com", :patient => patient) }
+
+    it "passes validation" do
+      email.should be_valid
+    end
+
+    context "when replacing with a new record with the same value" do
+      before do
+        Email.create(:address => "joe@example.com", :patient => patient) 
+      end
+      it "passes validation" do
+        email.should be_valid
       end
     end
   end

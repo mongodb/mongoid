@@ -17,18 +17,29 @@ module Mongoid #:nodoc:
       def setup(klass)
         @klass = klass
       end
-      
+
       def validate_each(document, attribute, value)
-        criteria = @klass.where(attribute => value)
-        
+        if document.embedded?
+          return if document._parent.nil?
+
+          criteria = document._parent.send(document.association_name)
+
+          # If the parent document embeds_one, no need to validate uniqueness
+          return if criteria.is_a?(Mongoid::Document)
+
+          criteria = criteria.where(attribute => value, :_id => {'$ne' => document._id})
+        else
+          criteria = @klass.where(attribute => value)
+
+          unless document.new_record?
+            criteria = criteria.where(:_id => {'$ne' => document._id})
+          end
+        end
+
         Array.wrap(options[:scope]).each do |item|
           criteria = criteria.where(item => document.attributes[item])
         end
-        
-        unless document.new_record?
-          criteria = criteria.where(:_id => {'$ne' => document._id})
-        end
-        
+
         if criteria.exists?
           document.errors.add(attribute, :taken, options.merge!(:value => value))
         end
