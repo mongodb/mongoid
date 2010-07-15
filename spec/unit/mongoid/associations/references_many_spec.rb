@@ -21,8 +21,8 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#<<" do
 
     before do
-      @child = stub
-      @second = stub
+      @child = Post.instantiate(:id => "1")
+      @second = Post.instantiate(:id => "2")
       @children = [@child, @second]
     end
 
@@ -171,8 +171,8 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#concat" do
 
     before do
-      @child = stub
-      @second = stub
+      @child = Post.instantiate(:id => "1")
+      @second = Post.instantiate(:id => "2")
     end
 
     context "when parent document has been saved" do
@@ -423,8 +423,8 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#push" do
 
     before do
-      @child = stub
-      @second = stub
+      @child = Post.instantiate(:id => "1")
+      @second = Post.instantiate(:id => "2")
     end
 
     context "when parent document has been saved" do

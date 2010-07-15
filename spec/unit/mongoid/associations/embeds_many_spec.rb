@@ -273,7 +273,7 @@ describe Mongoid::Associations::EmbedsMany do
         Mongoid::Associations::Options.new(:name => :addresses)
       )
       @association.clear
-      @address = stub(:parentize => true, :_index= => true, :notify => true, :matches? => true)
+      @address = Address.instantiate(:street => "Street 1")
       @association << @address
     end
 
@@ -306,7 +306,7 @@ describe Mongoid::Associations::EmbedsMany do
         Mongoid::Associations::Options.new(:name => :addresses)
       )
       @association.clear
-      @address = stub(:parentize => true, :_index= => true, :notify => true, :matches? => true)
+      @address = Address.instantiate(:id => "1", :street => "Street 1")
       @association << @address
     end
 
