@@ -11,3 +11,4 @@ gem "bson_ext", "~> 1.0.1"
 
 gem "rspec", "2.0.0.beta.16"
 gem "mocha", "0.9.8"
+gem "watchr", "0.6"
