@@ -6,14 +6,12 @@ Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 
 == Project Tracking
 
-* {Mongoid on Pivotal Tracker}[http://www.pivotaltracker.com/projects/27482]
 * {Mongoid Google Group}[http://groups.google.com/group/mongoid]
-* {Mongoid on CI Joe}[http://ci.mongoid.org/]
 * {Mongoid Website and Documentation}[http://mongoid.org]
 
 == Compatibility
 
-Mongoid is developed against Ruby 1.8.6, 1.8.7, 1.9.1, 1.9.2
+Mongoid is developed against Ruby 1.8.7, 1.9.1, 1.9.2
 
 = Documentation
 
@@ -22,7 +20,7 @@ Please see the new Mongoid website for up-to-date documentation:
 
 = License
 
-Copyright (c) 2009 Durran Jordan
+Copyright (c) 2009, 2010 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
