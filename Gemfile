@@ -2,3 +2,4 @@
 # Use `bundle exec rake` in order to run the specs using the bundle
 source "http://gemcutter.org"
 gemspec
+
