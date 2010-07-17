@@ -559,6 +559,14 @@ describe Mongoid::Criteria do
 
     end
 
+    context "when returning a non-criteria object" do
+      let(:ages) { [10, 20] }
+      it "does not attempt to merge" do
+        Person.stubs(:ages => ages)
+        expect { @criteria.ages }.to_not raise_error(NoMethodError)
+      end
+    end
+
     context "when expecting behaviour of an array" do
 
       before do
@@ -841,6 +849,25 @@ describe Mongoid::Criteria do
       @result.selector[:title].should == 'Test'
       @result.options.should == { :skip => 10 }
     end
+  end
+
+  context "===" do
+
+    context "when the other object is a Criteria" do
+      subject { Mongoid::Criteria === Mongoid::Criteria.allocate }
+      it { should be_true }
+    end
+
+    context "when the other object is a Scope" do
+      subject { Mongoid::Criteria === Mongoid::Scope.allocate }
+      it { should be_true }
+    end
+
+    context "when the other object is not compatible" do
+      subject { Mongoid::Criteria === [] }
+      it { should be_false }
+    end
+
   end
 
 end
