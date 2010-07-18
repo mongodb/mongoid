@@ -64,7 +64,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
         it "contains uniqueness errors" do
           account.valid?
-          account.errors[:username].should == ["is already taken"]
+          account.errors[:username].should == ["is not unique"]
         end
       end
     end
