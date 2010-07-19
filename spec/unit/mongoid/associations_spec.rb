@@ -478,7 +478,7 @@ describe Mongoid::Associations do
   describe ".reflect_on_association" do
 
     it "returns the association class for the name" do
-      Person.reflect_on_association(:addresses).should == :embeds_many
+      Person.reflect_on_association(:addresses).macro.should == :embeds_many
     end
 
   end

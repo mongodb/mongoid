@@ -1,17 +1,17 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Associations #:nodoc:
-    class Options #:nodoc:
+    class Options < Hash #:nodoc:
 
       # Create the new +Options+ object, which provides convenience methods for
       # accessing values out of an options +Hash+.
       def initialize(attributes = {})
-        @attributes = attributes
+        self.merge!(attributes)
       end
 
       # Returns the extension if it exists, nil if not.
       def extension
-        @attributes[:extend]
+        self[:extend]
       end
 
       # Returns true is the options have extensions.
@@ -22,13 +22,13 @@ module Mongoid #:nodoc:
       # Return the foreign key if it exists, otherwise inflect it from the
       # associated class name.
       def foreign_key
-        key = @attributes[:foreign_key] || klass.name.to_s.foreign_key
+        key = self[:foreign_key] || klass.name.to_s.foreign_key
         key.to_s
       end
 
       # Returns the name of the inverse_of association
       def inverse_of
-        @attributes[:inverse_of]
+        self[:inverse_of]
       end
 
       # Return a +Class+ for the options. See #class_name
@@ -40,22 +40,22 @@ module Mongoid #:nodoc:
       # was provided, then the constantized class_name will be returned. If not,
       # a constant based on the association name will be returned.
       def class_name
-        @attributes[:class_name] || name.to_s.classify
+        self[:class_name] || name.to_s.classify
       end
 
       # Returns the association name of the options.
       def name
-        @attributes[:name].to_s
+        self[:name].to_s
       end
 
       # Returns whether or not this association is polymorphic.
       def polymorphic
-        @attributes[:polymorphic] == true
+        self[:polymorphic] == true
       end
 
       # Used with references_many to save as array of ids.
       def stored_as
-        @attributes[:stored_as]
+        self[:stored_as]
       end
     end
   end
