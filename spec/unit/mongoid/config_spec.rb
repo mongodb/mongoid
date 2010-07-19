@@ -246,31 +246,33 @@ describe Mongoid::Config do
   end
 
   describe "#convert_to_object_id" do
-    before :all do
+    before :each do
       @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
       Mongoid.use_object_ids = true
     end
 
-    after :all do
+    after :each do
       Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
     end
+
     it "should return args if use_object_ids is false" do
       Mongoid.use_object_ids = false
       Mongoid.convert_to_object_id("foo").should == "foo"
     end
 
     it "should transform args String to BSON::ObjectID if use_object_ids is true" do
-      Mongoid.use_object_ids = true
       id = BSON::ObjectID.new
       Mongoid.convert_to_object_id(id.to_s).should == id
-      Mongoid.use_object_ids = false
     end
 
     it "should transform all String inside Array pass like args if use_object_ids is true" do
-      Mongoid.use_object_ids = true
       ids = [BSON::ObjectID.new, BSON::ObjectID.new]
       Mongoid.convert_to_object_id(ids.map(&:to_s)).should == ids
-      Mongoid.use_object_ids = false
+    end
+
+    it "should don't change args type if cast args is define to false" do
+      id = BSON::ObjectID.new
+      Mongoid.convert_to_object_id(id.to_s, false).should == id.to_s
     end
   end
 

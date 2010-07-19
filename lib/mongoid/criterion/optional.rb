@@ -100,9 +100,9 @@ module Mongoid #:nodoc:
       # Returns: <tt>self</tt>
       def id(*args)
         if args.flatten.size > 1
-          self.in(:_id => Mongoid.convert_to_object_id(args.flatten))
+          self.in(:_id => Mongoid.convert_to_object_id(args.flatten, self.klass.primary_key.nil?))
         else
-          @selector[:_id] = Mongoid.convert_to_object_id(args.first)
+          @selector[:_id] = Mongoid.convert_to_object_id(args.first, self.klass.primary_key.nil?)
         end
         self
       end
