@@ -32,13 +32,13 @@ describe Mongoid::Paranoia do
       ParanoidPost.count.should == 0
     end
 
-    it 'should be found overriding default deleted_at scoping' do
-      ParanoidPost.where(:deleted_at.ne => nil).count.should == 1
+    it 'should be found using the deleted named scope' do
+      ParanoidPost.deleted.count.should == 1
     end
 
     it 'should be hard-destroyable' do
       @post.destroy!
-      ParanoidPost.where(:deleted_at.ne => nil).count.should == 0
+      ParanoidPost.deleted.count.should == 0
     end
   end
 end
