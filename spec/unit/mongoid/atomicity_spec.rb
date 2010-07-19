@@ -137,7 +137,7 @@ describe Mongoid::Atomicity do
                 }
               }
           end
-          
+
           it "returns the proper hash with locations and queue" do
             @person._updates.should ==
               {

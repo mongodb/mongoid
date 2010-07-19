@@ -61,7 +61,7 @@ module Mongoid #:nodoc:
         updates = @document._updates
         unless updates.empty?
           other_pushes = updates.delete(:other)
-          
+
           @collection.update(@document._selector, updates, @options.merge(:multi => false))
           @collection.update(@document._selector, { "$pushAll" => other_pushes }, @options.merge(:multi => false)) if other_pushes
         end; true

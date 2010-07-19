@@ -70,10 +70,10 @@ describe Mongoid::Attributes do
             @person = Person.new(:title => "Sir", :ssn => "555-66-9999")
             @person.favorites.build(:title => "Ice Cream")
             @person.favorites.build(:title => "Jello")
-            @person.favorites.build(:title => "Ducce de Lecce") 
+            @person.favorites.build(:title => "Ducce de Lecce")
             @attributes = {
               "0" => { "_destroy" => "true" },
-              "1" => { "_destroy" => "true" } 
+              "1" => { "_destroy" => "true" }
             }
             @person.favorites_attributes = @attributes
           end
@@ -474,24 +474,24 @@ describe Mongoid::Attributes do
     end
 
   end
-  
+
   describe "#attribute_present?" do
     context "when attribute does not exist" do
       before do
         @person = Person.new
       end
-      
+
       it "returns false" do
         @person.attribute_present?(:owner_id).should be_false
       end
     end
-    
+
     context "when attribute does exist" do
       before do
         @person = Person.new
         @person.owner_id = 5
       end
-      
+
       it "returns true" do
         @person.attribute_present?(:owner_id).should be_true
       end

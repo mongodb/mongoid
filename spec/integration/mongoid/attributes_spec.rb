@@ -18,9 +18,9 @@ describe Mongoid::Attributes do
     end
 
   end
-  
+
   context "when persisting nested attributes" do
-    
+
     before do
       @survey = Survey.new
       3.times do
@@ -28,11 +28,11 @@ describe Mongoid::Attributes do
         4.times { @question.answers.build }
       end
     end
-    
+
   end
-  
+
   context "when persisting nested with accepts_nested_attributes_for" do
-    
+
     before do
       @survey = Survey.new
       @survey.questions.build(:content => 'Do you like cheesecake ?')
@@ -46,14 +46,14 @@ describe Mongoid::Attributes do
         "new_record" => { :content => "Do you carrot cake ?" }
       }
     end
-    
+
     it "adds/updates/removes embedded documents" do
       @survey.update_attributes(:questions_attributes => @attributes)
       @survey.reload
       @survey.questions.size.should == 2
       @survey.questions.first.content.should == "Do you like ice cream ?"
     end
-    
+
   end
 
 end
