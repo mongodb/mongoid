@@ -190,7 +190,7 @@ module Mongoid #:nodoc
     end
 
     ##
-    # If Mongoid.user_object_ids = true
+    # If Mongoid.use_object_ids = true
     #   Convert args to BSON::ObjectID
     #   If this args is an array, convert all args inside
     # Else
