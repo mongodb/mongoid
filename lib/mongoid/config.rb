@@ -199,10 +199,11 @@ module Mongoid #:nodoc
     # Options:
     #
     #  args : A +String+ or an +Array+ convert to +BSON::ObjectID+
+    #  cast :  A +Boolean+ define if we can or not cast to BSON::ObjectID. If false, we use the default type of args
     #
     # Example:
     #
-    # <tt>Mongoid.convert_to_object_id("4ab2bc4b8ad548971900005c")</tt>
+    # <tt>Mongoid.convert_to_object_id("4ab2bc4b8ad548971900005c", true)</tt>
     # <tt>Mongoid.convert_to_object_id(["4ab2bc4b8ad548971900005c", "4ab2bc4b8ad548971900005d"])</tt>
     #
     # Returns:
@@ -213,8 +214,8 @@ module Mongoid #:nodoc
     # Else
     #   <tt>args</tt>
     #
-    def convert_to_object_id(args)
-      return args if !use_object_ids || args.is_a?(BSON::ObjectID)
+    def convert_to_object_id(args, cast=true)
+      return args if !use_object_ids || args.is_a?(BSON::ObjectID) || !cast
       if args.is_a?(String)
         BSON::ObjectID(args)
       else

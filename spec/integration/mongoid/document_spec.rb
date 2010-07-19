@@ -89,7 +89,11 @@ describe Mongoid::Document do
 
     it "persists a new record to the database" do
       person = Person.create(:title => "Test")
-      person.id.should be_a_kind_of(String)
+      if Mongoid.use_object_ids
+        person.id.should be_a_kind_of(BSON::ObjectID)
+      else
+        person.id.should be_a_kind_of(String)
+      end
       person.attributes[:title].should == "Test"
     end
 
