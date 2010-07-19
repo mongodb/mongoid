@@ -3,6 +3,15 @@ require "spec_helper"
 describe Mongoid::Config do
   let(:config) { Mongoid::Config.instance }
 
+  before :all do
+    @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+    Mongoid.use_object_ids = true
+  end
+
+  after :all do
+    Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+  end
+
   after do
     config.reset
   end
@@ -205,6 +214,14 @@ describe Mongoid::Config do
   end
 
   describe "#convert_to_object_id" do
+    before :all do
+      @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+      Mongoid.use_object_ids = true
+    end
+
+    after :all do
+      Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+    end
     it "should return args if use_object_ids is false" do
       Mongoid.use_object_ids = false
       Mongoid.convert_to_object_id("foo").should == "foo"

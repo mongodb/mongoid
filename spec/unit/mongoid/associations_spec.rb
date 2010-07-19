@@ -511,13 +511,13 @@ describe Mongoid::Associations do
     end
 
     context "when using object ids" do
-
-      before do
+      before :all do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
         Mongoid.use_object_ids = true
       end
 
-      after do
-        Mongoid.use_object_ids = false
+      after :all do
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
       end
 
       it "sets the foreign key as an object id" do

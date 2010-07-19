@@ -22,7 +22,10 @@ Mongoid.configure do |config|
   # ]
 end
 
+Mongoid.use_object_ids = ENV['MONGOID_OBJECT_ID'] == "true"
+
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
+
 
 Rspec.configure do |config|
   config.mock_with :mocha
@@ -30,4 +33,3 @@ Rspec.configure do |config|
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
   end
 end
-

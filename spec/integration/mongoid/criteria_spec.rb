@@ -281,7 +281,12 @@ describe Mongoid::Criteria do
   describe "#id" do
     context "with Mongoid.use_object_ids is true" do
       before :all do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
         Mongoid.use_object_ids = true
+      end
+
+      after :all do
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
       end
 
       before :each do
@@ -296,12 +301,17 @@ describe Mongoid::Criteria do
         Person.criteria.id(@person.id).first.should == @person
       end
 
-      after :all do
+    end
+    context "with Mongoid.use_object_ids is false" do
+
+      before :all do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
         Mongoid.use_object_ids = false
       end
 
-    end
-    context "with Mongoid.use_object_ids is false" do
+      after :all do
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+      end
 
       before :each do
         @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
