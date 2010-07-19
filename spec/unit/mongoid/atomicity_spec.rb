@@ -119,13 +119,33 @@ describe Mongoid::Atomicity do
           end
 
           it "returns the proper hash with locations" do
+            @address.stubs(:_sets).returns({})
+            @person._updates.should ==
+              {
+                "$set" => {
+                  "title" => "Sir",
+                },
+                "$pushAll" => {
+                  "addresses" => [{
+                    "_id" => @new_address.id,
+                    "street" => "Another",
+                    "locations" => [
+                      "_id" => @location.id,
+                      "name" => "Home"
+                    ]
+                  }]
+                }
+              }
+          end
+          
+          it "returns the proper hash with locations and queue" do
             @person._updates.should ==
               {
                 "$set" => {
                   "title" => "Sir",
                   "addresses.0.street" => "Bond St"
                 },
-                "$pushAll" => {
+                :other => {
                   "addresses" => [{
                     "_id" => @new_address.id,
                     "street" => "Another",

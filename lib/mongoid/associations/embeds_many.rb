@@ -175,18 +175,24 @@ module Mongoid #:nodoc:
       #
       # The newly build target Document.
       def nested_build(attributes, options = {})
+        @parent.instance_variable_set(:@building_nested, true)
+        deleted_indexes = []
         attributes.each do |index, attrs|
           if document = detect { |document| document._index == index.to_i }
             if options && options[:allow_destroy] && attrs['_destroy']
+              deleted_indexes << document._index
               @target.delete(document)
               document.destroy
             else
               document.write_attributes(attrs)
+              document._index = index.to_i - deleted_indexes.collect { |i| i < index.to_i }.size
             end
           else
             build(attrs)
           end
-        end; self
+        end
+        @parent.instance_variable_set(:@building_nested, false)
+        self
       end
 
       # Paginate the association. Will create a new criteria, set the documents

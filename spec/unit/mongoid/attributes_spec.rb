@@ -70,15 +70,18 @@ describe Mongoid::Attributes do
             @person = Person.new(:title => "Sir", :ssn => "555-66-9999")
             @person.favorites.build(:title => "Ice Cream")
             @person.favorites.build(:title => "Jello")
+            @person.favorites.build(:title => "Ducce de Lecce") 
             @attributes = {
-              "0" => { "_destroy" => "true" }
+              "0" => { "_destroy" => "true" },
+              "1" => { "_destroy" => "true" } 
             }
             @person.favorites_attributes = @attributes
           end
 
           it "removes the items that have _destroy => true set" do
+            @person.favorites.class.should == Array
             @person.favorites.size.should == 1
-            @person.favorites.first.title.should == "Jello"
+            @person.favorites.first.title.should == "Ducce de Lecce"
           end
         end
 

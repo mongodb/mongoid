@@ -1,5 +1,6 @@
 class Question
   include Mongoid::Document
+  field :content
   embedded_in :survey, :inverse_of => :questions
   embeds_many :answers
   

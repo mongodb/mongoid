@@ -169,9 +169,19 @@ module Mongoid #:nodoc:
     # memoized association and notify the parent of the change.
     def remove(child)
       name = child.association_name
-      reset(name) { @attributes.remove(name, child.raw_attributes) }
-      notify
+      if @building_nested
+        @attributes.remove(name, child.raw_attributes)
+      else
+        reset(name) { @attributes.remove(name, child.raw_attributes) } 
+        notify
+      end
     end
+    
+    # def remove_without_reset
+    #   name = child.association_name
+    #   @attributes.remove(name, child.raw_attributes)
+    #   notify
+    # end
 
     # Return an array with this +Document+ only in it.
     def to_a

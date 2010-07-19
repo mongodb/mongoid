@@ -21,8 +21,8 @@ module Mongoid #:nodoc
     # Mongoid specific behavior is to remove the memoized object when setting
     # the association, or if it wasn't previously memoized it will get set.
     def reset(name, &block)
-      var = "@#{name}"
-      value = yield
+      var = "@#{name}"      
+      value = yield      
       if instance_variable_defined?(var)
         remove_instance_variable(var)
       else
