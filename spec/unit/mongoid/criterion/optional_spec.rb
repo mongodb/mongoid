@@ -213,6 +213,16 @@ describe Mongoid::Criterion::Optional do
   describe "#id" do
 
     context "with Mongoid.use_object_ids is false" do
+
+      before :each do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+        Mongoid.use_object_ids = false
+      end
+
+      after :each do
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+      end
+
       context "when passing a single id" do
 
         context "when the id is a string" do
@@ -263,10 +273,12 @@ describe Mongoid::Criterion::Optional do
 
     context "with Mongoid.use_object_ids is true" do
       before :each do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
         Mongoid.use_object_ids = true
       end
+
       after :each do
-        Mongoid.use_object_ids = false
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
       end
       context "when passing a single id" do
 

@@ -63,11 +63,10 @@ describe Mongoid::Identity do
 
         context "when using object ids" do
 
-          before do
+          before :each do
             Mongoid.use_object_ids = true
           end
-
-          after do
+          after :each do
             Mongoid.use_object_ids = false
           end
 
