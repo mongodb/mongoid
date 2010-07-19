@@ -22,10 +22,9 @@ Mongoid.configure do |config|
   # ]
 end
 
-Mongoid.use_object_ids = ENV['MONGOID_OBJECT_ID'] == "true"
+Mongoid.use_object_ids = ENV['MONGOID_USE_OBJECT_IDS'] == "true"
 
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
-
 
 Rspec.configure do |config|
   config.mock_with :mocha
