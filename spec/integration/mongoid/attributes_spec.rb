@@ -43,7 +43,7 @@ describe Mongoid::Attributes do
         "0" => { :content => "lorem", "_destroy" => "true" },
         "1" => { :content => "lorem", "_destroy" => "true" },
         "2" => { :content => "Do you like ice cream ?" },
-        "new_record" => { :content => "Do you carrot cake ?" }
+        "new_record" => { :content => "Do you like carrot cake ?" }
       }
     end
 
@@ -52,8 +52,7 @@ describe Mongoid::Attributes do
       @survey.reload
       @survey.questions.size.should == 2
       @survey.questions.first.content.should == "Do you like ice cream ?"
+      @survey.questions.last.content.should == "Do you like carrot cake ?"
     end
-
   end
-
 end
