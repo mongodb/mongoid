@@ -269,6 +269,16 @@ describe Mongoid::Criterion::Optional do
         end
 
       end
+
+      context "when passing in an array with only one id" do
+
+        it "adds the _id query to the selector" do
+          ids = [BSON::ObjectID.new]
+          @criteria.id(ids).selector.should == { :_id => ids.first }
+        end
+
+      end
+
     end
 
     context "with Mongoid.use_object_ids is true" do

@@ -91,18 +91,20 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # object_id: A +String+ representation of a <tt>BSON::ObjectID</tt>
+      # object_id: A single id or an array of ids in +String+ or <tt>BSON::ObjectID</tt> format
       #
       # Example:
       #
       # <tt>criteria.id("4ab2bc4b8ad548971900005c")</tt>
+      # <tt>criteria.id(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])</tt>
       #
       # Returns: <tt>self</tt>
-      def id(*args)
-        if args.flatten.size > 1
-          self.in(:_id => Mongoid.convert_to_object_id(args.flatten, self.klass.primary_key.nil?))
+      def id(*ids)
+        ids.flatten!
+        if ids.size > 1
+          self.in(:_id => Mongoid.convert_to_object_id(ids, self.klass.primary_key.nil?))
         else
-          @selector[:_id] = Mongoid.convert_to_object_id(args.first, self.klass.primary_key.nil?)
+          @selector[:_id] = Mongoid.convert_to_object_id(ids.first, self.klass.primary_key.nil?)
         end
         self
       end
