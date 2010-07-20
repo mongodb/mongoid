@@ -8,9 +8,11 @@ RAILS
 .bundle
 Gemfile.lock
 rdoc/*
+<<<<<<< HEAD
 TODO
 ISSUES
 DONATE
 .yardoc/*
 doc/*
 *.swp
+*.un~

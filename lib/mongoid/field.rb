@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   class Field
-    attr_reader :copyable, :klass, :name, :options, :type
+    attr_reader :copyable, :klass, :label, :name, :options, :type
 
     # Get the default value for the field.
     #
@@ -28,6 +28,7 @@ module Mongoid #:nodoc:
       @type = options[:type] || Object
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
+      @label = options[:label]
       @options = options
       check_default!
     end
