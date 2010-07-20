@@ -172,11 +172,11 @@ module Mongoid #:nodoc:
       if @building_nested
         @attributes.remove(name, child.raw_attributes)
       else
-        reset(name) { @attributes.remove(name, child.raw_attributes) } 
+        reset(name) { @attributes.remove(name, child.raw_attributes) }
         notify
       end
     end
-    
+
     # def remove_without_reset
     #   name = child.association_name
     #   @attributes.remove(name, child.raw_attributes)

@@ -93,7 +93,6 @@ module Mongoid #:nodoc:
           target
         end
       end
-
     end
   end
 end
