@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   class Field
-    attr_reader :name, :type
+    attr_reader :name, :type, :label
 
     # Determine if the field is able to be accessible via a mass update.
     #
@@ -47,6 +47,7 @@ module Mongoid #:nodoc:
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
       @accessible = options.has_key?(:accessible) ? options[:accessible] : true
+      @label = options[:label]
       @options = options
       check_default!
     end

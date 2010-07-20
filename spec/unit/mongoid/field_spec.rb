@@ -119,6 +119,18 @@ describe Mongoid::Field do
 
   end
 
+  describe "#label" do
+
+    it "defaults to nil" do
+      Mongoid::Field.new(:name).label.should be_nil
+    end
+
+    it "allows a label to be set an retrieved" do
+      Mongoid::Field.new(:name, :label => "Name").label.should == "Name"
+    end
+
+  end
+
   describe "#set" do
 
     before do
