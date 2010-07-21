@@ -62,6 +62,28 @@ module Rails #:nodoc:
           end
         end
       end
+
+      initializer "reconnect to master if application is preloaded" do
+        config.after_initialize do
+          # Unicorn clears the START_CTX when a worker is forked, so if we have
+          # data in START_CTX then we know we're being preloaded. Unicorn does
+          # not provide application-level hooks for executing code after the
+          # process has forked, so we reconnect lazily.
+          if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
+            ::Mongoid.reconnect!(true)
+          end
+
+          # Passenger provides the :starting_worker_process event for executing
+          # code after it has forked, so we use that and reconnect immediately.
+          if defined?(PhusionPassenger)
+            PhusionPassenger.on_event(:starting_worker_process) do |forked|
+              if forked
+                ::Mongoid.reconnect!
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

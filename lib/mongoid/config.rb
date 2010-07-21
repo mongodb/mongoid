@@ -74,7 +74,14 @@ module Mongoid #:nodoc
     #
     # The master +Mongo::DB+
     def master
-      @master || (raise Errors::InvalidDatabase.new(nil))
+      raise Errors::InvalidDatabase.new(nil) unless @master
+
+      if @reconnect
+        @reconnect = false
+        reconnect!
+      end
+
+      @master
     end
 
     alias :database :master
@@ -170,8 +177,15 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>Mongoid.reconnect!</tt>
-    def reconnect!
-      master.connection.connect_to_master
+    def reconnect!(lazy = false)
+      if lazy
+        # We set a @reconnect flag so that #master knows to reconnect the next
+        # time the connection is accessed.
+        @reconnect = true
+      else
+        puts "Reconnecting"
+        master.connection.connect_to_master
+      end
     end
 
     # Reset the configuration options to the defaults.
