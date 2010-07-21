@@ -1,7 +1,11 @@
 require "spec_helper"
 
 describe Mongoid::Config do
-  let(:config) { Mongoid::Config.instance }
+  let(:config) { Class.new(Mongoid::Config).instance }
+
+  before do
+    config.reset
+  end
 
   before :all do
     @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
@@ -10,10 +14,6 @@ describe Mongoid::Config do
 
   after :all do
     Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
-  end
-
-  after do
-    config.reset
   end
 
   describe "#database=" do
@@ -232,17 +232,73 @@ describe Mongoid::Config do
 
   describe "#reconnect!" do
 
-    before do
-      @connection = mock
-      @master = mock
-      config.expects(:master).returns(@master)
-      @master.expects(:connection).returns(@connection)
+    context "with non-lazy reconnection option" do
+      before do
+        @connection = mock
+        @master = mock
+        config.expects(:master).returns(@master)
+        @master.expects(:connection).returns(@connection)
+      end
+
+      context "default" do
+        it "reconnects on the master connection" do
+          @connection.expects(:connect_to_master).returns(true)
+          config.reconnect!
+        end
+      end
+
+      context "now=true" do
+        it "reconnects on the master connection" do
+          @connection.expects(:connect_to_master).returns(true)
+          config.reconnect!(true)
+        end
+      end
     end
 
-    it "reconnects on the master connection" do
-      @connection.expects(:connect_to_master).returns(true)
-      config.reconnect!
+    context "with lazy reconnection option" do
+      before do
+        @master = mock
+        config.stubs(:master).returns(@master)
+      end
+
+      it "sets a reconnection flag" do
+        @master.expects(:connection).never
+        config.reconnect!(false)
+        config.instance_variable_get(:@reconnect).should be_true
+      end
     end
+
+  end
+
+  describe "#master" do
+    before do
+      config.send(:instance_variable_set, :@master, master)
+    end
+
+    context "when the database has not been configured" do
+      let(:master) { nil }
+      it "should raise an error" do
+        expect { config.master }.to raise_error(Mongoid::Errors::InvalidDatabase)
+      end
+    end
+
+    context "when the database has been configured" do
+      let(:connection) { mock }
+      let(:master) { stub(:connection => connection) }
+
+      it "returns the database" do
+        config.master.should == master
+      end
+
+      context "when the reconnection flag is set" do
+        before { config.reconnect!(false) }
+        it "reconnects" do
+          config.expects(:reconnect!)
+          config.master
+        end
+      end
+    end
+
   end
 
   describe "#convert_to_object_id" do

@@ -70,7 +70,7 @@ module Rails #:nodoc:
           # not provide application-level hooks for executing code after the
           # process has forked, so we reconnect lazily.
           if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
-            ::Mongoid.reconnect!(true)
+            ::Mongoid.reconnect!(false)
           end
 
           # Passenger provides the :starting_worker_process event for executing

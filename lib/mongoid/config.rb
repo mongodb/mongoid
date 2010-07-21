@@ -177,14 +177,13 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>Mongoid.reconnect!</tt>
-    def reconnect!(lazy = false)
-      if lazy
+    def reconnect!(now = true)
+      if now
+        master.connection.connect_to_master
+      else
         # We set a @reconnect flag so that #master knows to reconnect the next
         # time the connection is accessed.
         @reconnect = true
-      else
-        puts "Reconnecting"
-        master.connection.connect_to_master
       end
     end
 
