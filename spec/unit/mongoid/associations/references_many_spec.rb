@@ -147,6 +147,14 @@ describe Mongoid::Associations::ReferencesMany do
     end
   end
 
+  describe '#build (2)' do
+    it 'should build associated object correctly when there are two associations to the same object' do
+      user = User.create!
+      description = user.descriptions.build :details => 'Likes peanut butter...'
+      description.user.should_not == nil
+    end
+  end
+
   describe "#delete_all" do
 
     before do
