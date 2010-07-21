@@ -233,13 +233,19 @@ module Mongoid #:nodoc:
           end
 
           if !inverse
-            association = options.klass.associations.values.detect do |metadata|
-              metadata.options.klass == target
-            end
-            inverse = association.name if association
+            association = detect_association(target, options, false)
+            association = detect_association(target, options, true) if association.blank?
+            inferred = association.name if association
           end
 
-          inverse || target.to_s.underscore
+          inverse || inferred || target.to_s.underscore
+        end
+
+        def detect_association(target, options, with_class_name = false)
+          association = options.klass.associations.values.detect do |metadata|
+            metadata.options.klass == target &&
+              (with_class_name ? true : metadata.options[:class_name].nil?)
+          end
         end
       end
     end
