@@ -436,4 +436,13 @@ describe Mongoid::Finders do
 
   end
 
+  describe ".near" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Address.near(:latlng => [37.761523, -122.423575, 1])
+      criteria.selector.should == { :latlng => { "$near" => [37.761523, -122.423575, 1] } }
+    end
+
+  end
+
 end

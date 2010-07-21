@@ -8,6 +8,7 @@ class Address
   field :post_code
   field :parent_title
   field :services, :type => Array
+  field :latlng, :type => Array
   key :street
   embeds_many :locations
 
