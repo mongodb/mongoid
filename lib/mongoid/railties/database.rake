@@ -18,7 +18,7 @@ namespace :db do
 
   if not Rake::Task.task_defined?("db:setup")
     desc 'Create the database, and initialize with the seed data'
-    task :setup => [ 'db:create', 'db:seed' ]
+    task :setup => [ 'db:create', 'db:create_indexes', 'db:seed' ]
   end
 
   if not Rake::Task.task_defined?("db:reseed")
@@ -56,10 +56,17 @@ namespace :db do
 
   if not Rake::Task.task_defined?("db:create_indexes")
     desc 'Create the indexes defined on your mongoid models'
-    task :create_indexes do
-      # force mongoid to create indexes
-      ENV["MONGOID_CREATE_INDEXES"] = "true"
-      Rake::Task["environment"].invoke
+    task :create_indexes => :environment do
+      # find all the mongoid models
+      mongoid_models = []
+      ObjectSpace.each_object(Class) do |klass|
+        mongoid_models << klass if klass.ancestors.map(&:to_s).include?("Mongoid::Document")
+      end
+
+      # create indexes on each model
+      mongoid_models.each do |model|
+        model.create_indexes
+      end
     end
   end
 

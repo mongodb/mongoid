@@ -24,6 +24,9 @@ describe Mongoid::Persistence do
     context "inserting with a field that is not unique" do
 
       context "when a unique index exists" do
+        before do
+          Person.create_indexes
+        end
 
         after do
           Person.delete_all

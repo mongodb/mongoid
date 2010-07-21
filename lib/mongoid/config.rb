@@ -204,11 +204,6 @@ module Mongoid #:nodoc
       @time_zone = nil
     end
 
-    # Allows the override of autocreate_indexes via ENV variable
-    def autocreate_indexes
-      ENV["MONGOID_CREATE_INDEXES"] || @autocreate_indexes
-    end
-
     ##
     # If Mongoid.use_object_ids = true
     #   Convert args to BSON::ObjectID
