@@ -29,12 +29,18 @@ describe Mongoid::Indexes do
     context "when indexes have not been added" do
 
       before do
+        Mongoid.autocreate_indexes = true
+
         @class = Class.new do
           include Mongoid::Indexes
           def self.hereditary
             true
           end
         end
+      end
+
+      after do
+        Mongoid.autocreate_indexes = false
       end
 
       it "adds the _type index" do
@@ -69,11 +75,17 @@ describe Mongoid::Indexes do
   describe ".index" do
 
     before do
+      Mongoid.autocreate_indexes = true
+
       @collection = mock
       @class = Class.new do
         include Mongoid::Indexes
       end
       @class.expects(:collection).returns(@collection)
+    end
+
+    after do
+      Mongoid.autocreate_indexes = false
     end
 
     context "when unique" do
@@ -86,6 +98,13 @@ describe Mongoid::Indexes do
     end
 
     context "when not unique" do
+      before do
+        Mongoid.autocreate_indexes = true
+      end
+
+      after do
+        Mongoid.autocreate_indexes = false
+      end
 
       it "creates an index on the collection" do
         @collection.expects(:create_index).with(:name, :unique => false)

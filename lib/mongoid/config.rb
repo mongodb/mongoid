@@ -11,6 +11,7 @@ module Mongoid #:nodoc
       :parameterize_keys,
       :persist_in_safe_mode,
       :raise_not_found_error,
+      :autocreate_indexes,
       :use_object_ids,
       :skip_version_check
 
@@ -184,9 +185,15 @@ module Mongoid #:nodoc
       @persist_in_safe_mode = true
       @raise_not_found_error = true
       @reconnect_time = 3
+      @autocreate_indexes = false
       @use_object_ids = false
       @skip_version_check = false
       @time_zone = nil
+    end
+
+    # Allows the override of autocreate_indexes via ENV variable
+    def autocreate_indexes
+      ENV["MONGOID_CREATE_INDEXES"] || @autocreate_indexes
     end
 
     ##
