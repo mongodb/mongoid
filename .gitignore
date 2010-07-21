@@ -6,5 +6,4 @@ tmp/*
 *.gem
 RAILS
 .bundle
-.rvmrc
 Gemfile.lock

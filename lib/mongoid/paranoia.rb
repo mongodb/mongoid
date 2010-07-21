@@ -1,18 +1,5 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
-  module Paranoid #:nodoc:
-    # Find deleted documents
-    #
-    # Examples:
-    #
-    #   <tt>Person.deleted</tt>  # all deleted employees
-    #   <tt>Company.first.employees.deleted</tt>  # works with a join
-    #   <tt>Person.deleted.find("4c188dea7b17235a2a000001").first</tt>  # retrieve by id a deleted person
-    def deleted
-      where(:deleted_at.exists => false)
-    end
-  end
-
   # Include this module to get soft deletion of root level documents.
   # This will add a deleted_at field to the +Document+, managed automatically.
   # Potentially incompatible with unique indices. (if collisions with deleted items)
@@ -27,7 +14,6 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      Mongoid::Criteria.send(:include, Mongoid::Paranoid)
       field :deleted_at, :type => Time
     end
 
@@ -101,6 +87,18 @@ module Mongoid #:nodoc:
       def criteria
         super.where(:deleted_at.exists => false)
       end
+      
+      # Find deleted documents
+      #
+      # Examples:
+      #
+      #   <tt>Person.deleted</tt>  # all deleted employees
+      #   <tt>Company.first.employees.deleted</tt>  # works with a join
+      #   <tt>Person.deleted.find("4c188dea7b17235a2a000001").first</tt>  # retrieve by id a deleted person
+      def deleted
+        where(:deleted_at.exists => true)
+      end
+      
     end
   end
 end

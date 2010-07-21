@@ -4,8 +4,9 @@ module Mongoid #:nodoc:
 
     # Delegate to the criteria methods that are natural for creating a new
     # criteria.
-    [ :all_in, :any_in, :avg, :excludes, :limit, :max, :min,
-      :not_in, :only, :order_by, :skip, :sum, :where ].each do |name|
+    [ :all_in, :any_in, :asc, :ascending, :avg, :desc, :descending,
+      :excludes, :limit, :max, :min, :not_in, :only, :order_by,
+      :skip, :sum, :where ].each do |name|
       define_method(name) do |*args|
         criteria.send(name, *args)
       end
@@ -25,7 +26,7 @@ module Mongoid #:nodoc:
     # Returns a count of matching records in the database based on the
     # provided arguments.
     #
-    # <tt>Person.count(:first, :conditions => { :attribute => "value" })</tt>
+    # <tt>Person.count(:conditions => { :attribute => "value" })</tt>
     def count(*args)
       Criteria.translate(self, *args).count
     end
@@ -33,7 +34,7 @@ module Mongoid #:nodoc:
     # Returns true if there are on document in database based on the
     # provided arguments.
     #
-    # <tt>Person.exists?(:first, :conditions => { :attribute => "value" })</tt>
+    # <tt>Person.exists?(:conditions => { :attribute => "value" })</tt>
     def exists?(*args)
       Criteria.translate(self, *args).limit(1).count == 1
     end

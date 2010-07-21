@@ -40,7 +40,7 @@ require "active_model/validator"
 require "active_model/validations"
 require "will_paginate/collection"
 require "mongo"
-require "mongoid/observable"
+require "mongoid/extensions"
 require "mongoid/associations"
 require "mongoid/atomicity"
 require "mongoid/attributes"
@@ -53,7 +53,6 @@ require "mongoid/criteria"
 require "mongoid/cursor"
 require "mongoid/deprecation"
 require "mongoid/dirty"
-require "mongoid/extensions"
 require "mongoid/extras"
 require "mongoid/errors"
 require "mongoid/factory"
@@ -64,6 +63,7 @@ require "mongoid/hierarchy"
 require "mongoid/identity"
 require "mongoid/indexes"
 require "mongoid/javascript"
+require "mongoid/logger"
 require "mongoid/matchers"
 require "mongoid/memoization"
 require "mongoid/named_scope"
@@ -112,7 +112,7 @@ module Mongoid #:nodoc
       block_given? ? yield(config) : config
     end
 
-    # Easy convenience method for having an alert generated from the
+    # Easy convenience method for generating an alert from the
     # deprecation module.
     #
     # Example:

@@ -43,6 +43,19 @@ module Mongoid #:nodoc
       end
     end
 
+    # Raised when trying to get or set a value for a defined field, where the
+    # type of the object does not match the defined field type.
+    #
+    # Example:
+    #
+    # <tt>InvalidType.new(Array, "Not an Array")</tt>
+    class InvalidType < MongoidError
+      def initialize(klass, value)
+        super("Field was defined as a(n) #{klass.name}, but received a #{value.class.name} " +
+              "with the value #{value.inspect}.")
+      end
+    end
+
     # Raised when the database version is not supported by Mongoid.
     #
     # Example:

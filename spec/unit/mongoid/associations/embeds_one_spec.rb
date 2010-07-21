@@ -7,7 +7,7 @@ describe Mongoid::Associations::EmbedsOne do
       "name" => "Jack and Coke", "_type" => "MixedDrink" },
       "writer" => { "speed" => 50, "_type" => "HtmlWriter" }
     }
-    @document = stub(:raw_attributes => @attributes, :observe => true)
+    @document = stub(:raw_attributes => @attributes, :observe => true, :update_child => nil)
   end
 
   describe "#build_*" do
@@ -271,7 +271,7 @@ describe Mongoid::Associations::EmbedsOne do
     context "when the document is not nil" do
 
       before do
-        @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } }, :observe => true)
+        @document = stub(:raw_attributes => { "name" => { "first_name" => "Test" } }, :observe => true, :update_child => nil)
         @options = Mongoid::Associations::Options.new(:name => :name)
         @association = Mongoid::Associations::EmbedsOne.instantiate(@document, @options)
       end

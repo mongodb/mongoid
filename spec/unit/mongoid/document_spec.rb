@@ -568,6 +568,13 @@ describe Mongoid::Document do
       types.should include("Browser")
     end
 
+    it 'should return strings' do
+      types = Canvas._types
+      types.each do |type|
+        type.should be_an_instance_of String
+      end
+    end
+
   end
 
   describe "#to_a" do

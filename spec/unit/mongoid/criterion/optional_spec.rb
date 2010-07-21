@@ -212,51 +212,130 @@ describe Mongoid::Criterion::Optional do
 
   describe "#id" do
 
-    context "when passing a single id" do
+    context "with Mongoid.use_object_ids is false" do
 
-      context "when the id is a string" do
-
-        it "adds the _id query to the selector" do
-          id = BSON::ObjectID.new.to_s
-          @criteria.id(id)
-          @criteria.selector.should == { :_id => id }
-        end
-
-        it "returns self" do
-          id = BSON::ObjectID.new.to_s
-          @criteria.id(id).should == @criteria
-        end
+      before :each do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+        Mongoid.use_object_ids = false
       end
 
-      context "when the id is an object id" do
+      after :each do
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+      end
+
+      context "when passing a single id" do
+
+        context "when the id is a string" do
+
+          it "adds the _id query to the selector" do
+            id = BSON::ObjectID.new.to_s
+            @criteria.id(id)
+            @criteria.selector.should == { :_id => id }
+          end
+
+          it "returns self" do
+            id = BSON::ObjectID.new.to_s
+            @criteria.id(id).should == @criteria
+          end
+        end
+
+        context "when the id is an object id" do
+
+          it "adds the _id query to the selector" do
+            id = BSON::ObjectID.new
+            @criteria.id(id)
+            @criteria.selector.should == { :_id => id }
+          end
+
+          it "returns self" do
+            id = BSON::ObjectID.new
+            @criteria.id(id).should == @criteria
+          end
+        end
+
+      end
+
+      context "when passing in an array of ids" do
+
+        before do
+          @ids = []
+          3.times { @ids << BSON::ObjectID.new.to_s }
+        end
 
         it "adds the _id query to the selector" do
-          id = BSON::ObjectID.new
-          @criteria.id(id)
-          @criteria.selector.should == { :_id => id }
+          @criteria.id(@ids)
+          @criteria.selector.should ==
+            { :_id => { "$in" => @ids } }
         end
 
-        it "returns self" do
-          id = BSON::ObjectID.new
-          @criteria.id(id).should == @criteria
+      end
+
+      context "when passing in an array with only one id" do
+
+        it "adds the _id query to the selector" do
+          ids = [BSON::ObjectID.new]
+          @criteria.id(ids).selector.should == { :_id => ids.first }
         end
+
       end
 
     end
 
-    context "when passing in an array of ids" do
-
-      before do
-        @ids = []
-        3.times { @ids << BSON::ObjectID.new.to_s }
+    context "with Mongoid.use_object_ids is true" do
+      before :each do
+        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+        Mongoid.use_object_ids = true
       end
 
-      it "adds the _id query to the selector" do
-        @criteria.id(@ids)
-        @criteria.selector.should ==
-          { :_id => { "$in" => @ids } }
+      after :each do
+        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+      end
+      context "when passing a single id" do
+
+        context "when the id is a string" do
+
+          it "adds the _id query to the selector convert like BSON::ObjectID" do
+            id = BSON::ObjectID.new.to_s
+            @criteria.id(id)
+            @criteria.selector.should == { :_id => BSON::ObjectID(id) }
+          end
+
+          it "returns self" do
+            id = BSON::ObjectID.new.to_s
+            @criteria.id(id).should == @criteria
+          end
+        end
+
+        context "when the id is an object id" do
+
+          it "adds the _id query to the selector without cast" do
+            id = BSON::ObjectID.new
+            @criteria.id(id)
+            @criteria.selector.should == { :_id => id }
+          end
+
+          it "returns self" do
+            id = BSON::ObjectID.new
+            @criteria.id(id).should == @criteria
+          end
+        end
+
       end
 
+      context "when passing in an array of ids" do
+
+        before do
+          @ids = []
+          3.times { @ids << BSON::ObjectID.new.to_s }
+        end
+
+        it "adds the _id query to the selector with all ids like BSON::ObjectID" do
+          @criteria.id(@ids)
+          @criteria.selector.should ==
+            { :_id => { "$in" => @ids.map{|i| BSON::ObjectID(i)} } }
+        end
+
+      end
     end
 
   end
@@ -378,7 +457,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        @criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+        @criteria.options[:sort].should include([:title, :asc], [:text, :desc])
       end
     end
 
@@ -449,6 +528,34 @@ describe Mongoid::Criterion::Optional do
 
     it "returns self" do
       @criteria.skip.should == @criteria
+    end
+
+  end
+
+  describe "#type" do
+
+    context "when the type is a string" do
+
+      it "adds the _type query to the selector" do
+        @criteria.type('Browser')
+        @criteria.selector.should == { :_type => { '$in' => ['Browser'] } }
+      end
+
+      it "returns self" do
+        @criteria.type('Browser').should == @criteria
+      end
+    end
+
+    context "when the type is an Array of type" do
+
+      it "adds the _type query to the selector" do
+        @criteria.type(['Browser', 'Firefox'])
+        @criteria.selector.should == { :_type => { '$in' => ['Browser', 'Firefox'] } }
+      end
+
+      it "returns self" do
+        @criteria.type(['Browser', 'Firefox']).should == @criteria
+      end
     end
 
   end

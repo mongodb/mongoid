@@ -20,10 +20,10 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency("activemodel", ["~>3.0.0.beta"])
   s.add_runtime_dependency("tzinfo", ["~>0.3.22"])
   s.add_runtime_dependency("will_paginate", ["~>3.0.pre"])
-  s.add_runtime_dependency("mongo", ["~>1.0.1"])
-  s.add_runtime_dependency("bson", ["~>1.0.1"])
+  s.add_runtime_dependency("mongo", ["~>1.0.5"])
+  s.add_runtime_dependency("bson", ["~>1.0.4"])
 
-  s.add_development_dependency(%q<rspec>, ["= 2.0.0.beta.12"])
+  s.add_development_dependency(%q<rspec>, ["= 2.0.0.beta.16"])
   s.add_development_dependency(%q<mocha>, ["= 0.9.8"])
 
   s.files        = Dir.glob("lib/**/*") + %w(MIT_LICENSE README.rdoc)

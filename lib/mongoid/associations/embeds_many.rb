@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
       def clear
         unless @target.empty?
           document = @target.first
-          document.notify_observers(document, true)
+          document._parent.update_child(document, true) if (document._parent)
           @target.clear
         end
       end
@@ -175,6 +175,7 @@ module Mongoid #:nodoc:
       #
       # The newly build target Document.
       def nested_build(attributes, options = {})
+        @parent.instance_variable_set(:@building_nested, true)
         attributes.each do |index, attrs|
           if document = detect { |document| document._index == index.to_i }
             if options && options[:allow_destroy] && attrs['_destroy']
@@ -187,6 +188,9 @@ module Mongoid #:nodoc:
             build(attrs)
           end
         end
+        @target.each_with_index { |document, index| document._index = index }
+        @parent.instance_variable_set(:@building_nested, false)
+        self
       end
 
       # Paginate the association. Will create a new criteria, set the documents

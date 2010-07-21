@@ -47,8 +47,7 @@ module Mongoid #:nodoc
       end
 
       # Sets up a child/parent association. This is used for newly created
-      # objects so they can be properly added to the graph and have the parent
-      # observers set up properly.
+      # objects so they can be properly added to the graph.
       #
       # Options:
       #
@@ -61,7 +60,6 @@ module Mongoid #:nodoc
       def parentize(object, association_name)
         self._parent = object
         self.association_name = association_name.to_s
-        add_observer(object)
       end
 
       # Return the root +Document+ in the object graph. If the current +Document+

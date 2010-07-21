@@ -14,7 +14,7 @@ module Mongoid #:nodoc
       :use_object_ids,
       :skip_version_check
 
-    # Defaults the configuration options to true.
+    # Initializes the configuration with default settings.
     def initialize
       reset
     end
@@ -56,7 +56,7 @@ module Mongoid #:nodoc
     #
     # Returns:
     #
-    # The Master DB instance.
+    # The master +Mongo::DB+ instance.
     def master=(db)
       check_database!(db)
       @master = db
@@ -79,8 +79,8 @@ module Mongoid #:nodoc
     alias :database :master
     alias :database= :master=
 
-    # Sets the Mongo::DB slave databases to be used. If the objects trying to me
-    # set are not valid +Mongo::DBs+, then an error will be raise.
+    # Sets the Mongo::DB slave databases to be used. If the objects provided
+    # are not valid +Mongo::DBs+ an error will be raised.
     #
     # Example:
     #
@@ -88,7 +88,7 @@ module Mongoid #:nodoc
     #
     # Returns:
     #
-    # The slaves DB instances.
+    # The slave DB instances.
     def slaves=(dbs)
       return unless dbs
       dbs.each do |db|
@@ -97,7 +97,7 @@ module Mongoid #:nodoc
       @slaves = dbs
     end
 
-    # Returns the slave databases, or if none has been set nil
+    # Returns the slave databases or nil if none have been set.
     #
     # Example:
     #
@@ -108,6 +108,26 @@ module Mongoid #:nodoc
     # The slave +Mongo::DBs+
     def slaves
       @slaves
+    end
+
+    # Returns the logger, or defaults to Rails logger or stdout logger.
+    #
+    # Example:
+    #
+    # <tt>Config.logger</tt>
+    def logger
+      return @logger if defined?(@logger)
+
+      @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+    end
+
+    # Sets the logger for Mongoid to use.
+    #
+    # Example:
+    #
+    # <tt>Config.logger = Logger.new($stdout, :warn)</tt>
+    def logger=(logger)
+      @logger = logger
     end
 
     # Return field names that could cause destructive things to happen if
@@ -129,7 +149,8 @@ module Mongoid #:nodoc
       }.call
     end
 
-    # Configure mongoid from a hash that was usually parsed out of yml.
+    # Configure mongoid from a hash. This is usually called after parsing a
+    # yaml config file such as mongoid.yml.
     #
     # Example:
     #
@@ -137,9 +158,19 @@ module Mongoid #:nodoc
     def from_hash(settings)
       _master(settings)
       _slaves(settings)
-      settings.except("database").each_pair do |name, value|
+      settings.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?(name)
       end
+    end
+
+    # Convenience method for connecting to the master database after forking a
+    # new process.
+    #
+    # Example:
+    #
+    # <tt>Mongoid.reconnect!</tt>
+    def reconnect!
+      master.connection.connect_to_master
     end
 
     # Reset the configuration options to the defaults.
@@ -158,6 +189,42 @@ module Mongoid #:nodoc
       @time_zone = nil
     end
 
+    ##
+    # If Mongoid.use_object_ids = true
+    #   Convert args to BSON::ObjectID
+    #   If this args is an array, convert all args inside
+    # Else
+    #   return args
+    #
+    # Options:
+    #
+    #  args : A +String+ or an +Array+ convert to +BSON::ObjectID+
+    #  cast :  A +Boolean+ define if we can or not cast to BSON::ObjectID. If false, we use the default type of args
+    #
+    # Example:
+    #
+    # <tt>Mongoid.convert_to_object_id("4ab2bc4b8ad548971900005c", true)</tt>
+    # <tt>Mongoid.convert_to_object_id(["4ab2bc4b8ad548971900005c", "4ab2bc4b8ad548971900005d"])</tt>
+    #
+    # Returns:
+    #
+    # If Mongoid.use_object_ids = true
+    #   An +Array+ of +BSON::ObjectID+ of each element if params is an +Array+
+    #   A +BSON::ObjectID+ from params if params is +String+
+    # Else
+    #   <tt>args</tt>
+    #
+    def convert_to_object_id(args, cast=true)
+      return args if !use_object_ids || args.is_a?(BSON::ObjectID) || !cast
+      if args.is_a?(String)
+        BSON::ObjectID(args)
+      else
+        args.map{ |a|
+          a.is_a?(BSON::ObjectID) ? a : BSON::ObjectID(a)
+        }
+      end
+    end
+
     protected
 
     # Check if the database is valid and the correct version.
@@ -173,16 +240,9 @@ module Mongoid #:nodoc
       end
     end
 
-    # Get a Rails logger or stdout logger.
-    #
-    # Example:
-    #
-    # <tt>config.logger</tt>
-    def logger
-      defined?(Rails) ? Rails.logger : Logger.new($stdout)
-    end
-
     # Get a master database from settings.
+    #
+    # TODO: Durran: This code's a bit hairy, refactor.
     #
     # Example:
     #
@@ -193,11 +253,11 @@ module Mongoid #:nodoc
       name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
       host = settings["host"] || mongo_uri.host || "localhost"
       port = settings["port"] || mongo_uri.port || 27017
-      pool_size = settings["pool_size"] || 1 
+      pool_size = settings["pool_size"] || 1
       username = settings["username"] || mongo_uri.user
       password = settings["password"] || mongo_uri.password
 
-      connection = Mongo::Connection.new(host, port, :logger => logger, :pool_size => pool_size)
+      connection = Mongo::Connection.new(host, port, :logger => Mongoid::Logger.new, :pool_size => pool_size)
       if username || password
         connection.add_auth(name, username, password)
         connection.apply_saved_authentication
@@ -206,6 +266,8 @@ module Mongoid #:nodoc
     end
 
     # Get a bunch-o-slaves from settings and names.
+    #
+    # TODO: Durran: This code's a bit hairy, refactor.
     #
     # Example:
     #

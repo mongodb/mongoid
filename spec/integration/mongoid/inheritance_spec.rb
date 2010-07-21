@@ -50,6 +50,11 @@ describe Mongoid::Document do
       Canvas.where(:name => "Testy").first.should == @firefox
     end
 
+    it 'should returns on of this subclasses if you find by _type' do
+      Browser.create(:name => 'Safari', :version => '4.0.0')
+      Canvas.where(:_type.in => ['Firefox']).count.should == 1
+    end
+
   end
 
   context "when document has associations" do

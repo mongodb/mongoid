@@ -50,6 +50,20 @@ describe Mongoid::Errors do
     end
   end
 
+  describe Mongoid::Errors::InvalidType do
+
+    describe "#message" do
+
+      before do
+        @error = Mongoid::Errors::InvalidType.new(Array, "Test")
+      end
+
+      it "returns a message with the bad type and supplied value" do
+        @error.message.should include("Array, but received a String")
+      end
+    end
+  end
+
   describe Mongoid::Errors::UnsupportedVersion do
 
     describe "#message" do

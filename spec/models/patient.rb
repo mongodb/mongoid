@@ -1,6 +1,7 @@
 class Email
   include Mongoid::Document
   field :address
+  validates_uniqueness_of :address
   embedded_in :patient, :inverse_of => :email
 end
 

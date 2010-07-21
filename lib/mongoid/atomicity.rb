@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     # Get all the atomic updates that need to happen for the current
-    # +Document+. This will include all changes that need to happen in the
+    # +Document+. This includes all changes that need to happen in the
     # entire hierarchy that exists below where the save call was made.
     #
     # Example:
@@ -15,9 +15,22 @@ module Mongoid #:nodoc:
     #
     # A +Hash+ of all atomic updates that need to occur.
     def _updates
-      _children.inject({ "$set" => _sets, "$push" => {}}) do |updates, child|
-        updates["$set"].update(child._sets)
-        updates["$push"].update(child._pushes)
+      processed = {}
+      
+      _children.inject({ "$set" => _sets, "$pushAll" => {}, :other => {} }) do |updates, child|
+        changes = child._sets
+        updates["$set"].update(changes)
+        processed[child.class] = true unless changes.empty?
+        
+        target = processed.has_key?(child.class) ? :other : "$pushAll"
+        
+        child._pushes.each do |attr, val|
+          if updates[target].has_key?(attr)
+            updates[target][attr] << val
+          else
+            updates[target].update({attr => [val]})
+          end
+        end
         updates
       end.delete_if do |key, value|
         value.empty?

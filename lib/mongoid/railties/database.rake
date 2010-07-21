@@ -46,6 +46,14 @@ namespace :db do
     end
   end
 
+  if not Rake::Task.task_defined?("db:test:prepare")
+    namespace :test do
+      task :prepare do
+        # noop
+      end
+    end
+  end
+
   ########
   # TODO: lots more useful db tasks can be added here. stuff like copyDatabase, etc
   ########

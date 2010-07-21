@@ -14,9 +14,8 @@ module Mongoid #:nodoc:
     end
 
     protected
-    # Instantiate a new logger to stdout or a rails logger if available.
     def initialize
-      @logger = defined?(Rails) ? Rails.logger : Logger.new($stdout)
+      @logger = Mongoid::Logger.new
     end
   end
 end

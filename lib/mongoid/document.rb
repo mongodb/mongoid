@@ -63,7 +63,7 @@ module Mongoid #:nodoc:
       # causes the first call to only return direct children, hence
       # the double call and unique.
       def _types
-        @_type ||= [subclasses + subclasses + [self.name]].flatten.uniq
+        @_type ||= [subclasses + subclasses + [self.name]].flatten.uniq.map(&:to_s)
       end
     end
 
@@ -141,13 +141,13 @@ module Mongoid #:nodoc:
       "#<#{self.class.name} _id: #{id}, #{attrs * ', '}>"
     end
 
-    # Notify observers of an update.
+    # Notify parent of an update.
     #
     # Example:
     #
     # <tt>person.notify</tt>
     def notify
-      notify_observers(self)
+      _parent.update_child(self) if _parent
     end
 
     # Return the attributes hash.
@@ -169,16 +169,26 @@ module Mongoid #:nodoc:
     # memoized association and notify the parent of the change.
     def remove(child)
       name = child.association_name
-      reset(name) { @attributes.remove(name, child.raw_attributes) }
-      notify
+      if @building_nested
+        @attributes.remove(name, child.raw_attributes)
+      else
+        reset(name) { @attributes.remove(name, child.raw_attributes) }
+        notify
+      end
     end
+
+    # def remove_without_reset
+    #   name = child.association_name
+    #   @attributes.remove(name, child.raw_attributes)
+    #   notify
+    # end
 
     # Return an array with this +Document+ only in it.
     def to_a
       [ self ]
     end
 
-    # Observe a notify call from a child +Document+. This will either update
+    # Recieve a notify call from a child +Document+. This will either update
     # existing attributes on the +Document+ or clear them out for the child if
     # the clear boolean is provided.
     #
@@ -186,18 +196,15 @@ module Mongoid #:nodoc:
     #
     # child: The child +Document+ that sent the notification.
     # clear: Will clear out the child's attributes if set to true.
-    #
-    # This will also cause the observing +Document+ to notify it's parent if
-    # there is any.
-    def observe(child, clear = false)
+    def update_child(child, clear = false)
       name = child.association_name
       attrs = child.instance_variable_get(:@attributes)
       if clear
         @attributes.delete(name)
       else
+        # check good for array only
         @attributes.insert(name, attrs) unless @attributes[name] && @attributes[name].include?(attrs)
       end
-      notify
     end
   end
 end

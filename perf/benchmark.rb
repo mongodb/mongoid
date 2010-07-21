@@ -149,11 +149,18 @@ end
 # Updating An Embedded Document 10k Times     12.250000   0.500000  12.750000 ( 13.786223)
 # Appending A New Embedded Document 10k Times 12.320000   0.510000  12.830000 ( 14.392891)
 # ---------------------------------------------------------------------------------------
-# Master:
+# 2.0.0.beta3:
 #
 # Saving 10k New Documents                    23.890000   0.380000  24.270000 ( 24.332954)
 # Querying & Iterating 10k Documents           2.980000   0.100000   3.080000 (  3.105810)
 # Updating The Root Document 10k Times         4.870000   0.110000   4.980000 (  4.976892)
 # Updating An Embedded Document 10k Times      3.430000   0.100000   3.530000 (  3.536181)
 # Appending A New Embedded Document 10k Times  7.030000   0.220000   7.250000 ( 12.238345)
-
+# ---------------------------------------------------------------------------------------
+# 2.0.0.beta9:
+#
+# Saving 10k New Documents                    21.040000   0.350000  21.390000 ( 21.426144)
+# Querying & Iterating 10k Documents           3.590000   0.110000   3.700000 (  3.732166)
+# Updating The Root Document 10k Times         5.430000   0.130000   5.560000 (  5.568188)
+# Updating An Embedded Document 10k Times      3.630000   0.110000   3.740000 (  3.765507)
+# Appending A New Embedded Document 10k Times  9.550000   0.270000   9.820000 ( 13.363242)

@@ -207,7 +207,7 @@ describe Mongoid::Persistence do
         it "persists with proper set and push modifiers" do
           @person._updates.should == {
             "$set" => { "title" => "King", "name.first_name" => "Ryan" },
-            "$push"=> { "addresses" => { "_id" => @address.id, "street"=>"Bond St" }}
+            "$pushAll"=> { "addresses" => [{ "_id" => @address.id, "street"=>"Bond St" }]}
           }
           @person.save
           @person._updates.should == {}

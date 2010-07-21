@@ -70,15 +70,18 @@ describe Mongoid::Attributes do
             @person = Person.new(:title => "Sir", :ssn => "555-66-9999")
             @person.favorites.build(:title => "Ice Cream")
             @person.favorites.build(:title => "Jello")
+            @person.favorites.build(:title => "Ducce de Lecce")
             @attributes = {
-              "0" => { "_destroy" => "true" }
+              "0" => { "_destroy" => "true" },
+              "1" => { "_destroy" => "true" }
             }
             @person.favorites_attributes = @attributes
           end
 
           it "removes the items that have _destroy => true set" do
+            @person.favorites.class.should == Array
             @person.favorites.size.should == 1
-            @person.favorites.first.title.should == "Jello"
+            @person.favorites.first.title.should == "Ducce de Lecce"
           end
         end
 
@@ -108,7 +111,8 @@ describe Mongoid::Attributes do
               "4" => { "title" => "Tim Tams" },
               "5" => { "title" => "Milo" }
             }
-            lambda { @person.favorites_attributes = @attributes }.should raise_error(Mongoid::Errors::TooManyNestedAttributeRecords)
+            lambda { @person.favorites_attributes = @attributes }.should
+              raise_error(Mongoid::Errors::TooManyNestedAttributeRecords)
           end
         end
 
@@ -119,12 +123,12 @@ describe Mongoid::Attributes do
         before do
           @person = Person.new
         end
-        
+
         it "can be added if :update_only is false" do
           @person.pet_attributes = { "name" => "Darwin" }
           @person.pet.name.should == "Darwin"
         end
-        
+
         it "can be updated if :update_only is false" do
           @person.pet_attributes = { "name" => "Darwin" }
           @person.pet_attributes = { "name" => "Zulu" }
@@ -142,11 +146,44 @@ describe Mongoid::Attributes do
           @person.name.first_name.should == "Fernando"
           @person.name.last_name.should == "Torres"
         end
+      end
+    end
+  end
 
+  describe ".attr_protected" do
+
+    context "when the field is not _id" do
+
+      before do
+        @person = Person.new(:security_code => "ABBA")
       end
 
+      it "prevents setting via mass assignment" do
+        @person.security_code.should be_nil
+      end
     end
 
+    context "when the field is _id" do
+
+      before do
+        @game = Game.new(:_id => "ABBA")
+      end
+
+      it "prevents setting via mass assignment" do
+        @game._id.should_not == "ABBA"
+      end
+    end
+
+    context "when using instantiate" do
+
+      before do
+        @person = Person.instantiate("_id" => "1", "security_code" => "ABBA")
+      end
+
+      it "ignores any protected attribute" do
+        @person.security_code.should == "ABBA"
+      end
+    end
   end
 
   describe "#_id" do
@@ -437,24 +474,24 @@ describe Mongoid::Attributes do
     end
 
   end
-  
+
   describe "#attribute_present?" do
     context "when attribute does not exist" do
       before do
         @person = Person.new
       end
-      
+
       it "returns false" do
         @person.attribute_present?(:owner_id).should be_false
       end
     end
-    
+
     context "when attribute does exist" do
       before do
         @person = Person.new
         @person.owner_id = 5
       end
-      
+
       it "returns true" do
         @person.attribute_present?(:owner_id).should be_true
       end
@@ -564,9 +601,7 @@ describe Mongoid::Attributes do
             @owner.pet.name.should == "Bingo"
             @owner.pet.vet_visits.size.should == 1
           end
-
         end
-
       end
 
       context "on a child document" do

@@ -6,8 +6,14 @@ describe Mongoid::Cursor do
     stub.quacks_like(Mongoid::Collection.allocate)
   end
 
+  let(:mongo_cursor) do
+    Mongo::Cursor.allocate.tap do |cursor|
+      cursor.stubs(:inspect => "<Mongo::Cursor>")
+    end
+  end
+
   let(:proxy) do
-    stub.quacks_like(Mongo::Cursor.allocate)
+    stub.quacks_like(mongo_cursor)
   end
 
   let(:cursor) do

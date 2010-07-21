@@ -97,12 +97,19 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def where(selector = nil)
-        case selector
-        when String
-          @selector.update("$where" => selector)
-        else
-          @selector.update(selector ? selector.expand_complex_criteria : {})
+        selector = case selector
+          when String then {"$where" => selector}
+          else selector ? selector.expand_complex_criteria : {}
         end
+        
+        selector.each_pair do |key, value|
+          if @selector.has_key? key
+            @selector[key].merge!(value)
+          else
+            @selector[key] = value
+          end
+        end
+        
         self
       end
     end

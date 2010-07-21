@@ -1,16 +1,27 @@
+require "singleton"
 require "rails"
+require "mongoid/config"
 module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
-
-      # do we want a custom log subscriber for mongoid?
-      # log_subscriber :mongoid, ::Mongoid::Railties::LogSubscriber.new
 
       config.generators.orm :mongoid, :migration => false
 
       rake_tasks do
         load "mongoid/railties/database.rake"
       end
+
+      # Exposes Mongoid's configuration to the Rails application configuration.
+      #
+      # Example:
+      #
+      #   module MyApplication
+      #     class Application < Rails::Application
+      #       config.mongoid.logger = Logger.new($stdout, :warn)
+      #       config.mongoid.reconnect_time = 10
+      #     end
+      #   end
+      config.mongoid = ::Mongoid::Config.instance
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.

@@ -1,12 +1,20 @@
 require "spec_helper"
 
 describe Mongoid::Config do
+  let(:config) { Mongoid::Config.instance }
 
-  after :all do
-    config.raise_not_found_error = true
+  before :all do
+    @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+    Mongoid.use_object_ids = true
   end
 
-  let(:config) { Mongoid::Config.instance }
+  after :all do
+    Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+  end
+
+  after do
+    config.reset
+  end
 
   describe "#database=" do
 
@@ -84,6 +92,38 @@ describe Mongoid::Config do
       end
     end
 
+    context "mongoid_with_slaves.yml" do
+
+      let(:connection) do
+        stub(:server_version => version).quacks_like(Mongo::Connection.allocate)
+      end
+
+      let(:database) do
+        stub(:kind_of? => true, :connection => connection).quacks_like(Mongo::DB.allocate)
+      end
+
+      let(:version) do
+        Mongo::ServerVersion.new("2.0.0")
+      end
+
+
+      before do
+        Mongo::Connection.stubs(:new => connection)
+        connection.stubs(:db => database)
+        database.stubs(:collections => []) #supress warning message from cleanup
+
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_slaves.yml")
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.from_hash(@settings)
+      end
+
+      after { config.reset }
+
+      it "sets slaves" do
+        config.slaves.should_not be_empty
+      end
+    end
   end
 
   describe "#master=" do
@@ -188,6 +228,52 @@ describe Mongoid::Config do
 
     end
 
+  end
+
+  describe "#reconnect!" do
+
+    before do
+      @connection = mock
+      @master = mock
+      config.expects(:master).returns(@master)
+      @master.expects(:connection).returns(@connection)
+    end
+
+    it "reconnects on the master connection" do
+      @connection.expects(:connect_to_master).returns(true)
+      config.reconnect!
+    end
+  end
+
+  describe "#convert_to_object_id" do
+    before :each do
+      @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
+      Mongoid.use_object_ids = true
+    end
+
+    after :each do
+      Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+    end
+
+    it "should return args if use_object_ids is false" do
+      Mongoid.use_object_ids = false
+      Mongoid.convert_to_object_id("foo").should == "foo"
+    end
+
+    it "should transform args String to BSON::ObjectID if use_object_ids is true" do
+      id = BSON::ObjectID.new
+      Mongoid.convert_to_object_id(id.to_s).should == id
+    end
+
+    it "should transform all String inside Array pass like args if use_object_ids is true" do
+      ids = [BSON::ObjectID.new, BSON::ObjectID.new]
+      Mongoid.convert_to_object_id(ids.map(&:to_s)).should == ids
+    end
+
+    it "should don't change args type if cast args is define to false" do
+      id = BSON::ObjectID.new
+      Mongoid.convert_to_object_id(id.to_s, false).should == id.to_s
+    end
   end
 
   describe "#reconnect_time" do

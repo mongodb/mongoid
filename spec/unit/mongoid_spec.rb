@@ -32,14 +32,14 @@ describe Mongoid do
   end
 
   describe ".deprecate" do
+    let(:deprecation) { stub }
 
     before do
-      @deprecation = mock
-      Mongoid::Deprecation.expects(:instance).returns(@deprecation)
+      Mongoid::Deprecation.expects(:instance).returns(deprecation)
     end
 
     it "calls alert on the deprecation singleton" do
-      @deprecation.expects(:alert).with("testing")
+      deprecation.expects(:alert).with("testing")
       Mongoid.deprecate("testing")
     end
   end
