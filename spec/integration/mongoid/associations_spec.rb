@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Associations do
 
   before do
-    [ Artist, Person, Game, Post, Preference ].each { |klass| klass.collection.remove }
+    [ Artist, Person, Game, Post, Preference, UserAccount ].each { |klass| klass.collection.remove }
   end
 
   context "anonymous extensions" do
@@ -668,100 +668,160 @@ describe Mongoid::Associations do
   context "references many as array" do
 
     context "with a saved parent" do
-
-      before do
-        @person = Person.create!(:ssn => "992-33-1010")
-      end
+      let(:person) { Person.create!(:ssn => "992-33-1010") }
 
       context "appending a new document" do
 
-        before do
-          @preference = Preference.new(:name => "test")
-          @person.preferences << @preference
+        context "with a references_many association" do
+          let(:preference) { Preference.new(:name => "test") }
+          before { person.preferences << preference }
+
+          it "adds the document to the array" do
+            person.preferences.first.should == preference
+          end
+
+          it "adds the parent document to the reverse association" do
+            preference.people.first.should == person
+          end
         end
 
-        it "adds the document to the array" do
-          @person.preferences.first.should == @preference
-        end
+        context "with a referenced_in association" do
+          let(:user_account) { UserAccount.new(:username => "johndoe") }
+          before { person.user_accounts << user_account }
 
-        it "adds the parent document to the reverse association" do
-          @preference.people.first.should == @person
+          it "adds the document to the array" do
+            person.user_accounts.first.should == user_account
+          end
+
+          it "adds the parent document to the reverse association" do
+            user_account.person.should == person
+          end
         end
       end
 
       context "building a document" do
 
-        before do
-          @preference = @person.preferences.build(:name => "test")
+        context "with a references_many association" do
+          let!(:preference) { person.preferences.build(:name => "test") }
+
+          it "adds the document to the array" do
+            person.preferences.first.should == preference
+          end
+
+          it "adds the parent document to the reverse association" do
+            preference.people.first.should == person
+          end
         end
 
-        it "adds the document to the array" do
-          @person.preferences.first.should == @preference
-        end
+        context "with a referenced_in association" do
+          let!(:user_account) { person.user_accounts.build(:username => "johndoe") }
 
-        it "adds the parent document to the reverse association" do
-          @preference.people.first.should == @person
+          it "adds the document to the array" do
+            person.user_accounts.first.should == user_account
+          end
+
+          it "adds the parent document to the reverse association" do
+            user_account.person.should == person
+          end
         end
       end
 
       context "creating a document" do
+        context "with a references_many association" do
+          let!(:preference) { person.preferences.create(:name => "test") }
 
-        before do
-          @preference = @person.preferences.create(:name => "test")
+          it "adds the document to the array" do
+            person.preferences.first.should == preference
+          end
+
+          it "adds the parent document to the reverse association" do
+            preference.people.first.should == person
+          end
         end
 
-        it "adds the document to the array" do
-          @person.preferences.first.should == @preference
-        end
+        context "with a referenced_in association" do
+          let!(:user_account) { person.user_accounts.create(:username => "johndoe") }
 
-        it "adds the parent document to the reverse association" do
-          @preference.people.first.should == @person
+          it "adds the document to the array" do
+            person.user_accounts.first.should == user_account
+          end
+
+          it "adds the parent document to the reverse association" do
+            user_account.person.should == person
+          end
         end
       end
     end
 
     context "with a new parent" do
 
-      let(:person) do
-        Person.new(:ssn => "992-33-1010")
-      end
+      let(:person) { Person.new(:ssn => "992-33-1010") }
 
       context "appending a new document" do
 
-        before do
-          @preference = Preference.new(:name => "test")
-          person.preferences << @preference
+        context "with a references_many association" do
+          let(:preference) { Preference.new(:name => "test") }
+          before { person.preferences << preference }
+
+          it "adds the document to the array" do
+            person.preferences.first.should == preference
+          end
         end
 
-        it "adds the document to the array" do
-          person.preferences.first.should == @preference
+        context "with a referenced_in association" do
+          let(:user_account) { UserAccount.new(:username => "test") }
+          before { person.user_accounts << user_account }
+
+          it "adds the document to the array" do
+            person.user_accounts.first.should == user_account
+          end
         end
       end
 
       context "building a document" do
 
-        before do
-          @preference = person.preferences.build(:name => "test")
+        context "with a references_many association" do
+          let!(:preference) { person.preferences.build(:name => "test") }
+
+          it "adds the document to the array" do
+            person.preferences.first.should == preference
+          end
+
+          it "adds the parent document to the reverse association"
         end
 
-        it "adds the document to the array" do
-          person.preferences.first.should == @preference
-        end
+        context "with a referenced_in association" do
+          let!(:user_account) { person.user_accounts.build(:username => "test") }
 
-        it "adds the parent document to the reverse association"
+          it "adds the document to the array" do
+            person.user_accounts.first.should == user_account
+          end
+
+          it "adds the parent document to the reverse association"
+        end
       end
 
       context "creating a document" do
 
-        before do
-          @preference = person.preferences.create(:name => "test")
+        context "with a references_many association" do
+          let!(:preference) { person.preferences.create(:name => "test") }
+
+          it "adds the document to the array" do
+            person.preferences.first.should == preference
+          end
+
+          it "adds the parent document to the reverse association"
         end
 
-        it "adds the document to the array" do
-          person.preferences.first.should == @preference
-        end
+        context "with a referenced_in association" do
+          let!(:user_account) { person.user_accounts.create(:username => "test") }
 
-        it "adds the parent document to the reverse association"
+          it "adds the document to the array" do
+            person.user_accounts.first.should == user_account
+          end
+
+          it "adds the parent document to the reverse association"
+        end
       end
     end
   end
