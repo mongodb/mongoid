@@ -50,6 +50,10 @@ describe Mongoid::Associations::ReferencesOne do
       @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
     end
 
+    it "can be called with no arguments" do
+      expect { @association.create }.to_not raise_error
+    end
+
     it "adds a new object to the association" do
       @association.create(:score => 100)
       @association.score.should == 100
