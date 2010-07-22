@@ -11,6 +11,10 @@ module Mongoid #:nodoc:
       attr_reader :new_record
 
       delegate :primary_key, :to => "self.class"
+
+      unless self.instance_of?(Class) and self.name == ""
+        (@@descendants ||= {})[self] = :seen
+      end
     end
 
     module ClassMethods #:nodoc:
@@ -56,6 +60,11 @@ module Mongoid #:nodoc:
       def key(*fields)
         self.primary_key = fields
         set_callback :save, :before, :identify
+      end
+
+      # Returns the classes that have included Mongoid::Document
+      def self.descendents
+        (@@descendants ||= {}).keys
       end
 
       # Returns all types to query for when using this class as the base.

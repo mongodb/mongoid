@@ -57,13 +57,7 @@ namespace :db do
   if not Rake::Task.task_defined?("db:create_indexes")
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
-      # find all the mongoid models
-      # TODO: We should be tracking documents on Mongoid::Document instead of
-      #       relying on ObjectSpace, which is disabled on some platforms.
-      mongoid_models = ObjectSpace.each_object(Class).select { |k| Mogoid::Document > k }
-
-      # create indexes on each model
-      mongoid_models.each do |model|
+      Mongoid::Document.descendents.each do |model|
         model.create_indexes
       end
     end
