@@ -522,6 +522,7 @@ describe Mongoid::Associations do
       context "when delete_all" do
         before do
           @person.addresses << Address.new(:street => 'hello')
+          @person.addresses << Address.new(:street => 'hello')
           @person.save
           @person.addresses.delete_all
         end
