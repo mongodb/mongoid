@@ -167,6 +167,12 @@ describe Mongoid::Criteria do
       @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
     end
 
+    context "chaining multiple where" do
+      it "with the same key" do
+        Person.criteria.where(:title => "Sir").where(:title => "Mam").should == [@person]
+      end
+    end
+
     context "with complex criterion" do
 
       context "#all" do
