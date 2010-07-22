@@ -11,10 +11,6 @@ module Mongoid #:nodoc:
     #     false
     #   );
     class RemoveEmbedded < Command
-      # Insert the new document in the database. If the document's parent is a
-      # new record, we will call save on the parent, otherwise we will $push
-      # the document onto the parent.
-      #
       # Remove the document from the database. If the parent is a new record,
       # it will get removed in Ruby only. If the parent is not a new record
       # then either an $unset or $set will occur, depending if it's an
