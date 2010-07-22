@@ -58,10 +58,9 @@ namespace :db do
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
       # find all the mongoid models
-      mongoid_models = []
-      ObjectSpace.each_object(Class) do |klass|
-        mongoid_models << klass if klass.ancestors.map(&:to_s).include?("Mongoid::Document")
-      end
+      # TODO: We should be tracking documents on Mongoid::Document instead of
+      #       relying on ObjectSpace, which is disabled on some platforms.
+      mongoid_models = ObjectSpace.each_object(Class).select { |k| Mogoid::Document > k }
 
       # create indexes on each model
       mongoid_models.each do |model|
