@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
       # newly created document.
       #
       # Returns the newly created object.
-      def create(attributes)
+      def create(attributes = {})
         build(attributes).tap(&:save)
       end
 

@@ -237,6 +237,11 @@ describe Mongoid::Associations::ReferencesMany do
       Post.expects(:instantiate).returns(@post)
     end
 
+    it "can be called with no arguments" do
+      @post.expects(:save).returns(true)
+      expect { @association.create }.to_not raise_error
+    end
+
     it "builds and saves the new object" do
       @post.expects(:save).returns(true)
       @association.create(:title => "Sassy")
@@ -257,6 +262,11 @@ describe Mongoid::Associations::ReferencesMany do
       Post.expects(:all).returns([])
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       Post.expects(:instantiate).returns(@post)
+    end
+
+    it "can be called with no arguments" do
+      @post.expects(:save!).returns(true)
+      expect { @association.create! }.to_not raise_error
     end
 
     it "builds and saves the new object" do

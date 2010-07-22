@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
       # the new object will then be saved.
       #
       # Returns the newly created object.
-      def create(attributes)
+      def create(attributes = nil)
         build(attributes).tap(&:save)
       end
 
@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
       # validation fails an error is raised.
       #
       # Returns the newly created object.
-      def create!(attributes)
+      def create!(attributes = nil)
         build(attributes).tap(&:save!)
       end
 
