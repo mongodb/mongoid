@@ -42,7 +42,7 @@ describe Mongoid::Attributes do
       @attributes = {
         "0" => { :content => "lorem", "_destroy" => "true" },
         "1" => { :content => "lorem", "_destroy" => "true" },
-        "2" => { :content => "Do you like ice cream ?" },
+        "2" => { :content => "Do you like ice cream ?", "_destroy" => "" },
         "new_record" => { :content => "Do you like carrot cake ?" }
       }
     end
