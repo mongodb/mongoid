@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
           # clean way to handle this with new documents - we want to set the
           # actual objects as well, but dont want to get in an infinite loop
           # while doing so.
-          object.send(reverse_key(object)) << @parent.id
+          object.send(reverse_key(object)) << @parent.id if inverse?
           @target << object
         end
       end
@@ -42,9 +42,16 @@ module Mongoid #:nodoc:
       end
 
       protected
+
       # Find the inverse key for the supplied document.
       def reverse_key(document)
         document.send(@options.inverse_of).options.foreign_key
+      end
+
+      # Returns +true+ if there is an inverse association on the referenced
+      # model.
+      def inverse?
+        !!@options.inverse_of
       end
 
       # The default query used for retrieving the documents from the database.
@@ -67,8 +74,7 @@ module Mongoid #:nodoc:
         # <tt>RelatesToManyAsArray.update(preferences, person, options)</tt>
         def update(target, document, options)
           target.each do |child|
-            name = child.associations[options.inverse_of.to_s].options.name
-            child.send(name) << document
+            document.send(options.name) << child
           end
           instantiate(document, options, target)
         end
