@@ -169,7 +169,7 @@ describe Mongoid::Criteria do
 
     context "chaining multiple where" do
       it "with the same key" do
-        Person.criteria.where(:title => "Sir").where(:title => "Mam").should == [@person]
+        Person.criteria.where(:title => "Maam").where(:title => "Sir").should == [@person]
       end
     end
 
