@@ -45,11 +45,11 @@ namespace :spec do
   task :all do
     puts "Running Mongoid tests with MONGOID_USE_OBJECT_IDS as \"true\""
     ENV["MONGOID_USE_OBJECT_IDS"] = "true"
-    Rake::Task["spec"].invoke
+    Rake::Task["spec"].execute
 
     puts "Running Mongoid tests with MONGOID_USE_OBJECT_IDS as \"false\""
     ENV["MONGOID_USE_OBJECT_IDS"] = "false"
-    Rake::Task["spec"].invoke
+    Rake::Task["spec"].execute
   end
 end
 
