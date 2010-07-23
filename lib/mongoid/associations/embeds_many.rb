@@ -178,7 +178,7 @@ module Mongoid #:nodoc:
         @parent.instance_variable_set(:@building_nested, true)
         attributes.each do |index, attrs|
           if document = detect { |document| document._index == index.to_i }
-            if options && options[:allow_destroy] && has_destroy_flag?(attrs)
+            if options && options[:allow_destroy] && Boolean.set(attrs['_destroy'])
               @target.delete(document)
               document.destroy
             else
@@ -191,22 +191,6 @@ module Mongoid #:nodoc:
         @target.each_with_index { |document, index| document._index = index }
         @parent.instance_variable_set(:@building_nested, false)
         self
-      end
-
-      # Determines if a hash contains a truthy _destroy key.
-      def has_destroy_flag?(hash)
-        value_to_boolean(hash['_destroy'])
-      end
-
-      TRUE_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE'].to_set
-
-      # convert something to a boolean
-      def value_to_boolean(value)
-        if value.is_a?(String) && value.blank?
-          nil
-        else
-          TRUE_VALUES.include?(value)
-        end
       end
 
       # Paginate the association. Will create a new criteria, set the documents
