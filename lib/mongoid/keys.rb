@@ -8,6 +8,20 @@ module Mongoid #:nodoc:
       delegate :_id_type, :primary_key, :to => "self.class"
     end
 
+    # Convenience method for determining if we are using +BSON::ObjectIDs+ as
+    # our id.
+    #
+    # Example:
+    #
+    # <tt>person.using_object_ids?</tt>
+    #
+    # Returns:
+    #
+    # true if we are using BSON::ObjectIDs
+    def using_object_ids?
+      _id_type == BSON::ObjectID
+    end
+
     module ClassMethods #:nodoc:
 
       # Convenience method for returning the type of the id for this class.

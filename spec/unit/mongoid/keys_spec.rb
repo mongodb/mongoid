@@ -63,4 +63,37 @@ describe Mongoid::Keys do
       end
     end
   end
+
+  describe "#using_object_ids?" do
+
+    context "when id type is an object id" do
+
+      before do
+        Address.identity :type => BSON::ObjectID
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      it "returns true" do
+        address.should be_using_object_ids
+      end
+    end
+
+    context "when id type is not an object id" do
+
+      before do
+        Address.identity :type => String
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      it "returns false" do
+        address.should_not be_using_object_ids
+      end
+    end
+  end
 end
