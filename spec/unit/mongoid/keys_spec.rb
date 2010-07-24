@@ -2,6 +2,24 @@ require "spec_helper"
 
 describe Mongoid::Keys do
 
+  describe ".identity" do
+
+    context "when provided a type" do
+
+      before do
+        Address.identity :type => String
+      end
+
+      after do
+        Address.identity :type => BSON::ObjectID
+      end
+
+      it "sets the type of the id" do
+        Address._id_type.should == String
+      end
+    end
+  end
+
   describe ".key" do
 
     context "when key is single field" do
@@ -14,6 +32,10 @@ describe Mongoid::Keys do
       it "adds the callback for primary key generation" do
         @address.run_callbacks(:save)
         @address.id.should == "testing-street-name"
+      end
+
+      it "changes the _id_type to a string" do
+        @address._id_type.should == String
       end
     end
 
