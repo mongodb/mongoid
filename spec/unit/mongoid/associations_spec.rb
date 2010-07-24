@@ -512,12 +512,12 @@ describe Mongoid::Associations do
 
     context "when using object ids" do
       before :all do
-        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-        Mongoid.use_object_ids = true
+        @@previous_mongoid_use_object_ids = Person._id_type
+        Person.identity :type => BSON::ObjectID
       end
 
       after :all do
-        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+        Person.identity :type => @@previous_mongoid_use_object_ids
       end
 
       it "sets the foreign key as an object id" do

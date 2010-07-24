@@ -12,7 +12,6 @@ module Mongoid #:nodoc
       :persist_in_safe_mode,
       :raise_not_found_error,
       :autocreate_indexes,
-      :use_object_ids,
       :skip_version_check
 
     # Initializes the configuration with default settings.
@@ -199,45 +198,8 @@ module Mongoid #:nodoc
       @raise_not_found_error = true
       @reconnect_time = 3
       @autocreate_indexes = false
-      @use_object_ids = false
       @skip_version_check = false
       @time_zone = nil
-    end
-
-    ##
-    # If Mongoid.use_object_ids = true
-    #   Convert args to BSON::ObjectID
-    #   If this args is an array, convert all args inside
-    # Else
-    #   return args
-    #
-    # Options:
-    #
-    #  args : A +String+ or an +Array+ convert to +BSON::ObjectID+
-    #  cast :  A +Boolean+ define if we can or not cast to BSON::ObjectID. If false, we use the default type of args
-    #
-    # Example:
-    #
-    # <tt>Mongoid.convert_to_object_id("4ab2bc4b8ad548971900005c", true)</tt>
-    # <tt>Mongoid.convert_to_object_id(["4ab2bc4b8ad548971900005c", "4ab2bc4b8ad548971900005d"])</tt>
-    #
-    # Returns:
-    #
-    # If Mongoid.use_object_ids = true
-    #   An +Array+ of +BSON::ObjectID+ of each element if params is an +Array+
-    #   A +BSON::ObjectID+ from params if params is +String+
-    # Else
-    #   <tt>args</tt>
-    #
-    def convert_to_object_id(args, cast=true)
-      return args if !use_object_ids || args.is_a?(BSON::ObjectID) || !cast
-      if args.is_a?(String)
-        BSON::ObjectID(args)
-      else
-        args.map{ |a|
-          a.is_a?(BSON::ObjectID) ? a : BSON::ObjectID(a)
-        }
-      end
     end
 
     protected

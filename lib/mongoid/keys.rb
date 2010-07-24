@@ -5,21 +5,11 @@ module Mongoid #:nodoc:
     included do
       cattr_accessor :primary_key, :_identity
       self._identity = { :type => BSON::ObjectID }
-      delegate :_id_type, :primary_key, :to => "self.class"
-    end
 
-    # Convenience method for determining if we are using +BSON::ObjectIDs+ as
-    # our id.
-    #
-    # Example:
-    #
-    # <tt>person.using_object_ids?</tt>
-    #
-    # Returns:
-    #
-    # true if we are using BSON::ObjectIDs
-    def using_object_ids?
-      _id_type == BSON::ObjectID
+      delegate \
+        :_id_type,
+        :primary_key,
+        :using_object_ids?, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:
@@ -67,6 +57,20 @@ module Mongoid #:nodoc:
         self.primary_key = fields
         identity(:type => String)
         set_callback :save, :before, :identify
+      end
+
+      # Convenience method for determining if we are using +BSON::ObjectIDs+ as
+      # our id.
+      #
+      # Example:
+      #
+      # <tt>person.using_object_ids?</tt>
+      #
+      # Returns:
+      #
+      # true if we are using BSON::ObjectIDs
+      def using_object_ids?
+        _id_type == BSON::ObjectID
       end
     end
   end

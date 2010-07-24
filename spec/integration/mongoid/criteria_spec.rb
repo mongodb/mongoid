@@ -285,18 +285,25 @@ describe Mongoid::Criteria do
   end
 
   describe "#id" do
-    context "with Mongoid.use_object_ids is true" do
+
+    context "when using object ids" do
+
       before :all do
-        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-        Mongoid.use_object_ids = true
+        @@previous_mongoid_use_object_ids = Person._id_type
+        Person.identity :type => BSON::ObjectID
       end
 
       after :all do
-        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+        Person.identity :type => @@previous_mongoid_use_object_ids
       end
 
       before :each do
-        @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
+        @person = Person.create(
+          :title => "Sir",
+          :age => 33,
+          :aliases => ["D", "Durran"],
+          :things => [{:phone => 'HTC Incredible'}]
+        )
       end
 
       it 'should find object with String args' do
@@ -306,21 +313,26 @@ describe Mongoid::Criteria do
       it 'should find object with BSON::ObjectID  args' do
         Person.criteria.id(@person.id).first.should == @person
       end
-
     end
-    context "with Mongoid.use_object_ids is false" do
+
+    context "when not using object ids" do
 
       before :all do
-        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-        Mongoid.use_object_ids = false
+        @@previous_mongoid_use_object_ids = Person._id_type
+        Person.identity :type => String
       end
 
       after :all do
-        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+        Person.identity :type => @@previous_mongoid_use_object_ids
       end
 
       before :each do
-        @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
+        @person = Person.create(
+          :title => "Sir",
+          :age => 33,
+          :aliases => ["D", "Durran"],
+          :things => [{:phone => 'HTC Incredible'}]
+        )
       end
 
       it 'should find object with String args' do
@@ -330,8 +342,6 @@ describe Mongoid::Criteria do
       it 'should not find object with BSON::ObjectID  args' do
         Person.criteria.id(BSON::ObjectID(@person.id)).first.should == nil
       end
-
     end
   end
-
 end

@@ -38,6 +38,38 @@ module Mongoid #:nodoc:
         @options[:cache] == true
       end
 
+      # If the document is using BSON::ObjectIDs the convert the argument to
+      # either an object id or an array of them if the supplied argument is an
+      # Array. Otherwise just return.
+      #
+      # Options:
+      #  args: A +String+ or an +Array+ convert to +BSON::ObjectID+
+      #  cast: A +Boolean+ define if we can or not cast to BSON::ObjectID.
+      #        If false, we use the default type of args
+      #
+      # Example:
+      #
+      # <tt>Mongoid.cast_ids!("4ab2bc4b8ad548971900005c", true)</tt>
+      # <tt>Mongoid.cast_ids!(["4ab2bc4b8ad548971900005c"])</tt>
+      #
+      # Returns:
+      #
+      # If using object ids:
+      #   An +Array+ of +BSON::ObjectID+ of each element if params is an +Array+
+      #   A +BSON::ObjectID+ from params if params is +String+
+      # Otherwise:
+      #   <tt>args</tt>
+      def cast_ids!(args, cast = true)
+        return args if !using_object_ids? || args.is_a?(BSON::ObjectID) || !cast
+        if args.is_a?(String)
+          BSON::ObjectID(args)
+        else
+          args.map{ |a|
+            a.is_a?(BSON::ObjectID) ? a : BSON::ObjectID(a)
+          }
+        end
+      end
+
       # Adds fields to be sorted in descending order. Will add them in the order
       # they were passed into the method.
       #
@@ -102,9 +134,9 @@ module Mongoid #:nodoc:
       def id(*ids)
         ids.flatten!
         if ids.size > 1
-          self.in(:_id => Mongoid.convert_to_object_id(ids, self.klass.primary_key.nil?))
+          self.in(:_id => cast_ids!(ids, self.klass.primary_key.nil?))
         else
-          @selector[:_id] = Mongoid.convert_to_object_id(ids.first, self.klass.primary_key.nil?)
+          @selector[:_id] = cast_ids!(ids.first, self.klass.primary_key.nil?)
         end
         self
       end
@@ -174,7 +206,8 @@ module Mongoid #:nodoc:
         @options[:skip] = value; self
       end
 
-      # Adds a criterion to the +Criteria+ that specifies a type or an Array of type that must be matched.
+      # Adds a criterion to the +Criteria+ that specifies a type or an Array of
+      # type that must be matched.
       #
       # Options:
       #

@@ -7,15 +7,6 @@ describe Mongoid::Config do
     config.reset
   end
 
-  before :all do
-    @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-    Mongoid.use_object_ids = true
-  end
-
-  after :all do
-    Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
-  end
-
   describe "#database=" do
 
     context "when object provided is not a Mongo::DB" do
@@ -66,10 +57,6 @@ describe Mongoid::Config do
 
       it "sets raise_not_found_error" do
         config.raise_not_found_error.should == false
-      end
-
-      it "sets use_object_ids" do
-        config.use_object_ids.should == true
       end
 
       it "returns nil, which is interpreted as the local time_zone" do
@@ -301,37 +288,6 @@ describe Mongoid::Config do
 
   end
 
-  describe "#convert_to_object_id" do
-    before :each do
-      @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-      Mongoid.use_object_ids = true
-    end
-
-    after :each do
-      Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
-    end
-
-    it "should return args if use_object_ids is false" do
-      Mongoid.use_object_ids = false
-      Mongoid.convert_to_object_id("foo").should == "foo"
-    end
-
-    it "should transform args String to BSON::ObjectID if use_object_ids is true" do
-      id = BSON::ObjectID.new
-      Mongoid.convert_to_object_id(id.to_s).should == id
-    end
-
-    it "should transform all String inside Array pass like args if use_object_ids is true" do
-      ids = [BSON::ObjectID.new, BSON::ObjectID.new]
-      Mongoid.convert_to_object_id(ids.map(&:to_s)).should == ids
-    end
-
-    it "should don't change args type if cast args is define to false" do
-      id = BSON::ObjectID.new
-      Mongoid.convert_to_object_id(id.to_s, false).should == id.to_s
-    end
-  end
-
   describe "#reconnect_time" do
 
     it "defaults to 3" do
@@ -399,7 +355,6 @@ describe Mongoid::Config do
       it "sets the value" do
         config.allow_dynamic_fields.should == true
       end
-
     end
 
     context "when setting to false" do
@@ -411,16 +366,6 @@ describe Mongoid::Config do
       it "sets the value" do
         config.allow_dynamic_fields.should == false
       end
-
-    end
-
-  end
-
-  describe "#use_object_ids" do
-
-    it "defaults to false" do
-      config.use_object_ids.should == false
     end
   end
-
 end

@@ -11,7 +11,6 @@ defaults: &defaults
   raise_not_found_error: false
   reconnect_time: 5
   autocreate_indexes: false
-  use_object_ids: true
   persist_types: false
   option_no_exist: false
   skip_version_check: false

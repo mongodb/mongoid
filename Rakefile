@@ -40,17 +40,4 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-namespace :spec do
-  # runs the specs with both MONGOID_USE_OBJECT_IDS setting to both true and false
-  task :all do
-    puts "Running Mongoid tests with MONGOID_USE_OBJECT_IDS as \"true\""
-    ENV["MONGOID_USE_OBJECT_IDS"] = "true"
-    Rake::Task["spec"].execute
-
-    puts "Running Mongoid tests with MONGOID_USE_OBJECT_IDS as \"false\""
-    ENV["MONGOID_USE_OBJECT_IDS"] = "false"
-    Rake::Task["spec"].execute
-  end
-end
-
-task :default => ["spec:all"]
+task :default => ["spec"]

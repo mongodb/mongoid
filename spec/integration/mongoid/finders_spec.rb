@@ -62,12 +62,12 @@ describe Mongoid::Finders do
     context "using object ids" do
 
       before :all do
-        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-        Mongoid.use_object_ids = true
+        @@previous_mongoid_use_object_ids = Person._id_type
+        Person.identity :type => BSON::ObjectID
       end
 
       after :all do
-        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+        Person.identity :type => @@previous_mongoid_use_object_ids
       end
 
       before do
@@ -89,7 +89,6 @@ describe Mongoid::Finders do
           it "returns the document" do
             Person.find(@document.id).should == @document
           end
-
         end
 
         context "when the document is not found" do
@@ -97,9 +96,7 @@ describe Mongoid::Finders do
           it "raises an error" do
             lambda { Person.find(BSON::ObjectID.new) }.should raise_error
           end
-
         end
-
       end
 
       context "with a params in String as an argument" do
@@ -109,7 +106,6 @@ describe Mongoid::Finders do
           it "returns the document" do
             Person.find(@document.id.to_s).should == @document
           end
-
         end
 
         context "when the document is not found" do
@@ -117,9 +113,7 @@ describe Mongoid::Finders do
           it "raises an error" do
             lambda { Person.find("5") }.should raise_error
           end
-
         end
-
       end
 
       context "with an array of ids as args" do
@@ -130,7 +124,6 @@ describe Mongoid::Finders do
             @people = Person.find(@documents.map(&:id))
             @people.should == @documents
           end
-
         end
 
         context "when no documents found" do
@@ -138,7 +131,6 @@ describe Mongoid::Finders do
           it "raises an error" do
             lambda { Person.find(["11", "21", "31"]) }.should raise_error
           end
-
         end
       end
     end
