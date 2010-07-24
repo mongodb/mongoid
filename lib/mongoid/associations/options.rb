@@ -26,14 +26,9 @@ module Mongoid #:nodoc:
         key.to_s
       end
 
-      # Return the foreign key type.
-      def foreign_key_type
-        @attributes[:foreign_key_type] || BSON::ObjectID
-      end
-
       # Returns whether the foreign key column is indexed.
       def index
-        @attributes[:index] || false
+        self[:index] || false
       end
 
       # Returns the name of the inverse_of association

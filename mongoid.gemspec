@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
    _________________________________
   |:::::::::::::::::::::::::::::::::| "I find your lack of faith disturbing."
   |:::::::::::::;;::::::::::::::::::|
-  |:::::::::::'~||~~~``:::::::::::::| This version of Mongoid introduces
+  |:::::::::::'~||~~~``:::::::::::::| Mongoid 2 introduces
   |::::::::'   .':     o`:::::::::::| a different way of defining how
   |:::::::' oo | |o  o    ::::::::::| ids are stored on documents, as
   |::::::: 8  .'.'    8 o  :::::::::| well as how foreign key fields

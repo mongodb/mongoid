@@ -12,7 +12,6 @@ describe Mongoid::Associations::Options do
     it "returns the association storage" do
       @options.stored_as.should == :array
     end
-
   end
 
   describe "#name" do
@@ -25,7 +24,6 @@ describe Mongoid::Associations::Options do
     it "returns the association name" do
       @options.name.should == "addresses"
     end
-
   end
 
   describe "#extend" do
@@ -40,7 +38,6 @@ describe Mongoid::Associations::Options do
       it "returns the proc" do
         @options.extension.should == @attributes[:extend]
       end
-
     end
 
     context "when extension doesnt exist" do
@@ -52,9 +49,7 @@ describe Mongoid::Associations::Options do
       it "returns nil" do
         @options.extension.should be_nil
       end
-
     end
-
   end
 
   describe "extension?" do
@@ -69,7 +64,6 @@ describe Mongoid::Associations::Options do
       it "returns true" do
         @options.extension?.should be_true
       end
-
     end
 
     context "when extension doesnt exist" do
@@ -81,9 +75,7 @@ describe Mongoid::Associations::Options do
       it "returns false" do
         @options.extension?.should be_false
       end
-
     end
-
   end
 
   describe "#foreign_key" do
@@ -109,33 +101,6 @@ describe Mongoid::Associations::Options do
 
       it "returns the custom foreign_key" do
         @options.foreign_key.should == "blog_post_id"
-      end
-    end
-  end
-
-  describe "#foreign_key_type" do
-
-    context "when none defined" do
-
-      before do
-        @attributes = { :name => :posts }
-        @options = Mongoid::Associations::Options.new(@attributes)
-      end
-
-      it "returns BSON::ObjectID" do
-        @options.foreign_key_type.should == BSON::ObjectID
-      end
-    end
-
-    context "when a type defined" do
-
-      before do
-        @attributes = { :name => :posts, :foreign_key_type => Integer }
-        @options = Mongoid::Associations::Options.new(@attributes)
-      end
-
-      it "returns the defined type" do
-        @options.foreign_key_type.should == Integer
       end
     end
   end
@@ -192,7 +157,6 @@ describe Mongoid::Associations::Options do
       it "constantizes the class name" do
         @options.class_name.should == "Person"
       end
-
     end
 
     context "when no class_name provided" do
@@ -207,7 +171,6 @@ describe Mongoid::Associations::Options do
         it "classifies and constantizes the association name" do
           @options.class_name.should == "Person"
         end
-
       end
 
       context "when association name is plural" do
@@ -220,11 +183,8 @@ describe Mongoid::Associations::Options do
         it "classifies and constantizes the association name" do
           @options.class_name.should == "Person"
         end
-
       end
-
     end
-
   end
 
   describe "#klass" do
@@ -249,7 +209,6 @@ describe Mongoid::Associations::Options do
       it "returns the attribute" do
         @options.polymorphic.should be_true
       end
-
     end
 
     context "when attribute not provided" do
@@ -261,9 +220,6 @@ describe Mongoid::Associations::Options do
       it "returns false" do
         @options.polymorphic.should be_false
       end
-
     end
-
   end
-
 end
