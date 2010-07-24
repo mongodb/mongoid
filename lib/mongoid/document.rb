@@ -5,12 +5,8 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor :primary_key
-
       attr_accessor :association_name
       attr_reader :new_record
-
-      delegate :primary_key, :to => "self.class"
 
       unless self.instance_of?(Class) and self.name == ""
         (@@descendants ||= {})[self] = :seen
@@ -46,22 +42,6 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Defines the field that will be used for the id of this +Document+. This
-      # set the id of this +Document+ before save to a parameterized version of
-      # the field that was supplied. This is good for use for readable URLS in
-      # web applications.
-      #
-      # Example:
-      #
-      #   class Person
-      #     include Mongoid::Document
-      #     key :first_name, :last_name
-      #   end
-      def key(*fields)
-        self.primary_key = fields
-        set_callback :save, :before, :identify
-      end
-
       # Returns the classes that have included Mongoid::Document
       def self.descendents
         (@@descendants ||= {}).keys
@@ -88,8 +68,13 @@ module Mongoid #:nodoc:
       self == (comparison_object)
     end
 
-    # Delegates to id in order to allow two records of the same type and id to work with something like:
-    #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
+    # Delegates to id in order to allow two records of the same type and id to
+    # work with something like:
+    #   [ Person.find(1),
+    #     Person.find(2),
+    #     Person.find(3) ] &
+    #   [ Person.find(1),
+    #     Person.find(4) ] # => [ Person.find(1) ]
     def hash
       id.hash
     end

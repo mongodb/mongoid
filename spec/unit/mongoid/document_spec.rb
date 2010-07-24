@@ -338,9 +338,7 @@ describe Mongoid::Document do
         it "sets the primary key" do
           @address.id.should == "test"
         end
-
       end
-
     end
 
     context "without a type specified" do
@@ -348,9 +346,7 @@ describe Mongoid::Document do
       it "sets the type" do
         Person.new._type.should == "Person"
       end
-
     end
-
   end
 
   describe ".instantiate" do
@@ -376,50 +372,6 @@ describe Mongoid::Document do
       it "sets the attributes directly" do
         person = Person.instantiate(nil)
         person.id.should_not be_nil
-      end
-
-    end
-
-  end
-
-  describe ".key" do
-
-    context "when key is single field" do
-
-      before do
-        Address.key :street
-        @address = Address.new(:street => "Testing Street Name")
-      end
-
-      it "adds the callback for primary key generation" do
-        @address.run_callbacks(:save)
-        @address.id.should == "testing-street-name"
-      end
-
-    end
-
-    context "when key is composite" do
-
-      before do
-        Address.key :street, :post_code
-        @address = Address.new(:street => "Testing Street Name", :post_code => "94123")
-      end
-
-      it "combines all fields" do
-        @address.run_callbacks(:save)
-        @address.id.should == "testing-street-name-94123"
-      end
-
-    end
-
-    context "when key is on a subclass" do
-
-      before do
-        Firefox.key :name
-      end
-
-      it "sets the key for the entire hierarchy" do
-        Canvas.primary_key.should == [:name]
       end
 
     end
