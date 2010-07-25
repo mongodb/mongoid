@@ -457,7 +457,7 @@ describe Mongoid::Document do
       end
 
       it "always persists" do
-        @comment.save(false).should be_true
+        @comment.save(:validate => false).should be_true
         @from_db = Comment.find(@comment.id)
         @from_db.should == @comment
       end

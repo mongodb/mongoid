@@ -19,6 +19,7 @@ module Mongoid #:nodoc:
   # <tt>document.upsert</tt>
   module Persistence
     extend ActiveSupport::Concern
+
     # Remove the +Document+ from the datbase with callbacks.
     #
     # Example:
@@ -36,8 +37,9 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.insert</tt>
-    def insert(validate = true)
-      Insert.new(self, validate).persist
+    def insert(options = {})
+      validate = options[:validate]
+      Insert.new(self, (validate.nil? ? true : validate)).persist
     end
 
     # Remove the +Document+ from the datbase.
@@ -73,8 +75,9 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.update</tt>
-    def update(validate = true)
-      Update.new(self, validate).persist
+    def update(options = {})
+      validate = options[:validate]
+      Update.new(self, (validate.nil? ? true : validate)).persist
     end
 
     # Update the +Document+ attributes in the datbase.
@@ -116,12 +119,11 @@ module Mongoid #:nodoc:
     # Returns:
     #
     # A +Boolean+ for updates.
-    def upsert(validate = true)
-      validate = parse_validate(validate)
+    def upsert(options = {})
       if new_record?
-        insert(validate).persisted?
+        insert(options).persisted?
       else
-        update(validate)
+        update(options)
       end
     end
 
@@ -132,15 +134,6 @@ module Mongoid #:nodoc:
     #
     # <tt>document.save</tt>
     alias :save :upsert
-
-    protected
-    # Alternative validation params.
-    def parse_validate(validate)
-      if validate.is_a?(Hash) && validate.has_key?(:validate)
-        validate = validate[:validate]
-      end
-      validate
-    end
 
     module ClassMethods #:nodoc:
 
