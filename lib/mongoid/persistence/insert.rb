@@ -38,7 +38,10 @@ module Mongoid #:nodoc:
       # Insert the document into the database.
       def insert
         if @document.embedded?
-          Persistence::InsertEmbedded.new(@document, @validate).persist
+          Persistence::InsertEmbedded.new(
+            @document,
+            @options.merge(:validate => @validate)
+          ).persist
         else
           @collection.insert(@document.raw_attributes, @options)
         end

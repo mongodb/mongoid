@@ -25,8 +25,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.destroy</tt>
-    def destroy
-      run_callbacks(:destroy) { self.destroyed = true if _remove }
+    def destroy(options = {})
+      run_callbacks(:destroy) { self.destroyed = true if _remove(options) }
     end
 
     # Insert a new +Document+ into the database. Will return the document
@@ -36,8 +36,7 @@ module Mongoid #:nodoc:
     #
     # <tt>document.insert</tt>
     def insert(options = {})
-      validate = options[:validate]
-      Insert.new(self, (validate.nil? ? true : validate)).persist
+      Insert.new(self, options).persist
     end
 
     # Remove the +Document+ from the datbase.
@@ -47,8 +46,8 @@ module Mongoid #:nodoc:
     # <tt>document._remove</tt>
     #
     # TODO: Will get rid of other #remove once observable pattern killed.
-    def _remove
-      Remove.new(self).persist
+    def _remove(options = {})
+      Remove.new(self, options).persist
     end
 
     alias :delete :_remove
@@ -74,8 +73,7 @@ module Mongoid #:nodoc:
     #
     # <tt>document.update</tt>
     def update(options = {})
-      validate = options[:validate]
-      Update.new(self, (validate.nil? ? true : validate)).persist
+      Update.new(self, options).persist
     end
 
     # Update the +Document+ attributes in the datbase.
@@ -177,7 +175,7 @@ module Mongoid #:nodoc:
       def delete_all(conditions = {})
         RemoveAll.new(
           self,
-          false,
+          { :validate => false },
           conditions[:conditions] || {}
         ).persist
       end

@@ -80,7 +80,10 @@ describe Mongoid::Persistence::Remove do
       end
 
       it "delegates to the embedded persister" do
-        Mongoid::Persistence::RemoveEmbedded.expects(:new).with(address, true).returns(persister)
+        Mongoid::Persistence::RemoveEmbedded.expects(:new).with(
+          address,
+          { :validate => true, :safe => true }
+        ).returns(persister)
         persister.expects(:persist).returns(true)
         remove.persist.should == true
       end

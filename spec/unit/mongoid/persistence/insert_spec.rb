@@ -135,7 +135,10 @@ describe Mongoid::Persistence::Insert do
       end
 
       it "delegates to the embedded persister" do
-        Mongoid::Persistence::InsertEmbedded.expects(:new).with(address, true).returns(persister)
+        Mongoid::Persistence::InsertEmbedded.expects(:new).with(
+          address,
+          { :validate => true, :safe => true }
+        ).returns(persister)
         persister.expects(:persist).returns(address)
         insert.persist.should == address
       end
