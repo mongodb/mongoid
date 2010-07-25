@@ -128,6 +128,11 @@ describe Mongoid::Document do
 
       before do
         @person = Person.create(:title => "Sir")
+        Mongoid.persist_in_safe_mode = true
+      end
+
+      after do
+        Mongoid.persist_in_safe_mode = false
       end
 
       it "deletes the document" do

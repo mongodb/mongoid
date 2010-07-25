@@ -194,7 +194,7 @@ module Mongoid #:nodoc
     def reset
       @allow_dynamic_fields = true
       @parameterize_keys = true
-      @persist_in_safe_mode = true
+      @persist_in_safe_mode = false
       @raise_not_found_error = true
       @reconnect_time = 3
       @autocreate_indexes = false

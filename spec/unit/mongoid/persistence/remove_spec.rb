@@ -48,7 +48,7 @@ describe Mongoid::Persistence::Remove do
       lambda {
         collection.expects(:remove).with(
           { :_id => document.id },
-          :safe => true
+          :safe => false
         ).returns(true)
       }
     end
@@ -82,7 +82,7 @@ describe Mongoid::Persistence::Remove do
       it "delegates to the embedded persister" do
         Mongoid::Persistence::RemoveEmbedded.expects(:new).with(
           address,
-          { :validate => true, :safe => true }
+          { :validate => true, :safe => false }
         ).returns(persister)
         persister.expects(:persist).returns(true)
         remove.persist.should == true

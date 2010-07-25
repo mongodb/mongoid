@@ -50,7 +50,7 @@ describe Mongoid::Persistence::RemoveAll do
 
     def root_delete_expectation
       lambda {
-        collection.expects(:remove).with(selector, :safe => true).returns(true)
+        collection.expects(:remove).with(selector, :safe => false).returns(true)
       }
     end
 

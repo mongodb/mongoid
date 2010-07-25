@@ -54,7 +54,7 @@ describe Mongoid::Persistence::Update do
           { "_id" => document.id },
           { "$set" => document.setters },
           :multi => false,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -65,7 +65,7 @@ describe Mongoid::Persistence::Update do
           { "_id" => document.id, "addresses._id" => address.id },
           { "$set" => address.setters },
           :multi => false,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -76,7 +76,7 @@ describe Mongoid::Persistence::Update do
           { "_id" => root_category.id, "categories._id" => category.id, "categories.0.categories._id" => leaf_category.id },
           { "$set" => leaf_category.setters },
           :multi => false,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end

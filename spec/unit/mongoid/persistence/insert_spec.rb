@@ -48,7 +48,7 @@ describe Mongoid::Persistence::Insert do
       lambda {
         collection.expects(:insert).with(
           document.raw_attributes,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -58,7 +58,7 @@ describe Mongoid::Persistence::Insert do
         collection.expects(:update).with(
           { "_id" => document.id },
           { "addresses" => { "$push" => address.raw_attributes } },
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -137,7 +137,7 @@ describe Mongoid::Persistence::Insert do
       it "delegates to the embedded persister" do
         Mongoid::Persistence::InsertEmbedded.expects(:new).with(
           address,
-          { :validate => true, :safe => true }
+          { :validate => true, :safe => false }
         ).returns(persister)
         persister.expects(:persist).returns(address)
         insert.persist.should == address
