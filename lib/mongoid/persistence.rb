@@ -25,8 +25,6 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.destroy</tt>
-    #
-    # TODO: Will get rid of other #destroy once new persistence complete.
     def destroy
       run_callbacks(:destroy) { self.destroyed = true if _remove }
     end

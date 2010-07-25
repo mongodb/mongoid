@@ -24,6 +24,7 @@ module Mongoid #:nodoc
       include Mongoid::Memoization
       include Mongoid::Paths
       include Mongoid::Persistence
+      include Mongoid::Safety
       include Mongoid::State
       include Mongoid::Validations
       include Mongoid::Callbacks

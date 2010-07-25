@@ -43,7 +43,6 @@ describe Mongoid::Document do
       @from_db = Person.find(@person.id)
       @from_db.map.should == @map
     end
-
   end
 
   describe ".collection" do
@@ -53,13 +52,11 @@ describe Mongoid::Document do
       it "returns the root document collection" do
         Browser.collection.should == Canvas.collection
       end
-
     end
 
     context "on a namespaced document" do
       Medical::Patient.collection.name.should == "medical_patients"
     end
-
   end
 
   describe "#new" do
@@ -68,7 +65,6 @@ describe Mongoid::Document do
       person = Person.new
       person.collection.should be_a_kind_of(Mongoid::Collection)
     end
-
   end
 
   describe "#count" do
@@ -82,7 +78,6 @@ describe Mongoid::Document do
     it "returns the count" do
       Person.count.should == 5
     end
-
   end
 
   describe "#create" do
@@ -108,9 +103,7 @@ describe Mongoid::Document do
         person = Person.find(@person.id)
         person.addresses.first.street.should == "Nan Jing Dong Lu"
       end
-
     end
-
   end
 
   context "chaining criteria scopes" do
@@ -127,7 +120,6 @@ describe Mongoid::Document do
       people.count.should == 1
       people.first.should == @two
     end
-
   end
 
   context "#destroy" do
@@ -148,7 +140,6 @@ describe Mongoid::Document do
         @person.destroy
         @person.should be_destroyed
       end
-
     end
 
     context "on an embedded document" do
@@ -167,9 +158,7 @@ describe Mongoid::Document do
         @person.addresses.first.should be_nil
         @person.name.should be_nil
       end
-
     end
-
   end
 
   context ".find_or_create_by" do
@@ -183,7 +172,6 @@ describe Mongoid::Document do
       it "returns the document" do
         Person.find_or_create_by(:title => "Senior").should == @person
       end
-
     end
 
     context "when the document is not found" do
@@ -193,9 +181,7 @@ describe Mongoid::Document do
         person.title.should == "Senorita"
         person.should_not be_a_new_record
       end
-
     end
-
   end
 
   context ".find_or_initialize_by" do
@@ -209,7 +195,6 @@ describe Mongoid::Document do
       it "returns the document" do
         Person.find_or_initialize_by(:title => "Senior").should == @person
       end
-
     end
 
     context "when the document is not found" do
@@ -219,9 +204,7 @@ describe Mongoid::Document do
         person.title.should == "Senorita"
         person.should be_a_new_record
       end
-
     end
-
   end
 
   describe "#find" do
@@ -236,7 +219,6 @@ describe Mongoid::Document do
         documents = Person.find(:all, :conditions => { :title => "Test"})
         documents.first.title.should == "Test"
       end
-
     end
 
     context "finding first document" do
@@ -245,7 +227,6 @@ describe Mongoid::Document do
         person = Person.find(:first, :conditions => { :title => "Test" })
         person.title.should == "Test"
       end
-
     end
 
     context "finding by id" do
@@ -254,7 +235,6 @@ describe Mongoid::Document do
         person = Person.find(@person.id)
         person.id.should == @person.id
       end
-
     end
 
     context "limiting result fields" do
@@ -263,9 +243,7 @@ describe Mongoid::Document do
         people = Person.all(:fields => [ :title ])
         people.first.title.should == "Test"
       end
-
     end
-
   end
 
   describe "#group" do
@@ -283,7 +261,6 @@ describe Mongoid::Document do
       person.should be_a_kind_of(Person)
       person.title.should == "Sir"
     end
-
   end
 
   context "when address is a has one" do
@@ -303,7 +280,6 @@ describe Mongoid::Document do
       @from_db = PetOwner.find(@owner.id)
       @from_db.address.should == @address
     end
-
   end
 
   describe "#inspect" do
@@ -355,7 +331,6 @@ describe Mongoid::Document do
       @criteria = Mongoid::Criteria.translate(Person, { :per_page => 5, :page => 1 })
       @criteria.count.should == 10
     end
-
   end
 
   describe "#reload" do
@@ -447,7 +422,6 @@ describe Mongoid::Document do
         person = Person.find(@person.id)
         person.name.first_name.should == @name.first_name
       end
-
     end
 
     context "without validation" do
@@ -461,7 +435,6 @@ describe Mongoid::Document do
         @from_db = Comment.find(@comment.id)
         @from_db.should == @comment
       end
-
     end
 
     context "with failing validation" do
@@ -473,9 +446,7 @@ describe Mongoid::Document do
       it "returns false" do
         @comment.should_not be_valid
       end
-
     end
-
   end
 
   context ".store_in" do
@@ -489,7 +460,6 @@ describe Mongoid::Document do
       Canvas.store_in(:browsers)
       Canvas.collection.name.should == "browsers"
     end
-
   end
 
   context "when has many exists through a has one" do
@@ -507,7 +477,6 @@ describe Mongoid::Document do
       @owner.pet.vet_visits.clear
       @owner.pet.vet_visits.size.should == 0
     end
-
   end
 
   context "the lot" do
@@ -536,7 +505,6 @@ describe Mongoid::Document do
         person = Person.first(:conditions => { :title => "Sir" })
         person.should == @person
       end
-
     end
 
     context "when saving on an embeds_many" do
@@ -550,7 +518,6 @@ describe Mongoid::Document do
         person.should == @person
       end
     end
-
   end
 
   context "setting embedded_in" do
@@ -566,7 +533,6 @@ describe Mongoid::Document do
       @address.save!
       @person.addresses.first.should == @address
     end
-
   end
 
   describe "#to_json" do
@@ -582,7 +548,6 @@ describe Mongoid::Document do
       it "returns the json string" do
         @person.to_json.should include('"pets":false')
       end
-
     end
 
     context "on a persisted document" do
@@ -592,9 +557,7 @@ describe Mongoid::Document do
         from_db = Person.find(@person.id)
         from_db.to_json.should include('"pets":false')
       end
-
     end
-
   end
 
   describe "#as_json" do
@@ -610,7 +573,6 @@ describe Mongoid::Document do
       it "returns the document (not sure why ActiveModel behaves like this)" do
         @person.as_json.should == @person
       end
-
     end
 
     context "on a persisted document" do
@@ -620,9 +582,7 @@ describe Mongoid::Document do
         from_db = Person.find(@person.id)
         from_db.as_json.should == from_db
       end
-
     end
-
   end
 
   describe "#encode_json" do
@@ -639,7 +599,6 @@ describe Mongoid::Document do
       it "returns the attributes" do
         @person.encode_json(@encoder).should include('"pets":false')
       end
-
     end
 
     context "on a persisted document" do
@@ -649,9 +608,7 @@ describe Mongoid::Document do
         from_db = Person.find(@person.id)
         from_db.encode_json(@encoder).should include('"pets":false')
       end
-
     end
-
   end
 
   context "typecasting" do
@@ -666,7 +623,6 @@ describe Mongoid::Document do
       person = Person.first
       person.dob.should == @date
     end
-
   end
 
   context "versioning" do
@@ -689,7 +645,6 @@ describe Mongoid::Document do
         @from_db.versions.size.should == 1
         @from_db.version.should == 2
       end
-
     end
 
     context "multiple saves" do
@@ -705,9 +660,7 @@ describe Mongoid::Document do
         @from_db.version.should == 6
         @from_db.versions.size.should == 5
       end
-
     end
-
   end
 
   context "executing criteria with date comparisons" do
@@ -737,9 +690,6 @@ describe Mongoid::Document do
         people = Person.where(:dob => { "$lt" => Date.today.midnight })
         people.first.should == @person
       end
-
     end
-
   end
-
 end
