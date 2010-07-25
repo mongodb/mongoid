@@ -63,7 +63,7 @@ module Mongoid #:nodoc:
     # Returns:
     #
     # +true+ if validation passed, will raise error otherwise.
-    def save!
+    def save!(options = {})
       self.class.fail_validate!(self) unless upsert; true
     end
 
