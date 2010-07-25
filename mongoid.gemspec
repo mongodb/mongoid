@@ -61,7 +61,18 @@ Gem::Specification.new do |s|
   |  88P  888   d8P   ' 888         | associations no longer index by
   |   8  d88P.'d:8  .- dP~ o8       | default - you will need to pass
   |      888   888    d~ o888    LS | :index => true to the association
-  |_________________________________| definition to have the field indexed.
+  |_________________________________| definition to have the field indexed
+
+  or create the index manually, which is the preferred method. Note that
+  if you were using String ids and now want to use object ids instead you
+  will have to migrate your database manually - Mongoid cannot perform
+  this for you automatically. If you were using custom composite keys,
+  these will need to be defined as Strings since they cannot be converted.
+
+  Please see the following gist for assistance in migrating the database
+  via the Ruby driver (thanks to Kyle Banker):
+
+  http://gist.github.com/489098
 
   POST_INSTALL_MESSAGE
 end
