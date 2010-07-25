@@ -3,7 +3,7 @@ namespace :db do
   if not Rake::Task.task_defined?("db:drop")
     desc 'Drops all the collections for the database for the current Rails.env'
     task :drop => :environment do
-      Mongoid.master.collections.each{|col| col.drop unless col.name == 'system.users' || col.name == "system.indexes" }
+      Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     end
   end
 

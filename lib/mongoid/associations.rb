@@ -245,6 +245,19 @@ module Mongoid # :nodoc:
         association = associations[name.to_s]
       end
 
+      # Returns all association meta data for the provided type.
+      #
+      # Options:
+      #
+      # macro: The association macro.
+      #
+      # Example:
+      #
+      # <tt>Person.reflect_on_all_associations(:embeds_many)</tt>
+      def reflect_on_all_associations(macro)
+        associations.values.select { |meta| meta.macro == macro }
+      end
+
       protected
       # Adds the association to the associations hash with the type as the key,
       # then adds the accessors for the association. The defined setters and

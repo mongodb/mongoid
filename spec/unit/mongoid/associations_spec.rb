@@ -477,10 +477,18 @@ describe Mongoid::Associations do
 
   describe ".reflect_on_association" do
 
-    it "returns the association class for the name" do
+    it "returns the association meta data for the name" do
       Person.reflect_on_association(:addresses).macro.should == :embeds_many
     end
 
+  end
+
+  describe ".reflect_on_all_associations" do
+
+    it "returns all meta data for the supplied type" do
+      associations = Person.reflect_on_all_associations(:embeds_many)
+      associations.size.should == 4
+    end
   end
 
   describe ".referenced_in" do
