@@ -858,11 +858,6 @@ describe Mongoid::Criteria do
       it { should be_true }
     end
 
-    context "when the other object is a Scope" do
-      subject { Mongoid::Criteria === Mongoid::Scope.allocate }
-      it { should be_true }
-    end
-
     context "when the other object is not compatible" do
       subject { Mongoid::Criteria === [] }
       it { should be_false }

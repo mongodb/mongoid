@@ -149,19 +149,18 @@ module Mongoid #:nodoc:
         extends(options)
       end
 
-
-
       # If the target array does not respond to the supplied method then try to
       # find a named scope or criteria on the class and send the call there.
       #
       # If the method exists on the array, use the default proxy behavior.
       def method_missing(name, *args, &block)
-        unless @target.respond_to?(name)
-          object = @klass.send(name, *args)
-          object.documents = @target
-          return object
+        if @target.respond_to?(name)
+          super
+        else
+          @klass.send(:with_scope, criteria) do
+            object = @klass.send(name, *args)
+          end
         end
-        super
       end
 
       # Used for setting associations via a nested attributes setter from the
@@ -240,6 +239,14 @@ module Mongoid #:nodoc:
         criteria.each do |doc|
           @target.delete(doc); doc.send(method)
         end; count
+      end
+
+      # Returns the criteria object for the target class with its documents set
+      # to @target.
+      def criteria
+        criteria = @klass.criteria
+        criteria.documents = @target
+        criteria
       end
 
       class << self
