@@ -57,9 +57,7 @@ namespace :db do
   if not Rake::Task.task_defined?("db:create_indexes")
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
-      Mongoid::Document.descendants.each do |model|
-        model.create_indexes
-      end
+      ::Rails::Mongoid.index_children(Mongoid::Document.descendants)
     end
   end
 

@@ -1,6 +1,9 @@
-require "singleton"
-require "rails"
+# encoding: utf-8
 require "mongoid/config"
+require "rails"
+require "rails/mongoid"
+require "singleton"
+
 module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
@@ -50,6 +53,9 @@ module Rails #:nodoc:
         end
       end
 
+      # After initialization we will attempt to connect to the database, if
+      # we get an exception and can't find a mongoid.yml we will alert the user
+      # to generate one.
       initializer "verify that mongoid is configured" do
         config.after_initialize do
           begin
@@ -63,8 +69,20 @@ module Rails #:nodoc:
         end
       end
 
+      # Due to all models not getting loaded and messing up inheritance queries
+      # and indexing, we need to preload the models in order to address this.
+      #
+      # This will happen every request in development, once in ther other
+      # environments.
+      initializer "preload all application models" do |app|
+        config.to_prepare do
+          ::Rails::Mongoid.load_models(app)
+        end
+      end
+
       initializer "reconnect to master if application is preloaded" do
         config.after_initialize do
+
           # Unicorn clears the START_CTX when a worker is forked, so if we have
           # data in START_CTX then we know we're being preloaded. Unicorn does
           # not provide application-level hooks for executing code after the

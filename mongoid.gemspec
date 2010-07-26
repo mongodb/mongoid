@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("bson_ext", ["~>1.0.4"])
   s.add_development_dependency("mocha", ["= 0.9.8"])
-  s.add_development_dependency("rspec", ["= 2.0.0.beta.16"])
+  s.add_development_dependency("rspec", ["= 2.0.0.beta.19"])
   s.add_development_dependency("watchr", ["= 0.6"])
 
   s.files        = Dir.glob("lib/**/*") + %w(MIT_LICENSE README.rdoc)

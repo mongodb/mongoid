@@ -13,9 +13,15 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Returns all classes that have included Mongoid::Document
-    def self.descendants
-      (@@descendants ||= {}).keys
+    class << self
+
+      # Returns all classes that have included Mongoid::Document.
+      #
+      # This will not get subclasses of the top level models, for those we will
+      # use Class.descendents in the rake task for indexes.
+      def descendants
+        (@@descendants ||= {}).keys
+      end
     end
 
     module ClassMethods #:nodoc:
