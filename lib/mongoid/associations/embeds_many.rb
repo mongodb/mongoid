@@ -123,7 +123,7 @@ module Mongoid #:nodoc:
       # Array or single Document.
       def find(param)
         return @target if param == :all
-        return detect { |document| document.id == param }
+        criteria.id(param).first
       end
 
       # Creates the new association by finding the attributes in
