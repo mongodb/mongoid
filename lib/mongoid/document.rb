@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
     end
 
     # Returns all classes that have included Mongoid::Document
-    def self.descendents
+    def self.descendants
       (@@descendants ||= {}).keys
     end
 
