@@ -310,8 +310,16 @@ describe Mongoid::Criteria do
         Person.criteria.id(@person.id.to_s).first.should == @person
       end
 
-      it 'should find object with BSON::ObjectID  args' do
+      it 'should find object with BSON::ObjectID args' do
         Person.criteria.id(@person.id).first.should == @person
+      end
+
+      it 'should allow a query with nil' do
+        Person.criteria.id(nil).first.should be_nil
+      end
+
+      it 'should allow a string with an invalid ObjectId format' do
+        Person.criteria.id("asdf").first.should be_nil
       end
     end
 
@@ -342,6 +350,11 @@ describe Mongoid::Criteria do
       it 'should not find object with BSON::ObjectID  args' do
         Person.criteria.id(BSON::ObjectID(@person.id)).first.should == nil
       end
+
+      it 'should allow a query with nil' do
+        Person.criteria.id(nil).first.should be_nil
+      end
+
     end
   end
 end
