@@ -13,6 +13,11 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Returns all classes that have included Mongoid::Document
+    def self.descendents
+      (@@descendants ||= {}).keys
+    end
+
     module ClassMethods #:nodoc:
 
       # Perform default behavior but mark the hierarchy as being hereditary.
@@ -40,11 +45,6 @@ module Mongoid #:nodoc:
         else
           return new(attrs)
         end
-      end
-
-      # Returns the classes that have included Mongoid::Document
-      def self.descendents
-        (@@descendants ||= {}).keys
       end
 
       # Returns all types to query for when using this class as the base.
