@@ -166,7 +166,7 @@ module Mongoid #:nodoc
       _master(settings)
       _slaves(settings)
       settings.except("database", "slaves").each_pair do |name, value|
-        send("#{name}=", value) if respond_to?(name)
+        send("#{name}=", value) if respond_to?("#{name}=")
       end
     end
 
