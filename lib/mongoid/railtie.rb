@@ -1,8 +1,8 @@
 # encoding: utf-8
+require "singleton"
 require "mongoid/config"
 require "rails"
 require "rails/mongoid"
-require "singleton"
 
 module Rails #:nodoc:
   module Mongoid #:nodoc:
