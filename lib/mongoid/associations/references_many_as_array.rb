@@ -32,6 +32,7 @@ module Mongoid #:nodoc:
             end
           end
           @target << object
+          object.save unless @parent.new_record?
         end
       end
 

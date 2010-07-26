@@ -52,6 +52,12 @@ describe Mongoid::Associations::ReferencesManyAsArray do
             person.preference_ids.should include(preference.id)
           end
 
+          it "doesn't save the child document" do
+            child = Preference.new(:name => "Saturation")
+            child.expects(:save).never
+            @association << child
+          end
+
           if inverse_of
             it "adds the reverse association id" do
               preference.person_ids.should include(person.id)
@@ -83,6 +89,12 @@ describe Mongoid::Associations::ReferencesManyAsArray do
 
           it "adds the id to the association ids" do
             person.preference_ids.should include(preference.id)
+          end
+
+          it "saves the child document" do
+            child = Preference.new(:name => "Saturation")
+            child.expects(:save).returns(true)
+            @association << child
           end
 
           if inverse_of
