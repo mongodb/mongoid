@@ -350,13 +350,54 @@ describe Mongoid::Associations::EmbedsMany do
 
     context "when finding by id" do
 
-      it "returns the document in the array with that id" do
-        address = @association.find("street-2")
-        address.should_not be_nil
+      context "when using string ids" do
+
+        it "returns the document in the array with that id" do
+          address = @association.find("street-2")
+          address.should_not be_nil
+        end
       end
 
-    end
+      context "when using object ids" do
 
+        let(:document) do
+          Person.new
+        end
+
+        let(:association) do
+          Mongoid::Associations::EmbedsMany.new(
+            document,
+            Mongoid::Associations::Options.new(:name => :favorites)
+          )
+        end
+
+        before do
+          @favorite = Favorite.new(:title => "Test")
+        end
+
+        context "when passed an object id" do
+
+          before do
+            association << @favorite
+          end
+
+          it "finds using the object id" do
+            association.find(@favorite.id).should == @favorite
+          end
+        end
+
+        context "when passed a string" do
+
+          before do
+            association << @favorite
+          end
+
+          it "finds using the object id" do
+            association.find(@favorite.id.to_s).should == @favorite
+          end
+        end
+      end
+    end
   end
 
   describe "#first" do
