@@ -12,9 +12,9 @@ module Mongoid #:nodoc
       # Send the actual index creation comments to the MongoDB driver
       def create_indexes
         return unless index_options
-
+        current_collection = self._collection || set_collection
         index_options.each do |name, options|
-          self._collection.create_index(name, options)
+          current_collection.create_index(name, options)
         end
       end
 
@@ -30,6 +30,7 @@ module Mongoid #:nodoc
       # Adds an index on the field specified. Options can be :unique => true or
       # :unique => false. It will default to the latter.
       def index(name, options = { :unique => false })
+        puts "autocreate_indexes: #{Mongoid.autocreate_indexes}"
         self.index_options[name] = options
         create_indexes if Mongoid.autocreate_indexes
       end
