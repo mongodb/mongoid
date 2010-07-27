@@ -25,7 +25,7 @@ module Rails #:nodoc:
         children.each do |model|
           Logger.new($stdout).info("Generating indexes for #{model}")
           model.create_indexes
-          index_children(model.descendents)
+          index_children(model.descendants)
         end
       end
     end
