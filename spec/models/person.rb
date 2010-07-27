@@ -15,7 +15,7 @@ class Person
   field :score, :type => Integer
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :ssn
-  field :owner_id, :accessible => false, :type => Integer
+  field :owner_id, :type => Integer
   field :security_code
 
   index :age
@@ -27,7 +27,7 @@ class Person
 
   attr_reader :rescored
 
-  attr_protected :security_code
+  attr_protected :security_code, :owner_id
 
   embeds_many :favorites
   embeds_many :videos
