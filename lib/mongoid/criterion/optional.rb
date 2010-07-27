@@ -63,10 +63,12 @@ module Mongoid #:nodoc:
         return args if !using_object_ids? || args.is_a?(BSON::ObjectID) || !cast
         if args.is_a?(String)
           BSON::ObjectID(args)
-        else
+        elsif args.is_a?(Array)
           args.map{ |a|
             a.is_a?(BSON::ObjectID) ? a : BSON::ObjectID(a)
           }
+        else
+          args
         end
       end
 

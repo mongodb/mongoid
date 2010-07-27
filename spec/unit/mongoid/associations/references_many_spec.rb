@@ -415,15 +415,15 @@ describe Mongoid::Associations::ReferencesMany do
     end
 
     it "should update existing documents" do
-      @association.expects(:find).with(0).returns(@first)
-      @association.nested_build({ "0" => { :title => "Yet Another" } })
+      @association.expects(:find).with("0").returns(@first)
+      @association.nested_build({ "0" => { "id" => "0", "title" => "Yet Another" } })
       @association.size.should == 2
       @association[0].title.should == "Yet Another"
     end
 
     it "should create new documents" do
-      @association.expects(:find).with(2).raises(Mongoid::Errors::DocumentNotFound.new(Post, 2))
-      @association.nested_build({ "2" => { :title => "Yet Another" } })
+      @association.expects(:find).with(nil).raises(Mongoid::Errors::DocumentNotFound.new(Post, nil))
+      @association.nested_build({ "2" => { "title" => "Yet Another" } })
       @association.size.should == 3
       @association[2].title.should == "Yet Another"
     end
