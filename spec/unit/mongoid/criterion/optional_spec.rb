@@ -259,12 +259,12 @@ describe Mongoid::Criterion::Optional do
     context "with not using object ids" do
 
       before do
-        @@previous_id_type = Person._id_type
+        @previous_id_type = Person._id_type
         Person.identity :type => String
       end
 
       after do
-        Person.identity :type => @@previous_id_type
+        Person.identity :type => @previous_id_type
       end
 
       context "when passing a single id" do
@@ -328,12 +328,12 @@ describe Mongoid::Criterion::Optional do
     context "when using object ids" do
 
       before do
-        @@previous_id_type = Person._id_type
+        @previous_id_type = Person._id_type
         Person.identity :type => BSON::ObjectID
       end
 
       after do
-        Person.identity :type => @@previous_id_type
+        Person.identity :type => @previous_id_type
       end
 
       context "when passing a single id" do
