@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
       def <<(*objects)
         load_target
         objects.flatten.each do |object|
-          object.send("#{@foreign_key}=", @parent.id)
+          object.write_attribute(@foreign_key, @parent.id)
           @target << object
           object.save unless @parent.new_record?
         end

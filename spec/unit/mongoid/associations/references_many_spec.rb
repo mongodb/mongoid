@@ -35,7 +35,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "saves and appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @child.expects(:save).returns(true)
         @association << @child
         @association.size.should == 1
@@ -54,7 +54,7 @@ describe Mongoid::Associations::ReferencesMany do
         end
 
         it "appends the child document" do
-          @child.expects(:person_id=).with(@parent.id)
+          @child.expects(:write_attribute).with('person_id', @parent.id)
           @association << @child
           @association.size.should == 1
         end
@@ -71,7 +71,7 @@ describe Mongoid::Associations::ReferencesMany do
 
         it "appends the child document" do
           @criteria.expects(:entries).returns([])
-          @child.expects(:person_id=).with(@parent.id)
+          @child.expects(:write_attribute).with('person_id', @parent.id)
           @association << @child
           @association.size.should == 1
         end
@@ -88,8 +88,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child documents" do
-        @child.expects(:person_id=).with(@parent.id)
-        @second.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
+        @second.expects(:write_attribute).with('person_id', @parent.id)
         @association << [@child, @second]
         @association.size.should == 2
       end
@@ -184,7 +184,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "saves and appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @child.expects(:save).returns(true)
         @association.concat(@child)
         @association.size.should == 1
@@ -201,7 +201,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @association.concat(@child)
         @association.size.should == 1
       end
@@ -217,8 +217,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child documents" do
-        @child.expects(:person_id=).with(@parent.id)
-        @second.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
+        @second.expects(:write_attribute).with('person_id', @parent.id)
         @association.concat([@child, @second])
         @association.size.should == 2
       end
@@ -446,7 +446,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "saves and appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @child.expects(:save).returns(true)
         @association.push(@child)
         @association.size.should == 1
@@ -463,7 +463,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @association.push(@child)
         @association.size.should == 1
       end
@@ -479,8 +479,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child documents" do
-        @child.expects(:person_id=).with(@parent.id)
-        @second.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
+        @second.expects(:write_attribute).with('person_id', @parent.id)
         @association.push(@child, @second)
         @association.size.should == 2
       end
