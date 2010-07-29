@@ -9,6 +9,12 @@ module Mongoid #:nodoc:
         self.merge!(attributes)
       end
 
+      # For relational associations we want to know if we cascade deletes or
+      # destroys to associations.
+      def dependent
+        self[:dependent]
+      end
+
       # Returns the extension if it exists, nil if not.
       def extension
         self[:extend]

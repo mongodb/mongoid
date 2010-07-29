@@ -2,27 +2,18 @@ require "spec_helper"
 
 describe Mongoid::Associations::Options do
 
-  describe "#stored_as" do
+  describe "#dependent" do
 
-    before do
-      @attributes = { :stored_as => :array }
-      @options = Mongoid::Associations::Options.new(@attributes)
-    end
+    context "when dependent option exists" do
 
-    it "returns the association storage" do
-      @options.stored_as.should == :array
-    end
-  end
+      before do
+        @attributes = { :dependent => :destroy }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
 
-  describe "#name" do
-
-    before do
-      @attributes = { :name => :addresses }
-      @options = Mongoid::Associations::Options.new(@attributes)
-    end
-
-    it "returns the association name" do
-      @options.name.should == "addresses"
+      it "returns the option" do
+        @options.dependent.should == :destroy
+      end
     end
   end
 
@@ -197,6 +188,18 @@ describe Mongoid::Associations::Options do
     end
   end
 
+  describe "#name" do
+
+    before do
+      @attributes = { :name => :addresses }
+      @options = Mongoid::Associations::Options.new(@attributes)
+    end
+
+    it "returns the association name" do
+      @options.name.should == "addresses"
+    end
+  end
+
   describe "#polymorphic" do
 
     context "when attribute provided" do
@@ -220,6 +223,18 @@ describe Mongoid::Associations::Options do
       it "returns false" do
         @options.polymorphic.should be_false
       end
+    end
+  end
+
+  describe "#stored_as" do
+
+    before do
+      @attributes = { :stored_as => :array }
+      @options = Mongoid::Associations::Options.new(@attributes)
+    end
+
+    it "returns the association storage" do
+      @options.stored_as.should == :array
     end
   end
 end
