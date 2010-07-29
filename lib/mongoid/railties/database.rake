@@ -72,20 +72,6 @@ namespace :db do
     end
   end
 
-  namespace :mongoid do
-
-    desc "Convert string objectids in mongo database to ObjectID type"
-    task :convert_to_objectids => :environment do
-
-      require 'ruby-debug';debugger
-      puts Mongoid.descendents
-
-
-
-    end
-
-  end
-
 
   ########
   # TODO: lots more useful db tasks can be added here. stuff like copyDatabase, etc
