@@ -6,6 +6,7 @@ defaults: &defaults
     # - host: localhost
       # port: 27019
   allow_dynamic_fields: false
+  include_root_in_json: true
   parameterize_keys: false
   persist_in_safe_mode: false
   raise_not_found_error: false

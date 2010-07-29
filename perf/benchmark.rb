@@ -5,7 +5,6 @@ require "benchmark"
 require "mongoid"
 
 Mongoid.configure do |config|
-  config.persist_in_safe_mode = false
   config.master = Mongo::Connection.new.db("mongoid_perf_test")
 end
 
@@ -164,3 +163,11 @@ end
 # Updating The Root Document 10k Times         5.430000   0.130000   5.560000 (  5.568188)
 # Updating An Embedded Document 10k Times      3.630000   0.110000   3.740000 (  3.765507)
 # Appending A New Embedded Document 10k Times  9.550000   0.270000   9.820000 ( 13.363242)
+# ---------------------------------------------------------------------------------------
+# 2.0.0.beta11
+#
+# Saving 10k New Documents                    16.140000   0.300000  16.440000 ( 16.439016)
+# Querying & Iterating 10k Documents           3.030000   0.080000   3.110000 (  3.128215)
+# Updating The Root Document 10k Times         5.610000   0.180000   5.790000 (  5.785066)
+# Updating An Embedded Document 10k Times      4.520000   0.150000   4.670000 (  4.669489)
+# Appending A New Embedded Document 10k Times  7.140000   0.260000   7.400000 (  7.395471)

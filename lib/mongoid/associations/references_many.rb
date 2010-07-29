@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
       def <<(*objects)
         load_target
         objects.flatten.each do |object|
-          object.send("#{@foreign_key}=", @parent.id)
+          object.write_attribute(@foreign_key, @parent.id)
           @target << object
           object.save unless @parent.new_record?
         end
@@ -27,7 +27,8 @@ module Mongoid #:nodoc:
       def build(attributes = nil)
         load_target
         name = determine_name
-        object = @klass.instantiate((attributes || {}).merge(name => @parent))
+        object = @klass.instantiate(attributes || {})
+        object.send("#{name}=", @parent)
         @target << object
         object
       end
@@ -125,15 +126,16 @@ module Mongoid #:nodoc:
       def nested_build(attributes, options = {})
         attributes.each do |index, attrs|
           begin
-            document = find(index.to_i)
-            if options && options[:allow_destroy] && attrs['_destroy']
+            _destroy = Boolean.set(attrs.delete('_destroy'))
+            document = find(attrs.delete("id"))
+            if options && options[:allow_destroy] && _destroy
               @target.delete(document)
               document.destroy
             else
-              document.write_attributes(attrs)
+              document.update_attributes(attrs)
             end
           rescue Errors::DocumentNotFound
-            build(attrs)
+            create(attrs)
           end
         end
       end

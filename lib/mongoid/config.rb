@@ -7,6 +7,7 @@ module Mongoid #:nodoc
 
     attr_accessor \
       :allow_dynamic_fields,
+      :include_root_in_json,
       :reconnect_time,
       :parameterize_keys,
       :persist_in_safe_mode,
@@ -74,12 +75,10 @@ module Mongoid #:nodoc
     # The master +Mongo::DB+
     def master
       raise Errors::InvalidDatabase.new(nil) unless @master
-
       if @reconnect
         @reconnect = false
         reconnect!
       end
-
       @master
     end
 
@@ -193,6 +192,7 @@ module Mongoid #:nodoc
     # <tt>config.reset</tt>
     def reset
       @allow_dynamic_fields = true
+      @include_root_in_json = false
       @parameterize_keys = true
       @persist_in_safe_mode = false
       @raise_not_found_error = true

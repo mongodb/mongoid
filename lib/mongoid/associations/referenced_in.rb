@@ -11,27 +11,28 @@ module Mongoid #:nodoc:
       #
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
-      def initialize(document, foreign_key, options, target = nil)
+      def initialize(document, options, target = nil)
         @options = options
-        @target = target || options.klass.find(foreign_key)
+
+        if target
+          replace(target)
+        else
+          foreign_key = document.send(options.foreign_key)
+          replace(options.klass.find(foreign_key)) unless foreign_key.blank?
+        end
+
         extends(options)
       end
 
-      class << self
-        # Instantiate a new +ReferencedIn+ or return nil if the foreign key is
-        # nil. It is preferrable to use this method over the traditional call
-        # to new.
-        #
-        # Options:
-        #
-        # document: The +Document+ that contains the relationship.
-        # options: The association +Options+.
-        def instantiate(document, options, target = nil)
-          foreign_key = document.send(options.foreign_key)
-          return nil if foreign_key.blank? && target.nil?
-          new(document, foreign_key, options, target)
-        end
+      # Replaces the target with a new object
+      #
+      # Returns the association proxy
+      def replace(obj)
+        @target = obj
+        self
+      end
 
+      class << self
         # Returns the macro used to create the association.
         def macro
           :referenced_in
@@ -51,7 +52,7 @@ module Mongoid #:nodoc:
         # <tt>ReferencedIn.update(person, game, options)</tt>
         def update(target, document, options)
           document.send("#{options.foreign_key}=", target ? target.id : nil)
-          instantiate(document, options, target)
+          new(document, options, target)
         end
       end
     end

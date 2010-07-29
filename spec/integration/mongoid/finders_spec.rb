@@ -62,12 +62,12 @@ describe Mongoid::Finders do
     context "using object ids" do
 
       before :all do
-        @@previous_id_type = Person._id_type
+        @previous_id_type = Person._id_type
         Person.identity :type => BSON::ObjectID
       end
 
       after :all do
-        Person.identity :type => @@previous_id_type
+        Person.identity :type => @previous_id_type
       end
 
       before do

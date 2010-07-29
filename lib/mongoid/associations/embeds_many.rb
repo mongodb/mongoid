@@ -149,19 +149,18 @@ module Mongoid #:nodoc:
         extends(options)
       end
 
-
-
       # If the target array does not respond to the supplied method then try to
       # find a named scope or criteria on the class and send the call there.
       #
       # If the method exists on the array, use the default proxy behavior.
       def method_missing(name, *args, &block)
-        unless @target.respond_to?(name)
-          object = @klass.send(name, *args)
-          object.documents = @target
-          return object
+        if @target.respond_to?(name)
+          super
+        else
+          @klass.send(:with_scope, criteria) do
+            object = @klass.send(name, *args)
+          end
         end
-        super
       end
 
       # Used for setting associations via a nested attributes setter from the
@@ -242,19 +241,15 @@ module Mongoid #:nodoc:
         end; count
       end
 
+      # Returns the criteria object for the target class with its documents set
+      # to @target.
+      def criteria
+        criteria = @klass.criteria
+        criteria.documents = @target
+        criteria
+      end
+
       class << self
-
-        # Preferred method of creating a new +EmbedsMany+ association. It will
-        # delegate to new.
-        #
-        # Options:
-        #
-        # document: The parent +Document+
-        # options: The association options
-        def instantiate(document, options, target_array = nil)
-          new(document, options, target_array)
-        end
-
         # Returns the macro used to create the association.
         def macro
           :embeds_many
@@ -267,9 +262,9 @@ module Mongoid #:nodoc:
           parent.raw_attributes.delete(options.name)
           children.assimilate(parent, options)
           if children && children.first.is_a?(Mongoid::Document)
-            instantiate(parent, options, children)
+            new(parent, options, children)
           else
-            instantiate(parent, options)
+            new(parent, options)
           end
         end
       end

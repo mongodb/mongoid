@@ -35,7 +35,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "saves and appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @child.expects(:save).returns(true)
         @association << @child
         @association.size.should == 1
@@ -54,7 +54,7 @@ describe Mongoid::Associations::ReferencesMany do
         end
 
         it "appends the child document" do
-          @child.expects(:person_id=).with(@parent.id)
+          @child.expects(:write_attribute).with('person_id', @parent.id)
           @association << @child
           @association.size.should == 1
         end
@@ -71,7 +71,7 @@ describe Mongoid::Associations::ReferencesMany do
 
         it "appends the child document" do
           @criteria.expects(:entries).returns([])
-          @child.expects(:person_id=).with(@parent.id)
+          @child.expects(:write_attribute).with('person_id', @parent.id)
           @association << @child
           @association.size.should == 1
         end
@@ -88,8 +88,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child documents" do
-        @child.expects(:person_id=).with(@parent.id)
-        @second.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
+        @second.expects(:write_attribute).with('person_id', @parent.id)
         @association << [@child, @second]
         @association.size.should == 2
       end
@@ -133,6 +133,17 @@ describe Mongoid::Associations::ReferencesMany do
         @association.build(nil)
         @association.first.person.should == @parent
       end
+    end
+    
+    it "sets the foreign key when it is protected from mass assignment" do
+      Account.expects(:all).returns(@criteria)
+      options = Mongoid::Associations::Options.new(
+        :name => :accounts,
+        :foreign_key => "person_id"
+      )
+      @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
+      @association.build(:nickname => "Checking")
+      @association.first.person_id.should == @parent.id
     end
   end
 
@@ -184,7 +195,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "saves and appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @child.expects(:save).returns(true)
         @association.concat(@child)
         @association.size.should == 1
@@ -201,7 +212,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @association.concat(@child)
         @association.size.should == 1
       end
@@ -217,8 +228,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child documents" do
-        @child.expects(:person_id=).with(@parent.id)
-        @second.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
+        @second.expects(:write_attribute).with('person_id', @parent.id)
         @association.concat([@child, @second])
         @association.size.should == 2
       end
@@ -230,7 +241,7 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#create" do
 
     before do
-      @post = mock
+      @post = Post.new
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
@@ -257,7 +268,7 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#create!" do
 
     before do
-      @post = mock
+      @post = Post.new
       @parent = stub(:id => "5", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
@@ -415,15 +426,15 @@ describe Mongoid::Associations::ReferencesMany do
     end
 
     it "should update existing documents" do
-      @association.expects(:find).with(0).returns(@first)
-      @association.nested_build({ "0" => { :title => "Yet Another" } })
+      @association.expects(:find).with("0").returns(@first)
+      @association.nested_build({ "0" => { "id" => "0", "title" => "Yet Another" } })
       @association.size.should == 2
       @association[0].title.should == "Yet Another"
     end
 
     it "should create new documents" do
-      @association.expects(:find).with(2).raises(Mongoid::Errors::DocumentNotFound.new(Post, 2))
-      @association.nested_build({ "2" => { :title => "Yet Another" } })
+      @association.expects(:find).with(nil).raises(Mongoid::Errors::DocumentNotFound.new(Post, nil))
+      @association.nested_build({ "2" => { "title" => "Yet Another" } })
       @association.size.should == 3
       @association[2].title.should == "Yet Another"
     end
@@ -446,7 +457,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "saves and appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @child.expects(:save).returns(true)
         @association.push(@child)
         @association.size.should == 1
@@ -463,7 +474,7 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child document" do
-        @child.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
         @association.push(@child)
         @association.size.should == 1
       end
@@ -479,8 +490,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "appends the child documents" do
-        @child.expects(:person_id=).with(@parent.id)
-        @second.expects(:person_id=).with(@parent.id)
+        @child.expects(:write_attribute).with('person_id', @parent.id)
+        @second.expects(:write_attribute).with('person_id', @parent.id)
         @association.push(@child, @second)
         @association.size.should == 2
       end

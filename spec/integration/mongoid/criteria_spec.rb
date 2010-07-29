@@ -289,12 +289,12 @@ describe Mongoid::Criteria do
     context "when using object ids" do
 
       before :all do
-        @@previous_id_type = Person._id_type
+        @previous_id_type = ::Person._id_type
         Person.identity :type => BSON::ObjectID
       end
 
       after :all do
-        Person.identity :type => @@previous_id_type
+        Person.identity :type => @previous_id_type
       end
 
       before :each do
@@ -326,12 +326,12 @@ describe Mongoid::Criteria do
     context "when not using object ids" do
 
       before :all do
-        @@previous_id_type = Person._id_type
+        @previous_id_type = Person._id_type
         Person.identity :type => String
       end
 
       after :all do
-        Person.identity :type => @@previous_id_type
+        Person.identity :type => @previous_id_type
       end
 
       before :each do

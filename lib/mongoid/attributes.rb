@@ -2,10 +2,6 @@
 module Mongoid #:nodoc:
   module Attributes
     extend ActiveSupport::Concern
-    included do
-      class_inheritable_accessor :_protected_fields
-      self._protected_fields = []
-    end
 
     # Get the id associated with this object. This will pull the _id value out
     # of the attributes +Hash+.
@@ -38,10 +34,10 @@ module Mongoid #:nodoc:
     # attributes provided in the suppied +Hash+ so that no extra nil values get
     # put into the document's attributes.
     def process(attrs = nil)
-      (attrs || {}).each_pair do |key, value|
+      sanitize_for_mass_assignment(attrs || {}).each_pair do |key, value|
         if set_allowed?(key)
           write_attribute(key, value)
-        elsif write_allowed?(key)
+        else
           if associations.include?(key.to_s) and associations[key.to_s].embedded? and value.is_a?(Hash)
             if association = send(key)
               association.nested_build(value)
@@ -188,12 +184,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Return true if writing to the given field is allowed
-    def write_allowed?(key)
-      name = key.to_s
-      !self._protected_fields.include?(name)
-    end
-
     module ClassMethods
       # Defines attribute setters for the associations specified by the names.
       # This will work for a has one or has many association.
@@ -223,19 +213,6 @@ module Mongoid #:nodoc:
             end
           end
         end
-      end
-
-      # Defines fields that cannot be set via mass assignment.
-      #
-      # Example:
-      #
-      #   class Person
-      #     include Mongoid::Document
-      #     field :security_code
-      #     attr_protected :security_code
-      #   end
-      def attr_protected(*names)
-        _protected_fields.concat(names.flatten.map(&:to_s))
       end
     end
   end

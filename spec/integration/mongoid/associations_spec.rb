@@ -101,10 +101,16 @@ describe Mongoid::Associations do
 
     before do
       @person = Person.new(:title => "Sir")
+      @tx_home = Address.new(:street => "Leadbetter Dr", :state => "TX", :address_type => "Home")
       @sf_apartment = Address.new(:street => "Genoa Pl", :state => "CA", :address_type => "Apartment")
       @la_home = Address.new(:street => "Rodeo Dr", :state => "CA", :address_type => "Home")
       @sf_home = Address.new(:street => "Pacific", :state => "CA", :address_type => "Home")
-      @person.addresses << [ @sf_apartment, @la_home, @sf_home ]
+      @person.addresses << [ @tx_home, @sf_apartment, @la_home, @sf_home ]
+    end
+
+    it "handles an aggregation method" do
+      streets = [ @tx_home, @sf_apartment, @la_home, @sf_home ].map(&:street)
+      @person.addresses.streets.should == streets
     end
 
     it "handles a single criteria" do
@@ -113,16 +119,35 @@ describe Mongoid::Associations do
       cas.should == [ @sf_apartment, @la_home, @sf_home ]
     end
 
+    it "handles a single criteria and an aggregation method" do
+      streets = [ @sf_apartment, @la_home, @sf_home ].map(&:street)
+      @person.addresses.california.streets.should == streets
+    end
+
     it "handles chained criteria" do
       ca_homes = @person.addresses.california.homes
       ca_homes.size.should == 2
       ca_homes.should == [ @la_home, @sf_home ]
     end
 
+    it "handles chained criteria with final aggregation method" do
+      ca_streets = @person.addresses.california.homes.streets
+      ca_streets.should == [ @la_home.street, @sf_home.street ]
+    end
+
     it "handles chained criteria with named scopes" do
       ca_homes = @person.addresses.california.homes.rodeo
       ca_homes.size.should == 1
       ca_homes.should == [ @la_home ]
+    end
+
+    it "handles chained criteria with named scopes and final aggregation method" do
+      ca_streets = @person.addresses.california.homes.rodeo.streets
+      ca_streets.should == [ @la_home.street ]
+    end
+
+    it "handles chained criteria with named scope and extension" do
+      @person.addresses.california.homes.rodeo.should be_a_mansion
     end
   end
 
@@ -153,7 +178,7 @@ describe Mongoid::Associations do
 
       before do
         @user = User.new(:name => "Don Julio")
-        @account = @user.account.build(:number => "1234567890")
+        @account = @user.build_account(:number => "1234567890")
       end
 
       it "sets the name of the association properly" do

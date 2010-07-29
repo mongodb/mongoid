@@ -21,7 +21,11 @@ class Address
     end
   end
 
-  named_scope :rodeo, where(:street => "Rodeo Dr")
+  named_scope :rodeo, where(:street => "Rodeo Dr") do
+    def mansion?
+      all? { |address| address.street == "Rodeo Dr" }
+    end
+  end
 
   validates_presence_of :street, :on => :update
 
@@ -36,6 +40,10 @@ class Address
 
     def homes
       where(:address_type => "Home")
+    end
+
+    def streets
+      all.map(&:street)
     end
   end
 end

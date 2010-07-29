@@ -25,6 +25,13 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#include_root_in_json" do
+
+    it "defaults to false" do
+      config.include_root_in_json.should be_false
+    end
+  end
+
   describe "#from_hash" do
     context "regular mongoid.yml" do
       before do
@@ -41,6 +48,10 @@ describe Mongoid::Config do
 
       it "sets allow_dynamic_fields" do
         config.allow_dynamic_fields.should == false
+      end
+
+      it "sets include_root_in_json" do
+        config.include_root_in_json.should == true
       end
 
       it "sets reconnect_time" do

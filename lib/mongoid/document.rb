@@ -13,9 +13,15 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Returns all classes that have included Mongoid::Document
-    def self.descendants
-      (@@descendants ||= {}).keys
+    class << self
+
+      # Returns all classes that have included Mongoid::Document.
+      #
+      # This will not get subclasses of the top level models, for those we will
+      # use Class.descendents in the rake task for indexes.
+      def descendants
+        (@@descendants ||= {}).keys
+      end
     end
 
     module ClassMethods #:nodoc:
@@ -52,7 +58,7 @@ module Mongoid #:nodoc:
       # causes the first call to only return direct children, hence
       # the double call and unique.
       def _types
-        @_type ||= [subclasses + subclasses + [self.name]].flatten.uniq.map(&:to_s)
+        @_type ||= [descendants + [self]].flatten.uniq.map(&:to_s)
       end
     end
 

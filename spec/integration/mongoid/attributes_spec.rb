@@ -10,6 +10,7 @@ describe Mongoid::Attributes do
 
     after do
       Person.delete_all
+      Agent.delete_all
     end
 
     it "the field should exist with a nil value" do
@@ -19,40 +20,54 @@ describe Mongoid::Attributes do
 
   end
 
-  context "when persisting nested attributes" do
+  context "when persisting nested with accepts_nested_attributes_for" do
 
-    before do
-      @survey = Survey.new
-      3.times do
-        @question = @survey.questions.build
-        4.times { @question.answers.build }
+    context "when the nested document is embedded" do
+      before do
+        @survey = Survey.new
+        @survey.questions.build(:content => 'Do you like cheesecake ?')
+        @survey.questions.build(:content => 'Do you like cuppcake ?')
+        @survey.questions.build(:content => 'Do you like ace cream ?')
+        @survey.save
+        @attributes = {
+          "0" => { :content => "lorem", "_destroy" => "true" },
+          "1" => { :content => "lorem", "_destroy" => "true" },
+          "2" => { :content => "Do you like ice cream ?", "_destroy" => "" },
+          "new_record" => { :content => "Do you like carrot cake ?" }
+        }
+      end
+
+      it "adds/updates/removes embedded documents" do
+        @survey.update_attributes(:questions_attributes => @attributes)
+        @survey.reload
+        @survey.questions.size.should == 2
+        @survey.questions.first.content.should == "Do you like ice cream ?"
+        @survey.questions.last.content.should == "Do you like carrot cake ?"
       end
     end
 
-  end
+    context "when the nested document is related" do
+      before do
+        @agent = Agent.new
+        post1 = @agent.posts.build(:title => "Post 1")
+        post2 = @agent.posts.build(:title => "Post 2")
+        post3 = @agent.posts.build(:title => "Post 3")
+        @agent.save
+        @agent.reload
+        @attributes = {
+          "0" => { 'id' => post1.id.to_s, 'title' => "lorem", "_destroy" => "true" },
+          "1" => { 'id' => post2.id.to_s, 'title' => "lorem", "_destroy" => "true" },
+          "2" => { 'id' => post3.id.to_s, 'title' => "Do you like ice cream ?", "_destroy" => "" },
+          "new_record" => { 'title' => "Do you like carrot cake ?" }
+        }
+      end
 
-  context "when persisting nested with accepts_nested_attributes_for" do
-
-    before do
-      @survey = Survey.new
-      @survey.questions.build(:content => 'Do you like cheesecake ?')
-      @survey.questions.build(:content => 'Do you like cuppcake ?')
-      @survey.questions.build(:content => 'Do you like ace cream ?')
-      @survey.save
-      @attributes = {
-        "0" => { :content => "lorem", "_destroy" => "true" },
-        "1" => { :content => "lorem", "_destroy" => "true" },
-        "2" => { :content => "Do you like ice cream ?", "_destroy" => "" },
-        "new_record" => { :content => "Do you like carrot cake ?" }
-      }
-    end
-
-    it "adds/updates/removes embedded documents" do
-      @survey.update_attributes(:questions_attributes => @attributes)
-      @survey.reload
-      @survey.questions.size.should == 2
-      @survey.questions.first.content.should == "Do you like ice cream ?"
-      @survey.questions.last.content.should == "Do you like carrot cake ?"
+      it "adds/updates/removes related documents" do
+        @agent.update_attributes(:posts_attributes => @attributes)
+        @agent.posts.size.should == 2
+        Set.new(["Do you like ice cream ?", "Do you like carrot cake ?"]).should ==
+          Set.new(@agent.posts.map(&:title))
+      end
     end
   end
 end

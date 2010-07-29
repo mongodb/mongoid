@@ -14,6 +14,5 @@ module Mongoid
     def inspect
       "#<Mongoid::Logger:0x#{object_id.to_s(16)} @logger=#{logger.inspect}>"
     end
-
   end
 end

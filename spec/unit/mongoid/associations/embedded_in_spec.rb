@@ -21,7 +21,7 @@ describe Mongoid::Associations::EmbeddedIn do
   describe "#find" do
 
     before do
-      @association = Mongoid::Associations::EmbeddedIn.new(target, options)
+      @association = Mongoid::Associations::EmbeddedIn.new(child, options, target)
     end
 
     context "when finding by id" do
@@ -37,7 +37,7 @@ describe Mongoid::Associations::EmbeddedIn do
   describe "#initialize" do
 
     before do
-      @association = Mongoid::Associations::EmbeddedIn.new(target, options)
+      @association = Mongoid::Associations::EmbeddedIn.new(child, options, target)
     end
 
     it "sets the target" do
@@ -62,7 +62,7 @@ describe Mongoid::Associations::EmbeddedIn do
         end
       }
       @options = Mongoid::Associations::Options.new(:name => :person, :extend => @block)
-      @association = Mongoid::Associations::EmbeddedIn.new(@parent, @options)
+      @association = Mongoid::Associations::EmbeddedIn.new(@name, @options)
     end
 
     context "when the options have an extension" do
@@ -75,30 +75,18 @@ describe Mongoid::Associations::EmbeddedIn do
 
   end
 
-  describe ".instantiate" do
+  describe ".initialize" do
 
     context "when parent exists" do
 
       before do
         @parent = stub
         @target = stub(:_parent => @parent)
-        @association = Mongoid::Associations::EmbeddedIn.instantiate(@target, options)
+        @association = Mongoid::Associations::EmbeddedIn.new(@target, options)
       end
 
       it "sets the parent to the target" do
         @association.target.should == @parent
-      end
-
-    end
-
-    context "when parent is nil" do
-
-      before do
-        @document = stub(:_parent => nil)
-      end
-
-      it "returns nil" do
-        Mongoid::Associations::EmbeddedIn.instantiate(@document, options).should be_nil
       end
 
     end
@@ -116,7 +104,7 @@ describe Mongoid::Associations::EmbeddedIn do
   describe "#method_missing" do
 
     before do
-      @association = Mongoid::Associations::EmbeddedIn.new(target, options)
+      @association = Mongoid::Associations::EmbeddedIn.new(child, options, target)
     end
 
     context "when method is a getter" do

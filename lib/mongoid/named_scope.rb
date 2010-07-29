@@ -16,14 +16,13 @@ module Mongoid #:nodoc:
     #     named_scope :count_gt_one, :where => { :count.gt => 1 }
     #     named_scope :at_least_count, lambda { |count| { :where => { :count.gt => count } } }
     #   end
-    def named_scope(name, options = {}, &block)
+    def named_scope(name, conditions = {}, &block)
       name = name.to_sym
-      scopes[name] = lambda do |parent, *args|
-        Scope.new(parent, options.scoped(*args), &block)
-      end
+      scopes[name] = Scope.new(conditions, &block)
       (class << self; self; end).class_eval <<-EOT
         def #{name}(*args)
-          scopes[:#{name}].call(self, *args)
+          scope = scopes[:#{name}]
+          scope.extend(criteria.fuse(scope.conditions.scoped(*args)))
         end
       EOT
     end

@@ -10,6 +10,14 @@ module Mongoid #:nodoc:
         @target = attrs.assimilate(@parent, @options, type); self
       end
 
+      # Replaces the target with a new object
+      #
+      # Returns the association proxy
+      def replace(obj)
+        @target = obj
+        self
+      end
+
       # Creates the new association by finding the attributes in
       # the parent document with its name, and instantiating a
       # new document for it.
@@ -26,9 +34,16 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # A new +HashOne+ association proxy.
-      def initialize(document, attrs, options, target = nil)
+      def initialize(document, options, target = nil)
         @parent, @options  = document, options
-        @target = target ? target : attrs.assimilate(@parent, @options, attrs.klass)
+
+        if target
+          replace(target)
+        else
+          attributes = document.raw_attributes[options.name]
+          build(attributes) unless attributes.blank?
+        end
+
         extends(options)
       end
 
@@ -49,23 +64,6 @@ module Mongoid #:nodoc:
       end
 
       class << self
-        # Preferred method of instantiating a new +EmbedsOne+, since nil values
-        # will be handled properly.
-        #
-        # Options:
-        #
-        # document: The parent +Document+
-        # options: The association options.
-        #
-        # Returns:
-        #
-        # A new +EmbedsOne+ association proxy.
-        def instantiate(document, options, target = nil)
-          attributes = document.raw_attributes[options.name]
-          return nil if attributes.blank? && target.nil?
-          new(document, attributes, options, target)
-        end
-
         # Returns the macro used to create the association.
         def macro
           :embeds_one
@@ -89,7 +87,7 @@ module Mongoid #:nodoc:
         # A new +EmbedsOne+ association proxy.
         def update(child, parent, options)
           child.assimilate(parent, options)
-          instantiate(parent, options, child.is_a?(Hash) ? nil : child)
+          new(parent, options, child.is_a?(Hash) ? nil : child)
         end
       end
     end
