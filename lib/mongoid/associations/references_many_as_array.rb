@@ -86,7 +86,7 @@ module Mongoid #:nodoc:
         #
         # Example:
         #
-        # <tt>RelatesToManyAsArray.update(preferences, person, options)</tt>
+        # <tt>ReferencesManyAsArray.update(preferences, person, options)</tt>
         def update(target, document, options)
           target.each do |child|
             document.send(options.name) << child
