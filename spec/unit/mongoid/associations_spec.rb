@@ -36,9 +36,7 @@ describe Mongoid::Associations do
         it "makes the association false" do
           (!!@person.game).should == false
         end
-
       end
-
     end
 
     context "when child and parent are namespaced" do

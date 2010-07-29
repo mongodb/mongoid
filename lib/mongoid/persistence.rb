@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
     #
     # <tt>document.destroy</tt>
     def destroy(options = {})
-      run_callbacks(:destroy) { self.destroyed = true if _remove(options) }
+      run_callbacks(:destroy) { _remove(options) }
     end
 
     # Insert a new +Document+ into the database. Will return the document
@@ -47,7 +47,10 @@ module Mongoid #:nodoc:
     #
     # TODO: Will get rid of other #remove once observable pattern killed.
     def _remove(options = {})
-      Remove.new(self, options).persist
+      if Remove.new(self, options).persist
+        self.destroyed = true
+        cascading_remove!
+      end; true
     end
 
     alias :delete :_remove
@@ -130,6 +133,19 @@ module Mongoid #:nodoc:
     #
     # <tt>document.save</tt>
     alias :save :upsert
+
+    protected
+
+    # Perform all cascading deletes or destroys.
+    def cascading_remove!
+      cascades.each do |name, option|
+        association = send(name)
+        if association
+          documents = association.target.to_a
+          documents.each { |doc| doc.send(option) }
+        end
+      end
+    end
 
     module ClassMethods #:nodoc:
 

@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
           ).persist
         else
           @collection.remove({ :_id => @document.id }, @options)
-        end
+        end; true
       end
     end
   end

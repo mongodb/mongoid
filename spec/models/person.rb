@@ -56,13 +56,13 @@ class Person
   accepts_nested_attributes_for :pet
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
 
-  references_one :game do
+  references_one :game, :dependent => :destroy do
     def extension
       "Testing"
     end
   end
 
-  references_many :posts do
+  references_many :posts, :dependent => :delete do
     def extension
       "Testing"
     end
