@@ -215,14 +215,21 @@ describe Mongoid::Associations do
     end
 
     context "when the parent is nil" do
-
-      it "stores the parent correctly" do
+      before do
         @account = Account.new
         @account.creator = nil
         @account.save!
-        @account.reload
-        @account.creator.should be_nil
       end
+
+      it "stores the parent correctly" do
+        @account.reload
+        @account.creator.should == nil
+      end
+
+      it "should say that its nil" do
+        @account.creator.nil?.should == true
+      end
+
     end
 
   end
