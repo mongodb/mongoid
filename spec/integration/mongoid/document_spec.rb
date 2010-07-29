@@ -572,7 +572,6 @@ describe Mongoid::Document do
       it "should return the id field correctly" do
         @person.to_json.should include('"_id":"'+@person.id.to_s+'"')
       end
-
     end
   end
 

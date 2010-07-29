@@ -115,9 +115,7 @@ end
 class BSON::ObjectID #:nodoc
   extend Mongoid::Extensions::ObjectID::Conversions
 
-  unless self.new.respond_to?(:as_json)
-    def as_json(options = nil)
-      to_s
-    end
+  def as_json(options = nil)
+    to_s
   end
 end
