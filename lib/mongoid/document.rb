@@ -7,21 +7,6 @@ module Mongoid #:nodoc:
 
       attr_accessor :association_name
       attr_reader :new_record
-
-      unless self.instance_of?(Class) and self.name == ""
-        (@@descendants ||= {})[self] = :seen
-      end
-    end
-
-    class << self
-
-      # Returns all classes that have included Mongoid::Document.
-      #
-      # This will not get subclasses of the top level models, for those we will
-      # use Class.descendents in the rake task for indexes.
-      def descendants
-        (@@descendants ||= {}).keys
-      end
     end
 
     module ClassMethods #:nodoc:
@@ -31,8 +16,8 @@ module Mongoid #:nodoc:
       # This method must remain in the +Document+ module, even though its
       # behavior affects items in the Hierarchy module.
       def inherited(subclass)
-        super(subclass)
         self.hereditary = true
+        super
       end
 
       # Instantiate a new object, only when loaded from the database or when
