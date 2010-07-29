@@ -553,15 +553,26 @@ describe Mongoid::Document do
       it "returns the json string" do
         @person.to_json.should include('"pets":false')
       end
+
+      it "should return the id field correctly" do
+        @person.to_json.should include('"_id":"'+@person.id.to_s+'"')
+      end
     end
 
     context "on a persisted document" do
+      before do
+        @person.save
+      end
 
       it "returns the json string" do
-        @person.save
         from_db = Person.find(@person.id)
         from_db.to_json.should include('"pets":false')
       end
+
+      it "should return the id field correctly" do
+        @person.to_json.should include('"_id":"'+@person.id.to_s+'"')
+      end
+
     end
   end
 
