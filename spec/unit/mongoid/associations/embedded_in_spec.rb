@@ -29,9 +29,7 @@ describe Mongoid::Associations::EmbeddedIn do
       it "always returns the target document" do
         @association.find("").should == target
       end
-
     end
-
   end
 
   describe "#initialize" do
@@ -47,7 +45,6 @@ describe Mongoid::Associations::EmbeddedIn do
     it "sets the options" do
       @association.options.should == options
     end
-
   end
 
   describe "#initialize" do
@@ -70,9 +67,7 @@ describe Mongoid::Associations::EmbeddedIn do
       it "adds the extension module" do
         @association.extension.should == "Testing"
       end
-
     end
-
   end
 
   describe ".initialize" do
@@ -88,9 +83,7 @@ describe Mongoid::Associations::EmbeddedIn do
       it "sets the parent to the target" do
         @association.target.should == @parent
       end
-
     end
-
   end
 
   describe ".macro" do
@@ -98,7 +91,6 @@ describe Mongoid::Associations::EmbeddedIn do
     it "returns :embedded_in" do
       Mongoid::Associations::EmbeddedIn.macro.should == :embedded_in
     end
-
   end
 
   describe "#method_missing" do
@@ -112,7 +104,6 @@ describe Mongoid::Associations::EmbeddedIn do
       it "delegates to the target" do
         @association.title.should == "Pimp"
       end
-
     end
 
     context "when method is a setter" do
@@ -124,7 +115,6 @@ describe Mongoid::Associations::EmbeddedIn do
       it "delegates to the target" do
         @association.title.should == "Dealer"
       end
-
     end
 
     context "when method does not exist" do
@@ -132,9 +122,7 @@ describe Mongoid::Associations::EmbeddedIn do
       it "raises an error" do
         lambda { @association.nothing }.should raise_error(NoMethodError)
       end
-
     end
-
   end
 
   describe ".update" do
@@ -159,7 +147,6 @@ describe Mongoid::Associations::EmbeddedIn do
       it "returns the proxy association" do
         @association.target.should == @person
       end
-
     end
 
     context "when child is a has many" do
@@ -173,9 +160,22 @@ describe Mongoid::Associations::EmbeddedIn do
       it "updates the parent document" do
         @person.addresses.first.should == @address
       end
-
     end
-
   end
 
+  describe ".validate_options" do
+
+    context "when inverse_of is missing" do
+
+      let(:association) do
+        Mongoid::Associations::EmbeddedIn
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options({})
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+  end
 end

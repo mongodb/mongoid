@@ -57,6 +57,20 @@ module Mongoid #:nodoc:
         def update(target, child, options)
           new(child, options, target)
         end
+
+        # Validate the options passed to the embedded in macro, to encapsulate
+        # the behavior in this class instead of the associations module.
+        #
+        # Options:
+        #
+        # options: Thank you captain obvious.
+        def validate_options(options = {})
+          unless options.has_key?(:inverse_of)
+            raise Errors::InvalidOptions.new(
+              "Options for embedded_in association must include :inverse_of"
+            )
+          end
+        end
       end
     end
   end
