@@ -69,10 +69,14 @@ Gem::Specification.new do |s|
   this for you automatically. If you were using custom composite keys,
   these will need to be defined as Strings since they cannot be converted.
 
-  Please see the following gist for assistance in migrating the database
-  via the Ruby driver (thanks to Kyle Banker):
+  You can run a rake task to convert all your string object ids to ObjectID (thanks to Kyle Banker):
 
-  http://gist.github.com/489098
+  rake db:mongoid:objectid_convert
+
+  Your old collections will be backed up to their original names appended with "_old".
+  If you verify your site is still working good with the ObjectIDs, you can clean them up using:
+
+  rake db:mongoid:cleanup_old_collections
 
   POST_INSTALL_MESSAGE
 end
