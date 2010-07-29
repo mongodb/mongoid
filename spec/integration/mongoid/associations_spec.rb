@@ -3,7 +3,35 @@ require "spec_helper"
 describe Mongoid::Associations do
 
   before do
-    [ Artist, Person, Game, Post, Preference, UserAccount ].each { |klass| klass.collection.remove }
+    [ Artist, Person, Game, Post, Preference, UserAccount ].each do |klass|
+      klass.collection.remove
+    end
+  end
+
+  context "when destroying dependent documents" do
+
+    before do
+      @person = Person.create(:ssn => "243-79-1122")
+      @game = @person.create_game(:score => 450)
+    end
+
+    it "deletes the dependent documents from the db" do
+      @person.destroy
+      Game.count.should == 0
+    end
+  end
+
+  context "when deleting dependent documents" do
+
+    before do
+      @person = Person.create(:ssn => "243-79-1122")
+      @post = @person.posts.create(:title => "Testing")
+    end
+
+    it "deletes the dependent documents from the db" do
+      @person.destroy
+      Post.count.should == 0
+    end
   end
 
   context "anonymous extensions" do

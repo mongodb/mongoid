@@ -20,8 +20,9 @@ module Mongoid # :nodoc:
       cattr_accessor :embedded
       self.embedded = false
 
-      class_inheritable_accessor :associations
+      class_inheritable_accessor :associations, :cascades
       self.associations = {}
+      self.cascades = {}
 
       delegate :embedded, :embedded?, :to => "self.class"
     end
@@ -204,6 +205,7 @@ module Mongoid # :nodoc:
         set_callback :save, :before do |document|
           document.update_associations(name)
         end
+        add_cascade(name, options)
       end
 
       alias :has_many_related :references_many
@@ -230,6 +232,7 @@ module Mongoid # :nodoc:
         set_callback :save, :before do |document|
           document.update_association(name)
         end
+        add_cascade(name, options)
       end
 
       alias :has_one_related :references_one
@@ -318,6 +321,12 @@ module Mongoid # :nodoc:
             send("build_#{name}", attrs, attr_options).tap(&:save)
           end
         end
+      end
+
+      # Create the callbacks for dependent deletes and destroys.
+      def add_cascade(name, options)
+        dependent = options[:dependent]
+        self.cascades[name] = dependent if dependent
       end
 
       # build the options given the params.
