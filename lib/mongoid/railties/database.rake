@@ -57,7 +57,18 @@ namespace :db do
   if not Rake::Task.task_defined?("db:create_indexes")
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
-      ::Rails::Mongoid.index_children(Mongoid::Document.descendants)
+      documents = []
+      Dir.glob("app/models/**/*.rb").sort.each do |file|
+        model = file.match(/\/(\w+).rb$/)[1]
+        klass = model.classify.constantize
+        begin
+          documents << klass unless klass.embedded
+        rescue => e
+          # Just for non-mongoid objects that dont have the embedded
+          # attribute at the class level.
+        end
+      end
+      ::Rails::Mongoid.index_children(documents)
     end
   end
 
