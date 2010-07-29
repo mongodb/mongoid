@@ -214,6 +214,17 @@ describe Mongoid::Associations do
       end
     end
 
+    context "when the parent is nil" do
+
+      it "stores the parent correctly" do
+        @account = Account.new
+        @account.creator = nil
+        @account.save!
+        @account.reload
+        @account.creator.should be_nil
+      end
+    end
+
   end
 
   context "one-to-many relational associations" do

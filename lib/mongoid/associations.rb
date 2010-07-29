@@ -58,8 +58,8 @@ module Mongoid # :nodoc:
         next unless association.macro == :referenced_in
         foreign_key = association.options.foreign_key
         if send(foreign_key).nil?
-          target = send(name)
-          send("#{foreign_key}=", target ? target.id : nil)
+          proxy = send(name)
+          send("#{foreign_key}=", proxy && proxy.target ? proxy.id : nil)
         end
       end
     end
