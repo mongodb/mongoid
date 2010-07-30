@@ -177,5 +177,18 @@ describe Mongoid::Associations::EmbeddedIn do
         }.should raise_error(Mongoid::Errors::InvalidOptions)
       end
     end
+
+    context "when dependent is defined" do
+
+      let(:association) do
+        Mongoid::Associations::EmbeddedIn
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options({ :dependent => :delete })
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
   end
 end

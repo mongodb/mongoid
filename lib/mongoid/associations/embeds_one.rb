@@ -102,6 +102,11 @@ module Mongoid #:nodoc:
               "dependent_only_references_one_or_many", {}
             )
           end
+          if options.has_key?(:inverse_of)
+            raise Errors::InvalidOptions.new(
+              "embeds_one_cant_have_inverse_of", {}
+            )
+          end
         end
       end
     end

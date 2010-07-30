@@ -70,6 +70,11 @@ module Mongoid #:nodoc:
               "embedded_in_must_have_inverse_of", {}
             )
           end
+          if options.has_key?(:dependent)
+            raise Errors::InvalidOptions.new(
+              "dependent_only_references_one_or_many", {}
+            )
+          end
         end
       end
     end

@@ -670,5 +670,20 @@ describe Mongoid::Associations::EmbedsMany do
         }.should raise_error(Mongoid::Errors::InvalidOptions)
       end
     end
+
+    context "when inverse_of is defined" do
+
+      let(:association) do
+        Mongoid::Associations::EmbedsMany
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options(
+            { :name => :addresses, :inverse_of => :person }
+          )
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
   end
 end

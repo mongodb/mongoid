@@ -35,4 +35,9 @@ en:
         dependent_only_references_one_or_many:
           The dependent => destroy|delete option that was supplied
           is only valid on references_one or references_many associations.
-
+        embeds_many_cant_have_inverse_of:
+          Defining an inverse_of on an embeds_many is not allowed. Only
+          use this option on embedded_in.
+        embeds_one_cant_have_inverse_of:
+          Defining an inverse_of on an embeds_one is not allowed. Only
+          use this option on embedded_in.
