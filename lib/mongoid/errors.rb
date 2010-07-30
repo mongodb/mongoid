@@ -10,6 +10,8 @@ require "mongoid/errors/too_many_nested_attribute_records"
 require "mongoid/errors/unsupported_version"
 require "mongoid/errors/validations"
 
-I18n.load_path << File.join(
-  File.dirname(__FILE__), "errors", "locale", "en.yml"
-)
+MESSAGES = File.join(File.dirname(__FILE__), "errors", "locale")
+
+Dir[ File.join(MESSAGES, "*.yml") ].each do |file|
+  I18n.load_path << file
+end
