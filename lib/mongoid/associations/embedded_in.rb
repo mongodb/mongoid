@@ -65,14 +65,10 @@ module Mongoid #:nodoc:
         #
         # options: Thank you captain obvious.
         def validate_options(options = {})
+          check_dependent_not_allowed!(options)
           unless options.has_key?(:inverse_of)
             raise Errors::InvalidOptions.new(
               "embedded_in_must_have_inverse_of", {}
-            )
-          end
-          if options.has_key?(:dependent)
-            raise Errors::InvalidOptions.new(
-              "dependent_only_references_one_or_many", {}
             )
           end
         end

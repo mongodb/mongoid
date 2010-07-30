@@ -28,6 +28,17 @@ module Mongoid #:nodoc
         @foreign_key = options.foreign_key
         extends(options)
       end
+
+      protected
+      class << self
+        def check_dependent_not_allowed!(options)
+          if options.has_key?(:dependent)
+            raise Errors::InvalidOptions.new(
+              "dependent_only_references_one_or_many", {}
+            )
+          end
+        end
+      end
     end
   end
 end
