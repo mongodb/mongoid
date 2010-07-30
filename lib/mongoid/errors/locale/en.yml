@@ -27,3 +27,6 @@ en:
           to %{limit} records.
         embedded_in_must_have_inverse_of:
           Options for embedded_in association must include inverse_of.
+        dependent_only_references_one_or_many:
+          The dependent => destroy|delete option that was supplied
+          is only valid on references_one or references_many associations.

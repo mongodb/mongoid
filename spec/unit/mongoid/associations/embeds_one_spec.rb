@@ -186,9 +186,7 @@ describe Mongoid::Associations::EmbedsOne do
       it "clears out the association" do
         @person.name.should be_nil
       end
-
     end
-
   end
 
   describe "#to_a" do
@@ -203,7 +201,6 @@ describe Mongoid::Associations::EmbedsOne do
     it "returns the target in a new array" do
       @association.to_a.first.should be_a_kind_of(MixedDrink)
     end
-
   end
 
   describe "#valid?" do
@@ -219,9 +216,22 @@ describe Mongoid::Associations::EmbedsOne do
       it "validates the document" do
         @association.valid?.should be_true
       end
-
     end
-
   end
 
+  describe ".validate_options" do
+
+    context "when dependent is defined" do
+
+      let(:association) do
+        Mongoid::Associations::EmbedsOne
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options({ :name => :name, :dependent => :destroy })
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+  end
 end

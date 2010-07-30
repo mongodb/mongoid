@@ -652,7 +652,23 @@ describe Mongoid::Associations::EmbedsMany do
     it "returns the association proxy" do
       @association.target.size.should == 1
     end
-
   end
 
+  describe ".validate_options" do
+
+    context "when dependent is defined" do
+
+      let(:association) do
+        Mongoid::Associations::EmbedsMany
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options(
+            { :name => :addresses, :dependent => :destroy }
+          )
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+  end
 end
