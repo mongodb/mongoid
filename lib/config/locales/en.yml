@@ -1,4 +1,9 @@
 en:
+  activemodel:
+    errors:
+      messages:
+        taken: is already taken
+
   mongoid:
     errors:
       messages:
@@ -30,3 +35,4 @@ en:
         dependent_only_references_one_or_many:
           The dependent => destroy|delete option that was supplied
           is only valid on references_one or references_many associations.
+
