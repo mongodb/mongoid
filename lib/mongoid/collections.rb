@@ -56,7 +56,7 @@ module Mongoid #:nodoc
       #
       # Example:
       #
-      # <tt>Person.store_in :populdation</tt>
+      # <tt>Person.store_in :population</tt>
       def store_in(name)
         self.collection_name = name.to_s
         set_collection
