@@ -38,6 +38,22 @@ module Mongoid #:nodoc
             )
           end
         end
+
+        def check_inverse_not_allowed!(options)
+          if options.has_key?(:inverse_of)
+            raise Errors::InvalidOptions.new(
+              "association_cant_have_inverse_of", {}
+            )
+          end
+        end
+
+        def check_inverse_must_be_defined!(options)
+          unless options.has_key?(:inverse_of)
+            raise Errors::InvalidOptions.new(
+              "embedded_in_must_have_inverse_of", {}
+            )
+          end
+        end
       end
     end
   end
