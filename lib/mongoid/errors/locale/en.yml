@@ -25,3 +25,5 @@ en:
         too_many_nested_attribute_records:
           Accepting nested attributes for %{association} is limited
           to %{limit} records.
+        embedded_in_must_have_inverse_of:
+          Options for embedded_in association must include inverse_of.

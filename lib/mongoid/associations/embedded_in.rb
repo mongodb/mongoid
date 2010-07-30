@@ -67,7 +67,7 @@ module Mongoid #:nodoc:
         def validate_options(options = {})
           unless options.has_key?(:inverse_of)
             raise Errors::InvalidOptions.new(
-              "Options for embedded_in association must include :inverse_of"
+              "embedded_in_must_have_inverse_of", {}
             )
           end
         end

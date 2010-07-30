@@ -7,6 +7,10 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>InvalidOptions.new</tt>
-    class InvalidOptions < MongoidError; end
+    class InvalidOptions < MongoidError
+      def initialize(key, options)
+        super(translate(key, options))
+      end
+    end
   end
 end
