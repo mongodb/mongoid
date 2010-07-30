@@ -55,7 +55,6 @@ namespace :db do
   end
 
   if not Rake::Task.task_defined?("db:create_indexes")
-    desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => "mongoid:create_indexes"
   end
 
