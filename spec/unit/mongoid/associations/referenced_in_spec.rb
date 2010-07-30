@@ -108,9 +108,24 @@ describe Mongoid::Associations::ReferencedIn do
         Mongoid::Associations::ReferencedIn.update(nil, @child, @options)
         (!!@child.person).should == false
       end
-
     end
-
   end
 
+  describe ".validate_options" do
+
+    context "when dependent is defined" do
+
+      let(:association) do
+        Mongoid::Associations::ReferencedIn
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options(
+            { :name => :person, :dependent => :destroy }
+          )
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+  end
 end

@@ -89,6 +89,20 @@ module Mongoid #:nodoc:
           child.assimilate(parent, options)
           new(parent, options, child.is_a?(Hash) ? nil : child)
         end
+
+        # Validate the options passed to the embeds one macro, to encapsulate
+        # the behavior in this class instead of the associations module.
+        #
+        # Options:
+        #
+        # options: Thank you captain obvious.
+        def validate_options(options = {})
+          if options.has_key?(:dependent)
+            raise Errors::InvalidOptions.new(
+              "dependent_only_references_one_or_many", {}
+            )
+          end
+        end
       end
     end
   end

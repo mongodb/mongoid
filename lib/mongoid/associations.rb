@@ -99,13 +99,10 @@ module Mongoid # :nodoc:
       #     embedded_in :person, :inverse_of => :addresses
       #   end
       def embedded_in(name, options = {}, &block)
-        unless options.has_key?(:inverse_of)
-          raise Errors::InvalidOptions.new(
-            "Options for embedded_in association must include :inverse_of"
-          )
-        end
+        opts = optionize(name, options, nil, &block)
+        Associations::EmbeddedIn.validate_options(opts)
         self.embedded = true
-        associate(Associations::EmbeddedIn, optionize(name, options, nil, &block))
+        associate(Associations::EmbeddedIn, opts)
       end
 
       # Adds the association from a parent document to its children. The name
@@ -128,7 +125,9 @@ module Mongoid # :nodoc:
       #     embedded_in :person, :inverse_of => :addresses
       #   end
       def embeds_many(name, options = {}, &block)
-        associate(Associations::EmbedsMany, optionize(name, options, nil, &block))
+        opts = optionize(name, options, nil, &block)
+        Associations::EmbedsMany.validate_options(opts)
+        associate(Associations::EmbedsMany, opts)
       end
 
       alias :embed_many :embeds_many
@@ -155,6 +154,7 @@ module Mongoid # :nodoc:
       def embeds_one(name, options = {}, &block)
         opts = optionize(name, options, nil, &block)
         type = Associations::EmbedsOne
+        type.validate_options(opts)
         associate(type, opts)
         add_builder(type, opts)
         add_creator(type, opts)
@@ -178,6 +178,7 @@ module Mongoid # :nodoc:
       #
       def referenced_in(name, options = {}, &block)
         opts = optionize(name, options, constraint(name, options, :in), &block)
+        Associations::ReferencedIn.validate_options(opts)
         associate(Associations::ReferencedIn, opts)
         field(opts.foreign_key, :type => using_object_ids? ? BSON::ObjectID : String)
         index(opts.foreign_key, :background => true) if !embedded? && opts.index

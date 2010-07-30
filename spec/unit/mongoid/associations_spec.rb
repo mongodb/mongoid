@@ -6,6 +6,11 @@ describe Mongoid::Associations do
     @collection = stub(:name => "people")
     @database = stub(:collection => @collection)
     Mongoid.stubs(:database).returns(@database)
+    Mongoid.autocreate_indexes = true
+  end
+
+  after do
+    Mongoid.autocreate_indexes = false
   end
 
   describe "#association=" do

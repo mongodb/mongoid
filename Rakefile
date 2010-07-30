@@ -2,6 +2,8 @@ require "rake"
 require "rake/rdoctask"
 require "rspec"
 require "rspec/core/rake_task"
+require "bundler"
+Bundler.setup
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
