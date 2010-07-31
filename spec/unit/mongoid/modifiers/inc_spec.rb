@@ -22,14 +22,14 @@ describe Mongoid::Modifiers::Inc do
       before do
         @collection.expects(:update).with(
           person._selector,
-          { "$inc" => { :field => 5 } },
+          { "$inc" => { :age => 5 } },
           :safe => true,
           :multi => false
         ).returns(true)
       end
 
       it "increments with the safe mode in the options" do
-        inc.persist(:field, 5)
+        inc.persist(:age, 5)
       end
     end
 
@@ -42,14 +42,35 @@ describe Mongoid::Modifiers::Inc do
       before do
         @collection.expects(:update).with(
           person._selector,
-          { "$inc" => { :field => 5 } },
+          { "$inc" => { :age => 5 } },
           :safe => false,
           :multi => false
         ).returns(true)
       end
 
       it "increments with safe mode as globally defined" do
-        inc.persist(:field, 5)
+        inc.persist(:age, 5)
+      end
+    end
+
+    context "in conjunction with dirty attributes" do
+
+      let(:inc) do
+        Mongoid::Modifiers::Inc.new(person, :safe => true)
+      end
+
+      before do
+        @collection.expects(:update).with(
+          person._selector,
+          { "$inc" => { :age => 5 } },
+          :safe => true,
+          :multi => false
+        ).returns(true)
+        inc.persist(:age, 5)
+      end
+
+      it "does not mark the field as dirty" do
+        person.changes[:age].should be_nil
       end
     end
   end

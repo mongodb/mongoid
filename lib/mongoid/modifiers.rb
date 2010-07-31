@@ -17,6 +17,7 @@ module Mongoid #:nodoc:
       current = send(field)
       write_attribute(field, (current ? (current + value) : value))
       Inc.new(self, options).persist(field, value)
+      current + value
     end
   end
 end
