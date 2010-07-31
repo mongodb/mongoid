@@ -4,6 +4,8 @@ module Mongoid #:nodoc:
     # Persistence commands extend from this class to get basic functionality on
     # initialization.
     class Command
+      include Mongoid::Safe
+
       attr_reader \
         :collection,
         :document,
@@ -35,16 +37,6 @@ module Mongoid #:nodoc:
         @selector = selector
         @validate = (validate.nil? ? true : validate)
         @options = { :safe => safe_mode?(options) }
-      end
-
-      protected
-      # Determine based on configuration if we are persisting in safe mode or
-      # not.
-      #
-      # The query option will always override the global configuration.
-      def safe_mode?(options)
-        safe = options[:safe]
-        safe.nil? ? Mongoid.persist_in_safe_mode : safe
       end
     end
   end
