@@ -42,6 +42,10 @@ describe Mongoid::Safety do
       stub
     end
 
+    let(:modifier) do
+      stub
+    end
+
     let(:person) do
       Person.new
     end
@@ -92,6 +96,31 @@ describe Mongoid::Safety do
 
         it "sends the safe mode option to the command" do
           person.safely.destroy(:safe => true)
+        end
+      end
+    end
+
+    describe "#inc" do
+
+      before do
+        Mongoid::Modifiers::Inc.expects(:new).with(
+          person,
+          { :safe => true }
+        ).returns(modifier)
+        modifier.expects(:persist).with(:age, 5).returns(true)
+      end
+
+      context "without options provided" do
+
+        it "sends the safe mode option to the command" do
+          person.safely.inc(:age, 5)
+        end
+      end
+
+      context "with options provided" do
+
+        it "sends the safe mode option to the command" do
+          person.safely.inc(:age, 5, :safe => true)
         end
       end
     end
