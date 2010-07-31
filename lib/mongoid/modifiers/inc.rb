@@ -12,11 +12,10 @@ module Mongoid #:nodoc:
       # field: The field to increment.
       # value: The number to increment by.
       def persist(field, value)
-        safe = @options[:safe]
         @document.collection.update(
           @document._selector,
           { "$inc" => { field => value } },
-          :safe => safe.nil? ? Mongoid.persist_in_safe_mode : safe,
+          :safe => safe_mode?(@options),
           :multi => false
         )
       end

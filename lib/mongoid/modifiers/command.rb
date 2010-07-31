@@ -12,6 +12,16 @@ module Mongoid #:nodoc:
       def initialize(document, options = {})
         @document, @options = document, options
       end
+
+      protected
+      # Determine based on configuration if we are persisting in safe mode or
+      # not.
+      #
+      # The query option will always override the global configuration.
+      def safe_mode?(options)
+        safe = options[:safe]
+        safe.nil? ? Mongoid.persist_in_safe_mode : safe
+      end
     end
   end
 end
