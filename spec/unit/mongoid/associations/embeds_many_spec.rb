@@ -569,6 +569,21 @@ describe Mongoid::Associations::EmbedsMany do
 
     end
 
+    context "when calling criteria methods" do
+
+      before do
+        @association = Mongoid::Associations::EmbedsMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+      end
+
+      it "can use fancy criteria clauses" do
+        @association.where(:state => /CA/).count.should ==
+          @association.where(:state => 'CA').count
+      end
+    end
+
     context "when no class method exists" do
 
       before do
