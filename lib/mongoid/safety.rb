@@ -70,6 +70,18 @@ module Mongoid #:nodoc:
         @target.send(name, attributes.merge(:safe => true))
       end
 
+      # Increment the field by the provided value, else if it doesn't exists set
+      # it to that value.
+      #
+      # Options:
+      #
+      # field: The field to increment.
+      # value: The value to increment by.
+      # options: Options to pass through to the driver.
+      def inc(field, value, options = {})
+        @target.inc(field, value, :safe => true)
+      end
+
       # Update the +Document+ attributes in the datbase.
       #
       # Example:

@@ -275,11 +275,8 @@ module Mongoid #:nodoc:
         #
         # options: Thank you captain obvious.
         def validate_options(options = {})
-          if options.has_key?(:dependent)
-            raise Errors::InvalidOptions.new(
-              "dependent_only_references_one_or_many", {}
-            )
-          end
+          check_dependent_not_allowed!(options)
+          check_inverse_not_allowed!(options)
         end
       end
     end

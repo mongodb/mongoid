@@ -232,6 +232,21 @@ describe Mongoid::Associations::EmbedsOne do
           association.validate_options({ :name => :name, :dependent => :destroy })
         }.should raise_error(Mongoid::Errors::InvalidOptions)
       end
+
+      context "when inverse_of is defined" do
+
+        let(:association) do
+          Mongoid::Associations::EmbedsOne
+        end
+
+        it "raises an error" do
+          lambda {
+            association.validate_options(
+              { :name => :name, :inverse_of => :person }
+            )
+          }.should raise_error(Mongoid::Errors::InvalidOptions)
+        end
+      end
     end
   end
 end

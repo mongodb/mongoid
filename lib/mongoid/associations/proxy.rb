@@ -28,6 +28,33 @@ module Mongoid #:nodoc
         @foreign_key = options.foreign_key
         extends(options)
       end
+
+      protected
+      class << self
+        def check_dependent_not_allowed!(options)
+          if options.has_key?(:dependent)
+            raise Errors::InvalidOptions.new(
+              "dependent_only_references_one_or_many", {}
+            )
+          end
+        end
+
+        def check_inverse_not_allowed!(options)
+          if options.has_key?(:inverse_of)
+            raise Errors::InvalidOptions.new(
+              "association_cant_have_inverse_of", {}
+            )
+          end
+        end
+
+        def check_inverse_must_be_defined!(options)
+          unless options.has_key?(:inverse_of)
+            raise Errors::InvalidOptions.new(
+              "embedded_in_must_have_inverse_of", {}
+            )
+          end
+        end
+      end
     end
   end
 end

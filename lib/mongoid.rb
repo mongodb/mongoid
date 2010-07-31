@@ -43,6 +43,7 @@ require "will_paginate/collection"
 require "mongo"
 require "mongoid/errors"
 require "mongoid/extensions"
+require "mongoid/safe"
 require "mongoid/associations"
 require "mongoid/atomicity"
 require "mongoid/attributes"
@@ -69,6 +70,7 @@ require "mongoid/keys"
 require "mongoid/logger"
 require "mongoid/matchers"
 require "mongoid/memoization"
+require "mongoid/modifiers"
 require "mongoid/named_scope"
 require "mongoid/paths"
 require "mongoid/persistence"
@@ -85,6 +87,10 @@ require "mongoid/document"
 # add railtie
 if defined?(Rails)
   require "mongoid/railtie"
+end
+
+Dir[File.join(File.dirname(__FILE__), "config", "locales", "*.yml")].each do |file|
+  I18n.load_path << file
 end
 
 module Mongoid #:nodoc
