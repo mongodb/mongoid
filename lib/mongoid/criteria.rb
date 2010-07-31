@@ -196,14 +196,6 @@ module Mongoid #:nodoc:
       return klass.criteria.where(conditions).extras(params)
     end
 
-    # Returns the first +Document+ in the criteria and then skips it. Returns
-    # nil if no documents match.
-    def shift
-      top = first
-      @options[:skip] = (@options[:skip] || 0) + 1
-      top
-    end
-
     protected
 
     # Filters the unused options out of the options +Hash+. Currently this

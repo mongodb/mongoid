@@ -317,19 +317,6 @@ describe Mongoid::Associations do
             end
           end
         end
-        
-        describe "#shift" do
-
-          it "returns the current value" do
-            @person.addresses.criteria.shift.number.should == 1
-          end
-
-          it "skips to the next value" do
-            @person.addresses.criteria.shift
-            @person.addresses.criteria.first.number.should == 2
-          end
-
-        end
 
         context "when adding a new association" do
 
