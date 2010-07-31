@@ -1,6 +1,6 @@
 # Use `bundle install` in order to install these gems
 # Use `bundle exec rake` in order to run the specs using the bundle
-source "http://gemcutter.org"
+source "http://rubygems.org"
 gemspec
 
-gem "ruby-debug"
+gem "ruby-debug-wrapper"
