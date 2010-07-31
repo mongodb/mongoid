@@ -1,17 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Modifiers #:nodoc:
-    class Inc #:nodoc:
-
-      # Instantiate the new $inc modifier.
-      #
-      # Options:
-      #
-      # klass: The class to get the collection from.
-      # options: The options to get passed through to the driver.
-      def initialize(document, options = {})
-        @document, @options = document, options
-      end
+    class Inc < Command #:nodoc:
 
       # Execute the persistence operation. This will increment the provided
       # field by the supplied value. If no field exists, it will be created and

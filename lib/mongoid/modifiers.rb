@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/modifiers/command"
 require "mongoid/modifiers/inc"
 
 module Mongoid #:nodoc:
