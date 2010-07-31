@@ -9,8 +9,8 @@ module Mongoid #:nodoc:
       #
       # klass: The class to get the collection from.
       # options: The options to get passed through to the driver.
-      def initialize(klass, options = {})
-        @klass, @options = klass, options
+      def initialize(document, options = {})
+        @document, @options = document, options
       end
 
       # Execute the persistence operation. This will increment the provided
@@ -23,7 +23,8 @@ module Mongoid #:nodoc:
       # value: The number to increment by.
       def persist(field, value)
         safe = @options[:safe]
-        @klass.collection.update(
+        @document.collection.update(
+          @document._selector,
           { "$inc" => { field => value } },
           :safe => safe.nil? ? Mongoid.persist_in_safe_mode : safe,
           :multi => false

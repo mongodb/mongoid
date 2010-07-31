@@ -7,16 +7,21 @@ describe Mongoid::Modifiers::Inc do
     Person.stubs(:collection).returns(@collection)
   end
 
+  let(:person) do
+    Person.new
+  end
+
   describe "#persist" do
 
     context "when safe mode provided" do
 
       let(:inc) do
-        Mongoid::Modifiers::Inc.new(Person, :safe => true)
+        Mongoid::Modifiers::Inc.new(person, :safe => true)
       end
 
       before do
         @collection.expects(:update).with(
+          person._selector,
           { "$inc" => { :field => 5 } },
           :safe => true,
           :multi => false
@@ -31,11 +36,12 @@ describe Mongoid::Modifiers::Inc do
     context "when safe mode not provided" do
 
       let(:inc) do
-        Mongoid::Modifiers::Inc.new(Person)
+        Mongoid::Modifiers::Inc.new(person)
       end
 
       before do
         @collection.expects(:update).with(
+          person._selector,
           { "$inc" => { :field => 5 } },
           :safe => false,
           :multi => false
