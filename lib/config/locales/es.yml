@@ -24,18 +24,16 @@ es:
           es un documento incrustado, por favor acceda a la colección
           desde el documento raíz.
         invalid_field:
-          No está permitido definir un campo con el nombre %{name}. No 
+          No está permitido definir un campo con el nombre %{name}. No
           defina campos que entren en conflicto con los atributos internos o
           nombres de métodos de Mongoid. Utilice Document#instance_methods para
           consultar los nombres ya incluidos.
         too_many_nested_attribute_records:
-          La aceptación de atributos anidados para %{association} está limitada 
+          La aceptación de atributos anidados para %{association} está limitada
           a %{limit} registros.
-        embedded_in_must_have_inverse_of:
-          Las opciones de una asociación embedded_in deben incluir inverse_of.
         dependent_only_references_one_or_many:
           La opción dependent => destroy|delete proporcionada
           sólo es válida en asociaciones references_one o references_many.
         association_cant_have_inverse_of:
-          No está permitido definir inverse_of en esta asociación. Utilice 
+          No está permitido definir inverse_of en esta asociación. Utilice
           esta opción sólo en embedded_in o en references_many as array.

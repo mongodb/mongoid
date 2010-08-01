@@ -29,8 +29,6 @@ it:
         too_many_nested_attribute_records:
           Il numero di attrubuti nested per %{association} è limitato
           a %{limit} records.
-        embedded_in_must_have_inverse_of:
-          Le opzioni di associazioni embedded_in devono includere inverse_of.
         dependent_only_references_one_or_many:
           "L'opzione dependent => destroy|delete è valida solo per
           associazioni references_one o references_many."
