@@ -29,6 +29,11 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Override respond_to? so it responds properly for dynamic attributes
+    def respond_to?(sym)
+      (Mongoid.allow_dynamic_fields && @attributes && @attributes.has_key?(sym.to_s)) || super
+    end
+
     # Process the provided attributes casting them to their proper values if a
     # field exists for them on the +Document+. This will be limited to only the
     # attributes provided in the suppied +Hash+ so that no extra nil values get

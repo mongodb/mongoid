@@ -269,6 +269,9 @@ describe Mongoid::Attributes do
         @person.testing.should == "Test"
       end
 
+      it "returns true for respond_to?" do
+        @person.respond_to?(:testing).should == true
+      end
     end
 
   end
