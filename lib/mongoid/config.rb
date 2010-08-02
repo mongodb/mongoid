@@ -169,6 +169,21 @@ module Mongoid #:nodoc
       end
     end
 
+    # Adds a new I18n locale file to the load path
+    #
+    # Example:
+    #
+    # Add portuguese locale
+    # <tt>Mongoid::config.add_language('pt')</tt>
+    #
+    # Adds all available languages
+    # <tt>Mongoid::Config.add_language('*')</tt>
+    def add_language(language_code = nil)
+      Dir[File.join(File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml")].each do |file|
+        I18n.load_path << File.expand_path(file)
+      end
+    end
+
     # Convenience method for connecting to the master database after forking a
     # new process.
     #

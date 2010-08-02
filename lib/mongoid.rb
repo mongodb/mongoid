@@ -89,9 +89,8 @@ if defined?(Rails)
   require "mongoid/railtie"
 end
 
-Dir[File.join(File.dirname(__FILE__), "config", "locales", "*.yml")].each do |file|
-  I18n.load_path << file
-end
+# add english load path by default
+I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
 module Mongoid #:nodoc
 
