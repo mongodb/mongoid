@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
         when Hash
           value = value.dup
           value.each_pair do |k, v|
-            unless %w($exists $size $elemMatch).include?(k)
+            unless %w($exists $size).include?(k)
               value[k] = typecast_value_for(field, v)
             end
           end
