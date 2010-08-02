@@ -457,5 +457,5 @@ describe Mongoid::Associations::ReferencesManyAsArray do
         end
       end
     end
-    end
+  end
 end
