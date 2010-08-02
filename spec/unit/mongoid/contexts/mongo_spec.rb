@@ -158,7 +158,8 @@ describe Mongoid::Contexts::Mongo do
         :hereditary => false,
         :instantiate => @person,
         :enslaved? => false,
-        :cached? => false
+        :cached? => false,
+        :fields => {}
       )
       @criteria = Mongoid::Criteria.new(@klass)
       @criteria.where(selector).skip(20)

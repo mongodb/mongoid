@@ -3,6 +3,7 @@ require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/optional"
+require "mongoid/criterion/selector"
 
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
@@ -116,7 +117,8 @@ module Mongoid #:nodoc:
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
     def initialize(klass)
-      @selector, @options, @klass, @documents = {}, {}, klass, []
+      @selector = Mongoid::Criterion::Selector.new(klass)
+      @options, @klass, @documents = {}, klass, []
     end
 
     # Merges another object into this +Criteria+. The other object may be a
