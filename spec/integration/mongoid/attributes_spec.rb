@@ -20,6 +20,17 @@ describe Mongoid::Attributes do
 
   end
 
+  context "with a default last_drink_taken_at" do
+
+    let(:person) { Person.new }
+
+    it "saves the default" do
+      expect { person.save }.to_not raise_error
+      person.last_drink_taken_at.should == 1.day.ago.to_date
+    end
+
+  end
+
   context "when persisting nested with accepts_nested_attributes_for" do
 
     context "when the nested document is embedded" do

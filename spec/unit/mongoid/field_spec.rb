@@ -12,6 +12,11 @@ describe Mongoid::Field do
       @field.default.should == 0
     end
 
+    it "returns the typed value" do
+      @field.expects(:set).with(0)
+      @field.default
+    end
+
     context "when the field is an array" do
 
       before do

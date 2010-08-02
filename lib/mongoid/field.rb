@@ -16,9 +16,9 @@ module Mongoid #:nodoc:
     #
     # Returns:
     #
-    # The primitive value or a copy of the default.
+    # The typecast default value.
     def default
-      copy
+      copy.respond_to?(:call) ? copy : set(copy)
     end
 
     # Create the new field with a name and optional additional options. Valid

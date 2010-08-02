@@ -601,6 +601,45 @@ describe Mongoid::Attributes do
 
   end
 
+  describe "#typed_value_for" do
+
+    let(:person) { Person.new }
+
+    context "when the key has been specified as a field" do
+
+      before { person.stubs(:fields).returns({"age" => Integer}) }
+
+      it "retuns the typed value" do
+        person.fields["age"].expects(:set).with("51")
+        person.send(:typed_value_for, "age", "51")
+      end
+
+    end
+
+    context "when the key has not been specified as a field" do
+
+      before { person.stubs(:fields).returns({}) }
+
+      it "returns the value" do
+        person.send(:typed_value_for, "age", "51").should == "51"
+      end
+
+    end
+
+  end
+
+  describe "#default_attributes" do
+
+    let(:person) { Person.new }
+
+    it "typecasts proc values" do
+      person.stubs(:defaults).returns("age" => lambda { "51" })
+      person.expects(:typed_value_for).with("age", "51")
+      person.send(:default_attributes)
+    end
+
+  end
+
   [:attributes=, :write_attributes].each do |method|
     describe "##{method}" do
 
