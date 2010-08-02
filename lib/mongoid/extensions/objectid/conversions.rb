@@ -4,7 +4,11 @@ module Mongoid #:nodoc:
     module ObjectID #:nodoc:
       module Conversions #:nodoc:
         def set(value)
-          value
+          if value.is_a?(::String)
+            BSON::ObjectID(value)
+          else
+            value
+          end
         end
         def get(value)
           value
