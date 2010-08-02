@@ -34,6 +34,7 @@ module Mongoid #:nodoc:
           @target << object
           object.save unless @parent.new_record?
         end
+        @parent.save unless @parent.new_record?
       end
 
       alias :concat :<<

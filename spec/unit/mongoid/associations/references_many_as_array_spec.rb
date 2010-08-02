@@ -102,6 +102,11 @@ describe Mongoid::Associations::ReferencesManyAsArray do
               preference.person_ids.should include(person.id)
             end
           end
+
+          it "saves the parent" do
+            person.expects(:save)
+            person.preferences << Preference.new(:name => "Utter darkness")
+          end
         end
       end
 
