@@ -7,7 +7,7 @@ describe Mongoid::Associations::ReferencedIn do
     context "when related id has been set" do
 
       before do
-        @document = stub(:person_id => "5")
+        @document = stub(:person_id => "4c52c439931a90ab29000003")
         @options = Mongoid::Associations::Options.new(:name => :person)
         @related = stub
       end
@@ -23,7 +23,7 @@ describe Mongoid::Associations::ReferencedIn do
     context "when options have an extension" do
 
       before do
-        @document = stub(:person_id => "5")
+        @document = stub(:person_id => "4c52c439931a90ab29000003")
         @block = Proc.new {
           def extension
             "Testing"
@@ -47,7 +47,7 @@ describe Mongoid::Associations::ReferencedIn do
 
     before do
       @person = Person.new(:title => "Mr")
-      @document = stub(:person_id => "5")
+      @document = stub(:person_id => "4c52c439931a90ab29000003")
       @options = Mongoid::Associations::Options.new(:name => :person)
       Person.expects(:find).with(@document.person_id).returns(@person)
       @association = Mongoid::Associations::ReferencedIn.new(@document, @options)
@@ -83,14 +83,14 @@ describe Mongoid::Associations::ReferencedIn do
   describe ".update" do
 
     before do
-      @related = stub(:id => "5")
+      @related = stub(:id => "4c52c439931a90ab29000003")
       @child = Game.new
       @options = Mongoid::Associations::Options.new(:name => :person)
       @association = Mongoid::Associations::ReferencedIn.update(@related, @child, @options)
     end
 
     it "sets the related object id on the parent" do
-      @child.person_id.should == "5"
+      @child.person_id.should == BSON::ObjectID('4c52c439931a90ab29000003')
     end
 
     it "returns the proxy" do

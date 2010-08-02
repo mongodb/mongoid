@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Associations::ReferencesOne do
 
-  let(:document) { stub(:id => "1") }
+  let(:document) { stub(:id => "4c52c439931a90ab29000001") }
   let(:block) do
     Proc.new do
       def extension
@@ -17,7 +17,7 @@ describe Mongoid::Associations::ReferencesOne do
   describe "#build" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person)
       Game.expects(:first).returns(nil)
       @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
     end
@@ -29,7 +29,7 @@ describe Mongoid::Associations::ReferencesOne do
 
     it "sets the parent object id on the child" do
       @association.build(:score => 100)
-      @association.person_id.should == @parent.id
+      @association.person_id.should == BSON::ObjectID(@parent.id)
     end
 
     it "sets the parent object reference on the child" do
@@ -42,7 +42,7 @@ describe Mongoid::Associations::ReferencesOne do
   describe "#create" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person)
       @insert = stub
       Game.expects(:first).returns(nil)
       Mongoid::Persistence::Insert.expects(:new).returns(@insert)
@@ -61,7 +61,7 @@ describe Mongoid::Associations::ReferencesOne do
 
     it "sets the parent object id on the child" do
       @association.create(:score => 100)
-      @association.person_id.should == @parent.id
+      @association.person_id.should == BSON::ObjectID(@parent.id)
     end
 
     it "returns the new document" do
@@ -73,7 +73,7 @@ describe Mongoid::Associations::ReferencesOne do
   describe "#id" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person)
       @game = Game.new
       Game.expects(:first).returns(@game)
       @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
@@ -100,7 +100,7 @@ describe Mongoid::Associations::ReferencesOne do
     context "when the options have an extension" do
 
       before do
-        @parent = stub(:id => "5", :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person)
         @game = Game.new
         Game.expects(:first).returns(@game)
         @association = Mongoid::Associations::ReferencesOne.new(@parent, options)
@@ -142,7 +142,7 @@ describe Mongoid::Associations::ReferencesOne do
   describe "#nested_build" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person)
       @game = Game.new
       Game.expects(:first).returns(@game)
     end

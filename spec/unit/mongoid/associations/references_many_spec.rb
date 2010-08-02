@@ -21,15 +21,15 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#<<" do
 
     before do
-      @child = Post.instantiate(:id => "1")
-      @second = Post.instantiate(:id => "2")
+      @child = Post.instantiate(:id => "4c52c439931a90ab29000001")
+      @second = Post.instantiate(:id => "4c52c439931a90ab29000002")
       @children = [@child, @second]
     end
 
     context "when parent document has been saved" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => false, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => false, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -48,7 +48,7 @@ describe Mongoid::Associations::ReferencesMany do
       context "when appending a non mongoid object" do
 
         before do
-          @parent = stub(:id => "1", :new_record? => true, :class => Person)
+          @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
           Post.expects(:all).returns([])
           @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
         end
@@ -64,7 +64,7 @@ describe Mongoid::Associations::ReferencesMany do
 
         before do
           @criteria = mock
-          @parent = stub(:id => "1", :new_record? => true, :class => Person)
+          @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
           Post.expects(:all).returns(@criteria)
           @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
         end
@@ -82,7 +82,7 @@ describe Mongoid::Associations::ReferencesMany do
     context "with multiple objects" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -103,7 +103,7 @@ describe Mongoid::Associations::ReferencesMany do
     before do
       @criteria = mock
       @criteria.expects(:entries).returns([])
-      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person, :new_record? => true)
       Post.expects(:all).returns(@criteria)
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
@@ -115,7 +115,7 @@ describe Mongoid::Associations::ReferencesMany do
 
     it "sets the parent object id on the child" do
       @association.build(:title => "Sassy")
-      @association.first.person_id.should == @parent.id
+      @association.first.person_id.should == BSON::ObjectID(@parent.id)
     end
 
     it "returns the new object" do
@@ -143,7 +143,7 @@ describe Mongoid::Associations::ReferencesMany do
       )
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       @association.build(:nickname => "Checking")
-      @association.first.person_id.should == @parent.id
+      @association.first.person_id.should == BSON::ObjectID(@parent.id)
     end
   end
 
@@ -151,14 +151,14 @@ describe Mongoid::Associations::ReferencesMany do
 
     before do
       @criteria = mock
-      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person, :new_record? => true)
       Post.expects(:all).twice.returns(@criteria)
       @parent.expects(:reset).with("posts").yields
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     it "deletes all of the associated object" do
-      Post.expects(:delete_all).with(:conditions => { "person_id" => "5" }).returns(3)
+      Post.expects(:delete_all).with(:conditions => { "person_id" => "4c52c439931a90ab29000005" }).returns(3)
       @association.delete_all.should == 3
     end
   end
@@ -167,14 +167,14 @@ describe Mongoid::Associations::ReferencesMany do
 
     before do
       @criteria = mock
-      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person, :new_record? => true)
       Post.expects(:all).twice.returns(@criteria)
       @parent.expects(:reset).with("posts").yields
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     it "destroys all of the associated objects" do
-      Post.expects(:destroy_all).with(:conditions => { "person_id" => "5" }).returns(3)
+      Post.expects(:destroy_all).with(:conditions => { "person_id" => "4c52c439931a90ab29000005" }).returns(3)
       @association.destroy_all.should == 3
     end
   end
@@ -182,14 +182,14 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#concat" do
 
     before do
-      @child = Post.instantiate(:id => "1")
-      @second = Post.instantiate(:id => "2")
+      @child = Post.instantiate(:id => "4c52c439931a90ab29000001")
+      @second = Post.instantiate(:id => "4c52c439931a90ab29000002")
     end
 
     context "when parent document has been saved" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => false, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => false, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -206,7 +206,7 @@ describe Mongoid::Associations::ReferencesMany do
     context "when parent document has not been saved" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -222,7 +222,7 @@ describe Mongoid::Associations::ReferencesMany do
     context "with multiple objects" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -242,7 +242,7 @@ describe Mongoid::Associations::ReferencesMany do
 
     before do
       @post = Post.new
-      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       Post.expects(:instantiate).returns(@post)
@@ -269,7 +269,7 @@ describe Mongoid::Associations::ReferencesMany do
 
     before do
       @post = Post.new
-      @parent = stub(:id => "5", :class => Person, :new_record? => true)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person, :new_record? => true)
       Post.expects(:all).returns([])
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       Post.expects(:instantiate).returns(@post)
@@ -295,7 +295,7 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#find" do
 
     before do
-      @parent = stub(:id => "5", :class => Person)
+      @parent = stub(:id => "4c52c439931a90ab29000005", :class => Person)
       Post.expects(:all).returns([])
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
@@ -307,8 +307,8 @@ describe Mongoid::Associations::ReferencesMany do
       end
 
       it "returns the document in the array with that id" do
-        @association.expects(:id_criteria).with("5").returns(@post)
-        post = @association.find("5")
+        @association.expects(:id_criteria).with("4c52c439931a90ab29000005").returns(@post)
+        post = @association.find("4c52c439931a90ab29000005")
         post.should == @post
       end
     end
@@ -416,18 +416,18 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#nested_build" do
 
     before do
-      @parent = stub(:id => "1", :new_record? => false, :class => Person)
+      @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => false, :class => Person)
 
-      @first = Post.new(:id => 0)
-      @second = Post.new(:id => 1)
+      @first = Post.new(:id => "4c52c439931a90ab29000000")
+      @second = Post.new(:id => "4c52c439931a90ab29000001")
       @related = [@first, @second]
       Post.expects(:all).returns(@related)
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
     end
 
     it "should update existing documents" do
-      @association.expects(:find).with("0").returns(@first)
-      @association.nested_build({ "0" => { "id" => "0", "title" => "Yet Another" } })
+      @association.expects(:find).with("4c52c439931a90ab29000000").returns(@first)
+      @association.nested_build({ "0" => { "id" => "4c52c439931a90ab29000000", "title" => "Yet Another" } })
       @association.size.should == 2
       @association[0].title.should == "Yet Another"
     end
@@ -444,14 +444,14 @@ describe Mongoid::Associations::ReferencesMany do
   describe "#push" do
 
     before do
-      @child = Post.instantiate(:id => "1")
-      @second = Post.instantiate(:id => "2")
+      @child = Post.instantiate(:id => "4c52c439931a90ab29000001")
+      @second = Post.instantiate(:id => "4c52c439931a90ab29000002")
     end
 
     context "when parent document has been saved" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => false, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => false, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -468,7 +468,7 @@ describe Mongoid::Associations::ReferencesMany do
     context "when parent document has not been saved" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
@@ -484,7 +484,7 @@ describe Mongoid::Associations::ReferencesMany do
     context "with multiple objects" do
 
       before do
-        @parent = stub(:id => "1", :new_record? => true, :class => Person)
+        @parent = stub(:id => "4c52c439931a90ab29000001", :new_record? => true, :class => Person)
         Post.expects(:all).returns([])
         @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       end
