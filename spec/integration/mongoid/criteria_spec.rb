@@ -163,13 +163,13 @@ describe Mongoid::Criteria do
 
   describe "#where" do
 
-    before do
-      @person = Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
+    let!(:person) do
+      Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
     end
 
     context "chaining multiple where" do
       it "with the same key" do
-        Person.criteria.where(:title => "Maam").where(:title => "Sir").should == [@person]
+        Person.criteria.where(:title => "Maam").where(:title => "Sir").should == [person]
       end
     end
 
@@ -178,7 +178,7 @@ describe Mongoid::Criteria do
       context "#all" do
 
         it "returns those matching an all clause" do
-          Person.criteria.where(:title.all => ["Sir"]).should == [@person]
+          Person.criteria.where(:title.all => ["Sir"]).should == [person]
         end
 
       end
@@ -186,7 +186,7 @@ describe Mongoid::Criteria do
       context "#exists" do
 
         it "returns those matching an exists clause" do
-          Person.criteria.where(:title.exists => true).should == [@person]
+          Person.criteria.where(:title.exists => true).should == [person]
         end
 
       end
@@ -194,7 +194,7 @@ describe Mongoid::Criteria do
       context "#gt" do
 
         it "returns those matching a gt clause" do
-          Person.criteria.where(:age.gt => 30).should == [@person]
+          Person.criteria.where(:age.gt => 30).should == [person]
         end
 
       end
@@ -202,7 +202,7 @@ describe Mongoid::Criteria do
       context "#gte" do
 
         it "returns those matching a gte clause" do
-          Person.criteria.where(:age.gte => 33).should == [@person]
+          Person.criteria.where(:age.gte => 33).should == [person]
         end
 
       end
@@ -210,7 +210,7 @@ describe Mongoid::Criteria do
       context "#in" do
 
         it "returns those matching an in clause" do
-          Person.criteria.where(:title.in => ["Sir", "Madam"]).should == [@person]
+          Person.criteria.where(:title.in => ["Sir", "Madam"]).should == [person]
         end
 
       end
@@ -218,7 +218,7 @@ describe Mongoid::Criteria do
       context "#lt" do
 
         it "returns those matching a lt clause" do
-          Person.criteria.where(:age.lt => 34).should == [@person]
+          Person.criteria.where(:age.lt => 34).should == [person]
         end
 
       end
@@ -226,7 +226,7 @@ describe Mongoid::Criteria do
       context "#lte" do
 
         it "returns those matching a lte clause" do
-          Person.criteria.where(:age.lte => 33).should == [@person]
+          Person.criteria.where(:age.lte => 33).should == [person]
         end
 
       end
@@ -234,7 +234,7 @@ describe Mongoid::Criteria do
       context "#ne" do
 
         it "returns those matching a ne clause" do
-          Person.criteria.where(:age.ne => 50).should == [@person]
+          Person.criteria.where(:age.ne => 50).should == [person]
         end
 
       end
@@ -242,7 +242,7 @@ describe Mongoid::Criteria do
       context "#nin" do
 
         it "returns those matching a nin clause" do
-          Person.criteria.where(:title.nin => ["Esquire", "Congressman"]).should == [@person]
+          Person.criteria.where(:title.nin => ["Esquire", "Congressman"]).should == [person]
         end
 
       end
@@ -250,7 +250,7 @@ describe Mongoid::Criteria do
       context "#size" do
 
         it "returns those matching a size clause" do
-          Person.criteria.where(:aliases.size => 2).should == [@person]
+          Person.criteria.where(:aliases.size => 2).should == [person]
         end
 
       end
@@ -258,7 +258,7 @@ describe Mongoid::Criteria do
       context "#match" do
 
         it "returns those matching a partial element in a list" do
-          Person.where(:things.matches => { :phone => "HTC Incredible" }).should == [@person]
+          Person.where(:things.matches => { :phone => "HTC Incredible" }).should == [person]
         end
 
       end
