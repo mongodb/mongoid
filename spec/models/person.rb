@@ -18,6 +18,7 @@ class Person
   field :ssn
   field :owner_id, :type => Integer
   field :security_code
+  field :reading, :type => Object
 
   index :age
   index :addresses
