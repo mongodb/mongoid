@@ -32,14 +32,12 @@ module Mongoid #:nodoc:
       end
 
       def typecast_value_for(field, value)
-        return value if field.type === value
+        return field.set(value) if field.type === value
         case value
         when Hash
           value = value.dup
           value.each_pair do |k, v|
-            unless %w($exists $size).include?(k)
-              value[k] = typecast_value_for(field, v)
-            end
+            value[k] = typecast_hash_value(field, k, v)
           end
         when Array
           value.map { |v| typecast_value_for(field, v) }
@@ -47,6 +45,17 @@ module Mongoid #:nodoc:
           value
         else
           field.set(value)
+        end
+      end
+
+      def typecast_hash_value(field, key, value)
+        case key
+        when "$exists"
+          Boolean.set(value)
+        when "$size"
+          Integer.set(value)
+        else
+          typecast_value_for(field, value)
         end
       end
 

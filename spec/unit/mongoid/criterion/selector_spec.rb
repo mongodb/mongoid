@@ -103,9 +103,9 @@ describe Mongoid::Criterion::Selector do
     context "when the value is an array" do
 
       context "and the field type is array" do
-        it "should not try to typecast the value" do
+        it "should let the field typecast the value" do
           field.stubs(:type).returns(Array)
-          field.expects(:set).never
+          field.expects(:set).with([]).once
           selector.send(:typecast_value_for, field, [])
         end
       end
@@ -133,9 +133,15 @@ describe Mongoid::Criterion::Selector do
 
         context "when the hash is an $exists query" do
 
-          it "should not typecast the value" do
+          it "should not typecast the hash" do
             value = {"$exists" => true}
             field.expects(:set).never
+            selector.send(:typecast_value_for, field, value)
+          end
+
+          it "typecasts the value" do
+            value = {"$exists" => "true"}
+            Boolean.expects(:set).with("true")
             selector.send(:typecast_value_for, field, value)
           end
 
@@ -143,9 +149,15 @@ describe Mongoid::Criterion::Selector do
 
         context "when the hash is a $size query" do
 
-          it "should not typecast the value" do
+          it "should not typecast the hash" do
             value = {"$size" => 2}
             field.expects(:set).never
+            selector.send(:typecast_value_for, field, value)
+          end
+
+          it "typecasts the value" do
+            value = {"$size" => "2"}
+            Integer.expects(:set).with("2")
             selector.send(:typecast_value_for, field, value)
           end
 
@@ -156,9 +168,9 @@ describe Mongoid::Criterion::Selector do
       context "and the field type is a hash" do
         before { field.stubs(:type => Hash) }
 
-        it "should not try to typecast it's values" do
+        it "should let the field typecast the value" do
           value = { "name" => "John" }
-          field.expects(:set).never
+          field.expects(:set).with(value).once
           selector.send(:typecast_value_for, field, value)
         end
 

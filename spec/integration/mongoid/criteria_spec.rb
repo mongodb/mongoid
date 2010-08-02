@@ -163,14 +163,49 @@ describe Mongoid::Criteria do
 
   describe "#where" do
 
+    let(:dob) { 33.years.ago.to_date }
+    let(:lunch_time) { 30.minutes.ago }
     let!(:person) do
-      Person.create(:title => "Sir", :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
+      Person.create(:title => "Sir", :dob => dob, :lunch_time => lunch_time, :age => 33, :aliases => ["D", "Durran"], :things => [{:phone => 'HTC Incredible'}])
     end
 
     context "chaining multiple where" do
       it "with the same key" do
         Person.criteria.where(:title => "Maam").where(:title => "Sir").should == [person]
       end
+    end
+
+    context "with untyped criteria" do
+
+      it "typecasts integers" do
+        Person.where(:age => "33").should == [person]
+      end
+
+      it "typecasts datetimes" do
+        Person.where(:lunch_time => lunch_time.to_s).should == [person]
+      end
+
+      it "typecasts dates" do
+        Person.where({:dob => dob.to_s}).should == [person]
+      end
+
+      it "typecasts times with zones" do
+        time = lunch_time.in_time_zone("Alaska")
+        Person.where(:lunch_time => time).should == [person]
+      end
+
+      it "typecasts array elements" do
+        Person.where(:age.in => [17, "33"]).should == [person]
+      end
+
+      it "typecasts size criterion to integer" do
+        Person.where(:aliases.size => "2").should == [person]
+      end
+
+      it "typecasts exists criterion to boolean" do
+        Person.where(:score.exists => "f").should == [person]
+      end
+
     end
 
     context "with complex criterion" do
