@@ -1,5 +1,5 @@
 require "rubygems"
-require "ruby-prof"
+# require "ruby-prof"
 require "benchmark"
 
 require "mongoid"
@@ -48,7 +48,7 @@ end
 
 puts "Starting benchmark..."
 
-RubyProf.start
+# RubyProf.start
 
 1000.times do |n|
   person = Person.new(:birth_date => Date.new(1970, 1, 1))
@@ -67,9 +67,9 @@ RubyProf.start
   person.save
 end
 
-result = RubyProf.stop
-printer = RubyProf::FlatPrinter.new(result)
-printer.print(STDOUT, 0)
+# result = RubyProf.stop
+# printer = RubyProf::FlatPrinter.new(result)
+# printer.print(STDOUT, 0)
 
 Benchmark.bm do |bm|
   bm.report("Saving 10k New Documents") do
@@ -171,3 +171,11 @@ end
 # Updating The Root Document 10k Times         5.610000   0.180000   5.790000 (  5.785066)
 # Updating An Embedded Document 10k Times      4.520000   0.150000   4.670000 (  4.669489)
 # Appending A New Embedded Document 10k Times  7.140000   0.260000   7.400000 (  7.395471)
+# ---------------------------------------------------------------------------------------
+# 2.0.0.beta.15
+#
+# Saving 10k New Documents                    14.450000   0.360000  14.810000 ( 14.797150)
+# Querying & Iterating 10k Documents           1.150000   0.070000   1.220000 (  1.234555)
+# Updating The Root Document 10k Times         3.040000   0.160000   3.200000 (  3.195466)
+# Updating An Embedded Document 10k Times      2.550000   0.130000   2.680000 (  2.668367)
+# Appending A New Embedded Document 10k Times  5.080000   0.240000   5.320000 (  5.327933)
