@@ -537,6 +537,34 @@ describe Mongoid::Associations::EmbedsMany do
       @association.size.should == 3
       @association[2].street.should == "Yet Another"
     end
+    
+    it "should reorder documents if ids are present" do
+      @association.nested_build({
+        "0" => { "id" => "street-2" },
+        "1" => { "id" => "street-1" }
+      })
+      @association.size.should == 2
+      @association[0].street.should == "Street 2"
+      @association[1].street.should == "Street 1"
+    end
+
+    it "should add multiple objects in the correct order" do
+      @association.nested_build({
+        "0" => { "id" => "street-2" },
+        "1" => { "id" => "street-1" },
+        "2" => { :street => "Street 3" },
+        "3" => { :street => "Street 4" },
+        "4" => { :street => "Street 5" },
+        "5" => { :street => "Street 6" }
+      })
+      @association.size.should == 6
+      @association[0].street.should == "Street 2"
+      @association[1].street.should == "Street 1"
+      @association[2].street.should == "Street 3"
+      @association[3].street.should == "Street 4"
+      @association[4].street.should == "Street 5"
+      @association[5].street.should == "Street 6"
+    end
 
   end
 

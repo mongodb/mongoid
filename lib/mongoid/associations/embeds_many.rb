@@ -175,8 +175,16 @@ module Mongoid #:nodoc:
       # The newly build target Document.
       def nested_build(attributes, options = {})
         @parent.instance_variable_set(:@building_nested, true)
+        id_index, reordering = {}, false
         attributes.each do |index, attrs|
-          if document = detect { |document| document._index == index.to_i }
+          document = if attrs["id"].present?
+            reordering = true
+            id_index[attrs["id"]] = index.to_i
+            detect { |document| document.id.to_s == attrs["id"].to_s }
+          else
+            detect { |document| document._index == index.to_i }
+          end
+          if document
             if options && options[:allow_destroy] && Boolean.set(attrs['_destroy'])
               @target.delete(document)
               document.destroy
@@ -184,7 +192,14 @@ module Mongoid #:nodoc:
               document.write_attributes(attrs)
             end
           else
-            build(attrs)
+            document = build(attrs)
+            id_index[document.id.to_s] = index.to_i
+          end
+        end
+        if reordering
+          @target.sort! do |a, b|
+            ai, bi = id_index[a.id.to_s], id_index[b.id.to_s]
+            ai.nil? ? (bi.nil? ? 0 : 1) : (bi.nil? ? -1 : ai <=> bi)
           end
         end
         @target.each_with_index { |document, index| document._index = index }
