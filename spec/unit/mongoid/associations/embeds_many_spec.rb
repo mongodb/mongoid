@@ -537,7 +537,7 @@ describe Mongoid::Associations::EmbedsMany do
       @association.size.should == 3
       @association[2].street.should == "Yet Another"
     end
-    
+
     it "should reorder documents if ids are present" do
       @association.nested_build({
         "0" => { "id" => "street-2" },
