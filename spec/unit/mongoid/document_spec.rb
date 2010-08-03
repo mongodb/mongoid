@@ -12,6 +12,10 @@ describe Mongoid::Document do
     @canvas_collection.stubs(:create_index).with(:_type, false)
   end
 
+  it "does not respond to _destroy" do
+    Person.new.should_not respond_to(:_destroy)
+  end
+
   describe "#==" do
 
     context "when other object is a Document" do
