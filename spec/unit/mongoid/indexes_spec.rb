@@ -47,7 +47,7 @@ describe Mongoid::Indexes do
       before do
         @class = Class.new do
           include Mongoid::Indexes
-          def self.hereditary
+          def self.hereditary?
             true
           end
         end
@@ -65,7 +65,7 @@ describe Mongoid::Indexes do
       before do
         @class = Class.new do
           include Mongoid::Indexes
-          def self.hereditary
+          def self.hereditary?
             true
           end
         end

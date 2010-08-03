@@ -218,12 +218,20 @@ describe Mongoid::Document do
 
   end
 
-  describe ".hereditary" do
+  describe ".hereditary?" do
 
-    context "when the class is part of a hierarchy" do
+    context "when the class is the root of a hierarchy" do
+
+      it "returns false" do
+        Canvas.should_not be_hereditary
+      end
+
+    end
+
+    context "when the class is a part of a hierarchy" do
 
       it "returns true" do
-        Canvas.hereditary.should be_true
+        Browser.should be_hereditary
       end
 
     end
@@ -231,7 +239,7 @@ describe Mongoid::Document do
     context "when the class is not part of a hierarchy" do
 
       it "returns false" do
-        Game.hereditary.should be_false
+        Game.should_not be_hereditary
       end
 
     end
@@ -344,7 +352,7 @@ describe Mongoid::Document do
     context "without a type specified" do
 
       it "sets the type" do
-        Person.new._type.should == "Person"
+        Doctor.new._type.should == "Doctor"
       end
     end
   end

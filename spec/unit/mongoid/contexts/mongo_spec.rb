@@ -21,7 +21,7 @@ describe Mongoid::Contexts::Mongo do
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with(
           [:field1],
-          {:_type => {'$in' => ['Doctor', 'Person']}},
+          {},
           {:count => 0},
           @reduce,
           true
@@ -44,7 +44,7 @@ describe Mongoid::Contexts::Mongo do
     it "calls group on the collection with the aggregate js" do
       @collection.expects(:group).with(
         nil,
-        {:_type => {'$in' => ['Doctor', 'Person']}},
+        {},
         {:sum => "start"},
         @reduce
       ).returns([{"sum" => 100.0}])
@@ -155,7 +155,7 @@ describe Mongoid::Contexts::Mongo do
       @collection = mock
       @klass = stub(
         :collection => @collection,
-        :hereditary => false,
+        :hereditary? => false,
         :instantiate => @person,
         :enslaved? => false,
         :cached? => false,
@@ -221,7 +221,7 @@ describe Mongoid::Contexts::Mongo do
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with(
           [:field1],
-          {:_type => { "$in" => ["Doctor", "Person"] }},
+          {},
           {:group => []},
           @reduce
         ).returns(@grouping)
@@ -236,7 +236,7 @@ describe Mongoid::Contexts::Mongo do
 
     let(:selector) { { :field => "value"  } }
     let(:options) { { :skip => 20 } }
-    let(:klass) { Person }
+    let(:klass) { Doctor }
     let(:criteria) { Mongoid::Criteria.new(klass) }
     let(:context) { Mongoid::Contexts::Mongo.new(criteria) }
 
@@ -259,7 +259,7 @@ describe Mongoid::Contexts::Mongo do
     context "when hereditary" do
 
       it "set the selector to query across the _type when it is hereditary" do
-        context.selector[:_type].should == {'$in' => Person._types}
+        context.selector[:_type].should == {'$in' => klass._types}
       end
 
     end
@@ -364,7 +364,7 @@ describe Mongoid::Contexts::Mongo do
         @criteria.order_by([[:title, :asc]])
         @context = Mongoid::Contexts::Mongo.new(@criteria)
         @collection.expects(:find_one).with(
-          {:_type => {'$in' => ['Doctor', 'Person']}},
+          {},
           { :sort => [[:title, :desc]] }
         ).returns(
           { "title" => "Sir", "_type" => "Person" }
@@ -384,7 +384,7 @@ describe Mongoid::Contexts::Mongo do
         @criteria.order_by([[:_id, :asc]])
         @context = Mongoid::Contexts::Mongo.new(@criteria)
         @collection.expects(:find_one).with(
-          {:_type => {'$in' => ['Doctor', 'Person']}},
+          {},
           { :sort => [[:_id, :desc]] }
         ).returns(nil)
       end
@@ -402,7 +402,7 @@ describe Mongoid::Contexts::Mongo do
         @criteria.order_by([[:_id, :asc]])
         @context = Mongoid::Contexts::Mongo.new(@criteria)
         @collection.expects(:find_one).with(
-          {:_type => {'$in' => ['Doctor', 'Person']}},
+          {},
           { :sort => [[:_id, :desc]] }
         ).returns(
           { "title" => "Sir", "_type" => "Person" }
@@ -430,7 +430,7 @@ describe Mongoid::Contexts::Mongo do
     it "calls group on the collection with the aggregate js" do
       @collection.expects(:group).with(
         nil,
-        {:_type => {'$in' => ['Doctor', 'Person']}},
+        {},
         {:max => "start"},
         @reduce
       ).returns([{"max" => 200.0}])
@@ -452,7 +452,7 @@ describe Mongoid::Contexts::Mongo do
     it "calls group on the collection with the aggregate js" do
       @collection.expects(:group).with(
         nil,
-        {:_type => {'$in' => ['Doctor', 'Person']}},
+        {},
         {:min => "start"},
         @reduce
       ).returns([{"min" => 4.0}])
@@ -469,7 +469,7 @@ describe Mongoid::Contexts::Mongo do
         Person.expects(:collection).returns(@collection)
         @criteria = Mongoid::Criteria.new(Person)
         @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with({:_type => {'$in' => ['Doctor', 'Person']}}, {}).returns(
+        @collection.expects(:find_one).with({}, {}).returns(
           { "title"=> "Sir", "_type" => "Person" }
         )
       end
@@ -487,7 +487,7 @@ describe Mongoid::Contexts::Mongo do
         Person.expects(:collection).returns(@collection)
         @criteria = Mongoid::Criteria.new(Person)
         @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with({:_type => {'$in' => ['Doctor', 'Person']}}, {}).returns(nil)
+        @collection.expects(:find_one).with({}, {}).returns(nil)
       end
 
       it "returns nil" do
@@ -536,7 +536,7 @@ describe Mongoid::Contexts::Mongo do
       @criteria = Person.where(:_id => "1").skip(60).limit(20)
       @context = Mongoid::Contexts::Mongo.new(@criteria)
       @collection.expects(:find).with(
-        {:_type => { "$in" => ["Doctor", "Person"] }, :_id => "1"}, :skip => 60, :limit => 20
+        {:_id => "1"}, :skip => 60, :limit => 20
       ).returns([])
       @results = @context.paginate
     end
@@ -555,7 +555,7 @@ describe Mongoid::Contexts::Mongo do
       @criteria = Person.where(:_id => "1").skip(60).limit(20)
       @context = Mongoid::Contexts::Mongo.new(@criteria)
       @collection.expects(:find).with(
-        {:_type => { "$in" => ["Doctor", "Person"] }, :_id => "1"}, :skip => 20, :limit => 10
+        {:_id => "1"}, :skip => 20, :limit => 10
       ).returns([])
       @results = @context.paginate(:page => 3, :per_page => 10)
     end
@@ -581,7 +581,7 @@ describe Mongoid::Contexts::Mongo do
       it "calls group on the collection with the aggregate js" do
         @collection.expects(:group).with(
           nil,
-          {:_type => {'$in' => ['Doctor', 'Person']}},
+          {},
           {:sum => "start"},
           @reduce
         ).returns([{"sum" => 50.0}])

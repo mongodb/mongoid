@@ -95,7 +95,7 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :title => "Sir", :_type => { "$in" => ["Doctor", "Person"] } }, {}).returns(@cursor)
+        @collection.expects(:find).with({ :title => "Sir"}, {}).returns(@cursor)
       end
 
       it "executes the criteria and returns the element at the index" do
@@ -330,7 +330,7 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @collection.expects(:find).with({:title => "Sir"}, {}).returns(@cursor)
         @cursor.expects(:each).yields(@person)
       end
 
@@ -346,7 +346,7 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @collection.expects(:find).with({:title => "Sir"}, {}).returns(@cursor)
         @cursor.expects(:each).yields(@person)
       end
 
@@ -371,9 +371,7 @@ describe Mongoid::Criteria do
       before do
         Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with(
-          { :_type => { "$in" => ["Doctor", "Person"] },
-            :title => "Sir"
-          },
+          { :title => "Sir" },
           { :cache => true }
         ).returns(@cursor)
         @cursor.expects(:each).yields(@person)

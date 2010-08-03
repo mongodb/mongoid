@@ -11,15 +11,6 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
 
-      # Perform default behavior but mark the hierarchy as being hereditary.
-      #
-      # This method must remain in the +Document+ module, even though its
-      # behavior affects items in the Hierarchy module.
-      def inherited(subclass)
-        self.hereditary = true
-        super
-      end
-
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #

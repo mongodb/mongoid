@@ -44,7 +44,7 @@ describe Mongoid::Cursor do
   describe "#each" do
 
     before do
-      proxy.expects(:each).yields({ "_type" => "Person" })
+      proxy.expects(:each).yields({})
     end
 
     it "yields to the next document" do
@@ -57,7 +57,7 @@ describe Mongoid::Cursor do
   describe "#next_document" do
 
     before do
-      proxy.expects(:next_document).returns({ "_type" => "Person" })
+      proxy.expects(:next_document).returns({})
     end
 
     it "returns the next document from the proxied cursor" do
@@ -69,7 +69,7 @@ describe Mongoid::Cursor do
   describe "#to_a" do
 
     before do
-      proxy.expects(:to_a).returns([{ "_type" => "Person" }])
+      proxy.expects(:to_a).returns([{}])
     end
 
     it "converts the proxy cursor to an array of documents" do
