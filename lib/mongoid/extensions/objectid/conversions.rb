@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def set(value)
           if value.is_a?(::String)
-            BSON::ObjectID.from_string(value)
+            BSON::ObjectID.from_string(value) unless value.blank?
           else
             value
           end
