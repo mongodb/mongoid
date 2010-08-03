@@ -2,7 +2,7 @@ sv:
   activemodel:
     errors:
       messages:
-        taken: är redan tagen
+        taken: har redan använts
 
   mongoid:
     errors:
