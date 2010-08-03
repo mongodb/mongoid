@@ -17,12 +17,12 @@ describe Mongoid::Extensions do
       end
 
     end
+
   end
 
   context "setting association foreign keys" do
 
     context "when value is a string" do
-      
 
       before do
         @game = Game.new
@@ -36,7 +36,7 @@ describe Mongoid::Extensions do
       end
 
     end
-    
+
     context "when value is a ObjectID" do
 
       before do
@@ -51,7 +51,7 @@ describe Mongoid::Extensions do
       end
 
     end
-    
+
   end
 
 end
