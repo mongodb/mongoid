@@ -74,6 +74,13 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#execute" do
 
+    it "calls sort on the filtered collection" do
+      filtered_documents = []
+      context.stubs(:filter).returns(filtered_documents)
+      context.expects(:sort).with(filtered_documents)
+      context.execute
+    end
+
     context "when the selector is present" do
       before { criteria.where(:street => "Bourke Street") }
       it "returns the matching documents from the array" do
@@ -277,6 +284,24 @@ describe Mongoid::Contexts::Enumerable do
         context.per_page.should == 50
       end
 
+    end
+
+  end
+
+  describe "#sort" do
+
+    context "with no sort options" do
+      it "returns the documents as is" do
+        context.send(:sort, docs).should == docs
+      end
+    end
+
+    context "with sort options" do
+      before { context.options[:sort] = [ [:created_at, :asc] ] }
+      it "sorts by the key" do
+        docs.expects(:sort_by).once
+        context.send(:sort, docs)
+      end
     end
 
   end

@@ -1,4 +1,7 @@
 # encoding: utf-8
+
+require 'mongoid/contexts/enumerable/sort'
+
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
@@ -56,7 +59,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ of documents that matched the selector.
       def execute(paginating = false)
-        limit(filter) || []
+        limit(sort(filter)) || []
       end
 
       # Groups the documents by the first field supplied in the field options.
@@ -150,6 +153,16 @@ module Mongoid #:nodoc:
           return documents.first(limit)
         end
         documents
+      end
+
+      # Sorts the result set if sort options have been set.
+      def sort(documents)
+        return documents if options[:sort].blank?
+        documents.sort_by do |document|
+          options[:sort].map do |key, direction|
+            Sort.new(document.read_attribute(key), direction)
+          end
+        end
       end
     end
   end
