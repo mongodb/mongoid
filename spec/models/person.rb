@@ -55,7 +55,8 @@ class Person
 
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name, :update_only => true
-  accepts_nested_attributes_for :pet
+  accepts_nested_attributes_for :pet, :allow_destroy => true
+  accepts_nested_attributes_for :game, :allow_destroy => true
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
 
   references_one :game, :dependent => :destroy do

@@ -61,7 +61,15 @@ module Mongoid #:nodoc:
       #
       # A new target document.
       def nested_build(attributes, options = nil)
-        build(attributes) unless @target.blank? && options[:update_only]
+        options ||= {}
+        _destroy = Boolean.set(attributes.delete('_destroy'))
+        if options[:allow_destroy] && _destroy
+          @target.destroy
+          @target = nil
+        elsif @target.present? || !options[:update_only]
+          build(attributes)
+        end
+        @target
       end
 
       class << self

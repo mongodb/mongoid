@@ -33,7 +33,7 @@ describe Mongoid::Attributes do
 
   context "when persisting nested with accepts_nested_attributes_for" do
 
-    context "when the nested document is embedded" do
+    context "when the nested document is an embeds_many" do
       before do
         @survey = Survey.new
         @survey.questions.build(:content => 'Do you like cheesecake ?')
@@ -57,7 +57,28 @@ describe Mongoid::Attributes do
       end
     end
 
-    context "when the nested document is related" do
+    context "when the nested document is an embeds_one" do
+      let(:person) { Person.create }
+
+      it "adds an embedded document" do
+        person.update_attributes(:pet_attributes => {"name" => "Smoke"})
+        person.pet.name.should == "Smoke"
+      end
+
+      it "updates an embedded document" do
+        person.create_pet(:name => "Smoke")
+        person.update_attributes(:pet_attributes => {"name" => "Chloe"})
+        person.pet.name.should == "Chloe"
+      end
+
+      it "deletes an embedded document" do
+        person.create_pet(:name => "Smoke")
+        person.update_attributes(:pet_attributes => {"_destroy" => "1"})
+        person.pet.should be_nil
+      end
+    end
+
+    context "when the nested document is a references_many" do
       before do
         @agent = Agent.new
         post1 = @agent.posts.build(:title => "Post 1")
@@ -78,6 +99,27 @@ describe Mongoid::Attributes do
         @agent.posts.size.should == 2
         Set.new(["Do you like ice cream ?", "Do you like carrot cake ?"]).should ==
           Set.new(@agent.posts.map(&:title))
+      end
+    end
+
+    context "when the nested document is a references_one" do
+      let(:person) { Person.create }
+
+      it "adds a document" do
+        person.update_attributes(:game_attributes => {"score" => "78"})
+        person.game.score.should == 78
+      end
+
+      it "updates a document" do
+        person.create_game(:score => "78")
+        person.update_attributes(:game_attributes => {"score" => "67"})
+        person.game.score.should == 67
+      end
+
+      it "deletes a document" do
+        person.create_game(:score => "78")
+        person.update_attributes(:game_attributes => {"_destroy" => "1"})
+        person.game.should be_nil
       end
     end
   end
