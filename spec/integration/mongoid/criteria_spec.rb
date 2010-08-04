@@ -200,6 +200,16 @@ describe Mongoid::Criteria do
 
     end
 
+    context "with multiple complex criteria" do
+      before do
+        Person.create(:title => "Mrs", :age => 29)
+        Person.create(:title => "Ms", :age => 41)
+      end
+      it "returns those matching both criteria" do
+        Person.where(:age.gt => 30, :age.lt => 40).should == [person]
+      end
+    end
+
     context "with complex criterion" do
 
       context "#all" do
