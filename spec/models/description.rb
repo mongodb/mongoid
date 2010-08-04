@@ -3,6 +3,6 @@ class Description
 
   field :details
 
-  belongs_to_related :user
-  belongs_to_related :updater, :class_name => 'User'
+  referenced_in :user
+  referenced_in :updater, :class_name => 'User'
 end
