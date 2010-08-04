@@ -240,14 +240,14 @@ describe Mongoid::Config do
 
       context "default" do
         it "reconnects on the master connection" do
-          @connection.expects(:connect_to_master).returns(true)
+          @connection.expects(:connect).returns(true)
           config.reconnect!
         end
       end
 
       context "now=true" do
         it "reconnects on the master connection" do
-          @connection.expects(:connect_to_master).returns(true)
+          @connection.expects(:connect).returns(true)
           config.reconnect!(true)
         end
       end
