@@ -102,50 +102,6 @@ describe Mongoid::Criterion::Optional do
     end
   end
 
-  describe "#cast_ids!" do
-
-    let(:criteria) do
-      Mongoid::Criteria.new(Person)
-    end
-
-    context "when not using object ids" do
-
-      before do
-        Person.identity :type => String
-      end
-
-      it "returns args" do
-        criteria.cast_ids!("foo").should == "foo"
-      end
-
-    end
-
-    context "when using object ids" do
-
-      before do
-        Person.identity :type => BSON::ObjectID
-      end
-
-      it "transforms String args to BSON::ObjectIDs" do
-        id = BSON::ObjectID.new
-        criteria.cast_ids!(id.to_s).should == id
-      end
-
-      it "transforms all Strings inside an Array" do
-        ids = [BSON::ObjectID.new, BSON::ObjectID.new]
-        criteria.cast_ids!(ids.map(&:to_s)).should == ids
-      end
-
-      context "when casting is false" do
-
-        it "doesnt change the argument types" do
-          id = BSON::ObjectID.new
-          criteria.cast_ids!(id.to_s, false).should == id.to_s
-        end
-      end
-    end
-  end
-
   describe "#descending" do
 
     context "when providing a field" do

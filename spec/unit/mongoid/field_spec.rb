@@ -19,14 +19,32 @@ describe Mongoid::Field do
 
     context "when the field is an array" do
 
-      before do
-        @field = Mongoid::Field.new(:vals, :type => Array, :default => [ "first" ])
+      context "when the array is user defined" do
+
+        before do
+          @field = Mongoid::Field.new(:vals, :type => Array, :default => [ "first" ])
+        end
+
+        it "dups the array" do
+          array = @field.default
+          array << "second"
+          @field.default.should == [ "first" ]
+        end
       end
 
-      it "dups the array" do
-        array = @field.default
-        array << "second"
-        @field.default.should == [ "first" ]
+      context "when the array is object ids" do
+
+        let(:field) do
+          Mongoid::Field.new(:vals, :type => Array, :default => [], :identity => true)
+        end
+
+        context "when using object ids" do
+
+        end
+
+        context "when using defaults" do
+
+        end
       end
     end
 
