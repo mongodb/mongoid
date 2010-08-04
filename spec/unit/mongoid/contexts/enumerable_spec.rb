@@ -116,6 +116,16 @@ describe Mongoid::Contexts::Enumerable do
 
     end
 
+    context "when skip is set without limit in the options" do
+
+      before { criteria.skip(2) }
+
+      it "properly skips the specified records" do
+        context.execute.size.should == 2
+      end
+
+    end
+
   end
 
   describe "#first" do

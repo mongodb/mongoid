@@ -151,6 +151,8 @@ module Mongoid #:nodoc:
           return documents.slice(skip, limit)
         elsif limit
           return documents.first(limit)
+        elsif skip
+          return documents.slice(skip..-1)
         end
         documents
       end
