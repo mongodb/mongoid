@@ -63,9 +63,9 @@ namespace :db do
     def get_mongoid_models
       documents = []
       Dir.glob("app/models/**/*.rb").sort.each do |file|
-        model = file.match(/\/(\w+).rb$/)[1]
+        model_path = file[0..-4].split('/')[2..-1]
         begin
-          klass = model.classify.constantize
+          klass = model_path.map(&:classify).join('::').constantize
           if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
             documents << klass
           end
