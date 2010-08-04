@@ -8,6 +8,28 @@ describe Mongoid::Associations do
     end
   end
 
+  context "when setting an array of object ids" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when the values are strings" do
+
+      let(:object_id) do
+        BSON::ObjectID.new
+      end
+
+      before do
+        person.attributes = { "preference_ids" => [ object_id.to_s ] }
+      end
+
+      it "casts back to object ids" do
+        person.preference_ids.should == [ object_id ]
+      end
+    end
+  end
+
   context "when destroying dependent documents" do
 
     before do

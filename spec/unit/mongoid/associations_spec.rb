@@ -678,6 +678,10 @@ describe Mongoid::Associations do
           Person.allocate.should respond_to(:preference_ids)
         end
 
+        it "creates an array field with identity set to true" do
+          Person.fields["preference_ids"].options[:identity].should be_true
+        end
+
         context "when index is set to true" do
 
           it "adds an index on the association field" do

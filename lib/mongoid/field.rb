@@ -1,13 +1,13 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   class Field
-    attr_reader :name, :type
+    attr_reader :klass, :name, :type
 
     # Get the declared options for this field
     #
     # Returns:
     #
-    # a hash of options 
+    # a hash of options
     def options
       @options
     end
@@ -32,8 +32,9 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>Field.new(:score, :default => 0)</tt>
-    def initialize(name, options = {})
+    def initialize(name, klass, options = {})
       check_name!(name)
+      @klass = klass
       @type = options[:type] || String
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
@@ -44,7 +45,11 @@ module Mongoid #:nodoc:
     # Used for setting an object in the attributes hash. If nil is provided the
     # default will get returned if it exists.
     def set(object)
-      type.set(object)
+      unless @options[:identity]
+        type.set(object)
+      else
+        type.set(BSON::ObjectID.cast!(@klass, object))
+      end
     end
 
     # Used for retrieving the object out of the attributes hash.
