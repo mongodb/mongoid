@@ -69,6 +69,19 @@ describe Mongoid::Contexts::Enumerable do
 
   end
 
+  describe "#shift" do
+    it "returns the first element" do
+      person.addresses.criteria.shift.number.should == 0
+    end
+
+    it "skips to the next value" do
+      criteria = person.addresses.criteria
+      criteria.shift
+      criteria.shift
+      criteria.first.number.should == 2
+    end
+  end
+
   describe "#skip" do
 
     it "excludes the specified number of document" do

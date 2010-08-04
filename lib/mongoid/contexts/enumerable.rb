@@ -118,6 +118,18 @@ module Mongoid #:nodoc:
       # The first document in the +Array+
       alias :one :first
 
+      # Get one document and tell the criteria to skip this record on
+      # successive calls.
+      #
+      # Returns:
+      #
+      # The first document in the +Array+
+      def shift
+        document = first
+        criteria.skip((options[:skip] || 0) + 1)
+        document
+      end
+
       # Get the sum of the field values for all the documents.
       #
       # Returns:

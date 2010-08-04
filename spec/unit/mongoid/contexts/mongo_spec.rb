@@ -566,6 +566,30 @@ describe Mongoid::Contexts::Mongo do
     end
   end
 
+  describe "#shift" do
+
+    let(:collection) { [1, 2, 3] }
+    let(:criteria) { Person.criteria }
+    let(:context) { Mongoid::Contexts::Mongo.new(criteria) }
+
+    before do
+      Person.stubs(:collection).returns(collection)
+    end
+
+    it "returns the first document" do
+      context.expects(:first).returns(collection.first)
+      context.shift.should == collection.first
+    end
+
+    it "updates the criteria with the new skip value" do
+      context.stubs(:first)
+      context.options[:skip] = 1
+      criteria.expects(:skip).with(2)
+      context.shift
+    end
+
+  end
+
   describe "#sum" do
 
     context "when klass not provided" do

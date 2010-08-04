@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
 
     delegate :aggregate, :avg, :blank?, :count, :distinct, :empty?,
              :execute, :first, :group, :id_criteria, :last, :max,
-             :min, :one, :page, :paginate, :per_page, :sum, :to => :context
+             :min, :one, :page, :paginate, :per_page, :shift, :sum, :to => :context
 
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.

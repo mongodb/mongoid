@@ -225,6 +225,18 @@ module Mongoid #:nodoc:
 
       alias :first :one
 
+      # Return the first result for the +Context+ and skip it
+      # for successive calls.
+      #
+      # Returns:
+      #
+      # The first document in the collection.
+      def shift
+        document = first
+        criteria.skip((options[:skip] || 0) + 1)
+        document
+      end
+
       # Sum the context.
       #
       # This will take the internally built selector and options
