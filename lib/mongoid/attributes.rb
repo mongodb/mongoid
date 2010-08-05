@@ -30,8 +30,8 @@ module Mongoid #:nodoc:
     end
 
     # Override respond_to? so it responds properly for dynamic attributes
-    def respond_to?(sym)
-      (Mongoid.allow_dynamic_fields && @attributes && @attributes.has_key?(sym.to_s)) || super
+    def respond_to?(*args)
+      (Mongoid.allow_dynamic_fields && @attributes && @attributes.has_key?(args.first.to_s)) || super
     end
 
     # Process the provided attributes casting them to their proper values if a
