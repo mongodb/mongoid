@@ -9,6 +9,7 @@ module Mongoid #:nodoc:
       define_model_callbacks \
         :create,
         :destroy,
+        :initialize,
         :save,
         :update,
         :validation

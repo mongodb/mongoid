@@ -23,9 +23,9 @@ module Mongoid #:nodoc:
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
           document.setup_modifications
-          return document
+          document
         else
-          return new(attrs)
+          new(attrs)
         end
       end
 
@@ -100,11 +100,13 @@ module Mongoid #:nodoc:
     #
     # attrs: The attributes +Hash+ to set up the document with.
     def initialize(attrs = nil)
-      @attributes = default_attributes
-      process(attrs)
-      @new_record = true
-      document = yield self if block_given?
-      identify
+      run_callbacks(:initialize) do
+        @attributes = default_attributes
+        process(attrs)
+        @new_record = true
+        document = yield self if block_given?
+        identify
+      end
     end
 
     # Returns the class name plus its attributes.
