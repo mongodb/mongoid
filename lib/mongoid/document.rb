@@ -100,12 +100,13 @@ module Mongoid #:nodoc:
     #
     # attrs: The attributes +Hash+ to set up the document with.
     def initialize(attrs = nil)
+      @attributes = default_attributes
+      process(attrs)
+      @new_record = true
+      document = yield self if block_given?
+      identify
       run_callbacks(:initialize) do
-        @attributes = default_attributes
-        process(attrs)
-        @new_record = true
-        document = yield self if block_given?
-        identify
+        document
       end
     end
 
