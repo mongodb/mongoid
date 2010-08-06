@@ -1,5 +1,8 @@
 class Address
   include Mongoid::Document
+
+  attr_accessor :mode
+
   field :address_type
   field :number, :type => Integer
   field :street

@@ -30,7 +30,6 @@ describe Mongoid::Document do
         it "returns true" do
           @document.should == @other
         end
-
       end
 
       context "when attributes are not equal" do
@@ -43,9 +42,7 @@ describe Mongoid::Document do
         it "returns false" do
           @document.should_not == @other
         end
-
       end
-
     end
 
     context "when other object is not a Document" do
@@ -53,7 +50,6 @@ describe Mongoid::Document do
       it "returns false" do
         Person.new.==("Test").should be_false
       end
-
     end
 
     context "when comapring parent to its subclass" do
@@ -61,9 +57,7 @@ describe Mongoid::Document do
       it "returns false" do
         Canvas.new.should_not == Firefox.new
       end
-
     end
-
   end
 
   describe "#eql?" do
@@ -80,7 +74,6 @@ describe Mongoid::Document do
         it "returns true" do
           @document.eql?(@other).should be_true
         end
-
       end
 
       context "when attributes are not equal" do
@@ -93,9 +86,7 @@ describe Mongoid::Document do
         it "returns false" do
           @document.eql?(@other).should_not be_true
         end
-
       end
-
     end
 
     context "when other object is not a Document" do
@@ -103,7 +94,6 @@ describe Mongoid::Document do
       it "returns false" do
         Person.new.eql?("Test").should be_false
       end
-
     end
 
     context "when comapring parent to its subclass" do
@@ -111,9 +101,7 @@ describe Mongoid::Document do
       it "returns false" do
         Canvas.new.eql?(Firefox.new).should_not be_true
       end
-
     end
-
   end
 
   describe "#hash" do
@@ -130,7 +118,6 @@ describe Mongoid::Document do
     it "has unique hash per id" do
       @document.hash.should_not == @other.hash
     end
-
   end
 
   describe "#alias_method_chain" do
@@ -145,9 +132,7 @@ describe Mongoid::Document do
         @person.score = 10
         @person.rescored.should == 30
       end
-
     end
-
   end
 
   describe "#assimilate" do
@@ -162,7 +147,39 @@ describe Mongoid::Document do
       @child.assimilate(@parent, @options)
       @parent.name.should == @child
     end
+  end
 
+  describe ".attr_accessor" do
+
+    context "on a root document" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.mode = "testing"
+      end
+
+      it "allows access to the instance variable" do
+        person.mode.should == "testing"
+      end
+    end
+
+    context "on an embedded document" do
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        address.mode = "test"
+      end
+
+      it "allows access to the instance variable" do
+        address.mode.should == "test"
+      end
+    end
   end
 
   describe ".db" do

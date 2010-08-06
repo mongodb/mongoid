@@ -2,6 +2,8 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  attr_accessor :mode
+
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
