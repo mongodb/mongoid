@@ -5,7 +5,7 @@ describe Mongoid::Field do
   describe "#default" do
 
     before do
-      @field = Mongoid::Field.new(:score, Person, :type => Integer, :default => 0)
+      @field = Mongoid::Field.new(:score, :type => Integer, :default => 0)
     end
 
     it "returns the default option" do
@@ -24,7 +24,6 @@ describe Mongoid::Field do
         before do
           @field = Mongoid::Field.new(
             :vals,
-            Person,
             :type => Array,
             :default => [ "first" ]
           )
@@ -42,10 +41,10 @@ describe Mongoid::Field do
         let(:field) do
           Mongoid::Field.new(
             :vals,
-            Person,
             :type => Array,
             :default => [],
-            :identity => true
+            :identity => true,
+            :inverse_class_name => "Game"
           )
         end
 
@@ -67,11 +66,11 @@ describe Mongoid::Field do
           end
 
           before do
-            Person.identity :type => String
+            Game.identity :type => String
           end
 
           after do
-            Person.identity :type => BSON::ObjectID
+            Game.identity :type => BSON::ObjectID
           end
 
           it "does not convert" do
@@ -86,7 +85,6 @@ describe Mongoid::Field do
       before do
         @field = Mongoid::Field.new(
           :vals,
-          Person,
           :type => Hash,
           :default => { :key => "value" }
         )
@@ -117,7 +115,6 @@ describe Mongoid::Field do
         lambda {
           Mongoid::Field.new(
             :names,
-            Person,
             :type => Integer,
             :default => "Jacob"
           )
@@ -131,7 +128,6 @@ describe Mongoid::Field do
     before do
       @field = Mongoid::Field.new(
         :score,
-        Person,
         :type => Integer,
         :default => 0
       )
@@ -145,7 +141,7 @@ describe Mongoid::Field do
   describe "#type" do
 
     before do
-      @field = Mongoid::Field.new(:name, Person)
+      @field = Mongoid::Field.new(:name)
     end
 
     it "defaults to String" do
@@ -158,7 +154,6 @@ describe Mongoid::Field do
     before do
       @field = Mongoid::Field.new(
         :score,
-        Person,
         :default => 10,
         :type => Integer
       )
@@ -185,7 +180,6 @@ describe Mongoid::Field do
     before do
       @field = Mongoid::Field.new(
         :score,
-        Person,
         :default => 10,
         :type => Integer
       )
@@ -200,7 +194,6 @@ describe Mongoid::Field do
     before do
       @field = Mongoid::Field.new(
         :terrible_and_unsafe_html_goes_here,
-        Person,
         :sanitize => true,
         :hello => :goodbye
       )

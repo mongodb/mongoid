@@ -43,7 +43,7 @@ module Mongoid #:nodoc
       # Define a field attribute for the +Document+.
       def set_field(name, options = {})
         meth = options.delete(:as) || name
-        fields[name] = Field.new(name, self, options)
+        fields[name] = Field.new(name, options)
         create_accessors(name, meth, options)
         add_dirty_methods(name)
       end

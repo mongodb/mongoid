@@ -606,7 +606,11 @@ describe Mongoid::Associations do
       end
 
       it "sets the foreign key as an object id" do
-        Game.expects(:field).with("person_id", :type => BSON::ObjectID)
+        Game.expects(:field).with(
+          "person_id",
+          :inverse_class_name => "Person",
+          :identity => true
+        )
         Game.referenced_in :person
       end
     end
@@ -695,6 +699,7 @@ describe Mongoid::Associations do
   describe "#update_foreign_keys" do
 
     before do
+      Person.identity :type => BSON::ObjectID
       @game = Game.new(:score => 1)
       @person = Person.new(:title => "Sir", :game => @game)
     end

@@ -32,9 +32,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>Field.new(:score, :default => 0)</tt>
-    def initialize(name, klass, options = {})
+    def initialize(name, options = {})
       check_name!(name)
-      @klass = klass
       @type = options[:type] || String
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
@@ -48,7 +47,8 @@ module Mongoid #:nodoc:
       unless @options[:identity]
         type.set(object)
       else
-        type.set(BSON::ObjectID.cast!(@klass, object))
+        inverse = @options[:inverse_class_name].constantize
+        object.blank? ? type.set(object) : BSON::ObjectID.cast!(inverse, object)
       end
     end
 

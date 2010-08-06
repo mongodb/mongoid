@@ -27,10 +27,10 @@ describe Mongoid::Extensions do
 
     context "when value is an empty string" do
 
-      it "should set the foreign key to nil" do
+      it "should set the foreign key to empty" do
         game.person_id = ""
         game.save
-        game.reload.person_id.should be_nil
+        game.reload.person_id.should be_empty
       end
 
     end
