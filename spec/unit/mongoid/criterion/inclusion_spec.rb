@@ -161,7 +161,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#all" do
 
-          it "returns those matching an all clause" do
+          it "returns a selector matching an all clause" do
             criteria.where(:title.all => ["Sir"])
             criteria.selector.should ==
               { :title => { "$all" => ["Sir"] } }
@@ -170,7 +170,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#exists" do
 
-          it "returns those matching an exists clause" do
+          it "returns a selector matching an exists clause" do
             criteria.where(:title.exists => true)
             criteria.selector.should ==
               { :title => { "$exists" => true } }
@@ -179,7 +179,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#gt" do
 
-          it "returns those matching a gt clause" do
+          it "returns a selector matching a gt clause" do
             criteria.where(:age.gt => 30)
             criteria.selector.should ==
               { :age => { "$gt" => 30 } }
@@ -188,7 +188,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#gte" do
 
-          it "returns those matching a gte clause" do
+          it "returns a selector matching a gte clause" do
             criteria.where(:age.gte => 33)
             criteria.selector.should ==
               { :age => { "$gte" => 33 } }
@@ -197,7 +197,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#in" do
 
-          it "returns those matching an in clause" do
+          it "returns a selector matching an in clause" do
             criteria.where(:title.in => ["Sir", "Madam"])
             criteria.selector.should ==
               { :title => { "$in" => ["Sir", "Madam"] } }
@@ -206,7 +206,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#lt" do
 
-          it "returns those matching a lt clause" do
+          it "returns a selector matching a lt clause" do
             criteria.where(:age.lt => 34)
             criteria.selector.should ==
               { :age => { "$lt" => 34 } }
@@ -215,7 +215,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#lte" do
 
-          it "returns those matching a lte clause" do
+          it "returns a selector matching a lte clause" do
             criteria.where(:age.lte => 33)
             criteria.selector.should ==
               { :age => { "$lte" => 33 } }
@@ -224,7 +224,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#ne" do
 
-          it "returns those matching a ne clause" do
+          it "returns a selector matching a ne clause" do
             criteria.where(:age.ne => 50)
             criteria.selector.should ==
               { :age => { "$ne" => 50 } }
@@ -233,7 +233,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#near" do
 
-          it "returns those matching a ne clause" do
+          it "returns a selector matching a ne clause" do
             criteria.where(:location.near => [ 50, 40 ])
             criteria.selector.should ==
               { :location => { "$near" => [ 50, 40 ] } }
@@ -242,7 +242,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#nin" do
 
-          it "returns those matching a nin clause" do
+          it "returns a selector matching a nin clause" do
             criteria.where(:title.nin => ["Esquire", "Congressman"])
             criteria.selector.should ==
               { :title => { "$nin" => ["Esquire", "Congressman"] } }
@@ -251,7 +251,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#size" do
 
-          it "returns those matching a size clause" do
+          it "returns a selector matching a size clause" do
             criteria.where(:aliases.size => 2)
             criteria.selector.should ==
               { :aliases => { "$size" => 2 } }
@@ -260,7 +260,7 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#near" do
 
-          it "returns those matching a ne clause" do
+          it "returns a selector matching a ne clause" do
             criteria.where(:location.within => { "$center" => [ [ 50, -40 ], 1 ] })
             criteria.selector.should ==
               { :location => { "$within" => { "$center" => [ [ 50, -40 ], 1 ] } } }
