@@ -43,6 +43,27 @@ module Mongoid #:nodoc:
         where(selector)
       end
 
+      # Adds a criterion to the +Criteria+ that specifies a set of expressions
+      # to match if any of them return true. This is a $or query in MongoDB and
+      # is similar to a SQL OR. This is named #any_of and aliased "or" for
+      # readability.
+      #
+      # Options:
+      #
+      # selector: Multiple +Hash+ expressions that any can match.
+      #
+      # Example:
+      #
+      # <tt>criteria.any_of({ :field1 => "value" }, { :field2 => "value2" })</tt>
+      #
+      # Returns: <tt>self</tt>
+      def any_of(*args)
+        criterion = @selector["$or"] || []
+        @selector["$or"] = criterion.concat(args)
+        self
+      end
+      alias :or :any_of
+
       # Adds a criterion to the +Criteria+ that specifies values where any can
       # be matched in order to return results. This is similar to an SQL "IN"
       # clause. The MongoDB conditional operator that will be used is "$in".
@@ -89,7 +110,7 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # selectior: A +Hash+ that must match the attributes of the +Document+.
+      # selector: A +Hash+ that must match the attributes of the +Document+.
       #
       # Example:
       #

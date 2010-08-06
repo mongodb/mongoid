@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
 
     # Delegate to the criteria methods that are natural for creating a new
     # criteria.
-    [ :all_in, :any_in, :asc, :ascending, :avg, :desc, :descending,
+    [ :all_in, :any_in, :any_of, :asc, :ascending, :avg, :desc, :descending,
       :excludes, :limit, :max, :min, :not_in, :only, :order_by,
       :skip, :sum, :where, :near ].each do |name|
       define_method(name) do |*args|

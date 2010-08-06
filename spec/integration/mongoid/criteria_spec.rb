@@ -48,9 +48,7 @@ describe Mongoid::Criteria do
       it "it properly excludes ids" do
         Person.excludes(:_id => person.id).entries.should be_empty
       end
-
     end
-
   end
 
   describe "#execute" do
@@ -128,6 +126,29 @@ describe Mongoid::Criteria do
 
       it "provides min for the field provided" do
         Person.min(:age).should == 10.0
+      end
+    end
+  end
+
+  describe "#any_of" do
+
+    before do
+      Person.create(:title => "Sir", :age => 5, :ssn => "098-76-5432")
+      Person.create(:title => "Sir", :age => 7, :ssn => "098-76-5433")
+      Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434")
+    end
+
+    context "with a single match" do
+
+      it "returns any matching documents" do
+        Person.where(:title => "Madam").any_of(:age => 1).count.should == 1
+      end
+    end
+
+    context "when chaining for multiple matches" do
+
+      it "returns any matching documents" do
+        Person.any_of({ :age => 7 }, { :age => 5 }).count.should == 2
       end
     end
   end
