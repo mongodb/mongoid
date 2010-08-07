@@ -104,7 +104,6 @@ describe Mongoid::Config do
         Mongo::ServerVersion.new("2.0.0")
       end
 
-
       before do
         Mongo::Connection.stubs(:new => connection)
         connection.stubs(:db => database)
@@ -120,6 +119,23 @@ describe Mongoid::Config do
 
       it "sets slaves" do
         config.slaves.should_not be_empty
+      end
+    end
+
+    context "with skip_version_check" do
+      let(:settings) do
+        {
+          "host" => "localhost",
+          "database" => "mongoid_config_test",
+          "skip_version_check" => true,
+        }
+      end
+
+      it "should set skip_version_check before it sets up the connection" do
+        version_check_ordered = sequence('version_check_ordered')
+        config.expects(:skip_version_check=).in_sequence(version_check_ordered)
+        config.expects(:_master).in_sequence(version_check_ordered)
+        config.from_hash(settings)
       end
     end
   end

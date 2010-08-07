@@ -162,11 +162,11 @@ module Mongoid #:nodoc
     #
     # <tt>Mongoid::Config.instance.from_hash({})</tt>
     def from_hash(settings)
-      _master(settings)
-      _slaves(settings)
       settings.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
+      _master(settings)
+      _slaves(settings)
     end
 
     # Adds a new I18n locale file to the load path
