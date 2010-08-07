@@ -6,6 +6,10 @@ describe Mongoid::Relations::Embedded::In do
     Mongoid::Relations::Embedded::In
   end
 
+  let(:base) do
+    Name.new
+  end
+
   context "properties" do
 
     let(:document) do
@@ -17,7 +21,7 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let(:relation) do
-      klass.new(document, metadata)
+      klass.new(base, document, metadata)
     end
 
     describe "#metadata" do
@@ -46,7 +50,7 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let(:relation) do
-      klass.new(document, metadata)
+      klass.new(base, document, metadata)
     end
 
     context "when the target is nil" do

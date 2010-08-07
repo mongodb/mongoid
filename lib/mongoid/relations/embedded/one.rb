@@ -8,10 +8,11 @@ module Mongoid # :nodoc:
         #
         # Options:
         #
+        # base: The document this relation hangs off of.
         # target: The target [child document] of the relation.
         # metadata: The relation's metadata
-        def initialize(target, metadata)
-          init(target, metadata)
+        def initialize(base, target, metadata)
+          init(base, target, metadata)
         end
 
         # Substitutes the supplied target documents for the existing document

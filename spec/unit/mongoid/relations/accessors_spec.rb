@@ -114,7 +114,7 @@ describe Mongoid::Relations::Accessors do
           klass.getter("addresses")
           document.instance_variable_set(
             :@addresses,
-            Mongoid::Relations::Embedded::Many.new([], metadata)
+            Mongoid::Relations::Embedded::Many.new(document, [], metadata)
           )
         end
 

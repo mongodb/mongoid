@@ -29,6 +29,10 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: The name of the relation.
+        #
+        # Returns:
+        #
+        # self
         def getter(name)
           tap do
             define_method(name) do
@@ -54,6 +58,10 @@ module Mongoid # :nodoc:
         # name: The name of the relation.
         # metadata: The metadata for the relation.
         # relation: the class for the relation.
+        #
+        # Returns:
+        #
+        # self
         def setter(name, metadata, relation)
           tap do
             define_method("#{name}=") do |target|
@@ -61,7 +69,7 @@ module Mongoid # :nodoc:
               if existing
                 set(name, existing.substitute(target))
               else
-                set(name, relation.new(target, metadata))
+                set(name, relation.new(self, target, metadata))
               end
             end
           end

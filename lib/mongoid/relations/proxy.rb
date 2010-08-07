@@ -8,10 +8,12 @@ module Mongoid # :nodoc:
       end
 
       attr_accessor \
+        :base,
         :metadata,
         :target
 
       protected
+
       # Convenience for setting the target and the metadata properties since
       # all proxies will need to do this.
       #
@@ -23,8 +25,8 @@ module Mongoid # :nodoc:
       #
       # target: The target of the proxy.
       # metadata: The relation's metadata.
-      def init(target, metadata)
-        @target, @metadata = target, metadata
+      def init(base, target, metadata)
+        @base, @target, @metadata = base, target, metadata
       end
 
       # Default behavior of method missing should be to delegate all calls

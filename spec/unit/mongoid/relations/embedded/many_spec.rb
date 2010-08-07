@@ -6,18 +6,87 @@ describe Mongoid::Relations::Embedded::Many do
     Mongoid::Relations::Embedded::Many
   end
 
+  let(:metadata) do
+    stub(:name => :addresses)
+  end
+
+  let(:base) do
+    Person.new
+  end
+
+  describe "#<<" do
+
+    context "when adding a single document" do
+
+      let(:address) do
+        Address.new
+      end
+
+      let(:document) do
+        address
+      end
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      before do
+        relation << document
+      end
+
+      it "adds the parent to the document" do
+        address._parent.should == base
+      end
+
+      it "appends to the target" do
+        relation.target.size.should == 1
+      end
+
+      it "sets the index" do
+        address._index.should == 0
+      end
+    end
+
+    context "when adding multiple documents" do
+
+      let(:address) do
+        Address.new
+      end
+
+      let(:documents) do
+        [ address ]
+      end
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      before do
+        relation << documents
+      end
+
+      it "adds the parent to the documents" do
+        address._parent.should == base
+      end
+
+      it "appends to the target" do
+        relation.target.size.should == 1
+      end
+
+      it "sets the indices" do
+        address._index.should == 0
+      end
+    end
+  end
+
   context "properties" do
 
     let(:documents) do
       [ stub ]
     end
 
-    let(:metadata) do
-      stub
-    end
-
     let(:relation) do
-      klass.new(documents, metadata)
+      klass.new(base, documents, metadata)
     end
 
     describe "#metadata" do
@@ -41,12 +110,8 @@ describe Mongoid::Relations::Embedded::Many do
       [ stub ]
     end
 
-    let(:metadata) do
-      stub
-    end
-
     let(:relation) do
-      klass.new(documents, metadata)
+      klass.new(base, documents, metadata)
     end
 
     context "when the target is nil" do
