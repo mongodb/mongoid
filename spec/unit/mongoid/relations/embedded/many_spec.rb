@@ -159,6 +159,21 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  context "#count" do
+
+    let(:documents) do
+      [ stub(:persisted? => true), stub(:persisted? => false) ]
+    end
+
+    let(:relation) do
+      klass.new(base, documents, metadata)
+    end
+
+    it "returns the number of persisted documents" do
+      relation.count.should == 1
+    end
+  end
+
   context "properties" do
 
     let(:documents) do

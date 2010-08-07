@@ -46,6 +46,19 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Returns a count of the number of documents in the association that have
+        # actually been persisted to the database.
+        #
+        # Use #size if you want the total number of documents.
+        #
+        # Returns:
+        #
+        # The total number of persisted embedded docs, as flagged by the
+        # #persisted? method.
+        def count
+          @target.select(&:persisted?).size
+        end
+
         # Instantiate a new embeds_many relation.
         #
         # Options:
