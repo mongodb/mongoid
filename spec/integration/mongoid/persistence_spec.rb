@@ -220,6 +220,41 @@ describe Mongoid::Persistence do
 
       end
 
+      context "when combining modifications and pushes" do
+        before do
+          @location1 = Location.new(:name => 'Work')
+          @address1 = Address.new(:number => 101,
+                                  :street => 'South St',
+                                  :locations => [@location1])
+          @person = Person.create!(:addresses => [@address1])
+        end
+
+        def append_address_save_and_reload
+          @person.addresses <<
+            Address.new(:street => 'North St')
+          @person.save
+          @person.reload
+        end
+
+        it "should allow modifications and pushes at the same level" do
+          @address1.number = 102
+          append_address_save_and_reload
+          @person.addresses[0].number.should == 102
+          @person.addresses[0].street.should == 'South St'
+          @person.addresses[0].locations.first.name.should == 'Work'
+          @person.addresses[1].street.should == 'North St'
+        end
+
+        it "should allow modifications one level deeper than pushes" do
+          @address1.locations.first.name = 'Home'
+          append_address_save_and_reload
+          @person.addresses[0].number.should == 101
+          @person.addresses[0].street.should == 'South St'
+          @person.addresses[0].locations.first.name.should == 'Home'
+          @person.addresses[1].street.should == 'North St'
+        end
+      end
+
       context "when removing elements without using delete or destroy" do
 
         before do
