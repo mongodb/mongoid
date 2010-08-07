@@ -34,4 +34,47 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  describe "#substitute" do
+
+    let(:documents) do
+      [ stub ]
+    end
+
+    let(:metadata) do
+      stub
+    end
+
+    let(:relation) do
+      klass.new(documents, metadata)
+    end
+
+    context "when the target is nil" do
+
+      it "clears out the target" do
+        relation.substitute(nil)
+        relation.target.should == []
+      end
+
+      it "returns self" do
+        relation.substitute(nil).should == relation
+      end
+    end
+
+    context "when the target is not nil" do
+
+      let(:new_docs) do
+        [ stub ]
+      end
+
+      it "replaces the target" do
+        relation.substitute(new_docs)
+        relation.target.should == new_docs
+      end
+
+      it "returns self" do
+        relation.substitute(new_docs).should == relation
+      end
+    end
+  end
 end

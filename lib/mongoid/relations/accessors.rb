@@ -4,6 +4,19 @@ module Mongoid # :nodoc:
     module Accessors #:nodoc:
       extend ActiveSupport::Concern
 
+      private
+
+      # Set the supplied relation to an instance variable on the class with the
+      # provided name. Used as a helper just for code cleanliness.
+      #
+      # Options:
+      #
+      # name: The name of the association.
+      # relation: The relation to set.
+      def set(name, relation)
+        instance_variable_set("@#{name}", relation)
+      end
+
       module ClassMethods #:nodoc:
 
         # Defines the getter for the relation. Nothing too special here: just
@@ -17,22 +30,40 @@ module Mongoid # :nodoc:
         #
         # name: The name of the relation.
         def getter(name)
-          define_method(name) do
-            variable = "@#{name}"
-            if instance_variable_defined?(variable)
-              instance_variable_get(variable)
+          tap do
+            define_method(name) do
+              variable = "@#{name}"
+              if instance_variable_defined?(variable)
+                instance_variable_get(variable)
+              end
             end
           end
         end
 
+        # Defines the setter for the relation. This does a few things based on
+        # some conditions. If there is an existing association, a target
+        # substitution will take place, otherwise a new relation will be
+        # created with the supplied target.
+        #
+        # Example:
+        #
+        # <tt>Person.setter("addresses", metadata, relation)</tt>
+        #
+        # Options:
+        #
+        # name: The name of the relation.
+        # metadata: The metadata for the relation.
+        # relation: the class for the relation.
         def setter(name, metadata, relation)
-          define_method("#{name}=") do |document|
-            # If relation exists, reset the target of the relation.
-            # If relation does not exist, create a new one and set the target.
-            # If the document is nil:
-            #   When a one-to-one set the relation to nil.
-            #   When a one-to-many clear the target.
-            instance_variable_set("@#{name}", document)
+          tap do
+            define_method("#{name}=") do |target|
+              existing = send(name)
+              if existing
+                set(name, existing.substitute(target))
+              else
+                set(name, relation.new(target, metadata))
+              end
+            end
           end
         end
       end
