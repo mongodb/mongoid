@@ -102,7 +102,7 @@ describe Mongoid::Atomicity do
                   "title" => "Sir",
                   "addresses.0.street" => "Bond St"
                 },
-                "$pushAll" => {
+                :other => {
                   "addresses.0.locations" => [{ "_id" => @location.id, "name" => "Work" }]
                 }
               }
