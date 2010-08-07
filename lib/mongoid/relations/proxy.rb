@@ -40,6 +40,21 @@ module Mongoid # :nodoc:
       def method_missing(name, *args, &block)
         @target.send(name, *args, &block)
       end
+
+      # Return a new document for the type of class we want to instantiate.
+      # If the type is provided use that, otherwise the klass from the
+      # metadata.
+      #
+      # Options:
+      #
+      # type: The type of class to instantiate.
+      #
+      # Returns:
+      #
+      # A +Document+
+      def instantiated(type = nil)
+        type ? type.instantiate : @metadata.klass.instantiate
+      end
     end
   end
 end

@@ -7,7 +7,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   let(:metadata) do
-    stub(:name => :addresses)
+    stub(:name => :addresses, :klass => Address)
   end
 
   let(:base) do
@@ -75,6 +75,86 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "sets the indices" do
         address._index.should == 0
+      end
+    end
+  end
+
+  describe "#build" do
+
+    context "when providing a type" do
+
+      let(:base) do
+        Canvas.new
+      end
+
+      let(:metadata) do
+        stub(:name => :shapes, :klass => Shape)
+      end
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      before do
+        @shape = relation.build(
+          { :radius => 10 },
+          Circle
+        )
+      end
+
+      it "returns a new document" do
+        @shape.should be_a_kind_of(Circle)
+      end
+
+      it "sets the attributes on the new document" do
+        @shape.radius.should == 10
+      end
+
+      it "sets the type on the new document" do
+        @shape._type.should == "Circle"
+      end
+
+      it "adds the parent to the new document" do
+        @shape._parent.should == base
+      end
+
+      it "appends to the target" do
+        relation.target.size.should == 1
+      end
+
+      it "sets the indices" do
+        @shape._index.should == 0
+      end
+    end
+
+    context "when not providing a type" do
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      before do
+        @address = relation.build(:street => "Nan Jing Dong Lu")
+      end
+
+      it "returns a new document" do
+        @address.should be_a_kind_of(Address)
+      end
+
+      it "sets the attributes on the new document" do
+        @address.street.should == "Nan Jing Dong Lu"
+      end
+
+      it "adds the parent to the new document" do
+        @address._parent.should == base
+      end
+
+      it "appends to the target" do
+        relation.target.size.should == 1
+      end
+
+      it "sets the indices" do
+        @address._index.should == 0
       end
     end
   end

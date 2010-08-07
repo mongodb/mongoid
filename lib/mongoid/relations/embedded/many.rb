@@ -23,6 +23,29 @@ module Mongoid # :nodoc:
         alias :concat :<<
         alias :push :<<
 
+        # Builds a new document in the relation and appends it to the target.
+        # Takes an optional type if you want to specify a subclass.
+        #
+        # Example:
+        #
+        # <tt>relation.build(:name => "Bozo")</tt>
+        #
+        # Options:
+        #
+        # attributes: The attributes to build the document with.
+        # type: Optional class to build the document with.
+        #
+        # Returns:
+        #
+        # The new document.
+        def build(attributes = {}, type = nil)
+          instantiated(type).tap do |doc|
+            doc.parentize(@base, @metadata.name.to_s)
+            doc.write_attributes(attributes || {})
+            append(doc)
+          end
+        end
+
         # Instantiate a new embeds_many relation.
         #
         # Options:
