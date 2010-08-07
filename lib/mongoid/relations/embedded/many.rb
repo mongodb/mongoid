@@ -20,6 +20,8 @@ module Mongoid # :nodoc:
             append(doc)
           end
         end
+        alias :concat :<<
+        alias :push :<<
 
         # Instantiate a new embeds_many relation.
         #
