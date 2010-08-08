@@ -73,6 +73,7 @@ module Mongoid #:nodoc:
       typed_value = fields.has_key?(access) ? fields[access].get(value) : value
       accessed(access, typed_value)
     end
+    alias :[] :read_attribute
 
     # Remove a value from the +Document+ attributes. If the value does not exist
     # it will fail gracefully.
@@ -131,6 +132,7 @@ module Mongoid #:nodoc:
       modify(access, @attributes[access], typed_value_for(access, value))
       notify if !id.blank? && new_record?
     end
+    alias :[]= :write_attribute
 
     # Writes the supplied attributes +Hash+ to the +Document+. This will only
     # overwrite existing attributes if they are present in the new +Hash+, all
