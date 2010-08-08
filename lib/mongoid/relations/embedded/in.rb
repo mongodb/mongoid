@@ -28,13 +28,12 @@ module Mongoid # :nodoc:
           #
           # meta: The metadata of the relation.
           # object: A document or attributes to build with.
-          # parent: Optional parent relation.
           #
           # Returns:
           #
           # A newly instantiated builder object.
-          def builder(meta, object, parent = nil)
-            Builders::In.new(meta, object, parent)
+          def builder(meta, object)
+            Builders::In.new(meta, object)
           end
 
           # Returns the macro for this relation. Used mostly as a helper in

@@ -12,6 +12,25 @@ describe Mongoid::Relations::Embedded::Builders::One do
 
   describe "#build" do
 
+    context "when provided nil" do
+
+      let(:metadata) do
+        stub(:klass => Name, :name => :name)
+      end
+
+      let(:builder) do
+        klass.new(metadata, nil)
+      end
+
+      before do
+        @document = builder.build
+      end
+
+      it "returns nil" do
+        @document.should be_nil
+      end
+    end
+
     context "when provided a document" do
 
       let(:metadata) do

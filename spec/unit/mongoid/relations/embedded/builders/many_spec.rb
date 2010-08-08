@@ -50,6 +50,25 @@ describe Mongoid::Relations::Embedded::Builders::Many do
       end
     end
 
+    context "when passed nil" do
+
+      let(:metadata) do
+        stub(:klass => Address, :name => :addresses)
+      end
+
+      let(:builder) do
+        klass.new(metadata, nil)
+      end
+
+      before do
+        @documents = builder.build
+      end
+
+      it "returns an empty array" do
+        @documents.should == []
+      end
+    end
+
     context "when no type is in the object" do
 
       let(:metadata) do

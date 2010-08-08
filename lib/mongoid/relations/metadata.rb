@@ -13,13 +13,12 @@ module Mongoid # :nodoc:
       # Options:
       #
       # object: A document or attributes to pass to the builder.
-      # parent: Optional parent document.
       #
       # Returns:
       #
       # The builder for the relation.
-      def builder(object, parent = nil)
-        relation.builder(self, object, parent)
+      def builder(object)
+        relation.builder(self, object)
       end
 
       # Returns the name of the class that this relation contains. If the

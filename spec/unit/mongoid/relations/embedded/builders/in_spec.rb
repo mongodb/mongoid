@@ -13,12 +13,16 @@ describe Mongoid::Relations::Embedded::Builders::In do
       stub
     end
 
+    let(:object) do
+      stub(:_parent => parent)
+    end
+
     let(:metadata) do
       stub(:klass => Person, :name => :person)
     end
 
     let(:builder) do
-      klass.new(metadata, nil, parent)
+      klass.new(metadata, object)
     end
 
     before do

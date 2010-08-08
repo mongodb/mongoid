@@ -97,7 +97,7 @@ describe Mongoid::Relations::Accessors do
     describe "#\{relation=\}" do
 
       let(:address) do
-        stub
+        Address.new
       end
 
       context "when no relation exists" do
@@ -117,15 +117,15 @@ describe Mongoid::Relations::Accessors do
 
         before do
           klass.getter("addresses")
-          document.instance_variable_set(
-            :@addresses,
-            Mongoid::Relations::Embedded::Many.new(document, [], metadata)
-          )
         end
 
         context "when new target is not nil" do
 
           before do
+            document.instance_variable_set(
+              :@addresses,
+              Mongoid::Relations::Embedded::Many.new(document, [], metadata)
+            )
             document.addresses = [ address ]
           end
 
@@ -137,10 +137,25 @@ describe Mongoid::Relations::Accessors do
         context "when new target is nil" do
 
           before do
+            document.instance_variable_set(
+              :@addresses,
+              Mongoid::Relations::Embedded::Many.new(document, [], metadata)
+            )
             document.addresses = nil
           end
 
           context "when relation is one-to-one" do
+
+            let(:relation) do
+              Mongoid::Relations::Embedded::One
+            end
+
+            let(:metadata) do
+              Mongoid::Relations::Metadata.new(
+                :name => :name,
+                :relation => relation
+              )
+            end
 
             before do
               klass.setter("name", metadata).getter("name")

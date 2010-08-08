@@ -11,10 +11,32 @@ module Mongoid # :nodoc:
       #
       # Options:
       #
-      # name: The name of the association.
+      # name: The name of the relation.
       # relation: The relation to set.
+      #
+      # Returns:
+      #
+      # The relation.
       def set(name, relation)
         instance_variable_set("@#{name}", relation)
+      end
+
+      # Builds the related document and creates the relation unless the
+      # document is nil, then sets the relation on this document.
+      #
+      # Options:
+      #
+      # name: The name of the relation.
+      # object: The document or attributes to build.
+      # metadata: The relation's metadata.
+      #
+      # Returns:
+      #
+      # The relation
+      def build(name, object, metadata)
+        target = metadata.builder(object).build
+        target = metadata.relation.new(self, target, metadata) if target
+        set(name, target)
       end
 
       module ClassMethods #:nodoc:
@@ -63,12 +85,12 @@ module Mongoid # :nodoc:
         # self
         def setter(name, metadata)
           tap do
-            define_method("#{name}=") do |target|
+            define_method("#{name}=") do |object|
               existing = send(name)
               if existing
-                set(name, existing.substitute(target))
+                set(name, existing.substitute(object))
               else
-                set(name, metadata.relation.new(self, target, metadata))
+                build(name, object, metadata)
               end
             end
           end

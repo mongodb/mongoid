@@ -16,7 +16,7 @@ module Mongoid # :nodoc:
           #
           # A single +Document+.
           def build
-            @parent
+            @object._parent
           end
         end
       end
