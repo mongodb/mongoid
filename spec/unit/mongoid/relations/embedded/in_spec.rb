@@ -10,10 +10,23 @@ describe Mongoid::Relations::Embedded::In do
     Name.new
   end
 
-  describe ".macro" do
+  describe ".builder" do
 
-    it "returns :embedded_in" do
-      klass.macro.should == :embedded_in
+    let(:builder_klass) do
+      Mongoid::Relations::Embedded::Builders::In
+    end
+
+    let(:document) do
+      stub
+    end
+
+    let(:metadata) do
+      stub(:extension? => false)
+    end
+
+    it "returns the embedded in builder" do
+      klass.builder(metadata, document).should
+        be_a_kind_of(builder_klass)
     end
   end
 

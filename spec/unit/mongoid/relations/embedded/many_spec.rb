@@ -159,7 +159,27 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  context "#count" do
+  describe ".builder" do
+
+    let(:builder_klass) do
+      Mongoid::Relations::Embedded::Builders::Many
+    end
+
+    let(:document) do
+      stub
+    end
+
+    let(:metadata) do
+      stub(:extension? => false)
+    end
+
+    it "returns the embeds many builder" do
+      klass.builder(metadata, [ document ]).should
+        be_a_kind_of(builder_klass)
+    end
+  end
+
+  describe "#count" do
 
     let(:documents) do
       [ stub(:persisted? => true), stub(:persisted? => false) ]
@@ -174,7 +194,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  context "#create" do
+  describe "#create" do
 
     context "when a type is provided" do
 

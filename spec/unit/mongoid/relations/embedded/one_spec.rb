@@ -10,6 +10,26 @@ describe Mongoid::Relations::Embedded::One do
     Person.new
   end
 
+  describe ".builder" do
+
+    let(:builder_klass) do
+      Mongoid::Relations::Embedded::Builders::One
+    end
+
+    let(:document) do
+      stub
+    end
+
+    let(:metadata) do
+      stub(:extension? => false)
+    end
+
+    it "returns the embeds one builder" do
+      klass.builder(metadata, document).should
+        be_a_kind_of(builder_klass)
+    end
+  end
+
   describe ".macro" do
 
     it "returns :embeds_one" do
