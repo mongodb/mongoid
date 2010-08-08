@@ -39,6 +39,11 @@ describe Mongoid::Relations::Embedded::One do
     end
   end
 
+  describe "#nested_build" do
+
+    it "needs to move elsewhere"
+  end
+
   describe "#substitute" do
 
     let(:document) do
