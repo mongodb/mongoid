@@ -174,6 +174,62 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  context "#create" do
+
+    context "when a type is provided" do
+
+      let(:base) do
+        Canvas.new
+      end
+
+      let(:metadata) do
+        stub(:name => :shapes, :klass => Shape)
+      end
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      let(:circle) do
+        Circle.new
+      end
+
+      before do
+        Circle.expects(:instantiate).returns(circle)
+        circle.expects(:save).returns(true)
+        @shape = relation.create(
+          { :radius => 10 },
+          Circle
+        )
+      end
+
+      it "returns a saved document" do
+        @shape.should be_a_kind_of(Circle)
+      end
+    end
+
+    context "when a type is not provided" do
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        Address.expects(:instantiate).returns(address)
+        address.expects(:save).returns(true)
+        @address = relation.create(:street => "Nan Jing Dong Lu")
+      end
+
+      it "returns a saved document" do
+        @address.should be_a_kind_of(Address)
+      end
+    end
+  end
+
   context "properties" do
 
     let(:documents) do

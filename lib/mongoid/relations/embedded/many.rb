@@ -41,7 +41,7 @@ module Mongoid # :nodoc:
         def build(attributes = {}, type = nil)
           instantiated(type).tap do |doc|
             doc.parentize(@base, @metadata.name.to_s)
-            doc.write_attributes(attributes || {})
+            doc.write_attributes(attributes)
             append(doc)
           end
         end
@@ -57,6 +57,25 @@ module Mongoid # :nodoc:
         # #persisted? method.
         def count
           @target.select(&:persisted?).size
+        end
+
+        # Create a new document in the relation. This is essentially the same
+        # as doing a #build then #save on the new document.
+        #
+        # Example:
+        #
+        # <tt>relation.create(:name => "Bozo")</tt>
+        #
+        # Options:
+        #
+        # attributes: The attributes to build the document with.
+        # type: Optional class to create the document with.
+        #
+        # Returns:
+        #
+        # The newly created document.
+        def create(attributes = {}, type = nil)
+          build(attributes, type).tap(&:save)
         end
 
         # Instantiate a new embeds_many relation.
