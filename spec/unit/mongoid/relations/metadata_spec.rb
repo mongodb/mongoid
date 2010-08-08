@@ -139,6 +139,17 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  context "#macro" do
+
+    let(:metadata) do
+      klass.new(:relation => Mongoid::Relations::Embedded::One)
+    end
+
+    it "returns the macro from the relation" do
+      metadata.macro.should == :embeds_one
+    end
+  end
+
   context "properties" do
 
     PROPERTIES = [
@@ -148,6 +159,7 @@ describe Mongoid::Relations::Metadata do
       "inverse_of",
       "name",
       "polymorphic",
+      "relation",
       "stored_as"
     ]
 

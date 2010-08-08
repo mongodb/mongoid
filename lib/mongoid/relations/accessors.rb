@@ -51,25 +51,24 @@ module Mongoid # :nodoc:
         #
         # Example:
         #
-        # <tt>Person.setter("addresses", metadata, relation)</tt>
+        # <tt>Person.setter("addresses", metadata)</tt>
         #
         # Options:
         #
         # name: The name of the relation.
         # metadata: The metadata for the relation.
-        # relation: the class for the relation.
         #
         # Returns:
         #
         # self
-        def setter(name, metadata, relation)
+        def setter(name, metadata)
           tap do
             define_method("#{name}=") do |target|
               existing = send(name)
               if existing
                 set(name, existing.substitute(target))
               else
-                set(name, relation.new(self, target, metadata))
+                set(name, metadata.relation.new(self, target, metadata))
               end
             end
           end

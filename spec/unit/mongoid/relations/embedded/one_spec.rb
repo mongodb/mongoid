@@ -10,6 +10,13 @@ describe Mongoid::Relations::Embedded::One do
     Person.new
   end
 
+  describe ".macro" do
+
+    it "returns :embeds_one" do
+      klass.macro.should == :embeds_one
+    end
+  end
+
   context "properties" do
 
     let(:document) do

@@ -8,6 +8,10 @@ describe Mongoid::Relations::Accessors do
     end
   end
 
+  let(:relation) do
+    Mongoid::Relations::Embedded::Many
+  end
+
   describe ".getter" do
 
     let(:document) do
@@ -66,14 +70,16 @@ describe Mongoid::Relations::Accessors do
     end
 
     let(:metadata) do
-      Mongoid::Relations::Metadata.new(:name => :addresses)
+      Mongoid::Relations::Metadata.new(
+        :name => :addresses,
+        :relation => relation
+      )
     end
 
     before do
       klass.setter(
         "addresses",
-        metadata,
-        Mongoid::Relations::Embedded::Many
+        metadata
       )
     end
 
@@ -84,8 +90,7 @@ describe Mongoid::Relations::Accessors do
     it "returns self" do
       klass.setter(
         "preferences",
-        metadata,
-        Mongoid::Relations::Embedded::Many
+        metadata
       ).should == klass
     end
 
@@ -138,11 +143,7 @@ describe Mongoid::Relations::Accessors do
           context "when relation is one-to-one" do
 
             before do
-              klass.setter(
-                "name",
-                metadata,
-                Mongoid::Relations::Embedded::One
-              ).getter("name")
+              klass.setter("name", metadata).getter("name")
               document.name = nil
             end
 

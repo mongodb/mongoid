@@ -434,6 +434,13 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe ".macro" do
+
+    it "returns :embeds_many" do
+      klass.macro.should == :embeds_many
+    end
+  end
+
   describe "#method_missing" do
 
     let(:address) do

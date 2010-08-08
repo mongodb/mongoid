@@ -97,6 +97,19 @@ module Mongoid # :nodoc:
         @klass ||= class_name.constantize
       end
 
+      # Returns the macro for the relation of this metadata.
+      #
+      # Example:
+      #
+      # <tt>metadata.macro</tt>
+      #
+      # Returns:
+      #
+      # The macro as a +Symbol+.
+      def macro
+        relation.macro
+      end
+
       private
 
       # Handles two different cases - the first is a convenience for JSON like

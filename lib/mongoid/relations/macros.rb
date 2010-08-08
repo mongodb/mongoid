@@ -34,8 +34,7 @@ module Mongoid # :nodoc:
         def embedded_in(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, options, &block),
-            Relations::Embedded::In
+            metadatafy(name, Relations::Embedded::In, options, &block)
           )
         end
 
@@ -61,8 +60,7 @@ module Mongoid # :nodoc:
         def embeds_many(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, options, &block),
-            Relations::Embedded::Many
+            metadatafy(name, Relations::Embedded::Many, options, &block)
           )
         end
         alias :embed_many :embeds_many
@@ -89,22 +87,18 @@ module Mongoid # :nodoc:
         def embeds_one(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, options, &block),
-            Relations::Embedded::One
+            metadatafy(name, Relations::Embedded::One, options, &block)
           )
         end
         alias :embed_one :embeds_one
 
         def referenced_in
-
         end
 
         def references_many
-
         end
 
         def references_one
-
         end
 
         private
@@ -120,9 +114,10 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # A +Relations::Metadata+ object for this relation.
-        def metadatafy(name, options, &block)
+        def metadatafy(name, relation, options, &block)
           Relations::Metadata.new(
             options.merge(
+              :relation => relation,
               :extend => block,
               :inverse_class_name => self.name,
               :name => name
@@ -138,11 +133,11 @@ module Mongoid # :nodoc:
         # name: The name of the relation.
         # metadata: The metadata for the relation.
         # relation: The type (class) of the relation.
-        def relate(name, metadata, relation)
+        def relate(name, metadata)
           key = name.to_s
           relations[key] = metadata
           # getter(key)
-          # setter(key, metadata, relation)
+          # setter(key, metadata)
         end
       end
     end

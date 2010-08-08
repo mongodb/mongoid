@@ -10,6 +10,13 @@ describe Mongoid::Relations::Embedded::In do
     Name.new
   end
 
+  describe ".macro" do
+
+    it "returns :embedded_in" do
+      klass.macro.should == :embedded_in
+    end
+  end
+
   context "properties" do
 
     let(:document) do

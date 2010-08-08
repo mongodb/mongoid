@@ -2,7 +2,7 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Embedded
-      class In < Relations::Proxy
+      class In < OneToOne
 
         # Instantiate a new embedded_in relation.
         #
@@ -15,23 +15,21 @@ module Mongoid # :nodoc:
           init(base, target, metadata)
         end
 
-        # Substitutes the supplied target documents for the existing document
-        # in the relation.
-        #
-        # Example:
-        #
-        # <tt>name.substitute(new_name)</tt>
-        #
-        # Options:
-        #
-        # target: A document to replace the target.
-        #
-        # Returns:
-        #
-        # The relation or nil.
-        def substitute(target)
-          return nil unless target
-          @target = target; self
+        class << self
+
+          # Returns the macro for this relation. Used mostly as a helper in
+          # reflection.
+          #
+          # Example:
+          #
+          # <tt>Mongoid::Relations::Embedded::In.macro</tt>
+          #
+          # Returns:
+          #
+          # <tt>:embedded_in</tt>
+          def macro
+            :embedded_in
+          end
         end
       end
     end

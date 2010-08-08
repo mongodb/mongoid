@@ -255,6 +255,23 @@ module Mongoid # :nodoc:
             end
           end
         end
+
+        class << self
+
+          # Returns the macro for this relation. Used mostly as a helper in
+          # reflection.
+          #
+          # Example:
+          #
+          # <tt>Mongoid::Relations::Embedded::Many.macro</tt>
+          #
+          # Returns:
+          #
+          # <tt>:embeds_many</tt>
+          def macro
+            :embeds_many
+          end
+        end
       end
     end
   end
