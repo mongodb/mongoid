@@ -78,6 +78,28 @@ module Mongoid # :nodoc:
           build(attributes, type).tap(&:save)
         end
 
+        # Create a new document in the relation. This is essentially the same
+        # as doing a #build then #save on the new document. If validation
+        # failed on the document an error will get raised.
+        #
+        # Example:
+        #
+        # <tt>relation.create(:name => "Bozo")</tt>
+        #
+        # Options:
+        #
+        # attributes: The attributes to build the document with.
+        # type: Optional class to create the document with.
+        #
+        # Returns:
+        #
+        # The newly created document or raises a validation error.
+        def create!(attributes = {}, type = nil)
+          create(attributes, type).tap do |doc|
+            raise Errors::Validations.new(doc) unless doc.errors.empty?
+          end
+        end
+
         # Instantiate a new embeds_many relation.
         #
         # Options:

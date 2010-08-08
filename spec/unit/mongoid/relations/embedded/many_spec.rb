@@ -230,6 +230,53 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#create!" do
+
+    context "when validation passes" do
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        Address.expects(:instantiate).returns(address)
+        address.expects(:save).returns(true)
+        @address = relation.create!(:street => "Nan Jing Dong Lu")
+      end
+
+      it "returns a saved document" do
+        @address.should be_a_kind_of(Address)
+      end
+    end
+
+    context "when validation fails" do
+
+      let(:relation) do
+        klass.new(base, [], metadata)
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        Address.expects(:instantiate).returns(address)
+        address.expects(:save).returns(false)
+        address.errors[:street] = [ "is require" ]
+      end
+
+      it "raises an error" do
+        expect {
+          relation.create!(:street => "Nan Jing Dong Lu")
+        }.to raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
+
   context "properties" do
 
     let(:documents) do
