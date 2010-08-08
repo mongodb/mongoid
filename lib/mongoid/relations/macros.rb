@@ -141,8 +141,7 @@ module Mongoid # :nodoc:
         def relate(name, metadata)
           key = name.to_s
           relations[key] = metadata
-          getter(key)
-          setter(key, metadata)
+          getter(key).setter(key, metadata)
         end
       end
     end

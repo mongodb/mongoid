@@ -4,7 +4,7 @@ describe Mongoid::Relations::Accessors do
 
   let(:klass) do
     Class.new do
-      include Mongoid::Relations::Accessors
+      include Mongoid::Relations
     end
   end
 
@@ -94,83 +94,85 @@ describe Mongoid::Relations::Accessors do
       ).should == klass
     end
 
-    describe "#\{relation=\}" do
+    context "defined methods" do
+      describe "#\{relation=\}" do
 
-      let(:address) do
-        Address.new
-      end
-
-      context "when no relation exists" do
-
-        before do
-          klass.getter("addresses")
-          document.instance_variable_set(:@addresses, nil)
-          document.addresses = [ address ]
+        let(:address) do
+          Address.new
         end
 
-        it "creates a new relation" do
-          document.instance_variable_get(:@addresses).should == [ address ]
-        end
-      end
-
-      context "when a relation exists" do
-
-        before do
-          klass.getter("addresses")
-        end
-
-        context "when new target is not nil" do
+        context "when no relation exists" do
 
           before do
-            document.instance_variable_set(
-              :@addresses,
-              Mongoid::Relations::Embedded::Many.new(document, [], metadata)
-            )
+            klass.getter("addresses")
+            document.instance_variable_set(:@addresses, nil)
             document.addresses = [ address ]
           end
 
-          it "replaces the target of the relation" do
+          it "creates a new relation" do
             document.instance_variable_get(:@addresses).should == [ address ]
           end
         end
 
-        context "when new target is nil" do
+        context "when a relation exists" do
 
           before do
-            document.instance_variable_set(
-              :@addresses,
-              Mongoid::Relations::Embedded::Many.new(document, [], metadata)
-            )
-            document.addresses = nil
+            klass.getter("addresses")
           end
 
-          context "when relation is one-to-one" do
-
-            let(:relation) do
-              Mongoid::Relations::Embedded::One
-            end
-
-            let(:metadata) do
-              Mongoid::Relations::Metadata.new(
-                :name => :name,
-                :relation => relation
-              )
-            end
+          context "when new target is not nil" do
 
             before do
-              klass.setter("name", metadata).getter("name")
-              document.name = nil
+              document.instance_variable_set(
+                :@addresses,
+                Mongoid::Relations::Embedded::Many.new(document, [], metadata)
+              )
+              document.addresses = [ address ]
             end
 
-            it "sets the relation to nil" do
-              document.name.should be_nil
+            it "replaces the target of the relation" do
+              document.instance_variable_get(:@addresses).should == [ address ]
             end
           end
 
-          context "when relation is one-to-many" do
+          context "when new target is nil" do
 
-            it "clears the target of the relation" do
-              document.instance_variable_get(:@addresses).should == []
+            before do
+              document.instance_variable_set(
+                :@addresses,
+                Mongoid::Relations::Embedded::Many.new(document, [], metadata)
+              )
+              document.addresses = nil
+            end
+
+            context "when relation is one-to-one" do
+
+              let(:relation) do
+                Mongoid::Relations::Embedded::One
+              end
+
+              let(:metadata) do
+                Mongoid::Relations::Metadata.new(
+                  :name => :name,
+                  :relation => relation
+                )
+              end
+
+              before do
+                klass.setter("name", metadata).getter("name")
+                document.name = nil
+              end
+
+              it "sets the relation to nil" do
+                document.name.should be_nil
+              end
+            end
+
+            context "when relation is one-to-many" do
+
+              it "clears the target of the relation" do
+                document.instance_variable_get(:@addresses).should == []
+              end
             end
           end
         end

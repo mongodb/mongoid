@@ -14,6 +14,7 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     extend ActiveSupport::Concern
     include Accessors
+    include Embedded::Builders
     include Macros
 
     included do
