@@ -7,7 +7,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   let(:metadata) do
-    stub(:name => :addresses, :klass => Address)
+    stub(:name => :addresses, :klass => Address, :extension? => false)
   end
 
   let(:base) do
@@ -88,7 +88,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let(:metadata) do
-        stub(:name => :shapes, :klass => Shape)
+        stub(:name => :shapes, :klass => Shape, :extension? => false)
       end
 
       let(:relation) do
@@ -183,7 +183,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let(:metadata) do
-        stub(:name => :shapes, :klass => Shape)
+        stub(:name => :shapes, :klass => Shape, :extension? => false)
       end
 
       let(:relation) do
@@ -283,16 +283,8 @@ describe Mongoid::Relations::Embedded::Many do
       Address.new(:street => "Street 1")
     end
 
-    let(:document) do
-      address
-    end
-
     let(:relation) do
-      klass.new(base, [], metadata)
-    end
-
-    before do
-      relation << document
+      klass.new(base, [ address ], metadata)
     end
 
     context "when no conditions passed" do
@@ -337,16 +329,8 @@ describe Mongoid::Relations::Embedded::Many do
       Address.new(:street => "Street 1")
     end
 
-    let(:document) do
-      address
-    end
-
     let(:relation) do
-      klass.new(base, [], metadata)
-    end
-
-    before do
-      relation << document
+      klass.new(base, [ address ], metadata)
     end
 
     context "when no conditions passed" do
@@ -382,6 +366,153 @@ describe Mongoid::Relations::Embedded::Many do
           :conditions => { :street => "Street 1" }
         ).should == 1
       end
+    end
+  end
+
+  describe "#find" do
+
+    context "when finding all" do
+
+      let(:address) do
+        Address.new(:street => "Street 1")
+      end
+
+      let(:relation) do
+        klass.new(base, [ address ], metadata)
+      end
+
+      it "returns all the documents" do
+        relation.find(:all).should == relation
+      end
+    end
+
+    context "when finding by id" do
+
+      context "when using string ids" do
+
+        let(:address) do
+          Address.new(:street => "Street 2")
+        end
+
+        let(:relation) do
+          klass.new(base, [ address ], metadata)
+        end
+
+        it "returns the matching document" do
+          relation.find("street-2").should == address
+        end
+      end
+
+      context "when using object ids" do
+
+        let(:favorite) do
+          Favorite.new(:title => "Test")
+        end
+
+        let(:metadata) do
+          stub(:name => :favorites, :klass => Favorite, :extension? => false)
+        end
+
+        let(:relation) do
+          klass.new(base, [ favorite ], metadata)
+        end
+
+        context "when passed an object id" do
+
+          it "finds using the object id" do
+            relation.find(favorite.id).should == favorite
+          end
+        end
+
+        context "when passed a string" do
+
+          it "finds using the object id" do
+            relation.find(favorite.id.to_s).should == favorite
+          end
+        end
+      end
+    end
+  end
+
+  describe "#method_missing" do
+
+    let(:address) do
+      Address.new(:street => "Street 2", :state => "CA")
+    end
+
+    let(:relation) do
+      klass.new(base, [ address ], metadata)
+    end
+
+    before do
+      relation << Address.new(:state => "FL")
+    end
+
+    context "when the relation has a criteria class method" do
+
+      let(:cali) do
+        relation.california
+      end
+
+      it "returns the criteria" do
+        cali.should be_a_kind_of(Mongoid::Criteria)
+      end
+
+      it "sets the documents on the criteria" do
+        cali.documents.should == relation.entries
+      end
+
+      it "returns the scoped documents" do
+        cali.size.should == 1
+        cali.first.state.should == "CA"
+      end
+    end
+
+    context "when calling criteria methods" do
+
+      it "can use fancy criteria clauses" do
+        relation.where(:state => /CA/).count.should ==
+          relation.where(:state => 'CA').count
+      end
+    end
+
+    context "when no class method exists" do
+
+      it "delegates to the array" do
+        relation.entries.size.should == 2
+      end
+    end
+  end
+
+  describe "#nested_build" do
+
+    it "is horrendous and needs an overhaul"
+  end
+
+  describe "#paginate" do
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    let(:options) do
+      { :page => 1, :per_page => 10 }
+    end
+
+    let(:criteria) do
+      stub
+    end
+
+    before do
+      Mongoid::Criteria.expects(:translate).with(
+        Address, options
+      ).returns(criteria)
+      criteria.expects(:documents=).with(relation.target)
+      criteria.expects(:paginate).returns([])
+    end
+
+    it "creates a criteria and paginates it" do
+      relation.paginate(options).should == []
     end
   end
 

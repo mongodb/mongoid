@@ -17,7 +17,7 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     let(:metadata) do
-      stub
+      stub(:extension? => false)
     end
 
     let(:relation) do
@@ -46,7 +46,7 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     let(:metadata) do
-      stub
+      stub(:extension? => false)
     end
 
     let(:relation) do

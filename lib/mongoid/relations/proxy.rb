@@ -25,8 +25,10 @@ module Mongoid # :nodoc:
       #
       # target: The target of the proxy.
       # metadata: The relation's metadata.
-      def init(base, target, metadata)
+      def init(base, target, metadata, &block)
         @base, @target, @metadata = base, target, metadata
+        yield block if block_given?
+        extend Module.new(&metadata.extension) if metadata.extension?
       end
 
       # Default behavior of method missing should be to delegate all calls

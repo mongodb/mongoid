@@ -134,6 +134,21 @@ module Mongoid # :nodoc:
           remove_all(conditions, true)
         end
 
+        # Finds a document in this association.
+        #
+        # Options:
+        #
+        # parameter: If :all is passed, returns all the documents else
+        #            if an id is passed, will return the document for that id.
+        #
+        # Returns:
+        #
+        # A single matching +Document+.
+        def find(parameter)
+          return @target if parameter == :all
+          criteria.id(parameter).first
+        end
+
         # Instantiate a new embeds_many relation.
         #
         # Options:
@@ -143,6 +158,22 @@ module Mongoid # :nodoc:
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
           init(base, target, metadata)
+        end
+
+        # Paginate the association. Will create a new criteria, set the documents
+        # on it and execute in an enumerable context.
+        #
+        # Options:
+        #
+        # options: A +Hash+ of pagination options.
+        #
+        # Returns:
+        #
+        # A +WillPaginate::Collection+.
+        def paginate(options)
+          criteria = Mongoid::Criteria.translate(@metadata.klass, options)
+          criteria.documents = @target
+          criteria.paginate(options)
         end
 
         # Substitutes the supplied target documents for the existing documents
@@ -164,6 +195,44 @@ module Mongoid # :nodoc:
         end
 
         private
+
+        # Returns the criteria object for the target class with its documents set
+        # to @target.
+        #
+        # Example:
+        #
+        # <tt>relation.criteria</tt>
+        #
+        # Returns:
+        #
+        # A +Criteria+ object for this relation.
+        def criteria
+          @metadata.klass.criteria.tap do |criterion|
+            criterion.documents = @target
+          end
+        end
+
+        # If the target array does not respond to the supplied method then try to
+        # find a named scope or criteria on the class and send the call there.
+        #
+        # If the method exists on the array, use the default proxy behavior.
+        #
+        # Options:
+        #
+        # name: The name of the method.
+        # args: The method args
+        # block: Optional block to pass.
+        #
+        # Returns:
+        #
+        # A Criteria or return value from the target.
+        def method_missing(name, *args, &block)
+          return super if @target.respond_to?(name)
+          klass = @metadata.klass
+          klass.send(:with_scope, criteria) do
+            klass.send(name, *args)
+          end
+        end
 
         # Remove all documents from the relation, either with a delete or a
         # destroy depending on what this was called through.
