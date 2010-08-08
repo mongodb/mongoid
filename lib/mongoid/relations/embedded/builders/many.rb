@@ -3,11 +3,12 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Embedded #:nodoc:
       module Builders #:nodoc:
-        class One < Builder #:nodoc:
+        class Many < Builder #:nodoc:
 
           # Builds the document out of the attributes using the provided
           # metadata on the relation. Instantiates through the factory in order
-          # to make sure subclasses and allocation are used if fitting.
+          # to make sure subclasses and allocation are used if fitting. This
+          # case will return many documents.
           #
           # Example:
           #
@@ -15,10 +16,15 @@ module Mongoid # :nodoc:
           #
           # Returns:
           #
-          # A single +Document+.
+          # An +Array+ of +Documents+.
           def build
             name = @metadata.name.to_s
-            Mongoid::Factory.build(@metadata.klass, @attributes[name])
+            attributes = @attributes[name]
+            attributes.inject([]) do |documents, attrs|
+              documents.tap do |docs|
+                docs << Mongoid::Factory.build(@metadata.klass, attrs)
+              end
+            end
           end
         end
       end
