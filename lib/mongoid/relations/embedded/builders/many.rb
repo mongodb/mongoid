@@ -18,9 +18,8 @@ module Mongoid # :nodoc:
           #
           # An +Array+ of +Documents+.
           def build
-            name = @metadata.name.to_s
-            attributes = @attributes[name]
-            attributes.inject([]) do |documents, attrs|
+            return @object if @object.first.is_a?(Document)
+            @object.inject([]) do |documents, attrs|
               documents.tap do |docs|
                 docs << Mongoid::Factory.build(@metadata.klass, attrs)
               end

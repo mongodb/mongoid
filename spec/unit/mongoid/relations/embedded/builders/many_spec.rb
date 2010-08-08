@@ -7,24 +7,57 @@ describe Mongoid::Relations::Embedded::Builders::Many do
   end
 
   let(:builder) do
-    klass.new(metadata, attributes)
+    klass.new(metadata, object)
   end
 
   describe "#build" do
 
-    context "when no type is in the attributes" do
+    context "when passed an array of documents" do
 
       let(:metadata) do
         stub(:klass => Address, :name => :addresses)
       end
 
-      let(:attributes) do
-        {
-          "title" => "Sir",
-          "addresses" => [
-            { "city" => "London" }, { "city" => "Shanghai" }
-          ]
-        }
+      let(:object) do
+        [ Address.new(:city => "London") ]
+      end
+
+      before do
+        @documents = builder.build
+      end
+
+      it "returns an array of documents" do
+        @documents.should == object
+      end
+    end
+
+    context "when the array is empty" do
+
+      let(:metadata) do
+        stub(:klass => Address, :name => :addresses)
+      end
+
+      let(:object) do
+        []
+      end
+
+      before do
+        @documents = builder.build
+      end
+
+      it "returns an empty array" do
+        @documents.should == object
+      end
+    end
+
+    context "when no type is in the object" do
+
+      let(:metadata) do
+        stub(:klass => Address, :name => :addresses)
+      end
+
+      let(:object) do
+        [ { "city" => "London" }, { "city" => "Shanghai" } ]
       end
 
       before do
@@ -39,26 +72,23 @@ describe Mongoid::Relations::Embedded::Builders::Many do
         @documents[0].should be_a_kind_of(Address)
       end
 
-      it "sets the attributes on the documents" do
+      it "sets the object on the documents" do
         @documents[0].city.should == "London"
         @documents[1].city.should == "Shanghai"
       end
     end
 
-    context "when a type is in the attributes" do
+    context "when a type is in the object" do
 
       let(:metadata) do
         stub(:klass => Shape, :name => :shapes)
       end
 
-      let(:attributes) do
-        {
-          "name" => "Canvas",
-          "shapes" => [
-            { "_type" => "Circle", "radius" => 100 },
-            { "_type" => "Square", "width" => 50 }
-          ]
-        }
+      let(:object) do
+        [
+          { "_type" => "Circle", "radius" => 100 },
+          { "_type" => "Square", "width" => 50 }
+        ]
       end
 
       before do
@@ -74,7 +104,7 @@ describe Mongoid::Relations::Embedded::Builders::Many do
         @documents[1].should be_a_kind_of(Square)
       end
 
-      it "sets the attributes on the document" do
+      it "sets the object on the document" do
         @documents[0].radius.should == 100
         @documents[1].width.should == 50
       end

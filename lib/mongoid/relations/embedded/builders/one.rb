@@ -17,8 +17,8 @@ module Mongoid # :nodoc:
           #
           # A single +Document+.
           def build
-            name = @metadata.name.to_s
-            Mongoid::Factory.build(@metadata.klass, @attributes[name])
+            return @object if @object.is_a?(Document)
+            Mongoid::Factory.build(@metadata.klass, @object)
           end
         end
       end
