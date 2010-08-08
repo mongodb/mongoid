@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/relations/embedded/builder"
+require "mongoid/relations/embedded/builders/in"
 require "mongoid/relations/embedded/builders/many"
 require "mongoid/relations/embedded/builders/one"
 
