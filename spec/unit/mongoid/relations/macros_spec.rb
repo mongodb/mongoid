@@ -121,6 +121,14 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:name=)
       end
 
+      it "defines the builder" do
+        klass.allocate.should respond_to(:build_name)
+      end
+
+      it "defines the creator" do
+        klass.allocate.should respond_to(:create_name)
+      end
+
       context "metadata properties" do
 
         let(:metadata) do

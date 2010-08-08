@@ -19,7 +19,7 @@ describe Mongoid::Relations::Accessors do
     end
 
     before do
-      klass.getter("addresses")
+      klass.getter(:addresses)
     end
 
     it "defines a getter method" do
@@ -159,7 +159,7 @@ describe Mongoid::Relations::Accessors do
               end
 
               before do
-                klass.setter("name", metadata).getter("name")
+                klass.setter(:name, metadata).getter("name")
                 document.name = nil
               end
 

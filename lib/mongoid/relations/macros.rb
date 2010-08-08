@@ -94,6 +94,7 @@ module Mongoid # :nodoc:
             name,
             metadatafy(name, Relations::Embedded::One, options, &block)
           )
+          builder(name).creator(name)
         end
         alias :embed_one :embeds_one
 
@@ -139,9 +140,8 @@ module Mongoid # :nodoc:
         # metadata: The metadata for the relation.
         # relation: The type (class) of the relation.
         def relate(name, metadata)
-          key = name.to_s
-          relations[key] = metadata
-          getter(key).setter(key, metadata)
+          relations[name.to_s] = metadata
+          getter(name).setter(name, metadata)
         end
       end
     end
