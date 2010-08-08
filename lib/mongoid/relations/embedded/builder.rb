@@ -10,8 +10,9 @@ module Mongoid # :nodoc:
         #
         # metadata: The metadata for the relation.
         # attributes: The attributes to build from.
-        def initialize(metadata, attributes)
-          @metadata, @attributes = metadata, attributes
+        # parent: The parent document, if applicable
+        def initialize(metadata, attributes, parent = nil)
+          @metadata, @attributes, @parent = metadata, attributes, parent
         end
       end
     end
