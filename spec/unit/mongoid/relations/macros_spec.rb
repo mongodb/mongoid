@@ -4,51 +4,9 @@ describe Mongoid::Relations::Macros do
 
   let(:klass) do
     Class.new do
-      include Mongoid::Relations::Macros
+      include Mongoid::Relations
       def self.name
         "TestClass"
-      end
-    end
-  end
-
-  describe "#embedded?" do
-
-    context "when the class is embedded" do
-
-      before do
-        klass.embedded_in(:person)
-      end
-
-      it "returns true" do
-        klass.allocate.should be_embedded
-      end
-    end
-
-    context "when the class is not embedded" do
-
-      it "returns false" do
-        klass.allocate.should_not be_embedded
-      end
-    end
-  end
-
-  describe ".embedded?" do
-
-    context "when the class is embedded" do
-
-      before do
-        klass.embedded_in(:person)
-      end
-
-      it "returns true" do
-        klass.should be_embedded
-      end
-    end
-
-    context "when the class is not embedded" do
-
-      it "returns false" do
-        klass.should_not be_embedded
       end
     end
   end
@@ -71,6 +29,14 @@ describe Mongoid::Relations::Macros do
 
       it "marks the class as embedded" do
         klass.embedded.should == true
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:person)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:person=)
       end
 
       context "metadata properties" do
@@ -106,6 +72,14 @@ describe Mongoid::Relations::Macros do
         klass.relations["addresses"].should_not be_nil
       end
 
+      it "defines the getter" do
+        klass.allocate.should respond_to(:addresses)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:addresses=)
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -137,6 +111,14 @@ describe Mongoid::Relations::Macros do
 
       it "adds the metadata to the klass" do
         klass.relations["name"].should_not be_nil
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:name)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:name=)
       end
 
       context "metadata properties" do

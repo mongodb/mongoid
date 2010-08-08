@@ -14,5 +14,32 @@ module Mongoid # :nodoc:
     extend ActiveSupport::Concern
     include Accessors
     include Macros
+
+    included do
+      cattr_accessor :embedded
+      self.embedded = false
+
+      # Convenience methods for the instance to know about attributes that
+      # are located at the class level.
+      delegate \
+        :embedded,
+        :embedded?, :to => "self.class"
+    end
+
+    module ClassMethods #:nodoc:
+
+      # Specifies whether or not the class is an embedded document.
+      #
+      # Example:
+      #
+      # <tt>Address.embedded?</tt>
+      #
+      # Returns:
+      #
+      # true if embedded, false if not.
+      def embedded?
+        !!embedded
+      end
+    end
   end
 end

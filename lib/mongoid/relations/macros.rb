@@ -5,33 +5,15 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
-        cattr_accessor :embedded
         class_inheritable_accessor :relations
-        self.embedded = false
         self.relations = {}
 
         # Convenience methods for the instance to know about attributes that
         # are located at the class level.
-        delegate \
-          :embedded,
-          :embedded?,
-          :relations, :to => "self.class"
+        delegate :relations, :to => "self.class"
       end
 
       module ClassMethods #:nodoc:
-
-        # Specifies whether or not the class is an embedded document.
-        #
-        # Example:
-        #
-        # <tt>Address.embedded?</tt>
-        #
-        # Returns:
-        #
-        # true if embedded, false if not.
-        def embedded?
-          !!embedded
-        end
 
         # Adds the relation back to the parent document. This macro is
         # necessary to set the references from the child back to the parent
@@ -159,8 +141,8 @@ module Mongoid # :nodoc:
         def relate(name, metadata)
           key = name.to_s
           relations[key] = metadata
-          # getter(key)
-          # setter(key, metadata)
+          getter(key)
+          setter(key, metadata)
         end
       end
     end
