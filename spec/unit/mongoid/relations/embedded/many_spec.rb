@@ -277,6 +277,114 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#delete_all" do
+
+    let(:address) do
+      Address.new(:street => "Street 1")
+    end
+
+    let(:document) do
+      address
+    end
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    before do
+      relation << document
+    end
+
+    context "when no conditions passed" do
+
+      before do
+        address.expects(:delete)
+      end
+
+      it "clears the target" do
+        relation.delete_all
+        relation.size.should == 0
+      end
+
+      it "returns the number of documents deleted" do
+        relation.delete_all.should == 1
+      end
+
+    end
+
+    context "when conditions passed" do
+
+      before do
+        address.expects(:delete)
+      end
+
+      it "deletes the correct documents" do
+        relation.delete_all(:conditions => { :street => "Street 1" })
+        relation.size.should == 0
+      end
+
+      it "returns the number of documents deleted" do
+        relation.delete_all(
+          :conditions => { :street => "Street 1" }
+        ).should == 1
+      end
+    end
+  end
+
+  describe "#destroy_all" do
+
+    let(:address) do
+      Address.new(:street => "Street 1")
+    end
+
+    let(:document) do
+      address
+    end
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    before do
+      relation << document
+    end
+
+    context "when no conditions passed" do
+
+      before do
+        address.expects(:destroy)
+      end
+
+      it "clears the target" do
+        relation.destroy_all
+        relation.size.should == 0
+      end
+
+      it "returns the number of documents deleted" do
+        relation.destroy_all.should == 1
+      end
+
+    end
+
+    context "when conditions passed" do
+
+      before do
+        address.expects(:destroy)
+      end
+
+      it "deletes the correct documents" do
+        relation.destroy_all(:conditions => { :street => "Street 1" })
+        relation.size.should == 0
+      end
+
+      it "returns the number of documents deleted" do
+        relation.destroy_all(
+          :conditions => { :street => "Street 1" }
+        ).should == 1
+      end
+    end
+  end
+
   context "properties" do
 
     let(:documents) do

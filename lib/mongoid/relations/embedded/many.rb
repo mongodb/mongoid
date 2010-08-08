@@ -100,6 +100,40 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Delete all the documents in the association without running callbacks.
+        #
+        # Example:
+        #
+        # <tt>addresses.delete_all</tt>
+        #
+        # Options:
+        #
+        # conditions: Optional conditions hash to limit what gets deleted.
+        #
+        # Returns:
+        #
+        # The number of documents deleted.
+        def delete_all(conditions = {})
+          remove_all(conditions, false)
+        end
+
+        # Destroy all the documents in the association whilst running callbacks.
+        #
+        # Example:
+        #
+        # <tt>addresses.destroy_all</tt>
+        #
+        # Options:
+        #
+        # conditions: Optional conditions hash to limit what gets destroyed.
+        #
+        # Returns:
+        #
+        # The number of documents destroyed.
+        def destroy_all(conditions = {})
+          remove_all(conditions, true)
+        end
+
         # Instantiate a new embeds_many relation.
         #
         # Options:
@@ -127,6 +161,30 @@ module Mongoid # :nodoc:
         # The relation.
         def substitute(target)
           target.nil? ? @target.clear : @target = target; self
+        end
+
+        private
+
+        # Remove all documents from the relation, either with a delete or a
+        # destroy depending on what this was called through.
+        #
+        # Options:
+        #
+        # conditions: Hash of conditions to filter by.
+        # destroy: If true destroy, else delete.
+        #
+        # Returns:
+        #
+        # The number of documents removed.
+        def remove_all(conditions = {}, destroy)
+          criteria = @metadata.klass.find(conditions || {})
+          criteria.documents = @target
+          criteria.size.tap do
+            criteria.each do |doc|
+              @target.delete(doc)
+              destroy ? doc.destroy : doc.delete
+            end
+          end
         end
       end
     end
