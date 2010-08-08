@@ -6,6 +6,22 @@ describe Mongoid::Relations::Metadata do
     Mongoid::Relations::Metadata
   end
 
+  describe "#builder" do
+
+    let(:metadata) do
+      klass.new(:relation => Mongoid::Relations::Embedded::One)
+    end
+
+    let(:object) do
+      stub
+    end
+
+    it "returns the builder from the relation" do
+      metadata.builder(object).should
+        be_a_kind_of(Mongoid::Relations::Embedded::Builders::One)
+    end
+  end
+
   describe "#class_name" do
 
     context "when class_name provided" do

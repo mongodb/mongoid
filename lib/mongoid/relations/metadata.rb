@@ -3,6 +3,25 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     class Metadata < Hash #:nodoc:
 
+      # Gets a relation builder associated with the relation this metadata is
+      # for.
+      #
+      # Example:
+      #
+      # <tt>metadata.builder(document)</tt>
+      #
+      # Options:
+      #
+      # object: A document or attributes to pass to the builder.
+      # parent: Optional parent document.
+      #
+      # Returns:
+      #
+      # The builder for the relation.
+      def builder(object, parent = nil)
+        relation.builder(self, object, parent)
+      end
+
       # Returns the name of the class that this relation contains. If the
       # class_name was provided as an option this will return that, otherwise
       # it will determine the name from the name property.
