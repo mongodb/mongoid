@@ -211,6 +211,56 @@ describe Mongoid::Relations::Macros do
     end
   end
 
+  describe ".referenced_in_from_array" do
+
+    it "defines the macro" do
+      klass.should respond_to(:referenced_in_from_array)
+    end
+
+    context "when defining the relation" do
+
+      before do
+        klass.referenced_in_from_array(:person)
+      end
+
+      it "adds the metadata to the klass" do
+        klass.relations["person"].should_not be_nil
+      end
+
+      it "does not mark the class as embedded" do
+        klass.embedded.should == false
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:person)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:person=)
+      end
+
+      it "creates the correct relation" do
+        klass.relations["person"].relation.should ==
+          Mongoid::Relations::Referenced::InFromArray
+      end
+
+      context "metadata properties" do
+
+        let(:metadata) do
+          klass.relations["person"]
+        end
+
+        it "automatically adds the name" do
+          metadata.name.should == :person
+        end
+
+        it "automatically adds the inverse class name" do
+          metadata.inverse_class_name.should == "TestClass"
+        end
+      end
+    end
+  end
+
   describe ".references_many" do
 
     it "defines the macro" do
@@ -242,6 +292,56 @@ describe Mongoid::Relations::Macros do
       it "creates the correct relation" do
         klass.relations["posts"].relation.should ==
           Mongoid::Relations::Referenced::Many
+      end
+
+      context "metadata properties" do
+
+        let(:metadata) do
+          klass.relations["posts"]
+        end
+
+        it "automatically adds the name" do
+          metadata.name.should == :posts
+        end
+
+        it "automatically adds the inverse class name" do
+          metadata.inverse_class_name.should == "TestClass"
+        end
+      end
+    end
+  end
+
+  describe ".references_many_as_array" do
+
+    it "defines the macro" do
+      klass.should respond_to(:references_many_as_array)
+    end
+
+    context "when defining the relation" do
+
+      before do
+        klass.references_many_as_array(:posts)
+      end
+
+      it "adds the metadata to the klass" do
+        klass.relations["posts"].should_not be_nil
+      end
+
+      it "does not mark the class as embedded" do
+        klass.embedded.should == false
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:posts)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:posts=)
+      end
+
+      it "creates the correct relation" do
+        klass.relations["posts"].relation.should ==
+          Mongoid::Relations::Referenced::ManyAsArray
       end
 
       context "metadata properties" do

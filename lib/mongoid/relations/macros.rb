@@ -131,6 +131,35 @@ module Mongoid # :nodoc:
           )
         end
 
+        # Adds a relational association from the child Document to a Document in
+        # another database or collection. This differs from a normal
+        # referenced_in in that the foreign key is not stored on this object,
+        # but in an array on the inverse side.
+        #
+        # Options:
+        #
+        # name: A +Symbol+ that is the related class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
+        #
+        # Example:
+        #
+        #   class Game
+        #     include Mongoid::Document
+        #     referenced_in_from_array :person
+        #   end
+        #
+        #   class Person
+        #     include Mongoid::Document
+        #     references_many_as_array :game
+        #   end
+        def referenced_in_from_array(name, options = {}, &block)
+          relate(
+            name,
+            metadatafy(name, Relations::Referenced::InFromArray, options, &block)
+          )
+        end
+
         # Adds a relational association from a parent Document to many
         # Documents in another database or collection.
         #
@@ -155,6 +184,35 @@ module Mongoid # :nodoc:
           relate(
             name,
             metadatafy(name, Relations::Referenced::Many, options, &block)
+          )
+        end
+
+        # Adds a relational association from a parent Document to many
+        # Documents in another database or collection, but instead of storing
+        # the foreign key on the inverse objects, it gets stored on this side as
+        # an array.
+        #
+        # Options:
+        #
+        # name: A +Symbol+ that is the related class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
+        #
+        # Example:
+        #
+        #   class Person
+        #     include Mongoid::Document
+        #     references_many_as_array :posts
+        #   end
+        #
+        #   class Game
+        #     include Mongoid::Document
+        #     referenced_in_from_array :person
+        #   end
+        def references_many_as_array(name, options = {}, &block)
+          relate(
+            name,
+            metadatafy(name, Relations::Referenced::ManyAsArray, options, &block)
           )
         end
 
