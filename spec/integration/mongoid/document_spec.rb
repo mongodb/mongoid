@@ -336,6 +336,29 @@ describe Mongoid::Document do
       @criteria = Mongoid::Criteria.translate(Person, { :per_page => 5, :page => 1 })
       @criteria.count.should == 10
     end
+
+    context "when paginating $or queries" do
+
+      before do
+        @results = Person.any_of(:title => /^Test/).paginate(:page => 2, :per_page => 5)
+      end
+
+      it "returns the proper page" do
+        @results.current_page.should == 2
+      end
+
+      it "returns the proper number per page" do
+        @results.per_page.should == 5
+      end
+
+      it "returns the proper count" do
+        @results.count.should == 5
+      end
+
+      it "returns the proper total entries" do
+        @results.total_entries.should == 10
+      end
+    end
   end
 
   describe "#reload" do
