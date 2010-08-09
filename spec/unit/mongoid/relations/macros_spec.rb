@@ -39,6 +39,11 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:person=)
       end
 
+      it "creates the correct relation" do
+        klass.relations["person"].relation.should ==
+          Mongoid::Relations::Embedded::In
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -78,6 +83,11 @@ describe Mongoid::Relations::Macros do
 
       it "defines the setter" do
         klass.allocate.should respond_to(:addresses=)
+      end
+
+      it "creates the correct relation" do
+        klass.relations["addresses"].relation.should ==
+          Mongoid::Relations::Embedded::Many
       end
 
       context "metadata properties" do
@@ -129,6 +139,11 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:create_name)
       end
 
+      it "creates the correct relation" do
+        klass.relations["name"].relation.should ==
+          Mongoid::Relations::Embedded::One
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -174,6 +189,11 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:person=)
       end
 
+      it "creates the correct relation" do
+        klass.relations["person"].relation.should ==
+          Mongoid::Relations::Referenced::In
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -196,12 +216,148 @@ describe Mongoid::Relations::Macros do
     it "defines the macro" do
       klass.should respond_to(:references_many)
     end
+
+    context "when defining the relation" do
+
+      before do
+        klass.references_many(:posts)
+      end
+
+      it "adds the metadata to the klass" do
+        klass.relations["posts"].should_not be_nil
+      end
+
+      it "does not mark the class as embedded" do
+        klass.embedded.should == false
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:posts)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:posts=)
+      end
+
+      it "creates the correct relation" do
+        klass.relations["posts"].relation.should ==
+          Mongoid::Relations::Referenced::Many
+      end
+
+      context "metadata properties" do
+
+        let(:metadata) do
+          klass.relations["posts"]
+        end
+
+        it "automatically adds the name" do
+          metadata.name.should == :posts
+        end
+
+        it "automatically adds the inverse class name" do
+          metadata.inverse_class_name.should == "TestClass"
+        end
+      end
+    end
+  end
+
+  describe ".references_and_referenced_in_many" do
+
+    it "defines the macro" do
+      klass.should respond_to(:references_and_referenced_in_many)
+    end
+
+    context "when defining the relation" do
+
+      before do
+        klass.references_and_referenced_in_many(:preferences)
+      end
+
+      it "adds the metadata to the klass" do
+        klass.relations["preferences"].should_not be_nil
+      end
+
+      it "does not mark the class as embedded" do
+        klass.embedded.should == false
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:preferences)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:preferences=)
+      end
+
+      it "creates the correct relation" do
+        klass.relations["preferences"].relation.should ==
+          Mongoid::Relations::Referenced::ManyToMany
+      end
+
+      context "metadata properties" do
+
+        let(:metadata) do
+          klass.relations["preferences"]
+        end
+
+        it "automatically adds the name" do
+          metadata.name.should == :preferences
+        end
+
+        it "automatically adds the inverse class name" do
+          metadata.inverse_class_name.should == "TestClass"
+        end
+      end
+    end
   end
 
   describe ".references_one" do
 
     it "defines the macro" do
       klass.should respond_to(:references_one)
+    end
+
+    context "when defining the relation" do
+
+      before do
+        klass.references_one(:game)
+      end
+
+      it "adds the metadata to the klass" do
+        klass.relations["game"].should_not be_nil
+      end
+
+      it "does not mark the class as embedded" do
+        klass.embedded.should == false
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:game)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:game=)
+      end
+
+      it "creates the correct relation" do
+        klass.relations["game"].relation.should ==
+          Mongoid::Relations::Referenced::One
+      end
+
+      context "metadata properties" do
+
+        let(:metadata) do
+          klass.relations["game"]
+        end
+
+        it "automatically adds the name" do
+          metadata.name.should == :game
+        end
+
+        it "automatically adds the inverse class name" do
+          metadata.inverse_class_name.should == "TestClass"
+        end
+      end
     end
   end
 

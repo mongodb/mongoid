@@ -23,6 +23,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that matches the name of the parent class.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -50,6 +52,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that is the plural child class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -77,6 +81,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that is the plural child class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -104,6 +110,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that is the related class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -129,6 +137,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that is the related class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -141,7 +151,11 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     referenced_in :person
         #   end
-        def references_many
+        def references_many(name, options = {}, &block)
+          relate(
+            name,
+            metadatafy(name, Relations::Referenced::Many, options, &block)
+          )
         end
 
         # Adds a relational many-to-many association between many of this
@@ -150,6 +164,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that is the related class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -162,7 +178,11 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     references_and_referenced_in_many :people
         #   end
-        def references_and_referenced_in_many
+        def references_and_referenced_in_many(name, options = {}, &block)
+          relate(
+            name,
+            metadatafy(name, Relations::Referenced::ManyToMany, options, &block)
+          )
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -171,6 +191,8 @@ module Mongoid # :nodoc:
         # Options:
         #
         # name: A +Symbol+ that is the related class name.
+        # options: The relation options as a +Hash+.
+        # block: Optional block for defining relation extensions.
         #
         # Example:
         #
@@ -183,7 +205,11 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     references_one :game
         #   end
-        def references_one
+        def references_one(name, options = {}, &block)
+          relate(
+            name,
+            metadatafy(name, Relations::Referenced::One, options, &block)
+          )
         end
 
         private
