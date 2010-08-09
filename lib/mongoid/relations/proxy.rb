@@ -4,7 +4,8 @@ module Mongoid # :nodoc:
     class Proxy #:nodoc
 
       instance_methods.each do |method|
-        undef_method(method) unless method =~ /(^__|^send$|^object_id$|^extend$)/
+        undef_method(method) unless
+          method =~ /(^__|^send$|^object_id$|^extend$|^tap$)/
       end
 
       attr_accessor \

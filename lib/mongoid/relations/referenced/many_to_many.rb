@@ -1,8 +1,9 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    class OneToOne < Proxy
-
+    module Referenced #:nodoc:
+      class ManyToMany
+      end
     end
   end
 end

@@ -151,6 +151,44 @@ describe Mongoid::Relations::Macros do
     it "defines the macro" do
       klass.should respond_to(:referenced_in)
     end
+
+    context "when defining the relation" do
+
+      before do
+        klass.referenced_in(:person)
+      end
+
+      it "adds the metadata to the klass" do
+        klass.relations["person"].should_not be_nil
+      end
+
+      it "does not mark the class as embedded" do
+        klass.embedded.should == false
+      end
+
+      it "defines the getter" do
+        klass.allocate.should respond_to(:person)
+      end
+
+      it "defines the setter" do
+        klass.allocate.should respond_to(:person=)
+      end
+
+      context "metadata properties" do
+
+        let(:metadata) do
+          klass.relations["person"]
+        end
+
+        it "automatically adds the name" do
+          metadata.name.should == :person
+        end
+
+        it "automatically adds the inverse class name" do
+          metadata.inverse_class_name.should == "TestClass"
+        end
+      end
+    end
   end
 
   describe ".references_many" do

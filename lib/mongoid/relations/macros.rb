@@ -98,12 +98,91 @@ module Mongoid # :nodoc:
         end
         alias :embed_one :embeds_one
 
-        def referenced_in
+        # Adds a relational association from the child Document to a Document in
+        # another database or collection.
+        #
+        # Options:
+        #
+        # name: A +Symbol+ that is the related class name.
+        #
+        # Example:
+        #
+        #   class Game
+        #     include Mongoid::Document
+        #     referenced_in :person
+        #   end
+        #
+        #   class Person
+        #     include Mongoid::Document
+        #     references_one :game
+        #   end
+        def referenced_in(name, options = {}, &block)
+          relate(
+            name,
+            metadatafy(name, Relations::Referenced::In, options, &block)
+          )
         end
 
+        # Adds a relational association from a parent Document to many
+        # Documents in another database or collection.
+        #
+        # Options:
+        #
+        # name: A +Symbol+ that is the related class name.
+        #
+        # Example:
+        #
+        #   class Person
+        #     include Mongoid::Document
+        #     references_many :posts
+        #   end
+        #
+        #   class Game
+        #     include Mongoid::Document
+        #     referenced_in :person
+        #   end
         def references_many
         end
 
+        # Adds a relational many-to-many association between many of this
+        # Document and many of another Document.
+        #
+        # Options:
+        #
+        # name: A +Symbol+ that is the related class name.
+        #
+        # Example:
+        #
+        #   class Person
+        #     include Mongoid::Document
+        #     references_and_referenced_in_many :preferences
+        #   end
+        #
+        #   class Preference
+        #     include Mongoid::Document
+        #     references_and_referenced_in_many :people
+        #   end
+        def references_and_referenced_in_many
+        end
+
+        # Adds a relational association from the child Document to a Document in
+        # another database or collection.
+        #
+        # Options:
+        #
+        # name: A +Symbol+ that is the related class name.
+        #
+        # Example:
+        #
+        #   class Game
+        #     include Mongoid::Document
+        #     referenced_in :person
+        #   end
+        #
+        #   class Person
+        #     include Mongoid::Document
+        #     references_one :game
+        #   end
         def references_one
         end
 

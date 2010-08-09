@@ -2,7 +2,7 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Embedded
-      class Many < OneToMany
+      class Many < Proxy
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
@@ -195,6 +195,21 @@ module Mongoid # :nodoc:
         end
 
         private
+
+        # Appends the document to the target array, updating the index on the
+        # document at the same time.
+        #
+        # Example:
+        #
+        # <tt>relation.append(document)</tt>
+        #
+        # Options:
+        #
+        # document: The document to append to the target.
+        def append(document)
+          @target << document
+          document._index = @target.size - 1
+        end
 
         # Returns the criteria object for the target class with its documents set
         # to @target.

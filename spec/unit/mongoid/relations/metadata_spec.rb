@@ -97,6 +97,10 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#foreign_key" do
+
+  end
+
   describe "#indexed?" do
 
     context "when an index property exists" do
