@@ -243,7 +243,6 @@ module Mongoid # :nodoc:
         #
         # name: The name of the relation.
         # metadata: The metadata for the relation.
-        # relation: The type (class) of the relation.
         def relate(name, metadata)
           relations[name.to_s] = metadata
           getter(name).setter(name, metadata)
