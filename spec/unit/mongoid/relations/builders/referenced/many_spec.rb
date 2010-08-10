@@ -1,17 +1,17 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Builders::Referenced::In do
+describe Mongoid::Relations::Builders::Referenced::Many do
 
   let(:klass) do
-    Mongoid::Relations::Builders::Referenced::In
+    Mongoid::Relations::Builders::Referenced::Many
   end
 
   describe "#build" do
 
     let(:metadata) do
       stub(
-        :klass => Person,
-        :name => :person,
+        :klass => Post,
+        :name => :posts,
         :foreign_key => "person_id"
       )
     end
@@ -27,35 +27,37 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       let(:object) do
-        { "person_id" => object_id }
+        { "_id" => object_id }
       end
 
-      let(:person) do
+      let(:post) do
         stub
       end
 
       before do
-        Person.expects(:find).with(object_id).returns(person)
-        @document = builder.build
+        Post.expects(:find).with(
+          :conditions => { "person_id" => object_id }
+        ).returns([ post ])
+        @documents = builder.build
       end
 
-      it "sets the document" do
-        @document.should == person
+      it "sets the documents" do
+        @documents.should == [ post ]
       end
     end
 
     context "when provided a object" do
 
       let(:object) do
-        Person.new
+        [ Person.new ]
       end
 
       before do
-        @document = builder.build
+        @documents = builder.build
       end
 
       it "returns the object" do
-        @document.should == object
+        @documents.should == object
       end
     end
   end

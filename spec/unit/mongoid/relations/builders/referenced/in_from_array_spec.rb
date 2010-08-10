@@ -49,7 +49,7 @@ describe Mongoid::Relations::Builders::Referenced::InFromArray do
     context "when provided a object" do
 
       let(:object) do
-        stub(:attributes => {})
+        Person.new
       end
 
       before do

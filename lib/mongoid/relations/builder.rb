@@ -26,7 +26,7 @@ module Mongoid # :nodoc:
       #
       # true if the object responds to <tt>#attributes</tt>.
       def query?
-        !@object.respond_to?(:attributes)
+        !@object.to_a.first.respond_to?(:attributes)
       end
     end
   end
