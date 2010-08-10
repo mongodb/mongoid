@@ -99,6 +99,105 @@ describe Mongoid::Relations::Metadata do
 
   describe "#foreign_key" do
 
+    context "when no foreign key was explicitly defined" do
+
+      context "when the relation stores a foreign key" do
+
+        context "when referenced in" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :person,
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          it "returns the foreign_key" do
+            metadata.foreign_key.should == "person_id"
+          end
+        end
+
+        context "when references and referenced in many" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :people,
+              :relation => Mongoid::Relations::Referenced::ManyToMany
+            )
+          end
+
+          it "returns the foreign_key" do
+            metadata.foreign_key.should == "person_ids"
+          end
+        end
+
+        context "when references many as array" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :posts,
+              :relation => Mongoid::Relations::Referenced::ManyAsArray
+            )
+          end
+
+          it "returns the foreign_key" do
+            metadata.foreign_key.should == "post_ids"
+          end
+        end
+      end
+
+      context "when the relation does not store a foreign key" do
+
+        context "when references one" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :post,
+              :relation => Mongoid::Relations::Referenced::One,
+              :inverse_class_name => "Person"
+            )
+          end
+
+          it "returns the inverse foreign key" do
+            metadata.foreign_key.should == "person_id"
+          end
+        end
+
+        context "when references many" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :posts,
+              :relation => Mongoid::Relations::Referenced::Many,
+              :inverse_class_name => "Person"
+            )
+          end
+
+          it "returns the inverse foreign key" do
+            metadata.foreign_key.should == "person_id"
+          end
+        end
+
+        context "when referenced in from array" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :person,
+              :relation => Mongoid::Relations::Referenced::InFromArray,
+              :inverse_class_name => "Post"
+            )
+          end
+
+          it "returns the inverse foreign key" do
+            metadata.foreign_key.should == "post_ids"
+          end
+        end
+      end
+    end
+
+    context "when a foreign_key was defined" do
+
+    end
   end
 
   describe "#indexed?" do
@@ -174,7 +273,6 @@ describe Mongoid::Relations::Metadata do
 
     PROPERTIES = [
       "dependent",
-      "foreign_key",
       "inverse_class_name",
       "inverse_of",
       "name",

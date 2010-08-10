@@ -24,6 +24,19 @@ module Mongoid # :nodoc:
             Builders::Referenced::In.new(meta, object)
           end
 
+          # Returns the suffix of the foreign key field, either "_id" or "_ids".
+          #
+          # Example:
+          #
+          # <tt>Referenced::In.foreign_key_suffix</tt>
+          #
+          # Returns:
+          #
+          # "_id"
+          def foreign_key_suffix
+            "_id"
+          end
+
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
@@ -36,6 +49,20 @@ module Mongoid # :nodoc:
           # <tt>:referenced_in</tt>
           def macro
             :referenced_in
+          end
+
+          # Tells the caller if this relation is one that stores the foreign
+          # key on its own objects.
+          #
+          # Example:
+          #
+          # <tt>Referenced::In.stores_foreign_key?</tt>
+          #
+          # Returns:
+          #
+          # true
+          def stores_foreign_key?
+            true
           end
         end
       end

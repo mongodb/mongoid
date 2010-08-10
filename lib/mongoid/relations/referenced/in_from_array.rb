@@ -24,6 +24,19 @@ module Mongoid # :nodoc:
             Builders::Referenced::InFromArray.new(meta, object)
           end
 
+          # Returns the suffix of the foreign key field, either "_id" or "_ids".
+          #
+          # Example:
+          #
+          # <tt>Referenced::InFromArray.foreign_key_suffix</tt>
+          #
+          # Returns:
+          #
+          # "_id"
+          def foreign_key_suffix
+            "_ids"
+          end
+
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
@@ -36,6 +49,20 @@ module Mongoid # :nodoc:
           # <tt>:referenced_in_from_array</tt>
           def macro
             :referenced_in_from_array
+          end
+
+          # Tells the caller if this relation is one that stores the foreign
+          # key on its own objects.
+          #
+          # Example:
+          #
+          # <tt>Referenced::InFromArray.stores_foreign_key?</tt>
+          #
+          # Returns:
+          #
+          # false
+          def stores_foreign_key?
+            false
           end
         end
       end

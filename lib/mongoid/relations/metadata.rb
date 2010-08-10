@@ -63,6 +63,32 @@ module Mongoid # :nodoc:
         !!extension
       end
 
+      # Handles all the logic for figuring out what the foreign_key is for each
+      # relations query. The logic is as follows:
+      #
+      # 1. If the developer defined a custom key, use that.
+      # 2. If the relation stores a foreign key,
+      #    use the class_name_id strategy.
+      # 3. If the relation does not store the key,
+      #    use the inverse_class_name_id strategy.
+      #
+      # Example:
+      #
+      # <tt>metadata.foreign_key</tt>
+      #
+      # Returns:
+      #
+      # A string to use as the foreign key when querying.
+      def foreign_key
+        return self[:foreign_key] if self[:foreign_key]
+        suffix = relation.foreign_key_suffix
+        if relation.stores_foreign_key?
+          class_name.underscore << suffix
+        else
+          inverse_class_name.underscore << suffix
+        end
+      end
+
       # Tells whether a foreign key index exists on the relation.
       #
       # Example:
