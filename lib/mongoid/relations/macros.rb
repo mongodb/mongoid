@@ -303,7 +303,7 @@ module Mongoid # :nodoc:
         # metadata: The metadata for the relation.
         def relate(name, metadata)
           relations[name.to_s] = metadata
-          getter(name).setter(name, metadata)
+          getter(name, metadata).setter(name, metadata)
         end
       end
     end

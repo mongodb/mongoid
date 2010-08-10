@@ -19,6 +19,7 @@ describe Mongoid::Relations::Embedded::Builders do
     end
 
     before do
+      document.instance_variable_set(:@attributes, {})
       klass.builder("name")
     end
 
@@ -40,7 +41,7 @@ describe Mongoid::Relations::Embedded::Builders do
       end
 
       before do
-        klass.getter("name").setter("name", metadata)
+        klass.getter("name", metadata).setter("name", metadata)
       end
 
       describe "#build_\{relation\}" do
@@ -67,6 +68,7 @@ describe Mongoid::Relations::Embedded::Builders do
     end
 
     before do
+      document.instance_variable_set(:@attributes, {})
       klass.creator("name")
     end
 
@@ -88,7 +90,7 @@ describe Mongoid::Relations::Embedded::Builders do
       end
 
       before do
-        klass.getter("name").setter("name", metadata)
+        klass.getter("name", metadata).setter("name", metadata)
       end
 
       describe "#create_\{relation\}" do

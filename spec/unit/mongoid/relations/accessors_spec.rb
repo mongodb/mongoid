@@ -18,8 +18,15 @@ describe Mongoid::Relations::Accessors do
       klass.new
     end
 
+    let(:metadata) do
+      Mongoid::Relations::Metadata.new(
+        :name => :addresses,
+        :relation => relation
+      )
+    end
+
     before do
-      klass.getter(:addresses)
+      klass.getter(:addresses, metadata)
     end
 
     it "defines a getter method" do
@@ -27,25 +34,46 @@ describe Mongoid::Relations::Accessors do
     end
 
     it "returns self" do
-      klass.getter("name").should == klass
+      klass.getter("name", metadata).should == klass
     end
 
     context "defined methods" do
 
       describe "#\{relation\}" do
 
-        let(:relation) do
-          stub
-        end
-
         context "when the instance variable is not set" do
 
           before do
-            document.instance_variable_set(:@addresses, nil)
+            klass.setter(:addresses, metadata)
           end
 
-          it "returns nil" do
-            document.addresses.should be_nil
+          context "when relation attributes exist" do
+
+            let(:attributes) do
+              { "addresses" => [
+                  { "city" => "London" }
+                ]
+              }
+            end
+
+            before do
+              document.instance_variable_set(:@attributes, attributes)
+            end
+
+            it "returns a new relation" do
+              document.addresses.size.should == 1
+            end
+          end
+
+          context "when relation attributes do not exist" do
+
+            before do
+              document.instance_variable_set(:@attributes, {})
+            end
+
+            it "returns the empty relation" do
+              document.addresses.should == []
+            end
           end
         end
 
@@ -104,7 +132,7 @@ describe Mongoid::Relations::Accessors do
         context "when no relation exists" do
 
           before do
-            klass.getter("addresses")
+            klass.getter("addresses", metadata)
             document.instance_variable_set(:@addresses, nil)
             document.addresses = [ address ]
           end
@@ -117,7 +145,7 @@ describe Mongoid::Relations::Accessors do
         context "when a relation exists" do
 
           before do
-            klass.getter("addresses")
+            klass.getter("addresses", metadata)
           end
 
           context "when new target is not nil" do
@@ -159,7 +187,8 @@ describe Mongoid::Relations::Accessors do
               end
 
               before do
-                klass.setter(:name, metadata).getter("name")
+                document.instance_variable_set(:@attributes, {})
+                klass.setter(:name, metadata).getter("name", metadata)
                 document.name = nil
               end
 

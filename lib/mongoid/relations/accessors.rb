@@ -46,21 +46,24 @@ module Mongoid # :nodoc:
         #
         # Example:
         #
-        # <tt>Person.getter("addresses")</tt>
+        # <tt>Person.getter("addresses", metadata)</tt>
         #
         # Options:
         #
         # name: The name of the relation.
+        # metadata: The metadata for the relation.
         #
         # Returns:
         #
         # self
-        def getter(name)
+        def getter(name, metadata)
           tap do
             define_method(name) do
               variable = "@#{name}"
               if instance_variable_defined?(variable)
                 instance_variable_get(variable)
+              else
+                build(name, @attributes[name.to_s], metadata)
               end
             end
           end
