@@ -44,7 +44,7 @@ module Mongoid #:nodoc:
         when Regexp
           value
         else
-          field.set(value)
+          field.type == Array ? value.class.set(value) : field.set(value)
         end
       end
 

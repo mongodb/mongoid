@@ -2,7 +2,9 @@ require "spec_helper"
 require 'mongoid/criterion/selector'
 
 describe Mongoid::Criterion::Selector do
+
   let(:field) { stub(:type => Integer) }
+
   describe "#initialize" do
     it "should store the class" do
       klass = stub
@@ -91,6 +93,16 @@ describe Mongoid::Criterion::Selector do
         field.expects(:set).with("45")
         selector.send(:typecast_value_for, field, "45")
       end
+
+      context "when the field is an array" do
+
+        let(:field) { stub(:type => Array) }
+
+        it "allows the simple value to be set" do
+          String.expects(:set).with("007")
+          selector.send(:typecast_value_for, field, "007")
+        end
+      end
     end
 
     context "when the value is a regex" do
@@ -117,7 +129,6 @@ describe Mongoid::Criterion::Selector do
           selector.send(:typecast_value_for, field, ["1", "2"])
         end
       end
-
     end
 
     context "when the value is a hash" do

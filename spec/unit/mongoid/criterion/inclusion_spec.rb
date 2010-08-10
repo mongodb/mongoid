@@ -155,6 +155,17 @@ describe Mongoid::Criterion::Inclusion do
           criteria.selector.should ==
             { :title => "Title", :text => "Text" }
         end
+
+        context "when field defined as an array" do
+
+          before do
+            criteria.where(:aliases => "007")
+          end
+
+          it "allows a single value to be passed" do
+            criteria.selector.should == { :aliases => "007" }
+          end
+        end
       end
 
       context "with complex criterion" do
