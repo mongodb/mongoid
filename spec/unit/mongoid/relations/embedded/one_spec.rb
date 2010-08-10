@@ -13,7 +13,7 @@ describe Mongoid::Relations::Embedded::One do
   describe ".builder" do
 
     let(:builder_klass) do
-      Mongoid::Relations::Embedded::Builders::One
+      Mongoid::Relations::Builders::Embedded::One
     end
 
     let(:document) do

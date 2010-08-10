@@ -18,7 +18,7 @@ describe Mongoid::Relations::Metadata do
 
     it "returns the builder from the relation" do
       metadata.builder(object).should
-        be_a_kind_of(Mongoid::Relations::Embedded::Builders::One)
+        be_a_kind_of(Mongoid::Relations::Builders::Embedded::One)
     end
   end
 

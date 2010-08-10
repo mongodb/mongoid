@@ -1,15 +1,15 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Referenced::One do
+describe Mongoid::Relations::Referenced::ManyToMany do
 
   let(:klass) do
-    Mongoid::Relations::Referenced::One
+    Mongoid::Relations::Referenced::ManyToMany
   end
 
   describe ".builder" do
 
     let(:builder_klass) do
-      Mongoid::Relations::Builders::Referenced::One
+      Mongoid::Relations::Builders::Referenced::ManyToMany
     end
 
     let(:document) do
@@ -28,8 +28,8 @@ describe Mongoid::Relations::Referenced::One do
 
   describe ".macro" do
 
-    it "returns references_one" do
-      klass.macro.should == :references_one
+    it "returns references_and_referenced_in_many" do
+      klass.macro.should == :references_and_referenced_in_many
     end
   end
 end

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Embedded::Builders do
+describe Mongoid::Relations::Builders do
 
   let(:klass) do
     Class.new do

@@ -1,10 +1,9 @@
-
 require "spec_helper"
 
-describe Mongoid::Relations::Embedded::Builders::In do
+describe Mongoid::Relations::Builders::Embedded::In do
 
   let(:klass) do
-    Mongoid::Relations::Embedded::Builders::In
+    Mongoid::Relations::Builders::Embedded::In
   end
 
   describe "#build" do

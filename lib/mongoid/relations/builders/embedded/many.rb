@@ -1,8 +1,8 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Embedded #:nodoc:
-      module Builders #:nodoc:
+    module Builders #:nodoc:
+      module Embedded #:nodoc:
         class Many < Builder #:nodoc:
 
           # Builds the document out of the attributes using the provided

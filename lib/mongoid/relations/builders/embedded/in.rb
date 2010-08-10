@@ -1,8 +1,8 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Embedded #:nodoc:
-      module Builders #:nodoc:
+    module Builders #:nodoc:
+      module Embedded #:nodoc:
         class In < Builder #:nodoc:
 
           # This builder doesn't actually build anything, just returns the
@@ -10,7 +10,7 @@ module Mongoid # :nodoc:
           #
           # Example:
           #
-          # <tt>Builder.new(meta, attrs, parent).build</tt>
+          # <tt>Builder.new(meta, attrs).build</tt>
           #
           # Returns:
           #

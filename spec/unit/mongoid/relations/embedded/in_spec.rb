@@ -13,7 +13,7 @@ describe Mongoid::Relations::Embedded::In do
   describe ".builder" do
 
     let(:builder_klass) do
-      Mongoid::Relations::Embedded::Builders::In
+      Mongoid::Relations::Builders::Embedded::In
     end
 
     let(:document) do
@@ -27,6 +27,13 @@ describe Mongoid::Relations::Embedded::In do
     it "returns the embedded in builder" do
       klass.builder(metadata, document).should
         be_a_kind_of(builder_klass)
+    end
+  end
+
+  describe ".macro" do
+
+    it "returns embedded_in" do
+      klass.macro.should == :embedded_in
     end
   end
 

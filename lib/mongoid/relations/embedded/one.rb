@@ -52,7 +52,7 @@ module Mongoid # :nodoc:
           #
           # A newly instantiated builder object.
           def builder(meta, object)
-            Builders::One.new(meta, object)
+            Builders::Embedded::One.new(meta, object)
           end
 
           # Returns the macro for this relation. Used mostly as a helper in

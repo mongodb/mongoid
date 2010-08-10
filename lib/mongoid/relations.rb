@@ -1,7 +1,7 @@
 # encoding: utf-8
 require "mongoid/relations/accessors"
 require "mongoid/relations/proxy"
-require "mongoid/relations/embedded/builders"
+require "mongoid/relations/builders"
 require "mongoid/relations/embedded/in"
 require "mongoid/relations/embedded/many"
 require "mongoid/relations/embedded/one"
@@ -18,7 +18,7 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     extend ActiveSupport::Concern
     include Accessors
-    include Embedded::Builders
+    include Builders
     include Macros
 
     included do

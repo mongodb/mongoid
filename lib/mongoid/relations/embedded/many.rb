@@ -289,7 +289,7 @@ module Mongoid # :nodoc:
           #
           # A newly instantiated builder object.
           def builder(meta, object)
-            Builders::Many.new(meta, object)
+            Builders::Embedded::Many.new(meta, object)
           end
 
           # Returns the macro for this relation. Used mostly as a helper in

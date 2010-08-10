@@ -162,7 +162,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe ".builder" do
 
     let(:builder_klass) do
-      Mongoid::Relations::Embedded::Builders::Many
+      Mongoid::Relations::Builders::Embedded::Many
     end
 
     let(:document) do
