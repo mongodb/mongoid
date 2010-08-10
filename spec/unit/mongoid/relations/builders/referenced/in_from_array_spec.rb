@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Builders::Referenced::In do
+describe Mongoid::Relations::Builders::Referenced::InFromArray do
 
   let(:klass) do
-    Mongoid::Relations::Builders::Referenced::In
+    Mongoid::Relations::Builders::Referenced::InFromArray
   end
 
   describe "#build" do
@@ -12,7 +12,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       stub(
         :klass => Person,
         :name => :person,
-        :foreign_key => "person_id"
+        :foreign_key => "post_ids"
       )
     end
 
@@ -27,7 +27,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       let(:object) do
-        { "person_id" => object_id }
+        { "_id" => object_id }
       end
 
       let(:person) do
@@ -35,7 +35,9 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       before do
-        Person.expects(:find).with(object_id).returns(person)
+        Person.expects(:any_in).with(
+          "post_ids" => [ object_id ]
+        ).returns([ person ])
         @document = builder.build
       end
 
