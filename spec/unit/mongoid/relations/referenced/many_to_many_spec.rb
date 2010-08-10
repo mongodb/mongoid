@@ -26,10 +26,24 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe ".foreign_key_suffix" do
+
+    it "returns _ids" do
+      klass.foreign_key_suffix.should == "_ids"
+    end
+  end
+
   describe ".macro" do
 
     it "returns references_and_referenced_in_many" do
       klass.macro.should == :references_and_referenced_in_many
+    end
+  end
+
+  describe ".stores_foreign_key?" do
+
+    it "returns true" do
+      klass.stores_foreign_key?.should == true
     end
   end
 end

@@ -26,10 +26,24 @@ describe Mongoid::Relations::Referenced::ManyAsArray do
     end
   end
 
+  describe ".foreign_key_suffix" do
+
+    it "returns _ids" do
+      klass.foreign_key_suffix.should == "_ids"
+    end
+  end
+
   describe ".macro" do
 
     it "returns references_many_as_array" do
       klass.macro.should == :references_many_as_array
+    end
+  end
+
+  describe ".stores_foreign_key?" do
+
+    it "returns true" do
+      klass.stores_foreign_key?.should == true
     end
   end
 end
