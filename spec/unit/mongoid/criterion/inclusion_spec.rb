@@ -86,12 +86,12 @@ describe Mongoid::Criterion::Inclusion do
       context "on the same fields" do
 
         before do
-          criteria.any_of( {:field1 => "test" }, { :field1 => "testy" })
+          criteria.any_of( {:field1 => "test" }, { :field1.lt => "testy" })
         end
 
         it "adds the $or criteria to the selector" do
           criteria.selector.should ==
-            { "$or" => [ { :field1 => "test" }, { :field1 => "testy" } ] }
+            { "$or" => [ { :field1 => "test" }, { :field1 => { "$lt" => "testy" } } ] }
         end
       end
     end

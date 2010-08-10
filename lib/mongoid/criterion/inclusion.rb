@@ -59,7 +59,8 @@ module Mongoid #:nodoc:
       # Returns: <tt>self</tt>
       def any_of(*args)
         criterion = @selector["$or"] || []
-        @selector["$or"] = criterion.concat(args)
+        expanded = args.collect(&:expand_complex_criteria)
+        @selector["$or"] = criterion.concat(expanded)
         self
       end
       alias :or :any_of

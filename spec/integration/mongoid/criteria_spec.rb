@@ -148,7 +148,7 @@ describe Mongoid::Criteria do
     context "when chaining for multiple matches" do
 
       it "returns any matching documents" do
-        Person.any_of({ :age => 7 }, { :age => 5 }).count.should == 2
+        Person.any_of({ :age => 7 }, { :age.lt => 3 }).count.should == 2
       end
     end
   end

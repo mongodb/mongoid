@@ -8,3 +8,4 @@ RAILS
 .bundle
 Gemfile.lock
 .rvmrc
+doc/*
