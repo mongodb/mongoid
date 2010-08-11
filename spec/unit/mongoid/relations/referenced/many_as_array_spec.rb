@@ -26,6 +26,13 @@ describe Mongoid::Relations::Referenced::ManyAsArray do
     end
   end
 
+  describe ".embedded?" do
+
+    it "returns false" do
+      klass.should_not be_embedded
+    end
+  end
+
   describe ".foreign_key_suffix" do
 
     it "returns _ids" do

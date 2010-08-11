@@ -30,6 +30,13 @@ describe Mongoid::Relations::Embedded::One do
     end
   end
 
+  describe ".embedded?" do
+
+    it "returns true" do
+      klass.should be_embedded
+    end
+  end
+
   describe ".macro" do
 
     it "returns :embeds_one" do

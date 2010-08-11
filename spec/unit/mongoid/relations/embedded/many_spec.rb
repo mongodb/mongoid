@@ -389,6 +389,13 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe ".embedded?" do
+
+    it "returns true" do
+      klass.should be_embedded
+    end
+  end
+
   describe "#find" do
 
     context "when finding all" do
