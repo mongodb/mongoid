@@ -55,6 +55,20 @@ module Mongoid # :nodoc:
             Builders::Embedded::One.new(meta, object)
           end
 
+          # Returns true if the relation is an embedded one. In this case
+          # always true.
+          #
+          # Example:
+          #
+          # <tt>Embedded::One.embedded?</tt>
+          #
+          # Returns:
+          #
+          # true
+          def embedded?
+            true
+          end
+
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #

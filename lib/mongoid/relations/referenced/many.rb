@@ -24,6 +24,20 @@ module Mongoid # :nodoc:
             Builders::Referenced::Many.new(meta, object)
           end
 
+          # Returns true if the relation is an embedded one. In this case
+          # always false.
+          #
+          # Example:
+          #
+          # <tt>Referenced::Many.embedded?</tt>
+          #
+          # Returns:
+          #
+          # true
+          def embedded?
+            false
+          end
+
           # Returns the suffix of the foreign key field, either "_id" or "_ids".
           #
           # Example:

@@ -101,6 +101,20 @@ describe Mongoid::Relations::Metadata do
 
     context "when no foreign key was explicitly defined" do
 
+      context "when relation is embedded" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :addresses,
+            :relation => Mongoid::Relations::Embedded::Many
+          )
+        end
+
+        it "returns the name as a string" do
+          metadata.foreign_key.should == "addresses"
+        end
+      end
+
       context "when the relation stores a foreign key" do
 
         context "when referenced in" do

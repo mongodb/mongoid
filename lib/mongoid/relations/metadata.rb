@@ -81,6 +81,7 @@ module Mongoid # :nodoc:
       # A string to use as the foreign key when querying.
       def foreign_key
         return self[:foreign_key] if self[:foreign_key]
+        return name.to_s if relation.embedded?
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
           class_name.underscore << suffix
@@ -88,6 +89,7 @@ module Mongoid # :nodoc:
           inverse_class_name.underscore << suffix
         end
       end
+      alias :key :foreign_key
 
       # Tells whether a foreign key index exists on the relation.
       #

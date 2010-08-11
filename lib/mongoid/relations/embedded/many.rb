@@ -292,6 +292,20 @@ module Mongoid # :nodoc:
             Builders::Embedded::Many.new(meta, object)
           end
 
+          # Returns true if the relation is an embedded one. In this case
+          # always true.
+          #
+          # Example:
+          #
+          # <tt>Embedded::Many.embedded?</tt>
+          #
+          # Returns:
+          #
+          # true
+          def embedded?
+            true
+          end
+
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
