@@ -101,20 +101,6 @@ describe Mongoid::Relations::Metadata do
 
     context "when no foreign key was explicitly defined" do
 
-      context "when relation is embedded" do
-
-        let(:metadata) do
-          klass.new(
-            :name => :addresses,
-            :relation => Mongoid::Relations::Embedded::Many
-          )
-        end
-
-        it "returns the name as a string" do
-          metadata.foreign_key.should == "addresses"
-        end
-      end
-
       context "when the relation stores a foreign key" do
 
         context "when referenced in" do
@@ -211,6 +197,17 @@ describe Mongoid::Relations::Metadata do
 
     context "when a foreign_key was defined" do
 
+      let(:metadata) do
+        klass.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :foreign_key => "blog_post_id"
+        )
+      end
+
+      it "returns the foreign_key" do
+        metadata.foreign_key.should == "blog_post_id"
+      end
     end
   end
 
@@ -258,6 +255,55 @@ describe Mongoid::Relations::Metadata do
 
     it "constantizes the inverse_class_name" do
       metadata.inverse_klass.should == Person
+    end
+  end
+
+  context "#key" do
+
+    context "when relation is embedded" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :addresses,
+          :relation => Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "returns the name as a string" do
+        metadata.key.should == "addresses"
+      end
+    end
+
+    context "when relation is referenced" do
+
+      context "when relation stores foreign_key" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :posts,
+            :relation => Mongoid::Relations::Referenced::ManyAsArray
+          )
+        end
+
+        it "returns the foreign_key" do
+          metadata.key.should == "post_ids"
+        end
+      end
+
+      context "when relation does not store a foreign_key" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :addresses,
+            :relation => Mongoid::Relations::Referenced::Many,
+            :inverse_class_name => "Person"
+          )
+        end
+
+        it "returns _id" do
+          metadata.key.should == "_id"
+        end
+      end
     end
   end
 

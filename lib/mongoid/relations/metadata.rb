@@ -81,7 +81,6 @@ module Mongoid # :nodoc:
       # A string to use as the foreign key when querying.
       def foreign_key
         return self[:foreign_key] if self[:foreign_key]
-        return name.to_s if relation.embedded?
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
           class_name.underscore << suffix
@@ -89,7 +88,6 @@ module Mongoid # :nodoc:
           inverse_class_name.underscore << suffix
         end
       end
-      alias :key :foreign_key
 
       # Tells whether a foreign key index exists on the relation.
       #
@@ -128,6 +126,22 @@ module Mongoid # :nodoc:
       # The +Class+ of the inverse of the relation.
       def inverse_klass
         @inverse_klass ||= inverse_class_name.constantize
+      end
+
+      # This returns the key that is to be used to grab the attributes for the
+      # relation or the foreign key or id that a referenced relation will use
+      # to query for the object.
+      #
+      # Example:
+      #
+      # <tt>metadata.key</tt>
+      #
+      # Returns:
+      #
+      # The association name, foreign key name, or _id.
+      def key
+        return name.to_s if relation.embedded?
+        relation.stores_foreign_key? ? foreign_key : "_id"
       end
 
       # Returns the class of the proxied relation.

@@ -20,14 +20,14 @@ describe Mongoid::Relations::Builders::Referenced::ManyAsArray do
       klass.new(metadata, object)
     end
 
-    context "when provided a hash" do
+    context "when provided an id array" do
 
       let(:object_id) do
         BSON::ObjectID.new
       end
 
       let(:object) do
-        { "post_ids" => [ object_id ] }
+        [ object_id ]
       end
 
       let(:post) do

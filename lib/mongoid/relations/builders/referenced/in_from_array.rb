@@ -18,7 +18,7 @@ module Mongoid # :nodoc:
           def build
             return @object unless query?
             key = @metadata.foreign_key
-            @metadata.klass.any_in(key => [ @object["_id" ] ]).first
+            @metadata.klass.any_in(key => [ @object ]).first
           end
         end
       end
