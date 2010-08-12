@@ -453,6 +453,14 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:game=)
       end
 
+      it "defines the builder" do
+        klass.allocate.should respond_to(:build_game)
+      end
+
+      it "defines the creator" do
+        klass.allocate.should respond_to(:create_game)
+      end
+
       it "creates the correct relation" do
         klass.relations["game"].relation.should ==
           Mongoid::Relations::Referenced::One

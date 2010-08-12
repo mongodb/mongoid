@@ -263,6 +263,7 @@ module Mongoid # :nodoc:
             name,
             metadatafy(name, Referenced::One, options, &block)
           )
+          builder(name).creator(name)
         end
 
         private
