@@ -125,10 +125,14 @@ module Mongoid # :nodoc:
         #     references_one :game
         #   end
         def referenced_in(name, options = {}, &block)
-          relate(
+          metadata = metadatafy(
             name,
-            metadatafy(name, Relations::Referenced::In, options, &block)
+            Relations::Referenced::In,
+            options,
+            &block
           )
+          relate(name, metadata)
+          reference(metadata)
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -210,10 +214,14 @@ module Mongoid # :nodoc:
         #     referenced_in_from_array :person
         #   end
         def references_many_as_array(name, options = {}, &block)
-          relate(
+          metadata = metadatafy(
             name,
-            metadatafy(name, Relations::Referenced::ManyAsArray, options, &block)
+            Relations::Referenced::ManyAsArray,
+            options,
+            &block
           )
+          relate(name, metadata)
+          reference(metadata)
         end
 
         # Adds a relational many-to-many association between many of this
@@ -237,10 +245,14 @@ module Mongoid # :nodoc:
         #     references_and_referenced_in_many :people
         #   end
         def references_and_referenced_in_many(name, options = {}, &block)
-          relate(
+          metadata = metadatafy(
             name,
-            metadatafy(name, Relations::Referenced::ManyToMany, options, &block)
+            Relations::Referenced::ManyToMany,
+            options,
+            &block
           )
+          relate(name, metadata)
+          reference(metadata)
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -271,6 +283,24 @@ module Mongoid # :nodoc:
         end
 
         private
+
+        # Defines a field to be used as a foreign key in the relation and
+        # indexes it if defined.
+        #
+        # Example:
+        #
+        # <tt>Person.reference(metadata)</tt>
+        #
+        # Options:
+        #
+        # metadata: The metadata for the relation.
+        def reference(metadata)
+          if metadata.relation.stores_foreign_key?
+            key = metadata.foreign_key
+            field(key)
+            index(key, :background => true) if metadata.indexed?
+          end
+        end
 
         # Create the metadata for the relation.
         #

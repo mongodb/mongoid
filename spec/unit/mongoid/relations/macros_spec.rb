@@ -5,6 +5,8 @@ describe Mongoid::Relations::Macros do
   let(:klass) do
     Class.new do
       include Mongoid::Relations
+      include Mongoid::Dirty
+      include Mongoid::Fields
       def self.name
         "TestClass"
       end
@@ -194,6 +196,10 @@ describe Mongoid::Relations::Macros do
           Mongoid::Relations::Referenced::In
       end
 
+      it "creates the field for the foreign key" do
+        klass.allocate.should respond_to(:person_id)
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -344,6 +350,10 @@ describe Mongoid::Relations::Macros do
           Mongoid::Relations::Referenced::ManyAsArray
       end
 
+      it "creates the field for the foreign key" do
+        klass.allocate.should respond_to(:post_ids)
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -392,6 +402,10 @@ describe Mongoid::Relations::Macros do
       it "creates the correct relation" do
         klass.relations["preferences"].relation.should ==
           Mongoid::Relations::Referenced::ManyToMany
+      end
+
+      it "creates the field for the foreign key" do
+        klass.allocate.should respond_to(:preference_ids)
       end
 
       context "metadata properties" do

@@ -2,7 +2,21 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class One
+      class One < Proxy
+
+        # Instantiate a new references_one relation.
+        #
+        # Options:
+        #
+        # base: The document this relation hangs off of.
+        # target: The target [child document] of the relation.
+        # metadata: The relation's metadata
+        def initialize(base, target, metadata)
+          init(base, target, metadata) do
+            target.send(metadata.foreign_key_setter, base.id)
+          end
+        end
+
         class << self
 
           # Return the builder that is responsible for generating the documents

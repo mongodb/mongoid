@@ -211,6 +211,21 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#foreign_key_setter" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :foreign_key => "person_id"
+        )
+      end
+
+    it "returns the foreign_key plus =" do
+      metadata.foreign_key_setter.should == "person_id="
+    end
+  end
+
   describe "#indexed?" do
 
     context "when an index property exists" do

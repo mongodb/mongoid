@@ -89,6 +89,20 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Returns the name of the method used to set the foreign key on a
+      # document.
+      #
+      # Example:
+      #
+      # <tt>metadata.foreign_key_setter</tt>
+      #
+      # Returns:
+      #
+      # The foreign_key plus =.
+      def foreign_key_setter
+        foreign_key << "="
+      end
+
       # Tells whether a foreign key index exists on the relation.
       #
       # Example:

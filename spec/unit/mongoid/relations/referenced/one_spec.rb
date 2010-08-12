@@ -6,6 +6,10 @@ describe Mongoid::Relations::Referenced::One do
     Mongoid::Relations::Referenced::One
   end
 
+  let(:base) do
+    Person.new
+  end
+
   describe ".builder" do
 
     let(:builder_klass) do
@@ -40,6 +44,29 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
+  describe "#initialize" do
+
+    let(:base) do
+      Person.new
+    end
+
+    let(:target) do
+      Game.new
+    end
+
+    let(:metadata) do
+      stub(:extension? => false, :foreign_key_setter => "person_id=")
+    end
+
+    before do
+      klass.new(base, target, metadata)
+    end
+
+    it "sets the id of the base on the target" do
+      target.person_id.should == base.id
+    end
+  end
+
   describe ".macro" do
 
     it "returns references_one" do
@@ -51,6 +78,35 @@ describe Mongoid::Relations::Referenced::One do
 
     it "returns false" do
       klass.stores_foreign_key?.should == false
+    end
+  end
+
+  context "properties" do
+
+    let(:document) do
+      Post.new
+    end
+
+    let(:metadata) do
+      stub(:extension? => false, :foreign_key_setter => "person_id=")
+    end
+
+    let(:relation) do
+      klass.new(base, document, metadata)
+    end
+
+    describe "#metadata" do
+
+      it "returns the relation's metadata" do
+        relation.metadata.should == metadata
+      end
+    end
+
+    describe "#target" do
+
+      it "returns the relation's target" do
+        relation.target.should == document
+      end
     end
   end
 end
