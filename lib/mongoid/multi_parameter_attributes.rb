@@ -1,8 +1,33 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module MultiParameterAttributes
+    module Errors
+      # Raised when an error occurred while doing a mass assignment to an attribute through the
+      # <tt>attributes=</tt> method. The exception has an +attribute+ property that is the name of the
+      # offending attribute.
+      class AttributeAssignmentError < Mongoid::Errors::MongoidError
+        attr_reader :exception, :attribute
+        def initialize(message, exception, attribute)
+          @exception = exception
+          @attribute = attribute
+          @message = message
+        end
+      end
+
+      # Raised when there are multiple errors while doing a mass assignment through the +attributes+
+      # method. The exception has an +errors+ property that contains an array of AttributeAssignmentError
+      # objects, each corresponding to the error while assigning to an attribute.
+      class MultiparameterAssignmentErrors < Mongoid::Errors::MongoidError
+        attr_reader :errors
+        def initialize(errors)
+          @errors = errors
+        end
+      end
+    end
+
     def process(attrs = nil)
       if attrs
+        errors = []
         attributes = {}
         multi_parameter_attributes = {}
       
@@ -17,19 +42,27 @@ module Mongoid #:nodoc:
         end
         
         multi_parameter_attributes.each_pair do |key, values|
-          values = (values.keys.min..values.keys.max).map { |i| values[i] }
-          klass = self.class.fields[key].try(:type)
-          attributes[key] = if klass == DateTime
-            instantiate_time_object(*values).to_datetime
-          elsif klass == Date
-            instantiate_time_object(*values).to_date
-          elsif klass == Time
-            instantiate_time_object(*values).to_time
-          elsif klass
-            klass.new *values
-          else
-            values
+          begin
+            values = (values.keys.min..values.keys.max).map { |i| values[i] }
+            klass = self.class.fields[key].try(:type)
+            attributes[key] = if klass == DateTime
+              instantiate_time_object(*values).to_datetime
+            elsif klass == Date
+              Date.civil(*values)
+            elsif klass == Time
+              instantiate_time_object(*values).to_time
+            elsif klass
+              klass.new *values
+            else
+              values
+            end
+          rescue => e
+            errors << Errors::AttributeAssignmentError.new("error on assignment #{values.inspect} to #{key}", e, key)
           end
+        end
+        
+        unless errors.empty?
+          raise Errors::MultiparameterAssignmentErrors.new(errors), "#{errors.size} error(s) on assignment of multiparameter attributes"
         end
         
         super attributes

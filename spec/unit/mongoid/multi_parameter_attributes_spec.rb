@@ -29,18 +29,34 @@ describe Mongoid::MultiParameterAttributes do
     end
     
     context "creating a person" do
-      before do
-        @person = Person.new({
-          "dob(1i)" => 1980,
-          "dob(2i)" => 7,
-          "dob(3i)" => 27
-        })
-      end
+      context "with a valid DOB" do
+        before do
+          @person = Person.new({
+            "dob(1i)" => 1980,
+            "dob(2i)" => 7,
+            "dob(3i)" => 27
+          })
+        end
 
-      it "should set a multi-parameter Date attribute correctly" do
-        @person.dob.should == Date.civil(1980, 7, 27)
+        it "should set a multi-parameter Date attribute correctly" do
+          @person.dob.should == Date.civil(1980, 7, 27)
+        end
       end
       
+      context "with an invalid DOB" do
+        it "should raise an exception" do
+          lambda {
+            @person = Person.new({
+              "dob(1i)" => 1980,
+              "dob(2i)" => 2,
+              "dob(3i)" => 31
+            })
+          }.should raise_exception(
+            Mongoid::MultiParameterAttributes::Errors::MultiparameterAssignmentErrors,
+            "1 error(s) on assignment of multiparameter attributes"
+          )
+        end
+      end
     end
     
   end
