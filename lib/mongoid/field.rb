@@ -34,7 +34,7 @@ module Mongoid #:nodoc:
     # <tt>Field.new(:score, :default => 0)</tt>
     def initialize(name, options = {})
       check_name!(name)
-      @type = options[:type] || String
+      @type = options[:type] || Object
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
       @options = options

@@ -144,8 +144,8 @@ describe Mongoid::Field do
       @field = Mongoid::Field.new(:name)
     end
 
-    it "defaults to String" do
-      @field.type.should == String
+    it "defaults to Object" do
+      @field.type.should == Object
     end
   end
 
