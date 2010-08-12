@@ -72,7 +72,6 @@ module Mongoid # :nodoc:
             metadatafy(name, Embedded::Many, options, &block)
           )
         end
-        alias :embed_many :embeds_many
 
         # Adds the relation from a parent document to its child. The name
         # of the relation needs to be a singular form of the child class
@@ -102,7 +101,6 @@ module Mongoid # :nodoc:
           )
           builder(name).creator(name)
         end
-        alias :embed_one :embeds_one
 
         # Adds a relational association from the child Document to a Document in
         # another database or collection.
