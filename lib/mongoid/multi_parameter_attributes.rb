@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
     
   protected
     def instantiate_time_object(*values)
-      (Time.zone || Time).local(*values)
+      (Time.zone || Time).send(Mongoid::Config.instance.use_utc? ? :utc : :local, *values)
     end
   end
 end
