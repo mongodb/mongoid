@@ -41,7 +41,7 @@ module Mongoid # :nodoc:
           self.embedded = true
           relate(
             name,
-            metadatafy(name, Relations::Embedded::In, options, &block)
+            metadatafy(name, Embedded::In, options, &block)
           )
         end
 
@@ -69,7 +69,7 @@ module Mongoid # :nodoc:
         def embeds_many(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, Relations::Embedded::Many, options, &block)
+            metadatafy(name, Embedded::Many, options, &block)
           )
         end
         alias :embed_many :embeds_many
@@ -98,7 +98,7 @@ module Mongoid # :nodoc:
         def embeds_one(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, Relations::Embedded::One, options, &block)
+            metadatafy(name, Embedded::One, options, &block)
           )
           builder(name).creator(name)
         end
@@ -125,12 +125,7 @@ module Mongoid # :nodoc:
         #     references_one :game
         #   end
         def referenced_in(name, options = {}, &block)
-          metadata = metadatafy(
-            name,
-            Relations::Referenced::In,
-            options,
-            &block
-          )
+          metadata = metadatafy(name, Referenced::In, options, &block)
           relate(name, metadata)
           reference(metadata)
         end
@@ -160,7 +155,7 @@ module Mongoid # :nodoc:
         def referenced_in_from_array(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, Relations::Referenced::InFromArray, options, &block)
+            metadatafy(name, Referenced::InFromArray, options, &block)
           )
         end
 
@@ -187,7 +182,7 @@ module Mongoid # :nodoc:
         def references_many(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, Relations::Referenced::Many, options, &block)
+            metadatafy(name, Referenced::Many, options, &block)
           )
         end
 
@@ -214,12 +209,7 @@ module Mongoid # :nodoc:
         #     referenced_in_from_array :person
         #   end
         def references_many_as_array(name, options = {}, &block)
-          metadata = metadatafy(
-            name,
-            Relations::Referenced::ManyAsArray,
-            options,
-            &block
-          )
+          metadata = metadatafy(name, Referenced::ManyAsArray, options, &block)
           relate(name, metadata)
           reference(metadata)
         end
@@ -245,12 +235,7 @@ module Mongoid # :nodoc:
         #     references_and_referenced_in_many :people
         #   end
         def references_and_referenced_in_many(name, options = {}, &block)
-          metadata = metadatafy(
-            name,
-            Relations::Referenced::ManyToMany,
-            options,
-            &block
-          )
+          metadata = metadatafy(name, Referenced::ManyToMany, options, &block)
           relate(name, metadata)
           reference(metadata)
         end
@@ -278,7 +263,7 @@ module Mongoid # :nodoc:
         def references_one(name, options = {}, &block)
           relate(
             name,
-            metadatafy(name, Relations::Referenced::One, options, &block)
+            metadatafy(name, Referenced::One, options, &block)
           )
         end
 
