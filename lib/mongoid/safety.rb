@@ -12,13 +12,13 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>person.safely.upsert</tt>
-    # <tt>person.safely.destroy</tt>
+    # <tt>person.safely(:w => 2, :fsync => true).destroy</tt>
     #
     # Returns:
     #
     # A +Proxy+ to the +Document+.
-    def safely
-      Proxy.new(self)
+    def safely(safety = true)
+      Proxy.new(self, safety)
     end
 
     module ClassMethods #:nodoc:
@@ -28,13 +28,13 @@ module Mongoid #:nodoc:
       # Example:
       #
       # <tt>Person.safely.create(:name => "John")</tt>
-      # <tt>Person.safely.delete_all</tt>
+      # <tt>Person.safely(:w => 2, :fsync => true).delete_all</tt>
       #
       # Returns:
       #
       # A +Proxy+ to the +Document+ class.
-      def safely
-        Proxy.new(self)
+      def safely(safety = true)
+        Proxy.new(self, safety)
       end
     end
 
@@ -48,15 +48,17 @@ module Mongoid #:nodoc:
     # not safe mode is allowed.
     class Proxy
 
-      attr_reader :target
+      attr_reader :target, :safety_options
 
       # Create the new +Proxy+.
       #
       # Options:
       #
       # target: Either the class or the instance.
-      def initialize(target)
+      # safety_options: true or a hash of options
+      def initialize(target, safety_options)
         @target = target
+        @safety_options = safety_options
       end
 
       # We will use method missing to proxy calls to the target.
@@ -67,7 +69,7 @@ module Mongoid #:nodoc:
       def method_missing(*args)
         name = args[0]
         attributes = args[1] || {}
-        @target.send(name, attributes.merge(:safe => true))
+        @target.send(name, attributes.merge(:safe => safety_options))
       end
 
       # Increment the field by the provided value, else if it doesn't exists set
@@ -79,7 +81,7 @@ module Mongoid #:nodoc:
       # value: The value to increment by.
       # options: Options to pass through to the driver.
       def inc(field, value, options = {})
-        @target.inc(field, value, :safe => true)
+        @target.inc(field, value, :safe => safety_options)
       end
 
       # Update the +Document+ attributes in the datbase.
@@ -93,7 +95,7 @@ module Mongoid #:nodoc:
       # +true+ if validation passed, +false+ if not.
       def update_attributes(attributes = {})
         @target.write_attributes(attributes)
-        @target.update(:safe => true)
+        @target.update(:safe => safety_options)
       end
 
       # Update the +Document+ attributes in the datbase.
@@ -107,7 +109,7 @@ module Mongoid #:nodoc:
       # +true+ if validation passed, raises an error if not
       def update_attributes!(attributes = {})
         @target.write_attributes(attributes)
-        result = update(:safe => true)
+        result = update(:safe => safety_options)
         @target.class.fail_validate!(self) unless result
         result
       end
@@ -122,7 +124,7 @@ module Mongoid #:nodoc:
       #
       # Returns: the +Document+.
       def create(attributes = {})
-        @target.new(attributes).tap { |doc| doc.insert(:safe => true) }
+        @target.new(attributes).tap { |doc| doc.insert(:safe => safety_options) }
       end
 
       # Create a new +Document+. This will instantiate a new document and
@@ -137,7 +139,7 @@ module Mongoid #:nodoc:
       # Returns: the +Document+.
       def create!(attributes = {})
         document = @target.new(attributes)
-        fail_validate!(document) if document.insert(:safe => true).errors.any?
+        fail_validate!(document) if document.insert(:safe => safety_options).errors.any?
         document
       end
 
@@ -154,7 +156,7 @@ module Mongoid #:nodoc:
       def delete_all(conditions = {})
         Mongoid::Persistence::RemoveAll.new(
           @target,
-          { :validate => false, :safe => true },
+          { :validate => false, :safe => safety_options },
           conditions[:conditions] || {}
         ).persist
       end
@@ -172,7 +174,7 @@ module Mongoid #:nodoc:
       def destroy_all(conditions = {})
         documents = @target.all(conditions)
         count = documents.count
-        documents.each { |doc| doc.destroy(:safe => true) }
+        documents.each { |doc| doc.destroy(:safe => safety_options) }
         count
       end
     end
