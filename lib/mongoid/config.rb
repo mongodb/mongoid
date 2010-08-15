@@ -74,7 +74,10 @@ module Mongoid #:nodoc
     #
     # The master +Mongo::DB+
     def master
-      raise Errors::InvalidDatabase.new(nil) unless @master
+      unless @master
+        _master(@settings)
+        raise Errors::InvalidDatabase.new(nil) unless @master
+      end
       if @reconnect
         @reconnect = false
         reconnect!
@@ -113,6 +116,7 @@ module Mongoid #:nodoc
     #
     # The slave +Mongo::DBs+
     def slaves
+      _slaves(@settings)  unless @slaves
       @slaves
     end
 
@@ -165,8 +169,7 @@ module Mongoid #:nodoc
       settings.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      _master(settings)
-      _slaves(settings)
+      @settings = settings.dup
     end
 
     # Adds a new I18n locale file to the load path
