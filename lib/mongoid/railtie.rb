@@ -65,7 +65,7 @@ module Rails #:nodoc:
           rescue ::Mongoid::Errors::InvalidDatabase => e
             unless Rails.root.join("config", "mongoid.yml").file?
               puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
-              puts "to generate one run: script/rails generate mongoid:config\n\n"
+              puts "to generate one run: rails generate mongoid:config\n\n"
             end
           end
         end
