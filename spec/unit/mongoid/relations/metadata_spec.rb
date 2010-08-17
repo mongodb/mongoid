@@ -262,6 +262,56 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  context "#inverse" do
+
+    context "when an inverse relation exists" do
+
+      context "when not polymorphic" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :pet,
+            :class_name => "Animal",
+            :inverse_class_name => "Person"
+          )
+        end
+
+        it "returns the name of the relation" do
+          metadata.inverse.should == :person
+        end
+      end
+
+      context "when polymorphic" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :addresses,
+            :as => :addressable,
+            :inverse_class_name => "Person"
+          )
+        end
+
+        it "returns the name of the relation" do
+          metadata.inverse.should == :addressable
+        end
+      end
+    end
+
+    context "when an inverse relation does not exist" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :shape,
+          :inverse_class_name => "Person"
+        )
+      end
+
+      it "returns nil" do
+        metadata.inverse.should be_nil
+      end
+    end
+  end
+
   context "#inverse_klass" do
 
     let(:metadata) do
@@ -270,6 +320,21 @@ describe Mongoid::Relations::Metadata do
 
     it "constantizes the inverse_class_name" do
       metadata.inverse_klass.should == Person
+    end
+  end
+
+  context "#inverse_setter" do
+
+    let(:metadata) do
+      klass.new(
+        :name => :pet,
+        :class_name => "Animal",
+        :inverse_class_name => "Person"
+      )
+    end
+
+    it "returns a string for the setter" do
+      metadata.inverse_setter.should == "person="
     end
   end
 

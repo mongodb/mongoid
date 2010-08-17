@@ -129,6 +129,22 @@ module Mongoid # :nodoc:
         merge!(properties)
       end
 
+      # Get the name of the inverse relation if it exists. If this is a
+      # polymorphic relation then just return the :as option that was defined.
+      #
+      # Example:
+      #
+      # <tt>metadata.inverse</tt>
+      #
+      # Returns:
+      #
+      # The inverse name as a symbol.
+      def inverse
+        return self[:as] if polymorphic?
+        name = inverse_klass.name.underscore
+        inverse_exists? ? name.to_sym : nil
+      end
+
       # Returns the inverse class of the proxied relation.
       #
       # Example:
@@ -140,6 +156,19 @@ module Mongoid # :nodoc:
       # The +Class+ of the inverse of the relation.
       def inverse_klass
         @inverse_klass ||= inverse_class_name.constantize
+      end
+
+      # Returns the setter for the inverse side of the relation.
+      #
+      # Example:
+      #
+      # <tt>metadata.inverse_setter</tt>
+      #
+      # Returns:
+      #
+      # A string for the setter method name.
+      def inverse_setter
+        inverse.to_s << "="
       end
 
       # This returns the key that is to be used to grab the attributes for the
@@ -184,7 +213,48 @@ module Mongoid # :nodoc:
         relation.macro
       end
 
+      # Returns true if the relation is polymorphic.
+      #
+      # Example:
+      #
+      # <tt>metadata.polymorphic?</tt>
+      #
+      # Returns:
+      #
+      # true if the relation is polymorphic, false if not.
+      def polymorphic?
+        !!self[:as] || !!self[:polymorphic]
+      end
+
       private
+
+      # Determine if the inverse class had a relation defined or is one-way.
+      #
+      # Example:
+      #
+      # <tt>metadata.inverse_exists?</tt>
+      #
+      # Returns:
+      #
+      # true if defined, false if not.
+      def inverse_exists?
+        klass.relations.keys.any? do |name|
+          inverse_name == name
+        end
+      end
+
+      # Infer the name of the inverse relation from the class.
+      #
+      # Example:
+      #
+      # <tt>metadata.inverse_name</tt>
+      #
+      # Returns:
+      #
+      # The inverse class name underscored.
+      def inverse_name
+        inverse_klass.name.underscore
+      end
 
       # Handles two different cases - the first is a convenience for JSON like
       # access to the hash instead of having to call []. The second is a
