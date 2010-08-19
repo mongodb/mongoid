@@ -36,7 +36,7 @@ class Person
   embeds_many :favorites
   embeds_many :videos
   embeds_many :phone_numbers, :class_name => "Phone"
-  embeds_many :addresses do
+  embeds_many :addresses, :as => :addressable do
     def extension
       "Testing"
     end
@@ -46,7 +46,7 @@ class Person
   end
 
   embeds_one :pet, :class_name => "Animal"
-  embeds_one :name do
+  embeds_one :name, :as => :namable do
     def extension
       "Testing"
     end

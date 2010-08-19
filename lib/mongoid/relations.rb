@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/relations/accessors"
 require "mongoid/relations/proxy"
+require "mongoid/relations/bindings"
 require "mongoid/relations/builders"
 require "mongoid/relations/embedded/in"
 require "mongoid/relations/embedded/many"

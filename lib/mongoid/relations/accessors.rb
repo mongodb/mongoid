@@ -6,6 +6,20 @@ module Mongoid # :nodoc:
 
       private
 
+      # Determines if the relation exists or not.
+      #
+      # Options:
+      #
+      # name: The name of the relation to check.
+      #
+      # Returns:
+      #
+      # true if set and not nil, false if not.
+      def relation_exists?(name)
+        var = "@#{name}"
+        instance_variable_defined?(var) && instance_variable_get(var)
+      end
+
       # Set the supplied relation to an instance variable on the class with the
       # provided name. Used as a helper just for code cleanliness.
       #
@@ -35,8 +49,10 @@ module Mongoid # :nodoc:
       # The relation
       def build(name, object, metadata)
         target = metadata.builder(object).build
-        target = metadata.relation.new(self, target, metadata) if target
-        set(name, target)
+        relation = metadata.relation.new(self, target, metadata) if target
+        set(name, relation).tap do |relation|
+          relation.bind if relation
+        end
       end
 
       module ClassMethods #:nodoc:
@@ -89,9 +105,9 @@ module Mongoid # :nodoc:
         def setter(name, metadata)
           tap do
             define_method("#{name}=") do |object|
-              existing = send(name)
-              if existing
-                set(name, existing.substitute(object))
+              variable = "@#{name}"
+              if relation_exists?(name)
+                set(name, send(name).substitute(object))
               else
                 build(name, object, metadata)
               end

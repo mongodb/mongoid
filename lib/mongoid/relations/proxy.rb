@@ -10,6 +10,7 @@ module Mongoid # :nodoc:
 
       attr_accessor \
         :base,
+        :link,
         :metadata,
         :target
 
@@ -32,18 +33,6 @@ module Mongoid # :nodoc:
         extend Module.new(&metadata.extension) if metadata.extension?
       end
 
-      # Default behavior of method missing should be to delegate all calls
-      # to the target of the proxy. This can be overridden in special cases.
-      #
-      # Options:
-      #
-      # name: The name of the method.
-      # args: The arguments passed to the method.
-      # block: Optional block to pass.
-      def method_missing(name, *args, &block)
-        @target.send(name, *args, &block)
-      end
-
       # Return a new document for the type of class we want to instantiate.
       # If the type is provided use that, otherwise the klass from the
       # metadata.
@@ -57,6 +46,18 @@ module Mongoid # :nodoc:
       # A +Document+
       def instantiated(type = nil)
         type ? type.instantiate : @metadata.klass.instantiate
+      end
+
+      # Default behavior of method missing should be to delegate all calls
+      # to the target of the proxy. This can be overridden in special cases.
+      #
+      # Options:
+      #
+      # name: The name of the method.
+      # args: The arguments passed to the method.
+      # block: Optional block to pass.
+      def method_missing(name, *args, &block)
+        @target.send(name, *args, &block)
       end
     end
   end

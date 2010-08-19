@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
         if set_allowed?(key)
           write_attribute(key, value)
         else
-          if associations.include?(key.to_s) and associations[key.to_s].embedded? and value.is_a?(Hash)
+          if relations.include?(key.to_s) and relations[key.to_s].embedded? and value.is_a?(Hash)
             if association = send(key)
               association.nested_build(value)
             else

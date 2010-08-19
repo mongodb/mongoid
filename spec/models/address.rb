@@ -15,7 +15,7 @@ class Address
   key :street
   embeds_many :locations
 
-  embedded_in :addressable, :inverse_of => :addresses do
+  embedded_in :addressable, :polymorphic => true do
     def extension
       "Testing"
     end

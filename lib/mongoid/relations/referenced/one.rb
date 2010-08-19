@@ -4,7 +4,27 @@ module Mongoid # :nodoc:
     module Referenced #:nodoc:
       class One < Proxy
 
-        # Instantiate a new references_one relation.
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>person.game.bind</tt>
+        def bind
+          Bindings::Referenced::One.new(base, target, metadata).bind
+          target.save if base.persisted?
+        end
+
+        # Instantiate a new references_one relation. Will set the foreign key
+        # and the base on the inverse object.
+        #
+        # Example:
+        #
+        # <tt>Referenced::One.new(base, target, metadata)</tt>
         #
         # Options:
         #
@@ -12,9 +32,39 @@ module Mongoid # :nodoc:
         # target: The target [child document] of the relation.
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
-          init(base, target, metadata) do
-            target.send(metadata.foreign_key_setter, base.id)
-          end
+          init(base, target, metadata)
+        end
+
+        # Substitutes the supplied target documents for the existing document
+        # in the relation. If the new target is nil, perform the necessary
+        # deletion.
+        #
+        # Example:
+        #
+        # <tt>name.substitute(new_name)</tt>
+        #
+        # Options:
+        #
+        # target: A document to replace the target.
+        #
+        # Returns:
+        #
+        # The relation or nil.
+        def substitute(target)
+          target.tap { |t| t ? (@target = t and bind) : unbind }
+        end
+
+        # Unbinds the base object to the inverse of the relation. This occurs
+        # when setting a side of the relation to nil.
+        #
+        # Will delete the object if necessary.
+        #
+        # Example:
+        #
+        # <tt>person.game.unbind</tt>
+        def unbind
+          Bindings::Referenced::One.new(base, target, metadata).unbind
+          target.delete if base.persisted?
         end
 
         class << self

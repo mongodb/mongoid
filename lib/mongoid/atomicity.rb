@@ -16,14 +16,14 @@ module Mongoid #:nodoc:
     # A +Hash+ of all atomic updates that need to occur.
     def _updates
       processed = {}
-      
+
       _children.inject({ "$set" => _sets, "$pushAll" => {}, :other => {} }) do |updates, child|
         changes = child._sets
         updates["$set"].update(changes)
         unless changes.empty?
           processed[child._conficting_modification_key] = true
         end
-        
+
         # MongoDB does not allow "conflicting modifications" to be
         # performed in a single operation.  Conflicting modifications are
         # detected by the 'haveConflictingMod' function in MongoDB.
@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
         else
           target = "$pushAll"
         end
-        
+
         child._pushes.each do |attr, val|
           if updates[target].has_key?(attr)
             updates[target][attr] << val
@@ -74,6 +74,11 @@ module Mongoid #:nodoc:
       else
         embedded_one? && new_record? ? { _path => raw_attributes } : {}
       end
+    end
+
+    # TODO: Remove
+    def embedded_one?
+      false
     end
   end
 end

@@ -31,7 +31,7 @@ module Mongoid #:nodoc
       #
       # All child +Documents+ to this +Document+ in the entire hierarchy.
       def _children
-        associations.inject([]) do |children, (name, metadata)|
+        relations.inject([]) do |children, (name, metadata)|
           if metadata.embedded? && name != "versions"
             child = send(name)
             child.to_a.each do |doc|

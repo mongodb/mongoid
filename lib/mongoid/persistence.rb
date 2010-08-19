@@ -138,13 +138,14 @@ module Mongoid #:nodoc:
 
     # Perform all cascading deletes or destroys.
     def cascading_remove!
-      cascades.each do |name, option|
-        association = send(name)
-        if association
-          documents = association.target.to_a
-          documents.each { |doc| doc.send(option) }
-        end
-      end
+      # TODO: Get cascades back
+      # cascades.each do |name, option|
+        # association = send(name)
+        # if association
+          # documents = association.target.to_a
+          # documents.each { |doc| doc.send(option) }
+        # end
+      # end
     end
 
     module ClassMethods #:nodoc:

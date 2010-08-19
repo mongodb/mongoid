@@ -2,7 +2,62 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class In
+      class In < Proxy
+
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>game.person.bind</tt>
+        def bind
+          Bindings::Referenced::In.new(base, target, metadata).bind
+          target.save if base.persisted?
+        end
+
+        # Instantiate a new referenced_in relation.
+        #
+        # Options:
+        #
+        # base: The document this relation hangs off of.
+        # target: The target [parent document] of the relation.
+        # metadata: The relation's metadata
+        def initialize(base, target, metadata)
+          init(base, target, metadata)
+        end
+
+        # Substitutes the supplied target documents for the existing document
+        # in the relation.
+        #
+        # Example:
+        #
+        # <tt>name.substitute(new_name)</tt>
+        #
+        # Options:
+        #
+        # target: A document to replace the target.
+        #
+        # Returns:
+        #
+        # The relation or nil.
+        def substitute(target)
+          target.tap { |t| t ? (@target = t and bind) : unbind }
+        end
+
+        # Unbinds the base object to the inverse of the relation. This occurs
+        # when setting a side of the relation to nil.
+        #
+        # Example:
+        #
+        # <tt>game.person.unbind</tt>
+        def unbind
+          Bindings::Referenced::In.new(base, target, metadata).unbind
+        end
+
         class << self
 
           # Return the builder that is responsible for generating the documents
