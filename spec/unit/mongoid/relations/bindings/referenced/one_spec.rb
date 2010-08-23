@@ -49,8 +49,8 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       stub(
         :extension? => false,
         :foreign_key_setter => "person_id=",
-        :inverse => :post,
-        :inverse_setter => "post="
+        :inverse => :person,
+        :inverse_setter => "person="
       )
     end
 
@@ -66,7 +66,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
 
       it "removes the foreign key and inverse from the target" do
         target.expects(:send).with("person_id=", nil)
-        target.expects(:send).with("post=", nil)
+        target.expects(:send).with("person=", nil)
         binding.unbind
       end
     end
