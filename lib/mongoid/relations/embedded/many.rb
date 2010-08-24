@@ -260,7 +260,7 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The number of documents removed.
-        def remove_all(conditions = {}, destroy)
+        def remove_all(conditions = {}, destroy = false)
           criteria = @metadata.klass.find(conditions || {})
           criteria.documents = @target
           criteria.size.tap do
