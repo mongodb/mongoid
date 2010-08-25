@@ -296,20 +296,6 @@ describe Mongoid::Relations::Metadata do
         end
       end
     end
-
-    context "when an inverse relation does not exist" do
-
-      let(:metadata) do
-        klass.new(
-          :name => :shape,
-          :inverse_class_name => "Person"
-        )
-      end
-
-      it "returns nil" do
-        metadata.inverse.should be_nil
-      end
-    end
   end
 
   context "#inverse_klass" do

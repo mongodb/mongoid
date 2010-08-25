@@ -57,7 +57,7 @@ module Mongoid # :nodoc:
       #
       # The inverse relation.
       def inverse
-        target.send(metadata.inverse)
+        target.to_a.first.send(metadata.inverse)
       end
 
       # Determines if the supplied object is able to be unbound - this is to

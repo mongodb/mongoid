@@ -141,8 +141,7 @@ module Mongoid # :nodoc:
       # The inverse name as a symbol.
       def inverse
         return self[:as] if polymorphic?
-        name = inverse_klass.name.underscore
-        inverse_exists? ? name.to_sym : nil
+        inverse_relation
       end
 
       # Returns the inverse class of the proxied relation.
@@ -228,19 +227,22 @@ module Mongoid # :nodoc:
 
       private
 
-      # Determine if the inverse class had a relation defined or is one-way.
+      # Determine the name of the inverse relation.
       #
       # Example:
       #
-      # <tt>metadata.inverse_exists?</tt>
+      # <tt>metadata.inverse_relation</tt>
       #
       # Returns:
       #
-      # true if defined, false if not.
-      def inverse_exists?
-        klass.relations.keys.any? do |name|
-          inverse_name == name
+      # The name of the inverse relation.
+      def inverse_relation
+        klass.relations.keys.each do |key|
+          if key =~ /#{inverse_klass.name.underscore}/
+            return key.to_sym
+          end
         end
+        return inverse_klass.name.underscore.to_sym
       end
 
       # Infer the name of the inverse relation from the class.

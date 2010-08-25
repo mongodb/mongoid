@@ -2,7 +2,71 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class Many
+      class Many < Proxy
+
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>person.posts.bind</tt>
+        def bind
+          Bindings::Referenced::Many.new(base, target, metadata).bind
+          target.map(&:save) if base.persisted?
+        end
+
+        # Instantiate a new references_many relation. Will set the foreign key
+        # and the base on the inverse object.
+        #
+        # Example:
+        #
+        # <tt>Referenced::Many.new(base, target, metadata)</tt>
+        #
+        # Options:
+        #
+        # base: The document this relation hangs off of.
+        # target: The target [child documents] of the relation.
+        # metadata: The relation's metadata
+        def initialize(base, target, metadata)
+          init(base, target, metadata)
+        end
+
+        # Substitutes the supplied target documents for the existing document
+        # in the relation. If the new target is nil, perform the necessary
+        # deletion.
+        #
+        # Example:
+        #
+        # <tt>posts.substitute(new_name)</tt>
+        #
+        # Options:
+        #
+        # target: An array of documents to replace the target.
+        #
+        # Returns:
+        #
+        # The relation or nil.
+        def substitute(target)
+          tap { target ? (@target = target.to_a and bind) : unbind }
+        end
+
+        # Unbinds the base object to the inverse of the relation. This occurs
+        # when setting a side of the relation to nil.
+        #
+        # Will delete the object if necessary.
+        #
+        # Example:
+        #
+        # <tt>person.posts.unbind</tt>
+        def unbind
+          Bindings::Referenced::Many.new(base, target, metadata).unbind
+          target.map(&:delete) if base.persisted?
+        end
+
         class << self
 
           # Return the builder that is responsible for generating the documents
