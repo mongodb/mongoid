@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Referenced::One do
+describe Mongoid::Relations::Referenced::Many do
 
   before do
     Person.delete_all
