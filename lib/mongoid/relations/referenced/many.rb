@@ -4,6 +4,27 @@ module Mongoid # :nodoc:
     module Referenced #:nodoc:
       class Many < Proxy
 
+        # Append an object to the relation, which will bind the new object
+        # and save it if the base is persisted.
+        #
+        # Example:
+        #
+        # <tt>person.posts << Post.new</tt>
+        #
+        # Options:
+        #
+        # document: The document to append.
+        #
+        # Returns:
+        #
+        # The relation.
+        def <<(document)
+          # TODO: Durran: Can move this into the binding.
+          document.send(metadata.foreign_key_setter, base.id)
+          document.send(metadata.inverse_setter, base)
+          target << document
+        end
+
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
         # database twice when setting the relations up.
@@ -39,25 +60,24 @@ module Mongoid # :nodoc:
           metadata.klass.new(attributes).tap { |doc| self.<<(doc) }
         end
 
-        # Append an object to the relation, which will bind the new object
-        # and save it if the base is persisted.
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted.
         #
         # Example:
         #
-        # <tt>person.posts << Post.new</tt>
+        # <tt>person.posts.create(:text => "Testing")</tt>
         #
         # Options:
         #
-        # document: The document to append.
+        # attributes:
+        #
+        # A hash of attributes to create the document with.
         #
         # Returns:
         #
-        # The relation.
-        def <<(document)
-          # TODO: Durran: Can move this into the binding.
-          document.send(metadata.foreign_key_setter, base.id)
-          document.send(metadata.inverse_setter, base)
-          target << document
+        # The newly created document.
+        def create(attributes = nil)
+          build(attributes).tap { |doc| doc.save if base.persisted? }
         end
 
         # Instantiate a new references_many relation. Will set the foreign key
