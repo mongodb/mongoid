@@ -71,7 +71,8 @@ module Mongoid # :nodoc:
       #
       # true if unbindable.
       def unbindable?(object)
-        !object.send(metadata.foreign_key).nil?
+        return false if object.to_a.first.nil?
+        !object.to_a.first.send(metadata.foreign_key).nil?
       end
     end
   end

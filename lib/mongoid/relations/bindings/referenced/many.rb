@@ -30,10 +30,12 @@ module Mongoid # :nodoc:
           #
           # <tt>person.posts.unbind</tt>
           def unbind
-            # if unbindable?(target)
-              # target.send(metadata.foreign_key_setter, nil)
-              # target.send(metadata.inverse_setter, nil)
-            # end
+            obj = if unbindable?(target)
+              target.each do |doc|
+                doc.send(metadata.foreign_key_setter, nil)
+                doc.send(metadata.inverse_setter, nil)
+              end
+            end
           end
         end
       end

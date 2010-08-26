@@ -16,7 +16,8 @@ module Mongoid # :nodoc:
         # <tt>person.posts.bind</tt>
         def bind
           Bindings::Referenced::Many.new(base, target, metadata).bind
-          target.map(&:save) if base.persisted?
+          target.each(&:save) if base.persisted?
+          target
         end
 
         # Instantiate a new references_many relation. Will set the foreign key
@@ -35,7 +36,7 @@ module Mongoid # :nodoc:
           init(base, target, metadata)
         end
 
-        # Substitutes the supplied target documents for the existing document
+        # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary
         # deletion.
         #
@@ -51,7 +52,7 @@ module Mongoid # :nodoc:
         #
         # The relation or nil.
         def substitute(target)
-          tap { target ? (@target = target.to_a and bind) : unbind }
+          tap { target ? (@target = target.to_a and bind) : (@target = unbind) }
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs
@@ -64,7 +65,8 @@ module Mongoid # :nodoc:
         # <tt>person.posts.unbind</tt>
         def unbind
           Bindings::Referenced::Many.new(base, target, metadata).unbind
-          target.map(&:delete) if base.persisted?
+          target.each(&:delete) if base.persisted?
+          []
         end
 
         class << self
