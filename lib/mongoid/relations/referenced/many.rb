@@ -20,6 +20,25 @@ module Mongoid # :nodoc:
           target
         end
 
+        # Builds a new document on the references many relation.
+        #
+        # Example:
+        #
+        # <tt>person.posts.build(:text => "Testing")</tt>
+        #
+        # Options:
+        #
+        # attributes:
+        #
+        # A hash of attributes to build the document with.
+        #
+        # Returns:
+        #
+        # The newly built document.
+        def build(attributes = nil)
+          metadata.klass.new(attributes).tap { |doc| self.<<(doc) }
+        end
+
         # Append an object to the relation, which will bind the new object
         # and save it if the base is persisted.
         #
