@@ -20,10 +20,25 @@ module Mongoid # :nodoc:
           target
         end
 
-        def <<(instance)
-          instance.send(metadata.foreign_key_setter, base.id)
-          target << instance
-          instance.send(metadata.inverse_setter, base)
+        # Append an object to the relation, which will bind the new object
+        # and save it if the base is persisted.
+        #
+        # Example:
+        #
+        # <tt>person.posts << Post.new</tt>
+        #
+        # Options:
+        #
+        # document: The document to append.
+        #
+        # Returns:
+        #
+        # The relation.
+        def <<(document)
+          # TODO: Durran: Can move this into the binding.
+          document.send(metadata.foreign_key_setter, base.id)
+          document.send(metadata.inverse_setter, base)
+          target << document
         end
 
         # Instantiate a new references_many relation. Will set the foreign key
