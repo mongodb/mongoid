@@ -7,28 +7,55 @@ describe Mongoid::Relations::Referenced::Many do
     Post.delete_all
   end
 
-  # context "when building the relation" do
+  context "when appending to the relation" do
+    context "when the parent is a new record" do
+      let(:person) do
+        Person.new
+      end
+      let(:post) do
+        Post.new
+      end
+      before do
+        person.posts << post
+      end
 
-    # context "when the parent is a new record" do
+      it "sets the foreign key on the relation" do
+        post.person_id.should == person.id
+      end
+      it "sets the base on the inverse relation" do
+        post.person.should == person
+      end
+      it "does not save the target" do
+        post.should be_new_record
+      end
+    end
 
-      # it "sets the foreign key on the relation"
-      # it "sets the base on the inverse relation"
-      # it "does not save the target"
-    # end
+    context "when the parent is not a new record" do
+      it "sets the target of the relation"
+      it "sets the foreign key of the relation"
+      it "sets the base on the inverse relation"
+      it "does not save the target"
+    end
+  end
 
-    # context "when the parent is not a new record" do
+  context "when building the relation" do
+    context "when the parent is a new record" do
+      it "sets the target of the relation"
+      it "sets the foreign key of the relation"
+      it "sets the base on the inverse relation"
+      it "does not save the target"
+    end
 
-      # it "sets the target of the relation"
-      # it "sets the foreign key of the relation"
-      # it "sets the base on the inverse relation"
-      # it "does not save the target"
-    # end
-  # end
+    context "when the parent is not a new record" do
+      it "sets the target of the relation"
+      it "sets the foreign key of the relation"
+      it "sets the base on the inverse relation"
+      it "does not save the target"
+    end
+  end
 
   # context "when creating the relation" do
-
     # context "when the parent is a new record" do
-
       # it "sets the target of the relation"
       # it "sets the foreign key on the relation"
       # it "sets the base on the inverse relation"
@@ -36,7 +63,6 @@ describe Mongoid::Relations::Referenced::Many do
     # end
 
     # context "when the parent is not a new record" do
-
       # it "sets the target of the relation"
       # it "sets the foreign key of the relation"
       # it "sets the base on the inverse relation"

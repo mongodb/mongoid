@@ -20,6 +20,12 @@ module Mongoid # :nodoc:
           target
         end
 
+        def <<(instance)
+          instance.send(metadata.foreign_key_setter, base.id)
+          target << instance
+          instance.send(metadata.inverse_setter, base)
+        end
+
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #
@@ -33,7 +39,9 @@ module Mongoid # :nodoc:
         # target: The target [child documents] of the relation.
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
-          init(base, target, metadata)
+          init(base, target, metadata) do
+            @target = target.documents unless target
+          end
         end
 
         # Substitutes the supplied target documents for the existing documents
@@ -89,6 +97,7 @@ module Mongoid # :nodoc:
           def builder(meta, object)
             Builders::Referenced::Many.new(meta, object)
           end
+
 
           # Returns true if the relation is an embedded one. In this case
           # always false.

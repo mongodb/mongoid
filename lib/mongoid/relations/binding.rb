@@ -18,6 +18,7 @@ module Mongoid # :nodoc:
       #
       # true if bindable.
       def bindable?(object)
+        return false unless target.to_a.first
         !object.equal?(inverse ? inverse.target : nil)
       end
 
