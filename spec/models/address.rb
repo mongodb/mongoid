@@ -1,5 +1,8 @@
 class Address
   include Mongoid::Document
+
+  attr_accessor :mode
+
   field :address_type
   field :number, :type => Integer
   field :street
@@ -8,6 +11,7 @@ class Address
   field :post_code
   field :parent_title
   field :services, :type => Array
+  field :latlng, :type => Array
   key :street
   embeds_many :locations
 
@@ -20,7 +24,11 @@ class Address
     end
   end
 
-  named_scope :rodeo, where(:street => "Rodeo Dr")
+  named_scope :rodeo, where(:street => "Rodeo Dr") do
+    def mansion?
+      all? { |address| address.street == "Rodeo Dr" }
+    end
+  end
 
   validates_presence_of :street, :on => :update
 
@@ -35,6 +43,10 @@ class Address
 
     def homes
       where(:address_type => "Home")
+    end
+
+    def streets
+      all.map(&:street)
     end
   end
 end

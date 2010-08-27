@@ -41,11 +41,14 @@ module Mongoid #:nodoc
         collection.index_information
       end
 
+      # The MongoDB logger is not exposed through the driver to be changed
+      # after initialization of the connection, this is a hacky way around that
+      # if logging needs to be changed at runtime.
       #
-      # DEPRECATED. Use Mongoid.logger= instead
+      # Example:
       #
+      # <tt>Person.logger = Logger.new($stdout)</tt>
       def logger=(logger)
-        Mongoid.deprecate("#{self}.logger= is deprecated. Please use Mongoid.logger= instead")
         db.connection.instance_variable_set(:@logger, logger)
       end
 
@@ -53,7 +56,7 @@ module Mongoid #:nodoc
       #
       # Example:
       #
-      # <tt>Person.store_in :populdation</tt>
+      # <tt>Person.store_in :population</tt>
       def store_in(name)
         self.collection_name = name.to_s
         set_collection

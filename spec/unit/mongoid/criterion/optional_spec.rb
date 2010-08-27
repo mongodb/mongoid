@@ -212,15 +212,15 @@ describe Mongoid::Criterion::Optional do
 
   describe "#id" do
 
-    context "with Mongoid.use_object_ids is false" do
+    context "with not using object ids" do
 
-      before :each do
-        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-        Mongoid.use_object_ids = false
+      before do
+        @previous_id_type = Person._id_type
+        Person.identity :type => String
       end
 
-      after :each do
-        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+      after do
+        Person.identity :type => @previous_id_type
       end
 
       context "when passing a single id" do
@@ -281,15 +281,17 @@ describe Mongoid::Criterion::Optional do
 
     end
 
-    context "with Mongoid.use_object_ids is true" do
-      before :each do
-        @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-        Mongoid.use_object_ids = true
+    context "when using object ids" do
+
+      before do
+        @previous_id_type = Person._id_type
+        Person.identity :type => BSON::ObjectID
       end
 
-      after :each do
-        Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+      after do
+        Person.identity :type => @previous_id_type
       end
+
       context "when passing a single id" do
 
         context "when the id is a string" do
@@ -319,7 +321,6 @@ describe Mongoid::Criterion::Optional do
             @criteria.id(id).should == @criteria
           end
         end
-
       end
 
       context "when passing in an array of ids" do
@@ -334,10 +335,8 @@ describe Mongoid::Criterion::Optional do
           @criteria.selector.should ==
             { :_id => { "$in" => @ids.map{|i| BSON::ObjectID(i)} } }
         end
-
       end
     end
-
   end
 
   describe "#limit" do
@@ -348,7 +347,6 @@ describe Mongoid::Criterion::Optional do
         @criteria.limit(100)
         @criteria.options.should == { :limit => 100 }
       end
-
     end
 
     context "when value not provided" do

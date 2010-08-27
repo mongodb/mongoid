@@ -10,7 +10,6 @@ defaults: &defaults
   persist_in_safe_mode: false
   raise_not_found_error: false
   reconnect_time: 5
-  use_object_ids: true
   persist_types: false
   option_no_exist: false
   skip_version_check: false

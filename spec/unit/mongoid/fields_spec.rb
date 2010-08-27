@@ -88,7 +88,17 @@ describe Mongoid::Fields do
 
     end
 
-    context "when type is an object" do
+    context "when the type is an object" do
+
+      let(:bob) { Person.new(:reading => 10.023) }
+
+      it "returns the given value" do
+        bob.reading.should == 10.023
+      end
+
+    end
+
+    context "when type is a mongoid document" do
 
       before do
         @person = Person.new

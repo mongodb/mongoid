@@ -3,10 +3,15 @@ module Mongoid #:nodoc
   module Hierarchy #:nodoc
     extend ActiveSupport::Concern
     included do
-      cattr_accessor :hereditary
-      self.hereditary = false
-
       attr_accessor :_parent
+    end
+
+    module ClassMethods #:nodoc:
+      # Returns <tt>true</tt> if the document inherits from another
+      # Mongoid::Document.
+      def hereditary?
+        Mongoid::Document > superclass
+      end
     end
 
     module InstanceMethods #:nodoc:
@@ -43,7 +48,7 @@ module Mongoid #:nodoc
       #
       # <tt>true</tt> if inheritance used, <tt>false</tt> if not.
       def hereditary?
-        !!self.hereditary
+        self.class.hereditary?
       end
 
       # Sets up a child/parent association. This is used for newly created

@@ -29,10 +29,13 @@ module Mongoid #:nodoc:
       # Remove the document from the database.
       def remove
         if @document.embedded?
-          Persistence::RemoveEmbedded.new(@document, @validate).persist
+          Persistence::RemoveEmbedded.new(
+            @document,
+            @options.merge(:validate => @validate)
+          ).persist
         else
           @collection.remove({ :_id => @document.id }, @options)
-        end
+        end; true
       end
     end
   end

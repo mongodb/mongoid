@@ -22,9 +22,19 @@ module Mongoid #:nodoc:
           # clean way to handle this with new documents - we want to set the
           # actual objects as well, but dont want to get in an infinite loop
           # while doing so.
-          object.send(reverse_key(object)) << @parent.id
+          if inverse?
+            reverse_key = reverse_key(object)
+            case inverse_of(object).macro
+            when :references_many
+              object.send(reverse_key) << @parent.id
+            when :referenced_in
+              object.send("#{reverse_key}=", @parent.id)
+            end
+          end
           @target << object
+          object.save unless @parent.new_record?
         end
+        @parent.save unless @parent.new_record?
       end
 
       alias :concat :<<
@@ -41,10 +51,51 @@ module Mongoid #:nodoc:
         push(document); document
       end
 
+      # Destroy all the associated objects.
+      #
+      # Example:
+      #
+      # <tt>person.posts.destroy_all</tt>
+      #
+      # Returns:
+      #
+      # The number of objects destroyed.
+      def destroy_all(conditions = {})
+        removed = query.call.destroy_all(:conditions => conditions)
+        reset; removed
+      end
+
+      # Delete all the associated objects.
+      #
+      # Example:
+      #
+      # <tt>person.posts.delete_all</tt>
+      #
+      # Returns:
+      #
+      # The number of objects deleted.
+      def delete_all(conditions = {})
+        removed = query.call.delete_all(:conditions => conditions)
+        reset; removed
+      end
+
       protected
+
       # Find the inverse key for the supplied document.
       def reverse_key(document)
-        document.send(@options.inverse_of).options.foreign_key
+        inverse_of(document).options.foreign_key
+      end
+
+      # Returns +true+ if there is an inverse association on the referenced
+      # model.
+      def inverse?
+        !!@options.inverse_of
+      end
+
+      # Returns the association on +document+ which is the inverse of this
+      # association.
+      def inverse_of(document)
+        document.class.associations[@options.inverse_of.to_s]
       end
 
       # The default query used for retrieving the documents from the database.
@@ -64,11 +115,10 @@ module Mongoid #:nodoc:
         #
         # Example:
         #
-        # <tt>RelatesToManyAsArray.update(preferences, person, options)</tt>
+        # <tt>ReferencesManyAsArray.update(preferences, person, options)</tt>
         def update(target, document, options)
           target.each do |child|
-            name = child.associations[options.inverse_of.to_s].options.name
-            child.send(name) << document
+            document.send(options.name) << child
           end
           instantiate(document, options, target)
         end

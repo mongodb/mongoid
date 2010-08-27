@@ -2,6 +2,8 @@ require "rake"
 require "rake/rdoctask"
 require "rspec"
 require "rspec/core/rake_task"
+require "bundler"
+Bundler.setup
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
@@ -27,6 +29,11 @@ Rspec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
+Rspec::Core::RakeTask.new('spec:progress') do |spec|
+  spec.spec_opts = %w(--format progress)
+  spec.pattern = "spec/**/*_spec.rb"
+end
+
 Rake::RDocTask.new do |rdoc|
   if File.exist?("VERSION.yml")
     config = File.read("VERSION")
@@ -40,17 +47,4 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-namespace :spec do
-  # runs the specs with both MONGOID_USE_OBJECT_IDS setting to both true and false
-  task :all do
-    puts "Running Mongoid tests with MONGOID_USE_OBJECT_IDS as \"true\""
-    ENV["MONGOID_USE_OBJECT_IDS"] = "true"
-    Rake::Task["spec"].invoke
-
-    puts "Running Mongoid tests with MONGOID_USE_OBJECT_IDS as \"false\""
-    ENV["MONGOID_USE_OBJECT_IDS"] = "false"
-    Rake::Task["spec"].invoke
-  end
-end
-
-task :default => ["spec:all"]
+task :default => ["spec"]

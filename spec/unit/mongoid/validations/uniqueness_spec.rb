@@ -172,7 +172,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     describe "as a symbol" do
 
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
+      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes,
                                                                       :scope => :employer_id) }
 
       it "should query only scoped documents" do
@@ -186,7 +186,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     describe "as an array" do
 
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, 
+      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes,
                                                                       :scope => [:employer_id, :terms]) }
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)

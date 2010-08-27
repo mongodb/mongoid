@@ -63,11 +63,12 @@ describe Mongoid::Identity do
 
         context "when using object ids" do
 
-          before :each do
-            Mongoid.use_object_ids = true
+          before do
+            Person.identity :type => BSON::ObjectID
           end
-          after :each do
-            Mongoid.use_object_ids = false
+
+          after do
+            Person.identity :type => String
           end
 
           it "sets the id to a mongo object id" do

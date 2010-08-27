@@ -8,8 +8,17 @@ describe Mongoid::Extensions::Object::Conversions do
       @attributes = { :_id => "test", :title => "Sir", :age => 100 }
     end
 
-    it "instantiates a new class from the attributes" do
-      Person.get(@attributes).should == Person.new(@attributes)
+    context "when the value is a mongoid document" do
+      it "instantiates a new class from the attributes" do
+        Person.get(@attributes).should == Person.new(@attributes)
+      end
+    end
+
+    context "when the value is a primitive type" do
+      it "it returns the value" do
+        Object.get(12).should == 12
+        Object.get(13.04).should == 13.04
+      end
     end
 
     context "when the value is nil" do

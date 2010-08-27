@@ -25,7 +25,11 @@ describe Mongoid::Persistence::RemoveAll do
   describe "#initialize" do
 
     let(:remove_all) do
-      Mongoid::Persistence::RemoveAll.new(Patient, false, selector)
+      Mongoid::Persistence::RemoveAll.new(
+        Patient,
+        { :validate => false },
+        selector
+      )
     end
 
     it "sets the collection" do
@@ -46,7 +50,7 @@ describe Mongoid::Persistence::RemoveAll do
 
     def root_delete_expectation
       lambda {
-        collection.expects(:remove).with(selector, :safe => true).returns(true)
+        collection.expects(:remove).with(selector, :safe => false).returns(true)
       }
     end
 
@@ -59,7 +63,11 @@ describe Mongoid::Persistence::RemoveAll do
     end
 
     let(:remove_all) do
-      Mongoid::Persistence::RemoveAll.new(Patient, false, selector)
+      Mongoid::Persistence::RemoveAll.new(
+        Patient,
+        { :validate => false },
+        selector
+      )
     end
 
     context "when the document is a root document" do

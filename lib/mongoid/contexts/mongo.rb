@@ -133,7 +133,7 @@ module Mongoid #:nodoc:
       # <tt>Mongoid::Contexts::Mongo.new(criteria)</tt>
       def initialize(criteria)
         @criteria = criteria
-        if klass.hereditary && !criteria.selector.keys.include?(:_type)
+        if klass.hereditary? && !criteria.selector.keys.include?(:_type)
           criteria.in(:_type => criteria.klass._types)
         end
         criteria.enslave if klass.enslaved?
@@ -224,6 +224,18 @@ module Mongoid #:nodoc:
       end
 
       alias :first :one
+
+      # Return the first result for the +Context+ and skip it
+      # for successive calls.
+      #
+      # Returns:
+      #
+      # The first document in the collection.
+      def shift
+        document = first
+        criteria.skip((options[:skip] || 0) + 1)
+        document
+      end
 
       # Sum the context.
       #

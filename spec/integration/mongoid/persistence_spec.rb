@@ -3,11 +3,13 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
+    Mongoid.persist_in_safe_mode = true
     @person = Person.new(:title => "Sir", :ssn => "6969696", :pets => true)
   end
 
   after do
     @person.delete
+    Mongoid.persist_in_safe_mode = false
   end
 
   describe ".create" do
@@ -24,6 +26,9 @@ describe Mongoid::Persistence do
     context "inserting with a field that is not unique" do
 
       context "when a unique index exists" do
+        before do
+          Person.create_indexes
+        end
 
         after do
           Person.delete_all

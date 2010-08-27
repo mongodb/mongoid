@@ -7,11 +7,12 @@ module Mongoid #:nodoc
 
     attr_accessor \
       :allow_dynamic_fields,
+      :include_root_in_json,
       :reconnect_time,
       :parameterize_keys,
       :persist_in_safe_mode,
       :raise_not_found_error,
-      :use_object_ids,
+      :autocreate_indexes,
       :skip_version_check
 
     # Initializes the configuration with default settings.
@@ -73,7 +74,12 @@ module Mongoid #:nodoc
     #
     # The master +Mongo::DB+
     def master
-      @master || (raise Errors::InvalidDatabase.new(nil))
+      raise Errors::InvalidDatabase.new(nil) unless @master
+      if @reconnect
+        @reconnect = false
+        reconnect!
+      end
+      @master
     end
 
     alias :database :master
@@ -156,10 +162,25 @@ module Mongoid #:nodoc
     #
     # <tt>Mongoid::Config.instance.from_hash({})</tt>
     def from_hash(settings)
+      settings.except("database", "slaves").each_pair do |name, value|
+        send("#{name}=", value) if respond_to?("#{name}=")
+      end
       _master(settings)
       _slaves(settings)
-      settings.except("database", "slaves").each_pair do |name, value|
-        send("#{name}=", value) if respond_to?(name)
+    end
+
+    # Adds a new I18n locale file to the load path
+    #
+    # Example:
+    #
+    # Add portuguese locale
+    # <tt>Mongoid::config.add_language('pt')</tt>
+    #
+    # Adds all available languages
+    # <tt>Mongoid::Config.add_language('*')</tt>
+    def add_language(language_code = nil)
+      Dir[File.join(File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml")].each do |file|
+        I18n.load_path << File.expand_path(file)
       end
     end
 
@@ -169,8 +190,14 @@ module Mongoid #:nodoc
     # Example:
     #
     # <tt>Mongoid.reconnect!</tt>
-    def reconnect!
-      master.connection.connect_to_master
+    def reconnect!(now = true)
+      if now
+        master.connection.connect
+      else
+        # We set a @reconnect flag so that #master knows to reconnect the next
+        # time the connection is accessed.
+        @reconnect = true
+      end
     end
 
     # Reset the configuration options to the defaults.
@@ -180,49 +207,14 @@ module Mongoid #:nodoc
     # <tt>config.reset</tt>
     def reset
       @allow_dynamic_fields = true
+      @include_root_in_json = false
       @parameterize_keys = true
-      @persist_in_safe_mode = true
+      @persist_in_safe_mode = false
       @raise_not_found_error = true
       @reconnect_time = 3
-      @use_object_ids = false
+      @autocreate_indexes = false
       @skip_version_check = false
       @time_zone = nil
-    end
-
-    ##
-    # If Mongoid.use_object_ids = true
-    #   Convert args to BSON::ObjectID
-    #   If this args is an array, convert all args inside
-    # Else
-    #   return args
-    #
-    # Options:
-    #
-    #  args : A +String+ or an +Array+ convert to +BSON::ObjectID+
-    #  cast :  A +Boolean+ define if we can or not cast to BSON::ObjectID. If false, we use the default type of args
-    #
-    # Example:
-    #
-    # <tt>Mongoid.convert_to_object_id("4ab2bc4b8ad548971900005c", true)</tt>
-    # <tt>Mongoid.convert_to_object_id(["4ab2bc4b8ad548971900005c", "4ab2bc4b8ad548971900005d"])</tt>
-    #
-    # Returns:
-    #
-    # If Mongoid.use_object_ids = true
-    #   An +Array+ of +BSON::ObjectID+ of each element if params is an +Array+
-    #   A +BSON::ObjectID+ from params if params is +String+
-    # Else
-    #   <tt>args</tt>
-    #
-    def convert_to_object_id(args, cast=true)
-      return args if !use_object_ids || args.is_a?(BSON::ObjectID) || !cast
-      if args.is_a?(String)
-        BSON::ObjectID(args)
-      else
-        args.map{ |a|
-          a.is_a?(BSON::ObjectID) ? a : BSON::ObjectID(a)
-        }
-      end
     end
 
     protected

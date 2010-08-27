@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
         def assimilate(parent, options, type = nil)
           klass = self.klass || (type ? type : options.klass)
           child = klass.instantiate("_id" => self["_id"])
-          self.merge("_type" => klass.name) if klass.hereditary
+          self.merge("_type" => klass.name) if klass.hereditary?
           init(parent, child, options)
         end
 

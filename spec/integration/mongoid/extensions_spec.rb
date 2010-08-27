@@ -17,6 +17,44 @@ describe Mongoid::Extensions do
       end
 
     end
+
+  end
+
+  context "setting association foreign keys" do
+
+    let(:game) { Game.new }
+    let(:person) { Person.create(:ssn => "555555555555555") }
+
+    context "when value is an empty string" do
+
+      it "should set the foreign key to empty" do
+        game.person_id = ""
+        game.save
+        game.reload.person_id.should be_empty
+      end
+
+    end
+
+    context "when value is a populated string" do
+
+      it "should set the foreign key as ObjectID" do
+        game.person_id = person.id.to_s
+        game.save
+        game.reload.person_id.should == person.id
+      end
+
+    end
+
+    context "when value is a ObjectID" do
+
+      it "should keep the the foreign key as ObjectID" do
+        game.person_id = person.id
+        game.save
+        game.reload.person_id.should == person.id
+      end
+
+    end
+
   end
 
 end

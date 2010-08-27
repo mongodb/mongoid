@@ -350,13 +350,54 @@ describe Mongoid::Associations::EmbedsMany do
 
     context "when finding by id" do
 
-      it "returns the document in the array with that id" do
-        address = @association.find("street-2")
-        address.should_not be_nil
+      context "when using string ids" do
+
+        it "returns the document in the array with that id" do
+          address = @association.find("street-2")
+          address.should_not be_nil
+        end
       end
 
-    end
+      context "when using object ids" do
 
+        let(:document) do
+          Person.new
+        end
+
+        let(:association) do
+          Mongoid::Associations::EmbedsMany.new(
+            document,
+            Mongoid::Associations::Options.new(:name => :favorites)
+          )
+        end
+
+        before do
+          @favorite = Favorite.new(:title => "Test")
+        end
+
+        context "when passed an object id" do
+
+          before do
+            association << @favorite
+          end
+
+          it "finds using the object id" do
+            association.find(@favorite.id).should == @favorite
+          end
+        end
+
+        context "when passed a string" do
+
+          before do
+            association << @favorite
+          end
+
+          it "finds using the object id" do
+            association.find(@favorite.id.to_s).should == @favorite
+          end
+        end
+      end
+    end
   end
 
   describe "#first" do
@@ -452,15 +493,6 @@ describe Mongoid::Associations::EmbedsMany do
 
   end
 
-  describe ".instantiate" do
-
-    it "delegates to new" do
-      Mongoid::Associations::EmbedsMany.expects(:new).with(@document, @options, nil)
-      Mongoid::Associations::EmbedsMany.instantiate(@document, @options)
-    end
-
-  end
-
   describe "#length" do
 
     context "#length" do
@@ -506,6 +538,34 @@ describe Mongoid::Associations::EmbedsMany do
       @association[2].street.should == "Yet Another"
     end
 
+    it "should reorder documents if ids are present" do
+      @association.nested_build({
+        "0" => { "id" => "street-2" },
+        "1" => { "id" => "street-1" }
+      })
+      @association.size.should == 2
+      @association[0].street.should == "Street 2"
+      @association[1].street.should == "Street 1"
+    end
+
+    it "should add multiple objects in the correct order" do
+      @association.nested_build({
+        "0" => { "id" => "street-2" },
+        "1" => { "id" => "street-1" },
+        "2" => { :street => "Street 3" },
+        "3" => { :street => "Street 4" },
+        "4" => { :street => "Street 5" },
+        "5" => { :street => "Street 6" }
+      })
+      @association.size.should == 6
+      @association[0].street.should == "Street 2"
+      @association[1].street.should == "Street 1"
+      @association[2].street.should == "Street 3"
+      @association[3].street.should == "Street 4"
+      @association[4].street.should == "Street 5"
+      @association[5].street.should == "Street 6"
+    end
+
   end
 
   describe "#method_missing" do
@@ -535,6 +595,21 @@ describe Mongoid::Associations::EmbedsMany do
         addresses.first.state.should == "CA"
       end
 
+    end
+
+    context "when calling criteria methods" do
+
+      before do
+        @association = Mongoid::Associations::EmbedsMany.new(
+          @document,
+          Mongoid::Associations::Options.new(:name => :addresses)
+        )
+      end
+
+      it "can use fancy criteria clauses" do
+        @association.where(:state => /CA/).count.should ==
+          @association.where(:state => 'CA').count
+      end
     end
 
     context "when no class method exists" do
@@ -620,7 +695,38 @@ describe Mongoid::Associations::EmbedsMany do
     it "returns the association proxy" do
       @association.target.size.should == 1
     end
-
   end
 
+  describe ".validate_options" do
+
+    context "when dependent is defined" do
+
+      let(:association) do
+        Mongoid::Associations::EmbedsMany
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options(
+            { :name => :addresses, :dependent => :destroy }
+          )
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+
+    context "when inverse_of is defined" do
+
+      let(:association) do
+        Mongoid::Associations::EmbedsMany
+      end
+
+      it "raises an error" do
+        lambda {
+          association.validate_options(
+            { :name => :addresses, :inverse_of => :person }
+          )
+        }.should raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+  end
 end

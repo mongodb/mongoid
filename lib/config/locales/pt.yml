@@ -1,0 +1,40 @@
+pt:
+  activemodel:
+    errors:
+      messages:
+        taken: já está utilizada
+
+  mongoid:
+    errors:
+      messages:
+        document_not_found:
+          Nenhum documento encontrado para a classe %{klass} com os id(s) %{identifiers}.
+        invalid_database:
+          A base de dados deverá ser uma Mongo::DB, em vez de %{name}.
+        invalid_type:
+          O campo foi definido como %{klass}, mas recebeu uma instância de %{other} com
+          o valor %{value}.
+        unsupported_version:
+          MongoDB %{version} não é suportada, por favor actualize para a 
+          versão %{mongo_version}.
+        validations:
+          A validação falhou - %{errors}.
+        invalid_collection:
+          O acesso à colecção para %{klass} não é permitido porque
+          é um documento embebido, por favor aceda à colecção através
+          do documento raiz.
+        invalid_field:
+          Não é permitido definir um campo com o nome %{name}. Não defina
+          campos que entrem em conflito com os nomes dos atributos internos e métodos 
+          do Mongoid. Use Document#instance_methods para consultar esses nomes.
+        too_many_nested_attribute_records:
+          A aceitação de atributos encadeados para %{association} encontra-se limitada
+          a %{limit} registros.
+        embedded_in_must_have_inverse_of:
+          As opções para uma associação embedded_in devem incluir inverse_of.
+        dependent_only_references_one_or_many:
+          A opção The dependent => destroy|delete que é fornecida
+          é apenas válida para associações references_one ou references_many.
+        association_cant_have_inverse_of:
+          A definição de inverse_of nesta associação não é permitida. Apenas
+          use esta opção em embedded_in ou references_many como lista.
