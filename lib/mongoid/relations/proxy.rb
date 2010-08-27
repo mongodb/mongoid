@@ -10,11 +10,40 @@ module Mongoid # :nodoc:
 
       attr_accessor \
         :base,
-        :link,
         :metadata,
         :target
 
       protected
+
+      # Yields to the block to allow the building flag to get set and unset for
+      # the supplied code.
+      #
+      # Example:
+      #
+      # <tt>person.building { @target << Post.new }</tt>
+      #
+      # Options:
+      #
+      # block: The block to have the building flag set around.
+      def building(&block)
+        @building = true
+        yield block if block_given?
+        @building = false
+      end
+
+      # Convenience method for determining if we are building an association.
+      # We never want to save in this case.
+      #
+      # Example:
+      #
+      # <tt>person.posts.building?</tt>
+      #
+      # Returns:
+      #
+      # true if currently building, false if not.
+      def building?
+        !!@building
+      end
 
       # Convenience for setting the target and the metadata properties since
       # all proxies will need to do this.
@@ -28,7 +57,7 @@ module Mongoid # :nodoc:
       # target: The target of the proxy.
       # metadata: The relation's metadata.
       def init(base, target, metadata, &block)
-        @base, @target, @metadata = base, target, metadata
+        @base, @building, @target, @metadata = base, false, target, metadata
         yield block if block_given?
         extend Module.new(&metadata.extension) if metadata.extension?
       end

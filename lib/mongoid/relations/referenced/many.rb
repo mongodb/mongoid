@@ -18,12 +18,18 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation.
-        def <<(document)
+        def <<(*documents)
           # TODO: Durran: Can move this into the binding.
-          document.send(metadata.foreign_key_setter, base.id)
-          document.send(metadata.inverse_setter, base)
-          target << document
+          documents.flatten.each do |doc|
+            doc.send(metadata.foreign_key_setter, base.id)
+            doc.send(metadata.inverse_setter, base)
+            doc.save if base.persisted? && !building?
+            target << doc
+          end
         end
+
+        alias :concat :<<
+        alias :push :<<
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
@@ -37,8 +43,7 @@ module Mongoid # :nodoc:
         # <tt>person.posts.bind</tt>
         def bind
           Bindings::Referenced::Many.new(base, target, metadata).bind
-          target.each(&:save) if base.persisted?
-          target
+          target.tap { |t| t.each(&:save) if base.persisted? && !building? }
         end
 
         # Builds a new document on the references many relation.
@@ -57,7 +62,9 @@ module Mongoid # :nodoc:
         #
         # The newly built document.
         def build(attributes = nil)
-          metadata.klass.new(attributes).tap { |doc| self.<<(doc) }
+          metadata.klass.new(attributes).tap do |doc|
+            building { self.<<(doc) }
+          end
         end
 
         # Creates a new document on the references many relation. This will
