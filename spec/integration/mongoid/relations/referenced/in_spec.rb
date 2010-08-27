@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::In do
     Game.delete_all
   end
 
-  context "when setting the relation" do
+  describe "#=" do
 
     context "when the child is a new record" do
 
@@ -72,7 +72,7 @@ describe Mongoid::Relations::Referenced::In do
     end
   end
 
-  context "when removing the relation" do
+  describe "#= nil" do
 
     context "when the parent is a new record" do
 

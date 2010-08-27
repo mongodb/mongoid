@@ -19,8 +19,8 @@ module Mongoid # :nodoc:
         #
         # The relation.
         def <<(*documents)
-          # TODO: Durran: Can move this into the binding.
           documents.flatten.each do |doc|
+            # TODO: Durran: Can move this into a separate class.
             doc.send(metadata.foreign_key_setter, base.id)
             doc.send(metadata.inverse_setter, base)
             doc.save if base.persisted? && !building?
@@ -85,6 +85,27 @@ module Mongoid # :nodoc:
         # The newly created document.
         def create(attributes = nil)
           build(attributes).tap { |doc| doc.save if base.persisted? }
+        end
+
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted and will raise an
+        # error if validation fails.
+        #
+        # Example:
+        #
+        # <tt>person.posts.create!(:text => "Testing")</tt>
+        #
+        # Options:
+        #
+        # attributes:
+        #
+        # A hash of attributes to create the document with.
+        #
+        # Returns:
+        #
+        # The newly created document.
+        def create!(attributes = nil)
+          build(attributes).tap { |doc| doc.save! if base.persisted? }
         end
 
         # Instantiate a new references_many relation. Will set the foreign key

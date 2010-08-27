@@ -7,44 +7,7 @@ describe Mongoid::Relations::Referenced::One do
     Game.delete_all
   end
 
-  # context "when building the relation" do
-
-    # context "when the parent is a new record" do
-
-      # it "sets the foreign key on the relation"
-      # it "sets the base on the inverse relation"
-      # it "does not save the target"
-    # end
-
-    # context "when the parent is not a new record" do
-
-      # it "sets the target of the relation"
-      # it "sets the foreign key of the relation"
-      # it "sets the base on the inverse relation"
-      # it "does not save the target"
-    # end
-  # end
-
-  # context "when creating the relation" do
-
-    # context "when the parent is a new record" do
-
-      # it "sets the target of the relation"
-      # it "sets the foreign key on the relation"
-      # it "sets the base on the inverse relation"
-      # it "does not save the target"
-    # end
-
-    # context "when the parent is not a new record" do
-
-      # it "sets the target of the relation"
-      # it "sets the foreign key of the relation"
-      # it "sets the base on the inverse relation"
-      # it "saves the target"
-    # end
-  # end
-
-  context "when setting the relation" do
+  describe "#=" do
 
     context "when the parent is a new record" do
 
@@ -109,7 +72,7 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
-  context "when removing the relation" do
+  describe "#= nil" do
 
     context "when the parent is a new record" do
 

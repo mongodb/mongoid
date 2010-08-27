@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::Many do
     Post.delete_all
   end
 
-  context "when appending to the relation" do
+  describe "#<<" do
 
     context "when the parent is a new record" do
 
@@ -64,7 +64,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "when building the relation" do
+  describe "#build" do
 
     context "when the parent is a new record" do
 
@@ -121,7 +121,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "when concating with the relation" do
+  describe "#concat" do
 
     context "when the parent is a new record" do
 
@@ -178,7 +178,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "when creating the relation" do
+  describe "#create" do
 
     context "when the parent is a new record" do
 
@@ -235,7 +235,64 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "when pushing to the relation" do
+  describe "#create!" do
+
+    context "when the parent is a new record" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:post) do
+        person.posts.create!(:text => "Testing")
+      end
+
+      it "sets the foreign key on the relation" do
+        post.person_id.should == person.id
+      end
+
+      it "sets the base on the inverse relation" do
+        post.person.should == person
+      end
+
+      it "sets the attributes" do
+        post.text.should == "Testing"
+      end
+
+      it "does not save the target" do
+        post.should be_a_new_record
+      end
+    end
+
+    context "when the parent is not a new record" do
+
+      let(:person) do
+        Person.create(:ssn => "554-44-3891")
+      end
+
+      let(:post) do
+        person.posts.create!(:text => "Testing")
+      end
+
+      it "sets the foreign key on the relation" do
+        post.person_id.should == person.id
+      end
+
+      it "sets the base on the inverse relation" do
+        post.person.should == person
+      end
+
+      it "sets the attributes" do
+        post.text.should == "Testing"
+      end
+
+      it "saves the target" do
+        post.should_not be_a_new_record
+      end
+    end
+  end
+
+  describe "#push" do
 
     context "when the parent is a new record" do
 
@@ -292,7 +349,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "when setting the relation" do
+  describe "#=" do
 
     context "when the parent is a new record" do
 
@@ -357,7 +414,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "when removing the relation" do
+  describe "#= nil" do
 
     context "when the parent is a new record" do
 
