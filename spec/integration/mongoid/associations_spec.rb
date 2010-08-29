@@ -17,7 +17,7 @@ describe Mongoid::Associations do
     context "when the values are strings" do
 
       let(:object_id) do
-        BSON::ObjectID.new
+        BSON::ObjectId.new
       end
 
       before do

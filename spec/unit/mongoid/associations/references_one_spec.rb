@@ -29,7 +29,7 @@ describe Mongoid::Associations::ReferencesOne do
 
     it "sets the parent object id on the child" do
       @association.build(:score => 100)
-      @association.person_id.should == BSON::ObjectID(@parent.id)
+      @association.person_id.should == BSON::ObjectId(@parent.id)
     end
 
     it "sets the parent object reference on the child" do
@@ -61,7 +61,7 @@ describe Mongoid::Associations::ReferencesOne do
 
     it "sets the parent object id on the child" do
       @association.create(:score => 100)
-      @association.person_id.should == BSON::ObjectID(@parent.id)
+      @association.person_id.should == BSON::ObjectId(@parent.id)
     end
 
     it "returns the new document" do

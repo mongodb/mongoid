@@ -335,7 +335,7 @@ describe Mongoid::Contexts::Enumerable do
 
     context "with a single argument" do
 
-      let(:id) { BSON::ObjectID.new.to_s }
+      let(:id) { BSON::ObjectId.new.to_s }
 
       before do
         criteria.expects(:id).with(id).returns(criteria)
@@ -369,7 +369,7 @@ describe Mongoid::Contexts::Enumerable do
       context "when an array of ids" do
 
         let(:ids) do
-          (0..2).inject([]) { |ary, i| ary << BSON::ObjectID.new.to_s }
+          (0..2).inject([]) { |ary, i| ary << BSON::ObjectId.new.to_s }
         end
 
         context "when documents are found" do
@@ -403,7 +403,7 @@ describe Mongoid::Contexts::Enumerable do
       context "when an array of object ids" do
 
         let(:ids) do
-          (0..2).inject([]) { |ary, i| ary << BSON::ObjectID.new }
+          (0..2).inject([]) { |ary, i| ary << BSON::ObjectId.new }
         end
 
         context "when documents are found" do
