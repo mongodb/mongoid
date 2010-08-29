@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe Mongoid::Extensions::ObjectID::Conversions do
+describe Mongoid::Extensions::ObjectId::Conversions do
 
-  let(:object_id) { BSON::ObjectID.new }
+  let(:object_id) { BSON::ObjectId.new }
 
   describe ".cast!" do
 
@@ -13,7 +13,7 @@ describe Mongoid::Extensions::ObjectID::Conversions do
       end
 
       it "returns args" do
-        BSON::ObjectID.cast!(Person, "foo").should == "foo"
+        BSON::ObjectId.cast!(Person, "foo").should == "foo"
       end
 
     end
@@ -21,24 +21,24 @@ describe Mongoid::Extensions::ObjectID::Conversions do
     context "when using object ids" do
 
       before do
-        Person.identity :type => BSON::ObjectID
+        Person.identity :type => BSON::ObjectId
       end
 
-      it "transforms String args to BSON::ObjectIDs" do
-        id = BSON::ObjectID.new
-        BSON::ObjectID.cast!(Person, id.to_s).should == id
+      it "transforms String args to BSON::ObjectIds" do
+        id = BSON::ObjectId.new
+        BSON::ObjectId.cast!(Person, id.to_s).should == id
       end
 
       it "transforms all Strings inside an Array" do
-        ids = [BSON::ObjectID.new, BSON::ObjectID.new]
-        BSON::ObjectID.cast!(Person, ids.map(&:to_s)).should == ids
+        ids = [BSON::ObjectId.new, BSON::ObjectId.new]
+        BSON::ObjectId.cast!(Person, ids.map(&:to_s)).should == ids
       end
 
       context "when casting is false" do
 
         it "doesnt change the argument types" do
-          id = BSON::ObjectID.new
-          BSON::ObjectID.cast!(Person, id.to_s, false).should == id.to_s
+          id = BSON::ObjectId.new
+          BSON::ObjectId.cast!(Person, id.to_s, false).should == id.to_s
         end
       end
     end
@@ -47,7 +47,7 @@ describe Mongoid::Extensions::ObjectID::Conversions do
   describe ".get" do
 
     it "returns self" do
-      BSON::ObjectID.get(object_id).should == object_id
+      BSON::ObjectId.get(object_id).should == object_id
     end
 
   end
@@ -58,20 +58,20 @@ describe Mongoid::Extensions::ObjectID::Conversions do
 
     context "with a blank string" do
       it "returns nil" do
-        BSON::ObjectID.set("").should be_nil
+        BSON::ObjectId.set("").should be_nil
       end
     end
 
     context "with a populated string" do
       it "returns ObjectID" do
-        BSON::ObjectID.set(object_id_string).should ==
-          BSON::ObjectID.from_string(object_id_string)
+        BSON::ObjectId.set(object_id_string).should ==
+          BSON::ObjectId.from_string(object_id_string)
       end
     end
 
     context "with an ObjectID" do
       it "returns self" do
-        BSON::ObjectID.set(object_id).should == object_id
+        BSON::ObjectId.set(object_id).should == object_id
       end
     end
   end
