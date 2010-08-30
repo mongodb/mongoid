@@ -77,6 +77,10 @@ module Mongoid # :nodoc:
         type ? type.instantiate : @metadata.klass.instantiate
       end
 
+      def loaded?
+        !target.is_a?(Mongoid::Criteria)
+      end
+
       # Default behavior of method missing should be to delegate all calls
       # to the target of the proxy. This can be overridden in special cases.
       #
@@ -86,7 +90,7 @@ module Mongoid # :nodoc:
       # args: The arguments passed to the method.
       # block: Optional block to pass.
       def method_missing(name, *args, &block)
-        @target.send(name, *args, &block)
+        target.send(name, *args, &block)
       end
     end
   end

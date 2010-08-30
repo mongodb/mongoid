@@ -1,7 +1,7 @@
 class Tag
   include Mongoid::Document
   field :text
-  referenced_in :post, :stored_as => :array
+  referenced_in :post
 end
 
 class Post
@@ -16,6 +16,8 @@ class Post
   references_many :tags, :stored_as => :array
 
   named_scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
+
+  validates_format_of :title, :without => /\$\$\$/
 
   class << self
     def old

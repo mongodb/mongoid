@@ -11,7 +11,6 @@ module Mongoid #:nodoc
       include ActiveModel::MassAssignmentSecurity
       include ActiveModel::Serializers::JSON
       include ActiveModel::Serializers::Xml
-      # include Mongoid::Associations
       include Mongoid::Atomicity
       include Mongoid::Attributes
       include Mongoid::Collections

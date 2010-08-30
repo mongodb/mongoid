@@ -20,11 +20,9 @@ module Mongoid # :nodoc:
         # The relation.
         def <<(*documents)
           documents.flatten.each do |doc|
-            # TODO: Durran: Can move this into a separate class.
             doc.send(metadata.foreign_key_setter, base.id)
             doc.send(metadata.inverse_setter, base)
             doc.save if base.persisted? && !building?
-            target << doc
           end
         end
 
@@ -43,7 +41,9 @@ module Mongoid # :nodoc:
         # <tt>person.posts.bind</tt>
         def bind
           Bindings::Referenced::Many.new(base, target, metadata).bind
-          target.tap { |t| t.each(&:save) if base.persisted? && !building? }
+          target.tap do |t|
+            t.each(&:save) if base.persisted? && !building?
+          end
         end
 
         # Builds a new document on the references many relation.
@@ -63,7 +63,7 @@ module Mongoid # :nodoc:
         # The newly built document.
         def build(attributes = nil)
           metadata.klass.new(attributes).tap do |doc|
-            building { self.<<(doc) }
+            building { push(doc) }
           end
         end
 
@@ -84,7 +84,9 @@ module Mongoid # :nodoc:
         #
         # The newly created document.
         def create(attributes = nil)
-          build(attributes).tap { |doc| doc.save if base.persisted? }
+          build(attributes).tap do |doc|
+            doc.save if base.persisted?
+          end
         end
 
         # Creates a new document on the references many relation. This will
@@ -105,7 +107,80 @@ module Mongoid # :nodoc:
         #
         # The newly created document.
         def create!(attributes = nil)
-          build(attributes).tap { |doc| doc.save! if base.persisted? }
+          build(attributes).tap do |doc|
+            doc.save! if base.persisted?
+          end
+        end
+
+        # Deletes all related documents from the database given the supplied
+        # conditions.
+        #
+        # Example:
+        #
+        # <tt>person.posts.delete_all(:title => "Testing")</tt>
+        #
+        # Options:
+        #
+        # conditions: A hash of conditions to limit the delete by.
+        #
+        # Returns:
+        #
+        # The number of documents deleted.
+        def delete_all(conditions = nil)
+          selector = conditions || {}
+          target.delete_if { |doc| doc.matches?(selector) }
+          metadata.klass.delete_all(
+            :conditions => selector.merge(metadata.foreign_key => base.id)
+          )
+        end
+
+        # Deletes all related documents from the database given the supplied
+        # conditions.
+        #
+        # Example:
+        #
+        # <tt>person.posts.destroy_all(:title => "Testing")</tt>
+        #
+        # Options:
+        #
+        # conditions: A hash of conditions to limit the delete by.
+        #
+        # Returns:
+        #
+        # The number of documents deleted.
+        def destroy_all(conditions = nil)
+          selector = conditions || {}
+          target.delete_if { |doc| doc.matches?(selector) }
+          metadata.klass.destroy_all(
+            :conditions => selector.merge(metadata.foreign_key => base.id)
+          )
+        end
+
+        # Find the matchind document on the association, either based on id or
+        # conditions.
+        #
+        # Example:
+        #
+        # <tt>person.find(ObjectID("4c52c439931a90ab29000005"))</tt>
+        # <tt>person.find(:all, :conditions => { :title => "Sir" })</tt>
+        # <tt>person.find(:first, :conditions => { :title => "Sir" })</tt>
+        # <tt>person.find(:last, :conditions => { :title => "Sir" })</tt>
+        #
+        # Options:
+        #
+        # arg: Either an id or a type of search.
+        # options: a Hash of selector arguments.
+        #
+        # Returns:
+        #
+        # The matching document or documents.
+        def find(arg, options = {})
+          klass = metadata.klass
+          return klass.criteria.id_criteria(arg) unless arg.is_a?(Symbol)
+          selector = (options[:conditions] || {}).merge(
+            metadata.foreign_key => base.id
+          )
+          klass.find(arg, :conditions => selector)
         end
 
         # Instantiate a new references_many relation. Will set the foreign key
@@ -121,9 +196,7 @@ module Mongoid # :nodoc:
         # target: The target [child documents] of the relation.
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
-          init(base, target, metadata) do
-            @target = target.documents unless target
-          end
+          init(base, target, metadata)
         end
 
         # Substitutes the supplied target documents for the existing documents
