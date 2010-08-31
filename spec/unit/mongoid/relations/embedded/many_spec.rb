@@ -181,12 +181,29 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#count" do
 
+    let(:saved) do
+      stub(:persisted? => true)
+    end
+
+    let(:unsaved) do
+      stub(:persisted? => false)
+    end
+
     let(:documents) do
-      [ stub(:persisted? => true), stub(:persisted? => false) ]
+      [ saved, unsaved ]
     end
 
     let(:relation) do
       klass.new(base, documents, metadata)
+    end
+
+    before do
+      saved.expects(:metadata=).with(metadata)
+      unsaved.expects(:metadata=).with(metadata)
+      saved.expects(:parentize).with(base)
+      unsaved.expects(:parentize).with(base)
+      saved.expects(:_index=).with(0)
+      unsaved.expects(:_index=).with(1)
     end
 
     it "returns the number of persisted documents" do
@@ -264,7 +281,7 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         Address.expects(:instantiate).returns(address)
-        address.expects(:save).returns(true)
+        address.expects(:save!).returns(true)
         @address = relation.create!(:street => "Nan Jing Dong Lu")
       end
 
@@ -285,8 +302,8 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         Address.expects(:instantiate).returns(address)
-        address.expects(:save).returns(false)
-        address.errors[:street] = [ "is require" ]
+        address.expects(:save!).raises(Mongoid::Errors::Validations.new(address))
+        address.errors[:street] = [ "is required" ]
       end
 
       it "raises an error" do
@@ -552,12 +569,22 @@ describe Mongoid::Relations::Embedded::Many do
 
   context "properties" do
 
+    let(:document) do
+      stub
+    end
+
     let(:documents) do
-      [ stub ]
+      [ document ]
     end
 
     let(:relation) do
       klass.new(base, documents, metadata)
+    end
+
+    before do
+      document.expects(:metadata=).with(metadata)
+      document.expects(:parentize).with(base)
+      document.expects(:_index=).with(0)
     end
 
     describe "#metadata" do
@@ -577,12 +604,22 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#substitute" do
 
+    let(:document) do
+      stub
+    end
+
     let(:documents) do
-      [ stub ]
+      [ document ]
     end
 
     let(:relation) do
       klass.new(base, documents, metadata)
+    end
+
+    before do
+      document.expects(:metadata=).with(metadata)
+      document.expects(:parentize).with(base)
+      document.expects(:_index=).with(0)
     end
 
     context "when the target is nil" do
@@ -599,8 +636,19 @@ describe Mongoid::Relations::Embedded::Many do
 
     context "when the target is not nil" do
 
+      let(:new_doc) do
+        stub
+      end
+
       let(:new_docs) do
-        [ stub ]
+        [ new_doc ]
+      end
+
+      before do
+        new_doc.expects(:to_a).returns(new_docs)
+        new_doc.expects(:metadata=).with(metadata)
+        new_doc.expects(:parentize).with(base)
+        new_doc.expects(:_index=).with(0)
       end
 
       it "replaces the target" do

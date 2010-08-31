@@ -58,6 +58,12 @@ describe Mongoid::Relations::Embedded::One do
       klass.new(base, document, metadata)
     end
 
+    before do
+      document.stubs(:to_a).returns([ document ])
+      document.expects(:metadata=).with(metadata)
+      document.expects(:parentize).with(base)
+    end
+
     describe "#metadata" do
 
       it "returns the relation's metadata" do
@@ -92,6 +98,12 @@ describe Mongoid::Relations::Embedded::One do
       klass.new(base, document, metadata)
     end
 
+    before do
+      document.stubs(:to_a).returns([ document ])
+      document.expects(:metadata=).with(metadata)
+      document.expects(:parentize).with(base)
+    end
+
     context "when the target is nil" do
 
       it "returns nil" do
@@ -103,6 +115,12 @@ describe Mongoid::Relations::Embedded::One do
 
       let(:new_doc) do
         stub
+      end
+
+      before do
+        new_doc.stubs(:to_a).returns([ new_doc ])
+        new_doc.expects(:metadata=).with(metadata)
+        new_doc.expects(:parentize).with(base)
       end
 
       it "replaces the target" do

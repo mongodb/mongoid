@@ -26,6 +26,7 @@ module Mongoid # :nodoc:
 
     included do
       cattr_accessor :embedded
+      attr_accessor :metadata
       self.embedded = false
 
       # Convenience methods for the instance to know about attributes that
@@ -33,6 +34,14 @@ module Mongoid # :nodoc:
       delegate \
         :embedded,
         :embedded?, :to => "self.class"
+    end
+
+    def embedded_many?
+      metadata && metadata.macro == :embeds_many
+    end
+
+    def embedded_one?
+      metadata && metadata.macro == :embeds_one
     end
 
     module ClassMethods #:nodoc:

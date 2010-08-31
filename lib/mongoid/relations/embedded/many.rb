@@ -4,6 +4,9 @@ module Mongoid # :nodoc:
     module Embedded
       class Many < Proxy
 
+        def bind
+        end
+
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -16,7 +19,6 @@ module Mongoid # :nodoc:
         # docs: Any number of documents.
         def <<(*docs)
           docs.flatten.each do |doc|
-            doc.parentize(@base, @metadata.name.to_s)
             append(doc)
           end
         end
@@ -40,9 +42,8 @@ module Mongoid # :nodoc:
         # The new document.
         def build(attributes = {}, type = nil)
           instantiated(type).tap do |doc|
-            doc.parentize(@base, @metadata.name.to_s)
-            doc.write_attributes(attributes)
             append(doc)
+            doc.write_attributes(attributes)
           end
         end
 
@@ -56,7 +57,7 @@ module Mongoid # :nodoc:
         # The total number of persisted embedded docs, as flagged by the
         # #persisted? method.
         def count
-          @target.select(&:persisted?).size
+          target.select(&:persisted?).size
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -95,9 +96,7 @@ module Mongoid # :nodoc:
         #
         # The newly created document or raises a validation error.
         def create!(attributes = {}, type = nil)
-          create(attributes, type).tap do |doc|
-            raise Errors::Validations.new(doc) unless doc.errors.empty?
-          end
+          build(attributes, type).tap(&:save!)
         end
 
         # Delete all the documents in the association without running callbacks.
@@ -145,7 +144,7 @@ module Mongoid # :nodoc:
         #
         # A single matching +Document+.
         def find(parameter)
-          return @target if parameter == :all
+          return target if parameter == :all
           criteria.id(parameter).first
         end
 
@@ -157,7 +156,12 @@ module Mongoid # :nodoc:
         # target: The target [child document array] of the relation.
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
-          init(base, target, metadata)
+          init(base, target, metadata) do
+            target.each_with_index do |doc, index|
+              doc.parentize(base)
+              doc._index = index
+            end
+          end
         end
 
         # Paginate the association. Will create a new criteria, set the documents
@@ -171,8 +175,8 @@ module Mongoid # :nodoc:
         #
         # A +WillPaginate::Collection+.
         def paginate(options)
-          criteria = Mongoid::Criteria.translate(@metadata.klass, options)
-          criteria.documents = @target
+          criteria = Mongoid::Criteria.translate(metadata.klass, options)
+          criteria.documents = target
           criteria.paginate(options)
         end
 
@@ -190,8 +194,13 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation.
-        def substitute(target)
-          target.nil? ? @target.clear : @target = target; self
+        def substitute(documents)
+          target.clear
+          documents.each { |doc| append(doc) } unless documents.nil?
+          self
+        end
+
+        def unbind
         end
 
         private
@@ -207,12 +216,14 @@ module Mongoid # :nodoc:
         #
         # document: The document to append to the target.
         def append(document)
-          @target << document
-          document._index = @target.size - 1
+          metadatafy(document)
+          document.parentize(base)
+          target << document
+          document._index = target.size - 1
         end
 
         # Returns the criteria object for the target class with its documents set
-        # to @target.
+        # to target.
         #
         # Example:
         #
@@ -222,8 +233,8 @@ module Mongoid # :nodoc:
         #
         # A +Criteria+ object for this relation.
         def criteria
-          @metadata.klass.criteria.tap do |criterion|
-            criterion.documents = @target
+          metadata.klass.criteria.tap do |criterion|
+            criterion.documents = target
           end
         end
 
@@ -242,8 +253,8 @@ module Mongoid # :nodoc:
         #
         # A Criteria or return value from the target.
         def method_missing(name, *args, &block)
-          return super if @target.respond_to?(name)
-          klass = @metadata.klass
+          return super if target.respond_to?(name)
+          klass = metadata.klass
           klass.send(:with_scope, criteria) do
             klass.send(name, *args)
           end
@@ -261,11 +272,11 @@ module Mongoid # :nodoc:
         #
         # The number of documents removed.
         def remove_all(conditions = {}, destroy = false)
-          criteria = @metadata.klass.find(conditions || {})
-          criteria.documents = @target
+          criteria = metadata.klass.find(conditions || {})
+          criteria.documents = target
           criteria.size.tap do
             criteria.each do |doc|
-              @target.delete(doc)
+              target.delete(doc)
               destroy ? doc.destroy : doc.delete
             end
           end

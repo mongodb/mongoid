@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
       def validate_each(document, attribute, value)
         if document.embedded?
           return if document._parent.nil?
-          criteria = document._parent.send(document.association_name)
+          criteria = document._parent.send(document.metadata.name)
           # If the parent document embeds_one, no need to validate uniqueness
           return if criteria.is_a?(Mongoid::Document)
           criteria = criteria.where(attribute => value, :_id => {'$ne' => document._id})

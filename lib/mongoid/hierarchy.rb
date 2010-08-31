@@ -57,14 +57,12 @@ module Mongoid #:nodoc
       # Options:
       #
       # abject: The parent object that needs to be set for the child.
-      # association_name: The name of the association for the child.
       #
       # Example:
       #
       # <tt>address.parentize(person, :addresses)</tt>
-      def parentize(object, association_name)
+      def parentize(object)
         self._parent = object
-        self.association_name = association_name.to_s
       end
 
       # Return the root +Document+ in the object graph. If the current +Document+

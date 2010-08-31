@@ -58,6 +58,7 @@ module Mongoid # :nodoc:
       # metadata: The relation's metadata.
       def init(base, target, metadata, &block)
         @base, @building, @target, @metadata = base, false, target, metadata
+        metadatafy(target)
         yield block if block_given?
         extend Module.new(&metadata.extension) if metadata.extension?
       end
@@ -79,6 +80,10 @@ module Mongoid # :nodoc:
 
       def loaded?
         !target.is_a?(Mongoid::Criteria)
+      end
+
+      def metadatafy(object)
+        object.to_a.each { |obj| obj.metadata = metadata }
       end
 
       # Default behavior of method missing should be to delegate all calls

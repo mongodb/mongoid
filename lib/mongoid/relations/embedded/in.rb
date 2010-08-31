@@ -4,6 +4,9 @@ module Mongoid # :nodoc:
     module Embedded
       class In < Proxy
 
+        def bind
+        end
+
         # Instantiate a new embedded_in relation.
         #
         # Options:
@@ -12,7 +15,9 @@ module Mongoid # :nodoc:
         # target: The target [parent document] of the relation.
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
-          init(base, target, metadata)
+          init(base, target, metadata) do
+            base.parentize(target)
+          end
         end
 
         # Substitutes the supplied target documents for the existing document
@@ -33,6 +38,10 @@ module Mongoid # :nodoc:
           return nil unless target
           @target = target
           self
+        end
+
+        def unbind
+
         end
 
         class << self

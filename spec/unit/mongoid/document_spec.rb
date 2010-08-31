@@ -135,20 +135,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#assimilate" do
-
-    before do
-      @child = Name.new(:first_name => "Hank", :last_name => "Moody")
-      @parent = Person.new(:title => "Mr.")
-      @options = Mongoid::Associations::Options.new(:name => :name)
-    end
-
-    it "sets up all associations in the object graph" do
-      @child.assimilate(@parent, @options)
-      @parent.name.should == @child
-    end
-  end
-
   describe ".attr_accessor" do
 
     context "on a root document" do
@@ -443,7 +429,7 @@ describe Mongoid::Document do
     end
 
     it "sets the parent on each element" do
-      @child.parentize(@parent, :child)
+      @child.parentize(@parent)
       @child._parent.should == @parent
     end
 
@@ -466,38 +452,6 @@ describe Mongoid::Document do
       @person.reload.should be_kind_of(Person)
     end
 
-  end
-
-  describe "#remove" do
-
-    context "when removing an element from a has many" do
-
-      before do
-        @person = Person.new
-        @address = Address.new(:street => "Testing")
-        @person.addresses << @address
-      end
-
-      it "removes the child document attributes" do
-        @person.remove(@address)
-        @person.addresses.size.should == 0
-      end
-
-    end
-
-    context "when removing a has one" do
-
-      before do
-        @person = Person.new
-        @name = Name.new(:first_name => "Neytiri")
-        @person.name = @name
-      end
-
-      it "removes the child document attributes" do
-        @person.remove(@name)
-        @person.name.should be_nil
-      end
-    end
   end
 
   describe "#_root" do

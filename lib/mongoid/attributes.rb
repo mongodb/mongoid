@@ -124,13 +124,9 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>person.write_attribute(:title, "Mr.")</tt>
-    #
-    # This will also cause the observing +Document+ to notify it's parent if
-    # there is any.
     def write_attribute(name, value)
       access = name.to_s
       modify(access, @attributes[access], typed_value_for(access, value))
-      notify if !id.blank? && new_record?
     end
     alias :[]= :write_attribute
 
@@ -145,14 +141,11 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>person.write_attributes(:title => "Mr.")</tt>
-    #
-    # This will also cause the observing +Document+ to notify it's parent if
-    # there is any.
     def write_attributes(attrs = nil)
       process(attrs || {})
       identified = !id.blank?
       if new_record? && !identified
-        identify; notify
+        identify
       end
     end
     alias :attributes= :write_attributes

@@ -58,6 +58,11 @@ describe Mongoid::Relations::Embedded::In do
       klass.new(base, document, metadata)
     end
 
+    before do
+      document.expects(:to_a).returns([ document ])
+      document.expects(:metadata=).with(metadata)
+    end
+
     describe "#metadata" do
 
       it "returns the relation's metadata" do
@@ -85,6 +90,11 @@ describe Mongoid::Relations::Embedded::In do
 
     let(:relation) do
       klass.new(base, document, metadata)
+    end
+
+    before do
+      document.expects(:to_a).returns([ document ])
+      document.expects(:metadata=).with(metadata)
     end
 
     context "when the target is nil" do
