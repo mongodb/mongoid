@@ -19,6 +19,7 @@ module Mongoid #:nodoc
       include Mongoid::Fields
       include Mongoid::Hierarchy
       include Mongoid::Indexes
+      include Mongoid::Inspection
       include Mongoid::JSON
       include Mongoid::Keys
       include Mongoid::Matchers
