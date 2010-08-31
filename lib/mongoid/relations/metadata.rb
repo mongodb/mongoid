@@ -36,6 +36,10 @@ module Mongoid # :nodoc:
         self[:class_name] || name.to_s.classify
       end
 
+      def embedded?
+        macro == :embeds_one || macro == :embeds_many
+      end
+
       # Returns the extension of the relation. This can be a +Proc+
       # or +Module+.
       #

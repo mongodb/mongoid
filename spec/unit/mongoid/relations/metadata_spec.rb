@@ -399,6 +399,7 @@ describe Mongoid::Relations::Metadata do
 
     PROPERTIES = [
       "dependent",
+      "embedded",
       "inverse_class_name",
       "inverse_of",
       "name",
