@@ -38,3 +38,5 @@ en:
         association_cant_have_inverse_of:
           Defining an inverse_of on this association is not allowed. Only
           use this option on embedded_in or references_many as array.
+        calling_document_find_with_nil_is_invalid:
+          Calling Document#find with nil is invalid
