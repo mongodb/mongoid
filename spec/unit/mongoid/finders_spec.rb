@@ -155,6 +155,14 @@ describe Mongoid::Finders do
 
       end
 
+      context "when it is called with a nil value" do
+
+        it "raises an InvalidOptions error" do
+          lambda { Person.find(nil) }.should raise_error(Mongoid::Errors::InvalidOptions)
+        end
+
+      end
+
     end
 
     context "when an array of ids is passed in" do
