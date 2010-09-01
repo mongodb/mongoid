@@ -90,7 +90,7 @@ describe Mongoid::Associations::ReferencedIn do
     end
 
     it "sets the related object id on the parent" do
-      @child.person_id.should == BSON::ObjectID('4c52c439931a90ab29000003')
+      @child.person_id.should == BSON::ObjectId('4c52c439931a90ab29000003')
     end
 
     it "returns the proxy" do

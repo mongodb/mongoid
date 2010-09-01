@@ -112,8 +112,8 @@ class TrueClass #:nodoc
   include Mongoid::Extensions::TrueClass::Equality
 end
 
-class BSON::ObjectID #:nodoc
-  extend Mongoid::Extensions::ObjectID::Conversions
+class BSON::ObjectId #:nodoc
+  extend Mongoid::Extensions::ObjectId::Conversions
 
   def as_json(options = nil)
     to_s

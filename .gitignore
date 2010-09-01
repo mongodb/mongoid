@@ -9,3 +9,5 @@ RAILS
 Gemfile.lock
 .rvmrc
 doc/*
+.idea/*
+mongoid/*

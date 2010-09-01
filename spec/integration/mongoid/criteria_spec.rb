@@ -348,7 +348,7 @@ describe Mongoid::Criteria do
 
       before :all do
         @previous_id_type = ::Person._id_type
-        Person.identity :type => BSON::ObjectID
+        Person.identity :type => BSON::ObjectId
       end
 
       after :all do
@@ -368,7 +368,7 @@ describe Mongoid::Criteria do
         Person.criteria.id(person.id.to_s).first.should == person
       end
 
-      it 'should find object with BSON::ObjectID  args' do
+      it 'should find object with BSON::ObjectId  args' do
         Person.criteria.id(person.id).first.should == person
       end
     end
@@ -397,8 +397,8 @@ describe Mongoid::Criteria do
         Person.criteria.id(person.id.to_s).first.should == person
       end
 
-      it 'should not find object with BSON::ObjectID  args' do
-        Person.criteria.id(BSON::ObjectID(person.id)).first.should == nil
+      it 'should not find object with BSON::ObjectId  args' do
+        Person.criteria.id(BSON::ObjectId(person.id)).first.should == nil
       end
     end
   end

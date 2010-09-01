@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     included do
       cattr_accessor :primary_key, :_identity
-      self._identity = { :type => BSON::ObjectID }
+      self._identity = { :type => BSON::ObjectId }
 
       delegate \
         :_id_type,
@@ -28,9 +28,9 @@ module Mongoid #:nodoc:
       end
 
       # Used for telling Mongoid on a per model basis whether to override the
-      # default +BSON::ObjectID+ and use a different type. This will be
+      # default +BSON::ObjectId+ and use a different type. This will be
       # expanded in the future for requiring a PkFactory if the type is not a
-      # +BSON::ObjectID+ or +String+.
+      # +BSON::ObjectId+ or +String+.
       #
       # Example:
       #
@@ -59,7 +59,7 @@ module Mongoid #:nodoc:
         set_callback :save, :before, :identify
       end
 
-      # Convenience method for determining if we are using +BSON::ObjectIDs+ as
+      # Convenience method for determining if we are using +BSON::ObjectIds+ as
       # our id.
       #
       # Example:
@@ -68,9 +68,9 @@ module Mongoid #:nodoc:
       #
       # Returns:
       #
-      # true if we are using BSON::ObjectIDs
+      # true if we are using BSON::ObjectIds
       def using_object_ids?
-        _id_type == BSON::ObjectID
+        _id_type == BSON::ObjectId
       end
     end
   end

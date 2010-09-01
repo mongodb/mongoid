@@ -20,13 +20,13 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", ["~> 3.0.0"])
   s.add_dependency("tzinfo", ["~> 0.3.22"])
   s.add_dependency("will_paginate", ["~>3.0.pre"])
-  s.add_dependency("mongo", ["= 1.0.7"])
-  s.add_dependency("bson", ["= 1.0.4"])
+  s.add_dependency("mongo", ["= 1.0.8"])
+  s.add_dependency("bson", ["= 1.0.7"])
 
-  s.add_development_dependency("bson_ext", ["= 1.0.4"])
+  s.add_development_dependency("bson_ext", ["= 1.0.7"])
   s.add_development_dependency("mocha", ["= 0.9.8"])
-  s.add_development_dependency("rspec", ["= 2.0.0.beta.19"])
-  s.add_development_dependency("watchr", ["= 0.6"])
+  s.add_development_dependency("rspec", ["= 2.0.0.beta.20"])
+  s.add_development_dependency("watchr", ["= 0.7"])
   s.add_development_dependency("ruby-debug-wrapper", ["= 0.0.1"])
 
   s.files        = Dir.glob("lib/**/*") + %w(MIT_LICENSE README.rdoc)

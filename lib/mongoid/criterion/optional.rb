@@ -91,7 +91,7 @@ module Mongoid #:nodoc:
       #
       # Options:
       #
-      # object_id: A single id or an array of ids in +String+ or <tt>BSON::ObjectID</tt> format
+      # object_id: A single id or an array of ids in +String+ or <tt>BSON::ObjectId</tt> format
       #
       # Example:
       #
@@ -103,11 +103,11 @@ module Mongoid #:nodoc:
         ids.flatten!
         if ids.size > 1
           self.in(
-            :_id => ::BSON::ObjectID.cast!(@klass, ids, @klass.primary_key.nil?)
+            :_id => ::BSON::ObjectId.cast!(@klass, ids, @klass.primary_key.nil?)
           )
         else
           @selector[:_id] =
-            ::BSON::ObjectID.cast!(@klass, ids.first, @klass.primary_key.nil?)
+            ::BSON::ObjectId.cast!(@klass, ids.first, @klass.primary_key.nil?)
         end
         self
       end
