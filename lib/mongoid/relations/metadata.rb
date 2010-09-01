@@ -36,6 +36,16 @@ module Mongoid # :nodoc:
         self[:class_name] || name.to_s.classify
       end
 
+      # Will determine if the relation is an embedded one or not. Currently
+      # only checks against embeds one and many.
+      #
+      # Example:
+      #
+      # <tt>metadata.embedded?</tt>
+      #
+      # Returns:
+      #
+      # True if embedded, false if not.
       def embedded?
         macro == :embeds_one || macro == :embeds_many
       end
@@ -216,6 +226,25 @@ module Mongoid # :nodoc:
         relation.macro
       end
 
+      # Gets a relation nested builder associated with the relation this metadata
+      # is for.
+      #
+      # Example:
+      #
+      # <tt>metadata.nested_builder(attributes, options)</tt>
+      #
+      # Options:
+      #
+      # attributes: The attributes to build the relation with.
+      # options: Options for the nested builder.
+      #
+      # Returns:
+      #
+      # The nested builder for the relation.
+      def nested_builder(attributes, options)
+        relation.nested_builder(self, attributes, options)
+      end
+
       # Returns true if the relation is polymorphic.
       #
       # Example:
@@ -227,6 +256,10 @@ module Mongoid # :nodoc:
       # true if the relation is polymorphic, false if not.
       def polymorphic?
         !!self[:as] || !!self[:polymorphic]
+      end
+
+      def setter
+        name.to_s << "="
       end
 
       private

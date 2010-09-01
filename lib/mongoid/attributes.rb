@@ -173,21 +173,21 @@ module Mongoid #:nodoc:
 
     # Used when supplying a :reject_if block as an option to
     # accepts_nested_attributes_for
-    def reject(attributes, options)
-      rejector = options[:reject_if]
-      if rejector
-        attributes.delete_if do |key, value|
-          rejector.call(value)
-        end
-      end
-    end
+    # def reject(attributes, options)
+      # rejector = options[:reject_if]
+      # if rejector
+        # attributes.delete_if do |key, value|
+          # rejector.call(value)
+        # end
+      # end
+    # end
 
     # Used when supplying a :limit as an option to accepts_nested_attributes_for
-    def limit(attributes, name, options)
-      if options[:limit] && attributes.size > options[:limit]
-        raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit])
-      end
-    end
+    # def limit(attributes, name, options)
+      # if options[:limit] && attributes.size > options[:limit]
+        # raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit])
+      # end
+    # end
 
     module ClassMethods
       # Defines attribute setters for the associations specified by the names.
@@ -202,23 +202,23 @@ module Mongoid #:nodoc:
       #
       #     accepts_nested_attributes_for :name, :addresses
       #   end
-      def accepts_nested_attributes_for(*args)
-        associations = args.flatten
-        options = associations.last.is_a?(Hash) ? associations.pop : {}
-        associations.each do |name|
-          define_method("#{name}_attributes=") do |attrs|
-            reject(attrs, options)
-            limit(attrs, name, options)
-            association = send(name)
-            if association
+      # def accepts_nested_attributes_for(*args)
+        # associations = args.flatten
+        # options = associations.last.is_a?(Hash) ? associations.pop : {}
+        # associations.each do |name|
+          # define_method("#{name}_attributes=") do |attrs|
+            # reject(attrs, options)
+            # limit(attrs, name, options)
+            # association = send(name)
+            # if association
               # observe(association, true)
-              association.nested_build(attrs, options)
-            else
-              send("build_#{name}", attrs, options)
-            end
-          end
-        end
-      end
+              # association.nested_build(attrs, options)
+            # else
+              # send("build_#{name}", attrs, options)
+            # end
+          # end
+        # end
+      # end
     end
   end
 end

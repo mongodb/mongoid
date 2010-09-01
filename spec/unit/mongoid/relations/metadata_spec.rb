@@ -61,6 +61,39 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#embedded?" do
+
+    context "when the relation is embedded" do
+
+      let(:metadata) do
+        klass.new(:relation => relation)
+      end
+
+      let(:relation) do
+        stub(:macro => :embeds_one)
+      end
+
+      it "returns true" do
+        metadata.should be_embedded
+      end
+    end
+
+    context "when the relation is not embedded" do
+
+      let(:metadata) do
+        klass.new(:relation => relation)
+      end
+
+      let(:relation) do
+        stub(:macro => :references_one)
+      end
+
+      it "returns false" do
+        metadata.should_not be_embedded
+      end
+    end
+  end
+
   describe "#extension" do
 
     let(:metadata) do
@@ -395,11 +428,30 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#nested_builder" do
+
+    let(:metadata) do
+      klass.new(:relation => Mongoid::Relations::Embedded::One)
+    end
+
+    let(:attributes) do
+      {}
+    end
+
+    let(:options) do
+      {}
+    end
+
+    it "returns the nested builder from the relation" do
+      metadata.nested_builder(attributes, options).should
+        be_a_kind_of(Mongoid::Relations::Builders::Embedded::Nested::One)
+    end
+  end
+
   context "properties" do
 
     PROPERTIES = [
       "dependent",
-      "embedded",
       "inverse_class_name",
       "inverse_of",
       "name",

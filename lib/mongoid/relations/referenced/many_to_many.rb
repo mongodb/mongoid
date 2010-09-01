@@ -65,6 +65,25 @@ module Mongoid # :nodoc:
             :references_and_referenced_in_many
           end
 
+          # Return the nested builder that is responsible for generating the documents
+          # that will be used by this relation.
+          #
+          # Example:
+          #
+          # <tt>Referenced::Nested::ManyToMany.builder(attributes, options)</tt>
+          #
+          # Options:
+          #
+          # attributes: The attributes to build with.
+          # options: The options for the builder.
+          #
+          # Returns:
+          #
+          # A newly instantiated nested builder object.
+          def nested_builder(metadata, attributes, options)
+            Builders::Referenced::Nested::ManyToMany.new(metadata, attributes, options)
+          end
+
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #

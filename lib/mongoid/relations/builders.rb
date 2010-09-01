@@ -1,8 +1,11 @@
 # encoding: utf-8
 require "mongoid/relations/builder"
+require "mongoid/relations/nested_builder"
 require "mongoid/relations/builders/embedded/in"
 require "mongoid/relations/builders/embedded/many"
 require "mongoid/relations/builders/embedded/one"
+require "mongoid/relations/builders/nested_attributes/one"
+require "mongoid/relations/builders/nested_attributes/many"
 require "mongoid/relations/builders/referenced/in"
 require "mongoid/relations/builders/referenced/in_from_array"
 require "mongoid/relations/builders/referenced/many"
