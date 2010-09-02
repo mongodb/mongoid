@@ -5,6 +5,7 @@ module Mongoid # :nodoc:
       class One < Proxy
 
         def bind
+          Bindings::Embedded::One.new(base, target, metadata).bind
         end
 
         # Instantiate a new embeds_one relation.

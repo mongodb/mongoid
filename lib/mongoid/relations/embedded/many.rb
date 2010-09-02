@@ -196,7 +196,7 @@ module Mongoid # :nodoc:
         # The relation.
         def substitute(documents)
           target.clear
-          documents.each { |doc| append(doc) } unless documents.nil?
+          documents.to_a.each { |doc| append(doc) } unless documents.nil?
           self
         end
 

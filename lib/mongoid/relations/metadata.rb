@@ -185,8 +185,8 @@ module Mongoid # :nodoc:
       # Returns:
       #
       # A string for the setter method name.
-      def inverse_setter
-        inverse.to_s << "="
+      def inverse_setter(other = nil)
+        inverse(other).to_s << "="
       end
 
       # This returns the key that is to be used to grab the attributes for the
@@ -279,8 +279,9 @@ module Mongoid # :nodoc:
       #
       # The name of the inverse relation.
       def inverse_relation
-        klass.relations.keys.each do |key|
-          if key =~ /#{inverse_klass.name.underscore}/
+        klass.relations.each_pair do |key, meta|
+          if key =~ /#{inverse_klass.name.underscore}/ ||
+            meta.class_name == inverse_class_name
             return key.to_sym
           end
         end
@@ -316,6 +317,7 @@ module Mongoid # :nodoc:
       #
       # The inverse name.
       def lookup_inverse(other)
+        return nil unless other
         other.relations.each_pair do |key, meta|
           return meta.name if meta.as == name
         end

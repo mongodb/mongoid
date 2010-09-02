@@ -5,8 +5,7 @@ module Mongoid # :nodoc:
       class In < Proxy
 
         def bind
-          inverse = metadata.inverse(target)
-          base.metadata = target.class.reflect_on_association(inverse)
+          Bindings::Embedded::In.new(base, target, metadata).bind
         end
 
         # Instantiate a new embedded_in relation.
@@ -37,13 +36,11 @@ module Mongoid # :nodoc:
         #
         # The relation or nil.
         def substitute(target)
-          return nil unless target
-          @target = target
-          self
+          target.tap { |t| t ? (@target = t and bind) : unbind }
         end
 
         def unbind
-
+          Bindings::Embedded::In.new(base, target, metadata).unbind
         end
 
         class << self

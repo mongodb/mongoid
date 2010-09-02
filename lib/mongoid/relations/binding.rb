@@ -22,6 +22,22 @@ module Mongoid # :nodoc:
         !object.equal?(inverse ? inverse.target : nil)
       end
 
+      alias :embedded_bindable? :bindable?
+
+      # Determines if the supplied object is able to be unbound - this is to
+      # prevent infinite loops when setting inverse associations.
+      #
+      # Options:
+      #
+      # object: The object to check if it can be unbound.
+      #
+      # Returns:
+      #
+      # true if unbindable.
+      def embedded_unbindable?(object)
+        !object.to_a.first.nil?
+      end
+
       # Create the new binding.
       #
       # Example:
@@ -59,6 +75,7 @@ module Mongoid # :nodoc:
       # The inverse relation.
       def inverse
         target.to_a.first.send(metadata.inverse)
+        # target.to_a.first.send(metadata.inverse(target))
       end
 
       # Determines if the supplied object is able to be unbound - this is to
@@ -72,7 +89,7 @@ module Mongoid # :nodoc:
       #
       # true if unbindable.
       def unbindable?(object)
-        return false if object.to_a.first.nil?
+        return false if !object.to_a.first.nil?
         !object.to_a.first.send(metadata.foreign_key).nil?
       end
     end

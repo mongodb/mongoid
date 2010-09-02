@@ -187,6 +187,7 @@ describe Mongoid::Validations::UniquenessValidator do
   end
 
   context "when the parent document embeds_one" do
+
     let(:patient) { Patient.create }
     let(:email) { Email.new(:address => "joe@example.com", :patient => patient) }
 
@@ -195,9 +196,11 @@ describe Mongoid::Validations::UniquenessValidator do
     end
 
     context "when replacing with a new record with the same value" do
+
       before do
-        Email.create(:address => "joe@example.com", :patient => patient) 
+        Email.create(:address => "joe@example.com", :patient => patient)
       end
+
       it "passes validation" do
         email.should be_valid
       end
