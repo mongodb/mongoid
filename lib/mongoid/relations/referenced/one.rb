@@ -145,7 +145,7 @@ module Mongoid # :nodoc:
           #
           # A newly instantiated nested builder object.
           def nested_builder(metadata, attributes, options)
-            Builders::Referenced::Nested::One.new(metadata, attributes, options)
+            Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
 
           # Tells the caller if this relation is one that stores the foreign

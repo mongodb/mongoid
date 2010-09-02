@@ -64,7 +64,7 @@ end
 
 class Tool
   include Mongoid::Document
-  embedded_in :palette, :inverse_of => :tools
+  embedded_in :palette
 end
 
 class Pencil < Tool; end

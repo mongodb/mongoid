@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
+
     # Remove is a persistence command responsible for deleting a document from
     # the database.
     #
@@ -11,6 +12,7 @@ module Mongoid #:nodoc:
     #     false
     #   );
     class RemoveEmbedded < Command
+
       # Remove the document from the database. If the parent is a new record,
       # it will get removed in Ruby only. If the parent is not a new record
       # then either an $unset or $set will occur, depending if it's an

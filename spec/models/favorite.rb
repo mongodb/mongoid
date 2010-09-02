@@ -4,5 +4,5 @@ class Favorite
   field :title
   validates_uniqueness_of :title
 
-  embedded_in :person, :inverse_of => :favorites
+  embedded_in :person
 end

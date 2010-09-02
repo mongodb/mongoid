@@ -44,8 +44,8 @@ module Mongoid #:nodoc:
           write_attribute(key, value)
         else
           if relations.include?(key.to_s) and relations[key.to_s].embedded? and value.is_a?(Hash)
-            if association = send(key)
-              association.nested_build(value)
+            if relation = send(key)
+              relation.metadata.nested_builder(value, {}).build(self)
             else
               send("build_#{key}", value)
             end

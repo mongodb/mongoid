@@ -8,28 +8,46 @@ describe Mongoid::Relations::Builders::Embedded::In do
 
   describe "#build" do
 
-    let(:parent) do
-      stub
-    end
-
     let(:object) do
-      stub(:_parent => parent)
+      stub
     end
 
     let(:metadata) do
       stub(:klass => Person, :name => :person)
     end
 
-    let(:builder) do
-      klass.new(metadata, object)
+    context "when a document is provided" do
+
+      let(:builder) do
+        klass.new(metadata, object)
+      end
+
+      let(:document) do
+        builder.build
+      end
+
+      it "returns the document" do
+        document.should == object
+      end
     end
 
-    before do
-      @document = builder.build
-    end
+    context "when attributes are provided" do
 
-    it "sets the parent as the document" do
-      @document.should == parent
+      let(:builder) do
+        klass.new(metadata, { :title => "Sir" })
+      end
+
+      let(:document) do
+        builder.build
+      end
+
+      it "returns a new document" do
+        document.should be_a_kind_of(Person)
+      end
+
+      it "sets the attributes on the document" do
+        document.title.should == "Sir"
+      end
     end
   end
 end

@@ -444,7 +444,7 @@ describe Mongoid::Relations::Metadata do
 
     it "returns the nested builder from the relation" do
       metadata.nested_builder(attributes, options).should
-        be_a_kind_of(Mongoid::Relations::Builders::Embedded::Nested::One)
+        be_a_kind_of(Mongoid::Relations::Builders::NestedAttributes::One)
     end
   end
 
