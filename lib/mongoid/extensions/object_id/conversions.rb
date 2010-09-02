@@ -1,12 +1,12 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
-    module ObjectID #:nodoc:
+    module ObjectId #:nodoc:
       module Conversions #:nodoc:
 
         def set(value)
           if value.is_a?(::String)
-            BSON::ObjectID.from_string(value) unless value.blank?
+            BSON::ObjectId.from_string(value) unless value.blank?
           else
             value
           end
@@ -16,13 +16,13 @@ module Mongoid #:nodoc:
           value
         end
 
-        # If the document is using BSON::ObjectIDs the convert the argument to
+        # If the document is using BSON::ObjectIds the convert the argument to
         # either an object id or an array of them if the supplied argument is an
         # Array. Otherwise just return.
         #
         # Options:
-        #  args: A +String+ or an +Array+ convert to +BSON::ObjectID+
-        #  cast: A +Boolean+ define if we can or not cast to BSON::ObjectID.
+        #  args: A +String+ or an +Array+ convert to +BSON::ObjectId+
+        #  cast: A +Boolean+ define if we can or not cast to BSON::ObjectId.
         #        If false, we use the default type of args
         #
         # Example:
@@ -33,19 +33,19 @@ module Mongoid #:nodoc:
         # Returns:
         #
         # If using object ids:
-        #   An +Array+ of +BSON::ObjectID+ of each element if params is an +Array+
-        #   A +BSON::ObjectID+ from params if params is +String+
+        #   An +Array+ of +BSON::ObjectId+ of each element if params is an +Array+
+        #   A +BSON::ObjectId+ from params if params is +String+
         # Otherwise:
         #   <tt>args</tt>
         def cast!(klass, args, cast = true)
-          if !klass.using_object_ids? || args.is_a?(::BSON::ObjectID) || !cast
+          if !klass.using_object_ids? || args.is_a?(::BSON::ObjectId) || !cast
             return args
           end
           if args.is_a?(::String)
-            ::BSON::ObjectID(args)
+            ::BSON::ObjectId(args)
           elsif args.is_a?(::Array)
             args.map{ |a|
-              a.is_a?(::BSON::ObjectID) ? a : ::BSON::ObjectID(a)
+              a.is_a?(::BSON::ObjectId) ? a : ::BSON::ObjectId(a)
             }
           else
             args

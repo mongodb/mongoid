@@ -297,9 +297,9 @@ describe Mongoid::Associations::ReferencesManyAsArray do
             )
             @criteria = Preference.any_in(
               :_id => [
-                BSON::ObjectID("4c52c439931a90ab29000003"),
-                BSON::ObjectID("4c52c439931a90ab29000004"),
-                BSON::ObjectID("4c52c439931a90ab29000005")
+                BSON::ObjectId("4c52c439931a90ab29000003"),
+                BSON::ObjectId("4c52c439931a90ab29000004"),
+                BSON::ObjectId("4c52c439931a90ab29000005")
               ]
             )
           end
@@ -371,9 +371,9 @@ describe Mongoid::Associations::ReferencesManyAsArray do
             )
             @criteria = Preference.any_in(
               :_id => [
-                BSON::ObjectID("4c52c439931a90ab29000003"),
-                BSON::ObjectID("4c52c439931a90ab29000004"),
-                BSON::ObjectID("4c52c439931a90ab29000005")
+                BSON::ObjectId("4c52c439931a90ab29000003"),
+                BSON::ObjectId("4c52c439931a90ab29000004"),
+                BSON::ObjectId("4c52c439931a90ab29000005")
               ]
             )
           end
@@ -426,9 +426,9 @@ describe Mongoid::Associations::ReferencesManyAsArray do
           it "executes the criteria and sends to the result" do
             Preference.expects(:any_in).with(
               :_id => [
-                BSON::ObjectID("4c52c439931a90ab29000003"),
-                BSON::ObjectID("4c52c439931a90ab29000004"),
-                BSON::ObjectID("4c52c439931a90ab29000005")
+                BSON::ObjectId("4c52c439931a90ab29000003"),
+                BSON::ObjectId("4c52c439931a90ab29000004"),
+                BSON::ObjectId("4c52c439931a90ab29000005")
               ]
             ).returns([])
             @association.entries.should == []

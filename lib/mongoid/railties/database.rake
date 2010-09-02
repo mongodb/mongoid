@@ -84,7 +84,7 @@ namespace :db do
 
     def convert_ids(obj)
       if obj.is_a?(String) && obj =~ /^[a-f0-9]{24}$/
-        BSON::ObjectID(obj)
+        BSON::ObjectId(obj)
       elsif obj.is_a?(Array)
         obj.map do |v|
           convert_ids(v)
@@ -98,11 +98,11 @@ namespace :db do
       end
     end
 
-    desc "Convert string objectids in mongo database to ObjectID type"
+    desc "Convert string objectids in mongo database to ObjectId type"
     task :objectid_convert => :environment do
       documents = get_mongoid_models
       documents.each do |document|
-        puts "Converting #{document.to_s} to use ObjectIDs"
+        puts "Converting #{document.to_s} to use ObjectIds"
 
         # get old collection
         collection_name = document.collection.name
