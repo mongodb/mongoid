@@ -79,7 +79,7 @@ module Mongoid # :nodoc:
               if instance_variable_defined?(variable)
                 instance_variable_get(variable)
               else
-                build(name, @attributes[metadata.key], metadata)
+                build(name, @attributes.delete(metadata.key), metadata)
               end
             end
           end

@@ -2,16 +2,6 @@ require "spec_helper"
 
 describe Mongoid::NestedAttributes do
 
-  before do
-    Person.accepts_nested_attributes_for :name
-    Name.accepts_nested_attributes_for :person
-  end
-
-  after do
-    Person.send(:undef_method, :name_attributes=)
-    Name.send(:undef_method, :person_attributes=)
-  end
-
   describe "##{name}_attributes=" do
 
     context "when the parent document is new" do

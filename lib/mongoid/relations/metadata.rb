@@ -150,11 +150,16 @@ module Mongoid # :nodoc:
       #
       # <tt>metadata.inverse</tt>
       #
+      # Options:
+      #
+      # other: Optional document to pass when figuring out polymorphic
+      #        inverses on children.
+      #
       # Returns:
       #
       # The inverse name as a symbol.
-      def inverse
-        return self[:as] if polymorphic?
+      def inverse(other = nil)
+        return self[:as] || lookup_inverse(other) if polymorphic?
         inverse_relation
       end
 
@@ -293,6 +298,27 @@ module Mongoid # :nodoc:
       # The inverse class name underscored.
       def inverse_name
         inverse_klass.name.underscore
+      end
+
+      # For polymorphic children, we need to figure out the inverse from the
+      # actual instance on the other side, since we cannot know the exact class
+      # name to infer it from at load time.
+      #
+      # Example:
+      #
+      # <tt>metadata.lookup_inverse(other)</tt>
+      #
+      # Options:
+      #
+      # other: The parent document.
+      #
+      # Returns:
+      #
+      # The inverse name.
+      def lookup_inverse(other)
+        other.relations.each_pair do |key, meta|
+          return meta.name if meta.as == name
+        end
       end
 
       # Handles two different cases - the first is a convenience for JSON like

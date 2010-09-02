@@ -159,7 +159,35 @@ module Mongoid #:nodoc:
         raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
       end
       @attributes = {}.merge(reloaded || {})
-      self.relations.keys.each { |association_name| unmemoize(association_name) }; self
+      tap do
+        relations.keys.each do |name|
+          if relation_exists?(name)
+            remove_instance_variable("@#{name}")
+          end
+        end
+      end
+    end
+
+    # TODO: Need to reindex at this point for embeds many.
+    #
+    # Remove a child document from this parent. If an embeds one then set to
+    # nil, otherwise remove from the embeds many.
+    #
+    # This is called from the +RemoveEmbedded+ persistence command.
+    #
+    # Example:
+    #
+    # <tt>document.remove_child(child)</tt>
+    #
+    # Options:
+    #
+    # child: The child (embedded) document to remove.
+    def remove_child(child)
+      if child.embedded_one?
+        send(child.metadata.setter, nil)
+      else
+        send(child.metadata.name).delete(child)
+      end
     end
 
     # Return an array with this +Document+ only in it.

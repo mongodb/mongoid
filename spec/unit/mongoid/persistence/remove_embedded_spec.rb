@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Remove do
+describe Mongoid::Persistence::RemoveEmbedded do
 
   let(:document) do
     Patient.new(:title => "Mr")

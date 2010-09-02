@@ -5,6 +5,8 @@ module Mongoid # :nodoc:
       class In < Proxy
 
         def bind
+          inverse = metadata.inverse(target)
+          base.metadata = target.class.reflect_on_association(inverse)
         end
 
         # Instantiate a new embedded_in relation.

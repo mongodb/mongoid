@@ -47,11 +47,14 @@ describe Mongoid::Relations::Embedded::In do
   context "properties" do
 
     let(:document) do
-      stub
+      Person.new
     end
 
     let(:metadata) do
-      stub(:extension? => false)
+      stub(
+        :extension? => false,
+        :inverse => :name
+      )
     end
 
     let(:relation) do
@@ -81,11 +84,14 @@ describe Mongoid::Relations::Embedded::In do
   describe "#substitute" do
 
     let(:document) do
-      stub
+      Person.new
     end
 
     let(:metadata) do
-      stub(:extension? => false)
+      stub(
+        :extension? => false,
+        :inverse => :name
+      )
     end
 
     let(:relation) do

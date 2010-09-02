@@ -328,6 +328,21 @@ describe Mongoid::Relations::Metadata do
           metadata.inverse.should == :addressable
         end
       end
+
+      context "when polymorphic on the child" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :addressable,
+            :polymorphic => true,
+            :inverse_class_name => "Address"
+          )
+        end
+
+        it "returns the name of the relation" do
+          metadata.inverse(Person.new).should == :addresses
+        end
+      end
     end
   end
 
