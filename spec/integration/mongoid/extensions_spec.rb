@@ -37,7 +37,7 @@ describe Mongoid::Extensions do
 
     context "when value is a populated string" do
 
-      it "should set the foreign key as ObjectID" do
+      it "should set the foreign key as ObjectId" do
         game.person_id = person.id.to_s
         game.save
         game.reload.person_id.should == person.id
@@ -45,9 +45,9 @@ describe Mongoid::Extensions do
 
     end
 
-    context "when value is a ObjectID" do
+    context "when value is a ObjectId" do
 
-      it "should keep the the foreign key as ObjectID" do
+      it "should keep the the foreign key as ObjectId" do
         game.person_id = person.id
         game.save
         game.reload.person_id.should == person.id

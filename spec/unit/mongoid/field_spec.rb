@@ -51,7 +51,7 @@ describe Mongoid::Field do
         context "when using object ids" do
 
           let(:object_id) do
-            BSON::ObjectID.new
+            BSON::ObjectId.new
           end
 
           it "performs conversion on the ids if strings" do
@@ -62,7 +62,7 @@ describe Mongoid::Field do
         context "when not using object ids" do
 
           let(:object_id) do
-            BSON::ObjectID.new
+            BSON::ObjectId.new
           end
 
           before do
@@ -70,7 +70,7 @@ describe Mongoid::Field do
           end
 
           after do
-            Game.identity :type => BSON::ObjectID
+            Game.identity :type => BSON::ObjectId
           end
 
           it "does not convert" do

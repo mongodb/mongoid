@@ -137,7 +137,7 @@ describe Mongoid::Finders do
     context "when an id is passed in" do
 
       before do
-        @id = BSON::ObjectID.new.to_s
+        @id = BSON::ObjectId.new.to_s
       end
 
       it "delegates to criteria" do
@@ -161,7 +161,7 @@ describe Mongoid::Finders do
 
       before do
         @ids = []
-        3.times { @ids << BSON::ObjectID.new.to_s }
+        3.times { @ids << BSON::ObjectId.new.to_s }
       end
 
       it "delegates to the criteria" do
