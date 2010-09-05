@@ -6,6 +6,10 @@ describe Mongoid::Relations::Embedded::One do
     Mongoid::Relations::Embedded::One
   end
 
+  let(:binding_klass) do
+    Mongoid::Relations::Bindings::Embedded::One
+  end
+
   let(:base) do
     Person.new
   end
@@ -79,11 +83,6 @@ describe Mongoid::Relations::Embedded::One do
     end
   end
 
-  describe "#nested_build" do
-
-    it "needs to move elsewhere"
-  end
-
   describe "#substitute" do
 
     let(:document) do
@@ -98,6 +97,10 @@ describe Mongoid::Relations::Embedded::One do
       klass.new(base, document, metadata)
     end
 
+    let(:binding) do
+      stub
+    end
+
     before do
       document.stubs(:to_a).returns([ document ])
       document.expects(:metadata=).with(metadata)
@@ -105,6 +108,11 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     context "when the target is nil" do
+
+      before do
+        binding_klass.expects(:new).returns(binding)
+        binding.expects(:unbind)
+      end
 
       it "returns nil" do
         relation.substitute(nil).should be_nil
@@ -118,9 +126,8 @@ describe Mongoid::Relations::Embedded::One do
       end
 
       before do
-        new_doc.stubs(:to_a).returns([ new_doc ])
-        new_doc.expects(:metadata=).with(metadata)
-        new_doc.expects(:parentize).with(base)
+        binding_klass.expects(:new).returns(binding)
+        binding.expects(:bind)
       end
 
       it "replaces the target" do
