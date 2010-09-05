@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Embedded::One do
+describe Mongoid::Relations::Embedded::Many do
 
   describe "#=" do
 
@@ -10,24 +10,24 @@ describe Mongoid::Relations::Embedded::One do
         Person.new
       end
 
-      let(:name) do
-        Name.new
+      let(:address) do
+        Address.new
       end
 
       before do
-        person.name = name
+        person.addresses = [ address ]
       end
 
       it "sets the target of the relation" do
-        person.name.should == name
+        person.addresses.should == [ address ]
       end
 
       it "sets the base on the inverse relation" do
-        name.namable.should == person
+        address.addressable.should == person
       end
 
       it "does not save the target" do
-        name.should_not be_persisted
+        address.should_not be_persisted
       end
     end
 
@@ -37,24 +37,24 @@ describe Mongoid::Relations::Embedded::One do
         Person.create(:ssn => "437-11-1112")
       end
 
-      let(:name) do
-        Name.new
+      let(:address) do
+        Address.new
       end
 
       before do
-        person.name = name
+        person.addresses = [ address ]
       end
 
       it "sets the target of the relation" do
-        person.name.should == name
+        person.addresses.should == [ address ]
       end
 
       it "sets the base on the inverse relation" do
-        name.namable.should == person
+        address.addressable.should == person
       end
 
       it "saves the target" do
-        name.should be_persisted
+        address.should be_persisted
       end
     end
   end
@@ -67,21 +67,21 @@ describe Mongoid::Relations::Embedded::One do
         Person.new
       end
 
-      let(:name) do
-        Name.new
+      let(:address) do
+        Address.new
       end
 
       before do
-        person.name = name
-        person.name = nil
+        person.addresses = [ address ]
+        person.addresses = nil
       end
 
-      it "sets the relation to nil" do
-        person.name.should be_nil
+      it "sets the relation to empty" do
+        person.addresses.should be_empty
       end
 
       it "removes the inverse relation" do
-        name.namable.should be_nil
+        address.addressable.should be_nil
       end
     end
 
@@ -92,11 +92,11 @@ describe Mongoid::Relations::Embedded::One do
       end
 
       before do
-        person.name = nil
+        person.addresses = nil
       end
 
-      it "sets the relation to nil" do
-        person.name.should be_nil
+      it "sets the relation to empty" do
+        person.addresses.should be_empty
       end
     end
 
@@ -106,25 +106,25 @@ describe Mongoid::Relations::Embedded::One do
         Person.create(:ssn => "437-11-1112")
       end
 
-      let(:name) do
-        Name.new
+      let(:address) do
+        Address.new
       end
 
       before do
-        person.name = name
-        person.name = nil
+        person.addresses = [ address ]
+        person.addresses = nil
       end
 
-      it "sets the relation to nil" do
-        person.name.should be_nil
+      it "sets the relation to empty" do
+        person.addresses.should be_empty
       end
 
       it "removed the inverse relation" do
-        name.namable.should be_nil
+        address.addressable.should be_nil
       end
 
       it "deletes the child document" do
-        name.should be_destroyed
+        address.should be_destroyed
       end
     end
   end
