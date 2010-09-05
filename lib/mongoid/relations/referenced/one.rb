@@ -50,8 +50,13 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation or nil.
-        def substitute(target)
-          target.tap { |t| t ? (@target = t and bind) : unbind }
+        def substitute(new_target)
+          # TODO: Durran: One/In susbstitution is identical
+          old_target = target
+          tap do |relation|
+            relation.target = new_target
+            new_target ? bind : unbind(old_target) and return nil
+          end
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs
@@ -62,9 +67,9 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>person.game.unbind</tt>
-        def unbind
-          Bindings::Referenced::One.new(base, target, metadata).unbind
-          target.delete if base.persisted?
+        def unbind(old_target)
+          Bindings::Referenced::One.new(base, old_target, metadata).unbind
+          old_target.delete if base.persisted?
         end
 
         class << self
