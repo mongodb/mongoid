@@ -13,6 +13,8 @@ module Mongoid # :nodoc:
         :metadata,
         :target
 
+      delegate :binding, :to => "self.class"
+
       protected
 
       # Yields to the block to allow the building flag to get set and unset for

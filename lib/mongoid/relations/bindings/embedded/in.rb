@@ -13,20 +13,58 @@ module Mongoid # :nodoc:
           #
           # Example:
           #
-          # <tt>game.person.bind</tt>
+          # <tt>name.person.bind</tt>
+          # <tt>name.person = Person.new</tt>
           def bind
-            # if embedded_bindable?(base)
-              # inverse = metadata.inverse(target)
-              # base.metadata =
-                # target.class.reflect_on_association(inverse)
-              # target.send(metadata.inverse_setter(target), base)
-            # end
+            if bindable?
+              inverse = metadata.inverse(target)
+              base.metadata = target.reflect_on_association(inverse)
+              target.send(metadata.inverse_setter(target), base)
+            end
           end
 
+          # Unbinds the base object and the inverse, caused by setting the
+          # reference to nil.
+          #
+          # Example:
+          #
+          # <tt>name.person.unbind</tt>
+          # <tt>name.person = nil</tt>
           def unbind
-            # if embedded_unbindable?(base)
-              # target.send(metadata.inverse_setter(target), nil)
-            # end
+            if unbindable?
+              target.send(metadata.inverse_setter(target), nil)
+            end
+          end
+
+          private
+
+          # Protection from infinite loops setting the inverse relations.
+          # Checks if this document is not already equal to the target of the
+          # inverse.
+          #
+          # Example:
+          #
+          # <tt>binding.bindable?</tt>
+          #
+          # Returns:
+          #
+          # true if the documents differ, false if not.
+          def bindable?
+            !base.equal?(inverse ? inverse.target : nil)
+          end
+
+          # Protection from infinite loops removing the inverse relations.
+          # Checks if the target of the inverse is not already nil.
+          #
+          # Example:
+          #
+          # <tt>binding.unbindable?</tt>
+          #
+          # Returns:
+          #
+          # true if the target is not nil, false if not.
+          def unbindable?
+            !target.send(metadata.inverse(target)).nil?
           end
         end
       end

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Relations::Embedded::In do
+describe Mongoid::Relations::Embedded::One do
 
   describe "#=" do
 
@@ -15,19 +15,19 @@ describe Mongoid::Relations::Embedded::In do
       end
 
       before do
-        name.namable = person
+        person.name = name
       end
 
       it "sets the target of the relation" do
-        name.namable.should == person
-      end
-
-      it "sets the base on the inverse relation" do
         person.name.should == name
       end
 
+      it "sets the base on the inverse relation" do
+        name.namable.should == person
+      end
+
       it "does not save the target" do
-        person.should_not be_persisted
+        name.should_not be_persisted
       end
     end
 
@@ -42,18 +42,18 @@ describe Mongoid::Relations::Embedded::In do
       end
 
       before do
-        name.namable = person
+        person.name = name
       end
 
       it "sets the target of the relation" do
-        name.namable.should == person
-      end
-
-      it "sets the base on the inverse relation" do
         person.name.should == name
       end
 
-      it "saves the base" do
+      it "sets the base on the inverse relation" do
+        name.namable.should == person
+      end
+
+      it "saves the target" do
         name.should be_persisted
       end
     end
@@ -72,16 +72,16 @@ describe Mongoid::Relations::Embedded::In do
       end
 
       before do
-        name.namable = person
-        name.namable = nil
+        person.name = name
+        person.name = nil
       end
 
       it "sets the relation to nil" do
-        name.namable.should be_nil
+        person.name.should be_nil
       end
 
       it "removes the inverse relation" do
-        person.name.should be_nil
+        name.namable.should be_nil
       end
     end
 
@@ -96,15 +96,15 @@ describe Mongoid::Relations::Embedded::In do
       end
 
       before do
-        name.namable = nil
+        person.name = nil
       end
 
       it "sets the relation to nil" do
-        name.namable.should be_nil
+        person.name.should be_nil
       end
 
       it "removes the inverse relation" do
-        person.name.should be_nil
+        name.namable.should be_nil
       end
     end
 
@@ -119,16 +119,16 @@ describe Mongoid::Relations::Embedded::In do
       end
 
       before do
-        name.namable = person
-        name.namable = nil
+        person.name = name
+        person.name = nil
       end
 
       it "sets the relation to nil" do
-        name.namable.should be_nil
+        person.name.should be_nil
       end
 
       it "removed the inverse relation" do
-        person.name.should be_nil
+        name.namable.should be_nil
       end
 
       it "deletes the child document" do

@@ -4,8 +4,19 @@ module Mongoid # :nodoc:
     module Embedded
       class One < Proxy
 
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>person.name.bind</tt>
         def bind
           Bindings::Embedded::One.new(base, target, metadata).bind
+          target.save if base.persisted?
         end
 
         # Instantiate a new embeds_one relation.
@@ -30,21 +41,31 @@ module Mongoid # :nodoc:
         #
         # Options:
         #
-        # target: A document to replace the target.
+        # other: A document to replace the target.
         #
         # Returns:
         #
         # The relation or nil.
-        def substitute(target)
-          return nil unless target
+        def substitute(new_target)
+          # TODO: Durran: One/In susbstitution is identical
+          old_target = target
           tap do |relation|
-            relation.target = target
-            target.parentize(base)
-            metadatafy(target)
+            relation.target = new_target
+            new_target ? bind : unbind(old_target) and return nil
           end
         end
 
-        def unbind
+        # Unbinds the base object to the inverse of the relation. This occurs
+        # when setting a side of the relation to nil.
+        #
+        # Will delete the object if necessary.
+        #
+        # Example:
+        #
+        # <tt>person.name.unbind</tt>
+        def unbind(old_target)
+          Bindings::Embedded::One.new(base, old_target, metadata).unbind
+          old_target.delete if base.persisted?
         end
 
         class << self

@@ -4,6 +4,13 @@ module Mongoid # :nodoc:
     module Reflections #:nodoc:
       extend ActiveSupport::Concern
 
+      included do
+
+        delegate \
+          :reflect_on_association,
+          :reflect_on_all_associations, :to => "self.class"
+      end
+
       module ClassMethods #:nodoc
 
         # Returns the relation metadata for the supplied name.
