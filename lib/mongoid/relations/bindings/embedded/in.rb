@@ -19,7 +19,11 @@ module Mongoid # :nodoc:
             if bindable?
               inverse = metadata.inverse(target)
               base.metadata = target.reflect_on_association(inverse)
-              target.send(metadata.inverse_setter(target), base)
+              if base.embedded_many?
+                target.send(inverse).push(base)
+              else
+                target.send(metadata.inverse_setter(target), base)
+              end
             end
           end
 

@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
     # true if the ids are equal, false if not.
     def ==(other)
       return false unless other.is_a?(Document)
-      id == other.id
+      id == other.id || equal?(other)
     end
 
     # Delegates to ==. Used when needing checks in hashes.

@@ -31,9 +31,11 @@ module Mongoid # :nodoc:
           # <tt>person.addresses.unbind</tt>
           # <tt>person.addresses = nil</tt>
           def unbind
-            # if unbindable?
-              # target.send(metadata.inverse_setter(target), nil)
-            # end
+            if unbindable?
+              target.each do |doc|
+                doc.send(metadata.inverse_setter(target), nil)
+              end
+            end
           end
 
           private
@@ -69,7 +71,7 @@ module Mongoid # :nodoc:
           #
           # true if the target is not nil, false if not.
           def unbindable?
-            # !target.send(metadata.inverse(target)).nil?
+            inverse && !inverse.target.nil?
           end
         end
       end

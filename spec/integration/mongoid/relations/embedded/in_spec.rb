@@ -4,57 +4,117 @@ describe Mongoid::Relations::Embedded::In do
 
   describe "#=" do
 
-    context "when the child is a new record" do
+    context "when the inverse of an embeds one" do
 
-      let(:person) do
-        Person.new
+      context "when the child is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:name) do
+          Name.new
+        end
+
+        before do
+          name.namable = person
+        end
+
+        it "sets the target of the relation" do
+          name.namable.should == person
+        end
+
+        it "sets the base on the inverse relation" do
+          person.name.should == name
+        end
+
+        it "does not save the target" do
+          person.should_not be_persisted
+        end
       end
 
-      let(:name) do
-        Name.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        name.namable = person
-      end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-      it "sets the target of the relation" do
-        name.namable.should == person
-      end
+        let(:name) do
+          Name.new
+        end
 
-      it "sets the base on the inverse relation" do
-        person.name.should == name
-      end
+        before do
+          name.namable = person
+        end
 
-      it "does not save the target" do
-        person.should_not be_persisted
+        it "sets the target of the relation" do
+          name.namable.should == person
+        end
+
+        it "sets the base on the inverse relation" do
+          person.name.should == name
+        end
+
+        it "saves the base" do
+          name.should be_persisted
+        end
       end
     end
 
-    context "when the parent is not a new record" do
+    context "when the inverse of an embeds many" do
 
-      let(:person) do
-        Person.create(:ssn => "437-11-1112")
+      context "when the child is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        before do
+          address.addressable = person
+        end
+
+        it "sets the target of the relation" do
+          address.addressable.should == person
+        end
+
+        it "appends the base on the inverse relation" do
+          person.addresses.should include(address)
+        end
+
+        it "does not save the target" do
+          person.should_not be_persisted
+        end
       end
 
-      let(:name) do
-        Name.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        name.namable = person
-      end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-      it "sets the target of the relation" do
-        name.namable.should == person
-      end
+        let(:address) do
+          Address.new
+        end
 
-      it "sets the base on the inverse relation" do
-        person.name.should == name
-      end
+        before do
+          address.addressable = person
+        end
 
-      it "saves the base" do
-        name.should be_persisted
+        it "sets the target of the relation" do
+          address.addressable.should == person
+        end
+
+        it "appends the base on the inverse relation" do
+          person.addresses.should include(address)
+        end
+
+        it "saves the base" do
+          address.should be_persisted
+        end
       end
     end
   end

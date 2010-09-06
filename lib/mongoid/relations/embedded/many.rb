@@ -31,7 +31,7 @@ module Mongoid # :nodoc:
         # docs: Any number of documents.
         def <<(*docs)
           docs.flatten.each do |doc|
-            append(doc)
+            append(doc) unless target.include?(doc)
           end
         end
         alias :concat :<<
@@ -201,18 +201,24 @@ module Mongoid # :nodoc:
         #
         # Options:
         #
-        # target: An array of documents to replace the existing docs.
+        # new_target: An array of documents to replace the existing docs.
         #
         # Returns:
         #
         # The relation.
-        def substitute(documents)
-          target.clear
-          documents.to_a.each { |doc| append(doc) } unless documents.nil?
-          self
+        def substitute(new_target)
+          # target.clear
+          # documents.to_a.each { |doc| append(doc) } unless documents.nil?
+          # self
+          old_target = target
+          tap do |relation|
+            relation.target = new_target || []
+            !new_target.blank? ? bind : unbind(old_target)
+          end
         end
 
-        def unbind
+        def unbind(old_target)
+          Bindings::Embedded::Many.new(base, old_target, metadata).unbind
         end
 
         private
