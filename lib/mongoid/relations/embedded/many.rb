@@ -111,6 +111,24 @@ module Mongoid # :nodoc:
           build(attributes, type).tap(&:save!)
         end
 
+        # Delete the supplied document from the target. This method is proxied
+        # in order to reindex the array after the operation occurs.
+        #
+        # Example:
+        #
+        # <tt>addresses.delete(address)</tt>
+        #
+        # Options:
+        #
+        # document: The document to be deleted.
+        #
+        # Returns:
+        #
+        # The deleted document or nil if nothing deleted.
+        def delete(document)
+          target.delete(document).tap { reindex }
+        end
+
         # Delete all the documents in the association without running callbacks.
         #
         # Example:
@@ -275,6 +293,19 @@ module Mongoid # :nodoc:
           klass = metadata.klass
           klass.send(:with_scope, criteria) do
             klass.send(name, *args)
+          end
+        end
+
+        # Reindex all the target elements. This is useful when performing
+        # operations on the proxied target directly and the indices need to
+        # match that on the database side.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.reindex</tt>
+        def reindex
+          target.each_with_index do |doc, index|
+            doc._index = index
           end
         end
 

@@ -36,7 +36,12 @@ module Mongoid # :nodoc:
           # <tt>name.person = nil</tt>
           def unbind
             if unbindable?
-              target.send(metadata.inverse_setter(target), nil)
+              if base.embedded_many?
+                inverse = metadata.inverse(target)
+                target.send(inverse).delete(base)
+              else
+                target.send(metadata.inverse_setter(target), nil)
+              end
             end
           end
 
