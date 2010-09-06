@@ -16,9 +16,9 @@ module Mongoid # :nodoc:
           #
           # A single +Document+.
           def build
-            return @object unless query?
-            key = @metadata.foreign_key
-            @metadata.klass.any_in(key => [ @object ]).first
+            return object unless query?
+            key = metadata.foreign_key
+            metadata.klass.any_in(key => [ object ]).first
           end
         end
       end

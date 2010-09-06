@@ -3,6 +3,8 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     class Builder #:nodoc:
 
+      attr_reader :metadata, :object
+
       # Instantiate the new builder for embeds one relation.
       #
       # Options:
@@ -26,8 +28,8 @@ module Mongoid # :nodoc:
       #
       # true if the object responds to <tt>#attributes</tt>.
       def query?
-        object = @object.to_a.first
-        !object.respond_to?(:attributes) && !object.nil?
+        obj = object.to_a.first
+        !obj.respond_to?(:attributes) && !obj.nil?
       end
     end
   end

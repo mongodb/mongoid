@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
           @document.run_callbacks(:save) do
             if insert
               @document.new_record = false
-              @document._children.each { |child| child.new_record = false }
+              # @document._children.each { |child| child.new_record = false }
               @document.move_changes
             end
           end

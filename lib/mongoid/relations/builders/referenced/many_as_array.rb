@@ -16,8 +16,8 @@ module Mongoid # :nodoc:
           #
           # An array of documents.
           def build
-            return @object unless query?
-            @metadata.klass.find(@object)
+            return object unless query?
+            metadata.klass.find(object)
           end
         end
       end

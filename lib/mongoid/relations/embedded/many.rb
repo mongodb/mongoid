@@ -4,7 +4,19 @@ module Mongoid # :nodoc:
     module Embedded
       class Many < Proxy
 
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.bind</tt>
         def bind
+          Bindings::Embedded::Many.new(base, target, metadata).bind
+          # target.each(&:save) if base.persisted?
         end
 
         # Appends a document or array of documents to the relation. Will set

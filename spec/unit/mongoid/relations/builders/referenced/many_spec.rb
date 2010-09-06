@@ -23,7 +23,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     context "when provided an id" do
 
       let(:object_id) do
-        BSON::ObjectID.new
+        BSON::ObjectId.new
       end
 
       let(:object) do

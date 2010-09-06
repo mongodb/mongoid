@@ -18,11 +18,11 @@ module Mongoid # :nodoc:
           #
           # An +Array+ of +Documents+.
           def build
-            return [] if @object.blank?
-            return @object if @object.first.is_a?(Document)
-            @object.inject([]) do |documents, attrs|
+            return [] if object.blank?
+            return object if object.first.is_a?(Document)
+            object.inject([]) do |documents, attrs|
               documents.tap do |docs|
-                docs << Mongoid::Factory.build(@metadata.klass, attrs)
+                docs << Mongoid::Factory.build(metadata.klass, attrs)
               end
             end
           end

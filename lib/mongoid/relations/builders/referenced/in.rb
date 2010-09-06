@@ -16,8 +16,8 @@ module Mongoid # :nodoc:
           #
           # A single +Document+.
           def build
-            return @object unless query?
-            @metadata.klass.find(@object)
+            return object unless query?
+            metadata.klass.find(object)
           end
         end
       end
