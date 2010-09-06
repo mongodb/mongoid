@@ -4,21 +4,6 @@ module Mongoid # :nodoc:
     module Embedded
       class Many < Proxy
 
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
-        #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
-        #
-        # Example:
-        #
-        # <tt>person.addresses.bind</tt>
-        def bind
-          Bindings::Embedded::Many.new(base, target, metadata).bind
-          # target.each(&:save) if base.persisted?
-        end
-
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -36,6 +21,34 @@ module Mongoid # :nodoc:
         end
         alias :concat :<<
         alias :push :<<
+
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.bind</tt>
+        def bind
+          binding.bind_all
+          # target.each(&:save) if base.persisted?
+        end
+
+        # Bind the inverse relation between a single document in this proxy
+        # instead of the entire target.
+        #
+        # Used when appending to the target instead of setting the entire
+        # thing.
+        #
+        # Example:
+        #
+        # <tt>person.addressses.bind_one(address)</tt>
+        def bind_one(document)
+          binding.bind_one(document)
+        end
 
         # Builds a new document in the relation and appends it to the target.
         # Takes an optional type if you want to specify a subclass.
@@ -235,8 +248,18 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Unbind the inverse relation from this set of documents. Used when the
+        # entire proxy has been cleared, set to nil or empty, or replaced.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.unbind(target)</tt>
+        #
+        # Options:
+        #
+        # old_target: The previous target of the relation to unbind with.
         def unbind(old_target)
-          Bindings::Embedded::Many.new(base, old_target, metadata).unbind
+          binding(old_target).unbind
         end
 
         private
@@ -252,10 +275,26 @@ module Mongoid # :nodoc:
         #
         # document: The document to append to the target.
         def append(document)
-          metadatafy(document)
-          document.parentize(base)
           target << document
+          metadatafy(document) and bind_one(document)
           document._index = target.size - 1
+        end
+
+        # Instantiate the binding associated with this relation.
+        #
+        # Example:
+        #
+        # <tt>binding([ address ])</tt>
+        #
+        # Options:
+        #
+        # new_target: The new documents to bind with.
+        #
+        # Returns:
+        #
+        # A binding object.
+        def binding(new_target = nil)
+          Bindings::Embedded::Many.new(base, new_target || target, metadata)
         end
 
         # Returns the criteria object for the target class with its documents set
@@ -332,6 +371,10 @@ module Mongoid # :nodoc:
         end
 
         class << self
+
+          def binding(base, target, metadata)
+            Bindings::Embedded::Many.new(base, target, metadata)
+          end
 
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.

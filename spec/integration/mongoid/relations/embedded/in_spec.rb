@@ -92,7 +92,7 @@ describe Mongoid::Relations::Embedded::In do
 
       context "when the parent is not a new record" do
 
-        let(:person) do
+        let!(:person) do
           Person.create(:ssn => "437-11-1112")
         end
 

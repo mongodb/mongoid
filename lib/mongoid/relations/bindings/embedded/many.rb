@@ -15,11 +15,20 @@ module Mongoid # :nodoc:
           #
           # <tt>person.addresses.bind</tt>
           # <tt>person.addresses = [ Address.new ]</tt>
-          def bind
-            if bindable?
-              target.each do |doc|
-                doc.send(metadata.inverse_setter(target), base)
-              end
+          def bind_all
+            target.each { |doc| bind_one(doc) }
+          end
+
+          # Binds a single document with the inverse relation. Used
+          # specifically when appending to the proxy.
+          #
+          # Example:
+          #
+          # <tt>person.addresses.bind_one(address)</tt>
+          def bind_one(doc)
+            if bindable?(doc)
+              doc.parentize(base)
+              doc.send(metadata.inverse_setter(target), base)
             end
           end
 
@@ -56,8 +65,8 @@ module Mongoid # :nodoc:
           # Returns:
           #
           # true if the documents differ, false if not.
-          def bindable?
-            !base.equal?(inverse ? inverse.target : nil)
+          def bindable?(doc)
+            !base.equal?(doc.send(metadata.inverse(target)))
           end
 
           # Protection from infinite loops removing the inverse relations.
