@@ -8,6 +8,8 @@ require "mongoid"
 require "mocha"
 require "rspec"
 
+LOGGER = Logger.new($stdout)
+
 Mongoid.configure do |config|
   name = "mongoid_test"
   host = "localhost"

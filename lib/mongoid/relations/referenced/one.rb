@@ -55,7 +55,7 @@ module Mongoid # :nodoc:
           old_target = target
           tap do |relation|
             relation.target = new_target
-            new_target ? bind : unbind(old_target) and return nil
+            new_target ? bind : (unbind(old_target) and return nil)
           end
         end
 
