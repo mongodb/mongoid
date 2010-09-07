@@ -16,6 +16,7 @@ module Mongoid # :nodoc:
         # <tt>person.name.bind</tt>
         def bind
           Bindings::Embedded::One.new(base, target, metadata).bind
+          # TODO: Durran: This should not save when building via #build_name
           target.save if base.persisted?
         end
 

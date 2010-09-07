@@ -16,7 +16,6 @@ module Mongoid # :nodoc:
         # <tt>name.person.bind</tt>
         def bind
           Bindings::Embedded::In.new(base, target, metadata).bind
-          base.save if target.persisted?
         end
 
         # Instantiate a new embedded_in relation.

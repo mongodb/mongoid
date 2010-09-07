@@ -6,7 +6,7 @@ describe Mongoid::Contexts::Enumerable do
     person = Person.new(:title => "Sir")
     10.times do |n|
       post_code = n % 3 == 0 ? 32250 : 60661
-      person.addresses << Address.new(:number => n, :post_code => post_code, :street => "Upper Street")
+      person.addresses << Address.new(:number => n, :post_code => post_code, :street => "Upper Street #{n}")
     end
     person
   end

@@ -111,10 +111,6 @@ describe Mongoid::Relations::Embedded::In do
         it "appends the base on the inverse relation" do
           person.addresses.should include(address)
         end
-
-        it "saves the base" do
-          address.should be_persisted
-        end
       end
     end
   end

@@ -39,8 +39,12 @@ describe Mongoid::Relations::Metadata do
 
       context "when association name is singular" do
 
+        let(:relation) do
+          stub(:macro => :embeds_one)
+        end
+
         let(:metadata) do
-          klass.new(:name => :name)
+          klass.new(:name => :name, :relation => relation)
         end
 
         it "classifies and constantizes the association name" do
@@ -50,8 +54,12 @@ describe Mongoid::Relations::Metadata do
 
       context "when association name is plural" do
 
+        let(:relation) do
+          stub(:macro => :embeds_many)
+        end
+
         let(:metadata) do
-          klass.new(:name => :addresses)
+          klass.new(:name => :addresses, :relation => relation)
         end
 
         it "classifies and constantizes the association name" do

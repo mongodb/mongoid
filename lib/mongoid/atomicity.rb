@@ -75,10 +75,5 @@ module Mongoid #:nodoc:
         embedded_one? && new_record? ? { _path => raw_attributes } : {}
       end
     end
-
-    # TODO: Remove
-    def embedded_one?
-      false
-    end
   end
 end

@@ -75,7 +75,7 @@ module Mongoid # :nodoc:
       #
       # A +Document+
       def instantiated(type = nil)
-        type ? type.instantiate : @metadata.klass.instantiate
+        type ? type.instantiate : metadata.klass.instantiate
       end
 
       def loaded?

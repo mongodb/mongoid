@@ -143,14 +143,17 @@ module Mongoid #:nodoc:
     # <tt>person.write_attributes(:title => "Mr.")</tt>
     def write_attributes(attrs = nil)
       process(attrs || {})
-      identified = !id.blank?
-      if new_record? && !identified
+      if new_record? && unidentified?
         identify
       end
     end
     alias :attributes= :write_attributes
 
     protected
+
+    def unidentified?
+      id.blank?
+    end
 
     # Return the typecast value for a field.
     def typed_value_for(key, value)

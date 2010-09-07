@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Contexts::Enumerable do
 
+  before :all do
+    Mongoid.raise_not_found_error = true
+  end
+
   let(:london) { Address.new(:number => 1, :street => "Bond Street") }
   let(:shanghai) { Address.new(:number => 10, :street => "Nan Jing Dong Lu") }
   let(:melbourne) { Address.new(:number => 20, :street => "Bourke Street") }

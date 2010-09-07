@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Contexts::Mongo do
 
+  before :all do
+    Mongoid.raise_not_found_error = true
+  end
+
   describe "#aggregate" do
 
     before do

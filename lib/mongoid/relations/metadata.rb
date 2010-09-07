@@ -33,7 +33,7 @@ module Mongoid # :nodoc:
       #
       # A +String+ name of the relation's proxied class.
       def class_name
-        self[:class_name] || name.to_s.classify
+        self[:class_name] || classify
       end
 
       # Will determine if the relation is an embedded one or not. Currently
@@ -268,6 +268,10 @@ module Mongoid # :nodoc:
       end
 
       private
+
+      def classify
+        macro == :embedded_in ? name.to_s.camelize : name.to_s.classify
+      end
 
       # Determine the name of the inverse relation.
       #
