@@ -31,6 +31,37 @@ describe Mongoid::Relations::Embedded::Many do
         it "does not save the new document" do
           address.should_not be_persisted
         end
+
+        it "sets the parent on the child" do
+          address._parent.should == person
+        end
+
+        it "sets the metadata on the child" do
+          address.metadata.should_not be_nil
+        end
+
+        it "sets the index on the child" do
+          address._index.should == 0
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:person) do
+          Person.create(:ssn => "234-44-4432")
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        before do
+          person.addresses.send(method, address)
+        end
+
+        it "saves the new document" do
+          address.should be_persisted
+        end
       end
     end
   end
@@ -62,6 +93,18 @@ describe Mongoid::Relations::Embedded::Many do
       it "does not save the target" do
         address.should_not be_persisted
       end
+
+      it "sets the parent on the child" do
+        address._parent.should == person
+      end
+
+      it "sets the metadata on the child" do
+        address.metadata.should_not be_nil
+      end
+
+      it "sets the index on the child" do
+        address._index.should == 0
+      end
     end
 
     context "when the parent is not a new record" do
@@ -76,14 +119,6 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         person.addresses = [ address ]
-      end
-
-      it "sets the target of the relation" do
-        person.addresses.should == [ address ]
-      end
-
-      it "sets the base on the inverse relation" do
-        address.addressable.should == person
       end
 
       it "saves the target" do
