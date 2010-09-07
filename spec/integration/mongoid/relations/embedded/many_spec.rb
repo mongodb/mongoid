@@ -675,9 +675,75 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#find_or_create_by" do
 
+    let(:person) do
+      Person.new
+    end
+
+    let!(:address) do
+      person.addresses.build(:street => "Bourke", :city => "Melbourne")
+    end
+
+    context "when the document exists" do
+
+      let(:found) do
+        person.addresses.find_or_create_by(:street => "Bourke")
+      end
+
+      it "returns the document" do
+        found.should == address
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:found) do
+        person.addresses.find_or_create_by(:street => "King")
+      end
+
+      it "sets the new document attributes" do
+        found.street.should == "King"
+      end
+
+      it "returns a newly persisted document" do
+        found.should be_persisted
+      end
+    end
   end
 
   describe "#find_or_initialize_by" do
 
+    let(:person) do
+      Person.new
+    end
+
+    let!(:address) do
+      person.addresses.build(:street => "Bourke", :city => "Melbourne")
+    end
+
+    context "when the document exists" do
+
+      let(:found) do
+        person.addresses.find_or_initialize_by(:street => "Bourke")
+      end
+
+      it "returns the document" do
+        found.should == address
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:found) do
+        person.addresses.find_or_initialize_by(:street => "King")
+      end
+
+      it "sets the new document attributes" do
+        found.street.should == "King"
+      end
+
+      it "returns a non persisted document" do
+        found.should_not be_persisted
+      end
+    end
   end
 end

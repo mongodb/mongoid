@@ -198,6 +198,42 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Find the first +Document+ given the conditions, or creates a new document
+        # with the conditions that were supplied
+        #
+        # Example:
+        #
+        # <tt>person.addresses.find_or_create_by(:street => "Bond St")</tt>
+        #
+        # Options:
+        #
+        # attrs: A +Hash+ of attributes
+        #
+        # Returns:
+        #
+        # An existing document or newly created one.
+        def find_or_create_by(attrs = {})
+          find_or(:create, attrs)
+        end
+
+        # Find the first +Document+ given the conditions, or instantiates a new document
+        # with the conditions that were supplied
+        #
+        # Example:
+        #
+        # <tt>person.addresses.find_or_initialize_by(:street => "Bond St")</tt>
+        #
+        # Options:
+        #
+        # attrs: A +Hash+ of attributes
+        #
+        # Returns:
+        #
+        # An existing document or new one.
+        def find_or_initialize_by(attrs = {})
+          find_or(:build, attrs)
+        end
+
         # Instantiate a new embeds_many relation.
         #
         # Options:
@@ -315,6 +351,24 @@ module Mongoid # :nodoc:
           metadata.klass.criteria.tap do |criterion|
             criterion.documents = target
           end
+        end
+
+        # Find the first object given the supplied attributes or create/initialize it.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.find_or(:create, :street => "Bond")</tt>
+        #
+        # Options:
+        #
+        # method: The method name, create or new.
+        # attrs: The attributes to build with
+        #
+        # Returns:
+        #
+        # A matching document or a new/created one.
+        def find_or(method, attrs = {})
+          find(:first, :conditions => attrs) || send(method, attrs)
         end
 
         # If the target array does not respond to the supplied method then try to
