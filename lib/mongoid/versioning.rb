@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
     def revise
       last_version = self.class.first(:conditions => { :_id => id, :version => version })
       if last_version
-        self.versions << last_version.clone
+        self.versions.target << last_version.clone
         self.versions.shift if self.class.version_max.present? && self.versions.length > self.class.version_max
         self.version = (version || 1 ) + 1
         @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
