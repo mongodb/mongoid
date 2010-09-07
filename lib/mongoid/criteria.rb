@@ -157,6 +157,30 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Encaspulates the behavior of taking arguments and parsing them into a
+    # finder type and a corresponding criteria object.
+    #
+    # Example:
+    #
+    # <tt>Criteria.parse!(Person, :all, :conditions => {})</tt>
+    #
+    # Options:
+    #
+    # klass: The klass to create the criteria for.
+    # args: An assortment of finder options.
+    #
+    # Returns:
+    #
+    # An Array with the type and criteria.
+    def self.parse!(klass, *args)
+      if args[0].nil?
+        Errors::InvalidOptions.new("Calling Document#find with nil is invalid")
+      end
+      type = args.delete_at(0) if args[0].is_a?(Symbol)
+      criteria = translate(klass, *args)
+      return [ type, criteria ]
+    end
+
     alias :to_ary :to_a
 
     # Returns the selector and options as a +Hash+ that would be passed to a

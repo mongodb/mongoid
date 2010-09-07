@@ -6,10 +6,6 @@ describe Mongoid::Relations::Referenced::One do
     Mongoid::Relations::Referenced::One
   end
 
-  let(:base) do
-    Person.new
-  end
-
   describe ".builder" do
 
     let(:builder_klass) do
@@ -55,33 +51,6 @@ describe Mongoid::Relations::Referenced::One do
 
     it "returns false" do
       klass.stores_foreign_key?.should == false
-    end
-  end
-
-  context "properties" do
-
-    let(:document) do
-      Post.new
-    end
-
-    let(:metadata) do
-      stub(
-        :extension? => false,
-        :foreign_key_setter => "person_id=",
-        :inverse => :person,
-        :inverse_setter => "person="
-      )
-    end
-
-    let(:relation) do
-      klass.new(base, document, metadata)
-    end
-
-    describe "#metadata" do
-
-      it "returns the relation's metadata" do
-        relation.metadata.should == metadata
-      end
     end
   end
 end

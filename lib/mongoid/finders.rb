@@ -57,15 +57,22 @@ module Mongoid #:nodoc:
     # it will attempt to find either a single +Document+ or multiples based
     # on the conditions provided and the first parameter.
     #
+    # Example:
+    #
     # <tt>Person.find(:first, :conditions => { :attribute => "value" })</tt>
-    #
     # <tt>Person.find(:all, :conditions => { :attribute => "value" })</tt>
+    # <tt>Person.find(BSON::ObjectId)</tt>
     #
-    # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
+    # Options:
+    #
+    # args: An assortment of finder options.
+    #
+    # Returns:
+    #
+    # A document or criteria.
     def find(*args)
       raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {}) if args[0].nil?
-      type = args.delete_at(0) if args[0].is_a?(Symbol)
-      criteria = Criteria.translate(self, *args)
+      type, criteria = Criteria.parse!(self, *args)
       case type
       when :first then return criteria.one
       when :last then return criteria.last
@@ -154,7 +161,6 @@ module Mongoid #:nodoc:
     def with_scope(criteria)
       scope_stack = self.scope_stack
       scope_stack << criteria
-
       begin
         yield criteria
       ensure

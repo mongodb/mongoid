@@ -31,6 +31,7 @@ class Address
   end
 
   validates_presence_of :street, :on => :update
+  validates_format_of :street, :with => /\D/, :allow_nil => true
 
   def set_parent=(set = false)
     self.parent_title = addressable.title if set

@@ -186,9 +186,16 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # A single matching +Document+.
-        def find(parameter)
-          return target if parameter == :all
-          criteria.id(parameter).first
+        def find(*args)
+          type, criteria = Criteria.parse!(self, *args)
+          case type
+          when :first then return criteria.one
+          when :last then return criteria.last
+          else
+            criteria.tap do |crit|
+              crit.documents = target if crit.is_a?(Criteria)
+            end
+          end
         end
 
         # Instantiate a new embeds_many relation.
@@ -238,9 +245,6 @@ module Mongoid # :nodoc:
         #
         # The relation.
         def substitute(new_target)
-          # target.clear
-          # documents.to_a.each { |doc| append(doc) } unless documents.nil?
-          # self
           old_target = target
           tap do |relation|
             relation.target = new_target || []
