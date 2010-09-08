@@ -24,28 +24,28 @@ module Mongoid #:nodoc:
       #
       # The +Document+, whether the insert succeeded or not.
       def persist
-        return @document if @validate && @document.invalid?(:create)
-        @document.run_callbacks(:create) do
-          @document.run_callbacks(:save) do
+        return document if validate && document.invalid?(:create)
+        document.run_callbacks(:create) do
+          document.run_callbacks(:save) do
             if insert
-              @document.new_record = false
-              @document._children.each { |child| child.new_record = false }
-              @document.move_changes
+              document.new_record = false
+              document._children.each { |child| child.new_record = false }
+              document.move_changes
             end
           end
-        end; @document
+        end; document
       end
 
       protected
       # Insert the document into the database.
       def insert
-        if @document.embedded?
+        if document.embedded?
           Persistence::InsertEmbedded.new(
-            @document,
-            @options.merge(:validate => @validate)
+            document,
+            options.merge(:validate => validate)
           ).persist
         else
-          @collection.insert(@document.to_hash, @options)
+          collection.insert(document.to_hash, options)
         end
       end
     end

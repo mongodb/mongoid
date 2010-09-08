@@ -26,6 +26,26 @@ module Mongoid #:nodoc:
       #
       # <tt>DeleteAll.new(Person, { :validate => true }, {})</tt>
       def initialize(document_or_class, options = {}, selector = {})
+        init(document_or_class)
+        validate = options[:validate]
+        @validate = (validate.nil? ? true : validate)
+        @selector = selector
+        @options = { :safe => safe_mode?(options) }
+      end
+
+      private
+
+      # Setup the proper instance variables based on if the supplied argument
+      # was a document object or a class object.
+      #
+      # Example:
+      #
+      # <tt>init(document_or_class)</tt>
+      #
+      # Options:
+      #
+      # document_or_class: A document or a class.
+      def init(document_or_class)
         if document_or_class.is_a?(Mongoid::Document)
           @document = document_or_class
           @collection = @document.embedded? ? @document._root.collection : @document.collection
@@ -33,10 +53,6 @@ module Mongoid #:nodoc:
           @klass = document_or_class
           @collection = @klass.collection
         end
-        validate = options[:validate]
-        @selector = selector
-        @validate = (validate.nil? ? true : validate)
-        @options = { :safe => safe_mode?(options) }
       end
     end
   end
