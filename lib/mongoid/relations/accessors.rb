@@ -47,12 +47,16 @@ module Mongoid # :nodoc:
       # Returns:
       #
       # The relation
-      def build(name, object, metadata)
+      def build(name, object, metadata, building = nil)
         target = metadata.builder(object).build
         relation = metadata.relation.new(self, target, metadata) if target
         set(name, relation).tap do |relation|
-          relation.bind if relation
+          relation.bind(building) if relation
         end
+      end
+
+      def building?(args)
+        args.length > 1 ? args.last : false
       end
 
       module ClassMethods #:nodoc:
@@ -104,12 +108,13 @@ module Mongoid # :nodoc:
         # self
         def setter(name, metadata)
           tap do
-            define_method("#{name}=") do |object|
+            define_method("#{name}=") do |*args|
+              object, building = args.first, building?(args)
               variable = "@#{name}"
               if relation_exists?(name)
-                set(name, send(name).substitute(object))
+                set(name, send(name).substitute(object, building))
               else
-                build(name, object, metadata)
+                build(name, object, metadata, building)
               end
             end
           end

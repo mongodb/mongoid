@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::Many do
 
+  before do
+    # Mongoid.master.connection.instance_variable_set(:@logger, Logger.new($stdout))
+  end
+
   [ :<<, :push, :concat ].each do |method|
 
     describe "#{method}" do
@@ -258,12 +262,12 @@ describe Mongoid::Relations::Embedded::Many do
       Person.new
     end
 
-    let(:address) do
+    let!(:address) do
       person.addresses.create(:street => "Bond")
     end
 
     it "appends to the target" do
-      person.addresses.should == [ address ]
+      person.reload.addresses.should == [ address ]
     end
 
     it "sets the base on the inverse relation" do

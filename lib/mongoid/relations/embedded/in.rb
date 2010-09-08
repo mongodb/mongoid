@@ -14,7 +14,7 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>name.person.bind</tt>
-        def bind
+        def bind(building = nil)
           Bindings::Embedded::In.new(base, target, metadata).bind
         end
 
@@ -45,12 +45,12 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation or nil.
-        def substitute(new_target)
+        def substitute(new_target, building = nil)
           # TODO: Durran: One/In susbstitution is identical
           old_target = target
           tap do |relation|
             relation.target = new_target
-            new_target ? bind : (unbind(old_target) and return nil)
+            new_target ? bind(building) : (unbind(old_target) and return nil)
           end
         end
 

@@ -39,7 +39,7 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>person.posts.bind</tt>
-        def bind
+        def bind(building = nil)
           Bindings::Referenced::Many.new(base, target, metadata).bind
           target.tap do |t|
             t.each(&:save) if base.persisted? && !building?
@@ -214,7 +214,7 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation or nil.
-        def substitute(target)
+        def substitute(target, building = nil)
           tap { target ? (@target = target.to_a and bind) : (@target = unbind) }
         end
 

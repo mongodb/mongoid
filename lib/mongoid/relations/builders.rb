@@ -37,7 +37,7 @@ module Mongoid # :nodoc:
         def builder(name)
           tap do
             define_method("build_#{name}") do |object|
-              send("#{name}=", object)
+              send("#{name}=", object, true)
             end
           end
         end

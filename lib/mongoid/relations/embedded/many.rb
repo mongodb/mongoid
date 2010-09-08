@@ -33,9 +33,9 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>person.addresses.bind</tt>
-        def bind
+        def bind(building = nil)
           binding.bind_all
-          target.each(&:save) if base.persisted?
+          target.each(&:save) if base.persisted? && !building
         end
 
         # Bind the inverse relation between a single document in this proxy
@@ -282,11 +282,19 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation.
-        def substitute(new_target)
+        def substitute(new_target, building = nil)
           old_target = target
           tap do |relation|
             relation.target = new_target || []
-            !new_target.blank? ? bind : unbind(old_target)
+            !new_target.blank? ? bind(building) : unbind(old_target)
+          end
+        end
+
+        def to_hash
+          target.inject([]) do |attributes, doc|
+            attributes.tap do |attr|
+              attr << doc.to_hash
+            end
           end
         end
 

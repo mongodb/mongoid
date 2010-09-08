@@ -555,4 +555,33 @@ describe Mongoid::Document do
     end
 
   end
+
+  describe "#to_hash" do
+
+    let!(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    let!(:address) do
+      person.addresses.build(:street => "Upper")
+    end
+
+    let!(:name) do
+      person.build_name(:first_name => "James")
+    end
+
+    let!(:location) do
+      address.locations.build(:name => "Home")
+    end
+
+    it "includes embeds one attributes" do
+      person.to_hash.should have_key("name")
+    end
+    it "includes embeds many attributes" do
+      person.to_hash.should have_key("addresses")
+    end
+    it "includes 2 level embeds many attributes" do
+      person.to_hash["addresses"].first.should have_key("locations")
+    end
+  end
 end

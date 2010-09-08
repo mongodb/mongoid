@@ -14,10 +14,10 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>person.name.bind</tt>
-        def bind
+        def bind(building = nil)
           Bindings::Embedded::One.new(base, target, metadata).bind
           # TODO: Durran: This should not save when building via #build_name
-          target.save if base.persisted?
+          target.save if base.persisted? && !building
         end
 
         # Instantiate a new embeds_one relation.
@@ -47,12 +47,12 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation or nil.
-        def substitute(new_target)
+        def substitute(new_target, building = nil)
           # TODO: Durran: One/In susbstitution is identical
           old_target = target
           tap do |relation|
             relation.target = new_target
-            new_target ? bind : (unbind(old_target) and return nil)
+            new_target ? bind(building) : (unbind(old_target) and return nil)
           end
         end
 

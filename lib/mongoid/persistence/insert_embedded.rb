@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
+
     # Insert is a persistence command responsible for taking a document that
     # has not been saved to the database and saving it. This specific class
     # handles the case when the document is embedded in another.
@@ -12,6 +13,7 @@ module Mongoid #:nodoc:
     #     false
     #   );
     class InsertEmbedded < Command
+
       # Insert the new document in the database. If the document's parent is a
       # new record, we will call save on the parent, otherwise we will $push
       # the document onto the parent.

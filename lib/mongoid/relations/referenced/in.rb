@@ -14,7 +14,7 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>game.person.bind</tt>
-        def bind
+        def bind(building = nil)
           Bindings::Referenced::In.new(base, target, metadata).bind
           target.save if base.persisted?
         end
@@ -44,7 +44,7 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation or nil.
-        def substitute(target)
+        def substitute(target, building = nil)
           target.tap { |t| t ? (@target = t and bind) : unbind }
         end
 

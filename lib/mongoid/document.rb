@@ -203,6 +203,29 @@ module Mongoid #:nodoc:
       [ self ]
     end
 
+    # Return a hash of the entire document hierarchy from this document and
+    # below. Used when the attributes are needed for everything and not just
+    # the current document.
+    #
+    # Example:
+    #
+    # <tt>person.to_hash</tt>
+    #
+    # Returns:
+    #
+    # A hash of all attributes in the hierarchy.
+    def to_hash
+      attributes = @attributes
+      attributes.tap do |attrs|
+        relations.select { |name, meta| meta.embedded? }.each_pair do |name, meta|
+          if meta.embedded?
+            relation = send(name)
+            attrs[name] = relation.to_hash unless relation.blank?
+          end
+        end
+      end
+    end
+
     module ClassMethods #:nodoc:
 
       # Instantiate a new object, only when loaded from the database or when

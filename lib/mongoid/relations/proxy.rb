@@ -83,7 +83,9 @@ module Mongoid # :nodoc:
       end
 
       def metadatafy(object)
-        object.to_a.each { |obj| obj.metadata = metadata }
+        object.to_a.each do |obj|
+          obj.metadata = metadata unless obj.metadata
+        end
       end
 
       # Default behavior of method missing should be to delegate all calls
