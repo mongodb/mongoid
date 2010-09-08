@@ -12,6 +12,66 @@ describe Mongoid::Document do
     @canvas_collection.stubs(:create_index).with(:_type, false)
   end
 
+########################## SPEC REFACTOR ##########################
+
+  describe "#==" do
+
+  end
+
+  describe "#_types" do
+
+  end
+
+  describe "#attributes" do
+
+  end
+
+  describe "#clone" do
+
+  end
+
+  describe "#eql?" do
+
+  end
+
+  describe "#hash" do
+
+  end
+
+  describe "#identify" do
+
+  end
+
+  describe "#initialize" do
+
+  end
+
+  describe "#.instantiate" do
+
+  end
+
+  describe "#raw_attributes" do
+
+  end
+
+  describe "#reload" do
+
+  end
+
+  describe "#remove_child" do
+
+  end
+
+  describe "#to_a" do
+
+  end
+
+  describe "#to_hash" do
+
+  end
+
+########################## SPEC REFACTOR ##########################
+
   it "does not respond to _destroy" do
     Person.new.should_not respond_to(:_destroy)
   end
