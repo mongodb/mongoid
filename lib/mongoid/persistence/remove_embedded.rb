@@ -26,22 +26,22 @@ module Mongoid #:nodoc:
       #
       # +true+ or +false+, depending on if the removal passed.
       def persist
-        parent = @document._parent
-        parent.remove_child(@document)
+        parent = document._parent
+        parent.remove_child(document)
         unless parent.new_record?
-          update = { @document._remover => removal_selector }
-          @collection.update(parent._selector, update, @options.merge(:multi => false))
+          update = { document._remover => removal_selector }
+          collection.update(parent._selector, update, options.merge(:multi => false))
         end; true
       end
 
       protected
       # Get the value to pass to the removal modifier.
       def setter
-        @document._index ? @document.id : true
+        document._index ? document.id : true
       end
 
       def removal_selector
-        @document._index ? { @document._pull => { "_id" => @document.id } } : { @document._path => setter }
+        document._index ? { document._pull => { "_id" => document.id } } : { document._path => setter }
       end
     end
   end

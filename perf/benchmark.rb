@@ -176,3 +176,11 @@ end
 # Updating The Root Document 10k Times         3.040000   0.160000   3.200000 (  3.195466)
 # Updating An Embedded Document 10k Times      2.550000   0.130000   2.680000 (  2.668367)
 # Appending A New Embedded Document 10k Times  5.080000   0.240000   5.320000 (  5.327933)
+# ---------------------------------------------------------------------------------------
+# 2.0.0.rc.1
+#
+# Saving 10k New Documents                    19.530000   0.270000  19.800000 ( 19.778292)
+# Querying & Iterating 10k Documents           1.150000   0.060000   1.210000 (  1.219632)
+# Updating The Root Document 10k Times         3.270000   0.120000   3.390000 (  3.387370)
+# Updating An Embedded Document 10k Times      2.680000   0.110000   2.790000 (  2.790347)
+# Appending A New Embedded Document 10k Times  7.230000   0.240000   7.470000 (  7.458122)

@@ -183,11 +183,11 @@ module Mongoid #:nodoc:
     #
     # child: The child (embedded) document to remove.
     def remove_child(child)
-      # if child.embedded_one?
-        # send(child.metadata.setter, nil)
-      # else
-        # send(child.metadata.name).delete(child)
-      # end
+      if child.embedded_one?
+        remove_instance_variable("@#{child.metadata.name}")
+      else
+        send(child.metadata.name).delete(child)
+      end
     end
 
     # Return an array with this +Document+ only in it.

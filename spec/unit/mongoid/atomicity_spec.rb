@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Atomicity do
 
-  before do
-    # Mongoid.master.connection.instance_variable_set(:@logger, Logger.new($stdout))
-  end
-
   describe "#_updates" do
 
     context "when the document is persisted" do
@@ -115,6 +111,37 @@ describe Mongoid::Atomicity do
                 }
             end
           end
+
+          context "when adding a new second level child" do
+
+            let!(:new_address) do
+              person.addresses.build(:street => "Another")
+            end
+
+            let!(:location) do
+              new_address.locations.build(:name => "Home")
+            end
+
+            it "returns the $set for 1st level and other for the 2nd level" do
+              person._updates.should ==
+                {
+                  "$set" => {
+                    "title" => "Sir",
+                    "addresses.0.street" => "Bond St"
+                  },
+                  :other => {
+                    "addresses" => [{
+                      "_id" => new_address.id,
+                      "street" => "Another",
+                      "locations" => [
+                        "_id" => location.id,
+                        "name" => "Home"
+                      ]
+                    }]
+                  }
+                }
+            end
+          end
         end
 
         context "when adding new embedded docs at multiple levels" do
@@ -148,28 +175,5 @@ describe Mongoid::Atomicity do
         end
       end
     end
-
-          # it "returns the proper hash with locations and queue" do
-            # @person._updates.should ==
-              # {
-                # "$set" => {
-                  # "title" => "Sir",
-                  # "addresses.0.street" => "Bond St"
-                # },
-                # :other => {
-                  # "addresses" => [{
-                    # "_id" => @new_address.id,
-                    # "street" => "Another",
-                    # "locations" => [
-                      # "_id" => @location.id,
-                      # "name" => "Home"
-                    # ]
-                  # }]
-                # }
-              # }
-          # end
-        # end
-      # end
-    # end
   end
 end
