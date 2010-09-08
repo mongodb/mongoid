@@ -24,6 +24,8 @@ class Address
     end
   end
 
+  embedded_in :pet_owner
+
   named_scope :rodeo, where(:street => "Rodeo Dr") do
     def mansion?
       all? { |address| address.street == "Rodeo Dr" }
