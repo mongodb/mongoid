@@ -1,7 +1,4 @@
-require "rubygems"
-# require "ruby-prof"
 require "benchmark"
-
 require "mongoid"
 
 Mongoid.configure do |config|
@@ -25,7 +22,7 @@ class Name
   field :given
   field :family
   field :middle
-  embedded_in :person, :inverse_of => :name
+  embedded_in :person
 end
 
 class Address
@@ -35,7 +32,7 @@ class Address
   field :state
   field :post_code
   field :address_type
-  embedded_in :person, :inverse_of => :addresses
+  embedded_in :person
 end
 
 class Phone
@@ -43,7 +40,7 @@ class Phone
   field :country_code, :type => Integer
   field :number
   field :phone_type
-  embedded_in :person, :inverse_of => :phones
+  embedded_in :person
 end
 
 puts "Starting benchmark..."
