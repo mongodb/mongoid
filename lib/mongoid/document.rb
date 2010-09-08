@@ -86,7 +86,7 @@ module Mongoid #:nodoc:
     #
     # A new document with all the attributes except id and versions
     def clone
-      self.class.instantiate(@attributes.except("_id").except("versions").dup, true)
+      self.class.new(@attributes.except("_id").except("versions").dup)
     end
 
     # Generate an id for this +Document+.
@@ -243,9 +243,9 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # A new document.
-      def instantiate(attrs = nil, allocating = false)
+      def instantiate(attrs = nil)
         attributes = attrs || {}
-        if attributes["_id"] || allocating
+        if attributes["_id"]
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
           document.setup_modifications
