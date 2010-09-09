@@ -2,13 +2,19 @@ require "spec_helper"
 
 describe Mongoid::Relations do
 
+  class TestClass
+    include Mongoid::Relations
+    include Mongoid::Dirty
+    include Mongoid::Fields
+  end
+
   let(:klass) do
-    Class.new do
-      include Mongoid::Relations
-      def self.name
-        "TestClass"
-      end
-    end
+    TestClass
+  end
+
+  before do
+    klass.relations.clear
+    klass.embedded = false
   end
 
   describe "#embedded?" do

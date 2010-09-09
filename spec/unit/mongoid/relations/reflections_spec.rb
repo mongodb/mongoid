@@ -2,10 +2,17 @@ require "spec_helper"
 
 describe Mongoid::Relations::Reflections do
 
+  class TestClass
+    include Mongoid::Relations
+  end
+
   let(:klass) do
-    Class.new do
-      include Mongoid::Relations
-    end
+    TestClass
+  end
+
+  before do
+    klass.relations.clear
+    klass.embedded = false
   end
 
   describe ".reflect_on_association" do
