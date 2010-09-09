@@ -218,7 +218,7 @@ module Mongoid #:nodoc:
     def to_hash
       attributes = @attributes
       attributes.tap do |attrs|
-        relations.select { |name, meta| meta.embedded? }.each_pair do |name, meta|
+        relations.select { |name, meta| meta.embedded? }.each do |name, meta|
           if meta.embedded?
             relation = send(name)
             attrs[name] = relation.to_hash unless relation.blank?
