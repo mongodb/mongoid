@@ -30,12 +30,26 @@ module Mongoid # :nodoc:
           #
           # <tt>person.posts.unbind</tt>
           def unbind
-            obj = if unbindable?(target)
+            obj = if unbindable?
               target.each do |doc|
                 doc.send(metadata.foreign_key_setter, nil)
                 doc.send(metadata.inverse_setter, nil)
               end
             end
+          end
+
+          # Protection from infinite loops removing the inverse relations.
+          # Checks if the target of the inverse is not already nil.
+          #
+          # Example:
+          #
+          # <tt>binding.unbindable?</tt>
+          #
+          # Returns:
+          #
+          # true if the target is not nil, false if not.
+          def unbindable?
+            inverse && !inverse.target.nil?
           end
         end
       end
