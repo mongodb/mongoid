@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
       if last_version
         self.versions << last_version.clone
         self.versions.shift if self.class.version_max.present? && self.versions.length > self.class.version_max
-        self.version = version + 1
+        self.version = (version || 1 ) + 1
         @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
       end
     end
