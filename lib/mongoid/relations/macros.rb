@@ -268,24 +268,6 @@ module Mongoid # :nodoc:
 
         private
 
-        # Defines a field to be used as a foreign key in the relation and
-        # indexes it if defined.
-        #
-        # Example:
-        #
-        # <tt>Person.reference(metadata)</tt>
-        #
-        # Options:
-        #
-        # metadata: The metadata for the relation.
-        def reference(metadata)
-          if metadata.relation.stores_foreign_key?
-            key = metadata.foreign_key
-            field(key)
-            index(key, :background => true) if metadata.indexed?
-          end
-        end
-
         # Create the metadata for the relation.
         #
         # Options:
@@ -306,6 +288,24 @@ module Mongoid # :nodoc:
               :name => name
             )
           )
+        end
+
+        # Defines a field to be used as a foreign key in the relation and
+        # indexes it if defined.
+        #
+        # Example:
+        #
+        # <tt>Person.reference(metadata)</tt>
+        #
+        # Options:
+        #
+        # metadata: The metadata for the relation.
+        def reference(metadata)
+          if metadata.relation.stores_foreign_key?
+            key = metadata.foreign_key
+            field(key, :identity => true, :metadata => metadata)
+            index(key, :background => true) if metadata.indexed?
+          end
         end
 
         # Creates a relation for the given name, metadata and relation. It adds

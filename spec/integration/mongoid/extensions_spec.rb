@@ -15,9 +15,7 @@ describe Mongoid::Extensions do
       it "does not set the value" do
         person.save.should be_true
       end
-
     end
-
   end
 
   context "setting association foreign keys" do
@@ -30,9 +28,8 @@ describe Mongoid::Extensions do
       it "should set the foreign key to empty" do
         game.person_id = ""
         game.save
-        game.reload.person_id.should be_empty
+        game.reload.person_id.should be_blank
       end
-
     end
 
     context "when value is a populated string" do
@@ -42,7 +39,6 @@ describe Mongoid::Extensions do
         game.save
         game.reload.person_id.should == person.id
       end
-
     end
 
     context "when value is a ObjectID" do
@@ -52,9 +48,6 @@ describe Mongoid::Extensions do
         game.save
         game.reload.person_id.should == person.id
       end
-
     end
-
   end
-
 end

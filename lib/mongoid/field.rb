@@ -47,8 +47,8 @@ module Mongoid #:nodoc:
       unless @options[:identity]
         type.set(object)
       else
-        inverse = @options[:inverse_class_name].constantize
-        object.blank? ? type.set(object) : BSON::ObjectId.cast!(inverse, object)
+        metadata = @options[:metadata]
+        object.blank? ? type.set(object) : BSON::ObjectId.cast!(metadata.inverse_klass, object)
       end
     end
 
