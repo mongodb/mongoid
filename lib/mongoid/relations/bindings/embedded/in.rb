@@ -58,7 +58,7 @@ module Mongoid # :nodoc:
           # true if the documents differ, false if not.
           def bindable?
             if base.embedded_many?
-              return !inverse.target.include?(base)
+              return inverse && !inverse.target.include?(base)
             end
             !base.equal?(inverse ? inverse.target : nil)
           end
