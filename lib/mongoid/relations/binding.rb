@@ -74,8 +74,13 @@ module Mongoid # :nodoc:
       #
       # The inverse relation.
       def inverse
-        # target.to_a.first.send(metadata.inverse)
-        target.to_a.first.send(metadata.inverse(target))
+        name = metadata.inverse(target)
+        object = target.to_a.first
+        if object.instance_variable_defined?("@#{name}")
+          object.instance_variable_get("@#{name}")
+        else
+          nil
+        end
       end
 
       # Determines if the supplied object is able to be unbound - this is to

@@ -17,9 +17,9 @@ module Mongoid # :nodoc:
           # A single +Document+.
           def build
             return object unless query?
-            # if object.is_a?(Hash)
-              # return Mongoid::Factory.build(metadata.klass, object)
-            # end
+            if object.is_a?(Hash)
+              return Mongoid::Factory.build(metadata.klass, object)
+            end
             metadata.klass.first(
               :conditions => { metadata.foreign_key => object }
             )
