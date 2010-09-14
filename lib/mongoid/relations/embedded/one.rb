@@ -66,7 +66,7 @@ module Mongoid # :nodoc:
         # <tt>person.name.unbind</tt>
         def unbind(old_target)
           Bindings::Embedded::One.new(base, old_target, metadata).unbind
-          old_target.delete if base.persisted?
+          old_target.delete if base.persisted? && !old_target.destroyed?
         end
 
         class << self

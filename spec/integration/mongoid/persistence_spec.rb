@@ -72,7 +72,7 @@ describe Mongoid::Persistence do
         it "removes the document from the parent" do
           @address.delete
           @person.addresses.should be_empty
-          @person.attributes[:addresses].should be_empty
+          @person.attributes[:addresses].should be_nil
         end
       end
 
@@ -121,7 +121,7 @@ describe Mongoid::Persistence do
         it "removes the document from the parent" do
           @address.delete
           @person.addresses.should be_empty
-          @person.attributes[:addresses].should be_empty
+          @person.attributes[:addresses].should be_nil
         end
       end
 
@@ -270,6 +270,7 @@ describe Mongoid::Persistence do
         end
 
         it "persists with proper unset and pull modifiers" do
+          pending "Durran:: $unset already happened"
           @person._updates.should == {
             "$set" => { "name" => nil }
           }
