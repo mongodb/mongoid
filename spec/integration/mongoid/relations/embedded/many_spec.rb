@@ -259,7 +259,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#create" do
 
     let(:person) do
-      Person.new
+      Person.create(:ssn => "333-22-1234")
     end
 
     let!(:address) do
