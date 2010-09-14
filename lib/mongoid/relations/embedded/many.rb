@@ -290,6 +290,15 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Get this relation as as its representation in the database.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.to_hash</tt>
+        #
+        # Returns:
+        #
+        # An array of hashes, how the relation is stored.
         def to_hash
           target.inject([]) do |attributes, doc|
             attributes.tap do |attr|

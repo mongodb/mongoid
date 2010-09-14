@@ -15,7 +15,7 @@ module Mongoid # :nodoc:
         #
         # <tt>name.person.bind</tt>
         def bind(building = nil)
-          Bindings::Embedded::In.new(base, target, metadata).bind
+          binding.bind
         end
 
         # Instantiate a new embedded_in relation.
@@ -63,8 +63,27 @@ module Mongoid # :nodoc:
         #
         # <tt>name.person.unbind</tt>
         def unbind(old_target)
-          Bindings::Embedded::In.new(base, old_target, metadata).unbind
+          binding(old_target).unbind
           base.delete if old_target.persisted? && !base.destroyed?
+        end
+
+        private
+
+        # Instantiate the binding associated with this relation.
+        #
+        # Example:
+        #
+        # <tt>binding([ address ])</tt>
+        #
+        # Options:
+        #
+        # new_target: The new documents to bind with.
+        #
+        # Returns:
+        #
+        # A binding object.
+        def binding(new_target = nil)
+          Bindings::Embedded::In.new(base, new_target || target, metadata)
         end
 
         class << self
