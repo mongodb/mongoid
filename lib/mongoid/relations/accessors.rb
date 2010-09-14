@@ -16,8 +16,7 @@ module Mongoid # :nodoc:
       #
       # true if set and not nil, false if not.
       def relation_exists?(name)
-        var = "@#{name}"
-        instance_variable_defined?(var) && instance_variable_get(var)
+        ivar(name)
       end
 
       # Set the supplied relation to an instance variable on the class with the

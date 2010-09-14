@@ -20,6 +20,7 @@ require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/nil/assimilation"
 require "mongoid/extensions/object/conversions"
+require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
@@ -87,6 +88,7 @@ end
 
 class Object #:nodoc:
   include Mongoid::Extensions::Object::Conversions
+  include Mongoid::Extensions::Object::Reflections
 end
 
 class Proc #:nodoc:
