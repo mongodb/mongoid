@@ -785,6 +785,17 @@ describe Mongoid::Associations do
 
   context "references many as array" do
 
+    context "when initializing a new document" do
+      context "with a references_many association" do
+        let(:preference) { Preference.create(:name => "test") }
+        let(:person) { Person.new :preferences => [preference] }
+
+        it 'adds the document to the array' do
+          person.preferences.first.should == preference
+        end
+      end
+    end
+
     context "with a saved parent" do
       let(:person) { Person.create!(:ssn => "992-33-1010") }
 
