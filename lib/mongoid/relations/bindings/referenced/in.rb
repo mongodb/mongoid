@@ -29,10 +29,17 @@ module Mongoid # :nodoc:
           #
           # <tt>game.person.unbind</tt>
           def unbind
-            if unbindable?(base)
+            if unbindable?
               base.send(metadata.foreign_key_setter, nil)
               target.send(metadata.inverse_setter, nil)
             end
+          end
+
+          def unbindable?
+            # base = game
+            # target = person
+            # Can I set person.game to nil?
+            !target.send(metadata.inverse(target)).blank?
           end
         end
       end
