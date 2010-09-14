@@ -15,8 +15,8 @@ module Mongoid # :nodoc:
         #
         # <tt>person.game.bind</tt>
         def bind(building = nil)
-          Bindings::Referenced::One.new(base, target, metadata).bind
-          target.save if base.persisted?
+          binding.bind
+          target.save if base.persisted? && !building
         end
 
         # Instantiate a new references_one relation. Will set the foreign key
@@ -68,8 +68,27 @@ module Mongoid # :nodoc:
         #
         # <tt>person.game.unbind</tt>
         def unbind(old_target)
-          Bindings::Referenced::One.new(base, old_target, metadata).unbind
+          binding(old_target).unbind
           old_target.delete if base.persisted?
+        end
+
+        private
+
+        # Instantiate the binding associated with this relation.
+        #
+        # Example:
+        #
+        # <tt>binding([ address ])</tt>
+        #
+        # Options:
+        #
+        # new_target: The new documents to bind with.
+        #
+        # Returns:
+        #
+        # A binding object.
+        def binding(new_target = nil)
+          Bindings::Referenced::One.new(base, new_target || target, metadata)
         end
 
         class << self

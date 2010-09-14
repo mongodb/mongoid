@@ -15,8 +15,8 @@ module Mongoid # :nodoc:
         #
         # <tt>game.person.bind</tt>
         def bind(building = nil)
-          Bindings::Referenced::In.new(base, target, metadata).bind
-          target.save if base.persisted?
+          binding.bind
+          target.save if base.persisted? && !building
         end
 
         # Instantiate a new referenced_in relation.
@@ -44,8 +44,12 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The relation or nil.
-        def substitute(target, building = nil)
-          target.tap { |t| t ? (@target = t and bind) : unbind }
+        def substitute(new_target, building = nil)
+          old_target = target
+          tap do |relation|
+            relation.target = new_target
+            new_target ? bind(building) : (unbind(old_target) and return nil)
+          end
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs
@@ -54,8 +58,27 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>game.person.unbind</tt>
-        def unbind
-          Bindings::Referenced::In.new(base, target, metadata).unbind
+        def unbind(old_target)
+          binding(old_target).unbind
+        end
+
+        private
+
+        # Instantiate the binding associated with this relation.
+        #
+        # Example:
+        #
+        # <tt>binding([ address ])</tt>
+        #
+        # Options:
+        #
+        # new_target: The new documents to bind with.
+        #
+        # Returns:
+        #
+        # A binding object.
+        def binding(new_target = nil)
+          Bindings::Referenced::In.new(base, new_target || target, metadata)
         end
 
         class << self
