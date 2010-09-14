@@ -4,7 +4,6 @@ describe Mongoid::Document do
 
   before do
     Person.delete_all
-    # Mongoid.master.connection.instance_variable_set(:@logger, Logger.new($stdout))
   end
 
   context "creating anonymous documents" do

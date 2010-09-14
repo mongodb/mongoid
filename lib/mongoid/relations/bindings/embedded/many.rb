@@ -28,7 +28,8 @@ module Mongoid # :nodoc:
           def bind_one(doc)
             if bindable?(doc)
               doc.parentize(base)
-              doc.send(metadata.inverse_setter(target), base)
+              name = metadata.inverse_setter(target)
+              doc.send(name, base) unless name == "versions="
             end
           end
 

@@ -10,6 +10,8 @@ module Mongoid #:nodoc:
       field :version, :type => Integer, :default => 1
       embeds_many :versions, :class_name => self.name
       set_callback :save, :before, :revise
+
+      delegate :version_max, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:
@@ -26,10 +28,10 @@ module Mongoid #:nodoc:
     def revise
       last_version = self.class.first(:conditions => { :_id => id, :version => version })
       if last_version
-        self.versions.target << last_version.clone
-        self.versions.shift if self.class.version_max.present? && self.versions.length > self.class.version_max
+        versions.target << last_version.clone
+        versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
-        @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
+        @modifications["versions"] = [ nil, versions.to_hash ] if @modifications
       end
     end
   end
