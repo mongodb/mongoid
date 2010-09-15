@@ -62,7 +62,7 @@ describe Mongoid::Identity do
           @person = Person.allocate
           @person.instance_variable_set(:@attributes, {})
           @object_id = stub(:to_s => "1")
-          BSON::ObjectID.expects(:new).returns(@object_id)
+          BSON::ObjectId.expects(:new).returns(@object_id)
         end
 
         context "when using object ids" do

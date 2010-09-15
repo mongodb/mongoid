@@ -3,19 +3,19 @@ require "spec_helper"
 describe Mongoid::Persistence::Update do
 
   let(:document) do
-    Patient.new(:_id => BSON::ObjectID.new.to_s)
+    Patient.new(:_id => BSON::ObjectId.new.to_s)
   end
 
   let(:address) do
-    Address.new(:_id => BSON::ObjectID.new.to_s, :street => "Oxford St")
+    Address.new(:_id => BSON::ObjectId.new.to_s, :street => "Oxford St")
   end
 
   let(:root_category) do
-    RootCategory.instantiate("_id" => BSON::ObjectID.new.to_s)
+    RootCategory.instantiate("_id" => BSON::ObjectId.new.to_s)
   end
 
   let(:category) do
-    Category.instantiate("_id" => BSON::ObjectID.new.to_s, "name" => 'Programming')
+    Category.instantiate("_id" => BSON::ObjectId.new.to_s, "name" => 'Programming')
   end
 
   let(:collection) do
@@ -154,7 +154,7 @@ describe Mongoid::Persistence::Update do
 
       context "when the document is a tree" do
         let(:leaf_category) do
-          Category.new("_id" => BSON::ObjectID.new.to_s, "name" => 'Ruby')
+          Category.new("_id" => BSON::ObjectId.new.to_s, "name" => 'Ruby')
         end
 
         let(:embedded) do

@@ -42,7 +42,7 @@ module Mongoid #:nodoc:
     # Find a +Document+ in several different ways.
     #
     # If a +String+ is provided, it will be assumed that it is a
-    # representation of a Mongo::ObjectID and will attempt to find a single
+    # representation of a Mongo::ObjectId and will attempt to find a single
     # +Document+ based on that id. If a +Symbol+ and +Hash+ is provided then
     # it will attempt to find either a single +Document+ or multiples based
     # on the conditions provided and the first parameter.
@@ -51,7 +51,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find(:all, :conditions => { :attribute => "value" })</tt>
     #
-    # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
+    # <tt>Person.find(Mongo::ObjectId.new.to_s)</tt>
     def find(*args)
       raise Errors::InvalidOptions.new("Calling Document#find with nil is invalid") if args[0].nil?
       type = args.delete_at(0) if args[0].is_a?(Symbol)

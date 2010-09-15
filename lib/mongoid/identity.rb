@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       # Create the identity for the +Document+.
       #
       # The id will be set in either in the form of a Mongo
-      # +ObjectID+ or a composite key set up by defining a key on the document.
+      # +ObjectId+ or a composite key set up by defining a key on the document.
       #
       # The _type will be set to the document's class name.
       def create(doc)
@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
       protected
       # Return the proper id for the document.
       def generate_id
-        id = BSON::ObjectID.new
+        id = BSON::ObjectId.new
         Mongoid.use_object_ids ? id : id.to_s
       end
 
