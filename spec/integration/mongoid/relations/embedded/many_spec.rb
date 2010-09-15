@@ -747,6 +747,13 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#insert" do
+
+    it "inserts the document into the array"
+    it "reindexes the array"
+    it "flags the entire relation as dirty"
+  end
+
   describe "#paginate" do
 
     let(:person) do
@@ -774,5 +781,13 @@ describe Mongoid::Relations::Embedded::Many do
         addresses[1].street.should == "3 Bond St"
       end
     end
+  end
+
+
+  describe "#sort" do
+
+    it "sorts the relation"
+    it "reindexes the array"
+    it "flags the entire relation as dirty"
   end
 end
