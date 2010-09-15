@@ -59,6 +59,16 @@ describe Mongoid::Document do
     end
   end
 
+  describe "#===" do
+
+    context "when comparable is the same type" do
+
+      it "returns true" do
+        (person === Person.new).should be_true
+      end
+    end
+  end
+
   describe "._types" do
 
     context "when the document is subclassed" do

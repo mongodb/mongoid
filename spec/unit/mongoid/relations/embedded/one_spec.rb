@@ -39,6 +39,20 @@ describe Mongoid::Relations::Embedded::One do
     )
   end
 
+  describe "#===" do
+
+    let(:relation) do
+      klass.new(base, target, metadata)
+    end
+
+    context "when the proxied document is same class" do
+
+      it "returns true" do
+        (relation === Name.new).should be_true
+      end
+    end
+  end
+
   describe "#bind" do
 
     let(:relation) do

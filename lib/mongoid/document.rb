@@ -26,6 +26,23 @@ module Mongoid #:nodoc:
       id == other.id || equal?(other)
     end
 
+    # Performs class equality checking.
+    #
+    # Example:
+    #
+    # <tt>document === other</tt>
+    #
+    # Options:
+    #
+    # other: The other object to compare with
+    #
+    # Returns:
+    #
+    # true if the classes are equal, false if not.
+    def ===(other)
+      self.class == other.class
+    end
+
     # Delegates to ==. Used when needing checks in hashes.
     #
     # Example:
