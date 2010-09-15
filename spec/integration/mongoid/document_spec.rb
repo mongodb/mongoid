@@ -598,57 +598,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#as_json" do
-
-    before do
-      @person = Person.new(:title => "Sir", :age => 30)
-      @address = Address.new(:street => "Nan Jing Dong Lu")
-      @person.addresses << @address
-    end
-
-    context "on a new document" do
-
-      it "returns the document (not sure why ActiveModel behaves like this)" do
-        @person.as_json.should == @person
-      end
-    end
-
-    context "on a persisted document" do
-
-      it "returns the attributes" do
-        @person.save
-        from_db = Person.find(@person.id)
-        from_db.as_json.should == from_db
-      end
-    end
-  end
-
-  describe "#encode_json" do
-
-    before do
-      @person = Person.new(:title => "Sir", :age => 30)
-      @address = Address.new(:street => "Nan Jing Dong Lu")
-      @person.addresses << @address
-      @encoder = stub(:options => {})
-    end
-
-    context "on a new document" do
-
-      it "returns the attributes" do
-        @person.encode_json(@encoder).should include('"pets":false')
-      end
-    end
-
-    context "on a persisted document" do
-
-      it "returns the attributes" do
-        @person.save
-        from_db = Person.find(@person.id)
-        from_db.encode_json(@encoder).should include('"pets":false')
-      end
-    end
-  end
-
   context "typecasting" do
 
     before do
