@@ -19,9 +19,7 @@ module Mongoid # :nodoc:
             if bindable?
               inverse = metadata.inverse(target)
               base.metadata = target.reflect_on_association(inverse)
-              if base.embedded_many?
-                return target.send(inverse).push(base)
-              end
+              return target.send(inverse).push(base) if base.embedded_many?
               target.send(metadata.inverse_setter(target), base)
             end
           end
@@ -57,9 +55,7 @@ module Mongoid # :nodoc:
           #
           # true if the documents differ, false if not.
           def bindable?
-            if base.embedded_many?
-              return inverse && !inverse.target.include?(base)
-            end
+            return inverse && !inverse.target.include?(base) if base.embedded_many?
             !base.equal?(inverse ? inverse.target : nil)
           end
 
