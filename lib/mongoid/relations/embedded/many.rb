@@ -319,6 +319,11 @@ module Mongoid # :nodoc:
         # old_target: The previous target of the relation to unbind with.
         def unbind(old_target)
           binding(old_target).unbind
+          if base.persisted?
+            old_target.each do |doc|
+              doc.delete unless doc.destroyed?
+            end
+          end
         end
 
         private

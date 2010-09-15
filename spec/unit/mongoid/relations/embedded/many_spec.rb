@@ -542,9 +542,73 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   describe "#find_or_create_by" do
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    context "when the document exists" do
+
+      let!(:document) do
+        relation.build(:street => "Upper St")
+      end
+
+      let(:matching) do
+        relation.find_or_create_by(:street => "Upper St")
+      end
+
+      it "returns the document" do
+        matching.should == document
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:new_document) do
+        relation.find_or_create_by(:street => "Upper St")
+      end
+
+      before do
+        Address.any_instance.expects(:save)
+      end
+
+      it "creates the document" do
+        new_document.street.should == "Upper St"
+      end
+    end
   end
 
   describe "#find_or_initialize_by" do
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    context "when the document exists" do
+
+      let!(:document) do
+        relation.build(:street => "Upper St")
+      end
+
+      let(:matching) do
+        relation.find_or_initialize_by(:street => "Upper St")
+      end
+
+      it "returns the document" do
+        matching.should == document
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:new_document) do
+        relation.find_or_initialize_by(:street => "Upper St")
+      end
+
+      it "returns a new document" do
+        new_document.street.should == "Upper St"
+      end
+    end
   end
 
   describe ".macro" do
@@ -563,9 +627,77 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   describe "#paginate" do
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    before do
+      4.times do |n|
+        relation.build(:street => "#{n} Bond St", :city => "London")
+      end
+    end
+
+    context "when provided page and per page options" do
+
+      let(:addresses) do
+        relation.paginate(:page => 2, :per_page => 2)
+      end
+
+      it "returns the correct number of documents" do
+        addresses.size.should == 2
+      end
+
+      it "returns the supplied page of documents" do
+        addresses[0].street.should == "2 Bond St"
+        addresses[1].street.should == "3 Bond St"
+      end
+    end
   end
 
   describe "#substitute" do
+
+    let(:relation) do
+      klass.new(base, target, metadata)
+    end
+
+    context "when passing documents" do
+
+      let(:document) do
+        Address.new(:street => "Broadway")
+      end
+
+      before do
+        binding_klass.expects(:new).returns(binding)
+        binding.expects(:bind_all).returns(true)
+        @substitute = relation.substitute([ document ])
+      end
+
+      it "sets a new target" do
+        relation.target.should == [ document ]
+      end
+
+      it "returns the relation" do
+        @substitute.should == relation
+      end
+    end
+
+    context "when passing nil" do
+
+      before do
+        binding_klass.expects(:new).returns(binding)
+        binding.expects(:unbind)
+        @substitute = relation.substitute(nil)
+      end
+
+      it "sets a new target" do
+        relation.target.should == []
+      end
+
+      it "returns the relation" do
+        @substitute.should be_empty
+      end
+    end
   end
 
   describe "#to_hash" do
@@ -576,5 +708,49 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   describe "#unbind" do
+
+    let(:relation) do
+      klass.new(base, [], metadata)
+    end
+
+    let!(:document) do
+      Address.new
+    end
+
+    context "when the base is persisted" do
+
+      context "when the target has not been destroyed" do
+
+        before do
+          base.expects(:persisted?).returns(true)
+        end
+
+        it "deletes the target" do
+          document.expects(:delete).returns(true)
+          relation.unbind([ document ])
+        end
+      end
+
+      context "when the target is already destroyed" do
+
+        before do
+          base.expects(:persisted?).returns(true)
+          document.expects(:destroyed?).returns(true)
+        end
+
+        it "does not delete the target" do
+          target.expects(:delete).never
+          relation.unbind([ document ])
+        end
+      end
+    end
+
+    context "when the base is not persisted" do
+
+      it "does not delete the target" do
+        document.expects(:delete).never
+        relation.unbind([ document ])
+      end
+    end
   end
 end
