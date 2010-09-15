@@ -2,13 +2,9 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::Many do
 
-  before do
-    # Mongoid.master.connection.instance_variable_set(:@logger, Logger.new($stdout))
-  end
-
   [ :<<, :push, :concat ].each do |method|
 
-    describe "#{method}" do
+    describe "##{method}" do
 
       context "when the parent is a new record" do
 

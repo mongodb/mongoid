@@ -444,14 +444,11 @@ module Mongoid # :nodoc:
               target.delete(doc)
               destroy ? doc.destroy : doc.delete
             end
+            reindex
           end
         end
 
         class << self
-
-          def binding(base, target, metadata)
-            Bindings::Embedded::Many.new(base, target, metadata)
-          end
 
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
