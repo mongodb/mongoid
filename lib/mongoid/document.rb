@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     included do
       include Mongoid::Components
-      attr_accessor :new_record
+      attr_accessor :new_record, :reindexed
     end
 
     # Performs equality checking on the document ids. For more robust
@@ -183,6 +183,10 @@ module Mongoid #:nodoc:
           end
         end
       end
+    end
+
+    def reindexed?
+      !!reindexed
     end
 
     # TODO: Need to reindex at this point for embeds many.

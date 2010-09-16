@@ -141,7 +141,7 @@ module Mongoid # :nodoc:
         #
         # The deleted document or nil if nothing deleted.
         def delete(document)
-          target.delete(document).tap { reindex }
+          target.delete(document).tap { reindex(false) }
         end
 
         # Delete all the documents in the association without running callbacks.
@@ -249,6 +249,34 @@ module Mongoid # :nodoc:
               doc.parentize(base)
               doc._index = index
             end
+          end
+        end
+
+        # Insert a document into the association at index. Will persist the
+        # association and parent; and reindex the association
+        #
+        # Example:
+        #
+        # <tt>person.addresses.insert(0, address)
+        #
+        # Returns:
+        #
+        # The association.
+        def insert(index, document)
+          tap do |relation|
+            relation.target.insert(index, document)
+            document.parentize(base)
+            metadatafy(document)
+            reindex
+            Mongoid.logger.warn(
+              ::I18n.translate(
+                "mongoid.warnings.messages.reindexing",
+                :name => metadata.name,
+                :method => "#insert"
+              )
+            )
+            document._root.save
+            clear_reindexed
           end
         end
 
@@ -361,6 +389,10 @@ module Mongoid # :nodoc:
           Bindings::Embedded::Many.new(base, new_target || target, metadata)
         end
 
+        def clear_reindexed
+          target.each { |doc| doc.reindexed = false }
+        end
+
         # Returns the criteria object for the target class with its documents set
         # to target.
         #
@@ -424,9 +456,10 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>person.addresses.reindex</tt>
-        def reindex
+        def reindex(flag = true)
           target.each_with_index do |doc, index|
             doc._index = index
+            doc.reindexed = true if flag
           end
         end
 
@@ -449,7 +482,7 @@ module Mongoid # :nodoc:
               target.delete(doc)
               destroy ? doc.destroy : doc.delete
             end
-            reindex
+            reindex(false)
           end
         end
 

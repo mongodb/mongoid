@@ -122,9 +122,7 @@ module Mongoid #:nodoc
     #
     # <tt>Config.logger</tt>
     def logger
-      return @logger if defined?(@logger)
-
-      @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+      @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
     end
 
     # Sets the logger for Mongoid to use.

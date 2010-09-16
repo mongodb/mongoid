@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::Many do
 
+  before do
+    Person.delete_all
+  end
+
   [ :<<, :push, :concat ].each do |method|
 
     describe "##{method}" do
@@ -749,9 +753,53 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#insert" do
 
-    it "inserts the document into the array"
-    it "reindexes the array"
-    it "flags the entire relation as dirty"
+    let(:person) do
+      Person.create(:ssn => "333-33-1121")
+    end
+
+    let!(:address_one) do
+      person.addresses.create(:street => "Bourke")
+    end
+
+    let!(:address_two) do
+      person.addresses.create(:street => "King")
+    end
+
+    let(:address_three) do
+      Address.new(:street => "Queen")
+    end
+
+    let!(:relation) do
+      person.addresses.insert(0, address_three)
+    end
+
+    it "inserts the document into the array" do
+      person.addresses[0].should == address_three
+    end
+
+    it "reindexes the array" do
+      address_one._index.should == 1
+    end
+
+    it "persists the new array" do
+      person.reload.addresses.should == [ address_three, address_one, address_two ]
+    end
+
+    it "returns the relation" do
+      relation.should == person.addresses
+    end
+
+    it "sets the parent of the inserted document" do
+      address_three._parent.should == person
+    end
+
+    it "sets the metadata on the inserted document" do
+      address_three.metadata.should == person.addresses.metadata
+    end
+
+    it "resets the document as reindexed" do
+      address_three.should_not be_reindexed
+    end
   end
 
   describe "#paginate" do
@@ -782,7 +830,6 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
-
 
   describe "#sort" do
 
