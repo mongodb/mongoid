@@ -37,6 +37,10 @@ class Address
     self.parent_title = addressable.title if set
   end
 
+  def <=>(other)
+    street <=> other.street
+  end
+
   class << self
     def california
       where(:state => "CA")

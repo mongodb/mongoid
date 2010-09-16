@@ -264,19 +264,11 @@ module Mongoid # :nodoc:
         # The association.
         def insert(index, document)
           tap do |relation|
-            relation.target.insert(index, document)
-            document.parentize(base)
-            metadatafy(document)
-            reindex
-            Mongoid.logger.warn(
-              ::I18n.translate(
-                "mongoid.warnings.messages.reindexing",
-                :name => metadata.name,
-                :method => "#insert"
-              )
-            )
-            document._root.save
-            clear_reindexed
+            non_atomic_save("insert") do
+              relation.target.insert(index, document)
+              document.parentize(base)
+              metadatafy(document)
+            end
           end
         end
 
@@ -294,6 +286,14 @@ module Mongoid # :nodoc:
           criteria = Mongoid::Criteria.translate(metadata.klass, options)
           criteria.documents = target
           criteria.paginate(options)
+        end
+
+        def sort!
+          tap do |relation|
+            non_atomic_save("sort!") do
+              target.sort!
+            end
+          end
         end
 
         # Substitutes the supplied target documents for the existing documents
@@ -461,6 +461,20 @@ module Mongoid # :nodoc:
             doc._index = index
             doc.reindexed = true if flag
           end
+        end
+
+        def non_atomic_save(method, &block)
+          yield block
+          reindex
+          Mongoid.logger.warn(
+            ::I18n.translate(
+              "mongoid.warnings.messages.reindexing",
+              :name => metadata.name,
+              :method => "##{method}"
+            )
+          )
+          target.first._root.save unless target.empty?
+          clear_reindexed
         end
 
         # Remove all documents from the relation, either with a delete or a

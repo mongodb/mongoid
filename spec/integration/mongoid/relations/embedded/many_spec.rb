@@ -831,10 +831,49 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#sort" do
+  describe "#sort!" do
 
-    it "sorts the relation"
-    it "reindexes the array"
-    it "flags the entire relation as dirty"
+    let(:person) do
+      Person.create(:ssn => "333-33-1121")
+    end
+
+    let!(:address_one) do
+      person.addresses.create(:street => "King")
+    end
+
+    let!(:address_two) do
+      person.addresses.create(:street => "Bourke")
+    end
+
+    let!(:relation) do
+      person.addresses.sort!
+    end
+
+    it "reindexes the array" do
+      address_one._index.should == 1
+    end
+
+    it "persists the new array" do
+      person.reload.addresses.should == [ address_two, address_one ]
+    end
+
+    it "returns the relation" do
+      relation.should == person.addresses
+    end
+
+    it "resets the document as reindexed" do
+      address_one.should_not be_reindexed
+    end
+
+    context "when there are no documents in the relation" do
+
+      let(:document) do
+        Person.create(:ssn => "112-20-1231")
+      end
+
+      it "returns the relation" do
+        document.addresses.sort!.should == []
+      end
+    end
   end
 end

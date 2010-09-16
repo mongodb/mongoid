@@ -7,6 +7,21 @@ module Mongoid #:nodoc:
       attr_accessor :new_record, :reindexed
     end
 
+    # Default comparison is via the string version of the id.
+    #
+    # Example:
+    #
+    # <tt>person <=> person</tt>
+    #
+    # Options:
+    #
+    # other: The document to compare with.
+    #
+    # Returns -1, 0, 1.
+    def <=>(other)
+      id.to_s <=> other.id.to_s
+    end
+
     # Performs equality checking on the document ids. For more robust
     # equality checking please override this method.
     #
@@ -41,21 +56,6 @@ module Mongoid #:nodoc:
     # true if the classes are equal, false if not.
     def ===(other)
       self.class == other.class
-    end
-
-    # Default comparison is via the string version of the id.
-    #
-    # Example:
-    #
-    # <tt>person <=> person</tt>
-    #
-    # Options:
-    #
-    # other: The document to compare with.
-    #
-    # Returns -1, 0, 1.
-    def <=>(other)
-      id.to_s <=> other.id.to_s
     end
 
     # Delegates to ==. Used when needing checks in hashes.

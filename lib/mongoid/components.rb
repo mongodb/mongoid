@@ -33,7 +33,6 @@ module Mongoid #:nodoc
       include Mongoid::State
       include Mongoid::Validations
       include Mongoid::Callbacks
-      include Comparable
       extend ActiveModel::Translation
       extend Mongoid::Finders
       extend Mongoid::NamedScope
