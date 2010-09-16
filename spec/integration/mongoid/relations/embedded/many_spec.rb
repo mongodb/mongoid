@@ -129,6 +129,28 @@ describe Mongoid::Relations::Embedded::Many do
         address.should be_persisted
       end
     end
+
+    context "when replacing an existing relation" do
+
+      let(:person) do
+        Person.create(:ssn => "999-98-9988", :addresses => [
+          Address.new(:street => "1st St"),
+          Address.new(:street => "2nd St")
+        ])
+      end
+
+      let(:address) do
+        Address.new(:street => "3rd St")
+      end
+
+      before do
+        person.addresses = [ address ]
+      end
+
+      it "deletes the old documents" do
+        person.reload.addresses.should == [ address ]
+      end
+    end
   end
 
   describe "#= nil" do

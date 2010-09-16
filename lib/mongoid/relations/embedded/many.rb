@@ -325,7 +325,12 @@ module Mongoid # :nodoc:
           old_target = target
           tap do |relation|
             relation.target = new_target || []
-            !new_target.blank? ? bind(building) : unbind(old_target)
+            if !new_target.blank?
+              unbind(old_target)
+              bind(building)
+            else
+              unbind(old_target)
+            end
           end
         end
 

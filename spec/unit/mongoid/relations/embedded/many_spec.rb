@@ -668,7 +668,8 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       before do
-        binding_klass.expects(:new).returns(binding)
+        binding_klass.expects(:new).twice.returns(binding)
+        binding.expects(:unbind)
         binding.expects(:bind_all).returns(true)
         @substitute = relation.substitute([ document ])
       end
