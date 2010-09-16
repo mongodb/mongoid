@@ -288,10 +288,21 @@ module Mongoid # :nodoc:
           criteria.paginate(options)
         end
 
-        def sort!
+        # Sort the relation in place. This causes potential data corruption
+        # since MongoDB does not have the equivalent operation on the database
+        # side.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.sort!</tt>
+        #
+        # Returns:
+        #
+        # The relation, sorted.
+        def sort!(&block)
           tap do |relation|
             non_atomic_save("sort!") do
-              target.sort!
+              target.sort!(&block)
             end
           end
         end

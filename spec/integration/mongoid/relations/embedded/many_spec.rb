@@ -833,36 +833,39 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#sort!" do
 
-    let(:person) do
-      Person.create(:ssn => "333-33-1121")
-    end
+    context "when documents exist" do
 
-    let!(:address_one) do
-      person.addresses.create(:street => "King")
-    end
+      let(:person) do
+        Person.create(:ssn => "333-33-1121")
+      end
 
-    let!(:address_two) do
-      person.addresses.create(:street => "Bourke")
-    end
+      let!(:address_one) do
+        person.addresses.create(:street => "King")
+      end
 
-    let!(:relation) do
-      person.addresses.sort!
-    end
+      let!(:address_two) do
+        person.addresses.create(:street => "Bourke")
+      end
 
-    it "reindexes the array" do
-      address_one._index.should == 1
-    end
+      let!(:relation) do
+        person.addresses.sort!
+      end
 
-    it "persists the new array" do
-      person.reload.addresses.should == [ address_two, address_one ]
-    end
+      it "reindexes the array" do
+        address_one._index.should == 1
+      end
 
-    it "returns the relation" do
-      relation.should == person.addresses
-    end
+      it "persists the new array" do
+        person.reload.addresses.should == [ address_two, address_one ]
+      end
 
-    it "resets the document as reindexed" do
-      address_one.should_not be_reindexed
+      it "returns the relation" do
+        relation.should == person.addresses
+      end
+
+      it "resets the document as reindexed" do
+        address_one.should_not be_reindexed
+      end
     end
 
     context "when there are no documents in the relation" do
@@ -873,6 +876,31 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "returns the relation" do
         document.addresses.sort!.should == []
+      end
+    end
+
+    context "when providing a block" do
+
+      let(:person) do
+        Person.create(:ssn => "333-33-1121")
+      end
+
+      let!(:address_one) do
+        person.addresses.create(:street => "King")
+      end
+
+      let!(:address_two) do
+        person.addresses.create(:street => "Bourke")
+      end
+
+      let!(:sorted) do
+        person.addresses.sort! do |first, second|
+          first.id.to_s <=> second.id.to_s
+        end
+      end
+
+      it "sorts the relation using the block" do
+        sorted.should == [ address_two, address_one ]
       end
     end
   end
