@@ -69,6 +69,21 @@ describe Mongoid::Document do
     end
   end
 
+  describe "#<=>" do
+
+    let(:first) do
+      Person.new
+    end
+
+    let(:second) do
+      Person.new
+    end
+
+    it "compares based on the document id" do
+      (first <=> second ).should == -1
+    end
+  end
+
   describe "._types" do
 
     context "when the document is subclassed" do
