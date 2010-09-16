@@ -315,6 +315,17 @@ describe Mongoid::Relations::Embedded::Many do
     it "writes to the attributes" do
       address.street.should == "Bond"
     end
+
+    context "when embedding a multi word named document" do
+
+      let!(:component) do
+        person.address_components.create(:street => "Test")
+      end
+
+      it "saves the embedded document" do
+        person.reload.address_components.first.should == component
+      end
+    end
   end
 
   describe "#create!" do

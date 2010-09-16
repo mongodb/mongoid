@@ -44,6 +44,7 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
+  embeds_many :address_components
 
   embeds_one :pet, :class_name => "Animal"
   embeds_one :name, :as => :namable do

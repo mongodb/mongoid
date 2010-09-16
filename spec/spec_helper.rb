@@ -28,3 +28,7 @@ Rspec.configure do |config|
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
   end
 end
+
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.singular("address_components", "address_component")
+end
