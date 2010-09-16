@@ -25,7 +25,11 @@ module Mongoid #:nodoc:
       def validate_each(document, attribute, value)
         values = value.is_a?(Array) ? value : [ value ]
         return if values.collect { |doc| doc.nil? || doc.valid? }.all?
-        document.errors.add(attribute, :invalid, options.merge(:value => value))
+        values.each do |doc|
+          unless doc.valid?
+            document.errors.add(attribute, doc.errors.full_messages)
+          end
+        end
       end
     end
   end
