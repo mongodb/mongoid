@@ -488,8 +488,8 @@ describe Mongoid::Relations::Embedded::Many do
 
         context "when conditions are provided" do
 
-          before do
-            @deleted = person.addresses.send(
+          let!(:deleted) do
+            person.addresses.send(
               method,
               :conditions => { :street => "Bond" }
             )
@@ -500,7 +500,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "returns the number deleted" do
-            @deleted.should == 1
+            deleted.should == 1
           end
         end
 
@@ -516,6 +516,30 @@ describe Mongoid::Relations::Embedded::Many do
 
           it "returns the number deleted" do
             @deleted.should == 2
+          end
+        end
+
+        context "when removing and resaving" do
+
+          let(:owner) do
+            PetOwner.create(:title => "AKC")
+          end
+
+          before do
+            owner.pet = Pet.new(:name => "Fido")
+            owner.pet.vet_visits << VetVisit.new(:date => Date.today)
+            owner.save!
+            owner.pet.vet_visits.destroy_all
+          end
+
+          it "removes the documents" do
+            owner.pet.vet_visits.should be_empty
+          end
+
+          it "allows addition and a resave" do
+            owner.pet.vet_visits << VetVisit.new(:date => Date.today)
+            owner.save!
+            owner.pet.vet_visits.first.should be_persisted
           end
         end
       end
