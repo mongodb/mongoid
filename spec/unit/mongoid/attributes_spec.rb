@@ -4,54 +4,54 @@ describe Mongoid::Attributes do
 
   describe "#[]" do
 
+    let(:person) do
+      Person.new
+    end
+
     context "when attribute does not exist" do
 
-      before do
-        @person = Person.new
-      end
-
       it "returns the default value" do
-        @person[:age].should == 100
-        @person[:pets].should == false
+        person[:age].should == 100
       end
     end
 
     context "when attribute is not accessible" do
 
       before do
-        @person = Person.new
-        @person.owner_id = 5
+        person.owner_id = 5
       end
 
       it "returns the value" do
-        @person[:owner_id].should == 5
+        person[:owner_id].should == 5
       end
     end
   end
 
   describe "#[]=" do
 
+    let(:person) do
+      Person.new
+    end
+
     context "when setting the attribute to nil" do
 
       before do
-        @person = Person.new
+        person[:age] = nil
       end
 
       it "does not use the default value" do
-        @person[:age] = nil
-        @person.age.should be_nil
+        person.age.should be_nil
       end
     end
 
     context "when field has a default value" do
 
       before do
-        @person = Person.new
+        person[:terms] = true
       end
 
       it "should allow overwriting of the default value" do
-        @person[:terms] = true
-        @person.terms.should be_true
+        person.terms.should be_true
       end
     end
   end
@@ -212,34 +212,34 @@ describe Mongoid::Attributes do
 
     context "when the field is not _id" do
 
-      before do
-        @account = Account.new(:balance => 999999)
+      let(:account) do
+        Account.new(:balance => 999999)
       end
 
       it "prevents setting via mass assignment" do
-        @account.balance.should be_nil
+        account.balance.should be_nil
       end
     end
 
     context "when the field is _id" do
 
-      before do
-        @account = Account.new(:_id => "ABBA")
+      let(:account) do
+        Account.new(:_id => "ABBA")
       end
 
       it "prevents setting via mass assignment" do
-        @account._id.should_not == "ABBA"
+        account._id.should_not == "ABBA"
       end
     end
 
     context "when using instantiate" do
 
-      before do
-        @account = Account.instantiate("_id" => "1", "balance" => "ABBA")
+      let(:account) do
+        Account.instantiate("_id" => "1", "balance" => "ABBA")
       end
 
       it "ignores any protected attribute" do
-        @account.balance.should == "ABBA"
+        account.balance.should == "ABBA"
       end
     end
   end
@@ -248,109 +248,116 @@ describe Mongoid::Attributes do
 
     context "when the field is not _id" do
 
-      before do
-        @person = Person.new(:security_code => "ABBA")
+      let(:person) do
+        Person.new(:security_code => "ABBA")
       end
 
       it "prevents setting via mass assignment" do
-        @person.security_code.should be_nil
+        person.security_code.should be_nil
       end
     end
 
     context "when the field is _id" do
 
-      before do
-        @game = Game.new(:_id => "ABBA")
+      let(:game) do
+        Game.new(:_id => "ABBA")
       end
 
       it "prevents setting via mass assignment" do
-        @game._id.should_not == "ABBA"
+        game._id.should_not == "ABBA"
       end
     end
 
     context "when using instantiate" do
 
-      before do
-        @person = Person.instantiate("_id" => "1", "security_code" => "ABBA")
+      let(:person) do
+        Person.instantiate("_id" => "1", "security_code" => "ABBA")
       end
 
       it "ignores any protected attribute" do
-        @person.security_code.should == "ABBA"
+        person.security_code.should == "ABBA"
       end
     end
   end
 
   describe "#_id" do
 
-    before do
-      @person = Person.new
+    let(:person) do
+      Person.new
     end
 
     it "delegates to #id" do
-      @person._id.should == @person.id
+      person._id.should == person.id
     end
-
   end
 
   describe "#_id=" do
 
+    let(:person) do
+      Person.new
+    end
+
+    let(:bson_id) do
+      BSON::ObjectId.new
+    end
+
     before do
-      @person = Person.new
+      person._id = bson_id
     end
 
     it "delegates to #id=" do
-      @id = BSON::ObjectId.new.to_s
-      @person._id = @id
-      @person.id.should == @id
+      person.id.should == bson_id
     end
-
   end
 
   describe "#method_missing" do
 
+    let(:attributes) do
+      { :testing => "Testing" }
+    end
+
+    let(:person) do
+      Person.new(attributes)
+    end
+
     before do
       Mongoid.configure.allow_dynamic_fields = true
-      @attributes = {
-        :testing => "Testing"
-      }
-      @person = Person.new(@attributes)
     end
 
     context "when an attribute exists" do
 
       it "allows the getter" do
-        @person.testing.should == "Testing"
+        person.testing.should == "Testing"
       end
 
       it "allows the setter" do
-        @person.testing = "Test"
-        @person.testing.should == "Test"
+        person.testing = "Test"
+        person.testing.should == "Test"
       end
 
       it "returns true for respond_to?" do
-        @person.respond_to?(:testing).should == true
+        person.respond_to?(:testing).should == true
       end
     end
-
   end
 
   describe "#process" do
 
     context "when passing non accessible fields" do
 
-      before do
-        @person = Person.new(:owner_id => 6)
+      let(:person) do
+        Person.new(:owner_id => 6)
       end
 
       it "does not set the value" do
-        @person.owner_id.should be_nil
+        person.owner_id.should be_nil
       end
     end
 
     context "when attributes dont have fields defined" do
 
-      before do
-        @attributes = {
+      let(:attributes) do
+        {
           :nofieldstring => "Testing",
           :nofieldint => 5,
           :employer => Employer.new
@@ -359,37 +366,38 @@ describe Mongoid::Attributes do
 
       context "when allowing dynamic fields" do
 
+        let!(:person) do
+          Person.new(attributes)
+        end
+
         before do
           Mongoid.configure.allow_dynamic_fields = true
-          @person = Person.new(@attributes)
         end
 
         context "when attribute is a string" do
 
           it "adds the string to the attributes" do
-            @person.attributes[:nofieldstring].should == "Testing"
+            person.attributes[:nofieldstring].should == "Testing"
           end
-
         end
 
         context "when attribute is not a string" do
 
           it "adds a cast value to the attributes" do
-            @person.attributes[:nofieldint].should == 5
+            person.attributes[:nofieldint].should == 5
           end
-
         end
-
       end
 
       context "when not allowing dynamic fields" do
 
+        let!(:attributes) do
+          { :nofieldstring => "Testing" }
+        end
+
         before do
           Mongoid.configure.allow_dynamic_fields = false
           Person.fields.delete(:nofieldstring)
-          @attributes = {
-            :nofieldstring => "Testing"
-          }
         end
 
         after do
@@ -397,17 +405,15 @@ describe Mongoid::Attributes do
         end
 
         it "raises an error" do
-          lambda { Person.new(@attributes) }.should raise_error
+          lambda { Person.new(attributes) }.should raise_error
         end
-
       end
-
     end
 
-    context "when supplied hash has values" do
+    context "when supplied hash has string values" do
 
-      before do
-        @attributes = {
+      let!(:attributes) do
+        {
           :_id => "1",
           :title => "value",
           :age => "30",
@@ -423,14 +429,25 @@ describe Mongoid::Attributes do
         }
       end
 
-      it "returns properly cast attributes" do
-        attrs = Person.new(@attributes).attributes
-        attrs[:age].should == 30
-        attrs[:terms].should == true
-        attrs[:_id].should == "1"
-        attrs[:score].should be_nil
+      let!(:person) do
+        Person.new(attributes)
       end
 
+      it "casts integers" do
+        person.attributes[:age].should == 30
+      end
+
+      it "casts booleans" do
+        person.attributes[:terms].should == true
+      end
+
+      it "casts ids" do
+        person.attributes[:_id].should == "1"
+      end
+
+      it "sets empty strings to nil" do
+        person.attributes[:score].should be_nil
+      end
     end
 
     context "when associations provided in the attributes" do
