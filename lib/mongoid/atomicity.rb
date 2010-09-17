@@ -68,22 +68,16 @@ module Mongoid #:nodoc:
     end
 
     def pushable?
-      new_record? && embedded_many? && _parent.persisted? && !reindexed?
+      new_record? && embedded_many? && _parent.persisted?
     end
 
     # Get all the attributes that need to be set.
     def _sets
-      if resetable?
-        { _path => _parent.send(metadata.name).to_hash }
-      elsif changed? && !new_record?
+      if changed? && !new_record?
         setters
       else
         embedded_one? && new_record? ? { _path => to_hash } : {}
       end
-    end
-
-    def resetable?
-      embedded_many? && reindexed? && _parent.persisted?
     end
   end
 end

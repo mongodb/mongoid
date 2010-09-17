@@ -141,7 +141,7 @@ module Mongoid # :nodoc:
         #
         # The deleted document or nil if nothing deleted.
         def delete(document)
-          target.delete(document).tap { reindex(false) }
+          target.delete(document).tap { reindex }
         end
 
         # Delete all the documents in the association without running callbacks.
@@ -252,26 +252,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Insert a document into the association at index. Will persist the
-        # association and parent; and reindex the association
-        #
-        # Example:
-        #
-        # <tt>person.addresses.insert(0, address)
-        #
-        # Returns:
-        #
-        # The association.
-        def insert(index, document)
-          tap do |relation|
-            non_atomic_save("insert") do
-              relation.target.insert(index, document)
-              document.parentize(base)
-              metadatafy(document)
-            end
-          end
-        end
-
         # Paginate the association. Will create a new criteria, set the documents
         # on it and execute in an enumerable context.
         #
@@ -286,25 +266,6 @@ module Mongoid # :nodoc:
           criteria = Mongoid::Criteria.translate(metadata.klass, options)
           criteria.documents = target
           criteria.paginate(options)
-        end
-
-        # Sort the relation in place. This causes potential data corruption
-        # since MongoDB does not have the equivalent operation on the database
-        # side.
-        #
-        # Example:
-        #
-        # <tt>person.addresses.sort!</tt>
-        #
-        # Returns:
-        #
-        # The relation, sorted.
-        def sort!(&block)
-          tap do |relation|
-            non_atomic_save("sort!") do
-              target.sort!(&block)
-            end
-          end
         end
 
         # Substitutes the supplied target documents for the existing documents
@@ -405,10 +366,6 @@ module Mongoid # :nodoc:
           Bindings::Embedded::Many.new(base, new_target || target, metadata)
         end
 
-        def clear_reindexed
-          target.each { |doc| doc.reindexed = false }
-        end
-
         # Returns the criteria object for the target class with its documents set
         # to target.
         #
@@ -472,25 +429,10 @@ module Mongoid # :nodoc:
         # Example:
         #
         # <tt>person.addresses.reindex</tt>
-        def reindex(flag = true)
+        def reindex
           target.each_with_index do |doc, index|
             doc._index = index
-            doc.reindexed = true if flag
           end
-        end
-
-        def non_atomic_save(method, &block)
-          yield block
-          reindex
-          Mongoid.logger.warn(
-            ::I18n.translate(
-              "mongoid.warnings.messages.reindexing",
-              :name => metadata.name,
-              :method => "##{method}"
-            )
-          )
-          target.first._root.save unless target.empty?
-          clear_reindexed
         end
 
         # Remove all documents from the relation, either with a delete or a
@@ -512,7 +454,7 @@ module Mongoid # :nodoc:
               target.delete(doc)
               destroy ? doc.destroy : doc.delete
             end
-            reindex(false)
+            reindex
           end
         end
 

@@ -808,57 +808,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#insert" do
-
-    let(:person) do
-      Person.create(:ssn => "333-33-1121")
-    end
-
-    let!(:address_one) do
-      person.addresses.create(:street => "Bourke")
-    end
-
-    let!(:address_two) do
-      person.addresses.create(:street => "King")
-    end
-
-    let(:address_three) do
-      Address.new(:street => "Queen")
-    end
-
-    let!(:relation) do
-      person.addresses.insert(0, address_three)
-    end
-
-    it "inserts the document into the array" do
-      person.addresses[0].should == address_three
-    end
-
-    it "reindexes the array" do
-      address_one._index.should == 1
-    end
-
-    it "persists the new array" do
-      person.reload.addresses.should == [ address_three, address_one, address_two ]
-    end
-
-    it "returns the relation" do
-      relation.should == person.addresses
-    end
-
-    it "sets the parent of the inserted document" do
-      address_three._parent.should == person
-    end
-
-    it "sets the metadata on the inserted document" do
-      address_three.metadata.should == person.addresses.metadata
-    end
-
-    it "resets the document as reindexed" do
-      address_three.should_not be_reindexed
-    end
-  end
-
   describe "#paginate" do
 
     let(:person) do
@@ -884,80 +833,6 @@ describe Mongoid::Relations::Embedded::Many do
       it "returns the supplied page of documents" do
         addresses[0].street.should == "2 Bond St"
         addresses[1].street.should == "3 Bond St"
-      end
-    end
-  end
-
-  describe "#sort!" do
-
-    context "when documents exist" do
-
-      let(:person) do
-        Person.create(:ssn => "333-33-1121")
-      end
-
-      let!(:address_one) do
-        person.addresses.create(:street => "King")
-      end
-
-      let!(:address_two) do
-        person.addresses.create(:street => "Bourke")
-      end
-
-      let!(:relation) do
-        person.addresses.sort!
-      end
-
-      it "reindexes the array" do
-        address_one._index.should == 1
-      end
-
-      it "persists the new array" do
-        person.reload.addresses.should == [ address_two, address_one ]
-      end
-
-      it "returns the relation" do
-        relation.should == person.addresses
-      end
-
-      it "resets the document as reindexed" do
-        address_one.should_not be_reindexed
-      end
-    end
-
-    context "when there are no documents in the relation" do
-
-      let(:document) do
-        Person.create(:ssn => "112-20-1231")
-      end
-
-      it "returns the relation" do
-        document.addresses.sort!.should == []
-      end
-    end
-
-    context "when providing a block" do
-
-      let(:person) do
-        Person.create(:ssn => "333-33-1121")
-      end
-
-      let!(:address_one) do
-        person.addresses.create(:street => "King")
-      end
-
-      let!(:address_two) do
-        person.addresses.create(:street => "Bourke")
-      end
-
-      let!(:sorted) do
-        person.addresses.sort! do |first, second|
-          first.id.to_s <=> second.id.to_s
-        end
-      end
-
-      it "sorts the relation using the block" do
-        sorted.should == [ address_two, address_one ]
       end
     end
   end
