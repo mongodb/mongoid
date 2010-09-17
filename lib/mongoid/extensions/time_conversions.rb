@@ -30,13 +30,13 @@ module Mongoid #:nodoc:
             if Mongoid::Config.instance.use_activesupport_time_zone?
               ::Time.zone.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
             else
-              ::Time.utc(value.year, value.month, value.day, value.hour, value.min, value.sec)
+              ::Time.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
             end
           when ::Date
             if Mongoid::Config.instance.use_activesupport_time_zone?
               ::Time.zone.local(value.year, value.month, value.day)
             else
-              ::Time.utc(value.year, value.month, value.day)
+              ::Time.local(value.year, value.month, value.day)
             end
           else value
         end
