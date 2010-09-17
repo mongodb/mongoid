@@ -178,6 +178,25 @@ describe Mongoid::Relations::Embedded::Many do
         tracking_id.reload.validation_history.size.should == 1
       end
     end
+
+    context "when the relation has address in the name" do
+
+      let(:slave) do
+        Slave.new(:first_name => "Test")
+      end
+
+      before do
+        ActiveSupport::Inflector.inflections do |inflect|
+          inflect.singular("address_numbers", "address_number")
+        end
+        slave.address_numbers << AddressNumber.new(:country_code => 1)
+        slave.save
+      end
+
+      it "requires an inflection to determine the class" do
+        slave.reload.address_numbers.size.should == 1
+      end
+    end
   end
 
   describe "#= nil" do
