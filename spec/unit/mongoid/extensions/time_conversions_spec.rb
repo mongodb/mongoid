@@ -39,6 +39,7 @@ describe Mongoid::Extensions::TimeConversions do
     context "when given a Time" do
       it "converts to a utc time" do
         Time.set(@time).utc_offset.should == 0
+        Time.set(@time).utc_offset.should == 0
       end
 
       it "strips miliseconds" do
@@ -98,6 +99,45 @@ describe Mongoid::Extensions::TimeConversions do
           Time.get(@time).should == @time
         end
       end
+
+      context "when using the ActiveSupport time zone" do
+        before do
+          Mongoid::Config.instance.use_activesupport_time_zone = true
+          Time.zone = "Stockholm"
+        end
+        after do 
+          Time.zone = nil
+          Mongoid::Config.instance.use_activesupport_time_zone = false 
+        end
+
+        it "returns an ActiveSupport::TimeWithZone" do
+          Time.get(@time).class.should == ActiveSupport::TimeWithZone
+        end
+
+        context "when the local time is not observing daylight saving" do
+          before { @time = Time.utc(2010, 11, 19, 12) }
+
+          it "returns the local time" do
+            Time.get(@time).should == Time.zone.local(2010, 11, 19, 13)
+          end
+        end
+
+        context "when the local time is observing daylight saving" do
+          before { @time = Time.utc(2010, 9, 19, 12) }
+
+          it "returns the local time" do
+            Time.get(@time).should == Time.zone.local(2010, 9, 19, 14)
+          end
+        end
+
+        context "when we have a time close to midnight" do
+          before { @time = Time.utc(2010, 11, 19, 0, 30) }
+
+          it "change it back to the equivalent local time" do
+            Time.get(@time).should == Time.zone.local(2010, 11, 19, 1, 30)
+          end
+        end
+      end
     end
 
     context "when the time zone is defined as UTC" do
@@ -105,7 +145,27 @@ describe Mongoid::Extensions::TimeConversions do
       after { Mongoid::Config.instance.use_utc = false }
 
       it "returns utc" do
-         Time.get(@time.dup.utc).utc_offset.should == 0
+        Time.get(@time.dup.utc).utc_offset.should == 0
+      end
+
+      context "when using the ActiveSupport time zone" do
+        before do
+          Mongoid::Config.instance.use_activesupport_time_zone = true
+          Time.zone = "Stockholm"
+          @time = Time.utc(2010, 11, 19, 0, 30)
+        end
+        after do 
+          Time.zone = nil
+          Mongoid::Config.instance.use_activesupport_time_zone = false 
+        end
+
+        it "returns utc" do
+          Time.get(@time).should == ActiveSupport::TimeZone['UTC'].local(2010, 11, 19, 0, 30)
+        end
+
+        it "returns an ActiveSupport::TimeWithZone" do
+          Time.get(@time).class.should == ActiveSupport::TimeWithZone
+        end
       end
     end
 
@@ -114,6 +174,7 @@ describe Mongoid::Extensions::TimeConversions do
         Time.get(nil).should be_nil
       end
     end
+
   end
 
   describe "round trip - set then get" do
