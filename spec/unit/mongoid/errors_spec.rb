@@ -84,19 +84,26 @@ describe Mongoid::Errors do
 
   describe Mongoid::Errors::Validations do
 
+    before do
+      @errors = stub(:full_messages => [ "Error 1", "Error 2" ], :empty? => false)
+      @document = stub(:errors => @errors)
+      @error = Mongoid::Errors::Validations.new(@document)
+    end
+    
     describe "#message" do
 
       context "default" do
 
-        before do
-          @errors = stub(:full_messages => [ "Error 1", "Error 2" ], :empty? => false)
-          @document = stub(:errors => @errors)
-          @error = Mongoid::Errors::Validations.new(@document)
-        end
-
         it "contains the errors' full messages" do
           @error.message.should == "Validation failed - Error 1, Error 2."
         end
+      end
+    end
+    
+    describe "#document" do
+      
+      it "contains the a reference to the document" do
+        @error.document.should == @document
       end
     end
   end
