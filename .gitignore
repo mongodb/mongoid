@@ -5,3 +5,6 @@ scratch_directory/*
 tmp/*
 *.gem
 .bundle
+*.swp
+tags
+.rvmrc
