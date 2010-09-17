@@ -81,7 +81,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       let!(:post) do
-        person.posts.build(:text => "Testing")
+        person.posts.build(:title => "$$$")
       end
 
       it "sets the foreign key on the relation" do
@@ -93,7 +93,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "sets the attributes" do
-        post.text.should == "Testing"
+        post.title.should == "$$$"
       end
 
       it "does not save the target" do
@@ -102,6 +102,10 @@ describe Mongoid::Relations::Referenced::Many do
 
       it "adds the document to the target" do
         person.posts.count.should == 1
+      end
+
+      it "does not perform validation" do
+        post.errors.should be_empty
       end
     end
 
