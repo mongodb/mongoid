@@ -28,6 +28,30 @@ describe Mongoid::Extensions::TimeConversions do
       it "returns a local date from the string due to a limitation in Time.parse" do
         Time.set(@time.to_s).should == Time.local(@time.year, @time.month, @time.day, @time.hour, @time.min, @time.sec)
       end
+
+      context "when using the ActiveSupport time zone" do
+        before do
+          Mongoid::Config.instance.use_activesupport_time_zone = true
+          # if this is actually your time zone, the following tests are useless
+          Time.zone = "Stockholm" 
+        end
+        after do 
+          Time.zone = nil
+          Mongoid::Config.instance.use_activesupport_time_zone = false 
+        end
+
+        context "when the local time is not observing daylight saving" do
+          it "returns the local time" do
+            Time.set('2010-11-19 5:00:00').should == Time.utc(2010, 11, 19, 4)
+          end
+        end
+
+        context "when the local time is observing daylight saving" do
+          it "returns the local time" do
+            Time.set('2010-9-19 5:00:00').should == Time.utc(2010, 9, 19, 3)
+          end
+        end
+      end
     end
 
     context "when given a DateTime" do
@@ -38,7 +62,6 @@ describe Mongoid::Extensions::TimeConversions do
 
     context "when given a Time" do
       it "converts to a utc time" do
-        Time.set(@time).utc_offset.should == 0
         Time.set(@time).utc_offset.should == 0
       end
 
