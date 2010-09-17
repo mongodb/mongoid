@@ -56,7 +56,7 @@ describe Mongoid::Extensions::TimeConversions do
 
     context "when given a DateTime" do
       it "returns a time" do
-        Time.set(@time.to_datetime).should == Time.utc(@time.year, @time.month, @time.day, @time.hour, @time.min, @time.sec)
+        Time.set(@time.to_datetime).should == Time.local(@time.year, @time.month, @time.day, @time.hour, @time.min, @time.sec)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -107,7 +107,7 @@ describe Mongoid::Extensions::TimeConversions do
       before { @date = Date.today }
 
       it "converts to a utc time" do
-        Time.set(@date).should == Time.utc(@date.year, @date.month, @date.day)
+        Time.set(@date).should == Time.local(@date.year, @date.month, @date.day)
       end
 
       context "when using the ActiveSupport time zone" do
