@@ -24,20 +24,11 @@ module Mongoid #:nodoc:
       end
 
       def convert_to_time(value)
+        time = Mongoid::Config.instance.use_activesupport_time_zone? ? ::Time.zone : ::Time
         case value
-          when ::String then (Mongoid::Config.instance.use_activesupport_time_zone? ? ::Time.zone : ::Time).parse(value)
-          when ::DateTime 
-            if Mongoid::Config.instance.use_activesupport_time_zone?
-              ::Time.zone.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
-            else
-              ::Time.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
-            end
-          when ::Date
-            if Mongoid::Config.instance.use_activesupport_time_zone?
-              ::Time.zone.local(value.year, value.month, value.day)
-            else
-              ::Time.local(value.year, value.month, value.day)
-            end
+          when ::String then time.parse(value)
+          when ::DateTime then time.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
+          when ::Date then time.local(value.year, value.month, value.day)
           else value
         end
       end
