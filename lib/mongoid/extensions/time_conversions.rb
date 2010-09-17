@@ -9,11 +9,12 @@ module Mongoid #:nodoc:
 
       def get(value)
         return nil if value.blank?
-        if Mongoid::Config.instance.use_utc?
-          value
-        else
-          value.getlocal
+        value = value.getlocal unless Mongoid::Config.instance.use_utc?
+        if Mongoid::Config.instance.use_activesupport_time_zone?
+          time_zone = Mongoid::Config.instance.use_utc? ? 'UTC' : Time.zone
+          value = value.in_time_zone(time_zone)
         end
+        value
       end
 
       protected
