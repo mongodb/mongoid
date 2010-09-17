@@ -19,14 +19,6 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-require "rubygems"
-
-gem "activesupport", ">= 2.2.2", "<3.0.pre"
-gem "mongo", "~>1.0.1"
-gem "bson", "~>1.0.1"
-gem "durran-validatable", ">= 2.0.1"
-gem "will_paginate", ">= 2.3.11", "< 2.9"
-
 require "delegate"
 require "singleton"
 require "time"
