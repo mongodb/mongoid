@@ -151,6 +151,33 @@ describe Mongoid::Relations::Embedded::Many do
         person.reload.addresses.should == [ address ]
       end
     end
+
+    context "when the relation has an unusual name" do
+
+      let(:tracking_id) do
+        MyCompany::Model::TrackingId.create
+      end
+
+      let(:history) do
+        MyCompany::Model::TrackingIdValidationHistory.new(:old_state => "Test")
+      end
+
+      before do
+        tracking_id.validation_history << history
+      end
+
+      it "allows creation of the embedded document" do
+        tracking_id.validation_history.size.should == 1
+      end
+
+      it "saves the relation" do
+        history.should be_persisted
+      end
+
+      it "remains on reload" do
+        tracking_id.reload.validation_history.size.should == 1
+      end
+    end
   end
 
   describe "#= nil" do
