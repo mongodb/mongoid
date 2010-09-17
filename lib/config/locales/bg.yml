@@ -1,3 +1,9 @@
+bg:
+  activemodel:
+    errors:
+      messages:
+        taken: е вече заето
+
   mongoid:
     errors:
       messages:
