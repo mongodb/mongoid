@@ -6,6 +6,29 @@ describe Mongoid::Document do
     Person.delete_all
   end
 
+  context "defining a BSON::ObjectId as a field" do
+
+    let(:bson_id) do
+      BSON::ObjectId.new
+    end
+
+    let(:person) do
+      Person.new(:bson_id => bson_id)
+    end
+
+    before do
+      person.save
+    end
+
+    it "persists the correct type" do
+      person.reload.bson_id.should be_a(BSON::ObjectId)
+    end
+
+    it "has the correct value" do
+      person.bson_id.should == bson_id
+    end
+  end
+
   context "creating anonymous documents" do
 
     context "when defining collection" do

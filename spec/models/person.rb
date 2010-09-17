@@ -21,6 +21,7 @@ class Person
   field :owner_id, :type => Integer
   field :security_code
   field :reading, :type => Object
+  field :bson_id, :type => BSON::ObjectId
 
   index :age
   index :addresses
