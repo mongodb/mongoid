@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
 
       def convert_to_time(value)
         case value
-          when ::String then ::Time.parse(value)
+          when ::String then (Mongoid::Config.instance.use_activesupport_time_zone? ? ::Time.zone : ::Time).parse(value)
           when ::DateTime then ::Time.utc(value.year, value.month, value.day, value.hour, value.min, value.sec)
           when ::Date then ::Time.utc(value.year, value.month, value.day)
           else value
