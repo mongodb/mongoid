@@ -58,6 +58,23 @@ describe Mongoid::Extensions::TimeConversions do
       it "returns a time" do
         Time.set(@time.to_datetime).should == Time.utc(@time.year, @time.month, @time.day, @time.hour, @time.min, @time.sec)
       end
+
+      context "when using the ActiveSupport time zone" do
+        before do
+          Mongoid::Config.instance.use_activesupport_time_zone = true
+          # if this is actually your time zone, the following tests are useless
+          Time.zone = "Stockholm" 
+          @datetime = DateTime.new(2010, 11, 19)
+        end
+        after do 
+          Time.zone = nil
+          Mongoid::Config.instance.use_activesupport_time_zone = false 
+        end
+
+        it "assumes the given time is local" do
+          Time.set(@datetime).should == Time.utc(2010, 11, 18, 23)
+        end
+      end
     end
 
     context "when given a Time" do
@@ -91,6 +108,23 @@ describe Mongoid::Extensions::TimeConversions do
 
       it "converts to a utc time" do
         Time.set(@date).should == Time.utc(@date.year, @date.month, @date.day)
+      end
+
+      context "when using the ActiveSupport time zone" do
+        before do
+          Mongoid::Config.instance.use_activesupport_time_zone = true
+          # if this is actually your time zone, the following tests are useless
+          Time.zone = "Stockholm" 
+          @date = Date.new(2010, 11, 19)
+        end
+        after do 
+          Time.zone = nil
+          Mongoid::Config.instance.use_activesupport_time_zone = false 
+        end
+
+        it "assumes the given time is local" do
+          Time.set(@date).should == Time.utc(2010, 11, 18, 23)
+        end
       end
     end
   end
