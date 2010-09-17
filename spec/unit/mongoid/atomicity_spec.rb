@@ -29,13 +29,10 @@ describe Mongoid::Atomicity do
           it "returns a $set and $pushAll for modifications" do
             person._updates.should ==
               {
-                "$set" => {
-                  "title" => "Sir",
-                  "addresses.0.street" => "Bond St"
-                },
-                :other => {
-                  "addresses.0.locations" => [{ "_id" => @location.id, "name" => "Work" }]
-                }
+                "$set" => { "title" => "Sir" },
+                "$pushAll" => { "addresses" => [
+                    { "_id" => "oxford-st", "street" => "Oxford St" }
+                  ]}
               }
           end
         end
@@ -105,7 +102,7 @@ describe Mongoid::Atomicity do
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
                   },
-                  "$pushAll" => {
+                  :other => {
                     "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
                   }
                 }
