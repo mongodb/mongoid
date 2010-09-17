@@ -308,6 +308,77 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#clear" do
+
+    context "when the parent has been persisted" do
+
+      let(:person) do
+        Person.create(:ssn => "123-45-9999")
+      end
+
+      context "when the children are persisted" do
+
+        let!(:address) do
+          person.addresses.create(:street => "High St")
+        end
+
+        let!(:relation) do
+          person.addresses.clear
+        end
+
+        it "clears out the relation" do
+          person.addresses.should be_empty
+        end
+
+        it "marks the documents as deleted" do
+          address.should be_destroyed
+        end
+
+        it "deletes the documents from the db" do
+          person.reload.addresses.should be_empty
+        end
+
+        it "returns the relation" do
+          relation.should == []
+        end
+      end
+
+      context "when the children are not persisted" do
+
+        let!(:address) do
+          person.addresses.build(:street => "High St")
+        end
+
+        let!(:relation) do
+          person.addresses.clear
+        end
+
+        it "clears out the relation" do
+          person.addresses.should be_empty
+        end
+      end
+    end
+
+    context "when the parent is not persisted" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let!(:address) do
+        person.addresses.build(:street => "High St")
+      end
+
+      let!(:relation) do
+        person.addresses.clear
+      end
+
+      it "clears out the relation" do
+        person.addresses.should be_empty
+      end
+    end
+  end
+
   describe "#count" do
 
     let(:person) do

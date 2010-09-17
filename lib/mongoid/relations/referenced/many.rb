@@ -67,6 +67,20 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Clear the relation. Will delete the documents from the db if they are
+        # already persisted.
+        #
+        # Example:
+        #
+        # <tt>relation.clear</tt>
+        #
+        # Returns:
+        #
+        # The empty relation.
+        def clear
+          tap { |relation| relation.unbind }
+        end
+
         # Creates a new document on the references many relation. This will
         # save the document if the parent has been persisted.
         #
@@ -215,7 +229,7 @@ module Mongoid # :nodoc:
         #
         # The relation or nil.
         def substitute(target, building = nil)
-          tap { target ? (@target = target.to_a and bind) : (@target = unbind) }
+          tap { target ? (@target = target.to_a; bind) : (@target = unbind) }
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs

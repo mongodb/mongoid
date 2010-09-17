@@ -74,6 +74,20 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Clear the relation. Will delete the documents from the db if they are
+        # already persisted.
+        #
+        # Example:
+        #
+        # <tt>relation.clear</tt>
+        #
+        # Returns:
+        #
+        # The empty relation.
+        def clear
+          tap { |relation| relation.unbind(target) }
+        end
+
         # Returns a count of the number of documents in the association that have
         # actually been persisted to the database.
         #
