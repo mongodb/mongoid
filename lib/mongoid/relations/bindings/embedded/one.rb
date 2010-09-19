@@ -16,9 +16,7 @@ module Mongoid # :nodoc:
           # <tt>person.name.bind</tt>
           # <tt>person.name = Name.new</tt>
           def bind
-            if bindable?
-              target.send(metadata.inverse_setter(target), base)
-            end
+            target.send(metadata.inverse_setter(target), base) if bindable?
           end
 
           # Unbinds the base object and the inverse, caused by setting the
@@ -29,12 +27,23 @@ module Mongoid # :nodoc:
           # <tt>person.name.unbind</tt>
           # <tt>person.name = nil</tt>
           def unbind
-            if unbindable?
-              target.send(metadata.inverse_setter(target), nil)
-            end
+            target.send(metadata.inverse_setter(target), nil) if unbindable?
           end
 
           private
+
+          # Determine what the inverse of this relation is.
+          #
+          # Example:
+          #
+          # <tt>binding.inverse</tt>
+          #
+          # Returns:
+          #
+          # The inverse of this relation.
+          def inverse
+            target ? target.send(metadata.inverse(target)) : nil
+          end
 
           # Protection from infinite loops setting the inverse relations.
           # Checks if this document is not already equal to the target of the

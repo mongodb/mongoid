@@ -50,8 +50,17 @@ module Mongoid # :nodoc:
 
           private
 
+          # Determine what the inverse of this relation is.
+          #
+          # Example:
+          #
+          # <tt>binding.inverse</tt>
+          #
+          # Returns:
+          #
+          # The inverse of this relation.
           def inverse
-            relation = target.to_a.first
+            relation = target.first
             relation ? relation.send(metadata.inverse(target)) : nil
           end
 
