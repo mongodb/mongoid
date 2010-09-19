@@ -15,12 +15,19 @@ module Mongoid # :nodoc:
           #
           # <tt>name.person.bind</tt>
           # <tt>name.person = Person.new</tt>
+          #
+          # Returns:
+          #
+          # nil
           def bind
             if bindable?
               inverse = metadata.inverse(target)
               base.metadata = target.reflect_on_association(inverse)
-              return target.send(inverse).push(base) if base.embedded_many?
-              target.send(metadata.inverse_setter(target), base)
+              if base.embedded_many?
+                target.send(inverse).push(base)
+              else
+                target.send(metadata.inverse_setter(target), base)
+              end
             end
           end
 
@@ -31,17 +38,35 @@ module Mongoid # :nodoc:
           #
           # <tt>name.person.unbind</tt>
           # <tt>name.person = nil</tt>
+          #
+          # Returns:
+          #
+          # nil
           def unbind
             if unbindable?
               if base.embedded_many?
                 inverse = metadata.inverse(target)
-                return target.send(inverse).delete(base)
+                target.send(inverse).delete(base)
+              else
+                target.send(metadata.inverse_setter(target), nil)
               end
-              target.send(metadata.inverse_setter(target), nil)
             end
           end
 
           private
+
+          # Determine what the inverse of this relation is.
+          #
+          # Example:
+          #
+          # <tt>binding.inverse</tt>
+          #
+          # Returns:
+          #
+          # The inverse of this relation.
+          def inverse
+            target ? target.send(metadata.inverse(target)) : nil
+          end
 
           # Protection from infinite loops setting the inverse relations.
           # Checks if this document is not already equal to the target of the
@@ -55,8 +80,11 @@ module Mongoid # :nodoc:
           #
           # true if the documents differ, false if not.
           def bindable?
-            return inverse && !inverse.target.include?(base) if base.embedded_many?
-            !base.equal?(inverse ? inverse.target : nil)
+            if base.embedded_many?
+              inverse && !inverse.target.include?(base)
+            else
+              !base.equal?(inverse ? inverse.target : nil)
+            end
           end
 
           # Protection from infinite loops removing the inverse relations.

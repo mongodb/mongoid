@@ -35,12 +35,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   let(:metadata) do
-    Mongoid::Relations::Metadata.new(
-      :relation => klass,
-      :inverse_class_name => "Person",
-      :name => :addresses,
-      :as => :addressable
-    )
+    Person.relations["addresses"]
   end
 
   [ :<<, :push, :concat ].each do |method|
