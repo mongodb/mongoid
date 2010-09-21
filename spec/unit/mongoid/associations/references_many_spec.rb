@@ -115,7 +115,7 @@ describe Mongoid::Associations::ReferencesMany do
 
     it "sets the parent object id on the child" do
       @association.build(:title => "Sassy")
-      @association.first.person_id.should == BSON::ObjectID(@parent.id)
+      @association.first.person_id.should == BSON::ObjectId(@parent.id)
     end
 
     it "returns the new object" do
@@ -143,7 +143,7 @@ describe Mongoid::Associations::ReferencesMany do
       )
       @association = Mongoid::Associations::ReferencesMany.new(@parent, options)
       @association.build(:nickname => "Checking")
-      @association.first.person_id.should == BSON::ObjectID(@parent.id)
+      @association.first.person_id.should == BSON::ObjectId(@parent.id)
     end
   end
 

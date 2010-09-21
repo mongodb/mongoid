@@ -63,7 +63,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
     def find(*args)
-      raise Errors::InvalidOptions.new("Calling Document#find with nil is invalid") if args[0].nil?
+      raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {}) if args[0].nil?
       type = args.delete_at(0) if args[0].is_a?(Symbol)
       criteria = Criteria.translate(self, *args)
       case type

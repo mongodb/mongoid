@@ -9,7 +9,9 @@ module Mongoid #:nodoc
     #
     # <tt>Validations.new(person.errors)</tt>
     class Validations < MongoidError
+      attr_reader :document
       def initialize(document)
+        @document = document
         super(
           translate(
             "validations",

@@ -235,8 +235,14 @@ module Mongoid #:nodoc:
         unless @selector[key]
           @selector[key] = { operator => value }
         else
-          new_value = @selector[key].values.first + value
-          @selector[key] = { operator => new_value }
+          if @selector[key].has_key?(operator)
+            # add the value to the current operator
+            new_value = @selector[key].values.first + value
+            @selector[key] = { operator => new_value }
+          else
+            # create a new operator on this key
+            @selector[key][operator] = value
+          end        
         end
       end; self
     end

@@ -229,6 +229,18 @@ describe Mongoid::Criteria do
       it "returns those matching both criteria" do
         Person.where(:age.gt => 30, :age.lt => 40).should == [person]
       end
+
+      it "returns nothing if in and nin clauses cancel each other out" do
+        Person.any_in(:title => ["Sir"]).not_in(:title => ["Sir"]).should == []
+      end
+      
+      it "returns nothing if in and nin clauses cancel each other out ordered the other way" do
+        Person.not_in(:title => ["Sir"]).any_in(:title => ["Sir"]).should == []
+      end
+      
+      it "returns the intersection of in and nin clauses" do
+        Person.any_in(:title => ["Sir", "Mrs"]).not_in(:title => ["Mrs"]).should == [person]
+      end
     end
 
     context "with complex criterion" do
@@ -348,7 +360,7 @@ describe Mongoid::Criteria do
 
       before :all do
         @previous_id_type = ::Person._id_type
-        Person.identity :type => BSON::ObjectID
+        Person.identity :type => BSON::ObjectId
       end
 
       after :all do
@@ -368,7 +380,7 @@ describe Mongoid::Criteria do
         Person.criteria.id(person.id.to_s).first.should == person
       end
 
-      it 'should find object with BSON::ObjectID  args' do
+      it 'should find object with BSON::ObjectId  args' do
         Person.criteria.id(person.id).first.should == person
       end
     end
@@ -397,8 +409,8 @@ describe Mongoid::Criteria do
         Person.criteria.id(person.id.to_s).first.should == person
       end
 
-      it 'should not find object with BSON::ObjectID  args' do
-        Person.criteria.id(BSON::ObjectID(person.id)).first.should == nil
+      it 'should not find object with BSON::ObjectId  args' do
+        Person.criteria.id(BSON::ObjectId(person.id)).first.should == nil
       end
     end
   end

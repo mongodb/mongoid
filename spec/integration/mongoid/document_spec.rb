@@ -85,7 +85,7 @@ describe Mongoid::Document do
     it "persists a new record to the database" do
       person = Person.create(:title => "Test")
       if Person.using_object_ids?
-        person.id.should be_a_kind_of(BSON::ObjectID)
+        person.id.should be_a_kind_of(BSON::ObjectId)
       else
         person.id.should be_a_kind_of(String)
       end
@@ -594,57 +594,6 @@ describe Mongoid::Document do
 
       it "should return the id field correctly" do
         @person.to_json.should include('"_id":"'+@person.id.to_s+'"')
-      end
-    end
-  end
-
-  describe "#as_json" do
-
-    before do
-      @person = Person.new(:title => "Sir", :age => 30)
-      @address = Address.new(:street => "Nan Jing Dong Lu")
-      @person.addresses << @address
-    end
-
-    context "on a new document" do
-
-      it "returns the document (not sure why ActiveModel behaves like this)" do
-        @person.as_json.should == @person
-      end
-    end
-
-    context "on a persisted document" do
-
-      it "returns the attributes" do
-        @person.save
-        from_db = Person.find(@person.id)
-        from_db.as_json.should == from_db
-      end
-    end
-  end
-
-  describe "#encode_json" do
-
-    before do
-      @person = Person.new(:title => "Sir", :age => 30)
-      @address = Address.new(:street => "Nan Jing Dong Lu")
-      @person.addresses << @address
-      @encoder = stub(:options => {})
-    end
-
-    context "on a new document" do
-
-      it "returns the attributes" do
-        @person.encode_json(@encoder).should include('"pets":false')
-      end
-    end
-
-    context "on a persisted document" do
-
-      it "returns the attributes" do
-        @person.save
-        from_db = Person.find(@person.id)
-        from_db.encode_json(@encoder).should include('"pets":false')
       end
     end
   end
