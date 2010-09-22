@@ -5,9 +5,11 @@ module Mongoid #:nodoc:
       module CriteriaHelpers #:nodoc:
         def expand_complex_criteria
           hsh = {}
-          self.each_pair do |k,v|
-            if k.class == Mongoid::Criterion::Complex
-              hsh[k.key] = {"$#{k.operator}" => v}
+          each_pair do |k,v|
+            case k
+            when Mongoid::Criterion::Complex
+              hsh[k.key] ||= {}
+              hsh[k.key].merge!({"$#{k.operator}" => v})
             else
               hsh[k] = v
             end

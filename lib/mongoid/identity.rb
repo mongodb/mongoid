@@ -24,8 +24,8 @@ module Mongoid #:nodoc:
     protected
     # Return the proper id for the document.
     def generate_id
-      id = BSON::ObjectID.new
-      Mongoid.use_object_ids ? id : id.to_s
+      id = BSON::ObjectId.new
+      @document.using_object_ids? ? id : id.to_s
     end
 
     # Set the id for the document.
@@ -34,9 +34,9 @@ module Mongoid #:nodoc:
       @document.id = generate_id if @document.id.blank?
     end
 
-    # Set the _type field on the @document.ment.
+    # Set the _type field on the @document.
     def type!
-      @document._type = @document.class.name if @document.hereditary?
+      @document._type = @document.class.name if @document.hereditary? || @document.class.descendants.any?
     end
 
     # Generates the composite key for a @document.ment.

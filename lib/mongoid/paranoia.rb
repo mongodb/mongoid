@@ -47,7 +47,7 @@ module Mongoid #:nodoc:
     # Returns:
     #
     # true
-    def _remove
+    def _remove(options = {})
       now = Time.now
       collection.update({ :_id => self.id }, { '$set' => { :deleted_at => Time.now } })
       @attributes["deleted_at"] = now

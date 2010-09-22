@@ -12,6 +12,10 @@ describe Mongoid::Document do
     @canvas_collection.stubs(:create_index).with(:_type, false)
   end
 
+  it "does not respond to _destroy" do
+    Person.new.should_not respond_to(:_destroy)
+  end
+
   describe "#==" do
 
     context "when other object is a Document" do
@@ -26,7 +30,6 @@ describe Mongoid::Document do
         it "returns true" do
           @document.should == @other
         end
-
       end
 
       context "when attributes are not equal" do
@@ -39,9 +42,7 @@ describe Mongoid::Document do
         it "returns false" do
           @document.should_not == @other
         end
-
       end
-
     end
 
     context "when other object is not a Document" do
@@ -49,7 +50,6 @@ describe Mongoid::Document do
       it "returns false" do
         Person.new.==("Test").should be_false
       end
-
     end
 
     context "when comapring parent to its subclass" do
@@ -57,9 +57,7 @@ describe Mongoid::Document do
       it "returns false" do
         Canvas.new.should_not == Firefox.new
       end
-
     end
-
   end
 
   describe "#eql?" do
@@ -76,7 +74,6 @@ describe Mongoid::Document do
         it "returns true" do
           @document.eql?(@other).should be_true
         end
-
       end
 
       context "when attributes are not equal" do
@@ -89,9 +86,7 @@ describe Mongoid::Document do
         it "returns false" do
           @document.eql?(@other).should_not be_true
         end
-
       end
-
     end
 
     context "when other object is not a Document" do
@@ -99,7 +94,6 @@ describe Mongoid::Document do
       it "returns false" do
         Person.new.eql?("Test").should be_false
       end
-
     end
 
     context "when comapring parent to its subclass" do
@@ -107,9 +101,7 @@ describe Mongoid::Document do
       it "returns false" do
         Canvas.new.eql?(Firefox.new).should_not be_true
       end
-
     end
-
   end
 
   describe "#hash" do
@@ -126,7 +118,6 @@ describe Mongoid::Document do
     it "has unique hash per id" do
       @document.hash.should_not == @other.hash
     end
-
   end
 
   describe "#alias_method_chain" do
@@ -141,9 +132,7 @@ describe Mongoid::Document do
         @person.score = 10
         @person.rescored.should == 30
       end
-
     end
-
   end
 
   describe "#assimilate" do
@@ -158,7 +147,39 @@ describe Mongoid::Document do
       @child.assimilate(@parent, @options)
       @parent.name.should == @child
     end
+  end
 
+  describe ".attr_accessor" do
+
+    context "on a root document" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.mode = "testing"
+      end
+
+      it "allows access to the instance variable" do
+        person.mode.should == "testing"
+      end
+    end
+
+    context "on an embedded document" do
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        address.mode = "test"
+      end
+
+      it "allows access to the instance variable" do
+        address.mode.should == "test"
+      end
+    end
   end
 
   describe ".db" do
@@ -218,12 +239,20 @@ describe Mongoid::Document do
 
   end
 
-  describe ".hereditary" do
+  describe ".hereditary?" do
 
-    context "when the class is part of a hierarchy" do
+    context "when the class is the root of a hierarchy" do
+
+      it "returns false" do
+        Canvas.should_not be_hereditary
+      end
+
+    end
+
+    context "when the class is a part of a hierarchy" do
 
       it "returns true" do
-        Canvas.hereditary.should be_true
+        Browser.should be_hereditary
       end
 
     end
@@ -231,7 +260,7 @@ describe Mongoid::Document do
     context "when the class is not part of a hierarchy" do
 
       it "returns false" do
-        Game.hereditary.should be_false
+        Game.should_not be_hereditary
       end
 
     end
@@ -338,19 +367,15 @@ describe Mongoid::Document do
         it "sets the primary key" do
           @address.id.should == "test"
         end
-
       end
-
     end
 
     context "without a type specified" do
 
       it "sets the type" do
-        Person.new._type.should == "Person"
+        Doctor.new._type.should == "Doctor"
       end
-
     end
-
   end
 
   describe ".instantiate" do
@@ -376,50 +401,6 @@ describe Mongoid::Document do
       it "sets the attributes directly" do
         person = Person.instantiate(nil)
         person.id.should_not be_nil
-      end
-
-    end
-
-  end
-
-  describe ".key" do
-
-    context "when key is single field" do
-
-      before do
-        Address.key :street
-        @address = Address.new(:street => "Testing Street Name")
-      end
-
-      it "adds the callback for primary key generation" do
-        @address.run_callbacks(:save)
-        @address.id.should == "testing-street-name"
-      end
-
-    end
-
-    context "when key is composite" do
-
-      before do
-        Address.key :street, :post_code
-        @address = Address.new(:street => "Testing Street Name", :post_code => "94123")
-      end
-
-      it "combines all fields" do
-        @address.run_callbacks(:save)
-        @address.id.should == "testing-street-name-94123"
-      end
-
-    end
-
-    context "when key is on a subclass" do
-
-      before do
-        Firefox.key :name
-      end
-
-      it "sets the key for the entire hierarchy" do
-        Canvas.primary_key.should == [:name]
       end
 
     end
@@ -472,7 +453,7 @@ describe Mongoid::Document do
 
     before do
       @attributes = { "title" => "Herr" }
-      @person = Person.new(:_id => BSON::ObjectID.new.to_s)
+      @person = Person.new(:_id => BSON::ObjectId.new.to_s)
       @collection.expects(:find_one).with(:_id => @person.id).returns(@attributes)
     end
 
@@ -602,7 +583,7 @@ describe Mongoid::Document do
     context "when the document is not new" do
 
       before do
-        @id = BSON::ObjectID.new.to_s
+        @id = BSON::ObjectId.new.to_s
         @person = Person.instantiate("_id" => @id)
       end
 
@@ -615,7 +596,7 @@ describe Mongoid::Document do
   describe "#to_param" do
 
     it "returns the id" do
-      id = BSON::ObjectID.new.to_s
+      id = BSON::ObjectId.new.to_s
       Person.instantiate("_id" => id).to_param.should == id.to_s
     end
 

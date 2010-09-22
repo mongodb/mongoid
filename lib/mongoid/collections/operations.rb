@@ -15,6 +15,7 @@ module Mongoid #:nodoc:
         :index_information,
         :map_reduce,
         :mapreduce,
+        :stats,
         :options
       ]
 

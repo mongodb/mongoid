@@ -12,7 +12,11 @@ module Mongoid #:nodoc:
           end
 
           def get(value)
-            value ? self.instantiate(value) : value
+            if value && respond_to?(:instantiate)
+              instantiate(value)
+            else
+              value
+            end
           end
         end
       end

@@ -24,8 +24,9 @@ require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
+require "mongoid/extensions/symbol/conversions"
 require "mongoid/extensions/true_class/equality"
-require "mongoid/extensions/objectid/conversions"
+require "mongoid/extensions/object_id/conversions"
 
 class Array #:nodoc
   include Mongoid::Extensions::Array::Accessors
@@ -100,6 +101,7 @@ end
 class Symbol #:nodoc
   remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
   include Mongoid::Extensions::Symbol::Inflections
+  include Mongoid::Extensions::Symbol::Conversions
 end
 
 class Time #:nodoc
@@ -110,6 +112,10 @@ class TrueClass #:nodoc
   include Mongoid::Extensions::TrueClass::Equality
 end
 
-class BSON::ObjectID #:nodoc
-  extend Mongoid::Extensions::ObjectID::Conversions
+class BSON::ObjectId #:nodoc
+  extend Mongoid::Extensions::ObjectId::Conversions
+
+  def as_json(options = nil)
+    to_s
+  end
 end

@@ -28,7 +28,7 @@ describe Mongoid::Persistence::Insert do
       lambda {
         collection.expects(:insert).with(
           document.raw_attributes,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -39,7 +39,7 @@ describe Mongoid::Persistence::Insert do
           { "_id" => document.id },
           { "$push" => { "addresses" => address.raw_attributes } },
           :multi => false,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -50,7 +50,7 @@ describe Mongoid::Persistence::Insert do
           { "_id" => document.id },
           { "$set" => { "email" => email.raw_attributes } },
           :multi => false,
-          :safe => true
+          :safe => false
         ).returns("Object")
       }
     end
@@ -143,7 +143,7 @@ describe Mongoid::Persistence::Insert do
               { "_id" => document.id },
               { "$push" => { "addresses" => other_address.raw_attributes } },
               :multi => false,
-              :safe => true
+              :safe => false
             ).returns("Object")
             Mongoid::Persistence::InsertEmbedded.new(other_address).persist.should == other_address
           end

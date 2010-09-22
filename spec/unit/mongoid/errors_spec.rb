@@ -26,11 +26,13 @@ describe Mongoid::Errors do
       context "default" do
 
         before do
-          @error = Mongoid::Errors::InvalidOptions.new
+          @error = Mongoid::Errors::InvalidOptions.new(
+            "embedded_in_must_have_inverse_of", {}
+          )
         end
 
         it "returns the class name" do
-          @error.message.should == @error.class.name
+          @error.message.should include("inverse_of")
         end
       end
     end
@@ -75,30 +77,33 @@ describe Mongoid::Errors do
 
       it "returns a message with the bad version and good version" do
         @error.message.should ==
-          "MongoDB 1.2.4 not supported, please upgrade to #{Mongoid::MONGODB_VERSION}"
+          "MongoDB 1.2.4 not supported, please upgrade to #{Mongoid::MONGODB_VERSION}."
       end
     end
   end
 
   describe Mongoid::Errors::Validations do
 
+    before do
+      @errors = stub(:full_messages => [ "Error 1", "Error 2" ], :empty? => false)
+      @document = stub(:errors => @errors)
+      @error = Mongoid::Errors::Validations.new(@document)
+    end
+    
     describe "#message" do
 
       context "default" do
 
-        before do
-          @errors = stub(:full_messages => [ "Error 1", "Error 2" ], :empty? => false)
-          @document = stub(:errors => @errors)
-          @error = Mongoid::Errors::Validations.new(@document)
-        end
-
         it "contains the errors' full messages" do
-          @error.message.should == "Validation Failed: Error 1, Error 2"
+          @error.message.should == "Validation failed - Error 1, Error 2."
         end
-
-        it "allows access to the invalid document" do
-          @error.document.should == @document
-        end
+      end
+    end
+    
+    describe "#document" do
+      
+      it "contains the a reference to the document" do
+        @error.document.should == @document
       end
     end
   end
@@ -132,7 +137,7 @@ describe Mongoid::Errors do
         end
 
         it "contains class is not allowed" do
-          @error.message.should include("field named 'collection' is not allowed")
+          @error.message.should include("field named collection is not allowed")
         end
       end
     end
@@ -146,7 +151,8 @@ describe Mongoid::Errors do
         end
 
         it "contains error message" do
-          @error.message.should include("Accept Nested Attributes for Favorites is limited to 5 records")
+          @error.message.should
+            include("Accept Nested Attributes for Favorites is limited to 5 records.")
         end
       end
     end

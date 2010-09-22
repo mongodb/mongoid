@@ -2,6 +2,35 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
+  describe "#to_json" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when including root in json" do
+
+      before do
+        Mongoid.include_root_in_json = true
+      end
+
+      it "uses the mongoid configuration" do
+        person.to_json.should include("person")
+      end
+    end
+
+    context "when not including root in json" do
+
+      before do
+        Mongoid.include_root_in_json = false
+      end
+
+      it "uses the mongoid configuration" do
+        person.to_json.should_not include("person")
+      end
+    end
+  end
+
   describe "#to_xml" do
 
     context "when an Array field is defined" do

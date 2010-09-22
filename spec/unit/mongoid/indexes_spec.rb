@@ -10,38 +10,52 @@ describe Mongoid::Indexes do
       end
     end
 
-    it "adds an indexed accessor" do
-      @class.should respond_to(:indexed)
+    it "adds an index_options accessor" do
+      @class.should respond_to(:index_options)
     end
 
-    it "defaults indexed to false" do
-      @class.indexed.should be_false
+    it "defaults index_options to empty hash" do
+      @class.index_options.should == {}
     end
 
   end
 
-  describe ".add_indexes" do
-
+  describe ".create_indexes" do
     before do
       @collection = mock
+
+      @class = Class.new do
+        include Mongoid::Indexes
+
+        def self.index_options
+          {:_type => {:unique => false, :background => true}}
+        end
+      end
     end
+
+    it "creates the indexes" do
+      @class.expects(:_collection).returns(@collection)
+      @collection.expects(:create_index).with(:_type, {:unique => false, :background => true})
+      @class.create_indexes
+    end
+  end
+
+  describe ".add_indexes" do
 
     context "when indexes have not been added" do
 
       before do
         @class = Class.new do
           include Mongoid::Indexes
-          def self.hereditary
+          def self.hereditary?
             true
           end
         end
       end
 
       it "adds the _type index" do
-        @class.expects(:_collection).returns(@collection)
-        @collection.expects(:create_index).with(:_type, :unique => false, :background => true)
         @class.add_indexes
-        @class.indexed.should be_true
+        @class.index_options[:_type].should == {:unique => false, :background => true}
       end
 
     end
@@ -51,11 +65,11 @@ describe Mongoid::Indexes do
       before do
         @class = Class.new do
           include Mongoid::Indexes
-          def self.hereditary
+          def self.hereditary?
             true
           end
         end
-        @class.indexed = true
+        @class.index_options = {:type => {:unique => false, :background => true}}
       end
 
       it "ignores the request" do
@@ -69,27 +83,24 @@ describe Mongoid::Indexes do
   describe ".index" do
 
     before do
-      @collection = mock
       @class = Class.new do
         include Mongoid::Indexes
       end
-      @class.expects(:collection).returns(@collection)
     end
 
     context "when unique" do
 
       it "creates a unique index on the collection" do
-        @collection.expects(:create_index).with(:name, :unique => true)
         @class.index(:name, :unique => true)
+        @class.index_options[:name].should == {:unique => true}
       end
 
     end
 
     context "when not unique" do
-
       it "creates an index on the collection" do
-        @collection.expects(:create_index).with(:name, :unique => false)
         @class.index(:name)
+        @class.index_options[:name].should == {:unique => false}
       end
 
     end

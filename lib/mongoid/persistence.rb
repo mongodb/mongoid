@@ -19,15 +19,14 @@ module Mongoid #:nodoc:
   # <tt>document.upsert</tt>
   module Persistence
     extend ActiveSupport::Concern
+
     # Remove the +Document+ from the datbase with callbacks.
     #
     # Example:
     #
     # <tt>document.destroy</tt>
-    #
-    # TODO: Will get rid of other #destroy once new persistence complete.
-    def destroy
-      run_callbacks(:destroy) { self.destroyed = true if _remove }
+    def destroy(options = {})
+      run_callbacks(:destroy) { _remove(options) }
     end
 
     # Insert a new +Document+ into the database. Will return the document
@@ -36,8 +35,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.insert</tt>
-    def insert(validate = true)
-      Insert.new(self, validate).persist
+    def insert(options = {})
+      Insert.new(self, options).persist
     end
 
     # Remove the +Document+ from the datbase.
@@ -47,8 +46,11 @@ module Mongoid #:nodoc:
     # <tt>document._remove</tt>
     #
     # TODO: Will get rid of other #remove once observable pattern killed.
-    def _remove
-      Remove.new(self).persist
+    def _remove(options = {})
+      if Remove.new(self, options).persist
+        self.destroyed = true
+        cascading_remove!
+      end; true
     end
 
     alias :delete :_remove
@@ -64,7 +66,7 @@ module Mongoid #:nodoc:
     # Returns:
     #
     # +true+ if validation passed, will raise error otherwise.
-    def save!
+    def save!(options = {})
       self.class.fail_validate!(self) unless upsert; true
     end
 
@@ -73,8 +75,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>document.update</tt>
-    def update(validate = true)
-      Update.new(self, validate).persist
+    def update(options = {})
+      Update.new(self, options).persist
     end
 
     # Update the +Document+ attributes in the datbase.
@@ -116,12 +118,11 @@ module Mongoid #:nodoc:
     # Returns:
     #
     # A +Boolean+ for updates.
-    def upsert(validate = true)
-      validate = parse_validate(validate)
+    def upsert(options = {})
       if new_record?
-        insert(validate).persisted?
+        insert(options).persisted?
       else
-        update(validate)
+        update(options)
       end
     end
 
@@ -134,12 +135,16 @@ module Mongoid #:nodoc:
     alias :save :upsert
 
     protected
-    # Alternative validation params.
-    def parse_validate(validate)
-      if validate.is_a?(Hash) && validate.has_key?(:validate)
-        validate = validate[:validate]
+
+    # Perform all cascading deletes or destroys.
+    def cascading_remove!
+      cascades.each do |name, option|
+        association = send(name)
+        if association
+          documents = association.target.to_a
+          documents.each { |doc| doc.send(option) }
+        end
       end
-      validate
     end
 
     module ClassMethods #:nodoc:
@@ -186,7 +191,7 @@ module Mongoid #:nodoc:
       def delete_all(conditions = {})
         RemoveAll.new(
           self,
-          false,
+          { :validate => false },
           conditions[:conditions] || {}
         ).persist
       end

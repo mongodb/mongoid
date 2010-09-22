@@ -50,6 +50,20 @@ describe Mongoid::Callbacks do
       @class.should respond_to(:after_validation)
     end
 
+    it "includes the after_initialize callback" do
+      @class.should respond_to(:after_initialize)
+    end
+  end
+
+  describe ".after_initialize" do
+
+    let(:game) do
+      Game.new
+    end
+
+    it "runs after document instantiation" do
+      game.name.should == "Testing"
+    end
   end
 
   describe ".before_create" do
@@ -79,7 +93,5 @@ describe Mongoid::Callbacks do
         @artist.persisted?.should == false
       end
     end
-
   end
-
 end

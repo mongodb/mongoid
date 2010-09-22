@@ -95,7 +95,7 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :title => "Sir", :_type => { "$in" => ["Doctor", "Person"] } }, {}).returns(@cursor)
+        @collection.expects(:find).with({ :title => "Sir"}, {}).returns(@cursor)
       end
 
       it "executes the criteria and returns the element at the index" do
@@ -330,7 +330,7 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @collection.expects(:find).with({:title => "Sir"}, {}).returns(@cursor)
         @cursor.expects(:each).yields(@person)
       end
 
@@ -346,7 +346,7 @@ describe Mongoid::Criteria do
 
       before do
         Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :_type => { "$in" => ["Doctor", "Person"] }, :title => "Sir" }, {}).returns(@cursor)
+        @collection.expects(:find).with({:title => "Sir"}, {}).returns(@cursor)
         @cursor.expects(:each).yields(@person)
       end
 
@@ -371,9 +371,7 @@ describe Mongoid::Criteria do
       before do
         Person.expects(:collection).returns(@collection)
         @collection.expects(:find).with(
-          { :_type => { "$in" => ["Doctor", "Person"] },
-            :title => "Sir"
-          },
+          { :title => "Sir" },
           { :cache => true }
         ).returns(@cursor)
         @cursor.expects(:each).yields(@person)
@@ -707,7 +705,7 @@ describe Mongoid::Criteria do
       context "when the arg is a string" do
 
         before do
-          @id = BSON::ObjectID.new.to_s
+          @id = BSON::ObjectId.new.to_s
           @document = stub
           @criteria = mock
           Person.expects(:criteria).returns(@criteria)
@@ -722,7 +720,7 @@ describe Mongoid::Criteria do
       context "when the arg is an object id" do
 
         before do
-          @id = BSON::ObjectID.new
+          @id = BSON::ObjectId.new
           @document = stub
           @criteria = mock
           Person.expects(:criteria).returns(@criteria)
@@ -743,7 +741,7 @@ describe Mongoid::Criteria do
           @ids = []
           @documents = []
           3.times do
-            @ids << BSON::ObjectID.new.to_s
+            @ids << BSON::ObjectId.new.to_s
             @documents << stub
           end
           @criteria = mock
@@ -855,11 +853,6 @@ describe Mongoid::Criteria do
 
     context "when the other object is a Criteria" do
       subject { Mongoid::Criteria === Mongoid::Criteria.allocate }
-      it { should be_true }
-    end
-
-    context "when the other object is a Scope" do
-      subject { Mongoid::Criteria === Mongoid::Scope.allocate }
       it { should be_true }
     end
 

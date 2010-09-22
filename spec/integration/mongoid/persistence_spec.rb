@@ -3,11 +3,13 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
+    Mongoid.persist_in_safe_mode = true
     @person = Person.new(:title => "Sir", :ssn => "6969696", :pets => true)
   end
 
   after do
     @person.delete
+    Mongoid.persist_in_safe_mode = false
   end
 
   describe ".create" do
@@ -24,6 +26,9 @@ describe Mongoid::Persistence do
     context "inserting with a field that is not unique" do
 
       context "when a unique index exists" do
+        before do
+          Person.create_indexes
+        end
 
         after do
           Person.delete_all
@@ -213,6 +218,41 @@ describe Mongoid::Persistence do
           @person._updates.should == {}
         end
 
+      end
+
+      context "when combining modifications and pushes" do
+        before do
+          @location1 = Location.new(:name => 'Work')
+          @address1 = Address.new(:number => 101,
+                                  :street => 'South St',
+                                  :locations => [@location1])
+          @person = Person.create!(:addresses => [@address1])
+        end
+
+        def append_address_save_and_reload
+          @person.addresses <<
+            Address.new(:street => 'North St')
+          @person.save
+          @person.reload
+        end
+
+        it "should allow modifications and pushes at the same level" do
+          @address1.number = 102
+          append_address_save_and_reload
+          @person.addresses[0].number.should == 102
+          @person.addresses[0].street.should == 'South St'
+          @person.addresses[0].locations.first.name.should == 'Work'
+          @person.addresses[1].street.should == 'North St'
+        end
+
+        it "should allow modifications one level deeper than pushes" do
+          @address1.locations.first.name = 'Home'
+          append_address_save_and_reload
+          @person.addresses[0].number.should == 101
+          @person.addresses[0].street.should == 'South St'
+          @person.addresses[0].locations.first.name.should == 'Home'
+          @person.addresses[1].street.should == 'North St'
+        end
       end
 
       context "when removing elements without using delete or destroy" do

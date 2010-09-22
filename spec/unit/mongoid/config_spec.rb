@@ -1,18 +1,9 @@
 require "spec_helper"
 
 describe Mongoid::Config do
-  let(:config) { Mongoid::Config.instance }
+  let(:config) { Class.new(Mongoid::Config).instance }
 
-  before :all do
-    @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-    Mongoid.use_object_ids = true
-  end
-
-  after :all do
-    Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
-  end
-
-  after do
+  before do
     config.reset
   end
 
@@ -34,6 +25,13 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#include_root_in_json" do
+
+    it "defaults to false" do
+      config.include_root_in_json.should be_false
+    end
+  end
+
   describe "#from_hash" do
     context "regular mongoid.yml" do
       before do
@@ -52,6 +50,10 @@ describe Mongoid::Config do
         config.allow_dynamic_fields.should == false
       end
 
+      it "sets include_root_in_json" do
+        config.include_root_in_json.should == true
+      end
+
       it "sets reconnect_time" do
         config.reconnect_time.should == 5
       end
@@ -66,10 +68,6 @@ describe Mongoid::Config do
 
       it "sets raise_not_found_error" do
         config.raise_not_found_error.should == false
-      end
-
-      it "sets use_object_ids" do
-        config.use_object_ids.should == true
       end
 
       it "returns nil, which is interpreted as the local time_zone" do
@@ -106,7 +104,6 @@ describe Mongoid::Config do
         Mongo::ServerVersion.new("2.0.0")
       end
 
-
       before do
         Mongo::Connection.stubs(:new => connection)
         connection.stubs(:db => database)
@@ -122,6 +119,23 @@ describe Mongoid::Config do
 
       it "sets slaves" do
         config.slaves.should_not be_empty
+      end
+    end
+
+    context "with skip_version_check" do
+      let(:settings) do
+        {
+          "host" => "localhost",
+          "database" => "mongoid_config_test",
+          "skip_version_check" => true,
+        }
+      end
+
+      it "should set skip_version_check before it sets up the connection" do
+        version_check_ordered = sequence('version_check_ordered')
+        config.expects(:skip_version_check=).in_sequence(version_check_ordered)
+        config.expects(:_master).in_sequence(version_check_ordered)
+        config.from_hash(settings)
       end
     end
   end
@@ -232,48 +246,73 @@ describe Mongoid::Config do
 
   describe "#reconnect!" do
 
-    before do
-      @connection = mock
-      @master = mock
-      config.expects(:master).returns(@master)
-      @master.expects(:connection).returns(@connection)
+    context "with non-lazy reconnection option" do
+      before do
+        @connection = mock
+        @master = mock
+        config.expects(:master).returns(@master)
+        @master.expects(:connection).returns(@connection)
+      end
+
+      context "default" do
+        it "reconnects on the master connection" do
+          @connection.expects(:connect).returns(true)
+          config.reconnect!
+        end
+      end
+
+      context "now=true" do
+        it "reconnects on the master connection" do
+          @connection.expects(:connect).returns(true)
+          config.reconnect!(true)
+        end
+      end
     end
 
-    it "reconnects on the master connection" do
-      @connection.expects(:connect_to_master).returns(true)
-      config.reconnect!
+    context "with lazy reconnection option" do
+      before do
+        @master = mock
+        config.stubs(:master).returns(@master)
+      end
+
+      it "sets a reconnection flag" do
+        @master.expects(:connection).never
+        config.reconnect!(false)
+        config.instance_variable_get(:@reconnect).should be_true
+      end
     end
+
   end
 
-  describe "#convert_to_object_id" do
-    before :each do
-      @@previous_mongoid_use_object_ids = Mongoid.use_object_ids
-      Mongoid.use_object_ids = true
+  describe "#master" do
+    before do
+      config.send(:instance_variable_set, :@master, master)
     end
 
-    after :each do
-      Mongoid.use_object_ids = @@previous_mongoid_use_object_ids
+    context "when the database has not been configured" do
+      let(:master) { nil }
+      it "should raise an error" do
+        expect { config.master }.to raise_error(Mongoid::Errors::InvalidDatabase)
+      end
     end
 
-    it "should return args if use_object_ids is false" do
-      Mongoid.use_object_ids = false
-      Mongoid.convert_to_object_id("foo").should == "foo"
+    context "when the database has been configured" do
+      let(:connection) { mock }
+      let(:master) { stub(:connection => connection) }
+
+      it "returns the database" do
+        config.master.should == master
+      end
+
+      context "when the reconnection flag is set" do
+        before { config.reconnect!(false) }
+        it "reconnects" do
+          config.expects(:reconnect!)
+          config.master
+        end
+      end
     end
 
-    it "should transform args String to BSON::ObjectID if use_object_ids is true" do
-      id = BSON::ObjectID.new
-      Mongoid.convert_to_object_id(id.to_s).should == id
-    end
-
-    it "should transform all String inside Array pass like args if use_object_ids is true" do
-      ids = [BSON::ObjectID.new, BSON::ObjectID.new]
-      Mongoid.convert_to_object_id(ids.map(&:to_s)).should == ids
-    end
-
-    it "should don't change args type if cast args is define to false" do
-      id = BSON::ObjectID.new
-      Mongoid.convert_to_object_id(id.to_s, false).should == id.to_s
-    end
   end
 
   describe "#reconnect_time" do
@@ -343,7 +382,6 @@ describe Mongoid::Config do
       it "sets the value" do
         config.allow_dynamic_fields.should == true
       end
-
     end
 
     context "when setting to false" do
@@ -355,16 +393,6 @@ describe Mongoid::Config do
       it "sets the value" do
         config.allow_dynamic_fields.should == false
       end
-
-    end
-
-  end
-
-  describe "#use_object_ids" do
-
-    it "defaults to false" do
-      config.use_object_ids.should == false
     end
   end
-
 end

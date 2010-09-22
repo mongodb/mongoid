@@ -5,27 +5,35 @@ module Mongoid #:nodoc:
     # separate collection or database.
     class ReferencesOne < Proxy
 
-      delegate :nil?, :to => :target
-
       # Builds a new Document and sets it as the association.
       #
       # Returns the newly created object.
       def build(attributes = {})
-        @target = @klass.instantiate(attributes)
-        inverse = @target.associations.values.detect do |metadata|
-          metadata.options.klass == @parent.class
-        end
-        name = inverse.name
-        @target.send("#{name}=", @parent)
-        @target
+        target = @klass.instantiate(attributes)
+        replace(target)
+        target
       end
 
       # Builds a new Document and sets it as the association, then saves the
       # newly created document.
       #
       # Returns the newly created object.
-      def create(attributes)
+      def create(attributes = {})
         build(attributes).tap(&:save)
+      end
+
+      # Replaces the target with a new object
+      #
+      # Returns the association proxy
+      def replace(obj)
+        @target = obj
+        inverse = @target.associations.values.detect do |metadata|
+          metadata.options.klass == @parent.class
+        end
+        name = inverse.name
+        @target.send("#{name}=", @parent)
+
+        self
       end
 
       # Initializing a related association only requires looking up the objects
@@ -35,10 +43,10 @@ module Mongoid #:nodoc:
       #
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
-      def initialize(document, options, target = nil)
+      def initialize(document, options)
         @parent, @klass = document, options.klass
         @foreign_key = options.foreign_key
-        @target = target || @klass.first(:conditions => { @foreign_key => @parent.id })
+        @target = @klass.first(:conditions => { @foreign_key => @parent.id })
         extends(options)
       end
 
@@ -53,20 +61,18 @@ module Mongoid #:nodoc:
       #
       # A new target document.
       def nested_build(attributes, options = nil)
-        build(attributes) unless @target.blank? && options[:update_only]
+        options ||= {}
+        _destroy = Boolean.set(attributes.delete('_destroy'))
+        if options[:allow_destroy] && _destroy
+          @target.destroy
+          @target = nil
+        elsif @target.present? || !options[:update_only]
+          build(attributes)
+        end
+        @target
       end
 
       class << self
-        # Preferred method for creating the new +RelatesToMany+ association.
-        #
-        # Options:
-        #
-        # document: The +Document+ that contains the relationship.
-        # options: The association +Options+.
-        def instantiate(document, options, target = nil)
-          new(document, options, target)
-        end
-
         # Returns the macro used to create the association.
         def macro
           :references_one
@@ -87,10 +93,10 @@ module Mongoid #:nodoc:
         def update(target, document, options)
           if target
             name = document.class.to_s.underscore
-            target.send("#{name}=", document)
-            return instantiate(document, options, target)
+            proxy = new(document, options)
+            proxy.replace(target)
           end
-          target
+          proxy
         end
       end
     end

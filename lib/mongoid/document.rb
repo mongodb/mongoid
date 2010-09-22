@@ -5,24 +5,11 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor :primary_key
-
       attr_accessor :association_name
       attr_reader :new_record
-
-      delegate :primary_key, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:
-
-      # Perform default behavior but mark the hierarchy as being hereditary.
-      #
-      # This method must remain in the +Document+ module, even though its
-      # behavior affects items in the Hierarchy module.
-      def inherited(subclass)
-        super(subclass)
-        self.hereditary = true
-      end
 
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
@@ -36,26 +23,10 @@ module Mongoid #:nodoc:
           document = allocate
           document.instance_variable_set(:@attributes, attributes)
           document.setup_modifications
-          return document
+          document
         else
-          return new(attrs)
+          new(attrs)
         end
-      end
-
-      # Defines the field that will be used for the id of this +Document+. This
-      # set the id of this +Document+ before save to a parameterized version of
-      # the field that was supplied. This is good for use for readable URLS in
-      # web applications.
-      #
-      # Example:
-      #
-      #   class Person
-      #     include Mongoid::Document
-      #     key :first_name, :last_name
-      #   end
-      def key(*fields)
-        self.primary_key = fields
-        set_callback :save, :before, :identify
       end
 
       # Returns all types to query for when using this class as the base.
@@ -63,7 +34,7 @@ module Mongoid #:nodoc:
       # causes the first call to only return direct children, hence
       # the double call and unique.
       def _types
-        @_type ||= [subclasses + subclasses + [self.name]].flatten.uniq.map(&:to_s)
+        @_type ||= [descendants + [self]].flatten.uniq.map(&:to_s)
       end
     end
 
@@ -79,8 +50,13 @@ module Mongoid #:nodoc:
       self == (comparison_object)
     end
 
-    # Delegates to id in order to allow two records of the same type and id to work with something like:
-    #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
+    # Delegates to id in order to allow two records of the same type and id to
+    # work with something like:
+    #   [ Person.find(1),
+    #     Person.find(2),
+    #     Person.find(3) ] &
+    #   [ Person.find(1),
+    #     Person.find(4) ] # => [ Person.find(1) ]
     def hash
       id.hash
     end
@@ -124,11 +100,14 @@ module Mongoid #:nodoc:
     #
     # attrs: The attributes +Hash+ to set up the document with.
     def initialize(attrs = nil)
+      @new_record = true
       @attributes = default_attributes
       process(attrs)
-      @new_record = true
       document = yield self if block_given?
       identify
+      run_callbacks(:initialize) do
+        document
+      end
     end
 
     # Returns the class name plus its attributes.
@@ -172,7 +151,10 @@ module Mongoid #:nodoc:
       if @building_nested
         @attributes.remove(name, child.raw_attributes)
       else
-        reset(name) { @attributes.remove(name, child.raw_attributes) }
+        reset(name) do
+          @attributes.remove(name, child.raw_attributes)
+          @attributes[name]
+        end
         notify
       end
     end

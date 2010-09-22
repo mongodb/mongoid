@@ -3,6 +3,7 @@ require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/optional"
+require "mongoid/criterion/selector"
 
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
@@ -30,7 +31,7 @@ module Mongoid #:nodoc:
 
     delegate :aggregate, :avg, :blank?, :count, :distinct, :empty?,
              :execute, :first, :group, :id_criteria, :last, :max,
-             :min, :one, :page, :paginate, :per_page, :sum, :to => :context
+             :min, :one, :page, :paginate, :per_page, :shift, :sum, :to => :context
 
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.
@@ -61,12 +62,6 @@ module Mongoid #:nodoc:
       else
         return false
       end
-    end
-
-    # Returns true if the supplied +Object+ is an instance of +Criteria+ or
-    # +Scope+.
-    def self.===(other)
-      super || Scope === other
     end
 
     # Return or create the context in which this criteria should be executed.
@@ -122,7 +117,8 @@ module Mongoid #:nodoc:
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
     def initialize(klass)
-      @selector, @options, @klass, @documents = {}, {}, klass, []
+      @selector = Mongoid::Criterion::Selector.new(klass)
+      @options, @klass, @documents = {}, klass, []
     end
 
     # Merges another object into this +Criteria+. The other object may be a
@@ -153,9 +149,9 @@ module Mongoid #:nodoc:
     # Returns: <tt>Criteria</tt>
     def method_missing(name, *args)
       if @klass.respond_to?(name)
-        new_scope = @klass.send(name, *args)
-        new_scope.merge(self) if Criteria === new_scope
-        return new_scope
+        @klass.send(:with_scope, self) do
+          @klass.send(name, *args)
+        end
       else
         return entries.send(name, *args)
       end
@@ -239,8 +235,14 @@ module Mongoid #:nodoc:
         unless @selector[key]
           @selector[key] = { operator => value }
         else
-          new_value = @selector[key].values.first + value
-          @selector[key] = { operator => new_value }
+          if @selector[key].has_key?(operator)
+            # add the value to the current operator
+            new_value = @selector[key].values.first + value
+            @selector[key] = { operator => new_value }
+          else
+            # create a new operator on this key
+            @selector[key][operator] = value
+          end        
         end
       end; self
     end

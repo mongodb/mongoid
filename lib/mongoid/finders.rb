@@ -4,9 +4,9 @@ module Mongoid #:nodoc:
 
     # Delegate to the criteria methods that are natural for creating a new
     # criteria.
-    [ :all_in, :any_in, :asc, :ascending, :avg, :desc, :descending,
+    [ :all_in, :any_in, :any_of, :asc, :ascending, :avg, :desc, :descending,
       :excludes, :limit, :max, :min, :not_in, :only, :order_by,
-      :skip, :sum, :where ].each do |name|
+      :skip, :sum, :where, :near ].each do |name|
       define_method(name) do |*args|
         criteria.send(name, *args)
       end
@@ -39,13 +39,14 @@ module Mongoid #:nodoc:
       Criteria.translate(self, *args).limit(1).count == 1
     end
 
-    # Helper to initialize a new +Criteria+ object for this class.
+    # Helper to initialize a new +Criteria+ object for this class, or return
+    # the currently scoped +Criteria+ object.
     #
     # Example:
     #
     # <tt>Person.criteria</tt>
     def criteria
-      Criteria.new(self)
+      scope_stack.last || Criteria.new(self)
     end
 
     # Find a +Document+ in several different ways.
@@ -62,7 +63,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
     def find(*args)
-      raise Errors::InvalidOptions.new("Calling Document#find with nil is invalid") if args[0].nil?
+      raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {}) if args[0].nil?
       type = args.delete_at(0) if args[0].is_a?(Symbol)
       criteria = Criteria.translate(self, *args)
       case type
@@ -140,6 +141,25 @@ module Mongoid #:nodoc:
     # Find the first object or create/initialize it.
     def find_or(method, attrs = {})
       first(:conditions => attrs) || send(method, attrs)
+    end
+
+    # Initializes and returns the current scope stack.
+    def scope_stack
+      scope_stack_for = Thread.current[:mongoid_scope_stack] ||= {}
+      scope_stack_for[object_id] ||= []
+    end
+
+    # Pushes the provided criteria onto the scope stack, and removes it after the
+    # provided block is yielded.
+    def with_scope(criteria)
+      scope_stack = self.scope_stack
+      scope_stack << criteria
+
+      begin
+        yield criteria
+      ensure
+        scope_stack.pop
+      end
     end
   end
 end

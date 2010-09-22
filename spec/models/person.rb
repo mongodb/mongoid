@@ -2,6 +2,8 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  attr_accessor :mode
+
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
@@ -14,9 +16,11 @@ class Person
   field :map, :type => Hash
   field :score, :type => Integer
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
+  field :last_drink_taken_at, :type => Date, :default => lambda { 1.day.ago.in_time_zone("Alaska") }
   field :ssn
-  field :owner_id, :accessible => false, :type => Integer
+  field :owner_id, :type => Integer
   field :security_code
+  field :reading, :type => Object
 
   index :age
   index :addresses
@@ -27,7 +31,7 @@ class Person
 
   attr_reader :rescored
 
-  attr_protected :security_code
+  attr_protected :security_code, :owner_id
 
   embeds_many :favorites
   embeds_many :videos
@@ -53,22 +57,24 @@ class Person
 
   accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
   accepts_nested_attributes_for :name, :update_only => true
-  accepts_nested_attributes_for :pet
+  accepts_nested_attributes_for :pet, :allow_destroy => true
+  accepts_nested_attributes_for :game, :allow_destroy => true
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
 
-  references_one :game do
+  references_one :game, :dependent => :destroy do
     def extension
       "Testing"
     end
   end
 
-  references_many :posts do
+  references_many :posts, :dependent => :delete do
     def extension
       "Testing"
     end
   end
   references_many :paranoid_posts
-  references_many :preferences, :stored_as => :array, :inverse_of => :people
+  references_many :preferences, :stored_as => :array, :inverse_of => :people, :index => true
+  references_many :user_accounts, :stored_as => :array, :inverse_of => :person
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20

@@ -137,7 +137,7 @@ describe Mongoid::Finders do
     context "when an id is passed in" do
 
       before do
-        @id = BSON::ObjectID.new.to_s
+        @id = BSON::ObjectId.new.to_s
       end
 
       it "delegates to criteria" do
@@ -155,13 +155,21 @@ describe Mongoid::Finders do
 
       end
 
+      context "when it is called with a nil value" do
+
+        it "raises an InvalidOptions error" do
+          lambda { Person.find(nil) }.should raise_error(Mongoid::Errors::InvalidOptions)
+        end
+
+      end
+
     end
 
     context "when an array of ids is passed in" do
 
       before do
         @ids = []
-        3.times { @ids << BSON::ObjectID.new.to_s }
+        3.times { @ids << BSON::ObjectId.new.to_s }
       end
 
       it "delegates to the criteria" do
@@ -432,6 +440,15 @@ describe Mongoid::Finders do
     it "returns a new criteria with select conditions added" do
       criteria = Person.where(:title => "Sir")
       criteria.selector.should == { :title => "Sir" }
+    end
+
+  end
+
+  describe ".near" do
+
+    it "returns a new criteria with select conditions added" do
+      criteria = Address.near(:latlng => [37.761523, -122.423575, 1])
+      criteria.selector.should == { :latlng => { "$near" => [37.761523, -122.423575, 1] } }
     end
 
   end

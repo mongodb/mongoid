@@ -123,7 +123,7 @@ module Mongoid #:nodoc:
       # Array or single Document.
       def find(param)
         return @target if param == :all
-        return detect { |document| document.id == param }
+        criteria.id(param).first
       end
 
       # Creates the new association by finding the attributes in
@@ -149,19 +149,18 @@ module Mongoid #:nodoc:
         extends(options)
       end
 
-
-
       # If the target array does not respond to the supplied method then try to
       # find a named scope or criteria on the class and send the call there.
       #
       # If the method exists on the array, use the default proxy behavior.
       def method_missing(name, *args, &block)
-        unless @target.respond_to?(name)
-          object = @klass.send(name, *args)
-          object.documents = @target
-          return object
+        if @target.respond_to?(name)
+          super
+        else
+          @klass.send(:with_scope, criteria) do
+            object = @klass.send(name, *args)
+          end
         end
-        super
       end
 
       # Used for setting associations via a nested attributes setter from the
@@ -176,16 +175,31 @@ module Mongoid #:nodoc:
       # The newly build target Document.
       def nested_build(attributes, options = {})
         @parent.instance_variable_set(:@building_nested, true)
+        id_index, reordering = {}, false
         attributes.each do |index, attrs|
-          if document = detect { |document| document._index == index.to_i }
-            if options && options[:allow_destroy] && attrs['_destroy']
+          document = if attrs["id"].present?
+            reordering = true
+            id_index[attrs["id"]] = index.to_i
+            detect { |document| document.id.to_s == attrs["id"].to_s }
+          else
+            detect { |document| document._index == index.to_i }
+          end
+          if document
+            if options && options[:allow_destroy] && Boolean.set(attrs['_destroy'])
               @target.delete(document)
               document.destroy
             else
               document.write_attributes(attrs)
             end
           else
-            build(attrs)
+            document = build(attrs)
+            id_index[document.id.to_s] = index.to_i
+          end
+        end
+        if reordering
+          @target.sort! do |a, b|
+            ai, bi = id_index[a.id.to_s], id_index[b.id.to_s]
+            ai.nil? ? (bi.nil? ? 0 : 1) : (bi.nil? ? -1 : ai <=> bi)
           end
         end
         @target.each_with_index { |document, index| document._index = index }
@@ -242,19 +256,15 @@ module Mongoid #:nodoc:
         end; count
       end
 
+      # Returns the criteria object for the target class with its documents set
+      # to @target.
+      def criteria
+        criteria = @klass.criteria
+        criteria.documents = @target
+        criteria
+      end
+
       class << self
-
-        # Preferred method of creating a new +EmbedsMany+ association. It will
-        # delegate to new.
-        #
-        # Options:
-        #
-        # document: The parent +Document+
-        # options: The association options
-        def instantiate(document, options, target_array = nil)
-          new(document, options, target_array)
-        end
-
         # Returns the macro used to create the association.
         def macro
           :embeds_many
@@ -267,10 +277,21 @@ module Mongoid #:nodoc:
           parent.raw_attributes.delete(options.name)
           children.assimilate(parent, options)
           if children && children.first.is_a?(Mongoid::Document)
-            instantiate(parent, options, children)
+            new(parent, options, children)
           else
-            instantiate(parent, options)
+            new(parent, options)
           end
+        end
+
+        # Validate the options passed to the embeds many macro, to encapsulate
+        # the behavior in this class instead of the associations module.
+        #
+        # Options:
+        #
+        # options: Thank you captain obvious.
+        def validate_options(options = {})
+          check_dependent_not_allowed!(options)
+          check_inverse_not_allowed!(options)
         end
       end
     end

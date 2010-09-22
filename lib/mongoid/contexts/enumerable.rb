@@ -1,4 +1,7 @@
 # encoding: utf-8
+
+require 'mongoid/contexts/enumerable/sort'
+
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
@@ -56,7 +59,7 @@ module Mongoid #:nodoc:
       #
       # An +Array+ of documents that matched the selector.
       def execute(paginating = false)
-        limit(filter) || []
+        limit(sort(filter)) || []
       end
 
       # Groups the documents by the first field supplied in the field options.
@@ -115,6 +118,18 @@ module Mongoid #:nodoc:
       # The first document in the +Array+
       alias :one :first
 
+      # Get one document and tell the criteria to skip this record on
+      # successive calls.
+      #
+      # Returns:
+      #
+      # The first document in the +Array+
+      def shift
+        document = first
+        criteria.skip((options[:skip] || 0) + 1)
+        document
+      end
+
       # Get the sum of the field values for all the documents.
       #
       # Returns:
@@ -148,8 +163,20 @@ module Mongoid #:nodoc:
           return documents.slice(skip, limit)
         elsif limit
           return documents.first(limit)
+        elsif skip
+          return documents.slice(skip..-1)
         end
         documents
+      end
+
+      # Sorts the result set if sort options have been set.
+      def sort(documents)
+        return documents if options[:sort].blank?
+        documents.sort_by do |document|
+          options[:sort].map do |key, direction|
+            Sort.new(document.read_attribute(key), direction)
+          end
+        end
       end
     end
   end
