@@ -32,7 +32,7 @@ describe Mongoid::Validations::UniquenessValidator do
     context "with a record in the database" do
 
       before do
-        UserAccount.create(:username => "chitchins")
+        UserAccount.create(:username => "chitchins", :email => 'chitchins@test.com')
         UserAccount.create(:username => "rdawkins")
       end
 
@@ -42,6 +42,7 @@ describe Mongoid::Validations::UniquenessValidator do
           UserAccount.where(:username => "rdawkins").first
         end
 
+
         it "passes validation" do
           account.should be_valid
         end
@@ -49,6 +50,13 @@ describe Mongoid::Validations::UniquenessValidator do
         it "fails validation when another document has the same unique field" do
           account.username = "chitchins"
           account.should_not be_valid
+        end
+        
+        context "with case insensitive validation" do
+          it "fails validation when another document has the same unique field with a different case" do
+            account.email = "chiTchins@TEST.CoM"
+            account.should_not be_valid
+          end
         end
       end
 
@@ -65,6 +73,13 @@ describe Mongoid::Validations::UniquenessValidator do
         it "contains uniqueness errors" do
           account.valid?
           account.errors[:username].should == ["is not unique"]
+        end
+        
+        context "with case insensitive validation" do
+          it "fails validation when another document has the same unique field with a different case" do
+            account.email = "chiTchins@TEST.CoM"
+            account.should_not be_valid
+          end
         end
       end
     end
@@ -169,6 +184,13 @@ describe Mongoid::Validations::UniquenessValidator do
           favorite.title = "doritos"
           favorite.should_not be_valid
         end
+        
+        context "with case insensitive validation" do
+          it "fails validation when another document has the same unique field with a different case" do
+            favorite.title = "DoRiToS"
+            favorite.should_not be_valid
+          end
+        end
       end
 
       context "when document is new" do
@@ -181,6 +203,13 @@ describe Mongoid::Validations::UniquenessValidator do
         it "contains uniqueness errors" do
           favorite.valid?
           favorite.errors[:title].should == ["is already taken"]
+        end
+        
+        context "with case insensitive validation" do
+          it "fails validation when another document has the same unique field with a different case" do
+            favorite.title = "PIZZA"
+            favorite.should_not be_valid
+          end
         end
       end
     end
