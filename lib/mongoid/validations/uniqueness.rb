@@ -24,9 +24,9 @@ module Mongoid #:nodoc:
           criteria = document._parent.send(document.association_name)
           # If the parent document embeds_one, no need to validate uniqueness
           return if criteria.is_a?(Mongoid::Document)
-          criteria = criteria.where(attribute => value, :_id => {'$ne' => document._id})
+          criteria = criteria.where(attribute => value ? Regexp.new(value, !options[:case_sensitive]) :  value, :_id => {'$ne' => document._id})
         else
-          criteria = @klass.where(attribute => value)
+          criteria = @klass.where(attribute => value ? Regexp.new(value, !options[:case_sensitive]) : value)
           unless document.new_record?
             criteria = criteria.where(:_id => {'$ne' => document._id})
           end
