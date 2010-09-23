@@ -14,7 +14,7 @@ require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/integer/conversions"
-require "mongoid/extensions/nil/assimilation"
+require "mongoid/extensions/nil/collectionization"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/proc/scoping"
@@ -75,7 +75,7 @@ class Integer #:nodoc
 end
 
 class NilClass #:nodoc
-  include Mongoid::Extensions::Nil::Assimilation
+  include Mongoid::Extensions::Nil::Collectionization
 end
 
 class Object #:nodoc:

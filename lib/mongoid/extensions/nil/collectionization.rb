@@ -2,7 +2,7 @@
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Nil #:nodoc:
-      module Assimilation #:nodoc:
+      module Collectionization #:nodoc:
         def collectionize
           to_s.collectionize
         end

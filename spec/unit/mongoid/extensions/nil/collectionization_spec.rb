@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Extensions::Nil::Assimilation do
+describe Mongoid::Extensions::Nil::Collectionization do
 
   describe "#collectionize" do
 
