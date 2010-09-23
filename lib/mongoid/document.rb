@@ -2,6 +2,7 @@
 module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
+
     included do
       include Mongoid::Components
       attr_accessor :new_record
@@ -105,20 +106,6 @@ module Mongoid #:nodoc:
     # The attributes hash with indifferent access.
     def attributes
       @attributes.with_indifferent_access
-    end
-
-    # Clone the current +Document+. This will return all attributes with the
-    # exception of the document's id and versions.
-    #
-    # Example:
-    #
-    # <tt>document.clone</tt>
-    #
-    # Returns:
-    #
-    # A new document with all the attributes except id and versions
-    def clone
-      self.class.new(@attributes.except("_id").except("versions").dup)
     end
 
     # Generate an id for this +Document+.

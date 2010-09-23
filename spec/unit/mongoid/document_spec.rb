@@ -124,40 +124,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#clone" do
-
-    let(:person) do
-      Person.new(:title => "Sir")
-    end
-
-    context "when versions exist" do
-
-      let(:cloned) do
-        person.clone
-      end
-
-      before do
-        person[:versions] = [ { :number => 1 } ]
-      end
-
-      it "returns a new document" do
-        cloned.should_not be_persisted
-      end
-
-      it "has an id" do
-        cloned.id.should_not be_nil
-      end
-
-      it "has a different id from the original" do
-        cloned.id.should_not == person.id
-      end
-
-      it "does not clone the versions" do
-        cloned[:versions].should be_nil
-      end
-    end
-  end
-
   describe "#eql?" do
 
     context "when comparable is not a document" do

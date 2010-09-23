@@ -14,6 +14,7 @@ module Mongoid #:nodoc
       include Mongoid::Atomicity
       include Mongoid::Attributes
       include Mongoid::Collections
+      include Mongoid::Copyable
       include Mongoid::Dirty
       include Mongoid::Extras
       include Mongoid::Fields
