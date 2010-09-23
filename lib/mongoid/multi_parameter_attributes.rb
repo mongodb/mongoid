@@ -45,17 +45,7 @@ module Mongoid #:nodoc:
           begin
             values = (values.keys.min..values.keys.max).map { |i| values[i] }
             klass = self.class.fields[key].try(:type)
-            attributes[key] = if klass == DateTime
-              instantiate_time_object(*values).to_datetime
-            elsif klass == Date
-              Date.civil(*values)
-            elsif klass == Time
-              instantiate_time_object(*values).to_time
-            elsif klass
-              klass.new *values
-            else
-              values
-            end
+            attributes[key] = instantiate_object(klass, values)
           rescue => e
             errors << Errors::AttributeAssignmentError.new("error on assignment #{values.inspect} to #{key}", e, key)
           end
@@ -64,7 +54,7 @@ module Mongoid #:nodoc:
         unless errors.empty?
           raise Errors::MultiparameterAssignmentErrors.new(errors), "#{errors.size} error(s) on assignment of multiparameter attributes"
         end
-        
+
         super attributes
       else
         super
@@ -72,8 +62,14 @@ module Mongoid #:nodoc:
     end
     
   protected
-    def instantiate_time_object(*values)
-      (Time.zone || Time).send(Mongoid::Config.instance.use_utc? ? :utc : :local, *values)
+    def instantiate_object klass, values
+      if klass == DateTime || klass == Date || klass == Time
+        klass.send(:convert_to_time, values)
+      elsif klass
+        klass.new *values
+      else
+        values
+      end
     end
   end
 end

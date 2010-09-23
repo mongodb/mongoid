@@ -29,6 +29,7 @@ module Mongoid #:nodoc:
           when ::String then time.parse(value)
           when ::DateTime then time.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
           when ::Date then time.local(value.year, value.month, value.day)
+          when ::Array then time.local(*value)
           else value
         end
       end

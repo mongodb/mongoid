@@ -68,7 +68,15 @@ describe Mongoid::Extensions::Date::Conversions do
       it "converts to a utc time" do
         Date.set(@date).should == Time.utc(@date.year, @date.month, @date.day)
       end
+    end
 
+    context "when given an Array" do
+      before { @array = [@time.year, @time.month, @time.day] }
+
+      it "converts to a utc time" do
+        Date.set(@array).should == Time.utc(*@array)
+        Date.set(@array).utc_offset.should == 0
+      end
     end
   end
 

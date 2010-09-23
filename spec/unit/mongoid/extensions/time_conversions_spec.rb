@@ -108,6 +108,7 @@ describe Mongoid::Extensions::TimeConversions do
 
       it "converts to a utc time" do
         Time.set(@date).should == Time.local(@date.year, @date.month, @date.day)
+        Time.set(@date).utc_offset.should == 0
       end
 
       context "when using the ActiveSupport time zone" do
@@ -124,6 +125,30 @@ describe Mongoid::Extensions::TimeConversions do
 
         it "assumes the given time is local" do
           Time.set(@date).should == Time.utc(2010, 11, 18, 23)
+        end
+      end
+    end
+
+    context "when given an array" do
+      before { @array = [2010, 11, 19, 00, 24, 49] }
+
+      it "returns a time" do
+        Time.set(@array).should == Time.local(*@array)
+      end
+
+      context "when using the ActiveSupport time zone" do
+        before do
+          Mongoid::Config.instance.use_activesupport_time_zone = true
+          # if this is actually your time zone, the following tests are useless
+          Time.zone = "Stockholm" 
+        end
+        after do 
+          Time.zone = nil
+          Mongoid::Config.instance.use_activesupport_time_zone = false 
+        end
+
+        it "assumes the given time is local" do
+          Time.set(@array).should == Time.utc(2010, 11, 18, 23, 24, 49)
         end
       end
     end
