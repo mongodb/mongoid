@@ -32,7 +32,6 @@ module Mongoid #:nodoc:
         multi_parameter_attributes = {}
       
         attrs.each_pair do |key, value|
-          #if /^([^\(]+)\((\d+)([ifas])\)$/ === key
           if key =~ /^([^\(]+)\((\d+)([if])\)$/
             key, index = $1, $2.to_i
             value = value.send(:"to_#{$3}") if $3
