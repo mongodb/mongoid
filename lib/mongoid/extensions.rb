@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "mongoid/extensions/time_conversions"
-require "mongoid/extensions/array/accessors"
 require "mongoid/extensions/array/conversions"
 require "mongoid/extensions/array/parentization"
 require "mongoid/extensions/set/conversions"
@@ -11,7 +10,6 @@ require "mongoid/extensions/date/conversions"
 require "mongoid/extensions/datetime/conversions"
 require "mongoid/extensions/false_class/equality"
 require "mongoid/extensions/float/conversions"
-require "mongoid/extensions/hash/accessors"
 require "mongoid/extensions/hash/assimilation"
 require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/hash/criteria_helpers"
@@ -29,7 +27,6 @@ require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/object_id/conversions"
 
 class Array #:nodoc
-  include Mongoid::Extensions::Array::Accessors
   include Mongoid::Extensions::Array::Conversions
   include Mongoid::Extensions::Array::Parentization
 end
@@ -69,7 +66,6 @@ class Float #:nodoc
 end
 
 class Hash #:nodoc
-  include Mongoid::Extensions::Hash::Accessors
   include Mongoid::Extensions::Hash::Assimilation
   include Mongoid::Extensions::Hash::CriteriaHelpers
   include Mongoid::Extensions::Hash::Scoping
