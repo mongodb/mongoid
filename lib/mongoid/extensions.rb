@@ -10,7 +10,6 @@ require "mongoid/extensions/date/conversions"
 require "mongoid/extensions/datetime/conversions"
 require "mongoid/extensions/false_class/equality"
 require "mongoid/extensions/float/conversions"
-require "mongoid/extensions/hash/assimilation"
 require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
@@ -66,7 +65,6 @@ class Float #:nodoc
 end
 
 class Hash #:nodoc
-  include Mongoid::Extensions::Hash::Assimilation
   include Mongoid::Extensions::Hash::CriteriaHelpers
   include Mongoid::Extensions::Hash::Scoping
   include Mongoid::Extensions::Hash::Conversions
