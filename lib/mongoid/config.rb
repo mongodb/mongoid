@@ -224,7 +224,7 @@ module Mongoid #:nodoc
     # <tt>config.check_database!</tt>
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
-      unless Mongoid.skip_version_check
+      unless skip_version_check
         version = database.connection.server_version
         raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
       end

@@ -191,37 +191,5 @@ module Mongoid #:nodoc:
         # raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit])
       # end
     # end
-
-    module ClassMethods
-      # Defines attribute setters for the associations specified by the names.
-      # This will work for a has one or has many association.
-      #
-      # Example:
-      #
-      #   class Person
-      #     include Mongoid::Document
-      #     embeds_one :name
-      #     embeds_many :addresses
-      #
-      #     accepts_nested_attributes_for :name, :addresses
-      #   end
-      # def accepts_nested_attributes_for(*args)
-        # associations = args.flatten
-        # options = associations.last.is_a?(Hash) ? associations.pop : {}
-        # associations.each do |name|
-          # define_method("#{name}_attributes=") do |attrs|
-            # reject(attrs, options)
-            # limit(attrs, name, options)
-            # association = send(name)
-            # if association
-              # observe(association, true)
-              # association.nested_build(attrs, options)
-            # else
-              # send("build_#{name}", attrs, options)
-            # end
-          # end
-        # end
-      # end
-    end
   end
 end
