@@ -266,10 +266,10 @@ module Mongoid #:nodoc:
       def instantiate(attrs = nil)
         attributes = attrs || {}
         if attributes["_id"]
-          document = allocate
-          document.instance_variable_set(:@attributes, attributes)
-          document.setup_modifications
-          document
+          allocate.tap do |doc|
+            doc.instance_variable_set(:@attributes, attributes)
+            doc.setup_modifications
+          end
         else
           new(attrs)
         end
