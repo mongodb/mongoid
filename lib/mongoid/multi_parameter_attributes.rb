@@ -32,7 +32,8 @@ module Mongoid #:nodoc:
         multi_parameter_attributes = {}
       
         attrs.each_pair do |key, value|
-          if /^([^\(]+)\((\d+)([ifas])\)$/ === key
+          #if /^([^\(]+)\((\d+)([ifas])\)$/ === key
+          if key =~ /^([^\(]+)\((\d+)([if])\)$/
             key, index = $1, $2.to_i
             value = value.send(:"to_#{$3}") if $3
             (multi_parameter_attributes[key] ||= {})[index] = value
@@ -63,7 +64,9 @@ module Mongoid #:nodoc:
     
   protected
     def instantiate_object klass, values
-      if klass == DateTime || klass == Date || klass == Time
+      if values.all? {|v| v == 0}
+        nil
+      elsif klass == DateTime || klass == Date || klass == Time
         klass.send(:convert_to_time, values)
       elsif klass
         klass.new *values

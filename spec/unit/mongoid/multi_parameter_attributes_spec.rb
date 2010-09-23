@@ -5,11 +5,11 @@ describe Mongoid::MultiParameterAttributes do
     context "creating a post" do
       before do
         @post = Post.new({
-          "created_at(1i)" => 2010,
-          "created_at(2i)" => 8,
-          "created_at(3i)" => 12,
-          "created_at(4i)" => 15,
-          "created_at(5i)" => 45
+          "created_at(1i)" => "2010",
+          "created_at(2i)" => "8",
+          "created_at(3i)" => "12",
+          "created_at(4i)" => "15",
+          "created_at(5i)" => "45"
         })
       end
 
@@ -26,9 +26,9 @@ describe Mongoid::MultiParameterAttributes do
       context "with a valid DOB" do
         before do
           @person = Person.new({
-            "dob(1i)" => 1980,
-            "dob(2i)" => 7,
-            "dob(3i)" => 27
+            "dob(1i)" => "1980",
+            "dob(2i)" => "7",
+            "dob(3i)" => "27"
           })
         end
 
@@ -41,9 +41,9 @@ describe Mongoid::MultiParameterAttributes do
         it "should raise an exception" do
           lambda {
             @person = Person.new({
-              "dob(1i)" => 1980,
-              "dob(2i)" => 2,
-              "dob(3i)" => 31
+              "dob(1i)" => "1980",
+              "dob(2i)" => "2",
+              "dob(3i)" => "31"
             })
           }.should raise_exception(
             Mongoid::MultiParameterAttributes::Errors::MultiparameterAssignmentErrors,
@@ -52,6 +52,18 @@ describe Mongoid::MultiParameterAttributes do
         end
       end
     end
-    
+
+    context "with a blank DOB" do
+      it "should raise an exception" do
+        lambda {
+          @person = Person.new({
+            "title"   => "John",
+            "dob(1i)" => "",
+            "dob(2i)" => "",
+            "dob(3i)" => ""
+          })
+        }.should_not raise_exception
+      end
+    end
   end
 end
