@@ -466,56 +466,262 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find" do
 
-    context "when an id is provided" do
+    let(:person) do
+      Person.create
+    end
 
-      let(:person) do
-        Person.create(:ssn => "987-77-7712")
+    let!(:post_one) do
+      person.posts.create(:title => "Test")
+    end
+
+    let!(:post_two) do
+      person.posts.create(:title => "OMG I has relations")
+    end
+
+    context "when providing an id" do
+
+      context "when the id matches" do
+
+        let(:post) do
+          person.posts.find(post_one.id)
+        end
+
+        it "returns the matching document" do
+          post.should == post_one
+        end
       end
 
-      let(:post) do
-        person.posts.create(:title => "Testing")
-      end
+      context "when the id does not match" do
 
-      it "returns the matching document" do
-        person.posts.find(post.id).should == post
+        context "when config set to raise error" do
+
+          before do
+            Mongoid.raise_not_found_error = true
+          end
+
+          after do
+            Mongoid.raise_not_found_error = false
+          end
+
+          it "raises an error" do
+            expect {
+              person.posts.find(BSON::ObjectId.new)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when config set not to raise error" do
+
+          let(:post) do
+            person.posts.find(BSON::ObjectId.new)
+          end
+
+          before do
+            Mongoid.raise_not_found_error = false
+          end
+
+          it "returns nil" do
+            post.should be_nil
+          end
+        end
       end
     end
 
-    context "when a type is provided" do
+    context "when providing an array of ids" do
 
-      let(:person) do
-        Person.create(:ssn => "987-77-7712")
-      end
+      context "when the ids match" do
 
-      let!(:post) do
-        person.posts.create(:title => "Testing")
-      end
-
-      context "when finding all" do
+        let(:posts) do
+          person.posts.find([ post_one.id, post_two.id ])
+        end
 
         it "returns the matching documents" do
-          person.posts.find(
-            :all,
-            :conditions => { :title => "Testing" }).should == [ post ]
+          posts.should == [ post_one, post_two ]
         end
       end
 
-      context "when finding first" do
+      context "when the ids do not match" do
 
-        it "returns the matching documents" do
-          person.posts.find(
-            :first,
-            :conditions => { :title => "Testing" }).should == post
+        context "when config set to raise error" do
+
+          before do
+            Mongoid.raise_not_found_error = true
+          end
+
+          after do
+            Mongoid.raise_not_found_error = false
+          end
+
+          it "raises an error" do
+            expect {
+              person.posts.find([ BSON::ObjectId.new ])
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when config set not to raise error" do
+
+          let(:posts) do
+            person.posts.find([ BSON::ObjectId.new ])
+          end
+
+          before do
+            Mongoid.raise_not_found_error = false
+          end
+
+          it "returns an empty array" do
+            posts.should be_empty
+          end
+        end
+      end
+    end
+
+    context "when finding first" do
+
+      context "when there is a match" do
+
+        let(:post) do
+          person.posts.find(:first, :conditions => { :title => "Test" })
+        end
+
+        it "returns the first matching document" do
+          post.should == post_one
         end
       end
 
-      context "when finding last" do
+      context "when there is no match" do
+
+        let(:post) do
+          person.posts.find(:first, :conditions => { :title => "Testing" })
+        end
+
+        it "returns nil" do
+          post.should be_nil
+        end
+      end
+    end
+
+    context "when finding last" do
+
+      context "when there is a match" do
+
+        let(:post) do
+          person.posts.find(:last, :conditions => { :title => "OMG I has relations" })
+        end
+
+        it "returns the last matching document" do
+          post.should == post_two
+        end
+      end
+
+      context "when there is no match" do
+
+        let(:post) do
+          person.posts.find(:last, :conditions => { :title => "Testing" })
+        end
+
+        it "returns nil" do
+          post.should be_nil
+        end
+      end
+    end
+
+    context "when finding all" do
+
+      context "when there is a match" do
+
+        let(:posts) do
+          person.posts.find(:all, :conditions => { :title => { "$exists" => true } })
+        end
 
         it "returns the matching documents" do
-          person.posts.find(
-            :last,
-            :conditions => { :title => "Testing" }).should == post
+          posts.should == [ post_one, post_two ]
         end
+      end
+
+      context "when there is no match" do
+
+        let(:posts) do
+          person.posts.find(:all, :conditions => { :title => "Other" })
+        end
+
+        it "returns an empty array" do
+          posts.should be_empty
+        end
+      end
+    end
+  end
+
+  describe "#find_or_create_by" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:post) do
+      person.posts.create(:title => "Testing")
+    end
+
+    context "when the document exists" do
+
+      let(:found) do
+        person.posts.find_or_create_by(:title => "Testing")
+      end
+
+      it "returns the document" do
+        found.should == post
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:found) do
+        person.posts.find_or_create_by(:title => "Test")
+      end
+
+      it "sets the new document attributes" do
+        found.title.should == "Test"
+      end
+
+      it "returns a newly persisted document" do
+        found.should be_persisted
+      end
+    end
+  end
+
+  describe "#find_or_initialize_by" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:post) do
+      person.posts.create(:title => "Testing")
+    end
+
+    context "when the document exists" do
+
+      let(:found) do
+        person.posts.find_or_initialize_by(:title => "Testing")
+      end
+
+      it "returns the document" do
+        found.should == post
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:found) do
+        person.posts.find_or_initialize_by(:title => "Test")
+      end
+
+      it "sets the new document attributes" do
+        found.title.should == "Test"
+      end
+
+      it "returns a non persisted document" do
+        found.should_not be_persisted
       end
     end
   end

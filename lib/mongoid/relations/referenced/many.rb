@@ -197,6 +197,42 @@ module Mongoid # :nodoc:
           klass.find(arg, :conditions => selector)
         end
 
+        # Find the first +Document+ given the conditions, or creates a new document
+        # with the conditions that were supplied
+        #
+        # Example:
+        #
+        # <tt>person.posts.find_or_create_by(:title => "Testing")</tt>
+        #
+        # Options:
+        #
+        # attrs: A +Hash+ of attributes
+        #
+        # Returns:
+        #
+        # An existing document or newly created one.
+        def find_or_create_by(attrs = {})
+          find_or(:create, attrs)
+        end
+
+        # Find the first +Document+ given the conditions, or instantiates a new document
+        # with the conditions that were supplied
+        #
+        # Example:
+        #
+        # <tt>person.posts.find_or_initialize_by(:title => "Test")</tt>
+        #
+        # Options:
+        #
+        # attrs: A +Hash+ of attributes
+        #
+        # Returns:
+        #
+        # An existing document or new one.
+        def find_or_initialize_by(attrs = {})
+          find_or(:build, attrs)
+        end
+
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #
@@ -244,6 +280,26 @@ module Mongoid # :nodoc:
           Bindings::Referenced::Many.new(base, target, metadata).unbind
           target.each(&:delete) if base.persisted?
           []
+        end
+
+        private
+
+        # Find the first object given the supplied attributes or create/initialize it.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.find_or(:create, :street => "Bond")</tt>
+        #
+        # Options:
+        #
+        # method: The method name, create or new.
+        # attrs: The attributes to build with
+        #
+        # Returns:
+        #
+        # A matching document or a new/created one.
+        def find_or(method, attrs = {})
+          find(:first, :conditions => attrs) || send(method, attrs)
         end
 
         class << self
