@@ -51,6 +51,11 @@ describe Mongoid::Validations::UniquenessValidator do
           account.username = "chitchins"
           account.should_not be_valid
         end
+
+        it "passes validation when another document has a similar unique field" do
+          account.username = "chitch"
+          account.should be_valid
+        end
         
         context "with case insensitive validation" do
           it "fails validation when another document has the same unique field with a different case" do
