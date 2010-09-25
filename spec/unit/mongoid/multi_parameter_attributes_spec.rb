@@ -57,7 +57,6 @@ describe Mongoid::MultiParameterAttributes do
       it "should not raise an exception" do
         lambda {
           @person = Person.new({
-            "title"   => "John",
             "dob(1i)" => "",
             "dob(2i)" => "",
             "dob(3i)" => ""
@@ -66,7 +65,6 @@ describe Mongoid::MultiParameterAttributes do
       end
       it "should generate a nil date" do
         @person = Person.new({
-          "title"   => "John",
           "dob(1i)" => "",
           "dob(2i)" => "",
           "dob(3i)" => ""
@@ -74,5 +72,28 @@ describe Mongoid::MultiParameterAttributes do
         @person.dob.should be_nil
       end
     end
+
+    context "with a partially blank DOB" do
+      it "should not raise an exception" do
+        lambda {
+          @person = Person.new({
+            "dob(1i)" => "1980",
+            "dob(2i)" => "",
+            "dob(3i)" => ""
+          })
+        }.should_not raise_exception
+      end
+      it "should set empty date's parts to 1" do
+        @person = Person.new({
+          "dob(1i)" => "1980",
+          "dob(2i)" => "",
+          "dob(3i)" => ""
+        })
+        @person.dob.year.should == 1980
+        @person.dob.month.should == 1
+        @person.dob.day.should == 1
+      end
+    end
+
   end
 end
