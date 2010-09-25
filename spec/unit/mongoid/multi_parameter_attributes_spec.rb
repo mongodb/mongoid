@@ -54,7 +54,7 @@ describe Mongoid::MultiParameterAttributes do
     end
 
     context "with a blank DOB" do
-      it "should raise an exception" do
+      it "should not raise an exception" do
         lambda {
           @person = Person.new({
             "title"   => "John",
