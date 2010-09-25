@@ -25,6 +25,7 @@ module Mongoid #:nodoc
       include Mongoid::Matchers
       include Mongoid::Memoization
       include Mongoid::Modifiers
+      include Mongoid::MultiParameterAttributes
       include Mongoid::Paths
       include Mongoid::Persistence
       include Mongoid::Safety
