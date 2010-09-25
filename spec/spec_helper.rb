@@ -4,6 +4,13 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 MODELS = File.join(File.dirname(__FILE__), "models")
 $LOAD_PATH.unshift(MODELS)
 
+if ENV['COVERAGE'] and RUBY_VERSION =~ /1.\/9/
+  require 'simplecov'
+  SimpleCov.start do
+    add_filter '/spec/'
+  end
+end
+
 require "mongoid"
 require "mocha"
 require "rspec"
