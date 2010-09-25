@@ -21,7 +21,7 @@ describe Mongoid::MultiParameterAttributes do
         @post.attributes.should_not have_key("created_at(1i)")
       end
     end
-    
+
     context "creating a person" do
       context "with a valid DOB" do
         before do
@@ -36,7 +36,7 @@ describe Mongoid::MultiParameterAttributes do
           @person.dob.should == Date.civil(1980, 7, 27)
         end
       end
-      
+
       context "with an invalid DOB" do
         it "should raise an exception" do
           lambda {

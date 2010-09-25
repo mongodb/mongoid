@@ -30,7 +30,7 @@ module Mongoid #:nodoc:
         errors = []
         attributes = {}
         multi_parameter_attributes = {}
-      
+
         attrs.each_pair do |key, value|
           if key =~ /^([^\(]+)\((\d+)([if])\)$/
             key, index = $1, $2.to_i
@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
             attributes[key] = value
           end
         end
-        
+
         multi_parameter_attributes.each_pair do |key, values|
           begin
             values = (values.keys.min..values.keys.max).map { |i| values[i] }
@@ -50,7 +50,7 @@ module Mongoid #:nodoc:
             errors << Errors::AttributeAssignmentError.new("error on assignment #{values.inspect} to #{key}", e, key)
           end
         end
-        
+
         unless errors.empty?
           raise Errors::MultiparameterAssignmentErrors.new(errors), "#{errors.size} error(s) on assignment of multiparameter attributes"
         end
@@ -60,7 +60,7 @@ module Mongoid #:nodoc:
         super
       end
     end
-    
+
   protected
     def instantiate_object klass, values
       if values.all? {|v| v == 0}
