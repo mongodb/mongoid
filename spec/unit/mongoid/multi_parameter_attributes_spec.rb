@@ -64,6 +64,15 @@ describe Mongoid::MultiParameterAttributes do
           })
         }.should_not raise_exception
       end
+      it "should generate a nil date" do
+        @person = Person.new({
+          "title"   => "John",
+          "dob(1i)" => "",
+          "dob(2i)" => "",
+          "dob(3i)" => ""
+        })
+        @person.dob.should be_nil
+      end
     end
   end
 end
