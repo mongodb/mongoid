@@ -40,6 +40,31 @@ module Mongoid #:nodoc:
       alias :concat :<<
       alias :push :<<
 
+      # Removes association between two documents from association collections.
+      def delete(document)
+        @parent.send(@foreign_key).delete(document.id)
+        each do |object|
+          if inverse?
+            reverse_key = reverse_key(object)
+            case inverse_of(object).macro
+            when :references_many
+              object.send(reverse_key(object)).delete(@parent.id)
+            when :referenced_in
+              object.send("#{reverse_key}=", nil)
+            end
+          end
+          object.save unless object.new_record?
+        end
+        @parent.save unless @parent.new_record?
+      end
+
+      # Clears association by removing all keys from association collection.
+      def clear
+        each do |document|
+          delete(document)
+        end
+      end
+
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.

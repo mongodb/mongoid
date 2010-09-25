@@ -462,6 +462,57 @@ describe Mongoid::Associations::ReferencesManyAsArray do
         end
       end
 
+      describe "#delete" do
+ 
+        let(:person) do
+          Person.new
+        end
+
+        let(:preference) do
+          Preference.new(:name => "Brightness")
+        end
+
+        before do
+          @association = Mongoid::Associations::ReferencesManyAsArray.new(
+            person, options
+          )
+          @association.push(preference)
+        end
+
+        it "should remove keys from both sides when deleting association" do
+          @association.delete(preference)
+          preference.person_ids.should be_empty
+          person.preference_ids.should be_empty
+        end
+      
+      end
+
+      describe "#clear" do
+ 
+        let(:person) do
+          Person.new
+        end
+
+        let(:preference) do
+          Preference.new(:name => "Brightness")
+        end
+
+        before do
+          @association = Mongoid::Associations::ReferencesManyAsArray.new(
+            person, options
+          )
+          @association.push(preference)
+        end
+
+        it "should clear association completelly" do
+          @association.clear
+          preference.person_ids.should be_empty
+          person.preference_ids.should be_empty
+        end
+      
+      end
+
+
       describe ".update" do
 
         before do

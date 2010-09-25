@@ -365,6 +365,46 @@ describe Mongoid::Associations::ReferencesMany do
 
   end
 
+  describe "#delete" do
+    let :person do
+      Person.new
+    end 
+
+    let :post do
+      Post.new
+    end
+
+    before :each do
+      person.posts << post
+    end
+
+    it "should be true" do
+      person.posts.delete(post)
+      person.posts.should be_empty
+      post.person.should be_nil
+    end
+  end
+
+  describe "#clear" do
+    let :person do
+      Person.new
+    end 
+
+    let :post do
+      Post.new
+    end
+
+    before :each do
+      person.posts << post
+    end
+
+    it "should be true" do
+      person.posts.clear
+      person.posts.should be_empty
+      post.person.should be_nil
+    end
+  end
+
   describe ".initialize" do
 
     before do

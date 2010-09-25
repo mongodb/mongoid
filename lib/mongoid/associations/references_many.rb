@@ -19,6 +19,21 @@ module Mongoid #:nodoc:
       alias :concat :<<
       alias :push :<<
 
+      # Removes given document from association
+      def delete(document)
+        load_target
+        document.write_attribute(@foreign_key, nil)
+        @target.delete(document)
+        document.save unless @parent.new_record?
+      end
+
+      # Clears association by removing all keys from association collection.
+      def clear
+        each do |document|
+          delete(document)
+        end
+      end
+
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
