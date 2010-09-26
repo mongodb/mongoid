@@ -3,4 +3,4 @@
 source "http://rubygems.org"
 gemspec
 
-gem 'simplecov', :group => :test if RUBY_VERSION =~ /1\.9/
+gem 'simplecov', :require => false, :group => :test if RUBY_VERSION =~ /1\.9/
