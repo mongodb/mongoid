@@ -26,7 +26,7 @@ describe Mongoid::Attributes do
 
     it "saves the default" do
       expect { person.save }.to_not raise_error
-      person.last_drink_taken_at.should == 1.day.ago.to_date
+      person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
     end
 
   end

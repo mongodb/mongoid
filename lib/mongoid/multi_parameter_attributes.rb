@@ -34,8 +34,7 @@ module Mongoid #:nodoc:
         attrs.each_pair do |key, value|
           if key =~ /^([^\(]+)\((\d+)([if])\)$/
             key, index = $1, $2.to_i
-            value = value.send(:"to_#{$3}") if $3
-            (multi_parameter_attributes[key] ||= {})[index] = value
+            (multi_parameter_attributes[key] ||= {})[index] = value.empty? ? nil : value.send("to_#{$3}")
           else
             attributes[key] = value
           end
@@ -62,10 +61,13 @@ module Mongoid #:nodoc:
     end
 
   protected
-    def instantiate_object klass, values
-      if values.all? {|v| v == 0}
-        nil
-      elsif klass == DateTime || klass == Date || klass == Time
+
+    def instantiate_object(klass, values_with_empty_parameters)
+      return nil if values_with_empty_parameters.all? { |v| v.nil? }
+      
+      values = values_with_empty_parameters.collect { |v| v.nil? ? 1 : v }
+      
+      if klass == DateTime || klass == Date || klass == Time
         klass.send(:convert_to_time, values)
       elsif klass
         klass.new *values
@@ -73,5 +75,6 @@ module Mongoid #:nodoc:
         values
       end
     end
+
   end
 end
