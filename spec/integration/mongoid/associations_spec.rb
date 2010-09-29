@@ -582,11 +582,25 @@ describe Mongoid::Associations do
       context "when overwriting" do
         before do
           @person.addresses.build(:street => "Oxford St")
-          @person.addresses = @person.addresses
+          @person.addresses = [Address.new(:street => "Cambridge St")]
         end
 
         it "still recognizes the embedded document as a new record" do
           @person.addresses.first.should be_new_record
+        end
+
+        it "should only have one address" do
+          @person.should have(1).addresses
+        end
+
+        it "should only have one address after persisting" do
+          @person.save!
+          @person.reload
+          @person.should have(1).addresses
+          @person.addresses = [Address.new(:street => "Broadway Blvd")]
+          @person.save!
+          @person.reload
+          @person.should have(1).addresses
         end
       end
 
