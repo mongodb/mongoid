@@ -254,6 +254,8 @@ describe Mongoid::Relations::Metadata do
 
   describe "#foreign_key_setter" do
 
+    context "when the relation is not polymorphic" do
+
       let(:metadata) do
         klass.new(
           :name => :person,
@@ -262,8 +264,25 @@ describe Mongoid::Relations::Metadata do
         )
       end
 
-    it "returns the foreign_key plus =" do
-      metadata.foreign_key_setter.should == "person_id="
+      it "returns the foreign_key plus =" do
+        metadata.foreign_key_setter.should == "person_id="
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :ratings,
+          :relation => Mongoid::Relations::Referenced::Many,
+          :as => :ratable,
+          :inverse_class_name => "Movie"
+        )
+      end
+
+      it "returns the polymorphic foreign_key plus =" do
+        metadata.foreign_key_setter.should == "ratable_id="
+      end
     end
   end
 
