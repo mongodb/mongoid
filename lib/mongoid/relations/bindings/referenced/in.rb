@@ -31,7 +31,7 @@ module Mongoid # :nodoc:
           def unbind
             if unbindable?
               base.send(metadata.foreign_key_setter, nil)
-              target.send(metadata.inverse_setter, nil)
+              target.send(metadata.inverse_setter(target), nil)
             end
           end
 

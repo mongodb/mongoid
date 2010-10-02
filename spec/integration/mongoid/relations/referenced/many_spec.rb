@@ -286,40 +286,62 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#clear" do
 
-    context "when the parent has been persisted" do
+    context "when the relation is not polymorphic" do
 
-      let!(:person) do
-        Person.create(:ssn => "123-45-9988")
+      context "when the parent has been persisted" do
+
+        let!(:person) do
+          Person.create(:ssn => "123-45-9988")
+        end
+
+        context "when the children are persisted" do
+
+          let!(:post) do
+            person.posts.create(:title => "Testing")
+          end
+
+          let!(:relation) do
+            person.posts.clear
+          end
+
+          it "clears out the relation" do
+            person.posts.should be_empty
+          end
+
+          it "marks the documents as deleted" do
+            post.should be_destroyed
+          end
+
+          it "deletes the documents from the db" do
+            person.reload.posts.should be_empty
+          end
+
+          it "returns the relation" do
+            relation.should == []
+          end
+        end
+
+        context "when the children are not persisted" do
+
+          let!(:post) do
+            person.posts.build(:title => "Testing")
+          end
+
+          let!(:relation) do
+            person.posts.clear
+          end
+
+          it "clears out the relation" do
+            person.posts.should be_empty
+          end
+        end
       end
 
-      context "when the children are persisted" do
+      context "when the parent is not persisted" do
 
-        let!(:post) do
-          person.posts.create(:title => "Testing")
+        let(:person) do
+          Person.new
         end
-
-        let!(:relation) do
-          person.posts.clear
-        end
-
-        it "clears out the relation" do
-          person.posts.should be_empty
-        end
-
-        it "marks the documents as deleted" do
-          post.should be_destroyed
-        end
-
-        it "deletes the documents from the db" do
-          person.reload.posts.should be_empty
-        end
-
-        it "returns the relation" do
-          relation.should == []
-        end
-      end
-
-      context "when the children are not persisted" do
 
         let!(:post) do
           person.posts.build(:title => "Testing")
@@ -335,22 +357,74 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
 
-    context "when the parent is not persisted" do
+    context "when the relation is polymorphic" do
 
-      let(:person) do
-        Person.new
+      context "when the parent has been persisted" do
+
+        let!(:movie) do
+          Movie.create
+        end
+
+        context "when the children are persisted" do
+
+          let!(:rating) do
+            movie.ratings.create(:value => 1)
+          end
+
+          let!(:relation) do
+            movie.ratings.clear
+          end
+
+          it "clears out the relation" do
+            movie.ratings.should be_empty
+          end
+
+          it "marks the documents as deleted" do
+            rating.should be_destroyed
+          end
+
+          it "deletes the documents from the db" do
+            movie.reload.ratings.should be_empty
+          end
+
+          it "returns the relation" do
+            relation.should == []
+          end
+        end
+
+        context "when the children are not persisted" do
+
+          let!(:rating) do
+            movie.ratings.build(:value => 3)
+          end
+
+          let!(:relation) do
+            movie.ratings.clear
+          end
+
+          it "clears out the relation" do
+            movie.ratings.should be_empty
+          end
+        end
       end
 
-      let!(:post) do
-        person.posts.build(:title => "Testing")
-      end
+      context "when the parent is not persisted" do
 
-      let!(:relation) do
-        person.posts.clear
-      end
+        let(:movie) do
+          Movie.new
+        end
 
-      it "clears out the relation" do
-        person.posts.should be_empty
+        let!(:rating) do
+          movie.ratings.build(:value => 2)
+        end
+
+        let!(:relation) do
+          movie.ratings.clear
+        end
+
+        it "clears out the relation" do
+          movie.ratings.should be_empty
+        end
       end
     end
   end
