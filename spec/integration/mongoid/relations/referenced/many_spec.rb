@@ -3,8 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::Many do
 
   before do
-    Person.delete_all
-    Post.delete_all
+    [ Person, Post, Movie, Rating ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -713,112 +712,118 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  describe "#delete_all" do
+  [ :delete_all, :destroy_all ].each do |method|
 
-    context "when conditions are provided" do
+    describe "##{method}" do
 
-      let(:person) do
-        Person.create(:ssn => "123-32-2321")
+      context "when the relation is not polymorphic" do
+
+        context "when conditions are provided" do
+
+          let(:person) do
+            Person.create(:ssn => "123-32-2321")
+          end
+
+          before do
+            person.posts.create(:title => "Testing")
+            person.posts.create(:title => "Test")
+          end
+
+          it "removes the correct posts" do
+            person.posts.send(method, :conditions => { :title => "Testing" })
+            person.posts.count.should == 1
+          end
+
+          it "deletes the documents from the database" do
+            person.posts.send(method, :conditions => {:title => "Testing" })
+            Post.where(:title => "Testing").count.should == 0
+          end
+
+          it "returns the number of documents deleted" do
+            person.posts.send(method, :conditions => { :title => "Testing" }).should == 1
+          end
+        end
+
+        context "when conditions are not provided" do
+
+          let(:person) do
+            Person.create(:ssn => "123-32-2321")
+          end
+
+          before do
+            person.posts.create(:title => "Testing")
+            person.posts.create(:title => "Test")
+          end
+
+          it "removes the correct posts" do
+            person.posts.send(method)
+            person.posts.count.should == 0
+          end
+
+          it "deletes the documents from the database" do
+            person.posts.send(method)
+            Post.where(:title => "Testing").count.should == 0
+          end
+
+          it "returns the number of documents deleted" do
+            person.posts.send(method).should == 2
+          end
+        end
       end
 
-      before do
-        person.posts.create(:title => "Testing")
-        person.posts.create(:title => "Test")
-      end
+      context "when the relation is polymorphic" do
 
-      it "removes the correct posts" do
-        person.posts.delete_all(:title => "Testing")
-        person.posts.count.should == 1
-      end
+        context "when conditions are provided" do
 
-      it "deletes the documents from the database" do
-        person.posts.delete_all(:title => "Testing")
-        Post.where(:title => "Testing").count.should == 0
-      end
+          let(:movie) do
+            Movie.create(:title => "Bladerunner")
+          end
 
-      it "returns the number of documents deleted" do
-        person.posts.delete_all(:title => "Testing").should == 1
-      end
-    end
+          before do
+            movie.ratings.create(:value => 1)
+            movie.ratings.create(:value => 2)
+          end
 
-    context "when conditions are not provided" do
+          it "removes the correct ratings" do
+            movie.ratings.send(method, :conditions => { :value => 1 })
+            movie.ratings.count.should == 1
+          end
 
-      let(:person) do
-        Person.create(:ssn => "123-32-2321")
-      end
+          it "deletes the documents from the database" do
+            movie.ratings.send(method, :conditions => { :value => 1 })
+            Rating.where(:value => 1).count.should == 0
+          end
 
-      before do
-        person.posts.create(:title => "Testing")
-        person.posts.create(:title => "Test")
-      end
+          it "returns the number of documents deleted" do
+            movie.ratings.send(method, :conditions => { :value => 1 }).should == 1
+          end
+        end
 
-      it "removes the correct posts" do
-        person.posts.delete_all
-        person.posts.count.should == 0
-      end
+        context "when conditions are not provided" do
 
-      it "deletes the documents from the database" do
-        person.posts.delete_all
-        Post.where(:title => "Testing").count.should == 0
-      end
+          let(:movie) do
+            Movie.create(:title => "Bladerunner")
+          end
 
-      it "returns the number of documents deleted" do
-        person.posts.delete_all.should == 2
-      end
-    end
-  end
+          before do
+            movie.ratings.create(:value => 1)
+            movie.ratings.create(:value => 2)
+          end
 
-  describe "#destroy_all" do
+          it "removes the correct ratings" do
+            movie.ratings.send(method)
+            movie.ratings.count.should == 0
+          end
 
-    context "when conditions are provided" do
+          it "deletes the documents from the database" do
+            movie.ratings.send(method)
+            Rating.where(:value => 1).count.should == 0
+          end
 
-      let(:person) do
-        Person.create(:ssn => "123-32-2321")
-      end
-
-      before do
-        person.posts.create(:title => "Testing")
-        person.posts.create(:title => "Test")
-      end
-
-      it "removes the correct posts" do
-        person.posts.destroy_all(:title => "Testing")
-        person.posts.count.should == 1
-      end
-
-      it "deletes the documents from the database" do
-        person.posts.destroy_all(:title => "Testing")
-        Post.where(:title => "Testing").count.should == 0
-      end
-
-      it "returns the number of documents deleted" do
-        person.posts.destroy_all(:title => "Testing").should == 1
-      end
-    end
-
-    context "when conditions are not provided" do
-
-      let(:person) do
-        Person.create(:ssn => "123-32-2321")
-      end
-
-      before do
-        person.posts.create(:title => "Testing")
-        person.posts.create(:title => "Test")
-      end
-
-      it "removes the correct posts" do
-        person.posts.destroy_all
-        person.posts.count.should == 0
-      end
-
-      it "deletes the documents from the database" do
-        person.posts.destroy_all
-        Post.where(:title => "Testing").count.should == 0
-      end
-
-      it "returns the number of documents deleted" do
-        person.posts.destroy_all.should == 2
+          it "returns the number of documents deleted" do
+            movie.ratings.send(method).should == 2
+          end
+        end
       end
     end
   end

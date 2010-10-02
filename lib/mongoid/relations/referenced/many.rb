@@ -140,7 +140,7 @@ module Mongoid # :nodoc:
         #
         # The number of documents deleted.
         def delete_all(conditions = nil)
-          selector = conditions || {}
+          selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
           metadata.klass.delete_all(
             :conditions => selector.merge(metadata.foreign_key => base.id)
@@ -162,7 +162,7 @@ module Mongoid # :nodoc:
         #
         # The number of documents deleted.
         def destroy_all(conditions = nil)
-          selector = conditions || {}
+          selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
           metadata.klass.destroy_all(
             :conditions => selector.merge(metadata.foreign_key => base.id)
