@@ -18,7 +18,7 @@ module Mongoid # :nodoc:
           def bind
             if bindable?(base)
               base.send(metadata.foreign_key_setter, target.id)
-              target.send(metadata.inverse_setter, base)
+              target.send(metadata.inverse_setter(target), base)
             end
           end
 

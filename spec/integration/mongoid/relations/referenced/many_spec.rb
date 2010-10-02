@@ -11,65 +11,133 @@ describe Mongoid::Relations::Referenced::Many do
 
     describe "##{method}" do
 
-      context "when the parent is a new record" do
+      context "when the relations are not polymorphic" do
 
-        let(:person) do
-          Person.new
+        context "when the parent is a new record" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:post) do
+            Post.new
+          end
+
+          before do
+            person.posts.send(method, post)
+          end
+
+          it "sets the foreign key on the relation" do
+            post.person_id.should == person.id
+          end
+
+          it "sets the base on the inverse relation" do
+            post.person.should == person
+          end
+
+          it "does not save the target" do
+            post.should be_a_new_record
+          end
+
+          it "adds the document to the target" do
+            person.posts.count.should == 1
+          end
         end
 
-        let(:post) do
-          Post.new
-        end
+        context "when the parent is not a new record" do
 
-        before do
-          person.posts.send(method, post)
-        end
+          let(:person) do
+            Person.create(:ssn => "554-44-3891")
+          end
 
-        it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
-        end
+          let(:post) do
+            Post.new
+          end
 
-        it "sets the base on the inverse relation" do
-          post.person.should == person
-        end
+          before do
+            person.posts.send(method, post)
+          end
 
-        it "does not save the target" do
-          post.should be_a_new_record
-        end
+          it "sets the foreign key on the relation" do
+            post.person_id.should == person.id
+          end
 
-        it "adds the document to the target" do
-          person.posts.count.should == 1
+          it "sets the base on the inverse relation" do
+            post.person.should == person
+          end
+
+          it "saves the target" do
+            post.should_not be_a_new_record
+          end
+
+          it "adds the document to the target" do
+            person.posts.count.should == 1
+          end
         end
       end
 
-      context "when the parent is not a new record" do
+      context "when the relations are polymorphic" do
 
-        let(:person) do
-          Person.create(:ssn => "554-44-3891")
+        context "when the parent is a new record" do
+
+          let(:movie) do
+            Movie.new
+          end
+
+          let(:rating) do
+            Rating.new
+          end
+
+          before do
+            movie.ratings.send(method, rating)
+          end
+
+          it "sets the foreign key on the relation" do
+            rating.ratable_id.should == movie.id
+          end
+
+          it "sets the base on the inverse relation" do
+            rating.ratable.should == movie
+          end
+
+          it "does not save the target" do
+            rating.should be_new
+          end
+
+          it "adds the document to the target" do
+            movie.ratings.count.should == 1
+          end
         end
 
-        let(:post) do
-          Post.new
-        end
+        context "when the parent is not a new record" do
 
-        before do
-          person.posts.send(method, post)
-        end
+          let(:movie) do
+            Movie.create
+          end
 
-        it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
-        end
+          let(:rating) do
+            Rating.new
+          end
 
-        it "sets the base on the inverse relation" do
-          post.person.should == person
-        end
+          before do
+            movie.ratings.send(method, rating)
+          end
 
-        it "saves the target" do
-          post.should_not be_a_new_record
-        end
+          it "sets the foreign key on the relation" do
+            rating.ratable_id.should == movie.id
+          end
 
-        it "adds the document to the target" do
-          person.posts.count.should == 1
+          it "sets the base on the inverse relation" do
+            rating.ratable.should == movie
+          end
+
+          it "saves the target" do
+            rating.should_not be_new
+          end
+
+          it "adds the document to the target" do
+            movie.ratings.count.should == 1
+          end
         end
       end
     end

@@ -25,7 +25,6 @@ module Mongoid # :nodoc:
             doc.save if base.persisted? && !building?
           end
         end
-
         alias :concat :<<
         alias :push :<<
 

@@ -386,16 +386,58 @@ describe Mongoid::Relations::Metadata do
 
   context "#inverse_setter" do
 
-    let(:metadata) do
-      klass.new(
-        :name => :pet,
-        :class_name => "Animal",
-        :inverse_class_name => "Person"
-      )
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :pet,
+          :class_name => "Animal",
+          :inverse_class_name => "Person"
+        )
+      end
+
+      it "returns a string for the setter" do
+        metadata.inverse_setter.should == "person="
+      end
     end
 
-    it "returns a string for the setter" do
-      metadata.inverse_setter.should == "person="
+    context "when the relation is polymorphic" do
+
+      context "when a referenced in" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :ratable,
+            :inverse_class_name => "Movie",
+            :polymorphic => true,
+            :relation => Mongoid::Relations::Referenced::In
+          )
+        end
+
+        let(:other) do
+          Movie.new
+        end
+
+        it "returns a string for the setter" do
+          metadata.inverse_setter(other).should == "ratings="
+        end
+      end
+
+      context "when a references many" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :ratings,
+            :inverse_class_name => "Rating",
+            :as => :ratable,
+            :relation => Mongoid::Relations::Referenced::Many
+          )
+        end
+
+        it "returns a string for the setter" do
+          metadata.inverse_setter.should == "ratable="
+        end
+      end
     end
   end
 
