@@ -400,15 +400,33 @@ describe Mongoid::Relations::Metadata do
 
       context "when relation stores foreign_key" do
 
-        let(:metadata) do
-          klass.new(
-            :name => :posts,
-            :relation => Mongoid::Relations::Referenced::ManyAsArray
-          )
+        context "when the relation is not polymorphic" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :posts,
+              :relation => Mongoid::Relations::Referenced::ManyAsArray
+            )
+          end
+
+          it "returns the foreign_key" do
+            metadata.key.should == "post_ids"
+          end
         end
 
-        it "returns the foreign_key" do
-          metadata.key.should == "post_ids"
+        context "when the relation is polymorphic" do
+
+          let(:metadata) do
+            klass.new(
+              :name => :ratable,
+              :relation => Mongoid::Relations::Referenced::In,
+              :polymorphic => true
+            )
+          end
+
+          it "returns the polymorphic foreign_key" do
+            metadata.key.should == "ratable_id"
+          end
         end
       end
 
