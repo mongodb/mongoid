@@ -1363,65 +1363,133 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#=" do
 
-    context "when the parent is a new record" do
+    context "when the relation is not polymorphic" do
 
-      let(:person) do
-        Person.new
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts = [ post ]
+        end
+
+        it "sets the target of the relation" do
+          person.posts.target.should == [ post ]
+        end
+
+        it "sets the foreign key on the relation" do
+          post.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          post.person.should == person
+        end
+
+        it "does not save the target" do
+          post.should_not be_persisted
+        end
       end
 
-      let(:post) do
-        Post.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        person.posts = [ post ]
-      end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-      it "sets the target of the relation" do
-        person.posts.target.should == [ post ]
-      end
+        let(:post) do
+          Post.new
+        end
 
-      it "sets the foreign key on the relation" do
-        post.person_id.should == person.id
-      end
+        before do
+          person.posts = [ post ]
+        end
 
-      it "sets the base on the inverse relation" do
-        post.person.should == person
-      end
+        it "sets the target of the relation" do
+          person.posts.target.should == [ post ]
+        end
 
-      it "does not save the target" do
-        post.should_not be_persisted
+        it "sets the foreign key of the relation" do
+          post.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          post.person.should == person
+        end
+
+        it "saves the target" do
+          post.should be_persisted
+        end
       end
     end
 
-    context "when the parent is not a new record" do
+    context "when the relation is polymorphic" do
 
-      let(:person) do
-        Person.create(:ssn => "437-11-1112")
+      context "when the parent is a new record" do
+
+        let(:movie) do
+          Movie.new
+        end
+
+        let(:rating) do
+          Rating.new
+        end
+
+        before do
+          movie.ratings = [ rating ]
+        end
+
+        it "sets the target of the relation" do
+          movie.ratings.target.should == [ rating ]
+        end
+
+        it "sets the foreign key on the relation" do
+          rating.ratable_id.should == movie.id
+        end
+
+        it "sets the base on the inverse relation" do
+          rating.ratable.should == movie
+        end
+
+        it "does not save the target" do
+          rating.should_not be_persisted
+        end
       end
 
-      let(:post) do
-        Post.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        person.posts = [ post ]
-      end
+        let(:movie) do
+          Movie.create
+        end
 
-      it "sets the target of the relation" do
-        person.posts.target.should == [ post ]
-      end
+        let(:rating) do
+          Rating.new
+        end
 
-      it "sets the foreign key of the relation" do
-        post.person_id.should == person.id
-      end
+        before do
+          movie.ratings = [ rating ]
+        end
 
-      it "sets the base on the inverse relation" do
-        post.person.should == person
-      end
+        it "sets the target of the relation" do
+          movie.ratings.target.should == [ rating ]
+        end
 
-      it "saves the target" do
-        post.should be_persisted
+        it "sets the foreign key of the relation" do
+          rating.ratable_id.should == movie.id
+        end
+
+        it "sets the base on the inverse relation" do
+          rating.ratable.should == movie
+        end
+
+        it "saves the target" do
+          rating.should be_persisted
+        end
       end
     end
   end
