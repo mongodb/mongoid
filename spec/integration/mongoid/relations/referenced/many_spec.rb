@@ -1209,74 +1209,154 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find_or_create_by" do
 
-    let(:person) do
-      Person.create
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:post) do
+        person.posts.create(:title => "Testing")
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          person.posts.find_or_create_by(:title => "Testing")
+        end
+
+        it "returns the document" do
+          found.should == post
+        end
+      end
+
+      context "when the document does not exist" do
+
+        let(:found) do
+          person.posts.find_or_create_by(:title => "Test")
+        end
+
+        it "sets the new document attributes" do
+          found.title.should == "Test"
+        end
+
+        it "returns a newly persisted document" do
+          found.should be_persisted
+        end
+      end
     end
 
-    let!(:post) do
-      person.posts.create(:title => "Testing")
-    end
+    context "when the relation is polymorphic" do
 
-    context "when the document exists" do
-
-      let(:found) do
-        person.posts.find_or_create_by(:title => "Testing")
+      let(:movie) do
+        Movie.create
       end
 
-      it "returns the document" do
-        found.should == post
-      end
-    end
-
-    context "when the document does not exist" do
-
-      let(:found) do
-        person.posts.find_or_create_by(:title => "Test")
+      let!(:rating) do
+        movie.ratings.create(:value => 1)
       end
 
-      it "sets the new document attributes" do
-        found.title.should == "Test"
+      context "when the document exists" do
+
+        let(:found) do
+          movie.ratings.find_or_create_by(:value => 1)
+        end
+
+        it "returns the document" do
+          found.should == rating
+        end
       end
 
-      it "returns a newly persisted document" do
-        found.should be_persisted
+      context "when the document does not exist" do
+
+        let(:found) do
+          movie.ratings.find_or_create_by(:value => 3)
+        end
+
+        it "sets the new document attributes" do
+          found.value.should == 3
+        end
+
+        it "returns a newly persisted document" do
+          found.should be_persisted
+        end
       end
     end
   end
 
   describe "#find_or_initialize_by" do
 
-    let(:person) do
-      Person.create
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:post) do
+        person.posts.create(:title => "Testing")
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          person.posts.find_or_initialize_by(:title => "Testing")
+        end
+
+        it "returns the document" do
+          found.should == post
+        end
+      end
+
+      context "when the document does not exist" do
+
+        let(:found) do
+          person.posts.find_or_initialize_by(:title => "Test")
+        end
+
+        it "sets the new document attributes" do
+          found.title.should == "Test"
+        end
+
+        it "returns a non persisted document" do
+          found.should_not be_persisted
+        end
+      end
     end
 
-    let!(:post) do
-      person.posts.create(:title => "Testing")
-    end
+    context "when the relation is polymorphic" do
 
-    context "when the document exists" do
-
-      let(:found) do
-        person.posts.find_or_initialize_by(:title => "Testing")
+      let(:movie) do
+        Movie.create
       end
 
-      it "returns the document" do
-        found.should == post
-      end
-    end
-
-    context "when the document does not exist" do
-
-      let(:found) do
-        person.posts.find_or_initialize_by(:title => "Test")
+      let!(:rating) do
+        movie.ratings.create(:value => 1)
       end
 
-      it "sets the new document attributes" do
-        found.title.should == "Test"
+      context "when the document exists" do
+
+        let(:found) do
+          movie.ratings.find_or_initialize_by(:value => 1)
+        end
+
+        it "returns the document" do
+          found.should == rating
+        end
       end
 
-      it "returns a non persisted document" do
-        found.should_not be_persisted
+      context "when the document does not exist" do
+
+        let(:found) do
+          movie.ratings.find_or_initialize_by(:value => 3)
+        end
+
+        it "sets the new document attributes" do
+          found.value.should == 3
+        end
+
+        it "returns a non persisted document" do
+          found.should_not be_persisted
+        end
       end
     end
   end
