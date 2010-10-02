@@ -1496,63 +1496,129 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#= nil" do
 
-    context "when the parent is a new record" do
+    context "when the relation is not polymorphic" do
 
-      let(:person) do
-        Person.new
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts = [ post ]
+          person.posts = nil
+        end
+
+        it "sets the relation to an empty array" do
+          person.posts.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          post.person.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          post.person_id.should be_nil
+        end
       end
 
-      let(:post) do
-        Post.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        person.posts = [ post ]
-        person.posts = nil
-      end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-      it "sets the relation to an empty array" do
-        person.posts.should be_empty
-      end
+        let(:post) do
+          Post.new
+        end
 
-      it "removed the inverse relation" do
-        post.person.should be_nil
-      end
+        before do
+          person.posts = [ post ]
+          person.posts = nil
+        end
 
-      it "removes the foreign key value" do
-        post.person_id.should be_nil
+        it "sets the relation to empty" do
+          person.posts.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          post.person.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          post.person_id.should be_nil
+        end
+
+        it "deletes the target from the database" do
+          post.should be_destroyed
+        end
       end
     end
 
-    context "when the parent is not a new record" do
+    context "when the relation is polymorphic" do
 
-      let(:person) do
-        Person.create(:ssn => "437-11-1112")
+      context "when the parent is a new record" do
+
+        let(:movie) do
+          Movie.new
+        end
+
+        let(:rating) do
+          Rating.new
+        end
+
+        before do
+          movie.ratings = [ rating ]
+          movie.ratings = nil
+        end
+
+        it "sets the relation to an empty array" do
+          movie.ratings.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          rating.ratable.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          rating.ratable_id.should be_nil
+        end
       end
 
-      let(:post) do
-        Post.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        person.posts = [ post ]
-        person.posts = nil
-      end
+        let(:movie) do
+          Movie.create
+        end
 
-      it "sets the relation to empty" do
-        person.posts.should be_empty
-      end
+        let(:rating) do
+          Rating.new
+        end
 
-      it "removed the inverse relation" do
-        post.person.should be_nil
-      end
+        before do
+          movie.ratings = [ rating ]
+          movie.ratings = nil
+        end
 
-      it "removes the foreign key value" do
-        post.person_id.should be_nil
-      end
+        it "sets the relation to empty" do
+          movie.ratings.should be_empty
+        end
 
-      it "deletes the target from the database" do
-        post.should be_destroyed
+        it "removed the inverse relation" do
+          rating.ratable.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          rating.ratable_id.should be_nil
+        end
+
+        it "deletes the target from the database" do
+          rating.should be_destroyed
+        end
       end
     end
   end
