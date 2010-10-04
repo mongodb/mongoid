@@ -16,8 +16,10 @@ module Mongoid # :nodoc:
         # docs: Any number of documents.
         def <<(*docs)
           docs.flatten.each do |doc|
-            append(doc) unless target.include?(doc)
-            doc.save if base.persisted?
+            unless target.include?(doc)
+              append(doc)
+              doc.save if base.persisted?
+            end
           end
         end
         alias :concat :<<

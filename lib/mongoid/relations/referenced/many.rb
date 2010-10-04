@@ -20,9 +20,11 @@ module Mongoid # :nodoc:
         # The relation.
         def <<(*documents)
           documents.flatten.each do |doc|
-            doc.send(metadata.foreign_key_setter, base.id)
-            doc.send(metadata.inverse_setter, base)
-            doc.save if base.persisted? && !building?
+            unless target.include?(doc)
+              doc.send(metadata.foreign_key_setter, base.id)
+              doc.send(metadata.inverse_setter, base)
+              doc.save if base.persisted? && !building?
+            end
           end
         end
         alias :concat :<<
