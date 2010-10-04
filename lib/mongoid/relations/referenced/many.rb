@@ -61,9 +61,11 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The newly built document.
-        def build(attributes = nil)
-          metadata.klass.new(attributes).tap do |doc|
-            building { push(doc) }
+        def build(attributes = nil, type = nil)
+          instantiated(type).tap do |doc|
+            append(doc)
+            doc.write_attributes(attributes)
+            doc.identify
           end
         end
 

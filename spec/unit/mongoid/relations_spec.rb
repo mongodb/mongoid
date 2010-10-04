@@ -17,6 +17,10 @@ describe Mongoid::Relations do
     klass.embedded = false
   end
 
+  before(:all) do
+    Person.identity :type => BSON::ObjectId
+  end
+
   describe "#embedded?" do
 
     context "when the class is embedded" do

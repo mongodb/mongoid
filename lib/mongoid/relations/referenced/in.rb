@@ -16,7 +16,6 @@ module Mongoid # :nodoc:
         # <tt>game.person.bind</tt>
         def bind(building = nil)
           binding.bind
-          target.save if base.persisted? && !building
         end
 
         # Instantiate a new referenced_in relation.

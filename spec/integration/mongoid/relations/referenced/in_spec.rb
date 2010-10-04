@@ -66,8 +66,8 @@ describe Mongoid::Relations::Referenced::In do
         person.game.should == game
       end
 
-      it "saves the target" do
-        person.should be_persisted
+      it "does not saves the target" do
+        person.should_not be_persisted
       end
     end
   end
