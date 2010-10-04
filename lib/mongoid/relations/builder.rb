@@ -28,6 +28,7 @@ module Mongoid # :nodoc:
       #
       # true if the object responds to <tt>#attributes</tt>.
       def query?
+        # TODO: Need a to_a on String for cases that the ids are strings.
         obj = object.to_a.first
         !obj.respond_to?(:attributes) && !obj.nil?
       end
