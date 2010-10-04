@@ -41,7 +41,7 @@ module Mongoid # :nodoc:
         #
         # <tt>person.posts.bind</tt>
         def bind(building = nil)
-          Bindings::Referenced::Many.new(base, target, metadata).bind
+          binding.bind
           target.tap do |t|
             t.each(&:save) if base.persisted? && !building?
           end
@@ -278,12 +278,44 @@ module Mongoid # :nodoc:
         #
         # <tt>person.posts.unbind</tt>
         def unbind
-          Bindings::Referenced::Many.new(base, target, metadata).unbind
+          binding.unbind
           target.each(&:delete) if base.persisted?
           []
         end
 
         private
+
+        # Appends the document to the target array, updating the index on the
+        # document at the same time.
+        #
+        # Example:
+        #
+        # <tt>relation.append(document)</tt>
+        #
+        # Options:
+        #
+        # document: The document to append to the target.
+        def append(document)
+          # target << document
+          metadatafy(document) # and bind_one(document)
+        end
+
+        # Instantiate the binding associated with this relation.
+        #
+        # Example:
+        #
+        # <tt>binding([ address ])</tt>
+        #
+        # Options:
+        #
+        # new_target: The new documents to bind with.
+        #
+        # Returns:
+        #
+        # A binding object.
+        def binding(new_target = nil)
+          Bindings::Referenced::Many.new(base, new_target || target, metadata)
+        end
 
         # Find the first object given the supplied attributes or create/initialize it.
         #
