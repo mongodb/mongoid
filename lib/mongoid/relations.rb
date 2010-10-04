@@ -36,12 +36,56 @@ module Mongoid # :nodoc:
         :embedded?, :to => "self.class"
     end
 
+    # Determine if the document is part of an embeds_one relation.
+    #
+    # Example:
+    #
+    # <tt>address.embedded_many?</tt>
+    #
+    # Returns:
+    #
+    # True if in an embeds many.
     def embedded_many?
       metadata && metadata.macro == :embeds_many
     end
 
+    # Determine if the document is part of an embeds_one relation.
+    #
+    # Example:
+    #
+    # <tt>address.embedded_one?</tt>
+    #
+    # Returns:
+    #
+    # True if in an embeds one.
     def embedded_one?
       metadata && metadata.macro == :embeds_one
+    end
+
+    # Determine if the document is part of an references_one relation.
+    #
+    # Example:
+    #
+    # <tt>address.referenced_many?</tt>
+    #
+    # Returns:
+    #
+    # True if in a references many.
+    def referenced_many?
+      metadata && metadata.macro == :references_many
+    end
+
+    # Determine if the document is part of an references_one relation.
+    #
+    # Example:
+    #
+    # <tt>address.referenced_one?</tt>
+    #
+    # Returns:
+    #
+    # True if in a references one.
+    def referenced_one?
+      metadata && metadata.macro == :references_one
     end
 
     module ClassMethods #:nodoc:
