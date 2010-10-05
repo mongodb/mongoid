@@ -194,6 +194,19 @@ module Mongoid # :nodoc:
           remove_all(conditions, true)
         end
 
+        # Determine if any documents in this relation exist in the database.
+        #
+        # Example:
+        #
+        # <tt>person.posts.exists?</tt>
+        #
+        # Returns:
+        #
+        # True is persisted documents exist, false if not.
+        def exists?
+          count > 0
+        end
+
         # Finds a document in this association.
         #
         # Options:

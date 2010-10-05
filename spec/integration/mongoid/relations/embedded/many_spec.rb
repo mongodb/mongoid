@@ -663,6 +663,35 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#exists?" do
+
+    let!(:person) do
+      Person.create(:ssn => "292-19-4239")
+    end
+
+    context "when documents exist in the database" do
+
+      before do
+        person.addresses.create(:street => "Bond St")
+      end
+
+      it "returns true" do
+        person.addresses.exists?.should == true
+      end
+    end
+
+    context "when no documents exist in the database" do
+
+      before do
+        person.addresses.build(:street => "Hyde Park Dr")
+      end
+
+      it "returns false" do
+        person.addresses.exists?.should == false
+      end
+    end
+  end
+
   describe "#find" do
 
     let(:person) do
