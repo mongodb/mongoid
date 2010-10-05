@@ -37,19 +37,19 @@ describe Mongoid::Attributes do
 
     context "when the nested document is an embeds_many" do
 
-      # before do
-        # @survey = Survey.new
-        # @survey.questions.build(:content => 'Do you like cheesecake ?')
-        # @survey.questions.build(:content => 'Do you like cuppcake ?')
-        # @survey.questions.build(:content => 'Do you like ace cream ?')
-        # @survey.save
-        # @attributes = {
-          # "0" => { :content => "lorem", "_destroy" => "true" },
-          # "1" => { :content => "lorem", "_destroy" => "true" },
-          # "2" => { :content => "Do you like ice cream ?", "_destroy" => "" },
-          # "new_record" => { :content => "Do you like carrot cake ?" }
-        # }
-      # end
+      before do
+        @survey = Survey.new
+        @survey.questions.build(:content => 'Do you like cheesecake ?')
+        @survey.questions.build(:content => 'Do you like cuppcake ?')
+        @survey.questions.build(:content => 'Do you like ace cream ?')
+        @survey.save
+        @attributes = {
+          "0" => { :content => "lorem", "_destroy" => "true" },
+          "1" => { :content => "lorem", "_destroy" => "true" },
+          "2" => { :content => "Do you like ice cream ?", "_destroy" => "" },
+          "new_record" => { :content => "Do you like carrot cake ?" }
+        }
+      end
 
       it "adds/updates/removes embedded documents" do
         pending "Durran: NestedAttributes Refactoring"

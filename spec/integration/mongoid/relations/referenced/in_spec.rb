@@ -3,71 +3,138 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    Person.delete_all
-    Game.delete_all
+    [ Person, Game, Post ].map(&:delete_all)
   end
 
   describe "#=" do
 
-    context "when the child is a new record" do
+    context "when the parent is a references one" do
 
-      let(:person) do
-        Person.new
+      context "when the child is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:game) do
+          Game.new
+        end
+
+        before do
+          game.person = person
+        end
+
+        it "sets the target of the relation" do
+          game.person.target.should == person
+        end
+
+        it "sets the foreign key on the relation" do
+          game.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          person.game.should == game
+        end
+
+        it "does not save the target" do
+          person.should_not be_persisted
+        end
       end
 
-      let(:game) do
-        Game.new
-      end
+      context "when the child is not a new record" do
 
-      before do
-        game.person = person
-      end
+        let(:person) do
+          Person.new(:ssn => "437-11-1112")
+        end
 
-      it "sets the target of the relation" do
-        game.person.target.should == person
-      end
+        let(:game) do
+          Game.create
+        end
 
-      it "sets the foreign key on the relation" do
-        game.person_id.should == person.id
-      end
+        before do
+          game.person = person
+        end
 
-      it "sets the base on the inverse relation" do
-        person.game.should == game
-      end
+        it "sets the target of the relation" do
+          game.person.target.should == person
+        end
 
-      it "does not save the target" do
-        person.should_not be_persisted
+        it "sets the foreign key of the relation" do
+          game.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          person.game.should == game
+        end
+
+        it "does not saves the target" do
+          person.should_not be_persisted
+        end
       end
     end
 
-    context "when the child is not a new record" do
+    context "when the parent is a references many" do
 
-      let(:person) do
-        Person.new(:ssn => "437-11-1112")
+      context "when the child is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          post.person = person
+        end
+
+        it "sets the target of the relation" do
+          post.person.target.should == person
+        end
+
+        it "sets the foreign key on the relation" do
+          post.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          person.posts.should == [ post ]
+        end
+
+        it "does not save the target" do
+          person.should_not be_persisted
+        end
       end
 
-      let(:game) do
-        Game.create
-      end
+      context "when the child is not a new record" do
 
-      before do
-        game.person = person
-      end
+        let(:person) do
+          Person.new(:ssn => "437-11-1112")
+        end
 
-      it "sets the target of the relation" do
-        game.person.target.should == person
-      end
+        let(:post) do
+          Post.create
+        end
 
-      it "sets the foreign key of the relation" do
-        game.person_id.should == person.id
-      end
+        before do
+          post.person = person
+        end
 
-      it "sets the base on the inverse relation" do
-        person.game.should == game
-      end
+        it "sets the target of the relation" do
+          post.person.target.should == person
+        end
 
-      it "does not saves the target" do
-        person.should_not be_persisted
+        it "sets the foreign key of the relation" do
+          post.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          person.posts.should == [ post ]
+        end
+
+        it "does not saves the target" do
+          person.should_not be_persisted
+        end
       end
     end
   end
