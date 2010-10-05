@@ -1119,6 +1119,35 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#exists?" do
+
+    let!(:person) do
+      Person.create(:ssn => "292-19-4232")
+    end
+
+    context "when documents exist in the database" do
+
+      before do
+        person.posts.create
+      end
+
+      it "returns true" do
+        person.posts.exists?.should == true
+      end
+    end
+
+    context "when no documents exist in the database" do
+
+      before do
+        person.posts.build
+      end
+
+      it "returns false" do
+        person.posts.exists?.should == false
+      end
+    end
+  end
+
   describe "#find" do
 
     context "when the relation is not polymorphic" do

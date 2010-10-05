@@ -183,6 +183,19 @@ module Mongoid # :nodoc:
           )
         end
 
+        # Determine if any documents in this relation exist in the database.
+        #
+        # Example:
+        #
+        # <tt>person.posts.exists?</tt>
+        #
+        # Returns:
+        #
+        # True is persisted documents exist, false if not.
+        def exists?
+          count > 0
+        end
+
         # Find the matchind document on the association, either based on id or
         # conditions.
         #
