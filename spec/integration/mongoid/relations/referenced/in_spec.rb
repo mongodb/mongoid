@@ -141,59 +141,121 @@ describe Mongoid::Relations::Referenced::In do
 
   describe "#= nil" do
 
-    context "when the parent is a new record" do
+    context "when the parent is a references one" do
 
-      let(:person) do
-        Person.new
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:game) do
+          Game.new
+        end
+
+        before do
+          game.person = person
+          game.person = nil
+        end
+
+        it "sets the relation to nil" do
+          game.person.should be_nil
+        end
+
+        it "removed the inverse relation" do
+          person.game.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          game.person_id.should be_nil
+        end
       end
 
-      let(:game) do
-        Game.new
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        game.person = person
-        game.person = nil
-      end
+        let(:person) do
+          Person.new(:ssn => "437-11-1112")
+        end
 
-      it "sets the relation to nil" do
-        game.person.should be_nil
-      end
+        let(:game) do
+          Game.create
+        end
 
-      it "removed the inverse relation" do
-        person.game.should be_nil
-      end
+        before do
+          game.person = person
+          game.person = nil
+        end
 
-      it "removes the foreign key value" do
-        game.person_id.should be_nil
+        it "sets the relation to nil" do
+          game.person.should be_nil
+        end
+
+        it "removed the inverse relation" do
+          person.game.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          game.person_id.should be_nil
+        end
       end
     end
 
-    context "when the parent is not a new record" do
+    context "when the parent is a references many" do
 
-      let(:person) do
-        Person.new(:ssn => "437-11-1112")
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          post.person = person
+          post.person = nil
+        end
+
+        it "sets the relation to nil" do
+          post.person.should be_nil
+        end
+
+        it "removed the inverse relation" do
+          person.posts.should be_empty
+        end
+
+        it "removes the foreign key value" do
+          post.person_id.should be_nil
+        end
       end
 
-      let(:game) do
-        Game.create
-      end
+      context "when the parent is not a new record" do
 
-      before do
-        game.person = person
-        game.person = nil
-      end
+        let(:person) do
+          Person.new(:ssn => "437-11-1112")
+        end
 
-      it "sets the relation to nil" do
-        game.person.should be_nil
-      end
+        let(:post) do
+          Post.create
+        end
 
-      it "removed the inverse relation" do
-        person.game.should be_nil
-      end
+        before do
+          post.person = person
+          post.person = nil
+        end
 
-      it "removes the foreign key value" do
-        game.person_id.should be_nil
+        it "sets the relation to nil" do
+          post.person.should be_nil
+        end
+
+        it "removed the inverse relation" do
+          person.posts.should be_empty
+        end
+
+        it "removes the foreign key value" do
+          post.person_id.should be_nil
+        end
       end
     end
   end
