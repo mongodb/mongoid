@@ -233,11 +233,11 @@ describe Mongoid::Criteria do
       it "returns nothing if in and nin clauses cancel each other out" do
         Person.any_in(:title => ["Sir"]).not_in(:title => ["Sir"]).should == []
       end
-      
+
       it "returns nothing if in and nin clauses cancel each other out ordered the other way" do
         Person.not_in(:title => ["Sir"]).any_in(:title => ["Sir"]).should == []
       end
-      
+
       it "returns the intersection of in and nin clauses" do
         Person.any_in(:title => ["Sir", "Mrs"]).not_in(:title => ["Mrs"]).should == [person]
       end

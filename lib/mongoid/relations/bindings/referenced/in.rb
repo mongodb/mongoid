@@ -17,8 +17,14 @@ module Mongoid # :nodoc:
           # <tt>game.person.bind</tt>
           def bind
             if bindable?(base)
+              inverse = metadata.inverse(target)
+              base.metadata = target.reflect_on_association(inverse)
               base.send(metadata.foreign_key_setter, target.id)
-              target.send(metadata.inverse_setter(target), base)
+              if base.referenced_many?
+                target.send(inverse).push(base)
+              else
+                target.send(metadata.inverse_setter(target), base)
+              end
             end
           end
 

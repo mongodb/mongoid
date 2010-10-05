@@ -297,6 +297,7 @@ module Mongoid # :nodoc:
         #
         # document: The document to append to the target.
         def append(document)
+          loaded and target.push(document)
           document.send(metadata.foreign_key_setter, base.id)
           document.send(metadata.inverse_setter(target), base)
           metadatafy(document) # and bind_one(document)
@@ -335,6 +336,12 @@ module Mongoid # :nodoc:
         # A matching document or a new/created one.
         def find_or(method, attrs = {})
           find(:first, :conditions => attrs) || send(method, attrs)
+        end
+
+        def loaded
+          tap do |relation|
+            relation.target = target.entries if target.is_a?(Mongoid::Criteria)
+          end
         end
 
         class << self
