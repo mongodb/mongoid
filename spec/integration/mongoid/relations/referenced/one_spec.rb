@@ -137,28 +137,31 @@ describe Mongoid::Relations::Referenced::One do
 
   describe "#build_#\{name}" do
 
-    let(:person) do
-      Person.create
-    end
+    context "when using object ids" do
 
-    let(:game) do
-      person.build_game(:score => 50)
-    end
+      let(:person) do
+        Person.create
+      end
 
-    it "returns a new document" do
-      game.score.should == 50
-    end
+      let(:game) do
+        person.build_game(:score => 50)
+      end
 
-    it "sets the foreign key on the document" do
-      game.person_id.should == person.id
-    end
+      it "returns a new document" do
+        game.score.should == 50
+      end
 
-    it "sets the inverse relation" do
-      game.person.should == person
-    end
+      it "sets the foreign key on the document" do
+        game.person_id.should == person.id
+      end
 
-    it "does not save the built document" do
-      game.should_not be_persisted
+      it "sets the inverse relation" do
+        game.person.should == person
+      end
+
+      it "does not save the built document" do
+        game.should_not be_persisted
+      end
     end
   end
 

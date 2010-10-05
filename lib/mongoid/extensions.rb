@@ -89,7 +89,7 @@ end
 
 class String #:nodoc
   include Mongoid::Extensions::String::Inflections
-  extend Mongoid::Extensions::String::Conversions
+  include Mongoid::Extensions::String::Conversions
 end
 
 class Symbol #:nodoc
