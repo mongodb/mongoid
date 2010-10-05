@@ -953,4 +953,23 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  [ :size, :length ].each do |method|
+
+    describe "##{method}" do
+
+      let(:person) do
+        Person.create
+      end
+
+      before do
+        person.addresses.create(:street => "Upper")
+        person.addresses.build(:street => "Bond")
+      end
+
+      it "returns the number of persisted documents" do
+        person.addresses.send(method).should == 2
+      end
+    end
+  end
 end
