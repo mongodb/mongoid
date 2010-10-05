@@ -35,11 +35,11 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            post.should be_a_new_record
+            post.should be_new
           end
 
           it "adds the document to the target" do
-            person.posts.count.should == 1
+            person.posts.size.should == 1
           end
         end
 
@@ -104,7 +104,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            movie.ratings.count.should == 1
+            movie.ratings.size.should == 1
           end
         end
 
@@ -142,6 +142,268 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#=" do
+
+    context "when the relation is not polymorphic" do
+
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts = [ post ]
+        end
+
+        it "sets the target of the relation" do
+          person.posts.target.should == [ post ]
+        end
+
+        it "sets the foreign key on the relation" do
+          post.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          post.person.should == person
+        end
+
+        it "does not save the target" do
+          post.should_not be_persisted
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts = [ post ]
+        end
+
+        it "sets the target of the relation" do
+          person.posts.target.should == [ post ]
+        end
+
+        it "sets the foreign key of the relation" do
+          post.person_id.should == person.id
+        end
+
+        it "sets the base on the inverse relation" do
+          post.person.should == person
+        end
+
+        it "saves the target" do
+          post.should be_persisted
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      context "when the parent is a new record" do
+
+        let(:movie) do
+          Movie.new
+        end
+
+        let(:rating) do
+          Rating.new
+        end
+
+        before do
+          movie.ratings = [ rating ]
+        end
+
+        it "sets the target of the relation" do
+          movie.ratings.target.should == [ rating ]
+        end
+
+        it "sets the foreign key on the relation" do
+          rating.ratable_id.should == movie.id
+        end
+
+        it "sets the base on the inverse relation" do
+          rating.ratable.should == movie
+        end
+
+        it "does not save the target" do
+          rating.should_not be_persisted
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:movie) do
+          Movie.create
+        end
+
+        let(:rating) do
+          Rating.new
+        end
+
+        before do
+          movie.ratings = [ rating ]
+        end
+
+        it "sets the target of the relation" do
+          movie.ratings.target.should == [ rating ]
+        end
+
+        it "sets the foreign key of the relation" do
+          rating.ratable_id.should == movie.id
+        end
+
+        it "sets the base on the inverse relation" do
+          rating.ratable.should == movie
+        end
+
+        it "saves the target" do
+          rating.should be_persisted
+        end
+      end
+    end
+  end
+
+  describe "#= nil" do
+
+    context "when the relation is not polymorphic" do
+
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts = [ post ]
+          person.posts = nil
+        end
+
+        it "sets the relation to an empty array" do
+          person.posts.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          post.person.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          post.person_id.should be_nil
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts = [ post ]
+          person.posts = nil
+        end
+
+        it "sets the relation to empty" do
+          person.posts.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          post.person.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          post.person_id.should be_nil
+        end
+
+        it "deletes the target from the database" do
+          post.should be_destroyed
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      context "when the parent is a new record" do
+
+        let(:movie) do
+          Movie.new
+        end
+
+        let(:rating) do
+          Rating.new
+        end
+
+        before do
+          movie.ratings = [ rating ]
+          movie.ratings = nil
+        end
+
+        it "sets the relation to an empty array" do
+          movie.ratings.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          rating.ratable.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          rating.ratable_id.should be_nil
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:movie) do
+          Movie.create
+        end
+
+        let(:rating) do
+          Rating.new
+        end
+
+        before do
+          movie.ratings = [ rating ]
+          movie.ratings = nil
+        end
+
+        it "sets the relation to empty" do
+          movie.ratings.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          rating.ratable.should be_nil
+        end
+
+        it "removes the foreign key value" do
+          rating.ratable_id.should be_nil
+        end
+
+        it "deletes the target from the database" do
+          rating.should be_destroyed
+        end
+      end
+    end
+  end
+
   describe "#build" do
 
     context "when the relation is not polymorphic" do
@@ -169,11 +431,11 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "does not save the target" do
-          post.should be_a_new_record
+          post.should be_new
         end
 
         it "adds the document to the target" do
-          person.posts.count.should == 1
+          person.posts.size.should == 1
         end
 
         it "does not perform validation" do
@@ -204,11 +466,11 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "does not save the target" do
-          post.should be_a_new_record
+          post.should be_new
         end
 
         it "adds the document to the target" do
-          person.posts.count.should == 1
+          person.posts.size.should == 1
         end
       end
     end
@@ -242,7 +504,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          movie.ratings.count.should == 1
+          movie.ratings.size.should == 1
         end
 
         it "does not perform validation" do
@@ -277,7 +539,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          movie.ratings.count.should == 1
+          movie.ratings.size.should == 1
         end
       end
     end
@@ -428,6 +690,35 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#count" do
+
+    let(:movie) do
+      Movie.create
+    end
+
+    context "when documents have been persisted" do
+
+      let!(:rating) do
+        movie.ratings.create(:value => 1)
+      end
+
+      it "returns the number of persisted documents" do
+        movie.ratings.count.should == 1
+      end
+    end
+
+    context "when documents have not been persisted" do
+
+      let!(:rating) do
+        movie.ratings.build(:value => 1)
+      end
+
+      it "returns 0" do
+        movie.ratings.count.should == 0
+      end
+    end
+  end
+
   describe "#create" do
 
     context "when the relation is not polymorphic" do
@@ -459,7 +750,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          person.posts.count.should == 1
+          person.posts.size.should == 1
         end
       end
 
@@ -524,7 +815,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          movie.ratings.count.should == 1
+          movie.ratings.size.should == 1
         end
       end
 
@@ -592,7 +883,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          person.posts.count.should == 1
+          person.posts.size.should == 1
         end
       end
 
@@ -666,7 +957,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          movie.ratings.count.should == 1
+          movie.ratings.size.should == 1
         end
       end
 
@@ -1361,263 +1652,34 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  describe "#=" do
+  [ :size, :length ].each do |method|
 
-    context "when the relation is not polymorphic" do
+    describe "##{method}" do
 
-      context "when the parent is a new record" do
+      let(:movie) do
+        Movie.create
+      end
 
-        let(:person) do
-          Person.new
+      context "when documents have been persisted" do
+
+        let!(:rating) do
+          movie.ratings.create(:value => 1)
         end
 
-        let(:post) do
-          Post.new
-        end
-
-        before do
-          person.posts = [ post ]
-        end
-
-        it "sets the target of the relation" do
-          person.posts.target.should == [ post ]
-        end
-
-        it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
-        end
-
-        it "sets the base on the inverse relation" do
-          post.person.should == person
-        end
-
-        it "does not save the target" do
-          post.should_not be_persisted
+        it "returns 0" do
+          movie.ratings.send(method).should == 1
         end
       end
 
-      context "when the parent is not a new record" do
-
-        let(:person) do
-          Person.create(:ssn => "437-11-1112")
-        end
-
-        let(:post) do
-          Post.new
-        end
+      context "when documents have not been persisted" do
 
         before do
-          person.posts = [ post ]
+          movie.ratings.build(:value => 1)
+          movie.ratings.create(:value => 2)
         end
 
-        it "sets the target of the relation" do
-          person.posts.target.should == [ post ]
-        end
-
-        it "sets the foreign key of the relation" do
-          post.person_id.should == person.id
-        end
-
-        it "sets the base on the inverse relation" do
-          post.person.should == person
-        end
-
-        it "saves the target" do
-          post.should be_persisted
-        end
-      end
-    end
-
-    context "when the relation is polymorphic" do
-
-      context "when the parent is a new record" do
-
-        let(:movie) do
-          Movie.new
-        end
-
-        let(:rating) do
-          Rating.new
-        end
-
-        before do
-          movie.ratings = [ rating ]
-        end
-
-        it "sets the target of the relation" do
-          movie.ratings.target.should == [ rating ]
-        end
-
-        it "sets the foreign key on the relation" do
-          rating.ratable_id.should == movie.id
-        end
-
-        it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
-        end
-
-        it "does not save the target" do
-          rating.should_not be_persisted
-        end
-      end
-
-      context "when the parent is not a new record" do
-
-        let(:movie) do
-          Movie.create
-        end
-
-        let(:rating) do
-          Rating.new
-        end
-
-        before do
-          movie.ratings = [ rating ]
-        end
-
-        it "sets the target of the relation" do
-          movie.ratings.target.should == [ rating ]
-        end
-
-        it "sets the foreign key of the relation" do
-          rating.ratable_id.should == movie.id
-        end
-
-        it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
-        end
-
-        it "saves the target" do
-          rating.should be_persisted
-        end
-      end
-    end
-  end
-
-  describe "#= nil" do
-
-    context "when the relation is not polymorphic" do
-
-      context "when the parent is a new record" do
-
-        let(:person) do
-          Person.new
-        end
-
-        let(:post) do
-          Post.new
-        end
-
-        before do
-          person.posts = [ post ]
-          person.posts = nil
-        end
-
-        it "sets the relation to an empty array" do
-          person.posts.should be_empty
-        end
-
-        it "removed the inverse relation" do
-          post.person.should be_nil
-        end
-
-        it "removes the foreign key value" do
-          post.person_id.should be_nil
-        end
-      end
-
-      context "when the parent is not a new record" do
-
-        let(:person) do
-          Person.create(:ssn => "437-11-1112")
-        end
-
-        let(:post) do
-          Post.new
-        end
-
-        before do
-          person.posts = [ post ]
-          person.posts = nil
-        end
-
-        it "sets the relation to empty" do
-          person.posts.should be_empty
-        end
-
-        it "removed the inverse relation" do
-          post.person.should be_nil
-        end
-
-        it "removes the foreign key value" do
-          post.person_id.should be_nil
-        end
-
-        it "deletes the target from the database" do
-          post.should be_destroyed
-        end
-      end
-    end
-
-    context "when the relation is polymorphic" do
-
-      context "when the parent is a new record" do
-
-        let(:movie) do
-          Movie.new
-        end
-
-        let(:rating) do
-          Rating.new
-        end
-
-        before do
-          movie.ratings = [ rating ]
-          movie.ratings = nil
-        end
-
-        it "sets the relation to an empty array" do
-          movie.ratings.should be_empty
-        end
-
-        it "removed the inverse relation" do
-          rating.ratable.should be_nil
-        end
-
-        it "removes the foreign key value" do
-          rating.ratable_id.should be_nil
-        end
-      end
-
-      context "when the parent is not a new record" do
-
-        let(:movie) do
-          Movie.create
-        end
-
-        let(:rating) do
-          Rating.new
-        end
-
-        before do
-          movie.ratings = [ rating ]
-          movie.ratings = nil
-        end
-
-        it "sets the relation to empty" do
-          movie.ratings.should be_empty
-        end
-
-        it "removed the inverse relation" do
-          rating.ratable.should be_nil
-        end
-
-        it "removes the foreign key value" do
-          rating.ratable_id.should be_nil
-        end
-
-        it "deletes the target from the database" do
-          rating.should be_destroyed
+        it "returns the total number of documents" do
+          movie.ratings.send(method).should == 2
         end
       end
     end
