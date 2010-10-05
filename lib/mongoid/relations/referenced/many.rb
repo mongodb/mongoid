@@ -22,7 +22,7 @@ module Mongoid # :nodoc:
           docs.flatten.each do |doc|
             unless target.include?(doc)
               append(doc)
-              doc.save if base.persisted? && !building?
+              doc.save if base.persisted?
             end
           end
         end
@@ -41,9 +41,7 @@ module Mongoid # :nodoc:
         # <tt>person.posts.bind</tt>
         def bind(building = nil)
           binding.bind
-          target.tap do |t|
-            t.each(&:save) if base.persisted? && !building?
-          end
+          target.map(&:save) if base.persisted? && !building?
         end
 
         # Builds a new document on the references many relation.
