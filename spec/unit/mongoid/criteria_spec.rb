@@ -2,163 +2,370 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
-  before do
-    @criteria = Mongoid::Criteria.new(Person)
-    @canvas_criteria = Mongoid::Criteria.new(Canvas)
+  let(:criteria) do
+    Mongoid::Criteria.new(Person)
+  end
+
+  let(:canvas_criteria) do
+    Mongoid::Criteria.new(Canvas)
+  end
+
+  context "===" do
+
+    context "when the other object is a Criteria" do
+
+      let(:other) do
+        Mongoid::Criteria.allocate
+      end
+
+      it "returns true" do
+        Mongoid::Criteria.should === other
+      end
+    end
+
+    context "when the other object is not compatible" do
+
+      let(:other) do
+        []
+      end
+
+      it "returns false" do
+        Mongoid::Criteria.should_not === other
+      end
+    end
   end
 
   describe "#+" do
 
+    let(:sir) do
+      Person.new(:title => "Sir")
+    end
+
+    let(:canvas) do
+      Canvas.new
+    end
+
+    let(:collection) do
+      stub
+    end
+
+    let(:cursor) do
+      stub(:count => 1)
+    end
+
     before do
-      @sir = Person.new(:title => "Sir")
-      @canvas = Canvas.new
+      cursor.expects(:each).yields(sir)
+      Person.expects(:collection).returns(collection)
+      collection.expects(:find).returns(cursor)
     end
 
     context "when the criteria has not been executed" do
 
-      before do
-        @collection = mock
-        @cursor = stub(:count => 1)
-        @cursor.expects(:each).at_least_once.yields(@sir)
-        Person.expects(:collection).at_least_once.returns(@collection)
-        @collection.expects(:find).at_least_once.returns(@cursor)
-      end
-
       it "executes the criteria and concats the results" do
-        results = @criteria + [ @canvas ]
-        results.should == [ @sir, @canvas ]
+        results = criteria + [ canvas ]
+        results.should == [ sir, canvas ]
       end
-
     end
 
     context "when the other is a criteria" do
 
+      let(:canvas_collection) do
+        stub
+      end
+
+      let(:canvas_cursor) do
+        stub(:count => 1)
+      end
+
       before do
-        @collection = mock
-        @canvas_collection = mock
-        @cursor = stub(:count => 1)
-        @canvas_cursor = stub(:count => 1)
-        @cursor.expects(:each).at_least_once.yields(@sir)
-        @canvas_cursor.expects(:each).at_least_once.yields(@canvas)
-        Person.expects(:collection).at_least_once.returns(@collection)
-        @collection.expects(:find).at_least_once.returns(@cursor)
-        Canvas.expects(:collection).at_least_once.returns(@canvas_collection)
-        @canvas_collection.expects(:find).at_least_once.returns(@canvas_cursor)
+        canvas_cursor.expects(:each).yields(canvas)
+        Canvas.expects(:collection).returns(canvas_collection)
+        canvas_collection.expects(:find).returns(canvas_cursor)
       end
 
       it "concats the results" do
-        results = @criteria + @canvas_criteria
-        results.should == [ @sir, @canvas ]
+        results = criteria + canvas_criteria
+        results.should == [ sir, canvas ]
       end
-
     end
-
   end
 
   describe "#-" do
 
+    let(:sir) do
+      Person.new(:title => "Sir")
+    end
+
+    let(:madam) do
+      Person.new(:title => "Madam")
+    end
+
+    let(:collection) do
+      stub
+    end
+
+    let(:cursor) do
+      stub(:count => 1)
+    end
+
     before do
-      @sir = Person.new(:title => "Sir")
-      @madam = Person.new(:title => "Madam")
+      cursor.expects(:each).yields(madam)
+      Person.expects(:collection).returns(collection)
+      collection.expects(:find).returns(cursor)
     end
 
     context "when the criteria has not been executed" do
 
-      before do
-        @collection = mock
-        @cursor = stub(:count => 1)
-        @cursor.expects(:each).yields(@madam)
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).returns(@cursor)
-      end
-
       it "executes the criteria and returns the difference" do
-        results = @criteria - [ @sir ]
-        results.should == [ @madam ]
+        results = criteria - [ sir ]
+        results.should == [ madam ]
       end
-
     end
-
   end
 
   describe "#[]" do
 
+    let(:collection) do
+      stub
+    end
+
+    let(:cursor) do
+      stub(:count => 10)
+    end
+
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
     before do
-      @criteria.where(:title => "Sir")
-      @collection = stub
-      @person = Person.new(:title => "Sir")
-      @cursor = stub(:count => 10)
-      @cursor.expects(:each).yields(@person)
+      criteria.where(:title => "Sir")
+      cursor.expects(:each).yields(person)
+        Person.expects(:collection).returns(collection)
     end
 
     context "when the criteria has not been executed" do
 
       before do
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({ :title => "Sir"}, {}).returns(@cursor)
+        collection.expects(:find).with({ :title => "Sir"}, {}).returns(cursor)
       end
 
       it "executes the criteria and returns the element at the index" do
-        @criteria[0].should == @person
+        criteria[0].should == person
       end
-
-    end
-
-  end
-
-  describe "#aggregate" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:aggregate)
-      @criteria.aggregate
-    end
-
-  end
-
-  describe "#avg" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:avg).with(:age)
-      @criteria.avg(:age)
     end
   end
 
-  describe "#blank?" do
+  context "when methods delegate to the context" do
 
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
+    let(:context) do
+      stub
     end
 
-    context "when the context is blank" do
+    before do
+      criteria.instance_variable_set(:@context, context)
+    end
+
+    describe "#aggregate" do
 
       before do
-        @context.expects(:blank?).returns(true)
+        context.expects(:aggregate)
       end
 
-      it "returns true" do
-        @criteria.blank?.should be_true
+      it "delegates to the context" do
+        criteria.aggregate
       end
     end
 
-    context "when the context is not blank" do
+    describe "#avg" do
 
       before do
-        @context.expects(:blank?).returns(false)
+        context.expects(:avg).with(:age)
       end
 
-      it "returns false" do
-        @criteria.blank?.should be_false
+      it "delegates to the context" do
+        criteria.avg(:age)
+      end
+    end
+
+    describe "#blank?" do
+
+      context "when the context is blank" do
+
+        before do
+          context.expects(:blank?).returns(true)
+        end
+
+        it "returns true" do
+          criteria.blank?.should be_true
+        end
+      end
+
+      context "when the context is not blank" do
+
+        before do
+          context.expects(:blank?).returns(false)
+        end
+
+        it "returns false" do
+          criteria.blank?.should be_false
+        end
+      end
+    end
+
+    describe "#distinct" do
+
+      before do
+        context.expects(:distinct).with(:title)
+      end
+
+      it "delegates to the context" do
+        criteria.distinct(:title)
+      end
+    end
+
+    describe "#count" do
+
+      before do
+        context.expects(:count).returns(10)
+      end
+
+      it "delegates to the context" do
+        criteria.count.should == 10
+      end
+    end
+
+    describe "#exists?" do
+
+      context "when there are documents in the db" do
+
+        before do
+          context.expects(:count).returns(10)
+        end
+
+        it "call the count context and return true if there are element" do
+          criteria.exists?.should be_true
+        end
+      end
+
+      context "when there are no documents in the db" do
+
+        before do
+          context.expects(:count).returns(0)
+        end
+
+        it "call the count context and return false if there are no element" do
+          criteria.exists?.should be_false
+        end
+      end
+    end
+
+    describe "#first" do
+
+      before do
+        context.expects(:first).returns([])
+      end
+
+      it "delegates to the context" do
+        criteria.first.should == []
+      end
+    end
+
+    describe "#group" do
+
+      before do
+        context.expects(:group).returns({})
+      end
+
+      it "delegates to the context" do
+        criteria.group.should == {}
+      end
+    end
+
+    describe "#last" do
+
+      before do
+        context.expects(:last).returns([])
+      end
+
+      it "delegates to the context" do
+        criteria.last.should == []
+      end
+    end
+
+    describe "#max" do
+
+      before do
+        context.expects(:max).with(:field).returns(100)
+      end
+
+      it "delegates to the context" do
+        criteria.max(:field).should == 100
+      end
+    end
+
+    describe "#min" do
+
+      before do
+        context.expects(:min).with(:field).returns(100)
+      end
+
+      it "delegates to the context" do
+        criteria.min(:field).should == 100
+      end
+    end
+
+    describe "#one" do
+
+      before do
+        context.expects(:one)
+      end
+
+      it "delegates to the context" do
+        criteria.one
+      end
+    end
+
+    describe "#page" do
+
+      before do
+        context.expects(:page).returns(1)
+      end
+
+      it "delegates to the context" do
+        criteria.page.should == 1
+      end
+    end
+
+    describe "#paginate" do
+
+      before do
+        context.expects(:paginate).returns([])
+      end
+
+      it "delegates to the context" do
+        criteria.paginate.should == []
+      end
+    end
+
+    describe "#per_page" do
+
+      before do
+        context.expects(:per_page).returns(20)
+      end
+
+      it "delegates to the context" do
+        criteria.per_page.should == 20
+      end
+    end
+
+    describe "#sum" do
+
+      before do
+        context.expects(:sum).with(:field).returns(20)
+      end
+
+      it "delegates to the context" do
+        criteria.sum(:field).should == 20
       end
     end
   end
@@ -167,265 +374,197 @@ describe Mongoid::Criteria do
 
     context "when the context has been set" do
 
+      let(:context) do
+        stub
+      end
+
       before do
-        @context = stub
-        @criteria.instance_variable_set(:@context, @context)
+        criteria.instance_variable_set(:@context, context)
       end
 
       it "returns the memoized context" do
-        @criteria.context.should == @context
+        criteria.context.should == context
       end
-
     end
 
     context "when the context has not been set" do
 
-      before do
-        @context = stub
+      let(:context) do
+        stub
       end
 
       it "creates a new context" do
-        Mongoid::Contexts::Mongo.expects(:new).with(@criteria).returns(@context)
-        @criteria.context.should == @context
+        Mongoid::Contexts::Mongo.expects(:new).with(criteria).returns(context)
+        criteria.context.should == context
       end
-
     end
 
     context "when the class is embedded" do
 
-      before do
-        @criteria = Mongoid::Criteria.new(Address)
+      let(:criteria) do
+        Mongoid::Criteria.new(Address)
       end
 
       it "returns an enumerable context" do
-        @criteria.context.should be_a_kind_of(Mongoid::Contexts::Enumerable)
+        criteria.context.should be_a_kind_of(Mongoid::Contexts::Enumerable)
       end
-
     end
 
     context "when the class is not embedded" do
 
       it "returns a mongo context" do
-        @criteria.context.should be_a_kind_of(Mongoid::Contexts::Mongo)
+        criteria.context.should be_a_kind_of(Mongoid::Contexts::Mongo)
       end
-
-    end
-
-  end
-
-  describe "#distinct" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:distinct).with(:title)
-      @criteria.distinct(:title)
     end
   end
 
   describe "#entries" do
 
+    let(:collection) do
+      stub
+    end
+
+    let(:criteria) do
+      Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
+    end
+
+    before do
+      Person.expects(:collection).returns(collection)
+    end
+
     context "filtering" do
 
       before do
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-        @criteria = Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
-        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns([])
+        collection.expects(:find).with(criteria.selector, criteria.options).returns([])
+        criteria.entries
       end
 
-      it "filters out unused params" do
-        @criteria.entries
-        @criteria.options[:page].should be_nil
-        @criteria.options[:per_page].should be_nil
+      it "filters out empty page params" do
+        criteria.options[:page].should be_nil
       end
 
+      it "filters out empty per page params" do
+        criteria.options[:per_page].should be_nil
+      end
     end
 
     context "when type is :all" do
 
+      let(:cursor) do
+        stub(:count => 44)
+      end
+
       before do
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
-        @criteria = Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
-        @cursor = stub(:count => 44)
-        @cursor.expects(:each)
-        @collection.expects(:find).with(@criteria.selector, @criteria.options).returns(@cursor)
+        cursor.expects(:each)
+        collection.expects(:find).with(criteria.selector, criteria.options).returns(cursor)
+        criteria.entries
       end
 
       it "does not add the count instance variable" do
-        @criteria.entries.should == []
-        @criteria.instance_variable_get(:@count).should be_nil
+        criteria.instance_variable_get(:@count).should be_nil
       end
-
     end
 
     context "when type is not :first" do
 
-      it "calls find on the collection with the selector and options" do
-        criteria = Mongoid::Criteria.new(Person)
-        collection = mock
-        Person.expects(:collection).returns(collection)
-        collection.expects(:find).with(criteria.selector, criteria.options).returns([])
-        criteria.entries.should == []
+      let(:criteria) do
+        Mongoid::Criteria.new(Person)
       end
 
+      it "calls find on the collection with the selector and options" do
+        collection.expects(:find).with(criteria.selector, criteria.options).returns([])
+        criteria.entries
+      end
     end
-
-  end
-
-  describe "#count" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:count).returns(10)
-      @criteria.count.should == 10
-    end
-
-  end
-
-  describe "#exists?" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "call the count context and return true if there are element" do
-      @context.expects(:count).returns(10)
-      @criteria.exists?.should be_true
-    end
-
-    it "call the count context and return false if there are no element" do
-      @context.expects(:count).returns(0)
-      @criteria.exists?.should be_false
-    end
-
   end
 
   describe "#each" do
 
-    before do
-      @criteria.where(:title => "Sir")
-      @collection = stub
-      @person = Person.new(:title => "Sir")
-      @cursor = stub(:count => 10)
+    let(:collection) do
+      stub
     end
 
-    it "delegates to the context#iterate" do
-      @context = stub('context')
-      @criteria.stubs(:context).returns(@context)
-      @context.expects(:iterate)
-      @criteria.each
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    let(:cursor) do
+      stub(:count => 10)
+    end
+
+    let(:context) do
+      stub
+    end
+
+    before do
+      criteria.where(:title => "Sir")
     end
 
     context "when the criteria has not been executed" do
 
       before do
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({:title => "Sir"}, {}).returns(@cursor)
-        @cursor.expects(:each).yields(@person)
+        Person.expects(:collection).returns(collection)
+        collection.expects(:find).with({:title => "Sir"}, {}).returns(cursor)
+        cursor.expects(:each).yields(person)
       end
 
       it "executes the criteria" do
-        @criteria.each do |doc|
-          doc.should == @person
+        criteria.each do |doc|
+          doc.should == person
         end
       end
-
     end
 
     context "when the criteria has been executed" do
 
       before do
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with({:title => "Sir"}, {}).returns(@cursor)
-        @cursor.expects(:each).yields(@person)
+        Person.expects(:collection).returns(collection)
+        collection.expects(:find).with({:title => "Sir"}, {}).returns(cursor)
+        cursor.expects(:each).yields(person)
       end
 
       it "calls each on the existing results" do
-        @criteria.each do |person|
-          person.should == @person
+        criteria.each do |person|
+          person.should == person
         end
       end
-
     end
 
     context "when no block is passed" do
 
       it "returns self" do
-        @criteria.each.should == @criteria
+        criteria.each.should == criteria
       end
-
     end
 
     context "when caching" do
 
       before do
-        Person.expects(:collection).returns(@collection)
-        @collection.expects(:find).with(
+        Person.expects(:collection).returns(collection)
+        collection.expects(:find).with(
           { :title => "Sir" },
           { :cache => true }
-        ).returns(@cursor)
-        @cursor.expects(:each).yields(@person)
-        @criteria.cache
-        @criteria.each do |doc|
-          doc.should == @person
+        ).returns(cursor)
+        cursor.expects(:each).yields(person)
+        criteria.cache
+        criteria.each do |doc|
+          doc.should == person
         end
       end
 
       it "caches the results of the cursor iteration" do
-        @criteria.each do |doc|
-          doc.should == @person
-        end
-        # Do it again for sanity's sake.
-        @criteria.each do |doc|
-          doc.should == @person
+        criteria.each do |doc|
+          doc.should == person
         end
       end
-
     end
-
-  end
-
-  describe "#first" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:first).returns([])
-      @criteria.first.should == []
-    end
-
-  end
-
-  describe "#group" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:group).returns({})
-      @criteria.group.should == {}
-    end
-
   end
 
   describe "#initialize" do
 
-    let(:criteria) { Mongoid::Criteria.new(Person) }
+    let(:criteria) do
+      Mongoid::Criteria.new(Person)
+    end
 
     it "sets the selector to an empty hash" do
       criteria.selector.should == {}
@@ -442,293 +581,230 @@ describe Mongoid::Criteria do
     it "sets the klass to the given class" do
       criteria.klass.should == Person
     end
-
-  end
-
-  describe "#last" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:last).returns([])
-      @criteria.last.should == []
-    end
-
-  end
-
-  describe "#max" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:max).with(:field).returns(100)
-      @criteria.max(:field).should == 100
-    end
-
   end
 
   describe "#merge" do
 
     before do
-      @criteria.where(:title => "Sir", :age => 30).skip(40).limit(20)
+      criteria.where(:title => "Sir", :age => 30).skip(40).limit(20)
     end
 
     context "with another criteria" do
 
       context "when the other has a selector and options" do
 
+        let(:other) do
+          Mongoid::Criteria.new(Person)
+        end
+
+        let(:selector) do
+          { :title => "Sir", :age => 30, :name => "Chloe" }
+        end
+
+        let(:options) do
+          { :skip => 40, :limit => 20, :sort => [[:name, :asc]] }
+        end
+
         before do
-          @other = Mongoid::Criteria.new(Person)
-          @other.where(:name => "Chloe").order_by([[:name, :asc]])
-          @selector = { :title => "Sir", :age => 30, :name => "Chloe" }
-          @options = { :skip => 40, :limit => 20, :sort => [[:name, :asc]] }
+          other.where(:name => "Chloe").order_by([[:name, :asc]])
+          criteria.merge(other)
         end
 
-        it "merges the selector and options hashes together" do
-          @criteria.merge(@other)
-          @criteria.selector.should == @selector
-          @criteria.options.should == @options
+        it "merges the selector" do
+          criteria.selector.should == selector
         end
 
+        it "merges the options" do
+          criteria.options.should == options
+        end
       end
 
       context "when the other has no selector or options" do
 
+        let(:other) do
+          Mongoid::Criteria.new(Person)
+        end
+
+        let(:selector) do
+          { :title => "Sir", :age => 30 }
+        end
+
+        let(:options) do
+          { :skip => 40, :limit => 20 }
+        end
+
         before do
-          @other = Mongoid::Criteria.new(Person)
-          @selector = { :title => "Sir", :age => 30 }
-          @options = { :skip => 40, :limit => 20 }
+          criteria.merge(other)
         end
 
-        it "merges the selector and options hashes together" do
-          @criteria.merge(@other)
-          @criteria.selector.should == @selector
-          @criteria.options.should == @options
+        it "merges the selector" do
+          criteria.selector.should == selector
         end
 
+        it "merges the options" do
+          criteria.options.should == options
+        end
       end
 
       context "when the other has a document collection" do
 
+        let(:other) do
+          Mongoid::Criteria.new(Person)
+        end
+
+        let(:documents) do
+          [ stub ]
+        end
+
         before do
-          @documents = [ stub ]
-          @other = Mongoid::Criteria.new(Person)
-          @other.documents = @documents
+          other.documents = documents
+          criteria.merge(other)
         end
 
         it "merges the documents collection in" do
-          @criteria.merge(@other)
-          @criteria.documents.should == @documents
+          criteria.documents.should == documents
         end
-
       end
-
     end
-
   end
 
   describe "#method_missing" do
 
+    let(:criteria) do
+      Mongoid::Criteria.new(Person)
+    end
+
+    let(:new_criteria) do
+      criteria.accepted
+    end
+
     before do
-      @criteria = Mongoid::Criteria.new(Person)
-      @criteria.where(:title => "Sir")
+      criteria.where(:title => "Sir")
     end
 
     it "merges the criteria with the next one" do
-      @new_criteria = @criteria.accepted
-      @new_criteria.selector.should == { :title => "Sir", :terms => true }
+      new_criteria.selector.should == { :title => "Sir", :terms => true }
     end
 
     context "chaining more than one scope" do
 
-      before do
-        @criteria = Person.accepted.old.knight
+      let(:criteria) do
+        Person.accepted.old.knight
       end
 
       it "returns the final merged criteria" do
-        @criteria.selector.should == { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+        criteria.selector.should == { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
       end
 
     end
 
     context "when returning a non-criteria object" do
-      let(:ages) { [10, 20] }
-      it "does not attempt to merge" do
+
+      let(:ages) do
+        [ 10, 20 ]
+      end
+
+      before do
         Person.stubs(:ages => ages)
-        expect { @criteria.ages }.to_not raise_error(NoMethodError)
+      end
+
+      it "does not attempt to merge" do
+        expect { criteria.ages }.to_not raise_error(NoMethodError)
       end
     end
 
     context "when expecting behaviour of an array" do
 
-      before do
-        @array = mock
-        @document = mock
+      let(:array) do
+        stub
+      end
+
+      let(:document) do
+        stub
       end
 
       describe "#[]" do
 
-        it "collects the criteria and calls []" do
-          @criteria.expects(:entries).returns([@document])
-          @criteria[0].should == @document
+        before do
+          criteria.expects(:entries).returns([ document ])
         end
 
+        it "collects the criteria and calls []" do
+          criteria[0].should == document
+        end
       end
 
       describe "#rand" do
 
-        it "collects the criteria and call rand" do
-          @criteria.expects(:entries).returns(@array)
-          @array.expects(:send).with(:rand).returns(@document)
-          @criteria.rand
+        before do
+          criteria.expects(:entries).returns(array)
+          array.expects(:send).with(:rand).returns(document)
         end
 
+        it "collects the criteria and call rand" do
+          criteria.rand
+        end
       end
-
     end
-
-  end
-
-  describe "#min" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:min).with(:field).returns(100)
-      @criteria.min(:field).should == 100
-    end
-
-  end
-
-  describe "#offset" do
-
-  end
-
-  describe "#one" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:one)
-      @criteria.one
-    end
-
-  end
-
-  describe "#page" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:page).returns(1)
-      @criteria.page.should == 1
-    end
-
-  end
-
-  describe "#paginate" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:paginate).returns([])
-      @criteria.paginate.should == []
-    end
-
-  end
-
-  describe "#per_page" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:per_page).returns(20)
-      @criteria.per_page.should == 20
-    end
-
   end
 
   describe "#scoped" do
 
     context "when the options contain sort criteria" do
 
-      before do
-        @criteria = Person.where(:title => "Sir").asc(:score)
+      let(:criteria) do
+        Person.where(:title => "Sir").asc(:score)
       end
 
       it "changes sort to order_by" do
-        @criteria.scoped.should == { :where => { :title => "Sir" }, :order_by => [[:score, :asc]] }
+        criteria.scoped.should == { :where => { :title => "Sir" }, :order_by => [[:score, :asc]] }
       end
     end
-
-  end
-
-  describe "#sum" do
-
-    before do
-      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
-      @criteria.instance_variable_set(:@context, @context)
-    end
-
-    it "delegates to the context" do
-      @context.expects(:sum).with(:field).returns(20)
-      @criteria.sum(:field).should == 20
-    end
-
   end
 
   describe ".translate" do
 
     context "with a single argument" do
 
+      let(:criteria) do
+        stub
+      end
+
+      before do
+        Person.stubs(:criteria).returns(criteria)
+      end
+
+      let(:document) do
+        stub
+      end
+
       context "when the arg is a string" do
 
+        let(:id) do
+          BSON::ObjectId.new.to_s
+        end
+
         before do
-          @id = BSON::ObjectId.new.to_s
-          @document = stub
-          @criteria = mock
-          Person.expects(:criteria).returns(@criteria)
+          criteria.expects(:id_criteria).with(id).returns(document)
         end
 
         it "delegates to #id_criteria" do
-          @criteria.expects(:id_criteria).with(@id).returns(@document)
-          Mongoid::Criteria.translate(Person, @id).should == @document
+          Mongoid::Criteria.translate(Person, id).should == document
         end
       end
 
       context "when the arg is an object id" do
 
+        let(:id) do
+          BSON::ObjectId.new
+        end
+
         before do
-          @id = BSON::ObjectId.new
-          @document = stub
-          @criteria = mock
-          Person.expects(:criteria).returns(@criteria)
+          criteria.expects(:id_criteria).with(id).returns(document)
         end
 
         it "delegates to #id_criteria" do
-          @criteria.expects(:id_criteria).with(@id).returns(@document)
-          Mongoid::Criteria.translate(Person, @id).should == @document
+          Mongoid::Criteria.translate(Person, id).should == document
         end
       end
     end
@@ -737,130 +813,131 @@ describe Mongoid::Criteria do
 
       context "when an array of ids" do
 
+        let(:ids) do
+          []
+        end
+
+        let(:documents) do
+          []
+        end
+
         before do
-          @ids = []
-          @documents = []
           3.times do
-            @ids << BSON::ObjectId.new.to_s
-            @documents << stub
+            ids << BSON::ObjectId.new.to_s
+            documents << stub
           end
-          @criteria = mock
-          Person.expects(:criteria).returns(@criteria)
+          Person.stubs(:criteria).returns(criteria)
+          criteria.expects(:id_criteria).with(ids).returns(documents)
         end
 
         it "delegates to #id_criteria" do
-          @criteria.expects(:id_criteria).with(@ids).returns(@documents)
-          Mongoid::Criteria.translate(Person, @ids).should == @documents
+          Mongoid::Criteria.translate(Person, ids).should == documents
         end
-
       end
 
       context "when Person, :conditions => {}" do
 
-        before do
-          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
+        let(:criteria) do
+          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :title => "Test" }
+          criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
-          @criteria.klass.should == Person
+          criteria.klass.should == Person
         end
-
       end
 
       context "when Person, :conditions => {:id => id}" do
 
-        before do
-          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :id => "1234e567" })
+        let(:criteria) do
+          Mongoid::Criteria.translate(Person, :conditions => { :id => "1234e567" })
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :_id => "1234e567" }
+          criteria.selector.should == { :_id => "1234e567" }
         end
 
         it "returns a criteria with klass Person" do
-          @criteria.klass.should == Person
+          criteria.klass.should == Person
         end
-
       end
 
       context "when :all, :conditions => {}" do
 
-        before do
-          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
+        let(:criteria) do
+          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :title => "Test" }
+          criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
-          @criteria.klass.should == Person
+          criteria.klass.should == Person
         end
-
       end
 
       context "when :last, :conditions => {}" do
 
-        before do
-          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
+        let(:criteria) do
+          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
-          @criteria.selector.should == { :title => "Test" }
+          criteria.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
-          @criteria.klass.should == Person
+          criteria.klass.should == Person
         end
       end
 
       context "when options are provided" do
 
-        before do
-          @criteria = Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" }, :skip => 10)
+        let(:criteria) do
+          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" }, :skip => 10)
         end
 
-        it "adds the criteria and the options" do
-          @criteria.selector.should == { :title => "Test" }
-          @criteria.options.should == { :skip => 10 }
+        it "sets the selector" do
+          criteria.selector.should == { :title => "Test" }
         end
 
+        it "sets the options" do
+          criteria.options.should == { :skip => 10 }
+        end
       end
-
     end
-
   end
 
   context "#fuse" do
 
-    it ":where => {:title => 'Test'} returns a criteria with the correct selector" do
-      @result = @criteria.fuse(:where => { :title => 'Test' })
-      @result.selector[:title].should == 'Test'
+    context "when providing a selector" do
+
+      let(:result) do
+        criteria.fuse(:where => { :title => 'Test' })
+      end
+
+      it "adds the selector" do
+        result.selector[:title].should == 'Test'
+      end
     end
 
-    it ":where => {:title => 'Test'}, :skip => 10 returns a criteria with the correct selector and options" do
-      @result = @criteria.fuse(:where => { :title => 'Test' }, :skip => 10)
-      @result.selector[:title].should == 'Test'
-      @result.options.should == { :skip => 10 }
+    context "when providing a selector and options" do
+
+      let(:result) do
+        criteria.fuse(:where => { :title => 'Test' }, :skip => 10)
+      end
+
+      it "adds the selector" do
+        result.selector[:title].should == 'Test'
+      end
+
+      it "adds the options" do
+        result.options.should == { :skip => 10 }
+      end
     end
   end
-
-  context "===" do
-
-    context "when the other object is a Criteria" do
-      subject { Mongoid::Criteria === Mongoid::Criteria.allocate }
-      it { should be_true }
-    end
-
-    context "when the other object is not compatible" do
-      subject { Mongoid::Criteria === [] }
-      it { should be_false }
-    end
-
-  end
-
 end
