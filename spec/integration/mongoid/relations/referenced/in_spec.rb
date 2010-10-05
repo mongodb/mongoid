@@ -75,65 +75,133 @@ describe Mongoid::Relations::Referenced::In do
 
     context "when the parent is a references many" do
 
-      context "when the child is a new record" do
+      context "when the relation is not polymorphic" do
 
-        let(:person) do
-          Person.new
+        context "when the child is a new record" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:post) do
+            Post.new
+          end
+
+          before do
+            post.person = person
+          end
+
+          it "sets the target of the relation" do
+            post.person.target.should == person
+          end
+
+          it "sets the foreign key on the relation" do
+            post.person_id.should == person.id
+          end
+
+          it "sets the base on the inverse relation" do
+            person.posts.should == [ post ]
+          end
+
+          it "does not save the target" do
+            person.should_not be_persisted
+          end
         end
 
-        let(:post) do
-          Post.new
-        end
+        context "when the child is not a new record" do
 
-        before do
-          post.person = person
-        end
+          let(:person) do
+            Person.new(:ssn => "437-11-1112")
+          end
 
-        it "sets the target of the relation" do
-          post.person.target.should == person
-        end
+          let(:post) do
+            Post.create
+          end
 
-        it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
-        end
+          before do
+            post.person = person
+          end
 
-        it "sets the base on the inverse relation" do
-          person.posts.should == [ post ]
-        end
+          it "sets the target of the relation" do
+            post.person.target.should == person
+          end
 
-        it "does not save the target" do
-          person.should_not be_persisted
+          it "sets the foreign key of the relation" do
+            post.person_id.should == person.id
+          end
+
+          it "sets the base on the inverse relation" do
+            person.posts.should == [ post ]
+          end
+
+          it "does not saves the target" do
+            person.should_not be_persisted
+          end
         end
       end
 
-      context "when the child is not a new record" do
+      context "when the relation is polymorphic" do
 
-        let(:person) do
-          Person.new(:ssn => "437-11-1112")
+        context "when the child is a new record" do
+
+          let(:movie) do
+            Movie.new
+          end
+
+          let(:rating) do
+            Rating.new
+          end
+
+          before do
+            rating.ratable = movie
+          end
+
+          it "sets the target of the relation" do
+            rating.ratable.target.should == movie
+          end
+
+          it "sets the foreign key on the relation" do
+            rating.ratable_id.should == movie.id
+          end
+
+          it "sets the base on the inverse relation" do
+            movie.ratings.should == [ rating ]
+          end
+
+          it "does not save the target" do
+            movie.should_not be_persisted
+          end
         end
 
-        let(:post) do
-          Post.create
-        end
+        context "when the child is not a new record" do
 
-        before do
-          post.person = person
-        end
+          let(:movie) do
+            Movie.new(:ssn => "437-11-1112")
+          end
 
-        it "sets the target of the relation" do
-          post.person.target.should == person
-        end
+          let(:rating) do
+            Rating.create
+          end
 
-        it "sets the foreign key of the relation" do
-          post.person_id.should == person.id
-        end
+          before do
+            rating.ratable = movie
+          end
 
-        it "sets the base on the inverse relation" do
-          person.posts.should == [ post ]
-        end
+          it "sets the target of the relation" do
+            rating.ratable.target.should == movie
+          end
 
-        it "does not saves the target" do
-          person.should_not be_persisted
+          it "sets the foreign key of the relation" do
+            rating.ratable_id.should == movie.id
+          end
+
+          it "sets the base on the inverse relation" do
+            movie.ratings.should == [ rating ]
+          end
+
+          it "does not saves the target" do
+            movie.should_not be_persisted
+          end
         end
       end
     end
