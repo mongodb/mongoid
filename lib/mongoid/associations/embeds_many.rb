@@ -192,8 +192,10 @@ module Mongoid #:nodoc:
               document.write_attributes(attrs)
             end
           else
-            document = build(attrs)
-            id_index[document.id.to_s] = index.to_i
+            unless options && options[:allow_destroy] && Boolean.set(attrs['_destroy'])
+              document = build(attrs)
+              id_index[document.id.to_s] = index.to_i
+            end
           end
         end
         if reordering
