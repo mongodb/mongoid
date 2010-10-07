@@ -104,7 +104,7 @@ module Mongoid #:nodoc
     # The master +Mongo::DB+
     def master
       unless @master
-        _master(@settings)
+        _master(@settings)  if @settings
         raise Errors::InvalidDatabase.new(nil) unless @master
       end
       if @reconnect
@@ -145,7 +145,7 @@ module Mongoid #:nodoc
     #
     # The slave +Mongo::DBs+
     def slaves
-      _slaves(@settings)  unless @slaves
+      _slaves(@settings)  unless @slaves || !@settings
       @slaves
     end
 
