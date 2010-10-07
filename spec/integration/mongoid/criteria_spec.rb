@@ -65,6 +65,29 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#each" do
+
+    let(:person1) { Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666") }
+    let(:person2) { Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434") }
+
+    before do
+      person1.create_game(:score => 10)
+      person2.create_game(:score => 20)
+    end
+
+    it "without includes" do
+      criteria = Person.all
+      criteria.collect(&:title).should == ["Sir", "Madam"]
+    end
+
+    it "with includes" do
+      criteria = Person.all
+      criteria.expects(:preload)
+      criteria.eager_loadings = [:game]
+      criteria.collect(&:game).collect(&:score).should == [10, 20]
+    end
+  end
+
   describe "#in" do
 
     context "when searching nil values" do

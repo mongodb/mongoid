@@ -4,6 +4,7 @@ require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/optional"
 require "mongoid/criterion/selector"
+require "mongoid/criterion/eager_loading"
 
 module Mongoid #:nodoc:
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
@@ -24,6 +25,7 @@ module Mongoid #:nodoc:
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Optional
+    include Criterion::EagerLoading
     include Enumerable
 
     attr_reader :collection, :ids, :klass, :options, :selector
@@ -79,7 +81,15 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      context.iterate(&block)
+      if @eager_loadings
+        # if eager loadings are used, preload the associations.
+        docs = []
+        context.iterate { |doc| docs << doc }
+        preload(docs)
+        docs.each(&block)
+      else
+        context.iterate(&block)
+      end
       self
     end
 
