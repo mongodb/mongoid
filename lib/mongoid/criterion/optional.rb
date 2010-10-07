@@ -3,6 +3,16 @@ module Mongoid #:nodoc:
   module Criterion #:nodoc:
     module Optional
 
+      def using_default_sort?
+        @use_default_sort = true if @use_default_sort.nil? # TODO: move initialization elsewhere
+        return @use_default_sort
+      end
+
+      def remove_default_sort
+        @options[:sort] = nil if using_default_sort?
+        @use_default_sort = false
+      end
+
       # Adds fields to be sorted in ascending order. Will add them in the order
       # they were passed into the method.
       #
@@ -10,6 +20,8 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.ascending(:title, :dob)</tt>
       def ascending(*fields)
+        remove_default_sort
+
         @options[:sort] = [] unless @options[:sort] || fields.first.nil?
         fields.flatten.each { |field| @options[:sort] << [ field, :asc ] }
         self
@@ -45,6 +57,8 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.descending(:title, :dob)</tt>
       def descending(*fields)
+        remove_default_sort
+
         @options[:sort] = [] unless @options[:sort] || fields.first.nil?
         fields.flatten.each { |field| @options[:sort] << [ field, :desc ] }
         self
@@ -149,6 +163,11 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def order_by(*args)
+        remove_default_sort
+        set_order_by(*args)
+      end
+
+      def set_order_by(*args)
         @options[:sort] = [] unless @options[:sort] || args.first.nil?
         arguments = args.first
         case arguments
@@ -200,6 +219,7 @@ module Mongoid #:nodoc:
         types = [types] unless types.is_a?(Array)
         self.in(:_type => types)
       end
+
     end
   end
 end

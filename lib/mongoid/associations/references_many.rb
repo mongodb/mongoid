@@ -166,7 +166,11 @@ module Mongoid #:nodoc:
       #   An +Array+ of objects if an ActiveRecord association
       #   A +Collection+ if a DataMapper association.
       def query
-        @query ||= lambda { @klass.all(:conditions => { @foreign_key => @parent.id }) }
+        @query ||= lambda {
+          @klass.all(:conditions => { @foreign_key => @parent.id }).tap do |crit|
+            crit.set_order_by(@options.default_order) if @options.default_order
+          end
+        }
       end
 
       # Remove the objects based on conditions.

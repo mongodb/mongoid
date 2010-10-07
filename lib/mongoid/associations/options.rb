@@ -68,6 +68,11 @@ module Mongoid #:nodoc:
       def stored_as
         self[:stored_as]
       end
+
+      # Used with references_many to define a default sorting order
+      def default_order
+        self[:default_order]
+      end
     end
   end
 end
