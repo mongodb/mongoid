@@ -36,6 +36,10 @@ describe Mongoid::Relations::Referenced::In do
           person.game.should == game
         end
 
+        it "sets the same instance on the inverse relation" do
+          person.game.should eql(game)
+        end
+
         it "does not save the target" do
           person.should_not be_persisted
         end
@@ -65,6 +69,10 @@ describe Mongoid::Relations::Referenced::In do
 
         it "sets the base on the inverse relation" do
           person.game.should == game
+        end
+
+        it "sets the same instance on the inverse relation" do
+          person.game.should eql(game)
         end
 
         it "does not saves the target" do
@@ -103,6 +111,10 @@ describe Mongoid::Relations::Referenced::In do
             person.posts.should == [ post ]
           end
 
+          it "sets the same instance on the inverse relation" do
+            person.posts.first.should eql(post)
+          end
+
           it "does not save the target" do
             person.should_not be_persisted
           end
@@ -132,6 +144,10 @@ describe Mongoid::Relations::Referenced::In do
 
           it "sets the base on the inverse relation" do
             person.posts.should == [ post ]
+          end
+
+          it "sets the same instance on the inverse relation" do
+            person.posts.first.should eql(post)
           end
 
           it "does not saves the target" do
