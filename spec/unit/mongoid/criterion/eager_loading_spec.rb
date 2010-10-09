@@ -28,6 +28,11 @@ describe Mongoid::Criterion::EagerLoading do
       person1.posts.create(:title => "post2")
       person2.posts.create(:title => "post3")
       person2.posts.create(:title => "post4")
+      
+      person1.preferences.create(:name => "preference1")
+      person1.preferences.create(:name => "preference2")
+      person2.preferences.create(:name => "preference3")
+      person2.preferences.create(:name => "preference4")
     end
 
     it "preload references_one association" do
@@ -47,6 +52,14 @@ describe Mongoid::Criterion::EagerLoading do
       
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:posts)
+      criteria.preload([person1, person2])
+    end
+
+    it "preload references_many association" do
+      Preference.expects(:find).with((person1.preferences + person2.preferences).collect(&:id)).returns(person1.preferences + person2.preferences)
+
+      criteria = Mongoid::Criteria.new(Person)
+      criteria.includes(:preferences)
       criteria.preload([person1, person2])
     end
 
@@ -75,6 +88,14 @@ describe Mongoid::Criterion::EagerLoading do
       reflection.association.should == Mongoid::Associations::ReferencesMany
       reflection.foreign_key.should == "person_id"
       reflection.name.should == "posts"
+    end
+    
+    it "with references_many_as_array" do
+      criteria = Mongoid::Criteria.new(Person)
+      reflection = criteria.association_reflection(Person, :preferences)
+      reflection.association.should == Mongoid::Associations::ReferencesManyAsArray
+      reflection.foreign_key.should == "preference_ids"
+      reflection.name.should == "preferences"
     end
     
     it "with referenced_in" do

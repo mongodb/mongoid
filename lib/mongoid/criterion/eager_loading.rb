@@ -38,6 +38,14 @@ module Mongoid #:nodoc:
                 eager_association.send(reflection.foreign_key) == document.id
               })
             end
+          elsif reflection.association == Mongoid::Associations::ReferencesManyAsArray
+            ids = documents.collect(&:"#{reflection.foreign_key}").flatten
+            eager_associations = reflection.name.singularize.camelize.constantize.find(ids).to_a
+            documents.each do |document|
+              document.send("#{reflection.name}=", eager_associations.find_all { |eager_association|
+                eager_association.id == document.send(reflection.foreign_key)
+              })
+            end
           elsif reflection.association == Mongoid::Associations::ReferencedIn
             ids = documents.collect(&:"#{reflection.foreign_key}")
             eager_associations = reflection.name.singularize.camelize.constantize.find(ids).to_a
