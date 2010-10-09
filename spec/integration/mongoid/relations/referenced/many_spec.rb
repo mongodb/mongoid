@@ -34,6 +34,10 @@ describe Mongoid::Relations::Referenced::Many do
             post.person.should == person
           end
 
+          it "sets the same instance on the inverse relation" do
+            post.person.should eql(person)
+          end
+
           it "does not save the target" do
             post.should be_new
           end
@@ -63,6 +67,10 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "sets the base on the inverse relation" do
             post.person.should == person
+          end
+
+          it "sets the same instance on the inverse relation" do
+            post.person.should eql(person)
           end
 
           it "saves the target" do
