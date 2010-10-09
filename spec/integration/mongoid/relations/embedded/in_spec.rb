@@ -28,6 +28,10 @@ describe Mongoid::Relations::Embedded::In do
           person.name.should == name
         end
 
+        it "sets the same instance on the inverse relation" do
+          person.name.should eql(name)
+        end
+
         it "does not save the target" do
           person.should_not be_persisted
         end
@@ -53,6 +57,10 @@ describe Mongoid::Relations::Embedded::In do
 
         it "sets the base on the inverse relation" do
           person.name.should == name
+        end
+
+        it "sets the same instance on the inverse relation" do
+          person.name.should eql(name)
         end
 
         it "saves the base" do
@@ -82,7 +90,11 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "appends the base on the inverse relation" do
-          person.addresses.should include(address)
+          person.addresses.should == [ address ]
+        end
+
+        it "sets the same instance in the inverse relation" do
+          person.addresses.first.should eql(address)
         end
 
         it "does not save the target" do
@@ -108,8 +120,12 @@ describe Mongoid::Relations::Embedded::In do
           address.addressable.should == person
         end
 
+        it "sets the same instance in the inverse relation" do
+          person.addresses.first.should eql(address)
+        end
+
         it "appends the base on the inverse relation" do
-          person.addresses.should include(address)
+          person.addresses.should == [ address ]
         end
       end
     end
