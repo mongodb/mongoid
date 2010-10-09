@@ -81,10 +81,8 @@ describe Mongoid::Criteria do
     end
 
     it "with includes" do
-      criteria = Person.all
-      criteria.expects(:preload)
-      criteria.eager_loadings = [:game]
-      criteria.collect(&:game).collect(&:score).should == [10, 20]
+      criteria = Person.includes(:game)
+      criteria.collect(&:game).should == [person1.game, person2.game]
     end
   end
 
