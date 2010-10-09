@@ -55,7 +55,7 @@ describe Mongoid::Criterion::EagerLoading do
       criteria.preload([person1, person2])
     end
 
-    it "preload references_many association" do
+    it "preload references_many_as_array association" do
       Preference.expects(:find).with((person1.preferences + person2.preferences).collect(&:id)).returns(person1.preferences + person2.preferences)
 
       criteria = Mongoid::Criteria.new(Person)
@@ -69,41 +69,6 @@ describe Mongoid::Criterion::EagerLoading do
       criteria = Mongoid::Criteria.new(Game)
       criteria.includes(:person)
       criteria.preload([person1.game, person2.game])
-    end
-  end
-  
-  describe "#association_reflection" do
-
-    it "with references_one" do
-      criteria = Mongoid::Criteria.new(Person)
-      reflection = criteria.association_reflection(Person, :game)
-      reflection.association.should == Mongoid::Associations::ReferencesOne
-      reflection.foreign_key.should == "person_id"
-      reflection.name.should == "game"
-    end
-    
-    it "with references_many" do
-      criteria = Mongoid::Criteria.new(Person)
-      reflection = criteria.association_reflection(Person, :posts)
-      reflection.association.should == Mongoid::Associations::ReferencesMany
-      reflection.foreign_key.should == "person_id"
-      reflection.name.should == "posts"
-    end
-    
-    it "with references_many_as_array" do
-      criteria = Mongoid::Criteria.new(Person)
-      reflection = criteria.association_reflection(Person, :preferences)
-      reflection.association.should == Mongoid::Associations::ReferencesManyAsArray
-      reflection.foreign_key.should == "preference_ids"
-      reflection.name.should == "preferences"
-    end
-    
-    it "with referenced_in" do
-      criteria = Mongoid::Criteria.new(Game)
-      reflection = criteria.association_reflection(Game, :person)
-      reflection.association.should == Mongoid::Associations::ReferencedIn
-      reflection.foreign_key.should == "person_id"
-      reflection.name.should == "person"
     end
   end
 end
