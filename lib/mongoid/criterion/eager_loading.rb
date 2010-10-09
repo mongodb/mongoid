@@ -24,15 +24,23 @@ module Mongoid #:nodoc:
           reflection = association_reflection(document_class, eager_loading)
           if reflection.association == Mongoid::Associations::ReferencesOne
             ids = documents.collect(&:id)
-            eager_associations = reflection.name.camelize.constantize.where(reflection.foreign_key.to_sym.in => ids).to_a
+            eager_associations = reflection.name.singularize.camelize.constantize.where(reflection.foreign_key.to_sym.in => ids).to_a
             documents.each do |document|
               document.send("#{reflection.name}=", eager_associations.find { |eager_association|
                 eager_association.send(reflection.foreign_key) == document.id
               })
             end
+          elsif reflection.association == Mongoid::Associations::ReferencesMany
+            ids = documents.collect(&:id)
+            eager_associations = reflection.name.singularize.camelize.constantize.where(reflection.foreign_key.to_sym.in => ids).to_a
+            documents.each do |document|
+              document.send("#{reflection.name}=", eager_associations.find_all { |eager_association|
+                eager_association.send(reflection.foreign_key) == document.id
+              })
+            end
           elsif reflection.association == Mongoid::Associations::ReferencedIn
             ids = documents.collect(&:"#{reflection.foreign_key}")
-            eager_associations = reflection.name.camelize.constantize.find(ids).to_a
+            eager_associations = reflection.name.singularize.camelize.constantize.find(ids).to_a
             documents.each do |document|
               document.send("#{reflection.name}=", eager_associations.find { |eager_association|
                 eager_association.id == document.send(reflection.foreign_key)
