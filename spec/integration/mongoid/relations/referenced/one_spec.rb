@@ -3,8 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::One do
 
   before do
-    Person.delete_all
-    Game.delete_all
+    [ Person, Game ].map(&:delete_all)
   end
 
   describe "#=" do

@@ -3,80 +3,156 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    [ Person, Game, Post ].map(&:delete_all)
+    [ Person, Game, Post, Bar ].map(&:delete_all)
   end
 
   describe "#=" do
 
     context "when the parent is a references one" do
 
-      context "when the child is a new record" do
+      context "when the relation is not polymorphic" do
 
-        let(:person) do
-          Person.new
+        context "when the child is a new record" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:game) do
+            Game.new
+          end
+
+          before do
+            game.person = person
+          end
+
+          it "sets the target of the relation" do
+            game.person.target.should == person
+          end
+
+          it "sets the foreign key on the relation" do
+            game.person_id.should == person.id
+          end
+
+          it "sets the base on the inverse relation" do
+            person.game.should == game
+          end
+
+          it "sets the same instance on the inverse relation" do
+            person.game.should eql(game)
+          end
+
+          it "does not save the target" do
+            person.should_not be_persisted
+          end
         end
 
-        let(:game) do
-          Game.new
-        end
+        context "when the child is not a new record" do
 
-        before do
-          game.person = person
-        end
+          let(:person) do
+            Person.new(:ssn => "437-11-1112")
+          end
 
-        it "sets the target of the relation" do
-          game.person.target.should == person
-        end
+          let(:game) do
+            Game.create
+          end
 
-        it "sets the foreign key on the relation" do
-          game.person_id.should == person.id
-        end
+          before do
+            game.person = person
+          end
 
-        it "sets the base on the inverse relation" do
-          person.game.should == game
-        end
+          it "sets the target of the relation" do
+            game.person.target.should == person
+          end
 
-        it "sets the same instance on the inverse relation" do
-          person.game.should eql(game)
-        end
+          it "sets the foreign key of the relation" do
+            game.person_id.should == person.id
+          end
 
-        it "does not save the target" do
-          person.should_not be_persisted
+          it "sets the base on the inverse relation" do
+            person.game.should == game
+          end
+
+          it "sets the same instance on the inverse relation" do
+            person.game.should eql(game)
+          end
+
+          it "does not saves the target" do
+            person.should_not be_persisted
+          end
         end
       end
 
-      context "when the child is not a new record" do
+      context "when the relation is not polymorphic" do
 
-        let(:person) do
-          Person.new(:ssn => "437-11-1112")
+        context "when the child is a new record" do
+
+          let(:bar) do
+            Bar.new
+          end
+
+          let(:rating) do
+            Rating.new
+          end
+
+          before do
+            rating.ratable = bar
+          end
+
+          it "sets the target of the relation" do
+            rating.ratable.target.should == bar
+          end
+
+          it "sets the foreign key on the relation" do
+            rating.ratable_id.should == bar.id
+          end
+
+          it "sets the base on the inverse relation" do
+            bar.rating.should == rating
+          end
+
+          it "sets the same instance on the inverse relation" do
+            bar.rating.should eql(rating)
+          end
+
+          it "does not save the target" do
+            bar.should_not be_persisted
+          end
         end
 
-        let(:game) do
-          Game.create
-        end
+        context "when the child is not a new record" do
 
-        before do
-          game.person = person
-        end
+          let(:bar) do
+            Bar.new
+          end
 
-        it "sets the target of the relation" do
-          game.person.target.should == person
-        end
+          let(:rating) do
+            Rating.create
+          end
 
-        it "sets the foreign key of the relation" do
-          game.person_id.should == person.id
-        end
+          before do
+            rating.ratable = bar
+          end
 
-        it "sets the base on the inverse relation" do
-          person.game.should == game
-        end
+          it "sets the target of the relation" do
+            rating.ratable.target.should == bar
+          end
 
-        it "sets the same instance on the inverse relation" do
-          person.game.should eql(game)
-        end
+          it "sets the foreign key of the relation" do
+            rating.ratable_id.should == bar.id
+          end
 
-        it "does not saves the target" do
-          person.should_not be_persisted
+          it "sets the base on the inverse relation" do
+            bar.rating.should == rating
+          end
+
+          it "sets the same instance on the inverse relation" do
+            bar.rating.should eql(rating)
+          end
+
+          it "does not saves the target" do
+            bar.should_not be_persisted
+          end
         end
       end
     end
@@ -227,59 +303,121 @@ describe Mongoid::Relations::Referenced::In do
 
     context "when the parent is a references one" do
 
-      context "when the parent is a new record" do
+      context "when the relation is not polymorphic" do
 
-        let(:person) do
-          Person.new
+        context "when the parent is a new record" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:game) do
+            Game.new
+          end
+
+          before do
+            game.person = person
+            game.person = nil
+          end
+
+          it "sets the relation to nil" do
+            game.person.should be_nil
+          end
+
+          it "removed the inverse relation" do
+            person.game.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            game.person_id.should be_nil
+          end
         end
 
-        let(:game) do
-          Game.new
-        end
+        context "when the parent is not a new record" do
 
-        before do
-          game.person = person
-          game.person = nil
-        end
+          let(:person) do
+            Person.new(:ssn => "437-11-1112")
+          end
 
-        it "sets the relation to nil" do
-          game.person.should be_nil
-        end
+          let(:game) do
+            Game.create
+          end
 
-        it "removed the inverse relation" do
-          person.game.should be_nil
-        end
+          before do
+            game.person = person
+            game.person = nil
+          end
 
-        it "removes the foreign key value" do
-          game.person_id.should be_nil
+          it "sets the relation to nil" do
+            game.person.should be_nil
+          end
+
+          it "removed the inverse relation" do
+            person.game.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            game.person_id.should be_nil
+          end
         end
       end
 
-      context "when the parent is not a new record" do
+      context "when the relation is polymorphic" do
 
-        let(:person) do
-          Person.new(:ssn => "437-11-1112")
+        context "when the parent is a new record" do
+
+          let(:bar) do
+            Bar.new
+          end
+
+          let(:rating) do
+            Rating.new
+          end
+
+          before do
+            rating.ratable = bar
+            rating.ratable = nil
+          end
+
+          it "sets the relation to nil" do
+            rating.ratable.should be_nil
+          end
+
+          it "removed the inverse relation" do
+            bar.rating.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            rating.ratable_id.should be_nil
+          end
         end
 
-        let(:game) do
-          Game.create
-        end
+        context "when the parent is not a new record" do
 
-        before do
-          game.person = person
-          game.person = nil
-        end
+          let(:bar) do
+            Bar.new(:ssn => "437-11-1112")
+          end
 
-        it "sets the relation to nil" do
-          game.person.should be_nil
-        end
+          let(:rating) do
+            Rating.create
+          end
 
-        it "removed the inverse relation" do
-          person.game.should be_nil
-        end
+          before do
+            rating.ratable = bar
+            rating.ratable = nil
+          end
 
-        it "removes the foreign key value" do
-          game.person_id.should be_nil
+          it "sets the relation to nil" do
+            rating.ratable.should be_nil
+          end
+
+          it "removed the inverse relation" do
+            bar.rating.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            rating.ratable_id.should be_nil
+          end
         end
       end
     end
