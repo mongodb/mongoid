@@ -43,15 +43,8 @@ module Mongoid #:nodoc:
             @options.merge(:validate => @validate)
           ).persist
         else
-          @collection.insert(idelize(@document, @document.raw_attributes), @options)
+          @collection.insert(@document.normalized_attributes!, @options)
         end
-      end
-      
-      def idelize(document, hash)
-        if hash["_id"] and document.using_object_ids? and not hash["_id"].is_a? ::BSON::ObjectId
-          hash["_id"] = ::BSON::ObjectId(hash["_id"])
-        end
-        hash
       end
     end
   end

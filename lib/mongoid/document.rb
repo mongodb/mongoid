@@ -134,6 +134,14 @@ module Mongoid #:nodoc:
       @attributes
     end
 
+    # Return attributes hash, with "_id" as to ObjectId if supplied and cast is required
+    def normalized_attributes!
+      if using_object_ids? and @attributes["_id"] and not @attributes["_id"].is_a?(BSON::ObjectId)
+        @attributes["_id"] = ::BSON::ObjectId(@attributes["_id"])
+      end
+      @attributes
+    end      
+
     # Reloads the +Document+ attributes from the database.
     def reload
       reloaded = collection.find_one(:_id => id)
