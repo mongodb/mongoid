@@ -7,12 +7,12 @@ describe 'id is a legal bson string' do
     MixedDrink.delete_all
   end
   
-  # describe '#create with a ObjectId(id), then find with same id' do
-  #   it 'should create out of legal string' do
-  #     mojito = MixedDrink.create(:id => BSON::ObjectId(id), :name => 'mojito')
-  #     assert {MixedDrink.find(id) == mojito}
-  #   end
-  # end
+  describe '#create with a ObjectId(id), then find with same id' do
+    it 'should create out of legal string' do
+      mojito = MixedDrink.create(:id => BSON::ObjectId(id), :name => 'mojito')
+      MixedDrink.find(id).should == mojito
+    end
+  end
   
   describe '#create with a stringed object id (size=24), then find with same id' do
     it 'should create out of legal string' do

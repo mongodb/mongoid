@@ -48,7 +48,9 @@ module Mongoid #:nodoc:
       end
       
       def idelize(hash)
-        hash["_id"] = ::BSON::ObjectId(hash["_id"]) if hash["_id"]
+        if hash["_id"] and hash["_id"].is_a? String
+          hash["_id"] = ::BSON::ObjectId(hash["_id"])
+        end
         hash
       end
     end
