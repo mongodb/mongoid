@@ -136,8 +136,8 @@ module Mongoid #:nodoc:
 
     # Return attributes hash, with "_id" as to ObjectId if supplied and cast is required
     def normalized_attributes!
-      if using_object_ids? and @attributes["_id"] and not @attributes["_id"].is_a?(BSON::ObjectId)
-        @attributes["_id"] = ::BSON::ObjectId(@attributes["_id"])
+      if using_object_ids? and self.id and self.id.is_a?(String)
+        self.id = ::BSON::ObjectId(self.id)
       end
       @attributes
     end      
