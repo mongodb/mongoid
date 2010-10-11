@@ -1,21 +1,21 @@
 require 'spec_helper'
 
-describe 'id is a legal bson string' do
+describe 'Given id is a legal bson string' do
   let(:id) {'123456789012345678901234'}
   
   before do
     MixedDrink.delete_all
   end
   
-  describe '#create with a ObjectId(id), then find with same id' do
-    it 'should create out of legal string' do
+  describe 'when I create document with ObjectId(id) as "_id" field' do
+    it 'then I should find it with id string' do
       mojito = MixedDrink.create(:id => BSON::ObjectId(id), :name => 'mojito')
       MixedDrink.find(id).should == mojito
     end
   end
   
-  describe '#create with a stringed object id (size=24), then find with same id' do
-    it 'should create out of legal string' do
+  describe 'when I create document with id as "_id" field' do
+    it 'then I should find document with id string' do
       rhum = MixedDrink.create(:id => id, :name => 'rhum')
       MixedDrink.find(id).should == rhum
     end
