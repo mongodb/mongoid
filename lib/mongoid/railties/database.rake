@@ -98,11 +98,12 @@ namespace :db do
       end
     end
 
+    def collection_names
+      @collection_names ||= get_mongoid_models.map{ |d| d.collection.name }.uniq
+    end
+
     desc "Convert string objectids in mongo database to ObjectID type"
     task :objectid_convert => :environment do
-      documents = get_mongoid_models
-      collection_names = documents.map(&:collection).map(&:name).uniq
-
       collection_names.each do |collection_name|
         puts "Converting #{collection_name} to use ObjectIDs"
 
@@ -156,8 +157,8 @@ namespace :db do
 
     desc "Clean up old collections backed up by objectid_convert"
     task :cleanup_old_collections => :environment do
-      get_mongoid_models.each do |document|
-        collection = document.collection
+      collection_names.each do |collection_name|
+        collection = Mongoid.master.collection(collection_name)
         collection.db["#{collection.name}_old"].drop
       end
     end
