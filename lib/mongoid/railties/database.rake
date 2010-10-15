@@ -101,11 +101,12 @@ namespace :db do
     desc "Convert string objectids in mongo database to ObjectID type"
     task :objectid_convert => :environment do
       documents = get_mongoid_models
-      documents.each do |document|
-        puts "Converting #{document.to_s} to use ObjectIDs"
+      collection_names = documents.map(&:collection).map(&:name).uniq
+
+      collection_names.each do |collection_name|
+        puts "Converting #{collection_name} to use ObjectIDs"
 
         # get old collection
-        collection_name = document.collection.name
         collection = Mongoid.master.collection(collection_name)
 
         # get new collection (a clean one)
@@ -124,8 +125,7 @@ namespace :db do
       end
 
       # no errors. great! now rename _new to collection_name
-      documents.each do |document|
-        collection_name = document.collection.name
+      collection_names.each do |collection_name|
         collection = Mongoid.master.collection(collection_name)
         new_collection = collection.db["#{collection_name}_new"]
 
@@ -146,7 +146,7 @@ namespace :db do
         begin
           new_collection.rename(collection_name)
         rescue Exception => e
-          puts "Unable to rename database #{new_collection.name} to #{collection_name}_old"
+          puts "Unable to rename database #{new_collection.name} to #{collection_name}"
           puts "reason: #{e.message}\n\n"
         end
       end
