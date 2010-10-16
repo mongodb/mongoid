@@ -25,15 +25,21 @@ module Mongoid # :nodoc:
     include Reflections
 
     included do
-      cattr_accessor :embedded
       attr_accessor :metadata
-      self.embedded = false
+    end
 
-      # Convenience methods for the instance to know about attributes that
-      # are located at the class level.
-      delegate \
-        :embedded,
-        :embedded?, :to => "self.class"
+    # Determine if the document itself is embedded in another document via the
+    # proper channels. (If it has a parent document.)
+    #
+    # Example:
+    #
+    # <tt>address.embedded?</tt>
+    #
+    # Returns:
+    #
+    # True if the document has a parent document.
+    def embedded?
+      _parent.present?
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -86,22 +92,6 @@ module Mongoid # :nodoc:
     # True if in a references one.
     def referenced_one?
       metadata && metadata.macro == :references_one
-    end
-
-    module ClassMethods #:nodoc:
-
-      # Specifies whether or not the class is an embedded document.
-      #
-      # Example:
-      #
-      # <tt>Address.embedded?</tt>
-      #
-      # Returns:
-      #
-      # true if embedded, false if not.
-      def embedded?
-        !!embedded
-      end
     end
   end
 end

@@ -553,6 +553,7 @@ describe Mongoid::Relations::Metadata do
   context "properties" do
 
     PROPERTIES = [
+      "cyclic",
       "dependent",
       "inverse_class_name",
       "inverse_of",

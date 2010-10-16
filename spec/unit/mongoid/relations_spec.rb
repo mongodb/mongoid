@@ -3,9 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations do
 
   class TestClass
-    include Mongoid::Relations
-    include Mongoid::Dirty
-    include Mongoid::Fields
+    include Mongoid::Document
   end
 
   let(:klass) do
@@ -14,7 +12,6 @@ describe Mongoid::Relations do
 
   before do
     klass.relations.clear
-    klass.embedded = false
   end
 
   before(:all) do
@@ -23,42 +20,25 @@ describe Mongoid::Relations do
 
   describe "#embedded?" do
 
-    context "when the class is embedded" do
+    let(:document) do
+      klass.allocate
+    end
+
+    context "when the document has a parent" do
 
       before do
-        klass.embedded_in(:person)
+        document.parentize(stub)
       end
 
       it "returns true" do
-        klass.allocate.should be_embedded
+        document.should be_embedded
       end
     end
 
-    context "when the class is not embedded" do
+    context "when the document has no parent" do
 
       it "returns false" do
-        klass.allocate.should_not be_embedded
-      end
-    end
-  end
-
-  describe ".embedded?" do
-
-    context "when the class is embedded" do
-
-      before do
-        klass.embedded_in(:person)
-      end
-
-      it "returns true" do
-        klass.should be_embedded
-      end
-    end
-
-    context "when the class is not embedded" do
-
-      it "returns false" do
-        klass.should_not be_embedded
+        document.should_not be_embedded
       end
     end
   end

@@ -12,7 +12,6 @@ describe Mongoid::Relations::Reflections do
 
   before do
     klass.relations.clear
-    klass.embedded = false
   end
 
   describe ".reflect_on_association" do

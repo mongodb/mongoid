@@ -402,7 +402,7 @@ describe Mongoid::Criteria do
     context "when the class is embedded" do
 
       let(:criteria) do
-        Mongoid::Criteria.new(Address)
+        Mongoid::Criteria.new(Address, true)
       end
 
       it "returns an enumerable context" do
@@ -789,7 +789,7 @@ describe Mongoid::Criteria do
         end
 
         it "delegates to #id_criteria" do
-          Mongoid::Criteria.translate(Person, id).should == document
+          Mongoid::Criteria.translate(Person, false, id).should == document
         end
       end
 
@@ -804,7 +804,7 @@ describe Mongoid::Criteria do
         end
 
         it "delegates to #id_criteria" do
-          Mongoid::Criteria.translate(Person, id).should == document
+          Mongoid::Criteria.translate(Person, false, id).should == document
         end
       end
     end
@@ -831,14 +831,14 @@ describe Mongoid::Criteria do
         end
 
         it "delegates to #id_criteria" do
-          Mongoid::Criteria.translate(Person, ids).should == documents
+          Mongoid::Criteria.translate(Person, false, ids).should == documents
         end
       end
 
       context "when Person, :conditions => {}" do
 
         let(:criteria) do
-          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
+          Mongoid::Criteria.translate(Person, false, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
@@ -853,7 +853,7 @@ describe Mongoid::Criteria do
       context "when Person, :conditions => {:id => id}" do
 
         let(:criteria) do
-          Mongoid::Criteria.translate(Person, :conditions => { :id => "1234e567" })
+          Mongoid::Criteria.translate(Person, false, :conditions => { :id => "1234e567" })
         end
 
         it "returns a criteria with a selector from the conditions" do
@@ -868,7 +868,7 @@ describe Mongoid::Criteria do
       context "when :all, :conditions => {}" do
 
         let(:criteria) do
-          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
+          Mongoid::Criteria.translate(Person, false, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
@@ -883,7 +883,7 @@ describe Mongoid::Criteria do
       context "when :last, :conditions => {}" do
 
         let(:criteria) do
-          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" })
+          Mongoid::Criteria.translate(Person, false, :conditions => { :title => "Test" })
         end
 
         it "returns a criteria with a selector from the conditions" do
@@ -898,7 +898,11 @@ describe Mongoid::Criteria do
       context "when options are provided" do
 
         let(:criteria) do
-          Mongoid::Criteria.translate(Person, :conditions => { :title => "Test" }, :skip => 10)
+          Mongoid::Criteria.translate(
+            Person,
+            false,
+            :conditions => { :title => "Test" }, :skip => 10
+          )
         end
 
         it "sets the selector" do

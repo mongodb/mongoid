@@ -218,7 +218,7 @@ module Mongoid # :nodoc:
         #
         # A single matching +Document+.
         def find(*args)
-          type, criteria = Criteria.parse!(self, *args)
+          type, criteria = Criteria.parse!(self, true, *args)
           case type
           when :first then return criteria.one
           when :last then return criteria.last
@@ -292,7 +292,7 @@ module Mongoid # :nodoc:
         #
         # A +WillPaginate::Collection+.
         def paginate(options)
-          criteria = Mongoid::Criteria.translate(metadata.klass, options)
+          criteria = Mongoid::Criteria.translate(metadata.klass, true, options)
           criteria.documents = target
           criteria.paginate(options)
         end
@@ -406,7 +406,7 @@ module Mongoid # :nodoc:
         #
         # A +Criteria+ object for this relation.
         def criteria
-          metadata.klass.criteria.tap do |criterion|
+          metadata.klass.criteria(true).tap do |criterion|
             criterion.documents = target
           end
         end
@@ -476,8 +476,7 @@ module Mongoid # :nodoc:
         #
         # The number of documents removed.
         def remove_all(conditions = {}, destroy = false)
-          criteria = metadata.klass.find(conditions || {})
-          criteria.documents = target
+          criteria = find(conditions || {})
           criteria.size.tap do
             criteria.each do |doc|
               target.delete(doc)

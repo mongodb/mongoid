@@ -38,7 +38,6 @@ module Mongoid # :nodoc:
         #     embedded_in :person, :inverse_of => :addresses
         #   end
         def embedded_in(name, options = {}, &block)
-          self.embedded = true
           relate(
             name,
             metadatafy(name, Embedded::In, options, &block)

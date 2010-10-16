@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::In do
 
+  before do
+    Person.delete_all
+  end
+
   describe "#=" do
 
     context "when the inverse of an embeds one" do

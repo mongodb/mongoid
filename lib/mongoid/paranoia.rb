@@ -84,21 +84,20 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # A +Criteria+ for deleted_at not existing.
-      def criteria
+      def criteria(embedded = false)
         super.where(:deleted_at.exists => false)
       end
-      
+
       # Find deleted documents
       #
       # Examples:
       #
       #   <tt>Person.deleted</tt>  # all deleted employees
       #   <tt>Company.first.employees.deleted</tt>  # works with a join
-      #   <tt>Person.deleted.find("4c188dea7b17235a2a000001").first</tt>  # retrieve by id a deleted person
+      #   <tt>Person.deleted.find("4c188dea7b17235a2a000001").first</tt>
       def deleted
         where(:deleted_at.exists => true)
       end
-      
     end
   end
 end

@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
     include Criterion::Optional
     include Enumerable
 
-    attr_reader :collection, :ids, :klass, :options, :selector
+    attr_reader :collection, :embedded, :ids, :klass, :options, :selector
     attr_accessor :documents
 
     delegate :aggregate, :avg, :blank?, :count, :distinct, :empty?,
@@ -69,7 +69,7 @@ module Mongoid #:nodoc:
     # This will return an Enumerable context if the class is embedded,
     # otherwise it will return a Mongo context for root classes.
     def context
-      @context ||= Contexts.context_for(self)
+      @context ||= Contexts.context_for(self, embedded)
     end
 
     # Iterate over each +Document+ in the results. This can take an optional
@@ -116,9 +116,9 @@ module Mongoid #:nodoc:
     #
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
-    def initialize(klass)
+    def initialize(klass, embedded = false)
       @selector = Mongoid::Criterion::Selector.new(klass)
-      @options, @klass, @documents = {}, klass, []
+      @options, @klass, @documents, @embedded = {}, klass, [], embedded
     end
 
     # Merges another object into this +Criteria+. The other object may be a
@@ -157,32 +157,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Encaspulates the behavior of taking arguments and parsing them into a
-    # finder type and a corresponding criteria object.
-    #
-    # Example:
-    #
-    # <tt>Criteria.parse!(Person, :all, :conditions => {})</tt>
-    #
-    # Options:
-    #
-    # klass: The klass to create the criteria for.
-    # args: An assortment of finder options.
-    #
-    # Returns:
-    #
-    # An Array with the type and criteria.
-    def self.parse!(klass, *args)
-      if args[0].nil?
-        Errors::InvalidOptions.new("Calling Document#find with nil is invalid")
-      end
-      type = args.delete_at(0) if args[0].is_a?(Symbol)
-      criteria = translate(klass, *args)
-      return [ type, criteria ]
-    end
-
-    alias :to_ary :to_a
-
     # Returns the selector and options as a +Hash+ that would be passed to a
     # scope for use with named scopes.
     def scoped
@@ -192,34 +166,64 @@ module Mongoid #:nodoc:
       { :where => @selector }.merge(scope_options)
     end
 
-    # Translate the supplied arguments into a +Criteria+ object.
-    #
-    # If the passed in args is a single +String+, then it will
-    # construct an id +Criteria+ from it.
-    #
-    # If the passed in args are a type and a hash, then it will construct
-    # the +Criteria+ with the proper selector, options, and type.
-    #
-    # Options:
-    #
-    # args: either a +String+ or a +Symbol+, +Hash combination.
-    #
-    # Example:
-    #
-    # <tt>Criteria.translate(Person, "4ab2bc4b8ad548971900005c")</tt>
-    # <tt>Criteria.translate(Person, :conditions => { :field => "value"}, :limit => 20)</tt>
-    def self.translate(*args)
-      klass = args[0]
-      params = args[1] || {}
-      unless params.is_a?(Hash)
-        return klass.criteria.id_criteria(params)
+    alias :to_ary :to_a
+
+    class << self
+
+      # Encaspulates the behavior of taking arguments and parsing them into a
+      # finder type and a corresponding criteria object.
+      #
+      # Example:
+      #
+      # <tt>Criteria.parse!(Person, :all, :conditions => {})</tt>
+      #
+      # Options:
+      #
+      # klass: The klass to create the criteria for.
+      # args: An assortment of finder options.
+      #
+      # Returns:
+      #
+      # An Array with the type and criteria.
+      def parse!(klass, embedded, *args)
+        if args[0].nil?
+          Errors::InvalidOptions.new("Calling Document#find with nil is invalid")
+        end
+        type = args.delete_at(0) if args[0].is_a?(Symbol)
+        criteria = translate(klass, embedded, *args)
+        return [ type, criteria ]
       end
-      conditions = params.delete(:conditions) || {}
-      if conditions.include?(:id)
-        conditions[:_id] = conditions[:id]
-        conditions.delete(:id)
+
+      # Translate the supplied arguments into a +Criteria+ object.
+      #
+      # If the passed in args is a single +String+, then it will
+      # construct an id +Criteria+ from it.
+      #
+      # If the passed in args are a type and a hash, then it will construct
+      # the +Criteria+ with the proper selector, options, and type.
+      #
+      # Options:
+      #
+      # args: either a +String+ or a +Symbol+, +Hash combination.
+      #
+      # Example:
+      #
+      # <tt>Criteria.translate(Person, "4ab2bc4b8ad548971900005c")</tt>
+      # <tt>Criteria.translate(Person, :conditions => { :field => "value"}, :limit => 20)</tt>
+      def translate(*args)
+        klass = args[0]
+        embedded = args[1]
+        params = args[2] || {}
+        unless params.is_a?(Hash)
+          return klass.criteria(embedded).id_criteria(params)
+        end
+        conditions = params.delete(:conditions) || {}
+        if conditions.include?(:id)
+          conditions[:_id] = conditions[:id]
+          conditions.delete(:id)
+        end
+        return klass.criteria(embedded).where(conditions).extras(params)
       end
-      return klass.criteria.where(conditions).extras(params)
     end
 
     protected

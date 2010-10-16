@@ -14,7 +14,6 @@ describe Mongoid::Relations::Macros do
 
   before do
     klass.relations.clear
-    klass.embedded = false
   end
 
   describe ".embedded_in" do
@@ -31,10 +30,6 @@ describe Mongoid::Relations::Macros do
 
       it "adds the metadata to the klass" do
         klass.relations["person"].should_not be_nil
-      end
-
-      it "marks the class as embedded" do
-        klass.embedded.should == true
       end
 
       it "defines the getter" do
@@ -183,10 +178,6 @@ describe Mongoid::Relations::Macros do
         klass.relations["person"].should_not be_nil
       end
 
-      it "does not mark the class as embedded" do
-        klass.embedded.should == false
-      end
-
       it "defines the getter" do
         klass.allocate.should respond_to(:person)
       end
@@ -237,10 +228,6 @@ describe Mongoid::Relations::Macros do
         klass.relations["person"].should_not be_nil
       end
 
-      it "does not mark the class as embedded" do
-        klass.embedded.should == false
-      end
-
       it "defines the getter" do
         klass.allocate.should respond_to(:person)
       end
@@ -287,10 +274,6 @@ describe Mongoid::Relations::Macros do
         klass.relations["posts"].should_not be_nil
       end
 
-      it "does not mark the class as embedded" do
-        klass.embedded.should == false
-      end
-
       it "defines the getter" do
         klass.allocate.should respond_to(:posts)
       end
@@ -335,10 +318,6 @@ describe Mongoid::Relations::Macros do
 
       it "adds the metadata to the klass" do
         klass.relations["posts"].should_not be_nil
-      end
-
-      it "does not mark the class as embedded" do
-        klass.embedded.should == false
       end
 
       it "defines the getter" do
@@ -391,10 +370,6 @@ describe Mongoid::Relations::Macros do
         klass.relations["preferences"].should_not be_nil
       end
 
-      it "does not mark the class as embedded" do
-        klass.embedded.should == false
-      end
-
       it "defines the getter" do
         klass.allocate.should respond_to(:preferences)
       end
@@ -443,10 +418,6 @@ describe Mongoid::Relations::Macros do
 
       it "adds the metadata to the klass" do
         klass.relations["game"].should_not be_nil
-      end
-
-      it "does not mark the class as embedded" do
-        klass.embedded.should == false
       end
 
       it "defines the getter" do

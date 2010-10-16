@@ -2,120 +2,181 @@ require "spec_helper"
 
 describe Mongoid::Finders do
 
+  let(:collection) do
+    stub(:name => "people")
+  end
+
+  let(:database) do
+    stub(:collection => collection)
+  end
+
   before do
-    @collection = stub(:name => "people")
-    @database = stub(:collection => @collection)
-    Mongoid.stubs(:database).returns(@database)
+    Mongoid.stubs(:database).returns(database)
   end
 
   describe ".all" do
 
-    before do
-      @conditions = { :conditions => { :test => "Test" } }
+    let(:conditions) do
+      { :conditions => { :test => "Test" } }
     end
 
     context "when a selector is provided" do
 
-      it "finds from the collection and instantiate objects for each returned" do
-        Mongoid::Criteria.expects(:translate).with(Person, @conditions)
-        Person.all(@conditions)
+      before do
+        Mongoid::Criteria.expects(:translate).with(Person, false, conditions)
       end
 
+      it "finds from the collection and instantiate objects for each returned" do
+        Person.all(conditions)
+      end
     end
 
     context "when a selector is not provided" do
 
-      it "finds from the collection and instantiate objects for each returned" do
-        Mongoid::Criteria.expects(:translate).with(Person, nil)
-        Person.all
+      before do
+        Mongoid::Criteria.expects(:translate).with(Person, false, nil)
       end
 
+      it "finds from the collection and instantiate objects for each returned" do
+        Person.all
+      end
     end
-
   end
 
   describe ".all_in" do
 
-    it "returns a new criteria with select conditions added" do
-      criteria = Person.all_in(:aliases => [ "Bond", "007" ])
-      criteria.selector.should == { :aliases => { "$all" => [ "Bond", "007" ] } }
+    let(:criteria) do
+      Person.all_in(:aliases => [ "Bond", "007" ])
     end
 
+    it "returns a new criteria with select conditions added" do
+      criteria.selector.should == { :aliases => { "$all" => [ "Bond", "007" ] } }
+    end
   end
 
   describe ".any_in" do
 
-    it "returns a new criteria with select conditions added" do
-      criteria = Person.any_in(:aliases => [ "Bond", "007" ])
-      criteria.selector.should == { :aliases => { "$in" => [ "Bond", "007" ] } }
+    let(:criteria) do
+      Person.any_in(:aliases => [ "Bond", "007" ])
     end
 
+    it "returns a new criteria with select conditions added" do
+      criteria.selector.should == { :aliases => { "$in" => [ "Bond", "007" ] } }
+    end
   end
 
   describe ".count" do
 
-    before do
-      @conditions = { :conditions => { :title => "Sir" } }
-      @criteria = mock
+    let(:conditions) do
+      { :conditions => { :title => "Sir" } }
     end
 
-    it "delegates to the criteria api" do
-      Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
-      @criteria.expects(:count).returns(10)
-      Person.count(@conditions).should == 10
+    let(:criteria) do
+      stub
+    end
+
+    context "with options provided" do
+
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, conditions).returns(criteria)
+        criteria.expects(:count).returns(10)
+      end
+
+      it "delegates to the criteria api" do
+        Person.count(conditions).should == 10
+      end
     end
 
     context "when no options provided" do
 
-      it "adds in the default parameters" do
-        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
-        @criteria.expects(:count).returns(10)
-        Person.count.should == 10
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, nil).returns(criteria)
+        criteria.expects(:count).returns(10)
       end
 
+      it "adds in the default parameters" do
+        Person.count.should == 10
+      end
     end
-
   end
 
   describe ".exists?" do
 
-    before do
-      @conditions = { :conditions => { :title => "Sir" } }
-      @criteria = mock
+    let(:criteria) do
+      stub
     end
 
-    it "should be true if there are document in collection with options" do
-      Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
-      @criteria.expects(:limit).with(1).returns(@criteria)
-      @criteria.expects(:count).returns(1)
-      Person.exists?(@conditions).should be_true
-    end
+    context "when options are provided" do
 
-    it 'should false if there are no document in collection with options' do
-      Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
-      @criteria.expects(:limit).with(1).returns(@criteria)
-      @criteria.expects(:count).returns(0)
-      Person.exists?(@conditions).should be_false
-    end
-
-    context "when no options provided" do
-
-      it "should be true if there are document in collection" do
-        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
-        @criteria.expects(:limit).with(1).returns(@criteria)
-        @criteria.expects(:count).returns(1)
-        Person.exists?.should be_true
+      let(:conditions) do
+        { :conditions => { :title => "Sir" } }
       end
 
-      it "should be false if there are no document in collection" do
-        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
-        @criteria.expects(:limit).with(1).returns(@criteria)
-        @criteria.expects(:count).returns(1)
-        Person.exists?.should be_true
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, conditions).returns(criteria)
+        criteria.expects(:limit).with(1).returns(criteria)
       end
 
+      context "when count is greater than zero" do
+
+        before do
+          criteria.expects(:count).returns(1)
+        end
+
+        it "returns true" do
+          Person.exists?(conditions).should be_true
+        end
+      end
+
+      context "when the count is zero" do
+
+        before do
+          criteria.expects(:count).returns(0)
+        end
+
+        it "returns false" do
+          Person.exists?(conditions).should be_false
+        end
+      end
     end
 
+    context "when no options are provided" do
+
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, nil).returns(criteria)
+        criteria.expects(:limit).with(1).returns(criteria)
+      end
+
+      context "when count is greater than zero" do
+
+        before do
+          criteria.expects(:count).returns(1)
+        end
+
+        it "returns true" do
+          Person.exists?.should be_true
+        end
+      end
+
+      context "when the count is zero" do
+
+        before do
+          criteria.expects(:count).returns(0)
+        end
+
+        it "returns false" do
+          Person.exists?.should be_false
+        end
+      end
+    end
   end
 
   describe ".excludes" do
@@ -124,333 +185,447 @@ describe Mongoid::Finders do
       criteria = Person.excludes(:title => "Sir")
       criteria.selector.should == { :title => { "$ne" => "Sir" } }
     end
-
   end
 
   describe ".find" do
 
-    before do
-      @attributes = {}
-      @criteria = mock
+    let(:attributes) do
+      {}
     end
 
-    context "when an id is passed in" do
+    let(:criteria) do
+      stub
+    end
 
-      before do
-        @id = BSON::ObjectId.new.to_s
+    context "when an id is provided" do
+
+      let(:id) do
+        BSON::ObjectId.new
       end
 
-      it "delegates to criteria" do
-        Mongoid::Criteria.expects(:translate).with(Person, @id.to_s).returns(Person.new)
-        Person.find(@id.to_s)
+      context "when a document is found" do
+
+        let(:person) do
+          Person.new
+        end
+
+        before do
+          Mongoid::Criteria.expects(
+            :translate
+          ).with(Person, false, id).returns(person)
+        end
+
+        it "returns the document" do
+          Person.find(id).should == person
+        end
       end
 
       context "when no document is found" do
 
-        it "raises an error" do
-          @error = Mongoid::Errors::DocumentNotFound.new(Person, @id.to_s)
-          Mongoid::Criteria.expects(:translate).with(Person, @id.to_s).raises(@error)
-          lambda { Person.find(@id.to_s) }.should raise_error
+        let(:error) do
+          Mongoid::Errors::DocumentNotFound.new(Person, id)
         end
 
+        before do
+          Mongoid::Criteria.expects(
+            :translate
+          ).with(Person, false, id).raises(error)
+        end
+
+        it "raises an error" do
+          expect { Person.find(id) }.to raise_error
+        end
       end
 
       context "when it is called with a nil value" do
 
         it "raises an InvalidOptions error" do
-          lambda { Person.find(nil) }.should raise_error(Mongoid::Errors::InvalidOptions)
+          expect {
+            Person.find(nil)
+          }.to raise_error(Mongoid::Errors::InvalidOptions)
         end
-
       end
-
     end
 
     context "when an array of ids is passed in" do
 
-      before do
-        @ids = []
-        3.times { @ids << BSON::ObjectId.new.to_s }
+      let(:ids) do
+        3.times.collect { BSON::ObjectId.new }
       end
 
-      it "delegates to the criteria" do
+      context "when a document is found" do
 
+        let(:person) do
+          Person.new
+        end
+
+        before do
+          Mongoid::Criteria.expects(
+            :translate
+          ).with(Person, false, ids).returns([ person ])
+        end
+
+        it "returns the document" do
+          Person.find(ids).should == [ person ]
+        end
       end
 
-    end
+      context "when no document is found" do
 
-    context "when nil passed in" do
+        let(:error) do
+          Mongoid::Errors::DocumentNotFound.new(Person, ids)
+        end
 
-      it "raises an error" do
-        lambda { Person.find(nil) }.should raise_error
+        before do
+          Mongoid::Criteria.expects(
+            :translate
+          ).with(Person, false, ids).raises(error)
+        end
+
+        it "raises an error" do
+          expect { Person.find(ids) }.to raise_error
+        end
       end
-
     end
 
     context "when finding first" do
 
-      it "delegates to criteria" do
-        Mongoid::Criteria.expects(:translate).with(Person, :conditions => { :test => "Test" }).returns(@criteria)
-        @criteria.expects(:one).returns(@attributes)
-        Person.find(:first, :conditions => { :test => "Test" })
+      let(:conditions) do
+        { :test => "Test" }
       end
 
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, conditions).returns(criteria)
+        criteria.expects(:one).returns(Person.new)
+      end
+
+      it "delegates to criteria" do
+        Person.find(:first, conditions).should be_a(Person)
+      end
     end
 
     context "when finding all" do
 
+      let(:conditions) do
+        { :conditions => { :test => "Test" } }
+      end
+
       before do
-        @conditions = { :conditions => { :test => "Test" } }
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, conditions).returns(criteria)
       end
 
       it "delegates to find_all" do
-        Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
-        Person.find(:all, @conditions)
+        Person.find(:all, conditions)
       end
-
     end
 
     context "when sorting" do
 
+      let(:conditions) do
+        { :conditions => { :test => "Test" }, :sort => { :test => -1 } }
+      end
+
       before do
-        @conditions = { :conditions => { :test => "Test" }, :sort => { :test => -1 } }
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, conditions).returns(criteria)
       end
 
       it "adds the sort parameters for the collection call" do
-        Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
-        Person.find(:all, @conditions)
+        Person.find(:all, conditions)
       end
     end
-
   end
 
   describe ".find_or_create_by" do
 
-    before do
-      @person = Person.new(:age => 30)
-      @criteria = mock
+    let(:person) do
+      Person.new(:age => 30)
+    end
+
+    let(:criteria) do
+      stub
     end
 
     context "when the document is found" do
 
-      it "returns the document" do
+      before do
         Mongoid::Criteria.expects(:translate).with(
-          Person, :conditions => { :age => 30 }
-        ).returns(@criteria)
-        @criteria.expects(:one).returns(@person)
-        Person.find_or_create_by(:age => 30).should == @person
+          Person, false, :conditions => { :age => 30 }
+        ).returns(criteria)
+        criteria.expects(:one).returns(person)
       end
 
+      it "returns the document" do
+        Person.find_or_create_by(:age => 30).should == person
+      end
     end
 
     context "when the document is not found" do
 
-      it "creates a new document" do
+      before do
         Mongoid::Criteria.expects(:translate).with(
-          Person, :conditions => { :age => 30 }
-        ).returns(@criteria)
-        @criteria.expects(:one).returns(nil)
-        Person.expects(:create).returns(@person)
-        person = Person.find_or_create_by(:age => 30)
-        person.should be_a_kind_of(Person)
-        person.age.should == 30
+          Person, false, :conditions => { :age => 30 }
+        ).returns(criteria)
+        criteria.expects(:one).returns(nil)
+        Person.expects(:create).returns(person)
       end
 
-    end
+      let(:found) do
+        Person.find_or_create_by(:age => 30)
+      end
 
+      it "creates a new document" do
+        found.should be_a_kind_of(Person)
+      end
+
+      it "sets the attributes" do
+        found.age.should == 30
+      end
+    end
   end
 
   describe ".find_or_initialize_by" do
 
-    before do
-      @person = Person.new(:age => 30)
-      @criteria = mock
+    let(:person) do
+      Person.new(:age => 30)
+    end
+
+    let(:criteria) do
+      stub
     end
 
     context "when the document is found" do
 
-      it "returns the document" do
+      before do
         Mongoid::Criteria.expects(:translate).with(
-          Person, :conditions => { :age => 30 }
-        ).returns(@criteria)
-        @criteria.expects(:one).returns(@person)
-        Person.find_or_initialize_by(:age => 30).should == @person
+          Person, false, :conditions => { :age => 30 }
+        ).returns(criteria)
+        criteria.expects(:one).returns(person)
       end
 
+      it "returns the document" do
+        Person.find_or_initialize_by(:age => 30).should == person
+      end
     end
 
     context "when the document is not found" do
 
-      it "returns a new document with the conditions" do
+      before do
         Mongoid::Criteria.expects(:translate).with(
-          Person, :conditions => { :age => 30 }
-        ).returns(@criteria)
-        @criteria.expects(:one).returns(nil)
-        person = Person.find_or_initialize_by(:age => 30)
-        person.should be_a_kind_of(Person)
-        person.should be_a_new_record
-        person.age.should == 30
+          Person, false, :conditions => { :age => 30 }
+        ).returns(criteria)
+        criteria.expects(:one).returns(nil)
       end
 
-    end
+      let(:found) do
+        Person.find_or_initialize_by(:age => 30)
+      end
 
+      it "creates a new document" do
+        found.should be_a_kind_of(Person)
+      end
+
+      it "sets the attributes" do
+        found.age.should == 30
+      end
+    end
   end
 
   describe ".first" do
 
-    before do
-      @criteria = mock
-      @conditions = { :conditions => { :test => "Test" } }
+    let(:criteria) do
+      stub
+    end
+
+    let(:conditions) do
+      { :conditions => { :test => "Test" } }
     end
 
     context "when a selector is provided" do
 
-      it "finds the first document from the collection and instantiates it" do
-        Mongoid::Criteria.expects(:translate).with(Person, @conditions).returns(@criteria)
-        @criteria.expects(:one)
-        Person.first(@conditions)
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, conditions).returns(criteria)
+        criteria.expects(:one)
       end
 
+      it "returns the first document in the collection" do
+        Person.first(conditions)
+      end
     end
 
     context "when a selector is not provided" do
 
-      it "finds the first document from the collection and instantiates it" do
-        Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
-        @criteria.expects(:one)
-        Person.first
+      before do
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, nil).returns(criteria)
+        criteria.expects(:one)
       end
 
+      it "finds the first document from the collection and instantiates it" do
+        Person.first
+      end
     end
-
   end
 
   describe ".last" do
 
+    let(:criteria) do
+      stub
+    end
+
     before do
-      @criteria = mock
+      Mongoid::Criteria.expects(
+        :translate
+      ).with(Person, false, nil).returns(criteria)
+      criteria.expects(:last)
     end
 
     it "finds the last document by the id" do
-      Mongoid::Criteria.expects(:translate).with(Person, nil).returns(@criteria)
-      @criteria.expects(:last)
       Person.last
     end
-
   end
 
   describe ".max" do
 
+    let(:criteria) do
+      stub
+    end
+
     before do
-      @criteria = mock
+      Person.expects(:criteria).returns(criteria)
+      criteria.expects(:max).with(:age).returns(50.0)
     end
 
     it "returns the sum of a new criteria" do
-      Person.expects(:criteria).returns(@criteria)
-      @criteria.expects(:max).with(:age).returns(50.0)
       Person.max(:age).should == 50.0
     end
-
   end
 
   describe ".min" do
 
+    let(:criteria) do
+      stub
+    end
+
     before do
-      @criteria = mock
+      Person.expects(:criteria).returns(criteria)
+      criteria.expects(:min).with(:age).returns(50.0)
     end
 
     it "returns the sum of a new criteria" do
-      Person.expects(:criteria).returns(@criteria)
-      @criteria.expects(:min).with(:age).returns(50.0)
       Person.min(:age).should == 50.0
     end
-
   end
 
   describe ".not_in" do
 
-    it "returns a new criteria with select conditions added" do
-      criteria = Person.not_in(:aliases => [ "Bond", "007" ])
-      criteria.selector.should == { :aliases => { "$nin" => [ "Bond", "007" ] } }
+    let(:criteria) do
+      Person.not_in(:aliases => [ "Bond", "007" ])
     end
 
+    it "returns a new criteria with select conditions added" do
+      criteria.selector.should == { :aliases => { "$nin" => [ "Bond", "007" ] } }
+    end
   end
 
   describe ".paginate" do
 
-    before do
-      @criteria = stub(:page => 1, :per_page => "20", :count => 100)
+    let(:criteria) do
+      stub(:page => 1, :per_page => "20", :count => 100)
     end
 
     context "when pagination parameters are passed" do
 
+      let(:params) do
+        { :conditions => { :test => "Test" }, :page => 2, :per_page => 20 }
+      end
+
       before do
-        @params = { :conditions => { :test => "Test" }, :page => 2, :per_page => 20 }
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, params).returns(criteria)
+        criteria.expects(:paginate).returns([])
       end
 
       it "delegates to will paginate with the results" do
-        Mongoid::Criteria.expects(:translate).with(Person, @params).returns(@criteria)
-        @criteria.expects(:paginate).returns([])
-        Person.paginate(@params)
+        Person.paginate(params)
       end
-
     end
 
     context "when pagination parameters are not passed" do
 
+      let(:params) do
+        { :conditions => { :test => "Test" }}
+      end
+
       before do
-        @params = { :conditions => { :test => "Test" }}
+        Mongoid::Criteria.expects(
+          :translate
+        ).with(Person, false, params).returns(criteria)
+        criteria.expects(:paginate).returns([])
       end
 
       it "delegates to will paginate with default values" do
-        Mongoid::Criteria.expects(:translate).with(Person, @params).returns(@criteria)
-        @criteria.expects(:paginate).returns([])
         Person.paginate(:conditions => { :test => "Test" })
       end
-
     end
-
   end
 
   describe ".only" do
 
-    it "returns a new criteria with select conditions added" do
-      criteria = Person.only(:title, :age)
-      criteria.options.should == { :fields => [ :title, :age ] }
+    let(:criteria) do
+      Person.only(:title, :age)
     end
 
+    it "returns a new criteria with select conditions added" do
+      criteria.options.should == { :fields => [ :title, :age ] }
+    end
   end
 
   describe ".sum" do
 
+    let(:criteria) do
+      stub
+    end
+
     before do
-      @criteria = mock
+      Person.expects(:criteria).returns(criteria)
+      criteria.expects(:sum).with(:age).returns(50.0)
     end
 
     it "returns the sum of a new criteria" do
-      Person.expects(:criteria).returns(@criteria)
-      @criteria.expects(:sum).with(:age).returns(50.0)
-      sum = Person.sum(:age)
-      sum.should == 50.0
+      Person.sum(:age).should == 50.0
     end
-
   end
 
   describe ".where" do
 
-    it "returns a new criteria with select conditions added" do
-      criteria = Person.where(:title => "Sir")
-      criteria.selector.should == { :title => "Sir" }
+    let(:criteria) do
+      Person.where(:title => "Sir")
     end
 
+    it "returns a new criteria with select conditions added" do
+      criteria.selector.should == { :title => "Sir" }
+    end
   end
 
   describe ".near" do
 
-    it "returns a new criteria with select conditions added" do
-      criteria = Address.near(:latlng => [37.761523, -122.423575, 1])
-      criteria.selector.should == { :latlng => { "$near" => [37.761523, -122.423575, 1] } }
+    let(:criteria) do
+      Address.near(:latlng => [37.761523, -122.423575, 1])
     end
 
+    it "returns a new criteria with select conditions added" do
+      criteria.selector.should ==
+        { :latlng => { "$near" => [37.761523, -122.423575, 1] } }
+    end
   end
-
 end

@@ -71,6 +71,71 @@ describe Mongoid::Relations::Embedded::Many do
           address.should be_persisted
         end
       end
+
+      context "when the parent and child have a cyclic relation" do
+
+        context "when the parent is a new record" do
+
+          let(:parent_role) do
+            Role.new
+          end
+
+          let(:child_role) do
+            Role.new
+          end
+
+          before do
+            parent_role.roles.send(method, child_role)
+          end
+
+          it "appends to the target" do
+            parent_role.roles.should == [ child_role ]
+          end
+
+          it "sets the base on the inverse relation" do
+            child_role.role.should == parent_role
+          end
+
+          it "sets the same instance on the inverse relation" do
+            child_role.role.should eql(parent_role)
+          end
+
+          it "does not save the new document" do
+            child_role.should_not be_persisted
+          end
+
+          it "sets the parent on the child" do
+            child_role._parent.should == parent_role
+          end
+
+          it "sets the metadata on the child" do
+            child_role.metadata.should_not be_nil
+          end
+
+          it "sets the index on the child" do
+            child_role._index.should == 0
+          end
+        end
+
+        context "when the parent is not a new record" do
+
+          let(:parent_role) do
+            Role.create(:name => "CEO")
+          end
+
+          let(:child_role) do
+            Role.new(:name => "COO")
+          end
+
+          before do
+            parent_role.roles.send(method, child_role)
+          end
+
+          it "saves the new document" do
+            child_role.should be_persisted
+          end
+        end
+      end
     end
   end
 

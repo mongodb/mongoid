@@ -323,7 +323,7 @@ describe Mongoid::Document do
     end
 
     it "returns a proper count" do
-      @criteria = Mongoid::Criteria.translate(Person, { :per_page => 5, :page => 1 })
+      @criteria = Mongoid::Criteria.translate(Person, false, { :per_page => 5, :page => 1 })
       @criteria.count.should == 10
     end
 

@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::One do
 
+  before do
+    Person.delete_all
+  end
+
   describe "#=" do
 
     context "when the parent is a new record" do
