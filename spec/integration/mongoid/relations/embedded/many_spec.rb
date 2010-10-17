@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    Person.delete_all
+    [ Person, Role ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -85,19 +85,19 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           before do
-            parent_role.roles.send(method, child_role)
+            parent_role.child_roles.send(method, child_role)
           end
 
           it "appends to the target" do
-            parent_role.roles.should == [ child_role ]
+            parent_role.child_roles.should == [ child_role ]
           end
 
           it "sets the base on the inverse relation" do
-            child_role.role.should == parent_role
+            child_role.parent_role.should == parent_role
           end
 
           it "sets the same instance on the inverse relation" do
-            child_role.role.should eql(parent_role)
+            child_role.parent_role.should eql(parent_role)
           end
 
           it "does not save the new document" do
@@ -128,7 +128,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           before do
-            parent_role.roles.send(method, child_role)
+            parent_role.child_roles.send(method, child_role)
           end
 
           it "saves the new document" do
@@ -270,114 +270,294 @@ describe Mongoid::Relations::Embedded::Many do
         slave.reload.address_numbers.size.should == 1
       end
     end
+
+    context "when the parent and child have a cyclic relation" do
+
+      context "when the parent is a new record" do
+
+        let(:parent_role) do
+          Role.new
+        end
+
+        let(:child_role) do
+          Role.new
+        end
+
+        before do
+          parent_role.child_roles = [ child_role ]
+        end
+
+        it "sets the target of the relation" do
+          parent_role.child_roles.should == [ child_role ]
+        end
+
+        it "sets the base on the inverse relation" do
+          child_role.parent_role.should == parent_role
+        end
+
+        it "sets the same instance on the inverse relation" do
+          child_role.parent_role.should eql(parent_role)
+        end
+
+        it "does not save the target" do
+          child_role.should_not be_persisted
+        end
+
+        it "sets the parent on the child" do
+          child_role._parent.should == parent_role
+        end
+
+        it "sets the metadata on the child" do
+          child_role.metadata.should_not be_nil
+        end
+
+        it "sets the index on the child" do
+          child_role._index.should == 0
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:parent_role) do
+          Role.create(:name => "CTO")
+        end
+
+        let(:child_role) do
+          Role.new
+        end
+
+        before do
+          parent_role.child_roles = [ child_role ]
+        end
+
+        it "saves the target" do
+          child_role.should be_persisted
+        end
+      end
+    end
   end
 
   describe "#= nil" do
 
-    context "when the parent is a new record" do
+    context "when the relationship is polymorphic" do
 
-      let(:person) do
-        Person.new
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        before do
+          person.addresses = [ address ]
+          person.addresses = nil
+        end
+
+        it "sets the relation to empty" do
+          person.addresses.should be_empty
+        end
+
+        it "removes the inverse relation" do
+          address.addressable.should be_nil
+        end
       end
 
-      let(:address) do
-        Address.new
+      context "when the inverse is already nil" do
+
+        let(:person) do
+          Person.new
+        end
+
+        before do
+          person.addresses = nil
+        end
+
+        it "sets the relation to empty" do
+          person.addresses.should be_empty
+        end
       end
 
-      before do
-        person.addresses = [ address ]
-        person.addresses = nil
-      end
+      context "when the documents are not new records" do
 
-      it "sets the relation to empty" do
-        person.addresses.should be_empty
-      end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-      it "removes the inverse relation" do
-        address.addressable.should be_nil
+        let(:address) do
+          Address.new
+        end
+
+        before do
+          person.addresses = [ address ]
+          person.addresses = nil
+        end
+
+        it "sets the relation to empty" do
+          person.addresses.should be_empty
+        end
+
+        it "removed the inverse relation" do
+          address.addressable.should be_nil
+        end
+
+        it "deletes the child document" do
+          address.should be_destroyed
+        end
       end
     end
 
-    context "when the inverse is already nil" do
+    context "when the relationship is cyclic" do
 
-      let(:person) do
-        Person.new
+      context "when the parent is a new record" do
+
+        let(:parent_role) do
+          Role.new
+        end
+
+        let(:child_role) do
+          Role.new
+        end
+
+        before do
+          parent_role.child_roles = [ child_role ]
+          parent_role.child_roles = nil
+        end
+
+        it "sets the relation to empty" do
+          parent_role.child_roles.should be_empty
+        end
+
+        it "removes the inverse relation" do
+          child_role.parent_role.should be_nil
+        end
       end
 
-      before do
-        person.addresses = nil
+      context "when the inverse is already nil" do
+
+        let(:parent_role) do
+          Role.new
+        end
+
+        before do
+          parent_role.child_roles = nil
+        end
+
+        it "sets the relation to empty" do
+          parent_role.child_roles.should be_empty
+        end
       end
 
-      it "sets the relation to empty" do
-        person.addresses.should be_empty
-      end
-    end
+      context "when the documents are not new records" do
 
-    context "when the documents are not new records" do
+        let(:parent_role) do
+          Role.create
+        end
 
-      let(:person) do
-        Person.create(:ssn => "437-11-1112")
-      end
+        let(:child_role) do
+          Role.new
+        end
 
-      let(:address) do
-        Address.new
-      end
+        before do
+          parent_role.child_roles = [ child_role ]
+          parent_role.child_roles = nil
+        end
 
-      before do
-        person.addresses = [ address ]
-        person.addresses = nil
-      end
+        it "sets the relation to empty" do
+          parent_role.child_roles.should be_empty
+        end
 
-      it "sets the relation to empty" do
-        person.addresses.should be_empty
-      end
+        it "removed the inverse relation" do
+          child_role.parent_role.should be_nil
+        end
 
-      it "removed the inverse relation" do
-        address.addressable.should be_nil
-      end
-
-      it "deletes the child document" do
-        address.should be_destroyed
+        it "deletes the child document" do
+          child_role.should be_destroyed
+        end
       end
     end
   end
 
   describe "#build" do
 
-    let(:person) do
-      Person.new
+    context "when the relation is not cyclic" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:address) do
+        person.addresses.build(:street => "Bond")
+      end
+
+      it "appends to the target" do
+        person.addresses.should == [ address ]
+      end
+
+      it "sets the base on the inverse relation" do
+        address.addressable.should == person
+      end
+
+      it "does not save the new document" do
+        address.should_not be_persisted
+      end
+
+      it "sets the parent on the child" do
+        address._parent.should == person
+      end
+
+      it "sets the metadata on the child" do
+        address.metadata.should_not be_nil
+      end
+
+      it "sets the index on the child" do
+        address._index.should == 0
+      end
+
+      it "writes to the attributes" do
+        address.street.should == "Bond"
+      end
     end
 
-    let(:address) do
-      person.addresses.build(:street => "Bond")
-    end
+    context "when the relation is cyclic" do
 
-    it "appends to the target" do
-      person.addresses.should == [ address ]
-    end
+      let(:parent_role) do
+        Role.new
+      end
 
-    it "sets the base on the inverse relation" do
-      address.addressable.should == person
-    end
+      let(:child_role) do
+        parent_role.child_roles.build(:name => "CTO")
+      end
 
-    it "does not save the new document" do
-      address.should_not be_persisted
-    end
+      it "appends to the target" do
+        parent_role.child_roles.should == [ child_role ]
+      end
 
-    it "sets the parent on the child" do
-      address._parent.should == person
-    end
+      it "sets the base on the inverse relation" do
+        child_role.parent_role.should == parent_role
+      end
 
-    it "sets the metadata on the child" do
-      address.metadata.should_not be_nil
-    end
+      it "does not save the new document" do
+        child_role.should_not be_persisted
+      end
 
-    it "sets the index on the child" do
-      address._index.should == 0
-    end
+      it "sets the parent on the child" do
+        child_role._parent.should == parent_role
+      end
 
-    it "writes to the attributes" do
-      address.street.should == "Bond"
+      it "sets the metadata on the child" do
+        child_role.metadata.should_not be_nil
+      end
+
+      it "sets the index on the child" do
+        child_role._index.should == 0
+      end
+
+      it "writes to the attributes" do
+        child_role.name.should == "CTO"
+      end
     end
   end
 

@@ -326,6 +326,19 @@ describe Mongoid::Relations::Metadata do
 
     context "when an inverse relation exists" do
 
+      context "when inverse_of is defined" do
+
+        let(:metadata) do
+          klass.new(
+            :inverse_of => :crazy_name
+          )
+        end
+
+        it "returns the name of the inverse_of property" do
+          metadata.inverse.should == :crazy_name
+        end
+      end
+
       context "when not polymorphic" do
 
         let(:metadata) do
@@ -368,6 +381,23 @@ describe Mongoid::Relations::Metadata do
 
         it "returns the name of the relation" do
           metadata.inverse(Person.new).should == :addresses
+        end
+      end
+
+      context "when in a cyclic relation" do
+
+        let(:metadata) do
+          klass.new(
+            :name => :parent_role,
+            :class_name => "Role",
+            :inverse_class_name => "Role",
+            :relation => Mongoid::Relations::Embedded::In,
+            :cyclic => true
+          )
+        end
+
+        it "returns the name of the relation" do
+          metadata.inverse(Role.new).should == :child_roles
         end
       end
     end

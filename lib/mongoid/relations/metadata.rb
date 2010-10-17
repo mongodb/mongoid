@@ -159,8 +159,9 @@ module Mongoid # :nodoc:
       #
       # The inverse name as a symbol.
       def inverse(other = nil)
+        return self[:inverse_of] if inverse_of?
         return self[:as] || lookup_inverse(other) if polymorphic?
-        inverse_relation
+        cyclic? ? cyclic_inverse : inverse_relation
       end
 
       # Returns the inverse class of the proxied relation.
@@ -263,14 +264,58 @@ module Mongoid # :nodoc:
         !!self[:as] || !!self[:polymorphic]
       end
 
+      # Gets the method name used to set this relation.
+      #
+      # Example:
+      #
+      #   metadata = Metadata.new(:name => :person)
+      #   metadata.setter # => "person="
+      #
+      # Returns:
+      #
+      # The name plus "="
       def setter
         name.to_s << "="
       end
 
       private
 
+      # Returns the class name for the relation.
+      #
+      # Example:
+      #
+      # <tt>metadata.classify</tt>
+      #
+      # Returns:
+      #
+      # If embedded_in, the camelized, else classified.
       def classify
         macro == :embedded_in ? name.to_s.camelize : name.to_s.classify
+      end
+
+      # Get the name of the inverse relation in a cyclic relation.
+      #
+      # Example:
+      #
+      #   class Role
+      #     include Mongoid::Document
+      #     embedded_in :parent_role, :cyclic => true
+      #     embeds_many :child_roles, :cyclic => true
+      #   end
+      #
+      #   metadata = Metadata.new(:name => :parent_role)
+      #   metadata.cyclic_inverse # => "child_roles"
+      #
+      # Returns:
+      #
+      # The inverse name that does not have the same relation.
+      def cyclic_inverse
+        klass.relations.each_pair do |key, meta|
+          if key =~ /#{inverse_klass.name.underscore}/ &&
+            meta.relation != relation
+            return key.to_sym
+          end
+        end
       end
 
       # Determine the name of the inverse relation.
