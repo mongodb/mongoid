@@ -173,23 +173,5 @@ module Mongoid #:nodoc:
     def set_allowed?(key)
       Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
     end
-
-    # Used when supplying a :reject_if block as an option to
-    # accepts_nested_attributes_for
-    # def reject(attributes, options)
-      # rejector = options[:reject_if]
-      # if rejector
-        # attributes.delete_if do |key, value|
-          # rejector.call(value)
-        # end
-      # end
-    # end
-
-    # Used when supplying a :limit as an option to accepts_nested_attributes_for
-    # def limit(attributes, name, options)
-      # if options[:limit] && attributes.size > options[:limit]
-        # raise Mongoid::Errors::TooManyNestedAttributeRecords.new(name, options[:limit])
-      # end
-    # end
   end
 end
