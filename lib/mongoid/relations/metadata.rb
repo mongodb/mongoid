@@ -114,7 +114,7 @@ module Mongoid # :nodoc:
       #
       # The foreign_key plus =.
       def foreign_key_setter
-        foreign_key << "="
+        "#{foreign_key}="
       end
 
       # Tells whether a foreign key index exists on the relation.
