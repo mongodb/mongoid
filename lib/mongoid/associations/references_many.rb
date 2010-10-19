@@ -26,8 +26,10 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def build(attributes = {},type = nil)
         load_target
+        name = determine_name
         object = (type || @klass).instantiate(attributes)
-        self << object
+        object.send("#{name}=", @parent)
+        @target << object
         object
       end
 
@@ -37,7 +39,7 @@ module Mongoid #:nodoc:
       # the new object will then be saved.
       #
       # Returns the newly created object.
-      def create(attributes = {},type = nil)
+      def create(attributes = nil,type = nil)
         build(attributes,type).tap(&:save)
       end
 
@@ -45,7 +47,7 @@ module Mongoid #:nodoc:
       # validation fails an error is raised.
       #
       # Returns the newly created object.
-      def create!(attributes = {},type = nil)
+      def create!(attributes = nil,type = nil)
         build(attributes,type).tap(&:save!)
       end
 
