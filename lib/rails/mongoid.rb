@@ -7,7 +7,7 @@ module Rails #:nodoc:
       # that indexing and inheritance work in both development and production
       # with the same results.
       def load_models(app)
-        app.config.paths.app.models.each do |path|
+        app.config.paths['app/models'].each do |path|
           Dir.glob("#{path}/**/*.rb").sort.each do |file|
             require_dependency(file)
           end

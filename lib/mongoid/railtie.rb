@@ -10,7 +10,7 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
 
-      config.generators.orm :mongoid, :migration => false
+      config.app_generators.orm :mongoid, :migration => false
 
       rake_tasks do
         load "mongoid/railties/database.rake"
