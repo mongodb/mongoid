@@ -62,6 +62,11 @@ describe Mongoid::Validations::UniquenessValidator do
             account.email = "chiTchins@TEST.CoM"
             account.should_not be_valid
           end
+          
+          it "passes validation when using special chars in string that will be escaped in regexp" do
+            account.email = "chiT.hins@T.ST.CoM"
+            account.should be_valid
+          end
         end
       end
 
@@ -82,8 +87,15 @@ describe Mongoid::Validations::UniquenessValidator do
         
         context "with case insensitive validation" do
           it "fails validation when another document has the same unique field with a different case" do
+            account.username = 'boblu'
             account.email = "chiTchins@TEST.CoM"
             account.should_not be_valid
+          end
+          
+          it "passes validation when using special chars in string that will be escaped in regexp" do
+            account.username = 'boblu'
+            account.email = "chiT.hins@T.ST.CoM"
+            account.should be_valid
           end
         end
       end

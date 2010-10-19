@@ -54,7 +54,7 @@ module Mongoid #:nodoc:
       # ensure :case_sensitive is true by default
       def unique_search_value(value)
         if options[:case_sensitive] == false
-          value ? /^#{value}$/i : nil
+          value ? Regexp.new("^#{Regexp.escape(value.to_s)}$", Regexp::IGNORECASE) : nil
         else
           value
         end

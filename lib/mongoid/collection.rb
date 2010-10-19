@@ -83,7 +83,7 @@ module Mongoid #:nodoc
     #
     # Options:
     #
-    # map: The map javascript funcdtion.
+    # map: The map javascript function.
     # reduce: The reduce javascript function.
     def map_reduce(map, reduce, options = {})
       directed(options).map_reduce(map, reduce, options)

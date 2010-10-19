@@ -96,6 +96,33 @@ describe Mongoid::Associations::Options do
     end
   end
 
+  describe "#default_order" do
+
+    context "when no default_order defined" do
+
+      before do
+        @attributes = { :name => :posts }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns nil" do
+        @options.default_order.should be_nil
+      end
+    end
+
+    context "when an default_order is defined" do
+      before do
+        @attributes = { :name => :posts, :default_order => :blog_post_id.asc }
+        @options = Mongoid::Associations::Options.new(@attributes)
+      end
+
+      it "returns the custom default_order criteria object" do
+        @options.default_order.key.should == :blog_post_id.asc.key
+        @options.default_order.operator.should == :blog_post_id.asc.operator
+      end
+    end
+  end
+
   describe "#index" do
 
     context "when not defined" do
