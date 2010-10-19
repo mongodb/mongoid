@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("bson_ext", ["= 1.0.9"])
   s.add_development_dependency("mocha", ["= 0.9.8"])
-  s.add_development_dependency("rspec", ["= 2.0.0.beta.22"])
+  s.add_development_dependency("rspec", ["= 2.0.1"])
   s.add_development_dependency("watchr", ["= 0.6"])
   s.add_development_dependency("ruby-debug-wrapper", ["= 0.0.1"])
 
