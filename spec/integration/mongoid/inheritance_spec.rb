@@ -167,5 +167,37 @@ describe Mongoid::Document do
     end
 
   end
+  
+  context "Creating references_many documents from a parent association" do
+    
+    before do
+      @container = ShippingContainer.create
+    end
 
+    it "should allow STI from << using model.new" do
+      @container.vehicles << Car.new({})
+      @container.vehicles << Truck.new({})
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+
+    it "should allow STI from << using model.create" do
+      @container.vehicles << Car.create({})
+      @container.vehicles << Truck.create({})
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+    
+    it "should allow STI from the build call" do
+      @container.vehicles.build({},Car)
+      @container.vehicles.build({},Truck)
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+    
+    it "should allow STI from the build call" do
+      @container.vehicles.create({},Car)
+      @container.vehicles.create({},Truck)
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+    
+  end
+  
 end
