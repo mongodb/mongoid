@@ -29,6 +29,53 @@ describe Mongoid::Document do
         person.to_json.should_not include("person")
       end
     end
+    
+    context "when adding :include", :focus => true do
+      context "for a references_many association" do
+        it "should include extra json" do
+          person.preferences.build
+          person.to_json(:include => :preferences).should include(%|"preferences":[{|)
+        end
+      end
+
+      context "for a references_one association" do
+        it "should include extra json" do
+          person.build_game
+          person.to_json(:include => :game).should include(%|"game":{|)
+        end
+      end
+
+      context "for a referenced_in association" do
+        it "should include extra json" do
+          game = person.build_game
+          game.to_json(:include => :person).should include(%|"person":{|)
+        end
+      end
+
+      context "for a embeds_one association" do
+        it "should include extra json" do
+          person.build_pet
+          person.to_json(:include => :pet).should include(%|"pet":{|)
+        end
+      end
+
+      context "for a embeds_many association" do
+        it "should include extra json" do
+          person.addresses.build
+          person.to_json(:include => :addresses).should include(%|"addresses":[{|)
+        end
+      end
+      
+      context "for a complex situation" do
+        it "should include extra json" do
+          person.addresses.build
+          game = person.build_game
+          game.to_json(:include => { :person => { :include => :addresses } }).should include(%|"addresses":[{|)
+        end
+      end
+      
+
+    end
   end
 
   describe "#to_xml" do
