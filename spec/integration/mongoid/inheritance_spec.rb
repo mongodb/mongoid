@@ -137,7 +137,7 @@ describe Mongoid::Document do
       Browser.count.should == 2
       Canvas.count.should == 3
     end
-    
+
     it "deletes all documents except for those belonging to parent class collection" do
       Firefox.delete_all
       Firefox.count.should == 0
@@ -167,9 +167,9 @@ describe Mongoid::Document do
     end
 
   end
-  
+
   context "Creating references_many documents from a parent association" do
-    
+
     before do
       @container = ShippingContainer.create
     end
@@ -185,19 +185,23 @@ describe Mongoid::Document do
       @container.vehicles << Truck.create({})
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
-    
+
     it "should allow STI from the build call" do
-      @container.vehicles.build({},Car)
-      @container.vehicles.build({},Truck)
+      car = @container.vehicles.build({},Car)
+      car.save
+
+      truck = @container.vehicles.build({},Truck)
+      truck.save
+
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
-    
+
     it "should allow STI from the build call" do
       @container.vehicles.create({},Car)
       @container.vehicles.create({},Truck)
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
-    
+
   end
-  
+
 end
