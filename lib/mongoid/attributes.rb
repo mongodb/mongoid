@@ -3,6 +3,8 @@ module Mongoid #:nodoc:
   module Attributes
     extend ActiveSupport::Concern
 
+    REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |_, value| value.blank? } }
+
     # Get the id associated with this object. This will pull the _id value out
     # of the attributes +Hash+.
     def id
@@ -181,7 +183,7 @@ module Mongoid #:nodoc:
     # Used when supplying a :reject_if block as an option to
     # accepts_nested_attributes_for
     def reject(attributes, options)
-      rejector = options[:reject_if]
+      rejector = options[:reject_if] == :all_blank ? REJECT_ALL_BLANK_PROC : options[:reject_if]
       if rejector
         attributes.delete_if do |key, value|
           rejector.call(value)

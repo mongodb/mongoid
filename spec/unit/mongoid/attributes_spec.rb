@@ -85,6 +85,37 @@ describe Mongoid::Attributes do
 
         end
 
+        context "when reject :all_blank is supplied and all attributes are blank" do
+
+          before do
+            @attributes = {
+              "0" => { "title" => " " }
+            }
+            @person.videos_attributes = @attributes
+          end
+
+          it "removes the attributes that match" do
+            @person.videos.should be_empty
+          end
+
+        end
+
+        context "when reject :all_blank is supplied and some attributes are present" do
+
+          before do
+            @attributes = {
+              "0" => { "title" => "Pulp Fiction" }
+            }
+            @person.videos_attributes = @attributes
+          end
+
+          it "removes the attributes that match" do
+            video = @person.videos.first
+            video.title.should == "Pulp Fiction"
+          end
+
+        end
+
         context "when association is empty" do
 
           before do
