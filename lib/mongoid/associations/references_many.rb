@@ -24,10 +24,10 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor.
       #
       # Returns the newly created object.
-      def build(attributes = nil)
+      def build(attributes = {},type = nil)
         load_target
         name = determine_name
-        object = @klass.instantiate(attributes || {})
+        object = (type || @klass).instantiate(attributes)
         object.send("#{name}=", @parent)
         @target << object
         object
@@ -39,16 +39,16 @@ module Mongoid #:nodoc:
       # the new object will then be saved.
       #
       # Returns the newly created object.
-      def create(attributes = nil)
-        build(attributes).tap(&:save)
+      def create(attributes = nil,type = nil)
+        build(attributes,type).tap(&:save)
       end
 
       # Creates a new Document and adds it to the association collection. If
       # validation fails an error is raised.
       #
       # Returns the newly created object.
-      def create!(attributes = nil)
-        build(attributes).tap(&:save!)
+      def create!(attributes = nil,type = nil)
+        build(attributes,type).tap(&:save!)
       end
 
       # Delete all the associated objects.
@@ -166,7 +166,11 @@ module Mongoid #:nodoc:
       #   An +Array+ of objects if an ActiveRecord association
       #   A +Collection+ if a DataMapper association.
       def query
-        @query ||= lambda { @klass.all(:conditions => { @foreign_key => @parent.id }) }
+        @query ||= lambda {
+          @klass.all(:conditions => { @foreign_key => @parent.id }).tap do |crit|
+            crit.set_order_by(@options.default_order) if @options.default_order
+          end
+        }
       end
 
       # Remove the objects based on conditions.

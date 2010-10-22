@@ -48,6 +48,35 @@ module Mongoid #:nodoc
     attr_reader :use_utc
     alias_method :use_utc?, :use_utc
 
+    # Sets whether the times returned from the database use the ruby or
+    # the ActiveSupport time zone.
+    # If you omit this setting, then times will use the ruby time zone.
+    #
+    # Example:
+    #
+    # <tt>Config.use_activesupport_time_zone = true</tt>
+    #
+    # Returns:
+    #
+    # A boolean
+    def use_activesupport_time_zone=(value)
+      @use_activesupport_time_zone = value || false
+    end
+
+    # Sets whether the times returned from the database use the ruby or
+    # the ActiveSupport time zone.
+    # If the setting is false, then times will use the ruby time zone.
+    #
+    # Example:
+    #
+    # <tt>Config.use_activesupport_time_zone</tt>
+    #
+    # Returns:
+    #
+    # A boolean
+    attr_reader :use_activesupport_time_zone
+    alias_method :use_activesupport_time_zone?, :use_activesupport_time_zone
+
     # Sets the Mongo::DB master database to be used. If the object trying to be
     # set is not a valid +Mongo::DB+, then an error will be raised.
     #
@@ -74,7 +103,10 @@ module Mongoid #:nodoc
     #
     # The master +Mongo::DB+
     def master
-      raise Errors::InvalidDatabase.new(nil) unless @master
+      unless @master
+        _master(@settings)  if @settings
+        raise Errors::InvalidDatabase.new(nil) unless @master
+      end
       if @reconnect
         @reconnect = false
         reconnect!
@@ -113,6 +145,7 @@ module Mongoid #:nodoc
     #
     # The slave +Mongo::DBs+
     def slaves
+      _slaves(@settings)  unless @slaves || !@settings
       @slaves
     end
 
@@ -165,8 +198,7 @@ module Mongoid #:nodoc
       settings.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      _master(settings)
-      _slaves(settings)
+      @settings = settings.dup
     end
 
     # Adds a new I18n locale file to the load path

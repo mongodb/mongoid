@@ -1,13 +1,15 @@
+require "bundler"
+Bundler.setup
+
 require "rake"
 require "rake/rdoctask"
 require "rspec"
 require "rspec/core/rake_task"
-require "bundler"
-Bundler.setup
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
 
+task :gem => :build
 task :build do
   system "gem build mongoid.gemspec"
 end
@@ -21,7 +23,7 @@ task :release => :build do
   system "git tag -a #{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
   puts "Pushing to Github..."
   system "git push --tags"
-  puts "Pushing to Gemcutter..."
+  puts "Pushing to rubygems.org..."
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
@@ -30,21 +32,15 @@ Rspec::Core::RakeTask.new(:spec) do |spec|
 end
 
 Rspec::Core::RakeTask.new('spec:progress') do |spec|
-  spec.spec_opts = %w(--format progress)
+  spec.rspec_opts = %w(--format progress)
   spec.pattern = "spec/**/*_spec.rb"
 end
 
 Rake::RDocTask.new do |rdoc|
-  if File.exist?("VERSION.yml")
-    config = File.read("VERSION")
-    version = "#{config[:major]}.#{config[:minor]}.#{config[:patch]}"
-  else
-    version = ""
-  end
   rdoc.rdoc_dir = "rdoc"
-  rdoc.title = "mongoid #{version}"
+  rdoc.title = "mongoid #{Mongoid::VERSION}"
   rdoc.rdoc_files.include("README*")
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-task :default => ["spec"]
+task :default => :spec

@@ -8,7 +8,8 @@ module Mongoid #:nodoc:
       end
       # Return true if the attribute and value are equal.
       def matches?(value)
-        value === @attribute
+        @attribute.is_a?(Array) && value.is_a?(String) ?
+          @attribute.include?(value) : value === @attribute
       end
 
       protected

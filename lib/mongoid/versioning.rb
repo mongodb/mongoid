@@ -14,6 +14,8 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
       attr_accessor :version_max
+      
+      # the number of max_version should >= 0
       def max_versions(number)
         self.version_max = number.to_i
       end
@@ -26,10 +28,14 @@ module Mongoid #:nodoc:
     def revise
       last_version = self.class.first(:conditions => { :_id => id, :version => version })
       if last_version
+        old_versions = ( @attributes['versions'].duplicable? ? @attributes['versions'].dup : nil )
         self.versions << last_version.clone
-        self.versions.shift if self.class.version_max.present? && self.versions.length > self.class.version_max
-        self.version = version + 1
-        @modifications["versions"] = [ nil, @attributes["versions"] ] if @modifications
+        if self.class.version_max.present? && ( self.class.version_max >= 0 ) && ( self.versions.length > self.class.version_max )
+          self.versions.shift
+          @attributes['versions'].shift
+        end
+        self.version = (version || 1 ) + 1
+        @modifications["versions"] = [ old_versions, @attributes['versions'] ] if @modifications
       end
     end
   end

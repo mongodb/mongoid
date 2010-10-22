@@ -598,7 +598,7 @@ describe Mongoid::Associations do
     context "when using object ids" do
       before :all do
         @previous_id_type = Person._id_type
-        Person.identity :type => BSON::ObjectID
+        Person.identity :type => BSON::ObjectId
       end
 
       after :all do
@@ -637,6 +637,20 @@ describe Mongoid::Associations do
       it "defines the method on the association" do
         @person.game.extension.should == "Testing"
       end
+    end
+  end
+
+  describe "default_order" do
+    before do
+      @person = Person.new
+    end
+
+    it "should default the order when no ordering is specified" do
+      @person.posts.instance_eval { @options }[:sort].should == [[:created_at, :desc]]
+    end
+
+    it "should not include the default order when specifying an ordering" do
+      @person.posts.asc(:title).instance_eval { @options }[:sort].should == [[:title, :asc]]
     end
   end
 
@@ -699,7 +713,7 @@ describe Mongoid::Associations do
   describe "#update_foreign_keys" do
 
     before do
-      Person.identity :type => BSON::ObjectID
+      Person.identity :type => BSON::ObjectId
       @game = Game.new(:score => 1)
       @person = Person.new(:title => "Sir", :game => @game)
     end
@@ -754,7 +768,9 @@ describe Mongoid::Associations do
       end
 
       it "does nothing" do
-        Post.expects(:find).returns([])
+        results = []
+        results.stubs(:set_order_by)
+        Post.expects(:find).returns(results)
         @person.update_associations(:posts)
         @person.posts.first.should be_nil
       end

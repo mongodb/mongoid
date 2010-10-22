@@ -94,15 +94,15 @@ module Mongoid #:nodoc:
     # an empty +Hash+.
     #
     # If a primary key is defined, the document's id will be set to that key,
-    # otherwise it will be set to a fresh +BSON::ObjectID+ string.
+    # otherwise it will be set to a fresh +BSON::ObjectId+ string.
     #
     # Options:
     #
     # attrs: The attributes +Hash+ to set up the document with.
     def initialize(attrs = nil)
+      @new_record = true
       @attributes = default_attributes
       process(attrs)
-      @new_record = true
       document = yield self if block_given?
       identify
       run_callbacks(:initialize) do

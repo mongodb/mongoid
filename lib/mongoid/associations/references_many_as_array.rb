@@ -45,9 +45,9 @@ module Mongoid #:nodoc:
       # association, and the attributes will be passed into the constructor.
       #
       # Returns the newly created object.
-      def build(attributes = nil)
+      def build(attributes = {},type=nil)
         load_target
-        document = @klass.instantiate(attributes || {})
+        document = (type || @klass).instantiate(attributes)
         push(document); document
       end
 

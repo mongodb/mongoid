@@ -11,7 +11,7 @@ describe Mongoid::Keys do
       end
 
       after do
-        Address.identity :type => BSON::ObjectID
+        Address.identity :type => BSON::ObjectId
       end
 
       it "sets the type of the id" do
@@ -69,7 +69,7 @@ describe Mongoid::Keys do
     context "when id type is an object id" do
 
       before do
-        Address.identity :type => BSON::ObjectID
+        Address.identity :type => BSON::ObjectId
       end
 
       let(:address) do

@@ -134,8 +134,29 @@ describe Mongoid::Config do
       it "should set skip_version_check before it sets up the connection" do
         version_check_ordered = sequence('version_check_ordered')
         config.expects(:skip_version_check=).in_sequence(version_check_ordered)
-        config.expects(:_master).in_sequence(version_check_ordered)
         config.from_hash(settings)
+      end
+    end
+
+    context "deferring connection" do
+      let(:settings) do
+        {
+          "host" => "localhost",
+          "database" => "mongoid_config_test",
+        }
+      end
+      it "does not connect initially" do
+        config.reset
+        config.expects(:_master).never
+        config.expects(:_slave).never
+        config.from_hash(settings)
+      end
+      it "#master establishes deferred connection" do
+        config.reset
+        config.from_hash(settings)
+        config.send(:instance_variable_get, :@master).should be_nil
+        config.master.should_not be_nil
+        config.send(:instance_variable_get, :@master).should_not be_nil
       end
     end
   end

@@ -63,7 +63,7 @@ describe Mongoid::Finders do
 
       before :all do
         @previous_id_type = Person._id_type
-        Person.identity :type => BSON::ObjectID
+        Person.identity :type => BSON::ObjectId
       end
 
       after :all do
@@ -82,7 +82,7 @@ describe Mongoid::Finders do
         Person.delete_all
       end
 
-      context "with an id in BSON::ObjectID as an argument" do
+      context "with an id in BSON::ObjectId as an argument" do
 
         context "when the document is found" do
 
@@ -94,7 +94,7 @@ describe Mongoid::Finders do
         context "when the document is not found" do
 
           it "raises an error" do
-            lambda { Person.find(BSON::ObjectID.new) }.should raise_error
+            lambda { Person.find(BSON::ObjectId.new) }.should raise_error
           end
         end
       end

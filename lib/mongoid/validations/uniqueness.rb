@@ -24,9 +24,9 @@ module Mongoid #:nodoc:
           criteria = document._parent.send(document.association_name)
           # If the parent document embeds_one, no need to validate uniqueness
           return if criteria.is_a?(Mongoid::Document)
-          criteria = criteria.where(attribute => value, :_id => {'$ne' => document._id})
+          criteria = criteria.where(attribute => unique_search_value(value), :_id => {'$ne' => document._id})
         else
-          criteria = @klass.where(attribute => value)
+          criteria = @klass.where(attribute => unique_search_value(value))
           unless document.new_record?
             criteria = criteria.where(:_id => {'$ne' => document._id})
           end
@@ -49,6 +49,15 @@ module Mongoid #:nodoc:
         (document.primary_key || {}).each do |key|
           return true if document.send("#{key}_changed?")
         end; false
+      end
+
+      # ensure :case_sensitive is true by default
+      def unique_search_value(value)
+        if options[:case_sensitive] == false
+          value ? Regexp.new("^#{Regexp.escape(value.to_s)}$", Regexp::IGNORECASE) : nil
+        else
+          value
+        end
       end
     end
   end
