@@ -58,10 +58,11 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def any_of(*args)
-        criterion = @selector["$or"] || []
-        expanded = args.collect(&:expand_complex_criteria)
-        @selector["$or"] = criterion.concat(expanded)
-        self
+        clone.tap do |crit|
+          criterion = @selector["$or"] || []
+          expanded = args.collect(&:expand_complex_criteria)
+          crit.selector["$or"] = criterion.concat(expanded)
+        end
       end
       alias :or :any_of
 
@@ -119,20 +120,20 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def where(selector = nil)
-        selector = case selector
-          when String then {"$where" => selector}
-          else selector ? selector.expand_complex_criteria : {}
-        end
+        clone.tap do |crit|
+          selector = case selector
+            when String then {"$where" => selector}
+            else selector ? selector.expand_complex_criteria : {}
+          end
 
-        selector.each_pair do |key, value|
-          if @selector.has_key?(key) && @selector[key].respond_to?(:merge!)
-            @selector[key].merge!(value)
-          else
-            @selector[key] = value
+          selector.each_pair do |key, value|
+            if crit.selector.has_key?(key) && crit.selector[key].respond_to?(:merge!)
+              crit.selector[key].merge!(value)
+            else
+              crit.selector[key] = value
+            end
           end
         end
-
-        self
       end
     end
   end

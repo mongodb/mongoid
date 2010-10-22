@@ -26,8 +26,7 @@ module Mongoid #:nodoc:
     include Criterion::Optional
     include Enumerable
 
-    attr_reader :collection, :embedded, :ids, :klass, :options, :selector
-    attr_accessor :documents
+    attr_accessor :collection, :documents, :embedded, :ids, :klass, :options, :selector
 
     delegate :aggregate, :avg, :blank?, :count, :distinct, :empty?,
              :execute, :first, :group, :id_criteria, :last, :max,
@@ -79,8 +78,7 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.each { |doc| p doc }</tt>
     def each(&block)
-      context.iterate(&block)
-      self
+      tap { context.iterate(&block) }
     end
 
     # Return true if the criteria has some Document or not
@@ -117,7 +115,7 @@ module Mongoid #:nodoc:
     # type: One of :all, :first:, or :last
     # klass: The class to execute on.
     def initialize(klass, embedded = false)
-      @selector = Mongoid::Criterion::Selector.new(klass)
+      @selector = Criterion::Selector.new(klass)
       @options, @klass, @documents, @embedded = {}, klass, [], embedded
     end
 
@@ -133,9 +131,11 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
     def merge(other)
-      @selector.update(other.selector)
-      @options.update(other.options)
-      @documents = other.documents
+      clone.tap do |crit|
+        crit.selector.update(other.selector)
+        crit.options.update(other.options)
+        crit.documents = other.documents
+      end
     end
 
     # Used for chaining +Criteria+ scopes together in the for of class methods
@@ -228,6 +228,12 @@ module Mongoid #:nodoc:
 
     protected
 
+    # Return the entries of the other criteria or the object. Used for
+    # comparing criteria or an enumerable.
+    def comparable(other)
+      other.is_a?(Criteria) ? other.entries : other
+    end
+
     # Filters the unused options out of the options +Hash+. Currently this
     # takes into account the "page" and "per_page" options that would be passed
     # in if using will_paginate.
@@ -246,10 +252,24 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Return the entries of the other criteria or the object. Used for
-    # comparing criteria or an enumerable.
-    def comparable(other)
-      other.is_a?(Criteria) ? other.entries : other
+    # Clone or dup the current +Criteria+. This will return a new criteria with
+    # the selector, options, klass, embedded options, etc intact.
+    #
+    # Example:
+    #
+    # <tt>criteria.clone</tt>
+    # <tt>criteria.dup</tt>
+    #
+    # Options:
+    #
+    # other: The criteria getting cloned.
+    #
+    # Returns:
+    #
+    # A new identical criteria
+    def initialize_copy(other)
+      @selector = other.selector.dup
+      @options = other.options.dup
     end
 
     # Update the selector setting the operator on the value for each key in the
@@ -259,20 +279,20 @@ module Mongoid #:nodoc:
     #
     # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
     def update_selector(attributes, operator)
-      attributes.each do |key, value|
-        unless @selector[key]
-          @selector[key] = { operator => value }
-        else
-          if @selector[key].has_key?(operator)
-            # add the value to the current operator
-            new_value = @selector[key].values.first + value
-            @selector[key] = { operator => new_value }
+      clone.tap do |crit|
+        attributes.each do |key, value|
+          unless crit.selector[key]
+            crit.selector[key] = { operator => value }
           else
-            # create a new operator on this key
-            @selector[key][operator] = value
-          end        
+            if crit.selector[key].has_key?(operator)
+              new_value = crit.selector[key].values.first + value
+              crit.selector[key] = { operator => new_value }
+            else
+              crit.selector[key][operator] = value
+            end
+          end
         end
-      end; self
+      end
     end
   end
 end

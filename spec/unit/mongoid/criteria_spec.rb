@@ -137,8 +137,11 @@ describe Mongoid::Criteria do
       Person.new(:title => "Sir")
     end
 
-    before do
+    let(:new_criteria) do
       criteria.where(:title => "Sir")
+    end
+
+    before do
       cursor.expects(:each).yields(person)
         Person.expects(:collection).returns(collection)
     end
@@ -150,7 +153,7 @@ describe Mongoid::Criteria do
       end
 
       it "executes the criteria and returns the element at the index" do
-        criteria[0].should == person
+        new_criteria[0].should == person
       end
     end
   end
@@ -370,6 +373,38 @@ describe Mongoid::Criteria do
     end
   end
 
+
+  describe "#clone" do
+
+    let(:criteria) do
+      Person.only(:title).where(:age.gt => 30).skip(10)
+    end
+
+    let(:copy) do
+      criteria.clone
+    end
+
+    it "copies the selector" do
+      copy.selector.should == criteria.selector
+    end
+
+    it "copies the options" do
+      copy.options.should == criteria.options
+    end
+
+    it "copies the embedded flag" do
+      copy.embedded.should == criteria.embedded
+    end
+
+    it "references the class" do
+      copy.klass.should eql(criteria.klass)
+    end
+
+    it "references the documents" do
+      copy.documents.should eql(criteria.documents)
+    end
+  end
+
   describe "#context" do
 
     context "when the context has been set" do
@@ -496,7 +531,7 @@ describe Mongoid::Criteria do
       stub
     end
 
-    before do
+    let(:new_criteria) do
       criteria.where(:title => "Sir")
     end
 
@@ -509,7 +544,7 @@ describe Mongoid::Criteria do
       end
 
       it "executes the criteria" do
-        criteria.each do |doc|
+        new_criteria.each do |doc|
           doc.should == person
         end
       end
@@ -524,7 +559,7 @@ describe Mongoid::Criteria do
       end
 
       it "calls each on the existing results" do
-        criteria.each do |person|
+        new_criteria.each do |person|
           person.should == person
         end
       end
@@ -533,7 +568,7 @@ describe Mongoid::Criteria do
     context "when no block is passed" do
 
       it "returns self" do
-        criteria.each.should == criteria
+        new_criteria.each.should == new_criteria
       end
     end
 
@@ -546,14 +581,10 @@ describe Mongoid::Criteria do
           { :cache => true }
         ).returns(cursor)
         cursor.expects(:each).yields(person)
-        criteria.cache
-        criteria.each do |doc|
-          doc.should == person
-        end
       end
 
       it "caches the results of the cursor iteration" do
-        criteria.each do |doc|
+        new_criteria.cache.each do |doc|
           doc.should == person
         end
       end
@@ -594,7 +625,7 @@ describe Mongoid::Criteria do
       context "when the other has a selector and options" do
 
         let(:other) do
-          Mongoid::Criteria.new(Person)
+          criteria.where(:name => "Chloe").order_by([[:name, :asc]])
         end
 
         let(:selector) do
@@ -605,17 +636,21 @@ describe Mongoid::Criteria do
           { :skip => 40, :limit => 20, :sort => [[:name, :asc]] }
         end
 
-        before do
-          other.where(:name => "Chloe").order_by([[:name, :asc]])
+        let(:merged) do
           criteria.merge(other)
         end
 
+        before do
+          other.selector = selector
+          other.options = options
+        end
+
         it "merges the selector" do
-          criteria.selector.should == selector
+          merged.selector.should == selector
         end
 
         it "merges the options" do
-          criteria.options.should == options
+          merged.options.should == options
         end
       end
 
@@ -633,16 +668,25 @@ describe Mongoid::Criteria do
           { :skip => 40, :limit => 20 }
         end
 
+        let(:new_criteria) do
+          Mongoid::Criteria.new(Person)
+        end
+
+        let(:merged) do
+          new_criteria.merge(other)
+        end
+
         before do
-          criteria.merge(other)
+          new_criteria.selector = selector
+          new_criteria.options = options
         end
 
         it "merges the selector" do
-          criteria.selector.should == selector
+          merged.selector.should == selector
         end
 
         it "merges the options" do
-          criteria.options.should == options
+          merged.options.should == options
         end
       end
 
@@ -656,13 +700,16 @@ describe Mongoid::Criteria do
           [ stub ]
         end
 
-        before do
-          other.documents = documents
+        let(:merged) do
           criteria.merge(other)
         end
 
+        before do
+          other.documents = documents
+        end
+
         it "merges the documents collection in" do
-          criteria.documents.should == documents
+          merged.documents.should == documents
         end
       end
     end
@@ -678,12 +725,12 @@ describe Mongoid::Criteria do
       criteria.accepted
     end
 
-    before do
-      criteria.where(:title => "Sir")
+    let(:chained) do
+      new_criteria.where(:title => "Sir")
     end
 
     it "merges the criteria with the next one" do
-      new_criteria.selector.should == { :title => "Sir", :terms => true }
+      chained.selector.should == { :title => "Sir", :terms => true }
     end
 
     context "chaining more than one scope" do
@@ -692,8 +739,17 @@ describe Mongoid::Criteria do
         Person.accepted.old.knight
       end
 
+      let(:chained) do
+        criteria.where(:security_code => "5555")
+      end
+
       it "returns the final merged criteria" do
-        criteria.selector.should == { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+        criteria.selector.should ==
+          { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+      end
+
+      it "always returns a new criteria" do
+        chained.should_not eql(criteria)
       end
 
     end
@@ -916,7 +972,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  context "#fuse" do
+  describe "#fuse" do
 
     context "when providing a selector" do
 

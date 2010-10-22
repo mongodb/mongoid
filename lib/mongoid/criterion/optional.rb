@@ -10,11 +10,11 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.ascending(:title, :dob)</tt>
       def ascending(*fields)
-        @options[:sort] = [] unless @options[:sort] || fields.first.nil?
-        fields.flatten.each { |field| @options[:sort] << [ field, :asc ] }
-        self
+        clone.tap do |crit|
+          crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
+          fields.flatten.each { |field| crit.options[:sort] << [ field, :asc ] }
+        end
       end
-
       alias :asc :ascending
 
       # Tells the criteria that the cursor that gets returned needs to be
@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.cache</tt>
       def cache
-        @options.merge!(:cache => true); self
+        clone.tap { |crit| crit.options.merge!(:cache => true) }
       end
 
       # Will return true if the cache option has been set.
@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.cached?</tt>
       def cached?
-        @options[:cache] == true
+        options[:cache] == true
       end
 
       # Adds fields to be sorted in descending order. Will add them in the order
@@ -45,11 +45,11 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.descending(:title, :dob)</tt>
       def descending(*fields)
-        @options[:sort] = [] unless @options[:sort] || fields.first.nil?
-        fields.flatten.each { |field| @options[:sort] << [ field, :desc ] }
-        self
+        clone.tap do |crit|
+          crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
+          fields.flatten.each { |field| crit.options[:sort] << [ field, :desc ] }
+        end
       end
-
       alias :desc :descending
 
       # Flags the criteria to execute against a read-only slave in the pool
@@ -59,7 +59,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.enslave</tt>
       def enslave
-        @options.merge!(:enslave => true); self
+        clone.tap { |crit| crit.options.merge!(:enslave => true) }
       end
 
       # Will return true if the criteria is enslaved.
@@ -68,7 +68,7 @@ module Mongoid #:nodoc:
       #
       # <tt>criteria.enslaved?</tt>
       def enslaved?
-        @options[:enslave] == true
+        options[:enslave] == true
       end
 
       # Adds a criterion to the +Criteria+ that specifies additional options
@@ -84,7 +84,10 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def extras(extras)
-        @options.merge!(extras); filter_options; self
+        clone.tap do |crit|
+          crit.options.merge!(extras)
+          crit.filter_options
+        end
       end
 
       # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
@@ -102,14 +105,15 @@ module Mongoid #:nodoc:
       def id(*ids)
         ids.flatten!
         if ids.size > 1
-          self.in(
-            :_id => ::BSON::ObjectId.cast!(@klass, ids, @klass.primary_key.nil?)
+          any_in(
+            :_id => ::BSON::ObjectId.cast!(klass, ids, klass.primary_key.nil?)
           )
         else
-          @selector[:_id] =
-            ::BSON::ObjectId.cast!(@klass, ids.first, @klass.primary_key.nil?)
+          clone.tap do |crit|
+            crit.selector[:_id] =
+              ::BSON::ObjectId.cast!(klass, ids.first, klass.primary_key.nil?)
+          end
         end
-        self
       end
 
       # Adds a criterion to the +Criteria+ that specifies the maximum number of
@@ -126,14 +130,14 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def limit(value = 20)
-        @options[:limit] = value; self
+        clone.tap { |crit| crit.options[:limit] = value }
       end
 
       # Returns the offset option. If a per_page option is in the list then it
       # will replace it with a skip parameter and return the same value. Defaults
       # to 20 if nothing was provided.
       def offset(*args)
-        args.size > 0 ? skip(args.first) : @options[:skip]
+        args.size > 0 ? skip(args.first) : options[:skip]
       end
 
       # Adds a criterion to the +Criteria+ that specifies the sort order of
@@ -149,21 +153,24 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def order_by(*args)
-        @options[:sort] = [] unless @options[:sort] || args.first.nil?
-        arguments = args.first
-        case arguments
-        when Hash
-          arguments.each do |field, direction|
-            @options[:sort] << [ field, direction ]
+        clone.tap do |crit|
+          crit.options[:sort] = [] unless options[:sort] || args.first.nil?
+          arguments = args.first
+          case arguments
+          when Hash
+            arguments.each do |field, direction|
+              crit.options[:sort] << [ field, direction ]
+            end
+          when Array
+            crit.options[:sort].concat(arguments)
+          when Complex
+            args.flatten.each do |complex|
+              crit.options[:sort] << [ complex.key, complex.operator.to_sym ]
+            end
           end
-        when Array
-          @options[:sort].concat(arguments)
-        when Complex
-          args.flatten.each do |complex|
-            @options[:sort] << [ complex.key, complex.operator.to_sym ]
-          end
-        end; self
+        end
       end
+      alias :order :order_by
 
       # Adds a criterion to the +Criteria+ that specifies how many results to skip
       # when returning Documents. This is mostly used in conjunction with
@@ -180,7 +187,7 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def skip(value = 0)
-        @options[:skip] = value; self
+        clone.tap { |crit| crit.options[:skip] = value }
       end
 
       # Adds a criterion to the +Criteria+ that specifies a type or an Array of
@@ -198,7 +205,7 @@ module Mongoid #:nodoc:
       # Returns: <tt>self</tt>
       def type(types)
         types = [types] unless types.is_a?(Array)
-        self.in(:_type => types)
+        any_in(:_type => types)
       end
     end
   end
