@@ -57,7 +57,7 @@ namespace :db do
   if not Rake::Task.task_defined?("db:create_indexes")
     task :create_indexes => "mongoid:create_indexes"
   end
-
+  
   namespace :mongoid do
     # gets a list of the mongoid models defined in the app/models directory
     def get_mongoid_models
@@ -80,6 +80,33 @@ namespace :db do
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
       ::Rails::Mongoid.index_children(get_mongoid_models)
+    end
+    
+    def valid_mongo_type(t)
+      [Array, BigDecimal, Boolean, Date, DateTime, Float, Hash, Integer, String, Symbol, Time, BSON::ObjectId].include?(t)
+    end
+    
+    desc "Default existing document values"
+    task :set_defaults => :environment do
+      models = get_mongoid_models
+      models.each do |m|
+        # get fields that have defaults set
+        fields_with_defaults = m.fields.select {|k,v| v.options.include?(:default)}
+        fields_with_defaults.each do |f|
+          field_name = f[0]
+          default_value = f[1].options[:default]
+          field_type = f[1].options[:type] || String # String is the default type
+          
+          # the default could be a new document, so we don't worry about those
+          if valid_mongo_type(field_type)
+            # update all the documents of the collection to set the default field if the field is not set
+            result = Mongoid.master.collection(m.collection.name).update({field_name => {'$exists' => false}}, {'$set' => {field_name => default_value}}, :multi => true, :safe => true)
+            if result[0][0]["updatedExisting"]
+              puts "Updated #{result.first.first['n']} #{m.name} documents to use a default of: #{default_value}"
+            end
+          end
+        end
+      end
     end
 
     def convert_ids(obj)
