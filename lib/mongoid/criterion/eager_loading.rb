@@ -50,7 +50,7 @@ module Mongoid #:nodoc:
           ids = []
           documents.each do |document|
             id_document_map[document.id] = document
-            ids << document.id
+            ids << document.id if document.id
           end
 
           association_class = reflection.name.singularize.camelize.constantize
@@ -72,11 +72,11 @@ module Mongoid #:nodoc:
             foreign_key_value = document.send(foreign_key_name)
             if one
               id_document_map[foreign_key_value] = document
-              ids << foreign_key_value
+              ids << foreign_key_value if foreign_key_value
             elsif foreign_key_value
               foreign_key_value.each do |fkv|
                 id_document_map[fkv] = document
-                ids << fkv
+                ids << fkv if fkv
               end
             end
           end
