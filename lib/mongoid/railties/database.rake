@@ -133,9 +133,11 @@ namespace :db do
         embedded_klass = association_metadata.options.klass
         # we only care about the ones with a default set
         embedded_fields_with_defaults = model_fields_with_defaults embedded_klass
-        embedded_fields_with_defaults.each {|f| default_field(collection, f, "#{prefix}#{association_name}", embeds_many) }
+        embedded_fields_with_defaults.each do |f| 
+          default_field(collection, f, "#{prefix}#{association_name}", embeds_many)
+        end
         
-        #recurse
+        # recurse
         default_embedded_associations(embedded_klass, collection,"#{prefix}#{association_name}")        
       end      
     end
