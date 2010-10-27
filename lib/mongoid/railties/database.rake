@@ -58,6 +58,10 @@ namespace :db do
     task :create_indexes => "mongoid:create_indexes"
   end
   
+  if not Rake::Task.task_defined?("db:set_defaults")
+    task :set_defaults => "mongoid:set_defaults"
+  end
+  
   namespace :mongoid do
     # gets a list of the mongoid models defined in the app/models directory
     def get_mongoid_models
@@ -86,26 +90,75 @@ namespace :db do
       [Array, BigDecimal, Boolean, Date, DateTime, Float, Hash, Integer, String, Symbol, Time, BSON::ObjectId].include?(t)
     end
     
+    def default_field(collection, field, field_prefix='', embeds_many=false)
+      field_prefix_dotted = "#{field_prefix}." if field_prefix.present?
+      field_name_query = "#{field_prefix_dotted}#{field[0]}"
+      field_name_set = embeds_many ? "#{field_prefix_dotted}$.#{field[0]}" : field_name_query
+      default_value = field[1].options[:default]
+      field_type = field[1].options[:type] || String # String is the default type
+      
+      # the default could be a new document, so we don't worry about those
+      if valid_mongo_type(field_type)
+        # only default if the field doesn't exist
+        criteria = {field_name_query => {'$exists' => false}}
+        # make sure the parent of this field exists
+        criteria.merge!({field_prefix => {'$exists' => true}}) if field_prefix.present?
+        
+        # the positional operator only updates the first match, so for embeds_many we need to keep 
+        # running the update til there are none updated
+        count = 0
+        begin
+          result = collection.update(
+            criteria, 
+            {'$set' => {field_name_set => default_value}}, 
+            :upsert => false,
+            :multi => true, 
+            :safe => true)
+          updated = result[0][0]["updatedExisting"]
+          count += result.first.first['n'] if updated
+        end while (embeds_many && updated)
+        puts "Updated #{count} #{collection.name} to use a default #{field_name_query} of: #{default_value}" if updated
+      end
+    end
+    
+    def default_embedded_associations(model, collection, prefix="")
+      prefix = "#{prefix}." if prefix.present?
+      # get all the embedded associations
+      embedded_associations = model.associations.select {|k,v| v.embedded?}
+      embedded_associations.each do |a|
+        association_name = a[0]
+        association_metadata = a[1]
+        embeds_many = association_metadata.association == Mongoid::Associations::EmbedsMany
+        
+        embedded_klass = association_metadata.options.klass
+        # we only care about the ones with a default set
+        embedded_fields_with_defaults = model_fields_with_defaults embedded_klass
+        embedded_fields_with_defaults.each {|f| default_field(collection, f, "#{prefix}#{association_name}", embeds_many) }
+        
+        #recurse
+        default_embedded_associations(embedded_klass, collection,"#{prefix}#{association_name}")        
+      end      
+    end
+    
+    def model_fields_with_defaults(model)
+      model.fields.select {|k,v| v.options.include?(:default)}
+    end
+    
     desc "Default existing document values"
     task :set_defaults => :environment do
       models = get_mongoid_models
       models.each do |m|
+        collection = Mongoid.master.collection(m.collection.name)
+     
+        # first handle the fields
         # get fields that have defaults set
-        fields_with_defaults = m.fields.select {|k,v| v.options.include?(:default)}
+        fields_with_defaults = model_fields_with_defaults m
         fields_with_defaults.each do |f|
-          field_name = f[0]
-          default_value = f[1].options[:default]
-          field_type = f[1].options[:type] || String # String is the default type
-          
-          # the default could be a new document, so we don't worry about those
-          if valid_mongo_type(field_type)
-            # update all the documents of the collection to set the default field if the field is not set
-            result = Mongoid.master.collection(m.collection.name).update({field_name => {'$exists' => false}}, {'$set' => {field_name => default_value}}, :multi => true, :safe => true)
-            if result[0][0]["updatedExisting"]
-              puts "Updated #{result.first.first['n']} #{m.name} documents to use a default of: #{default_value}"
-            end
-          end
+          default_field(collection, f)
         end
+      
+        # next recurse on the associations
+        default_embedded_associations(m, collection)   
       end
     end
 
