@@ -16,6 +16,10 @@ describe Mongoid::Extensions::Set::Conversions do
       Set.set(["test"]).should == ["test"]
     end
 
+    it "returns an array even if the value is a set" do
+      Set.set(Set.new(["test"])) == ["test"]
+    end
+
   end
 
 end

@@ -11,7 +11,7 @@ module Mongoid #:nodoc:
             ::Set.new(value)
           end
           def set(value)
-            value
+            value.to_a
           end
         end
       end
