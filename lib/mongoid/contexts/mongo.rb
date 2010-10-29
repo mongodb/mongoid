@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Mongo
       include Ids, Paging
-      attr_reader :criteria
+      attr_accessor :criteria
 
       delegate :klass, :options, :selector, :to => :criteria
 
@@ -134,10 +134,10 @@ module Mongoid #:nodoc:
       def initialize(criteria)
         @criteria = criteria
         if klass.hereditary? && !criteria.selector.keys.include?(:_type)
-          criteria.in(:_type => criteria.klass._types)
+          @criteria = criteria.in(:_type => criteria.klass._types)
         end
-        criteria.enslave if klass.enslaved?
-        criteria.cache if klass.cached?
+        @criteria.enslave if klass.enslaved?
+        @criteria.cache if klass.cached?
       end
 
       # Iterate over each +Document+ in the results. This can take an optional

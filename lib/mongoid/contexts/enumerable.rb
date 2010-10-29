@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
       include Ids, Paging
-      attr_reader :criteria
+      attr_accessor :criteria
 
       delegate :blank?, :empty?, :first, :last, :to => :execute
       delegate :klass, :documents, :options, :selector, :to => :criteria
