@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/relations/accessors"
+require "mongoid/relations/cyclic"
 require "mongoid/relations/proxy"
 require "mongoid/relations/bindings"
 require "mongoid/relations/builders"
@@ -20,6 +21,7 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     extend ActiveSupport::Concern
     include Accessors
+    include Cyclic
     include Builders
     include Macros
     include Reflections
