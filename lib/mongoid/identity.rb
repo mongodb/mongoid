@@ -24,7 +24,9 @@ module Mongoid #:nodoc:
     protected
     # Return the proper id for the document.
     def generate_id
-      id = BSON::ObjectId.new
+      pk_factory = Mongoid.master.pk_factory || BSON::ObjectId
+      attrs = pk_factory.create_pk(@document.attributes)
+      id = attrs['_id'] || attrs[:_id]
       @document.using_object_ids? ? id : id.to_s
     end
 
