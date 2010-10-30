@@ -125,9 +125,9 @@ module Mongoid #:nodoc:
       #
       # The first document in the +Array+
       def shift
-        document = first
-        criteria.skip((options[:skip] || 0) + 1)
-        document
+        first.tap do |document|
+          self.criteria = criteria.skip((options[:skip] || 0) + 1)
+        end
       end
 
       # Get the sum of the field values for all the documents.

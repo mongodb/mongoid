@@ -29,7 +29,7 @@ describe Mongoid::Attributes do
     end
 
     it "does not override the default" do
-      person.last_drink_taken_at.should == 1.day.ago.to_date
+      person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
     end
   end
 

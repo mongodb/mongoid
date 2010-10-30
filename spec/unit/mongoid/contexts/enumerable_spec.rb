@@ -38,8 +38,13 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#aggregate" do
 
-    let(:counts) { context.aggregate }
-    before { criteria.only(:number) }
+    let(:counts) do
+      context.aggregate
+    end
+
+    before do
+      context.criteria = criteria.only(:number)
+    end
 
     it "groups by the fields provided in the options" do
       counts.size.should == 3
@@ -50,7 +55,6 @@ describe Mongoid::Contexts::Enumerable do
       counts[10].should == 1
       counts[20].should == 2
     end
-
   end
 
   describe "#avg" do
@@ -58,7 +62,6 @@ describe Mongoid::Contexts::Enumerable do
     it "returns the avg value for the supplied field" do
       context.avg(:number).should == 12.75
     end
-
   end
 
   describe "#count" do
@@ -66,7 +69,6 @@ describe Mongoid::Contexts::Enumerable do
     it "returns the size of the enumerable" do
       context.count.should == 4
     end
-
   end
 
   describe "#distinct" do
@@ -74,13 +76,12 @@ describe Mongoid::Contexts::Enumerable do
     context "when the criteria is limited" do
 
       before do
-        criteria.where(:street => "Bourke Street")
+        context.criteria = criteria.where(:street => "Bourke Street")
       end
 
       it "returns an array of distinct values for the field" do
         context.distinct(:street).should == [ "Bourke Street" ]
       end
-
     end
 
     context "when the criteria is not limited" do
@@ -89,9 +90,7 @@ describe Mongoid::Contexts::Enumerable do
         context.distinct(:street).should ==
           [ "Bond Street", "Nan Jing Dong Lu", "Bourke Street", "Broadway" ]
       end
-
     end
-
   end
 
   describe "#execute" do
@@ -104,7 +103,11 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     context "when the selector is present" do
-      before { criteria.where(:street => "Bourke Street") }
+
+      before do
+        context.criteria = criteria.where(:street => "Bourke Street")
+      end
+
       it "returns the matching documents from the array" do
         context.execute.should == [ melbourne ]
       end
@@ -115,57 +118,65 @@ describe Mongoid::Contexts::Enumerable do
       it "returns all the documents" do
         context.execute.should == docs
       end
-
     end
 
     context "when skip and limit are in the options" do
 
-      before { criteria.skip(2).limit(2) }
+      before do
+        context.criteria = criteria.skip(2).limit(2)
+      end
 
       it "properly narrows down the matching results" do
         context.execute.should == [ melbourne, new_york ]
       end
-
     end
 
     context "when limit is set without skip in the options" do
 
-      before { criteria.limit(2) }
+      before do
+        context.criteria = criteria.limit(2)
+      end
 
       it "properly narrows down the matching results" do
         context.execute.size.should == 2
       end
-
     end
 
     context "when skip is set without limit in the options" do
 
-      before { criteria.skip(2) }
+      before do
+        context.criteria = criteria.skip(2)
+      end
 
       it "properly skips the specified records" do
         context.execute.size.should == 2
       end
-
     end
-
   end
 
   describe "#first" do
 
     context "when a selector is present" do
-      before { criteria.where(:street => "Bourke Street") }
+
+      before do
+        context.criteria = criteria.where(:street => "Bourke Street")
+      end
 
       it "returns the first that matches the selector" do
         context.first.should == melbourne
       end
     end
-
   end
 
   describe "#group" do
 
-    let(:group) { context.group }
-    before { criteria.only(:number) }
+    let(:group) do
+      context.group
+    end
+
+    before do
+      context.criteria = criteria.only(:number)
+    end
 
     it "groups by the fields provided in the options" do
       group.size.should == 3

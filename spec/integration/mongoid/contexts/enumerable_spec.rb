@@ -3,12 +3,12 @@ require "spec_helper"
 describe Mongoid::Contexts::Enumerable do
 
   let(:person) do
-    person = Person.new(:title => "Sir")
-    10.times do |n|
-      post_code = n % 3 == 0 ? 32250 : 60661
-      person.addresses << Address.new(:number => n, :post_code => post_code, :street => "Upper Street #{n}")
+    Person.new(:title => "Sir").tap do |person|
+      10.times do |n|
+        post_code = n % 3 == 0 ? 32250 : 60661
+        person.addresses << Address.new(:number => n, :post_code => post_code, :street => "Upper Street #{n}")
+      end
     end
-    person
   end
 
   describe "#limit" do
