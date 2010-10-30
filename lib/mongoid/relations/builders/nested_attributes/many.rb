@@ -3,7 +3,26 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Builders #:nodoc:
       module NestedAttributes #:nodoc:
-        class Many
+        class Many < NestedBuilder
+
+          # Builds the relation depending on the attributes and the options
+          # passed to the macro.
+          #
+          # This attempts to perform 3 operations, either one of an update of
+          # the existing relation, a replacement of the relation with a new
+          # document, or a removal of the relation.
+          #
+          # Example:
+          #
+          # <tt>many.build(person)</tt>
+          #
+          # Options:
+          #
+          # parent: The parent document of the relation.
+          def build(parent)
+            @existing = parent.send(metadata.name)
+            attributes.each { |attrs| process(attrs[1]) }
+          end
 
           # Create the new builder for nested attributes on one-to-one
           # relations.
@@ -22,13 +41,51 @@ module Mongoid # :nodoc:
           #
           # A new builder.
           def initialize(metadata, attributes, options)
-            @attributes = attributes.with_indifferent_access
+            @attributes = attributes.with_indifferent_access.sort do |a, b|
+              a[0] <=> b[0]
+            end
             @metadata = metadata
             @options = options
           end
 
-          def build(parent)
+          private
 
+          # Can the existing relation potentially be deleted?
+          #
+          # Example:
+          #
+          # <tt>destroyable?({ :_destroy => "1" })</tt>
+          #
+          # Options:
+          #
+          # attributes: The attributes to pull the flag from.
+          #
+          # Returns:
+          #
+          # True if the relation can potentially be deleted.
+          def destroyable?(attributes)
+            destroy = attributes.delete(:_destroy)
+            [ 1, "1", true, "true" ].include?(destroy) && allow_destroy?
+          end
+
+          # Process each set of attributes one at a time for each potential
+          # new, existing, or ignored document.
+          #
+          # Example:
+          #
+          # <tt>builder.process({ "_id" => 1, "street" => "Bond" })
+          #
+          # Options:
+          #
+          # attrs: The single document attributes to process.
+          def process(attrs)
+            return if reject?(attrs)
+            if attrs[:_id]
+              document = existing.find(attrs[:_id])
+              destroyable?(attrs) ? document.destroy : document.update_attributes(attrs)
+            else
+              existing << metadata.klass.new(attrs) unless destroyable?(attrs)
+            end
           end
         end
       end
