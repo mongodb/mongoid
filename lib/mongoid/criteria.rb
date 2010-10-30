@@ -156,6 +156,26 @@ module Mongoid #:nodoc:
         return entries.send(name, *args)
       end
     end
+    
+    # Operates like find on a given criteria object. Returns the result of
+    #  +Criteria.translate_criteria+ letting the user also pass first / last to get specific results.
+    # Primarily useful for chaining scopes.
+    #
+    # <tt>Person.where(:admin => true).find(:first, :conditions => { :attribute => "value" })</tt>
+    #
+    # <tt>Person.where(:admin => true).find(:all, :conditions => { :attribute => "value" })</tt>
+    #
+    # <tt>Person.where(:admin => true).find(Mongo::ObjectID.new.to_s)</tt>
+    def find(*args)
+      raise Errors::InvalidOptions.new(:calling_criteria_find_with_nil_is_invalid, {}) if args[0].nil?
+      type = args.shift if args.first.is_a?(Symbol)
+      criteria = self.class.translate_criteria(self, *args)
+      case type
+      when :first then criteria.one
+      when :last  then criteria.last
+      else criteria
+      end
+    end
 
     alias :to_ary :to_a
 
@@ -178,7 +198,7 @@ module Mongoid #:nodoc:
     #
     # Options:
     #
-    # args: either a +String+ or a +Symbol+, +Hash combination.
+    # args: either a +String+ or a +Symbol+, +Hash+ combination.
     #
     # Example:
     #
@@ -187,15 +207,21 @@ module Mongoid #:nodoc:
     def self.translate(*args)
       klass = args[0]
       params = args[1] || {}
+      translate_criteria klass.criteria, params
+    end
+    
+    # Translates the given criteria using supplied arguments.
+    #
+    # For more details on how this works, see +Criteria#translate+
+    def self.translate_criteria(criteria, params = {})
       unless params.is_a?(Hash)
-        return klass.criteria.id_criteria(params)
+        return criteria.id_criteria(params)
       end
       conditions = params.delete(:conditions) || {}
       if conditions.include?(:id)
-        conditions[:_id] = conditions[:id]
-        conditions.delete(:id)
+        conditions[:_id] = conditions.delete(:id)
       end
-      return klass.criteria.where(conditions).extras(params)
+      criteria.where(conditions).extras(params)
     end
 
     protected
