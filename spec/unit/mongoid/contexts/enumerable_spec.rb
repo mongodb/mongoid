@@ -6,16 +6,34 @@ describe Mongoid::Contexts::Enumerable do
     Mongoid.raise_not_found_error = true
   end
 
-  let(:london) { Address.new(:number => 1, :street => "Bond Street") }
-  let(:shanghai) { Address.new(:number => 10, :street => "Nan Jing Dong Lu") }
-  let(:melbourne) { Address.new(:number => 20, :street => "Bourke Street") }
-  let(:new_york) { Address.new(:number => 20, :street => "Broadway") }
-  let(:docs) { [ london, shanghai, melbourne, new_york ] }
-  let(:context) { Mongoid::Contexts::Enumerable.new(criteria) }
+  let(:london) do
+    Address.new(:number => 1, :street => "Bond Street")
+  end
+
+  let(:shanghai) do
+    Address.new(:number => 10, :street => "Nan Jing Dong Lu")
+  end
+
+  let(:melbourne) do
+    Address.new(:number => 20, :street => "Bourke Street")
+  end
+
+  let(:new_york) do
+    Address.new(:number => 20, :street => "Broadway")
+  end
+
+  let(:docs) do
+    [ london, shanghai, melbourne, new_york ]
+  end
+
   let(:criteria) do
     Mongoid::Criteria.new(Address).tap do |criteria|
       criteria.documents = docs
     end
+  end
+
+  let(:context) do
+    Mongoid::Contexts::Enumerable.new(criteria)
   end
 
   describe "#aggregate" do
@@ -158,7 +176,6 @@ describe Mongoid::Contexts::Enumerable do
       group[10].should == [ shanghai ]
       group[20].should == [ melbourne, new_york ]
     end
-
   end
 
   describe ".initialize" do
@@ -167,9 +184,16 @@ describe Mongoid::Contexts::Enumerable do
     let(:options) { { :skip => 20 } }
     let(:documents) { [stub] }
 
-    before do
-      criteria.documents = documents
+    let(:crit) do
       criteria.where(selector).skip(20)
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Enumerable.new(crit)
+    end
+
+    before do
+      crit.documents = documents
     end
 
     it "sets the selector" do
@@ -188,7 +212,13 @@ describe Mongoid::Contexts::Enumerable do
 
   describe "#iterate" do
 
-    before { criteria.where(:street => "Bourke Street") }
+    let(:crit) do
+      criteria.where(:street => "Bourke Street")
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Enumerable.new(crit)
+    end
 
     it "executes the criteria" do
       acc = []
@@ -197,18 +227,24 @@ describe Mongoid::Contexts::Enumerable do
       end
       acc.should == [melbourne]
     end
-
   end
 
   describe "#last" do
 
     context "when the selector is present" do
-      before { criteria.where(:street => "Bourke Street") }
+
+      let(:crit) do
+        criteria.where(:street => "Bourke Street")
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Enumerable.new(crit)
+      end
+
       it "returns the last matching in the enumerable" do
         context.last.should == melbourne
       end
     end
-
   end
 
   describe "#max" do
@@ -216,7 +252,6 @@ describe Mongoid::Contexts::Enumerable do
     it "returns the max value for the supplied field" do
       context.max(:number).should == 20
     end
-
   end
 
   describe "#min" do
@@ -224,18 +259,24 @@ describe Mongoid::Contexts::Enumerable do
     it "returns the min value for the supplied field" do
       context.min(:number).should == 1
     end
-
   end
 
   describe "#one" do
 
     context "when the selector is present" do
-      before { criteria.where(:street => "Bourke Street") }
+
+      let(:crit) do
+        criteria.where(:street => "Bourke Street")
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Enumerable.new(crit)
+      end
+
       it "returns the first matching in the enumerable" do
         context.one.should == melbourne
       end
     end
-
   end
 
   describe "#page" do
@@ -247,12 +288,18 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     context "when the page option exists" do
-      before { criteria.extras(:page => 5) }
+
+      let(:crit) do
+        criteria.extras(:page => 5)
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Enumerable.new(crit)
+      end
 
       it "returns the page option" do
         context.page.should == 5
       end
-
     end
 
     context "when the page option does not exist" do
@@ -260,12 +307,11 @@ describe Mongoid::Contexts::Enumerable do
       it "returns 1" do
         context.page.should == 1
       end
-
     end
-
   end
 
   describe "#paginate" do
+
     let(:criteria) { Person.criteria.skip(2).limit(2) }
     let(:results) { context.paginate }
 
@@ -273,7 +319,6 @@ describe Mongoid::Contexts::Enumerable do
       results.current_page.should == 2
       results.per_page.should == 2
     end
-
   end
 
   describe "#per_page" do
@@ -283,7 +328,6 @@ describe Mongoid::Contexts::Enumerable do
       it "returns 20" do
         context.per_page.should == 20
       end
-
     end
 
     context "when a limit option does not exist" do
@@ -297,27 +341,27 @@ describe Mongoid::Contexts::Enumerable do
       it "returns the limit" do
         context.per_page.should == 50
       end
-
     end
-
   end
 
   describe "#sort" do
 
     context "with no sort options" do
+
       it "returns the documents as is" do
         context.send(:sort, docs).should == docs
       end
     end
 
     context "with sort options" do
+
       before { context.options[:sort] = [ [:created_at, :asc] ] }
+
       it "sorts by the key" do
         docs.expects(:sort_by).once
         context.send(:sort, docs)
       end
     end
-
   end
 
   describe "#sum" do
@@ -325,16 +369,16 @@ describe Mongoid::Contexts::Enumerable do
     it "returns the sum of all the field values" do
       context.sum(:number).should == 51
     end
-
   end
 
   context "#id_criteria" do
 
     let(:criteria) do
-      criteria = Mongoid::Criteria.new(Address)
-      criteria.documents = []
-      criteria
+      Mongoid::Criteria.new(Address).tap do |crit|
+        crit.documents = []
+      end
     end
+
     let(:context) { criteria.context }
 
     context "with a single argument" do
@@ -354,18 +398,15 @@ describe Mongoid::Contexts::Enumerable do
           document.expects(:blank? => false)
           context.id_criteria(id).should == document
         end
-
       end
 
       context "when the document is not found" do
 
         it "raises an error" do
           context.expects(:one).returns(nil)
-          lambda { context.id_criteria(id) }.should raise_error
+          expect { context.id_criteria(id) }.to raise_error
         end
-
       end
-
     end
 
     context "multiple arguments" do
@@ -390,18 +431,15 @@ describe Mongoid::Contexts::Enumerable do
             context.expects(:execute).returns(docs)
             context.id_criteria(ids).should == docs
           end
-
         end
 
         context "when documents are not found" do
 
           it "raises an error" do
             context.expects(:execute).returns([])
-            lambda { context.id_criteria(ids) }.should raise_error
+            expect { context.id_criteria(ids) }.to raise_error
           end
-
         end
-
       end
 
       context "when an array of object ids" do
@@ -424,22 +462,16 @@ describe Mongoid::Contexts::Enumerable do
             context.expects(:execute).returns(docs)
             context.id_criteria(ids).should == docs
           end
-
         end
 
         context "when documents are not found" do
 
           it "raises an error" do
             context.expects(:execute).returns([])
-            lambda { context.id_criteria(ids) }.should raise_error
+            expect { context.id_criteria(ids) }.to raise_error
           end
-
         end
-
       end
-
     end
-
   end
-
 end
