@@ -258,7 +258,7 @@ describe Mongoid::Persistence do
       context "when removing elements without using delete or destroy" do
 
         before do
-          @person = Person.create(:title => "Blah", :ssn => "244-01-1112")
+          @person = Person.create!(:title => "Blah", :ssn => "244-01-1112")
           @person.create_name(:first_name => "Tony")
           @person.name = nil
         end
@@ -267,15 +267,6 @@ describe Mongoid::Persistence do
           @person.save
           @person.reload
           @person.name.should be_nil
-        end
-
-        it "persists with proper unset and pull modifiers" do
-          pending "Durran:: $unset already happened"
-          @person._updates.should == {
-            "$set" => { "name" => nil }
-          }
-          @person.save
-          @person._updates.should == {}
         end
       end
     end
