@@ -21,6 +21,9 @@ module Mongoid # :nodoc:
           # parent: The parent document of the relation.
           def build(parent)
             @existing = parent.send(metadata.name)
+            if over_limit?(attributes)
+              raise Errors::TooManyNestedAttributeRecords.new(@existing, options[:limit])
+            end
             attributes.each { |attrs| process(attrs[1]) }
           end
 
@@ -66,6 +69,25 @@ module Mongoid # :nodoc:
           def destroyable?(attributes)
             destroy = attributes.delete(:_destroy)
             [ 1, "1", true, "true" ].include?(destroy) && allow_destroy?
+          end
+
+          # Are the supplied attributes of greater number than the supplied
+          # limit?
+          #
+          # Example:
+          #
+          # <tt>builder.over_limit?({ "street" => "Bond" })</tt>
+          #
+          # Options:
+          #
+          # attributes: The attributes being set.
+          #
+          # Returns:
+          #
+          # True if a limit supplied and the attributes are of greater number.
+          def over_limit?(attributes)
+            limit = options[:limit]
+            limit ? attributes.size > limit : false
           end
 
           # Process each set of attributes one at a time for each potential

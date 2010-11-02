@@ -14,7 +14,38 @@ describe Mongoid::NestedAttributes do
 
         context "when a reject proc is specified" do
 
-          it "respects the rejection"
+          before :all do
+            Person.send(:undef_method, :name_attributes=)
+            Person.accepts_nested_attributes_for \
+              :name, :reject_if => lambda { |attrs| attrs[:first_name].blank? }
+          end
+
+          after :all do
+            Person.send(:undef_method, :name_attributes=)
+            Person.accepts_nested_attributes_for :name
+          end
+
+          context "when the attributes match" do
+
+            before do
+              person.name_attributes = { :last_name => "Lang" }
+            end
+
+            it "does not add the document" do
+              person.name.should be_nil
+            end
+          end
+
+          context "when the attributes do not match" do
+
+            before do
+              person.name_attributes = { :first_name => "Lang" }
+            end
+
+            it "adds the document" do
+              person.name.first_name.should == "Lang"
+            end
+          end
         end
 
         context "when no id has been passed" do
@@ -540,7 +571,50 @@ describe Mongoid::NestedAttributes do
 
         context "when a limit is specified" do
 
-          it "respects the limit"
+          before :all do
+            Person.send(:undef_method, :addresses_attributes=)
+            Person.accepts_nested_attributes_for :addresses, :limit => 2
+          end
+
+          after :all do
+            Person.send(:undef_method, :addresses_attributes=)
+            Person.accepts_nested_attributes_for :addresses
+          end
+
+          context "when more are provided than the limit" do
+
+            let(:attributes) do
+              {
+                "foo" => { "street" => "Maybachufer" },
+                "bar" => { "street" => "Alexander Platz" },
+                "baz" => { "street" => "Unter den Linden" }
+              }
+            end
+
+            it "raises an error" do
+              expect {
+                person.addresses_attributes = attributes
+              }.to raise_error(Mongoid::Errors::TooManyNestedAttributeRecords)
+            end
+          end
+
+          context "when less are provided than the limit" do
+
+            let(:attributes) do
+              {
+                "foo" => { "street" => "Maybachufer" },
+                "bar" => { "street" => "Alexander Platz" }
+              }
+            end
+
+            before do
+              person.addresses_attributes = attributes
+            end
+
+            it "sets the documents on the relation" do
+              person.addresses.size.should == 2
+            end
+          end
         end
 
         context "when ids are passed" do
@@ -789,7 +863,7 @@ describe Mongoid::NestedAttributes do
               person.addresses.second.street.should == "Alexander Platz"
             end
 
-            it "builds a new thirs document" do
+            it "builds a new third document" do
               person.addresses.third.street.should == "Maybachufer"
             end
 
