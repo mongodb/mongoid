@@ -22,7 +22,7 @@ module Mongoid # :nodoc:
           def build(parent)
             @existing = parent.send(metadata.name)
             if over_limit?(attributes)
-              raise Errors::TooManyNestedAttributeRecords.new(@existing, options[:limit])
+              raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
             end
             attributes.each { |attrs| process(attrs[1]) }
           end
@@ -43,7 +43,7 @@ module Mongoid # :nodoc:
           # Returns:
           #
           # A new builder.
-          def initialize(metadata, attributes, options)
+          def initialize(metadata, attributes, options = {})
             @attributes = attributes.with_indifferent_access.sort do |a, b|
               a[0] <=> b[0]
             end
