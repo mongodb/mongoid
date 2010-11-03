@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::NestedAttributes do
 
   before do
-    [ Person, Post, Movie, Rating ].map(&:delete_all)
+    [ Person, Post, Game ].map(&:delete_all)
   end
 
   describe "##{name}_attributes=" do
