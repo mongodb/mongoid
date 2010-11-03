@@ -9,6 +9,6 @@ class Game
   attr_protected :_id
 
   set_callback(:initialize, :after) do |document|
-    write_attribute("name", "Testing")
+    write_attribute("name", "Testing") unless name
   end
 end

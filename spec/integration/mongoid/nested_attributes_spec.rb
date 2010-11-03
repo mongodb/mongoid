@@ -1109,6 +1109,342 @@ describe Mongoid::NestedAttributes do
           end
         end
       end
+
+      context "when the relation is a references one" do
+
+        let(:person) do
+          Person.new
+        end
+
+        context "when a reject proc is specified" do
+
+          before :all do
+            Person.send(:undef_method, :game_attributes=)
+            Person.accepts_nested_attributes_for \
+              :game, :reject_if => lambda { |attrs| attrs[:name].blank? }
+          end
+
+          after :all do
+            Person.send(:undef_method, :game_attributes=)
+            Person.accepts_nested_attributes_for :game
+          end
+
+          context "when the attributes match" do
+
+            before do
+              person.game_attributes = { :score => 10 }
+            end
+
+            it "does not add the document" do
+              person.game.should be_nil
+            end
+          end
+
+          context "when the attributes do not match" do
+
+            before do
+              person.game_attributes = { :name => "Tron" }
+            end
+
+            it "adds the document" do
+              person.game.name.should == "Tron"
+            end
+          end
+        end
+
+        context "when no id has been passed" do
+
+          context "with no destroy attribute" do
+
+            before do
+              person.game_attributes = { :name => "Tron" }
+            end
+
+            it "builds a new document" do
+              person.game.name.should == "Tron"
+            end
+          end
+
+          context "with a destroy attribute" do
+
+            context "when allow_destroy is true" do
+
+              before :all do
+                Person.send(:undef_method, :game_attributes=)
+                Person.accepts_nested_attributes_for :game, :allow_destroy => true
+              end
+
+              after :all do
+                Person.send(:undef_method, :game_attributes=)
+                Person.accepts_nested_attributes_for :game
+              end
+
+              before do
+                person.game_attributes = { :name => "Tron", :_destroy => "1" }
+              end
+
+              it "does not build the document" do
+                person.game.should be_nil
+              end
+            end
+
+            context "when allow_destroy is false" do
+
+              before :all do
+                Person.send(:undef_method, :game_attributes=)
+                Person.accepts_nested_attributes_for :game, :allow_destroy => false
+              end
+
+              after :all do
+                Person.send(:undef_method, :game_attributes=)
+                Person.accepts_nested_attributes_for :game
+              end
+
+              before do
+                person.game_attributes = { :name => "Tron", :_destroy => "1" }
+              end
+
+              it "builds the document" do
+                person.game.name.should == "Tron"
+              end
+            end
+          end
+
+          context "with empty attributes" do
+
+            before do
+              person.game_attributes = {}
+            end
+
+            it "does not build the document" do
+              person.game.should be_nil
+            end
+          end
+
+          context "when there is an existing document" do
+
+            context "with no destroy attribute" do
+
+              before do
+                person.game = Game.new(:name => "Tron")
+                person.game_attributes = { :name => "Pong" }
+              end
+
+              it "replaces the document" do
+                person.game.name.should == "Pong"
+              end
+            end
+
+            context "with a destroy attribute" do
+
+              context "when allow_destroy is true" do
+
+                before :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game, :allow_destroy => true
+                end
+
+                after :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game
+                end
+
+                before do
+                  person.game = Game.new(:name => "Tron")
+                  person.game_attributes = { :name => "Pong", :_destroy => "1" }
+                end
+
+                it "does not replace the document" do
+                  person.game.name.should == "Tron"
+                end
+              end
+
+              context "when allow_destroy is false" do
+
+                before :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game, :allow_destroy => false
+                end
+
+                after :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game
+                end
+
+                before do
+                  person.game = Game.new(:name => "Tron")
+                  person.game_attributes = { :name => "Pong", :_destroy => "1" }
+                end
+
+                it "replaces the document" do
+                  person.game.name.should == "Pong"
+                end
+              end
+            end
+          end
+        end
+
+        context "when an id is passed" do
+
+          context "when there is an existing record" do
+
+            let(:game) do
+              Game.new(:name => "Tron")
+            end
+
+            before do
+              person.game = game
+            end
+
+            context "when the id matches" do
+
+              context "when passed keys as symbols" do
+
+                before do
+                  person.game_attributes =
+                    { :_id => game.id, :name => "Pong" }
+                end
+
+                it "updates the existing document" do
+                  person.game.name.should == "Pong"
+                end
+              end
+
+              context "when passed keys as strings" do
+
+                before do
+                  person.game_attributes =
+                    { "_id" => game.id, "name" => "Pong" }
+                end
+
+                it "updates the existing document" do
+                  person.game.name.should == "Pong"
+                end
+              end
+
+              context "when allow_destroy is true" do
+
+                before :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game, :allow_destroy => true
+                end
+
+                after :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed #{truth} with destroy" do
+
+                    before do
+                      person.game_attributes =
+                        { :_id => game.id, :_destroy => truth }
+                    end
+
+                    it "destroys the existing document" do
+                      person.game.should be_nil
+                    end
+                  end
+                end
+
+                [ nil, 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed #{falsehood} with destroy" do
+
+                    before do
+                      person.game_attributes =
+                        { :_id => game.id, :_destroy => falsehood }
+                    end
+
+                    it "does not destroy the existing document" do
+                      person.game.should == game
+                    end
+                  end
+                end
+              end
+
+              context "when allow destroy is false" do
+
+                before :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game, :allow_destroy => false
+                end
+
+                after :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game
+                end
+
+                context "when a destroy attribute is passed" do
+
+                  before do
+                    person.game_attributes =
+                      { :_id => game.id, :_destroy => true }
+                  end
+
+                  it "does not destroy the document" do
+                    person.game.should == game
+                  end
+                end
+              end
+
+              context "when update only is true" do
+
+                before :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for \
+                    :game,
+                    :update_only => true,
+                    :allow_destroy => true
+                end
+
+                after :all do
+                  Person.send(:undef_method, :game_attributes=)
+                  Person.accepts_nested_attributes_for :game
+                end
+
+                context "when the id matches" do
+
+                  before do
+                    person.game_attributes =
+                      { :_id => game.id, :name => "Donkey Kong" }
+                  end
+
+                  it "updates the existing document" do
+                    person.game.name.should == "Donkey Kong"
+                  end
+                end
+
+                context "when the id does not match" do
+
+                  before do
+                    person.game_attributes =
+                      { :_id => "1", :name => "Pong" }
+                  end
+
+                  it "updates the existing document" do
+                    person.game.name.should == "Pong"
+                  end
+                end
+
+                context "when passed a destroy truth" do
+
+                  before do
+                    person.game_attributes =
+                      { :_id => game.id, :_destroy => true }
+                  end
+
+                  it "destroys the existing document" do
+                    person.game.should be_nil
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
