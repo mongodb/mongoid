@@ -24,6 +24,27 @@ describe Mongoid::Timestamps do
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
       Person.should.respond_to? :record_timestamps
     end
+    
+    context 'record_timestamps is set to false' do
+      before :all do
+        Person.record_timestamps = false
+      end
+      
+      it 'does not update updated_at' do
+        person = Person.new
+        person.run_callbacks(:save)
+        updated_at_before = person.updated_at
+        sleep(1)
+        person.run_callbacks(:save)
+        person.updated_at.should == updated_at_before
+      end
+      
+      it 'does not add created_at' do
+        person = Person.new
+        person.run_callbacks(:create)
+        person.created_at.should == nil
+      end
+    end
 
   end
 

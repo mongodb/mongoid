@@ -15,12 +15,14 @@ module Mongoid #:nodoc:
     # Update the created_at field on the Document to the current time. This is
     # only called on create.
     def set_created_at
+      return if self.class.record_timestamps == false
       self.created_at = Time.now.utc if !created_at
     end
 
     # Update the updated_at field on the Document to the current time.
     # This is only called on create and on save.
     def set_updated_at
+      return if self.class.record_timestamps == false
       self.updated_at = Time.now.utc
     end
   end
