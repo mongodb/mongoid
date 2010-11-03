@@ -362,6 +362,16 @@ module Mongoid # :nodoc:
           find(:first, :conditions => attrs) || send(method, attrs)
         end
 
+        # Will load the target into an array if the target had not already been
+        # loaded.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.loaded</tt>
+        #
+        # Returns:
+        #
+        # The relation itself.
         def loaded
           tap do |relation|
             relation.target = target.entries if target.is_a?(Mongoid::Criteria)

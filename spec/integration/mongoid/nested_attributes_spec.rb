@@ -1750,15 +1750,15 @@ describe Mongoid::NestedAttributes do
               context "when reloading the document" do
 
                 it "updates the first existing document" do
-                  person.reload.posts.first.title.should == "First"
+                  person.posts(true).first.title.should == "First"
                 end
 
                 it "updates the second existing document" do
-                  person.reload.posts.second.title.should == "Second"
+                  person.posts(true).second.title.should == "Second"
                 end
 
                 it "does not add new documents" do
-                  person.reload.posts.size.should == 2
+                  person.posts(true).size.should == 2
                 end
               end
             end
@@ -1805,11 +1805,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the documents" do
 
                       it "deletes the marked document" do
-                        person.reload.posts.size.should == 1
+                        person.posts(true).size.should == 1
                       end
 
                       it "does not delete the unmarked document" do
-                        person.reload.posts.first.title.should == "My Blog"
+                        person.posts(true).first.title.should == "My Blog"
                       end
                     end
                   end
@@ -1830,11 +1830,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the document" do
 
                       it "does not delete the marked document" do
-                        person.reload.posts.size.should == 2
+                        person.posts(true).size.should == 2
                       end
 
                       it "does not delete the unmarked document" do
-                        person.reload.posts.last.title.should == "My Blog"
+                        person.posts(true).last.title.should == "My Blog"
                       end
                     end
                   end
@@ -1869,15 +1869,15 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        person.reload.posts.first.title.should == "Another Title"
+                        person.posts(true).first.title.should == "Another Title"
                       end
 
                       it "does not delete the unmarked document" do
-                        person.reload.posts.last.title.should == "New Title"
+                        person.posts(true).last.title.should == "New Title"
                       end
 
                       it "does not add additional documents" do
-                        person.reload.posts.size.should == 2
+                        person.posts(true).size.should == 2
                       end
                     end
                   end
@@ -1898,11 +1898,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the documents" do
 
                       it "does not delete the marked document" do
-                        person.reload.posts.size.should == 2
+                        person.posts(true).size.should == 2
                       end
 
                       it "does not delete the unmarked document" do
-                        person.reload.posts.last.title.should == "New Title"
+                        person.posts(true).last.title.should == "New Title"
                       end
                     end
                   end
@@ -1932,15 +1932,15 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        person.reload.posts.first.title.should == "Another Title"
+                        person.posts(true).first.title.should == "Another Title"
                       end
 
                       it "does not delete the unmarked document" do
-                        person.reload.posts.last.title.should == "New Title"
+                        person.posts(true).last.title.should == "New Title"
                       end
 
                       it "does not add additional documents" do
-                        person.reload.posts.size.should == 2
+                        person.posts(true).size.should == 2
                       end
                     end
                   end
@@ -1961,11 +1961,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not delete the marked document" do
-                        person.reload.posts.size.should == 2
+                        person.posts(true).size.should == 2
                       end
 
                       it "does not delete the unmarked document" do
-                        person.reload.posts.last.title.should == "New Title"
+                        person.posts(true).last.title.should == "New Title"
                       end
                     end
                   end

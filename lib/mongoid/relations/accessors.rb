@@ -77,9 +77,9 @@ module Mongoid # :nodoc:
         # self
         def getter(name, metadata)
           tap do
-            define_method(name) do
-              variable = "@#{name}"
-              if instance_variable_defined?(variable)
+            define_method(name) do |*args|
+              reload, variable = args.first, "@#{name}"
+              if instance_variable_defined?(variable) && !reload
                 instance_variable_get(variable)
               else
                 build(name, @attributes[metadata.key], metadata)
