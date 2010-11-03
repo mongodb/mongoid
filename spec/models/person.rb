@@ -62,6 +62,7 @@ class Person
   accepts_nested_attributes_for :pet, :allow_destroy => true
   accepts_nested_attributes_for :game, :allow_destroy => true
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
+  accepts_nested_attributes_for :posts
 
   references_one :game, :dependent => :destroy do
     def extension
