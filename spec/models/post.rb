@@ -9,6 +9,7 @@ class Post
   include Mongoid::Versioning
   include Mongoid::Timestamps
   field :title
+  field :content
   referenced_in :person
   referenced_in :author, :foreign_key => :author_id, :class_name => "User"
   referenced_in :poster, :foreign_key => :poster_id, :class_name => "Agent"

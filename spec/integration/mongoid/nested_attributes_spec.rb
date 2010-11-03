@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::NestedAttributes do
 
+  before do
+    [ Person, Post, Movie, Rating ].map(&:delete_all)
+  end
+
   describe "##{name}_attributes=" do
 
     context "when the parent document is new" do
@@ -1721,497 +1725,522 @@ describe Mongoid::NestedAttributes do
           end
         end
 
-        # context "when ids are passed" do
-
-          # before do
-            # person.posts << [ post_one, post_two ]
-          # end
-
-          # context "when no destroy attributes are passed" do
-
-            # context "when the ids match" do
-
-              # before do
-                # person.posts_attributes =
-                  # {
-                    # "foo" => { "_id" => post_one.id, "title" => "Maybachufer" },
-                    # "bar" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                  # }
-              # end
-
-              # it "updates the first existing document" do
-                # person.posts.first.title.should == "Maybachufer"
-              # end
-
-              # it "updates the second existing document" do
-                # person.posts.second.title.should == "Alexander Platz"
-              # end
-
-              # it "does not add new documents" do
-                # person.posts.size.should == 2
-              # end
-            # end
-
-            # context "when the ids do not match" do
-
-              # it "raises an error" do
-                # expect {
-                  # person.posts_attributes =
-                    # { "foo" => { "_id" => "test", "title" => "Test" } }
-                # }.to raise_error
-              # end
-            # end
-          # end
-
-          # context "when destroy attributes are passed" do
-
-            # context "when the ids match" do
-
-              # context "when allow_destroy is true" do
-
-                # before :all do
-                  # Person.send(:undef_method, :posts_attributes=)
-                  # Person.accepts_nested_attributes_for :posts, :allow_destroy => true
-                # end
-
-                # after :all do
-                  # Person.send(:undef_method, :posts_attributes=)
-                  # Person.accepts_nested_attributes_for :posts
-                # end
-
-                # [ 1, "1", true, "true" ].each do |truth|
-
-                  # context "when passed a #{truth} with destroy" do
-
-                    # before do
-                      # person.posts_attributes =
-                        # {
-                          # "bar" => { "_id" => post_one.id, "_destroy" => truth },
-                          # "foo" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                        # }
-                    # end
-
-                    # it "deletes the marked document" do
-                      # person.posts.size.should == 1
-                    # end
-
-                    # it "does not delete the unmarked document" do
-                      # person.posts.first.title.should == "Alexander Platz"
-                    # end
-                  # end
-                # end
-
-                # [ 0, "0", false, "false" ].each do |falsehood|
-
-                  # context "when passed a #{falsehood} with destroy" do
-
-                    # before do
-                      # person.posts_attributes =
-                        # {
-                          # "bar" => { "_id" => post_one.id, "_destroy" => falsehood },
-                          # "foo" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                        # }
-                    # end
-
-                    # it "does not delete the marked document" do
-                      # person.posts.size.should == 2
-                    # end
-
-                    # it "does not delete the unmarked document" do
-                      # person.posts.last.title.should == "Alexander Platz"
-                    # end
-                  # end
-                # end
-              # end
-
-              # context "when allow_destroy is false" do
-
-                # before :all do
-                  # Person.send(:undef_method, :posts_attributes=)
-                  # Person.accepts_nested_attributes_for :posts, :allow_destroy => false
-                # end
-
-                # after :all do
-                  # Person.send(:undef_method, :posts_attributes=)
-                  # Person.accepts_nested_attributes_for :posts
-                # end
-
-                # [ 1, "1", true, "true" ].each do |truth|
-
-                  # context "when passed a #{truth} with destroy" do
-
-                    # before do
-                      # person.posts_attributes =
-                        # {
-                          # "bar" => {
-                            # "_id" => post_one.id, "title" => "Maybachufer", "_destroy" => truth },
-                          # "foo" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                        # }
-                    # end
-
-                    # it "does not ignore the marked document" do
-                      # person.posts.first.title.should == "Maybachufer"
-                    # end
-
-                    # it "does not delete the unmarked document" do
-                      # person.posts.last.title.should == "Alexander Platz"
-                    # end
-
-                    # it "does not add additional documents" do
-                      # person.posts.size.should == 2
-                    # end
-                  # end
-                # end
-
-                # [ 0, "0", false, "false" ].each do |falsehood|
-
-                  # context "when passed a #{falsehood} with destroy" do
-
-                    # before do
-                      # person.posts_attributes =
-                        # {
-                          # "bar" => { "_id" => post_one.id, "_destroy" => falsehood },
-                          # "foo" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                        # }
-                    # end
-
-                    # it "does not delete the marked document" do
-                      # person.posts.size.should == 2
-                    # end
-
-                    # it "does not delete the unmarked document" do
-                      # person.posts.last.title.should == "Alexander Platz"
-                    # end
-                  # end
-                # end
-              # end
-
-              # context "when allow_destroy is undefined" do
-
-                # before :all do
-                  # Person.send(:undef_method, :posts_attributes=)
-                  # Person.accepts_nested_attributes_for :posts
-                # end
-
-                # [ 1, "1", true, "true" ].each do |truth|
-
-                  # context "when passed a #{truth} with destroy" do
-
-                    # before do
-                      # person.posts_attributes =
-                        # {
-                          # "bar" => {
-                            # "_id" => post_one.id, "title" => "Maybachufer", "_destroy" => truth },
-                          # "foo" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                        # }
-                    # end
-
-                    # it "does not ignore the marked document" do
-                      # person.posts.first.title.should == "Maybachufer"
-                    # end
-
-                    # it "does not delete the unmarked document" do
-                      # person.posts.last.title.should == "Alexander Platz"
-                    # end
-
-                    # it "does not add additional documents" do
-                      # person.posts.size.should == 2
-                    # end
-                  # end
-                # end
-
-                # [ 0, "0", false, "false" ].each do |falsehood|
-
-                  # context "when passed a #{falsehood} with destroy" do
-
-                    # before do
-                      # person.posts_attributes =
-                        # {
-                          # "bar" => { "_id" => post_one.id, "_destroy" => falsehood },
-                          # "foo" => { "_id" => post_two.id, "title" => "Alexander Platz" }
-                        # }
-                    # end
-
-                    # it "does not delete the marked document" do
-                      # person.posts.size.should == 2
-                    # end
-
-                    # it "does not delete the unmarked document" do
-                      # person.posts.last.title.should == "Alexander Platz"
-                    # end
-                  # end
-                # end
-              # end
-            # end
-          # end
-        # end
-
-        # context "when no ids are passed" do
-
-          # context "when no destroy attributes are passed" do
-
-            # before do
-              # person.posts_attributes =
-                # {
-                  # "4" => { "title" => "Maybachufer" },
-                  # "1" => { "title" => "Frederichstrasse" },
-                  # "2" => { "title" => "Alexander Platz" }
-                # }
-            # end
-
-            # it "builds a new first document" do
-              # person.posts.first.title.should == "Frederichstrasse"
-            # end
-
-            # it "builds a new second document" do
-              # person.posts.second.title.should == "Alexander Platz"
-            # end
-
-            # it "builds a new third document" do
-              # person.posts.third.title.should == "Maybachufer"
-            # end
-
-            # it "does not add extra documents" do
-              # person.posts.size.should == 3
-            # end
-
-            # it "adds the documents in the sorted hash key order" do
-              # person.posts.map(&:title).should ==
-                # [ "Frederichstrasse", "Alexander Platz", "Maybachufer" ]
-            # end
-          # end
-
-          # context "when a reject block is supplied" do
-
-            # before :all do
-              # Person.send(:undef_method, :posts_attributes=)
-              # Person.accepts_nested_attributes_for \
-                # :posts, :reject_if => lambda { |attrs| attrs["title"].blank? }
-            # end
-
-            # after :all do
-              # Person.send(:undef_method, :posts_attributes=)
-              # Person.accepts_nested_attributes_for :posts
-            # end
-
-            # context "when the attributes match" do
-
-              # before do
-                # person.posts_attributes =
-                  # { "3" => { "city" => "Berlin" } }
-              # end
-
-              # it "does not add the new document" do
-                # person.posts.should be_empty
-              # end
-            # end
-
-            # context "when the attributes do not match" do
-
-              # before do
-                # person.posts_attributes =
-                  # { "3" => { "title" => "Maybachufer" } }
-              # end
-
-              # it "adds the new document" do
-                # person.posts.size.should == 1
-              # end
-
-              # it "sets the correct attributes" do
-                # person.posts.first.title.should == "Maybachufer"
-              # end
-            # end
-          # end
-
-          # context "when destroy attributes are passed" do
-
-            # context "when allow_destroy is true" do
-
-              # before :all do
-                # Person.send(:undef_method, :posts_attributes=)
-                # Person.accepts_nested_attributes_for :posts, :allow_destroy => true
-              # end
-
-              # after :all do
-                # Person.send(:undef_method, :posts_attributes=)
-                # Person.accepts_nested_attributes_for :posts
-              # end
-
-              # [ 1, "1", true, "true" ].each do |truth|
-
-                # context "when passed a #{truth} with destroy" do
-
-                  # before do
-                    # person.posts_attributes =
-                      # {
-                        # "bar" => { "title" => "Maybachufer", "_destroy" => truth },
-                        # "foo" => { "title" => "Alexander Platz" }
-                      # }
-                  # end
-
-                  # it "ignores the the marked document" do
-                    # person.posts.size.should == 1
-                  # end
-
-                  # it "adds the new unmarked document" do
-                    # person.posts.first.title.should == "Alexander Platz"
-                  # end
-                # end
-              # end
-
-              # [ 0, "0", false, "false" ].each do |falsehood|
-
-                # context "when passed a #{falsehood} with destroy" do
-
-                  # before do
-                    # person.posts_attributes =
-                      # {
-                        # "bar" => { "title" => "Maybachufer", "_destroy" => falsehood },
-                        # "foo" => { "title" => "Alexander Platz" }
-                      # }
-                  # end
-
-                  # it "adds the new marked document" do
-                    # person.posts.first.title.should == "Maybachufer"
-                  # end
-
-                  # it "adds the new unmarked document" do
-                    # person.posts.last.title.should == "Alexander Platz"
-                  # end
-
-                  # it "does not add extra documents" do
-                    # person.posts.size.should == 2
-                  # end
-                # end
-              # end
-            # end
-
-            # context "when allow destroy is false" do
-
-              # before :all do
-                # Person.send(:undef_method, :posts_attributes=)
-                # Person.accepts_nested_attributes_for :posts, :allow_destroy => false
-              # end
-
-              # after :all do
-                # Person.send(:undef_method, :posts_attributes=)
-                # Person.accepts_nested_attributes_for :posts
-              # end
-
-              # [ 1, "1", true, "true" ].each do |truth|
-
-                # context "when passed a #{truth} with destroy" do
-
-                  # before do
-                    # person.posts_attributes =
-                      # {
-                        # "bar" => { "title" => "Maybachufer", "_destroy" => truth },
-                        # "foo" => { "title" => "Alexander Platz" }
-                      # }
-                  # end
-
-                  # it "adds the the marked document" do
-                    # person.posts.first.title.should == "Maybachufer"
-                  # end
-
-                  # it "adds the new unmarked document" do
-                    # person.posts.last.title.should == "Alexander Platz"
-                  # end
-
-                  # it "adds the correct number of documents" do
-                    # person.posts.size.should == 2
-                  # end
-                # end
-              # end
-
-              # [ 0, "0", false, "false" ].each do |falsehood|
-
-                # context "when passed a #{falsehood} with destroy" do
-
-                  # before do
-                    # person.posts_attributes =
-                      # {
-                        # "bar" => { "title" => "Maybachufer", "_destroy" => falsehood },
-                        # "foo" => { "title" => "Alexander Platz" }
-                      # }
-                  # end
-
-                  # it "adds the new marked document" do
-                    # person.posts.first.title.should == "Maybachufer"
-                  # end
-
-                  # it "adds the new unmarked document" do
-                    # person.posts.last.title.should == "Alexander Platz"
-                  # end
-
-                  # it "does not add extra documents" do
-                    # person.posts.size.should == 2
-                  # end
-                # end
-              # end
-            # end
-
-            # context "when allow destroy is not defined" do
-
-              # before :all do
-                # Person.send(:undef_method, :posts_attributes=)
-                # Person.accepts_nested_attributes_for :posts
-              # end
-
-              # [ 1, "1", true, "true" ].each do |truth|
-
-                # context "when passed a #{truth} with destroy" do
-
-                  # before do
-                    # person.posts_attributes =
-                      # {
-                        # "bar" => { "title" => "Maybachufer", "_destroy" => truth },
-                        # "foo" => { "title" => "Alexander Platz" }
-                      # }
-                  # end
-
-                  # it "adds the the marked document" do
-                    # person.posts.first.title.should == "Maybachufer"
-                  # end
-
-                  # it "adds the new unmarked document" do
-                    # person.posts.last.title.should == "Alexander Platz"
-                  # end
-
-                  # it "adds the correct number of documents" do
-                    # person.posts.size.should == 2
-                  # end
-                # end
-              # end
-
-              # [ 0, "0", false, "false" ].each do |falsehood|
-
-                # context "when passed a #{falsehood} with destroy" do
-
-                  # before do
-                    # person.posts_attributes =
-                      # {
-                        # "bar" => { "title" => "Maybachufer", "_destroy" => falsehood },
-                        # "foo" => { "title" => "Alexander Platz" }
-                      # }
-                  # end
-
-                  # it "adds the new marked document" do
-                    # person.posts.first.title.should == "Maybachufer"
-                  # end
-
-                  # it "adds the new unmarked document" do
-                    # person.posts.last.title.should == "Alexander Platz"
-                  # end
-
-                  # it "does not add extra documents" do
-                    # person.posts.size.should == 2
-                  # end
-                # end
-              # end
-            # end
-          # end
-        # end
+        context "when ids are passed" do
+
+          let(:person) do
+            Person.create(:ssn => "987-12-4756")
+          end
+
+          before do
+            person.posts << [ post_one, post_two ]
+          end
+
+          context "when no destroy attributes are passed" do
+
+            context "when the ids match" do
+
+              before do
+                person.posts_attributes =
+                  {
+                    "0" => { "_id" => post_one.id, "title" => "First" },
+                    "1" => { "_id" => post_two.id, "title" => "Second" }
+                  }
+              end
+
+              context "when reloading the document" do
+
+                it "updates the first existing document" do
+                  person.reload.posts.first.title.should == "First"
+                end
+
+                it "updates the second existing document" do
+                  person.reload.posts.second.title.should == "Second"
+                end
+
+                it "does not add new documents" do
+                  person.reload.posts.size.should == 2
+                end
+              end
+            end
+
+            context "when the ids do not match" do
+
+              it "raises an error" do
+                expect {
+                  person.posts_attributes =
+                    { "foo" => { "_id" => "test", "title" => "Test" } }
+                }.to raise_error
+              end
+            end
+          end
+
+          context "when destroy attributes are passed" do
+
+            context "when the ids match" do
+
+              context "when allow_destroy is true" do
+
+                before :all do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts, :allow_destroy => true
+                end
+
+                after :all do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed a #{truth} with destroy" do
+
+                    before do
+                      person.posts_attributes =
+                        {
+                          "0" => { "_id" => post_one.id, "_destroy" => truth },
+                          "1" => { "_id" => post_two.id, "title" => "My Blog" }
+                        }
+                    end
+
+                    context "when reloading the documents" do
+
+                      it "deletes the marked document" do
+                        person.reload.posts.size.should == 1
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.reload.posts.first.title.should == "My Blog"
+                      end
+                    end
+                  end
+                end
+
+                [ 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed a #{falsehood} with destroy" do
+
+                    before do
+                      person.posts_attributes =
+                        {
+                          "0" => { "_id" => post_one.id, "_destroy" => falsehood },
+                          "1" => { "_id" => post_two.id, "title" => "My Blog" }
+                        }
+                    end
+
+                    context "when reloading the document" do
+
+                      it "does not delete the marked document" do
+                        person.reload.posts.size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.reload.posts.last.title.should == "My Blog"
+                      end
+                    end
+                  end
+                end
+              end
+
+              context "when allow_destroy is false" do
+
+                before :all do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts, :allow_destroy => false
+                end
+
+                after :all do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed a #{truth} with destroy" do
+
+                    before do
+                      person.posts_attributes =
+                        {
+                          "0" => {
+                            "_id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
+                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading the document" do
+
+                      it "does not ignore the marked document" do
+                        person.reload.posts.first.title.should == "Another Title"
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.reload.posts.last.title.should == "New Title"
+                      end
+
+                      it "does not add additional documents" do
+                        person.reload.posts.size.should == 2
+                      end
+                    end
+                  end
+                end
+
+                [ 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed a #{falsehood} with destroy" do
+
+                    before do
+                      person.posts_attributes =
+                        {
+                          "0" => { "_id" => post_one.id, "_destroy" => falsehood },
+                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading the documents" do
+
+                      it "does not delete the marked document" do
+                        person.reload.posts.size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.reload.posts.last.title.should == "New Title"
+                      end
+                    end
+                  end
+                end
+              end
+
+              context "when allow_destroy is undefined" do
+
+                before :all do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed a #{truth} with destroy" do
+
+                    before do
+                      person.posts_attributes =
+                        {
+                          "0" => {
+                            "_id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
+                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading" do
+
+                      it "does not ignore the marked document" do
+                        person.reload.posts.first.title.should == "Another Title"
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.reload.posts.last.title.should == "New Title"
+                      end
+
+                      it "does not add additional documents" do
+                        person.reload.posts.size.should == 2
+                      end
+                    end
+                  end
+                end
+
+                [ 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed a #{falsehood} with destroy" do
+
+                    before do
+                      person.posts_attributes =
+                        {
+                          "0" => { "_id" => post_one.id, "_destroy" => falsehood },
+                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading" do
+
+                      it "does not delete the marked document" do
+                        person.reload.posts.size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.reload.posts.last.title.should == "New Title"
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        context "when no ids are passed" do
+
+          context "when no destroy attributes are passed" do
+
+            before do
+              person.posts_attributes =
+                {
+                  "4" => { "title" => "Third" },
+                  "1" => { "title" => "First" },
+                  "2" => { "title" => "Second" }
+                }
+            end
+
+            it "builds a new first document" do
+              person.posts.first.title.should == "First"
+            end
+
+            it "builds a new second document" do
+              person.posts.second.title.should == "Second"
+            end
+
+            it "builds a new third document" do
+              person.posts.third.title.should == "Third"
+            end
+
+            it "does not add extra documents" do
+              person.posts.size.should == 3
+            end
+
+            it "adds the documents in the sorted hash key order" do
+              person.posts.map(&:title).should ==
+                [ "First", "Second", "Third" ]
+            end
+          end
+
+          context "when a reject block is supplied" do
+
+            before :all do
+              Person.send(:undef_method, :posts_attributes=)
+              Person.accepts_nested_attributes_for \
+                :posts, :reject_if => lambda { |attrs| attrs["title"].blank? }
+            end
+
+            after :all do
+              Person.send(:undef_method, :posts_attributes=)
+              Person.accepts_nested_attributes_for :posts
+            end
+
+            context "when the attributes match" do
+
+              before do
+                person.posts_attributes =
+                  { "3" => { "content" => "My first blog" } }
+              end
+
+              it "does not add the new document" do
+                person.posts.should be_empty
+              end
+            end
+
+            context "when the attributes do not match" do
+
+              before do
+                person.posts_attributes =
+                  { "3" => { "title" => "Blogging" } }
+              end
+
+              it "adds the new document" do
+                person.posts.size.should == 1
+              end
+
+              it "sets the correct attributes" do
+                person.posts.first.title.should == "Blogging"
+              end
+            end
+          end
+
+          context "when destroy attributes are passed" do
+
+            context "when allow_destroy is true" do
+
+              before :all do
+                Person.send(:undef_method, :posts_attributes=)
+                Person.accepts_nested_attributes_for :posts, :allow_destroy => true
+              end
+
+              after :all do
+                Person.send(:undef_method, :posts_attributes=)
+                Person.accepts_nested_attributes_for :posts
+              end
+
+              [ 1, "1", true, "true" ].each do |truth|
+
+                context "when passed a #{truth} with destroy" do
+
+                  before do
+                    person.posts_attributes =
+                      {
+                        "0" => { "title" => "New Blog", "_destroy" => truth },
+                        "1" => { "title" => "Blog Two" }
+                      }
+                  end
+
+                  it "ignores the the marked document" do
+                    person.posts.size.should == 1
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.posts.first.title.should == "Blog Two"
+                  end
+                end
+              end
+
+              [ 0, "0", false, "false" ].each do |falsehood|
+
+                context "when passed a #{falsehood} with destroy" do
+
+                  before do
+                    person.posts_attributes =
+                      {
+                        "0" => { "title" => "New Blog", "_destroy" => falsehood },
+                        "1" => { "title" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the new marked document" do
+                    person.posts.first.title.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.posts.last.title.should == "Blog Two"
+                  end
+
+                  it "does not add extra documents" do
+                    person.posts.size.should == 2
+                  end
+                end
+              end
+            end
+
+            context "when allow destroy is false" do
+
+              before :all do
+                Person.send(:undef_method, :posts_attributes=)
+                Person.accepts_nested_attributes_for :posts, :allow_destroy => false
+              end
+
+              after :all do
+                Person.send(:undef_method, :posts_attributes=)
+                Person.accepts_nested_attributes_for :posts
+              end
+
+              [ 1, "1", true, "true" ].each do |truth|
+
+                context "when passed a #{truth} with destroy" do
+
+                  before do
+                    person.posts_attributes =
+                      {
+                        "0" => { "title" => "New Blog", "_destroy" => truth },
+                        "1" => { "title" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the the marked document" do
+                    person.posts.first.title.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.posts.last.title.should == "Blog Two"
+                  end
+
+                  it "adds the correct number of documents" do
+                    person.posts.size.should == 2
+                  end
+                end
+              end
+
+              [ 0, "0", false, "false" ].each do |falsehood|
+
+                context "when passed a #{falsehood} with destroy" do
+
+                  before do
+                    person.posts_attributes =
+                      {
+                        "0" => { "title" => "New Blog", "_destroy" => falsehood },
+                        "1" => { "title" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the new marked document" do
+                    person.posts.first.title.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.posts.last.title.should == "Blog Two"
+                  end
+
+                  it "does not add extra documents" do
+                    person.posts.size.should == 2
+                  end
+                end
+              end
+            end
+
+            context "when allow destroy is not defined" do
+
+              before :all do
+                Person.send(:undef_method, :posts_attributes=)
+                Person.accepts_nested_attributes_for :posts
+              end
+
+              [ 1, "1", true, "true" ].each do |truth|
+
+                context "when passed a #{truth} with destroy" do
+
+                  before do
+                    person.posts_attributes =
+                      {
+                        "0" => { "title" => "New Blog", "_destroy" => truth },
+                        "1" => { "title" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the the marked document" do
+                    person.posts.first.title.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.posts.last.title.should == "Blog Two"
+                  end
+
+                  it "adds the correct number of documents" do
+                    person.posts.size.should == 2
+                  end
+                end
+              end
+
+              [ 0, "0", false, "false" ].each do |falsehood|
+
+                context "when passed a #{falsehood} with destroy" do
+
+                  before do
+                    person.posts_attributes =
+                      {
+                        "0" => { "title" => "New Blog", "_destroy" => falsehood },
+                        "1" => { "title" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the new marked document" do
+                    person.posts.first.title.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.posts.last.title.should == "Blog Two"
+                  end
+
+                  it "does not add extra documents" do
+                    person.posts.size.should == 2
+                  end
+                end
+              end
+            end
+          end
+        end
       end
     end
   end
