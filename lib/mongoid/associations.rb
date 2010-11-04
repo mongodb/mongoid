@@ -14,9 +14,9 @@ require "mongoid/associations/meta_data"
 module Mongoid # :nodoc:
   module Associations #:nodoc:
     extend ActiveSupport::Concern
-    included do
-      include ForeignKey
+    include ForeignKey
 
+    included do
       cattr_accessor :embedded
       self.embedded = false
 
