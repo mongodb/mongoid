@@ -162,7 +162,7 @@ module Mongoid #:nodoc
     # TODO: Docs
     def databases
       _databases(@settings) unless @databases || !@settings
-      @databases
+      @databases || {}
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
