@@ -96,6 +96,7 @@ describe Mongoid::Config do
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_slaves.yml")
         file = File.new(file_name)
         @settings = YAML.load(file.read)["test"]
+        config.expects(:check_database!).times(3)
         config.from_hash(@settings)
       end
 
@@ -103,6 +104,27 @@ describe Mongoid::Config do
 
       it "sets slaves" do
         config.slaves.should_not be_empty
+      end
+    end
+
+    context "mongoid_with_multiple_mongos.yml" do
+
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_multiple_mongos.yml")
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.expects(:check_database!).times(3)
+        config.from_hash(@settings)
+      end
+
+      after { config.reset }
+
+      it "sets secondary database" do
+        config.databases.should_not be_empty
+      end
+
+      it "sets slaves for secondary database" do
+        config.databases["secondary_slaves"].should_not be_empty
       end
     end
 
