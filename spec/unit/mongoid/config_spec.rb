@@ -92,23 +92,7 @@ describe Mongoid::Config do
 
     context "mongoid_with_slaves.yml" do
 
-      let(:connection) do
-        stub(:server_version => version).quacks_like(Mongo::Connection.allocate)
-      end
-
-      let(:database) do
-        stub(:kind_of? => true, :connection => connection).quacks_like(Mongo::DB.allocate)
-      end
-
-      let(:version) do
-        Mongo::ServerVersion.new("2.0.0")
-      end
-
       before do
-        Mongo::Connection.stubs(:new => connection)
-        connection.stubs(:db => database)
-        database.stubs(:collections => []) #supress warning message from cleanup
-
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_slaves.yml")
         file = File.new(file_name)
         @settings = YAML.load(file.read)["test"]
