@@ -3,6 +3,7 @@ module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
     include Mongoid::Components
+    include Mongoid::MultiDatabase
 
     included do
       attr_accessor :association_name
