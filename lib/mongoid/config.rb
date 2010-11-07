@@ -309,7 +309,7 @@ module Mongoid #:nodoc
           hash[key+"_slaves"] = database["slaves"].to_a.map do |slave|
             database_from_hash({"database" => db.name}.merge(slave), :slave_ok => true)
           end
-        end
+        end if settings["databases"]
       end
 
       self.databases = databases

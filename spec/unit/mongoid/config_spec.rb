@@ -73,6 +73,10 @@ describe Mongoid::Config do
       it "returns nil, which is interpreted as the local time_zone" do
         config.use_utc.should be_false
       end
+
+      it "returns an empty hash without additional databases configured" do
+        config.databases.should == {}
+      end
     end
 
     context "mongoid_with_utc.yml" do
