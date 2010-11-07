@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
     include Criterion::Optional
     include Enumerable
 
-    attr_reader :collection, :ids, :klass, :options, :selector
+    attr_reader :collection, :ids, :klass, :options, :selector, :field_list
     attr_accessor :documents
 
     delegate :aggregate, :avg, :blank?, :count, :distinct, :empty?,
@@ -156,7 +156,7 @@ module Mongoid #:nodoc:
         return entries.send(name, *args)
       end
     end
-    
+
     # Operates like find on a given criteria object. Returns the result of
     #  +Criteria.translate_criteria+ letting the user also pass first / last to get specific results.
     # Primarily useful for chaining scopes.
@@ -209,7 +209,7 @@ module Mongoid #:nodoc:
       params = args[1] || {}
       translate_criteria klass.criteria, params
     end
-    
+
     # Translates the given criteria using supplied arguments.
     #
     # For more details on how this works, see +Criteria#translate+
@@ -268,7 +268,7 @@ module Mongoid #:nodoc:
           else
             # create a new operator on this key
             @selector[key][operator] = value
-          end        
+          end
         end
       end; self
     end

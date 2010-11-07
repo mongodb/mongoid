@@ -98,11 +98,16 @@ describe Mongoid::Criterion::Exclusion do
 
       it "adds the options for limiting by fields" do
         @criteria.only(:title, :text)
-        @criteria.options.should == { :fields => [ :title, :text ] }
+        @criteria.options.should == { :fields => { :_type => 1, :title => 1, :text => 1 } }
       end
 
       it "returns self" do
         @criteria.only.should == @criteria
+      end
+
+      it "should assign the field list" do
+        @criteria.without(:title, :text)
+        @criteria.field_list == [:title, :text]
       end
 
     end
@@ -112,6 +117,42 @@ describe Mongoid::Criterion::Exclusion do
       it "does not add the field option" do
         @criteria.only
         @criteria.options[:fields].should be_nil
+      end
+
+      it "should not assign the field list" do
+        @criteria.only
+        @criteria.field_list.should be_nil
+      end
+
+    end
+
+  end
+
+  describe "#without" do
+
+    context "when args are provided" do
+
+      it "adds the options for excluding the fields" do
+        @criteria.without(:title, :text)
+        @criteria.options.should == { :fields => { :title => 0, :text => 0 } }
+      end
+
+      it "returns self" do
+        @criteria.without.should == @criteria
+      end
+
+    end
+
+    context "when no args provided" do
+
+      it "does not add the field option" do
+        @criteria.without
+        @criteria.options[:fields].should be_nil
+      end
+
+      it "should not assign the field list" do
+        @criteria.without
+        @criteria.field_list.should be_nil
       end
 
     end

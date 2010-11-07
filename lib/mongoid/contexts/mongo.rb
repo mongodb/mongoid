@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       include Ids, Paging
       attr_reader :criteria
 
-      delegate :klass, :options, :selector, :to => :criteria
+      delegate :klass, :options, :field_list, :selector, :to => :criteria
 
       # Aggregate the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, counts as values
       def aggregate
-        klass.collection.group(options[:fields], selector, { :count => 0 }, Javascript.aggregate, true)
+        klass.collection.group(field_list, selector, { :count => 0 }, Javascript.aggregate, true)
       end
 
       # Get the average value for the supplied field.
@@ -113,7 +113,7 @@ module Mongoid #:nodoc:
       # A +Hash+ with field values as keys, arrays of documents as values.
       def group
         klass.collection.group(
-          options[:fields],
+          field_list,
           selector,
           { :group => [] },
           Javascript.group
@@ -272,7 +272,11 @@ module Mongoid #:nodoc:
       def process_options
         fields = options[:fields]
         if fields && fields.size > 0 && !fields.include?(:_type)
-          fields << :_type
+          if fields.kind_of?(Hash)
+            fields[:_type] = 1 if fields.first.last != 0 # Not excluding
+          else
+            fields << :type
+          end
           options[:fields] = fields
         end
         options.dup

@@ -9,3 +9,4 @@ RAILS
 Gemfile.lock
 .rvmrc
 rdoc/*
+*~
