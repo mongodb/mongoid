@@ -2,28 +2,7 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Embedded
-      class Many < Proxy
-
-        # Appends a document or array of documents to the relation. Will set
-        # the parent and update the index in the process.
-        #
-        # Example:
-        #
-        # <tt>relation << document</tt>
-        #
-        # Options:
-        #
-        # docs: Any number of documents.
-        def <<(*docs)
-          docs.flatten.each do |doc|
-            unless target.include?(doc)
-              append(doc)
-              doc.save if base.persisted?
-            end
-          end
-        end
-        alias :concat :<<
-        alias :push :<<
+      class Many < ManyToOne
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
@@ -53,29 +32,6 @@ module Mongoid # :nodoc:
           binding.bind_one(document)
         end
 
-        # Builds a new document in the relation and appends it to the target.
-        # Takes an optional type if you want to specify a subclass.
-        #
-        # Example:
-        #
-        # <tt>relation.build(:name => "Bozo")</tt>
-        #
-        # Options:
-        #
-        # attributes: The attributes to build the document with.
-        # type: Optional class to build the document with.
-        #
-        # Returns:
-        #
-        # The new document.
-        def build(attributes = {}, type = nil)
-          instantiated(type).tap do |doc|
-            append(doc)
-            doc.write_attributes(attributes)
-            doc.identify
-          end
-        end
-
         # Clear the relation. Will delete the documents from the db if they are
         # already persisted.
         #
@@ -88,19 +44,6 @@ module Mongoid # :nodoc:
         # The empty relation.
         def clear
           tap { |relation| relation.unbind(target) }
-        end
-
-        # Returns a count of the number of documents in the association that have
-        # actually been persisted to the database.
-        #
-        # Use #size if you want the total number of documents.
-        #
-        # Returns:
-        #
-        # The total number of persisted embedded docs, as flagged by the
-        # #persisted? method.
-        def count
-          target.select(&:persisted?).size
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -194,19 +137,6 @@ module Mongoid # :nodoc:
           remove_all(conditions, true)
         end
 
-        # Determine if any documents in this relation exist in the database.
-        #
-        # Example:
-        #
-        # <tt>person.posts.exists?</tt>
-        #
-        # Returns:
-        #
-        # True is persisted documents exist, false if not.
-        def exists?
-          count > 0
-        end
-
         # Finds a document in this association.
         #
         # Options:
@@ -227,42 +157,6 @@ module Mongoid # :nodoc:
               crit.documents = target if crit.is_a?(Criteria)
             end
           end
-        end
-
-        # Find the first +Document+ given the conditions, or creates a new document
-        # with the conditions that were supplied
-        #
-        # Example:
-        #
-        # <tt>person.addresses.find_or_create_by(:street => "Bond St")</tt>
-        #
-        # Options:
-        #
-        # attrs: A +Hash+ of attributes
-        #
-        # Returns:
-        #
-        # An existing document or newly created one.
-        def find_or_create_by(attrs = {})
-          find_or(:create, attrs)
-        end
-
-        # Find the first +Document+ given the conditions, or instantiates a new document
-        # with the conditions that were supplied
-        #
-        # Example:
-        #
-        # <tt>person.addresses.find_or_initialize_by(:street => "Bond St")</tt>
-        #
-        # Options:
-        #
-        # attrs: A +Hash+ of attributes
-        #
-        # Returns:
-        #
-        # An existing document or new one.
-        def find_or_initialize_by(attrs = {})
-          find_or(:build, attrs)
         end
 
         # Instantiate a new embeds_many relation.
@@ -409,24 +303,6 @@ module Mongoid # :nodoc:
           metadata.klass.criteria(true).tap do |criterion|
             criterion.documents = target
           end
-        end
-
-        # Find the first object given the supplied attributes or create/initialize it.
-        #
-        # Example:
-        #
-        # <tt>person.addresses.find_or(:create, :street => "Bond")</tt>
-        #
-        # Options:
-        #
-        # method: The method name, create or new.
-        # attrs: The attributes to build with
-        #
-        # Returns:
-        #
-        # A matching document or a new/created one.
-        def find_or(method, attrs = {})
-          find(:first, :conditions => attrs) || send(method, attrs)
         end
 
         # If the target array does not respond to the supplied method then try to
