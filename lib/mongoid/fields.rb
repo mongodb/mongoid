@@ -51,7 +51,26 @@ module Mongoid #:nodoc
       # Create the field accessors.
       def create_accessors(name, meth, options = {})
         generated_field_methods.module_eval do
-          define_method(meth) { read_attribute(name) }
+          define_method(meth) {
+            default_value = if options[:default]
+                              if options[:default].is_a?(Proc)
+                                options[:default].call
+                              else
+                                options[:default]
+                              end
+                            end
+
+            default_value = typed_value_for(name, default_value)
+
+            if options[:type] == Boolean
+              val = read_attribute(name)
+
+              val.nil? ?  default_value : val
+            else
+              read_attribute(name) || default_value
+            end
+          }
+
           define_method("#{meth}=") { |value| write_attribute(name, value) }
           define_method("#{meth}?") do
             attr = read_attribute(name)

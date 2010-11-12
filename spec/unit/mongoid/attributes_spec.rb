@@ -37,9 +37,11 @@ describe Mongoid::Attributes do
         @person = Person.new
       end
 
-      it "does not use the default value" do
+      it "use the default value, but the no need to save it" do
         @person[:age] = nil
-        @person.age.should be_nil
+
+        @person[:age].should be_nil
+        @person.age.should == 100
       end
     end
 
@@ -633,8 +635,9 @@ describe Mongoid::Attributes do
         @person = Person.new(:age => nil)
       end
 
-      it "does not use the default value" do
-        @person.age.should be_nil
+      it "use the default value, but the no need to save it" do
+        @person[:age].should be_nil
+        @person.age.should == 100
       end
     end
 

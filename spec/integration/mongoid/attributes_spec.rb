@@ -123,4 +123,42 @@ describe Mongoid::Attributes do
       end
     end
   end
+
+  context "with default value for existed documents" do
+
+    it "overload default for existed documents" do
+      class TeamMember
+        include Mongoid::Document
+
+        field :title
+        field :terms,   :type => Boolean
+        field :aliases, :type => Array
+        field :map,     :type => Hash
+        field :count,   :type => Integer
+      end
+
+      member = TeamMember.new
+      member.save
+      member.title.should be_nil
+      member.terms.should be_false
+      member.aliases.should be_nil
+      member.map.should be_nil
+      member.count.should be_nil
+
+      TeamMember.field :title,   :default => 'CEO'
+      TeamMember.field :terms,   :type => Boolean, :default => true
+      TeamMember.field :aliases, :type => Array,   :default => ['cool', 2]
+      TeamMember.field :map,     :type => Hash,    :default => { :cool => 3 }
+      TeamMember.field :count,   :type => Integer, :default => lambda { 1 + 1 }
+
+      member.reload
+      member.title.should == 'CEO'
+      member.terms.should be_true
+      member.aliases.should == ['cool', 2]
+      member.map.should == { :cool => 3 }
+      member.count.should == 2
+    end
+
+  end
+
 end
