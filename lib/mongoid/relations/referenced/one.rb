@@ -2,7 +2,7 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class One < Proxy
+      class One < OneToOne
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
@@ -33,30 +33,6 @@ module Mongoid # :nodoc:
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
           init(base, target, metadata)
-        end
-
-        # Substitutes the supplied target documents for the existing document
-        # in the relation. If the new target is nil, perform the necessary
-        # deletion.
-        #
-        # Example:
-        #
-        # <tt>name.substitute(new_name)</tt>
-        #
-        # Options:
-        #
-        # target: A document to replace the target.
-        #
-        # Returns:
-        #
-        # The relation or nil.
-        def substitute(new_target, building = nil)
-          # TODO: Durran: One/In susbstitution is identical
-          old_target = target
-          tap do |relation|
-            relation.target = new_target
-            new_target ? bind : (unbind(old_target) and return nil)
-          end
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs

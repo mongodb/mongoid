@@ -2,7 +2,7 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class In < Proxy
+      class In < OneToOne
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
