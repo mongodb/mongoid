@@ -279,7 +279,7 @@ module Mongoid # :nodoc:
         #
         # A +Relations::Metadata+ object for this relation.
         def metadatafy(name, relation, options, &block)
-          Relations::Metadata.new(
+          Metadata.new(
             options.merge(
               :relation => relation,
               :extend => block,
@@ -302,7 +302,12 @@ module Mongoid # :nodoc:
         def reference(metadata)
           if metadata.relation.stores_foreign_key?
             key = metadata.foreign_key
-            field(key, :identity => true, :metadata => metadata)
+            field(
+              key,
+              :identity => true,
+              :metadata => metadata,
+              :default => metadata.foreign_key_default
+            )
             index(key, :background => true) if metadata.indexed?
           end
         end

@@ -2,7 +2,113 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class ManyToMany
+      class ManyToMany < Proxy
+
+        # Appends a document or array of documents to the relation. Will set
+        # the parent and update the index in the process.
+        #
+        # Example:
+        #
+        # <tt>relation << document</tt>
+        #
+        # Options:
+        #
+        # docs: Any number of documents.
+        def <<(*docs)
+          docs.flatten.each do |doc|
+            unless target.include?(doc)
+              append(doc)
+              # doc.save if base.persisted?
+            end
+          end
+        end
+        alias :concat :<<
+        alias :push :<<
+
+        # Binds the base object to the inverse of the relation. This is so we
+        # are referenced to the actual objects themselves and dont hit the
+        # database twice when setting the relations up.
+        #
+        # This is called after first creating the relation, or if a new object
+        # is set on the relation.
+        #
+        # Example:
+        #
+        # <tt>person.preferences.bind</tt>
+        def bind(building = nil)
+          # binding.bind
+          # target.map(&:save) if base.persisted? && !building?
+        end
+
+        # Instantiate a new references_many relation. Will set the foreign key
+        # and the base on the inverse object.
+        #
+        # Example:
+        #
+        # <tt>Referenced::ManyToMany.new(base, target, metadata)</tt>
+        #
+        # Options:
+        #
+        # base: The document this relation hangs off of.
+        # target: The target [child documents] of the relation.
+        # metadata: The relation's metadata
+        def initialize(base, target, metadata)
+          init(base, target, metadata)
+        end
+
+        private
+
+        # Appends the document to the target array, updating the index on the
+        # document at the same time.
+        #
+        # Example:
+        #
+        # <tt>relation.append(document)</tt>
+        #
+        # Options:
+        #
+        # document: The document to append to the target.
+        def append(document)
+          target.push(document)
+          base.send(metadata.foreign_key).push(document.id)
+          # document.send(metadata.foreign_key_setter, base.id)
+          # document.send(metadata.inverse_setter(target), base)
+          metadatafy(document) # and bind_one(document)
+        end
+
+        # Instantiate the binding associated with this relation.
+        #
+        # Example:
+        #
+        # <tt>binding([ address ])</tt>
+        #
+        # Options:
+        #
+        # new_target: The new documents to bind with.
+        #
+        # Returns:
+        #
+        # A binding object.
+        def binding(new_target = nil)
+          Bindings::Referenced::ManyToMany.new(base, new_target || target, metadata)
+        end
+
+        # Will load the target into an array if the target had not already been
+        # loaded.
+        #
+        # Example:
+        #
+        # <tt>person.addresses.loaded</tt>
+        #
+        # Returns:
+        #
+        # The relation itself.
+        def loaded
+          tap do |relation|
+            relation.target = target.entries if target.is_a?(Mongoid::Criteria)
+          end
+        end
+
         class << self
 
           # Return the builder that is responsible for generating the documents
