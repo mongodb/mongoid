@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::ManyToMany do
 
   before do
-    [ Person, Preference ].map(&:delete_all)
+    [ Person, Preference, UserAccount ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -74,6 +74,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the foreign key on the relation" do
+            person.preference_ids.should == [ preference.id ]
+          end
+
+          it "sets the foreign key on the inverse relation" do
             preference.person_ids.should == [ person.id ]
           end
 
@@ -95,70 +99,86 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
       end
 
-      # context "when the relations are polymorphic" do
+      context "when the relations are polymorphic" do
 
-        # context "when the parent is a new record" do
+        context "when the parent is a new record" do
 
-          # let(:movie) do
-            # Movie.new
-          # end
+          let(:person) do
+            Person.new
+          end
 
-          # let(:rating) do
-            # Rating.new
-          # end
+          let(:user_account) do
+            UserAccount.new
+          end
 
-          # before do
-            # movie.ratings.send(method, rating)
-          # end
+          before do
+            person.accountables.send(method, user_account)
+          end
 
-          # it "sets the foreign key on the relation" do
-            # rating.ratable_id.should == movie.id
-          # end
+          it "adds the document to the relation" do
+            person.accountables.should == [ user_account ]
+          end
 
-          # it "sets the base on the inverse relation" do
-            # rating.ratable.should == movie
-          # end
+          it "sets the foreign key on the relation" do
+            person.accountables_ids.should == [ user_account.id ]
+          end
 
-          # it "does not save the target" do
-            # rating.should be_new
-          # end
+          it "sets the foreign key on the inverse relation" do
+            user_account.people_ids.should == [ person.id ]
+          end
 
-          # it "adds the document to the target" do
-            # movie.ratings.size.should == 1
-          # end
-        # end
+          it "sets the base on the inverse relation" do
+            user_account.people.should == [ person ]
+          end
 
-        # context "when the parent is not a new record" do
+          it "does not save the target" do
+            user_account.should be_new
+          end
 
-          # let(:movie) do
-            # Movie.create
-          # end
+          it "adds the document to the target" do
+            person.accountables.size.should == 1
+          end
+        end
 
-          # let(:rating) do
-            # Rating.new
-          # end
+        context "when the parent is not a new record" do
 
-          # before do
-            # movie.ratings.send(method, rating)
-          # end
+          let(:person) do
+            Person.create(:ssn => "423-43-5928")
+          end
 
-          # it "sets the foreign key on the relation" do
-            # rating.ratable_id.should == movie.id
-          # end
+          let(:user_account) do
+            UserAccount.new
+          end
 
-          # it "sets the base on the inverse relation" do
-            # rating.ratable.should == movie
-          # end
+          before do
+            person.accountables.send(method, user_account)
+          end
 
-          # it "saves the target" do
-            # rating.should_not be_new
-          # end
+          it "adds the document to the relation" do
+            person.accountables.should == [ user_account ]
+          end
 
-          # it "adds the document to the target" do
-            # movie.ratings.count.should == 1
-          # end
-        # end
-      # end
+          it "sets the foreign key on the relation" do
+            person.accountables_ids.should == [ user_account.id ]
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            user_account.people_ids.should == [ person.id ]
+          end
+
+          it "sets the base on the inverse relation" do
+            user_account.people.should == [ person ]
+          end
+
+          it "saves the target" do
+            user_account.should be_persisted
+          end
+
+          it "adds the document to the target" do
+            person.accountables.size.should == 1
+          end
+        end
+      end
     end
   end
 

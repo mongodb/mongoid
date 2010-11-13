@@ -369,7 +369,7 @@ module Mongoid # :nodoc:
       # The inverse name.
       def lookup_inverse(other)
         return nil unless other
-        other.relations.each_pair do |key, meta|
+        other.to_a.first.relations.each_pair do |key, meta|
           return meta.name if meta.as == name
         end
       end

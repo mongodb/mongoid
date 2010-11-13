@@ -77,7 +77,7 @@ class Person
   end
   references_many :paranoid_posts
   references_and_referenced_in_many :preferences, :index => true
-  references_and_referenced_in_many :user_accounts
+  references_and_referenced_in_many :accountables, :polymorphic => true
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
