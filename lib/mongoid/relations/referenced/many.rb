@@ -15,7 +15,7 @@ module Mongoid # :nodoc:
         #
         # <tt>person.posts.bind</tt>
         def bind(building = nil)
-          binding.bind
+          binding.bind_all
           target.map(&:save) if base.persisted? && !building?
         end
 
@@ -212,9 +212,8 @@ module Mongoid # :nodoc:
         # document: The document to append to the target.
         def append(document)
           loaded and target.push(document)
-          document.send(metadata.foreign_key_setter, base.id)
-          document.send(metadata.inverse_setter(target), base)
-          metadatafy(document) # and bind_one(document)
+          metadatafy(document)
+          binding.bind_one(document)
         end
 
         # Instantiate the binding associated with this relation.

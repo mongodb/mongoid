@@ -6,21 +6,28 @@ module Mongoid # :nodoc:
         class Many < Binding
 
           # Binds the base object to the inverse of the relation. This is so we
-          # are referenced to the actual objects themselves and dont hit the
-          # database twice when setting the relations up.
+          # are referenced to the actual objects themselves on both sides.
           #
-          # This essentially sets the foreign key and the object itself.
+          # This case sets the metadata on the inverse object as well as the
+          # document itself.
           #
           # Example:
           #
-          # <tt>person.posts.bind</tt>
-          def bind
-            if bindable?(base)
-              target.each do |doc|
-                doc.send(metadata.foreign_key_setter, base.id)
-                doc.send(metadata.inverse_setter, base)
-              end
-            end
+          # <tt>person.posts.bind_all</tt>
+          # <tt>person.posts = [ Post.new ]</tt>
+          def bind_all
+            target.each { |doc| bind_one(doc) } if bindable?(base)
+          end
+
+          # Binds a single document with the inverse relation. Used
+          # specifically when appending to the proxy.
+          #
+          # Example:
+          #
+          # <tt>person.posts.bind_one(post)</tt>
+          def bind_one(doc)
+            doc.send(metadata.foreign_key_setter, base.id)
+            doc.send(metadata.inverse_setter, base)
           end
 
           # Unbinds the base object to the inverse of the relation. This occurs
