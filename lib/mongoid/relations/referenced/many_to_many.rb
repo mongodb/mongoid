@@ -18,7 +18,7 @@ module Mongoid # :nodoc:
           docs.flatten.each do |doc|
             unless target.include?(doc)
               append(doc)
-              # doc.save if base.persisted?
+              doc.save if base.persisted?
             end
           end
         end
@@ -71,9 +71,8 @@ module Mongoid # :nodoc:
         def append(document)
           target.push(document)
           base.send(metadata.foreign_key).push(document.id)
-          # document.send(metadata.foreign_key_setter, base.id)
-          # document.send(metadata.inverse_setter(target), base)
-          metadatafy(document) # and bind_one(document)
+          document.send(metadata.inverse(target)).push(base)
+          metadatafy(document)
         end
 
         # Instantiate the binding associated with this relation.

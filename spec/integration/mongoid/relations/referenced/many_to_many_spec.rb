@@ -34,61 +34,65 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             person.preference_ids.should == [ preference.id ]
           end
 
-          # it "sets the foreign key on the inverse relation" do
-            # preference.person_ids.should == [ person.id ]
-          # end
+          it "sets the foreign key on the inverse relation" do
+            preference.person_ids.should == [ person.id ]
+          end
 
-          # it "sets the base on the inverse relation" do
-            # post.person.should == person
-          # end
+          it "sets the base on the inverse relation" do
+            preference.people.should == [ person ]
+          end
 
-          # it "sets the same instance on the inverse relation" do
-            # post.person.should eql(person)
-          # end
+          it "sets the same instance on the inverse relation" do
+            preference.people.first.should eql(person)
+          end
 
-          # it "does not save the target" do
-            # post.should be_new
-          # end
+          it "does not save the target" do
+            preference.should be_new
+          end
 
-          # it "adds the document to the target" do
-            # person.posts.size.should == 1
-          # end
+          it "adds the correct number of documents" do
+            person.preferences.size.should == 1
+          end
         end
 
-        # context "when the parent is not a new record" do
+        context "when the parent is not a new record" do
 
-          # let(:person) do
-            # Person.create(:ssn => "554-44-3891")
-          # end
+          let(:person) do
+            Person.create(:ssn => "554-44-3887")
+          end
 
-          # let(:post) do
-            # Post.new
-          # end
+          let(:preference) do
+            Preference.new
+          end
 
-          # before do
-            # person.posts.send(method, post)
-          # end
+          before do
+            person.preferences.send(method, preference)
+          end
 
-          # it "sets the foreign key on the relation" do
-            # post.person_id.should == person.id
-          # end
+          it "adds the documents to the relation" do
+            person.preferences.should == [ preference ]
+          end
 
-          # it "sets the base on the inverse relation" do
-            # post.person.should == person
-          # end
+          it "sets the foreign key on the relation" do
+            preference.person_ids.should == [ person.id ]
+          end
 
-          # it "sets the same instance on the inverse relation" do
-            # post.person.should eql(person)
-          # end
+          it "sets the base on the inverse relation" do
+            preference.people.should == [ person ]
+          end
 
-          # it "saves the target" do
-            # post.should_not be_a_new_record
-          # end
+          it "sets the same instance on the inverse relation" do
+            preference.people.first.should eql(person)
+          end
 
-          # it "adds the document to the target" do
-            # person.posts.count.should == 1
-          # end
-        # end
+          it "saves the target" do
+            preference.should_not be_new
+          end
+
+          it "adds the document to the target" do
+            person.preferences.count.should == 1
+          end
+        end
       end
 
       # context "when the relations are polymorphic" do
