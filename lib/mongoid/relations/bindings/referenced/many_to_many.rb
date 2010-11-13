@@ -35,14 +35,26 @@ module Mongoid # :nodoc:
           #
           # Example:
           #
-          # <tt>person.posts.unbind</tt>
-          def unbind
-            # obj = if unbindable?
-              # target.each do |doc|
-                # doc.send(metadata.foreign_key_setter, nil)
-                # doc.send(metadata.inverse_setter, nil)
-              # end
-            # end
+          # <tt>person.preferences.unbind</tt>
+          def unbind_all
+            target.each { |doc| unbind_one(doc) }
+          end
+
+          # Unbinds a single document from the relation. Removes both the
+          # object and the foreign key from both sides.
+          #
+          # Example:
+          #
+          # <tt>binding.unbind_one(doc)</tt>
+          #
+          # Options:
+          #
+          # doc: The document to unbind.
+          def unbind_one(doc)
+            if unbindable?(doc)
+              base.send(metadata.foreign_key).delete(doc.id)
+              doc.send(metadata.inverse(target)).delete(base)
+            end
           end
 
           private
@@ -67,13 +79,13 @@ module Mongoid # :nodoc:
           #
           # Example:
           #
-          # <tt>binding.unbindable?</tt>
+          # <tt>binding.unbindable?(doc)</tt>
           #
           # Returns:
           #
           # true if the target is not nil, false if not.
-          def unbindable?
-            # inverse && !inverse.target.nil?
+          def unbindable?(doc)
+            base.send(metadata.foreign_key).include?(doc.id)
           end
         end
       end

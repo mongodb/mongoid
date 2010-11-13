@@ -40,6 +40,11 @@ module Mongoid # :nodoc:
           target.map(&:save) if base.persisted? && !building?
         end
 
+        def delete(document)
+          target.delete(document)
+          binding.unbind_one(document)
+        end
+
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #
@@ -54,6 +59,39 @@ module Mongoid # :nodoc:
         # metadata: The relation's metadata
         def initialize(base, target, metadata)
           init(base, target, metadata)
+        end
+
+        # Substitutes the supplied target documents for the existing documents
+        # in the relation. If the new target is nil, perform the necessary
+        # deletion.
+        #
+        # Example:
+        #
+        # <tt>posts.substitute(new_name)</tt>
+        #
+        # Options:
+        #
+        # target: An array of documents to replace the target.
+        #
+        # Returns:
+        #
+        # The relation or nil.
+        def substitute(target, building = nil)
+          tap { target ? (@target = target.to_a; bind) : (@target = unbind) }
+        end
+
+        # Unbinds the base object to the inverse of the relation. This occurs
+        # when setting a side of the relation to nil.
+        #
+        # Will delete the object if necessary.
+        #
+        # Example:
+        #
+        # <tt>person.posts.unbind</tt>
+        def unbind
+          target.each(&:delete) if base.persisted?
+          binding.unbind_all
+          []
         end
 
         private

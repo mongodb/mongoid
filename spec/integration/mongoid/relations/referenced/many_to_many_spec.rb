@@ -339,70 +339,78 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#= nil" do
+  describe "#= nil" do
 
-    # context "when the relation is not polymorphic" do
+    context "when the relation is not polymorphic" do
 
-      # context "when the parent is a new record" do
+      context "when the parent is a new record" do
 
-        # let(:person) do
-          # Person.new
-        # end
+        let(:person) do
+          Person.new
+        end
 
-        # let(:post) do
-          # Post.new
-        # end
+        let(:preference) do
+          Preference.new
+        end
 
-        # before do
-          # person.posts = [ post ]
-          # person.posts = nil
-        # end
+        before do
+          person.preferences = [ preference ]
+          person.preferences = nil
+        end
 
-        # it "sets the relation to an empty array" do
-          # person.posts.should be_empty
-        # end
+        it "sets the relation to an empty array" do
+          person.preferences.should be_empty
+        end
 
-        # it "removed the inverse relation" do
-          # post.person.should be_nil
-        # end
+        it "removed the inverse relation" do
+          preference.people.should be_empty
+        end
 
-        # it "removes the foreign key value" do
-          # post.person_id.should be_nil
-        # end
-      # end
+        it "removes the foreign key values" do
+          person.preference_ids.should be_empty
+        end
 
-      # context "when the parent is not a new record" do
+        it "removes the inverse foreign key values" do
+          preference.person_ids.should be_empty
+        end
+      end
 
-        # let(:person) do
-          # Person.create(:ssn => "437-11-1112")
-        # end
+      context "when the parent is not a new record" do
 
-        # let(:post) do
-          # Post.new
-        # end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-        # before do
-          # person.posts = [ post ]
-          # person.posts = nil
-        # end
+        let(:preference) do
+          Preference.new
+        end
 
-        # it "sets the relation to empty" do
-          # person.posts.should be_empty
-        # end
+        before do
+          person.preferences = [ preference ]
+          person.preferences = nil
+        end
 
-        # it "removed the inverse relation" do
-          # post.person.should be_nil
-        # end
+        it "sets the relation to an empty array" do
+          person.preferences.should be_empty
+        end
 
-        # it "removes the foreign key value" do
-          # post.person_id.should be_nil
-        # end
+        it "removed the inverse relation" do
+          preference.people.should be_empty
+        end
 
-        # it "deletes the target from the database" do
-          # post.should be_destroyed
-        # end
-      # end
-    # end
+        it "removes the foreign key values" do
+          person.preference_ids.should be_empty
+        end
+
+        it "removes the inverse foreign key values" do
+          preference.person_ids.should be_empty
+        end
+
+        it "deletes the target from the database" do
+          preference.should be_destroyed
+        end
+      end
+    end
 
     # context "when the relation is polymorphic" do
 
@@ -466,7 +474,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         # end
       # end
     # end
-  # end
+  end
 
   # describe "#build" do
 
