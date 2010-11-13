@@ -182,72 +182,80 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#=" do
+  describe "#=" do
 
-    # context "when the relation is not polymorphic" do
+    context "when the relation is not polymorphic" do
 
-      # context "when the parent is a new record" do
+      context "when the parent is a new record" do
 
-        # let(:person) do
-          # Person.new
-        # end
+        let(:person) do
+          Person.new
+        end
 
-        # let(:post) do
-          # Post.new
-        # end
+        let(:preference) do
+          Preference.new
+        end
 
-        # before do
-          # person.posts = [ post ]
-        # end
+        before do
+          person.preferences = [ preference ]
+        end
 
-        # it "sets the target of the relation" do
-          # person.posts.target.should == [ post ]
-        # end
+        it "sets the relation" do
+          person.preferences.should == [ preference ]
+        end
 
-        # it "sets the foreign key on the relation" do
-          # post.person_id.should == person.id
-        # end
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should == [ preference.id ]
+        end
 
-        # it "sets the base on the inverse relation" do
-          # post.person.should == person
-        # end
+        it "sets the foreign key on the inverse relation" do
+          preference.person_ids.should == [ person.id ]
+        end
 
-        # it "does not save the target" do
-          # post.should_not be_persisted
-        # end
-      # end
+        it "sets the base on the inverse relation" do
+          preference.people.first.should == person
+        end
 
-      # context "when the parent is not a new record" do
+        it "does not save the target" do
+          preference.should be_new
+        end
+      end
 
-        # let(:person) do
-          # Person.create(:ssn => "437-11-1112")
-        # end
+      context "when the parent is not a new record" do
 
-        # let(:post) do
-          # Post.new
-        # end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-        # before do
-          # person.posts = [ post ]
-        # end
+        let(:preference) do
+          Preference.new
+        end
 
-        # it "sets the target of the relation" do
-          # person.posts.target.should == [ post ]
-        # end
+        before do
+          person.preferences = [ preference ]
+        end
 
-        # it "sets the foreign key of the relation" do
-          # post.person_id.should == person.id
-        # end
+        it "sets the relation" do
+          person.preferences.should == [ preference ]
+        end
 
-        # it "sets the base on the inverse relation" do
-          # post.person.should == person
-        # end
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should == [ preference.id ]
+        end
 
-        # it "saves the target" do
-          # post.should be_persisted
-        # end
-      # end
-    # end
+        it "sets the foreign key on the inverse relation" do
+          preference.person_ids.should == [ person.id ]
+        end
+
+        it "sets the base on the inverse relation" do
+          preference.people.first.should == person
+        end
+
+        it "saves the target" do
+          preference.should be_persisted
+        end
+      end
+    end
 
     # context "when the relation is polymorphic" do
 
@@ -313,7 +321,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         # end
       # end
     # end
-  # end
+  end
 
   # describe "#= nil" do
 

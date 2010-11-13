@@ -36,8 +36,8 @@ module Mongoid # :nodoc:
         #
         # <tt>person.preferences.bind</tt>
         def bind(building = nil)
-          # binding.bind
-          # target.map(&:save) if base.persisted? && !building?
+          binding.bind_all
+          target.map(&:save) if base.persisted? && !building?
         end
 
         # Instantiate a new references_many relation. Will set the foreign key
