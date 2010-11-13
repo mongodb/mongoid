@@ -38,6 +38,10 @@ module Mongoid # :nodoc:
             false
           end
 
+          def foreign_key_default
+            []
+          end
+
           # Returns the suffix of the foreign key field, either "_id" or "_ids".
           #
           # Example:

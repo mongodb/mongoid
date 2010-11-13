@@ -252,6 +252,39 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#foreign_key_default" do
+
+    context "when the relation stores keys in an array" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :preferences,
+          :relation => Mongoid::Relations::Referenced::ManyToMany,
+          :foreign_key => "preference_ids"
+        )
+      end
+
+      it "returns an empty array" do
+        metadata.foreign_key_default.should == []
+      end
+    end
+
+    context "when the relation stores a single key" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::In,
+          :foreign_key => "person_id"
+        )
+      end
+
+      it "returns an empty array" do
+        metadata.foreign_key_default.should be_nil
+      end
+    end
+  end
+
   describe "#foreign_key_setter" do
 
     context "when the relation is not polymorphic" do

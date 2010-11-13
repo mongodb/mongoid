@@ -3,6 +3,8 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     class Metadata < Hash #:nodoc:
 
+      delegate :foreign_key_default, :to => :relation
+
       # Gets a relation builder associated with the relation this metadata is
       # for.
       #
