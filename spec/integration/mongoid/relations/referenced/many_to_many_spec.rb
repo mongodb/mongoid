@@ -412,68 +412,76 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
-    # context "when the relation is polymorphic" do
+    context "when the relation is polymorphic" do
 
-      # context "when the parent is a new record" do
+      context "when the parent is a new record" do
 
-        # let(:movie) do
-          # Movie.new
-        # end
+        let(:person) do
+          Person.new
+        end
 
-        # let(:rating) do
-          # Rating.new
-        # end
+        let(:user_account) do
+          UserAccount.new
+        end
 
-        # before do
-          # movie.ratings = [ rating ]
-          # movie.ratings = nil
-        # end
+        before do
+          person.accountables = [ user_account ]
+          person.accountables = nil
+        end
 
-        # it "sets the relation to an empty array" do
-          # movie.ratings.should be_empty
-        # end
+        it "sets the relation to an empty array" do
+          person.accountables.should be_empty
+        end
 
-        # it "removed the inverse relation" do
-          # rating.ratable.should be_nil
-        # end
+        it "removed the inverse relation" do
+          user_account.people.should be_empty
+        end
 
-        # it "removes the foreign key value" do
-          # rating.ratable_id.should be_nil
-        # end
-      # end
+        it "removes the foreign key values" do
+          person.accountables_ids.should be_empty
+        end
 
-      # context "when the parent is not a new record" do
+        it "removes the inverse foreign key values" do
+          user_account.people_ids.should be_empty
+        end
+      end
 
-        # let(:movie) do
-          # Movie.create
-        # end
+      context "when the parent is not a new record" do
 
-        # let(:rating) do
-          # Rating.new
-        # end
+        let(:person) do
+          Person.create(:ssn => "433-10-0000")
+        end
 
-        # before do
-          # movie.ratings = [ rating ]
-          # movie.ratings = nil
-        # end
+        let(:user_account) do
+          UserAccount.new
+        end
 
-        # it "sets the relation to empty" do
-          # movie.ratings.should be_empty
-        # end
+        before do
+          person.accountables = [ user_account ]
+          person.accountables = nil
+        end
 
-        # it "removed the inverse relation" do
-          # rating.ratable.should be_nil
-        # end
+        it "sets the relation to an empty array" do
+          person.accountables.should be_empty
+        end
 
-        # it "removes the foreign key value" do
-          # rating.ratable_id.should be_nil
-        # end
+        it "removed the inverse relation" do
+          user_account.people.should be_empty
+        end
 
-        # it "deletes the target from the database" do
-          # rating.should be_destroyed
-        # end
-      # end
-    # end
+        it "removes the foreign key values" do
+          person.accountables_ids.should be_empty
+        end
+
+        it "removes the inverse foreign key values" do
+          user_account.people_ids.should be_empty
+        end
+
+        it "deletes the documents from the database" do
+          user_account.should be_destroyed
+        end
+      end
+    end
   end
 
   # describe "#build" do
