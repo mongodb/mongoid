@@ -70,9 +70,8 @@ module Mongoid # :nodoc:
         # document: The document to append to the target.
         def append(document)
           target.push(document)
-          base.send(metadata.foreign_key).push(document.id)
-          document.send(metadata.inverse(target)).push(base)
           metadatafy(document)
+          binding.bind_one(document)
         end
 
         # Instantiate the binding associated with this relation.
