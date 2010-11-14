@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    class ManyToOne < Proxy
+    class Many < Proxy
 
       # Appends a document or array of documents to the relation. Will set
       # the parent and update the index in the process.

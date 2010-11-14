@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    class OneToOne < Proxy
+    class One < Proxy
 
       # Substitutes the supplied target documents for the existing document
       # in the relation.

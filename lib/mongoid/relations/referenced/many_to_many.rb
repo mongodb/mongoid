@@ -2,28 +2,7 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
-      class ManyToMany < Proxy
-
-        # Appends a document or array of documents to the relation. Will set
-        # the parent and update the index in the process.
-        #
-        # Example:
-        #
-        # <tt>relation << document</tt>
-        #
-        # Options:
-        #
-        # docs: Any number of documents.
-        def <<(*docs)
-          docs.flatten.each do |doc|
-            unless target.include?(doc)
-              append(doc)
-              doc.save if base.persisted?
-            end
-          end
-        end
-        alias :concat :<<
-        alias :push :<<
+      class ManyToMany < Relations::Many
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
@@ -40,29 +19,6 @@ module Mongoid # :nodoc:
           target.map(&:save) if base.persisted? && !building?
         end
 
-        # Builds a new document in the relation and appends it to the target.
-        # Takes an optional type if you want to specify a subclass.
-        #
-        # Example:
-        #
-        # <tt>relation.build(:name => "Bozo")</tt>
-        #
-        # Options:
-        #
-        # attributes: The attributes to build the document with.
-        # type: Optional class to build the document with.
-        #
-        # Returns:
-        #
-        # The new document.
-        def build(attributes = {}, type = nil)
-          instantiated(type).tap do |doc|
-            append(doc)
-            doc.write_attributes(attributes)
-            doc.identify
-          end
-        end
-
         # Clear the relation. Will delete the documents from the db if they are
         # already persisted.
         #
@@ -75,19 +31,6 @@ module Mongoid # :nodoc:
         # The empty relation.
         def clear
           tap { |relation| relation.unbind }
-        end
-
-        # Returns a count of the number of documents in the association that have
-        # actually been persisted to the database.
-        #
-        # Use #size if you want the total number of documents.
-        #
-        # Returns:
-        #
-        # The total number of persisted embedded docs, as flagged by the
-        # #persisted? method.
-        def count
-          target.select(&:persisted?).size
         end
 
         # Creates a new document on the references many relation. This will
