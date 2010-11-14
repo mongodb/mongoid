@@ -818,34 +818,34 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#count" do
+  describe "#count" do
 
-    # let(:movie) do
-      # Movie.create
-    # end
+    let(:person) do
+      Person.create(:ssn => "111-11-1111")
+    end
 
-    # context "when documents have been persisted" do
+    context "when documents have been persisted" do
 
-      # let!(:rating) do
-        # movie.ratings.create(:value => 1)
-      # end
+      let!(:preference) do
+        person.preferences.create(:name => "setting")
+      end
 
-      # it "returns the number of persisted documents" do
-        # movie.ratings.count.should == 1
-      # end
-    # end
+      it "returns the number of persisted documents" do
+        person.preferences.count.should == 1
+      end
+    end
 
-    # context "when documents have not been persisted" do
+    context "when documents have not been persisted" do
 
-      # let!(:rating) do
-        # movie.ratings.build(:value => 1)
-      # end
+      let!(:preference) do
+        person.preferences.build(:name => "settings")
+      end
 
-      # it "returns 0" do
-        # movie.ratings.count.should == 0
-      # end
-    # end
-  # end
+      it "returns 0" do
+        person.preferences.count.should == 0
+      end
+    end
+  end
 
   # describe "#create" do
 
