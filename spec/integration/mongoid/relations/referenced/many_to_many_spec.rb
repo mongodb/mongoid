@@ -484,76 +484,88 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#build" do
+  describe "#build" do
 
-    # context "when the relation is not polymorphic" do
+    context "when the relation is not polymorphic" do
 
-      # context "when the parent is a new record" do
+      context "when the parent is a new record" do
 
-        # let(:person) do
-          # Person.new
-        # end
+        let(:person) do
+          Person.new
+        end
 
-        # let!(:post) do
-          # person.posts.build(:title => "$$$")
-        # end
+        let!(:preference) do
+          person.preferences.build(:name => "settings")
+        end
 
-        # it "sets the foreign key on the relation" do
-          # post.person_id.should == person.id
-        # end
+        it "adds the document to the relation" do
+          person.preferences.should == [ preference ]
+        end
 
-        # it "sets the base on the inverse relation" do
-          # post.person.should == person
-        # end
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should == [ preference.id ]
+        end
 
-        # it "sets the attributes" do
-          # post.title.should == "$$$"
-        # end
+        it "sets the inverse foreign key on the relation" do
+          preference.person_ids.should == [ person.id ]
+        end
 
-        # it "does not save the target" do
-          # post.should be_new
-        # end
+        it "sets the base on the inverse relation" do
+          preference.people.should == [ person ]
+        end
 
-        # it "adds the document to the target" do
-          # person.posts.size.should == 1
-        # end
+        it "sets the attributes" do
+          preference.name.should == "settings"
+        end
 
-        # it "does not perform validation" do
-          # post.errors.should be_empty
-        # end
-      # end
+        it "does not save the target" do
+          preference.should be_new
+        end
 
-      # context "when the parent is not a new record" do
+        it "adds the correct number of documents" do
+          person.preferences.size.should == 1
+        end
+      end
 
-        # let(:person) do
-          # Person.create(:ssn => "554-44-3891")
-        # end
+      context "when the parent is not a new record" do
 
-        # let!(:post) do
-          # person.posts.build(:text => "Testing")
-        # end
+        let(:person) do
+          Person.create(:ssn => "554-44-3891")
+        end
 
-        # it "sets the foreign key on the relation" do
-          # post.person_id.should == person.id
-        # end
+        let!(:preference) do
+          person.preferences.build(:name => "settings")
+        end
 
-        # it "sets the base on the inverse relation" do
-          # post.person.should == person
-        # end
+        it "adds the document to the relation" do
+          person.preferences.should == [ preference ]
+        end
 
-        # it "sets the attributes" do
-          # post.text.should == "Testing"
-        # end
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should == [ preference.id ]
+        end
 
-        # it "does not save the target" do
-          # post.should be_new
-        # end
+        it "sets the inverse foreign key on the relation" do
+          preference.person_ids.should == [ person.id ]
+        end
 
-        # it "adds the document to the target" do
-          # person.posts.size.should == 1
-        # end
-      # end
-    # end
+        it "sets the base on the inverse relation" do
+          preference.people.should == [ person ]
+        end
+
+        it "sets the attributes" do
+          preference.name.should == "settings"
+        end
+
+        it "does not save the target" do
+          preference.should be_new
+        end
+
+        it "adds the correct number of documents" do
+          person.preferences.size.should == 1
+        end
+      end
+    end
 
     # context "when the relation is polymorphic" do
 
@@ -623,7 +635,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         # end
       # end
     # end
-  # end
+  end
 
   # describe "#clear" do
 
