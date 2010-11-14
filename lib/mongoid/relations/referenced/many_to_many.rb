@@ -33,51 +33,6 @@ module Mongoid # :nodoc:
           tap { |relation| relation.unbind }
         end
 
-        # Creates a new document on the references many relation. This will
-        # save the document if the parent has been persisted.
-        #
-        # Example:
-        #
-        # <tt>person.posts.create(:text => "Testing")</tt>
-        #
-        # Options:
-        #
-        # attributes:
-        #
-        # A hash of attributes to create the document with.
-        #
-        # Returns:
-        #
-        # The newly created document.
-        def create(attributes = nil, type = nil)
-          build(attributes, type).tap do |doc|
-            doc.save if base.persisted?
-          end
-        end
-
-        # Creates a new document on the references many relation. This will
-        # save the document if the parent has been persisted and will raise an
-        # error if validation fails.
-        #
-        # Example:
-        #
-        # <tt>person.posts.create!(:text => "Testing")</tt>
-        #
-        # Options:
-        #
-        # attributes:
-        #
-        # A hash of attributes to create the document with.
-        #
-        # Returns:
-        #
-        # The newly created document.
-        def create!(attributes = nil, type = nil)
-          build(attributes, type).tap do |doc|
-            doc.save! if base.persisted?
-          end
-        end
-
         def delete(document)
           target.delete(document)
           binding.unbind_one(document)
