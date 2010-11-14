@@ -649,78 +649,90 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#clear" do
+  describe "#clear" do
 
-    # context "when the relation is not polymorphic" do
+    context "when the relation is not polymorphic" do
 
-      # context "when the parent has been persisted" do
+      context "when the parent has been persisted" do
 
-        # let!(:person) do
-          # Person.create(:ssn => "123-45-9988")
-        # end
+        let!(:person) do
+          Person.create(:ssn => "123-45-9988")
+        end
 
-        # context "when the children are persisted" do
+        context "when the children are persisted" do
 
-          # let!(:post) do
-            # person.posts.create(:title => "Testing")
-          # end
+          let!(:preference) do
+            person.preferences.create(:name => "settings")
+          end
 
-          # let!(:relation) do
-            # person.posts.clear
-          # end
+          let!(:relation) do
+            person.preferences.clear
+          end
 
-          # it "clears out the relation" do
-            # person.posts.should be_empty
-          # end
+          it "clears out the relation" do
+            person.preferences.should be_empty
+          end
 
-          # it "marks the documents as deleted" do
-            # post.should be_destroyed
-          # end
+          it "removes the parent from the inverse relation" do
+            preference.people.should_not include(person)
+          end
 
-          # it "deletes the documents from the db" do
-            # person.reload.posts.should be_empty
-          # end
+          it "removes the foreign keys" do
+            person.preference_ids.should be_empty
+          end
 
-          # it "returns the relation" do
-            # relation.should == []
-          # end
-        # end
+          it "removes the parent key from the inverse" do
+            preference.person_ids.should_not include(person.id)
+          end
 
-        # context "when the children are not persisted" do
+          it "marks the documents as deleted" do
+            preference.should be_destroyed
+          end
 
-          # let!(:post) do
-            # person.posts.build(:title => "Testing")
-          # end
+          it "deletes the documents from the db" do
+            person.reload.preferences.should be_empty
+          end
 
-          # let!(:relation) do
-            # person.posts.clear
-          # end
+          it "returns the relation" do
+            relation.should == []
+          end
+        end
 
-          # it "clears out the relation" do
-            # person.posts.should be_empty
-          # end
-        # end
-      # end
+        context "when the children are not persisted" do
 
-      # context "when the parent is not persisted" do
+          let!(:post) do
+            person.preferences.build(:name => "setting")
+          end
 
-        # let(:person) do
-          # Person.new
-        # end
+          let!(:relation) do
+            person.preferences.clear
+          end
 
-        # let!(:post) do
-          # person.posts.build(:title => "Testing")
-        # end
+          it "clears out the relation" do
+            person.preferences.should be_empty
+          end
+        end
+      end
 
-        # let!(:relation) do
-          # person.posts.clear
-        # end
+      context "when the parent is not persisted" do
 
-        # it "clears out the relation" do
-          # person.posts.should be_empty
-        # end
-      # end
-    # end
+        let(:person) do
+          Person.new
+        end
+
+        let!(:preference) do
+          person.preferences.build(:name => "setting")
+        end
+
+        let!(:relation) do
+          person.preferences.clear
+        end
+
+        it "clears out the relation" do
+          person.preferences.should be_empty
+        end
+      end
+    end
 
     # context "when the relation is polymorphic" do
 
@@ -792,7 +804,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         # end
       # end
     # end
-  # end
+  end
 
   # describe "#count" do
 
