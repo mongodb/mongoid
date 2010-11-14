@@ -567,74 +567,86 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
-    # context "when the relation is polymorphic" do
+    context "when the relation is polymorphic" do
 
-      # context "when the parent is a new record" do
+      context "when the parent is a new record" do
 
-        # let(:movie) do
-          # Movie.new
-        # end
+        let(:person) do
+          Person.new
+        end
 
-        # let!(:rating) do
-          # movie.ratings.build(:value => 3)
-        # end
+        let!(:user_account) do
+          person.accountables.build({ :username => "durran" }, UserAccount)
+        end
 
-        # it "sets the foreign key on the relation" do
-          # rating.ratable_id.should == movie.id
-        # end
+        it "adds the document to the relation" do
+          person.accountables.should == [ user_account ]
+        end
 
-        # it "sets the base on the inverse relation" do
-          # rating.ratable.should == movie
-        # end
+        it "sets the foreign key on the relation" do
+          person.accountables_ids.should == [ user_account.id ]
+        end
 
-        # it "sets the attributes" do
-          # rating.value.should == 3
-        # end
+        it "sets the inverse foreign key on the relation" do
+          user_account.people_ids.should == [ person.id ]
+        end
 
-        # it "does not save the target" do
-          # rating.should be_new
-        # end
+        it "sets the base on the inverse relation" do
+          user_account.people.should == [ person ]
+        end
 
-        # it "adds the document to the target" do
-          # movie.ratings.size.should == 1
-        # end
+        it "sets the attributes" do
+          user_account.username.should == "durran"
+        end
 
-        # it "does not perform validation" do
-          # rating.errors.should be_empty
-        # end
-      # end
+        it "does not save the target" do
+          user_account.should be_new
+        end
 
-      # context "when the parent is not a new record" do
+        it "adds the correct number of documents" do
+          person.accountables.size.should == 1
+        end
+      end
 
-        # let(:movie) do
-          # Movie.create
-        # end
+      context "when the parent is not a new record" do
 
-        # let!(:rating) do
-          # movie.ratings.build(:value => 4)
-        # end
+        let(:person) do
+          Person.create(:ssn => "777-77-8811")
+        end
 
-        # it "sets the foreign key on the relation" do
-          # rating.ratable_id.should == movie.id
-        # end
+        let!(:user_account) do
+          person.accountables.build({ :username => "durran" }, UserAccount)
+        end
 
-        # it "sets the base on the inverse relation" do
-          # rating.ratable.should == movie
-        # end
+        it "adds the document to the relation" do
+          person.accountables.should == [ user_account ]
+        end
 
-        # it "sets the attributes" do
-          # rating.value.should == 4
-        # end
+        it "sets the foreign key on the relation" do
+          person.accountables_ids.should == [ user_account.id ]
+        end
 
-        # it "does not save the target" do
-          # rating.should be_new
-        # end
+        it "sets the inverse foreign key on the relation" do
+          user_account.people_ids.should == [ person.id ]
+        end
 
-        # it "adds the document to the target" do
-          # movie.ratings.size.should == 1
-        # end
-      # end
-    # end
+        it "sets the base on the inverse relation" do
+          user_account.people.should == [ person ]
+        end
+
+        it "sets the attributes" do
+          user_account.username.should == "durran"
+        end
+
+        it "does not save the target" do
+          user_account.should be_new
+        end
+
+        it "adds the correct number of documents" do
+          person.accountables.size.should == 1
+        end
+      end
+    end
   end
 
   # describe "#clear" do
