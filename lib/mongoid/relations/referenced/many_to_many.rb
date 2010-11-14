@@ -93,8 +93,8 @@ module Mongoid # :nodoc:
         # Returns:
         #
         # The newly created document.
-        def create(attributes = nil)
-          build(attributes).tap do |doc|
+        def create(attributes = nil, type = nil)
+          build(attributes, type).tap do |doc|
             doc.save if base.persisted?
           end
         end

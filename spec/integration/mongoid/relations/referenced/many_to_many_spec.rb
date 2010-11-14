@@ -734,76 +734,88 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
-    # context "when the relation is polymorphic" do
+    context "when the relation is polymorphic" do
 
-      # context "when the parent has been persisted" do
+      context "when the parent has been persisted" do
 
-        # let!(:movie) do
-          # Movie.create
-        # end
+        let!(:person) do
+          Person.create(:ssn => "123-45-9188")
+        end
 
-        # context "when the children are persisted" do
+        context "when the children are persisted" do
 
-          # let!(:rating) do
-            # movie.ratings.create(:value => 1)
-          # end
+          let!(:accountable) do
+            person.accountables.create({ :username => "durran" }, UserAccount)
+          end
 
-          # let!(:relation) do
-            # movie.ratings.clear
-          # end
+          let!(:relation) do
+            person.accountables.clear
+          end
 
-          # it "clears out the relation" do
-            # movie.ratings.should be_empty
-          # end
+          it "clears out the relation" do
+            person.accountables.should be_empty
+          end
 
-          # it "marks the documents as deleted" do
-            # rating.should be_destroyed
-          # end
+          it "removes the parent from the inverse relation" do
+            accountable.people.should_not include(person)
+          end
 
-          # it "deletes the documents from the db" do
-            # movie.reload.ratings.should be_empty
-          # end
+          it "removes the foreign keys" do
+            person.accountables_ids.should be_empty
+          end
 
-          # it "returns the relation" do
-            # relation.should == []
-          # end
-        # end
+          it "removes the parent key from the inverse" do
+            accountable.people_ids.should_not include(person.id)
+          end
 
-        # context "when the children are not persisted" do
+          it "marks the documents as deleted" do
+            accountable.should be_destroyed
+          end
 
-          # let!(:rating) do
-            # movie.ratings.build(:value => 3)
-          # end
+          it "deletes the documents from the db" do
+            person.reload.accountables.should be_empty
+          end
 
-          # let!(:relation) do
-            # movie.ratings.clear
-          # end
+          it "returns the relation" do
+            relation.should == []
+          end
+        end
 
-          # it "clears out the relation" do
-            # movie.ratings.should be_empty
-          # end
-        # end
-      # end
+        context "when the children are not persisted" do
 
-      # context "when the parent is not persisted" do
+          let!(:post) do
+            person.accountables.build({ :username => "durran" }, UserAccount)
+          end
 
-        # let(:movie) do
-          # Movie.new
-        # end
+          let!(:relation) do
+            person.accountables.clear
+          end
 
-        # let!(:rating) do
-          # movie.ratings.build(:value => 2)
-        # end
+          it "clears out the relation" do
+            person.accountables.should be_empty
+          end
+        end
+      end
 
-        # let!(:relation) do
-          # movie.ratings.clear
-        # end
+      context "when the parent is not persisted" do
 
-        # it "clears out the relation" do
-          # movie.ratings.should be_empty
-        # end
-      # end
-    # end
+        let(:person) do
+          Person.new
+        end
+
+        let!(:accountable) do
+          person.accountables.build({ :username => "durran" }, UserAccount)
+        end
+
+        let!(:relation) do
+          person.accountables.clear
+        end
+
+        it "clears out the relation" do
+          person.accountables.should be_empty
+        end
+      end
+    end
   end
 
   # describe "#count" do
