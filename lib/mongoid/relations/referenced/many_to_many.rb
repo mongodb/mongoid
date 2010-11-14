@@ -38,6 +38,48 @@ module Mongoid # :nodoc:
           binding.unbind_one(document)
         end
 
+        # Deletes all related documents from the database given the supplied
+        # conditions.
+        #
+        # Example:
+        #
+        # <tt>person.posts.delete_all(:title => "Testing")</tt>
+        #
+        # Options:
+        #
+        # conditions: A hash of conditions to limit the delete by.
+        #
+        # Returns:
+        #
+        # The number of documents deleted.
+        def delete_all(conditions = nil)
+          selector = (conditions || {})[:conditions] || {}
+          target.delete_if { |doc| doc.matches?(selector) }
+          scoping = { :_id => { "$in" => base.send(metadata.foreign_key) } }
+          metadata.klass.delete_all(:conditions => selector.merge(scoping))
+        end
+
+        # Deletes all related documents from the database given the supplied
+        # conditions.
+        #
+        # Example:
+        #
+        # <tt>person.posts.destroy_all(:title => "Testing")</tt>
+        #
+        # Options:
+        #
+        # conditions: A hash of conditions to limit the delete by.
+        #
+        # Returns:
+        #
+        # The number of documents deleted.
+        def destroy_all(conditions = nil)
+          selector = (conditions || {})[:conditions] || {}
+          target.delete_if { |doc| doc.matches?(selector) }
+          scoping = { :_id => { "$in" => base.send(metadata.foreign_key) } }
+          metadata.klass.destroy_all(:conditions => selector.merge(scoping))
+        end
+
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #
@@ -136,6 +178,10 @@ module Mongoid # :nodoc:
           tap do |relation|
             relation.target = target.entries if target.is_a?(Mongoid::Criteria)
           end
+        end
+
+        def scoped(conditions = nil)
+
         end
 
         class << self

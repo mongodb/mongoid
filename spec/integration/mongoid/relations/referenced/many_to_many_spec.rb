@@ -1043,64 +1043,67 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # [ :delete_all, :destroy_all ].each do |method|
+  [ :delete_all, :destroy_all ].each do |method|
 
-    # describe "##{method}" do
+    describe "##{method}" do
 
-      # context "when the relation is not polymorphic" do
+      context "when the relation is not polymorphic" do
 
-        # context "when conditions are provided" do
+        context "when conditions are provided" do
 
-          # let(:person) do
-            # Person.create(:ssn => "123-32-2321")
-          # end
+          let(:person) do
+            Person.create(:ssn => "123-32-2321").tap do |person|
+              person.preferences.create(:name => "Testing")
+              person.preferences.create(:name => "Test")
+            end
+          end
 
-          # before do
-            # person.posts.create(:title => "Testing")
-            # person.posts.create(:title => "Test")
-          # end
+          let!(:deleted) do
+            person.preferences.send(
+              method,
+              :conditions => { :name => "Testing" }
+            )
+          end
 
-          # it "removes the correct posts" do
-            # person.posts.send(method, :conditions => { :title => "Testing" })
-            # person.posts.count.should == 1
-          # end
+          it "removes the correct preferences" do
+            person.preferences.count.should == 1
+          end
 
-          # it "deletes the documents from the database" do
-            # person.posts.send(method, :conditions => {:title => "Testing" })
-            # Post.where(:title => "Testing").count.should == 0
-          # end
+          it "deletes the documents from the database" do
+            Preference.where(:name => "Testing").count.should == 0
+          end
 
-          # it "returns the number of documents deleted" do
-            # person.posts.send(method, :conditions => { :title => "Testing" }).should == 1
-          # end
-        # end
+          it "returns the number of documents deleted" do
+            deleted.should == 1
+          end
+        end
 
-        # context "when conditions are not provided" do
+        context "when conditions are not provided" do
 
-          # let(:person) do
-            # Person.create(:ssn => "123-32-2321")
-          # end
+          let(:person) do
+            Person.create(:ssn => "123-32-2321").tap do |person|
+              person.preferences.create(:name => "Testing")
+              person.preferences.create(:name => "Test")
+            end
+          end
 
-          # before do
-            # person.posts.create(:title => "Testing")
-            # person.posts.create(:title => "Test")
-          # end
+          let!(:deleted) do
+            person.preferences.send(method)
+          end
 
-          # it "removes the correct posts" do
-            # person.posts.send(method)
-            # person.posts.count.should == 0
-          # end
+          it "removes the correct posts" do
+            person.posts.count.should == 0
+          end
 
-          # it "deletes the documents from the database" do
-            # person.posts.send(method)
-            # Post.where(:title => "Testing").count.should == 0
-          # end
+          it "deletes the documents from the database" do
+            Preference.count.should == 0
+          end
 
-          # it "returns the number of documents deleted" do
-            # person.posts.send(method).should == 2
-          # end
-        # end
-      # end
+          it "returns the number of documents deleted" do
+            deleted.should == 2
+          end
+        end
+      end
 
       # context "when the relation is polymorphic" do
 
@@ -1156,8 +1159,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           # end
         # end
       # end
-    # end
-  # end
+    end
+  end
 
   # describe "#exists?" do
 
