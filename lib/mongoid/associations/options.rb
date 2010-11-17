@@ -28,7 +28,9 @@ module Mongoid #:nodoc:
       # Return the foreign key if it exists, otherwise inflect it from the
       # associated class name.
       def foreign_key
-        key = self[:foreign_key] || klass.name.to_s.foreign_key
+        key = self[:foreign_key] ||
+                (inverse_of ? inverse_of.foreign_key : nil) ||
+                klass.name.to_s.foreign_key
         key.to_s
       end
 
