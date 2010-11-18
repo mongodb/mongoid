@@ -12,7 +12,6 @@ class Post
   field :content
   referenced_in :person
   referenced_in :author, :foreign_key => :author_id, :class_name => "User"
-  referenced_in :poster, :foreign_key => :poster_id, :class_name => "Agent"
 
   references_many :tags, :stored_as => :array
 
