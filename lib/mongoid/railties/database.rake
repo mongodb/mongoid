@@ -116,6 +116,8 @@ namespace :db do
             :safe => true)
           updated = result[0][0]["updatedExisting"]
           count += result.first.first['n'] if updated
+        rescue Exception => e
+          puts "Error trying to update #{collection.name} to use a default #{field_name_query} of #{default_value}: #{e.message}"
         end while (embeds_many && updated)
         puts "Updated #{count} #{collection.name} to use a default #{field_name_query} of: #{default_value}" if updated
       end
