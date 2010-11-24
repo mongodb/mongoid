@@ -67,6 +67,79 @@ describe Mongoid::Associations::EmbedsMany do
 
   end
 
+  describe "#insert" do
+
+    subject do
+      Mongoid::Associations::EmbedsMany.new(
+        @document,
+        Mongoid::Associations::Options.new(:name => :addresses)
+      )
+    end
+
+    let(:last_address) { subject.last }
+    let(:address1) { Address.new }
+    let(:address2) { Address.new }
+
+    context "inserting a single document" do
+
+      before { subject.insert(1, address1) }
+
+      its(:length) { should == 3 }
+
+      it "puts the address in the right place" do
+        subject.index(address1).should == 1
+      end
+
+      it "sets the index on the address" do
+        address1._index.should == 1
+      end
+
+      it "resets the index on the last address" do
+        last_address._index.should == 2
+      end
+
+      it "sets the parent on the address" do
+        address1._parent.should == @document
+      end
+
+    end
+
+    context "inserting multiple documents" do
+
+      before { subject.insert(1, address1, address2) }
+
+      it "puts the first address in the right place" do
+        subject.index(address1).should == 1
+      end
+
+      it "puts the second address in the right place" do
+        subject.index(address2).should == 2
+      end
+
+      it "sets the index on the first address" do
+        address1._index.should == 1
+      end
+
+      it "sets the index on the second address" do
+        address2._index.should == 2
+      end
+
+      it "resets the index on the last address" do
+        last_address._index.should == 3
+      end
+
+      it "sets the parent on the first address" do
+        address1._parent.should == @document
+      end
+
+      it "sets the parent on the second address" do
+        address2._parent.should == @document
+      end
+
+    end
+
+  end
+
   describe "#build" do
 
     context "setting the parent relationship" do
