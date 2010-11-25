@@ -178,8 +178,11 @@ module Mongoid # :nodoc:
       #
       def referenced_in(name, options = {}, &block)
         opts = optionize(name, options, constraint(name, options, :in), &block)
-        Associations::ReferencedIn.validate_options(opts)
-        associate(Associations::ReferencedIn, opts)
+        type = Associations::ReferencedIn
+        type.validate_options(opts)
+        associate(type, opts)
+        add_builder(type, opts)
+        add_creator(type, opts)
         field(opts.foreign_key, :inverse_class_name => opts.class_name, :identity => true)
         index(opts.foreign_key, :background => true) if !embedded? && opts.index
         set_callback(:save, :before) { |document| document.update_foreign_keys }

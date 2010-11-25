@@ -219,10 +219,11 @@ module Mongoid #:nodoc:
             association = send(name)
             if association
               # observe(association, true)
-              association.nested_build(attrs, options)
+              association = association.nested_build(attrs, options)
             else
-              send("build_#{name}", attrs, options)
+              association = send("build_#{name}", attrs, options)
             end
+            association.save if association.present? && options[:save_parent]
           end
         end
       end

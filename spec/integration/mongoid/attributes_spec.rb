@@ -122,5 +122,28 @@ describe Mongoid::Attributes do
         person.game.should be_nil
       end
     end
+    
+    context "when the nested document is a referenced_in" do
+      let(:description) { Description.create }
+
+      it "adds a document" do
+        description.update_attributes(:user_attributes => {"name" => "Bob"})
+        description.user.name.should == "Bob"
+      end
+
+      it "updates a document" do
+        user = description.create_user(:name => "Suzy")
+        description.update_attributes(:user_attributes => {"name" => "Tony"})
+        description.user.name.should == "Tony"
+        user.reload.name.should == "Tony"
+      end
+
+      it "deletes a document" do
+        user = description.create_user(:name => "Suzy")
+        description.update_attributes(:user_attributes => {"_destroy" => "1"})
+        description.user.should be_nil
+        lambda { User.find(user.id) }.should raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
   end
 end

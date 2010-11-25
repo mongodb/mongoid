@@ -13,6 +13,7 @@ module Mongoid #:nodoc:
       # options: The association +Options+.
       def initialize(document, options, target = nil)
         @options = options
+        @klass = options.klass
 
         if target
           replace(target)
@@ -20,8 +21,46 @@ module Mongoid #:nodoc:
           foreign_key = document.send(options.foreign_key)
           replace(options.klass.find(foreign_key)) unless foreign_key.blank?
         end
-
         extends(options)
+      end
+      
+      # Used for setting the association via a nested attributes setter on the
+      # parent +Document+. Called when using accepts_nested_attributes_for.
+      #
+      # Options:
+      #
+      # attributes: The attributes for the new association
+      #
+      # Returns:
+      #
+      # A new target document.
+      def nested_build(attributes, options = nil)
+        options ||= {}
+        _destroy = Boolean.set(attributes.delete('_destroy'))
+        if options[:allow_destroy] && _destroy
+          @target.destroy
+          @target = nil
+        elsif @target.present? || !options[:update_only]
+          @target.attributes = @target.attributes.merge(attributes)
+        end
+        @target
+      end
+      
+      # Builds a new Document and sets it as the association.
+      #
+      # Returns the newly created object.
+      def build(attributes = {})
+        target = @klass.instantiate(attributes)
+        replace(target)
+        target
+      end
+      
+      # Builds a new Document and sets it as the association, then saves the
+      # newly created document.
+      #
+      # Returns the newly created object.
+      def create(attributes = {})
+        build(attributes).tap(&:save)
       end
 
       # Replaces the target with a new object
