@@ -81,6 +81,14 @@ module Rails #:nodoc:
           ::Rails::Mongoid.load_models(app) unless $rails_rake_task
         end
       end
+      
+      initializer "load http errors" do |app|
+        config.after_initialize do
+          ActionDispatch::ShowExceptions.rescue_responses.update({
+            "Mongoid::Errors::DocumentNotFound" => :not_found
+          })
+        end
+      end
 
       initializer "reconnect to master if application is preloaded" do
         config.after_initialize do
