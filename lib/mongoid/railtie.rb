@@ -85,7 +85,8 @@ module Rails #:nodoc:
       initializer "load http errors" do |app|
         config.after_initialize do
           ActionDispatch::ShowExceptions.rescue_responses.update({
-            "Mongoid::Errors::DocumentNotFound" => :not_found
+            "Mongoid::Errors::DocumentNotFound" => :not_found,
+            "Mongoid::Errors::Validations" => 422
           })
         end
       end
