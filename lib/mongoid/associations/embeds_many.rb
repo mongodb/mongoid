@@ -21,18 +21,6 @@ module Mongoid #:nodoc:
       alias :concat :<<
       alias :push :<<
 
-      # Inserts the given documents before the document with the
-      # given index (which may be negative).
-      # Sets the parent in the process.
-      def insert(index, *documents)
-        documents.each { |doc| doc.parentize(@parent, @association_name) }
-        @target.insert(index, *documents)
-        @target[index..-1].each_with_index do |doc, i|
-          doc._index = index + i
-          doc.notify
-        end
-      end
-
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
