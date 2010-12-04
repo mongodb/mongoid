@@ -3,8 +3,8 @@ module Mongoid #:nodoc:
   module Modifiers #:nodoc:
     class AddToSet < Command #:nodoc:
 
-      # Execute the persistence operation. This will increment the provided
-      # field by the supplied value. If no field exists, it will be created and
+      # Execute the persistence operation. This will add the supplied value to
+      # the provided array field. If no field exists, it will be created and
       # set to the value provided.
       #
       # Options:

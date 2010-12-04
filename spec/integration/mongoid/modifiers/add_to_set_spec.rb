@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Modifiers::AddToSet do
 
-  describe "#inc" do
+  describe "#addToSet" do
 
     let(:person) do
       Person.create(:ssn => "777-66-1010")
