@@ -45,7 +45,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "sets the inverse relation" do
-          account.creator.should == user
+          user.account.should == account
         end
       end
 
