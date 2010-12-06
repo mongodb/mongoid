@@ -395,6 +395,34 @@ describe Mongoid::Criteria do
 
   end
 
+  describe "#find" do
+    
+    before do
+      @context = stub.quacks_like(Mongoid::Contexts::Mongo.allocate)
+      @criteria.instance_variable_set(:@context, @context)
+      @conditions = BSON::ObjectId.new
+      @result = stub.quacks_like(Mongoid::Criteria.allocate)
+    end
+    
+    it 'calls translate_criteria on the class' do
+      Mongoid::Criteria.expects(:translate_criteria).with(@criteria, @conditions)
+      @criteria.find @conditions
+    end
+    
+    it 'optionally takes a :first position parameter' do
+      Mongoid::Criteria.expects(:translate_criteria).at_least_once.with(@criteria, @conditions).returns(@result)
+      @result.expects(:one)
+      @criteria.find :first, @conditions
+    end
+    
+    it 'optionally takes a :last position parameter' do
+      Mongoid::Criteria.expects(:translate_criteria).at_least_once.with(@criteria, @conditions).returns(@result)
+      @result.expects(:last)
+      @criteria.find :last, @conditions
+    end
+    
+  end
+
   describe "#first" do
 
     before do

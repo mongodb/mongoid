@@ -73,6 +73,10 @@ describe Mongoid::Config do
       it "returns nil, which is interpreted as the local time_zone" do
         config.use_utc.should be_false
       end
+
+      it "returns an empty hash without additional databases configured" do
+        config.databases.should == {}
+      end
     end
 
     context "mongoid_with_utc.yml" do
@@ -92,26 +96,11 @@ describe Mongoid::Config do
 
     context "mongoid_with_slaves.yml" do
 
-      let(:connection) do
-        stub(:server_version => version).quacks_like(Mongo::Connection.allocate)
-      end
-
-      let(:database) do
-        stub(:kind_of? => true, :connection => connection).quacks_like(Mongo::DB.allocate)
-      end
-
-      let(:version) do
-        Mongo::ServerVersion.new("2.0.0")
-      end
-
       before do
-        Mongo::Connection.stubs(:new => connection)
-        connection.stubs(:db => database)
-        database.stubs(:collections => []) #supress warning message from cleanup
-
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_slaves.yml")
         file = File.new(file_name)
         @settings = YAML.load(file.read)["test"]
+        config.expects(:check_database!).times(3)
         config.from_hash(@settings)
       end
 
@@ -119,6 +108,27 @@ describe Mongoid::Config do
 
       it "sets slaves" do
         config.slaves.should_not be_empty
+      end
+    end
+
+    context "mongoid_with_multiple_mongos.yml" do
+
+      before do
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_multiple_mongos.yml")
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.expects(:check_database!).times(3)
+        config.from_hash(@settings)
+      end
+
+      after { config.reset }
+
+      it "sets secondary database" do
+        config.databases.should_not be_empty
+      end
+
+      it "sets slaves for secondary database" do
+        config.databases["secondary_slaves"].should_not be_empty
       end
     end
 
@@ -134,8 +144,29 @@ describe Mongoid::Config do
       it "should set skip_version_check before it sets up the connection" do
         version_check_ordered = sequence('version_check_ordered')
         config.expects(:skip_version_check=).in_sequence(version_check_ordered)
-        config.expects(:_master).in_sequence(version_check_ordered)
         config.from_hash(settings)
+      end
+    end
+
+    context "deferring connection" do
+      let(:settings) do
+        {
+          "host" => "localhost",
+          "database" => "mongoid_config_test",
+        }
+      end
+      it "does not connect initially" do
+        config.reset
+        config.expects(:_master).never
+        config.expects(:_slave).never
+        config.from_hash(settings)
+      end
+      it "#master establishes deferred connection" do
+        config.reset
+        config.from_hash(settings)
+        config.send(:instance_variable_get, :@master).should be_nil
+        config.master.should_not be_nil
+        config.send(:instance_variable_get, :@master).should_not be_nil
       end
     end
   end

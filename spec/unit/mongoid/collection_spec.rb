@@ -40,6 +40,40 @@ describe Mongoid::Collection do
     end
   end
 
+  describe "master and slave" do
+
+    context "when the database is named" do
+      let(:secondary) { mock("secondary") }
+      let(:secondary_slaves) { mock("secondary_slaves") }
+      let(:collection) do
+        Mongoid::Collection.new(Business, "businesses")
+      end
+
+      before do
+        collection.instance_variable_set(:@master, nil)
+        collection.instance_variable_set(:@slaves, nil)
+      end
+
+      before do
+        Mongoid.expects(:databases).returns({
+          "secondary" => secondary,
+          "secondary_slaves" => secondary_slaves
+        })
+      end
+
+      it "should use the named database master" do
+        Mongoid::Collections::Master.expects(:new).with(secondary, "businesses")
+        collection.master
+      end
+
+      it "should use the named database slaves" do
+        Mongoid::Collections::Slaves.expects(:new).with(secondary_slaves, "businesses")
+        collection.slaves
+      end
+    end
+
+  end
+
   describe "#directed" do
 
     context "when an enslave option is not passed" do

@@ -19,6 +19,8 @@ module Mongoid #:nodoc:
       def initialize(document, options, target = nil)
         if target
           inverse = determine_name(target, options)
+          target_association = target.send(inverse)
+          document._index ||= target_association.respond_to?(:count) ? target_association.count : nil
           document.parentize(target, inverse)
           document.notify
           target.unmemoize(inverse)

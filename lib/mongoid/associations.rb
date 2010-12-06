@@ -14,9 +14,9 @@ require "mongoid/associations/meta_data"
 module Mongoid # :nodoc:
   module Associations #:nodoc:
     extend ActiveSupport::Concern
-    included do
-      include ForeignKey
+    include ForeignKey
 
+    included do
       cattr_accessor :embedded
       self.embedded = false
 
@@ -193,12 +193,16 @@ module Mongoid # :nodoc:
       # Options:
       #
       # name: A +Symbol+ that is the related class name pluralized.
+      # default_order: A +Criteria+ that specifies the default sort order for
+      # this association. (e.g. :position.asc). If an explicit ordering is
+      # specified on a +Criteria+ object, the default order will NOT be used.
       #
       # Example:
       #
       #   class Person
       #     include Mongoid::Document
       #     references_many :posts
+      #     references_many :board_games, :default_order => :title.asc
       #   end
       #
       def references_many(name, options = {}, &block)

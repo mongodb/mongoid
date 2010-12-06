@@ -67,7 +67,7 @@ class Person
     end
   end
 
-  references_many :posts, :dependent => :delete do
+  references_many :posts, :dependent => :delete, :default_order => :created_at.desc do
     def extension
       "Testing"
     end

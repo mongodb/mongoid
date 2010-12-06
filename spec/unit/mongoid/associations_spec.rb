@@ -640,6 +640,20 @@ describe Mongoid::Associations do
     end
   end
 
+  describe "default_order" do
+    before do
+      @person = Person.new
+    end
+
+    it "should default the order when no ordering is specified" do
+      @person.posts.instance_eval { @options }[:sort].should == [[:created_at, :desc]]
+    end
+
+    it "should not include the default order when specifying an ordering" do
+      @person.posts.asc(:title).instance_eval { @options }[:sort].should == [[:title, :asc]]
+    end
+  end
+
   describe ".references_many" do
 
     it "creates a getter for the association" do
@@ -754,7 +768,9 @@ describe Mongoid::Associations do
       end
 
       it "does nothing" do
-        Post.expects(:find).returns([])
+        results = []
+        results.stubs(:set_order_by)
+        Post.expects(:find).returns(results)
         @person.update_associations(:posts)
         @person.posts.first.should be_nil
       end

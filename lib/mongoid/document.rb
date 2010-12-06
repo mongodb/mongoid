@@ -2,9 +2,10 @@
 module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
-    included do
-      include Mongoid::Components
+    include Mongoid::Components
+    include Mongoid::MultiDatabase
 
+    included do
       attr_accessor :association_name
       attr_reader :new_record
     end
@@ -94,7 +95,7 @@ module Mongoid #:nodoc:
     # an empty +Hash+.
     #
     # If a primary key is defined, the document's id will be set to that key,
-    # otherwise it will be set to a fresh +BSON::ObjectID+ string.
+    # otherwise it will be set to a fresh +BSON::ObjectId+ string.
     #
     # Options:
     #

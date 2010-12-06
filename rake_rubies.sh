@@ -1,6 +1,6 @@
 #!/bin/bash
-rvm ruby-1.8.7@mongoid ruby -S bundle install      || exit $?
-rvm ruby-1.9.1@mongoid ruby -S bundle install      || exit $?
-rvm ruby-1.9.2@mongoid ruby -S bundle install || exit $?
-rvm ree@mongoid ruby -S bundle install             || exit $?
-rvm 1.8.7@mongoid,1.9.1,1.9.2,ree rake spec:progress
+rubies=( 1.8.7 1.9.1 1.9.2 ree )
+gemset="mongoid"
+
+for x in ${rubies[*]}; do rvm use --create $x@$gemset && bundle install || exit $?; done
+rvm ree@$gemset,1.8.7@$gemset,1.9.1@$gemset,1.9.2@$gemset rake spec:progress

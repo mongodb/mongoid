@@ -70,3 +70,18 @@ end
 class Pencil < Tool; end
 
 class Eraser < Tool; end
+
+########################################
+# These are for references relationships
+########################################
+class ShippingContainer
+  include Mongoid::Document
+  references_many :vehicles
+end
+class Vehicle
+  include Mongoid::Document
+  referenced_in :shipping_container
+end
+class Car < Vehicle; end
+class Truck < Vehicle; end
+

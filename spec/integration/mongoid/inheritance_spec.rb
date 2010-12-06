@@ -137,7 +137,7 @@ describe Mongoid::Document do
       Browser.count.should == 2
       Canvas.count.should == 3
     end
-    
+
     it "deletes all documents except for those belonging to parent class collection" do
       Firefox.delete_all
       Firefox.count.should == 0
@@ -164,6 +164,42 @@ describe Mongoid::Document do
     it "properly saves the subclasses" do
       from_db = Canvas.find(@canvas.id)
       from_db.palette.tools.map(&:class).should == [Pencil, Eraser]
+    end
+
+  end
+
+  context "Creating references_many documents from a parent association" do
+
+    before do
+      @container = ShippingContainer.create
+    end
+
+    it "should allow STI from << using model.new" do
+      @container.vehicles << Car.new({})
+      @container.vehicles << Truck.new({})
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+
+    it "should allow STI from << using model.create" do
+      @container.vehicles << Car.create({})
+      @container.vehicles << Truck.create({})
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+
+    it "should allow STI from the build call" do
+      car = @container.vehicles.build({},Car)
+      car.save
+
+      truck = @container.vehicles.build({},Truck)
+      truck.save
+
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+
+    it "should allow STI from the build call" do
+      @container.vehicles.create({},Car)
+      @container.vehicles.create({},Truck)
+      @container.vehicles.map(&:class).should == [Car,Truck]
     end
 
   end

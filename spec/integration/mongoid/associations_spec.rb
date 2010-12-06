@@ -507,6 +507,35 @@ describe Mongoid::Associations do
       end
     end
 
+    context "saving a new parent document with new children" do
+
+      let(:person) { Person.create }
+      let(:address) { Address.create(:addressable => person) }
+      let!(:first_location) { Location.create(:address => address) }
+      let!(:second_location) { Location.create(:address => address) }
+
+      it "saves the person" do
+        Person.last.should == person
+      end
+
+      it "saves the address" do
+        Person.last.addresses.last.should == address
+        address._index.should == 0
+      end
+
+      it "saves the first location with the correct index" do
+        first_location._index.should == 0
+      end
+
+      it "saves the second location with the correct index" do
+        second_location._index.should == 1
+      end
+
+      it "has the locations in the association array" do
+        Person.last.addresses.last.locations.should == [first_location, second_location]
+      end
+    end
+
     context "saving an existing parent document with existing children" do
 
       before do

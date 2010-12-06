@@ -83,7 +83,7 @@ module Mongoid #:nodoc
     #
     # Options:
     #
-    # map: The map javascript funcdtion.
+    # map: The map javascript function.
     # reduce: The reduce javascript function.
     def map_reduce(map, reduce, options = {})
       directed(options).map_reduce(map, reduce, options)
@@ -98,7 +98,8 @@ module Mongoid #:nodoc
     #
     # <tt>collection.writer</tt>
     def master
-      @master ||= Collections::Master.new(Mongoid.master, @name)
+      db = Mongoid.databases[@klass.database] || Mongoid.master
+      @master ||= Collections::Master.new(db, @name)
     end
 
     # Return the object responsible for reading documents from the database.
@@ -109,7 +110,8 @@ module Mongoid #:nodoc
     #
     # <tt>collection.reader</tt>
     def slaves
-      @slaves ||= Collections::Slaves.new(Mongoid.slaves, @name)
+      slaves = Mongoid.databases["#{@klass.database}_slaves"] || Mongoid.slaves
+      @slaves ||= Collections::Slaves.new(slaves, @name)
     end
 
     protected

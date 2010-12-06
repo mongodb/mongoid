@@ -48,6 +48,35 @@ module Mongoid #:nodoc
     attr_reader :use_utc
     alias_method :use_utc?, :use_utc
 
+    # Sets whether the times returned from the database use the ruby or
+    # the ActiveSupport time zone.
+    # If you omit this setting, then times will use the ruby time zone.
+    #
+    # Example:
+    #
+    # <tt>Config.use_activesupport_time_zone = true</tt>
+    #
+    # Returns:
+    #
+    # A boolean
+    def use_activesupport_time_zone=(value)
+      @use_activesupport_time_zone = value || false
+    end
+
+    # Sets whether the times returned from the database use the ruby or
+    # the ActiveSupport time zone.
+    # If the setting is false, then times will use the ruby time zone.
+    #
+    # Example:
+    #
+    # <tt>Config.use_activesupport_time_zone</tt>
+    #
+    # Returns:
+    #
+    # A boolean
+    attr_reader :use_activesupport_time_zone
+    alias_method :use_activesupport_time_zone?, :use_activesupport_time_zone
+
     # Sets the Mongo::DB master database to be used. If the object trying to be
     # set is not a valid +Mongo::DB+, then an error will be raised.
     #
@@ -74,7 +103,10 @@ module Mongoid #:nodoc
     #
     # The master +Mongo::DB+
     def master
-      raise Errors::InvalidDatabase.new(nil) unless @master
+      unless @master
+        _master(@settings)  if @settings
+        raise Errors::InvalidDatabase.new(nil) unless @master
+      end
       if @reconnect
         @reconnect = false
         reconnect!
@@ -113,7 +145,24 @@ module Mongoid #:nodoc
     #
     # The slave +Mongo::DBs+
     def slaves
+      _slaves(@settings)  unless @slaves || !@settings
       @slaves
+    end
+
+    # TODO: Docs
+    def databases=(databases)
+      databases.values.each do |value|
+        Array.wrap(value).each do |database|
+          check_database!(database)
+        end
+      end
+      @databases = databases
+    end
+
+    # TODO: Docs
+    def databases
+      _databases(@settings) unless @databases || !@settings
+      @databases || {}
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -162,11 +211,10 @@ module Mongoid #:nodoc
     #
     # <tt>Mongoid::Config.instance.from_hash({})</tt>
     def from_hash(settings)
-      settings.except("database", "slaves").each_pair do |name, value|
+      settings.except("database", "slaves", "databases").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      _master(settings)
-      _slaves(settings)
+      @settings = settings.dup
     end
 
     # Adds a new I18n locale file to the load path
@@ -234,12 +282,40 @@ module Mongoid #:nodoc
 
     # Get a master database from settings.
     #
-    # TODO: Durran: This code's a bit hairy, refactor.
-    #
     # Example:
     #
     # <tt>config._master({}, "test")</tt>
     def _master(settings)
+      self.master = database_from_hash(settings)
+    end
+
+    # Get a bunch-o-slaves from settings and names.
+    #
+    # Example:
+    #
+    # <tt>config._slaves({}, "test")</tt>
+    def _slaves(settings)
+      self.slaves = settings["slaves"].to_a.map do |slave|
+        database_from_hash({"database" => master.name}.merge(slave), :slave_ok => true)
+      end
+    end
+
+    def _databases(settings)
+      databases = {}.tap do |hash|
+        settings["databases"].each do |key, database|
+          db = database_from_hash(database)
+          hash[key] = db
+
+          hash[key+"_slaves"] = database["slaves"].to_a.map do |slave|
+            database_from_hash({"database" => db.name}.merge(slave), :slave_ok => true)
+          end
+        end if settings["databases"]
+      end
+
+      self.databases = databases
+    end
+
+    def database_from_hash(settings, connection_options={})
       mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
 
       name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
@@ -249,43 +325,18 @@ module Mongoid #:nodoc
       username = settings["username"] || mongo_uri.user
       password = settings["password"] || mongo_uri.password
 
-      connection = Mongo::Connection.new(host, port, :logger => Mongoid::Logger.new, :pool_size => pool_size)
-      if username || password
-        connection.add_auth(name, username, password)
-        connection.apply_saved_authentication
-      end
-      self.master = connection.db(name)
-    end
+      local_options = {
+        :logger => Mongoid::Logger.new,
+        :pool_size => pool_size
+      }.merge(connection_options)
 
-    # Get a bunch-o-slaves from settings and names.
-    #
-    # TODO: Durran: This code's a bit hairy, refactor.
-    #
-    # Example:
-    #
-    # <tt>config._slaves({}, "test")</tt>
-    def _slaves(settings)
-      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
-      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
-      self.slaves = []
-      slaves = settings["slaves"]
-      slaves.to_a.each do |slave|
-        slave_uri = slave["uri"].present? ? URI.parse(slave["uri"]) : OpenStruct.new
-        slave_username = slave["username"] || slave_uri.user
-        slave_password = slave["password"] || slave_uri.password
-
-        slave_connection = Mongo::Connection.new(
-          slave["host"] || slave_uri.host || "localhost",
-          slave["port"] || slave_uri.port,
-          :slave_ok => true
-        )
-
-        if slave_username || slave_password
-          slave_connection.add_auth(name, slave_username, slave_password)
-          slave_connection.apply_saved_authentication
+      Mongo::Connection.new(host, port, local_options).tap do |connection|
+        if username || password
+          connection.add_auth(name, username, password)
+          connection.apply_saved_authentication
         end
-        self.slaves << slave_connection.db(name)
-      end
+      end.db(name)
     end
   end
+
 end

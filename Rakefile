@@ -9,6 +9,7 @@ require "rspec/core/rake_task"
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
 
+task :gem => :build
 task :build do
   system "gem build mongoid.gemspec"
 end
