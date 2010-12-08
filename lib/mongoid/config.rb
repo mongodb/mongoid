@@ -104,8 +104,9 @@ module Mongoid #:nodoc
     #
     # The master +Mongo::DB+
     def master
+      replica_set
       unless @master
-        _master(@settings)  if @settings
+        _master(@settings) if @settings
         raise Errors::InvalidDatabase.new(nil) unless @master
       end
       if @reconnect
@@ -115,27 +116,26 @@ module Mongoid #:nodoc
       @master
     end
 
-    alias :database :master
+    alias :database  :master
     alias :database= :master=
-    alias :primary :master
-    alias :primary= :master=
+    alias :primary   :master
+    alias :primary=  :master=
 
-
-      # Returns the replica set databases or nil if none have been set.
-      #
-      # Example:
-      #
-      # <tt>Config.replica_set</tt>
-      #
-      # Returns:
-      #
-      # The replica set of +Mongo::DBs+
-      def replica_set
-        unless @replica_set || !@settings
-          _replica(@settings)
-        end
-        @replica_set
+    # Returns the replica set databases or nil if none have been set.
+    #
+    # Example:
+    #
+    # <tt>Config.replica_set</tt>
+    #
+    # Returns:
+    #
+    # The replica set of +Mongo::DBs+
+    def replica_set
+      unless @replica_set || !@settings
+        _replica(@settings)
       end
+      @replica_set
+    end
 
     # Returns the replica set databases or nil if none have been set.
     #
