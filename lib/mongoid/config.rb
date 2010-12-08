@@ -118,24 +118,24 @@ module Mongoid #:nodoc
 
     alias :database  :master
     alias :database= :master=
-    alias :primary   :master
+      alias :primary   :master
     alias :primary=  :master=
 
-    # Returns the replica set databases or nil if none have been set.
-    #
-    # Example:
-    #
-    # <tt>Config.replica_set</tt>
-    #
-    # Returns:
-    #
-    # The replica set of +Mongo::DBs+
-    def replica_set
-      unless @replica_set || !@settings
-        _replica(@settings)
+      # Returns the replica set databases or nil if none have been set.
+      #
+      # Example:
+      #
+      # <tt>Config.replica_set</tt>
+      #
+      # Returns:
+      #
+      # The replica set of +Mongo::DBs+
+      def replica_set
+        unless @replica_set || !@settings
+          _replica(@settings)
+        end
+        @replica_set
       end
-      @replica_set
-    end
 
     # Returns the replica set databases or nil if none have been set.
     #
@@ -219,7 +219,7 @@ module Mongoid #:nodoc
     def destructive_fields
       @destructive_fields ||= lambda {
         klass = Class.new do
-        include Mongoid::Document
+          include Mongoid::Document
         end
       klass.instance_methods(true).collect { |method| method.to_s }
       }.call
@@ -322,7 +322,7 @@ module Mongoid #:nodoc
 
       unless set.empty?
         connection = Mongo::Connection.multi(set, 
-                                              :allow_read_secondary => self.allow_read_secondary)
+                                             :allow_read_secondary => self.allow_read_secondary)
         self.replica_set = connection.db(name)
         self.primary = self.replica_set
       end
