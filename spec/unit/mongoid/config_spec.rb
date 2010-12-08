@@ -13,7 +13,7 @@ describe Mongoid::Config do
 
       it "raises an error" do
         lambda { config.database = "Test" }.should
-          raise_error(Mongoid::Errors::InvalidDatabase)
+        raise_error(Mongoid::Errors::InvalidDatabase)
       end
     end
   end
@@ -66,6 +66,10 @@ describe Mongoid::Config do
         config.persist_in_safe_mode.should == false
       end
 
+      it "sets allow_read_secondary" do
+        config.allow_read_secondary.should == false
+      end
+
       it "sets raise_not_found_error" do
         config.raise_not_found_error.should == false
       end
@@ -87,6 +91,41 @@ describe Mongoid::Config do
 
       it "sets time_zone" do
         config.use_utc.should be_true
+      end
+    end
+
+    context "mongoid_with_replicasets.yml" do
+     let(:connection) do
+       stub(:server_version => version).quacks_like(Mongo::Connection.allocate)
+      end
+
+      let(:database) do
+        stub(:kind_of? => true, :connection => connection).quacks_like(Mongo::DB.allocate)
+      end
+
+      let(:version) do
+        Mongo::ServerVersion.new("2.0.0")
+      end
+
+      before do
+        Mongo::Connection.stubs(:multi => connection)
+        connection.stubs(:db => database)
+
+        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_replicasets.yml")
+        file = File.new(file_name)
+        @settings = YAML.load(file.read)["test"]
+        config.from_hash(@settings)
+      end
+ 
+      after { config.reset }
+
+      it "has allow read slave true" do
+        config.allow_read_secondary.should be_true
+      end
+
+      it "has a set of hosts and a master is primary" do
+        config.replica_set.should_not be_nil
+        config.primary.should_not be_nil
       end
     end
 
@@ -167,7 +206,7 @@ describe Mongoid::Config do
 
       it "raises an error" do
         lambda { config.master = "Test" }.should
-          raise_error(Mongoid::Errors::InvalidDatabase)
+        raise_error(Mongoid::Errors::InvalidDatabase)
       end
     end
 
@@ -193,7 +232,7 @@ describe Mongoid::Config do
 
       it "raises an error" do
         lambda { config.master = database }.should
-          raise_error(Mongoid::Errors::UnsupportedVersion)
+        raise_error(Mongoid::Errors::UnsupportedVersion)
       end
     end
   end
@@ -387,7 +426,7 @@ describe Mongoid::Config do
 
       it "raises an error" do
         lambda { config.slaves = [ database ] }.should
-          raise_error(Mongoid::Errors::UnsupportedVersion)
+        raise_error(Mongoid::Errors::UnsupportedVersion)
       end
     end
   end

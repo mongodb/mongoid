@@ -13,6 +13,7 @@ module Mongoid #:nodoc
       :persist_in_safe_mode,
       :raise_not_found_error,
       :autocreate_indexes,
+      :allow_read_secondary,
       :skip_version_check
 
     # Initializes the configuration with default settings.
@@ -116,6 +117,42 @@ module Mongoid #:nodoc
 
     alias :database :master
     alias :database= :master=
+    alias :primary :master
+    alias :primary= :master=
+
+
+      # Returns the replica set databases or nil if none have been set.
+      #
+      # Example:
+      #
+      # <tt>Config.replica_set</tt>
+      #
+      # Returns:
+      #
+      # The replica set of +Mongo::DBs+
+      def replica_set
+        unless @replica_set || !@settings
+          _replica(@settings)
+        end
+        @replica_set
+      end
+
+    # Returns the replica set databases or nil if none have been set.
+    #
+    # Replica sets do not support user or password auth
+    #
+    # Example:
+    #
+    # <tt>Config.replica_set</tt>
+    #
+    # Returns:
+    #
+    # The replica set of +Mongo::DBs+
+    def replica_set=(replica_set)
+      return unless replica_set
+      check_database!(replica_set)
+      @replica_set = replica_set
+    end
 
     # Sets the Mongo::DB slave databases to be used. If the objects provided
     # are not valid +Mongo::DBs+ an error will be raised.
@@ -182,9 +219,9 @@ module Mongoid #:nodoc
     def destructive_fields
       @destructive_fields ||= lambda {
         klass = Class.new do
-          include Mongoid::Document
+        include Mongoid::Document
         end
-        klass.instance_methods(true).collect { |method| method.to_s }
+      klass.instance_methods(true).collect { |method| method.to_s }
       }.call
     end
 
@@ -195,7 +232,7 @@ module Mongoid #:nodoc
     #
     # <tt>Mongoid::Config.instance.from_hash({})</tt>
     def from_hash(settings)
-      settings.except("database", "slaves").each_pair do |name, value|
+      settings.except("database", "slaves", "replica_set").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
       @settings = settings.dup
@@ -247,6 +284,7 @@ module Mongoid #:nodoc
       @autocreate_indexes = false
       @skip_version_check = false
       @time_zone = nil
+      @allow_read_secondary = false
     end
 
     protected
@@ -261,6 +299,32 @@ module Mongoid #:nodoc
       unless Mongoid.skip_version_check
         version = database.connection.server_version
         raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+      end
+    end
+
+    # Configure a replica set connection from settings.
+    #
+    #
+    # Example:
+    #
+    # <tt>config._replicas({})</tt>
+    def _replica(settings)
+      replicas = settings["replica_set"]
+      name     = settings["database"]
+
+      set = []
+      replicas.to_a.each do |replica|
+        mongo_uri = replica["uri"].present? ? URI.parse(replica["uri"]) : OpenStruct.new
+        host = replica["host"] || mongo_uri.host || "localhost"
+        port = replica["port"] || mongo_uri.port || 27017
+        set << [host,port]
+      end
+
+      unless set.empty?
+        connection = Mongo::Connection.multi(set, 
+                                              :allow_read_secondary => self.allow_read_secondary)
+        self.replica_set = connection.db(name)
+        self.primary = self.replica_set
       end
     end
 
@@ -281,7 +345,9 @@ module Mongoid #:nodoc
       username = settings["username"] || mongo_uri.user
       password = settings["password"] || mongo_uri.password
 
-      connection = Mongo::Connection.new(host, port, :logger => Mongoid::Logger.new, :pool_size => pool_size)
+      connection = Mongo::Connection.new(host, port, 
+                                         :logger => Mongoid::Logger.new, 
+                                         :pool_size => pool_size)
       if username || password
         connection.add_auth(name, username, password)
         connection.apply_saved_authentication
