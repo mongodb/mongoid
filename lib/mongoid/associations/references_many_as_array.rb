@@ -40,6 +40,41 @@ module Mongoid #:nodoc:
       alias :concat :<<
       alias :push :<<
 
+      # Overwrites the content of this association. This will also take care
+      # of the inverse association.
+      def assign(*objects)
+        if inverse?
+          # Remove the current content from the collection on the other side
+          @target.each do |object|
+            reverse_key = reverse_key(object)
+            if inverse_of(object).macro == :references_many
+              object.send(reverse_key).delete @parent.id
+            end
+          end
+        end
+        objects = objects.flatten
+        # Overwrite the collection of object
+        @target = objects
+        # Overwrite the collection of ids
+        @parent.send :"#{ @foreign_key }=", objects.map(&:id)
+        # Save objects if necessary
+        objects.each &:save unless @parent.new_record?
+        if inverse?
+          # Take care of the inverse association
+          objects.each do |object|
+            reverse_key = reverse_key(object)
+            case inverse_of(object).macro
+            when :references_many
+              object.send(reverse_key) << @parent.id
+            when :referenced_in
+              object.send("#{reverse_key}=", @parent.id)
+            end
+          end
+        end
+        # Save the parent itself if necessary
+        @parent.save unless @parent.new_record?
+      end
+
       # Builds a new Document and adds it to the association collection. The
       # document created will be of the same class as the others in the
       # association, and the attributes will be passed into the constructor.
@@ -117,9 +152,7 @@ module Mongoid #:nodoc:
         #
         # <tt>ReferencesManyAsArray.update(preferences, person, options)</tt>
         def update(target, document, options)
-          target.each do |child|
-            document.send(options.name) << child
-          end
+          document.send(options.name).assign target
           instantiate(document, options, target)
         end
       end
