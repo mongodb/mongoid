@@ -485,6 +485,26 @@ describe Mongoid::Associations::ReferencesManyAsArray do
           @parent.preference_ids.should include(@first.id)
           @parent.preference_ids.should include(@second.id)
         end
+
+        it 'overwrites the content of the association' do
+          if options.inverse_of.present?
+            @related.each do |preference|
+              preference.person_ids.should include(@parent.id)
+            end
+          end
+          other_related = (0..5).map { Preference.new }
+          Mongoid::Associations::ReferencesManyAsArray.update other_related, @parent, options
+          @parent.preference_ids.length.should == other_related.length
+          (@parent.preference_ids - other_related.map(&:id)).should be_empty
+          if options.inverse_of.present?
+            @related.each do |preference|
+              preference.person_ids.should_not include(@parent.id)
+            end
+            other_related.each do |preference|
+              preference.person_ids.should include(@parent.id)
+            end
+          end
+        end
       end
     end
   end
