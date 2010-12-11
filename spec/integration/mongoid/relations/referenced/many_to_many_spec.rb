@@ -386,7 +386,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         context "when the children are not persisted" do
 
-          let!(:post) do
+          let!(:preference) do
             person.preferences.build(:name => "setting")
           end
 
@@ -604,8 +604,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             person.preferences.send(method)
           end
 
-          it "removes the correct posts" do
-            person.posts.count.should == 0
+          it "removes the correct preferences" do
+            person.preferences.count.should == 0
           end
 
           it "deletes the documents from the database" do
@@ -840,159 +840,85 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#find_or_create_by" do
+  describe "#find_or_create_by" do
 
-    # context "when the relation is not polymorphic" do
+    context "when the relation is not polymorphic" do
 
-      # let(:person) do
-        # Person.create
-      # end
+      let(:person) do
+        Person.create(:ssn => "666-66-1321")
+      end
 
-      # let!(:post) do
-        # person.posts.create(:title => "Testing")
-      # end
+      let!(:preference) do
+        person.preferences.create(:name => "Testing")
+      end
 
-      # context "when the document exists" do
+      context "when the document exists" do
 
-        # let(:found) do
-          # person.posts.find_or_create_by(:title => "Testing")
-        # end
+        let(:found) do
+          person.preferences.find_or_create_by(:name => "Testing")
+        end
 
-        # it "returns the document" do
-          # found.should == post
-        # end
-      # end
+        it "returns the document" do
+          found.should == preference
+        end
+      end
 
-      # context "when the document does not exist" do
+      context "when the document does not exist" do
 
-        # let(:found) do
-          # person.posts.find_or_create_by(:title => "Test")
-        # end
+        let(:found) do
+          person.preferences.find_or_create_by(:name => "Test")
+        end
 
-        # it "sets the new document attributes" do
-          # found.title.should == "Test"
-        # end
+        it "sets the new document attributes" do
+          found.name.should == "Test"
+        end
 
-        # it "returns a newly persisted document" do
-          # found.should be_persisted
-        # end
-      # end
-    # end
+        it "returns a newly persisted document" do
+          found.should be_persisted
+        end
+      end
+    end
+  end
 
-    # context "when the relation is polymorphic" do
+  describe "#find_or_initialize_by" do
 
-      # let(:movie) do
-        # Movie.create
-      # end
+    context "when the relation is not polymorphic" do
 
-      # let!(:rating) do
-        # movie.ratings.create(:value => 1)
-      # end
+      let(:person) do
+        Person.create(:ssn => "666-67-1234")
+      end
 
-      # context "when the document exists" do
+      let!(:preference) do
+        person.preferences.create(:name => "Testing")
+      end
 
-        # let(:found) do
-          # movie.ratings.find_or_create_by(:value => 1)
-        # end
+      context "when the document exists" do
 
-        # it "returns the document" do
-          # found.should == rating
-        # end
-      # end
+        let(:found) do
+          person.preferences.find_or_initialize_by(:name => "Testing")
+        end
 
-      # context "when the document does not exist" do
+        it "returns the document" do
+          found.should == preference
+        end
+      end
 
-        # let(:found) do
-          # movie.ratings.find_or_create_by(:value => 3)
-        # end
+      context "when the document does not exist" do
 
-        # it "sets the new document attributes" do
-          # found.value.should == 3
-        # end
+        let(:found) do
+          person.preferences.find_or_initialize_by(:name => "Test")
+        end
 
-        # it "returns a newly persisted document" do
-          # found.should be_persisted
-        # end
-      # end
-    # end
-  # end
+        it "sets the new document attributes" do
+          found.name.should == "Test"
+        end
 
-  # describe "#find_or_initialize_by" do
-
-    # context "when the relation is not polymorphic" do
-
-      # let(:person) do
-        # Person.create
-      # end
-
-      # let!(:post) do
-        # person.posts.create(:title => "Testing")
-      # end
-
-      # context "when the document exists" do
-
-        # let(:found) do
-          # person.posts.find_or_initialize_by(:title => "Testing")
-        # end
-
-        # it "returns the document" do
-          # found.should == post
-        # end
-      # end
-
-      # context "when the document does not exist" do
-
-        # let(:found) do
-          # person.posts.find_or_initialize_by(:title => "Test")
-        # end
-
-        # it "sets the new document attributes" do
-          # found.title.should == "Test"
-        # end
-
-        # it "returns a non persisted document" do
-          # found.should_not be_persisted
-        # end
-      # end
-    # end
-
-    # context "when the relation is polymorphic" do
-
-      # let(:movie) do
-        # Movie.create
-      # end
-
-      # let!(:rating) do
-        # movie.ratings.create(:value => 1)
-      # end
-
-      # context "when the document exists" do
-
-        # let(:found) do
-          # movie.ratings.find_or_initialize_by(:value => 1)
-        # end
-
-        # it "returns the document" do
-          # found.should == rating
-        # end
-      # end
-
-      # context "when the document does not exist" do
-
-        # let(:found) do
-          # movie.ratings.find_or_initialize_by(:value => 3)
-        # end
-
-        # it "sets the new document attributes" do
-          # found.value.should == 3
-        # end
-
-        # it "returns a non persisted document" do
-          # found.should_not be_persisted
-        # end
-      # end
-    # end
-  # end
+        it "returns a non persisted document" do
+          found.should_not be_persisted
+        end
+      end
+    end
+  end
 
   # [ :size, :length ].each do |method|
 
