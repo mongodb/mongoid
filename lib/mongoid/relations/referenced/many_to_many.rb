@@ -80,6 +80,33 @@ module Mongoid # :nodoc:
           metadata.klass.destroy_all(:conditions => selector.merge(scoping))
         end
 
+        # Find the matchind document on the association, either based on id or
+        # conditions.
+        #
+        # Example:
+        #
+        # <tt>person.find(ObjectID("4c52c439931a90ab29000005"))</tt>
+        # <tt>person.find(:all, :conditions => { :title => "Sir" })</tt>
+        # <tt>person.find(:first, :conditions => { :title => "Sir" })</tt>
+        # <tt>person.find(:last, :conditions => { :title => "Sir" })</tt>
+        #
+        # Options:
+        #
+        # arg: Either an id or a type of search.
+        # options: a Hash of selector arguments.
+        #
+        # Returns:
+        #
+        # The matching document or documents.
+        def find(arg, options = {})
+          klass = metadata.klass
+          return klass.criteria.id_criteria(arg) unless arg.is_a?(Symbol)
+          selector = (options[:conditions] || {}).merge(
+            "_id" => { "$in" => base.send(metadata.foreign_key) }
+          )
+          klass.find(arg, :conditions => selector)
+        end
+
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #

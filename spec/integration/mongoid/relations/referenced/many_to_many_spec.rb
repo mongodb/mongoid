@@ -649,384 +649,196 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # describe "#find" do
+  describe "#find" do
 
-    # context "when the relation is not polymorphic" do
+    context "when the relation is not polymorphic" do
 
-      # let(:person) do
-        # Person.create
-      # end
+      let(:person) do
+        Person.create(:ssn => "777-67-0000")
+      end
 
-      # let!(:post_one) do
-        # person.posts.create(:title => "Test")
-      # end
+      let!(:preference_one) do
+        person.preferences.create(:name => "Test")
+      end
 
-      # let!(:post_two) do
-        # person.posts.create(:title => "OMG I has relations")
-      # end
+      let!(:preference_two) do
+        person.preferences.create(:name => "OMG I has relations")
+      end
 
-      # context "when providing an id" do
+      context "when providing an id" do
 
-        # context "when the id matches" do
+        context "when the id matches" do
 
-          # let(:post) do
-            # person.posts.find(post_one.id)
-          # end
+          let(:preference) do
+            person.preferences.find(preference_one.id)
+          end
 
-          # it "returns the matching document" do
-            # post.should == post_one
-          # end
-        # end
+          it "returns the matching document" do
+            preference.should == preference_one
+          end
+        end
 
-        # context "when the id does not match" do
+        context "when the id does not match" do
 
-          # context "when config set to raise error" do
+          context "when config set to raise error" do
 
-            # before do
-              # Mongoid.raise_not_found_error = true
-            # end
+            before do
+              Mongoid.raise_not_found_error = true
+            end
 
-            # after do
-              # Mongoid.raise_not_found_error = false
-            # end
+            after do
+              Mongoid.raise_not_found_error = false
+            end
 
-            # it "raises an error" do
-              # expect {
-                # person.posts.find(BSON::ObjectId.new)
-              # }.to raise_error(Mongoid::Errors::DocumentNotFound)
-            # end
-          # end
+            it "raises an error" do
+              expect {
+                person.preferences.find(BSON::ObjectId.new)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
 
-          # context "when config set not to raise error" do
+          context "when config set not to raise error" do
 
-            # let(:post) do
-              # person.posts.find(BSON::ObjectId.new)
-            # end
+            let(:preference) do
+              person.preferences.find(BSON::ObjectId.new)
+            end
 
-            # before do
-              # Mongoid.raise_not_found_error = false
-            # end
+            before do
+              Mongoid.raise_not_found_error = false
+            end
 
-            # it "returns nil" do
-              # post.should be_nil
-            # end
-          # end
-        # end
-      # end
+            it "returns nil" do
+              preference.should be_nil
+            end
+          end
+        end
+      end
 
-      # context "when providing an array of ids" do
+      context "when providing an array of ids" do
 
-        # context "when the ids match" do
+        context "when the ids match" do
 
-          # let(:posts) do
-            # person.posts.find([ post_one.id, post_two.id ])
-          # end
+          let(:preferences) do
+            person.preferences.find([ preference_one.id, preference_two.id ])
+          end
 
-          # it "returns the matching documents" do
-            # posts.should == [ post_one, post_two ]
-          # end
-        # end
+          it "returns the matching documents" do
+            preferences.should == [ preference_one, preference_two ]
+          end
+        end
 
-        # context "when the ids do not match" do
+        context "when the ids do not match" do
 
-          # context "when config set to raise error" do
+          context "when config set to raise error" do
 
-            # before do
-              # Mongoid.raise_not_found_error = true
-            # end
+            before do
+              Mongoid.raise_not_found_error = true
+            end
 
-            # after do
-              # Mongoid.raise_not_found_error = false
-            # end
+            after do
+              Mongoid.raise_not_found_error = false
+            end
 
-            # it "raises an error" do
-              # expect {
-                # person.posts.find([ BSON::ObjectId.new ])
-              # }.to raise_error(Mongoid::Errors::DocumentNotFound)
-            # end
-          # end
+            it "raises an error" do
+              expect {
+                person.preferences.find([ BSON::ObjectId.new ])
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
 
-          # context "when config set not to raise error" do
+          context "when config set not to raise error" do
 
-            # let(:posts) do
-              # person.posts.find([ BSON::ObjectId.new ])
-            # end
+            let(:preferences) do
+              person.preferences.find([ BSON::ObjectId.new ])
+            end
 
-            # before do
-              # Mongoid.raise_not_found_error = false
-            # end
+            before do
+              Mongoid.raise_not_found_error = false
+            end
 
-            # it "returns an empty array" do
-              # posts.should be_empty
-            # end
-          # end
-        # end
-      # end
+            it "returns an empty array" do
+              preferences.should be_empty
+            end
+          end
+        end
+      end
 
-      # context "when finding first" do
+      context "when finding first" do
 
-        # context "when there is a match" do
+        context "when there is a match" do
 
-          # let(:post) do
-            # person.posts.find(:first, :conditions => { :title => "Test" })
-          # end
+          let(:preference) do
+            person.preferences.find(:first, :conditions => { :name => "Test" })
+          end
 
-          # it "returns the first matching document" do
-            # post.should == post_one
-          # end
-        # end
+          it "returns the first matching document" do
+            preference.should == preference_one
+          end
+        end
 
-        # context "when there is no match" do
+        context "when there is no match" do
 
-          # let(:post) do
-            # person.posts.find(:first, :conditions => { :title => "Testing" })
-          # end
+          let(:preference) do
+            person.preferences.find(:first, :conditions => { :name => "Testing" })
+          end
 
-          # it "returns nil" do
-            # post.should be_nil
-          # end
-        # end
-      # end
+          it "returns nil" do
+            preference.should be_nil
+          end
+        end
+      end
 
-      # context "when finding last" do
+      context "when finding last" do
 
-        # context "when there is a match" do
+        context "when there is a match" do
 
-          # let(:post) do
-            # person.posts.find(:last, :conditions => { :title => "OMG I has relations" })
-          # end
+          let(:preference) do
+            person.preferences.find(:last, :conditions => { :name => "OMG I has relations" })
+          end
 
-          # it "returns the last matching document" do
-            # post.should == post_two
-          # end
-        # end
+          it "returns the last matching document" do
+            preference.should == preference_two
+          end
+        end
 
-        # context "when there is no match" do
+        context "when there is no match" do
 
-          # let(:post) do
-            # person.posts.find(:last, :conditions => { :title => "Testing" })
-          # end
+          let(:preference) do
+            person.preferences.find(:last, :conditions => { :name => "Testing" })
+          end
 
-          # it "returns nil" do
-            # post.should be_nil
-          # end
-        # end
-      # end
+          it "returns nil" do
+            preference.should be_nil
+          end
+        end
+      end
 
-      # context "when finding all" do
+      context "when finding all" do
 
-        # context "when there is a match" do
+        context "when there is a match" do
 
-          # let(:posts) do
-            # person.posts.find(:all, :conditions => { :title => { "$exists" => true } })
-          # end
+          let(:preferences) do
+            person.preferences.find(:all, :conditions => { :name => { "$exists" => true } })
+          end
 
-          # it "returns the matching documents" do
-            # posts.should == [ post_one, post_two ]
-          # end
-        # end
+          it "returns the matching documents" do
+            preferences.should == [ preference_one, preference_two ]
+          end
+        end
 
-        # context "when there is no match" do
+        context "when there is no match" do
 
-          # let(:posts) do
-            # person.posts.find(:all, :conditions => { :title => "Other" })
-          # end
+          let(:preferences) do
+            person.preferences.find(:all, :conditions => { :name => "Other" })
+          end
 
-          # it "returns an empty array" do
-            # posts.should be_empty
-          # end
-        # end
-      # end
-    # end
-
-    # context "when the relation is polymorphic" do
-
-      # let(:movie) do
-        # Movie.create
-      # end
-
-      # let!(:rating_one) do
-        # movie.ratings.create(:value => 1)
-      # end
-
-      # let!(:rating_two) do
-        # movie.ratings.create(:value => 5)
-      # end
-
-      # context "when providing an id" do
-
-        # context "when the id matches" do
-
-          # let(:rating) do
-            # movie.ratings.find(rating_one.id)
-          # end
-
-          # it "returns the matching document" do
-            # rating.should == rating_one
-          # end
-        # end
-
-        # context "when the id does not match" do
-
-          # context "when config set to raise error" do
-
-            # before do
-              # Mongoid.raise_not_found_error = true
-            # end
-
-            # after do
-              # Mongoid.raise_not_found_error = false
-            # end
-
-            # it "raises an error" do
-              # expect {
-                # movie.ratings.find(BSON::ObjectId.new)
-              # }.to raise_error(Mongoid::Errors::DocumentNotFound)
-            # end
-          # end
-
-          # context "when config set not to raise error" do
-
-            # let(:rating) do
-              # movie.ratings.find(BSON::ObjectId.new)
-            # end
-
-            # before do
-              # Mongoid.raise_not_found_error = false
-            # end
-
-            # it "returns nil" do
-              # rating.should be_nil
-            # end
-          # end
-        # end
-      # end
-
-      # context "when providing an array of ids" do
-
-        # context "when the ids match" do
-
-          # let(:ratings) do
-            # movie.ratings.find([ rating_one.id, rating_two.id ])
-          # end
-
-          # it "returns the matching documents" do
-            # ratings.should == [ rating_one, rating_two ]
-          # end
-        # end
-
-        # context "when the ids do not match" do
-
-          # context "when config set to raise error" do
-
-            # before do
-              # Mongoid.raise_not_found_error = true
-            # end
-
-            # after do
-              # Mongoid.raise_not_found_error = false
-            # end
-
-            # it "raises an error" do
-              # expect {
-                # movie.ratings.find([ BSON::ObjectId.new ])
-              # }.to raise_error(Mongoid::Errors::DocumentNotFound)
-            # end
-          # end
-
-          # context "when config set not to raise error" do
-
-            # let(:ratings) do
-              # movie.ratings.find([ BSON::ObjectId.new ])
-            # end
-
-            # before do
-              # Mongoid.raise_not_found_error = false
-            # end
-
-            # it "returns an empty array" do
-              # ratings.should be_empty
-            # end
-          # end
-        # end
-      # end
-
-      # context "when finding first" do
-
-        # context "when there is a match" do
-
-          # let(:rating) do
-            # movie.ratings.find(:first, :conditions => { :value => 1 })
-          # end
-
-          # it "returns the first matching document" do
-            # rating.should == rating_one
-          # end
-        # end
-
-        # context "when there is no match" do
-
-          # let(:rating) do
-            # movie.ratings.find(:first, :conditions => { :value => 11 })
-          # end
-
-          # it "returns nil" do
-            # rating.should be_nil
-          # end
-        # end
-      # end
-
-      # context "when finding last" do
-
-        # context "when there is a match" do
-
-          # let(:rating) do
-            # movie.ratings.find(:last, :conditions => { :value => 5 })
-          # end
-
-          # it "returns the last matching document" do
-            # rating.should == rating_two
-          # end
-        # end
-
-        # context "when there is no match" do
-
-          # let(:rating) do
-            # movie.ratings.find(:last, :conditions => { :value => 3 })
-          # end
-
-          # it "returns nil" do
-            # rating.should be_nil
-          # end
-        # end
-      # end
-
-      # context "when finding all" do
-
-        # context "when there is a match" do
-
-          # let(:ratings) do
-            # movie.ratings.find(:all, :conditions => { :value => { "$exists" => true } })
-          # end
-
-          # it "returns the matching documents" do
-            # ratings.should == [ rating_one, rating_two ]
-          # end
-        # end
-
-        # context "when there is no match" do
-
-          # let(:ratings) do
-            # movie.ratings.find(:all, :conditions => { :value => 7 })
-          # end
-
-          # it "returns an empty array" do
-            # ratings.should be_empty
-          # end
-        # end
-      # end
-    # end
-  # end
+          it "returns an empty array" do
+            preferences.should be_empty
+          end
+        end
+      end
+    end
+  end
 
   # describe "#find_or_create_by" do
 
