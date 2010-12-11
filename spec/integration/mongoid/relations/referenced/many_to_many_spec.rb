@@ -920,36 +920,36 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  # [ :size, :length ].each do |method|
+  [ :size, :length ].each do |method|
 
-    # describe "##{method}" do
+    describe "##{method}" do
 
-      # let(:movie) do
-        # Movie.create
-      # end
+      let(:person) do
+        Person.create(:ssn => "666-77-4321")
+      end
 
-      # context "when documents have been persisted" do
+      context "when documents have been persisted" do
 
-        # let!(:rating) do
-          # movie.ratings.create(:value => 1)
-        # end
+        let!(:preference) do
+          person.preferences.create(:name => "Testing")
+        end
 
-        # it "returns 0" do
-          # movie.ratings.send(method).should == 1
-        # end
-      # end
+        it "returns the number of documents" do
+          person.preferences.send(method).should == 1
+        end
+      end
 
-      # context "when documents have not been persisted" do
+      context "when documents have not been persisted" do
 
-        # before do
-          # movie.ratings.build(:value => 1)
-          # movie.ratings.create(:value => 2)
-        # end
+        before do
+          person.preferences.build(:name => "Test")
+          person.preferences.create(:name => "Test 2")
+        end
 
-        # it "returns the total number of documents" do
-          # movie.ratings.send(method).should == 2
-        # end
-      # end
-    # end
-  # end
+        it "returns the total number of documents" do
+          person.preferences.send(method).should == 2
+        end
+      end
+    end
+  end
 end
