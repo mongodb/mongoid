@@ -78,8 +78,8 @@ module Mongoid #:nodoc
     alias :database :master
     alias :database= :master=
 
-    # Sets the Mongo::DB slave databases to be used. If the objects trying to me
-    # set are not valid +Mongo::DBs+, then an error will be raise.
+    # Sets the Mongo::DB slave databases to be used. If the objects provided
+    # are not valid +Mongo::DBs+ an error will be raised.
     #
     # Example:
     #
@@ -87,8 +87,9 @@ module Mongoid #:nodoc
     #
     # Returns:
     #
-    # The slaves DB instances.
+    # The slave DB instances.
     def slaves=(dbs)
+      return unless dbs
       dbs.each do |db|
         check_database!(db)
       end
@@ -164,10 +165,7 @@ module Mongoid #:nodoc
     #
     # <tt>config._master({}, "test")</tt>
     def _master(settings)
-      name = settings["database"]
-      host = settings.delete("host") || "localhost"
-      port = settings.delete("port") || 27017
-      self.master = Mongo::Connection.new(host, port, :logger => logger).db(name)
+      self.master = database_from_hash(settings)
     end
 
     # Get a bunch-o-slaves from settings and names.
@@ -176,16 +174,32 @@ module Mongoid #:nodoc
     #
     # <tt>config._slaves({}, "test")</tt>
     def _slaves(settings)
-      name = settings["database"]
-      self.slaves = []
-      slaves = settings.delete("slaves")
-      slaves.to_a.each do |slave|
-        self.slaves << Mongo::Connection.new(
-          slave["host"],
-          slave["port"],
-          :slave_ok => true
-        ).db(name)
+      self.slaves = settings["slaves"].to_a.map do |slave|
+        database_from_hash({"database" => master.name}.merge(slave), :slave_ok => true)
       end
+    end
+
+    def database_from_hash(settings, connection_options={})
+      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
+
+      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
+      host = settings["host"] || mongo_uri.host || "localhost"
+      port = settings["port"] || mongo_uri.port || 27017
+      pool_size = settings["pool_size"] || 1
+      username = settings["username"] || mongo_uri.user
+      password = settings["password"] || mongo_uri.password
+
+      local_options = {
+        :logger => logger,
+        :pool_size => pool_size
+      }.merge(connection_options)
+
+      Mongo::Connection.new(host, port, local_options).tap do |connection|
+        if username || password
+          connection.add_auth(name, username, password)
+          connection.apply_saved_authentication
+        end
+      end.db(name)
     end
   end
 end

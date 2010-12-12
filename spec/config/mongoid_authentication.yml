@@ -1,0 +1,4 @@
+test:
+  username: kate
+  password: secret
+  database: mongoid_config_test
