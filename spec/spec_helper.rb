@@ -26,6 +26,6 @@ Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) 
 Spec::Runner.configure do |config|
   config.mock_with :mocha
   config.after :suite do
-    Mongoid.master.collections.each(&:drop)
+    Mongoid.master.collections.each(&:drop) if Mongoid.master.is_a?(Mongo::DB)
   end
 end

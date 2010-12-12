@@ -22,9 +22,7 @@ describe Mongoid::Config do
   describe "#from_hash" do
     context "regular mongoid.yml" do
       before do
-        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
-        file = File.new(file_name)
-        @settings = YAML.load(file.read)["test"]
+        @settings = load_settings("mongoid.yml")
         config.from_hash(@settings)
       end
 
@@ -35,7 +33,7 @@ describe Mongoid::Config do
       end
 
       it "sets use_object_ids" do
-          config.use_object_ids.should == true
+        config.use_object_ids.should == true
       end
 
       it "sets allow_dynamic_fields" do
@@ -69,9 +67,7 @@ describe Mongoid::Config do
 
     context "mongoid_with_utc.yml" do
       before do
-        file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_utc.yml")
-        file = File.new(file_name)
-        @settings = YAML.load(file.read)["test"]
+        @settings = load_settings("mongoid_with_utc.yml")
         config.from_hash(@settings)
       end
 
@@ -80,6 +76,29 @@ describe Mongoid::Config do
       it "sets time_zone" do
         config.use_utc.should be_true
       end
+    end
+
+    context "mongoid_authentication.yml" do
+      before do
+        @settings = load_settings("mongoid_authentication.yml")
+        @connection = mock
+        @connection.stubs(:db).returns(true)
+        @connection.stubs(:tap).yields(@connection).returns(@connection)
+        Mongo::Connection.stubs(:new).returns(@connection)
+        config.stubs(:check_database!).returns(true)
+      end
+
+      it "sets username and password" do
+        @connection.expects(:add_auth).with("mongoid_config_test", "kate", "secret")
+        @connection.expects(:apply_saved_authentication)
+        config.from_hash(@settings)
+      end
+    end
+
+    def load_settings(filename)
+      file_name = File.join(File.dirname(__FILE__), "..", "..", "config", filename)
+      file = File.new(file_name)
+      YAML.load(file.read)["test"]
     end
   end
 
