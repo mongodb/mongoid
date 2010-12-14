@@ -296,12 +296,10 @@ describe Mongoid::Persistence do
   end
 
   describe "#update_attributes" do
-
-    before do
-      @person.save
-    end
-
     context "when validation passes" do
+      before do
+        @person.save
+      end
 
       it "returns true" do
         @person.update_attributes(:ssn => "555-55-1234").should be_true
@@ -313,6 +311,13 @@ describe Mongoid::Persistence do
         @from_db.ssn.should == "555-55-1235"
         @from_db.pets.should == false
         @from_db.title.should be_nil
+      end
+    end
+
+    context "on a new record" do
+      it "saves the new record" do
+        @person.update_attributes(:ssn => "555-55-1235", :pets => false, :title => nil)
+        Person.find(@person.id).should_not be_nil
       end
     end
   end

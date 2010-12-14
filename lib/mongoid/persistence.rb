@@ -89,7 +89,7 @@ module Mongoid #:nodoc:
     #
     # +true+ if validation passed, +false+ if not.
     def update_attributes(attributes = {})
-      write_attributes(attributes); update
+      write_attributes(attributes); save
     end
 
     # Update the +Document+ attributes in the datbase.
@@ -102,8 +102,7 @@ module Mongoid #:nodoc:
     #
     # +true+ if validation passed, raises an error if not
     def update_attributes!(attributes = {})
-      write_attributes(attributes)
-      result = update
+      result = update_attributes(attributes)
       self.class.fail_validate!(self) unless result
       result
     end
