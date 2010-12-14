@@ -95,7 +95,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if validation passed, false if not.
     def update_attributes(attributes = {})
-      write_attributes(attributes); update
+      write_attributes(attributes); save
     end
 
     # Update the document attributes in the database and raise an error if
@@ -106,10 +106,11 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] attributes The attributes to update.
     #
+    # @raise [ Errors::Validations ] If validation failed.
+    #
     # @return [ true, false ] True if validation passed.
     def update_attributes!(attributes = {})
-      write_attributes(attributes)
-      update.tap do |result|
+      update_attributes(attributes).tap do |result|
         self.class.fail_validate!(self) unless result
       end
     end

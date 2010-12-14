@@ -321,11 +321,11 @@ describe Mongoid::Persistence do
 
   describe "#update_attributes" do
 
-    let(:person) do
-      Person.create(:ssn => "717-98-9999")
-    end
-
     context "when validation passes" do
+
+      let(:person) do
+        Person.create(:ssn => "717-98-9999")
+      end
 
       let!(:saved) do
         person.update_attributes(:pets => false)
@@ -341,6 +341,21 @@ describe Mongoid::Persistence do
 
       it "saves the attributes" do
         from_db.pets.should be_false
+      end
+    end
+
+    context "on a new record" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.update_attributes(:ssn => "555-55-1235", :pets => false, :title => nil)
+      end
+
+      it "saves the new record" do
+        Person.find(person.id).should_not be_nil
       end
     end
   end
