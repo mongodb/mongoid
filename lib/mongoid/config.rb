@@ -321,7 +321,7 @@ module Mongoid #:nodoc
       end
 
       unless set.empty?
-        connection =  Mongo::ReplSetConnection.new(set, 
+        connection =  Mongo::ReplSetConnection.new(*set, 
                                                    :allow_read_secondary => self.allow_read_secondary)
         self.replica_set = connection.db(name)
         self.primary = self.replica_set
