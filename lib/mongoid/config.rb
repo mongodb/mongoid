@@ -118,7 +118,7 @@ module Mongoid #:nodoc
 
     alias :database  :master
     alias :database= :master=
-      alias :primary   :master
+    alias :primary   :master
     alias :primary=  :master=
 
       # Returns the replica set databases or nil if none have been set.
@@ -321,8 +321,8 @@ module Mongoid #:nodoc
       end
 
       unless set.empty?
-        connection = Mongo::Connection.multi(set, 
-                                             :allow_read_secondary => self.allow_read_secondary)
+        connection =  Mongo::ReplSetConnection.new(set, 
+                                                   :allow_read_secondary => self.allow_read_secondary)
         self.replica_set = connection.db(name)
         self.primary = self.replica_set
       end

@@ -108,7 +108,7 @@ describe Mongoid::Config do
       end
 
       before do
-        Mongo::Connection.stubs(:multi => connection)
+        Mongo::ReplSetConnection.stubs(:new => connection)
         connection.stubs(:db => database)
 
         file_name = File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_replicasets.yml")
