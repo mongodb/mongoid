@@ -6,6 +6,7 @@ require "mongoid/relations/bindings"
 require "mongoid/relations/builders"
 require "mongoid/relations/many"
 require "mongoid/relations/one"
+require "mongoid/relations/polymorphic"
 require "mongoid/relations/embedded/in"
 require "mongoid/relations/embedded/many"
 require "mongoid/relations/embedded/one"
@@ -26,6 +27,7 @@ module Mongoid # :nodoc:
     include Cyclic
     include Builders
     include Macros
+    include Polymorphic
     include Reflections
 
     included do

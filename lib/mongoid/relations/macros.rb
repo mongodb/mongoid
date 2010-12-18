@@ -20,13 +20,7 @@ module Mongoid # :nodoc:
         # document. If a child does not define this relation calling
         # persistence methods on the child object will cause a save to fail.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that matches the name of the parent class.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Person
         #     include Mongoid::Document
@@ -35,8 +29,12 @@ module Mongoid # :nodoc:
         #
         #   class Address
         #     include Mongoid::Document
-        #     embedded_in :person, :inverse_of => :addresses
+        #     embedded_in :person
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
           relate(
             name,
@@ -48,13 +46,7 @@ module Mongoid # :nodoc:
         # of the relation needs to be a pluralized form of the child class
         # name.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the plural child class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Person
         #     include Mongoid::Document
@@ -65,6 +57,10 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     embedded_in :person, :inverse_of => :addresses
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
           relate(
             name,
@@ -76,13 +72,7 @@ module Mongoid # :nodoc:
         # of the relation needs to be a singular form of the child class
         # name.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the plural child class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Person
         #     include Mongoid::Document
@@ -93,6 +83,10 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     embedded_in :person
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
           relate(
             name,
@@ -104,13 +98,7 @@ module Mongoid # :nodoc:
         # Adds a relational association from the child Document to a Document in
         # another database or collection.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the related class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Game
         #     include Mongoid::Document
@@ -121,8 +109,13 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     references_one :game
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def referenced_in(name, options = {}, &block)
           metadata = metadatafy(name, Referenced::In, options, &block)
+          determine_polymorphism(options)
           relate(name, metadata)
           reference(metadata)
         end
@@ -132,13 +125,7 @@ module Mongoid # :nodoc:
         # referenced_in in that the foreign key is not stored on this object,
         # but in an array on the inverse side.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the related class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Game
         #     include Mongoid::Document
@@ -149,6 +136,10 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     references_many_as_array :game
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def referenced_in_from_array(name, options = {}, &block)
           relate(
             name,
@@ -159,13 +150,7 @@ module Mongoid # :nodoc:
         # Adds a relational association from a parent Document to many
         # Documents in another database or collection.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the related class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Person
         #     include Mongoid::Document
@@ -176,11 +161,16 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     referenced_in :person
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def references_many(name, options = {}, &block)
           relate(
             name,
             metadatafy(name, Referenced::Many, options, &block)
           )
+          determine_polymorphism(options)
         end
 
         # Adds a relational association from a parent Document to many
@@ -188,13 +178,7 @@ module Mongoid # :nodoc:
         # the foreign key on the inverse objects, it gets stored on this side as
         # an array.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the related class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Person
         #     include Mongoid::Document
@@ -205,6 +189,10 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     referenced_in_from_array :person
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def references_many_as_array(name, options = {}, &block)
           metadata = metadatafy(name, Referenced::ManyAsArray, options, &block)
           relate(name, metadata)
@@ -214,13 +202,7 @@ module Mongoid # :nodoc:
         # Adds a relational many-to-many association between many of this
         # Document and many of another Document.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the related class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Person
         #     include Mongoid::Document
@@ -231,6 +213,10 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     references_and_referenced_in_many :people
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def references_and_referenced_in_many(name, options = {}, &block)
           metadata = metadatafy(name, Referenced::ManyToMany, options, &block)
           relate(name, metadata)
@@ -240,13 +226,7 @@ module Mongoid # :nodoc:
         # Adds a relational association from the child Document to a Document in
         # another database or collection.
         #
-        # Options:
-        #
-        # name: A +Symbol+ that is the related class name.
-        # options: The relation options as a +Hash+.
-        # block: Optional block for defining relation extensions.
-        #
-        # Example:
+        # @example Define the relation.
         #
         #   class Game
         #     include Mongoid::Document
@@ -257,11 +237,16 @@ module Mongoid # :nodoc:
         #     include Mongoid::Document
         #     references_one :game
         #   end
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         def references_one(name, options = {}, &block)
           relate(
             name,
             metadatafy(name, Referenced::One, options, &block)
           )
+          determine_polymorphism(options)
           builder(name).creator(name)
         end
 
@@ -269,15 +254,15 @@ module Mongoid # :nodoc:
 
         # Create the metadata for the relation.
         #
-        # Options:
+        # @example Create the metadata.
+        #   Person.metadatafy(:posts, Referenced::Many, {})
         #
-        # name: The name of the relation.
-        # options: The hash of options provided to the macro.
-        # block: Optional block to use as an extension.
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Object ] relation The type of relation.
+        # @param [ Hash ] options The relation options.
+        # @param [ Proc ] block Optional block for defining extensions.
         #
-        # Returns:
-        #
-        # A +Relations::Metadata+ object for this relation.
+        # @return [ Metadata ] The metadata for the relation.
         def metadatafy(name, relation, options, &block)
           Metadata.new(
             options.merge(
@@ -292,13 +277,10 @@ module Mongoid # :nodoc:
         # Defines a field to be used as a foreign key in the relation and
         # indexes it if defined.
         #
-        # Example:
+        # @example Set up the relational fields and indexes.
+        #   Person.reference(metadata)
         #
-        # <tt>Person.reference(metadata)</tt>
-        #
-        # Options:
-        #
-        # metadata: The metadata for the relation.
+        # @param [ Metadata ] metadata The metadata for the relation.
         def reference(metadata)
           if metadata.relation.stores_foreign_key?
             key = metadata.foreign_key
@@ -315,10 +297,11 @@ module Mongoid # :nodoc:
         # Creates a relation for the given name, metadata and relation. It adds
         # the metadata to the relations hash and has the accessors set up.
         #
-        # Options:
+        # @example Set up the relation and accessors.
+        #   Person.relate(:addresses, Metadata)
         #
-        # name: The name of the relation.
-        # metadata: The metadata for the relation.
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Metadata ] metadata The metadata for the relation.
         def relate(name, metadata)
           relations[name.to_s] = metadata
           getter(name, metadata).setter(name, metadata)
