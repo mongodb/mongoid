@@ -130,6 +130,20 @@ module Mongoid # :nodoc:
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
+
+          # Tells the caller if this relation is one that stores the foreign
+          # key on its own objects.
+          #
+          # Example:
+          #
+          # <tt>Embedded::In.stores_foreign_key?</tt>
+          #
+          # Returns:
+          #
+          # false
+          def stores_foreign_key?
+            false
+          end
         end
       end
     end

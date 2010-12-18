@@ -319,6 +319,74 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#inverse_type" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :foreign_key => "person_id"
+        )
+      end
+
+      it "returns nil" do
+        metadata.inverse_type.should be_nil
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :ratable,
+          :relation => Mongoid::Relations::Referenced::In,
+          :polymorphic => true,
+          :inverse_class_name => "Rating"
+        )
+      end
+
+      it "returns the polymorphic name plus type" do
+        metadata.inverse_type.should == "ratable_type"
+      end
+    end
+  end
+
+  describe "#inverse_type_setter" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :foreign_key => "person_id"
+        )
+      end
+
+      it "returns nil" do
+        metadata.inverse_type_setter.should be_nil
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :ratable,
+          :relation => Mongoid::Relations::Referenced::In,
+          :polymorphic => true,
+          :inverse_class_name => "Rating"
+        )
+      end
+
+      it "returns the inverse type plus =" do
+        metadata.inverse_type_setter.should == "ratable_type="
+      end
+    end
+  end
+
   describe "#indexed?" do
 
     context "when an index property exists" do

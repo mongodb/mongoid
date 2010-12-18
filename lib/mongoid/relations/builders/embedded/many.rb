@@ -17,7 +17,7 @@ module Mongoid # :nodoc:
           # Returns:
           #
           # An +Array+ of +Documents+.
-          def build
+          def build(type = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)
             object.inject([]) do |documents, attrs|

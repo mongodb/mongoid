@@ -15,12 +15,12 @@ module Mongoid # :nodoc:
           # Returns:
           #
           # A single +Document+.
-          def build
+          def build(type = nil)
             return object unless query?
             if object.is_a?(Hash)
               return Mongoid::Factory.build(metadata.klass, object)
             end
-            metadata.klass.find(object)
+            (type ? type.constantize : metadata.klass).find(object)
           end
         end
       end

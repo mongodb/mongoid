@@ -47,7 +47,8 @@ module Mongoid # :nodoc:
       #
       # The relation
       def build(name, object, metadata, building = nil)
-        target = metadata.builder(object).build
+        type = @attributes[metadata.inverse_type]
+        target = metadata.builder(object).build(type)
         relation = metadata.relation.new(self, target, metadata) if target
         set(name, relation).tap do |relation|
           relation.bind(building) if relation

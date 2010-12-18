@@ -12,6 +12,22 @@ module Mongoid # :nodoc:
 
       module ClassMethods #:nodoc:
 
+        # Attempts to set up the information needed to handle a polymorphic
+        # relation, if the metadata checks out.
+        #
+        # @example Set up the polymorphic information.
+        #   Movie.polymorph(metadata)
+        #
+        # @param [ Metadata ] metadata The relation metadata.
+        def polymorph(metadata)
+          if metadata.polymorphic?
+            self.polymorphic = true
+            if metadata.relation.stores_foreign_key?
+              field(metadata.inverse_type, :type => String)
+            end
+          end
+        end
+
         # Determines if the class is in a polymorphic relations, and thus must
         # store the _type field in the database.
         #
@@ -21,19 +37,6 @@ module Mongoid # :nodoc:
         # @return [ Boolean ] True if polymorphic, false if not.
         def polymorphic?
           !!polymorphic
-        end
-
-        private
-
-        # Parses the options and sets the polymorphic flag if the document is
-        # part of a polymorphic relation.
-        #
-        # @example Set polymorphic depending on the options.
-        #   Movie.determine_polymorphism(:as => :ratable)
-        #
-        # @param [ Hash ] options The options passed to the relation macro.
-        def determine_polymorphism(options)
-          self.polymorphic = true if options[:as] || options[:polymorphic]
         end
       end
     end

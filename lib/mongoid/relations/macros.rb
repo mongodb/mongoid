@@ -114,10 +114,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def referenced_in(name, options = {}, &block)
-          metadata = metadatafy(name, Referenced::In, options, &block)
-          determine_polymorphism(options)
-          relate(name, metadata)
-          reference(metadata)
+          metadatafy(name, Referenced::In, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+          end
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -141,10 +141,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def referenced_in_from_array(name, options = {}, &block)
-          relate(
-            name,
-            metadatafy(name, Referenced::InFromArray, options, &block)
-          )
+          metadatafy(name, Referenced::InFromArray, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+          end
         end
 
         # Adds a relational association from a parent Document to many
@@ -166,11 +166,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_many(name, options = {}, &block)
-          relate(
-            name,
-            metadatafy(name, Referenced::Many, options, &block)
-          )
-          determine_polymorphism(options)
+          metadatafy(name, Referenced::Many, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+          end
         end
 
         # Adds a relational association from a parent Document to many
@@ -194,9 +193,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_many_as_array(name, options = {}, &block)
-          metadata = metadatafy(name, Referenced::ManyAsArray, options, &block)
-          relate(name, metadata)
-          reference(metadata)
+          metadatafy(name, Referenced::ManyAsArray, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+          end
         end
 
         # Adds a relational many-to-many association between many of this
@@ -218,9 +218,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_and_referenced_in_many(name, options = {}, &block)
-          metadata = metadatafy(name, Referenced::ManyToMany, options, &block)
-          relate(name, metadata)
-          reference(metadata)
+          metadatafy(name, Referenced::ManyToMany, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+          end
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -242,12 +243,11 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_one(name, options = {}, &block)
-          relate(
-            name,
-            metadatafy(name, Referenced::One, options, &block)
-          )
-          determine_polymorphism(options)
-          builder(name).creator(name)
+          metadatafy(name, Referenced::One, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+            builder(name).creator(name)
+          end
         end
 
         private
@@ -282,6 +282,7 @@ module Mongoid # :nodoc:
         #
         # @param [ Metadata ] metadata The metadata for the relation.
         def reference(metadata)
+          polymorph(metadata)
           if metadata.relation.stores_foreign_key?
             key = metadata.foreign_key
             field(

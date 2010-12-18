@@ -2,6 +2,86 @@ require "spec_helper"
 
 describe Mongoid::Relations::Polymorphic do
 
+  describe "#polymorph" do
+
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      context "when the relation stores a foreign key" do
+
+        let(:metadata) do
+          Mongoid::Relations::Metadata.new(
+            :name => :ratable,
+            :polymorphic => true,
+            :relation => Mongoid::Relations::Referenced::In
+          )
+        end
+
+        before do
+          klass.polymorph(metadata)
+        end
+
+        it "sets polymorphic to true" do
+          klass.should be_polymorphic
+        end
+
+        it "adds the foreign key type field" do
+          klass.fields["ratable_type"].should_not be_nil
+        end
+      end
+
+      context "when the relation does not store a foreign key" do
+
+        let(:metadata) do
+          Mongoid::Relations::Metadata.new(
+            :name => :ratings,
+            :as => :ratable,
+            :relation => Mongoid::Relations::Referenced::Many
+          )
+        end
+
+        before do
+          klass.polymorph(metadata)
+        end
+
+        it "sets polymorphic to true" do
+          klass.should be_polymorphic
+        end
+
+        it "does not add the foreign key type field" do
+          klass.fields["ratable_type"].should be_nil
+        end
+      end
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        Mongoid::Relations::Metadata.new(
+          :name => :ratings,
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      before do
+        klass.polymorph(metadata)
+      end
+
+      it "sets polymorphic to false" do
+        klass.should_not be_polymorphic
+      end
+
+      it "does not add the foreign key type field" do
+        klass.fields["ratable_type"].should be_nil
+      end
+    end
+  end
+
   describe ".polymorphic?" do
 
     context "when the document is in a polymorphic relation" do
