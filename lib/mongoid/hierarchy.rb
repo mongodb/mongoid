@@ -7,8 +7,13 @@ module Mongoid #:nodoc
     end
 
     module ClassMethods #:nodoc:
-      # Returns <tt>true</tt> if the document inherits from another
-      # Mongoid::Document.
+
+      # Determines if the document is a subclass of another document.
+      #
+      # @example Check if the document is a subclass.
+      #   Square.hereditary?
+      #
+      # @return [ Boolean ] True if hereditary, false if not.
       def hereditary?
         Mongoid::Document > superclass
       end
@@ -23,13 +28,10 @@ module Mongoid #:nodoc
       # always be preferred, since they are optimized calls... This operation
       # can get expensive in domains with large hierarchies.
       #
-      # Example:
+      # @example Get all the document's children.
+      #   person._children
       #
-      # <tt>person._children</tt>
-      #
-      # Returns:
-      #
-      # All child +Documents+ to this +Document+ in the entire hierarchy.
+      # @return [ Array<Document> ] All child documents in the hierarchy.
       def _children
         relations.inject([]) do |children, (name, metadata)|
           children.tap do |kids|
@@ -43,11 +45,12 @@ module Mongoid #:nodoc
         end
       end
 
-      # Is inheritance in play here?
+      # Determines if the document is a subclass of another document.
       #
-      # Returns:
+      # @example Check if the document is a subclass
+      #   Square.new.hereditary?
       #
-      # <tt>true</tt> if inheritance used, <tt>false</tt> if not.
+      # @return [ Boolean ] True if hereditary, false if not.
       def hereditary?
         self.class.hereditary?
       end
@@ -55,19 +58,23 @@ module Mongoid #:nodoc
       # Sets up a child/parent association. This is used for newly created
       # objects so they can be properly added to the graph.
       #
-      # Options:
+      # @example Set the parent document.
+      #   document.parentize(parent)
       #
-      # abject: The parent object that needs to be set for the child.
+      # @param [ Document ] document The parent document.
       #
-      # Example:
-      #
-      # <tt>address.parentize(person, :addresses)</tt>
-      def parentize(object)
-        self._parent = object
+      # @return [ Document ] The parent document.
+      def parentize(document)
+        self._parent = document
       end
 
-      # Return the root +Document+ in the object graph. If the current +Document+
+      # Return the root document in the object graph. If the current document
       # is the root object in the graph it will return self.
+      #
+      # @example Get the root document in the hierarchy.
+      #   document._root
+      #
+      # @return [ Document ] The root document in the hierarchy.
       def _root
         object = self
         while (object._parent) do object = object._parent; end

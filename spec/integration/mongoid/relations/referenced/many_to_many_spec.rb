@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::ManyToMany do
 
   before do
-    [ Person, Preference, UserAccount ].map(&:delete_all)
+    [ Person, Preference ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
