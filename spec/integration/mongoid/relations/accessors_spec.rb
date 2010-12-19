@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Accessors do
 
   before do
-    [ Movie, Rating ].each(&:delete_all)
+    [ Book, Movie, Rating ].each(&:delete_all)
   end
 
   describe "\#{getter}" do
@@ -14,16 +14,53 @@ describe Mongoid::Relations::Accessors do
         Movie.create(:title => "Inception")
       end
 
-      let(:rating) do
-        Rating.where(:value => 10).first
+      let(:book) do
+        Book.create(:title => "Jurassic Park")
       end
 
-      before do
+      let!(:movie_rating) do
         movie.ratings.create(:value => 10)
       end
 
-      it "returns the correct type" do
-        rating.ratable.should be_a(Movie)
+      let!(:book_rating) do
+        book.create_rating(:value => 5)
+      end
+
+      context "when accessing a referenced in" do
+
+        let(:rating) do
+          Rating.where(:value => 10).first
+        end
+
+        it "returns the correct type" do
+          rating.ratable.should be_a(Movie)
+        end
+
+        it "returns the correct document" do
+          rating.ratable.should == movie
+        end
+      end
+
+      context "when accessing a references many" do
+
+        let(:ratings) do
+          Movie.first.ratings
+        end
+
+        it "returns the correct documents" do
+          ratings.should == [ movie_rating ]
+        end
+      end
+
+      context "when accessing a references one" do
+
+        let(:rating) do
+          Book.first.rating
+        end
+
+        it "returns the correct document" do
+          rating.should == book_rating
+        end
       end
     end
   end
