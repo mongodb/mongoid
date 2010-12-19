@@ -9,17 +9,24 @@ describe Mongoid::Criteria do
   context "when caching" do
 
     before do
-      10.times do |n|
-        Person.create!(:title => "Sir", :age => (n * 10), :aliases => ["D", "Durran"], :ssn => "#{n}")
+      5.times do |n|
+        Person.create!(
+          :title => "Sir",
+          :age => (n * 10),
+          :aliases => ["D", "Durran"],
+          :ssn => "#{n}"
+        )
       end
     end
 
-    it "iterates over the cursor only once" do
-      criteria = Person.where(:title => "Sir").cache
+    let(:criteria) do
+      Person.where(:title => "Sir").cache
+    end
 
-      criteria.collect.to_a.size.should == 10
+    it "iterates over the cursor only once" do
+      criteria.size.should == 5
       Person.create!(:title => "Sir")
-      criteria.collect.to_a.size.should == 10
+      criteria.size.should == 5
     end
   end
 
@@ -27,7 +34,7 @@ describe Mongoid::Criteria do
 
     context "when using object ids" do
 
-      before :all do
+      before(:all) do
         Person.identity :type => BSON::ObjectId
       end
 
@@ -51,11 +58,11 @@ describe Mongoid::Criteria do
 
     context "when not using object ids" do
 
-      before :all do
+      before(:all) do
         Person.identity :type => String
       end
 
-      after :all do
+      after(:all) do
         Person.identity :type => BSON::ObjectId
       end
 
