@@ -18,6 +18,12 @@ Mongoid is developed against Ruby 1.8.7, 1.9.1, 1.9.2, and REE.
 Please see the new Mongoid website for up-to-date documentation:
 {mongoid.org}[http://mongoid.org]
 
+= Donating
+<a href='http://www.pledgie.com/campaigns/7757'>
+  <img alt='Support Mongoid on Pledgie'
+       src='http://www.pledgie.com/campaigns/7757.png?skin_name=chrome' border='0'/>
+</a>
+
 = License
 
 Copyright (c) 2009, 2010 Durran Jordan

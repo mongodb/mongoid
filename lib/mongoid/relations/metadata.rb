@@ -111,32 +111,6 @@ module Mongoid # :nodoc:
         foreign_key << "="
       end
 
-      # Returns the name of the field in which to store the name of the class
-      # for the polymorphic relation.
-      #
-      # @example Get the name of the field.
-      #   metadata.inverse_type
-      #
-      # @return [ String ] The name of the field for storing the type.
-      def inverse_type
-        if relation.stores_foreign_key? && polymorphic?
-          (polymorphic? ? name.to_s : class_name.underscore) << "_type"
-        else
-          return nil
-        end
-      end
-
-      # Gets the setter for the field that sets the type of document on a
-      # polymorphic relation.
-      #
-      # @example Get the inverse type setter.
-      #   metadata.inverse_type_setter
-      #
-      # @return [ String ] The name of the setter.
-      def inverse_type_setter
-        inverse_type ? inverse_type << "=" : nil
-      end
-
       # Tells whether a foreign key index exists on the relation.
       #
       # @example Is the key indexed?
@@ -172,6 +146,18 @@ module Mongoid # :nodoc:
         cyclic? ? cyclic_inverse : inverse_relation
       end
 
+      # Used for relational many to many only. This determines the name of the
+      # foreign key field on the inverse side of the relation, since in this
+      # case there are keys on both sides.
+      #
+      # @example Find the inverse foreign key
+      #   metadata.inverse_foreign_key
+      #
+      # @return [ String ] The foreign key on the inverse.
+      def inverse_foreign_key
+        inverse_class_name.underscore << relation.foreign_key_suffix
+      end
+
       # Returns the inverse class of the proxied relation.
       #
       # @example Get the inverse class.
@@ -192,6 +178,32 @@ module Mongoid # :nodoc:
       # @return [ String ] The inverse setter name.
       def inverse_setter(other = nil)
         inverse(other).to_s << "="
+      end
+
+      # Returns the name of the field in which to store the name of the class
+      # for the polymorphic relation.
+      #
+      # @example Get the name of the field.
+      #   metadata.inverse_type
+      #
+      # @return [ String ] The name of the field for storing the type.
+      def inverse_type
+        if relation.stores_foreign_key? && polymorphic?
+          (polymorphic? ? name.to_s : class_name.underscore) << "_type"
+        else
+          return nil
+        end
+      end
+
+      # Gets the setter for the field that sets the type of document on a
+      # polymorphic relation.
+      #
+      # @example Get the inverse type setter.
+      #   metadata.inverse_type_setter
+      #
+      # @return [ String ] The name of the setter.
+      def inverse_type_setter
+        inverse_type ? inverse_type << "=" : nil
       end
 
       # This returns the key that is to be used to grab the attributes for the

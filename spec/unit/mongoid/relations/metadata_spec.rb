@@ -554,6 +554,26 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  context "#inverse_foreign_key" do
+
+    context "when the inverse foreign key is not defined" do
+
+      let(:metadata) do
+        klass.new(
+          :name => :preferences,
+          :index => true,
+          :dependent => :nullify,
+          :relation => Mongoid::Relations::Referenced::ManyToMany,
+          :inverse_class_name => "Person"
+        )
+      end
+
+      it "returns the inverse class name plus suffix" do
+        metadata.inverse_foreign_key.should == "person_ids"
+      end
+    end
+  end
+
   context "#inverse_klass" do
 
     let(:metadata) do

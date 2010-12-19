@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Cascading do
 
+  before do
+    [ Person, Post, Book, Movie, Rating ].each(&:delete_all)
+  end
+
   [ :delete, :destroy ].each do |method|
 
     describe "##{method}" do
@@ -52,24 +56,77 @@ describe Mongoid::Relations::Cascading do
 
         context "when dependent is nullify" do
 
-          let(:movie) do
-            Movie.create(:title => "Bladerunner")
+          context "when nullifying a references many" do
+
+            let(:movie) do
+              Movie.create(:title => "Bladerunner")
+            end
+
+            let!(:rating) do
+              movie.ratings.create(:value => 10)
+            end
+
+            let(:from_db) do
+              Rating.find(rating.id)
+            end
+
+            before do
+              movie.send(method)
+            end
+
+            it "removes the references to the removed document" do
+              from_db.ratable_id.should be_nil
+            end
           end
 
-          let!(:rating) do
-            movie.ratings.create(:value => 10)
+          context "when nullifying a references one" do
+
+            let(:book) do
+              Book.create(:title => "Neuromancer")
+            end
+
+            let!(:rating) do
+              book.create_rating(:value => 10)
+            end
+
+            let(:from_db) do
+              Rating.find(rating.id)
+            end
+
+            before do
+              book.send(method)
+            end
+
+            it "removes the references to the removed document" do
+              from_db.ratable_id.should be_nil
+            end
           end
 
-          let(:from_db) do
-            Rating.find(rating.id)
-          end
+          context "when nullifying a many to many" do
 
-          before do
-            movie.send(method)
-          end
+            let(:person) do
+              Person.create(:ssn => "009-00-0111")
+            end
 
-          it "removes the references to the removed document" do
-            from_db.ratable_id.should be_nil
+            let!(:preference) do
+              person.preferences.create(:name => "Setting")
+            end
+
+            let(:from_db) do
+              Preference.find(preference.id)
+            end
+
+            before do
+              person.send(method)
+            end
+
+            it "removes the references from the removed document" do
+              person.preference_ids.should_not include(preference.id)
+            end
+
+            it "removes the references to the removed document" do
+              from_db.person_ids.should_not include(person.id)
+            end
           end
         end
       end

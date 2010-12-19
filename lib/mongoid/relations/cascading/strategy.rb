@@ -4,7 +4,7 @@ module Mongoid # :nodoc:
     module Cascading #:nodoc:
       class Strategy
 
-        attr_accessor :relation, :metadata
+        attr_accessor :document, :relation, :metadata
 
         # Initialize the new cascade strategy, which will set up the relation
         # and the metadata.
@@ -17,7 +17,8 @@ module Mongoid # :nodoc:
         #
         # @return [ Strategy ] The new strategy.
         def initialize(document, metadata)
-          @relation, @metadata = document.send(metadata.name), metadata
+          @document, @metadata = document, metadata
+          @relation = document.send(metadata.name)
         end
       end
     end
