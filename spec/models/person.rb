@@ -75,7 +75,7 @@ class Person
       "Testing"
     end
   end
-  references_many :paranoid_posts
+  references_many :paranoid_posts, :dependent => :nullify
   references_and_referenced_in_many :preferences, :index => true
   references_and_referenced_in_many :user_accounts
 
