@@ -8,99 +8,105 @@ require "mongoid/persistence/remove_embedded"
 require "mongoid/persistence/update"
 
 module Mongoid #:nodoc:
+
   # The persistence module is a mixin to provide database accessor methods for
   # the document. These correspond to the appropriate accessors on a
-  # +Mongo::Collection+ and retain the same DSL.
+  # mongo collection and retain the same DSL.
   #
-  # Examples:
-  #
-  # <tt>document.insert</tt>
-  # <tt>document.update</tt>
-  # <tt>document.upsert</tt>
+  # @example Sample persistence operations.
+  #   document.insert
+  #   document.update
+  #   document.upsert
   module Persistence
     extend ActiveSupport::Concern
 
-    # Remove the +Document+ from the datbase with callbacks.
+    # Remove the document from the datbase with callbacks.
     #
-    # Example:
+    # @example Destroy a document.
+    #   document.destroy
     #
-    # <tt>document.destroy</tt>
+    # @param [ Hash ] options Options to pass to destroy.
+    #
+    # @return [ Boolean ] True if successful, false if not.
     def destroy(options = {})
-      run_callbacks(:destroy) { _remove(options) }
+      run_callbacks(:destroy) { remove(options) }
     end
 
-    # Insert a new +Document+ into the database. Will return the document
+    # Insert a new document into the database. Will return the document
     # itself whether or not the save was successful.
     #
-    # Example:
+    # @example Insert a document.
+    #   document.insert
     #
-    # <tt>document.insert</tt>
+    # @param [ Hash ] options Options to pass to insert.
+    #
+    # @return [ Document ] The persisted document.
     def insert(options = {})
       Insert.new(self, options).persist
     end
 
-    # Remove the +Document+ from the datbase.
+    # Remove the document from the datbase.
     #
-    # Example:
+    # @example Remove the document.
+    #   document.remove
     #
-    # <tt>document._remove</tt>
+    # @param [ Hash ] options Options to pass to remove.
     #
-    # TODO: Will get rid of other #remove once observable pattern killed.
-    def _remove(options = {})
+    # @return [ TrueClass ] True.
+    def remove(options = {})
       if Remove.new(self, options).persist
         self.destroyed = true
         cascading_remove!
       end; true
     end
-
-    alias :delete :_remove
+    alias :delete :remove
 
     # Save the document - will perform an insert if the document is new, and
-    # update if not. If a validation error occurs a
-    # Mongoid::Errors::Validations error will get raised.
+    # update if not. If a validation error occurs an error will get raised.
     #
-    # Example:
+    # @example Save the document.
+    #   document.save!
     #
-    # <tt>document.save!</tt>
+    # @param [ Hash ] options Options to pass to the save.
     #
-    # Returns:
-    #
-    # +true+ if validation passed, will raise error otherwise.
+    # @return [ Boolean ] True if validation passed.
     def save!(options = {})
       self.class.fail_validate!(self) unless upsert; true
     end
 
-    # Update the +Document+ in the datbase.
+    # Update the document in the datbase.
     #
-    # Example:
+    # @example Update an existing document.
+    #   document.update
     #
-    # <tt>document.update</tt>
+    # @param [ Hash ] options Options to pass to update.
+    #
+    # @return [ Boolean ] True if succeeded, false if not.
     def update(options = {})
       Update.new(self, options).persist
     end
 
-    # Update the +Document+ attributes in the datbase.
+    # Update the document attributes in the datbase.
     #
-    # Example:
+    # @example Update the document's attributes
+    #   document.update_attributes(:title => "Sir")
     #
-    # <tt>document.update_attributes(:title => "Sir")</tt>
+    # @param [ Hash ] attributes The attributes to update.
     #
-    # Returns:
-    #
-    # +true+ if validation passed, +false+ if not.
+    # @return [ Boolean ] True if validation passed, false if not.
     def update_attributes(attributes = {})
       write_attributes(attributes); update
     end
 
-    # Update the +Document+ attributes in the datbase.
+    # Update the document attributes in the database and raise an error if
+    # validation failed.
     #
-    # Example:
+    # @example Update the document's attributes.
+    #   document.update_attributes(:title => "Sir")
     #
-    # <tt>document.update_attributes(:title => "Sir")</tt>
+    # @param [ Hash ] attributes The attributes to update.
     #
-    # Returns:
-    #
-    # +true+ if validation passed, raises an error if not
+    # @return [ Boolean ] True if validation passed.
     def update_attributes!(attributes = {})
       write_attributes(attributes)
       result = update
@@ -111,13 +117,12 @@ module Mongoid #:nodoc:
     # Upsert the document - will perform an insert if the document is new, and
     # update if not.
     #
-    # Example:
+    # @example Upsert the document.
+    #   document.upsert
     #
-    # <tt>document.upsert</tt>
+    # @param [ Hash ] options Options to pass to the upsert.
     #
-    # Returns:
-    #
-    # A +Boolean+ for updates.
+    # @return [ Boolean ] True is success, false if not.
     def upsert(options = {})
       if new_record?
         insert(options).persisted?
@@ -125,13 +130,6 @@ module Mongoid #:nodoc:
         update(options)
       end
     end
-
-    # Save is aliased so that users familiar with active record can have some
-    # semblance of a familiar API.
-    #
-    # Example:
-    #
-    # <tt>document.save</tt>
     alias :save :upsert
 
     protected
@@ -150,29 +148,31 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
 
-      # Create a new +Document+. This will instantiate a new document and
+      # Create a new document. This will instantiate a new document and
       # insert it in a single call. Will always return the document
       # whether save passed or not.
       #
-      # Example:
+      # @example Create a new document.
+      #   Person.create(:title => "Mr")
       #
-      # <tt>Person.create(:title => "Mr")</tt>
+      # @param [ Hash ] attributes The attributes to create with.
       #
-      # Returns: the +Document+.
+      # @return [ Document ] The newly created document.
       def create(attributes = {})
         new(attributes).tap(&:insert)
       end
 
-      # Create a new +Document+. This will instantiate a new document and
+      # Create a new document. This will instantiate a new document and
       # insert it in a single call. Will always return the document
       # whether save passed or not, and if validation fails an error will be
       # raise.
       #
-      # Example:
+      # @example Create a new document.
+      #   Person.create!(:title => "Mr")
       #
-      # <tt>Person.create!(:title => "Mr")</tt>
+      # @param [ Hash ] attributes The attributes to create with.
       #
-      # Returns: the +Document+.
+      # @return [ Document ] The newly created document.
       def create!(attributes = {})
         document = new(attributes)
         fail_validate!(document) if document.insert.errors.any?
@@ -183,12 +183,15 @@ module Mongoid #:nodoc:
       # are passed, the entire collection will be dropped for performance
       # benefits. Does not fire any callbacks.
       #
-      # Example:
+      # @example Delete matching documents from the collection.
+      #   Person.delete_all(:conditions => { :title => "Sir" })
       #
-      # <tt>Person.delete_all(:conditions => { :title => "Sir" })</tt>
-      # <tt>Person.delete_all</tt>
+      # @example Delete all documents from the collection.
+      #   Person.delete_all
       #
-      # Returns: true or raises an error.
+      # @param [ Hash ] conditions Optional conditions to delete by.
+      #
+      # @return [ Integer ] The number of documents deleted.
       def delete_all(conditions = {})
         RemoveAll.new(
           self,
@@ -201,19 +204,28 @@ module Mongoid #:nodoc:
       # are passed, the entire collection will be dropped for performance
       # benefits. Fires the destroy callbacks if conditions were passed.
       #
-      # Example:
+      # @example Destroy matching documents from the collection.
+      #   Person.destroy_all(:conditions => { :title => "Sir" })
       #
-      # <tt>Person.destroy_all(:conditions => { :title => "Sir" })</tt>
-      # <tt>Person.destroy_all</tt>
+      # @example Destroy all documents from the collection.
+      #   Person.destroy_all
       #
-      # Returns: true or raises an error.
+      # @param [ Hash ] conditions Optional conditions to destroy by.
+      #
+      # @return [ Integer ] The number of documents destroyed.
       def destroy_all(conditions = {})
         documents = all(conditions)
-        count = documents.count
-        documents.each { |doc| doc.destroy }; count
+        documents.count.tap do
+          documents.each { |doc| doc.destroy }
+        end
       end
 
       # Raise an error if validation failed.
+      #
+      # @example Raise the validation error.
+      #   Person.fail_validate!(person)
+      #
+      # @param [ Document ] document The document to fail.
       def fail_validate!(document)
         raise Errors::Validations.new(document)
       end
