@@ -2,10 +2,12 @@
 require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
+require "mongoid/criterion/inspection"
 require "mongoid/criterion/optional"
 require "mongoid/criterion/selector"
 
 module Mongoid #:nodoc:
+
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
   # objects from the database. It is a DSL that essentially sets up the
   # selector and options arguments that get passed on to a <tt>Mongo::Collection</tt>
@@ -23,6 +25,7 @@ module Mongoid #:nodoc:
   class Criteria
     include Criterion::Exclusion
     include Criterion::Inclusion
+    include Criterion::Inspection
     include Criterion::Optional
     include Enumerable
 

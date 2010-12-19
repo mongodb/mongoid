@@ -6,10 +6,6 @@ describe Mongoid::Criteria do
     Person.delete_all
   end
 
-  after do
-    Person.delete_all
-  end
-
   describe "#avg" do
 
     context "without results" do
