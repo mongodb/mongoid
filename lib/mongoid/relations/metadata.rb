@@ -18,6 +18,22 @@ module Mongoid # :nodoc:
         relation.builder(self, object)
       end
 
+      # Returns the name of the strategy used for handling dependent relations.
+      #
+      # @example Get the strategy.
+      #   metadata.cascade_strategy
+      #
+      # @return [ Object ] The cascading strategy to use.
+      def cascade_strategy
+        if dependent?
+          strategy =
+            %{Mongoid::Relations::Cascading::#{dependent.to_s.classify}}
+          strategy.constantize
+        else
+          return nil
+        end
+      end
+
       # Returns the name of the class that this relation contains. If the
       # class_name was provided as an option this will return that, otherwise
       # it will determine the name from the name property.

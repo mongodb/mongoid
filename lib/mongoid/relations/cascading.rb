@@ -1,4 +1,9 @@
 # encoding: utf-8
+require "mongoid/relations/cascading/strategy"
+require "mongoid/relations/cascading/delete"
+require "mongoid/relations/cascading/destroy"
+require "mongoid/relations/cascading/nullify"
+
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Cascading #:nodoc:
@@ -6,7 +11,21 @@ module Mongoid # :nodoc:
 
       included do
         class_inheritable_accessor :cascades
-        self.cascades = {}
+        self.cascades = []
+        delegate :cascades, :to => "self.class"
+      end
+
+      # Perform all cascading deletes, destroys, or nullifies. Will delegate to
+      # the appropriate strategy to perform the operation.
+      #
+      # @example Execute cascades.
+      #   document.cascade!
+      def cascade!
+        cascades.each do |name|
+          metadata = relations[name]
+          strategy = metadata.cascade_strategy
+          strategy.new(self, metadata).cascade
+        end
       end
 
       module ClassMethods #:nodoc:
@@ -21,11 +40,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Class ] The class of the document.
         def cascade(metadata)
-          tap do
-            if metadata.dependent?
-              cascades[metadata.name.to_s] = metadata.dependent
-            end
-          end
+          tap { cascades << metadata.name.to_s if metadata.dependent? }
         end
       end
     end

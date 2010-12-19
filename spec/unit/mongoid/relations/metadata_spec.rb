@@ -22,6 +22,56 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#cascade_strategy" do
+
+    context "when no dependent option is set" do
+
+      let(:metadata) do
+        klass.new(:name => :posts)
+      end
+
+      it "returns nil" do
+        metadata.cascade_strategy.should be_nil
+      end
+    end
+
+    context "when dependent is delete" do
+
+      let(:metadata) do
+        klass.new(:name => :posts, :dependent => :delete)
+      end
+
+      it "returns the delete strategy" do
+        metadata.cascade_strategy.should ==
+          Mongoid::Relations::Cascading::Delete
+      end
+    end
+
+    context "when dependent is destroy" do
+
+      let(:metadata) do
+        klass.new(:name => :posts, :dependent => :destroy)
+      end
+
+      it "returns the destroy strategy" do
+        metadata.cascade_strategy.should ==
+          Mongoid::Relations::Cascading::Destroy
+      end
+    end
+
+    context "when dependent is nullify" do
+
+      let(:metadata) do
+        klass.new(:name => :posts, :dependent => :nullify)
+      end
+
+      it "returns the nullify strategy" do
+        metadata.cascade_strategy.should ==
+          Mongoid::Relations::Cascading::Nullify
+      end
+    end
+  end
+
   describe "#class_name" do
 
     context "when class_name provided" do

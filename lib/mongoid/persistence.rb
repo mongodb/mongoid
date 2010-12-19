@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
     def remove(options = {})
       if Remove.new(self, options).persist
         self.destroyed = true
-        cascading_remove!
+        cascade!
       end; true
     end
     alias :delete :remove
@@ -109,9 +109,9 @@ module Mongoid #:nodoc:
     # @return [ Boolean ] True if validation passed.
     def update_attributes!(attributes = {})
       write_attributes(attributes)
-      result = update
-      self.class.fail_validate!(self) unless result
-      result
+      update.tap do |result|
+        self.class.fail_validate!(self) unless result
+      end
     end
 
     # Upsert the document - will perform an insert if the document is new, and
@@ -131,20 +131,6 @@ module Mongoid #:nodoc:
       end
     end
     alias :save :upsert
-
-    protected
-
-    # Perform all cascading deletes or destroys.
-    def cascading_remove!
-      # TODO: Get cascades back
-      # cascades.each do |name, option|
-        # association = send(name)
-        # if association
-          # documents = association.target.to_a
-          # documents.each { |doc| doc.send(option) }
-        # end
-      # end
-    end
 
     module ClassMethods #:nodoc:
 

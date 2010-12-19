@@ -25,7 +25,7 @@ describe Mongoid::Relations::Cascading do
       end
 
       it "adds the action to the cascades" do
-        klass.cascades["posts"].should == :destroy
+        klass.cascades.should include("posts")
       end
 
       it "returns self" do
@@ -47,7 +47,7 @@ describe Mongoid::Relations::Cascading do
       end
 
       it "does not add an action to the cascades" do
-        klass.cascades["posts"].should be_nil
+        klass.cascades.should_not include("posts")
       end
 
       it "returns self" do
