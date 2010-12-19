@@ -2,23 +2,19 @@
 module Mongoid #:nodoc:
   module Criterion #:nodoc:
     module Inclusion
+
       # Adds a criterion to the +Criteria+ that specifies values that must all
       # be matched in order to return results. Similar to an "in" clause but the
       # underlying conditional logic is an "AND" and not an "OR". The MongoDB
       # conditional operator that will be used is "$all".
       #
-      # Options:
+      # @example Adding the criterion.
+      #   criteria.all(:field => ["value1", "value2"])
+      #   criteria.all(:field1 => ["value1", "value2"], :field2 => ["value1"])
       #
-      # attributes: A +Hash+ where the key is the field name and the value is an
-      # +Array+ of values that must all match.
+      # @param [ Hash ] attributes Name/value pairs that all must match.
       #
-      # Example:
-      #
-      # <tt>criteria.all(:field => ["value1", "value2"])</tt>
-      #
-      # <tt>criteria.all(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] A new criteria with the added selector.
       def all(attributes = {})
         update_selector(attributes, "$all")
       end
@@ -30,15 +26,12 @@ module Mongoid #:nodoc:
       # similar to the Javascript object that is used when performing a find()
       # in the MongoDB console.
       #
-      # Options:
+      # @example Adding the criterion.
+      #   criteria.and(:field1 => "value1", :field2 => 15)
       #
-      # selectior: A +Hash+ that must match the attributes of the +Document+.
+      # @param [ Hash ] selectior Name/value pairs that all must match.
       #
-      # Example:
-      #
-      # <tt>criteria.and(:field1 => "value1", :field2 => 15)</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] A new criteria with the added selector.
       def and(selector = nil)
         where(selector)
       end
@@ -48,15 +41,12 @@ module Mongoid #:nodoc:
       # is similar to a SQL OR. This is named #any_of and aliased "or" for
       # readability.
       #
-      # Options:
+      # @example Adding the criterion.
+      #   criteria.any_of({ :field1 => "value" }, { :field2 => "value2" })
       #
-      # selector: Multiple +Hash+ expressions that any can match.
+      # @param [ Array<Hash> ] args A list of name/value pairs any can match.
       #
-      # Example:
-      #
-      # <tt>criteria.any_of({ :field1 => "value" }, { :field2 => "value2" })</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] A new criteria with the added selector.
       def any_of(*args)
         clone.tap do |crit|
           criterion = @selector["$or"] || []
@@ -70,18 +60,13 @@ module Mongoid #:nodoc:
       # be matched in order to return results. This is similar to an SQL "IN"
       # clause. The MongoDB conditional operator that will be used is "$in".
       #
-      # Options:
+      # @example Adding the criterion.
+      #   criteria.in(:field => ["value1", "value2"])
+      #   criteria.in(:field1 => ["value1", "value2"], :field2 => ["value1"])
       #
-      # attributes: A +Hash+ where the key is the field name and the value is an
-      # +Array+ of values that any can match.
+      # @param [ Hash ] attributes Name/value pairs any can match.
       #
-      # Example:
-      #
-      # <tt>criteria.in(:field => ["value1", "value2"])</tt>
-      #
-      # <tt>criteria.in(:field1 => ["value1", "value2"], :field2 => ["value1"])</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] A new criteria with the added selector.
       def in(attributes = {})
         update_selector(attributes, "$in")
       end
@@ -90,16 +75,12 @@ module Mongoid #:nodoc:
       # Adds a criterion to the +Criteria+ that specifies values to do
       # geospacial searches by. The field must be indexed with the "2d" option.
       #
-      # Options:
+      # @example Adding the criterion.
+      #   criteria.near(:field1 => [30, -44])
       #
-      # attributes: A +Hash+ where the keys are the field names and the values are
-      # +Arrays+ of [latitude, longitude] pairs.
+      # @param [ Hash ] attributes The fields with lat/long values.
       #
-      # Example:
-      #
-      # <tt>criteria.near(:field1 => [30, -44])</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] A new criteria with the added selector.
       def near(attributes = {})
         update_selector(attributes, "$near")
       end
@@ -110,15 +91,12 @@ module Mongoid #:nodoc:
       # similar to the Javascript object that is used when performing a find()
       # in the MongoDB console.
       #
-      # Options:
+      # @example Adding the criterion.
+      #   criteria.where(:field1 => "value1", :field2 => 15)
       #
-      # selector: A +Hash+ that must match the attributes of the +Document+.
+      # @param [ Hash ] selector Name/value pairs where all must match.
       #
-      # Example:
-      #
-      # <tt>criteria.where(:field1 => "value1", :field2 => 15)</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] A new criteria with the added selector.
       def where(selector = nil)
         clone.tap do |crit|
           selector = case selector
