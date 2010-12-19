@@ -22,7 +22,7 @@ describe Mongoid::Relations::Polymorphic do
           )
         end
 
-        before do
+        let!(:polymorphed) do
           klass.polymorph(metadata)
         end
 
@@ -32,6 +32,10 @@ describe Mongoid::Relations::Polymorphic do
 
         it "adds the foreign key type field" do
           klass.fields["ratable_type"].should_not be_nil
+        end
+
+        it "returns self" do
+          polymorphed.should == klass
         end
       end
 

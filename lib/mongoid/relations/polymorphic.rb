@@ -6,7 +6,6 @@ module Mongoid # :nodoc:
 
       included do
         class_inheritable_accessor :polymorphic
-
         delegate :polymorphic?, :to => "self.class"
       end
 
@@ -20,10 +19,12 @@ module Mongoid # :nodoc:
         #
         # @param [ Metadata ] metadata The relation metadata.
         def polymorph(metadata)
-          if metadata.polymorphic?
-            self.polymorphic = true
-            if metadata.relation.stores_foreign_key?
-              field(metadata.inverse_type, :type => String)
+          tap do |klass|
+            if metadata.polymorphic?
+              klass.polymorphic = true
+              if metadata.relation.stores_foreign_key?
+                field(metadata.inverse_type, :type => String)
+              end
             end
           end
         end

@@ -1,0 +1,58 @@
+require "spec_helper"
+
+describe Mongoid::Relations::Cascading do
+
+  describe ".cascade" do
+
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+      end
+    end
+
+    context "when a dependent option is provided" do
+
+      let(:metadata) do
+        Mongoid::Relations::Metadata.new(
+          :name => :posts,
+          :dependent => :destroy,
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      let!(:cascaded) do
+        klass.cascade(metadata)
+      end
+
+      it "adds the action to the cascades" do
+        klass.cascades["posts"].should == :destroy
+      end
+
+      it "returns self" do
+        cascaded.should == klass
+      end
+    end
+
+    context "when no dependent option is provided" do
+
+      let(:metadata) do
+        Mongoid::Relations::Metadata.new(
+          :name => :posts,
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      let!(:cascaded) do
+        klass.cascade(metadata)
+      end
+
+      it "does not add an action to the cascades" do
+        klass.cascades["posts"].should be_nil
+      end
+
+      it "returns self" do
+        cascaded.should == klass
+      end
+    end
+  end
+end

@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/relations/accessors"
+require "mongoid/relations/cascading"
 require "mongoid/relations/cyclic"
 require "mongoid/relations/proxy"
 require "mongoid/relations/bindings"
@@ -24,6 +25,7 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     extend ActiveSupport::Concern
     include Accessors
+    include Cascading
     include Cyclic
     include Builders
     include Macros
@@ -37,65 +39,50 @@ module Mongoid # :nodoc:
     # Determine if the document itself is embedded in another document via the
     # proper channels. (If it has a parent document.)
     #
-    # Example:
+    # @example Is the document embedded?
+    #   address.embedded?
     #
-    # <tt>address.embedded?</tt>
-    #
-    # Returns:
-    #
-    # True if the document has a parent document.
+    # @return [ Boolean ] True if the document has a parent document.
     def embedded?
       _parent.present?
     end
 
-    # Determine if the document is part of an embeds_one relation.
+    # Determine if the document is part of an embeds_many relation.
     #
-    # Example:
+    # @example Is the document in an embeds many?
+    #   address.embedded_many?
     #
-    # <tt>address.embedded_many?</tt>
-    #
-    # Returns:
-    #
-    # True if in an embeds many.
+    # @return [ Boolean ] True if in an embeds many.
     def embedded_many?
       metadata && metadata.macro == :embeds_many
     end
 
     # Determine if the document is part of an embeds_one relation.
     #
-    # Example:
+    # @example Is the document in an embeds one?
+    #   address.embedded_one?
     #
-    # <tt>address.embedded_one?</tt>
-    #
-    # Returns:
-    #
-    # True if in an embeds one.
+    # @return [ Boolean ] True if in an embeds one.
     def embedded_one?
       metadata && metadata.macro == :embeds_one
     end
 
-    # Determine if the document is part of an references_one relation.
+    # Determine if the document is part of an references_many relation.
     #
-    # Example:
+    # @example Is the document in a references many?
+    #   post.referenced_many?
     #
-    # <tt>address.referenced_many?</tt>
-    #
-    # Returns:
-    #
-    # True if in a references many.
+    # @return [ Boolean ] True if in a references many.
     def referenced_many?
       metadata && metadata.macro == :references_many
     end
 
     # Determine if the document is part of an references_one relation.
     #
-    # Example:
+    # @example Is the document in a references one?
+    #   address.referenced_one?
     #
-    # <tt>address.referenced_one?</tt>
-    #
-    # Returns:
-    #
-    # True if in a references one.
+    # @return [ Boolean ] True if in a references one.
     def referenced_one?
       metadata && metadata.macro == :references_one
     end

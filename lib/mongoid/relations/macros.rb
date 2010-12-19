@@ -282,7 +282,7 @@ module Mongoid # :nodoc:
         #
         # @param [ Metadata ] metadata The metadata for the relation.
         def reference(metadata)
-          polymorph(metadata)
+          polymorph(metadata).cascade(metadata)
           if metadata.relation.stores_foreign_key?
             key = metadata.foreign_key
             field(
