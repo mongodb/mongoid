@@ -120,6 +120,19 @@ module Mongoid # :nodoc:
           init(base, target, metadata)
         end
 
+        # Removes all associations between the base document and the target
+        # documents by deleting the foreign keys and the references, orphaning
+        # the target documents in the process.
+        #
+        # @example Nullify the relation.
+        #   person.posts.nullify_all
+        def nullify_all
+          loaded and target.each do |doc|
+            binding.unbind
+            doc.save
+          end
+        end
+
         # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary
         # deletion.

@@ -1694,7 +1694,67 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#nullify_all" do
 
-    pending "Github 272: Implement and hook into cascading"
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create(:ssn => "999-99-9999")
+      end
+
+      let!(:post_one) do
+        person.posts.create(:title => "One")
+      end
+
+      let!(:post_two) do
+        person.posts.create(:title => "Two")
+      end
+
+      before do
+        person.posts.nullify_all
+      end
+
+      it "removes all the foreign keys from the target" do
+        [ post_one, post_two ].each do |post|
+          post.person_id.should be_nil
+        end
+      end
+
+      it "removes all the references from the target" do
+        [ post_one, post_two ].each do |post|
+          post.person.should be_nil
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:movie) do
+        Movie.create(:title => "Oldboy")
+      end
+
+      let!(:rating_one) do
+        movie.ratings.create(:value => 10)
+      end
+
+      let!(:rating_two) do
+        movie.ratings.create(:value => 9)
+      end
+
+      before do
+        movie.ratings.nullify_all
+      end
+
+      it "removes all the foreign keys from the target" do
+        [ rating_one, rating_two ].each do |rating|
+          rating.ratable_id.should be_nil
+        end
+      end
+
+      it "removes all the references from the target" do
+        [ rating_one, rating_two ].each do |rating|
+          rating.ratable.should be_nil
+        end
+      end
+    end
   end
 
   [ :size, :length ].each do |method|
