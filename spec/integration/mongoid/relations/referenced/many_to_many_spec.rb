@@ -251,85 +251,88 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  describe "#build" do
+  [ :build, :new ].each do |method|
 
-    context "when the relation is not polymorphic" do
+    describe "##{method}" do
 
-      context "when the parent is a new record" do
+      context "when the relation is not polymorphic" do
 
-        let(:person) do
-          Person.new
+        context "when the parent is a new record" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let!(:preference) do
+            person.preferences.send(method, :name => "settings")
+          end
+
+          it "adds the document to the relation" do
+            person.preferences.should == [ preference ]
+          end
+
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should == [ preference.id ]
+          end
+
+          it "sets the inverse foreign key on the relation" do
+            preference.person_ids.should == [ person.id ]
+          end
+
+          it "sets the base on the inverse relation" do
+            preference.people.should == [ person ]
+          end
+
+          it "sets the attributes" do
+            preference.name.should == "settings"
+          end
+
+          it "does not save the target" do
+            preference.should be_new
+          end
+
+          it "adds the correct number of documents" do
+            person.preferences.size.should == 1
+          end
         end
 
-        let!(:preference) do
-          person.preferences.build(:name => "settings")
-        end
+        context "when the parent is not a new record" do
 
-        it "adds the document to the relation" do
-          person.preferences.should == [ preference ]
-        end
+          let(:person) do
+            Person.create(:ssn => "554-44-3891")
+          end
 
-        it "sets the foreign key on the relation" do
-          person.preference_ids.should == [ preference.id ]
-        end
+          let!(:preference) do
+            person.preferences.send(method, :name => "settings")
+          end
 
-        it "sets the inverse foreign key on the relation" do
-          preference.person_ids.should == [ person.id ]
-        end
+          it "adds the document to the relation" do
+            person.preferences.should == [ preference ]
+          end
 
-        it "sets the base on the inverse relation" do
-          preference.people.should == [ person ]
-        end
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should == [ preference.id ]
+          end
 
-        it "sets the attributes" do
-          preference.name.should == "settings"
-        end
+          it "sets the inverse foreign key on the relation" do
+            preference.person_ids.should == [ person.id ]
+          end
 
-        it "does not save the target" do
-          preference.should be_new
-        end
+          it "sets the base on the inverse relation" do
+            preference.people.should == [ person ]
+          end
 
-        it "adds the correct number of documents" do
-          person.preferences.size.should == 1
-        end
-      end
+          it "sets the attributes" do
+            preference.name.should == "settings"
+          end
 
-      context "when the parent is not a new record" do
+          it "does not save the target" do
+            preference.should be_new
+          end
 
-        let(:person) do
-          Person.create(:ssn => "554-44-3891")
-        end
-
-        let!(:preference) do
-          person.preferences.build(:name => "settings")
-        end
-
-        it "adds the document to the relation" do
-          person.preferences.should == [ preference ]
-        end
-
-        it "sets the foreign key on the relation" do
-          person.preference_ids.should == [ preference.id ]
-        end
-
-        it "sets the inverse foreign key on the relation" do
-          preference.person_ids.should == [ person.id ]
-        end
-
-        it "sets the base on the inverse relation" do
-          preference.people.should == [ person ]
-        end
-
-        it "sets the attributes" do
-          preference.name.should == "settings"
-        end
-
-        it "does not save the target" do
-          preference.should be_new
-        end
-
-        it "adds the correct number of documents" do
-          person.preferences.size.should == 1
+          it "adds the correct number of documents" do
+            person.preferences.size.should == 1
+          end
         end
       end
     end

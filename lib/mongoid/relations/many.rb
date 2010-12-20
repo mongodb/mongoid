@@ -46,6 +46,7 @@ module Mongoid # :nodoc:
           doc.identify
         end
       end
+      alias :new :build
 
       # Returns a count of the number of documents in the association that have
       # actually been persisted to the database.
