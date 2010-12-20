@@ -35,12 +35,12 @@ module Mongoid # :nodoc:
           init(base, target, metadata)
         end
 
-        # Removes all associations between the base document and the target
-        # documents by deleting the foreign keys and the references, orphaning
-        # the target documents in the process.
+        # Removes the association between the base document and the target
+        # document by deleting the foreign key and the reference, orphaning
+        # the target document in the process.
         #
         # @example Nullify the relation.
-        #   person.posts.nullify
+        #   person.game.nullify
         def nullify
           target.send(metadata.foreign_key_setter, nil)
           target.send(:remove_instance_variable, "@#{metadata.inverse(target)}")
