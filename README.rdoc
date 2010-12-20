@@ -19,10 +19,7 @@ Please see the new Mongoid website for up-to-date documentation:
 {mongoid.org}[http://mongoid.org]
 
 = Donating
-<a href='http://www.pledgie.com/campaigns/7757'>
-  <img alt='Support Mongoid on Pledgie'
-       src='http://www.pledgie.com/campaigns/7757.png?skin_name=chrome' border='0'/>
-</a>
+* {Support Mongoid at Pledgie}[http://www.pledgie.com/campaigns/7757]
 
 = License
 
