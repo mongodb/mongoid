@@ -404,8 +404,30 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
-  describe "#nullify_all" do
+  describe "#nullify" do
 
-    pending "Github 272: Implement and hook into cascading"
+    let(:person) do
+      Person.create(:ssn => "777-77-7777")
+    end
+
+    let!(:game) do
+      person.create_game(:name => "Starcraft II")
+    end
+
+    before do
+      person.game.nullify
+    end
+
+    it "removes the foreign key from the target" do
+      game.person_id.should be_nil
+    end
+
+    it "removes the reference from the target" do
+      game.person.should be_nil
+    end
+
+    it "removes the reference from the base" do
+      person.game.should be_nil
+    end
   end
 end

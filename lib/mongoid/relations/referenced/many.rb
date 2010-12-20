@@ -125,11 +125,17 @@ module Mongoid # :nodoc:
         # the target documents in the process.
         #
         # @example Nullify the relation.
-        #   person.posts.nullify_all
-        def nullify_all
-          loaded and binding.unbind
-          target.each(&:save)
+        #   person.posts.nullify
+        def nullify
+          loaded and target.each do |doc|
+            doc.send(metadata.foreign_key_setter, nil)
+            doc.send(
+              :remove_instance_variable, "@#{metadata.inverse(doc)}"
+            )
+            doc.save
+          end
         end
+        alias :nullify_all :nullify
 
         # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary

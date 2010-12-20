@@ -10,15 +10,7 @@ module Mongoid # :nodoc:
         # @example Nullify the reference.
         #   strategy.cascade
         def cascade
-          relation.to_a.each do |doc|
-            if metadata.macro == :references_and_referenced_in_many
-              document.send(metadata.foreign_key).delete(doc.id)
-              doc.send(metadata.inverse_foreign_key).delete(document.id)
-            else
-              doc.send(metadata.foreign_key_setter, nil)
-            end
-            doc.save
-          end
+          relation.nullify
         end
       end
     end

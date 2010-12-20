@@ -128,14 +128,15 @@ module Mongoid # :nodoc:
         # the target documents in the process.
         #
         # @example Nullify the relation.
-        #   person.preferences.nullify_all
-        def nullify_all
+        #   person.preferences.nullify
+        def nullify
           loaded and target.each do |doc|
             base.send(metadata.foreign_key).delete(doc.id)
             dereference(doc)
           end
           target.clear
         end
+        alias :nullify_all :nullify
 
         # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary
