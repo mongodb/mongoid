@@ -1689,6 +1689,11 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#nullify_all" do
+
+    pending "Github 272: Implement and hook into cascading"
+  end
+
   [ :size, :length ].each do |method|
 
     describe "##{method}" do

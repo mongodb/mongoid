@@ -105,6 +105,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+
+      context "when not adding validation options" do
+
+        pending "Github 220: Add association validation to related models"
+      end
+
+      context "when setting validate to false" do
+
+        pending "Github 220: Add association validation to related models"
+      end
     end
   end
 
@@ -158,6 +168,16 @@ describe Mongoid::Relations::Macros do
         it "automatically adds the inverse class name" do
           metadata.inverse_class_name.should == "TestClass"
         end
+      end
+
+      context "when not adding validation options" do
+
+        pending "Github 220: Add association validation to related models"
+      end
+
+      context "when setting validate to false" do
+
+        pending "Github 220: Add association validation to related models"
       end
     end
   end
@@ -301,6 +321,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+
+      context "when not adding validation options" do
+
+        pending "Github 220: Add association validation to related models"
+      end
+
+      context "when setting validate to false" do
+
+        pending "Github 220: Add association validation to related models"
+      end
     end
   end
 
@@ -351,6 +381,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+
+      context "when not adding validation options" do
+
+        pending "Github 220: Add association validation to related models"
+      end
+
+      context "when setting validate to false" do
+
+        pending "Github 220: Add association validation to related models"
+      end
     end
   end
 
@@ -400,6 +440,16 @@ describe Mongoid::Relations::Macros do
         it "automatically adds the inverse class name" do
           metadata.inverse_class_name.should == "TestClass"
         end
+      end
+
+      context "when not adding validation options" do
+
+        pending "Github 220: Add association validation to related models"
+      end
+
+      context "when setting validate to false" do
+
+        pending "Github 220: Add association validation to related models"
       end
     end
   end
@@ -454,6 +504,16 @@ describe Mongoid::Relations::Macros do
         it "automatically adds the inverse class name" do
           metadata.inverse_class_name.should == "TestClass"
         end
+      end
+
+      context "when not adding validation options" do
+
+        pending "Github 220: Add association validation to related models"
+      end
+
+      context "when setting validate to false" do
+
+        pending "Github 220: Add association validation to related models"
       end
     end
   end

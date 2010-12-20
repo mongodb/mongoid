@@ -403,4 +403,9 @@ describe Mongoid::Relations::Referenced::One do
       end
     end
   end
+
+  describe "#nullify_all" do
+
+    pending "Github 272: Implement and hook into cascading"
+  end
 end

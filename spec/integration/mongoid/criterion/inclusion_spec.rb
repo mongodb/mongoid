@@ -82,6 +82,11 @@ describe Mongoid::Criterion::Inclusion do
     end
   end
 
+  describe "#find" do
+
+    pending "Github 273: Criteria#find match AR behavior"
+  end
+
   describe "#where" do
 
     let(:dob) do

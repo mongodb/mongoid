@@ -69,6 +69,11 @@ describe Mongoid::Dirty do
         @person.previous_changes["ssn"].should == [ "234-11-2533", "222-22-2222" ]
       end
     end
+
+    context "when the previous value is nil" do
+
+      pending "Github 228: reset_attribute! should reset value to nil"
+    end
   end
 
   context "when associations are getting changed" do

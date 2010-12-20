@@ -69,6 +69,8 @@ describe Mongoid::Finders do
               ])
             }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
+
+          pending "Github 261: Passing an empty array returns empty array"
         end
       end
     end
