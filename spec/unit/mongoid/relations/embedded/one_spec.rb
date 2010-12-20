@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::One do
 
-  let(:klass) do
-    Mongoid::Relations::Embedded::One
-  end
-
   let(:binding_klass) do
     Mongoid::Relations::Bindings::Embedded::One
   end
@@ -32,7 +28,7 @@ describe Mongoid::Relations::Embedded::One do
 
   let(:metadata) do
     Mongoid::Relations::Metadata.new(
-      :relation => klass,
+      :relation => described_class,
       :inverse_class_name => "Person",
       :name => :name,
       :as => :namable
@@ -42,7 +38,7 @@ describe Mongoid::Relations::Embedded::One do
   describe "#===" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     context "when the proxied document is same class" do
@@ -56,7 +52,7 @@ describe Mongoid::Relations::Embedded::One do
   describe "#bind" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     before do
@@ -99,21 +95,21 @@ describe Mongoid::Relations::Embedded::One do
   describe ".builder" do
 
     it "returns the embedded one builder" do
-      klass.builder(metadata, target).should be_a(builder_klass)
+      described_class.builder(metadata, target).should be_a(builder_klass)
     end
   end
 
   describe ".embedded?" do
 
     it "returns true" do
-      klass.should be_embedded
+      described_class.should be_embedded
     end
   end
 
   describe "#initialize" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     it "parentizes the child" do
@@ -124,7 +120,7 @@ describe Mongoid::Relations::Embedded::One do
   describe ".macro" do
 
     it "returns embeds_one" do
-      klass.macro.should == :embeds_one
+      described_class.macro.should == :embeds_one
     end
   end
 
@@ -135,7 +131,7 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     it "returns the single nested builder" do
-      klass.nested_builder(metadata, attributes, {}).should
+      described_class.nested_builder(metadata, attributes, {}).should
         be_a(nested_builder_klass)
     end
   end
@@ -143,7 +139,7 @@ describe Mongoid::Relations::Embedded::One do
   describe "#substitute" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     context "when passing a document" do
@@ -188,7 +184,7 @@ describe Mongoid::Relations::Embedded::One do
   describe "#unbind" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     context "when the base is persisted" do

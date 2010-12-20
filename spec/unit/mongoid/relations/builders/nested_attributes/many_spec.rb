@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::NestedAttributes::Many do
 
-  let(:klass) do
-    Mongoid::Relations::Builders::NestedAttributes::Many
-  end
-
   let(:metadata) do
     Mongoid::Relations::Metadata.new(
       :name => :addresses,
@@ -22,7 +18,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the option is provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, :allow_destroy => true)
+        described_class.new(metadata, {}, :allow_destroy => true)
       end
 
       it "returns the option" do
@@ -33,7 +29,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the option is not provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns false" do
@@ -55,7 +51,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when attributes are over limit" do
 
       let(:builder) do
-        klass.new(metadata, attributes, :limit => 2)
+        described_class.new(metadata, attributes, :limit => 2)
       end
 
       it "raises an error" do
@@ -68,7 +64,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when rejectable" do
 
       let(:builder) do
-        klass.new(
+        described_class.new(
           metadata,
           attributes,
           :reject_if => lambda { |attrs| attrs[:city].blank? }
@@ -95,7 +91,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       let(:builder) do
-        klass.new(metadata, attributes)
+        described_class.new(metadata, attributes)
       end
 
       before do
@@ -114,7 +110,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       let(:builder) do
-        klass.new(metadata, attributes)
+        described_class.new(metadata, attributes)
       end
 
       before do
@@ -138,7 +134,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     end
 
     let(:builder) do
-      klass.new(metadata, attributes, {})
+      described_class.new(metadata, attributes, {})
     end
 
     it "sorts the attributes" do
@@ -157,7 +153,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       context "when the proc matches" do
 
         let(:builder) do
-          klass.new(metadata, {}, options)
+          described_class.new(metadata, {}, options)
         end
 
         it "returns true" do
@@ -168,7 +164,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       context "when the proc does not match" do
 
         let(:builder) do
-          klass.new(metadata, {}, options)
+          described_class.new(metadata, {}, options)
         end
 
         it "returns false" do
@@ -180,7 +176,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the proc is not provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns false" do
@@ -194,7 +190,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the option is provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, :update_only => true)
+        described_class.new(metadata, {}, :update_only => true)
       end
 
       it "returns the option" do
@@ -205,7 +201,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the option is not provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns false" do

@@ -2,12 +2,8 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Embedded::One do
 
-  let(:klass) do
-    Mongoid::Relations::Builders::Embedded::One
-  end
-
   let(:builder) do
-    klass.new(metadata, object)
+    described_class.new(metadata, object)
   end
 
   describe "#build" do
@@ -19,7 +15,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
       end
 
       let(:builder) do
-        klass.new(metadata, nil)
+        described_class.new(metadata, nil)
       end
 
       before do

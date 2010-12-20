@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Bindings::Embedded::Many do
 
-  let(:klass) do
-    Mongoid::Relations::Bindings::Embedded::Many
-  end
-
   let(:person) do
     Person.new
   end
@@ -25,7 +21,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
   describe "#bind_all" do
 
     let(:binding) do
-      klass.new(person, target, metadata)
+      described_class.new(person, target, metadata)
     end
 
     context "when the documents are bindable" do
@@ -59,7 +55,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
   describe "#bind_one" do
 
     let(:binding) do
-      klass.new(person, target, metadata)
+      described_class.new(person, target, metadata)
     end
 
     context "when the document is bindable" do
@@ -93,7 +89,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
   describe "#unbind" do
 
     let(:binding) do
-      klass.new(person, target, metadata)
+      described_class.new(person, target, metadata)
     end
 
     context "when the documents are unbindable" do

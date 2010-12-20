@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Bindings::Embedded::In do
 
-  let(:klass) do
-    Mongoid::Relations::Bindings::Embedded::In
-  end
-
   let(:person) do
     Person.new
   end
@@ -31,7 +27,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
     context "when the child of an embeds one" do
 
       let(:binding) do
-        klass.new(name, person, name_metadata)
+        described_class.new(name, person, name_metadata)
       end
 
       context "when the document is bindable" do
@@ -65,7 +61,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
     context "when the child of an embeds many" do
 
       let(:binding) do
-        klass.new(address, person, address_metadata)
+        described_class.new(address, person, address_metadata)
       end
 
       context "when the document is bindable" do
@@ -102,7 +98,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
     context "when the child of an embeds one" do
 
       let(:binding) do
-        klass.new(name, person, name_metadata)
+        described_class.new(name, person, name_metadata)
       end
 
       context "when the document is unbindable" do
@@ -129,7 +125,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
     context "when the child of an embeds many" do
 
       let(:binding) do
-        klass.new(address, person, address_metadata)
+        described_class.new(address, person, address_metadata)
       end
 
       context "when the document is unbindable" do

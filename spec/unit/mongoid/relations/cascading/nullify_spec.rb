@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Cascading::Nullify do
 
-  let(:klass) do
-    Mongoid::Relations::Cascading::Nullify
-  end
-
   let(:person) do
     Person.new
   end
@@ -27,7 +23,7 @@ describe Mongoid::Relations::Cascading::Nullify do
       end
 
       let(:strategy) do
-        klass.new(person, metadata)
+        described_class.new(person, metadata)
       end
 
       context "when the documents exist" do
@@ -72,7 +68,7 @@ describe Mongoid::Relations::Cascading::Nullify do
       end
 
       let(:strategy) do
-        klass.new(person, metadata)
+        described_class.new(person, metadata)
       end
 
       context "when the documents exist" do

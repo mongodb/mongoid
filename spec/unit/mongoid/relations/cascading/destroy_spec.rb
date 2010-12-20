@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Cascading::Destroy do
 
-  let(:klass) do
-    Mongoid::Relations::Cascading::Destroy
-  end
-
   let(:person) do
     Person.new
   end
@@ -15,7 +11,7 @@ describe Mongoid::Relations::Cascading::Destroy do
   end
 
   let(:strategy) do
-    klass.new(person, metadata)
+    described_class.new(person, metadata)
   end
 
   describe "#cascade" do

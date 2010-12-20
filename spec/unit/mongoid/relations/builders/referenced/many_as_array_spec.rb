@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::ManyAsArray do
 
-  let(:klass) do
-    Mongoid::Relations::Builders::Referenced::ManyAsArray
-  end
-
   describe "#build" do
 
     let(:metadata) do
@@ -17,7 +13,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyAsArray do
     end
 
     let(:builder) do
-      klass.new(metadata, object)
+      described_class.new(metadata, object)
     end
 
     context "when provided an id array" do

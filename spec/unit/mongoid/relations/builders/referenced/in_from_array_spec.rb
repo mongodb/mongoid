@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::InFromArray do
 
-  let(:klass) do
-    Mongoid::Relations::Builders::Referenced::InFromArray
-  end
-
   describe "#build" do
 
     let(:metadata) do
@@ -17,7 +13,7 @@ describe Mongoid::Relations::Builders::Referenced::InFromArray do
     end
 
     let(:builder) do
-      klass.new(metadata, object)
+      described_class.new(metadata, object)
     end
 
     context "when provided an id" do

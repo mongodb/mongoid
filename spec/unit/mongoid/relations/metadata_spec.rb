@@ -2,14 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Metadata do
 
-  let(:klass) do
-    Mongoid::Relations::Metadata
-  end
-
   describe "#builder" do
 
     let(:metadata) do
-      klass.new(:relation => Mongoid::Relations::Embedded::One)
+      described_class.new(:relation => Mongoid::Relations::Embedded::One)
     end
 
     let(:object) do
@@ -27,7 +23,7 @@ describe Mongoid::Relations::Metadata do
     context "when no dependent option is set" do
 
       let(:metadata) do
-        klass.new(:name => :posts)
+        described_class.new(:name => :posts)
       end
 
       it "returns nil" do
@@ -38,7 +34,7 @@ describe Mongoid::Relations::Metadata do
     context "when dependent is delete" do
 
       let(:metadata) do
-        klass.new(:name => :posts, :dependent => :delete)
+        described_class.new(:name => :posts, :dependent => :delete)
       end
 
       it "returns the delete strategy" do
@@ -50,7 +46,7 @@ describe Mongoid::Relations::Metadata do
     context "when dependent is destroy" do
 
       let(:metadata) do
-        klass.new(:name => :posts, :dependent => :destroy)
+        described_class.new(:name => :posts, :dependent => :destroy)
       end
 
       it "returns the destroy strategy" do
@@ -62,7 +58,7 @@ describe Mongoid::Relations::Metadata do
     context "when dependent is nullify" do
 
       let(:metadata) do
-        klass.new(:name => :posts, :dependent => :nullify)
+        described_class.new(:name => :posts, :dependent => :nullify)
       end
 
       it "returns the nullify strategy" do
@@ -77,7 +73,7 @@ describe Mongoid::Relations::Metadata do
     context "when class_name provided" do
 
       let(:metadata) do
-        klass.new(:class_name => "Person")
+        described_class.new(:class_name => "Person")
       end
 
       it "constantizes the class name" do
@@ -94,7 +90,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         let(:metadata) do
-          klass.new(:name => :name, :relation => relation)
+          described_class.new(:name => :name, :relation => relation)
         end
 
         it "classifies and constantizes the association name" do
@@ -109,7 +105,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         let(:metadata) do
-          klass.new(:name => :addresses, :relation => relation)
+          described_class.new(:name => :addresses, :relation => relation)
         end
 
         it "classifies and constantizes the association name" do
@@ -124,7 +120,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is embedded" do
 
       let(:metadata) do
-        klass.new(:relation => relation)
+        described_class.new(:relation => relation)
       end
 
       let(:relation) do
@@ -139,7 +135,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is not embedded" do
 
       let(:metadata) do
-        klass.new(:relation => relation)
+        described_class.new(:relation => relation)
       end
 
       let(:relation) do
@@ -155,7 +151,7 @@ describe Mongoid::Relations::Metadata do
   describe "#extension" do
 
     let(:metadata) do
-      klass.new(:extend => :value)
+      described_class.new(:extend => :value)
     end
 
     it "returns the extend property" do
@@ -168,7 +164,7 @@ describe Mongoid::Relations::Metadata do
     context "when an extends property exists" do
 
       let(:metadata) do
-        klass.new(:extend => :value)
+        described_class.new(:extend => :value)
       end
 
       it "returns true" do
@@ -179,7 +175,7 @@ describe Mongoid::Relations::Metadata do
     context "when the extend option is nil" do
 
       let(:metadata) do
-        klass.new
+        described_class.new
       end
 
       it "returns false" do
@@ -197,7 +193,7 @@ describe Mongoid::Relations::Metadata do
         context "when referenced in" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :person,
               :relation => Mongoid::Relations::Referenced::In
             )
@@ -211,7 +207,7 @@ describe Mongoid::Relations::Metadata do
         context "when references and referenced in many" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :people,
               :relation => Mongoid::Relations::Referenced::ManyToMany
             )
@@ -225,7 +221,7 @@ describe Mongoid::Relations::Metadata do
         context "when references many as array" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :posts,
               :relation => Mongoid::Relations::Referenced::ManyAsArray
             )
@@ -242,7 +238,7 @@ describe Mongoid::Relations::Metadata do
         context "when references one" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :post,
               :relation => Mongoid::Relations::Referenced::One,
               :inverse_class_name => "Person"
@@ -257,7 +253,7 @@ describe Mongoid::Relations::Metadata do
         context "when references many" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :posts,
               :relation => Mongoid::Relations::Referenced::Many,
               :inverse_class_name => "Person"
@@ -272,7 +268,7 @@ describe Mongoid::Relations::Metadata do
         context "when referenced in from array" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :person,
               :relation => Mongoid::Relations::Referenced::InFromArray,
               :inverse_class_name => "Post"
@@ -289,7 +285,7 @@ describe Mongoid::Relations::Metadata do
     context "when a foreign_key was defined" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :person,
           :relation => Mongoid::Relations::Referenced::InFromArray,
           :foreign_key => "blog_post_id"
@@ -307,7 +303,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation stores keys in an array" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :preferences,
           :relation => Mongoid::Relations::Referenced::ManyToMany,
           :foreign_key => "preference_ids"
@@ -322,7 +318,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation stores a single key" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :person,
           :relation => Mongoid::Relations::Referenced::In,
           :foreign_key => "person_id"
@@ -340,7 +336,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is not polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :person,
           :relation => Mongoid::Relations::Referenced::InFromArray,
           :foreign_key => "person_id"
@@ -355,7 +351,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :ratings,
           :relation => Mongoid::Relations::Referenced::Many,
           :as => :ratable,
@@ -374,7 +370,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is not polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :person,
           :relation => Mongoid::Relations::Referenced::InFromArray,
           :foreign_key => "person_id"
@@ -389,7 +385,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :ratable,
           :relation => Mongoid::Relations::Referenced::In,
           :polymorphic => true,
@@ -408,7 +404,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is not polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :person,
           :relation => Mongoid::Relations::Referenced::InFromArray,
           :foreign_key => "person_id"
@@ -423,7 +419,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :ratable,
           :relation => Mongoid::Relations::Referenced::In,
           :polymorphic => true,
@@ -442,7 +438,7 @@ describe Mongoid::Relations::Metadata do
     context "when an index property exists" do
 
       let(:metadata) do
-        klass.new(:index => true)
+        described_class.new(:index => true)
       end
 
       it "returns true" do
@@ -453,7 +449,7 @@ describe Mongoid::Relations::Metadata do
     context "when the index option is nil" do
 
       let(:metadata) do
-        klass.new
+        described_class.new
       end
 
       it "returns false" do
@@ -464,7 +460,7 @@ describe Mongoid::Relations::Metadata do
     context "when the index option is false" do
 
       let(:metadata) do
-        klass.new(:index => false)
+        described_class.new(:index => false)
       end
 
       it "returns false" do
@@ -480,7 +476,7 @@ describe Mongoid::Relations::Metadata do
       context "when inverse_of is defined" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :inverse_of => :crazy_name
           )
         end
@@ -493,7 +489,7 @@ describe Mongoid::Relations::Metadata do
       context "when not polymorphic" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :pet,
             :class_name => "Animal",
             :inverse_class_name => "Person"
@@ -508,7 +504,7 @@ describe Mongoid::Relations::Metadata do
       context "when polymorphic" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :addresses,
             :as => :addressable,
             :inverse_class_name => "Person"
@@ -523,7 +519,7 @@ describe Mongoid::Relations::Metadata do
       context "when polymorphic on the child" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :addressable,
             :polymorphic => true,
             :inverse_class_name => "Address"
@@ -538,7 +534,7 @@ describe Mongoid::Relations::Metadata do
       context "when in a cyclic relation" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :parent_role,
             :class_name => "Role",
             :inverse_class_name => "Role",
@@ -559,7 +555,7 @@ describe Mongoid::Relations::Metadata do
     context "when the inverse foreign key is not defined" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :preferences,
           :index => true,
           :dependent => :nullify,
@@ -577,7 +573,7 @@ describe Mongoid::Relations::Metadata do
   context "#inverse_klass" do
 
     let(:metadata) do
-      klass.new(:inverse_class_name => "Person")
+      described_class.new(:inverse_class_name => "Person")
     end
 
     it "constantizes the inverse_class_name" do
@@ -590,7 +586,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is not polymorphic" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :pet,
           :class_name => "Animal",
           :inverse_class_name => "Person"
@@ -607,7 +603,7 @@ describe Mongoid::Relations::Metadata do
       context "when a referenced in" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :ratable,
             :inverse_class_name => "Movie",
             :polymorphic => true,
@@ -627,7 +623,7 @@ describe Mongoid::Relations::Metadata do
       context "when a references many" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :ratings,
             :inverse_class_name => "Rating",
             :as => :ratable,
@@ -647,7 +643,7 @@ describe Mongoid::Relations::Metadata do
     context "when relation is embedded" do
 
       let(:metadata) do
-        klass.new(
+        described_class.new(
           :name => :addresses,
           :relation => Mongoid::Relations::Embedded::Many
         )
@@ -665,7 +661,7 @@ describe Mongoid::Relations::Metadata do
         context "when the relation is not polymorphic" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :posts,
               :relation => Mongoid::Relations::Referenced::ManyAsArray
             )
@@ -679,7 +675,7 @@ describe Mongoid::Relations::Metadata do
         context "when the relation is polymorphic" do
 
           let(:metadata) do
-            klass.new(
+            described_class.new(
               :name => :ratable,
               :relation => Mongoid::Relations::Referenced::In,
               :polymorphic => true
@@ -695,7 +691,7 @@ describe Mongoid::Relations::Metadata do
       context "when relation does not store a foreign_key" do
 
         let(:metadata) do
-          klass.new(
+          described_class.new(
             :name => :addresses,
             :relation => Mongoid::Relations::Referenced::Many,
             :inverse_class_name => "Person"
@@ -712,7 +708,7 @@ describe Mongoid::Relations::Metadata do
   context "#klass" do
 
     let(:metadata) do
-      klass.new(:class_name => "Address")
+      described_class.new(:class_name => "Address")
     end
 
     it "constantizes the class_name" do
@@ -723,7 +719,7 @@ describe Mongoid::Relations::Metadata do
   context "#macro" do
 
     let(:metadata) do
-      klass.new(:relation => Mongoid::Relations::Embedded::One)
+      described_class.new(:relation => Mongoid::Relations::Embedded::One)
     end
 
     it "returns the macro from the relation" do
@@ -734,7 +730,7 @@ describe Mongoid::Relations::Metadata do
   describe "#nested_builder" do
 
     let(:metadata) do
-      klass.new(:relation => Mongoid::Relations::Embedded::One)
+      described_class.new(:relation => Mongoid::Relations::Embedded::One)
     end
 
     let(:attributes) do
@@ -769,7 +765,7 @@ describe Mongoid::Relations::Metadata do
       describe "##{property}" do
 
         let(:metadata) do
-          klass.new(property.to_sym => :value)
+          described_class.new(property.to_sym => :value)
         end
 
         it "returns the #{property} property" do
@@ -782,7 +778,7 @@ describe Mongoid::Relations::Metadata do
         context "when a #{property} property exists" do
 
           let(:metadata) do
-            klass.new(property.to_sym => :value)
+            described_class.new(property.to_sym => :value)
           end
 
           it "returns true" do
@@ -793,7 +789,7 @@ describe Mongoid::Relations::Metadata do
         context "when the #{property} property is nil" do
 
           let(:metadata) do
-            klass.new
+            described_class.new
           end
 
           it "returns false" do

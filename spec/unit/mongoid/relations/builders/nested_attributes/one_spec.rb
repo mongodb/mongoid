@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::NestedAttributes::One do
 
-  let(:klass) do
-    Mongoid::Relations::Builders::NestedAttributes::One
-  end
-
   let(:metadata) do
     Mongoid::Relations::Metadata.new(
       :name => :name,
@@ -18,7 +14,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the option is provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, :allow_destroy => true)
+        described_class.new(metadata, {}, :allow_destroy => true)
       end
 
       it "returns the option" do
@@ -29,7 +25,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the option is not provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns false" do
@@ -51,7 +47,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       let(:builder) do
-        klass.new(metadata, { :last_name => "Lang" }, options)
+        described_class.new(metadata, { :last_name => "Lang" }, options)
       end
 
       before do
@@ -74,7 +70,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       let(:builder) do
-        klass.new(metadata, {
+        described_class.new(metadata, {
           :_id => name.id,
           :last_name => "Lang"
         }, options)
@@ -96,7 +92,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       let(:builder) do
-        klass.new(metadata, {
+        described_class.new(metadata, {
           :last_name => "Lang"
         }, options)
       end
@@ -121,7 +117,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       let(:builder) do
-        klass.new(metadata, {
+        described_class.new(metadata, {
           :_id => name.id,
           :last_name => "Lang",
           :_destroy => true
@@ -143,7 +139,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the attribute exists" do
 
       let(:builder) do
-        klass.new(metadata, { :_destroy => true }, {})
+        described_class.new(metadata, { :_destroy => true }, {})
       end
 
       it "returns the value" do
@@ -154,7 +150,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the attribute does not exist" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns nil" do
@@ -174,7 +170,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       context "when the proc matches" do
 
         let(:builder) do
-          klass.new(metadata, {}, options)
+          described_class.new(metadata, {}, options)
         end
 
         it "returns true" do
@@ -185,7 +181,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       context "when the proc does not match" do
 
         let(:builder) do
-          klass.new(metadata, {}, options)
+          described_class.new(metadata, {}, options)
         end
 
         it "returns false" do
@@ -197,7 +193,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the proc is not provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns false" do
@@ -211,7 +207,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the option is provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, :update_only => true)
+        described_class.new(metadata, {}, :update_only => true)
       end
 
       it "returns the option" do
@@ -222,7 +218,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
     context "when the option is not provided" do
 
       let(:builder) do
-        klass.new(metadata, {}, {})
+        described_class.new(metadata, {}, {})
       end
 
       it "returns false" do

@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::Many do
 
-  let(:klass) do
-    Mongoid::Relations::Embedded::Many
-  end
-
   let(:binding_klass) do
     Mongoid::Relations::Bindings::Embedded::Many
   end
@@ -43,7 +39,7 @@ describe Mongoid::Relations::Embedded::Many do
     describe "##{method}" do
 
       let(:relation) do
-        klass.new(base, target, metadata)
+        described_class.new(base, target, metadata)
       end
 
       let(:document) do
@@ -89,7 +85,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#bind" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     before do
@@ -132,7 +128,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#bind_one" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     let(:document) do
@@ -152,7 +148,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#build" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     let!(:document) do
@@ -183,7 +179,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe ".builder" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     let(:document) do
@@ -191,7 +187,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the many builder" do
-      klass.builder(metadata, document).should
+      described_class.builder(metadata, document).should
         be_a(Mongoid::Relations::Builders::Embedded::Many)
     end
   end
@@ -199,7 +195,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#count" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     before do
@@ -214,7 +210,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#create" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     it "builds and saves a new document" do
@@ -226,7 +222,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#create!" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     context "when validation passes" do
@@ -257,7 +253,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#delete" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     context "when the document is in the target" do
@@ -294,7 +290,7 @@ describe Mongoid::Relations::Embedded::Many do
   [ :delete_all, :destroy_all ].each do |method|
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     describe "##{method}" do
@@ -344,14 +340,14 @@ describe Mongoid::Relations::Embedded::Many do
   describe ".embedded?" do
 
     it "returns true" do
-      klass.should be_embedded
+      described_class.should be_embedded
     end
   end
 
   describe "#find" do
 
     let(:relation) do
-      klass.new(base, [], metadata)
+      described_class.new(base, [], metadata)
     end
 
     let!(:address_one) do
@@ -539,7 +535,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#find_or_create_by" do
 
     let(:relation) do
-      klass.new(base, [], metadata)
+      described_class.new(base, [], metadata)
     end
 
     context "when the document exists" do
@@ -576,7 +572,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#find_or_initialize_by" do
 
     let(:relation) do
-      klass.new(base, [], metadata)
+      described_class.new(base, [], metadata)
     end
 
     context "when the document exists" do
@@ -609,14 +605,14 @@ describe Mongoid::Relations::Embedded::Many do
   describe ".macro" do
 
     it "returns embeds_many" do
-      klass.macro.should == :embeds_many
+      described_class.macro.should == :embeds_many
     end
   end
 
   describe ".nested_builder" do
 
     it "returns the many nested builder class" do
-      klass.nested_builder(metadata, {}, {}).should
+      described_class.nested_builder(metadata, {}, {}).should
         be_a(Mongoid::Relations::Builders::NestedAttributes::Many)
     end
   end
@@ -624,7 +620,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#paginate" do
 
     let(:relation) do
-      klass.new(base, [], metadata)
+      described_class.new(base, [], metadata)
     end
 
     before do
@@ -653,7 +649,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#substitute" do
 
     let(:relation) do
-      klass.new(base, target, metadata)
+      described_class.new(base, target, metadata)
     end
 
     context "when passing documents" do
@@ -706,7 +702,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#unbind" do
 
     let(:relation) do
-      klass.new(base, [], metadata)
+      described_class.new(base, [], metadata)
     end
 
     let!(:document) do

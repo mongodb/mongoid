@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Embedded::In do
 
-  let(:klass) do
-    Mongoid::Relations::Builders::Embedded::In
-  end
-
   describe "#build" do
 
     let(:object) do
@@ -19,7 +15,7 @@ describe Mongoid::Relations::Builders::Embedded::In do
     context "when a document is provided" do
 
       let(:builder) do
-        klass.new(metadata, object)
+        described_class.new(metadata, object)
       end
 
       let(:document) do
@@ -34,7 +30,7 @@ describe Mongoid::Relations::Builders::Embedded::In do
     context "when attributes are provided" do
 
       let(:builder) do
-        klass.new(metadata, { :title => "Sir" })
+        described_class.new(metadata, { :title => "Sir" })
       end
 
       let(:document) do
