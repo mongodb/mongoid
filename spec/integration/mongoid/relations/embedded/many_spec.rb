@@ -480,83 +480,86 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#build" do
+  [ :build, :new ].each do |method|
 
-    context "when the relation is not cyclic" do
+    describe "#build" do
 
-      let(:person) do
-        Person.new
+      context "when the relation is not cyclic" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:address) do
+          person.addresses.send(method, :street => "Bond")
+        end
+
+        it "appends to the target" do
+          person.addresses.should == [ address ]
+        end
+
+        it "sets the base on the inverse relation" do
+          address.addressable.should == person
+        end
+
+        it "does not save the new document" do
+          address.should_not be_persisted
+        end
+
+        it "sets the parent on the child" do
+          address._parent.should == person
+        end
+
+        it "sets the metadata on the child" do
+          address.metadata.should_not be_nil
+        end
+
+        it "sets the index on the child" do
+          address._index.should == 0
+        end
+
+        it "writes to the attributes" do
+          address.street.should == "Bond"
+        end
       end
 
-      let(:address) do
-        person.addresses.build(:street => "Bond")
-      end
+      context "when the relation is cyclic" do
 
-      it "appends to the target" do
-        person.addresses.should == [ address ]
-      end
+        let(:parent_role) do
+          Role.new
+        end
 
-      it "sets the base on the inverse relation" do
-        address.addressable.should == person
-      end
+        let(:child_role) do
+          parent_role.child_roles.send(method, :name => "CTO")
+        end
 
-      it "does not save the new document" do
-        address.should_not be_persisted
-      end
+        it "appends to the target" do
+          parent_role.child_roles.should == [ child_role ]
+        end
 
-      it "sets the parent on the child" do
-        address._parent.should == person
-      end
+        it "sets the base on the inverse relation" do
+          child_role.parent_role.should == parent_role
+        end
 
-      it "sets the metadata on the child" do
-        address.metadata.should_not be_nil
-      end
+        it "does not save the new document" do
+          child_role.should_not be_persisted
+        end
 
-      it "sets the index on the child" do
-        address._index.should == 0
-      end
+        it "sets the parent on the child" do
+          child_role._parent.should == parent_role
+        end
 
-      it "writes to the attributes" do
-        address.street.should == "Bond"
-      end
-    end
+        it "sets the metadata on the child" do
+          child_role.metadata.should_not be_nil
+        end
 
-    context "when the relation is cyclic" do
+        it "sets the index on the child" do
+          child_role._index.should == 0
+        end
 
-      let(:parent_role) do
-        Role.new
-      end
-
-      let(:child_role) do
-        parent_role.child_roles.build(:name => "CTO")
-      end
-
-      it "appends to the target" do
-        parent_role.child_roles.should == [ child_role ]
-      end
-
-      it "sets the base on the inverse relation" do
-        child_role.parent_role.should == parent_role
-      end
-
-      it "does not save the new document" do
-        child_role.should_not be_persisted
-      end
-
-      it "sets the parent on the child" do
-        child_role._parent.should == parent_role
-      end
-
-      it "sets the metadata on the child" do
-        child_role.metadata.should_not be_nil
-      end
-
-      it "sets the index on the child" do
-        child_role._index.should == 0
-      end
-
-      it "writes to the attributes" do
-        child_role.name.should == "CTO"
+        it "writes to the attributes" do
+          child_role.name.should == "CTO"
+        end
       end
     end
   end
