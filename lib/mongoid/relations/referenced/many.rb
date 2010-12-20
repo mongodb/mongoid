@@ -127,10 +127,8 @@ module Mongoid # :nodoc:
         # @example Nullify the relation.
         #   person.posts.nullify_all
         def nullify_all
-          loaded and target.each do |doc|
-            binding.unbind
-            doc.save
-          end
+          loaded and binding.unbind
+          target.each(&:save)
         end
 
         # Substitutes the supplied target documents for the existing documents

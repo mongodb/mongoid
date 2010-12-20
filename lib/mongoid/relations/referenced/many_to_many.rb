@@ -123,6 +123,20 @@ module Mongoid # :nodoc:
           init(base, target, metadata)
         end
 
+        # Removes all associations between the base document and the target
+        # documents by deleting the foreign keys and the references, orphaning
+        # the target documents in the process.
+        #
+        # @example Nullify the relation.
+        #   person.preferences.nullify_all
+        def nullify_all
+          loaded and target.each do |doc|
+            base.send(metadata.foreign_key).delete(doc.id)
+            dereference(doc)
+          end
+          target.clear
+        end
+
         # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary
         # deletion.
@@ -191,6 +205,18 @@ module Mongoid # :nodoc:
           Bindings::Referenced::ManyToMany.new(base, new_target || target, metadata)
         end
 
+        # Dereferences the supplied document from the base of the relation.
+        #
+        # @example Dereference the document.
+        #   person.preferences.dereference(preference)
+        #
+        # @param [ Document ] document The document to dereference.
+        def dereference(document)
+          document.send(metadata.inverse_foreign_key).delete(base.id)
+          document.send(metadata.inverse(document)).target.delete(base)
+          document.save
+        end
+
         # Will load the target into an array if the target had not already been
         # loaded.
         #
@@ -205,10 +231,6 @@ module Mongoid # :nodoc:
           tap do |relation|
             relation.target = target.entries if target.is_a?(Mongoid::Criteria)
           end
-        end
-
-        def scoped(conditions = nil)
-
         end
 
         class << self

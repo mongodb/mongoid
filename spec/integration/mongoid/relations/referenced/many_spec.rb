@@ -1723,6 +1723,10 @@ describe Mongoid::Relations::Referenced::Many do
           post.person.should be_nil
         end
       end
+
+      it "saves the documents" do
+        post_one.reload.person.should be_nil
+      end
     end
 
     context "when the relation is polymorphic" do

@@ -925,7 +925,49 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
   describe "#nullify_all" do
 
-    pending "Github 272: Implement and hook into cascading"
+    let(:person) do
+      Person.create(:ssn => "888-88-8888")
+    end
+
+    let!(:preference_one) do
+      person.preferences.create(:name => "One")
+    end
+
+    let!(:preference_two) do
+      person.preferences.create(:name => "Two")
+    end
+
+    before do
+      person.preferences.nullify_all
+    end
+
+    it "removes the foreign key from the base document" do
+      [ preference_one, preference_two ].each do |preference|
+        person.preference_ids.should_not include(preference.id)
+      end
+    end
+
+    it "removes the foreign key from the target documents" do
+      [ preference_one, preference_two ].each do |preference|
+        preference.person_ids.should_not include(person.id)
+      end
+    end
+
+    it "removes the reference from the base document" do
+      [ preference_one, preference_two ].each do |preference|
+        person.preferences.should_not include(preference)
+      end
+    end
+
+    it "removes the reference from the target documents" do
+      [ preference_one, preference_two ].each do |preference|
+        preference.people.should_not include(person)
+      end
+    end
+
+    it "saves the documents" do
+      preference_one.reload.people.should_not include(person)
+    end
   end
 
   [ :size, :length ].each do |method|
