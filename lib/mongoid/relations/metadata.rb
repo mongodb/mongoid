@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    class Metadata < Hash #:nodoc:
+
+    # The "Grand Poobah" of information about any relation is this class. It
+    # contains everything you could ever possible want to know.
+    class Metadata < Hash
 
       delegate :foreign_key_default, :to => :relation
 
@@ -14,6 +17,8 @@ module Mongoid # :nodoc:
       # @param [ Object ] object A document or attributes to give the builder.
       #
       # @return [ Builder ] The builder for the relation.
+      #
+      # @since 2.0.0.rc.1
       def builder(object)
         relation.builder(self, object)
       end
@@ -24,6 +29,8 @@ module Mongoid # :nodoc:
       #   metadata.cascade_strategy
       #
       # @return [ Object ] The cascading strategy to use.
+      #
+      # @since 2.0.0.rc.1
       def cascade_strategy
         if dependent?
           strategy =
@@ -42,6 +49,8 @@ module Mongoid # :nodoc:
       #   metadata.class_name
       #
       # @return [ String ] The name of the relation's proxied class.
+      #
+      # @since 2.0.0.rc.1
       def class_name
         self[:class_name] || classify
       end
@@ -53,6 +62,8 @@ module Mongoid # :nodoc:
       #   metadata.embedded?
       #
       # @return [ true, false ] True if embedded, false if not.
+      #
+      # @since 2.0.0.rc.1
       def embedded?
         macro == :embeds_one || macro == :embeds_many
       end
@@ -63,6 +74,8 @@ module Mongoid # :nodoc:
       #   metadata.extension
       #
       # @return [ Proc ] The extension or nil.
+      #
+      # @since 2.0.0.rc.1
       def extension
         self[:extend]
       end
@@ -72,7 +85,9 @@ module Mongoid # :nodoc:
       # @example Is an extension defined?
       #   metadata.extension?
       #
-      # @return True if an extension exists, false if not.
+      # @return [ true, false ] True if an extension exists, false if not.
+      #
+      # @since 2.0.0.rc.1
       def extension?
         !!extension
       end
@@ -90,6 +105,8 @@ module Mongoid # :nodoc:
       #   metadata.foreign_key
       #
       # @return [ String ] The foreign key for the relation.
+      #
+      # @since 2.0.0.rc.1
       def foreign_key
         return self[:foreign_key] if self[:foreign_key]
         suffix = relation.foreign_key_suffix
@@ -107,6 +124,8 @@ module Mongoid # :nodoc:
       #   metadata.foreign_key_setter
       #
       # @return [ String ] The foreign_key plus =.
+      #
+      # @since 2.0.0.rc.1
       def foreign_key_setter
         foreign_key << "="
       end
@@ -117,6 +136,8 @@ module Mongoid # :nodoc:
       #   metadata.indexed?
       #
       # @return [ true, false ] True if an index exists, false if not.
+      #
+      # @since 2.0.0.rc.1
       def indexed?
         !!self[:index]
       end
@@ -127,6 +148,8 @@ module Mongoid # :nodoc:
       #   Metadata.new(:name => :addresses)
       #
       # @param [ Hash ] properties The relation options.
+      #
+      # @since 2.0.0.rc.1
       def initialize(properties = {})
         merge!(properties)
       end
@@ -140,6 +163,8 @@ module Mongoid # :nodoc:
       # @param [ Document ] other The document to aid in the discovery.
       #
       # @return [ Symbol ] The inverse name.
+      #
+      # @since 2.0.0.rc.1
       def inverse(other = nil)
         return self[:inverse_of] if inverse_of?
         return self[:as] || lookup_inverse(other) if polymorphic?
@@ -154,6 +179,8 @@ module Mongoid # :nodoc:
       #   metadata.inverse_foreign_key
       #
       # @return [ String ] The foreign key on the inverse.
+      #
+      # @since 2.0.0.rc.1
       def inverse_foreign_key
         inverse_class_name.underscore << relation.foreign_key_suffix
       end
@@ -164,6 +191,8 @@ module Mongoid # :nodoc:
       #   metadata.inverse_klass
       #
       # @return [ Class ] The class of the inverse of the relation.
+      #
+      # @since 2.0.0.rc.1
       def inverse_klass
         @inverse_klass ||= inverse_class_name.constantize
       end
@@ -176,6 +205,8 @@ module Mongoid # :nodoc:
       # @param [ Document ] other A document to aid in the discovery.
       #
       # @return [ String ] The inverse setter name.
+      #
+      # @since 2.0.0.rc.1
       def inverse_setter(other = nil)
         inverse(other).to_s << "="
       end
@@ -187,6 +218,8 @@ module Mongoid # :nodoc:
       #   metadata.inverse_type
       #
       # @return [ String ] The name of the field for storing the type.
+      #
+      # @since 2.0.0.rc.1
       def inverse_type
         if relation.stores_foreign_key? && polymorphic?
           (polymorphic? ? name.to_s : class_name.underscore) << "_type"
@@ -202,6 +235,8 @@ module Mongoid # :nodoc:
       #   metadata.inverse_type_setter
       #
       # @return [ String ] The name of the setter.
+      #
+      # @since 2.0.0.rc.1
       def inverse_type_setter
         inverse_type ? inverse_type << "=" : nil
       end
@@ -214,6 +249,8 @@ module Mongoid # :nodoc:
       #   metadata.key
       #
       # @return [ String ] The association name, foreign key name, or _id.
+      #
+      # @since 2.0.0.rc.1
       def key
         return name.to_s if relation.embedded?
         relation.stores_foreign_key? ? foreign_key : "_id"
@@ -225,6 +262,8 @@ module Mongoid # :nodoc:
       #   metadata.klass
       #
       # @return [ Class ] The class of the relation.
+      #
+      # @since 2.0.0.rc.1
       def klass
         @klass ||= class_name.constantize
       end
@@ -235,6 +274,8 @@ module Mongoid # :nodoc:
       #   metadata.macro
       #
       # @return [ Symbol ] The macro.
+      #
+      # @since 2.0.0.rc.1
       def macro
         relation.macro
       end
@@ -249,6 +290,8 @@ module Mongoid # :nodoc:
       # @param [ Hash ] options Options for the nested builder.
       #
       # @return [ NestedBuilder ] The nested builder for the relation.
+      #
+      # @since 2.0.0.rc.1
       def nested_builder(attributes, options)
         relation.nested_builder(self, attributes, options)
       end
@@ -259,6 +302,8 @@ module Mongoid # :nodoc:
       #   metadata.polymorphic?
       #
       # @return [ true, false ] True if the relation is polymorphic, false if not.
+      #
+      # @since 2.0.0.rc.1
       def polymorphic?
         !!self[:as] || !!self[:polymorphic]
       end
@@ -270,6 +315,8 @@ module Mongoid # :nodoc:
       #   metadata.setter # => "person="
       #
       # @return [ String ] The name plus "=".
+      #
+      # @since 2.0.0.rc.1
       def setter
         name.to_s << "="
       end
@@ -282,6 +329,8 @@ module Mongoid # :nodoc:
       #   metadata.classify
       #
       # @return [ String ] If embedded_in, the camelized, else classified.
+      #
+      # @since 2.0.0.rc.1
       def classify
         macro == :embedded_in ? name.to_s.camelize : name.to_s.classify
       end
@@ -300,6 +349,8 @@ module Mongoid # :nodoc:
       #   metadata.cyclic_inverse # => "child_roles"
       #
       # @return [ String ] The cyclic inverse name.
+      #
+      # @since 2.0.0.rc.1
       def cyclic_inverse
         klass.relations.each_pair do |key, meta|
           if key =~ /#{inverse_klass.name.underscore}/ &&
@@ -315,6 +366,8 @@ module Mongoid # :nodoc:
       #   metadata.inverse_relation
       #
       # @return [ Symbol ] The name of the inverse relation.
+      #
+      # @since 2.0.0.rc.1
       def inverse_relation
         klass.relations.each_pair do |key, meta|
           if key =~ /#{inverse_klass.name.underscore}/ ||
@@ -331,6 +384,8 @@ module Mongoid # :nodoc:
       #   metadata.inverse_name
       #
       # @return [ String ] The inverse class name underscored.
+      #
+      # @since 2.0.0.rc.1
       def inverse_name
         inverse_klass.name.underscore
       end
@@ -345,6 +400,8 @@ module Mongoid # :nodoc:
       # @param [ Document ] : The inverse document.
       #
       # @return [ String ] The inverse name.
+      #
+      # @since 2.0.0.rc.1
       def lookup_inverse(other)
         return nil unless other
         other.to_a.first.relations.each_pair do |key, meta|
@@ -365,6 +422,8 @@ module Mongoid # :nodoc:
       # @param [ Array ] args The arguments passed to the method.
       #
       # @return [ Object ] Either the value or a boolen.
+      #
+      # @since 2.0.0.rc.1
       def method_missing(name, *args)
         method = name.to_s
         if method.include?('?')

@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Cyclic #:nodoc:
+
+    # This module provides convenience macros for using cyclic embedded
+    # relations.
+    module Cyclic
       extend ActiveSupport::Concern
 
       module ClassMethods #:nodoc:
@@ -9,7 +12,14 @@ module Mongoid # :nodoc:
         # Create a cyclic embedded relation that creates a tree hierarchy for
         # the document and many embedded child documents.
         #
-        # This essentially does the same as:
+        # @example Set up a recursive embeds many.
+        #
+        #   class Role
+        #     include Mongoid::Document
+        #     recursively_embeds_many
+        #   end
+        #
+        # @example The previous example is a shorcut for this.
         #
         #   class Role
         #     include Mongoid::Document
@@ -17,8 +27,10 @@ module Mongoid # :nodoc:
         #     embedded_in :parent_role, :class_name => "Role", :cyclic => true
         #   end
         #
-        # And provides the default nomenclature for accessing a parent document
+        # This provides the default nomenclature for accessing a parent document
         # or its children.
+        #
+        # @since 2.0.0.rc.1
         def recursively_embeds_many
           embeds_many child_name, :class_name => self.name, :cyclic => true
           embedded_in parent_name, :class_name => self.name, :cyclic => true
@@ -27,7 +39,14 @@ module Mongoid # :nodoc:
         # Create a cyclic embedded relation that creates a single self
         # referencing relationship for a parent and a single child.
         #
-        # This essentially does the same as:
+        # @example Set up a recursive embeds one.
+        #
+        #   class Role
+        #     include Mongoid::Document
+        #     recursively_embeds_one
+        #   end
+        #
+        # @example The previous example is a shorcut for this.
         #
         #   class Role
         #     include Mongoid::Document
@@ -35,8 +54,10 @@ module Mongoid # :nodoc:
         #     embedded_in :parent_role, :class_name => "Role", :cyclic => true
         #   end
         #
-        # And provides the default nomenclature for accessing a parent document
+        # This provides the default nomenclature for accessing a parent document
         # or its children.
+        #
+        # @since 2.0.0.rc.1
         def recursively_embeds_one
           embeds_one child_name(false), :class_name => self.name, :cyclic => true
           embedded_in parent_name, :class_name => self.name, :cyclic => true
@@ -46,30 +67,27 @@ module Mongoid # :nodoc:
 
         # Determines the parent name given the class.
         #
-        # Example:
+        # @example Determine the parent name.
+        #   Role.parent_name
         #
-        # <tt>Role.parent_name</tt>
+        # @return [ String ] "parent_" plus the class name underscored.
         #
-        # Returns:
-        #
-        # "parent_" plus the class name underscored.
+        # @since 2.0.0.rc.1
         def parent_name
           ("parent_" << self.name.underscore.singularize).to_sym
         end
 
         # Determines the child name given the class.
         #
-        # Example:
+        # @example Determine the child name.
+        #   Role.child_name
         #
-        # <tt>Role.child_name</tt>
+        # @param [ true, false ] many Is the a many relation?
         #
-        # Options:
+        # @return [ String ] "child_" plus the class name underscored in
+        #   singular or plural form.
         #
-        # many: Is the a many relation?
-        #
-        # Returns:
-        #
-        # "child_" plus the class name underscored in singular or plural form.
+        # @since 2.0.0.rc.1
         def child_name(many = true)
           ("child_" << self.name.underscore.send(many ? :pluralize : :singularize)).to_sym
         end

@@ -13,25 +13,36 @@ require "mongoid/relations/builders/referenced/one"
 
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Builders #:nodoc:
+
+    # This module is responsible for defining the build and create methods used
+    # in one to one relations.
+    #
+    # @example Methods that get created.
+    #
+    #   class Person
+    #     include Mongoid::Document
+    #     embeds_one :name
+    #   end
+    #
+    #   # The following methods get created:
+    #   person.build_name({ :first_name => "Durran" })
+    #   person.create_name({ :first_name => "Durran" })
+    module Builders
       extend ActiveSupport::Concern
 
       module ClassMethods #:nodoc:
 
         # Defines a builder method for an embeds_one relation. This is
-        # defined as <tt>build_#{relation_name}</tt>.
+        # defined as #build_name.
         #
-        # Example:
+        # @example
+        #   Person.builder("name")
         #
-        # <tt>klass.builder("name")</tt>
+        # @param [ String, Symbol ] name The name of the relation.
         #
-        # Options:
+        # @return [ Class ] The class being set up.
         #
-        # name: The name of the relation.
-        #
-        # Returns:
-        #
-        # The klass.
+        # @since 2.0.0.rc.1
         def builder(name)
           tap do
             define_method("build_#{name}") do |object|
@@ -41,20 +52,17 @@ module Mongoid # :nodoc:
         end
 
         # Defines a creator method for an embeds_one relation. This is
-        # defined as <tt>create_#{relation_name}</tt>. After the object is
-        # built, it will immediately save.
+        # defined as #create_name. After the object is built it will
+        # immediately save.
         #
-        # Example:
+        # @example
+        #   Person.creator("name")
         #
-        # <tt>klass.creator("name")</tt>
+        # @param [ String, Symbol ] name The name of the relation.
         #
-        # Options:
+        # @return [ Class ] The class being set up.
         #
-        # name: The name of the relation.
-        #
-        # Returns:
-        #
-        # The klass.
+        # @since 2.0.0.rc.1
         def creator(name)
           tap do
             define_method("create_#{name}") do |object|

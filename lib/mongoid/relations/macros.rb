@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Macros #:nodoc:
+
+    # This module contains the core macros for defining relations between
+    # documents. They can be either embedded or referenced (relational).
+    module Macros
       extend ActiveSupport::Concern
 
       included do
@@ -55,7 +58,7 @@ module Mongoid # :nodoc:
         #
         #   class Address
         #     include Mongoid::Document
-        #     embedded_in :person, :inverse_of => :addresses
+        #     embedded_in :person
         #   end
         #
         # @param [ Symbol ] name The name of the relation.
@@ -163,6 +166,8 @@ module Mongoid # :nodoc:
         # @param [ Symbol ] name The name of the relation.
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
+        #
+        # @since 2.0.0.rc.1
         def references_and_referenced_in_many(name, options = {}, &block)
           metadatafy(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)

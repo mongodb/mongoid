@@ -1,32 +1,37 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    class Builder #:nodoc:
+
+    # Superclass for all builder objects. Builders are responsible for either
+    # looking up a relation's target from the database, or creating them from a
+    # supplied attributes hash.
+    class Builder
 
       attr_reader :metadata, :object
-
-      # Instantiate the new builder for embeds one relation.
+      # Instantiate the new builder for a relation.
       #
-      # Options:
+      # @example Create the builder.
+      #   Builder.new(metadata, { :field => "value })
       #
-      # metadata: The metadata for the relation.
-      # object: The attributes or document to build from.
+      # @param [ Metdata ] metadata The metadata for the relation.
+      # @param [ Hash, BSON::ObjectId ] object The attributes to build from or
+      #   id to query with.
+      #
+      # @since 2.0.0.rc.1
       def initialize(metadata, object)
         @metadata, @object = metadata, object
       end
 
       protected
       # Do we need to perform a database query? It will be so if the object we
-      # have is not a +Document+, +ActiveRecord::Base+, or
-      # +DataMapper::Resource+
+      # have is not a document.
       #
-      # Example:
+      # @example Should we query the database?
+      #   builder.query?
       #
-      # <tt>builder.query?</tt>
+      # @return [ true, false ] Whether a database query should happen.
       #
-      # Returns:
-      #
-      # true if the object responds to <tt>#attributes</tt>.
+      # @since 2.0.0.rc.1
       def query?
         obj = object.to_a.first
         !obj.respond_to?(:attributes) && !obj.nil?

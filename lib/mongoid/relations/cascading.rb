@@ -6,7 +6,10 @@ require "mongoid/relations/cascading/nullify"
 
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Cascading #:nodoc:
+
+    # This module defines the behaviour for setting up cascading deletes and
+    # nullifies for relations, and how to delegate to the approriate strategy.
+    module Cascading
       extend ActiveSupport::Concern
 
       included do
@@ -20,6 +23,8 @@ module Mongoid # :nodoc:
       #
       # @example Execute cascades.
       #   document.cascade!
+      #
+      # @since 2.0.0.rc.1
       def cascade!
         cascades.each do |name|
           metadata = relations[name]
@@ -39,6 +44,8 @@ module Mongoid # :nodoc:
         # @param [ Metadata ] metadata The metadata for the relation.
         #
         # @return [ Class ] The class of the document.
+        #
+        # @since 2.0.0.rc.1
         def cascade(metadata)
           tap { cascades << metadata.name.to_s if metadata.dependent? }
         end
