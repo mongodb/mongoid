@@ -8,13 +8,12 @@ module Mongoid # :nodoc:
           # This builder either takes an _id or an object and queries for the
           # inverse side using the id or sets the object.
           #
-          # Example:
+          # @example Build the document.
+          #   Builder.new(meta, attrs).build
           #
-          # <tt>Builder.new(meta, attrs).build</tt>
+          # @param [ String ] type The type of document to query for.
           #
-          # Returns:
-          #
-          # A single +Document+.
+          # @return [ Document ] A single document.
           def build(type = nil)
             return object unless query?
             if object.is_a?(Hash)

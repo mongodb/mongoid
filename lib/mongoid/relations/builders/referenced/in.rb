@@ -8,13 +8,12 @@ module Mongoid # :nodoc:
           # This builder either takes a foreign key and queries for the
           # object or a document, where it will just return it.
           #
-          # Example:
+          # @example Build the document.
+          #   Builder.new(meta, attrs).build
           #
-          # <tt>Builder.new(meta, attrs).build</tt>
+          # @param [ String ] type The type of document to query for.
           #
-          # Returns:
-          #
-          # A single +Document+.
+          # @return [ Document ] A single document.
           def build(type = nil)
             return object unless query?
             if object.is_a?(Hash)

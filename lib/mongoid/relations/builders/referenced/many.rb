@@ -8,13 +8,12 @@ module Mongoid # :nodoc:
           # This builder either takes a hash and queries for the
           # object or an array of documents, where it will just return tem.
           #
-          # Example:
+          # @example Build the documents.
+          #   Builder.new(meta, attrs).build
           #
-          # <tt>Builder.new(meta, attrs).build</tt>
+          # @param [ String ] type The type of document to query for.
           #
-          # Returns:
-          #
-          # An array of documents.
+          # @return [ Array<Document> ] The documents.
           def build(type = nil)
             return object unless query?
             key = metadata.foreign_key
