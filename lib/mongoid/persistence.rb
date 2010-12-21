@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] options Options to pass to destroy.
     #
-    # @return [ Boolean ] True if successful, false if not.
+    # @return [ true, false ] True if successful, false if not.
     def destroy(options = {})
       run_callbacks(:destroy) { remove(options) }
     end
@@ -69,7 +69,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] options Options to pass to the save.
     #
-    # @return [ Boolean ] True if validation passed.
+    # @return [ true, false ] True if validation passed.
     def save!(options = {})
       self.class.fail_validate!(self) unless upsert; true
     end
@@ -81,7 +81,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] options Options to pass to update.
     #
-    # @return [ Boolean ] True if succeeded, false if not.
+    # @return [ true, false ] True if succeeded, false if not.
     def update(options = {})
       Update.new(self, options).persist
     end
@@ -93,7 +93,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] attributes The attributes to update.
     #
-    # @return [ Boolean ] True if validation passed, false if not.
+    # @return [ true, false ] True if validation passed, false if not.
     def update_attributes(attributes = {})
       write_attributes(attributes); update
     end
@@ -106,7 +106,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] attributes The attributes to update.
     #
-    # @return [ Boolean ] True if validation passed.
+    # @return [ true, false ] True if validation passed.
     def update_attributes!(attributes = {})
       write_attributes(attributes)
       update.tap do |result|
@@ -122,7 +122,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] options Options to pass to the upsert.
     #
-    # @return [ Boolean ] True is success, false if not.
+    # @return [ true, false ] True is success, false if not.
     def upsert(options = {})
       if new_record?
         insert(options).persisted?

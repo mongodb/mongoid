@@ -40,7 +40,7 @@ module Mongoid # :nodoc:
     # @example Is the document embedded?
     #   address.embedded?
     #
-    # @return [ Boolean ] True if the document has a parent document.
+    # @return [ true, false ] True if the document has a parent document.
     def embedded?
       _parent.present?
     end
@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
     # @example Is the document in an embeds many?
     #   address.embedded_many?
     #
-    # @return [ Boolean ] True if in an embeds many.
+    # @return [ true, false ] True if in an embeds many.
     def embedded_many?
       metadata && metadata.macro == :embeds_many
     end
@@ -60,7 +60,7 @@ module Mongoid # :nodoc:
     # @example Is the document in an embeds one?
     #   address.embedded_one?
     #
-    # @return [ Boolean ] True if in an embeds one.
+    # @return [ true, false ] True if in an embeds one.
     def embedded_one?
       metadata && metadata.macro == :embeds_one
     end
@@ -70,7 +70,7 @@ module Mongoid # :nodoc:
     # @example Is the document in a references many?
     #   post.referenced_many?
     #
-    # @return [ Boolean ] True if in a references many.
+    # @return [ true, false ] True if in a references many.
     def referenced_many?
       metadata && metadata.macro == :references_many
     end
@@ -80,7 +80,7 @@ module Mongoid # :nodoc:
     # @example Is the document in a references one?
     #   address.referenced_one?
     #
-    # @return [ Boolean ] True if in a references one.
+    # @return [ true, false ] True if in a references one.
     def referenced_one?
       metadata && metadata.macro == :references_one
     end

@@ -79,7 +79,7 @@ module Mongoid #:nodoc:
     # @example Check if the document is typed.
     #   identity.typed?
     #
-    # @return [ Boolean ] True if typed, false if not.
+    # @return [ true, false ] True if typed, false if not.
     def typed?
       document.hereditary? ||
         document.class.descendants.any? ||

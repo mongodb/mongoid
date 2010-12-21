@@ -62,7 +62,7 @@ module Mongoid # :nodoc:
           # @example Is the relation bindable?
           #   binding.bindable?
           #
-          # @return [ Boolean ] True if the documents differ, false if not.
+          # @return [ true, false ] True if the documents differ, false if not.
           def bindable?
             if base.embedded_many?
               inverse && !inverse.target.include?(base)
@@ -77,7 +77,7 @@ module Mongoid # :nodoc:
           # @example Is the relation unbindable?
           #   binding.unbindable?
           #
-          # @return [ Boolean ] True if the target is not nil, false if not.
+          # @return [ true, false ] True if the target is not nil, false if not.
           def unbindable?
             !target.send(metadata.inverse(target)).nil?
           end

@@ -69,7 +69,7 @@ module Mongoid # :nodoc:
           #
           # @param [ Document ] doc The document to check.
           #
-          # @return [ Boolean ] True if the documents differ, false if not.
+          # @return [ true, false ] True if the documents differ, false if not.
           def bindable?(doc)
             !base.equal?(doc.send(metadata.inverse(target)))
           end
@@ -80,7 +80,7 @@ module Mongoid # :nodoc:
           # @example Is the relation unbindable?
           #   binding.unbindable?
           #
-          # @return [ Boolean ] True if the target is not nil, false if not.
+          # @return [ true, false ] True if the target is not nil, false if not.
           def unbindable?
             inverse && !inverse.target.nil?
           end

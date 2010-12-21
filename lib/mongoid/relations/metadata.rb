@@ -52,7 +52,7 @@ module Mongoid # :nodoc:
       # @example Is the document embedded.
       #   metadata.embedded?
       #
-      # @return [ Boolean ] True if embedded, false if not.
+      # @return [ true, false ] True if embedded, false if not.
       def embedded?
         macro == :embeds_one || macro == :embeds_many
       end
@@ -116,7 +116,7 @@ module Mongoid # :nodoc:
       # @example Is the key indexed?
       #   metadata.indexed?
       #
-      # @return [ Boolean ] True if an index exists, false if not.
+      # @return [ true, false ] True if an index exists, false if not.
       def indexed?
         !!self[:index]
       end
@@ -258,7 +258,7 @@ module Mongoid # :nodoc:
       # @example Is the relation polymorphic?
       #   metadata.polymorphic?
       #
-      # @return [ Boolean ] True if the relation is polymorphic, false if not.
+      # @return [ true, false ] True if the relation is polymorphic, false if not.
       def polymorphic?
         !!self[:as] || !!self[:polymorphic]
       end

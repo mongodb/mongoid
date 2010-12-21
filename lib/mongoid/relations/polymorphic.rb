@@ -35,7 +35,7 @@ module Mongoid # :nodoc:
         # @example Check if the class is polymorphic.
         #   Movie.polymorphic?
         #
-        # @return [ Boolean ] True if polymorphic, false if not.
+        # @return [ true, false ] True if polymorphic, false if not.
         def polymorphic?
           !!polymorphic
         end

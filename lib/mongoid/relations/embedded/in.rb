@@ -2,6 +2,10 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Embedded
+
+      # This class defines the behaviour necessary to handle relations that are
+      # embedded within another relation, either as a single document or
+      # multiple documents.
       class In < Relations::One
 
         # Binds the base object to the inverse of the relation. This is so we
@@ -11,20 +15,25 @@ module Mongoid # :nodoc:
         # This is called after first creating the relation, or if a new object
         # is set on the relation.
         #
-        # Example:
+        # @example Bind the relation.
+        #   name.person.bind
         #
-        # <tt>name.person.bind</tt>
+        # @param [ true, false ] building Whether this is getting called in a
+        # build.
         def bind(building = nil)
           binding.bind
         end
 
         # Instantiate a new embedded_in relation.
         #
-        # Options:
+        # @example Create the new relation.
+        #   Embedded::In.new(name, person, metadata)
         #
-        # base: The document the relation hangs off of.
-        # target: The target [parent document] of the relation.
-        # metadata: The relation's metadata
+        # @param [ Document ] base The document the relation hangs off of.
+        # @param [ Document ] target The target (parent) of the relation.
+        # @param [ Metadata ] metadata The relation metadata.
+        #
+        # @return [ In ] The proxy.
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             base.parentize(target)
@@ -36,9 +45,10 @@ module Mongoid # :nodoc:
         #
         # Will delete the object if necessary.
         #
-        # Example:
+        # @example Unbind the relation.
+        #   name.person.unbind
         #
-        # <tt>name.person.unbind</tt>
+        # @param [ Proxy ] old_target The previous target of the relation.
         def unbind(old_target)
           binding(old_target).unbind
           base.delete if old_target.persisted? && !base.destroyed?
@@ -48,17 +58,12 @@ module Mongoid # :nodoc:
 
         # Instantiate the binding associated with this relation.
         #
-        # Example:
+        # @example Get the binding.
+        #   binding([ address ])
         #
-        # <tt>binding([ address ])</tt>
+        # @param [ Proxy ] new_target The new documents to bind with.
         #
-        # Options:
-        #
-        # new_target: The new documents to bind with.
-        #
-        # Returns:
-        #
-        # A binding object.
+        # @return [ Binding ] A binding object.
         def binding(new_target = nil)
           Bindings::Embedded::In.new(base, new_target || target, metadata)
         end
@@ -68,18 +73,13 @@ module Mongoid # :nodoc:
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   Embedded::In.builder(meta, object, person)
           #
-          # <tt>Embedded::In.builder(meta, object, person)</tt>
+          # @param [ Metadata ] meta The metadata of the relation.
+          # @param [ Document, Hash ] object A document or attributes to build with.
           #
-          # Options:
-          #
-          # meta: The metadata of the relation.
-          # object: A document or attributes to build with.
-          #
-          # Returns:
-          #
-          # A newly instantiated builder object.
+          # @return [ Builder ] A newly instantiated builder object.
           def builder(meta, object)
             Builders::Embedded::In.new(meta, object)
           end
@@ -87,13 +87,10 @@ module Mongoid # :nodoc:
           # Returns true if the relation is an embedded one. In this case
           # always true.
           #
-          # Example:
+          # @example Is this relation embedded?
+          #   Embedded::In.embedded?
           #
-          # <tt>Embedded::In.embedded?</tt>
-          #
-          # Returns:
-          #
-          # true
+          # @return [ true ] true.
           def embedded?
             true
           end
@@ -101,13 +98,10 @@ module Mongoid # :nodoc:
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
-          # Example:
+          # @example Get the macro.
+          #   Mongoid::Relations::Embedded::In.macro
           #
-          # <tt>Mongoid::Relations::Embedded::In.macro</tt>
-          #
-          # Returns:
-          #
-          # <tt>:embedded_in</tt>
+          # @return [ Symbol ] :embedded_in.
           def macro
             :embedded_in
           end
@@ -115,18 +109,14 @@ module Mongoid # :nodoc:
           # Return the nested builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   NestedAttributes::One.builder(attributes, options)
           #
-          # <tt>NestedAttributes::One.builder(attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes to build with.
+          # @param [ Hash ] options The options for the builder.
           #
-          # Options:
-          #
-          # attributes: The attributes to build with.
-          # options: The options for the builder.
-          #
-          # Returns:
-          #
-          # A newly instantiated nested builder object.
+          # @return [ Builder ] A newly instantiated nested builder object.
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
@@ -134,13 +124,10 @@ module Mongoid # :nodoc:
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
-          # Example:
+          # @example Does this relation store a foreign key?
+          #   Embedded::In.stores_foreign_key?
           #
-          # <tt>Embedded::In.stores_foreign_key?</tt>
-          #
-          # Returns:
-          #
-          # false
+          # @return [ false ] false.
           def stores_foreign_key?
             false
           end

@@ -2,6 +2,9 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Embedded
+
+      # This class handles the behaviour for a document that embeds many other
+      # documents within in it as an array.
       class Many < Relations::Many
 
         # Binds the base object to the inverse of the relation. This is so we
@@ -11,9 +14,12 @@ module Mongoid # :nodoc:
         # This is called after first creating the relation, or if a new object
         # is set on the relation.
         #
-        # Example:
+        # @example Bind the relation.
+        #   person.addresses.bind
         #
-        # <tt>person.addresses.bind</tt>
+        # @param [ true, false ] building Is the relation in a build?
+        #
+        # @since 2.0.0.rc.1
         def bind(building = nil)
           binding.bind_all
           target.each(&:save) if base.persisted? && !building
@@ -25,9 +31,12 @@ module Mongoid # :nodoc:
         # Used when appending to the target instead of setting the entire
         # thing.
         #
-        # Example:
+        # @example Bind a single document.
+        #   person.addressses.bind_one(address)
         #
-        # <tt>person.addressses.bind_one(address)</tt>
+        # @param [ Document ] document The document to bind.
+        #
+        # @since 2.0.0.rc.1
         def bind_one(document)
           binding.bind_one(document)
         end
@@ -35,13 +44,10 @@ module Mongoid # :nodoc:
         # Clear the relation. Will delete the documents from the db if they are
         # already persisted.
         #
-        # Example:
+        # @example Clear the relation.
+        #   person.addresses.clear
         #
-        # <tt>relation.clear</tt>
-        #
-        # Returns:
-        #
-        # The empty relation.
+        # @return [ Many ] The empty relation.
         def clear
           tap { |relation| relation.unbind(target) }
         end
@@ -49,18 +55,13 @@ module Mongoid # :nodoc:
         # Create a new document in the relation. This is essentially the same
         # as doing a #build then #save on the new document.
         #
-        # Example:
+        # @example Create a new document in the relation.
+        #   person.movies.create(:name => "Bozo")
         #
-        # <tt>relation.create(:name => "Bozo")</tt>
+        # @param [ Hash ] attributes The attributes to build the document with.
+        # @param [ Class ] type Optional class to create the document with.
         #
-        # Options:
-        #
-        # attributes: The attributes to build the document with.
-        # type: Optional class to create the document with.
-        #
-        # Returns:
-        #
-        # The newly created document.
+        # @return [ Document ] The newly created document.
         def create(attributes = {}, type = nil)
           build(attributes, type).tap(&:save)
         end
@@ -69,18 +70,15 @@ module Mongoid # :nodoc:
         # as doing a #build then #save on the new document. If validation
         # failed on the document an error will get raised.
         #
-        # Example:
+        # @example Create the document.
+        #   person.addresses.create!(:street => "Unter der Linden")</tt>
         #
-        # <tt>relation.create(:name => "Bozo")</tt>
+        # @param [ Hash ] attributes The attributes to build the document with.
+        # @param [ Class ] type Optional class to create the document with.
         #
-        # Options:
+        # @raise [ Errors::Validations ] If a validation error occured.
         #
-        # attributes: The attributes to build the document with.
-        # type: Optional class to create the document with.
-        #
-        # Returns:
-        #
-        # The newly created document or raises a validation error.
+        # @return [ Document ] The newly created document.
         def create!(attributes = {}, type = nil)
           build(attributes, type).tap(&:save!)
         end
@@ -88,65 +86,65 @@ module Mongoid # :nodoc:
         # Delete the supplied document from the target. This method is proxied
         # in order to reindex the array after the operation occurs.
         #
-        # Example:
+        # @example Delete the document from the relation.
+        #   perosn.addresses.delete(address)
         #
-        # <tt>addresses.delete(address)</tt>
+        # @param [ Document ] document The document to be deleted.
         #
-        # Options:
+        # @return [ Document, nil ] The deleted document or nil if nothing deleted.
         #
-        # document: The document to be deleted.
-        #
-        # Returns:
-        #
-        # The deleted document or nil if nothing deleted.
+        # @since 2.0.0.rc.1
         def delete(document)
           target.delete(document).tap { reindex }
         end
 
         # Delete all the documents in the association without running callbacks.
         #
-        # Example:
+        # @example Delete all documents from the relation.
+        #   person.addresses.delete_all
         #
-        # <tt>addresses.delete_all</tt>
+        # @example Conditionally delete documents from the relation.
+        #   person.addresses.delete_all(:conditions => { :street => "Bond" })
         #
-        # Options:
+        # @param [ Hash ] conditions Conditions on which documents to delete.
         #
-        # conditions: Optional conditions hash to limit what gets deleted.
-        #
-        # Returns:
-        #
-        # The number of documents deleted.
+        # @return [ Integer ] The number of documents deleted.
         def delete_all(conditions = {})
           remove_all(conditions, false)
         end
 
         # Destroy all the documents in the association whilst running callbacks.
         #
-        # Example:
+        # @example Destroy all documents from the relation.
+        #   person.addresses.destroy_all
         #
-        # <tt>addresses.destroy_all</tt>
+        # @example Conditionally destroy documents from the relation.
+        #   person.addresses.destroy_all(:conditions => { :street => "Bond" })
         #
-        # Options:
+        # @param [ Hash ] conditions Conditions on which documents to destroy.
         #
-        # conditions: Optional conditions hash to limit what gets destroyed.
-        #
-        # Returns:
-        #
-        # The number of documents destroyed.
+        # @return [ Integer ] The number of documents destroyed.
         def destroy_all(conditions = {})
           remove_all(conditions, true)
         end
 
-        # Finds a document in this association.
+        # Finds a document in this association through several different
+        # methods.
         #
-        # Options:
+        # @example Find a document by its id.
+        #   person.addresses.find(BSON::ObjectId.new)
         #
-        # parameter: If :all is passed, returns all the documents else
-        #            if an id is passed, will return the document for that id.
+        # @example Find documents for multiple ids.
+        #   person.addresses.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
         #
-        # Returns:
+        # @example Find documents based on conditions.
+        #   person.addresses.find(:all, :conditions => { :number => 10 })
+        #   person.addresses.find(:first, :conditions => { :number => 10 })
+        #   person.addresses.find(:last, :conditions => { :number => 10 })
         #
-        # A single matching +Document+.
+        # @param [ Array<Object> ] args Various arguments.
+        #
+        # @return [ Array<Document>, Document ] A single or multiple documents.
         def find(*args)
           type, criteria = Criteria.parse!(self, true, *args)
           case type
@@ -161,11 +159,14 @@ module Mongoid # :nodoc:
 
         # Instantiate a new embeds_many relation.
         #
-        # Options:
+        # @example Create the new relation.
+        #   Many.new(person, addresses, metadata)
         #
-        # base: The document this relation hangs off of.
-        # target: The target [child document array] of the relation.
-        # metadata: The relation's metadata
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Array<Document> ] target The child documents of the relation.
+        # @param [ Metadata ] metadata The relation's metadata
+        #
+        # @return [ Many ] The proxy.
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             target.each_with_index do |doc, index|
@@ -178,13 +179,15 @@ module Mongoid # :nodoc:
         # Paginate the association. Will create a new criteria, set the documents
         # on it and execute in an enumerable context.
         #
-        # Options:
+        # @example Paginate the relation.
+        #   person.addresses.paginate(:page => 1, :per_page => 20)
         #
-        # options: A +Hash+ of pagination options.
+        # @param [ Hash ] options The pagination options.
         #
-        # Returns:
+        # @option options [ Integer ] :page The page number.
+        # @option options [ Integer ] :per_page The number on each page.
         #
-        # A +WillPaginate::Collection+.
+        # @return [ WillPaginate::Collection ] The paginated documents.
         def paginate(options)
           criteria = Mongoid::Criteria.translate(metadata.klass, true, options)
           criteria.documents = target
@@ -194,17 +197,15 @@ module Mongoid # :nodoc:
         # Substitutes the supplied target documents for the existing documents
         # in the relation.
         #
-        # Example:
+        # @example Substitute the relation's target.
+        #   person.addresses.substitute([ address ])
         #
-        # <tt>addresses.substitute([ address ])</tt>
+        # @param [ Array<Document> ] new_target The replacement array.
+        # @param [ true, false ] building Are we in build mode?
         #
-        # Options:
+        # @return [ Many ] The proxied relation.
         #
-        # new_target: An array of documents to replace the existing docs.
-        #
-        # Returns:
-        #
-        # The relation.
+        # @since 2.0.0.rc.1
         def substitute(new_target, building = nil)
           old_target = target
           tap do |relation|
@@ -220,13 +221,12 @@ module Mongoid # :nodoc:
 
         # Get this relation as as its representation in the database.
         #
-        # Example:
+        # @example Convert the relation to an attributes hash.
+        #   person.addresses.to_hash
         #
-        # <tt>person.addresses.to_hash</tt>
+        # @return [ Array<Hash> ] The relation as stored in the db.
         #
-        # Returns:
-        #
-        # An array of hashes, how the relation is stored.
+        # @since 2.0.0.rc.1
         def to_hash
           target.inject([]) do |attributes, doc|
             attributes.tap do |attr|
@@ -238,13 +238,12 @@ module Mongoid # :nodoc:
         # Unbind the inverse relation from this set of documents. Used when the
         # entire proxy has been cleared, set to nil or empty, or replaced.
         #
-        # Example:
+        # @example Unbind the relation.
+        #   person.addresses.unbind(target)
         #
-        # <tt>person.addresses.unbind(target)</tt>
+        # @param [ Array<Document> ] old_target The relations previous target.
         #
-        # Options:
-        #
-        # old_target: The previous target of the relation to unbind with.
+        # @since 2.0.0.rc.1
         def unbind(old_target)
           binding(old_target).unbind
           if base.persisted?
@@ -259,13 +258,12 @@ module Mongoid # :nodoc:
         # Appends the document to the target array, updating the index on the
         # document at the same time.
         #
-        # Example:
+        # @example Append to the document.
+        #   relation.append(document)
         #
-        # <tt>relation.append(document)</tt>
+        # @param [ Document ] document The document to append to the target.
         #
-        # Options:
-        #
-        # document: The document to append to the target.
+        # @since 2.0.0.rc.1
         def append(document)
           target << document
           metadatafy(document) and bind_one(document)
@@ -274,17 +272,14 @@ module Mongoid # :nodoc:
 
         # Instantiate the binding associated with this relation.
         #
-        # Example:
+        # @example Create the binding.
+        #   relation.binding([ address ])
         #
-        # <tt>binding([ address ])</tt>
+        # @param [ Array<Document> ] new_target The new documents to bind with.
         #
-        # Options:
+        # @return [ Binding ] The many binding.
         #
-        # new_target: The new documents to bind with.
-        #
-        # Returns:
-        #
-        # A binding object.
+        # @since 2.0.0.rc.1
         def binding(new_target = nil)
           Bindings::Embedded::Many.new(base, new_target || target, metadata)
         end
@@ -292,13 +287,10 @@ module Mongoid # :nodoc:
         # Returns the criteria object for the target class with its documents set
         # to target.
         #
-        # Example:
+        # @example Get a criteria for the relation.
+        #   relation.criteria
         #
-        # <tt>relation.criteria</tt>
-        #
-        # Returns:
-        #
-        # A +Criteria+ object for this relation.
+        # @return [ Criteria ] A new criteria.
         def criteria
           metadata.klass.criteria(true).tap do |criterion|
             criterion.documents = target
@@ -310,15 +302,11 @@ module Mongoid # :nodoc:
         #
         # If the method exists on the array, use the default proxy behavior.
         #
-        # Options:
+        # @param [ Symbol, String ] name The name of the method.
+        # @param [ Array ] args The method args
+        # @param [ Proc ] block Optional block to pass.
         #
-        # name: The name of the method.
-        # args: The method args
-        # block: Optional block to pass.
-        #
-        # Returns:
-        #
-        # A Criteria or return value from the target.
+        # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
           return super if target.respond_to?(name)
           klass = metadata.klass
@@ -331,9 +319,10 @@ module Mongoid # :nodoc:
         # operations on the proxied target directly and the indices need to
         # match that on the database side.
         #
-        # Example:
+        # @example Reindex the relation.
+        #   person.addresses.reindex
         #
-        # <tt>person.addresses.reindex</tt>
+        # @since 2.0.0.rc.1
         def reindex
           target.each_with_index do |doc, index|
             doc._index = index
@@ -343,14 +332,13 @@ module Mongoid # :nodoc:
         # Remove all documents from the relation, either with a delete or a
         # destroy depending on what this was called through.
         #
-        # Options:
+        # @example Destroy documents from the relation.
+        #   relation.remove_all(:conditions => { :num => 1 }, true)
         #
-        # conditions: Hash of conditions to filter by.
-        # destroy: If true destroy, else delete.
+        # @param [ Hash ] conditions Conditions to filter by.
+        # @param [ true, false ] destroy If true then destroy, else delete.
         #
-        # Returns:
-        #
-        # The number of documents removed.
+        # @return [ Integer ] The number of documents removed.
         def remove_all(conditions = {}, destroy = false)
           criteria = find(conditions || {})
           criteria.size.tap do
@@ -367,18 +355,16 @@ module Mongoid # :nodoc:
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   Embedded::Many.builder(meta, object)
           #
-          # <tt>Embedded::Many.builder(meta, object, person)</tt>
+          # @param [ Metadata ] meta The metadata of the relation.
+          # @param [ Document, Hash ] object A document or attributes to build
+          #   with.
           #
-          # Options:
+          # @return [ Builder ] A newly instantiated builder object.
           #
-          # meta: The metadata of the relation.
-          # object: A document or attributes array to build with.
-          #
-          # Returns:
-          #
-          # A newly instantiated builder object.
+          # @since 2.0.0.rc.1
           def builder(meta, object)
             Builders::Embedded::Many.new(meta, object)
           end
@@ -386,13 +372,12 @@ module Mongoid # :nodoc:
           # Returns true if the relation is an embedded one. In this case
           # always true.
           #
-          # Example:
+          # @example Is the relation embedded?
+          #   Embedded::Many.embedded?
           #
-          # <tt>Embedded::Many.embedded?</tt>
+          # @return [ true ] true.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def embedded?
             true
           end
@@ -400,32 +385,38 @@ module Mongoid # :nodoc:
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
-          # Example:
+          # @example Get the relation macro.
+          #   Mongoid::Relations::Embedded::Many.macro
           #
-          # <tt>Mongoid::Relations::Embedded::Many.macro</tt>
+          # @return [ Symbol ] :embeds_many
           #
-          # Returns:
-          #
-          # <tt>:embeds_many</tt>
+          # @since 2.0.0.rc.1
           def macro
             :embeds_many
           end
 
-          # Return the nested builder that is responsible for generating the documents
-          # that will be used by this relation.
+          # Return the nested builder that is responsible for generating the
+          # documents that will be used by this relation.
           #
-          # Example:
+          # @example Get the nested builder.
+          #   NestedAttributes::Many.builder(attributes, options)
           #
-          # <tt>NestedAttributes::Many.builder(attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes to build with.
+          # @param [ Hash ] options The builder options.
           #
-          # Options:
+          # @option options [ true, false ] :allow_destroy Can documents be
+          #   deleted?
+          # @option options [ Integer ] :limit Max number of documents to
+          #   create at once.
+          # @option options [ Proc, Symbol ] :reject_if If documents match this
+          #   option then they are ignored.
+          # @option options [ true, false ] :update_only Only existing documents
+          #   can be modified.
           #
-          # attributes: The attributes to build with.
-          # options: The options for the builder.
+          # @return [ NestedBuilder ] The nested attributes builder.
           #
-          # Returns:
-          #
-          # A newly instantiated nested builder object.
+          # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::Many.new(metadata, attributes, options)
           end
@@ -433,13 +424,12 @@ module Mongoid # :nodoc:
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
-          # Example:
+          # @example Does this relation store a foreign key?
+          #   Embedded::Many.stores_foreign_key?
           #
-          # <tt>Embedded::Many.stores_foreign_key?</tt>
+          # @return [ false ] false.
           #
-          # Returns:
-          #
-          # false
+          # @since 2.0.0.rc.1
           def stores_foreign_key?
             false
           end

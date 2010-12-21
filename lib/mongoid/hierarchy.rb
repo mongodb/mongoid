@@ -13,7 +13,7 @@ module Mongoid #:nodoc
       # @example Check if the document is a subclass.
       #   Square.hereditary?
       #
-      # @return [ Boolean ] True if hereditary, false if not.
+      # @return [ true, false ] True if hereditary, false if not.
       def hereditary?
         Mongoid::Document > superclass
       end
@@ -50,7 +50,7 @@ module Mongoid #:nodoc
       # @example Check if the document is a subclass
       #   Square.new.hereditary?
       #
-      # @return [ Boolean ] True if hereditary, false if not.
+      # @return [ true, false ] True if hereditary, false if not.
       def hereditary?
         self.class.hereditary?
       end
