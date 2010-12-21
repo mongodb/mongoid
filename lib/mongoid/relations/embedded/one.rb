@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Embedded
+    module Embedded #:nodoc:
+
+      # This class defines the behaviour needed for embedded one to one
+      # relations.
       class One < Relations::One
 
         # Binds the base object to the inverse of the relation. This is so we
@@ -11,9 +14,10 @@ module Mongoid # :nodoc:
         # This is called after first creating the relation, or if a new object
         # is set on the relation.
         #
-        # Example:
+        # @example Bind the relation.
+        #   person.name.bind
         #
-        # <tt>person.name.bind</tt>
+        # @since 2.0.0.rc.1
         def bind(building = nil)
           binding.bind
           target.save if base.persisted? && !building
@@ -21,11 +25,12 @@ module Mongoid # :nodoc:
 
         # Instantiate a new embeds_one relation.
         #
-        # Options:
+        # @example Create the new proxy.
+        #   One.new(person, name, metadata)
         #
-        # base: The document this relation hangs off of.
-        # target: The target [child document] of the relation.
-        # metadata: The relation's metadata
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Document ] target The child document in the relation.
+        # @param [ Metadata ] metadata The relation's metadata
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             target.parentize(base)
@@ -37,9 +42,12 @@ module Mongoid # :nodoc:
         #
         # Will delete the object if necessary.
         #
-        # Example:
+        # @example Unbind the relation.
+        #   person.name.unbind
         #
-        # <tt>person.name.unbind</tt>
+        # @param [ Document ] old_target The previous target of the relation.
+        #
+        # @since 2.0.0.rc.1
         def unbind(old_target)
           binding(old_target).unbind
           old_target.delete if base.persisted? && !old_target.destroyed?
@@ -49,17 +57,14 @@ module Mongoid # :nodoc:
 
         # Instantiate the binding associated with this relation.
         #
-        # Example:
+        # @example Get the binding.
+        #   relation.binding([ address ])
         #
-        # <tt>binding([ address ])</tt>
+        # @param [ Document ] new_target The new document to bind with.
         #
-        # Options:
+        # @return [ Binding ] The relation's binding.
         #
-        # new_target: The new documents to bind with.
-        #
-        # Returns:
-        #
-        # A binding object.
+        # @since 2.0.0.rc.1
         def binding(new_target = nil)
           Bindings::Embedded::One.new(base, new_target || target, metadata)
         end
@@ -69,18 +74,15 @@ module Mongoid # :nodoc:
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   Embedded::One.builder(meta, object, person)
           #
-          # <tt>Embedded::One.builder(meta, object, person)</tt>
+          # @param [ Metadata ] meta The metadata of the relation.
+          # @param [ Document, Hash ] object A document or attributes to build with.
           #
-          # Options:
+          # @return [ Builder ] A newly instantiated builder object.
           #
-          # meta: The metadata of the relation.
-          # object: A document or attributes to build with.
-          #
-          # Returns:
-          #
-          # A newly instantiated builder object.
+          # @since 2.0.0.rc.1
           def builder(meta, object)
             Builders::Embedded::One.new(meta, object)
           end
@@ -88,13 +90,12 @@ module Mongoid # :nodoc:
           # Returns true if the relation is an embedded one. In this case
           # always true.
           #
-          # Example:
+          # @example Is this relation embedded?
+          #   Embedded::One.embedded?
           #
-          # <tt>Embedded::One.embedded?</tt>
+          # @return [ true ] true.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def embedded?
             true
           end
@@ -102,32 +103,38 @@ module Mongoid # :nodoc:
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
-          # Example:
+          # @example Get the macro.
+          #   Mongoid::Relations::Embedded::One.macro
           #
-          # <tt>Mongoid::Relations::Embedded::One.macro</tt>
+          # @return [ Symbol ] :embeds_one.
           #
-          # Returns:
-          #
-          # <tt>:embeds_one</tt>
+          # @since 2.0.0.rc.1
           def macro
             :embeds_one
           end
 
-          # Return the nested builder that is responsible for generating the documents
-          # that will be used by this relation.
+          # Return the nested builder that is responsible for generating
+          # the documents that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   NestedAttributes::One.builder(attributes, options)
           #
-          # <tt>NestedAttributes::One.builder(attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes to build with.
+          # @param [ Hash ] options The options for the builder.
           #
-          # Options:
+          # @option options [ true, false ] :allow_destroy Can documents be
+          #   deleted?
+          # @option options [ Integer ] :limit Max number of documents to
+          #   create at once.
+          # @option options [ Proc, Symbol ] :reject_if If documents match this
+          #   option then they are ignored.
+          # @option options [ true, false ] :update_only Only existing documents
+          #   can be modified.
           #
-          # attributes: The attributes to build with.
-          # options: The options for the builder.
+          # @return [ Builder ] A newly instantiated nested builder object.
           #
-          # Returns:
-          #
-          # A newly instantiated nested builder object.
+          # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
@@ -135,13 +142,12 @@ module Mongoid # :nodoc:
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
-          # Example:
+          # @example Does this relation store a foreign key?
+          #   Embedded::One.stores_foreign_key?
           #
-          # <tt>Embedded::One.stores_foreign_key?</tt>
+          # @return [ false ] false.
           #
-          # Returns:
-          #
-          # false
+          # @since 2.0.0.rc.1
           def stores_foreign_key?
             false
           end

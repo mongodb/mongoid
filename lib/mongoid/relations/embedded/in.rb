@@ -20,6 +20,8 @@ module Mongoid # :nodoc:
         #
         # @param [ true, false ] building Whether this is getting called in a
         # build.
+        #
+        # @since 2.0.0.rc.1
         def bind(building = nil)
           binding.bind
         end
@@ -49,6 +51,8 @@ module Mongoid # :nodoc:
         #   name.person.unbind
         #
         # @param [ Proxy ] old_target The previous target of the relation.
+        #
+        # @since 2.0.0.rc.1
         def unbind(old_target)
           binding(old_target).unbind
           base.delete if old_target.persisted? && !base.destroyed?
@@ -64,6 +68,8 @@ module Mongoid # :nodoc:
         # @param [ Proxy ] new_target The new documents to bind with.
         #
         # @return [ Binding ] A binding object.
+        #
+        # @since 2.0.0.rc.1
         def binding(new_target = nil)
           Bindings::Embedded::In.new(base, new_target || target, metadata)
         end
@@ -80,6 +86,8 @@ module Mongoid # :nodoc:
           # @param [ Document, Hash ] object A document or attributes to build with.
           #
           # @return [ Builder ] A newly instantiated builder object.
+          #
+          # @since 2.0.0.rc.1
           def builder(meta, object)
             Builders::Embedded::In.new(meta, object)
           end
@@ -91,6 +99,8 @@ module Mongoid # :nodoc:
           #   Embedded::In.embedded?
           #
           # @return [ true ] true.
+          #
+          # @since 2.0.0.rc.1
           def embedded?
             true
           end
@@ -102,12 +112,14 @@ module Mongoid # :nodoc:
           #   Mongoid::Relations::Embedded::In.macro
           #
           # @return [ Symbol ] :embedded_in.
+          #
+          # @since 2.0.0.rc.1
           def macro
             :embedded_in
           end
 
-          # Return the nested builder that is responsible for generating the documents
-          # that will be used by this relation.
+          # Return the nested builder that is responsible for generating
+          # the documents that will be used by this relation.
           #
           # @example Get the builder.
           #   NestedAttributes::One.builder(attributes, options)
@@ -116,7 +128,18 @@ module Mongoid # :nodoc:
           # @param [ Hash ] attributes The attributes to build with.
           # @param [ Hash ] options The options for the builder.
           #
+          # @option options [ true, false ] :allow_destroy Can documents be
+          #   deleted?
+          # @option options [ Integer ] :limit Max number of documents to
+          #   create at once.
+          # @option options [ Proc, Symbol ] :reject_if If documents match this
+          #   option then they are ignored.
+          # @option options [ true, false ] :update_only Only existing documents
+          #   can be modified.
+          #
           # @return [ Builder ] A newly instantiated nested builder object.
+          #
+          # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
@@ -128,6 +151,8 @@ module Mongoid # :nodoc:
           #   Embedded::In.stores_foreign_key?
           #
           # @return [ false ] false.
+          #
+          # @since 2.0.0.rc.1
           def stores_foreign_key?
             false
           end
