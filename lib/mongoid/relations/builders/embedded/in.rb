@@ -8,13 +8,12 @@ module Mongoid # :nodoc:
           # This builder doesn't actually build anything, just returns the
           # parent since it should already be instantiated.
           #
-          # Example:
+          # @example Build the document.
+          #   Builder.new(meta, attrs).build
           #
-          # <tt>Builder.new(meta, attrs).build</tt>
+          # @param [ String ] type Not used in this context.
           #
-          # Returns:
-          #
-          # A single +Document+.
+          # @return [ Document ] A single document.
           def build(type = nil)
             return object unless object.is_a?(Hash)
             Mongoid::Factory.build(metadata.klass, object)

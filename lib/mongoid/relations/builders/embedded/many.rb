@@ -10,13 +10,12 @@ module Mongoid # :nodoc:
           # to make sure subclasses and allocation are used if fitting. This
           # case will return many documents.
           #
-          # Example:
+          # @example Build the documents.
+          #   Builder.new(meta, attrs).build
           #
-          # <tt>Builder.new(meta, attrs).build</tt>
+          # @param [ String ] type Not used in this context.
           #
-          # Returns:
-          #
-          # An +Array+ of +Documents+.
+          # @return [ Array<Document ] The documents.
           def build(type = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)

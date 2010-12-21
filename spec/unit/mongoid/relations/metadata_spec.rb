@@ -217,20 +217,6 @@ describe Mongoid::Relations::Metadata do
             metadata.foreign_key.should == "person_ids"
           end
         end
-
-        context "when references many as array" do
-
-          let(:metadata) do
-            described_class.new(
-              :name => :posts,
-              :relation => Mongoid::Relations::Referenced::ManyAsArray
-            )
-          end
-
-          it "returns the foreign_key" do
-            metadata.foreign_key.should == "post_ids"
-          end
-        end
       end
 
       context "when the relation does not store a foreign key" do
@@ -264,21 +250,6 @@ describe Mongoid::Relations::Metadata do
             metadata.foreign_key.should == "person_id"
           end
         end
-
-        context "when referenced in from array" do
-
-          let(:metadata) do
-            described_class.new(
-              :name => :person,
-              :relation => Mongoid::Relations::Referenced::InFromArray,
-              :inverse_class_name => "Post"
-            )
-          end
-
-          it "returns the inverse foreign key" do
-            metadata.foreign_key.should == "post_ids"
-          end
-        end
       end
     end
 
@@ -287,7 +258,7 @@ describe Mongoid::Relations::Metadata do
       let(:metadata) do
         described_class.new(
           :name => :person,
-          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :relation => Mongoid::Relations::Referenced::ManyToMany,
           :foreign_key => "blog_post_id"
         )
       end
@@ -338,7 +309,7 @@ describe Mongoid::Relations::Metadata do
       let(:metadata) do
         described_class.new(
           :name => :person,
-          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :relation => Mongoid::Relations::Referenced::In,
           :foreign_key => "person_id"
         )
       end
@@ -372,7 +343,7 @@ describe Mongoid::Relations::Metadata do
       let(:metadata) do
         described_class.new(
           :name => :person,
-          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :relation => Mongoid::Relations::Referenced::In,
           :foreign_key => "person_id"
         )
       end
@@ -406,7 +377,7 @@ describe Mongoid::Relations::Metadata do
       let(:metadata) do
         described_class.new(
           :name => :person,
-          :relation => Mongoid::Relations::Referenced::InFromArray,
+          :relation => Mongoid::Relations::Referenced::In,
           :foreign_key => "person_id"
         )
       end
@@ -663,7 +634,7 @@ describe Mongoid::Relations::Metadata do
           let(:metadata) do
             described_class.new(
               :name => :posts,
-              :relation => Mongoid::Relations::Referenced::ManyAsArray
+              :relation => Mongoid::Relations::Referenced::ManyToMany
             )
           end
 

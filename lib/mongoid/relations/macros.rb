@@ -120,33 +120,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Adds a relational association from the child Document to a Document in
-        # another database or collection. This differs from a normal
-        # referenced_in in that the foreign key is not stored on this object,
-        # but in an array on the inverse side.
-        #
-        # @example Define the relation.
-        #
-        #   class Game
-        #     include Mongoid::Document
-        #     referenced_in_from_array :person
-        #   end
-        #
-        #   class Person
-        #     include Mongoid::Document
-        #     references_many_as_array :game
-        #   end
-        #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
-        # @param [ Proc ] block Optional block for defining extensions.
-        def referenced_in_from_array(name, options = {}, &block)
-          metadatafy(name, Referenced::InFromArray, options, &block).tap do |meta|
-            relate(name, meta)
-            reference(meta)
-          end
-        end
-
         # Adds a relational association from a parent Document to many
         # Documents in another database or collection.
         #
@@ -167,33 +140,6 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         def references_many(name, options = {}, &block)
           metadatafy(name, Referenced::Many, options, &block).tap do |meta|
-            relate(name, meta)
-            reference(meta)
-          end
-        end
-
-        # Adds a relational association from a parent Document to many
-        # Documents in another database or collection, but instead of storing
-        # the foreign key on the inverse objects, it gets stored on this side as
-        # an array.
-        #
-        # @example Define the relation.
-        #
-        #   class Person
-        #     include Mongoid::Document
-        #     references_many_as_array :posts
-        #   end
-        #
-        #   class Game
-        #     include Mongoid::Document
-        #     referenced_in_from_array :person
-        #   end
-        #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
-        # @param [ Proc ] block Optional block for defining extensions.
-        def references_many_as_array(name, options = {}, &block)
-          metadatafy(name, Referenced::ManyAsArray, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
           end
