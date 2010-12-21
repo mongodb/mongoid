@@ -11,10 +11,9 @@ module Mongoid # :nodoc:
           # This case sets the metadata on the inverse object as well as the
           # document itself.
           #
-          # Example:
-          #
-          # <tt>person.name.bind</tt>
-          # <tt>person.name = Name.new</tt>
+          # @example Bind the document.
+          #   person.name.bind
+          #   person.name = Name.new
           def bind
             target.send(metadata.inverse_setter(target), base) if bindable?
           end
@@ -22,10 +21,9 @@ module Mongoid # :nodoc:
           # Unbinds the base object and the inverse, caused by setting the
           # reference to nil.
           #
-          # Example:
-          #
-          # <tt>person.name.unbind</tt>
-          # <tt>person.name = nil</tt>
+          # @example Unbind the document.
+          #   person.name.unbind
+          #   person.name = nil
           def unbind
             target.send(metadata.inverse_setter(target), nil) if unbindable?
           end
@@ -34,13 +32,10 @@ module Mongoid # :nodoc:
 
           # Determine what the inverse of this relation is.
           #
-          # Example:
+          # @example Get the inverse.
+          #   binding.inverse
           #
-          # <tt>binding.inverse</tt>
-          #
-          # Returns:
-          #
-          # The inverse of this relation.
+          # @return [ Proxy ] The inverse of this relation.
           def inverse
             target ? target.send(metadata.inverse(target)) : nil
           end
@@ -49,13 +44,10 @@ module Mongoid # :nodoc:
           # Checks if this document is not already equal to the target of the
           # inverse.
           #
-          # Example:
+          # @example Is this relation bindable?
+          #   binding.bindable?
           #
-          # <tt>binding.bindable?</tt>
-          #
-          # Returns:
-          #
-          # true if the documents differ, false if not.
+          # @return [ Boolean ] True if the documents differ, false if not.
           def bindable?
             !base.equal?(inverse ? inverse.target : nil)
           end
@@ -63,13 +55,10 @@ module Mongoid # :nodoc:
           # Protection from infinite loops removing the inverse relations.
           # Checks if the target of the inverse is not already nil.
           #
-          # Example:
+          # @example Is the relation unbindable?
+          #   binding.unbindable?
           #
-          # <tt>binding.unbindable?</tt>
-          #
-          # Returns:
-          #
-          # true if the target is not nil, false if not.
+          # @return [ Boolean ] True if the target is not nil, false if not.
           def unbindable?
             !target.send(metadata.inverse(target)).nil?
           end

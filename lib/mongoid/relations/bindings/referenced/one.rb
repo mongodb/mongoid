@@ -11,9 +11,8 @@ module Mongoid # :nodoc:
           #
           # This essentially sets the foreign key and the object itself.
           #
-          # Example:
-          #
-          # <tt>person.game.bind</tt>
+          # @example Bind the relation.
+          #   person.game.bind
           def bind
             if bindable?
               target.send(metadata.foreign_key_setter, base.id)
@@ -24,9 +23,8 @@ module Mongoid # :nodoc:
           # Unbinds the base object to the inverse of the relation. This occurs
           # when setting a side of the relation to nil.
           #
-          # Example:
-          #
-          # <tt>person.game.unbind</tt>
+          # @example Unbind the relation.
+          #   person.game.unbind
           def unbind
             if unbindable?
               target.send(metadata.foreign_key_setter, nil)
@@ -40,13 +38,10 @@ module Mongoid # :nodoc:
           # Checks if this document is not already equal to the target of the
           # inverse.
           #
-          # Example:
+          # @example Is the relation bindable?
+          #   binding.bindable?
           #
-          # <tt>binding.bindable?</tt>
-          #
-          # Returns:
-          #
-          # true if the documents differ, false if not.
+          # @return [ Boolean ] True if the documents differ, false if not.
           def bindable?
             !base.equal?(inverse ? inverse.target : nil)
           end
@@ -54,13 +49,10 @@ module Mongoid # :nodoc:
           # Protection from infinite loops removing the inverse relations.
           # Checks if the target of the inverse is not already nil.
           #
-          # Example:
+          # @example Is the relation unbindable?
+          #   binding.unbindable?
           #
-          # <tt>binding.unbindable?</tt>
-          #
-          # Returns:
-          #
-          # true if the target is not nil, false if not.
+          # @return [ Boolean ] True if the target is not nil, false if not.
           def unbindable?
             !target.send(metadata.inverse(target)).nil?
           end

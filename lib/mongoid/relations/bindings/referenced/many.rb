@@ -11,10 +11,9 @@ module Mongoid # :nodoc:
           # This case sets the metadata on the inverse object as well as the
           # document itself.
           #
-          # Example:
-          #
-          # <tt>person.posts.bind_all</tt>
-          # <tt>person.posts = [ Post.new ]</tt>
+          # @example Bind the relation.
+          #   person.posts.bind_all
+          #   person.posts = [ Post.new ]
           def bind_all
             target.each { |doc| bind_one(doc) } if bindable?(base)
           end
@@ -22,9 +21,10 @@ module Mongoid # :nodoc:
           # Binds a single document with the inverse relation. Used
           # specifically when appending to the proxy.
           #
-          # Example:
+          # @example Bind one document.
+          #   person.posts.bind_one(post)
           #
-          # <tt>person.posts.bind_one(post)</tt>
+          # @param [ Document ] doc The document to bind.
           def bind_one(doc)
             doc.send(metadata.foreign_key_setter, base.id)
             doc.send(metadata.inverse_setter, base)
@@ -33,9 +33,8 @@ module Mongoid # :nodoc:
           # Unbinds the base object to the inverse of the relation. This occurs
           # when setting a side of the relation to nil.
           #
-          # Example:
-          #
-          # <tt>person.posts.unbind</tt>
+          # @example Unbind the relation.
+          #   person.posts.unbind
           def unbind
             obj = if unbindable?
               target.each do |doc|
@@ -50,28 +49,24 @@ module Mongoid # :nodoc:
           # Determines if the supplied object is able to be bound - this is to
           # prevent infinite loops when setting inverse associations.
           #
-          # Options:
+          # @example Is the document bindable?
+          #   binding.bindable?(document)
           #
-          # object: The object to check if it can be bound.
+          # @param [ Document ] doc The document to check.
           #
-          # Returns:
-          #
-          # true if bindable.
-          def bindable?(object)
+          # @return [ Boolean ] True if bindable, false if not.
+          def bindable?(doc)
             return false unless target.to_a.first
-            !object.equal?(inverse ? inverse.target : nil)
+            !doc.equal?(inverse ? inverse.target : nil)
           end
 
           # Protection from infinite loops removing the inverse relations.
           # Checks if the target of the inverse is not already nil.
           #
-          # Example:
+          # @example Is the relation unbindable?
+          #   binding.unbindable?
           #
-          # <tt>binding.unbindable?</tt>
-          #
-          # Returns:
-          #
-          # true if the target is not nil, false if not.
+          # @return [ Boolean ] True if the target is not nil, false if not.
           def unbindable?
             inverse && !inverse.target.nil?
           end
