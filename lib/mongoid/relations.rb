@@ -20,7 +20,11 @@ require "mongoid/relations/metadata"
 require "mongoid/relations/macros"
 
 module Mongoid # :nodoc:
-  module Relations #:nodoc:
+
+  # All classes and modules under the relations namespace handle the
+  # functionality that has to do with embedded and referenced (relational)
+  # associations.
+  module Relations
     extend ActiveSupport::Concern
     include Accessors
     include Cascading
@@ -41,6 +45,8 @@ module Mongoid # :nodoc:
     #   address.embedded?
     #
     # @return [ true, false ] True if the document has a parent document.
+    #
+    # @since 2.0.0.rc.1
     def embedded?
       _parent.present?
     end
@@ -51,6 +57,8 @@ module Mongoid # :nodoc:
     #   address.embedded_many?
     #
     # @return [ true, false ] True if in an embeds many.
+    #
+    # @since 2.0.0.rc.1
     def embedded_many?
       metadata && metadata.macro == :embeds_many
     end
@@ -61,6 +69,8 @@ module Mongoid # :nodoc:
     #   address.embedded_one?
     #
     # @return [ true, false ] True if in an embeds one.
+    #
+    # @since 2.0.0.rc.1
     def embedded_one?
       metadata && metadata.macro == :embeds_one
     end
@@ -71,6 +81,8 @@ module Mongoid # :nodoc:
     #   post.referenced_many?
     #
     # @return [ true, false ] True if in a references many.
+    #
+    # @since 2.0.0.rc.1
     def referenced_many?
       metadata && metadata.macro == :references_many
     end
@@ -81,6 +93,8 @@ module Mongoid # :nodoc:
     #   address.referenced_one?
     #
     # @return [ true, false ] True if in a references one.
+    #
+    # @since 2.0.0.rc.1
     def referenced_one?
       metadata && metadata.macro == :references_one
     end

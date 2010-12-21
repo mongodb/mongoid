@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Reflections #:nodoc:
+
+    # The reflections module provides convenience methods that can retrieve
+    # useful information about associations.
+    module Reflections
       extend ActiveSupport::Concern
 
       included do
@@ -15,26 +18,24 @@ module Mongoid # :nodoc:
 
         # Returns the relation metadata for the supplied name.
         #
-        # Options:
+        # @example Find relation metadata by name.
+        #   Person.reflect_on_association(:addresses)
         #
-        # name: The relation name.
+        # @param [ String, Symbol ] name The name of the relation to find.
         #
-        # Example:
-        #
-        # <tt>Person.reflect_on_association(:addresses)</tt>
+        # @return [ Metadata ] The matching relation metadata.
         def reflect_on_association(name)
           relations[name.to_s]
         end
 
         # Returns all relation metadata for the supplied macros.
         #
-        # Options:
+        # @example Find multiple relation metadata by macro.
+        #   Person.reflect_on_all_associations(:embeds_many)
         #
-        # macros: The relation macros
+        # @param [ Array<String, Symbol> ] *macros The relation macros.
         #
-        # Example:
-        #
-        # <tt>Person.reflect_on_all_associations(:embeds_many)</tt>
+        # @return [ Array<Metadata> ] The matching relation metadata.
         def reflect_on_all_associations(*macros)
           relations.values.select { |meta| macros.include?(meta.macro) }
         end

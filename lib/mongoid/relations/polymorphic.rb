@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Polymorphic #:nodoc:
+
+    # This module contains the behaviour for handling polymorphic relational
+    # associations.
+    module Polymorphic
       extend ActiveSupport::Concern
 
       included do
@@ -18,6 +21,10 @@ module Mongoid # :nodoc:
         #   Movie.polymorph(metadata)
         #
         # @param [ Metadata ] metadata The relation metadata.
+        #
+        # @return [ Class ] The class being set up.
+        #
+        # @since 2.0.0.rc.1
         def polymorph(metadata)
           tap do |klass|
             if metadata.polymorphic?
@@ -36,6 +43,8 @@ module Mongoid # :nodoc:
         #   Movie.polymorphic?
         #
         # @return [ true, false ] True if polymorphic, false if not.
+        #
+        # @since 2.0.0.rc.1
         def polymorphic?
           !!polymorphic
         end
