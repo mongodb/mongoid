@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid # :nodoc:
   module Relations #:nodoc:
-    module Embedded
+    module Embedded #:nodoc:
 
       # This class handles the behaviour for a document that embeds many other
       # documents within in it as an array.
