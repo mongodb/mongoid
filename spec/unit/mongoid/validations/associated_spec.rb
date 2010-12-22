@@ -98,6 +98,56 @@ describe Mongoid::Validations::AssociatedValidator do
 
     end
 
+
+    context "when the association is a criteria" do
+
+      context "when the association is empty" do
+
+        before do
+          @associated = Post.where(:bogus_field => 'bogus_value')
+          validator.validate_each(@document, :posts, @associated)
+        end
+
+        it "adds no errors" do
+          @document.errors[:posts].should be_empty
+        end
+
+      end
+
+      context "when the association has invalid documents" do
+
+        before do
+          post = Post.new( :title => nil ).tap { |post|  post.insert(:validate => false) }
+          post.should_not be_valid
+
+          @associated = Post.where(:_id => post.id)
+          validator.validate_each(@document, :posts, @associated)
+        end
+
+        it "adds errors to the parent document" do
+          @document.errors[:posts].should_not be_empty
+        end
+
+      end
+
+      context "when the assocation has all valid documents" do
+
+        before do
+          post = Post.create( :title => "Make money fast!" )
+          post.should be_valid
+
+          @associated = Post.where(:_id => post.id)
+          validator.validate_each(@document, :posts, @associated)
+        end
+
+        it "adds no errors" do
+          @document.errors[:posts].should be_empty
+        end
+
+      end
+
+    end
+
   end
 
 end

@@ -15,6 +15,8 @@ class Post
 
   references_many :tags, :stored_as => :array
 
+  validates_presence_of :title
+
   named_scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
 
   class << self

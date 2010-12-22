@@ -23,7 +23,14 @@ module Mongoid #:nodoc:
       #
       # <tt>validator.validate_each(document, :name, name)</tt>
       def validate_each(document, attribute, value)
-        values = value.is_a?(Array) ? value : [ value ]
+        values =
+          if value.is_a?(Array)
+            value
+          elsif value.respond_to?(:to_a)
+            value.to_a
+          else
+            [ value ]
+          end
         return if values.collect { |doc| doc.nil? || doc.valid? }.all?
         document.errors.add(attribute, :invalid, options.merge(:value => value))
       end
