@@ -5,11 +5,9 @@ describe Mongoid::Relations::Cascading do
   describe ".cascade" do
 
     let(:klass) do
-      class Cascades
-        include Mongoid::Document
-      end
-      Cascades.cascades = []
-      Cascades
+      c = Class.new
+      c.send(:include, Mongoid::Document)
+      c
     end
 
     context "when a dependent option is provided" do
