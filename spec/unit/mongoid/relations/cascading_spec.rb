@@ -5,7 +5,7 @@ describe Mongoid::Relations::Cascading do
   describe ".cascade" do
 
     let(:klass) do
-      Class.new do
+      class Cascades
         include Mongoid::Document
       end
     end
