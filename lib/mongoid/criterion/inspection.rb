@@ -12,10 +12,10 @@ module Mongoid #:nodoc:
       # @return [ String ] The inspection string.
       def inspect
         "#<Mongoid::Criteria\n" <<
-        "  selector: #{selector},\n" <<
-        "  options:  #{options},\n" <<
-        "  count:    #{count},\n" <<
-        "  matching: #{entries}>"
+        "  selector: #{selector.inspect},\n" <<
+        "  options:  #{options.inspect},\n" <<
+        "  count:    #{count.inspect},\n" <<
+        "  matching: #{entries.inspect}>"
       end
     end
   end
