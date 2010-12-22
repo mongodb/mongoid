@@ -8,6 +8,8 @@ describe Mongoid::Relations::Cascading do
       class Cascades
         include Mongoid::Document
       end
+      Cascades.cascades = []
+      Cascades
     end
 
     context "when a dependent option is provided" do
