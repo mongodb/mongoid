@@ -34,6 +34,7 @@ module Mongoid #:nodoc
       include Mongoid::Validations
       include Mongoid::Callbacks
       extend ActiveModel::Translation
+      extend Mongoid::DefaultScope
       extend Mongoid::Finders
       extend Mongoid::NamedScope
     end
