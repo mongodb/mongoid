@@ -5,9 +5,7 @@ describe Mongoid::Relations::Cascading do
   describe ".cascade" do
 
     let(:klass) do
-      c = Class.new
-      c.send(:include, Mongoid::Document)
-      c
+      Class.new.tap { |c| c.send(:include, Mongoid::Document) }
     end
 
     context "when a dependent option is provided" do

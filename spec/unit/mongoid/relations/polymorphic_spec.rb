@@ -5,9 +5,7 @@ describe Mongoid::Relations::Polymorphic do
   describe "#polymorph" do
 
     let(:klass) do
-      c = Class.new
-      c.send(:include, Mongoid::Document)
-      c
+      Class.new.tap { |c| c.send(:include, Mongoid::Document) }
     end
 
     context "when the relation is polymorphic" do
