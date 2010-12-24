@@ -1,10 +1,11 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Validations #:nodoc:
+
     # Validates whether or not an association is valid or not. Will correctly
     # handle has one and has many associations.
     #
-    # Example:
+    # @example Set up the association validations.
     #
     #   class Person
     #     include Mongoid::Document
@@ -19,9 +20,12 @@ module Mongoid #:nodoc:
       # valid. If neither is true then the appropriate errors will be added to
       # the parent document.
       #
-      # Example:
+      # @example Validate the association.
+      #   validator.validate_each(document, :name, name)
       #
-      # <tt>validator.validate_each(document, :name, name)</tt>
+      # @param [ Document ] document The document to validate.
+      # @param [ Symbol ] attribute The relation to validate.
+      # @param [ Object ] value The value of the relation.
       def validate_each(document, attribute, value)
         values = value.is_a?(Array) ? value : [ value ]
         return if values.collect { |doc| doc.nil? || doc.valid? }.all?

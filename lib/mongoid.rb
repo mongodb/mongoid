@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 # Copyright (c) 2009, 2010 Durran Jordan
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -19,7 +20,6 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 require "delegate"
 require "singleton"
 require "time"
@@ -102,7 +102,7 @@ module Mongoid #:nodoc
 
     # Sets the Mongoid configuration options. Best used by passing a block.
     #
-    # Example:
+    # @example Set up configuration options.
     #
     #   Mongoid.configure do |config|
     #     name = "mongoid_test"
@@ -115,33 +115,30 @@ module Mongoid #:nodoc
     #     ]
     #   end
     #
-    # Returns:
-    #
-    # The Mongoid +Config+ singleton instance.
+    # @return [ Config ] The configuration obejct.
     def configure
       config = Mongoid::Config.instance
       block_given? ? yield(config) : config
     end
+    alias :config :configure
 
     # Easy convenience method for generating an alert from the
     # deprecation module.
     #
-    # Example:
+    # @example Alert a deprecation.
+    #   Mongoid.deprecate("Method no longer used")
     #
-    # <tt>Mongoid.deprecate("Method no longer used")</tt>
+    # @param [ String ] message The message to print.
     def deprecate(message)
       Mongoid::Deprecation.instance.alert(message)
     end
-
-    alias :config :configure
   end
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
   #
-  # Example:
-  #
-  # <tt>Mongoid.database = Mongo::Connection.new.db("test")</tt>
+  # @example Delegate the configuration methods.
+  #   Mongoid.database = Mongo::Connection.new.db("test")
   Mongoid::Config.public_instance_methods(false).each do |name|
     (class << self; self; end).class_eval <<-EOT
       def #{name}(*args)

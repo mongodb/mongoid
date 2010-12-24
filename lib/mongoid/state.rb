@@ -1,18 +1,18 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
-  module State #:nodoc:
+
+  # This module contains the behaviour for getting the various states a
+  # document can transition through.
+  module State
 
     # Returns true if the +Document+ has not been persisted to the database,
     # false if it has. This is determined by the variable @new_record
     # and NOT if the object has an id.
     #
-    # Example:
+    # @example Is the document new?
+    #   person.new_record?
     #
-    # <tt>person.new_record?</tt>
-    #
-    # Returns
-    #
-    # true if new, false if not.
+    # @return [ true, false ] True if new, false if not.
     def new_record?
       @new_record == true
     end
@@ -20,57 +20,45 @@ module Mongoid #:nodoc:
 
     # Sets the new_record boolean - used after document is saved.
     #
-    # Example:
+    # @example Set whether the document is new.
+    #   person.new_record = true
     #
-    # <tt>person.new_record = true</tt>
+    # @param [ true, false ] saved The value to set for new_record.
     #
-    # Options:
-    #
-    # saved: The value to set for new_record
-    #
-    # Returns:
-    #
-    # The new_record value.
+    # @return [ true, false ] The new_record value.
     def new_record=(saved)
       @new_record = saved
     end
 
     # Checks if the document has been saved to the database.
     #
-    # Example:
+    # @example Is the document persisted?
+    #   person.persisted?
     #
-    # <tt>person.persisted?</tt>
-    #
-    # Returns:
-    #
-    # true if persisted, false if not.
+    # @return [ true, false ] True if persisted, false if not.
     def persisted?
       !new_record?
     end
 
-    # Returns true if the +Document+ has been succesfully destroyed, and false if it hasn't.
-    # This is determined by the variable @destroyed and NOT by checking the database.
+    # Returns true if the +Document+ has been succesfully destroyed, and false
+    # if it hasn't. This is determined by the variable @destroyed and NOT
+    # by checking the database.
     #
-    # Example:
+    # @example Is the document destroyed?
+    #   person.destroyed?
     #
-    # <tt>person.destroyed?</tt>
-    #
-    # Returns:
-    #
-    # true if destroyed, false if not.
+    # @return [ true, false ] True if destroyed, false if not.
     def destroyed?
       @destroyed == true
     end
+    alias :deleted? :destroyed?
 
     # Sets the destroyed boolean - used after document is destroyed.
     #
-    # Example:
+    # @example Set the destroyed flag.
+    #   person.destroyed = true
     #
-    # <tt>person.destroyed = true</tt>
-    #
-    # Returns:
-    #
-    # The value set for destroyed.
+    # @return [ true, false ] The value set for destroyed.
     def destroyed=(destroyed)
       @destroyed = destroyed && true
     end
