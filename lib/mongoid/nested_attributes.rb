@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
       # Used when needing to update related models from a parent relation. Can
       # be used on embedded or referenced relations.
       #
-      # Example:
+      # @example Defining nested attributes.
       #
       #   class Person
       #     include Mongoid::Document
@@ -20,23 +20,13 @@ module Mongoid #:nodoc:
       #     accepts_nested_attributes_for :addresses, :game, :posts
       #   end
       #
-      # This will define a setter for the relation in the form of
-      # <tt>#{relation_name}_attributes=</tt>. So the above example would get
-      # the following methods added:
+      # @param [ Array<Symbol>, Hash ] *args A list of relation names, followed
+      #   by a hash of options.
       #
-      #   addresses_attributes=
-      #   game_attributes=
-      #   posts_attributes=
-      #
-      # Options:
-      #
-      # args: A list of relation names, followed by a hash of options. The
-      #       available options are:
-      #
-      #       :allow_destroy,
-      #       :reject_if,
-      #       :limit,
-      #       :update_only.
+      # @option *args [ true, false ] :allow_destroy Can deletion occur?
+      # @option *args [ Proc ] :reject_if Block to reject documents with.
+      # @option *args [ Integer ] :limit The max number to create.
+      # @option *args [ true, false ] :update_only Only update existing docs.
       def accepts_nested_attributes_for(*args)
         options = args.extract_options!
         args.each do |name|
