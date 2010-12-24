@@ -17,7 +17,6 @@ describe Mongoid::DefaultScope do
     subject { Acolyte.all }
 
     its(:options) { should == {:sort => [[:name, :asc]]} }
-
   end
 
   context "combined with a named scope" do
@@ -26,7 +25,5 @@ describe Mongoid::DefaultScope do
 
     its(:options) { should == {:sort => [[:name, :asc]]} }
     its(:selector) { should == {:status => "active"} }
-
   end
-
 end

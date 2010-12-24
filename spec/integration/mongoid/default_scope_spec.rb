@@ -21,11 +21,10 @@ describe Mongoid::DefaultScope do
   end
 
   it "returns them in the correct order" do
-    DefaultScopeTestModel.all.entries.should == [obj3, obj2, obj1]
+    DefaultScopeTestModel.all.entries.should == [ obj3, obj2, obj1 ]
   end
 
   it "respects other scopes" do
-    DefaultScopeTestModel.verdant.entries.should == [obj2, obj1]
+    DefaultScopeTestModel.verdant.entries.should == [ obj2, obj1 ]
   end
-
 end
