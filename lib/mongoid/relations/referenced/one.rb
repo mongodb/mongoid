@@ -2,6 +2,9 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
+
+      # This class defines the behaviour for all relations that are a
+      # one-to-one between documents in different collections.
       class One < Relations::One
 
         # Binds the base object to the inverse of the relation. This is so we
@@ -11,9 +14,12 @@ module Mongoid # :nodoc:
         # This is called after first creating the relation, or if a new object
         # is set on the relation.
         #
-        # Example:
+        # @example Bind the relation.
+        #   person.game.bind
         #
-        # <tt>person.game.bind</tt>
+        # @param [ true, false ] building Are we in build mode?
+        #
+        # @since 2.0.0.rc.1
         def bind(building = nil)
           binding.bind
           target.save if base.persisted? && !building
@@ -22,15 +28,12 @@ module Mongoid # :nodoc:
         # Instantiate a new references_one relation. Will set the foreign key
         # and the base on the inverse object.
         #
-        # Example:
+        # @example Create the new relation.
+        #   Referenced::One.new(base, target, metadata)
         #
-        # <tt>Referenced::One.new(base, target, metadata)</tt>
-        #
-        # Options:
-        #
-        # base: The document this relation hangs off of.
-        # target: The target [child document] of the relation.
-        # metadata: The relation's metadata
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Document ] target The target (child) of the relation.
+        # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
           init(base, target, metadata)
         end
@@ -41,6 +44,8 @@ module Mongoid # :nodoc:
         #
         # @example Nullify the relation.
         #   person.game.nullify
+        #
+        # @since 2.0.0.rc.1
         def nullify
           target.send(metadata.foreign_key_setter, nil)
           target.send(:remove_instance_variable, "@#{metadata.inverse(target)}")
@@ -53,9 +58,12 @@ module Mongoid # :nodoc:
         #
         # Will delete the object if necessary.
         #
-        # Example:
+        # @example Unbind the relation.
+        #   person.game.unbind
         #
-        # <tt>person.game.unbind</tt>
+        # @param [ Document ] old_target The previous target of the relation.
+        #
+        # @since 2.0.0.rc.1
         def unbind(old_target)
           binding(old_target).unbind
           old_target.delete if base.persisted?
@@ -65,17 +73,12 @@ module Mongoid # :nodoc:
 
         # Instantiate the binding associated with this relation.
         #
-        # Example:
+        # @example Get the binding.
+        #   relation.binding([ address ])
         #
-        # <tt>binding([ address ])</tt>
+        # @param [ Document ] new_target The new target of the relation.
         #
-        # Options:
-        #
-        # new_target: The new documents to bind with.
-        #
-        # Returns:
-        #
-        # A binding object.
+        # @return [ Binding ] The binding object.
         def binding(new_target = nil)
           Bindings::Referenced::One.new(base, new_target || target, metadata)
         end
@@ -85,18 +88,16 @@ module Mongoid # :nodoc:
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   Referenced::One.builder(meta, object)
           #
-          # <tt>Referenced::One.builder(meta, object)</tt>
+          # @param [ Metadata ] meta The metadata of the relation.
+          # @param [ Document, Hash ] object A document or attributes to build
+          #   with.
           #
-          # Options:
+          # @return [ Builder ] A new builder object.
           #
-          # meta: The metadata of the relation.
-          # object: A document or attributes to build with.
-          #
-          # Returns:
-          #
-          # A newly instantiated builder object.
+          # @since 2.0.0.rc.1
           def builder(meta, object)
             Builders::Referenced::One.new(meta, object)
           end
@@ -104,30 +105,36 @@ module Mongoid # :nodoc:
           # Returns true if the relation is an embedded one. In this case
           # always false.
           #
-          # Example:
+          # @example Is this relation embedded?
+          #   Referenced::One.embedded?
           #
-          # <tt>Referenced::One.embedded?</tt>
+          # @return [ false ] Always false.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def embedded?
             false
           end
 
+          # Get the default value for the foreign key.
+          #
+          # @example Get the default.
+          #   Referenced::One.foreign_key_default
+          #
+          # @return [ nil ] Always nil.
+          #
+          # @since 2.0.0.rc.1
           def foreign_key_default
             nil
           end
 
           # Returns the suffix of the foreign key field, either "_id" or "_ids".
           #
-          # Example:
+          # @example Get the suffix for the foreign key.
+          #   Referenced::One.foreign_key_suffix
           #
-          # <tt>Referenced::One.foreign_key_suffix</tt>
+          # @return [ String ] "_id"
           #
-          # Returns:
-          #
-          # "_id"
+          # @since 2.0.0.rc.1
           def foreign_key_suffix
             "_id"
           end
@@ -135,13 +142,10 @@ module Mongoid # :nodoc:
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
-          # Example:
+          # @example Get the macro.
+          #   Referenced::One.macro
           #
-          # <tt>Mongoid::Relations::Referenced::One.macro</tt>
-          #
-          # Returns:
-          #
-          # <tt>:references_one</tt>
+          # @return [ Symbol ] :references_one.
           def macro
             :references_one
           end
@@ -149,18 +153,25 @@ module Mongoid # :nodoc:
           # Return the nested builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the nested builder.
+          #   Referenced::One.builder(attributes, options)
           #
-          # <tt>Referenced::Nested::One.builder(attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes to build with.
+          # @param [ Hash ] options The options for the builder.
           #
-          # Options:
+          # @option options [ true, false ] :allow_destroy Can documents be
+          #   deleted?
+          # @option options [ Integer ] :limit Max number of documents to
+          #   create at once.
+          # @option options [ Proc, Symbol ] :reject_if If documents match this
+          #   option then they are ignored.
+          # @option options [ true, false ] :update_only Only existing documents
+          #   can be modified.
           #
-          # attributes: The attributes to build with.
-          # options: The options for the builder.
+          # @return [ NestedBuilder ] A newly instantiated nested builder object.
           #
-          # Returns:
-          #
-          # A newly instantiated nested builder object.
+          # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
@@ -168,13 +179,12 @@ module Mongoid # :nodoc:
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
-          # Example:
+          # @example Does this relation store a foreign key?
+          #   Referenced::One.stores_foreign_key?
           #
-          # <tt>Referenced::One.stores_foreign_key?</tt>
+          # @return [ false ] Always false.
           #
-          # Returns:
-          #
-          # false
+          # @since 2.0.0.rc.1
           def stores_foreign_key?
             false
           end

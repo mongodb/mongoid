@@ -2,6 +2,9 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
+
+      # This class defines the behaviour for all relations that are a
+      # many-to-many between documents in different collections.
       class ManyToMany < Relations::Many
 
         # Binds the base object to the inverse of the relation. This is so we
@@ -11,9 +14,12 @@ module Mongoid # :nodoc:
         # This is called after first creating the relation, or if a new object
         # is set on the relation.
         #
-        # Example:
+        # @example Bind the relation.
+        #   person.preferences.bind
         #
-        # <tt>person.preferences.bind</tt>
+        # @param [ true, false ] Are we in build mode?
+        #
+        # @since 2.0.0.rc.1
         def bind(building = nil)
           binding.bind_all
           target.map(&:save) if base.persisted? && !building?
@@ -22,17 +28,22 @@ module Mongoid # :nodoc:
         # Clear the relation. Will delete the documents from the db if they are
         # already persisted.
         #
-        # Example:
+        # @example Clear the relation.
+        #   person.preferences.clear
         #
-        # <tt>relation.clear</tt>
-        #
-        # Returns:
-        #
-        # The empty relation.
+        # @return [ Many ] The relation emptied.
         def clear
           tap { |relation| relation.unbind }
         end
 
+        # Delete a single document from the relation.
+        #
+        # @example Delete a document.
+        #   person.preferences.delete(preference)
+        #
+        # @param [ Document ] document The document to delete.
+        #
+        # @since 2.0.0.rc.1
         def delete(document)
           target.delete(document)
           binding.unbind_one(document)
@@ -41,17 +52,15 @@ module Mongoid # :nodoc:
         # Deletes all related documents from the database given the supplied
         # conditions.
         #
-        # Example:
+        # @example Delete all documents in the relation.
+        #   person.preferences.delete_all
         #
-        # <tt>person.posts.delete_all(:title => "Testing")</tt>
+        # @example Conditonally delete all documents in the relation.
+        #   person.preferences.delete_all(:conditions => { :title => "Testing" })
         #
-        # Options:
+        # @param [ Hash ] conditions Optional conditions to delete with.
         #
-        # conditions: A hash of conditions to limit the delete by.
-        #
-        # Returns:
-        #
-        # The number of documents deleted.
+        # @return [ Integer ] The number of documents deleted.
         def delete_all(conditions = nil)
           selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
@@ -59,20 +68,18 @@ module Mongoid # :nodoc:
           metadata.klass.delete_all(:conditions => selector.merge(scoping))
         end
 
-        # Deletes all related documents from the database given the supplied
+        # Destroys all related documents from the database given the supplied
         # conditions.
         #
-        # Example:
+        # @example Destroy all documents in the relation.
+        #   person.preferences.destroy_all
         #
-        # <tt>person.posts.destroy_all(:title => "Testing")</tt>
+        # @example Conditonally destroy all documents in the relation.
+        #   person.preferences.destroy_all(:conditions => { :title => "Testing" })
         #
-        # Options:
+        # @param [ Hash ] conditions Optional conditions to destroy with.
         #
-        # conditions: A hash of conditions to limit the delete by.
-        #
-        # Returns:
-        #
-        # The number of documents deleted.
+        # @return [ Integer ] The number of documents destroyd.
         def destroy_all(conditions = nil)
           selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
@@ -83,21 +90,26 @@ module Mongoid # :nodoc:
         # Find the matchind document on the association, either based on id or
         # conditions.
         #
-        # Example:
+        # @example Find by an id.
+        #   person.preferences.find(BSON::ObjectId.new)
         #
-        # <tt>person.find(ObjectID("4c52c439931a90ab29000005"))</tt>
-        # <tt>person.find(:all, :conditions => { :title => "Sir" })</tt>
-        # <tt>person.find(:first, :conditions => { :title => "Sir" })</tt>
-        # <tt>person.find(:last, :conditions => { :title => "Sir" })</tt>
+        # @example Find by multiple ids.
+        #   person.preferences.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
         #
-        # Options:
+        # @example Conditionally find all matching documents.
+        #   person.preferences.find(:all, :conditions => { :title => "Sir" })
         #
-        # arg: Either an id or a type of search.
-        # options: a Hash of selector arguments.
+        # @example Conditionally find the first document.
+        #   person.preferences.find(:first, :conditions => { :title => "Sir" })
         #
-        # Returns:
+        # @example Conditionally find the last document.
+        #   person.preferences.find(:last, :conditions => { :title => "Sir" })
         #
-        # The matching document or documents.
+        # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
+        #   argument to search with.
+        # @param [ Hash ] options The options to search with.
+        #
+        # @return [ Document, Criteria ] The matching document(s).
         def find(arg, options = {})
           klass = metadata.klass
           return klass.criteria.id_criteria(arg) unless arg.is_a?(Symbol)
@@ -110,15 +122,12 @@ module Mongoid # :nodoc:
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #
-        # Example:
+        # @example Create the new relation.
+        #   Referenced::ManyToMany.new(base, target, metadata)
         #
-        # <tt>Referenced::ManyToMany.new(base, target, metadata)</tt>
-        #
-        # Options:
-        #
-        # base: The document this relation hangs off of.
-        # target: The target [child documents] of the relation.
-        # metadata: The relation's metadata
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Array<Document> ] target The target of the relation.
+        # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
           init(base, target, metadata)
         end
@@ -129,6 +138,8 @@ module Mongoid # :nodoc:
         #
         # @example Nullify the relation.
         #   person.preferences.nullify
+        #
+        # @since 2.0.0.rc.1
         def nullify
           loaded and target.each do |doc|
             base.send(metadata.foreign_key).delete(doc.id)
@@ -142,17 +153,15 @@ module Mongoid # :nodoc:
         # in the relation. If the new target is nil, perform the necessary
         # deletion.
         #
-        # Example:
+        # @example Replace the relation.
+        #   person.preferences.substitute(new_name)
         #
-        # <tt>posts.substitute(new_name)</tt>
+        # @param [ Array<Document> ] target The replacement target.
+        # @param [ true, false ] building Are we in build mode?
         #
-        # Options:
+        # @return [ Many ] The relation.
         #
-        # target: An array of documents to replace the target.
-        #
-        # Returns:
-        #
-        # The relation or nil.
+        # @since 2.0.0.rc.1
         def substitute(target, building = nil)
           tap { target ? (@target = target.to_a; bind) : (@target = unbind) }
         end
@@ -162,9 +171,10 @@ module Mongoid # :nodoc:
         #
         # Will delete the object if necessary.
         #
-        # Example:
+        # @example Unbind the target.
+        #   person.preferences.unbind
         #
-        # <tt>person.posts.unbind</tt>
+        # @since 2.0.0.rc.1
         def unbind
           target.each(&:delete) if base.persisted?
           binding.unbind_all
@@ -176,32 +186,28 @@ module Mongoid # :nodoc:
         # Appends the document to the target array, updating the index on the
         # document at the same time.
         #
-        # Example:
+        # @example Append the document to the relation.
+        #   relation.append(document)
         #
-        # <tt>relation.append(document)</tt>
+        # @param [ Document ] document The document to append to the target.
         #
-        # Options:
-        #
-        # document: The document to append to the target.
+        # @since 2.0.0.rc.1
         def append(document)
-          target.push(document)
+          loaded and target.push(document)
           metadatafy(document)
           binding.bind_one(document)
         end
 
         # Instantiate the binding associated with this relation.
         #
-        # Example:
+        # @example Get the binding.
+        #   relation.binding([ address ])
         #
-        # <tt>binding([ address ])</tt>
+        # @param [ Array<Document> ] new_target The new documents to bind with.
         #
-        # Options:
+        # @return [ Binding ] The binding.
         #
-        # new_target: The new documents to bind with.
-        #
-        # Returns:
-        #
-        # A binding object.
+        # @since 2.0.0.rc.1
         def binding(new_target = nil)
           Bindings::Referenced::ManyToMany.new(base, new_target || target, metadata)
         end
@@ -221,13 +227,12 @@ module Mongoid # :nodoc:
         # Will load the target into an array if the target had not already been
         # loaded.
         #
-        # Example:
+        # @example Load the relation into memory.
+        #   relation.loaded
         #
-        # <tt>person.addresses.loaded</tt>
+        # @return [ ManyToMany ] The relation.
         #
-        # Returns:
-        #
-        # The relation itself.
+        # @since 2.0.0.rc.1
         def loaded
           tap do |relation|
             relation.target = target.entries if target.is_a?(Mongoid::Criteria)
@@ -239,18 +244,16 @@ module Mongoid # :nodoc:
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   Referenced::ManyToMany.builder(meta, object)
           #
-          # <tt>Referenced::ManyToMany.builder(meta, object)</tt>
+          # @param [ Metadata ] meta The metadata of the relation.
+          # @param [ Document, Hash ] object A document or attributes to build
+          #   with.
           #
-          # Options:
+          # @return [ Builder ] A new builder object.
           #
-          # meta: The metadata of the relation.
-          # object: A document or attributes to build with.
-          #
-          # Returns:
-          #
-          # A newly instantiated builder object.
+          # @since 2.0.0.rc.1
           def builder(meta, object)
             Builders::Referenced::ManyToMany.new(meta, object)
           end
@@ -258,30 +261,36 @@ module Mongoid # :nodoc:
           # Returns true if the relation is an embedded one. In this case
           # always false.
           #
-          # Example:
+          # @example Is this relation embedded?
+          #   Referenced::ManyToMany.embedded?
           #
-          # <tt>Referenced::ManyToMany.embedded?</tt>
+          # @return [ false ] Always false.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def embedded?
             false
           end
 
+          # Get the default value for the foreign key.
+          #
+          # @example Get the default.
+          #   Referenced::ManyToMany.foreign_key_default
+          #
+          # @return [ Array ] Always an empty array.
+          #
+          # @since 2.0.0.rc.1
           def foreign_key_default
             []
           end
 
           # Returns the suffix of the foreign key field, either "_id" or "_ids".
           #
-          # Example:
+          # @example Get the suffix for the foreign key.
+          #   Referenced::ManyToMany.foreign_key_suffix
           #
-          # <tt>Referenced::ManyToMany.foreign_key_suffix</tt>
+          # @return [ String ] "_ids"
           #
-          # Returns:
-          #
-          # "_id"
+          # @since 2.0.0.rc.1
           def foreign_key_suffix
             "_ids"
           end
@@ -289,13 +298,10 @@ module Mongoid # :nodoc:
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
-          # Example:
+          # @example Get the macro.
+          #   Referenced::ManyToMany.macro
           #
-          # <tt>Mongoid::Relations::Referenced::ManyToMany.macro</tt>
-          #
-          # Returns:
-          #
-          # <tt>:references_and_referenced_in_many</tt>
+          # @return [ Symbol ] :references_and_referenced_in_many
           def macro
             :references_and_referenced_in_many
           end
@@ -303,18 +309,25 @@ module Mongoid # :nodoc:
           # Return the nested builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the nested builder.
+          #   Referenced::ManyToMany.builder(attributes, options)
           #
-          # <tt>Referenced::Nested::ManyToMany.builder(attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes to build with.
+          # @param [ Hash ] options The options for the builder.
           #
-          # Options:
+          # @option options [ true, false ] :allow_destroy Can documents be
+          #   deleted?
+          # @option options [ Integer ] :limit Max number of documents to
+          #   create at once.
+          # @option options [ Proc, Symbol ] :reject_if If documents match this
+          #   option then they are ignored.
+          # @option options [ true, false ] :update_only Only existing documents
+          #   can be modified.
           #
-          # attributes: The attributes to build with.
-          # options: The options for the builder.
+          # @return [ NestedBuilder ] A newly instantiated nested builder object.
           #
-          # Returns:
-          #
-          # A newly instantiated nested builder object.
+          # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
             Builders::Referenced::Nested::ManyToMany.new(metadata, attributes, options)
           end
@@ -322,13 +335,12 @@ module Mongoid # :nodoc:
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
-          # Example:
+          # @example Does this relation store a foreign key?
+          #   Referenced::Many.stores_foreign_key?
           #
-          # <tt>Referenced::ManyToMany.stores_foreign_key?</tt>
+          # @return [ true ] Always true.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def stores_foreign_key?
             true
           end

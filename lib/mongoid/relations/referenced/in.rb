@@ -2,6 +2,11 @@
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
+
+      # This class handles all behaviour for relations that are either
+      # one-to-many or one-to-one, where the foreign key is store on this side
+      # of the relation and the reference is to document(s) in another
+      # collection.
       class In < Relations::One
 
         # Binds the base object to the inverse of the relation. This is so we
@@ -11,20 +16,25 @@ module Mongoid # :nodoc:
         # This is called after first creating the relation, or if a new object
         # is set on the relation.
         #
-        # Example:
+        # @example Bind the relation.
+        #   game.person.bind
         #
-        # <tt>game.person.bind</tt>
+        # @param [ true, false ] building Are we in build mode?
+        #
+        # @since 2.0.0.rc.1
         def bind(building = nil)
           binding.bind
         end
 
         # Instantiate a new referenced_in relation.
         #
-        # Options:
+        # @example Create the new relation.
+        #   Referenced::In.new(game, person, metadata)
         #
-        # base: The document this relation hangs off of.
-        # target: The target [parent document] of the relation.
-        # metadata: The relation's metadata
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Document, Array<Document> ] target The target (parent) of the
+        #   relation.
+        # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
           init(base, target, metadata)
         end
@@ -32,17 +42,15 @@ module Mongoid # :nodoc:
         # Substitutes the supplied target documents for the existing document
         # in the relation.
         #
-        # Example:
+        # @example Substitute the relation.
+        #   name.substitute(new_name)
         #
-        # <tt>name.substitute(new_name)</tt>
+        # @param [ Document, Array<Document> ] new_target The replacement.
+        # @param [ true, false ] building Are we in build mode?
         #
-        # Options:
+        # @return [ In, nil ] The relation or nil.
         #
-        # target: A document to replace the target.
-        #
-        # Returns:
-        #
-        # The relation or nil.
+        # @since 2.0.0.rc.1
         def substitute(new_target, building = nil)
           old_target = target
           tap do |relation|
@@ -59,9 +67,12 @@ module Mongoid # :nodoc:
         # Unbinds the base object to the inverse of the relation. This occurs
         # when setting a side of the relation to nil.
         #
-        # Example:
+        # @example Unbind the relation.
+        #   game.person.unbind
         #
-        # <tt>game.person.unbind</tt>
+        # @param [ Document, Array<Document> ] old_target The previous target.
+        #
+        # @since 2.0.0.rc.1
         def unbind(old_target)
           binding(old_target).unbind
         end
@@ -70,17 +81,14 @@ module Mongoid # :nodoc:
 
         # Instantiate the binding associated with this relation.
         #
-        # Example:
+        # @example Get the binding object.
+        #   binding([ address ])
         #
-        # <tt>binding([ address ])</tt>
+        # @param [ Document, Array<Document> ] new_target The replacement.
         #
-        # Options:
+        # @return [ Binding ] The binding object.
         #
-        # new_target: The new documents to bind with.
-        #
-        # Returns:
-        #
-        # A binding object.
+        # @since 2.0.0.rc.1
         def binding(new_target = nil)
           Bindings::Referenced::In.new(base, new_target || target, metadata)
         end
@@ -90,18 +98,16 @@ module Mongoid # :nodoc:
           # Return the builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the builder.
+          #   Referenced::In.builder(meta, object)
           #
-          # <tt>Referenced::In.builder(meta, object)</tt>
+          # @param [ Metadata ] meta The metadata of the relation.
+          # @param [ Document, Hash ] object A document or attributes to build
+          #   with.
           #
-          # Options:
+          # @return [ Builder ] A new builder object.
           #
-          # meta: The metadata of the relation.
-          # object: A document or attributes to build with.
-          #
-          # Returns:
-          #
-          # A newly instantiated builder object.
+          # @since 2.0.0.rc.1
           def builder(meta, object)
             Builders::Referenced::In.new(meta, object)
           end
@@ -109,30 +115,36 @@ module Mongoid # :nodoc:
           # Returns true if the relation is an embedded one. In this case
           # always false.
           #
-          # Example:
+          # @example Is this relation embedded?
+          #   Referenced::In.embedded?
           #
-          # <tt>Referenced::In.embedded?</tt>
+          # @return [ false ] Always false.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def embedded?
             false
           end
 
+          # Get the default value for the foreign key.
+          #
+          # @example Get the default.
+          #   Referenced::In.foreign_key_default
+          #
+          # @return [ nil ] Always nil.
+          #
+          # @since 2.0.0.rc.1
           def foreign_key_default
             nil
           end
 
           # Returns the suffix of the foreign key field, either "_id" or "_ids".
           #
-          # Example:
+          # @example Get the suffix for the foreign key.
+          #   Referenced::In.foreign_key_suffix
           #
-          # <tt>Referenced::In.foreign_key_suffix</tt>
+          # @return [ String ] "_id"
           #
-          # Returns:
-          #
-          # "_id"
+          # @since 2.0.0.rc.1
           def foreign_key_suffix
             "_id"
           end
@@ -140,13 +152,10 @@ module Mongoid # :nodoc:
           # Returns the macro for this relation. Used mostly as a helper in
           # reflection.
           #
-          # Example:
+          # @example Get the macro.
+          #   Referenced::In.macro
           #
-          # <tt>Mongoid::Relations::Referenced::In.macro</tt>
-          #
-          # Returns:
-          #
-          # <tt>:referenced_in</tt>
+          # @return [ Symbol ] :referenced_in
           def macro
             :referenced_in
           end
@@ -154,18 +163,25 @@ module Mongoid # :nodoc:
           # Return the nested builder that is responsible for generating the documents
           # that will be used by this relation.
           #
-          # Example:
+          # @example Get the nested builder.
+          #   Referenced::In.builder(attributes, options)
           #
-          # <tt>Referenced::Nested::In.builder(attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes to build with.
+          # @param [ Hash ] options The options for the builder.
           #
-          # Options:
+          # @option options [ true, false ] :allow_destroy Can documents be
+          #   deleted?
+          # @option options [ Integer ] :limit Max number of documents to
+          #   create at once.
+          # @option options [ Proc, Symbol ] :reject_if If documents match this
+          #   option then they are ignored.
+          # @option options [ true, false ] :update_only Only existing documents
+          #   can be modified.
           #
-          # attributes: The attributes to build with.
-          # options: The options for the builder.
+          # @return [ NestedBuilder ] A newly instantiated nested builder object.
           #
-          # Returns:
-          #
-          # A newly instantiated nested builder object.
+          # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
@@ -173,13 +189,12 @@ module Mongoid # :nodoc:
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
-          # Example:
+          # @example Does this relation store a foreign key?
+          #   Referenced::In.stores_foreign_key?
           #
-          # <tt>Referenced::In.stores_foreign_key?</tt>
+          # @return [ true ] Always true.
           #
-          # Returns:
-          #
-          # true
+          # @since 2.0.0.rc.1
           def stores_foreign_key?
             true
           end
