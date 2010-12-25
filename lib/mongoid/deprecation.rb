@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
-  class Deprecation #:nodoc
-    include Singleton
+  module Deprecation #:nodoc
+    extend self
 
     # Alert of a deprecation. This will delegate to the logger and call warn on
     # it.
@@ -10,12 +10,12 @@ module Mongoid #:nodoc:
     #
     # <tt>deprecation.alert("Method no longer used")</tt>
     def alert(message)
-      @logger.warn("Deprecation: #{message}")
+      logger.warn("Deprecation: #{message}")
     end
 
     protected
-    def initialize
-      @logger = Mongoid::Logger.new
+    def logger
+      @logger ||= Mongoid::Logger.new
     end
   end
 end

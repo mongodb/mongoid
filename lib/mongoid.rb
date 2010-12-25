@@ -21,7 +21,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require "delegate"
-require "singleton"
 require "time"
 require "ostruct"
 require "active_support/core_ext"
@@ -130,7 +129,7 @@ module Mongoid #:nodoc
     #
     # @param [ String ] message The message to print.
     def deprecate(message)
-      Mongoid::Deprecation.instance.alert(message)
+      Mongoid::Deprecation.alert(message)
     end
   end
 
