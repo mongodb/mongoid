@@ -177,12 +177,11 @@ module Mongoid #:nodoc:
         @parent.instance_variable_set(:@building_nested, true)
         id_index, reordering = {}, false
         attributes.each do |index, attrs|
+          attrs = attrs.stringify_keys
           document = if attrs["id"].present?
             reordering = true
             id_index[attrs["id"]] = index.to_i
             detect { |document| document.id.to_s == attrs["id"].to_s }
-          else
-            detect { |document| document._index == index.to_i }
           end
           if document
             if options && options[:allow_destroy] && Boolean.set(attrs['_destroy'])
