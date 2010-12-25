@@ -14,6 +14,8 @@ module Mongoid #:nodoc:
       #   master.configure
       #
       # @return [ Mongo::DB ] The Mongo database.
+      #
+      # @since 2.0.0.rc.1
       def configure
         connection.db(name)
       end
@@ -21,7 +23,9 @@ module Mongoid #:nodoc:
       # Create the new master configuration class.
       #
       # @example Initialize the class.
-      #   Config::Master.new("uri" => { "mongodb://localhost:27001/sushi" })
+      #   Config::Master.new(
+      #     "uri" => { "mongodb://durran:password@localhost:27001/mongoid" }
+      #   )
       #
       # @param [ Hash ] options The configuration options.
       #
@@ -31,6 +35,8 @@ module Mongoid #:nodoc:
       # @option options [ String ] :port The port for the database.
       # @option options [ String ] :uri The uri for the database.
       # @option options [ String ] :username The user for authentication.
+      #
+      # @since 2.0.0.rc.1
       def initialize(options = {})
         merge!(options)
       end
@@ -43,6 +49,8 @@ module Mongoid #:nodoc:
       #   master.authenticating?
       #
       # @return [ true, false ] True if auth is needed, false if not.
+      #
+      # @since 2.0.0.rc.1
       def authenticating?
         username || password
       end
@@ -54,6 +62,8 @@ module Mongoid #:nodoc:
       #   master.build_uri
       #
       # @return [ String ] A mongo compliant URI string.
+      #
+      # @since 2.0.0.rc.1
       def build_uri
         "mongodb://".tap do |base|
           base << "#{username}:#{password}@" if authenticating?
@@ -69,6 +79,8 @@ module Mongoid #:nodoc:
       #   master.connection
       #
       # @return [ Mongo::Connection ] The mongo connection.
+      #
+      # @since 2.0.0.rc.1
       def connection
         Mongo::Connection.from_uri(
           uri, :pool_size => pool_size, :logger => Mongoid::Logger.new
@@ -83,6 +95,8 @@ module Mongoid #:nodoc:
       #   master.host
       #
       # @return [ Object ] The value in the hash.
+      #
+      # @since 2.0.0.rc.1
       def method_missing(name, *args, &block)
         self[name.to_s]
       end
@@ -94,6 +108,8 @@ module Mongoid #:nodoc:
       #   master.name
       #
       # @return [ String ] The database name.
+      #
+      # @since 2.0.0.rc.1
       def name
         db_name = URI.parse(uri).path.to_s.sub("/", "")
         db_name.blank? ? database : db_name
@@ -105,6 +121,8 @@ module Mongoid #:nodoc:
       #   master.uri
       #
       # @return [ String ] The URI for the connection.
+      #
+      # @since 2.0.0.rc.1
       def uri
         self["uri"] || build_uri
       end
