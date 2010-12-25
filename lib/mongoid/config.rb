@@ -2,148 +2,77 @@
 require "uri"
 
 module Mongoid #:nodoc
-  class Config #:nodoc
+
+  # This class defines all the configuration options for Mongoid, including the
+  # database connections.
+  #
+  # @todo Durran: This class needs an overhaul, remove singleton, etc.
+  class Config < Hash
     include Singleton
 
-    attr_accessor \
-      :allow_dynamic_fields,
-      :include_root_in_json,
-      :reconnect_time,
-      :parameterize_keys,
-      :persist_in_safe_mode,
-      :raise_not_found_error,
-      :autocreate_indexes,
-      :skip_version_check
+    class_inheritable_accessor :options
+    self.options = []
 
-    # Initializes the configuration with default settings.
-    def initialize
-      reset
-    end
+    class << self
 
-    # Sets whether the times returned from the database are in UTC or local time.
-    # If you omit this setting, then times will be returned in
-    # the local time zone.
-    #
-    # Example:
-    #
-    # <tt>Config.use_utc = true</tt>
-    #
-    # Returns:
-    #
-    # A boolean
-    def use_utc=(value)
-      @use_utc = value || false
-    end
+      # Define a configuration option with a default.
+      #
+      # @example Define the option.
+      #   Config.option(:persist_in_safe_mode, :default => false)
+      #
+      # @param [ Symbol ] name The name of the configuration option.
+      # @param [ Hash ] options Extras for the option.
+      #
+      # @option options [ Object ] :default The default value.
+      #
+      # @since 2.0.0.rc.1
+      def option(name, options = {})
+        self.options << name
 
-    # Returns whether times are return from the database in UTC. If
-    # this setting is false, then times will be returned in the local time zone.
-    #
-    # Example:
-    #
-    # <tt>Config.use_utc</tt>
-    #
-    # Returns:
-    #
-    # A boolean
-    attr_reader :use_utc
-    alias_method :use_utc?, :use_utc
-
-    # Sets the Mongo::DB master database to be used. If the object trying to be
-    # set is not a valid +Mongo::DB+, then an error will be raised.
-    #
-    # Example:
-    #
-    # <tt>Config.master = Mongo::Connection.db("test")</tt>
-    #
-    # Returns:
-    #
-    # The master +Mongo::DB+ instance.
-    def master=(db)
-      check_database!(db)
-      @master = db
-    end
-
-    # Returns the master database, or if none has been set it will raise an
-    # error.
-    #
-    # Example:
-    #
-    # <tt>Config.master</tt>
-    #
-    # Returns:
-    #
-    # The master +Mongo::DB+
-    def master
-      raise Errors::InvalidDatabase.new(nil) unless @master
-      if @reconnect
-        @reconnect = false
-        reconnect!
+        define_method(name) { has_key?(name) ? self[name] : options[:default] }
+        define_method("#{name}=") { |value| self[name] = value }
+        define_method("#{name}?") { send(name) }
       end
-      @master
     end
 
-    alias :database :master
-    alias :database= :master=
+    option :allow_dynamic_fields, :default => true
+    option :include_root_in_json, :default => false
+    option :parameterize_keys, :default => true
+    option :persist_in_safe_mode, :default => false
+    option :raise_not_found_error, :default => true
+    option :reconnect_time, :default => 3
+    option :autocreate_indexes, :default => false
+    option :skip_version_check, :default => false
+    option :time_zone, :default => nil
 
-    # Sets the Mongo::DB slave databases to be used. If the objects provided
-    # are not valid +Mongo::DBs+ an error will be raised.
+    # Adds a new I18n locale file to the load path.
     #
-    # Example:
+    # @example Add a portuguese locale.
+    #   Mongoid::Config.add_language('pt')
     #
-    # <tt>Config.slaves = [ Mongo::Connection.db("test") ]</tt>
+    # @example Add all available languages.
+    #   Mongoid::Config.add_language('*')
     #
-    # Returns:
-    #
-    # The slave DB instances.
-    def slaves=(dbs)
-      return unless dbs
-      dbs.each do |db|
-        check_database!(db)
+    # @param [ String ] language_code The language to add.
+    def add_language(language_code = nil)
+      Dir[ File.join(
+        File.dirname(__FILE__),
+        "..",
+        "config",
+        "locales",
+        "#{language_code}.yml")
+      ].each do |file|
+        I18n.load_path << File.expand_path(file)
       end
-      @slaves = dbs
-    end
-
-    # Returns the slave databases or nil if none have been set.
-    #
-    # Example:
-    #
-    # <tt>Config.slaves</tt>
-    #
-    # Returns:
-    #
-    # The slave +Mongo::DBs+
-    def slaves
-      @slaves
-    end
-
-    # Returns the logger, or defaults to Rails logger or stdout logger.
-    #
-    # Example:
-    #
-    # <tt>Config.logger</tt>
-    def logger
-      @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
-    end
-
-    # Sets the logger for Mongoid to use.
-    #
-    # Example:
-    #
-    # <tt>Config.logger = Logger.new($stdout, :warn)</tt>
-    def logger=(logger)
-      @logger = logger
     end
 
     # Return field names that could cause destructive things to happen if
-    # defined in a Mongoid::Document
+    # defined in a Mongoid::Document.
     #
-    # Example:
+    # @example Get the destructive fields.
+    #   config.destructive_fields
     #
-    # <tt>Config.destructive_fields</tt>
-    #
-    # Returns:
-    #
-    # An array of bad field names.
+    # @return [ Array<String> ] An array of bad field names.
     def destructive_fields
       @destructive_fields ||= lambda {
         klass = Class.new do
@@ -156,9 +85,10 @@ module Mongoid #:nodoc
     # Configure mongoid from a hash. This is usually called after parsing a
     # yaml config file such as mongoid.yml.
     #
-    # Example:
+    # @example Configure Mongoid.
+    #   config.from_hash({})
     #
-    # <tt>Mongoid::Config.instance.from_hash({})</tt>
+    # @param [ Hash ] settings The settings to use.
     def from_hash(settings)
       settings.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
@@ -167,27 +97,79 @@ module Mongoid #:nodoc
       _slaves(settings)
     end
 
-    # Adds a new I18n locale file to the load path
+    # Returns the logger, or defaults to Rails logger or stdout logger.
     #
-    # Example:
+    # @example Get the logger.
+    #   config.logger
     #
-    # Add portuguese locale
-    # <tt>Mongoid::config.add_language('pt')</tt>
+    # @return [ Logger ] The desired logger.
+    def logger
+      @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+    end
+
+    # Sets the logger for Mongoid to use.
     #
-    # Adds all available languages
-    # <tt>Mongoid::Config.add_language('*')</tt>
-    def add_language(language_code = nil)
-      Dir[File.join(File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml")].each do |file|
-        I18n.load_path << File.expand_path(file)
+    # @example Set the logger.
+    #   config.logger = Logger.new($stdout, :warn)
+    #
+    # @return [ Logger ] The newly set logger.
+    def logger=(logger)
+      @logger = logger
+    end
+
+    # Sets the Mongo::DB master database to be used. If the object trying to be
+    # set is not a valid +Mongo::DB+, then an error will be raised.
+    #
+    # @example Set the master database.
+    #   config.master = Mongo::Connection.db("test")
+    #
+    # @param [ Mongo::DB ] db The master database.
+    #
+    # @raise [ Errors::InvalidDatabase ] If the master isnt a valid object.
+    #
+    # @return [ Mongo::DB ] The master instance.
+    def master=(db)
+      check_database!(db)
+      @master = db
+    end
+    alias :database= :master=
+
+    # Returns the master database, or if none has been set it will raise an
+    # error.
+    #
+    # @example Get the master database.
+    #   config.master
+    #
+    # @raise [ Errors::InvalidDatabase ] If the database was not set.
+    #
+    # @return [ Mongo::DB ] The master database.
+    def master
+      raise Errors::InvalidDatabase.new(nil) unless @master
+      if @reconnect
+        @reconnect = false
+        reconnect!
       end
+      @master
+    end
+    alias :database :master
+
+    # Get the list of defined options in the configuration.
+    #
+    # @example Get the options.
+    #   config.options
+    #
+    # @return [ Array ] The list of options.
+    def options
+      self.class.options
     end
 
     # Convenience method for connecting to the master database after forking a
     # new process.
     #
-    # Example:
+    # @example Reconnect to the master.
+    #   Mongoid.reconnect!
     #
-    # <tt>Mongoid.reconnect!</tt>
+    # @param [ true, false ] now Perform the reconnection immediately?
     def reconnect!(now = true)
       if now
         master.connection.connect
@@ -200,28 +182,76 @@ module Mongoid #:nodoc
 
     # Reset the configuration options to the defaults.
     #
-    # Example:
-    #
-    # <tt>config.reset</tt>
+    # @example Reset the configuration options.
+    #   config.reset
     def reset
-      @allow_dynamic_fields = true
-      @include_root_in_json = false
-      @parameterize_keys = true
-      @persist_in_safe_mode = false
-      @raise_not_found_error = true
-      @reconnect_time = 3
-      @autocreate_indexes = false
-      @skip_version_check = false
-      @time_zone = nil
+      options.each { |option| delete(option) }
     end
+
+    # Sets the Mongo::DB slave databases to be used. If the objects provided
+    # are not valid +Mongo::DBs+ an error will be raised.
+    #
+    # @example Set the slaves.
+    #   config.slaves = [ Mongo::Connection.db("test") ]
+    #
+    # @param [ Array<Mongo::DB> ] dbs The slave databases.
+    #
+    # @raise [ Errors::InvalidDatabase ] If the slaves arent valid objects.
+    #
+    # @return [ Array<Mongo::DB> ] The slave DB instances.
+    def slaves=(dbs)
+      return unless dbs
+      dbs.each do |db|
+        check_database!(db)
+      end
+      @slaves = dbs
+    end
+
+    # Returns the slave databases or nil if none have been set.
+    #
+    # @example Get the slaves.
+    #   config.slaves
+    #
+    # @return [ Array<Mongo::DB>, nil ] The slave databases.
+    def slaves
+      @slaves
+    end
+
+    # Sets whether the times returned from the database are in UTC or local time.
+    # If you omit this setting, then times will be returned in
+    # the local time zone.
+    #
+    # @example Set the use of UTC.
+    #   config.use_utc = true
+    #
+    # @param [ true, false ] value Whether to use UTC or not.
+    #
+    # @return [ true, false ] Are we using UTC?
+    def use_utc=(value)
+      @use_utc = value || false
+    end
+
+    # Returns whether times are return from the database in UTC. If
+    # this setting is false, then times will be returned in the local time zone.
+    #
+    # @example Are we using UTC?
+    #   config.use_utc
+    #
+    # @return [ true, false ] True if UTC, false if not.
+    attr_reader :use_utc
+    alias :use_utc? :use_utc
 
     protected
 
     # Check if the database is valid and the correct version.
     #
-    # Example:
+    # @example Check if the database is valid.
+    #   config.check_database!
     #
-    # <tt>config.check_database!</tt>
+    # @param [ Mongo::DB ] database The db to check.
+    #
+    # @raise [ Errors::InvalidDatabase ] If the object is not valid.
+    # @raise [ Errors::UnsupportedVersion ] If the db version is too old.
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
       unless skip_version_check
@@ -232,11 +262,10 @@ module Mongoid #:nodoc
 
     # Get a master database from settings.
     #
-    # TODO: Durran: This code's a bit hairy, refactor.
+    # @example Configure the master db.
+    #   config._master({}, "test")
     #
-    # Example:
-    #
-    # <tt>config._master({}, "test")</tt>
+    # @param [ Hash ] settings The settings to use.
     def _master(settings)
       mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
 
@@ -257,11 +286,10 @@ module Mongoid #:nodoc
 
     # Get a bunch-o-slaves from settings and names.
     #
-    # TODO: Durran: This code's a bit hairy, refactor.
+    # @example Configure the slaves.
+    #   config._slaves({}, "test")
     #
-    # Example:
-    #
-    # <tt>config._slaves({}, "test")</tt>
+    # @param [ Hash ] settings The settings to use.
     def _slaves(settings)
       mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
       name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
