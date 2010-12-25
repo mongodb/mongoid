@@ -6,7 +6,7 @@ describe Mongoid::Associations::EmbedsMany do
     @attributes = { "addresses" => [
       { "_id" => "street-1", "street" => "Street 1", "state" => "CA" },
       { "_id" => "street-2", "street" => "Street 2" } ] }
-    @document = stub(:raw_attributes => @attributes, :add_observer => true, :observe => true, :update_child => nil)
+    @document = stub(:raw_attributes => @attributes, :add_observer => true, :observe => true, :update_child => nil, :_parent => nil, :collection => nil, :remove => nil, :new_record? => true)
   end
 
   describe "#[]" do
@@ -562,6 +562,16 @@ describe Mongoid::Associations::EmbedsMany do
       @association[2].street.should == "Street 4"
       @association[3].street.should == "Street 1"
       @association[4].street.should == "Street 5"
+    end
+
+    it 'should destroy objects without leaving +_destroy+ in attributes' do
+      @association.nested_build({
+        "0" => { "id" => "street-1", :_destroy => "false" },
+        "1" => { "id" => "street-2", :_destroy => "true" }
+      }, :allow_destroy => true)
+      @association.size.should == 1
+      @association[0].street.should == 'Street 1'
+      @association[0].attributes.has_key?('_destroy').should be_false
     end
 
   end
