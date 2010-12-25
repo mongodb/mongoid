@@ -7,5 +7,7 @@ tmp/*
 RAILS
 .bundle
 Gemfile.lock
-.rvmrc
 rdoc/*
+TODO
+ISSUES
+DONATE
