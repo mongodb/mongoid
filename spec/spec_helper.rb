@@ -12,12 +12,9 @@ LOGGER = Logger.new($stdout)
 
 Mongoid.configure do |config|
   name = "mongoid_test"
-  host = "localhost"
-  config.master = Mongo::Connection.new.db(name)
+  connection = Mongo::Connection.new
+  config.master = connection.db(name)
   config.logger = nil
-  # config.slaves = [
-    # Mongo::Connection.new(host, 27018, :slave_ok => true).db(name)
-  # ]
 end
 
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }

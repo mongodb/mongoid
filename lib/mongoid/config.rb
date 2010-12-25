@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "uri"
+require "mongoid/config/master"
 
 module Mongoid #:nodoc
 
@@ -88,8 +89,7 @@ module Mongoid #:nodoc
       options.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      _master(options)
-      _slaves(options)
+      configure_master(options)._slaves(options)
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -251,22 +251,8 @@ module Mongoid #:nodoc
     #   config._master({}, "test")
     #
     # @param [ Hash ] options The options to use.
-    def _master(options)
-      mongo_uri = options["uri"].present? ? URI.parse(options["uri"]) : OpenStruct.new
-
-      name = options["database"] || mongo_uri.path.to_s.sub("/", "")
-      host = options["host"] || mongo_uri.host || "localhost"
-      port = options["port"] || mongo_uri.port || 27017
-      pool_size = options["pool_size"] || 1
-      username = options["username"] || mongo_uri.user
-      password = options["password"] || mongo_uri.password
-
-      connection = Mongo::Connection.new(host, port, :logger => Mongoid::Logger.new, :pool_size => pool_size)
-      if username || password
-        connection.add_auth(name, username, password)
-        connection.apply_saved_authentication
-      end
-      self.master = connection.db(name)
+    def configure_master(options)
+      tap { @master = Master.new(options).configure }
     end
 
     # Get a bunch-o-slaves from options and names.
