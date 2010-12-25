@@ -3,36 +3,33 @@ require "uri"
 
 module Mongoid #:nodoc
 
-  # This class defines all the configuration options for Mongoid, including the
+  # This module defines all the configuration options for Mongoid, including the
   # database connections.
   #
-  # @todo Durran: This class needs an overhaul, remove singleton, etc.
-  class Config < Hash
-    include Singleton
+  # @todo Durran: This module needs an overhaul, remove singleton, etc.
+  module Config
+    extend self
 
-    class_inheritable_accessor :options
-    self.options = []
+    attr_accessor :settings
+    @settings = {}
 
-    class << self
-
-      # Define a configuration option with a default.
-      #
-      # @example Define the option.
-      #   Config.option(:persist_in_safe_mode, :default => false)
-      #
-      # @param [ Symbol ] name The name of the configuration option.
-      # @param [ Hash ] options Extras for the option.
-      #
-      # @option options [ Object ] :default The default value.
-      #
-      # @since 2.0.0.rc.1
-      def option(name, options = {})
-        self.options << name
-
-        define_method(name) { has_key?(name) ? self[name] : options[:default] }
-        define_method("#{name}=") { |value| self[name] = value }
-        define_method("#{name}?") { send(name) }
+    # Define a configuration option with a default.
+    #
+    # @example Define the option.
+    #   Config.option(:persist_in_safe_mode, :default => false)
+    #
+    # @param [ Symbol ] name The name of the configuration option.
+    # @param [ Hash ] options Extras for the option.
+    #
+    # @option options [ Object ] :default The default value.
+    #
+    # @since 2.0.0.rc.1
+    def option(name, options = {})
+      define_method(name) do
+        settings.has_key?(name) ? settings[name] : options[:default]
       end
+      define_method("#{name}=") { |value| settings[name] = value }
+      define_method("#{name}?") { send(name) }
     end
 
     option :allow_dynamic_fields, :default => true
@@ -44,7 +41,6 @@ module Mongoid #:nodoc
     option :autocreate_indexes, :default => false
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
-    option :logger, :default => defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
 
     # Adds a new I18n locale file to the load path.
     #
@@ -56,12 +52,10 @@ module Mongoid #:nodoc
     #
     # @param [ String ] language_code The language to add.
     def add_language(language_code = nil)
-      Dir[ File.join(
-        File.dirname(__FILE__),
-        "..",
-        "config",
-        "locales",
-        "#{language_code}.yml")
+      Dir[
+        File.join(
+          File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml"
+        )
       ].each do |file|
         I18n.load_path << File.expand_path(file)
       end
@@ -89,13 +83,33 @@ module Mongoid #:nodoc
     # @example Configure Mongoid.
     #   config.from_hash({})
     #
-    # @param [ Hash ] settings The settings to use.
-    def from_hash(settings)
-      settings.except("database", "slaves").each_pair do |name, value|
+    # @param [ Hash ] options The settings to use.
+    def from_hash(options = {})
+      options.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      _master(settings)
-      _slaves(settings)
+      _master(options)
+      _slaves(options)
+    end
+
+    # Returns the logger, or defaults to Rails logger or stdout logger.
+    #
+    # @example Get the logger.
+    #   config.logger
+    #
+    # @return [ Logger ] The desired logger.
+    def logger
+      @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+    end
+
+    # Sets the logger for Mongoid to use.
+    #
+    # @example Set the logger.
+    #   config.logger = Logger.new($stdout, :warn)
+    #
+    # @return [ Logger ] The newly set logger.
+    def logger=(logger)
+      @logger = logger
     end
 
     # Sets the Mongo::DB master database to be used. If the object trying to be
@@ -134,16 +148,6 @@ module Mongoid #:nodoc
     end
     alias :database :master
 
-    # Get the list of defined options in the configuration.
-    #
-    # @example Get the options.
-    #   config.options
-    #
-    # @return [ Array ] The list of options.
-    def options
-      self.class.options
-    end
-
     # Convenience method for connecting to the master database after forking a
     # new process.
     #
@@ -166,7 +170,7 @@ module Mongoid #:nodoc
     # @example Reset the configuration options.
     #   config.reset
     def reset
-      options.each { |option| delete(option) }
+      settings.clear
     end
 
     # Sets the Mongo::DB slave databases to be used. If the objects provided
@@ -246,16 +250,16 @@ module Mongoid #:nodoc
     # @example Configure the master db.
     #   config._master({}, "test")
     #
-    # @param [ Hash ] settings The settings to use.
-    def _master(settings)
-      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
+    # @param [ Hash ] options The options to use.
+    def _master(options)
+      mongo_uri = options["uri"].present? ? URI.parse(options["uri"]) : OpenStruct.new
 
-      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
-      host = settings["host"] || mongo_uri.host || "localhost"
-      port = settings["port"] || mongo_uri.port || 27017
-      pool_size = settings["pool_size"] || 1
-      username = settings["username"] || mongo_uri.user
-      password = settings["password"] || mongo_uri.password
+      name = options["database"] || mongo_uri.path.to_s.sub("/", "")
+      host = options["host"] || mongo_uri.host || "localhost"
+      port = options["port"] || mongo_uri.port || 27017
+      pool_size = options["pool_size"] || 1
+      username = options["username"] || mongo_uri.user
+      password = options["password"] || mongo_uri.password
 
       connection = Mongo::Connection.new(host, port, :logger => Mongoid::Logger.new, :pool_size => pool_size)
       if username || password
@@ -265,17 +269,17 @@ module Mongoid #:nodoc
       self.master = connection.db(name)
     end
 
-    # Get a bunch-o-slaves from settings and names.
+    # Get a bunch-o-slaves from options and names.
     #
     # @example Configure the slaves.
     #   config._slaves({}, "test")
     #
-    # @param [ Hash ] settings The settings to use.
-    def _slaves(settings)
-      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
-      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
+    # @param [ Hash ] options The options to use.
+    def _slaves(options)
+      mongo_uri = options["uri"].present? ? URI.parse(options["uri"]) : OpenStruct.new
+      name = options["database"] || mongo_uri.path.to_s.sub("/", "")
       self.slaves = []
-      slaves = settings["slaves"]
+      slaves = options["slaves"]
       slaves.to_a.each do |slave|
         slave_uri = slave["uri"].present? ? URI.parse(slave["uri"]) : OpenStruct.new
         slave_username = slave["username"] || slave_uri.user

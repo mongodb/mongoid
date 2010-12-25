@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       module Conversions #:nodoc:
         def get(value)
           return nil if value.blank?
-          if Mongoid::Config.instance.use_utc?
+          if Mongoid::Config.use_utc?
             value.to_date
           else
             ::Date.new(value.year, value.month, value.day)

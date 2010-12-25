@@ -117,7 +117,7 @@ module Mongoid #:nodoc
     #
     # @return [ Config ] The configuration obejct.
     def configure
-      config = Mongoid::Config.instance
+      config = Mongoid::Config
       block_given? ? yield(config) : config
     end
     alias :config :configure

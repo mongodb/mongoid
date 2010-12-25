@@ -73,7 +73,7 @@ describe Mongoid::Extensions::TimeConversions do
 
   describe ".get" do
     context "when the time zone is not defined" do
-      before { Mongoid::Config.instance.use_utc = false }
+      before { Mongoid::Config.use_utc = false }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.utc(2010, 11, 19) }
@@ -101,8 +101,8 @@ describe Mongoid::Extensions::TimeConversions do
     end
 
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.instance.use_utc = true }
-      after { Mongoid::Config.instance.use_utc = false }
+      before { Mongoid::Config.use_utc = true }
+      after { Mongoid::Config.use_utc = false }
 
       it "returns utc" do
          Time.get(@time.dup.utc).utc_offset.should == 0
@@ -118,7 +118,7 @@ describe Mongoid::Extensions::TimeConversions do
 
   describe "round trip - set then get" do
     context "when the time zone is not defined" do
-      before { Mongoid::Config.instance.use_utc = false }
+      before { Mongoid::Config.use_utc = false }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.set(Time.local(2010, 11, 19)) }
@@ -149,8 +149,8 @@ describe Mongoid::Extensions::TimeConversions do
     end
 
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.instance.use_utc = true }
-      after { Mongoid::Config.instance.use_utc = false }
+      before { Mongoid::Config.use_utc = true }
+      after { Mongoid::Config.use_utc = false }
 
       context "when the local time is not observing daylight saving" do
         before { @time = Time.set(Time.local(2010, 11, 19)) }

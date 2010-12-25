@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
 
       def get(value)
         return nil if value.blank?
-        if Mongoid::Config.instance.use_utc?
+        if Mongoid::Config.use_utc?
           value
         else
           value.getlocal

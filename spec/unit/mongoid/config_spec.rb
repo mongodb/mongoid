@@ -1,10 +1,19 @@
 require "spec_helper"
 
 describe Mongoid::Config do
-  let(:config) { Class.new(Mongoid::Config).instance }
+  let(:config) { described_class }
 
   before do
     config.reset
+  end
+
+  after(:all) do
+    Mongoid.configure do |config|
+      name = "mongoid_test"
+      host = "localhost"
+      config.master = Mongo::Connection.new.db(name)
+      config.logger = nil
+    end
   end
 
   describe "#database=" do
@@ -287,6 +296,7 @@ describe Mongoid::Config do
   describe "#master" do
     before do
       config.send(:instance_variable_set, :@master, master)
+      config.send(:instance_variable_set, :@reconnect, false)
     end
 
     context "when the database has not been configured" do

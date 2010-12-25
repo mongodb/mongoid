@@ -81,7 +81,7 @@ describe Mongoid::Extensions::Date::Conversions do
 
     context "when the time zone is not defined" do
       before do
-        Mongoid::Config.instance.use_utc = false
+        Mongoid::Config.use_utc = false
       end
 
       context "when the local time is not observing daylight saving" do
@@ -102,8 +102,8 @@ describe Mongoid::Extensions::Date::Conversions do
     end
 
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.instance.use_utc = true }
-      after { Mongoid::Config.instance.use_utc = false }
+      before { Mongoid::Config.use_utc = true }
+      after { Mongoid::Config.use_utc = false }
 
       it "returns the same day" do
          Date.get(@time.dup.utc).day.should == @time.day
@@ -120,7 +120,7 @@ describe Mongoid::Extensions::Date::Conversions do
   describe "round trip - set then get" do
     context "when the time zone is not defined" do
       before do
-        Mongoid::Config.instance.use_utc = false
+        Mongoid::Config.use_utc = false
         Time.zone = "Stockholm"
       end
       after { Time.zone = nil }
