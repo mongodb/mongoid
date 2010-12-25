@@ -5,16 +5,17 @@ require "mongoid/collections/master"
 require "mongoid/collections/slaves"
 
 module Mongoid #:nodoc
-  # The Mongoid wrapper to the Mongo Ruby driver's collection object.
+
+  # This class is the Mongoid wrapper to the Mongo Ruby driver's collection
+  # object.
   class Collection
     attr_reader :counter, :name
 
     # All write operations should delegate to the master connection. These
     # operations mimic the methods on a Mongo:Collection.
     #
-    # Example:
-    #
-    # <tt>collection.save({ :name => "Al" })</tt>
+    # @example Delegate the operation.
+    #   collection.save({ :name => "Al" })
     Collections::Operations::PROXIED.each do |name|
       define_method(name) { |*args| master.send(name, *args) }
     end
@@ -23,13 +24,15 @@ module Mongoid #:nodoc
     # defined then send to master. If the read counter is under the configured
     # maximum then return the master. In any other case return the slaves.
     #
-    # Example:
+    # @example Send the operation to the master or slaves.
+    #   collection.directed
     #
-    # <tt>collection.directed</tt>
+    # @param [ Hash ] options The operation options.
     #
-    # Return:
+    # @option options [ true, false ] :cache Should the query cache in memory?
+    # @option options [ true, false ] :enslave Send the write to the slave?
     #
-    # Either a +Master+ or +Slaves+ collection.
+    # @return [ Master, Slaves ] The connection to use.
     def directed(options = {})
       options.delete(:cache)
       enslave = options.delete(:enslave) || @klass.enslaved?
@@ -38,14 +41,13 @@ module Mongoid #:nodoc
 
     # Find documents from the database given a selector and options.
     #
-    # Options:
+    # @example Find documents in the collection.
+    #   collection.find({ :test => "value" })
     #
-    # selector: A +Hash+ selector that is the query.
-    # options: The options to pass to the db.
+    # @param [ Hash ] selector The query selector.
+    # @param [ Hash ] options The options to pass to the db.
     #
-    # Example:
-    #
-    # <tt>collection.find({ :test => "value" })</tt>
+    # @return [ Cursor ] The results.
     def find(selector = {}, options = {})
       cursor = Mongoid::Cursor.new(@klass, self, directed(options).find(selector, options))
       if block_given?
@@ -57,14 +59,13 @@ module Mongoid #:nodoc
 
     # Find the first document from the database given a selector and options.
     #
-    # Options:
+    # @example Find one document.
+    #   collection.find_one({ :test => "value" })
     #
-    # selector: A +Hash+ selector that is the query.
-    # options: The options to pass to the db.
+    # @param [ Hash ] selector The query selector.
+    # @param [ Hash ] options The options to pass to the db.
     #
-    # Example:
-    #
-    # <tt>collection.find_one({ :test => "value" })</tt>
+    # @return [ Document, nil ] A matching document or nil if none found.
     def find_one(selector = {}, options = {})
       directed(options).find_one(selector, options)
     end
@@ -72,31 +73,37 @@ module Mongoid #:nodoc
     # Initialize a new Mongoid::Collection, setting up the master, slave, and
     # name attributes. Masters will be used for writes, slaves for reads.
     #
-    # Example:
+    # @example Create the new collection.
+    #   Collection.new(masters, slaves, "test")
     #
-    # <tt>Mongoid::Collection.new(masters, slaves, "test")</tt>
+    # @param [ Class ] klass The class the collection is for.
+    # @param [ String ] name The name of the collection.
     def initialize(klass, name)
       @klass, @name = klass, name
     end
 
     # Perform a map/reduce on the documents.
     #
-    # Options:
+    # @example Perform the map/reduce.
+    #   collection.map_reduce(map, reduce)
     #
-    # map: The map javascript funcdtion.
-    # reduce: The reduce javascript function.
+    # @param [ String ] map The map javascript function.
+    # @param [ String ] reduce The reduce javascript function.
+    # @param [ Hash ] options The options to pass to the db.
+    #
+    # @return [ Cursor ] The results.
     def map_reduce(map, reduce, options = {})
       directed(options).map_reduce(map, reduce, options)
     end
-
     alias :mapreduce :map_reduce
 
     # Return the object responsible for writes to the database. This will
     # always return a collection associated with the Master DB.
     #
-    # Example:
+    # @example Get the master connection.
+    #   collection.master
     #
-    # <tt>collection.writer</tt>
+    # @return [ Master ] The master connection.
     def master
       @master ||= Collections::Master.new(Mongoid.master, @name)
     end
@@ -105,14 +112,22 @@ module Mongoid #:nodoc
     # This is usually the slave databases, but in their absence the master will
     # handle the task.
     #
-    # Example:
+    # @example Get the slaves array.
+    #   collection.slaves
     #
-    # <tt>collection.reader</tt>
+    # @return [ Slaves ] The pool of slave connections.
     def slaves
       @slaves ||= Collections::Slaves.new(Mongoid.slaves, @name)
     end
 
     protected
+
+    # Determine if the read is going to the master or the slaves.
+    #
+    # @example Use the master or slaves?
+    #   collection.master_or_slaves
+    #
+    # @return [ Master, Slaves ] Master if not slaves exist, or slaves.
     def master_or_slaves
       slaves.empty? ? master : slaves
     end
