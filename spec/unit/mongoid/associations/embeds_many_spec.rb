@@ -549,19 +549,21 @@ describe Mongoid::Associations::EmbedsMany do
     end
 
     it "should add multiple objects in the correct order" do
-      @association.nested_build({
-        "0" => { :street => "Street 3" },
-        "1" => { "id" => "street-2" },
-        "2" => { :street => "Street 4" },
-        "3" => { "id" => "street-1" },
-        "4" => { :street => "Street 5" }
-      })
-      @association.size.should == 5
-      @association[0].street.should == "Street 3"
-      @association[1].street.should == "Street 2"
-      @association[2].street.should == "Street 4"
-      @association[3].street.should == "Street 1"
+      attributes = ActiveSupport::OrderedHash.new
+      attributes["3"] = { :street => "Street 4" }
+      attributes["4"] = { :street => "Street 5" }
+      attributes["5"] = { :street => "Street 6" }
+      attributes["0"] = { "id" => "street-2" }
+      attributes["1"] = { "id" => "street-1" }
+      attributes["2"] = { :street => "Street 3" }
+      @association.nested_build attributes
+      @association.size.should == 6
+      @association[0].street.should == "Street 2"
+      @association[1].street.should == "Street 1"
+      @association[2].street.should == "Street 3"
+      @association[3].street.should == "Street 4"
       @association[4].street.should == "Street 5"
+      @association[5].street.should == "Street 6"
     end
 
     it 'should destroy objects without leaving +_destroy+ in attributes' do

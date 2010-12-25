@@ -183,6 +183,8 @@ module Mongoid #:nodoc:
             reordering = true
             id_index[attrs["id"]] = index.to_i
             detect { |document| document.id.to_s == attrs["id"].to_s }
+          else
+            detect { |document| document._index == index.to_i }
           end
           if document
             if destroy
@@ -193,6 +195,7 @@ module Mongoid #:nodoc:
             end
           elsif !destroy
             document = build(attrs)
+            document._index = nil
             id_index[document.id.to_s] = index.to_i
           end
         end
