@@ -178,19 +178,20 @@ module Mongoid #:nodoc:
         id_index, reordering = {}, false
         attributes.each do |index, attrs|
           attrs = attrs.stringify_keys
+          destroy = options && options[:allow_destroy] && Boolean.set(attrs.delete('_destroy'))
           document = if attrs["id"].present?
             reordering = true
             id_index[attrs["id"]] = index.to_i
             detect { |document| document.id.to_s == attrs["id"].to_s }
           end
           if document
-            if options && options[:allow_destroy] && Boolean.set(attrs['_destroy'])
+            if destroy
               @target.delete(document)
               document.destroy
             else
               document.write_attributes(attrs)
             end
-          else
+          elsif !destroy
             document = build(attrs)
             id_index[document.id.to_s] = index.to_i
           end
