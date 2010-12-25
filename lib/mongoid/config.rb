@@ -44,6 +44,7 @@ module Mongoid #:nodoc
     option :autocreate_indexes, :default => false
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
+    option :logger, :default => defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
 
     # Adds a new I18n locale file to the load path.
     #
@@ -95,26 +96,6 @@ module Mongoid #:nodoc
       end
       _master(settings)
       _slaves(settings)
-    end
-
-    # Returns the logger, or defaults to Rails logger or stdout logger.
-    #
-    # @example Get the logger.
-    #   config.logger
-    #
-    # @return [ Logger ] The desired logger.
-    def logger
-      @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
-    end
-
-    # Sets the logger for Mongoid to use.
-    #
-    # @example Set the logger.
-    #   config.logger = Logger.new($stdout, :warn)
-    #
-    # @return [ Logger ] The newly set logger.
-    def logger=(logger)
-      @logger = logger
     end
 
     # Sets the Mongo::DB master database to be used. If the object trying to be
