@@ -527,7 +527,7 @@ describe Mongoid::Associations::EmbedsMany do
     end
 
     it "should update existing documents" do
-      @association.nested_build({ "0" => { :id => "street-1", :street => "Yet Another" } })
+      @association.nested_build({ "0" => { :street => "Yet Another" } })
       @association.size.should == 2
       @association[0].street.should == "Yet Another"
     end
