@@ -247,8 +247,8 @@ module Mongoid #:nodoc
 
     # Get a master database from settings.
     #
-    # @example Configure the master db.
-    #   config.configure_master("database" => "mongoid")
+    # @example Configure the master and slave dbs.
+    #   config.configure_databases("database" => "mongoid")
     #
     # @param [ Hash ] options The options to use.
     #
@@ -256,6 +256,7 @@ module Mongoid #:nodoc
     # @option options [ String ] :host The database host.
     # @option options [ String ] :password The password for authentication.
     # @option options [ Integer ] :port The port for the database.
+    # @option options [ Array<Hash> ] :slaves The slave db options.
     # @option options [ String ] :uri The uri for the database.
     # @option options [ String ] :username The user for authentication.
     #
