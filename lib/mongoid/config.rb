@@ -319,10 +319,9 @@ module Mongoid #:nodoc
         port = replica["port"] || mongo_uri.port || 27017
         set << [host,port]
       end
-
+      set << {:read_secondary => self.allow_read_secondary}
       unless set.empty?
-        connection =  Mongo::ReplSetConnection.new(*set, 
-                                                   :allow_read_secondary => self.allow_read_secondary)
+        connection =  Mongo::ReplSetConnection.new(*set)
         self.replica_set = connection.db(name)
         self.primary = self.replica_set
       end
