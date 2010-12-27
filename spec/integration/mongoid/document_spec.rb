@@ -50,7 +50,7 @@ describe Mongoid::Document do
   describe "#db" do
 
     it "returns the mongo database" do
-      Person.db.should == Mongoid.master
+      Person.db.should be_a(Mongo::DB)
     end
   end
 

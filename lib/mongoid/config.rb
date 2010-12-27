@@ -1,6 +1,6 @@
 # encoding: utf-8
 require "uri"
-require "mongoid/config/master"
+require "mongoid/config/database"
 
 module Mongoid #:nodoc
 
@@ -11,7 +11,7 @@ module Mongoid #:nodoc
   module Config
     extend self
 
-    attr_accessor :settings
+    attr_accessor :master, :slaves, :settings
     @settings = {}
 
     # Define a configuration option with a default.
@@ -89,7 +89,7 @@ module Mongoid #:nodoc
       options.except("database", "slaves").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      configure_master(options)._slaves(options)
+      configure_databases(options)
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -248,41 +248,20 @@ module Mongoid #:nodoc
     # Get a master database from settings.
     #
     # @example Configure the master db.
-    #   config._master({}, "test")
+    #   config.configure_master("database" => "mongoid")
     #
     # @param [ Hash ] options The options to use.
-    def configure_master(options)
-      tap { @master = Master.new(options).configure }
-    end
-
-    # Get a bunch-o-slaves from options and names.
     #
-    # @example Configure the slaves.
-    #   config._slaves({}, "test")
+    # @option options [ String ] :database The database name.
+    # @option options [ String ] :host The database host.
+    # @option options [ String ] :password The password for authentication.
+    # @option options [ Integer ] :port The port for the database.
+    # @option options [ String ] :uri The uri for the database.
+    # @option options [ String ] :username The user for authentication.
     #
-    # @param [ Hash ] options The options to use.
-    def _slaves(options)
-      mongo_uri = options["uri"].present? ? URI.parse(options["uri"]) : OpenStruct.new
-      name = options["database"] || mongo_uri.path.to_s.sub("/", "")
-      self.slaves = []
-      slaves = options["slaves"]
-      slaves.to_a.each do |slave|
-        slave_uri = slave["uri"].present? ? URI.parse(slave["uri"]) : OpenStruct.new
-        slave_username = slave["username"] || slave_uri.user
-        slave_password = slave["password"] || slave_uri.password
-
-        slave_connection = Mongo::Connection.new(
-          slave["host"] || slave_uri.host || "localhost",
-          slave["port"] || slave_uri.port,
-          :slave_ok => true
-        )
-
-        if slave_username || slave_password
-          slave_connection.add_auth(name, slave_username, slave_password)
-          slave_connection.apply_saved_authentication
-        end
-        self.slaves << slave_connection.db(name)
-      end
+    # @since 2.0.0.rc.1
+    def configure_databases(options)
+      @master, @slaves = Database.new(options).configure
     end
   end
 end
