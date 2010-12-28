@@ -32,6 +32,32 @@ describe Mongoid::Config::Database do
 
       context "when provided a uri" do
 
+        context "when the uri is on mongohq", :config => :mongohq do
+
+          let(:mongohq_user) do
+            ENV["MONGOHQ_USER_MONGOID"]
+          end
+
+          let(:mongohq_password) do
+            ENV["MONGOHQ_PASSWORD_MONGOID"]
+          end
+
+          let(:options) do
+            {
+              "uri" =>
+              "mongodb://#{mongohq_user}:#{mongohq_password}@flame.mongohq.com:27040/mongoid"
+            }
+          end
+
+          it "connects to the proper host" do
+            node[0].should == "flame.mongohq.com"
+          end
+
+          it "connects to the proper port" do
+            node[1].should == 27040
+          end
+        end
+
         context "when no pool size provided", :config => :user do
 
           let(:options) do
