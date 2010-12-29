@@ -42,6 +42,32 @@ module Mongoid #:nodoc:
         @count ||= filter.size
       end
 
+      # Delete all the documents in the database matching the selector.
+      #
+      # @example Delete the documents.
+      #   context.delete_all
+      #
+      # @return [ Integer ] The number of documents deleted.
+      #
+      # @since 2.0.0.rc.1
+      def delete_all
+        count.tap { filter.each(&:delete) }
+      end
+      alias :delete :delete_all
+
+      # Destroy all the documents in the database matching the selector.
+      #
+      # @example Destroy the documents.
+      #   context.destroy_all
+      #
+      # @return [ Integer ] The number of documents destroyed.
+      #
+      # @since 2.0.0.rc.1
+      def destroy_all
+        count.tap { filter.each(&:destroy) }
+      end
+      alias :destroy :destroy_all
+
       # Gets an array of distinct values for the supplied field across the
       # entire array or the susbset given the criteria.
       #
