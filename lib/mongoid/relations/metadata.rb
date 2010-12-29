@@ -52,7 +52,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def class_name
-        self[:class_name] || classify
+        @class_name ||= (self[:class_name] || classify)
       end
 
       # Will determine if the relation is an embedded one or not. Currently
@@ -182,7 +182,8 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_foreign_key
-        inverse_class_name.underscore << relation.foreign_key_suffix
+        @inverse_foreign_key ||=
+          (inverse_class_name.underscore << relation.foreign_key_suffix)
       end
 
       # Returns the inverse class of the proxied relation.
@@ -352,12 +353,45 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def cyclic_inverse
+        @cyclic_inverse ||= determine_cyclic_inverse
+      end
+
+      # Determine the cyclic inverse. Performance improvement with the
+      # memoization.
+      #
+      # @example Determine the inverse.
+      #   metadata.determine_cyclic_inverse
+      #
+      # @return [ String ] The cyclic inverse name.
+      #
+      # @since 2.0.0.rc.1
+      def determine_cyclic_inverse
         klass.relations.each_pair do |key, meta|
           if key =~ /#{inverse_klass.name.underscore}/ &&
             meta.relation != relation
             return key.to_sym
           end
         end
+      end
+
+      # Determine the inverse relation. Memoizing #inverse_relation and adding
+      # this method dropped 5 seconds off the test suite as a performance
+      # improvement.
+      #
+      # @example Determine the inverse.
+      #   metadata.determine_inverse_relation
+      #
+      # @return [ Symbol ] The name of the inverse.
+      #
+      # @since 2.0.0.rc.1
+      def determine_inverse_relation
+        klass.relations.each_pair do |key, meta|
+          if key =~ /#{inverse_klass.name.underscore}/ ||
+            meta.class_name == inverse_class_name
+            return key.to_sym
+          end
+        end
+        return inverse_klass.name.underscore.to_sym
       end
 
       # Determine the name of the inverse relation.
@@ -369,13 +403,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_relation
-        klass.relations.each_pair do |key, meta|
-          if key =~ /#{inverse_klass.name.underscore}/ ||
-            meta.class_name == inverse_class_name
-            return key.to_sym
-          end
-        end
-        return inverse_klass.name.underscore.to_sym
+        @inverse_relation ||= determine_inverse_relation
       end
 
       # Infer the name of the inverse relation from the class.
@@ -387,7 +415,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_name
-        inverse_klass.name.underscore
+        @inverse_name ||= inverse_klass.name.underscore
       end
 
       # For polymorphic children, we need to figure out the inverse from the
@@ -426,11 +454,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def method_missing(name, *args)
         method = name.to_s
-        if method.include?('?')
-          has_key?(method.sub('?', '').to_sym)
-        else
-          self[name]
-        end
+        method =~ /\?/ ? has_key?(method.sub('?', '').to_sym) : self[name]
       end
     end
   end
