@@ -11,6 +11,13 @@ module Mongoid #:nodoc:
       #
       # @example Create the document.
       #   Person.where(:title => "Sir").create
+      #
+      # @example Create with selectors getting ignored.
+      #   Person.where(:age.gt => 5).create
+      #
+      # @return [ Document ] A newly created document.
+      #
+      # @since 2.0.0.rc.1
       def create
         klass.create(
           selector.inject({}) do |hash, (key, value)|
