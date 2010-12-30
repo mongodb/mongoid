@@ -10,7 +10,11 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
 
-      config.generators.orm :mongoid, :migration => false
+      if config.respond_to?(:app_generators)
+        config.app_generators.orm :mongoid, :migration => false
+      else
+        config.generators.orm :mongoid, :migration => false
+      end
 
       rake_tasks do
         load "mongoid/railties/database.rake"
