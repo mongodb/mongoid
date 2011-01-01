@@ -69,8 +69,17 @@ describe Mongoid::Finders do
               ])
             }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
+        end
+      end
 
-          pending "Github 261: Passing an empty array returns empty array"
+      context "when passing an empty array" do
+
+        let(:people) do
+          Person.find([])
+        end
+
+        it "returns an empty array" do
+          people.should be_empty
         end
       end
     end
