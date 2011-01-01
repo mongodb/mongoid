@@ -19,7 +19,11 @@ module Mongoid # :nodoc:
             if object.is_a?(Hash)
               return Mongoid::Factory.build(metadata.klass, object)
             end
-            (type ? type.constantize : metadata.klass).find(object)
+            begin
+              (type ? type.constantize : metadata.klass).find(object)
+            rescue Errors::DocumentNotFound
+              return nil
+            end
           end
         end
       end
