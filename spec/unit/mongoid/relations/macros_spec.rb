@@ -6,6 +6,7 @@ describe Mongoid::Relations::Macros do
     include Mongoid::Relations
     include Mongoid::Dirty
     include Mongoid::Fields
+    include Mongoid::Validations
   end
 
   let(:klass) do
@@ -14,6 +15,7 @@ describe Mongoid::Relations::Macros do
 
   before do
     klass.relations.clear
+    klass._validators.clear
   end
 
   describe ".embedded_in" do
@@ -43,6 +45,10 @@ describe Mongoid::Relations::Macros do
       it "creates the correct relation" do
         klass.relations["person"].relation.should ==
           Mongoid::Relations::Embedded::In
+      end
+
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
 
       context "metadata properties" do
@@ -91,6 +97,12 @@ describe Mongoid::Relations::Macros do
           Mongoid::Relations::Embedded::Many
       end
 
+      it "adds an associated validation" do
+        klass._validators[:addresses].first.should be_a(
+          Mongoid::Validations::AssociatedValidator
+        )
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -105,15 +117,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+    end
 
-      context "when not adding validation options" do
+    context "when setting validate to false" do
 
-        pending "Github 220: Add association validation to related models"
+      before do
+        klass.embeds_many(:addresses, :validate => false)
       end
 
-      context "when setting validate to false" do
-
-        pending "Github 220: Add association validation to related models"
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
     end
   end
@@ -155,6 +168,12 @@ describe Mongoid::Relations::Macros do
           Mongoid::Relations::Embedded::One
       end
 
+      it "adds an associated validation" do
+        klass._validators[:name].first.should be_a(
+          Mongoid::Validations::AssociatedValidator
+        )
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -169,15 +188,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+    end
 
-      context "when not adding validation options" do
+    context "when setting validate to false" do
 
-        pending "Github 220: Add association validation to related models"
+      before do
+        klass.embeds_one(:name, :validate => false)
       end
 
-      context "when setting validate to false" do
-
-        pending "Github 220: Add association validation to related models"
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
     end
   end
@@ -213,6 +233,10 @@ describe Mongoid::Relations::Macros do
 
       it "creates the field for the foreign key" do
         klass.allocate.should respond_to(:person_id)
+      end
+
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
 
       context "metadata properties" do
@@ -261,6 +285,12 @@ describe Mongoid::Relations::Macros do
           Mongoid::Relations::Referenced::Many
       end
 
+      it "adds an associated validation" do
+        klass._validators[:posts].first.should be_a(
+          Mongoid::Validations::AssociatedValidator
+        )
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -275,15 +305,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+    end
 
-      context "when not adding validation options" do
+    context "when setting validate to false" do
 
-        pending "Github 220: Add association validation to related models"
+      before do
+        klass.references_many(:posts, :validate => false)
       end
 
-      context "when setting validate to false" do
-
-        pending "Github 220: Add association validation to related models"
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
     end
   end
@@ -321,6 +352,12 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:preference_ids)
       end
 
+      it "adds an associated validation" do
+        klass._validators[:preferences].first.should be_a(
+          Mongoid::Validations::AssociatedValidator
+        )
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -335,15 +372,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+    end
 
-      context "when not adding validation options" do
+    context "when setting validate to false" do
 
-        pending "Github 220: Add association validation to related models"
+      before do
+        klass.references_and_referenced_in_many(:preferences, :validate => false)
       end
 
-      context "when setting validate to false" do
-
-        pending "Github 220: Add association validation to related models"
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
     end
   end
@@ -385,6 +423,12 @@ describe Mongoid::Relations::Macros do
           Mongoid::Relations::Referenced::One
       end
 
+      it "adds an associated validation" do
+        klass._validators[:game].first.should be_a(
+          Mongoid::Validations::AssociatedValidator
+        )
+      end
+
       context "metadata properties" do
 
         let(:metadata) do
@@ -399,15 +443,16 @@ describe Mongoid::Relations::Macros do
           metadata.inverse_class_name.should == "TestClass"
         end
       end
+    end
 
-      context "when not adding validation options" do
+    context "when setting validate to false" do
 
-        pending "Github 220: Add association validation to related models"
+      before do
+        klass.references_one(:game, :validate => false)
       end
 
-      context "when setting validate to false" do
-
-        pending "Github 220: Add association validation to related models"
+      it "does not add associated validations" do
+        klass._validators.should be_empty
       end
     end
   end

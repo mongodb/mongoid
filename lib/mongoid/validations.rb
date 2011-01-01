@@ -49,6 +49,21 @@ module Mongoid #:nodoc:
       def validates_uniqueness_of(*args)
         validates_with(UniquenessValidator, _merge_attributes(args))
       end
+
+      protected
+
+      # Adds an associated validator for the relation if the validate option
+      # was not provided or set to true.
+      #
+      # @example Set up validation.
+      #   Person.validate_relation(metadata)
+      #
+      # @param [ Metadata ] metadata The relation metadata.
+      #
+      # @since 2.0.0.rc.1
+      def validate_relation(metadata)
+        validates_associated(metadata.name) if metadata.validate?
+      end
     end
   end
 end

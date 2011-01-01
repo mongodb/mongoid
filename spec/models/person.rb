@@ -34,10 +34,10 @@ class Person
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites
-  embeds_many :videos
-  embeds_many :phone_numbers, :class_name => "Phone"
-  embeds_many :addresses, :as => :addressable do
+  embeds_many :favorites, :validate => false
+  embeds_many :videos, :validate => false
+  embeds_many :phone_numbers, :class_name => "Phone", :validate => false
+  embeds_many :addresses, :as => :addressable, :validate => false do
     def extension
       "Testing"
     end
@@ -45,10 +45,10 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
-  embeds_many :address_components
+  embeds_many :address_components, :validate => false
 
-  embeds_one :pet, :class_name => "Animal"
-  embeds_one :name, :as => :namable do
+  embeds_one :pet, :class_name => "Animal", :validate => false
+  embeds_one :name, :as => :namable, :validate => false do
     def extension
       "Testing"
     end
@@ -64,20 +64,24 @@ class Person
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
   accepts_nested_attributes_for :posts
 
-  references_one :game, :dependent => :destroy do
+  references_one :game, :dependent => :destroy, :validate => false do
     def extension
       "Testing"
     end
   end
 
-  references_many :posts, :dependent => :delete do
+  references_many :posts, :dependent => :delete, :validate => false do
     def extension
       "Testing"
     end
   end
-  references_many :paranoid_posts
-  references_and_referenced_in_many :preferences, :index => true, :dependent => :nullify
-  references_and_referenced_in_many :user_accounts
+  references_many :paranoid_posts, :validate => false
+  references_and_referenced_in_many \
+    :preferences,
+    :index => true,
+    :dependent => :nullify,
+    :validate => false
+  references_and_referenced_in_many :user_accounts, :validate => false
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20

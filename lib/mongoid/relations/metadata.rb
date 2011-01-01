@@ -355,6 +355,18 @@ module Mongoid # :nodoc:
         name.to_s << "="
       end
 
+      # Are we validating this relation automatically?
+      #
+      # @example Is automatic validation on?
+      #   metadata.validate?
+      #
+      # @return [ true, false ] True unless explictly set to false.
+      #
+      # @since 2.0.0.rc.1
+      def validate?
+        self[:validate] != false
+      end
+
       private
 
       # Returns the class name for the relation.
