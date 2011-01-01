@@ -196,7 +196,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns nil" do
-        @person.attribute_was("title").should be_nil
+        @person.attribute_was("title").should == "Grand Poobah"
       end
     end
   end

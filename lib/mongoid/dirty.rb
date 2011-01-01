@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
     # The old field value.
     def attribute_was(name)
       change = modifications[name]
-      change ? change[0] : nil
+      change ? change[0] : @attributes[name]
     end
 
     # Gets the names of all the fields that have changed in the document.
@@ -156,10 +156,8 @@ module Mongoid #:nodoc:
     # The old field value.
     def reset_attribute!(name)
       value = attribute_was(name)
-      if value
-        @attributes[name] = value
-        modifications.delete(name)
-      end
+      value ? @attributes[name] = value : @attributes.delete(name)
+      modifications.delete(name)
     end
 
     # Sets up the modifications hash. This occurs just after the document is

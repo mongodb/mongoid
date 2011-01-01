@@ -143,6 +143,7 @@ module Mongoid #:nodoc:
       @new_record = true
       @attributes = default_attributes
       process(attrs)
+      reset_modifications
       document = yield self if block_given?
       identify
       run_callbacks(:initialize) { document }
