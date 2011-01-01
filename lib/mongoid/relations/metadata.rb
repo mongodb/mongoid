@@ -154,6 +154,39 @@ module Mongoid # :nodoc:
         merge!(properties)
       end
 
+      # Since a lot of the information from the metadata is inferred and not
+      # explicitly stored in the hash, the inspection needs to be much more
+      # detailed.
+      #
+      # @example Inspect the metadata.
+      #   metadata.inspect
+      #
+      # @return [ String ] Oodles of information in a nice format.
+      #
+      # @since 2.0.0.rc.1
+      def inspect
+        "#<Mongoid::Relations::Metadata\n" <<
+        "  class_name:           #{class_name},\n" <<
+        "  cyclic:               #{cyclic || "No"},\n" <<
+        "  dependent:            #{dependent || "None"},\n" <<
+        "  foreign_key:          #{foreign_key},\n" <<
+        "  foreign_key_default:  #{foreign_key_default},\n" <<
+        "  foreign_key_setter:   #{foreign_key_setter},\n" <<
+        "  inverse_foreign_key:  #{inverse_foreign_key},\n" <<
+        "  inverse_klass:        #{inverse_klass},\n" <<
+        "  inverse_of:           #{inverse_of || "N/A"},\n" <<
+        "  inverse_setter:       #{inverse_setter},\n" <<
+        "  inverse_type:         #{inverse_type || "N/A"},\n" <<
+        "  inverse_type_setter:  #{inverse_type_setter || "N/A"},\n" <<
+        "  key:                  #{key},\n" <<
+        "  klass:                #{klass},\n" <<
+        "  macro:                #{macro},\n" <<
+        "  name:                 #{name},\n" <<
+        "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<
+        "  relation:             #{relation},\n" <<
+        "  setter:               #{setter}>"
+      end
+
       # Get the name of the inverse relation if it exists. If this is a
       # polymorphic relation then just return the :as option that was defined.
       #
