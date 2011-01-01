@@ -1,5 +1,8 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
+  # This is the base module for all domain objects that need to be persisted to
+  # the database as documents.
   module Document
     extend ActiveSupport::Concern
 
@@ -10,15 +13,12 @@ module Mongoid #:nodoc:
 
     # Default comparison is via the string version of the id.
     #
-    # Example:
+    # @example Compare two documents.
+    #   person <=> other_person
     #
-    # <tt>person <=> person</tt>
+    # @param [ Document ] other The document to compare with.
     #
-    # Options:
-    #
-    # other: The document to compare with.
-    #
-    # Returns -1, 0, 1.
+    # @return [ Integer ] -1, 0, 1.
     def <=>(other)
       id.to_s <=> other.id.to_s
     end
@@ -26,17 +26,12 @@ module Mongoid #:nodoc:
     # Performs equality checking on the document ids. For more robust
     # equality checking please override this method.
     #
-    # Example:
+    # @example Compare for equality.
+    #   document == other
     #
-    # <tt>document == other</tt>
+    # @param [ Document, Object ] other The other object to compare with.
     #
-    # Options:
-    #
-    # other: The other object to compare with
-    #
-    # Returns:
-    #
-    # true if the ids are equal, false if not.
+    # @return [ true, false ] True if the ids are equal, false if not.
     def ==(other)
       return false unless other.is_a?(Document)
       id == other.id || equal?(other)
@@ -44,34 +39,24 @@ module Mongoid #:nodoc:
 
     # Performs class equality checking.
     #
-    # Example:
+    # @example Compare the classes.
+    #   document === other
     #
-    # <tt>document === other</tt>
+    # @param [ Document, Object ] other The other object to compare with.
     #
-    # Options:
-    #
-    # other: The other object to compare with
-    #
-    # Returns:
-    #
-    # true if the classes are equal, false if not.
+    # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
       self.class == other.class
     end
 
     # Delegates to ==. Used when needing checks in hashes.
     #
-    # Example:
+    # @example Perform equality checking.
+    #   document.eql?(other)
     #
-    # <tt>document.eql?(other)</tt>
+    # @param [ Document, Object ] other The object to check against.
     #
-    # Options:
-    #
-    # other: The object to check against.
-    #
-    # Returns:
-    #
-    # true if equal, false if not.
+    # @return [ true, false ] True if equal, false if not.
     def eql?(other)
       self == (other)
     end
@@ -82,13 +67,10 @@ module Mongoid #:nodoc:
     #   [ Person.find(1), Person.find(2), Person.find(3) ] &
     #   [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
     #
-    # Example:
+    # @example Get the hash.
+    #   document.hash
     #
-    # <tt>document.hash</tt>
-    #
-    # Returns:
-    #
-    # The hash of the document's id.
+    # @return [ Integer ] The hash of the document's id.
     def hash
       id.hash
     end
@@ -97,26 +79,20 @@ module Mongoid #:nodoc:
     # convenience - use +Document#raw_attributes+ where you dont care if the
     # keys are all strings.
     #
-    # Example:
+    # @example Get the attributes.
+    #   person.attributes
     #
-    # <tt>person.attributes</tt>
-    #
-    # Returns:
-    #
-    # The attributes hash with indifferent access.
+    # @return [ HashWithIndifferentAccess ] The attributes.
     def attributes
       @attributes.with_indifferent_access
     end
 
     # Generate an id for this +Document+.
     #
-    # Example:
+    # @example Create the id.
+    #   person.identify
     #
-    # <tt>person.identify</tt>
-    #
-    # Returns:
-    #
-    # A newly created id based on the strategy for creation.
+    # @return [ BSON::ObjectId, String ] A newly created id.
     def identify
       Identity.new(self).create
     end
@@ -128,17 +104,12 @@ module Mongoid #:nodoc:
     # If a primary key is defined, the document's id will be set to that key,
     # otherwise it will be set to a fresh +BSON::ObjectId+ string.
     #
-    # Example:
+    # @example Create a new document.
+    #   Person.new(:title => "Sir")
     #
-    # <tt>Person.new(:title => "Sir")</tt>
+    # @param [ Hash ] attrs The attributes to set up the document with.
     #
-    # Options:
-    #
-    # attrs: The attributes +Hash+ to set up the document with.
-    #
-    # Returns:
-    #
-    # A new document.
+    # @return [ Document ] A new document.
     def initialize(attrs = nil)
       @new_record = true
       @attributes = default_attributes
@@ -151,13 +122,10 @@ module Mongoid #:nodoc:
 
     # Return the attributes hash.
     #
-    # Example:
+    # @example Get the untouched attributes.
+    #   person.raw_attributes
     #
-    # <tt>person.raw_attributes</tt>
-    #
-    # Returns:
-    #
-    # This document's attributes.
+    # @return [ Hash ] This document's attributes.
     def raw_attributes
       @attributes
     end
@@ -166,13 +134,12 @@ module Mongoid #:nodoc:
     # not been saved then an error will get raised if the configuration option
     # was set.
     #
-    # Example:
+    # @example Reload the document.
+    #   person.reload
     #
-    # <tt>person.reload</tt>
+    # @raise [ Errors::DocumentNotFound ] If the document was deleted.
     #
-    # Returns:
-    #
-    # The document, reloaded.
+    # @return [ Document ] The document, reloaded.
     def reload
       reloaded = collection.find_one(:_id => id)
       if Mongoid.raise_not_found_error
@@ -188,20 +155,15 @@ module Mongoid #:nodoc:
       end
     end
 
-    # TODO: Need to reindex at this point for embeds many.
-    #
     # Remove a child document from this parent. If an embeds one then set to
     # nil, otherwise remove from the embeds many.
     #
     # This is called from the +RemoveEmbedded+ persistence command.
     #
-    # Example:
+    # @example Remove the child.
+    #   document.remove_child(child)
     #
-    # <tt>document.remove_child(child)</tt>
-    #
-    # Options:
-    #
-    # child: The child (embedded) document to remove.
+    # @param [ Document ] child The child (embedded) document to remove.
     def remove_child(child)
       name = child.metadata.name
       if child.embedded_one?
@@ -213,13 +175,10 @@ module Mongoid #:nodoc:
 
     # Return an array with this +Document+ only in it.
     #
-    # Example:
+    # @example Return the document in an array.
+    #   document.to_a
     #
-    # <tt>document.to_a</tt>
-    #
-    # Returns:
-    #
-    # An array with the document as its only item.
+    # @return [ Array<Document> ] An array with the document as its only item.
     def to_a
       [ self ]
     end
@@ -228,13 +187,10 @@ module Mongoid #:nodoc:
     # below. Used when the attributes are needed for everything and not just
     # the current document.
     #
-    # Example:
+    # @example Get the full hierarchy.
+    #   person.to_hash
     #
-    # <tt>person.to_hash</tt>
-    #
-    # Returns:
-    #
-    # A hash of all attributes in the hierarchy.
+    # @return [ Hash ] A hash of all attributes in the hierarchy.
     def to_hash
       attributes = @attributes
       attributes.tap do |attrs|
@@ -250,18 +206,12 @@ module Mongoid #:nodoc:
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #
-      # Example:
+      # @example Create the document.
+      #   Person.instantiate(:title => "Sir", :age => 30)
       #
-      # <tt>Person.instantiate(:title => "Sir", :age => 30)</tt>
+      # @param [ Hash ] attrs The hash of attributes to instantiate with.
       #
-      # Options:
-      #
-      # attrs: The hash of attributes to instantiate with.
-      # allocating: Set to true if cloning.
-      #
-      # Returns:
-      #
-      # A new document.
+      # @return [ Document ] A new document.
       def instantiate(attrs = nil)
         attributes = attrs || {}
         if attributes["_id"]
@@ -276,13 +226,10 @@ module Mongoid #:nodoc:
 
       # Returns all types to query for when using this class as the base.
       #
-      # Example:
+      # @example Get the types.
+      #   document._types
       #
-      # <tt>document._types</tt>
-      #
-      # Returns:
-      #
-      # All subclasses of the current document.
+      # @return [ Array<Class> ] All subclasses of the current document.
       def _types
         @_type ||= [descendants + [self]].flatten.uniq.map(&:to_s)
       end
