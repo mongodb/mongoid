@@ -56,6 +56,22 @@ module Mongoid #:nodoc:
       end
       alias :or :any_of
 
+      # Using the existing criteria, find a document by a single id, multiple
+      # ids, or using a conditions hash.
+      #
+      # @example Find a single document by id.
+      #   Person.where(:title => "Sir").find(id)
+      #
+      # @example Find multiple documents by ids.
+      #   Person.where(:title => "Sir").find([ id_one, id_two ])
+      #
+      # @return [ Document, Array<Document> ] The matching document(s).
+      #
+      # @since 2.0.0.rc.1
+      def find(*args)
+        id_criteria(*args)
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values where any can
       # be matched in order to return results. This is similar to an SQL "IN"
       # clause. The MongoDB conditional operator that will be used is "$in".

@@ -25,13 +25,13 @@ module Mongoid #:nodoc:
   #
   # <tt>criteria.execute</tt>
   class Criteria
+    include Enumerable
     include Criterion::Creational
     include Criterion::Destructive
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Inspection
     include Criterion::Optional
-    include Enumerable
 
     attr_accessor :collection, :documents, :embedded, :ids, :klass, :options, :selector
 
