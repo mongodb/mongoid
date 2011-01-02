@@ -3,10 +3,43 @@ require "spec_helper"
 describe Mongoid::Relations::Accessors do
 
   before do
-    [ Book, Movie, Rating ].each(&:delete_all)
+    [ Book, Movie, Rating, Person, Preference ].each(&:delete_all)
   end
 
   describe "\#{getter}" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create(:ssn => "666-66-6666")
+      end
+
+      context "when reloading" do
+
+        context "when reloading with a many to many" do
+
+          let(:preference) do
+            Preference.create(:name => "Setting")
+          end
+
+          let(:preferences) do
+            person.preferences(true)
+          end
+
+          before do
+            person.preferences << preference
+          end
+
+          it "reloads the correct documents" do
+            preferences.should == [ preference ]
+          end
+
+          it "reloads a new instance" do
+            preferences.first.should_not equal(preference)
+          end
+        end
+      end
+    end
 
     context "when the relation is polymorphic" do
 

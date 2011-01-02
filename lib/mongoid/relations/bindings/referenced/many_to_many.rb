@@ -26,8 +26,11 @@ module Mongoid # :nodoc:
           #
           # @param [ Document ] doc The document to bind.
           def bind_one(doc)
-            base.send(metadata.foreign_key).push(doc.id)
-            doc.send(metadata.inverse(target)).push(base)
+            keys = base.send(metadata.foreign_key)
+            unless keys.include?(doc.id)
+              keys.push(doc.id)
+              doc.send(metadata.inverse(target)).push(base)
+            end
           end
 
           # Unbinds the base object to the inverse of the relation. This occurs
