@@ -11,17 +11,6 @@ describe Mongoid::Collections do
     it "sets the collection name to the class pluralized" do
       Person.collection.name.should == "people"
     end
-
-    context "when document is embedded" do
-
-      before do
-        @address = Address.new
-      end
-
-      it "raises an error" do
-        lambda { Address.collection }.should raise_error
-      end
-    end
   end
 
   describe ".collection_name=" do

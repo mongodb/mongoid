@@ -2,12 +2,14 @@ require "spec_helper"
 
 describe Mongoid::Callbacks do
 
+  class TestClass
+    include Mongoid::Callbacks
+  end
+
   describe ".included" do
 
     before do
-      @class = Class.new do
-        include Mongoid::Callbacks
-      end
+      @class = TestClass
     end
 
     it "includes the before_create callback" do

@@ -21,6 +21,15 @@ module Mongoid #:nodoc:
       end
       alias update merge!
 
+      if RUBY_VERSION < '1.9'
+        def inspect
+          ret = self.keys.inject([]) do |ret, key|
+            ret << "#{key.inspect}=>#{self[key].inspect}"
+          end
+          "{#{ret.sort.join(', ')}}"
+        end
+      end
+
       private
 
       def try_to_typecast(key, value)

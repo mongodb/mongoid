@@ -2,16 +2,18 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Exclusion do
 
-  before do
-    @criteria = Mongoid::Criteria.new(Person)
-    @canvas_criteria = Mongoid::Criteria.new(Canvas)
+  let(:base) do
+    Mongoid::Criteria.new(Person)
   end
 
   describe "#excludes" do
 
+    let(:criteria) do
+      base.excludes(:title => "Bad Title", :text => "Bad Text")
+    end
+
     it "adds the $ne query to the selector" do
-      @criteria.excludes(:title => "Bad Title", :text => "Bad Text")
-      @criteria.selector.should ==
+      criteria.selector.should ==
         {
           :title =>
             { "$ne" => "Bad Title"},
@@ -20,38 +22,51 @@ describe Mongoid::Criterion::Exclusion do
         }
     end
 
-    it "returns self" do
-      @criteria.excludes(:title => "Bad").should == @criteria
+    it "returns a copy" do
+      base.excludes(:title => "Bad").should_not eql(base)
     end
 
     context "when passing an id" do
 
-      it "accepts id" do
-        @criteria.excludes(:id => "1")
-        @criteria.selector.should ==
-          {
-            :_id => { "$ne" => "1" }
-          }
+      context "when setting the field as id" do
+
+        let(:criteria) do
+          base.excludes(:id => "1")
+        end
+
+        it "updates the selector" do
+          criteria.selector.should ==
+            {
+              :_id => { "$ne" => "1" }
+            }
+        end
       end
 
-      it "accepts _id" do
-        @criteria.excludes(:_id => "1")
-        @criteria.selector.should ==
-          {
-            :_id => { "$ne" => "1" }
-          }
+      context "when setting the field as _id" do
+
+        let(:criteria) do
+          base.excludes(:_id => "1")
+        end
+
+        it "updates the selector" do
+          criteria.selector.should ==
+            {
+              :_id => { "$ne" => "1" }
+            }
+        end
       end
     end
 
     context "when existing ne criteria exists" do
 
-      before do
-        @criteria.excludes(:title => "Bad Title")
-        @criteria.excludes(:text => "Bad Text")
+      let(:criteria) do
+        base.
+          excludes(:title => "Bad Title").
+          excludes(:text => "Bad Text")
       end
 
       it "appends to the selector" do
-        @criteria.selector.should ==
+        criteria.selector.should ==
           {
             :title =>
               { "$ne" => "Bad Title"},
@@ -64,27 +79,31 @@ describe Mongoid::Criterion::Exclusion do
 
   describe "#not_in" do
 
+    let(:criteria) do
+      base.not_in(:title => ["title1", "title2"], :text => ["test"])
+    end
+
     it "adds the exclusion to the selector" do
-      @criteria.not_in(:title => ["title1", "title2"], :text => ["test"])
-      @criteria.selector.should == {
+      criteria.selector.should == {
         :title => { "$nin" => ["title1", "title2"] },
         :text => { "$nin" => ["test"] }
       }
     end
 
-    it "returns self" do
-      @criteria.not_in(:title => ["title1"]).should == @criteria
+    it "returns a copy" do
+      base.not_in(:title => ["title1"]).should_not eql(base)
     end
 
     context "when existing nin criteria exists" do
 
-      before do
-        @criteria.not_in(:title => ["title1", "title2"])
-        @criteria.not_in(:title => ["title3"], :text => ["test"])
+      let(:criteria) do
+        base.
+          not_in(:title => ["title1", "title2"]).
+          not_in(:title => ["title3"], :text => ["test"])
       end
 
       it "appends to the nin selector" do
-        @criteria.selector.should == {
+        criteria.selector.should == {
           :title => { "$nin" => ["title1", "title2", "title3"] },
           :text => { "$nin" => ["test"] }
         }
@@ -96,26 +115,28 @@ describe Mongoid::Criterion::Exclusion do
 
     context "when args are provided" do
 
+      let(:criteria) do
+        base.only(:title, :text)
+      end
+
       it "adds the options for limiting by fields" do
-        @criteria.only(:title, :text)
-        @criteria.options.should == { :fields => [ :title, :text ] }
+        criteria.options.should == { :fields => [ :title, :text ] }
       end
 
-      it "returns self" do
-        @criteria.only.should == @criteria
+      it "returns a copy" do
+        base.only.should_not eql(base)
       end
-
     end
 
     context "when no args provided" do
 
-      it "does not add the field option" do
-        @criteria.only
-        @criteria.options[:fields].should be_nil
+      let(:criteria) do
+        base.only
       end
 
+      it "does not add the field option" do
+        criteria.options[:fields].should be_nil
+      end
     end
-
   end
-
 end

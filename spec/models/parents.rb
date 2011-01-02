@@ -11,7 +11,7 @@ end
 class ChildDoc
   include Mongoid::Document
 
-  embedded_in :parent_doc, :inverse_of => :child_docs
+  embedded_in :parent_doc
 
   attr_writer :position
 

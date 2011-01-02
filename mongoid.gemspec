@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# encoding: utf-8
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Durran Jordan"]
   s.email       = ["durran@gmail.com"]
   s.homepage    = "http://mongoid.org"
-  s.summary     = "Elegent Persistance in Ruby for MongoDB."
+  s.summary     = "Elegant Persistance in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
 
   s.required_rubygems_version = ">= 1.3.6"
@@ -19,11 +19,12 @@ Gem::Specification.new do |s|
 
   s.add_dependency("activemodel", ["~> 3.0"])
   s.add_dependency("tzinfo", ["~> 0.3.22"])
-  s.add_dependency("will_paginate", ["~>3.0.pre"])
+  s.add_dependency("will_paginate", ["~> 3.0.pre"])
   s.add_dependency("mongo", ["~> 1.1"])
+
   s.add_development_dependency("bson_ext", ["~> 1.1"])
   s.add_development_dependency("mocha", ["= 0.9.8"])
-  s.add_development_dependency("rspec", ["= 2.0.1"])
+  s.add_development_dependency("rspec", ["~> 2.3"])
   s.add_development_dependency("watchr", ["= 0.6"])
   s.add_development_dependency("ruby-debug-wrapper", ["= 0.0.1"])
 

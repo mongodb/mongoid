@@ -1,52 +1,120 @@
 # encoding: utf-8
 require "uri"
+require "mongoid/config/database"
 
 module Mongoid #:nodoc
-  class Config #:nodoc
-    include Singleton
 
-    attr_accessor \
-      :allow_dynamic_fields,
-      :include_root_in_json,
-      :reconnect_time,
-      :parameterize_keys,
-      :persist_in_safe_mode,
-      :raise_not_found_error,
-      :autocreate_indexes,
-      :skip_version_check
+  # This module defines all the configuration options for Mongoid, including the
+  # database connections.
+  #
+  # @todo Durran: This module needs an overhaul, remove singleton, etc.
+  module Config
+    extend self
 
-    # Initializes the configuration with default settings.
-    def initialize
-      reset
+    attr_accessor :master, :slaves, :settings
+    @settings = {}
+
+    # Define a configuration option with a default.
+    #
+    # @example Define the option.
+    #   Config.option(:persist_in_safe_mode, :default => false)
+    #
+    # @param [ Symbol ] name The name of the configuration option.
+    # @param [ Hash ] options Extras for the option.
+    #
+    # @option options [ Object ] :default The default value.
+    #
+    # @since 2.0.0.rc.1
+    def option(name, options = {})
+      define_method(name) do
+        settings.has_key?(name) ? settings[name] : options[:default]
+      end
+      define_method("#{name}=") { |value| settings[name] = value }
+      define_method("#{name}?") { send(name) }
     end
 
-    # Sets whether the times returned from the database are in UTC or local time.
-    # If you omit this setting, then times will be returned in
-    # the local time zone.
+    option :allow_dynamic_fields, :default => true
+    option :include_root_in_json, :default => false
+    option :parameterize_keys, :default => true
+    option :persist_in_safe_mode, :default => false
+    option :raise_not_found_error, :default => true
+    option :reconnect_time, :default => 3
+    option :autocreate_indexes, :default => false
+    option :skip_version_check, :default => false
+    option :time_zone, :default => nil
+
+    # Adds a new I18n locale file to the load path.
     #
-    # Example:
+    # @example Add a portuguese locale.
+    #   Mongoid::Config.add_language('pt')
     #
-    # <tt>Config.use_utc = true</tt>
+    # @example Add all available languages.
+    #   Mongoid::Config.add_language('*')
     #
-    # Returns:
-    #
-    # A boolean
-    def use_utc=(value)
-      @use_utc = value || false
+    # @param [ String ] language_code The language to add.
+    def add_language(language_code = nil)
+      Dir[
+        File.join(
+          File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml"
+        )
+      ].each do |file|
+        I18n.load_path << File.expand_path(file)
+      end
     end
 
-    # Returns whether times are return from the database in UTC. If
-    # this setting is false, then times will be returned in the local time zone.
+    def databases
+      {}
+    end
+
+    # Return field names that could cause destructive things to happen if
+    # defined in a Mongoid::Document.
     #
-    # Example:
+    # @example Get the destructive fields.
+    #   config.destructive_fields
     #
-    # <tt>Config.use_utc</tt>
+    # @return [ Array<String> ] An array of bad field names.
+    def destructive_fields
+      @destructive_fields ||= lambda {
+        klass = Class.new do
+          include Mongoid::Document
+        end
+        klass.instance_methods(true).collect { |method| method.to_s }
+      }.call
+    end
+
+    # Configure mongoid from a hash. This is usually called after parsing a
+    # yaml config file such as mongoid.yml.
     #
-    # Returns:
+    # @example Configure Mongoid.
+    #   config.from_hash({})
     #
-    # A boolean
-    attr_reader :use_utc
-    alias_method :use_utc?, :use_utc
+    # @param [ Hash ] options The settings to use.
+    def from_hash(options = {})
+      options.except("database", "slaves").each_pair do |name, value|
+        send("#{name}=", value) if respond_to?("#{name}=")
+      end
+      configure_databases(options)
+    end
+
+    # Returns the logger, or defaults to Rails logger or stdout logger.
+    #
+    # @example Get the logger.
+    #   config.logger
+    #
+    # @return [ Logger ] The desired logger.
+    def logger
+      @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+    end
+
+    # Sets the logger for Mongoid to use.
+    #
+    # @example Set the logger.
+    #   config.logger = Logger.new($stdout, :warn)
+    #
+    # @return [ Logger ] The newly set logger.
+    def logger=(logger)
+      @logger = logger
+    end
 
     # Sets whether the times returned from the database use the ruby or
     # the ActiveSupport time zone.
@@ -80,31 +148,32 @@ module Mongoid #:nodoc
     # Sets the Mongo::DB master database to be used. If the object trying to be
     # set is not a valid +Mongo::DB+, then an error will be raised.
     #
-    # Example:
+    # @example Set the master database.
+    #   config.master = Mongo::Connection.db("test")
     #
-    # <tt>Config.master = Mongo::Connection.db("test")</tt>
+    # @param [ Mongo::DB ] db The master database.
     #
-    # Returns:
+    # @raise [ Errors::InvalidDatabase ] If the master isnt a valid object.
     #
-    # The master +Mongo::DB+ instance.
+    # @return [ Mongo::DB ] The master instance.
     def master=(db)
       check_database!(db)
       @master = db
     end
+    alias :database= :master=
 
     # Returns the master database, or if none has been set it will raise an
     # error.
     #
-    # Example:
+    # @example Get the master database.
+    #   config.master
     #
-    # <tt>Config.master</tt>
+    # @raise [ Errors::InvalidDatabase ] If the database was not set.
     #
-    # Returns:
-    #
-    # The master +Mongo::DB+
+    # @return [ Mongo::DB ] The master database.
     def master
       unless @master
-        _master(@settings)  if @settings
+        configure_databases(@settings) if @settings
         raise Errors::InvalidDatabase.new(nil) unless @master
       end
       if @reconnect
@@ -113,131 +182,15 @@ module Mongoid #:nodoc
       end
       @master
     end
-
     alias :database :master
-    alias :database= :master=
-
-    # Sets the Mongo::DB slave databases to be used. If the objects provided
-    # are not valid +Mongo::DBs+ an error will be raised.
-    #
-    # Example:
-    #
-    # <tt>Config.slaves = [ Mongo::Connection.db("test") ]</tt>
-    #
-    # Returns:
-    #
-    # The slave DB instances.
-    def slaves=(dbs)
-      return unless dbs
-      dbs.each do |db|
-        check_database!(db)
-      end
-      @slaves = dbs
-    end
-
-    # Returns the slave databases or nil if none have been set.
-    #
-    # Example:
-    #
-    # <tt>Config.slaves</tt>
-    #
-    # Returns:
-    #
-    # The slave +Mongo::DBs+
-    def slaves
-      _slaves(@settings)  unless @slaves || !@settings
-      @slaves
-    end
-
-    # TODO: Docs
-    def databases=(databases)
-      databases.values.each do |value|
-        Array.wrap(value).each do |database|
-          check_database!(database)
-        end
-      end
-      @databases = databases
-    end
-
-    # TODO: Docs
-    def databases
-      _databases(@settings) unless @databases || !@settings
-      @databases || {}
-    end
-
-    # Returns the logger, or defaults to Rails logger or stdout logger.
-    #
-    # Example:
-    #
-    # <tt>Config.logger</tt>
-    def logger
-      return @logger if defined?(@logger)
-
-      @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
-    end
-
-    # Sets the logger for Mongoid to use.
-    #
-    # Example:
-    #
-    # <tt>Config.logger = Logger.new($stdout, :warn)</tt>
-    def logger=(logger)
-      @logger = logger
-    end
-
-    # Return field names that could cause destructive things to happen if
-    # defined in a Mongoid::Document
-    #
-    # Example:
-    #
-    # <tt>Config.destructive_fields</tt>
-    #
-    # Returns:
-    #
-    # An array of bad field names.
-    def destructive_fields
-      @destructive_fields ||= lambda {
-        klass = Class.new do
-          include Mongoid::Document
-        end
-        klass.instance_methods(true).collect { |method| method.to_s }
-      }.call
-    end
-
-    # Configure mongoid from a hash. This is usually called after parsing a
-    # yaml config file such as mongoid.yml.
-    #
-    # Example:
-    #
-    # <tt>Mongoid::Config.instance.from_hash({})</tt>
-    def from_hash(settings)
-      settings.except("database", "slaves", "databases").each_pair do |name, value|
-        send("#{name}=", value) if respond_to?("#{name}=")
-      end
-      @settings = settings.dup
-    end
-
-    # Adds a new I18n locale file to the load path
-    #
-    # Example:
-    #
-    # Add portuguese locale
-    # <tt>Mongoid::config.add_language('pt')</tt>
-    #
-    # Adds all available languages
-    # <tt>Mongoid::Config.add_language('*')</tt>
-    def add_language(language_code = nil)
-      Dir[File.join(File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml")].each do |file|
-        I18n.load_path << File.expand_path(file)
-      end
-    end
 
     # Convenience method for connecting to the master database after forking a
     # new process.
     #
-    # Example:
+    # @example Reconnect to the master.
+    #   Mongoid.reconnect!
     #
-    # <tt>Mongoid.reconnect!</tt>
+    # @param [ true, false ] now Perform the reconnection immediately?
     def reconnect!(now = true)
       if now
         master.connection.connect
@@ -250,93 +203,103 @@ module Mongoid #:nodoc
 
     # Reset the configuration options to the defaults.
     #
-    # Example:
-    #
-    # <tt>config.reset</tt>
+    # @example Reset the configuration options.
+    #   config.reset
     def reset
-      @allow_dynamic_fields = true
-      @include_root_in_json = false
-      @parameterize_keys = true
-      @persist_in_safe_mode = false
-      @raise_not_found_error = true
-      @reconnect_time = 3
-      @autocreate_indexes = false
-      @skip_version_check = false
-      @time_zone = nil
+      settings.clear
     end
+
+    # Sets the Mongo::DB slave databases to be used. If the objects provided
+    # are not valid +Mongo::DBs+ an error will be raised.
+    #
+    # @example Set the slaves.
+    #   config.slaves = [ Mongo::Connection.db("test") ]
+    #
+    # @param [ Array<Mongo::DB> ] dbs The slave databases.
+    #
+    # @raise [ Errors::InvalidDatabase ] If the slaves arent valid objects.
+    #
+    # @return [ Array<Mongo::DB> ] The slave DB instances.
+    def slaves=(dbs)
+      return unless dbs
+      dbs.each do |db|
+        check_database!(db)
+      end
+      @slaves = dbs
+    end
+
+    # Returns the slave databases or nil if none have been set.
+    #
+    # @example Get the slaves.
+    #   config.slaves
+    #
+    # @return [ Array<Mongo::DB>, nil ] The slave databases.
+    def slaves
+      configure_databases(@settings) unless @slaves || !@settings
+      @slaves
+    end
+
+    # Sets whether the times returned from the database are in UTC or local time.
+    # If you omit this setting, then times will be returned in
+    # the local time zone.
+    #
+    # @example Set the use of UTC.
+    #   config.use_utc = true
+    #
+    # @param [ true, false ] value Whether to use UTC or not.
+    #
+    # @return [ true, false ] Are we using UTC?
+    def use_utc=(value)
+      @use_utc = value || false
+    end
+
+    # Returns whether times are return from the database in UTC. If
+    # this setting is false, then times will be returned in the local time zone.
+    #
+    # @example Are we using UTC?
+    #   config.use_utc
+    #
+    # @return [ true, false ] True if UTC, false if not.
+    attr_reader :use_utc
+    alias :use_utc? :use_utc
 
     protected
 
     # Check if the database is valid and the correct version.
     #
-    # Example:
+    # @example Check if the database is valid.
+    #   config.check_database!
     #
-    # <tt>config.check_database!</tt>
+    # @param [ Mongo::DB ] database The db to check.
+    #
+    # @raise [ Errors::InvalidDatabase ] If the object is not valid.
+    # @raise [ Errors::UnsupportedVersion ] If the db version is too old.
     def check_database!(database)
       raise Errors::InvalidDatabase.new(database) unless database.kind_of?(Mongo::DB)
-      unless Mongoid.skip_version_check
+      unless skip_version_check
         version = database.connection.server_version
         raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
       end
     end
 
-    # Get a master database from settings.
+    # Get a database from settings.
     #
-    # Example:
+    # @example Configure the master and slave dbs.
+    #   config.configure_databases("database" => "mongoid")
     #
-    # <tt>config._master({}, "test")</tt>
-    def _master(settings)
-      self.master = database_from_hash(settings)
-    end
-
-    # Get a bunch-o-slaves from settings and names.
+    # @param [ Hash ] options The options to use.
     #
-    # Example:
+    # @option options [ String ] :database The database name.
+    # @option options [ String ] :host The database host.
+    # @option options [ String ] :password The password for authentication.
+    # @option options [ Integer ] :port The port for the database.
+    # @option options [ Array<Hash> ] :slaves The slave db options.
+    # @option options [ String ] :uri The uri for the database.
+    # @option options [ String ] :username The user for authentication.
     #
-    # <tt>config._slaves({}, "test")</tt>
-    def _slaves(settings)
-      self.slaves = settings["slaves"].to_a.map do |slave|
-        database_from_hash({"database" => master.name}.merge(slave), :slave_ok => true)
-      end
-    end
-
-    def _databases(settings)
-      databases = {}.tap do |hash|
-        settings["databases"].each do |key, database|
-          db = database_from_hash(database)
-          hash[key] = db
-
-          hash[key+"_slaves"] = database["slaves"].to_a.map do |slave|
-            database_from_hash({"database" => db.name}.merge(slave), :slave_ok => true)
-          end
-        end if settings["databases"]
-      end
-
-      self.databases = databases
-    end
-
-    def database_from_hash(settings, connection_options={})
-      mongo_uri = settings["uri"].present? ? URI.parse(settings["uri"]) : OpenStruct.new
-
-      name = settings["database"] || mongo_uri.path.to_s.sub("/", "")
-      host = settings["host"] || mongo_uri.host || "localhost"
-      port = settings["port"] || mongo_uri.port || 27017
-      pool_size = settings["pool_size"] || 1
-      username = settings["username"] || mongo_uri.user
-      password = settings["password"] || mongo_uri.password
-
-      local_options = {
-        :logger => Mongoid::Logger.new,
-        :pool_size => pool_size
-      }.merge(connection_options)
-
-      Mongo::Connection.new(host, port, local_options).tap do |connection|
-        if username || password
-          connection.add_auth(name, username, password)
-          connection.apply_saved_authentication
-        end
-      end.db(name)
+    # @since 2.0.0.rc.1
+    def configure_databases(options)
+      @master, @slaves = Database.new(options).configure
     end
   end
-
 end

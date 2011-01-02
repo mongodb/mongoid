@@ -2,258 +2,334 @@ require "spec_helper"
 
 describe Mongoid::Contexts::Mongo do
 
+  before :all do
+    Mongoid.raise_not_found_error = true
+  end
+
+  let(:criteria) do
+    Mongoid::Criteria.new(Person)
+  end
+
   describe "#aggregate" do
 
-    before do
-      @criteria = Mongoid::Criteria.new(Person)
-      @criteria.only(:field1)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+    let(:crit) do
+      criteria.only(:field1)
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(crit)
     end
 
     context "when klass not provided" do
 
-      before do
-        @reduce = "function(obj, prev) { prev.count++; }"
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
+      let(:reduce) do
+        "function(obj, prev) { prev.count++; }"
       end
 
-      it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with(
+      let(:collection) do
+        stub
+      end
+
+      before do
+        Person.expects(:collection).returns(collection)
+        collection.expects(:group).with(
           [:field1],
           {},
           {:count => 0},
-          @reduce,
+          reduce,
           true
         )
-        @context.aggregate
+      end
+
+      it "calls group on the collection with the aggregate js" do
+        context.aggregate
       end
     end
   end
 
   describe "#avg" do
 
-    before do
-      @reduce = Mongoid::Javascript.sum.gsub("[field]", "age")
-      @collection = mock
-      Person.expects(:collection).twice.returns(@collection)
-      @criteria = Mongoid::Criteria.new(Person)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+    let(:reduce) do
+      Mongoid::Javascript.sum.gsub("[field]", "age")
     end
 
-    it "calls group on the collection with the aggregate js" do
-      @collection.expects(:group).with(
+    let(:collection) do
+      stub
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(criteria)
+    end
+
+    before do
+      Person.expects(:collection).twice.returns(collection)
+      collection.expects(:group).with(
         nil,
         {},
         {:sum => "start"},
-        @reduce
+        reduce
       ).returns([{"sum" => 100.0}])
-      @cursor = mock(:count => 10)
-      @collection.expects(:find).returns(@cursor)
-      @context.avg(:age).should == 10
+      cursor = mock(:count => 10)
+      collection.expects(:find).returns(cursor)
+    end
+
+    it "calls group on the collection with the aggregate js" do
+      context.avg(:age).should == 10
     end
   end
 
   describe "blank?" do
 
+    let(:crit) do
+      Mongoid::Criteria.new(Game).where(:test => "Testing")
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(crit)
+    end
+
+    let(:doc) do
+      stub
+    end
+
+    let(:collection) do
+      stub
+    end
+
     before do
-      @criteria = Mongoid::Criteria.new(Game)
-      @criteria.where(:test => 'Testing')
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+      Game.expects(:collection).returns(collection)
     end
 
     context "when a document exists" do
 
       before do
-        @doc = mock
-        @collection = mock
-        Game.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with({ :test => "Testing" }, { :fields => [ :_id ] }).returns(@doc)
+        collection.expects(:find_one).with({ :test => "Testing" }, { :fields => [ :_id ] }).returns(doc)
       end
 
       it "returns false" do
-        @context.blank?.should be_false
+        context.blank?.should be_false
       end
     end
 
     context "when a document does not exist" do
 
       before do
-        @doc = mock
-        @collection = mock
-        Game.expects(:collection).returns(@collection)
-        @collection.expects(:find_one).with({ :test => "Testing" }, { :fields => [ :_id ] }).returns(nil)
+        collection.expects(:find_one).with({ :test => "Testing" }, { :fields => [ :_id ] }).returns(nil)
       end
 
       it "returns true" do
-        @context.blank?.should be_true
+        context.blank?.should be_true
       end
     end
   end
 
   describe "#count" do
 
-    before do
-      @criteria = Mongoid::Criteria.new(Person)
-      @criteria.where(:test => 'Testing')
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+    let(:crit) do
+      criteria.where(:test => 'Testing')
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(crit)
     end
 
     context "when criteria has not been executed" do
 
       before do
-        @context.instance_variable_set(:@count, 34)
+        context.instance_variable_set(:@count, 34)
       end
 
       it "returns a count from the cursor" do
-        @context.count.should == 34
+        context.count.should == 34
       end
-
     end
 
     context "when criteria has been executed" do
 
+      let(:collection) do
+        stub
+      end
+
+      let(:cursor) do
+        stub
+      end
+
       before do
-        @collection = mock
-        @cursor = mock
-        Person.expects(:collection).returns(@collection)
+        Person.expects(:collection).returns(collection)
+        collection.expects(:find).with(crit.selector, {}).returns(cursor)
+        cursor.expects(:count).returns(10)
       end
 
       it "returns the count from the cursor without creating the documents" do
-        @collection.expects(:find).with(@criteria.selector, {}).returns(@cursor)
-        @cursor.expects(:count).returns(10)
-        @context.count.should == 10
+        context.count.should == 10
       end
-
     end
-
   end
 
   describe "#distinct" do
 
+    let(:distinct) do
+      criteria.where(:test => 'Testing')
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(distinct)
+    end
+
+    let(:collection) do
+      stub
+    end
+
     before do
-      @criteria = Mongoid::Criteria.new(Person)
-      @criteria.where(:test => 'Testing')
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(collection)
+      collection.expects(:distinct).with(:title, distinct.selector).returns(["Sir"])
     end
 
     it "returns delegates to distinct on the collection" do
-      @collection.expects(:distinct).with(:title, @criteria.selector).returns(["Sir"])
-      @context.distinct(:title).should == ["Sir"]
+      context.distinct(:title).should == ["Sir"]
     end
   end
 
   describe "#execute" do
 
-    let(:selector) { { :field => "value"  } }
-    let(:options) { { :skip => 20 } }
-
-    before do
-      @cursor = stub(:count => 500)
-      @collection = mock
-      @klass = stub(
-        :collection => @collection,
-        :hereditary? => false,
-        :instantiate => @person,
-        :enslaved? => false,
-        :cached? => false,
-        :fields => {}
-      )
-      @criteria = Mongoid::Criteria.new(@klass)
-      @criteria.where(selector).skip(20)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+    let(:selector) do
+      { :field => "value"  }
     end
 
-    it "calls find on the collection" do
-      @collection.expects(:find).with(selector, options).returns(@cursor)
-      @context.execute.should == @cursor
+    let(:options) do
+      { :skip => 20 }
+    end
+
+    let(:executed) do
+      criteria.where(selector).skip(20)
+    end
+
+    let(:collection) do
+      stub
+    end
+
+    let(:cursor) do
+      stub(:count => 500)
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(executed)
+    end
+
+    before do
+      Person.expects(:collection).returns(collection)
+    end
+
+    context "when not paginating" do
+
+      before do
+        collection.expects(:find).with(selector, options).returns(cursor)
+      end
+
+      it "calls find on the collection" do
+        context.execute.should == cursor
+      end
     end
 
     context "when paginating" do
 
-      it "should find the count from the cursor" do
-        @collection.expects(:find).with(selector, options).returns(@cursor)
-        @context.execute(true).should == @cursor
-        @context.count.should == 500
+      before do
+        collection.expects(:find).with(selector, options).returns(cursor)
       end
 
+      it "returns the cursor" do
+        context.execute(true).should == cursor
+      end
+
+      it "should find the count from the cursor" do
+        context.count.should == 500
+      end
     end
 
     context "when field options are supplied" do
 
       context "when _type not in the field list" do
 
-        before do
-          @criteria.only(:title)
-          @expected_options = { :skip => 20, :fields => [ :title, :_type ] }
+        let(:crit) do
+          executed.only(:title)
+        end
+
+        let(:context) do
+          Mongoid::Contexts::Mongo.new(crit)
+        end
+
+        let(:expected_options) do
+          { :skip => 20, :fields => [ :title, :_type ] }
         end
 
         it "adds _type to the fields" do
-          @collection.expects(:find).with(selector, @expected_options).returns(@cursor)
-          @context.execute.should == @cursor
+          collection.expects(:find).with(selector, expected_options).returns(cursor)
+          context.execute.should == cursor
         end
-
       end
-
     end
-
   end
 
   describe "#group" do
 
-    before do
-      @criteria = Mongoid::Criteria.new(Person)
-      @criteria.only(:field1)
-      @grouping = [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30, "_type" => "Person" }] }]
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
+    let(:grouped) do
+      criteria.only(:field1)
+    end
+
+    let(:grouping) do
+      [{ "title" => "Sir", "group" => [{ "title" => "Sir", "age" => 30, "_type" => "Person" }] }]
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(grouped)
     end
 
     context "when klass provided" do
 
+      let(:reduce) do
+        "function(obj, prev) { prev.group.push(obj); }"
+      end
+
+      let(:collection) do
+        stub
+      end
+
       before do
-        @reduce = "function(obj, prev) { prev.group.push(obj); }"
-        @collection = mock
-        Person.expects(:collection).returns(@collection)
+        Person.expects(:collection).returns(collection)
       end
 
       it "calls group on the collection with the aggregate js" do
-        @collection.expects(:group).with(
+        collection.expects(:group).with(
           [:field1],
           {},
           {:group => []},
-          @reduce
-        ).returns(@grouping)
-        @context.group
+          reduce
+        ).returns(grouping)
+        context.group
       end
-
     end
-
   end
 
   describe ".initialize" do
 
-    let(:selector) { { :field => "value"  } }
-    let(:options) { { :skip => 20 } }
-    let(:klass) { Doctor }
-    let(:criteria) { Mongoid::Criteria.new(klass) }
-    let(:context) { Mongoid::Contexts::Mongo.new(criteria) }
-
-    before do
-      criteria.where(selector).skip(20)
+    let(:selector) do
+      { :field => "value"  }
     end
 
-    it "sets the selector" do
-      context.selector.should == criteria.selector
+    let(:options) do
+      { :skip => 20 }
     end
 
-    it "sets the options" do
-      context.options.should == options
+    let(:klass) do
+      Doctor
     end
 
-    it "sets the klass" do
-      context.klass.should == klass
+    let(:criteria) do
+      Mongoid::Criteria.new(klass).where(selector).skip(20)
+    end
+
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(criteria)
     end
 
     context "when hereditary" do
@@ -261,109 +337,136 @@ describe Mongoid::Contexts::Mongo do
       it "set the selector to query across the _type when it is hereditary" do
         context.selector[:_type].should == {'$in' => klass._types}
       end
-
     end
 
     context "when not hereditary" do
 
-      before do
-        @criteria = Mongoid::Criteria.new(Name)
-        @context = Mongoid::Contexts::Mongo.new(@criteria)
+      let(:criteria) do
+        Mongoid::Criteria.new(Name)
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Mongo.new(criteria)
       end
 
       it "does not add the type to the selector" do
-        @context.selector[:_type].should be_nil
-      end
-
-    end
-
-    context "enslaved and cached classes" do
-
-      let(:klass) { Game }
-
-      it "enslaves the criteria" do
-        context.criteria.should be_enslaved
-      end
-
-      it "caches the criteria" do
-        context.criteria.should be_cached
+        context.selector[:_type].should be_nil
       end
     end
   end
 
   describe "#iterate" do
+
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    let(:cursor) do
+      stub
+    end
+
     before do
-      @criteria = Mongoid::Criteria.new(Person)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
-      @person = Person.new(:title => "Sir")
-      @cursor = stub('cursor')
-      @cursor.stubs(:each).yields(@person)
+      cursor.stubs(:each).yields(person)
     end
 
     context "when not caching" do
 
-      it "executes the criteria" do
-        @context.expects(:execute).returns(@cursor)
-        @context.iterate do |person|
-          person.should == @person
-        end
-
+      let(:context) do
+        Mongoid::Contexts::Mongo.new(criteria)
       end
 
+      before do
+        context.expects(:execute).returns(cursor)
+      end
+
+      it "executes the criteria" do
+        context.iterate do |person|
+          person.should == person
+        end
+      end
     end
 
     context "when caching" do
-      before do
-        @criteria.cache
+
+      let(:cached) do
+        criteria.cache
       end
 
-      it "executes the criteria" do
-        @context.expects(:execute).returns(@cursor)
-        @context.iterate do |person|
-          person.should == @person
+      context "when executing once" do
+
+        let(:context) do
+          Mongoid::Contexts::Mongo.new(cached)
+        end
+
+        before do
+          context.expects(:execute).returns(cursor)
+        end
+
+        it "executes the criteria" do
+          context.iterate do |person|
+            person.should == person
+          end
         end
       end
 
-      it "executes only once and it caches the result" do
-        @context.expects(:execute).once.returns(@cursor)
-        @context.iterate do |person|
-          person.should == @person
+      context "when executing twice" do
+
+        let(:context) do
+          Mongoid::Contexts::Mongo.new(cached)
         end
-        @context.iterate do |person|
-          person.should == @person
+
+        before do
+          context.expects(:execute).once.returns(cursor)
+        end
+
+        it "executes only once and it caches the result" do
+          2.times do
+            context.iterate do |person|
+              person.should == person
+            end
+          end
         end
       end
 
-      it "executes even if there is no block" do
-        @context.expects(:execute).once.returns(@cursor)
-        @context.iterate
-      end
+      context "when there is no block" do
 
-      it "caches even if there is no block" do
-        @context.expects(:execute).once.returns(@cursor)
-        @context.iterate
-        @context.iterate do |person|
-          person.should == @person
+        let(:context) do
+          Mongoid::Contexts::Mongo.new(cached)
+        end
+
+        before do
+          context.expects(:execute).once.returns(cursor)
+        end
+
+        it "executes the context" do
+          context.iterate
         end
       end
     end
-
   end
 
   describe "#last" do
 
+    let(:collection) do
+      stub
+    end
+
     before do
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
+      Person.expects(:collection).returns(collection)
     end
 
     context "when documents exist" do
 
+      let(:ordered) do
+        criteria.order_by([[:title, :asc]])
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Mongo.new(ordered)
+      end
+
       before do
-        @criteria = Mongoid::Criteria.new(Person)
-        @criteria.order_by([[:title, :asc]])
-        @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with(
+        collection.expects(:find_one).with(
           {},
           { :sort => [[:title, :desc]] }
         ).returns(
@@ -372,36 +475,44 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "calls find on the collection with the selector and sort options reversed" do
-        @context.last.should be_a_kind_of(Person)
+        context.last.should be_a_kind_of(Person)
       end
-
     end
 
     context "when no documents exist" do
 
+      let(:ordered) do
+        criteria.order_by([[:_id, :asc]])
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Mongo.new(ordered)
+      end
+
       before do
-        @criteria = Mongoid::Criteria.new(Person)
-        @criteria.order_by([[:_id, :asc]])
-        @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with(
+        collection.expects(:find_one).with(
           {},
           { :sort => [[:_id, :desc]] }
         ).returns(nil)
       end
 
       it "returns nil" do
-        @context.last.should be_nil
+        context.last.should be_nil
       end
-
     end
 
     context "when no sorting options provided" do
 
+      let(:ordered) do
+        criteria.order_by([[:_id, :asc]])
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Mongo.new(criteria)
+      end
+
       before do
-        @criteria = Mongoid::Criteria.new(Person)
-        @criteria.order_by([[:_id, :asc]])
-        @context = Mongoid::Contexts::Mongo.new(@criteria)
-        @collection.expects(:find_one).with(
+        collection.expects(:find_one).with(
           {},
           { :sort => [[:_id, :desc]] }
         ).returns(
@@ -410,11 +521,9 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "defaults to sort by id" do
-        @context.last
+        context.last
       end
-
     end
-
   end
 
   describe "#max" do
@@ -638,7 +747,6 @@ describe Mongoid::Contexts::Mongo do
           document.expects(:blank? => false)
           context.id_criteria(id).should == document
         end
-
       end
 
       context "when the document is not found" do
@@ -647,9 +755,7 @@ describe Mongoid::Contexts::Mongo do
           context.expects(:one).returns(nil)
           lambda { context.id_criteria(id) }.should raise_error
         end
-
       end
-
     end
 
     context "multiple arguments" do
@@ -674,7 +780,6 @@ describe Mongoid::Contexts::Mongo do
             context.expects(:execute).returns(docs)
             context.id_criteria(ids).should == docs
           end
-
         end
 
         context "when documents are not found" do
@@ -683,9 +788,7 @@ describe Mongoid::Contexts::Mongo do
             context.expects(:execute).returns([])
             lambda { context.id_criteria(ids) }.should raise_error
           end
-
         end
-
       end
 
       context "when an array of object ids" do
@@ -708,7 +811,6 @@ describe Mongoid::Contexts::Mongo do
             context.expects(:execute).returns(docs)
             context.id_criteria(ids).should == docs
           end
-
         end
 
         context "when documents are not found" do
@@ -717,12 +819,8 @@ describe Mongoid::Contexts::Mongo do
             context.expects(:execute).returns([])
             lambda { context.id_criteria(ids) }.should raise_error
           end
-
         end
-
       end
     end
-
   end
-
 end

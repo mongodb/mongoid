@@ -195,8 +195,8 @@ describe Mongoid::Dirty do
         @person = Person.new(:title => "Grand Poobah")
       end
 
-      it "returns nil" do
-        @person.attribute_was("title").should be_nil
+      it "returns the original value" do
+        @person.attribute_was("title").should == "Grand Poobah"
       end
     end
   end

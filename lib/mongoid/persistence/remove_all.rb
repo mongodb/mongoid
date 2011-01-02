@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
+
     # Remove is a persistence command responsible for deleting a document from
     # the database.
     #
@@ -11,6 +12,7 @@ module Mongoid #:nodoc:
     #     false
     #   );
     class RemoveAll < Command
+
       # Remove the document from the database: delegates to the MongoDB
       # collection remove method.
       #
@@ -28,10 +30,10 @@ module Mongoid #:nodoc:
       protected
       # Remove the document from the database.
       def remove
-        selector = (@klass.hereditary? ? @selector.merge(:_type => @klass.name) : @selector)
-        count = @collection.find(selector).count
-        @collection.remove(selector, @options)
-        count
+        select = (klass.hereditary? ? selector.merge(:_type => klass.name) : selector)
+        collection.find(select).count.tap do
+          collection.remove(select, options)
+        end
       end
     end
   end

@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
     # <tt>address.position</tt>
     def _position
       locator = _index ? (new_record? ? "" : ".#{_index}") : ""
-      embedded? ? "#{_parent._position}#{"." unless _parent._position.blank?}#{@association_name}#{locator}" : ""
+      embedded? ? "#{_parent._position}#{"." unless _parent._position.blank?}#{metadata.name.to_s}#{locator}" : ""
     end
 
     # Get the removal modifier for the document. Will be nil on root

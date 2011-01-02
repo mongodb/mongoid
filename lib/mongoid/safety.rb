@@ -9,14 +9,20 @@ module Mongoid #:nodoc:
 
     # Execute the following class-level persistence operation in safe mode.
     #
-    # Example:
+    # @example Upsert in safe mode.
+    #   person.safely.upsert
     #
-    # <tt>person.safely.upsert</tt>
-    # <tt>person.safely(:w => 2, :fsync => true).destroy</tt>
+    # @example Destroy in safe mode with w and fsync options.
+    #   person.safely(:w => 2, :fsync => true).destroy
     #
-    # Returns:
+    # @param [ Hash ] options The safe mode options.
     #
-    # A +Proxy+ to the +Document+.
+    # @option options [ Integer ] :w The number of nodes to write to.
+    # @option options [ Integer ] :wtimeout Time to wait for return from all
+    #   nodes.
+    # @option options [ true, false ] :fsync Should a fsync occur.
+    #
+    # @return [ Proxy ] The safety proxy.
     def safely(safety = true)
       Proxy.new(self, safety)
     end
@@ -25,14 +31,20 @@ module Mongoid #:nodoc:
 
       # Execute the following class-level persistence operation in safe mode.
       #
-      # Example:
+      # @example Create in safe mode.
+      #   Person.safely.create(:name => "John")
       #
-      # <tt>Person.safely.create(:name => "John")</tt>
-      # <tt>Person.safely(:w => 2, :fsync => true).delete_all</tt>
+      # @example Delete all in safe mode with options.
+      #   Person.safely(:w => 2, :fsync => true).delete_all
       #
-      # Returns:
+      # @param [ Hash ] options The safe mode options.
       #
-      # A +Proxy+ to the +Document+ class.
+      # @option options [ Integer ] :w The number of nodes to write to.
+      # @option options [ Integer ] :wtimeout Time to wait for return from all
+      #   nodes.
+      # @option options [ true, false ] :fsync Should a fsync occur.
+      #
+      # @return [ Proxy ] The safety proxy.
       def safely(safety = true)
         Proxy.new(self, safety)
       end
@@ -50,81 +62,18 @@ module Mongoid #:nodoc:
 
       attr_reader :target, :safety_options
 
-      # Create the new +Proxy+.
-      #
-      # Options:
-      #
-      # target: Either the class or the instance.
-      # safety_options: true or a hash of options
-      def initialize(target, safety_options)
-        @target = target
-        @safety_options = safety_options
-      end
-
-      # We will use method missing to proxy calls to the target.
-      #
-      # Example:
-      #
-      # <tt>person.safely.save</tt>
-      def method_missing(*args)
-        name = args[0]
-        attributes = args[1] || {}
-        @target.send(name, attributes.merge(:safe => safety_options))
-      end
-
-      # Increment the field by the provided value, else if it doesn't exists set
-      # it to that value.
-      #
-      # Options:
-      #
-      # field: The field to increment.
-      # value: The value to increment by.
-      # options: Options to pass through to the driver.
-      def inc(field, value, options = {})
-        @target.inc(field, value, :safe => safety_options)
-      end
-
-      # Update the +Document+ attributes in the datbase.
-      #
-      # Example:
-      #
-      # <tt>document.update_attributes(:title => "Sir")</tt>
-      #
-      # Returns:
-      #
-      # +true+ if validation passed, +false+ if not.
-      def update_attributes(attributes = {})
-        @target.write_attributes(attributes)
-        @target.update(:safe => safety_options)
-      end
-
-      # Update the +Document+ attributes in the datbase.
-      #
-      # Example:
-      #
-      # <tt>document.update_attributes(:title => "Sir")</tt>
-      #
-      # Returns:
-      #
-      # +true+ if validation passed, raises an error if not
-      def update_attributes!(attributes = {})
-        @target.write_attributes(attributes)
-        result = update(:safe => safety_options)
-        @target.class.fail_validate!(self) unless result
-        result
-      end
-
       # Create a new +Document+. This will instantiate a new document and
       # insert it in a single call. Will always return the document
       # whether save passed or not.
       #
-      # Example:
+      # @example Safely create a document.
+      #   Person.safely.create(:title => "Mr")
       #
-      # <tt>Person.create(:title => "Mr")</tt>
+      # @param [ Hash ] attributes The attributes to create with.
       #
-      # Returns: the +Document+.
+      # @return [ Document ] The new document.
       def create(attributes = {})
-        @target.new(attributes).tap { |doc| doc.insert(:safe => safety_options) }
+        target.new(attributes).tap { |doc| doc.insert(:safe => safety_options) }
       end
 
       # Create a new +Document+. This will instantiate a new document and
@@ -132,50 +81,126 @@ module Mongoid #:nodoc:
       # whether save passed or not, and if validation fails an error will be
       # raise.
       #
-      # Example:
+      # @example Safely create a document.
+      #   Person.safely.create!(:title => "Mr")
       #
-      # <tt>Person.create!(:title => "Mr")</tt>
+      # @param [ Hash ] attributes The attributes to create with.
       #
-      # Returns: the +Document+.
+      # @raise [ Errors::Validations ] If validation failed.
+      #
+      # @return [ Document ] If validation passed.
       def create!(attributes = {})
-        document = @target.new(attributes)
-        fail_validate!(document) if document.insert(:safe => safety_options).errors.any?
-        document
+        target.new(attributes).tap do |document|
+          fail_validate!(document) if document.insert(:safe => safety_options).errors.any?
+        end
       end
 
       # Delete all documents given the supplied conditions. If no conditions
       # are passed, the entire collection will be dropped for performance
       # benefits. Does not fire any callbacks.
       #
-      # Example:
+      # @example Delete all documents.
+      #   Person.safely.delete_all
       #
-      # <tt>Person.delete_all(:conditions => { :title => "Sir" })</tt>
-      # <tt>Person.delete_all</tt>
+      # @example Conditionally delete all documents.
+      #   Person.safely.delete_all(:conditions => { :title => "Sir" })
       #
-      # Returns: true or raises an error.
+      # @param [ Hash ] conditions The conditions to delete with.
+      #
+      # @return [ Integer ] The number of documents deleted.
       def delete_all(conditions = {})
         Mongoid::Persistence::RemoveAll.new(
-          @target,
+          target,
           { :validate => false, :safe => safety_options },
           conditions[:conditions] || {}
         ).persist
       end
 
-      # Delete all documents given the supplied conditions. If no conditions
+      # destroy all documents given the supplied conditions. If no conditions
       # are passed, the entire collection will be dropped for performance
       # benefits. Fires the destroy callbacks if conditions were passed.
       #
-      # Example:
+      # @example destroy all documents.
+      #   Person.safely.destroy_all
       #
-      # <tt>Person.destroy_all(:conditions => { :title => "Sir" })</tt>
-      # <tt>Person.destroy_all</tt>
+      # @example Conditionally destroy all documents.
+      #   Person.safely.destroy_all(:conditions => { :title => "Sir" })
       #
-      # Returns: true or raises an error.
+      # @param [ Hash ] conditions The conditions to destroy with.
+      #
+      # @return [ Integer ] The number of documents destroyd.
       def destroy_all(conditions = {})
-        documents = @target.all(conditions)
-        count = documents.count
-        documents.each { |doc| doc.destroy(:safe => safety_options) }
-        count
+        documents = target.all(conditions)
+        documents.count.tap do |count|
+          documents.each { |doc| doc.destroy(:safe => safety_options) }
+        end
+      end
+
+      # Increment the field by the provided value, else if it doesn't exists set
+      # it to that value.
+      #
+      # @example Safely increment a field.
+      #   person.safely.inc(:age, 1)
+      #
+      # @param [ Symbol, String ] field The field to increment.
+      # @param [ Integer ] value The value to increment by.
+      # @param [ Hash ] options Options to pass through to the driver.
+      def inc(field, value, options = {})
+        target.inc(field, value, :safe => safety_options)
+      end
+
+      # Create the new +Proxy+.
+      #
+      # @example Create the proxy.
+      #   Proxy.new(document, :w => 3)
+      #
+      # @param [ Document, Class ] target Either the class or the instance.
+      # @param [ true, Hash ] safety_options The options.
+      def initialize(target, safety_options)
+        @target = target
+        @safety_options = safety_options
+      end
+
+      # We will use method missing to proxy calls to the target.
+      #
+      # @example Save safely.
+      #   person.safely.save
+      #
+      # @param [ Array ] *args The arguments to pass on.
+      def method_missing(*args)
+        name = args[0]
+        attributes = args[1] || {}
+        target.send(name, attributes.merge(:safe => safety_options))
+      end
+
+      # Update the +Document+ attributes in the datbase.
+      #
+      # @example Safely update attributes.
+      #   person.safely.update_attributes(:title => "Sir")
+      #
+      # @param [ Hash ] attributes The attributes to update.
+      #
+      # @return [ true, false ] Whether the document was saved.
+      def update_attributes(attributes = {})
+        target.write_attributes(attributes)
+        target.update(:safe => safety_options)
+      end
+
+      # Update the +Document+ attributes in the datbase.
+      #
+      # @example Safely update attributes.
+      #   person.safely.update_attributes(:title => "Sir")
+      #
+      # @param [ Hash ] attributes The attributes to update.
+      #
+      # @raise [ Errors::Validations ] If validation failed.
+      #
+      # @return [ true ] If the document was saved.
+      def update_attributes!(attributes = {})
+        target.write_attributes(attributes)
+        update(:safe => safety_options).tap do |result|
+          target.class.fail_validate!(self) unless result
+        end
       end
     end
   end

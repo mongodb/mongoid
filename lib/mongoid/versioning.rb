@@ -1,5 +1,6 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
   # Include this module to get automatic versioning of root level documents.
   # This will add a version field to the +Document+ and a has_many association
   # with all the versions contained in it.
@@ -10,12 +11,21 @@ module Mongoid #:nodoc:
       field :version, :type => Integer, :default => 1
       embeds_many :versions, :class_name => self.name
       set_callback :save, :before, :revise
+
+      delegate :version_max, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:
       attr_accessor :version_max
-      
-      # the number of max_version should >= 0
+
+      # Sets the maximum number of versions to store.
+      #
+      # @example Set the maximum.
+      #   Person.max_versions(5)
+      #
+      # @param [ Integer ] number The maximum number to store.
+      #
+      # @return [ Integer ] The max number of versions.
       def max_versions(number)
         self.version_max = number.to_i
       end
@@ -25,17 +35,16 @@ module Mongoid #:nodoc:
     # document from the database and set it as the next version before saving
     # the current document. It then increments the version number. If a #max_versions
     # limit is set in the model and it's exceeded, the oldest version gets discarded.
+    #
+    # @example Revise the document.
+    #   person.revise
     def revise
       last_version = self.class.first(:conditions => { :_id => id, :version => version })
       if last_version
-        old_versions = ( @attributes['versions'].duplicable? ? @attributes['versions'].dup : nil )
-        self.versions << last_version.clone
-        if self.class.version_max.present? && ( self.class.version_max >= 0 ) && ( self.versions.length > self.class.version_max )
-          self.versions.shift
-          @attributes['versions'].shift
-        end
+        versions.target << last_version.clone
+        versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
-        @modifications["versions"] = [ old_versions, @attributes['versions'] ] if @modifications
+        @modifications["versions"] = [ nil, versions.to_hash ] if @modifications
       end
     end
   end

@@ -65,4 +65,86 @@ describe Mongoid::Hierarchy do
       end
     end
   end
+
+  describe ".hereditary?" do
+
+    context "when the document is a subclass" do
+
+      it "returns true" do
+        Circle.should be_hereditary
+      end
+    end
+
+    context "when the document is not a subclass" do
+
+      it "returns false" do
+        Shape.should_not be_hereditary
+      end
+    end
+  end
+
+  describe "#hereditary?" do
+
+    context "when the document is a subclass" do
+
+      it "returns true" do
+        Circle.new.should be_hereditary
+      end
+    end
+
+    context "when the document is not a subclass" do
+
+      it "returns false" do
+        Shape.new.should_not be_hereditary
+      end
+    end
+  end
+
+  describe "#parentize" do
+
+    let(:address) do
+      Address.new
+    end
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      address.parentize(person)
+    end
+
+    it "sets the parent document" do
+      address._parent.should == person
+    end
+  end
+
+  describe "#_root" do
+
+    let(:address) do
+      Address.new
+    end
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      address.parentize(person)
+    end
+
+    context "when the document is not the root" do
+
+      it "returns the root" do
+        address._root.should == person
+      end
+    end
+
+    context "when the document is the root" do
+
+      it "returns self" do
+        person._root.should == person
+      end
+    end
+  end
 end

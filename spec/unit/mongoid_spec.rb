@@ -7,7 +7,7 @@ describe Mongoid do
     context "when no block supplied" do
 
       it "returns the config singleton" do
-        Mongoid.configure.should == Mongoid::Config.instance
+        Mongoid.configure.should == Mongoid::Config
       end
     end
 
@@ -32,15 +32,9 @@ describe Mongoid do
   end
 
   describe ".deprecate" do
-    let(:deprecation) { stub }
 
-    before do
-      Mongoid::Deprecation.expects(:instance).returns(deprecation)
-    end
-
-    it "calls alert on the deprecation singleton" do
-      deprecation.expects(:alert).with("testing")
-      Mongoid.deprecate("testing")
+    it "returns true" do
+      Mongoid.deprecate("testing").should be_true
     end
   end
 end

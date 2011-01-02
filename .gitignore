@@ -11,3 +11,5 @@ rdoc/*
 TODO
 ISSUES
 DONATE
+.yardoc/*
+doc/*

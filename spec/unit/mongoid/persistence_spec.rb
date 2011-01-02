@@ -212,7 +212,7 @@ describe Mongoid::Persistence do
     end
   end
 
-  describe "#_remove" do
+  describe "#remove" do
 
     let(:remove) do
       stub.quacks_like(Mongoid::Persistence::Remove.allocate)
@@ -224,7 +224,7 @@ describe Mongoid::Persistence do
 
     it "delegates to the remove persistence command" do
       remove.expects(:persist).returns(true)
-      person._remove.should == true
+      person.remove.should == true
     end
   end
 
