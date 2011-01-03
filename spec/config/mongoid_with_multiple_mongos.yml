@@ -9,7 +9,7 @@ defaults: &defaults
     secondary:
       database: secondary_config_test
       host: localhost
-      post: 27020
+      port: 27020
       slaves:
         - host: localhost
           port: 27021
