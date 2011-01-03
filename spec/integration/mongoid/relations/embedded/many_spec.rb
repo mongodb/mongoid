@@ -1210,6 +1210,54 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#method_missing" do
+
+    let!(:person) do
+      Person.create(:ssn => "333-33-3333")
+    end
+
+    let!(:address_one) do
+      person.addresses.create(:street => "Market", :state => "CA")
+    end
+
+    let!(:address_two) do
+      person.addresses.create(:street => "Madison", :state => "NY")
+    end
+
+    context "when providing a single criteria" do
+
+      let(:addresses) do
+        person.addresses.where(:state => "CA")
+      end
+
+      it "applies the criteria to the documents" do
+        addresses.should == [ address_one ]
+      end
+    end
+
+    context "when providing a criteria class method" do
+
+      let(:addresses) do
+        person.addresses.california
+      end
+
+      it "applies the criteria to the documents" do
+        addresses.should == [ address_one ]
+      end
+    end
+
+    context "when chaining criteria" do
+
+      let(:addresses) do
+        person.addresses.california.where(:street.in => [ "Market" ])
+      end
+
+      it "applies the criteria to the documents" do
+        addresses.should == [ address_one ]
+      end
+    end
+  end
+
   describe "#paginate" do
 
     let(:person) do
