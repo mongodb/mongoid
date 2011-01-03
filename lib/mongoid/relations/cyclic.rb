@@ -32,8 +32,8 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def recursively_embeds_many
-          embeds_many child_name, :class_name => self.name, :cyclic => true
-          embedded_in parent_name, :class_name => self.name, :cyclic => true
+          embeds_many cyclic_child_name, :class_name => self.name, :cyclic => true
+          embedded_in cyclic_parent_name, :class_name => self.name, :cyclic => true
         end
 
         # Create a cyclic embedded relation that creates a single self
@@ -59,8 +59,8 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def recursively_embeds_one
-          embeds_one child_name(false), :class_name => self.name, :cyclic => true
-          embedded_in parent_name, :class_name => self.name, :cyclic => true
+          embeds_one cyclic_child_name(false), :class_name => self.name, :cyclic => true
+          embedded_in cyclic_parent_name, :class_name => self.name, :cyclic => true
         end
 
         private
@@ -68,19 +68,19 @@ module Mongoid # :nodoc:
         # Determines the parent name given the class.
         #
         # @example Determine the parent name.
-        #   Role.parent_name
+        #   Role.cyclic_parent_name
         #
         # @return [ String ] "parent_" plus the class name underscored.
         #
         # @since 2.0.0.rc.1
-        def parent_name
+        def cyclic_parent_name
           ("parent_" << self.name.underscore.singularize).to_sym
         end
 
         # Determines the child name given the class.
         #
         # @example Determine the child name.
-        #   Role.child_name
+        #   Role.cyclic_child_name
         #
         # @param [ true, false ] many Is the a many relation?
         #
@@ -88,7 +88,7 @@ module Mongoid # :nodoc:
         #   singular or plural form.
         #
         # @since 2.0.0.rc.1
-        def child_name(many = true)
+        def cyclic_child_name(many = true)
           ("child_" << self.name.underscore.send(many ? :pluralize : :singularize)).to_sym
         end
       end
