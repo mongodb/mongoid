@@ -2,15 +2,12 @@ require "spec_helper"
 
 describe Mongoid::Config::Database do
 
-  let(:logger) do
-    Logger.new($stdout)
-  end
-
-  after(:all) do
-    Mongoid.master.connection.instance_variable_set(:@logger, nil)
-  end
-
   describe "#configure" do
+
+    context "when configuring multiple databases" do
+
+      pending "Durran: Move Multi-Database Specs here."
+    end
 
     context "when configuring a master instance" do
 

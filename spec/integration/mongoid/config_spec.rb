@@ -15,6 +15,10 @@ describe Mongoid::Config do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_slaves.yml")
   end
 
+  let(:multi_config) do
+    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_multiple_mongos.yml")
+  end
+
   after(:all) do
     Mongoid.configure do |config|
       name = "mongoid_test"
