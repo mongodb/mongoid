@@ -15,22 +15,6 @@ module Mongoid #:nodoc:
       delegate :version_max, :to => "self.class"
     end
 
-    module ClassMethods #:nodoc:
-      attr_accessor :version_max
-
-      # Sets the maximum number of versions to store.
-      #
-      # @example Set the maximum.
-      #   Person.max_versions(5)
-      #
-      # @param [ Integer ] number The maximum number to store.
-      #
-      # @return [ Integer ] The max number of versions.
-      def max_versions(number)
-        self.version_max = number.to_i
-      end
-    end
-
     # Create a new version of the +Document+. This will load the previous
     # document from the database and set it as the next version before saving
     # the current document. It then increments the version number. If a #max_versions
@@ -45,6 +29,22 @@ module Mongoid #:nodoc:
         versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
         @modifications["versions"] = [ nil, versions.to_hash ] if @modifications
+      end
+    end
+
+    module ClassMethods #:nodoc:
+      attr_accessor :version_max
+
+      # Sets the maximum number of versions to store.
+      #
+      # @example Set the maximum.
+      #   Person.max_versions(5)
+      #
+      # @param [ Integer ] number The maximum number to store.
+      #
+      # @return [ Integer ] The max number of versions.
+      def max_versions(number)
+        self.version_max = number.to_i
       end
     end
   end

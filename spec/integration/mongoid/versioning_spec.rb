@@ -1,79 +1,90 @@
 require "spec_helper"
 
-class WikiPage
-  include Mongoid::Document
-  include Mongoid::Versioning
-
-  max_versions 5
-
-  field :title, :type => String
-end
-
 describe Mongoid::Versioning do
-  before do
-    @page = WikiPage.new :title => "1st Title"
-    @page.save
-  end
 
   describe "#version" do
-    it "defaults to 1" do
-      @page.version.should == 1
+
+    let(:page) do
+      WikiPage.new(:title => "1")
     end
 
-    context "document changes once" do
+    context "when the document is new" do
+
+      it "defaults to 1" do
+        page.version.should == 1
+      end
+    end
+
+    context "after the document's first save" do
+
       before do
-        @page.title = "2nd Title"
-        @page.save
+        page.save
       end
 
-      it "should be on its second version " do
-        @page.version.should == 2
+      it "returns 1" do
+        page.version.should == 1
+      end
+    end
+
+    context "when saving multiple times" do
+
+      it "increments the version by 1" do
+        8.times do |n|
+          page.save
+          page.version.should == n + 1
+        end
       end
     end
   end
 
-  context "when hitting version_max" do
-    before do
-      @page.update_attributes(:title => "2nd Title")
-      @page.update_attributes(:title => "3rd Title")
-      @page.update_attributes(:title => "4th Title")
-      @page.update_attributes(:title => "5th Title")
-      @page.update_attributes(:title => "6th Title")
+  describe "#versions" do
+
+    let(:page) do
+      WikiPage.create(:title => "1")
     end
 
-    it "should be on its 6th version" do
-      @page.version.should == 6
-    end
+    context "when version is less than the maximum" do
 
-    it "should store all 5 of its old copies" do
-      @page.versions.map(&:title).should == [
-        "1st Title",
-        "2nd Title",
-        "3rd Title",
-        "4th Title",
-        "5th Title"
-      ]
-    end
-
-    context "when exceeding version_max" do
       before do
-        @page.update_attributes(:title => "7th Title")
+        4.times do |n|
+          page.title = "#{n + 2}"
+          page.save
+        end
       end
 
-      it "be on its 7th version" do
-        @page.version.should == 7
+      let(:expected) do
+        [ "1", "2", "3", "4" ]
       end
 
-      it "should only store 5 of its old copies" do
-        @page.versions.map(&:title).should == [
-          "2nd Title",
-          "3rd Title",
-          "4th Title",
-          "5th Title",
-          "6th Title"
-        ]
+      it "retains all versions" do
+        page.versions.size.should == 4
+      end
+
+      it "retains the correct values" do
+        page.versions.map(&:title).should == expected
       end
     end
 
+    context "when version is over the maximum" do
+
+      before do
+        7.times do |n|
+          page.title = "#{n + 2}"
+          page.save
+        end
+      end
+
+      let(:expected) do
+        [ "3", "4", "5", "6", "7" ]
+      end
+
+      it "retains the set number of most recent versions" do
+        page.versions.size.should == 5
+      end
+
+      it "retains the most recent values" do
+        page.versions.map(&:title).should == expected
+      end
+    end
   end
 end
