@@ -1692,6 +1692,54 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#method_missing" do
+
+    let!(:person) do
+      Person.create(:ssn => "333-33-3333")
+    end
+
+    let!(:post_one) do
+      person.posts.create(:title => "First", :content => "Posting")
+    end
+
+    let!(:post_two) do
+      person.posts.create(:title => "Second", :content => "Testing")
+    end
+
+    context "when providing a single criteria" do
+
+      let(:posts) do
+        person.posts.where(:title => "First")
+      end
+
+      it "applies the criteria to the documents" do
+        posts.should == [ post_one ]
+      end
+    end
+
+    context "when providing a criteria class method" do
+
+      let(:posts) do
+        person.posts.posting
+      end
+
+      it "applies the criteria to the documents" do
+        posts.should == [ post_one ]
+      end
+    end
+
+    context "when chaining criteria" do
+
+      let(:posts) do
+        person.posts.posting.where(:title.in => [ "First" ])
+      end
+
+      it "applies the criteria to the documents" do
+        posts.should == [ post_one ]
+      end
+    end
+  end
+
   describe "#nullify_all" do
 
     context "when the relation is not polymorphic" do

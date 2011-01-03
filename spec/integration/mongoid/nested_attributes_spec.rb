@@ -1754,7 +1754,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the second existing document" do
-                  person.posts(true).second.title.should == "Second"
+                  person.posts(true).last.title.should == "Second"
                 end
 
                 it "does not add new documents" do

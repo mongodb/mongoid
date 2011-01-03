@@ -203,6 +203,17 @@ module Mongoid #:nodoc:
           Bindings::Referenced::Many.new(base, new_target || target, metadata)
         end
 
+        # Returns the criteria object for the target class with its documents set
+        # to target.
+        #
+        # @example Get a criteria for the relation.
+        #   relation.criteria
+        #
+        # @return [ Criteria ] A new criteria.
+        def criteria
+          metadata.klass.criteria(false)
+        end
+
         # Will load the target into an array if the target had not already been
         # loaded.
         #

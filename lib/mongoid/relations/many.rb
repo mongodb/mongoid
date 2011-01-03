@@ -148,6 +148,24 @@ module Mongoid #:nodoc:
       def find_or(method, attrs = {})
         find(:first, :conditions => attrs) || send(method, attrs)
       end
+
+      # If the target array does not respond to the supplied method then try to
+      # find a named scope or criteria on the class and send the call there.
+      #
+      # If the method exists on the array, use the default proxy behavior.
+      #
+      # @param [ Symbol, String ] name The name of the method.
+      # @param [ Array ] args The method args
+      # @param [ Proc ] block Optional block to pass.
+      #
+      # @return [ Criteria, Object ] A Criteria or return value from the target.
+      def method_missing(name, *args, &block)
+        return super if target.respond_to?(name) || [].respond_to?(name)
+        klass = metadata.klass
+        klass.send(:with_scope, criteria) do
+          klass.send(name, *args)
+        end
+      end
     end
   end
 end
