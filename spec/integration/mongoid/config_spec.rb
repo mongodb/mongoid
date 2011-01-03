@@ -125,6 +125,31 @@ describe Mongoid::Config do
         described_class.use_utc.should be_true
       end
     end
+
+    context "when configuring with multiple databases", :config => :multi do
+
+      let(:settings) do
+        YAML.load(ERB.new(File.new(multi_config).read).result)
+      end
+
+      let(:databases) do
+        described_class.databases["secondary"]
+      end
+
+      let(:slaves) do
+        described_class.databases["secondary_slaves"]
+      end
+
+      it "sets the secondary master database" do
+        databases.name.should == "secondary_config_test"
+      end
+
+      it "sets the secondary slaves" do
+        slaves.each do |slave|
+          slave.name.should == "secondary_config_test"
+        end
+      end
+    end
   end
 
   describe ".logger" do
@@ -329,6 +354,4 @@ describe Mongoid::Config do
       end
     end
   end
-
-  pending "Durran: Add specs for multi-database"
 end

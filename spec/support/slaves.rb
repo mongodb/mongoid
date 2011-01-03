@@ -20,14 +20,12 @@ module Support #:nodoc:
       ---------------------------------------------------------------------
       The Mongoid configuration specs require 2 slave databases to be
       running in order to properly be tested. Those specs are skipped when
-      the slaves are not running locally. Here is a sample configuration
-      for a slave database:
+      the slaves are not running locally.
 
-        dbpath = /usr/local/var/mongodb/slave
-        port = 27018
-        slave = true
-        bind_ip = 127.0.0.1
-        source = 127.0.0.1:27017
+      See the following configuration files for assistance:
+        spec/config/mongod.conf
+        spec/config/mongod.slave.one.conf
+        spec/config/mongod.slave.two.conf
       ---------------------------------------------------------------------
       }
     end

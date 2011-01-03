@@ -62,8 +62,20 @@ module Mongoid #:nodoc
       end
     end
 
+    # Get any extra databases that have been configured.
+    #
+    # @example Get the extras.
+    #   config.databases
+    #
+    # @return [ Hash ] A hash of secondary databases.
     def databases
-      {}
+      configure_extras(@settings) unless @databases || !@settings
+      @databases || {}
+    end
+
+    # @todo Durran: There were no tests around the databases setter, not sure
+    # what the exact expectation was. Set with a hash?
+    def databases=(databases)
     end
 
     # Return field names that could cause destructive things to happen if
@@ -90,10 +102,11 @@ module Mongoid #:nodoc
     #
     # @param [ Hash ] options The settings to use.
     def from_hash(options = {})
-      options.except("database", "slaves").each_pair do |name, value|
+      options.except("database", "slaves", "databases").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
       configure_databases(options)
+      configure_extras(options["databases"])
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -300,6 +313,22 @@ module Mongoid #:nodoc
     # @since 2.0.0.rc.1
     def configure_databases(options)
       @master, @slaves = Database.new(options).configure
+    end
+
+    # Get the secondary databases from settings.
+    #
+    # @example Configure the master and slave dbs.
+    #   config.configure_extras("databases" => settings)
+    #
+    # @param [ Hash ] options The options to use.
+    #
+    # @since 2.0.0.rc.1
+    def configure_extras(extras)
+      @databases = (extras || []).inject({}) do |dbs, (name, options)|
+        dbs.tap do |extra|
+          dbs[name], dbs["#{name}_slaves"] = Database.new(options).configure
+        end
+      end
     end
   end
 end

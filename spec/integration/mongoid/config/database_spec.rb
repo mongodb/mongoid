@@ -4,11 +4,6 @@ describe Mongoid::Config::Database do
 
   describe "#configure" do
 
-    context "when configuring multiple databases" do
-
-      pending "Durran: Move Multi-Database Specs here."
-    end
-
     context "when configuring a master instance" do
 
       let(:config) do
