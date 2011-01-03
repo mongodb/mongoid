@@ -6,50 +6,46 @@ describe Mongoid::Relations::Embedded::In do
     Person.delete_all
   end
 
-  before(:all) do
-    # Mongoid.master.connection.instance_variable_set(:@logger, LOGGER)
-  end
-
   context "when creating the tree through initialization" do
 
-    # let!(:person) do
-      # Person.create(:ssn => "666-66-6666")
-    # end
+    let!(:person) do
+      Person.create(:ssn => "666-66-6666")
+    end
 
-    # let!(:address) do
-      # Address.create(:addressable => person)
-    # end
+    let!(:address) do
+      Address.new(:addressable => person)
+    end
 
-    # let!(:first_location) do
-      # Location.create(:address => address)
-    # end
+    let!(:first_location) do
+      Location.new(:address => address)
+    end
 
-    # let!(:second_location) do
-      # Location.create(:address => address)
-    # end
+    let!(:second_location) do
+      Location.new(:address => address)
+    end
 
-    # it "saves the person" do
-      # Person.last.should == person
-    # end
+    it "saves the person" do
+      Person.last.should == person
+    end
 
-    # it "saves the address" do
-      # Person.last.should == person
-      # Person.last.addresses.last.should == address
-      # address._index.should == 0
-    # end
+    it "saves the address" do
+      Person.last.should == person
+      Person.last.addresses.last.should == address
+      address._index.should == 0
+    end
 
-    # it "saves the first location with the correct index" do
-      # first_location._index.should == 0
-    # end
+    it "saves the first location with the correct index" do
+      first_location._index.should == 0
+    end
 
-    # it "saves the second location with the correct index" do
-      # second_location._index.should == 1
-    # end
+    it "saves the second location with the correct index" do
+      second_location._index.should == 1
+    end
 
-    # it "has the locations in the association array" do
-      # Person.last.addresses.last.locations.should ==
-        # [first_location, second_location]
-    # end
+    it "has the locations in the association array" do
+      Person.last.addresses.last.locations.should ==
+        [first_location, second_location]
+    end
   end
 
   describe "#=" do
