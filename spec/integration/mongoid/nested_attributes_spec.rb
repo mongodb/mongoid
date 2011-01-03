@@ -2242,6 +2242,586 @@ describe Mongoid::NestedAttributes do
           end
         end
       end
+
+      context "when the relation is a references many to many" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:preference_one) do
+          Preference.new(:name => "First preference")
+        end
+
+        let(:preference_two) do
+          Preference.new(:name => "First response")
+        end
+
+        context "when a limit is specified" do
+
+          before :all do
+            Person.send(:undef_method, :preferences_attributes=)
+            Person.accepts_nested_attributes_for :preferences, :limit => 2
+          end
+
+          after :all do
+            Person.send(:undef_method, :preferences_attributes=)
+            Person.accepts_nested_attributes_for :preferences
+          end
+
+          context "when more are provided than the limit" do
+
+            let(:attributes) do
+              {
+                "foo" => { "name" => "First" },
+                "bar" => { "name" => "Second" },
+                "baz" => { "name" => "Third" }
+              }
+            end
+
+            it "raises an error" do
+              expect {
+                person.preferences_attributes = attributes
+              }.to raise_error(Mongoid::Errors::TooManyNestedAttributeRecords)
+            end
+          end
+
+          context "when less are provided than the limit" do
+
+            let(:attributes) do
+              {
+                "foo" => { "name" => "First" },
+                "bar" => { "name" => "Second" }
+              }
+            end
+
+            before do
+              person.preferences_attributes = attributes
+            end
+
+            it "sets the documents on the relation" do
+              person.preferences.size.should == 2
+            end
+          end
+        end
+
+        context "when ids are passed" do
+
+          let(:person) do
+            Person.create(:ssn => "987-12-4756")
+          end
+
+          before do
+            person.preferences << [ preference_one, preference_two ]
+          end
+
+          context "when no destroy attributes are passed" do
+
+            context "when the ids match" do
+
+              before do
+                person.preferences_attributes =
+                  {
+                    "0" => { "_id" => preference_one.id, "name" => "First" },
+                    "1" => { "_id" => preference_two.id, "name" => "Second" }
+                  }
+              end
+
+              context "when reloading the document" do
+
+                it "updates the first existing document" do
+                  person.preferences(true).first.name.should == "First"
+                end
+
+                it "updates the second existing document" do
+                  person.preferences(true).second.name.should == "Second"
+                end
+
+                it "does not add new documents" do
+                  person.preferences(true).size.should == 2
+                end
+              end
+            end
+
+            context "when the ids do not match" do
+
+              it "raises an error" do
+                expect {
+                  person.preferences_attributes =
+                    { "foo" => { "_id" => "test", "name" => "Test" } }
+                }.to raise_error
+              end
+            end
+          end
+
+          context "when destroy attributes are passed" do
+
+            context "when the ids match" do
+
+              context "when allow_destroy is true" do
+
+                before :all do
+                  Person.send(:undef_method, :preferences_attributes=)
+                  Person.accepts_nested_attributes_for :preferences, :allow_destroy => true
+                end
+
+                after :all do
+                  Person.send(:undef_method, :preferences_attributes=)
+                  Person.accepts_nested_attributes_for :preferences
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed a #{truth} with destroy" do
+
+                    before do
+                      person.preferences_attributes =
+                        {
+                          "0" => { "_id" => preference_one.id, "_destroy" => truth },
+                          "1" => { "_id" => preference_two.id, "name" => "My Blog" }
+                        }
+                    end
+
+                    context "when reloading the documents" do
+
+                      it "deletes the marked document" do
+                        person.preferences(true).size.should == 1
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.preferences(true).first.name.should == "My Blog"
+                      end
+                    end
+                  end
+                end
+
+                [ 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed a #{falsehood} with destroy" do
+
+                    before do
+                      person.preferences_attributes =
+                        {
+                          "0" => { "_id" => preference_one.id, "_destroy" => falsehood },
+                          "1" => { "_id" => preference_two.id, "name" => "My Blog" }
+                        }
+                    end
+
+                    context "when reloading the document" do
+
+                      it "does not delete the marked document" do
+                        person.preferences(true).size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.preferences(true).last.name.should == "My Blog"
+                      end
+                    end
+                  end
+                end
+              end
+
+              context "when allow_destroy is false" do
+
+                before :all do
+                  Person.send(:undef_method, :preferences_attributes=)
+                  Person.accepts_nested_attributes_for :preferences, :allow_destroy => false
+                end
+
+                after :all do
+                  Person.send(:undef_method, :preferences_attributes=)
+                  Person.accepts_nested_attributes_for :preferences
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed a #{truth} with destroy" do
+
+                    before do
+                      person.preferences_attributes =
+                        {
+                          "0" => {
+                            "_id" => preference_one.id, "name" => "Another Title", "_destroy" => truth },
+                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading the document" do
+
+                      it "does not ignore the marked document" do
+                        person.preferences(true).first.name.should == "Another Title"
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.preferences(true).last.name.should == "New Title"
+                      end
+
+                      it "does not add additional documents" do
+                        person.preferences(true).size.should == 2
+                      end
+                    end
+                  end
+                end
+
+                [ 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed a #{falsehood} with destroy" do
+
+                    before do
+                      person.preferences_attributes =
+                        {
+                          "0" => { "_id" => preference_one.id, "_destroy" => falsehood },
+                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading the documents" do
+
+                      it "does not delete the marked document" do
+                        person.preferences(true).size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.preferences(true).last.name.should == "New Title"
+                      end
+                    end
+                  end
+                end
+              end
+
+              context "when allow_destroy is undefined" do
+
+                before :all do
+                  Person.send(:undef_method, :preferences_attributes=)
+                  Person.accepts_nested_attributes_for :preferences
+                end
+
+                [ 1, "1", true, "true" ].each do |truth|
+
+                  context "when passed a #{truth} with destroy" do
+
+                    before do
+                      person.preferences_attributes =
+                        {
+                          "0" => {
+                            "_id" => preference_one.id, "name" => "Another Title", "_destroy" => truth },
+                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading" do
+
+                      it "does not ignore the marked document" do
+                        person.preferences(true).first.name.should == "Another Title"
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.preferences(true).last.name.should == "New Title"
+                      end
+
+                      it "does not add additional documents" do
+                        person.preferences(true).size.should == 2
+                      end
+                    end
+                  end
+                end
+
+                [ 0, "0", false, "false" ].each do |falsehood|
+
+                  context "when passed a #{falsehood} with destroy" do
+
+                    before do
+                      person.preferences_attributes =
+                        {
+                          "0" => { "_id" => preference_one.id, "_destroy" => falsehood },
+                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                        }
+                    end
+
+                    context "when reloading" do
+
+                      it "does not delete the marked document" do
+                        person.preferences(true).size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.preferences(true).last.name.should == "New Title"
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        context "when no ids are passed" do
+
+          context "when no destroy attributes are passed" do
+
+            before do
+              person.preferences_attributes =
+                {
+                  "4" => { "name" => "Third" },
+                  "1" => { "name" => "First" },
+                  "2" => { "name" => "Second" }
+                }
+            end
+
+            it "builds a new first document" do
+              person.preferences.first.name.should == "First"
+            end
+
+            it "builds a new second document" do
+              person.preferences.second.name.should == "Second"
+            end
+
+            it "builds a new third document" do
+              person.preferences.third.name.should == "Third"
+            end
+
+            it "does not add extra documents" do
+              person.preferences.size.should == 3
+            end
+
+            it "adds the documents in the sorted hash key order" do
+              person.preferences.map(&:name).should ==
+                [ "First", "Second", "Third" ]
+            end
+          end
+
+          context "when a reject block is supplied" do
+
+            before :all do
+              Person.send(:undef_method, :preferences_attributes=)
+              Person.accepts_nested_attributes_for \
+                :preferences, :reject_if => lambda { |attrs| attrs["name"].blank? }
+            end
+
+            after :all do
+              Person.send(:undef_method, :preferences_attributes=)
+              Person.accepts_nested_attributes_for :preferences
+            end
+
+            context "when the attributes match" do
+
+              before do
+                person.preferences_attributes =
+                  { "3" => { "content" => "My first blog" } }
+              end
+
+              it "does not add the new document" do
+                person.preferences.should be_empty
+              end
+            end
+
+            context "when the attributes do not match" do
+
+              before do
+                person.preferences_attributes =
+                  { "3" => { "name" => "Blogging" } }
+              end
+
+              it "adds the new document" do
+                person.preferences.size.should == 1
+              end
+
+              it "sets the correct attributes" do
+                person.preferences.first.name.should == "Blogging"
+              end
+            end
+          end
+
+          context "when destroy attributes are passed" do
+
+            context "when allow_destroy is true" do
+
+              before :all do
+                Person.send(:undef_method, :preferences_attributes=)
+                Person.accepts_nested_attributes_for :preferences, :allow_destroy => true
+              end
+
+              after :all do
+                Person.send(:undef_method, :preferences_attributes=)
+                Person.accepts_nested_attributes_for :preferences
+              end
+
+              [ 1, "1", true, "true" ].each do |truth|
+
+                context "when passed a #{truth} with destroy" do
+
+                  before do
+                    person.preferences_attributes =
+                      {
+                        "0" => { "name" => "New Blog", "_destroy" => truth },
+                        "1" => { "name" => "Blog Two" }
+                      }
+                  end
+
+                  it "ignores the the marked document" do
+                    person.preferences.size.should == 1
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.preferences.first.name.should == "Blog Two"
+                  end
+                end
+              end
+
+              [ 0, "0", false, "false" ].each do |falsehood|
+
+                context "when passed a #{falsehood} with destroy" do
+
+                  before do
+                    person.preferences_attributes =
+                      {
+                        "0" => { "name" => "New Blog", "_destroy" => falsehood },
+                        "1" => { "name" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the new marked document" do
+                    person.preferences.first.name.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.preferences.last.name.should == "Blog Two"
+                  end
+
+                  it "does not add extra documents" do
+                    person.preferences.size.should == 2
+                  end
+                end
+              end
+            end
+
+            context "when allow destroy is false" do
+
+              before :all do
+                Person.send(:undef_method, :preferences_attributes=)
+                Person.accepts_nested_attributes_for :preferences, :allow_destroy => false
+              end
+
+              after :all do
+                Person.send(:undef_method, :preferences_attributes=)
+                Person.accepts_nested_attributes_for :preferences
+              end
+
+              [ 1, "1", true, "true" ].each do |truth|
+
+                context "when passed a #{truth} with destroy" do
+
+                  before do
+                    person.preferences_attributes =
+                      {
+                        "0" => { "name" => "New Blog", "_destroy" => truth },
+                        "1" => { "name" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the the marked document" do
+                    person.preferences.first.name.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.preferences.last.name.should == "Blog Two"
+                  end
+
+                  it "adds the correct number of documents" do
+                    person.preferences.size.should == 2
+                  end
+                end
+              end
+
+              [ 0, "0", false, "false" ].each do |falsehood|
+
+                context "when passed a #{falsehood} with destroy" do
+
+                  before do
+                    person.preferences_attributes =
+                      {
+                        "0" => { "name" => "New Blog", "_destroy" => falsehood },
+                        "1" => { "name" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the new marked document" do
+                    person.preferences.first.name.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.preferences.last.name.should == "Blog Two"
+                  end
+
+                  it "does not add extra documents" do
+                    person.preferences.size.should == 2
+                  end
+                end
+              end
+            end
+
+            context "when allow destroy is not defined" do
+
+              before :all do
+                Person.send(:undef_method, :preferences_attributes=)
+                Person.accepts_nested_attributes_for :preferences
+              end
+
+              [ 1, "1", true, "true" ].each do |truth|
+
+                context "when passed a #{truth} with destroy" do
+
+                  before do
+                    person.preferences_attributes =
+                      {
+                        "0" => { "name" => "New Blog", "_destroy" => truth },
+                        "1" => { "name" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the the marked document" do
+                    person.preferences.first.name.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.preferences.last.name.should == "Blog Two"
+                  end
+
+                  it "adds the correct number of documents" do
+                    person.preferences.size.should == 2
+                  end
+                end
+              end
+
+              [ 0, "0", false, "false" ].each do |falsehood|
+
+                context "when passed a #{falsehood} with destroy" do
+
+                  before do
+                    person.preferences_attributes =
+                      {
+                        "0" => { "name" => "New Blog", "_destroy" => falsehood },
+                        "1" => { "name" => "Blog Two" }
+                      }
+                  end
+
+                  it "adds the new marked document" do
+                    person.preferences.first.name.should == "New Blog"
+                  end
+
+                  it "adds the new unmarked document" do
+                    person.preferences.last.name.should == "Blog Two"
+                  end
+
+                  it "does not add extra documents" do
+                    person.preferences.size.should == 2
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

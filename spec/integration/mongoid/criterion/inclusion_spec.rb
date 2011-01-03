@@ -84,7 +84,99 @@ describe Mongoid::Criterion::Inclusion do
 
   describe "#find" do
 
-    pending "Github 273: Criteria#find match AR behavior"
+    let!(:person) do
+      Person.create(:title => "Sir")
+    end
+
+    context "when finding by an id" do
+
+      context "when the id is found" do
+
+        let!(:from_db) do
+          Person.where(:title => "Sir").find(person.id)
+        end
+
+        it "returns the matching document" do
+          from_db.should == person
+        end
+      end
+
+      context "when the id is not found" do
+
+        context "when raising a not found error" do
+
+          it "raises an error" do
+            expect {
+              Person.where(:title => "Sir").find(BSON::ObjectId.new)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when not raising a not found error" do
+
+          before do
+            Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
+          end
+
+          let!(:from_db) do
+            Person.where(:title => "Sir").find(BSON::ObjectId.new)
+          end
+
+          it "returns nil" do
+            from_db.should be_nil
+          end
+        end
+      end
+    end
+
+    context "when finding by an array of ids" do
+
+      context "when the id is found" do
+
+        let!(:from_db) do
+          Person.where(:title => "Sir").find([ person.id ])
+        end
+
+        it "returns the matching document" do
+          from_db.should == [ person ]
+        end
+      end
+
+      context "when the id is not found" do
+
+        context "when raising a not found error" do
+
+          it "raises an error" do
+            expect {
+              Person.where(:title => "Sir").find([ BSON::ObjectId.new ])
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when not raising a not found error" do
+
+          before do
+            Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
+          end
+
+          let!(:from_db) do
+            Person.where(:title => "Sir").find([ BSON::ObjectId.new ])
+          end
+
+          it "returns an empty array" do
+            from_db.should be_empty
+          end
+        end
+      end
+    end
   end
 
   describe "#where" do

@@ -329,7 +329,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def nested_builder(metadata, attributes, options)
-            Builders::Referenced::Nested::ManyToMany.new(metadata, attributes, options)
+            Builders::NestedAttributes::Many.new(metadata, attributes, options)
           end
 
           # Tells the caller if this relation is one that stores the foreign

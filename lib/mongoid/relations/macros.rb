@@ -65,10 +65,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
-          relate(
-            name,
-            metadatafy(name, Embedded::Many, options, &block)
-          )
+          metadatafy(name, Embedded::Many, options, &block).tap do |meta|
+            relate(name, meta)
+            validate_relation(meta)
+          end
         end
 
         # Adds the relation from a parent document to its child. The name
@@ -91,11 +91,11 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
-          relate(
-            name,
-            metadatafy(name, Embedded::One, options, &block)
-          )
-          builder(name).creator(name)
+          metadatafy(name, Embedded::One, options, &block).tap do |meta|
+            relate(name, meta)
+            builder(name).creator(name)
+            validate_relation(meta)
+          end
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -145,6 +145,7 @@ module Mongoid # :nodoc:
           metadatafy(name, Referenced::Many, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
+            validate_relation(meta)
           end
         end
 
@@ -172,6 +173,7 @@ module Mongoid # :nodoc:
           metadatafy(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
+            validate_relation(meta)
           end
         end
 
@@ -198,6 +200,7 @@ module Mongoid # :nodoc:
             relate(name, meta)
             reference(meta)
             builder(name).creator(name)
+            validate_relation(meta)
           end
         end
 
