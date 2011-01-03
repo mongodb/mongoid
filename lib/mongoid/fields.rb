@@ -5,7 +5,7 @@ module Mongoid #:nodoc
     included do
       # Set up the class attributes that must be available to all subclasses.
       # These include defaults, fields
-      class_inheritable_accessor :fields
+      class_attribute :fields
 
       self.fields = {}
       delegate :defaults, :fields, :to => "self.class"

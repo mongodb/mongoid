@@ -8,7 +8,7 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
-        class_inheritable_accessor :relations
+        class_attribute :relations
         self.relations = {}
 
         # Convenience methods for the instance to know about attributes that
