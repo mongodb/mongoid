@@ -143,6 +143,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_many(name, options = {}, &block)
+          check_options(options)
           metadatafy(name, Referenced::Many, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
@@ -208,6 +209,26 @@ module Mongoid # :nodoc:
         alias :has_one_related :references_one
 
         private
+
+        # Temporary check while people switch over to the new macro. Will be
+        # deleted in 2.0.0.
+        #
+        # @example Check the options.
+        #   Person.check_options({})
+        #
+        # @param [ Hash ] options The options given to the relational many.
+        #
+        # @raise [ RuntimeError ] If :stored_as => :array is found.
+        #
+        # @since 2.0.0.rc.1
+        def check_options(options = {})
+          if options[:stored_as] == :array
+            raise RuntimeError.new(
+              "Macro: references_many :name, :stored_as => :array " <<
+              "Is no longer valid. Please use: references_and_referenced_in_many :name"
+            )
+          end
+        end
 
         # Create the metadata for the relation.
         #

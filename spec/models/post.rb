@@ -1,7 +1,7 @@
 class Tag
   include Mongoid::Document
   field :text
-  referenced_in :post
+  references_and_referenced_in_many :posts
 end
 
 class Post
@@ -12,8 +12,7 @@ class Post
   field :content
   referenced_in :person
   referenced_in :author, :foreign_key => :author_id, :class_name => "User"
-
-  references_many :tags, :stored_as => :array
+  references_and_referenced_in_many :tags
 
   scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
 
