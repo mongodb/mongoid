@@ -212,6 +212,17 @@ module Mongoid # :nodoc:
           Bindings::Referenced::ManyToMany.new(base, new_target || target, metadata)
         end
 
+        # Returns the criteria object for the target class with its documents set
+        # to target.
+        #
+        # @example Get a criteria for the relation.
+        #   relation.criteria
+        #
+        # @return [ Criteria ] A new criteria.
+        def criteria
+          metadata.klass.criteria(false)
+        end
+
         # Dereferences the supplied document from the base of the relation.
         #
         # @example Dereference the document.

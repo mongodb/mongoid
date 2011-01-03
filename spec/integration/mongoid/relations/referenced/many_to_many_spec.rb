@@ -923,6 +923,54 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#method_missing" do
+
+    let!(:person) do
+      Person.create(:ssn => "333-33-3333")
+    end
+
+    let!(:preference_one) do
+      person.preferences.create(:name => "First", :value => "Posting")
+    end
+
+    let!(:preference_two) do
+      person.preferences.create(:name => "Second", :value => "Testing")
+    end
+
+    context "when providing a single criteria" do
+
+      let(:preferences) do
+        person.preferences.where(:name => "First")
+      end
+
+      it "applies the criteria to the documents" do
+        preferences.should == [ preference_one ]
+      end
+    end
+
+    context "when providing a criteria class method" do
+
+      let(:preferences) do
+        person.preferences.posting
+      end
+
+      it "applies the criteria to the documents" do
+        preferences.should == [ preference_one ]
+      end
+    end
+
+    context "when chaining criteria" do
+
+      let(:preferences) do
+        person.preferences.posting.where(:name.in => [ "First" ])
+      end
+
+      it "applies the criteria to the documents" do
+        preferences.should == [ preference_one ]
+      end
+    end
+  end
+
   describe "#nullify_all" do
 
     let(:person) do
