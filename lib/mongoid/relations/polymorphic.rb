@@ -8,7 +8,7 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
-        class_inheritable_accessor :polymorphic
+        class_attribute :polymorphic
         delegate :polymorphic?, :to => "self.class"
       end
 

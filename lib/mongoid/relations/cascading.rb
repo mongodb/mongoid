@@ -13,7 +13,7 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
-        class_inheritable_accessor :cascades
+        class_attribute :cascades
         self.cascades = []
         delegate :cascades, :to => "self.class"
       end
