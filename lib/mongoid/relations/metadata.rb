@@ -169,17 +169,11 @@ module Mongoid # :nodoc:
         "  class_name:           #{class_name},\n" <<
         "  cyclic:               #{cyclic || "No"},\n" <<
         "  dependent:            #{dependent || "None"},\n" <<
-        "  foreign_key:          #{foreign_key},\n" <<
-        "  foreign_key_default:  #{foreign_key_default},\n" <<
-        "  foreign_key_setter:   #{foreign_key_setter},\n" <<
-        "  inverse_foreign_key:  #{inverse_foreign_key},\n" <<
-        "  inverse_klass:        #{inverse_klass},\n" <<
         "  inverse_of:           #{inverse_of || "N/A"},\n" <<
         "  inverse_setter:       #{inverse_setter},\n" <<
         "  inverse_type:         #{inverse_type || "N/A"},\n" <<
         "  inverse_type_setter:  #{inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{key},\n" <<
-        "  klass:                #{klass},\n" <<
         "  macro:                #{macro},\n" <<
         "  name:                 #{name},\n" <<
         "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<

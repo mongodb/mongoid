@@ -352,17 +352,11 @@ describe Mongoid::Relations::Metadata do
         "  class_name:           #{metadata.class_name},\n" <<
         "  cyclic:               #{metadata.cyclic || "No"},\n" <<
         "  dependent:            #{metadata.dependent || "None"},\n" <<
-        "  foreign_key:          #{metadata.foreign_key},\n" <<
-        "  foreign_key_default:  #{metadata.foreign_key_default},\n" <<
-        "  foreign_key_setter:   #{metadata.foreign_key_setter},\n" <<
-        "  inverse_foreign_key:  #{metadata.inverse_foreign_key},\n" <<
-        "  inverse_klass:        #{metadata.inverse_klass},\n" <<
         "  inverse_of:           #{metadata.inverse_of || "N/A"},\n" <<
         "  inverse_setter:       #{metadata.inverse_setter},\n" <<
         "  inverse_type:         #{metadata.inverse_type || "N/A"},\n" <<
         "  inverse_type_setter:  #{metadata.inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{metadata.key},\n" <<
-        "  klass:                #{metadata.klass},\n" <<
         "  macro:                #{metadata.macro},\n" <<
         "  name:                 #{metadata.name},\n" <<
         "  polymorphic:          #{metadata.polymorphic? ? "Yes" : "No"},\n" <<

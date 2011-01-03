@@ -114,11 +114,11 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil)
       @new_record = true
       @attributes = default_attributes
-      process(attrs)
-      reset_modifications
-      document = yield self if block_given?
-      identify
-      run_callbacks(:initialize) { document }
+      process(attrs) do |document|
+        yield self if block_given?
+        identify
+        run_callbacks(:initialize) { document }
+      end
     end
 
     # Return the attributes hash.

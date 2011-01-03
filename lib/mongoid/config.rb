@@ -186,7 +186,7 @@ module Mongoid #:nodoc
     # @return [ Mongo::DB ] The master database.
     def master
       unless @master
-        configure_databases(@settings) if @settings
+        configure_databases(@settings) unless @settings.blank?
         raise Errors::InvalidDatabase.new(nil) unless @master
       end
       if @reconnect
@@ -248,7 +248,9 @@ module Mongoid #:nodoc
     #
     # @return [ Array<Mongo::DB>, nil ] The slave databases.
     def slaves
-      configure_databases(@settings) unless @slaves || !@settings
+      unless @slaves
+        configure_databases(@settings) if @settings && @settings[:database]
+      end
       @slaves
     end
 

@@ -91,21 +91,17 @@ module Mongoid #:nodoc:
     #
     # @param [ Hash ] attrs The attributes to set.
     def process(attrs = nil)
+      pending = {}
       sanitize_for_mass_assignment(attrs || {}).each_pair do |key, value|
         if set_allowed?(key)
           write_attribute(key, value)
         else
-          if relations.include?(key.to_s) && relations[key.to_s].embedded? && value.is_a?(Hash)
-            if relation = send(key)
-              relation.metadata.nested_builder(value, {}).build(self)
-            else
-              send("build_#{key}", value)
-            end
-          else
-            send("#{key}=", value)
-          end
+          pending[key.to_s] = value and next if relations.has_key?(key.to_s)
+          send("#{key}=", value)
         end
       end
+      yield self if block_given?
+      process_relations(pending)
       setup_modifications
     end
 
@@ -207,6 +203,24 @@ module Mongoid #:nodoc:
         default_values[key] = typed_value_for(key, val.call) if val.respond_to?(:call)
       end
       default_values || {}
+    end
+
+    # Process all the pending relations that needed to wait until ids were set
+    # to fire off.
+    #
+    # @example Process the relations.
+    #   document.process_relations({ "addressable" => person })
+    #
+    # @param [ Hash ] pending The pending relation values.
+    def process_relations(pending)
+      pending.each_pair do |name, value|
+        metadata = relations[name]
+        if value.is_a?(Hash)
+          metadata.nested_builder(value, {}).build(self)
+        else
+          send("#{name}=", value)
+        end
+      end
     end
 
     # Return true if dynamic field setting is enabled.

@@ -206,6 +206,7 @@ module Mongoid #:nodoc:
     #
     # All changes to the document.
     def modifications
+      reset_modifications unless @modifications && @accessed
       @accessed.each_pair do |field, value|
         current = @attributes[field]
         @modifications[field] = [ value, current ] if current != value
