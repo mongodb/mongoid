@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
+module Mongoid #:nodoc:
   module Relations #:nodoc:
 
     # This is the superclass for all many to one and many to many relation

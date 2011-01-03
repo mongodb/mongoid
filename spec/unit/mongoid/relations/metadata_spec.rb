@@ -757,7 +757,7 @@ describe Mongoid::Relations::Metadata do
       "name",
       "polymorphic",
       "relation",
-      "stored_as"
+      "order"
     ]
 
     PROPERTIES.each do |property|
