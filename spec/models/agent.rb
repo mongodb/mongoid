@@ -3,4 +3,5 @@ class Agent
   field :title
   field :number
   embeds_many :names, :as => :namable
+  referenced_in :game
 end

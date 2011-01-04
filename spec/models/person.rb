@@ -34,7 +34,7 @@ class Person
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites, :order => :title.desc, :validate => false
+  embeds_many :favorites, :order => :title.desc, :validate => false, :inverse_of => :perp
   embeds_many :videos, :order => [[ :title, :asc ]],  :validate => false
   embeds_many :phone_numbers, :class_name => "Phone", :validate => false
   embeds_many :addresses, :as => :addressable, :validate => false do

@@ -23,9 +23,9 @@ module Mongoid # :nodoc:
                 base.send(metadata.inverse_type_setter, target.class.name)
               end
               if base.referenced_many?
-                target.send(inverse).push(base)
+                attempt(inverse, target).push(base)
               else
-                target.send(metadata.inverse_setter(target), base)
+                attempt(metadata.inverse_setter(target), target, base)
               end
             end
           end
@@ -36,9 +36,9 @@ module Mongoid # :nodoc:
           # @example Unbind the relation.
           #   game.person.unbind
           def unbind
+            base.send(metadata.foreign_key_setter, nil)
             if unbindable?
-              base.send(metadata.foreign_key_setter, nil)
-              target.send(metadata.inverse_setter(target), nil)
+              attempt(metadata.inverse_setter(target), target, nil)
             end
           end
 
@@ -66,7 +66,7 @@ module Mongoid # :nodoc:
           #
           # @return [ true, false ] Rrue if the target is not nil, false if not.
           def unbindable?
-            !target.send(metadata.inverse(target)).blank?
+            !attempt(metadata.inverse(target), target).blank?
           end
         end
       end

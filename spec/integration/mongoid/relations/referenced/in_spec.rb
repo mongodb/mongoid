@@ -3,10 +3,33 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    [ Person, Game, Post, Bar ].map(&:delete_all)
+    [ Person, Game, Post, Bar, Agent ].map(&:delete_all)
   end
 
   describe "#=" do
+
+    context "when the inverse relation has no reference defined" do
+
+      let(:agent) do
+        Agent.new(:title => "007")
+      end
+
+      let(:game) do
+        Game.new(:name => "Donkey Kong")
+      end
+
+      before do
+        agent.game = game
+      end
+
+      it "sets the relation" do
+        agent.game.should == game
+      end
+
+      it "sets the foreign_key" do
+        agent.game_id.should == game.id
+      end
+    end
 
     context "when the parent is a references one" do
 
@@ -300,6 +323,30 @@ describe Mongoid::Relations::Referenced::In do
   end
 
   describe "#= nil" do
+
+    context "when the inverse relation has no reference defined" do
+
+      let(:agent) do
+        Agent.new(:title => "007")
+      end
+
+      let(:game) do
+        Game.new(:name => "Donkey Kong")
+      end
+
+      before do
+        agent.game = game
+        agent.game = nil
+      end
+
+      it "removes the relation" do
+        agent.game.should be_nil
+      end
+
+      it "removes the foreign_key" do
+        agent.game_id.should be_nil
+      end
+    end
 
     context "when the parent is a references one" do
 
