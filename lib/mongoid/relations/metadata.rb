@@ -189,7 +189,7 @@ module Mongoid # :nodoc:
       def inverse(other = nil)
         return self[:inverse_of] if inverse_of?
         return self[:as] || lookup_inverse(other) if polymorphic?
-        cyclic? ? cyclic_inverse : inverse_relation
+        @inverse ||= (cyclic? ? cyclic_inverse : inverse_relation)
       end
 
       # Used for relational many to many only. This determines the name of the
@@ -274,8 +274,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def key
-        return name.to_s if relation.embedded?
-        relation.stores_foreign_key? ? foreign_key : "_id"
+        @key ||= determine_key
       end
 
       # Returns the class of the proxied relation.
@@ -327,7 +326,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def polymorphic?
-        !!self[:as] || !!self[:polymorphic]
+        @polymorphic ||= (!!self[:as] || !!self[:polymorphic])
       end
 
       # Gets the method name used to set this relation.
@@ -340,7 +339,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def setter
-        name.to_s << "="
+        @setter ||= "#{name.to_s}="
       end
 
       # Are we validating this relation automatically?
@@ -444,6 +443,19 @@ module Mongoid # :nodoc:
           end
         end
         return inverse_klass.name.underscore.to_sym
+      end
+
+      # Determine the key for the relation in the attributes.
+      #
+      # @example Get the key.
+      #   metadata.determine_key
+      #
+      # @return [ String ] The key in the attributes.
+      #
+      # @since 2.0.0.rc.1
+      def determine_key
+        return name.to_s if relation.embedded?
+        relation.stores_foreign_key? ? foreign_key : "_id"
       end
 
       # Determine the name of the inverse relation.
