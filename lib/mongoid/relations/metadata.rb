@@ -65,7 +65,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def embedded?
-        macro == :embeds_one || macro == :embeds_many
+        @embedded ||= (macro == :embeds_one || macro == :embeds_many)
       end
 
       # Returns the extension of the relation. This can be a proc or module.
@@ -108,13 +108,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def foreign_key
-        return self[:foreign_key] if self[:foreign_key]
-        suffix = relation.foreign_key_suffix
-        if relation.stores_foreign_key?
-          (polymorphic? ? name.to_s : class_name.underscore) << suffix
-        else
-          (polymorphic? ? self[:as].to_s : inverse_class_name.underscore) << suffix
-        end
+        @foreign_key ||= determine_foreign_key
       end
 
       # Returns the name of the method used to set the foreign key on a
@@ -127,7 +121,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def foreign_key_setter
-        foreign_key << "="
+        @foreign_key_setter ||= "#{foreign_key}="
       end
 
       # Tells whether a foreign key index exists on the relation.
@@ -410,6 +404,25 @@ module Mongoid # :nodoc:
             meta.relation != relation
             return key.to_sym
           end
+        end
+      end
+
+      # Determine the value for the relation's foreign key. Performance
+      # improvement.
+      #
+      # @example Determine the foreign key.
+      #   metadata.determine_foreign_key
+      #
+      # @return [ String ] The foreign key.
+      #
+      # @since 2.0.0.rc.1
+      def determine_foreign_key
+        return self[:foreign_key] if self[:foreign_key]
+        suffix = relation.foreign_key_suffix
+        if relation.stores_foreign_key?
+          (polymorphic? ? name.to_s : class_name.underscore) << suffix
+        else
+          (polymorphic? ? self[:as].to_s : inverse_class_name.underscore) << suffix
         end
       end
 
