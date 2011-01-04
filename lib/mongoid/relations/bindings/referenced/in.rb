@@ -32,9 +32,9 @@ module Mongoid # :nodoc:
             end
             if options[:continue]
               if base.referenced_many?
-                attempt(inverse, target).push(base, :continue => false)
+                target.do_or_do_not(inverse).push(base, :continue => false)
               else
-                attempt(metadata.inverse_setter(target), target, base, :continue => false)
+                target.do_or_do_not(metadata.inverse_setter(target), base, :continue => false)
               end
             end
           end
@@ -53,9 +53,9 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind(options = {})
-            attempt(metadata.foreign_key_setter, base, nil)
+            base.do_or_do_not(metadata.foreign_key_setter, nil)
             if options[:continue]
-              attempt(metadata.inverse_setter(target), target, nil, :continue => false)
+              target.do_or_do_not(metadata.inverse_setter(target), nil, :continue => false)
             end
           end
           alias :unbind_one :unbind

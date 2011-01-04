@@ -17,6 +17,7 @@ require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/nil/collectionization"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/object/reflections"
+require "mongoid/extensions/object/yoda"
 require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
@@ -81,6 +82,7 @@ end
 class Object #:nodoc:
   include Mongoid::Extensions::Object::Conversions
   include Mongoid::Extensions::Object::Reflections
+  include Mongoid::Extensions::Object::Yoda
 end
 
 class Proc #:nodoc:

@@ -25,7 +25,7 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind(options = {})
             if options[:continue]
-              attempt(metadata.inverse_setter(target), target, base, :continue => false)
+              target.do_or_do_not(metadata.inverse_setter(target), base, :continue => false)
             end
           end
           alias :bind_one :bind
@@ -45,7 +45,7 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def unbind(options = {})
             if options[:continue]
-              attempt(metadata.inverse_setter(target), target, nil, :continue => false)
+              target.do_or_do_not(metadata.inverse_setter(target), nil, :continue => false)
             end
           end
           alias :unbind_one :unbind

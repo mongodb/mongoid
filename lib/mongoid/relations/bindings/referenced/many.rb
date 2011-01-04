@@ -42,8 +42,8 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind_one(doc, options = {})
             if options[:continue]
-              attempt(metadata.foreign_key_setter, doc, base.id)
-              attempt(metadata.inverse_setter, doc, base, :continue => false)
+              doc.do_or_do_not(metadata.foreign_key_setter, base.id)
+              doc.do_or_do_not(metadata.inverse_setter, base, :continue => false)
             end
           end
 
@@ -77,8 +77,8 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def unbind_one(doc, options = {})
             if options[:continue]
-              attempt(metadata.foreign_key_setter, doc, nil)
-              attempt(metadata.inverse_setter, doc, nil, :continue => false)
+              doc.do_or_do_not(metadata.foreign_key_setter, nil)
+              doc.do_or_do_not(metadata.inverse_setter, nil, :continue => false)
             end
           end
         end

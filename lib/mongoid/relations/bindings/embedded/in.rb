@@ -29,9 +29,9 @@ module Mongoid # :nodoc:
             if options[:continue]
               base.parentize(target)
               if base.embedded_many?
-                attempt(inverse, target).push(base, :continue => false)
+                target.do_or_do_not(inverse).push(base, :continue => false)
               else
-                attempt(metadata.inverse_setter(target), target, base, :continue => false)
+                target.do_or_do_not(metadata.inverse_setter(target), base, :continue => false)
               end
             end
           end
@@ -53,9 +53,9 @@ module Mongoid # :nodoc:
             if options[:continue]
               if base.embedded_many?
                 inverse = metadata.inverse(target)
-                attempt(inverse, target).delete(base)
+                target.do_or_do_not(inverse).delete(base)
               else
-                attempt(metadata.inverse_setter(target), target, nil, :continue => false)
+                target.do_or_do_not(metadata.inverse_setter(target), nil, :continue => false)
               end
             end
           end
