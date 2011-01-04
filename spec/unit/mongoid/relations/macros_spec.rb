@@ -352,12 +352,6 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:preference_ids)
       end
 
-      it "adds an associated validation" do
-        klass._validators[:preferences].first.should be_a(
-          Mongoid::Validations::AssociatedValidator
-        )
-      end
-
       context "metadata properties" do
 
         let(:metadata) do
@@ -371,17 +365,6 @@ describe Mongoid::Relations::Macros do
         it "automatically adds the inverse class name" do
           metadata.inverse_class_name.should == "TestClass"
         end
-      end
-    end
-
-    context "when setting validate to false" do
-
-      before do
-        klass.references_and_referenced_in_many(:preferences, :validate => false)
-      end
-
-      it "does not add associated validations" do
-        klass._validators.should be_empty
       end
     end
   end

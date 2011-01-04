@@ -84,9 +84,8 @@ class Person
   references_and_referenced_in_many \
     :preferences,
     :index => true,
-    :dependent => :nullify,
-    :validate => false
-  references_and_referenced_in_many :user_accounts, :validate => false
+    :dependent => :nullify
+  references_and_referenced_in_many :user_accounts
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20

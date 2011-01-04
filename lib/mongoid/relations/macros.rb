@@ -176,7 +176,6 @@ module Mongoid # :nodoc:
           metadatafy(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
-            validate_relation(meta)
           end
         end
 
