@@ -16,14 +16,17 @@ module Mongoid # :nodoc:
         # is set on the relation.
         #
         # @example Bind the relation.
-        #   name.person.bind
+        #   name.person.bind(:continue => true)
         #
-        # @param [ true, false ] building Whether this is getting called in a
-        # build.
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def bind(building = nil)
-          binding.bind
+        def bind(options = {})
+          binding.bind(options)
         end
 
         # Instantiate a new embedded_in relation.
@@ -48,13 +51,18 @@ module Mongoid # :nodoc:
         # Will delete the object if necessary.
         #
         # @example Unbind the relation.
-        #   name.person.unbind
+        #   name.person.unbind(:continue => false)
         #
         # @param [ Proxy ] old_target The previous target of the relation.
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target)
-          binding(old_target).unbind
+        def unbind(old_target, options = {})
+          binding(old_target).unbind(options)
           base.delete if old_target.persisted? && !base.destroyed?
         end
 

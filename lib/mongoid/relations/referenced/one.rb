@@ -15,14 +15,18 @@ module Mongoid # :nodoc:
         # is set on the relation.
         #
         # @example Bind the relation.
-        #   person.game.bind
+        #   person.game.bind(:continue => false)
         #
-        # @param [ true, false ] building Are we in build mode?
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def bind(building = nil)
-          binding.bind
-          target.save if base.persisted? && !building
+        def bind(options = {})
+          binding.bind(options)
+          target.save if base.persisted? && !options[:building]
         end
 
         # Instantiate a new references_one relation. Will set the foreign key
@@ -59,14 +63,19 @@ module Mongoid # :nodoc:
         # Will delete the object if necessary.
         #
         # @example Unbind the relation.
-        #   person.game.unbind
+        #   person.game.unbind(name, :continue => true)
         #
         # @param [ Document ] old_target The previous target of the relation.
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target)
-          binding(old_target).unbind
-          old_target.delete if base.persisted?
+        def unbind(old_target, options = {})
+          binding(old_target).unbind(options)
+          old_target.delete if base.persisted? && !old_target.destroyed?
         end
 
         private

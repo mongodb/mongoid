@@ -6,6 +6,8 @@ module Mongoid # :nodoc:
     # common behaviour for all of them.
     class Proxy
 
+      DEFAULT_OPTIONS = { :building => false, :continue => true }
+
       instance_methods.each do |method|
         undef_method(method) unless
           method =~ /(^__|^send$|^object_id$|^extend$|^tap$)/

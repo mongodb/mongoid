@@ -23,7 +23,7 @@ describe Mongoid::Relations::Bindings::Embedded::One do
     context "when the document is bindable" do
 
       before do
-        binding.bind
+        binding.bind(:continue => true)
       end
 
       it "parentizes the documents" do

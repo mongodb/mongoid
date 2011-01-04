@@ -22,27 +22,44 @@ module Mongoid # :nodoc:
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def build(name, object, metadata, building = nil)
-        type = @attributes[metadata.inverse_type]
-        target = metadata.builder(object).build(type)
-        relation = metadata.relation.new(self, target, metadata) if target
+      def build(name, object, metadata, options = {})
+        relation = create_relation(object, metadata)
         set(name, relation).tap do |relation|
-          relation.bind(building) if relation
+          relation.bind(options) if relation
         end
       end
 
-      # Determine if we're building by inspecting the args.
+      # Return the options passed to the builders.
       #
-      # @example Are we building?
-      #   person.building?(:name, true)
+      # @example Get the options.
+      #   person.configurables(document, :continue => true)
       #
       # @param [ Array ] args The arguments to check.
       #
-      # @return [ true, false ] True if building, false if not.
+      # @return [ Hash ] The options.
       #
       # @since 2.0.0.rc.1
-      def building?(args)
-        args.length > 1 ? args.last : false
+      def configurables(args)
+        { :building => false, :continue => true }.merge(
+          args.extract_options!
+        )
+      end
+
+      # Create a relation from an object and metadata.
+      #
+      # @example Create the relation.
+      #   person.create_relation(document, metadata)
+      #
+      # @param [ Document, Array<Document ] object The relation target.
+      # @param [ Metadata ] metadata The relation metadata.
+      #
+      # @return [ Proxy ] The relation.
+      #
+      # @since 2.0.0.rc.1
+      def create_relation(object, metadata)
+        type = @attributes[metadata.inverse_type]
+        target = metadata.builder(object).build(type)
+        target ? metadata.relation.new(self, target, metadata) : nil
       end
 
       # Determines if the relation exists or not.
@@ -94,10 +111,11 @@ module Mongoid # :nodoc:
           tap do
             define_method(name) do |*args|
               reload, variable = args.first, "@#{name}"
+              options = configurables(args)
               if instance_variable_defined?(variable) && !reload
                 instance_variable_get(variable)
               else
-                build(name, @attributes[metadata.key], metadata)
+                build(name, @attributes[metadata.key], metadata, options)
               end
             end
           end
@@ -120,12 +138,12 @@ module Mongoid # :nodoc:
         def setter(name, metadata)
           tap do
             define_method("#{name}=") do |*args|
-              object, building = args.first, building?(args)
+              object, options = args.first, configurables(args)
               variable = "@#{name}"
               if relation_exists?(name)
-                set(name, send(name).substitute(object, building))
+                set(name, send(name).substitute(object, options))
               else
-                build(name, object, metadata, building)
+                build(name, object, metadata, options)
               end
             end
           end

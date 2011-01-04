@@ -64,7 +64,7 @@ describe Mongoid::Relations::Embedded::One do
 
       it "does not save the document" do
         target.expects(:save).never
-        relation.bind(true)
+        relation.bind(:continue => true)
       end
     end
 
@@ -78,7 +78,7 @@ describe Mongoid::Relations::Embedded::One do
 
         it "saves the target" do
           target.expects(:save).returns(true)
-          relation.bind
+          relation.bind(:continue => true)
         end
       end
 
@@ -86,7 +86,7 @@ describe Mongoid::Relations::Embedded::One do
 
         it "does not save the target" do
           target.expects(:save).never
-          relation.bind
+          relation.bind(:continue => true)
         end
       end
     end
@@ -197,7 +197,7 @@ describe Mongoid::Relations::Embedded::One do
 
         it "deletes the target" do
           target.expects(:delete).returns(true)
-          relation.unbind(target)
+          relation.unbind(target, :continue => true)
         end
       end
 
@@ -210,7 +210,7 @@ describe Mongoid::Relations::Embedded::One do
 
         it "does not delete the target" do
           target.expects(:delete).never
-          relation.unbind(target)
+          relation.unbind(target, :continue => true)
         end
       end
     end
@@ -219,7 +219,7 @@ describe Mongoid::Relations::Embedded::One do
 
       it "does not delete the target" do
         target.expects(:delete).never
-        relation.unbind(target)
+        relation.unbind(target, :continue => true)
       end
     end
   end

@@ -3,6 +3,8 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Bindings #:nodoc:
       module Referenced #:nodoc:
+
+        # Binding class for references_many relations.
         class Many < Binding
 
           # Binds the base object to the inverse of the relation. This is so we
@@ -11,11 +13,18 @@ module Mongoid # :nodoc:
           # This case sets the metadata on the inverse object as well as the
           # document itself.
           #
-          # @example Bind the relation.
-          #   person.posts.bind_all
+          # @example Bind all the documents.
+          #   person.posts.bind
           #   person.posts = [ Post.new ]
-          def bind_all
-            target.each { |doc| bind_one(doc) } if bindable?(base)
+          #
+          # @param [ Hash ] options The binding options.
+          #
+          # @option options [ true, false ] :continue Continue binding the inverse.
+          # @option options [ true, false ] :building Are we in build mode?
+          #
+          # @since 2.0.0.rc.1
+          def bind(options = {})
+            target.each { |doc| bind_one(doc, options) }
           end
 
           # Binds a single document with the inverse relation. Used
@@ -24,51 +33,53 @@ module Mongoid # :nodoc:
           # @example Bind one document.
           #   person.posts.bind_one(post)
           #
-          # @param [ Document ] doc The document to bind.
-          def bind_one(doc)
-            doc.send(metadata.foreign_key_setter, base.id)
-            doc.send(metadata.inverse_setter, base)
-          end
-
-          # Unbinds the base object to the inverse of the relation. This occurs
-          # when setting a side of the relation to nil.
+          # @param [ Document ] doc The single document to bind.
+          # @param [ Hash ] options The binding options.
           #
-          # @example Unbind the relation.
-          #   person.posts.unbind
-          def unbind
-            obj = if unbindable?
-              target.each do |doc|
-                doc.send(metadata.foreign_key_setter, nil)
-                doc.send(metadata.inverse_setter, nil)
-              end
+          # @option options [ true, false ] :continue Continue binding the inverse.
+          # @option options [ true, false ] :building Are we in build mode?
+          #
+          # @since 2.0.0.rc.1
+          def bind_one(doc, options = {})
+            if options[:continue]
+              attempt(metadata.foreign_key_setter, doc, base.id)
+              attempt(metadata.inverse_setter, doc, base, :continue => false)
             end
           end
 
-          private
-
-          # Determines if the supplied object is able to be bound - this is to
-          # prevent infinite loops when setting inverse associations.
+          # Unbinds the base object and the inverse, caused by setting the
+          # reference to nil.
           #
-          # @example Is the document bindable?
-          #   binding.bindable?(document)
+          # @example Unbind the documents.
+          #   person.posts.unbind
+          #   person.posts = nil
           #
-          # @param [ Document ] doc The document to check.
+          # @param [ Hash ] options The binding options.
           #
-          # @return [ true, false ] True if bindable, false if not.
-          def bindable?(doc)
-            return false unless target.to_a.first
-            !doc.equal?(inverse ? inverse.target : nil)
+          # @option options [ true, false ] :continue Continue binding the inverse.
+          # @option options [ true, false ] :building Are we in build mode?
+          #
+          # @since 2.0.0.rc.1
+          def unbind(options = {})
+            target.each { |doc| unbind_one(doc, options) }
           end
 
-          # Protection from infinite loops removing the inverse relations.
-          # Checks if the target of the inverse is not already nil.
+          # Unbind a single document.
           #
-          # @example Is the relation unbindable?
-          #   binding.unbindable?
+          # @example Unbind the document.
+          #   person.posts.unbind_one(document)
           #
-          # @return [ true, false ] True if the target is not nil, false if not.
-          def unbindable?
-            inverse && !inverse.target.nil?
+          # @param [ Hash ] options The binding options.
+          #
+          # @option options [ true, false ] :continue Continue binding the inverse.
+          # @option options [ true, false ] :building Are we in build mode?
+          #
+          # @since 2.0.0.rc.1
+          def unbind_one(doc, options = {})
+            if options[:continue]
+              attempt(metadata.foreign_key_setter, doc, nil)
+              attempt(metadata.inverse_setter, doc, nil, :continue => false)
+            end
           end
         end
       end

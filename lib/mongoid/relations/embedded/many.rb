@@ -15,14 +15,18 @@ module Mongoid # :nodoc:
         # is set on the relation.
         #
         # @example Bind the relation.
-        #   person.addresses.bind
+        #   person.addresses.bind(:continue => true)
         #
-        # @param [ true, false ] building Is the relation in a build?
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def bind(building = nil)
-          binding.bind_all
-          target.each(&:save) if base.persisted? && !building
+        def bind(options = {})
+          binding.bind(options)
+          target.each(&:save) if base.persisted? && !options[:building]
         end
 
         # Bind the inverse relation between a single document in this proxy
@@ -37,8 +41,8 @@ module Mongoid # :nodoc:
         # @param [ Document ] document The document to bind.
         #
         # @since 2.0.0.rc.1
-        def bind_one(document)
-          binding.bind_one(document)
+        def bind_one(document, options = {})
+          binding.bind_one(document, options)
         end
 
         # Clear the relation. Will delete the documents from the db if they are
@@ -49,7 +53,10 @@ module Mongoid # :nodoc:
         #
         # @return [ Many ] The empty relation.
         def clear
-          tap { |relation| relation.unbind(target) }
+          tap do |relation|
+            relation.unbind(target, default_options)
+            target.clear
+          end
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -206,15 +213,15 @@ module Mongoid # :nodoc:
         # @return [ Many ] The proxied relation.
         #
         # @since 2.0.0.rc.1
-        def substitute(new_target, building = nil)
+        def substitute(new_target, options = {})
           old_target = target
           tap do |relation|
             relation.target = new_target || []
             if !new_target.blank?
-              unbind(old_target)
-              bind(building)
+              unbind(old_target, options)
+              bind(options)
             else
-              unbind(old_target)
+              unbind(old_target, options)
             end
           end
         end
@@ -239,13 +246,18 @@ module Mongoid # :nodoc:
         # entire proxy has been cleared, set to nil or empty, or replaced.
         #
         # @example Unbind the relation.
-        #   person.addresses.unbind(target)
+        #   person.addresses.unbind(target, :continue => false)
         #
         # @param [ Array<Document> ] old_target The relations previous target.
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target)
-          binding(old_target).unbind
+        def unbind(old_target, options = {})
+          binding(old_target).unbind(options)
           if base.persisted?
             old_target.each do |doc|
               doc.delete unless doc.destroyed?
@@ -264,9 +276,10 @@ module Mongoid # :nodoc:
         # @param [ Document ] document The document to append to the target.
         #
         # @since 2.0.0.rc.1
-        def append(document)
+        def append(document, options = {})
           target << document
-          metadatafy(document) and bind_one(document)
+          metadatafy(document)
+          bind_one(document, options)
           document._index = target.size - 1
         end
 

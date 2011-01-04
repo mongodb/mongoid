@@ -19,11 +19,15 @@ module Mongoid # :nodoc:
         # @example Bind the relation.
         #   game.person.bind
         #
-        # @param [ true, false ] building Are we in build mode?
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def bind(building = nil)
-          binding.bind
+        def bind(options = {})
+          binding.bind(options)
         end
 
         # Instantiate a new referenced_in relation.
@@ -51,14 +55,14 @@ module Mongoid # :nodoc:
         # @return [ In, nil ] The relation or nil.
         #
         # @since 2.0.0.rc.1
-        def substitute(new_target, building = nil)
+        def substitute(new_target, options = {})
           old_target = target
           tap do |relation|
             relation.target = new_target
             if new_target
-              bind(building)
+              bind(building, options)
             else
-              unbind(old_target)
+              unbind(old_target, options)
               nil
             end
           end
@@ -71,10 +75,15 @@ module Mongoid # :nodoc:
         #   game.person.unbind
         #
         # @param [ Document, Array<Document> ] old_target The previous target.
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target)
-          binding(old_target).unbind
+        def unbind(old_target, options = {})
+          binding(old_target).unbind(options)
         end
 
         private

@@ -18,13 +18,12 @@ module Mongoid #:nodoc:
       # @example Concat with other documents.
       #   perosn.addresses.concat([ address_one, address_two ])
       #
-      # @param [ Document, Array<Document> ] *docs Any number of documents.
-      def <<(*docs)
-        docs.flatten.each do |doc|
-          unless target.include?(doc)
-            append(doc)
-            doc.save if base.persisted?
-          end
+      # @param [ Document, Array<Document> ] *args Any number of documents.
+      def <<(*args)
+        options = default_options(args)
+        args.flatten.each do |doc|
+          append(doc, options)
+          doc.save if base.persisted?
         end
       end
       alias :concat :<<
@@ -42,7 +41,7 @@ module Mongoid #:nodoc:
       # @return [ Document ] The new document.
       def build(attributes = {}, type = nil)
         instantiated(type).tap do |doc|
-          append(doc)
+          append(doc, default_options(:building => true))
           doc.write_attributes(attributes)
           doc.identify
         end
@@ -135,6 +134,19 @@ module Mongoid #:nodoc:
       end
 
       private
+
+      # Get the default options used in binding functions.
+      #
+      # @example Get the default options.
+      #   relation.default_options(:continue => true)
+      #
+      # @param [ Hash, Array ] args The arguments to parse from.
+      #
+      # @return [ Hash ] The options merged with the actuals.
+      def default_options(args = {})
+        options = args.is_a?(Hash) ? args : args.extract_options!
+        DEFAULT_OPTIONS.merge(options)
+      end
 
       # Find the first object given the supplied attributes or create/initialize it.
       #

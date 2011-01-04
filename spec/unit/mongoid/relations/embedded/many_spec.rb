@@ -90,14 +90,14 @@ describe Mongoid::Relations::Embedded::Many do
 
     before do
       binding_klass.expects(:new).returns(binding)
-      binding.expects(:bind_all)
+      binding.expects(:bind)
     end
 
     context "when building" do
 
       it "does not save the target docs" do
         address.expects(:save).never
-        relation.bind(true)
+        relation.bind(:continue => true)
       end
     end
 
@@ -140,8 +140,8 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "binds the document" do
-      binding.expects(:bind_one).with(document)
-      relation.bind_one(document)
+      binding.expects(:bind_one).with(document, :continue => true)
+      relation.bind_one(document, :continue => true)
     end
   end
 
@@ -661,7 +661,7 @@ describe Mongoid::Relations::Embedded::Many do
       before do
         binding_klass.expects(:new).twice.returns(binding)
         binding.expects(:unbind)
-        binding.expects(:bind_all).returns(true)
+        binding.expects(:bind).returns(true)
         @substitute = relation.substitute([ document ])
       end
 

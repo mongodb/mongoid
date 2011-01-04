@@ -27,7 +27,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
     context "when the documents are bindable" do
 
       before do
-        binding.bind_all
+        binding.bind(:continue => true)
       end
 
       it "parentizes the documents" do
@@ -47,7 +47,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
 
       it "does nothing" do
         person.addresses.expects(:<<).never
-        binding.bind_all
+        binding.bind
       end
     end
   end
@@ -65,7 +65,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
       end
 
       before do
-        binding.bind_one(address_two)
+        binding.bind_one(address_two, :continue => true)
       end
 
       it "parentizes the document" do
@@ -95,8 +95,8 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
     context "when the documents are unbindable" do
 
       before do
-        binding.bind_all
-        binding.unbind
+        binding.bind(:continue => true)
+        binding.unbind(:continue => true)
       end
 
       it "removes the inverse relation" do

@@ -3,59 +3,54 @@ module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Bindings #:nodoc:
       module Referenced #:nodoc:
+
+        # Binding class for references_one relations.
         class One < Binding
 
           # Binds the base object to the inverse of the relation. This is so we
-          # are referenced to the actual objects themselves and dont hit the
-          # database twice when setting the relations up.
+          # are referenced to the actual objects themselves on both sides.
           #
-          # This essentially sets the foreign key and the object itself.
+          # This case sets the metadata on the inverse object as well as the
+          # document itself.
           #
-          # @example Bind the relation.
-          #   person.game.bind
-          def bind
-            if bindable?
-              target.send(metadata.foreign_key_setter, base.id)
-              target.send(metadata.inverse_setter, base)
+          # @example Bind the document.
+          #   person.game.bind(:continue => true)
+          #   person.game = Game.new
+          #
+          # @param [ Hash ] options The options to pass through.
+          #
+          # @option options [ true, false ] :continue Do we continue binding?
+          # @option options [ true, false ] :building Are we in build mode?
+          #
+          # @since 2.0.0.rc.1
+          def bind(options = {})
+            if options[:continue]
+              attempt(metadata.foreign_key_setter, target, base.id)
+              attempt(metadata.inverse_setter, target, base, :continue => false)
             end
           end
+          alias :bind_one :bind
 
-          # Unbinds the base object to the inverse of the relation. This occurs
-          # when setting a side of the relation to nil.
+          # Unbinds the base object and the inverse, caused by setting the
+          # reference to nil.
           #
-          # @example Unbind the relation.
-          #   person.game.unbind
-          def unbind
-            if unbindable?
-              target.send(metadata.foreign_key_setter, nil)
-              target.send(metadata.inverse_setter, nil)
+          # @example Unbind the document.
+          #   person.game.unbind(:continue => true)
+          #   person.game = nil
+          #
+          # @param [ Hash ] options The options to pass through.
+          #
+          # @option options [ true, false ] :continue Do we continue unbinding?
+          # @option options [ true, false ] :building Are we in build mode?
+          #
+          # @since 2.0.0.rc.1
+          def unbind(options = {})
+            if options[:continue]
+              attempt(metadata.foreign_key_setter, target, nil)
+              attempt(metadata.inverse_setter, target, nil, :continue => false)
             end
           end
-
-          private
-
-          # Protection from infinite loops setting the inverse relations.
-          # Checks if this document is not already equal to the target of the
-          # inverse.
-          #
-          # @example Is the relation bindable?
-          #   binding.bindable?
-          #
-          # @return [ true, false ] True if the documents differ, false if not.
-          def bindable?
-            !base.equal?(inverse ? inverse.target : nil)
-          end
-
-          # Protection from infinite loops removing the inverse relations.
-          # Checks if the target of the inverse is not already nil.
-          #
-          # @example Is the relation unbindable?
-          #   binding.unbindable?
-          #
-          # @return [ true, false ] True if the target is not nil, false if not.
-          def unbindable?
-            !target.send(metadata.inverse(target)).nil?
-          end
+          alias :unbind_one :unbind
         end
       end
     end

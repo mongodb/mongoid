@@ -17,12 +17,16 @@ module Mongoid #:nodoc:
         # @example Bind the relation.
         #   person.posts.bind
         #
-        # @param [ true, false ] Are we in build mode?
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @since 2.0.0.rc.1
-        def bind(building = nil)
-          binding.bind_all
-          target.map(&:save) if base.persisted? && !building?
+        def bind(options = {})
+          binding.bind(options)
+          target.map(&:save) if base.persisted? && !options[:building]
         end
 
         # Clear the relation. Will delete the documents from the db if they are
@@ -33,7 +37,10 @@ module Mongoid #:nodoc:
         #
         # @return [ Many ] The relation emptied.
         def clear
-          tap { |relation| relation.unbind }
+          tap do |relation|
+            relation.unbind(default_options)
+            target.clear
+          end
         end
 
         # Deletes all related documents from the database given the supplied
@@ -148,13 +155,17 @@ module Mongoid #:nodoc:
         #   person.posts.substitute(new_name)
         #
         # @param [ Array<Document> ] target The replacement target.
-        # @param [ true, false ] building Are we in build mode?
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
         #
         # @return [ Many ] The relation.
         #
         # @since 2.0.0.rc.1
-        def substitute(target, building = nil)
-          tap { target ? (@target = target.to_a; bind) : (@target = unbind) }
+        def substitute(target, options = {})
+          tap { target ? (@target = target.to_a; bind(options)) : (@target = unbind(options)) }
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs
@@ -165,9 +176,15 @@ module Mongoid #:nodoc:
         # @example Unbind the target.
         #   person.posts.unbind
         #
+        # @param [ Hash ] options The options to bind with.
+        #
+        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :continue Continue binding the
+        #   inverse?
+        #
         # @since 2.0.0.rc.1
-        def unbind
-          binding.unbind
+        def unbind(options = {})
+          binding.unbind(options)
           target.each(&:delete) if base.persisted?
           []
         end
@@ -183,10 +200,10 @@ module Mongoid #:nodoc:
         # @param [ Document ] document The document to append to the target.
         #
         # @since 2.0.0.rc.1
-        def append(document)
+        def append(document, options = {})
           loaded and target.push(document)
           metadatafy(document)
-          binding.bind_one(document)
+          binding.bind_one(document, options)
         end
 
         # Instantiate the binding associated with this relation.

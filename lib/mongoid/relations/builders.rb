@@ -27,6 +27,8 @@ module Mongoid # :nodoc:
     #   # The following methods get created:
     #   person.build_name({ :first_name => "Durran" })
     #   person.create_name({ :first_name => "Durran" })
+    #
+    # @since 2.0.0.rc.1
     module Builders
       extend ActiveSupport::Concern
 
@@ -46,7 +48,7 @@ module Mongoid # :nodoc:
         def builder(name)
           tap do
             define_method("build_#{name}") do |object|
-              send("#{name}=", object, true)
+              send("#{name}=", object, :building => true)
             end
           end
         end
