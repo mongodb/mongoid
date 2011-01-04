@@ -19,7 +19,7 @@ describe Mongoid::Config::Database do
       end
 
       let(:node) do
-        connection.nodes.first
+        connection.primary
       end
 
       context "when provided a uri" do
