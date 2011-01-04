@@ -60,7 +60,7 @@ module Mongoid # :nodoc:
           tap do |relation|
             relation.target = new_target
             if new_target
-              bind(building, options)
+              bind(options)
             else
               unbind(old_target, options)
               nil
