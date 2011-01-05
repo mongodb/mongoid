@@ -196,7 +196,7 @@ module Mongoid #:nodoc:
       attributes = @attributes
       attributes.tap do |attrs|
         relations.select { |name, meta| meta.embedded? }.each do |name, meta|
-          relation = send(name, false, :continute => false)
+          relation = send(name, false, :continue => false)
           attrs[name] = relation.to_hash unless relation.blank?
         end
       end
