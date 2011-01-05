@@ -127,6 +127,7 @@ module Mongoid #:nodoc
     # @return [ Logger ] The newly set logger.
     def logger=(logger)
       @logger = logger
+      @master.connection.instance_variable_set(:@logger, logger)
     end
 
     # Sets whether the times returned from the database use the ruby or
