@@ -27,6 +27,12 @@ describe Mongoid::Persistence do
     it "returns the document" do
       person.should be_a_kind_of(Person)
     end
+
+    context "on an embedded document" do
+      subject { Address.create(:addressable => person) }
+      it { should be_persisted }
+      it { should be_a_kind_of(Address) }
+    end
   end
 
   describe ".create!" do

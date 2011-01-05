@@ -18,7 +18,7 @@ describe Mongoid::Persistence do
 
     before do
       Patient.expects(:new).returns(patient)
-      patient.expects(:insert).returns(patient)
+      patient.expects(:save).returns(true)
     end
 
     it "delegates to the insert persistence command" do
