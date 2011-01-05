@@ -8,12 +8,23 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
+        cattr_accessor :embedded
         class_inheritable_accessor :relations
+        self.embedded = false
         self.relations = {}
+
+        # For backwards compatibility, alias the class method for associations
+        # and embedding as well. Fix in related gems.
+        #
+        # @todo Affected libraries: Machinist
+        class << self
+          alias :associations :relations
+          alias :embedded? :embedded
+        end
 
         # Convenience methods for the instance to know about attributes that
         # are located at the class level.
-        delegate :relations, :to => "self.class"
+        delegate :associations, :relations, :to => "self.class"
       end
 
       module ClassMethods #:nodoc:
@@ -39,10 +50,10 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
-          relate(
-            name,
-            metadatafy(name, Embedded::In, options, &block)
-          )
+          metadatafy(name, Embedded::In, options, &block).tap do |meta|
+            self.embedded = true
+            relate(name, meta)
+          end
         end
 
         # Adds the relation from a parent document to its children. The name
