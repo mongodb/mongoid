@@ -14,11 +14,8 @@ module Mongoid
     # Example:
     #
     # <tt>Contexts.context_for(criteria)</tt>
-    def self.context_for(criteria)
-      if criteria.klass.embedded?
-        return Contexts::Enumerable.new(criteria)
-      end
-      Contexts::Mongo.new(criteria)
+    def self.context_for(criteria, embedded = false)
+      embedded ? Enumerable.new(criteria) : Mongo.new(criteria)
     end
   end
 end

@@ -1,7 +1,7 @@
 class Tag
   include Mongoid::Document
   field :text
-  referenced_in :post, :stored_as => :array
+  references_and_referenced_in_many :posts
 end
 
 class Post
@@ -9,13 +9,15 @@ class Post
   include Mongoid::Versioning
   include Mongoid::Timestamps
   field :title
+  field :content
   referenced_in :person
   referenced_in :author, :foreign_key => :author_id, :class_name => "User"
-  referenced_in :poster, :foreign_key => :poster_id, :class_name => "Agent"
+  references_and_referenced_in_many :tags
 
-  references_many :tags, :stored_as => :array
+  scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
+  scope :posting, where(:content.in => [ "Posting" ])
 
-  named_scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
+  validates_format_of :title, :without => /\$\$\$/
 
   class << self
     def old

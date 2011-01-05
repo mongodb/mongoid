@@ -4,153 +4,165 @@ describe Mongoid::Atomicity do
 
   describe "#_updates" do
 
-    context "when the root and embedded documets have changed" do
+    context "when the document is persisted" do
 
-      before do
-        @person = Person.new(:title => "Grand Poobah")
-        @person.instance_variable_set(:@new_record, false)
-        @person.title = "Sir"
+      let(:person) do
+        Person.create(:ssn => "231-11-9956")
       end
 
-      it "returns a hash of field names and new values" do
-        @person._updates.should ==
-          { "$set" => { "title" => "Sir" } }
-      end
+      context "when the document is modified" do
 
-      context "with a new embedded document" do
+        before do
+          person.title = "Sir"
+        end
 
-        context "when the document is an embeds many" do
+        it "returns the atomic updates" do
+          person._updates.should == { "$set" => { "title" => "Sir" } }
+        end
 
-          before do
-            @address = Address.new(:street => "Oxford St")
-            @person.addresses << @address
+        context "when an embeds many child is added" do
+
+          let!(:address) do
+            person.addresses.build(:street => "Oxford St")
           end
 
-          it "returns a hash of field names and new values" do
-            @person._updates.should ==
+          it "returns a $set and $pushAll for modifications" do
+            person._updates.should ==
               {
                 "$set" => { "title" => "Sir" },
-                "$pushAll" => { "addresses" => [{ "_id" => "oxford-st", "street" => "Oxford St" }]}
+                "$pushAll" => { "addresses" => [
+                    { "_id" => "oxford-st", "street" => "Oxford St" }
+                  ]}
               }
           end
         end
 
-        context "when the document is an embeds one" do
+        context "when an embeds one child is added" do
 
-          before do
-            @name = Name.new(:first_name => "Lionel")
-            @person.name = @name
+          let!(:name) do
+            person.build_name(:first_name => "Lionel")
           end
 
-          it "returns a hash of field names and new values" do
-            @person._updates.should ==
+          it "returns a $set for modifications" do
+            person._updates.should ==
               {
                 "$set" => {
                   "title" => "Sir",
                   "name" => { "_id" => "lionel", "first_name" => "Lionel" }
-                },
-              }
-          end
-        end
-      end
-
-      context "with an updated embedded document" do
-
-        before do
-          @address = Address.new(:street => "Oxford St")
-          @person.addresses << @address
-          @address.instance_variable_set(:@new_record, false)
-          @address.street = "Bond St"
-        end
-
-        it "returns a hash of field names and new values" do
-          @person._updates.should ==
-            { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" } }
-        end
-
-        context "with an multi-level updated embeded document" do
-
-          before do
-            @location = Location.new(:name => "Home")
-            @location.instance_variable_set(:@new_record, false)
-            @address.locations << @location
-            @location.name = "Work"
-          end
-
-          it "returns the proper hash with locations" do
-            @person._updates.should ==
-              { "$set" => {
-                "title" => "Sir",
-                "addresses.0.street" => "Bond St",
-                "addresses.0.locations.0.name" => "Work" }
-              }
-          end
-        end
-
-        context "with an multi-level new bottom embedded document" do
-
-          before do
-            @location = Location.new(:name => "Home")
-            @address.locations << @location
-            @location.name = "Work"
-          end
-
-          it "returns the proper hash with locations" do
-            @person._updates.should ==
-              {
-                "$set" => {
-                  "title" => "Sir",
-                  "addresses.0.street" => "Bond St"
-                },
-                :other => {
-                  "addresses.0.locations" => [{ "_id" => @location.id, "name" => "Work" }]
                 }
               }
           end
         end
 
-        context "with multi-level new documents" do
+        context "when an existing embeds many gets modified" do
 
-          before do
-            @location = Location.new(:name => "Home")
-            @new_address = Address.new(:street => "Another")
-            @new_address.locations << @location
-            @person.addresses << @new_address
+          let!(:address) do
+            person.addresses.create(:street => "Oxford St")
           end
 
-          it "returns the proper hash with locations" do
-            @address.stubs(:_sets).returns({})
-            @person._updates.should ==
+          before do
+            address.street = "Bond St"
+          end
+
+          it "returns the $set with correct position and modifications" do
+            person._updates.should ==
+              { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" } }
+          end
+
+          context "when an existing 2nd level embedded child gets modified" do
+
+            let!(:location) do
+              address.locations.create(:name => "Home")
+            end
+
+            before do
+              location.name = "Work"
+            end
+
+            it "returns the $set with correct positions and modifications" do
+              person._updates.should ==
+                { "$set" => {
+                  "title" => "Sir",
+                  "addresses.0.street" => "Bond St",
+                  "addresses.0.locations.0.name" => "Work" }
+                }
+            end
+          end
+
+          context "when a 2nd level embedded child gets added" do
+
+            let!(:location) do
+              address.locations.build(:name => "Home")
+            end
+
+            it "returns the $set with correct positions and modifications" do
+              person._updates.should ==
+                {
+                  "$set" => {
+                    "title" => "Sir",
+                    "addresses.0.street" => "Bond St"
+                  },
+                  :other => {
+                    "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
+                  }
+                }
+            end
+          end
+
+          context "when adding a new second level child" do
+
+            let!(:new_address) do
+              person.addresses.build(:street => "Another")
+            end
+
+            let!(:location) do
+              new_address.locations.build(:name => "Home")
+            end
+
+            it "returns the $set for 1st level and other for the 2nd level" do
+              person._updates.should ==
+                {
+                  "$set" => {
+                    "title" => "Sir",
+                    "addresses.0.street" => "Bond St"
+                  },
+                  :other => {
+                    "addresses" => [{
+                      "_id" => new_address.id,
+                      "street" => "Another",
+                      "locations" => [
+                        "_id" => location.id,
+                        "name" => "Home"
+                      ]
+                    }]
+                  }
+                }
+            end
+          end
+        end
+
+        context "when adding new embedded docs at multiple levels" do
+
+          let!(:address) do
+            person.addresses.build(:street => "Another")
+          end
+
+          let!(:location) do
+            address.locations.build(:name => "Home")
+          end
+
+          it "returns the proper $sets and $pushAlls for all levels" do
+            person._updates.should ==
               {
                 "$set" => {
                   "title" => "Sir",
                 },
                 "$pushAll" => {
                   "addresses" => [{
-                    "_id" => @new_address.id,
+                    "_id" => address.id,
                     "street" => "Another",
                     "locations" => [
-                      "_id" => @location.id,
-                      "name" => "Home"
-                    ]
-                  }]
-                }
-              }
-          end
-
-          it "returns the proper hash with locations and queue" do
-            @person._updates.should ==
-              {
-                "$set" => {
-                  "title" => "Sir",
-                  "addresses.0.street" => "Bond St"
-                },
-                :other => {
-                  "addresses" => [{
-                    "_id" => @new_address.id,
-                    "street" => "Another",
-                    "locations" => [
-                      "_id" => @location.id,
+                      "_id" => location.id,
                       "name" => "Home"
                     ]
                   }]

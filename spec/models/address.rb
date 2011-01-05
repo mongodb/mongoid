@@ -15,7 +15,7 @@ class Address
   key :street
   embeds_many :locations
 
-  embedded_in :addressable, :inverse_of => :addresses do
+  embedded_in :addressable, :polymorphic => true do
     def extension
       "Testing"
     end
@@ -31,9 +31,14 @@ class Address
   end
 
   validates_presence_of :street, :on => :update
+  validates_format_of :street, :with => /\D/, :allow_nil => true
 
   def set_parent=(set = false)
     self.parent_title = addressable.title if set
+  end
+
+  def <=>(other)
+    street <=> other.street
   end
 
   class << self

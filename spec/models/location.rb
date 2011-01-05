@@ -1,5 +1,5 @@
 class Location
   include Mongoid::Document
   field :name
-  embedded_in :address, :inverse_of => :locations
+  embedded_in :address
 end

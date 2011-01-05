@@ -1,3 +1,8 @@
+= PLEASE READ (03 JAN 2011)
+
+USERS CURRENTLY POINTED AT master, PLEASE MOVE TO safe_master UNTIL
+FURTHER NOTICE.
+
 = Overview
 
 == About Mongoid
@@ -17,6 +22,9 @@ Mongoid is developed against Ruby 1.8.7, 1.9.1, 1.9.2, and REE.
 
 Please see the new Mongoid website for up-to-date documentation:
 {mongoid.org}[http://mongoid.org]
+
+= Donating
+* {Support Mongoid at Pledgie}[http://www.pledgie.com/campaigns/7757]
 
 = License
 

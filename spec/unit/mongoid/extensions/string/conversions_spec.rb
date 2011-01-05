@@ -2,7 +2,14 @@ require "spec_helper"
 
 describe Mongoid::Extensions::String::Conversions do
 
-  describe "#set" do
+  describe ".get" do
+
+    it "returns the string" do
+      String.get("test").should == "test"
+    end
+  end
+
+  describe ".set" do
 
     context "when the value is not nil" do
 
@@ -19,10 +26,14 @@ describe Mongoid::Extensions::String::Conversions do
     end
   end
 
-  describe "#get" do
-    it "returns the string" do
-      String.get("test").should == "test"
+  describe "#to_a" do
+
+    let(:value) do
+      "Disintegration is the best album ever!"
+    end
+
+    it "returns an array with the string in it" do
+      value.to_a.should == [ value ]
     end
   end
-
 end

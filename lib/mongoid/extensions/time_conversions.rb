@@ -9,9 +9,9 @@ module Mongoid #:nodoc:
 
       def get(value)
         return nil if value.blank?
-        value = value.getlocal unless Mongoid::Config.instance.use_utc?
-        if Mongoid::Config.instance.use_activesupport_time_zone?
-          time_zone = Mongoid::Config.instance.use_utc? ? 'UTC' : Time.zone
+        value = value.getlocal unless Mongoid::Config.use_utc?
+        if Mongoid::Config.use_activesupport_time_zone?
+          time_zone = Mongoid::Config.use_utc? ? 'UTC' : Time.zone
           value = value.in_time_zone(time_zone)
         end
         value
@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
       end
 
       def convert_to_time(value)
-        time = Mongoid::Config.instance.use_activesupport_time_zone? ? ::Time.zone : ::Time
+        time = Mongoid::Config.use_activesupport_time_zone? ? ::Time.zone : ::Time
         case value
           when ::String then time.parse(value)
           when ::DateTime then time.local(value.year, value.month, value.day, value.hour, value.min, value.sec)

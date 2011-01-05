@@ -20,13 +20,13 @@ end
 class Song
   include Mongoid::Document
   field :title
-  embedded_in :artist, :inverse_of => :songs
+  embedded_in :artist
 end
 
 class Label
   include Mongoid::Document
   field :name
-  embedded_in :artist, :inverse_of => :labels
+  embedded_in :artist
   before_validation :cleanup
 
   private

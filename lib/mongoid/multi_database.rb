@@ -7,7 +7,5 @@ module Mongoid::MultiDatabase
     def set_database(name)
       @database = name.to_s
     end
-
   end
-
 end
