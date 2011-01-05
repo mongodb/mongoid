@@ -361,7 +361,7 @@ describe Mongoid::Relations::Metadata do
         "  name:                 #{metadata.name},\n" <<
         "  polymorphic:          #{metadata.polymorphic? ? "Yes" : "No"},\n" <<
         "  relation:             #{metadata.relation},\n" <<
-        "  setter:               #{metadata.setter}>"
+        "  setter:               #{metadata.setter}>\n"
     end
   end
 

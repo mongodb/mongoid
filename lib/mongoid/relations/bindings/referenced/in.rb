@@ -32,7 +32,9 @@ module Mongoid # :nodoc:
             end
             if options[:continue]
               if base.referenced_many?
-                target.do_or_do_not(inverse).push(base, :continue => false)
+                target.do_or_do_not(
+                  inverse, false, :continue => false
+                ).push(base, :continue => false)
               else
                 target.do_or_do_not(metadata.inverse_setter(target), base, :continue => false)
               end

@@ -26,8 +26,8 @@ module Mongoid # :nodoc:
           def bind(options = {})
             inverse = metadata.inverse(target)
             base.metadata = target.reflect_on_association(inverse)
+            base.parentize(target)
             if options[:continue]
-              base.parentize(target)
               if base.embedded_many?
                 target.do_or_do_not(inverse).push(base, :continue => false)
               else

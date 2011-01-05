@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
 
     included do
       field :version, :type => Integer, :default => 1
-      embeds_many :versions, :class_name => self.name
+      embeds_many :versions, :class_name => self.name, :validate => false
       set_callback :save, :before, :revise
 
       delegate :version_max, :to => "self.class"

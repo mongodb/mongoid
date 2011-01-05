@@ -61,7 +61,7 @@ describe Mongoid::Document do
 
     before do
       Firefox.delete_all
-      @firefox = Firefox.new(:name => "firefox")
+      @firefox = Firefox.create(:name => "firefox")
       @writer = HtmlWriter.new(:speed => 100)
       @circle = Circle.new(:radius => 50)
       @square = Square.new(:width => 300, :height => 150)
@@ -150,11 +150,10 @@ describe Mongoid::Document do
   context "when document is a subclass and its parent is an embedded document" do
 
     before do
-      @canvas = Canvas.new(:name => "canvas")
-      @canvas.build_palette({})
+      @canvas = Canvas.create(:name => "canvas")
+      @canvas.create_palette({})
       @canvas.palette.tools << Pencil.new
       @canvas.palette.tools << Eraser.new
-      @canvas.save
     end
 
     after do

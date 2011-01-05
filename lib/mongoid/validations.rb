@@ -11,6 +11,23 @@ module Mongoid #:nodoc:
 
     included do
       include ActiveModel::Validations
+
+      # Overrides the default ActiveModel behaviour since we need to handle
+      # validations of relations slightly different than just calling the
+      # getter.
+      #
+      # @todo Durran: Why does moving the ActiveModel::Validations include
+      #   statement outside of the block bomb the test suite. This feels dirty.
+      #
+      # @example Read the value.
+      #   person.read_attribute_for_validation(:addresses)
+      #
+      # @param [ Symbol ] attr The name of the field or relation.
+      #
+      # @return [ Object ] The value of the field or the relation.
+      def read_attribute_for_validation(attr)
+        relations[attr.to_s] ? send(attr, false, :continue => false) : send(attr)
+      end
     end
 
     module ClassMethods #:nodoc:

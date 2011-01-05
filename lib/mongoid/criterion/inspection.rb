@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
         "  selector: #{selector.inspect},\n" <<
         "  options:  #{options.inspect},\n" <<
         "  count:    #{count.inspect},\n" <<
-        "  matching: #{entries.inspect}>"
+        "  matching: #{entries.inspect}>\n"
       end
     end
   end

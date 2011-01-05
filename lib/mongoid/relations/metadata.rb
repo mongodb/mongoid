@@ -172,7 +172,7 @@ module Mongoid # :nodoc:
         "  name:                 #{name},\n" <<
         "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<
         "  relation:             #{relation},\n" <<
-        "  setter:               #{setter}>"
+        "  setter:               #{setter}>\n"
       end
 
       # Get the name of the inverse relation if it exists. If this is a

@@ -41,8 +41,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind_one(doc, options = {})
+            doc.parentize(base)
             if options[:continue]
-              doc.parentize(base)
               name = metadata.inverse_setter(target)
               doc.do_or_do_not(name, base, :continue => false) unless name == "versions="
             end
