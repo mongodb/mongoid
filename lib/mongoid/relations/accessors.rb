@@ -141,7 +141,7 @@ module Mongoid # :nodoc:
               object, options = args.first, configurables(args)
               variable = "@#{name}"
               if relation_exists?(name)
-                set(name, send(name).substitute(object, options))
+                set(name, ivar(name).substitute(object, options))
               else
                 build(name, object, metadata, options)
               end
