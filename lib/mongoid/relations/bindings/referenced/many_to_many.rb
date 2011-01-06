@@ -47,6 +47,7 @@ module Mongoid # :nodoc:
               doc.do_or_do_not(
                 metadata.inverse(target),
                 false,
+                :building => true,
                 :continue => false
               ).push(base, :continue => false)
             end

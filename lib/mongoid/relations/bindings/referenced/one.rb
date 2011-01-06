@@ -26,7 +26,12 @@ module Mongoid # :nodoc:
           def bind(options = {})
             if options[:continue]
               target.do_or_do_not(metadata.foreign_key_setter, base.id)
-              target.do_or_do_not(metadata.inverse_setter, base, :continue => false)
+              target.do_or_do_not(
+                metadata.inverse_setter,
+                base,
+                :building => true,
+                :continue => false
+              )
             end
           end
           alias :bind_one :bind

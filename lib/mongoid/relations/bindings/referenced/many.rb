@@ -43,7 +43,12 @@ module Mongoid # :nodoc:
           def bind_one(doc, options = {})
             if options[:continue]
               doc.do_or_do_not(metadata.foreign_key_setter, base.id)
-              doc.do_or_do_not(metadata.inverse_setter, base, :continue => false)
+              doc.do_or_do_not(
+                metadata.inverse_setter,
+                base,
+                :building => true,
+                :continue => false
+              )
             end
           end
 

@@ -218,11 +218,11 @@ describe Mongoid::Config::Database do
       end
 
       let(:node_one) do
-        connection_one.nodes.first
+        connection_one.primary
       end
 
       let(:node_two) do
-        connection_two.nodes.first
+        connection_two.primary
       end
 
       context "when provided a uri" do
