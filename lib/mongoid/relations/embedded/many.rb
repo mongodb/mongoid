@@ -53,10 +53,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Many ] The empty relation.
         def clear
-          tap do |relation|
-            relation.unbind(target, default_options)
-            target.clear
-          end
+          substitute(nil)
         end
 
         # Create a new document in the relation. This is essentially the same

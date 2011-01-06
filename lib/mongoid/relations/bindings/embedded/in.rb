@@ -29,9 +29,19 @@ module Mongoid # :nodoc:
             base.parentize(target)
             if options[:continue]
               if base.embedded_many?
-                target.do_or_do_not(inverse).push(base, :continue => false)
+                target.do_or_do_not(
+                  inverse,
+                  false,
+                  :building => true,
+                  :continue => false
+                ).push(base, :building => true, :continue => false)
               else
-                target.do_or_do_not(metadata.inverse_setter(target), base, :continue => false)
+                target.do_or_do_not(
+                  metadata.inverse_setter(target),
+                  base,
+                  :building => true,
+                  :continue => false
+                )
               end
             end
           end

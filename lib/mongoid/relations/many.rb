@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
         options = default_options(args)
         args.flatten.each do |doc|
           append(doc, options)
-          doc.save if base.persisted?
+          doc.save if base.persisted? && !options[:building]
         end
       end
       alias :concat :<<

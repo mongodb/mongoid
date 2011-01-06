@@ -27,6 +27,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def bind(options = {})
           binding.bind(options)
+          base.save if target.persisted? && !options[:building]
         end
 
         # Instantiate a new embedded_in relation.

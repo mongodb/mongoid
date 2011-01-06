@@ -44,7 +44,12 @@ module Mongoid # :nodoc:
             doc.parentize(base)
             if options[:continue]
               name = metadata.inverse_setter(target)
-              doc.do_or_do_not(name, base, :continue => false) unless name == "versions="
+              doc.do_or_do_not(
+                name,
+                base,
+                :building => true,
+                :continue => false
+              ) unless name == "versions="
             end
           end
 
