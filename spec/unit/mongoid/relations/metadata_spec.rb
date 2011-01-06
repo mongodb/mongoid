@@ -192,15 +192,33 @@ describe Mongoid::Relations::Metadata do
 
         context "when referenced in" do
 
-          let(:metadata) do
-            described_class.new(
-              :name => :person,
-              :relation => Mongoid::Relations::Referenced::In
-            )
+          context "when not providing a class name" do
+
+            let(:metadata) do
+              described_class.new(
+                :name => :person,
+                :relation => Mongoid::Relations::Referenced::In
+              )
+            end
+
+            it "returns the foreign_key" do
+              metadata.foreign_key.should == "person_id"
+            end
           end
 
-          it "returns the foreign_key" do
-            metadata.foreign_key.should == "person_id"
+          context "when providing a class name" do
+
+            let(:metadata) do
+              described_class.new(
+                :name => :person,
+                :relation => Mongoid::Relations::Referenced::In,
+                :class_name => "TheseAreNotTheDriods"
+              )
+            end
+
+            it "returns the foreign_key" do
+              metadata.foreign_key.should == "person_id"
+            end
           end
         end
 

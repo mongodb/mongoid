@@ -419,7 +419,11 @@ module Mongoid # :nodoc:
         return self[:foreign_key] if self[:foreign_key]
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
-          (polymorphic? ? name.to_s : class_name.underscore) << suffix
+          if relation.macro == :references_and_referenced_in_many
+            class_name.underscore << suffix
+          else
+            name.to_s << suffix
+          end
         else
           (polymorphic? ? self[:as].to_s : inverse_class_name.underscore) << suffix
         end
