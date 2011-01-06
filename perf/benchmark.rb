@@ -11,36 +11,59 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   field :birth_date, :type => Date
-  field :title
-  embeds_one :name
-  embeds_many :addresses
-  embeds_many :phones
+  field :title, :type => String
+
+  embeds_one :name, :validate => false
+  embeds_many :addresses, :validate => false
+  embeds_many :phones, :validate => false
+
+  # references_many :posts, :validate => false
+  # references_one :game, :validate => false
+  # references_and_referenced_in_many :preferences
 end
 
 class Name
   include Mongoid::Document
-  field :given
-  field :family
-  field :middle
+  field :given, :type => String
+  field :family, :type => String
+  field :middle, :type => String
   embedded_in :person
 end
 
 class Address
   include Mongoid::Document
-  field :street
-  field :city
-  field :state
-  field :post_code
-  field :address_type
+  field :street, :type => String
+  field :city, :type => String
+  field :state, :type => String
+  field :post_code, :type => String
+  field :address_type, :type => String
   embedded_in :person
 end
 
 class Phone
   include Mongoid::Document
   field :country_code, :type => Integer
-  field :number
-  field :phone_type
+  field :number, :type => String
+  field :phone_type, :type => String
   embedded_in :person
+end
+
+class Post
+  include Mongoid::Document
+
+  # referenced_in :person
+end
+
+class Game
+  include Mongoid::Document
+
+  # referenced_in :person
+end
+
+class Preference
+  include Mongoid::Document
+
+  # references_and_referenced_in_many :people
 end
 
 puts "Starting benchmark..."

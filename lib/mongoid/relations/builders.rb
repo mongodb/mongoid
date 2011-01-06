@@ -48,7 +48,8 @@ module Mongoid # :nodoc:
         def builder(name)
           tap do
             define_method("build_#{name}") do |*args|
-              send("#{name}=", *args, :building => true)
+              attributes = args.any? ? args : {}
+              send("#{name}=", *attributes, :building => true)
             end
           end
         end
@@ -68,7 +69,7 @@ module Mongoid # :nodoc:
         def creator(name)
           tap do
             define_method("create_#{name}") do |*args|
-              send("#{name}=", *args).tap(&:save)
+              send("build_#{name}", *args).tap(&:save)
             end
           end
         end

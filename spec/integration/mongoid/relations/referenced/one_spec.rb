@@ -314,6 +314,52 @@ describe Mongoid::Relations::Referenced::One do
           game.should_not be_persisted
         end
       end
+
+      context "when providing no attributes" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let(:game) do
+          person.build_game
+        end
+
+        it "sets the foreign key on the document" do
+          game.person_id.should == person.id
+        end
+
+        it "sets the inverse relation" do
+          game.person.should == person
+        end
+
+        it "does not save the built document" do
+          game.should_not be_persisted
+        end
+      end
+
+      context "when providing nil attributes" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let(:game) do
+          person.build_game(nil)
+        end
+
+        it "sets the foreign key on the document" do
+          game.person_id.should == person.id
+        end
+
+        it "sets the inverse relation" do
+          game.person.should == person
+        end
+
+        it "does not save the built document" do
+          game.should_not be_persisted
+        end
+      end
     end
 
     context "when the relation is polymorphic" do
@@ -361,6 +407,52 @@ describe Mongoid::Relations::Referenced::One do
 
       it "returns a new document" do
         game.score.should == 50
+      end
+
+      it "sets the foreign key on the document" do
+        game.person_id.should == person.id
+      end
+
+      it "sets the inverse relation" do
+        game.person.should == person
+      end
+
+      it "saves the document" do
+        game.should be_persisted
+      end
+    end
+
+    context "when providing no attributes" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:game) do
+        person.create_game
+      end
+
+      it "sets the foreign key on the document" do
+        game.person_id.should == person.id
+      end
+
+      it "sets the inverse relation" do
+        game.person.should == person
+      end
+
+      it "saves the document" do
+        game.should be_persisted
+      end
+    end
+
+    context "when providing nil attributes" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:game) do
+        person.create_game(nil)
       end
 
       it "sets the foreign key on the document" do

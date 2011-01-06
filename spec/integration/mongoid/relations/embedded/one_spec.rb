@@ -288,28 +288,85 @@ describe Mongoid::Relations::Embedded::One do
 
       context "when the parent is a new record" do
 
-        let(:person) do
-          Person.new
+        context "when not providing any attributes" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let!(:name) do
+            person.build_name
+          end
+
+          it "sets the target of the relation" do
+            person.name.should == name
+          end
+
+          it "sets the base on the inverse relation" do
+            name.namable.should == person
+          end
+
+          it "sets no attributes" do
+            name.first_name.should be_nil
+          end
+
+          it "does not save the target" do
+            name.should_not be_persisted
+          end
         end
 
-        let!(:name) do
-          person.build_name(:first_name => "James")
+        context "when passing nil as the attributes" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let!(:name) do
+            person.build_name(nil)
+          end
+
+          it "sets the target of the relation" do
+            person.name.should == name
+          end
+
+          it "sets the base on the inverse relation" do
+            name.namable.should == person
+          end
+
+          it "sets no attributes" do
+            name.first_name.should be_nil
+          end
+
+          it "does not save the target" do
+            name.should_not be_persisted
+          end
         end
 
-        it "sets the target of the relation" do
-          person.name.should == name
-        end
+        context "when providing attributes" do
 
-        it "sets the base on the inverse relation" do
-          name.namable.should == person
-        end
+          let(:person) do
+            Person.new
+          end
 
-        it "sets the attributes" do
-          name.first_name.should == "James"
-        end
+          let!(:name) do
+            person.build_name(:first_name => "James")
+          end
 
-        it "does not save the target" do
-          name.should_not be_persisted
+          it "sets the target of the relation" do
+            person.name.should == name
+          end
+
+          it "sets the base on the inverse relation" do
+            name.namable.should == person
+          end
+
+          it "sets the attributes" do
+            name.first_name.should == "James"
+          end
+
+          it "does not save the target" do
+            name.should_not be_persisted
+          end
         end
       end
 
@@ -379,43 +436,100 @@ describe Mongoid::Relations::Embedded::One do
 
     context "when the parent is a new record" do
 
-      let(:person) do
-        Person.new
+      context "when not providing any attributes" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let!(:name) do
+          person.create_name
+        end
+
+        it "sets the target of the relation" do
+          person.name.should == name
+        end
+
+        it "sets the base on the inverse relation" do
+          name.namable.should == person
+        end
+
+        it "sets no attributes" do
+          name.first_name.should be_nil
+        end
+
+        it "saves the target" do
+          name.should be_persisted
+        end
       end
 
-      let!(:name) do
-        person.create_name(:first_name => "James")
+      context "when passing nil as the attributes" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let!(:name) do
+          person.create_name(nil)
+        end
+
+        it "sets the target of the relation" do
+          person.name.should == name
+        end
+
+        it "sets the base on the inverse relation" do
+          name.namable.should == person
+        end
+
+        it "sets no attributes" do
+          name.first_name.should be_nil
+        end
+
+        it "saves the target" do
+          name.should be_persisted
+        end
       end
 
-      it "sets the target of the relation" do
-        person.name.should == name
+      context "when providing attributes" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let!(:name) do
+          person.create_name(:first_name => "James")
+        end
+
+        it "sets the target of the relation" do
+          person.name.should == name
+        end
+
+        it "sets the base on the inverse relation" do
+          name.namable.should == person
+        end
+
+        it "sets the attributes" do
+          name.first_name.should == "James"
+        end
+
+        it "saves the target" do
+          name.should be_persisted
+        end
       end
 
-      it "sets the base on the inverse relation" do
-        name.namable.should == person
-      end
+      context "when the parent is not a new record" do
 
-      it "sets the attributes" do
-        name.first_name.should == "James"
-      end
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
 
-      it "saves the target" do
-        name.should be_persisted
-      end
-    end
+        let!(:name) do
+          person.create_name(:first_name => "James")
+        end
 
-    context "when the parent is not a new record" do
-
-      let(:person) do
-        Person.create(:ssn => "437-11-1112")
-      end
-
-      let!(:name) do
-        person.create_name(:first_name => "James")
-      end
-
-      it "does not save the target" do
-        name.should be_persisted
+        it "does not save the target" do
+          name.should be_persisted
+        end
       end
     end
   end
