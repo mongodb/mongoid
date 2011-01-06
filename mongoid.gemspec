@@ -26,8 +26,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency("mocha", ["= 0.9.8"])
   s.add_development_dependency("rspec", ["~> 2.4"])
   s.add_development_dependency("watchr", ["= 0.6"])
-  s.add_development_dependency("ruby-debug19", ["= 0.11.6"])
-  s.add_development_dependency("ruby-debug-wrapper", ["= 0.0.1"])
 
   s.files        = Dir.glob("lib/**/*") + %w(MIT_LICENSE README.rdoc Rakefile)
   s.require_path = 'lib'
