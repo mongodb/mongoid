@@ -22,8 +22,10 @@ module Mongoid #:nodoc:
       def <<(*args)
         options = default_options(args)
         args.flatten.each do |doc|
-          append(doc, options)
-          doc.save if base.persisted? && !options[:building]
+          unless target.include?(doc)
+            append(doc, options)
+            doc.save if base.persisted? && !options[:building]
+          end
         end
       end
       alias :concat :<<
