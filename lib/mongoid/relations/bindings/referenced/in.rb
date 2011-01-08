@@ -25,7 +25,8 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind(options = {})
             inverse = metadata.inverse(target)
-            base.metadata = target.reflect_on_association(inverse)
+            meta = target.reflect_on_association(inverse)
+            base.metadata = meta if meta
             base.send(metadata.foreign_key_setter, target.id)
             if metadata.inverse_type
               base.send(metadata.inverse_type_setter, target.class.name)
