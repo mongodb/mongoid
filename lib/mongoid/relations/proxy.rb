@@ -8,15 +8,16 @@ module Mongoid # :nodoc:
 
       DEFAULT_OPTIONS = { :building => false, :continue => true }
 
+      # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
           method =~ /(^__|^send$|^object_id$|^extend$|^tap$)/
       end
 
-      attr_accessor \
-        :base,
-        :metadata,
-        :target
+      attr_accessor :base, :metadata, :target
+
+      # Backwards compatibiloty with Mongoid beta releases.
+      delegate :klass, :to => :metadata
 
       # Convenience for setting the target and the metadata properties since
       # all proxies will need to do this.
