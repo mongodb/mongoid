@@ -25,27 +25,28 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind(options = {})
             inverse = metadata.inverse(target)
-            meta = target.reflect_on_association(inverse)
-            base.metadata = meta if meta
             base.send(metadata.foreign_key_setter, target.id)
             if metadata.inverse_type
               base.send(metadata.inverse_type_setter, target.class.name)
             end
-            if options[:continue]
-              if base.referenced_many?
-                target.do_or_do_not(
-                  inverse,
-                  false,
-                  :building => true,
-                  :continue => false
-                ).push(base, :building => true, :continue => false)
-              else
-                target.do_or_do_not(
-                  metadata.inverse_setter(target),
-                  base,
-                  :building => true,
-                  :continue => false
-                )
+            if inverse
+              base.metadata = target.reflect_on_association(inverse)
+              if options[:continue]
+                if base.referenced_many?
+                  target.do_or_do_not(
+                    inverse,
+                    false,
+                    :building => true,
+                    :continue => false
+                  ).push(base, :building => true, :continue => false)
+                else
+                  target.do_or_do_not(
+                    metadata.inverse_setter(target),
+                    base,
+                    :building => true,
+                    :continue => false
+                  )
+                end
               end
             end
           end

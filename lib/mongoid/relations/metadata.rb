@@ -446,7 +446,7 @@ module Mongoid # :nodoc:
             return key.to_sym
           end
         end
-        return inverse_klass.name.underscore.to_sym
+        return nil
       end
 
       # Determine the key for the relation in the attributes.

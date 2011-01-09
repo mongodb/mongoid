@@ -31,6 +31,37 @@ describe Mongoid::Relations::Referenced::In do
       end
     end
 
+    context "when referencing a document from an embedded document" do
+
+      let(:person) do
+        Person.create(:ssn => "111-11-1111")
+      end
+
+      let(:address) do
+        person.addresses.create(:street => "Wienerstr")
+      end
+
+      let(:account) do
+        Account.create(:number => 1000000)
+      end
+
+      before do
+        address.account = account
+      end
+
+      it "sets the relation" do
+        address.account.should == account
+      end
+
+      it "does not erase the metadata" do
+        address.metadata.should_not be_nil
+      end
+
+      it "allows saving of the embedded document" do
+        address.save.should be_true
+      end
+    end
+
     context "when the parent is a references one" do
 
       context "when the relation is not polymorphic" do
