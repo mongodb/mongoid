@@ -4,6 +4,17 @@ describe Mongoid::Errors do
 
   describe Mongoid::Errors::DocumentNotFound do
 
+    describe "attribute readers" do
+
+      it 'exists for @identifiers' do
+        Mongoid::Errors::DocumentNotFound.new(Person, "3").should respond_to :identifiers
+      end
+
+      it 'exists for @klass' do
+        Mongoid::Errors::DocumentNotFound.new(Person, "3").should respond_to :klass
+      end
+    end
+
     describe "#message" do
 
       context "default" do
