@@ -9,7 +9,7 @@ module Rails #:nodoc:
       def load_models(app)
         app.config.paths['app/models'].each do |path|
           Dir.glob("#{path}/**/*.rb").sort.each do |file|
-            require_dependency(file)
+            require_dependency(File.basename(file, ".rb"))
           end
         end
       end
