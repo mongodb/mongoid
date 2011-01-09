@@ -158,6 +158,7 @@ module Mongoid # :nodoc:
           metadatafy(name, Referenced::Many, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
+            autosave(meta)
             validate_relation(meta)
           end
         end
@@ -212,7 +213,7 @@ module Mongoid # :nodoc:
           metadatafy(name, Referenced::One, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
-            builder(name).creator(name)
+            builder(name).creator(name).autosave(meta)
             validate_relation(meta)
           end
         end

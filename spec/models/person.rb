@@ -87,6 +87,9 @@ class Person
     :dependent => :nullify
   references_and_referenced_in_many :user_accounts
 
+  references_many :drugs, :autosave => true
+  references_one :account, :autosave => true
+
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
     self.score_without_rescoring = score

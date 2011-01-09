@@ -768,6 +768,7 @@ describe Mongoid::Relations::Metadata do
   context "properties" do
 
     PROPERTIES = [
+      "autosave",
       "cyclic",
       "dependent",
       "inverse_class_name",
