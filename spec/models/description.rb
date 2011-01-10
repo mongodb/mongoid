@@ -5,4 +5,6 @@ class Description
 
   referenced_in :user
   referenced_in :updater, :class_name => 'User'
+
+  validates :user, :associated => true
 end
