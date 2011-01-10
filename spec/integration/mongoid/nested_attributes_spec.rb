@@ -52,6 +52,42 @@ describe Mongoid::NestedAttributes do
           end
         end
 
+        context "when :reject_if => :all_blank is specified" do
+
+          before :all do
+            Person.send(:undef_method, :name_attributes=)
+            Person.accepts_nested_attributes_for \
+              :name, :reject_if => :all_blank
+          end
+
+          after :all do
+            Person.send(:undef_method, :name_attributes=)
+            Person.accepts_nested_attributes_for :name
+          end
+
+          context "when all attributes are empty" do
+
+            before do
+              person.name_attributes = { :last_name => "" }
+            end
+
+            it "does not add the document" do
+              person.name.should be_nil
+            end
+          end
+
+          context "when an attribute is non-empty" do
+
+            before do
+              person.name_attributes = { :first_name => "Lang" }
+            end
+
+            it "adds the document" do
+              person.name.first_name.should == "Lang"
+            end
+          end
+        end
+
         context "when no id has been passed" do
 
           context "with no destroy attribute" do
@@ -923,6 +959,48 @@ describe Mongoid::NestedAttributes do
             end
           end
 
+          context "when :reject_if => :all_blank is supplied" do
+
+            before :all do
+              Person.send(:undef_method, :addresses_attributes=)
+              Person.accepts_nested_attributes_for \
+                :addresses, :reject_if => :all_blank
+            end
+
+            after :all do
+              Person.send(:undef_method, :addresses_attributes=)
+              Person.accepts_nested_attributes_for :addresses
+            end
+
+            context "when all attributes are empty" do
+
+              before do
+                person.addresses_attributes =
+                  { "3" => { "city" => "" } }
+              end
+
+              it "does not add the new document" do
+                person.addresses.should be_empty
+              end
+            end
+
+            context "when an attribute is not-empty" do
+
+              before do
+                person.addresses_attributes =
+                  { "3" => { "street" => "Maybachufer" } }
+              end
+
+              it "adds the new document" do
+                person.addresses.size.should == 1
+              end
+
+              it "sets the correct attributes" do
+                person.addresses.first.street.should == "Maybachufer"
+              end
+            end
+          end
+
           context "when destroy attributes are passed" do
 
             context "when allow_destroy is true" do
@@ -1145,6 +1223,42 @@ describe Mongoid::NestedAttributes do
           end
 
           context "when the attributes do not match" do
+
+            before do
+              person.game_attributes = { :name => "Tron" }
+            end
+
+            it "adds the document" do
+              person.game.name.should == "Tron"
+            end
+          end
+        end
+
+        context "when reject_if => :all_blank is specified" do
+
+          before :all do
+            Person.send(:undef_method, :game_attributes=)
+            Person.accepts_nested_attributes_for \
+              :game, :reject_if => :all_blank
+          end
+
+          after :all do
+            Person.send(:undef_method, :game_attributes=)
+            Person.accepts_nested_attributes_for :game
+          end
+
+          context "when all attributes are empty" do
+
+            before do
+              person.game_attributes = { :score => nil }
+            end
+
+            it "does not add the document" do
+              person.game.should be_nil
+            end
+          end
+
+          context "when an attribute is non-empty" do
 
             before do
               person.game_attributes = { :name => "Tron" }
@@ -2052,6 +2166,48 @@ describe Mongoid::NestedAttributes do
             end
           end
 
+          context "when :reject_if => :all_blank is supplied" do
+
+            before :all do
+              Person.send(:undef_method, :posts_attributes=)
+              Person.accepts_nested_attributes_for \
+                :posts, :reject_if => :all_blank
+            end
+
+            after :all do
+              Person.send(:undef_method, :posts_attributes=)
+              Person.accepts_nested_attributes_for :posts
+            end
+
+            context "when all attributes are blank" do
+
+              before do
+                person.posts_attributes =
+                  { "3" => { "content" => "" } }
+              end
+
+              it "does not add the new document" do
+                person.posts.should be_empty
+              end
+            end
+
+            context "when an attribute is non-empty" do
+
+              before do
+                person.posts_attributes =
+                  { "3" => { "title" => "Blogging" } }
+              end
+
+              it "adds the new document" do
+                person.posts.size.should == 1
+              end
+
+              it "sets the correct attributes" do
+                person.posts.first.title.should == "Blogging"
+              end
+            end
+          end
+
           context "when destroy attributes are passed" do
 
             context "when allow_destroy is true" do
@@ -2616,6 +2772,48 @@ describe Mongoid::NestedAttributes do
             end
 
             context "when the attributes do not match" do
+
+              before do
+                person.preferences_attributes =
+                  { "3" => { "name" => "Blogging" } }
+              end
+
+              it "adds the new document" do
+                person.preferences.size.should == 1
+              end
+
+              it "sets the correct attributes" do
+                person.preferences.first.name.should == "Blogging"
+              end
+            end
+          end
+
+          context "when :reject_if => :all_blank is supplied" do
+
+            before :all do
+              Person.send(:undef_method, :preferences_attributes=)
+              Person.accepts_nested_attributes_for \
+                :preferences, :reject_if => :all_blank
+            end
+
+            after :all do
+              Person.send(:undef_method, :preferences_attributes=)
+              Person.accepts_nested_attributes_for :preferences
+            end
+
+            context "when all attributes are empty" do
+
+              before do
+                person.preferences_attributes =
+                  { "3" => { "content" => "" } }
+              end
+
+              it "does not add the new document" do
+                person.preferences.should be_empty
+              end
+            end
+
+            context "when an attribute is non-empty" do
 
               before do
                 person.preferences_attributes =
