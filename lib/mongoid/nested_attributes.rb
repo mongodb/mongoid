@@ -4,6 +4,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     module ClassMethods
+      REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |_, value| value.blank? } }
 
       # Used when needing to update related models from a parent relation. Can
       # be used on embedded or referenced relations.
@@ -29,6 +30,7 @@ module Mongoid #:nodoc:
       # @option *args [ true, false ] :update_only Only update existing docs.
       def accepts_nested_attributes_for(*args)
         options = args.extract_options!
+        options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
         args.each do |name|
           define_method("#{name}_attributes=") do |attrs|
             relation = relations[name.to_s]
