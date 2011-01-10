@@ -6,24 +6,55 @@ describe Mongoid::Validations::AssociatedValidator do
 
     context "when validating associated on both sides" do
 
-      let(:user) do
-        User.new(:name => "test")
+      context "when the documents are valid" do
+
+        let(:user) do
+          User.new(:name => "test")
+        end
+
+        let(:description) do
+          Description.new(:details => "testing")
+        end
+
+        before do
+          user.descriptions << description
+        end
+
+        it "only validates the parent once" do
+          user.should be_valid
+        end
+
+        it "only validates the child once" do
+          description.should be_valid
+        end
       end
 
-      let(:description) do
-        Description.new(:details => "testing")
-      end
+      context "when the documents are not valid" do
 
-      before do
-        user.descriptions << description
-      end
+        let(:user) do
+          User.new(:name => "test")
+        end
 
-      it "only validates the parent once" do
-        user.should be_valid
-      end
+        let(:description) do
+          Description.new
+        end
 
-      it "only validates the child once" do
-        description.should be_valid
+        before do
+          user.descriptions << description
+        end
+
+        it "only validates the parent once" do
+          user.should_not be_valid
+        end
+
+        it "adds the errors from the relation" do
+          user.valid?
+          user.errors[:descriptions].should_not be_nil
+        end
+
+        it "only validates the child once" do
+          description.should_not be_valid
+        end
       end
     end
   end
