@@ -32,18 +32,18 @@ module Mongoid #:nodoc:
       def read_attribute_for_validation(attr)
         relations[attr.to_s] ? send(attr, false, :continue => false) : send(attr)
       end
-    end
 
-    # Used to prevent infinite loops in associated validations.
-    #
-    # @example Is the document validated?
-    #   document.validated?
-    #
-    # @return [ true, false ] Has the document already been validated?
-    #
-    # @since 2.0.0.rc.2
-    def validated?
-      !!@validated
+      # Used to prevent infinite loops in associated validations.
+      #
+      # @example Is the document validated?
+      #   document.validated?
+      #
+      # @return [ true, false ] Has the document already been validated?
+      #
+      # @since 2.0.0.rc.2
+      def validated?
+        !!@validated
+      end
     end
 
     module ClassMethods #:nodoc:

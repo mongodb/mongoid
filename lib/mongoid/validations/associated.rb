@@ -29,7 +29,9 @@ module Mongoid #:nodoc:
       def validate_each(document, attribute, value)
         unless document.validated?
           document.validated = true
-          return if value.to_a.collect { |doc| doc.nil? || doc.valid? }.all?
+          valid = value.to_a.collect { |doc| doc.nil? || doc.valid? }.all?
+          document.validated = false
+          return if valid
           document.errors.add(attribute, :invalid, options.merge(:value => value))
         else
           document.validated = false
