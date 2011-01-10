@@ -81,7 +81,9 @@ module Rails #:nodoc:
           ::Rails::Mongoid.load_models(app) unless $rails_rake_task
         end
       end
-      
+
+      # Set the proper error types for Rails. DocumentNotFound errors should be
+      # 404s and not 500s, validation errors are 422s.
       initializer "load http errors" do |app|
         config.after_initialize do
           ActionDispatch::ShowExceptions.rescue_responses.update({
