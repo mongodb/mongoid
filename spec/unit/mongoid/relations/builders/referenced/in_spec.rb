@@ -18,25 +18,50 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
     context "when provided an id" do
 
-      let(:object_id) do
-        BSON::ObjectId.new
+      context "when the object is an object id" do
+
+        let(:object_id) do
+          BSON::ObjectId.new
+        end
+
+        let(:object) do
+          object_id
+        end
+
+        let(:person) do
+          stub
+        end
+
+        before do
+          Person.expects(:find).with(object_id).returns(person)
+          @document = builder.build
+        end
+
+        it "sets the document" do
+          @document.should == person
+        end
       end
 
-      let(:object) do
-        object_id
-      end
+      context "when the object is an integer" do
 
-      let(:person) do
-        stub
-      end
+        let(:object_id) { 666 }
 
-      before do
-        Person.expects(:find).with(object_id).returns(person)
-        @document = builder.build
-      end
+        let(:object) do
+          object_id
+        end
 
-      it "sets the document" do
-        @document.should == person
+        let(:person) do
+          stub
+        end
+
+        before do
+          Person.expects(:find).with(object_id).returns(person)
+          @document = builder.build
+        end
+
+        it "sets the document" do
+          @document.should == person
+        end
       end
     end
 
