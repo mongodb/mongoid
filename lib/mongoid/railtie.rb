@@ -10,7 +10,20 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
 
-      config.app_generators.orm :mongoid, :migration => false
+      # Determine which generator to use. app_generators was introduced after
+      # 3.0.0.
+      #
+      # @example Get the generators method.
+      #   railtie.generators
+      #
+      # @return [ Symbol ] The method name to use.
+      #
+      # @since 2.0.0.rc.4
+      def self.generator
+        config.respond_to?(:app_generators) ? :app_generators : :generators
+      end
+
+      config.send(generator).orm :mongoid, :migration => false
 
       rake_tasks do
         load "mongoid/railties/database.rake"
@@ -18,8 +31,7 @@ module Rails #:nodoc:
 
       # Exposes Mongoid's configuration to the Rails application configuration.
       #
-      # Example:
-      #
+      # @example Set up configuration in the Rails app.
       #   module MyApplication
       #     class Application < Rails::Application
       #       config.mongoid.logger = Logger.new($stdout, :warn)
@@ -31,7 +43,7 @@ module Rails #:nodoc:
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
       #
-      # Example mongoid.yml:
+      # @example mongoid.yml
       #
       #   defaults: &defaults
       #     host: localhost
@@ -93,6 +105,8 @@ module Rails #:nodoc:
         end
       end
 
+      # When workers are forked in passenger and unicorn, we need to reconnect
+      # to the database to all the workers do not share the same connection.
       initializer "reconnect to master if application is preloaded" do
         config.after_initialize do
 
