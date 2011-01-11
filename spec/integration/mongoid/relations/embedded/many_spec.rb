@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    [ Person, Role ].map(&:delete_all)
+    [ Person, Quiz, Role ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -1302,6 +1302,103 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "returns the number of persisted documents" do
         person.addresses.send(method).should == 2
+      end
+    end
+  end
+
+  context "when deeply embedding documents" do
+
+    context "when building the tree through pushes" do
+
+      let(:quiz) do
+        Quiz.new
+      end
+
+      let(:page) do
+        Page.new
+      end
+
+      let(:page_question) do
+        PageQuestion.new
+      end
+
+      before do
+        quiz.pages << page
+        page.page_questions << page_question
+      end
+
+      let(:question) do
+        quiz.pages.first.page_questions.first
+      end
+
+      it "sets up the hierarchy" do
+        question.should == page_question
+      end
+    end
+
+    context "when building the tree through builds" do
+
+      let!(:quiz) do
+        Quiz.new
+      end
+
+      let!(:page) do
+        quiz.pages.build
+      end
+
+      let!(:page_question) do
+        page.page_questions.build
+      end
+
+      let(:question) do
+        quiz.pages.first.page_questions.first
+      end
+
+      it "sets up the hierarchy" do
+        question.should == page_question
+      end
+    end
+
+    context "when creating a persisted tree" do
+
+      let(:quiz) do
+        Quiz.create
+      end
+
+      let(:page) do
+        Page.new
+      end
+
+      let(:page_question) do
+        PageQuestion.new
+      end
+
+      let(:question) do
+        quiz.pages.first.page_questions.first
+      end
+
+      before do
+        quiz.pages << page
+        page.page_questions << page_question
+      end
+
+      it "sets up the hierarchy" do
+        question.should == page_question
+      end
+
+      context "when reloading" do
+
+        let(:from_db) do
+          quiz.reload
+        end
+
+        let(:reloaded_question) do
+          from_db.pages.first.page_questions.first
+        end
+
+        it "reloads the entire tree" do
+          reloaded_question.should == question
+        end
       end
     end
   end
