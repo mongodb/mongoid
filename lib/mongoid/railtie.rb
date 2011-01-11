@@ -10,7 +10,7 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
 
-      config.generators.orm :mongoid, :migration => false
+      config.app_generators.orm :mongoid, :migration => false
 
       rake_tasks do
         load "mongoid/railties/database.rake"
@@ -26,7 +26,7 @@ module Rails #:nodoc:
       #       config.mongoid.reconnect_time = 10
       #     end
       #   end
-      config.mongoid = ::Mongoid::Config.instance
+      config.mongoid = ::Mongoid::Config
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
@@ -78,7 +78,18 @@ module Rails #:nodoc:
       # environments.
       initializer "preload all application models" do |app|
         config.to_prepare do
-          ::Rails::Mongoid.load_models(app)
+          ::Rails::Mongoid.load_models(app) unless $rails_rake_task
+        end
+      end
+
+      # Set the proper error types for Rails. DocumentNotFound errors should be
+      # 404s and not 500s, validation errors are 422s.
+      initializer "load http errors" do |app|
+        config.after_initialize do
+          ActionDispatch::ShowExceptions.rescue_responses.update({
+            "Mongoid::Errors::DocumentNotFound" => :not_found,
+            "Mongoid::Errors::Validations" => 422
+          })
         end
       end
 

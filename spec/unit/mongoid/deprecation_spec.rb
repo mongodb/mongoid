@@ -10,15 +10,15 @@ describe Mongoid::Deprecation do
     Mongoid::Logger.expects(:new).returns(logger)
   end
 
-  describe "#alert" do
+  after(:all) do
+    Mongoid::Deprecation.instance_variable_set(:@logger, Mongoid::Logger.new)
+  end
 
-    let(:deprecation) do
-      Mongoid::Deprecation.instance
-    end
+  describe "#alert" do
 
     it "calls warn on the memoized logger" do
       logger.expects(:warn).with("Deprecation: testing")
-      deprecation.alert("testing")
+      described_class.alert("testing")
     end
   end
 end

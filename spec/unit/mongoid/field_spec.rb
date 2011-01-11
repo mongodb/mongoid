@@ -38,13 +38,17 @@ describe Mongoid::Field do
 
       context "when the array is object ids" do
 
+        let(:metadata) do
+          Mongoid::Relations::Metadata.new({ :inverse_class_name => "Game" })
+        end
+
         let(:field) do
           Mongoid::Field.new(
             :vals,
             :type => Array,
             :default => [],
             :identity => true,
-            :inverse_class_name => "Game"
+            :metadata => metadata
           )
         end
 
@@ -144,8 +148,8 @@ describe Mongoid::Field do
       @field = Mongoid::Field.new(:name)
     end
 
-    it "defaults to String" do
-      @field.type.should == String
+    it "defaults to Object" do
+      @field.type.should == Object
     end
   end
 

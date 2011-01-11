@@ -5,7 +5,7 @@ class Name
   field :parent_title
   key :first_name, :last_name
   embeds_many :translations
-  embedded_in :namable, :inverse_of => [:name, :names]
+  embedded_in :namable, :polymorphic => true
 
   def set_parent=(set = false)
     self.parent_title = namable.title if set

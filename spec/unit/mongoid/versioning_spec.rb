@@ -2,92 +2,79 @@ require "spec_helper"
 
 describe Mongoid::Versioning do
 
-  describe "#version" do
+  describe ".max_versions" do
 
-    def first_update_post
-      @post.title = "New"
-      @version = Post.new(:title => "Test")
-      Post.expects(:first).at_least(1).with(:conditions => { :_id => @post.id, :version => 1 }).returns(@version)
-      @post.save
-      @post.reload
-    end
-
-    before do
-      @post = Post.new
-    end
-
-    it "defaults to 1" do
-      @post.version.should == 1
-    end
-
-    context "when document is saved" do
+    context "when provided an integer" do
 
       before do
-        first_update_post
+        WikiPage.max_versions(10)
       end
 
-      it "increments the version" do
-        @post.version.should == 2
+      after do
+        WikiPage.max_versions(5)
       end
 
-      it "adds a snapshot of the document to the versions" do
-        @post.title.should == "New"
-        @post.version.should == 2
-        @post.versions.size.should == 1
-        version = @post.versions.first
-        version.title.should == "Test"
-        version.version.should == 1
+      it "sets the class version max" do
+        WikiPage.version_max.should == 10
       end
-      
     end
-    
-    context "when a max_versions limit has been set to 0" do
+
+    context "when provided a string" do
 
       before do
-        Post.max_versions 0
-        first_update_post
+        WikiPage.max_versions("10")
       end
 
-      it "update version number without actually saving old versions" do
-        @post.title.should == "New"
-        @post.version.should == 2
-        @post.versions.size.should == 0
+      after do
+        WikiPage.max_versions(5)
       end
 
+      it "sets the class version max" do
+        WikiPage.version_max.should == 10
+      end
     end
-    
-    context "when a max_versions limit has been set to > 0" do
-
-      before do
-        Post.max_versions 1
-        first_update_post
-      end
-
-      it "update version number and save old versions" do
-        @post.title.should == "New"
-        @post.version.should == 2
-        @post.versions.size.should == 1
-        version = @post.versions.first
-        version.title.should == "Test"
-        version.version.should == 1
-      end
-
-      it "discards the oldest version if it's been exceeded" do
-        @previous_version = @post.clone
-        @post.title = "Another change"
-        Post.expects(:first).at_least(1).with(:conditions => { :_id => @post.id, :version => 2 }).returns(@previous_version)
-        @post.save
-        @post.reload
-        @post.title.should == "Another change"
-        @post.version.should == 3
-        @post.versions.size.should == 1
-        latest_version = @post.versions.first
-        latest_version.title.should == "New"
-        latest_version.version.should == 2
-      end
-
-    end
-
   end
 
+  describe "#revise" do
+
+    context "when a last version does not exist" do
+
+      let!(:page) do
+        WikiPage.new(:title => "1")
+      end
+
+      before do
+        WikiPage.expects(:first).with(
+          :conditions => { :_id => page.id, :version => 1 }
+        ).returns(nil)
+        page.revise
+      end
+
+      it "does not add any versions" do
+        page.versions.should be_empty
+      end
+    end
+
+    context "when a last version exists" do
+
+      let!(:page) do
+        WikiPage.new(:title => "1", :version => 2)
+      end
+
+      let!(:first) do
+        WikiPage.new(:title => "1", :version => 1)
+      end
+
+      before do
+        WikiPage.expects(:first).with(
+          :conditions => { :_id => page.id, :version => 2 }
+        ).returns(first)
+        page.revise
+      end
+
+      it "does not add any versions" do
+        page.versions.size.should == 1
+      end
+    end
+  end
 end

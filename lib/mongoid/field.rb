@@ -1,16 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   class Field
-    attr_reader :klass, :name, :type
-
-    # Get the declared options for this field
-    #
-    # Returns:
-    #
-    # a hash of options
-    def options
-      @options
-    end
+    attr_reader :copyable, :klass, :name, :options, :type
 
     # Get the default value for the field.
     #
@@ -34,25 +25,45 @@ module Mongoid #:nodoc:
     # <tt>Field.new(:score, :default => 0)</tt>
     def initialize(name, options = {})
       check_name!(name)
-      @type = options[:type] || String
+      @type = options[:type] || Object
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
       @options = options
       check_default!
     end
 
-    # Used for setting an object in the attributes hash. If nil is provided the
-    # default will get returned if it exists.
+    # Used for setting an object in the attributes hash.
+    #
+    # If nil is provided the default will get returned if it exists.
+    #
+    # If the field is an identity field, ie an id, it performs the necessary
+    # cast.
+    #
+    # Example:
+    #
+    # <tt>field.set("New Value")</tt>
+    #
+    # Returns:
+    #
+    # The new value.
     def set(object)
-      unless @options[:identity]
+      unless options[:identity]
         type.set(object)
       else
-        inverse = @options[:inverse_class_name].constantize
-        object.blank? ? type.set(object) : BSON::ObjectId.cast!(inverse, object)
+        metadata = options[:metadata]
+        object.blank? ? type.set(object) : BSON::ObjectId.cast!(metadata.inverse_klass, object)
       end
     end
 
     # Used for retrieving the object out of the attributes hash.
+    #
+    # Example:
+    #
+    # <tt>field.get("Value")</tt>
+    #
+    # Returns:
+    #
+    # The converted value.
     def get(object)
       type.get(object)
     end
@@ -60,7 +71,7 @@ module Mongoid #:nodoc:
     protected
     # Slightly faster default check.
     def copy
-      @copyable ? @default.dup : @default
+      copyable ? @default.dup : @default
     end
 
     # Check if the name is valid.
@@ -72,8 +83,8 @@ module Mongoid #:nodoc:
 
     def check_default!
       return if @default.is_a?(Proc)
-      if !@default.nil? && !@default.is_a?(@type)
-        raise Mongoid::Errors::InvalidType.new(@type, @default)
+      if !@default.nil? && !@default.is_a?(type)
+        raise Mongoid::Errors::InvalidType.new(type, @default)
       end
     end
   end

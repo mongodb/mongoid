@@ -58,7 +58,9 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def only(*args)
-        @options[:fields] = args.flatten if args.any?; self
+        clone.tap do |crit|
+          crit.options[:fields] = args.flatten if args.any?
+        end
       end
     end
   end

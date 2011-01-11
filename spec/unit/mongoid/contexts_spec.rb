@@ -3,23 +3,31 @@ require "spec_helper"
 describe Mongoid::Contexts do
 
   context ".context_for" do
-    let(:klass) { stub('klass', :embedded? => false) }
-    let(:criteria) { stub('criteria', :klass => klass) }
 
-    context "when criteria is for a top-level Mongoid::Document" do
-      it "creates a Mongo context" do
-        Mongoid::Contexts::Mongo.expects(:new).with(criteria)
+    let(:criteria) do
+      stub(:klass => Person)
+    end
+
+    context "when criteria is for a top-level document" do
+
+      let(:context) do
         Mongoid::Contexts.context_for(criteria)
+      end
+
+      it "creates a Mongo context" do
+        context.should be_a(Mongoid::Contexts::Mongo)
       end
     end
 
-    context "when criteria is for an embedded Mongoid::Document" do
-      it "creates a Mongo context" do
-        klass.stubs(:embedded?).returns(true)
-        Mongoid::Contexts::Enumerable.expects(:new).with(criteria)
-        Mongoid::Contexts.context_for(criteria)
+    context "when criteria is for an embedded document" do
+
+      let(:context) do
+        Mongoid::Contexts.context_for(criteria, true)
+      end
+
+      it "creates an Enumerable context" do
+        context.should be_a(Mongoid::Contexts::Enumerable)
       end
     end
   end
-
 end

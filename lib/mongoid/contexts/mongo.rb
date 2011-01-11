@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Mongo
       include Ids, Paging
-      attr_reader :criteria
+      attr_accessor :criteria
 
       delegate :klass, :options, :selector, :to => :criteria
 
@@ -51,7 +51,6 @@ module Mongoid #:nodoc:
       def blank?
         klass.collection.find_one(selector, { :fields => [ :_id ] }).nil?
       end
-
       alias :empty? :blank?
 
       # Get the count of matching documents in the database for the context.
@@ -66,6 +65,32 @@ module Mongoid #:nodoc:
       def count
         @count ||= klass.collection.find(selector, process_options).count
       end
+
+      # Delete all the documents in the database matching the selector.
+      #
+      # @example Delete the documents.
+      #   context.delete_all
+      #
+      # @return [ Integer ] The number of documents deleted.
+      #
+      # @since 2.0.0.rc.1
+      def delete_all
+        klass.delete_all(:conditions => selector)
+      end
+      alias :delete :delete_all
+
+      # Destroy all the documents in the database matching the selector.
+      #
+      # @example Destroy the documents.
+      #   context.destroy_all
+      #
+      # @return [ Integer ] The number of documents destroyed.
+      #
+      # @since 2.0.0.rc.1
+      def destroy_all
+        klass.destroy_all(:conditions => selector)
+      end
+      alias :destroy :destroy_all
 
       # Gets an array of distinct values for the supplied field across the
       # entire collection or the susbset given the criteria.
@@ -134,10 +159,10 @@ module Mongoid #:nodoc:
       def initialize(criteria)
         @criteria = criteria
         if klass.hereditary? && !criteria.selector.keys.include?(:_type)
-          criteria.in(:_type => criteria.klass._types)
+          @criteria = criteria.in(:_type => criteria.klass._types)
         end
-        criteria.enslave if klass.enslaved?
-        criteria.cache if klass.cached?
+        @criteria.enslave if klass.enslaved?
+        @criteria.cache if klass.cached?
       end
 
       # Iterate over each +Document+ in the results. This can take an optional

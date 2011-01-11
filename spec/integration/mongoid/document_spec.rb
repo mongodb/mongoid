@@ -6,6 +6,29 @@ describe Mongoid::Document do
     Person.delete_all
   end
 
+  context "defining a BSON::ObjectId as a field" do
+
+    let(:bson_id) do
+      BSON::ObjectId.new
+    end
+
+    let(:person) do
+      Person.new(:bson_id => bson_id)
+    end
+
+    before do
+      person.save
+    end
+
+    it "persists the correct type" do
+      person.reload.bson_id.should be_a(BSON::ObjectId)
+    end
+
+    it "has the correct value" do
+      person.bson_id.should == bson_id
+    end
+  end
+
   context "creating anonymous documents" do
 
     context "when defining collection" do
@@ -27,7 +50,7 @@ describe Mongoid::Document do
   describe "#db" do
 
     it "returns the mongo database" do
-      Person.db.should == Mongoid.master
+      Person.db.should be_a(Mongo::DB)
     end
   end
 
@@ -287,39 +310,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#inspect" do
-
-    context "with allow_dynamic_fields = false" do
-      before do
-        Mongoid.configure.allow_dynamic_fields = false
-        @person = Person.new :title => "CEO"
-      end
-
-      it "returns a pretty string of class name and attributes" do
-        attrs = Person.fields.map do |name, field|
-          "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name].inspect}"
-        end * ", "
-        @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
-      end
-    end
-
-    context "with allow_dynamic_fields = true" do
-      before do
-        Mongoid.configure.allow_dynamic_fields = true
-        @person = Person.new(:title => "CEO", :some_attribute => "foo")
-        @person.addresses << Address.new(:street => "test")
-      end
-
-      it "returns a pretty string of class name, attributes, and dynamic attributes" do
-        attrs = Person.fields.map do |name, field|
-          "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name].inspect}"
-        end * ", "
-        attrs << ", some_attribute: #{@person.attributes['some_attribute'].inspect}"
-        @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
-      end
-    end
-  end
-
   describe "#paginate" do
 
     before do
@@ -333,7 +323,7 @@ describe Mongoid::Document do
     end
 
     it "returns a proper count" do
-      @criteria = Mongoid::Criteria.translate(Person, { :per_page => 5, :page => 1 })
+      @criteria = Mongoid::Criteria.translate(Person, false, { :per_page => 5, :page => 1 })
       @criteria.count.should == 10
     end
 

@@ -1,4 +1,4 @@
 class Answer
   include Mongoid::Document
-  embedded_in :question, :inverse_of => :answers
+  embedded_in :question
 end

@@ -2,603 +2,518 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
-  before do
-    @database = mock
-    @collection = stub(:name => "people")
-    @canvas_collection = stub(:name => "canvases")
-    Person.stubs(:collection).returns(@collection)
-    Canvas.stubs(:collection).returns(@canvas_collection)
-    @collection.stubs(:create_index).with(:_type, false)
-    @canvas_collection.stubs(:create_index).with(:_type, false)
+  let(:person) do
+    Person.new
   end
 
   it "does not respond to _destroy" do
-    Person.new.should_not respond_to(:_destroy)
+    person.should_not respond_to(:_destroy)
   end
 
   describe "#==" do
 
-    context "when other object is a Document" do
+    context "when comparable is not a document" do
 
-      context "when attributes are equal" do
+      let(:other) do
+        "Document"
+      end
+
+      it "returns false" do
+        person.should_not == other
+      end
+    end
+
+    context "when comparable is a document" do
+
+      let(:other) do
+        Person.new
+      end
+
+      context "when it has the same id" do
 
         before do
-          @document = Person.new(:_id => 1, :title => "Sir")
-          @other = Person.new(:_id => 1, :title => "Sir")
+          other.id = person.id
         end
 
         it "returns true" do
-          @document.should == @other
+          person.should == other
         end
       end
 
-      context "when attributes are not equal" do
+      context "when it has a different id" do
 
-        before do
-          @document = Person.new(:title => "Sir")
-          @other = Person.new(:title => "Madam")
+        context "when the instances are the same" do
+
+          it "returns true" do
+            person.should == person
+          end
         end
 
-        it "returns false" do
-          @document.should_not == @other
+        context "when the instances are different" do
+
+          it "returns false" do
+            person.should_not == other
+          end
         end
       end
     end
+  end
 
-    context "when other object is not a Document" do
+  describe "#===" do
 
-      it "returns false" do
-        Person.new.==("Test").should be_false
+    context "when comparable is the same type" do
+
+      it "returns true" do
+        (person === Person.new).should be_true
+      end
+    end
+  end
+
+  describe "#<=>" do
+
+    let(:first) do
+      Person.new
+    end
+
+    let(:second) do
+      Person.new
+    end
+
+    it "compares based on the document id" do
+      (first <=> second ).should == -1
+    end
+  end
+
+  describe "._types" do
+
+    context "when the document is subclassed" do
+
+      let(:types) do
+        Person._types
+      end
+
+      it "includes the root" do
+        types.should include("Person")
+      end
+
+      it "includes the subclasses" do
+        types.should include("Doctor")
       end
     end
 
-    context "when comapring parent to its subclass" do
+    context "when the document is not subclassed" do
 
-      it "returns false" do
-        Canvas.new.should_not == Firefox.new
+      let(:types) do
+        Address._types
       end
+
+      it "returns the document" do
+        types.should == [ "Address" ]
+      end
+    end
+  end
+
+  describe "#attributes" do
+
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    it "returns the attributes with indifferent access" do
+      person.attributes[:title].should == "Sir"
     end
   end
 
   describe "#eql?" do
 
-    context "when other object is a Document" do
+    context "when comparable is not a document" do
 
-      context "when attributes are equal" do
+      let(:other) do
+        "Document"
+      end
+
+      it "returns false" do
+        person.should_not be_eql(other)
+      end
+    end
+
+    context "when comparable is a document" do
+
+      let(:other) do
+        Person.new
+      end
+
+      context "when it has the same id" do
 
         before do
-          @document = Person.new(:_id => 1, :title => "Sir")
-          @other = Person.new(:_id => 1, :title => "Sir")
+          other.id = person.id
         end
 
         it "returns true" do
-          @document.eql?(@other).should be_true
+          person.should be_eql(other)
         end
       end
 
-      context "when attributes are not equal" do
+      context "when it has a different id" do
 
-        before do
-          @document = Person.new(:title => "Sir")
-          @other = Person.new(:title => "Madam")
+        context "when the instances are the same" do
+
+          it "returns true" do
+            person.should be_eql(person)
+          end
         end
 
-        it "returns false" do
-          @document.eql?(@other).should_not be_true
+        context "when the instances are different" do
+
+          it "returns false" do
+            person.should_not be_eql(other)
+          end
         end
-      end
-    end
-
-    context "when other object is not a Document" do
-
-      it "returns false" do
-        Person.new.eql?("Test").should be_false
-      end
-    end
-
-    context "when comapring parent to its subclass" do
-
-      it "returns false" do
-        Canvas.new.eql?(Firefox.new).should_not be_true
       end
     end
   end
 
   describe "#hash" do
 
-    before do
-      @document = Person.new(:_id => 1, :title => "Sir")
-      @other = Person.new(:_id => 2, :title => "Sir")
+    let(:person) do
+      Person.new
     end
 
-    it "deligates to id" do
-      @document.hash.should == @document.id.hash
-    end
-
-    it "has unique hash per id" do
-      @document.hash.should_not == @other.hash
+    it "returns the id hash" do
+      person.hash.should == person.id.hash
     end
   end
 
-  describe "#alias_method_chain" do
+  describe "#identify" do
 
-    context "on a field setter" do
+    let!(:person) do
+      Person.new
+    end
+
+    let!(:identifier) do
+      stub
+    end
+
+    before do
+      Mongoid::Identity.expects(:new).with(person).returns(identifier)
+    end
+
+    it "creates a new identity" do
+      identifier.expects(:create)
+      person.identify
+    end
+  end
+
+  describe "#initialize" do
+
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    it "sets persisted to false" do
+      person.should_not be_persisted
+    end
+
+    it "creates an id for the document" do
+      person.id.should be_a(BSON::ObjectId)
+    end
+
+    it "sets the attributes" do
+      person.title.should == "Sir"
+    end
+
+    context "when initialize callbacks are defined" do
 
       before do
-        @person = Person.new
-      end
-
-      it "chains the method properly" do
-        @person.score = 10
-        @person.rescored.should == 30
-      end
-    end
-  end
-
-  describe "#assimilate" do
-
-    before do
-      @child = Name.new(:first_name => "Hank", :last_name => "Moody")
-      @parent = Person.new(:title => "Mr.")
-      @options = Mongoid::Associations::Options.new(:name => :name)
-    end
-
-    it "sets up all associations in the object graph" do
-      @child.assimilate(@parent, @options)
-      @parent.name.should == @child
-    end
-  end
-
-  describe ".attr_accessor" do
-
-    context "on a root document" do
-
-      let(:person) do
-        Person.new
-      end
-
-      before do
-        person.mode = "testing"
-      end
-
-      it "allows access to the instance variable" do
-        person.mode.should == "testing"
-      end
-    end
-
-    context "on an embedded document" do
-
-      let(:address) do
-        Address.new
-      end
-
-      before do
-        address.mode = "test"
-      end
-
-      it "allows access to the instance variable" do
-        address.mode.should == "test"
-      end
-    end
-  end
-
-  describe ".db" do
-
-    before do
-      @db = stub
-      @collection.expects(:db).returns(@db)
-    end
-
-    it "returns the database from the collection" do
-      Person.db.should == @db
-    end
-  end
-
-  describe "#clone" do
-
-    before do
-      @comment = Comment.new(:text => "Woooooo")
-      @clone = @comment.clone
-    end
-
-    it "returns a new document sans id and versions" do
-      @clone.id.should_not == @comment.id
-      @clone.versions.should be_empty
-    end
-
-  end
-
-  describe ".embedded" do
-
-    context "when the document is embedded" do
-
-      it "returns true" do
-        address = Address.new
-        address.embedded.should be_true
-      end
-
-    end
-
-    context "when the document is not embedded" do
-
-      it "returns false" do
-        person = Person.new
-        person.embedded.should be_false
-      end
-
-    end
-
-    context "when a subclass is embedded" do
-
-      it "returns true" do
-        circle = Circle.new
-        circle.embedded.should be_true
-      end
-
-    end
-
-  end
-
-  describe ".hereditary?" do
-
-    context "when the class is the root of a hierarchy" do
-
-      it "returns false" do
-        Canvas.should_not be_hereditary
-      end
-
-    end
-
-    context "when the class is a part of a hierarchy" do
-
-      it "returns true" do
-        Browser.should be_hereditary
-      end
-
-    end
-
-    context "when the class is not part of a hierarchy" do
-
-      it "returns false" do
-        Game.should_not be_hereditary
-      end
-
-    end
-
-  end
-
-  describe ".human_name" do
-
-    it "returns the class name underscored and humanized" do
-      MixedDrink.model_name.human.should == "Mixed drink"
-    end
-
-  end
-
-  describe ".initialize" do
-
-    context "when passed a block" do
-
-      it "yields self to the block" do
-        person = Person.new do |p|
-          p.title = "Sir"
-          p.age = 60
+        Person.set_callback :initialize, :after do |doc|
+          doc.title = "Madam"
         end
-        person.title.should == "Sir"
-        person.age.should == 60
       end
 
+      after do
+        Person.reset_callbacks(:initialize)
+      end
+
+      it "runs the callbacks" do
+        person.title.should == "Madam"
+      end
     end
 
-    context "with no attributes" do
+    context "when defaults are defined" do
 
-      it "sets default attributes" do
-        person = Person.new
-        person.attributes.empty?.should be_false
+      it "sets the default values" do
         person.age.should == 100
-        person.blood_alcohol_content.should == 0.0
       end
-
     end
 
-    context "with nil attributes" do
-
-      before do
-        @person = Person.new(nil)
-      end
-
-      it "sets default attributes" do
-        @person.attributes.empty?.should be_false
-        @person.age.should == 100
-        @person.blood_alcohol_content.should == 0.0
-      end
-
-    end
-
-    context "with attributes from another document" do
+    context "when a block is provided" do
 
       let(:person) do
-        Person.new(Person.new.attributes)
-      end
-
-      it "is a new record with a new id" do
-        person.new_record?.should be_true
-      end
-    end
-
-    context "with attributes" do
-
-      before do
-        @attributes = {
-          :_id => "1",
-          :title => "value",
-          :age => "30",
-          :terms => "true",
-          :name => {
-            :_id => "2", :first_name => "Test", :last_name => "User"
-          },
-          :addresses => [
-            { :_id => "3", :street => "First Street" },
-            { :_id => "4", :street => "Second Street" }
-          ]
-        }
-      end
-
-      it "sets the attributes hash on the object properly casted" do
-        person = Person.new(@attributes)
-        person.attributes[:age].should == 30
-        person.attributes[:terms].should be_true
-      end
-
-      it "is a new record" do
-        Person.new(@attributes).new_record?.should == true
-      end
-    end
-
-    context "with a primary key" do
-
-      context "when the value for the key exists" do
-
-        before do
-          Address.key :street
-          @address = Address.new(:street => "Test")
-        end
-
-        it "sets the primary key" do
-          @address.id.should == "test"
+        Person.new do |doc|
+          doc.title = "King"
         end
       end
-    end
 
-    context "without a type specified" do
-
-      it "sets the type" do
-        Doctor.new._type.should == "Doctor"
+      it "yields to the block" do
+        person.title.should == "King"
       end
     end
   end
 
-  describe ".instantiate" do
+  describe "#.instantiate" do
 
-    context "when attributes have an id" do
+    context "when an id exists" do
 
-      before do
-        @attributes = { "_id" => "1", "_type" => "Person", "title" => "Sir", "age" => 30 }
+      let(:person) do
+        Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
       end
 
-      it "sets the attributes directly" do
-        person = Person.instantiate(@attributes)
-        person._id.should == "1"
-        person._type.should == "Person"
+      it "sets the attributes" do
         person.title.should == "Sir"
-        person.age.should == 30
       end
 
+      it "sets persisted to true" do
+        person.should be_persisted
+      end
     end
 
-    context "with nil attributes" do
+    context "when attributes are nil" do
 
-      it "sets the attributes directly" do
-        person = Person.instantiate(nil)
-        person.id.should_not be_nil
+      let(:person) do
+        Person.instantiate
       end
 
-    end
+      it "creates a new document" do
+        person.should be_a(Person)
+      end
 
+      it "creates an id" do
+        person.id.should be_a(BSON::ObjectId)
+      end
+    end
   end
 
-  describe "#_parent" do
+  describe "#raw_attributes" do
 
-    before do
-      @attributes = { :title => "Sir",
-        :addresses => [
-          { :street => "Street 1" },
-          { :street => "Street 2" } ] }
-      @person = Person.new(@attributes)
+    let(:person) do
+      Person.new(:title => "Sir")
     end
 
-    context "when document is embedded" do
-
-      it "returns the parent document" do
-        @person.addresses.first._parent.should == @person
-      end
-
+    it "returns the internal attributes" do
+      person.raw_attributes["title"].should == "Sir"
     end
-
-    context "when document is root" do
-
-      it "returns nil" do
-        @person._parent.should be_nil
-      end
-
-    end
-
-  end
-
-  describe "#parentize" do
-
-    before do
-      @parent = Person.new
-      @child = Name.new
-    end
-
-    it "sets the parent on each element" do
-      @child.parentize(@parent, :child)
-      @child._parent.should == @parent
-    end
-
   end
 
   describe "#reload" do
 
-    before do
-      @attributes = { "title" => "Herr" }
-      @person = Person.new(:_id => BSON::ObjectId.new.to_s)
-      @collection.expects(:find_one).with(:_id => @person.id).returns(@attributes)
+    let(:collection) do
+      stub
     end
 
-    it "reloads the object attribtues from the database" do
-      @person.reload
-      @person.attributes.should == @attributes
+    let(:person) do
+      Person.new(:title => "Sir")
     end
 
-    it 'should return a person object' do
-      @person.reload.should be_kind_of(Person)
+    let!(:name) do
+      person.build_name(:first_name => "James")
     end
 
-  end
+    context "when the document has been persisted" do
 
-  describe "#remove" do
+      let(:reloaded) do
+        person.reload
+      end
 
-    context "when removing an element from a has many" do
+      let!(:attributes) do
+        {
+          "title" => "Mrs",
+          "name" => { "first_name" => "Money" }
+        }
+      end
 
       before do
-        @person = Person.new
-        @address = Address.new(:street => "Testing")
-        @person.addresses << @address
+        person.expects(:collection).returns(collection)
+        collection.expects(:find_one).
+          with(:_id => person.id).returns(attributes)
       end
 
-      it "removes the child document attributes" do
-        @person.remove(@address)
-        @person.addresses.size.should == 0
+      it "reloads the attributes" do
+        reloaded.title.should == "Mrs"
       end
 
+      it "reloads the relations" do
+        reloaded.name.first_name.should == "Money"
+      end
     end
 
-    context "when removing a has one" do
+    context "when the document is new" do
 
       before do
-        @person = Person.new
-        @name = Name.new(:first_name => "Neytiri")
-        @person.name = @name
+        person.expects(:collection).returns(collection)
+        collection.expects(:find_one).
+          with(:_id => person.id).returns(nil)
       end
 
-      it "removes the child document attributes" do
-        @person.remove(@name)
-        @person.name.should be_nil
+      context "when raising a not found error" do
+
+        before do
+          Mongoid.raise_not_found_error = true
+        end
+
+        after do
+          Mongoid.raise_not_found_error = false
+        end
+
+        it "raises an error" do
+          expect {
+            person.reload
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
       end
-    end
-  end
 
-  describe "#_root" do
+      context "when not raising a not found error" do
 
-    before do
-      @person = Person.new(:title => "Mr")
-      @phone_number = Phone.new(:number => "415-555-1212")
-      @country_code = CountryCode.new(:code => 1)
-      @phone_number.country_code = @country_code
-      @person.phone_numbers << @phone_number
-    end
+        before do
+          Mongoid.raise_not_found_error = false
+        end
 
-    context "when document is the root" do
-
-      it "returns self" do
-        @person._root.should == @person
-      end
-    end
-
-    context "when document is embedded one level" do
-
-      it "returns the parent" do
-        @phone_number._root.should == @person
-      end
-    end
-
-    context "when document is embedded multiple levels" do
-
-      it "returns the top level parent" do
-        @country_code._root.should == @person
+        it "sets the attributes to empty" do
+          person.reload.title.should be_nil
+        end
       end
     end
   end
 
-  describe "._types" do
+  describe "#remove_child" do
 
-    it "returns all subclasses for the class plus the class" do
-      types = Canvas._types
-      types.size.should == 3
-      types.should include("Firefox")
-      types.should include("Browser")
-      types.should include("Canvas")
+    let(:person) do
+      Person.new
     end
 
-    it "does not return parent classes" do
-      types = Browser._types
-      types.size.should == 2
-      types.should include("Firefox")
-      types.should include("Browser")
-    end
+    context "when child is an embeds one" do
 
-    it 'should return strings' do
-      types = Canvas._types
-      types.each do |type|
-        type.should be_an_instance_of String
+      let!(:name) do
+        person.build_name(:first_name => "James")
+      end
+
+      before do
+        person.remove_child(name)
+      end
+
+      it "removes the relation instance" do
+        person.name.should be_nil
       end
     end
 
+    context "when child is an embeds many" do
+
+      let!(:address) do
+        person.addresses.build(:street => "Upper St")
+      end
+
+      before do
+        person.remove_child(address)
+      end
+
+      it "removes the document from the relation target" do
+        person.addresses.should be_empty
+      end
+    end
   end
 
   describe "#to_a" do
 
-    it "returns an array with the document in it" do
-      person = Person.new
-      person.to_a.should == [ person ]
+    let(:person) do
+      Person.new
     end
 
+    let(:people) do
+      person.to_a
+    end
+
+    it "returns the document in an array" do
+      people.should == [ person ]
+    end
+  end
+
+  describe "#to_hash" do
+
+    let!(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    let!(:address) do
+      person.addresses.build(:street => "Upper")
+    end
+
+    let!(:name) do
+      person.build_name(:first_name => "James")
+    end
+
+    let!(:location) do
+      address.locations.build(:name => "Home")
+    end
+
+    it "includes embeds one attributes" do
+      person.to_hash.should have_key("name")
+    end
+
+    it "includes embeds many attributes" do
+      person.to_hash.should have_key("addresses")
+    end
+
+    it "includes second level embeds many attributes" do
+      person.to_hash["addresses"].first.should have_key("locations")
+    end
   end
 
   describe "#to_key" do
 
     context "when the document is new" do
 
-      before do
-        @person = Person.new
+      let(:person) do
+        Person.new
       end
 
       it "returns nil" do
-        @person.to_key.should be_nil
+        person.to_key.should be_nil
       end
     end
 
     context "when the document is not new" do
 
-      before do
-        @id = BSON::ObjectId.new.to_s
-        @person = Person.instantiate("_id" => @id)
+      let(:person) do
+        Person.instantiate("_id" => BSON::ObjectId.new)
       end
 
       it "returns the id in an array" do
-        @person.to_key.should == [ @id ]
+        person.to_key.should == [ person.id ]
       end
     end
   end
 
   describe "#to_param" do
 
-    it "returns the id" do
-      id = BSON::ObjectId.new.to_s
-      Person.instantiate("_id" => id).to_param.should == id.to_s
+    context "when the document is new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      it "returns nil" do
+        person.to_param.should be_nil
+      end
     end
 
+    context "when the document is not new" do
+
+      let(:person) do
+        Person.instantiate("_id" => BSON::ObjectId.new)
+      end
+
+      it "returns the id as a string" do
+        person.to_param.should == person.id.to_s
+      end
+    end
   end
 end

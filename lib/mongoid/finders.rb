@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.count(:conditions => { :attribute => "value" })</tt>
     def count(*args)
-      Criteria.translate(self, *args).count
+      Criteria.translate(self, false, *args).count
     end
 
     # Returns true if there are on document in database based on the
@@ -36,7 +36,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.exists?(:conditions => { :attribute => "value" })</tt>
     def exists?(*args)
-      Criteria.translate(self, *args).limit(1).count == 1
+      Criteria.translate(self, false, *args).limit(1).count == 1
     end
 
     # Helper to initialize a new +Criteria+ object for this class, or return
@@ -45,8 +45,8 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>Person.criteria</tt>
-    def criteria
-      scope_stack.last || Criteria.new(self)
+    def criteria(embedded = false)
+      scope_stack.last || Criteria.new(self, embedded)
     end
 
     # Find a +Document+ in several different ways.
@@ -57,15 +57,24 @@ module Mongoid #:nodoc:
     # it will attempt to find either a single +Document+ or multiples based
     # on the conditions provided and the first parameter.
     #
+    # Example:
+    #
     # <tt>Person.find(:first, :conditions => { :attribute => "value" })</tt>
-    #
     # <tt>Person.find(:all, :conditions => { :attribute => "value" })</tt>
+    # <tt>Person.find(BSON::ObjectId)</tt>
     #
-    # <tt>Person.find(Mongo::ObjectID.new.to_s)</tt>
+    # Options:
+    #
+    # args: An assortment of finder options.
+    #
+    # Returns:
+    #
+    # A document or criteria.
     def find(*args)
-      raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {}) if args[0].nil?
-      type = args.shift if args.first.is_a?(Symbol)
-      criteria = Criteria.translate(self, *args)
+      raise Errors::InvalidOptions.new(
+        :calling_document_find_with_nil_is_invalid, {}
+      ) if args[0].nil?
+      type, criteria = Criteria.parse!(self, false, *args)
       case type
       when :first then return criteria.one
       when :last then return criteria.last
@@ -134,7 +143,7 @@ module Mongoid #:nodoc:
     #
     # Returns paginated array of docs.
     def paginate(params = {})
-      Criteria.translate(self, params).paginate
+      Criteria.translate(self, false, params).paginate
     end
 
     protected
@@ -154,7 +163,6 @@ module Mongoid #:nodoc:
     def with_scope(criteria)
       scope_stack = self.scope_stack
       scope_stack << criteria
-
       begin
         yield criteria
       ensure

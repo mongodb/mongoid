@@ -1,7 +1,4 @@
-require "rubygems"
-# require "ruby-prof"
 require "benchmark"
-
 require "mongoid"
 
 Mongoid.configure do |config|
@@ -14,36 +11,59 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   field :birth_date, :type => Date
-  field :title
-  embeds_one :name
-  embeds_many :addresses
-  embeds_many :phones
+  field :title, :type => String
+
+  embeds_one :name, :validate => false
+  embeds_many :addresses, :validate => false
+  embeds_many :phones, :validate => false
+
+  # references_many :posts, :validate => false
+  # references_one :game, :validate => false
+  # references_and_referenced_in_many :preferences
 end
 
 class Name
   include Mongoid::Document
-  field :given
-  field :family
-  field :middle
-  embedded_in :person, :inverse_of => :name
+  field :given, :type => String
+  field :family, :type => String
+  field :middle, :type => String
+  embedded_in :person
 end
 
 class Address
   include Mongoid::Document
-  field :street
-  field :city
-  field :state
-  field :post_code
-  field :address_type
-  embedded_in :person, :inverse_of => :addresses
+  field :street, :type => String
+  field :city, :type => String
+  field :state, :type => String
+  field :post_code, :type => String
+  field :address_type, :type => String
+  embedded_in :person
 end
 
 class Phone
   include Mongoid::Document
   field :country_code, :type => Integer
-  field :number
-  field :phone_type
-  embedded_in :person, :inverse_of => :phones
+  field :number, :type => String
+  field :phone_type, :type => String
+  embedded_in :person
+end
+
+class Post
+  include Mongoid::Document
+
+  # referenced_in :person
+end
+
+class Game
+  include Mongoid::Document
+
+  # referenced_in :person
+end
+
+class Preference
+  include Mongoid::Document
+
+  # references_and_referenced_in_many :people
 end
 
 puts "Starting benchmark..."
@@ -179,3 +199,20 @@ end
 # Updating The Root Document 10k Times         3.040000   0.160000   3.200000 (  3.195466)
 # Updating An Embedded Document 10k Times      2.550000   0.130000   2.680000 (  2.668367)
 # Appending A New Embedded Document 10k Times  5.080000   0.240000   5.320000 (  5.327933)
+# ---------------------------------------------------------------------------------------
+# 2.0.0.beta.20 (1.9.2)
+#
+# Saving 10k New Documents                    19.530000   0.270000  19.800000 ( 19.778292)
+# Querying & Iterating 10k Documents           1.150000   0.060000   1.210000 (  1.219632)
+# Updating The Root Document 10k Times         3.270000   0.120000   3.390000 (  3.387370)
+# Updating An Embedded Document 10k Times      2.680000   0.110000   2.790000 (  2.790347)
+# Appending A New Embedded Document 10k Times  7.230000   0.240000   7.470000 (  7.458122)
+#
+# ---------------------------------------------------------------------------------------
+# 2.0.0.rc.1 (1.9.2)
+
+# Saving 10k New Documents                    12.230000   0.130000  12.360000 ( 12.345798)
+# Querying & Iterating 10k Documents           0.560000   0.050000   0.610000 (  0.615744)
+# Updating The Root Document 10k Times         3.430000   0.090000   3.520000 (  3.520051)
+# Updating An Embedded Document 10k Times      1.810000   0.090000   1.900000 (  1.900921)
+# Appending A New Embedded Document 10k Times  6.950000   0.230000   7.180000 (  7.175059)

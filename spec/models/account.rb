@@ -5,6 +5,6 @@ class Account
   field :number
   field :balance
   field :nickname
-  
+
   attr_accessible :nickname
 end

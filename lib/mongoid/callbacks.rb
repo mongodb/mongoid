@@ -5,7 +5,6 @@ module Mongoid #:nodoc:
     included do
       extend ActiveModel::Callbacks
 
-      # Define all the callbacks that are accepted by the document.
       define_model_callbacks \
         :create,
         :destroy,
@@ -15,7 +14,13 @@ module Mongoid #:nodoc:
         :validation
     end
 
-    def valid?(*) #nodoc
+    # Determine if the document is valid.
+    #
+    # @example Is the document valid?
+    #   person.valid?
+    #
+    # @return [ true, false ] True if valid, false if not.
+    def valid?(*)
       _run_validation_callbacks { super }
     end
   end
