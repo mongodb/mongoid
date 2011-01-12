@@ -164,7 +164,7 @@ module Mongoid # :nodoc:
           end
         end
         alias :has_many_related :references_many
-        alias :has_many :referenced_in
+        alias :has_many :references_many
 
         # Adds a relational many-to-many association between many of this
         # Document and many of another Document.
