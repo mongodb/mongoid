@@ -173,6 +173,26 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         it "saves the target" do
           preference.should be_persisted
         end
+
+        context 'when overwriting an existing relation' do
+          let(:another_preference) { Preference.new }
+
+          before do
+            person.preferences = [ another_preference ]
+          end
+
+          it 'sets the relation' do
+            person.preferences.should == [ another_preference ]
+          end
+
+          it 'saves the target' do
+            another_preference.should be_persisted
+          end
+
+          it 'does not leave foreign keys of the previous relation' do
+            person.preference_ids.should == [ another_preference.id ]
+          end
+        end
       end
     end
   end
