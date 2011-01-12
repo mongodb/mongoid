@@ -13,24 +13,22 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let!(:address) do
-      Address.new(:addressable => person)
+      Address.create(:addressable => person)
     end
 
     let!(:first_location) do
-      Location.new(:address => address)
+      Location.create(:address => address)
     end
 
     let!(:second_location) do
-      Location.new(:address => address)
+      Location.create(:address => address)
     end
 
-    it "saves the person" do
-      Person.last.should == person
-    end
-
-    it "saves the address" do
-      Person.last.should == person
+    it "saves the child" do
       Person.last.addresses.last.should == address
+    end
+
+    it "indexes the child" do
       address._index.should == 0
     end
 
@@ -45,6 +43,29 @@ describe Mongoid::Relations::Embedded::In do
     it "has the locations in the association array" do
       Person.last.addresses.last.locations.should ==
         [first_location, second_location]
+    end
+  end
+
+  context "when instantiating a new child with a persisted parent" do
+
+    let!(:person) do
+      Person.create(:ssn => "666-66-6666")
+    end
+
+    let!(:address) do
+      Address.new(:addressable => person)
+    end
+
+    let!(:location) do
+      Location.new(:address => address)
+    end
+
+    it "does not save the child" do
+      address.should_not be_persisted
+    end
+
+    it "does not save the deeply embedded children" do
+      address.locations.first.should_not be_persisted
     end
   end
 

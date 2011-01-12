@@ -218,7 +218,7 @@ module Mongoid #:nodoc:
         if value.is_a?(Hash)
           metadata.nested_builder(value, {}).build(self)
         else
-          send("#{name}=", value)
+          send("#{name}=", value, :building => true)
         end
       end
     end
