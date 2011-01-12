@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
-          metadatafy(name, Embedded::In, options, &block).tap do |meta|
+          characterize(name, Embedded::In, options, &block).tap do |meta|
             self.embedded = true
             relate(name, meta)
           end
@@ -76,7 +76,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
-          metadatafy(name, Embedded::Many, options, &block).tap do |meta|
+          characterize(name, Embedded::Many, options, &block).tap do |meta|
             relate(name, meta)
             validate_relation(meta)
           end
@@ -102,7 +102,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
-          metadatafy(name, Embedded::One, options, &block).tap do |meta|
+          characterize(name, Embedded::One, options, &block).tap do |meta|
             relate(name, meta)
             builder(name).creator(name)
             validate_relation(meta)
@@ -128,7 +128,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def referenced_in(name, options = {}, &block)
-          metadatafy(name, Referenced::In, options, &block).tap do |meta|
+          characterize(name, Referenced::In, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
           end
@@ -156,7 +156,7 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         def references_many(name, options = {}, &block)
           check_options(options)
-          metadatafy(name, Referenced::Many, options, &block).tap do |meta|
+          characterize(name, Referenced::Many, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
             autosave(meta)
@@ -187,7 +187,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def references_and_referenced_in_many(name, options = {}, &block)
-          metadatafy(name, Referenced::ManyToMany, options, &block).tap do |meta|
+          characterize(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
           end
@@ -213,7 +213,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_one(name, options = {}, &block)
-          metadatafy(name, Referenced::One, options, &block).tap do |meta|
+          characterize(name, Referenced::One, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
             builder(name).creator(name).autosave(meta)
@@ -248,7 +248,7 @@ module Mongoid # :nodoc:
         # Create the metadata for the relation.
         #
         # @example Create the metadata.
-        #   Person.metadatafy(:posts, Referenced::Many, {})
+        #   Person.characterize(:posts, Referenced::Many, {})
         #
         # @param [ Symbol ] name The name of the relation.
         # @param [ Object ] relation The type of relation.
@@ -256,7 +256,7 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         #
         # @return [ Metadata ] The metadata for the relation.
-        def metadatafy(name, relation, options, &block)
+        def characterize(name, relation, options, &block)
           Metadata.new(
             options.merge(
               :relation => relation,
