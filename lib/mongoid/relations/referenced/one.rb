@@ -39,7 +39,9 @@ module Mongoid # :nodoc:
         # @param [ Document ] target The target (child) of the relation.
         # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
-          init(base, target, metadata)
+          init(base, target, metadata) do
+            characterize_one(target)
+          end
         end
 
         # Removes the association between the base document and the target

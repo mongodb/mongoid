@@ -40,7 +40,9 @@ module Mongoid # :nodoc:
         #   relation.
         # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
-          init(base, target, metadata)
+          init(base, target, metadata) do
+            characterize_one(target)
+          end
         end
 
         # Substitutes the supplied target documents for the existing document

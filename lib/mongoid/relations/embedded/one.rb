@@ -39,6 +39,7 @@ module Mongoid # :nodoc:
         # @param [ Metadata ] metadata The relation's metadata
         def initialize(base, target, metadata)
           init(base, target, metadata) do
+            characterize_one(target)
             target.parentize(base)
           end
         end

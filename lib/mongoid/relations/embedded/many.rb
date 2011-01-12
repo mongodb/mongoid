@@ -174,6 +174,7 @@ module Mongoid # :nodoc:
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             target.each_with_index do |doc, index|
+              characterize_one(doc)
               doc.parentize(base)
               doc._index = index
             end
@@ -275,7 +276,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def append(document, options = {})
           target << document
-          metadatafy(document)
+          characterize_one(document)
           bind_one(document, options)
           document._index = target.size - 1
         end

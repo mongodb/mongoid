@@ -32,7 +32,6 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def init(base, target, metadata, &block)
         @base, @building, @target, @metadata = base, false, target, metadata
-        metadatafy(target)
         yield block if block_given?
         extend Module.new(&metadata.extension) if metadata.extension?
       end
@@ -93,20 +92,29 @@ module Mongoid # :nodoc:
         !target.is_a?(Mongoid::Criteria)
       end
 
-      # Takes the supplied document and sets the metadata on it. Used when
+      # Takes the supplied documents and sets the metadata on them. Used when
       # creating new documents and adding them to the relation.
       #
       # @example Set the metadata.
-      #   proxy.metadatafy(address)
+      #   proxy.characterize(addresses)
       #
-      # @param [ Document, Array<Document> ] object The object to set the
-      #   metadata on.
+      # @param [ Array<Document> ] documents The documents to set metadata on.
       #
-      # @since 2.0.0.rc.1
-      def metadatafy(object)
-        object.to_a.each do |obj|
-          obj.metadata = metadata unless obj.metadata
-        end
+      # @since 2.0.0.rc.4
+      def characterize(documents)
+        documents.each { |doc| characterize_one(doc) }
+      end
+
+      # Takes the supplied document and sets the metadata on it.
+      #
+      # @example Set the metadata.
+      #   proxt.characterize_one(name)
+      #
+      # @param [ Document ] document The document to set on.
+      #
+      # @since 2.0.0.rc.4
+      def characterize_one(document)
+        document.metadata = metadata unless document.metadata
       end
 
       # Default behavior of method missing should be to delegate all calls

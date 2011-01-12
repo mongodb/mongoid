@@ -25,7 +25,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def bind(options = {})
-          binding.bind(options)
+          loaded and binding.bind(options)
           target.map(&:save) if base.persisted? && !options[:building]
         end
 
@@ -211,7 +211,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def append(document, options = {})
           loaded and target.push(document)
-          metadatafy(document)
+          characterize_one(document)
           binding.bind_one(document, options)
         end
 

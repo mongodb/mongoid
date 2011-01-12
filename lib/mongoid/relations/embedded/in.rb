@@ -42,6 +42,7 @@ module Mongoid # :nodoc:
         # @return [ In ] The proxy.
         def initialize(base, target, metadata)
           init(base, target, metadata) do
+            characterize_one(target)
             base.parentize(target)
           end
         end
