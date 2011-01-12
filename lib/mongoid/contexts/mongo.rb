@@ -303,6 +303,26 @@ module Mongoid #:nodoc:
         options.dup
       end
 
+      # Very basic update that will perform a simple atomic $set of the
+      # attributes provided in the hash. Can be expanded to later for more
+      # robust functionality.
+      #
+      # @example Update all matching documents.
+      #   context.update_all(:title => "Sir")
+      #
+      # @param [ Hash ] attributes The sets to perform.
+      #
+      # @since 2.0.0.rc.4
+      def update_all(attributes = {})
+        klass.collection.update(
+          selector,
+          { "$set" => attributes },
+          :multi => true,
+          :safe => Mongoid.persist_in_safe_mode
+        )
+      end
+      alias :update :update_all
+
       protected
 
       # Iterate over each +Document+ in the results and cache the collection.

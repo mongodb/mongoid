@@ -5,6 +5,7 @@ require "mongoid/criterion/destructive"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/inspection"
+require "mongoid/criterion/modification"
 require "mongoid/criterion/optional"
 require "mongoid/criterion/selector"
 
@@ -31,6 +32,7 @@ module Mongoid #:nodoc:
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Inspection
+    include Criterion::Modification
     include Criterion::Optional
 
     attr_accessor :collection, :documents, :embedded, :ids, :klass, :options, :selector
