@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-# Copyright (c) 2009, 2010 Durran Jordan
+# Copyright (c) 2009 - 2011 Durran Jordan and friends.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
