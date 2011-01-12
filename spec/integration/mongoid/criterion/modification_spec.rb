@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Criterion::Modification do
+describe Mongoid::Criteria do
 
   before do
     Person.delete_all

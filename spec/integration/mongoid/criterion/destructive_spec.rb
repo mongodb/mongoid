@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Criterion::Destructive do
+describe Mongoid::Criteria do
 
   let(:name) do
     Name.new(:first_name => "Durran")

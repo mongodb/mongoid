@@ -1,11 +1,9 @@
 # encoding: utf-8
 require "mongoid/criterion/creational"
 require "mongoid/criterion/complex"
-require "mongoid/criterion/destructive"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/inspection"
-require "mongoid/criterion/modification"
 require "mongoid/criterion/optional"
 require "mongoid/criterion/selector"
 
@@ -28,18 +26,39 @@ module Mongoid #:nodoc:
   class Criteria
     include Enumerable
     include Criterion::Creational
-    include Criterion::Destructive
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Inspection
-    include Criterion::Modification
     include Criterion::Optional
 
     attr_accessor :collection, :documents, :embedded, :ids, :klass, :options, :selector
 
-    delegate :aggregate, :avg, :blank?, :count, :distinct, :empty?,
-             :execute, :first, :group, :id_criteria, :last, :max,
-             :min, :one, :page, :paginate, :per_page, :shift, :sum, :to => :context
+    delegate \
+      :aggregate,
+      :avg,
+      :blank?,
+      :count,
+      :delete,
+      :delete_all,
+      :destroy,
+      :destroy_all,
+      :distinct,
+      :empty?,
+      :execute,
+      :first,
+      :group,
+      :id_criteria,
+      :last,
+      :max,
+      :min,
+      :one,
+      :page,
+      :paginate,
+      :per_page,
+      :shift,
+      :sum,
+      :update,
+      :update_all, :to => :context
 
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.
