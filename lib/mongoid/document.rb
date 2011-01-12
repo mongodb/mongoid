@@ -204,6 +204,20 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
 
+      # Performs class equality checking.
+      #
+      # @example Compare the classes.
+      #   document === other
+      #
+      # @param [ Document, Object ] other The other object to compare with.
+      #
+      # @return [ true, false ] True if the classes are equal, false if not.
+      #
+      # @since 2.0.0.rc.4
+      def ===(other)
+        self == (other.is_a?(Class) ? other : other.class)
+      end
+
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #

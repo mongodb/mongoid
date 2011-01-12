@@ -61,20 +61,30 @@ describe Mongoid::Document do
     end
   end
 
-  describe '.===' do
-    context 'when comparable is an instance of this document' do
-      it 'returns true' do
+  describe ".===" do
+
+    context "when comparable is an instance of this document" do
+
+      it "returns true" do
         (klass === person).should be_true
       end
     end
 
-    context 'when comparable is a relation of this document' do
+    context "when comparable is a relation of this document" do
+
       let(:relation) do
-        Drug.find(Drug.create(:person => person).id).person
+        Post.new(:person => person).person
       end
 
-      it 'returns true' do
+      it "returns true" do
         (klass === relation).should be_true
+      end
+    end
+
+    context "when comparable is the same class" do
+
+      it "returns true" do
+        (klass === Person).should be_true
       end
     end
   end
