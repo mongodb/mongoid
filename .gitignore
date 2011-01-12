@@ -8,7 +8,6 @@ RAILS
 .bundle
 Gemfile.lock
 rdoc/*
-<<<<<<< HEAD
 TODO
 ISSUES
 DONATE
