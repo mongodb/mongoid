@@ -2,6 +2,8 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
+  let(:klass) { Person }
+
   let(:person) do
     Person.new
   end
@@ -55,6 +57,24 @@ describe Mongoid::Document do
             person.should_not == other
           end
         end
+      end
+    end
+  end
+
+  describe '.===' do
+    context 'when comparable is an instance of this document' do
+      it 'returns true' do
+        (klass === person).should be_true
+      end
+    end
+
+    context 'when comparable is a relation of this document' do
+      let(:relation) do
+        Drug.find(Drug.create(:person => person).id).person
+      end
+
+      it 'returns true' do
+        (klass === relation).should be_true
       end
     end
   end
