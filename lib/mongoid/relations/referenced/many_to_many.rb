@@ -173,8 +173,16 @@ module Mongoid # :nodoc:
         # @return [ Many ] The relation.
         #
         # @since 2.0.0.rc.1
-        def substitute(target, options = {})
-          tap { target ? (@target = target.to_a; bind(options)) : (@target = unbind(options)) }
+        def substitute(new_target, options = {})
+          tap do |relation|
+            if new_target
+              binding.unbind(options)
+              relation.target = new_target.to_a
+              bind(options)
+            else
+              relation.target = unbind(options)
+            end
+          end
         end
 
         # Unbinds the base object to the inverse of the relation. This occurs
