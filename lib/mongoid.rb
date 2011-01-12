@@ -52,7 +52,6 @@ require "mongoid/contexts"
 require "mongoid/copyable"
 require "mongoid/criteria"
 require "mongoid/cursor"
-require "mongoid/deprecation"
 require "mongoid/default_scope"
 require "mongoid/dirty"
 require "mongoid/extras"
@@ -122,17 +121,6 @@ module Mongoid #:nodoc
       block_given? ? yield(config) : config
     end
     alias :config :configure
-
-    # Easy convenience method for generating an alert from the
-    # deprecation module.
-    #
-    # @example Alert a deprecation.
-    #   Mongoid.deprecate("Method no longer used")
-    #
-    # @param [ String ] message The message to print.
-    def deprecate(message)
-      Mongoid::Deprecation.alert(message)
-    end
   end
 
   # Take all the public instance methods from the Config singleton and allow

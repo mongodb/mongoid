@@ -30,11 +30,4 @@ describe Mongoid do
       end
     end
   end
-
-  describe ".deprecate" do
-
-    it "returns true" do
-      Mongoid.deprecate("testing").should be_true
-    end
-  end
 end
