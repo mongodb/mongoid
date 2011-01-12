@@ -18,16 +18,37 @@ describe Mongoid::Criteria do
 
     describe "##{method}" do
 
-      let(:from_db) do
-        Person.first
+      context "when updating the root document" do
+
+        let(:from_db) do
+          Person.first
+        end
+
+        before do
+          Person.where(:title => "Sir").send(method, :title => "Madam")
+        end
+
+        it "updates all the matching documents" do
+          from_db.title.should == "Madam"
+        end
       end
 
-      before do
-        Person.where(:title => "Sir").send(method, :title => "Madam")
-      end
+      context "when updating an embedded document" do
 
-      it "updates all the matching documents" do
-        from_db.title.should == "Madam"
+        let(:from_db) do
+          Person.first
+        end
+
+        before do
+          Person.where(:title => "Sir").send(
+            method,
+            "addresses.0.city" => "Berlin"
+          )
+        end
+
+        it "updates all the matching documents" do
+          from_db.addresses.first.city.should == "Berlin"
+        end
       end
     end
   end
