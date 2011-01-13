@@ -43,6 +43,19 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Returns a count of the number of documents in the association that have
+        # actually been persisted to the database.
+        #
+        # Use #size if you want the total number of documents in memory.
+        #
+        # @example Get the count of persisted documents.
+        #   person.preferences.count
+        #
+        # @return [ Integer ] The total number of persisted documents.
+        def count
+          criteria.count
+        end
+
         # Delete a single document from the relation.
         #
         # @example Delete a document.
@@ -245,7 +258,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          metadata.klass.criteria(false)
+          metadata.klass.any_in(metadata.inverse_foreign_key => [ base.id ])
         end
 
         # Dereferences the supplied document from the base of the relation.

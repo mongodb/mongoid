@@ -74,7 +74,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "saves the target" do
-            post.should_not be_a_new_record
+            post.should be_persisted
           end
 
           it "adds the document to the target" do
@@ -726,6 +726,31 @@ describe Mongoid::Relations::Referenced::Many do
 
       it "returns 0" do
         movie.ratings.count.should == 0
+      end
+    end
+
+    context "when new documents exist in the database" do
+
+      context "when the documents are part of the relation" do
+
+        before do
+          Rating.create(:ratable_id => movie.id)
+        end
+
+        it "returns the count from the db" do
+          movie.ratings.count.should == 1
+        end
+      end
+
+      context "when the documents are not part of the relation" do
+
+        before do
+          Rating.create
+        end
+
+        it "returns the count from the db" do
+          movie.ratings.count.should == 0
+        end
       end
     end
   end

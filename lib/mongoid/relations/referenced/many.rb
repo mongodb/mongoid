@@ -43,6 +43,19 @@ module Mongoid #:nodoc:
           end
         end
 
+        # Returns a count of the number of documents in the association that have
+        # actually been persisted to the database.
+        #
+        # Use #size if you want the total number of documents in memory.
+        #
+        # @example Get the count of persisted documents.
+        #   person.posts.count
+        #
+        # @return [ Integer ] The total number of persisted documents.
+        def count
+          criteria.count
+        end
+
         # Deletes all related documents from the database given the supplied
         # conditions.
         #
@@ -228,7 +241,7 @@ module Mongoid #:nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          metadata.klass.criteria(false)
+          metadata.klass.where(metadata.foreign_key => base.id)
         end
 
         # Will load the target into an array if the target had not already been

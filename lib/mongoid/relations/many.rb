@@ -50,20 +50,6 @@ module Mongoid #:nodoc:
       end
       alias :new :build
 
-      # Returns a count of the number of documents in the association that have
-      # actually been persisted to the database.
-      #
-      # Use #size if you want the total number of documents.
-      #
-      # @example Get the count of persisted documents.
-      #   person.addresses.count
-      #
-      # @return [ Integer ] The total number of persisted embedded docs, as
-      #   flagged by the #persisted? method.
-      def count
-        target.select(&:persisted?).size
-      end
-
       # Creates a new document on the references many relation. This will
       # save the document if the parent has been persisted.
       #

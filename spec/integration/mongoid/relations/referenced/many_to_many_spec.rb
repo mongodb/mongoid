@@ -471,6 +471,31 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         person.preferences.count.should == 0
       end
     end
+
+    context "when new documents exist in the database" do
+
+      context "when the documents are part of the relation" do
+
+        before do
+          Preference.create(:person_ids => person.id)
+        end
+
+        it "returns the count from the db" do
+          person.preferences.count.should == 1
+        end
+      end
+
+      context "when the documents are not part of the relation" do
+
+        before do
+          Preference.create
+        end
+
+        it "returns the count from the db" do
+          person.preferences.count.should == 0
+        end
+      end
+    end
   end
 
   [ :create, :create! ].each do |method|
