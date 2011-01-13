@@ -89,9 +89,9 @@ module Mongoid #:nodoc
     def destructive_fields
       @destructive_fields ||= lambda {
         klass = Class.new do
-        include Mongoid::Document
+          include Mongoid::Document
         end
-      klass.instance_methods(true).collect { |method| method.to_s }
+        klass.instance_methods(true).collect { |method| method.to_s }
       }.call
     end
 
@@ -177,26 +177,26 @@ module Mongoid #:nodoc
     end
     alias :database= :master=
 
-      # Returns the master database, or if none has been set it will raise an
-      # error.
-      #
-      # @example Get the master database.
-      #   config.master
-      #
-      # @raise [ Errors::InvalidDatabase ] If the database was not set.
-      #
-      # @return [ Mongo::DB ] The master database.
-      def master
-        unless @master
-          configure_databases(@settings) unless @settings.blank?
-          raise Errors::InvalidDatabase.new(nil) unless @master
-        end
-        if @reconnect
-          @reconnect = false
-          reconnect!
-        end
-        @master
+    # Returns the master database, or if none has been set it will raise an
+    # error.
+    #
+    # @example Get the master database.
+    #   config.master
+    #
+    # @raise [ Errors::InvalidDatabase ] If the database was not set.
+    #
+    # @return [ Mongo::DB ] The master database.
+    def master
+      unless @master
+        configure_databases(@settings) unless @settings.blank?
+        raise Errors::InvalidDatabase.new(nil) unless @master
       end
+      if @reconnect
+        @reconnect = false
+        reconnect!
+      end
+      @master
+    end
     alias :database :master
 
     # Convenience method for connecting to the master database after forking a
