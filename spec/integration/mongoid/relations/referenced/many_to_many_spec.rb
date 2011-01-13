@@ -604,6 +604,71 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#delete" do
+
+    let(:person) do
+      Person.create(:ssn => "666-66-6666")
+    end
+
+    let(:preference_one) do
+      Preference.create(:name => "Testing")
+    end
+
+    let(:preference_two) do
+      Preference.create(:name => "Test")
+    end
+
+    before do
+      person.preferences << [ preference_one, preference_two ]
+    end
+
+    context "when the document exists" do
+
+      let!(:deleted) do
+        person.preferences.delete(preference_one)
+      end
+
+      it "removes the document from the relation" do
+        person.preferences.should == [ preference_two ]
+      end
+
+      it "returns the document" do
+        deleted.should == preference_one
+      end
+
+      it "removes the document key from the foreign key" do
+        person.preference_ids.should == [ preference_two.id ]
+      end
+
+      it "removes the inverse reference" do
+        deleted.people.should be_empty
+      end
+
+      it "removes the base id from the inverse keys" do
+        deleted.person_ids.should be_empty
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let!(:deleted) do
+        person.preferences.delete(Preference.new)
+      end
+
+      it "returns nil" do
+        deleted.should be_nil
+      end
+
+      it "does not modify the relation" do
+        person.preferences.should == [ preference_one, preference_two ]
+      end
+
+      it "does not modify the keys" do
+        person.preference_ids.should == [ preference_one.id, preference_two.id ]
+      end
+    end
+  end
+
   [ :delete_all, :destroy_all ].each do |method|
 
     describe "##{method}" do
