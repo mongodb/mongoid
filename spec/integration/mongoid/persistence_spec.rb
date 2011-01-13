@@ -16,22 +16,45 @@ describe Mongoid::Persistence do
 
   describe ".create" do
 
-    let(:person) do
-      Person.create(:title => "Sensei", :ssn => "666-66-6666")
+    context "when providing attributes" do
+
+      let(:person) do
+        Person.create(:title => "Sensei", :ssn => "666-66-6666")
+      end
+
+      it "it saves the document" do
+        person.should be_persisted
+      end
+
+      it "returns the document" do
+        person.should be_a_kind_of(Person)
+      end
+
+      context "on an embedded document" do
+
+        subject { Address.create(:addressable => person) }
+
+        it { should be_persisted }
+
+        it { should be_a_kind_of(Address) }
+      end
     end
 
-    it "it saves the document" do
-      person.should be_persisted
-    end
+    context "when passing in a block" do
 
-    it "returns the document" do
-      person.should be_a_kind_of(Person)
-    end
+      let(:person) do
+        Person.create do |peep|
+          peep.ssn = "666-66-6666"
+        end
+      end
 
-    context "on an embedded document" do
-      subject { Address.create(:addressable => person) }
-      it { should be_persisted }
-      it { should be_a_kind_of(Address) }
+      it "sets the attributes" do
+        person.ssn.should == "666-66-6666"
+      end
+
+      it "persists the document" do
+        person.should be_persisted
+      end
     end
   end
 
@@ -54,6 +77,23 @@ describe Mongoid::Persistence do
             Person.create!(:ssn => "555-55-9999")
           }.to raise_error
         end
+      end
+    end
+
+    context "when passing in a block" do
+
+      let(:person) do
+        Person.create! do |peep|
+          peep.ssn = "666-66-6666"
+        end
+      end
+
+      it "sets the attributes" do
+        person.ssn.should == "666-66-6666"
+      end
+
+      it "persists the document" do
+        person.should be_persisted
       end
     end
   end

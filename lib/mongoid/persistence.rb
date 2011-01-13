@@ -145,8 +145,8 @@ module Mongoid #:nodoc:
       # @param [ Hash ] attributes The attributes to create with.
       #
       # @return [ Document ] The newly created document.
-      def create(attributes = {})
-        new(attributes).tap(&:save)
+      def create(attributes = {}, &block)
+        new(attributes, &block).tap(&:save)
       end
 
       # Create a new document. This will instantiate a new document and
@@ -160,8 +160,8 @@ module Mongoid #:nodoc:
       # @param [ Hash ] attributes The attributes to create with.
       #
       # @return [ Document ] The newly created document.
-      def create!(attributes = {})
-        document = new(attributes)
+      def create!(attributes = {}, &block)
+        document = new(attributes, &block)
         fail_validate!(document) if document.insert.errors.any?
         document
       end
