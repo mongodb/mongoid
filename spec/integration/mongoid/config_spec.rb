@@ -19,9 +19,13 @@ describe Mongoid::Config do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_multiple_mongos.yml")
   end
 
+  let(:replset_config) do
+    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.replset.yml")
+  end
+
   after(:all) do
     Mongoid.configure do |config|
-      name = "mongoid_test"
+      name          = "mongoid_test"
       config.master = Mongo::Connection.new.db(name)
       config.slaves = []
       config.logger = nil
@@ -43,7 +47,7 @@ describe Mongoid::Config do
 
       it "adds the language" do
         I18n.translate("activemodel.errors.messages.taken").should ==
-          "ist bereits vergeben"
+                "ist bereits vergeben"
       end
     end
   end
@@ -150,6 +154,19 @@ describe Mongoid::Config do
         end
       end
     end
+
+    context "when configured with replset", :config => :replset_config do
+
+      let(:settings) do
+        YAML.load(ERB.new(File.new(replset_config).read).result)
+      end
+
+      it "should create a regular Mongo::ReplSetConnection" do
+        described_class.master.connection.should be_a Mongo::ReplSetConnection
+      end
+
+    end
+
   end
 
   describe ".logger" do
@@ -309,7 +326,7 @@ describe Mongoid::Config do
 
       before do
         described_class.slaves = [
-          Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
+                Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
         ]
       end
 
@@ -336,7 +353,7 @@ describe Mongoid::Config do
 
       before do
         described_class.slaves = [
-          Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
+                Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
         ]
       end
 
@@ -349,9 +366,10 @@ describe Mongoid::Config do
 
       it "raises an error" do
         expect {
-          described_class.slaves = [ :testing ]
+          described_class.slaves = [:testing]
         }.to raise_error(Mongoid::Errors::InvalidDatabase)
       end
     end
   end
+
 end

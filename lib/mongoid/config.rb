@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "uri"
 require "mongoid/config/database"
+require "mongoid/config/replset_database"
 
 module Mongoid #:nodoc
 
@@ -315,7 +316,11 @@ module Mongoid #:nodoc
     #
     # @since 2.0.0.rc.1
     def configure_databases(options)
-      @master, @slaves = Database.new(options).configure
+      if options.has_key?('hosts')
+        @master, @slaves = ReplsetDatabase.new(options).configure
+      else
+        @master, @slaves = Database.new(options).configure
+      end
     end
 
     # Get the secondary databases from settings.
