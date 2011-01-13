@@ -47,7 +47,7 @@ describe Mongoid::Config do
 
       it "adds the language" do
         I18n.translate("activemodel.errors.messages.taken").should ==
-                "ist bereits vergeben"
+          "ist bereits vergeben"
       end
     end
   end
@@ -326,7 +326,7 @@ describe Mongoid::Config do
 
       before do
         described_class.slaves = [
-                Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
+          Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
         ]
       end
 
@@ -353,7 +353,7 @@ describe Mongoid::Config do
 
       before do
         described_class.slaves = [
-                Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
+          Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
         ]
       end
 
@@ -371,5 +371,4 @@ describe Mongoid::Config do
       end
     end
   end
-
 end

@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Array<Mongo::DB, nil ] The Mongo databases.
       #
-      # @since #TODO
+      # @since 2.0.0.rc.5
       def configure
         #yes, construction is weird but the driver wants "A list of host-port pairs ending with a hash containing any options"
         #mongo likes symbols
@@ -39,11 +39,10 @@ module Mongoid #:nodoc:
       #
       # @see Mongo::ReplSetConnection for all options
       #
-      # @since #TODO
+      # @since 2.0.0.rc.5
       def initialize(options = {})
         merge!(options)
       end
-      
     end
   end
 end
