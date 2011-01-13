@@ -44,12 +44,15 @@ module Mongoid # :nodoc:
             keys = base.do_or_do_not(metadata.foreign_key)
             keys.push(doc.id) unless keys.include?(doc.id)
             if options[:continue]
-              doc.do_or_do_not(
-                metadata.inverse(target),
-                false,
-                :building => true,
-                :continue => false
-              ).push(base, :continue => false)
+              inverse = metadata.inverse(target)
+              if inverse
+                doc.do_or_do_not(
+                  inverse,
+                  false,
+                  :building => true,
+                  :continue => false
+                ).push(base, :continue => false)
+              end
             end
           end
 
@@ -84,7 +87,10 @@ module Mongoid # :nodoc:
           def unbind_one(doc, options = {})
             base.do_or_do_not(metadata.foreign_key).delete(doc.id)
             if options[:continue]
-              doc.do_or_do_not(metadata.inverse(target)).delete(base)
+              inverse = metadata.inverse(target)
+              if inverse
+                doc.do_or_do_not(inverse).delete(base)
+              end
             end
           end
         end

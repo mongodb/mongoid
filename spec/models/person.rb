@@ -86,6 +86,7 @@ class Person
     :index => true,
     :dependent => :nullify
   references_and_referenced_in_many :user_accounts
+  references_and_referenced_in_many :houses
 
   references_many :drugs, :autosave => true
   references_one :account, :autosave => true

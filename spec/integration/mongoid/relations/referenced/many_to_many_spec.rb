@@ -12,6 +12,29 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       context "when the relations are not polymorphic" do
 
+        context "when the inverse relation is not defined" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:house) do
+            House.new
+          end
+
+          before do
+            person.houses << house
+          end
+
+          it "appends the document to the relation" do
+            person.houses.should == [ house ]
+          end
+
+          it "sets the foreign key on the relation" do
+            person.house_ids.should == [ house.id ]
+          end
+        end
+
         context "when the parent is a new record" do
 
           let(:person) do
@@ -200,6 +223,30 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   describe "#= nil" do
 
     context "when the relation is not polymorphic" do
+
+      context "when the inverse relation is not defined" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:house) do
+          House.new
+        end
+
+        before do
+          person.houses << house
+          person.houses = nil
+        end
+
+        it "clears the relation" do
+          person.houses.should be_empty
+        end
+
+        it "clears the foreign keys" do
+          person.house_ids.should be_empty
+        end
+      end
 
       context "when the parent is a new record" do
 
