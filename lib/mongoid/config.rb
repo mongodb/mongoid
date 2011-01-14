@@ -43,6 +43,7 @@ module Mongoid #:nodoc
     option :autocreate_indexes, :default => false
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
+    option :binding_defaults, :default => { :binding => false, :continue => true }
 
     # Adds a new I18n locale file to the load path.
     #

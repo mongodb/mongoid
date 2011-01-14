@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
         args.flatten.each do |doc|
           unless target.include?(doc)
             append(doc, options)
-            doc.save if base.persisted? && !options[:building]
+            doc.save if base.persisted? && !options[:binding]
           end
         end
       end
@@ -43,7 +43,7 @@ module Mongoid #:nodoc:
       # @return [ Document ] The new document.
       def build(attributes = {}, type = nil)
         instantiated(type).tap do |doc|
-          append(doc, default_options(:building => true))
+          append(doc, default_options(:binding => true))
           doc.write_attributes(attributes)
           doc.identify
         end
@@ -133,7 +133,7 @@ module Mongoid #:nodoc:
       # @return [ Hash ] The options merged with the actuals.
       def default_options(args = {})
         options = args.is_a?(Hash) ? args : args.extract_options!
-        DEFAULT_OPTIONS.merge(options)
+        Mongoid.binding_defaults.merge(options)
       end
 
       # Find the first object given the supplied attributes or create/initialize it.

@@ -20,7 +20,7 @@ module Mongoid # :nodoc:
           # @param [ Hash ] options The binding options.
           #
           # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :building Are we in build mode?
+          # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
           def bind(options = {})
@@ -36,14 +36,14 @@ module Mongoid # :nodoc:
                   target.do_or_do_not(
                     inverse,
                     false,
-                    :building => true,
+                    :binding => true,
                     :continue => false
-                  ).push(base, :building => true, :continue => false)
+                  ).push(base, :binding => true, :continue => false)
                 else
                   target.do_or_do_not(
                     metadata.inverse_setter(target),
                     base,
-                    :building => true,
+                    :binding => true,
                     :continue => false
                   )
                 end
@@ -67,7 +67,12 @@ module Mongoid # :nodoc:
           def unbind(options = {})
             base.do_or_do_not(metadata.foreign_key_setter, nil)
             if options[:continue]
-              target.do_or_do_not(metadata.inverse_setter(target), nil, :continue => false)
+              target.do_or_do_not(
+                metadata.inverse_setter(target),
+                nil,
+                :binding => true,
+                :continue => false
+              )
             end
           end
           alias :unbind_one :unbind

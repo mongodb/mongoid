@@ -1948,7 +1948,7 @@ describe Mongoid::NestedAttributes do
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).last.title.should == "My Blog"
+                        person.posts(true).map(&:title).should include("My Blog")
                       end
                     end
                   end

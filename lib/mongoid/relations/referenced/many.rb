@@ -19,14 +19,14 @@ module Mongoid #:nodoc:
         #
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #
         # @since 2.0.0.rc.1
         def bind(options = {})
           loaded and binding.bind(options)
-          target.map(&:save) if base.persisted? && !options[:building]
+          target.map(&:save) if base.persisted? && !options[:binding]
         end
 
         # Clear the relation. Will delete the documents from the db if they are
@@ -170,7 +170,7 @@ module Mongoid #:nodoc:
         # @param [ Array<Document> ] target The replacement target.
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #
@@ -191,7 +191,7 @@ module Mongoid #:nodoc:
         #
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #

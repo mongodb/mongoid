@@ -64,7 +64,7 @@ describe Mongoid::Relations::Embedded::In do
 
       it "does not save the document" do
         target.expects(:save).never
-        relation.bind(:building => true)
+        relation.bind(:binding => true)
       end
     end
 

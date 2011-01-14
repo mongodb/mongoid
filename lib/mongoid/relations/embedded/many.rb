@@ -19,14 +19,14 @@ module Mongoid # :nodoc:
         #
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #
         # @since 2.0.0.rc.1
         def bind(options = {})
           binding.bind(options)
-          target.each(&:save) if base.persisted? && !options[:building]
+          target.each(&:save) if base.persisted? && !options[:binding]
         end
 
         # Bind the inverse relation between a single document in this proxy
@@ -263,7 +263,7 @@ module Mongoid # :nodoc:
         # @param [ Array<Document> ] old_target The relations previous target.
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #

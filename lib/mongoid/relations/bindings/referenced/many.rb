@@ -20,7 +20,7 @@ module Mongoid # :nodoc:
           # @param [ Hash ] options The binding options.
           #
           # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :building Are we in build mode?
+          # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
           def bind(options = {})
@@ -37,7 +37,7 @@ module Mongoid # :nodoc:
           # @param [ Hash ] options The binding options.
           #
           # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :building Are we in build mode?
+          # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
           def bind_one(doc, options = {})
@@ -46,7 +46,7 @@ module Mongoid # :nodoc:
               doc.do_or_do_not(
                 metadata.inverse_setter,
                 base,
-                :building => true,
+                :binding => true,
                 :continue => false
               )
             end
@@ -62,7 +62,7 @@ module Mongoid # :nodoc:
           # @param [ Hash ] options The binding options.
           #
           # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :building Are we in build mode?
+          # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
           def unbind(options = {})
@@ -77,13 +77,18 @@ module Mongoid # :nodoc:
           # @param [ Hash ] options The binding options.
           #
           # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :building Are we in build mode?
+          # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
           def unbind_one(doc, options = {})
             if options[:continue]
               doc.do_or_do_not(metadata.foreign_key_setter, nil)
-              doc.do_or_do_not(metadata.inverse_setter, nil, :continue => false)
+              doc.do_or_do_not(
+                metadata.inverse_setter,
+                nil,
+                :binding => true,
+                :continue => false
+              )
             end
           end
         end

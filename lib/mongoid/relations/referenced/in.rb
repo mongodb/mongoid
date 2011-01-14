@@ -21,7 +21,7 @@ module Mongoid # :nodoc:
         #
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #
@@ -79,7 +79,7 @@ module Mongoid # :nodoc:
         # @param [ Document, Array<Document> ] old_target The previous target.
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #

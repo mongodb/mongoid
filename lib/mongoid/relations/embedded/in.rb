@@ -20,14 +20,14 @@ module Mongoid # :nodoc:
         #
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #
         # @since 2.0.0.rc.1
         def bind(options = {})
           binding.bind(options)
-          base.save if target.persisted? && !options[:building]
+          base.save if target.persisted? && !options[:binding]
         end
 
         # Instantiate a new embedded_in relation.
@@ -58,7 +58,7 @@ module Mongoid # :nodoc:
         # @param [ Proxy ] old_target The previous target of the relation.
         # @param [ Hash ] options The options to bind with.
         #
-        # @option options [ true, false ] :building Are we in build mode?
+        # @option options [ true, false ] :binding Are we in build mode?
         # @option options [ true, false ] :continue Continue binding the
         #   inverse?
         #

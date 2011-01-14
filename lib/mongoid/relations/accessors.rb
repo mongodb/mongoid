@@ -39,10 +39,8 @@ module Mongoid # :nodoc:
       # @return [ Hash ] The options.
       #
       # @since 2.0.0.rc.1
-      def configurables(args)
-        options = args.extract_options!
-        options.merge!(:building => false) unless options[:building] == true
-        { :building => true, :continue => true }.merge(options)
+      def options(args)
+        Mongoid.binding_defaults.merge(args.extract_options!)
       end
 
       # Create a relation from an object and metadata.
@@ -111,11 +109,16 @@ module Mongoid # :nodoc:
           tap do
             define_method(name) do |*args|
               reload, variable = args.first, "@#{name}"
-              options = configurables(args)
+              options = options(args)
               if instance_variable_defined?(variable) && !reload
                 instance_variable_get(variable)
               else
-                build(name, @attributes[metadata.key], metadata, options)
+                build(
+                  name,
+                  @attributes[metadata.key],
+                  metadata,
+                  options.merge(:binding => true)
+                )
               end
             end
           end
@@ -138,7 +141,7 @@ module Mongoid # :nodoc:
         def setter(name, metadata)
           tap do
             define_method("#{name}=") do |*args|
-              object, options = args.first, configurables(args)
+              object, options = args.first, options(args)
               variable = "@#{name}"
               if relation_exists?(name)
                 set(name, ivar(name).substitute(object, options))
