@@ -416,7 +416,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_foreign_key
-        return self[:foreign_key] if self[:foreign_key]
+        return self[:foreign_key].to_s if self[:foreign_key]
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
           if relation.macro == :references_and_referenced_in_many
