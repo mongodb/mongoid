@@ -420,7 +420,7 @@ module Mongoid # :nodoc:
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
           if relation.macro == :references_and_referenced_in_many
-            class_name.underscore << suffix
+            name.to_s.singularize << suffix
           else
             name.to_s << suffix
           end

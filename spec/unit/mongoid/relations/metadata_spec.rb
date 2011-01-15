@@ -234,6 +234,34 @@ describe Mongoid::Relations::Metadata do
           it "returns the foreign_key" do
             metadata.foreign_key.should == "person_ids"
           end
+
+          context "given a specific foreign key" do
+            let(:metadata) do
+            described_class.new(
+                :name => :follower,
+                :foreign_key => :follower_list,
+                :relation => Mongoid::Relations::Referenced::ManyToMany
+              )
+            end
+
+            it "returns the foreign_key" do
+              metadata.foreign_key.should == "follower_list"
+            end
+          end
+
+          context "using name as foreign key" do
+            let(:metadata) do
+            described_class.new(
+                :name => :followers,
+                :class_name => "Person",
+                :relation => Mongoid::Relations::Referenced::ManyToMany
+              )
+            end
+
+            it "returns the foreign_key" do
+              metadata.foreign_key.should == "follower_ids"
+            end
+          end
         end
       end
 
