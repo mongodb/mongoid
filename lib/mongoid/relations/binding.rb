@@ -6,6 +6,8 @@ module Mongoid # :nodoc:
     class Binding
       attr_reader :base, :target, :metadata
 
+      OPTIONS = { :binding => true, :continue => false }
+
       # Create the new binding.
       #
       # @example Initialize a binding.

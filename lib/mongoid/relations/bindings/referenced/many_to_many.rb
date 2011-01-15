@@ -49,8 +49,7 @@ module Mongoid # :nodoc:
                 doc.do_or_do_not(
                   inverse,
                   false,
-                  :binding => true,
-                  :continue => false
+                  OPTIONS
                 ).push(base, :continue => false)
               end
             end

@@ -46,8 +46,7 @@ module Mongoid # :nodoc:
               doc.do_or_do_not(
                 metadata.inverse_setter,
                 base,
-                :binding => true,
-                :continue => false
+                OPTIONS
               )
             end
           end
@@ -86,8 +85,7 @@ module Mongoid # :nodoc:
               doc.do_or_do_not(
                 metadata.inverse_setter,
                 nil,
-                :binding => true,
-                :continue => false
+                OPTIONS
               )
             end
           end

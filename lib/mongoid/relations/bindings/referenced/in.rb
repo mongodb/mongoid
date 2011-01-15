@@ -34,17 +34,13 @@ module Mongoid # :nodoc:
               if options[:continue]
                 if base.referenced_many?
                   target.do_or_do_not(
-                    inverse,
-                    false,
-                    :binding => true,
-                    :continue => false
+                    inverse, false, OPTIONS
                   ).push(base, :binding => true, :continue => false)
                 else
                   target.do_or_do_not(
                     metadata.inverse_setter(target),
                     base,
-                    :binding => true,
-                    :continue => false
+                    OPTIONS
                   )
                 end
               end
@@ -67,12 +63,7 @@ module Mongoid # :nodoc:
           def unbind(options = {})
             base.do_or_do_not(metadata.foreign_key_setter, nil)
             if options[:continue]
-              target.do_or_do_not(
-                metadata.inverse_setter(target),
-                nil,
-                :binding => true,
-                :continue => false
-              )
+              target.do_or_do_not(metadata.inverse_setter(target), nil, OPTIONS)
             end
           end
           alias :unbind_one :unbind
