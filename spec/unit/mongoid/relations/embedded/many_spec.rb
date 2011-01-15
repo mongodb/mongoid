@@ -47,6 +47,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       before do
+        relation.loaded = true
         binding_klass.expects(:new).returns(binding)
         binding.expects(:bind_one)
       end
@@ -659,6 +660,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       before do
+        relation.loaded = true
         binding_klass.expects(:new).twice.returns(binding)
         binding.expects(:unbind)
         binding.expects(:bind).returns(true)
@@ -677,6 +679,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when passing nil" do
 
       before do
+        relation.loaded = true
         binding_klass.expects(:new).returns(binding)
         binding.expects(:unbind)
         @substitute = relation.substitute(nil)

@@ -5,56 +5,7 @@ module Mongoid # :nodoc:
 
       # This class defines the behaviour for all relations that are a
       # many-to-many between documents in different collections.
-      class ManyToMany < Relations::Many
-
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
-        #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
-        #
-        # @example Bind the relation.
-        #   person.preferences.bind
-        #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def bind(options = {})
-          loaded and binding.bind(options)
-          target.map(&:save) if base.persisted? && !options[:binding]
-        end
-
-        # Clear the relation. Will delete the documents from the db if they are
-        # already persisted.
-        #
-        # @example Clear the relation.
-        #   person.preferences.clear
-        #
-        # @return [ Many ] The relation emptied.
-        def clear
-          tap do |relation|
-            relation.unbind(default_options)
-            target.clear
-          end
-        end
-
-        # Returns a count of the number of documents in the association that have
-        # actually been persisted to the database.
-        #
-        # Use #size if you want the total number of documents in memory.
-        #
-        # @example Get the count of persisted documents.
-        #   person.preferences.count
-        #
-        # @return [ Integer ] The total number of persisted documents.
-        def count
-          criteria.count
-        end
+      class ManyToMany < Referenced::Many
 
         # Delete a single document from the relation.
         #
@@ -140,19 +91,6 @@ module Mongoid # :nodoc:
           klass.find(arg, :conditions => selector)
         end
 
-        # Instantiate a new references_many relation. Will set the foreign key
-        # and the base on the inverse object.
-        #
-        # @example Create the new relation.
-        #   Referenced::ManyToMany.new(base, target, metadata)
-        #
-        # @param [ Document ] base The document this relation hangs off of.
-        # @param [ Array<Document> ] target The target of the relation.
-        # @param [ Metadata ] metadata The relation's metadata.
-        def initialize(base, target, metadata)
-          init(base, target, metadata)
-        end
-
         # Removes all associations between the base document and the target
         # documents by deleting the foreign keys and the references, orphaning
         # the target documents in the process.
@@ -162,7 +100,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          loaded and target.each do |doc|
+          load! and target.each do |doc|
             base.send(metadata.foreign_key).delete(doc.id)
             dereference(doc)
           end
@@ -222,21 +160,6 @@ module Mongoid # :nodoc:
 
         private
 
-        # Appends the document to the target array, updating the index on the
-        # document at the same time.
-        #
-        # @example Append the document to the relation.
-        #   relation.append(document)
-        #
-        # @param [ Document ] document The document to append to the target.
-        #
-        # @since 2.0.0.rc.1
-        def append(document, options = {})
-          loaded and target.push(document)
-          characterize_one(document)
-          binding.bind_one(document, options)
-        end
-
         # Instantiate the binding associated with this relation.
         #
         # @example Get the binding.
@@ -272,21 +195,6 @@ module Mongoid # :nodoc:
           document.send(metadata.inverse_foreign_key).delete(base.id)
           document.send(metadata.inverse(document)).target.delete(base)
           document.save
-        end
-
-        # Will load the target into an array if the target had not already been
-        # loaded.
-        #
-        # @example Load the relation into memory.
-        #   relation.loaded
-        #
-        # @return [ ManyToMany ] The relation.
-        #
-        # @since 2.0.0.rc.1
-        def loaded
-          tap do |relation|
-            relation.target = target.entries if target.is_a?(Mongoid::Criteria)
-          end
         end
 
         class << self

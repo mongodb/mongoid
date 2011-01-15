@@ -2,6 +2,8 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
+  # @todo Durran: Rewrite this ugly-ass spec.
+
   before do
     Browser.delete_all
     Firefox.delete_all

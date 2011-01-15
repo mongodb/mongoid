@@ -6,6 +6,24 @@ module Mongoid # :nodoc:
     # behaviour or those proxies.
     class One < Proxy
 
+      # Will load the target into an array if the target had not already been
+      # loaded.
+      #
+      # @example Load the relation into memory.
+      #   relation.load!
+      #
+      # @return [ One ] The relation.
+      #
+      # @since 2.0.0.rc.5
+      def load!(options = {})
+        tap do |relation|
+          unless relation.loaded?
+            relation.bind(options)
+            relation.loaded = true
+          end
+        end
+      end
+
       # Substitutes the supplied target documents for the existing document
       # in the relation.
       #

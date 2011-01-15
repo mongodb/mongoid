@@ -25,7 +25,7 @@ module Mongoid # :nodoc:
       def build(name, object, metadata, options = {})
         relation = create_relation(object, metadata)
         set(name, relation).tap do |relation|
-          relation.bind(options) if relation
+          relation.load!(options) if relation && options[:eager]
         end
       end
 
@@ -117,7 +117,7 @@ module Mongoid # :nodoc:
                   name,
                   @attributes[metadata.key],
                   metadata,
-                  options.merge(:binding => true)
+                  options.merge(:binding => true, :eager => metadata.embedded?)
                 )
               end
             end
@@ -146,7 +146,7 @@ module Mongoid # :nodoc:
               if relation_exists?(name)
                 set(name, ivar(name).substitute(object, options))
               else
-                build(name, object, metadata, options)
+                build(name, object, metadata, options.merge(:eager => true))
               end
             end
           end

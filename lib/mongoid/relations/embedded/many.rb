@@ -53,7 +53,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Many ] The empty relation.
         def clear
-          substitute(nil)
+          load! and substitute(nil)
         end
 
         # Returns a count of the number of documents in the association that have
@@ -195,6 +195,24 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Will load the target into an array if the target had not already been
+        # loaded.
+        #
+        # @example Load the relation into memory.
+        #   relation.load!
+        #
+        # @return [ Many ] The relation.
+        #
+        # @since 2.0.0.rc.5
+        def load!(options = {})
+          tap do |relation|
+            unless relation.loaded?
+              relation.bind(options)
+              relation.loaded = true
+            end
+          end
+        end
+
         # Paginate the association. Will create a new criteria, set the documents
         # on it and execute in an enumerable context.
         #
@@ -289,7 +307,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def append(document, options = {})
-          target << document
+          load! and target.push(document)
           characterize_one(document)
           bind_one(document, options)
           document._index = target.size - 1
@@ -333,7 +351,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
-          return super if target.respond_to?(name)
+          load! and return super if target.respond_to?(name)
           klass = metadata.klass
           klass.send(:with_scope, criteria) do
             klass.send(name, *args)

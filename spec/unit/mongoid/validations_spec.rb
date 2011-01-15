@@ -37,7 +37,7 @@ describe Mongoid::Validations do
 
       before do
         person.expects(:addresses).with(
-          false, :continue => false
+          false, :continue => false, :eager => true
         ).returns([ address ])
       end
 

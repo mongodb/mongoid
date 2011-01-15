@@ -12,7 +12,7 @@ module Mongoid # :nodoc:
           method =~ /(^__|^send$|^object_id$|^extend$|^tap$)/
       end
 
-      attr_accessor :base, :metadata, :target
+      attr_accessor :base, :loaded, :metadata, :target
 
       # Backwards compatibiloty with Mongoid beta releases.
       delegate :klass, :to => :metadata
@@ -87,7 +87,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def loaded?
-        !target.is_a?(Mongoid::Criteria)
+        !!@loaded
       end
 
       # Takes the supplied documents and sets the metadata on them. Used when

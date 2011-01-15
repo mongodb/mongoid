@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def bind(options = {})
-          loaded and binding.bind(options)
+          binding.bind(options)
           target.map(&:save) if base.persisted? && !options[:binding]
         end
 
@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
         #
         # @return [ Many ] The relation emptied.
         def clear
-          tap do |relation|
+          load! and tap do |relation|
             relation.unbind(default_options)
             target.clear
           end
@@ -141,6 +141,25 @@ module Mongoid #:nodoc:
           init(base, target, metadata)
         end
 
+        # Will load the target into an array if the target had not already been
+        # loaded.
+        #
+        # @example Load the relation into memory.
+        #   relation.load!
+        #
+        # @return [ Many ] The relation.
+        #
+        # @since 2.0.0.rc.5
+        def load!(options = {})
+          tap do |relation|
+            unless relation.loaded?
+              relation.target = target.entries
+              relation.bind(options)
+              relation.loaded = true
+            end
+          end
+        end
+
         # Removes all associations between the base document and the target
         # documents by deleting the foreign keys and the references, orphaning
         # the target documents in the process.
@@ -150,7 +169,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          loaded and target.each do |doc|
+          load! and target.each do |doc|
             doc.send(metadata.foreign_key_setter, nil)
             doc.send(
               :remove_instance_variable, "@#{metadata.inverse(doc)}"
@@ -214,7 +233,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def append(document, options = {})
-          loaded and target.push(document)
+          load! and target.push(document)
           characterize_one(document)
           binding.bind_one(document, options)
         end
@@ -244,18 +263,21 @@ module Mongoid #:nodoc:
           metadata.klass.where(metadata.foreign_key => base.id)
         end
 
-        # Will load the target into an array if the target had not already been
-        # loaded.
+        # If the target array does not respond to the supplied method then try to
+        # find a named scope or criteria on the class and send the call there.
         #
-        # @example Load the relation into memory.
-        #   relation.loaded
+        # If the method exists on the array, use the default proxy behavior.
         #
-        # @return [ Many ] The relation.
+        # @param [ Symbol, String ] name The name of the method.
+        # @param [ Array ] args The method args
+        # @param [ Proc ] block Optional block to pass.
         #
-        # @since 2.0.0.rc.1
-        def loaded
-          tap do |relation|
-            relation.target = target.entries unless loaded?
+        # @return [ Criteria, Object ] A Criteria or return value from the target.
+        def method_missing(name, *args, &block)
+          load! and return super if [].respond_to?(name)
+          klass = metadata.klass
+          klass.send(:with_scope, criteria) do
+            klass.send(name, *args)
           end
         end
 
