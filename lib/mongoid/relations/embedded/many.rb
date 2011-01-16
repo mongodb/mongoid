@@ -351,7 +351,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
-          load! and return super if target.respond_to?(name)
+          load!(:binding => true) and return super if target.respond_to?(name)
           klass = metadata.klass
           klass.send(:with_scope, criteria) do
             klass.send(name, *args)
