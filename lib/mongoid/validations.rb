@@ -8,46 +8,57 @@ module Mongoid #:nodoc:
   # provide: validates_associated and validates_uniqueness_of.
   module Validations
     extend ActiveSupport::Concern
+    include ActiveModel::Validations
 
-    included do
-      include ActiveModel::Validations
+    attr_accessor :validated
 
-      attr_accessor :validated
-
-      # Overrides the default ActiveModel behaviour since we need to handle
-      # validations of relations slightly different than just calling the
-      # getter.
-      #
-      # @todo Durran: Why does moving the ActiveModel::Validations include
-      #   statement outside of the block bomb the test suite. This feels dirty.
-      #
-      # @example Read the value.
-      #   person.read_attribute_for_validation(:addresses)
-      #
-      # @param [ Symbol ] attr The name of the field or relation.
-      #
-      # @return [ Object ] The value of the field or the relation.
-      #
-      # @since 2.0.0.rc.1
-      def read_attribute_for_validation(attr)
-        if relations[attr.to_s]
-          send(attr, false, :eager => true)
-        else
-          send(attr)
-        end
+    # Overrides the default ActiveModel behaviour since we need to handle
+    # validations of relations slightly different than just calling the
+    # getter.
+    #
+    # @example Read the value.
+    #   person.read_attribute_for_validation(:addresses)
+    #
+    # @param [ Symbol ] attr The name of the field or relation.
+    #
+    # @return [ Object ] The value of the field or the relation.
+    #
+    # @since 2.0.0.rc.1
+    def read_attribute_for_validation(attr)
+      if relations[attr.to_s]
+        send(attr, false, :eager => true)
+      else
+        send(attr)
       end
+    end
 
-      # Used to prevent infinite loops in associated validations.
-      #
-      # @example Is the document validated?
-      #   document.validated?
-      #
-      # @return [ true, false ] Has the document already been validated?
-      #
-      # @since 2.0.0.rc.2
-      def validated?
-        !!@validated
-      end
+    # Determine if the document is valid.
+    #
+    # @example Is the document valid?
+    #   person.valid?
+    #
+    # @example Is the document valid in a context?
+    #   person.valid?(:create)
+    #
+    # @param [ Symbol ] context The optional validation context.
+    #
+    # @return [ true, false ] True if valid, false if not.
+    #
+    # @since 2.0.0.rc.6
+    def valid?(context = nil)
+      super context ? context : (new? ? :create : :update)
+    end
+
+    # Used to prevent infinite loops in associated validations.
+    #
+    # @example Is the document validated?
+    #   document.validated?
+    #
+    # @return [ true, false ] Has the document already been validated?
+    #
+    # @since 2.0.0.rc.2
+    def validated?
+      !!@validated
     end
 
     module ClassMethods #:nodoc:

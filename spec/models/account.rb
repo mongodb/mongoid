@@ -12,4 +12,5 @@ class Account
   attr_accessible :nickname, :name
 
   validates_presence_of :name
+  validates_length_of :name, :maximum => 10, :on => :create
 end
