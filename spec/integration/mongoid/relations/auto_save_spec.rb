@@ -71,7 +71,7 @@ describe Mongoid::Relations::AutoSave do
       context "when the relation is a references one" do
 
         let(:account) do
-          Account.new(:number => 111111111)
+          Account.new(:name => "Testing")
         end
 
         context "when saving a new parent document" do
@@ -90,7 +90,7 @@ describe Mongoid::Relations::AutoSave do
 
           before do
             person.save
-            person.build_account(:number => 111111111)
+            person.build_account(:name => "Test")
             person.save
           end
 

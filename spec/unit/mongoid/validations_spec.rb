@@ -36,9 +36,7 @@ describe Mongoid::Validations do
       end
 
       before do
-        person.expects(:addresses).with(
-          false, :continue => false, :eager => true
-        ).returns([ address ])
+        person.expects(:addresses).with(false, :eager => true).returns([ address ])
       end
 
       it "returns the value" do

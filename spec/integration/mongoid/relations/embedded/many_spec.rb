@@ -3,7 +3,44 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    [ Person, Quiz, Role ].map(&:delete_all)
+    [ Person, Account, Quiz, Role ].map(&:delete_all)
+  end
+
+  context "when validating the parent before accessing the child" do
+
+    let!(:account) do
+      Account.new(:name => "Testing").tap do |acct|
+        acct.memberships.build
+        acct.save
+      end
+    end
+
+    let(:from_db) do
+      Account.first
+    end
+
+    context "when saving" do
+
+      before do
+        account.name = ""
+        account.save
+      end
+
+      it "does not lose the parent reference" do
+        from_db.memberships.first.account.should == account
+      end
+    end
+
+    context "when updating attributes" do
+
+      before do
+        from_db.update_attributes(:name => "")
+      end
+
+      it "does not lose the parent reference" do
+        from_db.memberships.first.account.should == account
+      end
+    end
   end
 
   [ :<<, :push, :concat ].each do |method|

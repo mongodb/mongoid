@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.1
       def read_attribute_for_validation(attr)
         if relations[attr.to_s]
-          send(attr, false, :continue => false, :eager => true)
+          send(attr, false, :eager => true)
         else
           send(attr)
         end
