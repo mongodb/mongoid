@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
     # criteria.
     [ :all_in, :any_in, :any_of, :asc, :ascending, :avg, :desc, :descending,
       :excludes, :limit, :max, :min, :not_in, :only, :order_by,
-      :skip, :sum, :where, :near ].each do |name|
+      :skip, :sum, :where, :update, :update_all, :near ].each do |name|
       define_method(name) do |*args|
         criteria.send(name, *args)
       end

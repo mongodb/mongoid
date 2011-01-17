@@ -168,6 +168,23 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Very basic update that will perform a simple atomic $set of the
+      # attributes provided in the hash. Can be expanded to later for more
+      # robust functionality.
+      #
+      # @example Update all matching documents.
+      #   context.update_all(:title => "Sir")
+      #
+      # @param [ Hash ] attributes The sets to perform.
+      #
+      # @since 2.0.0.rc.6
+      def update_all(attributes = nil)
+        iterate do |doc|
+          doc.update_attributes(attributes || {})
+        end
+      end
+      alias :update :update_all
+
       protected
       # Filters the documents against the criteria's selector
       def filter
