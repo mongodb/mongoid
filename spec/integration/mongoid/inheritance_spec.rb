@@ -5,99 +5,130 @@ describe Mongoid::Document do
   # @todo Durran: Rewrite this ugly-ass spec.
 
   before do
-    Browser.delete_all
-    Firefox.delete_all
-    Canvas.delete_all
+    [ Browser, Firefox, Canvas ].each(&:delete_all)
   end
 
-  context "when document is a subclass of a root class" do
+  context "when the document is a subclass of a root class" do
 
-    before do
-      Browser.delete_all
-      @browser = Browser.create(:version => 3, :name => "Test")
+    let!(:browser) do
+      Browser.create(:version => 3, :name => "Test")
     end
 
-    it "saves in the same collection as the root" do
-      collection = Mongoid.master.collection("canvases")
-      attributes = collection.find({ :name => "Test"}, {}).next_document
+    let(:collection) do
+      Mongoid.master.collection("canvases")
+    end
+
+    let(:attributes) do
+      collection.find({ :name => "Test"}, {}).next_document
+    end
+
+    it "persists the versions" do
       attributes["version"].should == 3
-      attributes["name"].should == "Test"
-      attributes["_type"].should == "Browser"
-      attributes["_id"].should == @browser.id
     end
 
+    it "persists the type" do
+      attributes["_type"].should == "Browser"
+    end
+
+    it "persists the attributes" do
+      attributes["name"].should == "Test"
+    end
   end
 
-  context "when document is a subclass of a subclass" do
+  context "when the document is a subclass of a subclass" do
 
-    before do
-      Firefox.delete_all
-      @firefox = Firefox.create(:version => 2, :name => "Testy")
+    let!(:firefox) do
+      Firefox.create(:version => 2, :name => "Testy")
     end
 
-    it "saves in the same collection as the root" do
-      collection = Mongoid.master.collection("canvases")
-      attributes = collection.find({ :name => "Testy"}, {}).next_document
+    let(:collection) do
+      Mongoid.master.collection("canvases")
+    end
+
+    let(:attributes) do
+      collection.find({ :name => "Testy"}, {}).next_document
+    end
+
+    before do
+      Browser.create(:name => 'Safari', :version => '4.0.0')
+    end
+
+    it "persists the versions" do
       attributes["version"].should == 2
-      attributes["name"].should == "Testy"
+    end
+
+    it "persists the type" do
       attributes["_type"].should == "Firefox"
-      attributes["_id"].should == @firefox.id
+    end
+
+    it "persists the attributes" do
+      attributes["name"].should == "Testy"
     end
 
     it "returns the document when querying for superclass" do
-      Browser.where(:name => "Testy").first.should == @firefox
+      Browser.where(:name => "Testy").first.should == firefox
     end
 
     it "returns the document when querying for root class" do
-      Canvas.where(:name => "Testy").first.should == @firefox
+      Canvas.where(:name => "Testy").first.should == firefox
     end
 
     it 'should returns on of this subclasses if you find by _type' do
-      Browser.create(:name => 'Safari', :version => '4.0.0')
       Canvas.where(:_type.in => ['Firefox']).count.should == 1
     end
-
   end
 
-  context "when document has associations" do
+  context "when the document has associations" do
+
+    let!(:firefox) do
+      Firefox.create(:name => "firefox")
+    end
+
+    let!(:writer) do
+      HtmlWriter.new(:speed => 100)
+    end
+
+    let!(:circle) do
+      Circle.new(:radius => 50)
+    end
+
+    let!(:square) do
+      Square.new(:width => 300, :height => 150)
+    end
+
+    let(:from_db) do
+      Firefox.find(firefox.id)
+    end
 
     before do
-      Firefox.delete_all
-      @firefox = Firefox.create(:name => "firefox")
-      @writer = HtmlWriter.new(:speed => 100)
-      @circle = Circle.new(:radius => 50)
-      @square = Square.new(:width => 300, :height => 150)
-      @firefox.writer = @writer
-      @firefox.shapes << [ @circle, @square ]
-      @firefox.save!
+      firefox.writer = writer
+      firefox.shapes << [ circle, square ]
+      firefox.save!
     end
 
-    after do
-      Firefox.delete_all
-    end
-
-    it "properly saves a has one subclass" do
-      from_db = Firefox.find(@firefox.id)
+    it "properly persists the one-to-one type" do
       from_db.should be_a_kind_of(Firefox)
-      from_db.writer.should be_a_kind_of(HtmlWriter)
-      from_db.writer.should == @writer
     end
 
-    it "properly saves a has many subclass" do
-      from_db = Firefox.find(@firefox.id)
-      from_db.shapes.first.should == @circle
-      from_db.shapes.first.should be_a_kind_of(Circle)
-      from_db.shapes.last.should == @square
-      from_db.shapes.last.should be_a_kind_of(Square)
+    it "properly persists the one-to-one relations" do
+      from_db.writer.should == writer
     end
 
-    it "properly sets up the belongs to" do
-      from_db = Firefox.find(@firefox.id)
-      circle = from_db.shapes.first
-      circle.should == @circle
-      circle.canvas.should == @firefox
+    it "properly persists the one-to-many type" do
+      from_db.shapes.first.should == circle
     end
 
+    it "properly persists the one-to-many relations" do
+      from_db.shapes.last.should == square
+    end
+
+    it "properly sets up the parent relation" do
+      from_db.shapes.first.should == circle
+    end
+
+    it "properly sets up the entire hierarchy" do
+      from_db.shapes.first.canvas.should == firefox
+    end
   end
 
   context "when document has subclasses" do
@@ -125,12 +156,6 @@ describe Mongoid::Document do
       @firefox2 = Firefox.create(:name => "firefox 2")
       @browser = Browser.create(:name => "browser")
       @canvas = Canvas.create(:name => "canvas")
-    end
-
-    after do
-      Firefox.delete_all
-      Browser.delete_all
-      Canvas.delete_all
     end
 
     it "deletes from the parent class collection" do
@@ -166,7 +191,6 @@ describe Mongoid::Document do
       from_db = Canvas.find(@canvas.id)
       from_db.palette.tools.map(&:class).should == [Pencil, Eraser]
     end
-
   end
 
   context "Creating references_many documents from a parent association" do
@@ -202,7 +226,5 @@ describe Mongoid::Document do
       @container.vehicles.create({},Truck)
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
-
   end
-
 end
