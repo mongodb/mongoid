@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Extras #:nodoc:
     extend ActiveSupport::Concern
     included do
-      class_inheritable_accessor :cached, :enslaved
+      class_attribute :cached, :enslaved
       self.cached = false
       self.enslaved = false
       delegate :cached?, :enslaved?, :to => "self.class"

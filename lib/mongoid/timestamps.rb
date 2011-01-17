@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
       set_callback :create, :before, :set_created_at
       set_callback :save, :before, :set_updated_at
 
-      class_inheritable_accessor :record_timestamps, :instance_writer => false
+      class_attribute :record_timestamps
       self.record_timestamps = true
     end
 
