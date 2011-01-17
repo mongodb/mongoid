@@ -7,6 +7,41 @@ module Mongoid # :nodoc:
       # many-to-many between documents in different collections.
       class ManyToMany < Referenced::Many
 
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted.
+        #
+        # @example Create and save the new document.
+        #   person.preferences.create(:text => "Testing")
+        #
+        # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Class ] type The optional type of document to create.
+        #
+        # @return [ Document ] The newly created document.
+        def create(attributes = nil, type = nil)
+          build(attributes, type).tap do |doc|
+            doc.save and base.save if base.persisted?
+          end
+        end
+
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted and will raise an
+        # error if validation fails.
+        #
+        # @example Create and save the new document.
+        #   person.preferences.create!(:text => "Testing")
+        #
+        # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Class ] type The optional type of document to create.
+        #
+        # @raise [ Errors::Validations ] If validation failed.
+        #
+        # @return [ Document ] The newly created document.
+        def create!(attributes = nil, type = nil)
+          build(attributes, type).tap do |doc|
+            doc.save! and base.save! if base.persisted?
+          end
+        end
+
         # Delete a single document from the relation.
         #
         # @example Delete a document.
