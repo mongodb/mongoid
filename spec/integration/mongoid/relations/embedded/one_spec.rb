@@ -290,28 +290,59 @@ describe Mongoid::Relations::Embedded::One do
 
         context "when not providing any attributes" do
 
-          let(:person) do
-            Person.new
+          context "when building once" do
+
+            let(:person) do
+              Person.new
+            end
+
+            let!(:name) do
+              person.build_name
+            end
+
+            it "sets the target of the relation" do
+              person.name.should == name
+            end
+
+            it "sets the base on the inverse relation" do
+              name.namable.should == person
+            end
+
+            it "sets no attributes" do
+              name.first_name.should be_nil
+            end
+
+            it "does not save the target" do
+              name.should_not be_persisted
+            end
           end
 
-          let!(:name) do
-            person.build_name
-          end
+          context "when building twice" do
 
-          it "sets the target of the relation" do
-            person.name.should == name
-          end
+            let(:person) do
+              Person.new
+            end
 
-          it "sets the base on the inverse relation" do
-            name.namable.should == person
-          end
+            let!(:name) do
+              person.build_name
+              person.build_name
+            end
 
-          it "sets no attributes" do
-            name.first_name.should be_nil
-          end
+            it "sets the target of the relation" do
+              person.name.should == name
+            end
 
-          it "does not save the target" do
-            name.should_not be_persisted
+            it "sets the base on the inverse relation" do
+              name.namable.should == person
+            end
+
+            it "sets no attributes" do
+              name.first_name.should be_nil
+            end
+
+            it "does not save the target" do
+              name.should_not be_persisted
+            end
           end
         end
 

@@ -143,7 +143,7 @@ module Mongoid # :nodoc:
             define_method("#{name}=") do |*args|
               object, options = args.first, options(args)
               variable = "@#{name}"
-              if relation_exists?(name)
+              if relation_exists?(name) && !object.is_a?(Hash)
                 set(name, ivar(name).substitute(object, options))
               else
                 build(name, object, metadata, options.merge(:eager => true))
