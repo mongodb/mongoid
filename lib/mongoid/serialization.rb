@@ -54,8 +54,10 @@ module Mongoid # :nodoc:
       relation_names(inclusions).each do |name|
         metadata = relations[name.to_s]
         relation = send(metadata.name, false, :eager => true)
-        attributes[metadata.name.to_s] =
-          relation.serializable_hash(relation_options(inclusions, name))
+        if relation
+          attributes[metadata.name.to_s] =
+            relation.serializable_hash(relation_options(inclusions, options, name))
+        end
       end
     end
 
@@ -86,8 +88,12 @@ module Mongoid # :nodoc:
     # @return [ Hash ] The options for the relation.
     #
     # @since 2.0.0.rc.6
-    def relation_options(inclusions, name)
-      inclusions.is_a?(Hash) ? inclusions[name] : {}
+    def relation_options(inclusions, options, name)
+      if inclusions.is_a?(Hash)
+        inclusions[name]
+      else
+        { :except => options[:except], :only => options[:only] }
+      end
     end
   end
 end

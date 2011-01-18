@@ -95,6 +95,32 @@ describe Mongoid::Serialization do
                 relation_hash[0]["locations"].should == [{ "name" => "Home" }]
               end
             end
+
+            context "when defining a default exclusion" do
+
+              let!(:name) do
+                person.build_name(:first_name => "Sebastien")
+              end
+
+              let(:hash) do
+                person.serializable_hash(
+                  :except => :_id,
+                  :include => [ :addresses, :name ]
+                )
+              end
+
+              it "does not contain the root exclusion" do
+                hash["_id"].should be_nil
+              end
+
+              it "does not include the embedded many exclusion" do
+                relation_hash[0]["_id"].should be_nil
+              end
+
+              it "does not include the embedded one exclusion" do
+                hash["name"]["_id"].should be_nil
+              end
+            end
           end
         end
 
