@@ -34,6 +34,53 @@ describe Mongoid::Contexts::Mongo do
     end
   end
 
+  describe "#count" do
+    
+    context "when documents exist in the collection" do
+
+      before do
+        13.times do |n|
+          Person.create(
+            :title => "Sir",
+            :age => ((n + 1) * 10),
+            :aliases => ["D", "Durran"],
+            :ssn => "#{n}"
+          )
+        end
+      end
+
+      context "without skip or limit" do
+        it "returns the number of documents" do
+          Person.count.should == 13
+        end
+      end
+
+      context "with skip and limit" do
+
+        context "by default" do
+
+          it "ignores previous offset/limit statements" do
+            Person.limit(5).offset(10).count.should == 13
+          end
+        end
+
+        context "when passed 'true'" do
+
+          it "includes previous offset/limit statements" do
+            Person.limit(5).offset(5).count(true).should == 5
+          end
+        end
+
+        context "when passed 'false'" do
+
+          it "ignores previous offset/limit statements" do
+            Person.limit(5).offset(10).count(false).should == 13
+          end
+        end
+      end
+    end
+  end
+
   describe "#max" do
 
     context "when no documents are in the collection" do
