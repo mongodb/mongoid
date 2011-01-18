@@ -13,9 +13,7 @@ module Mongoid #:nodoc:
       def inspect
         "#<Mongoid::Criteria\n" <<
         "  selector: #{selector.inspect},\n" <<
-        "  options:  #{options.inspect},\n" <<
-        "  count:    #{count.inspect},\n" <<
-        "  matching: #{entries.inspect}>\n"
+        "  options:  #{options.inspect}>\n"
       end
     end
   end
