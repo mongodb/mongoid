@@ -67,18 +67,13 @@ module Rails #:nodoc:
         end
       end
 
-      # After initialization we will attempt to connect to the database, if
-      # we get an exception and can't find a mongoid.yml we will alert the user
-      # to generate one.
-      initializer "verify that mongoid is configured" do
+      # After initialization we will warn the user if we can't find a mongoid.yml and
+      # alert to create one.
+      initializer "warn when configuration is missing" do
         config.after_initialize do
-          begin
-            ::Mongoid.master
-          rescue ::Mongoid::Errors::InvalidDatabase => e
-            unless Rails.root.join("config", "mongoid.yml").file?
-              puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
-              puts "to generate one run: rails generate mongoid:config\n\n"
-            end
+          unless Rails.root.join("config", "mongoid.yml").file?
+            puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
+            puts "to generate one run: rails generate mongoid:config\n\n"
           end
         end
       end
