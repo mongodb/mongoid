@@ -30,28 +30,49 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         stub
       end
 
+      let(:documents) do
+        builder.build
+      end
+
       before do
         Post.expects(:find).with(object).returns([ post ])
-        @documents = builder.build
       end
 
       it "sets the documents" do
-        @documents.should == [ post ]
+        documents.should == [ post ]
       end
     end
 
     context "when provided a object" do
 
-      let(:object) do
-        [ Post.new ]
+      context "when the object is not nil" do
+
+        let(:object) do
+          [ Post.new ]
+        end
+
+        let!(:documents) do
+          builder.build
+        end
+
+        it "returns the objects" do
+          documents.should == object
+        end
       end
 
-      before do
-        @documents = builder.build
-      end
+      context "when the object is nil" do
 
-      it "returns the objects" do
-        @documents.should == object
+        let(:object) do
+          nil
+        end
+
+        let!(:documents) do
+          builder.build
+        end
+
+        it "returns the object" do
+          documents.should be_nil
+        end
       end
     end
   end
