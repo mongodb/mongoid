@@ -6,7 +6,7 @@ module Mongoid # :nodoc:
     # contains everything you could ever possible want to know.
     class Metadata < Hash
 
-      delegate :foreign_key_default, :to => :relation
+      delegate :foreign_key_default, :many?, :one?, :to => :relation
 
       # Gets a relation builder associated with the relation this metadata is
       # for.

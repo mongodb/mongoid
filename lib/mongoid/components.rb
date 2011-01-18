@@ -14,7 +14,6 @@ module Mongoid #:nodoc
 
     include ActiveModel::Conversion
     include ActiveModel::Naming
-    include ActiveModel::Serialization
     include ActiveModel::MassAssignmentSecurity
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
@@ -38,6 +37,7 @@ module Mongoid #:nodoc
     include Mongoid::Persistence
     include Mongoid::Relations
     include Mongoid::Safety
+    include Mongoid::Serialization
     include Mongoid::State
     include Mongoid::Validations
     include Mongoid::Callbacks

@@ -119,6 +119,26 @@ module Mongoid #:nodoc:
         find_or(:build, attrs)
       end
 
+      # Gets the document as a serializable hash, used by ActiveModel's JSON and
+      # XML serializers. This override is just to be able to pass the :include
+      # and :except options to get associations in the hash.
+      #
+      # @example Get the serializable hash.
+      #   relation.serializable_hash
+      #
+      # @param [ Hash ] options The options to pass.
+      #
+      # @option options [ Symbol ] :include What relations to include
+      # @option options [ Symbol ] :only Limit the fields to only these.
+      # @option options [ Symbol ] :except Dont include these fields.
+      #
+      # @return [ Hash ] The documents, ready to be serialized.
+      #
+      # @since 2.0.0.rc.6
+      def serializable_hash(options = {})
+        target.map { |document| document.serializable_hash(options) }
+      end
+
       private
 
       # Get the default options used in binding functions.
