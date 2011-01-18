@@ -199,7 +199,7 @@ module Mongoid #:nodoc:
       def update_attributes!(attributes = {})
         target.write_attributes(attributes)
         update(:safe => safety_options).tap do |result|
-          target.class.fail_validate!(self) unless result
+          target.class.fail_validate!(target) unless result
         end
       end
     end
