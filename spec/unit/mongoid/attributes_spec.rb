@@ -141,20 +141,137 @@ describe Mongoid::Attributes do
 
   describe "#_id=" do
 
-    let(:person) do
-      Person.new
+    after(:all) do
+      Person.identity :type => BSON::ObjectId
     end
 
-    let(:bson_id) do
-      BSON::ObjectId.new
+    context "when using object ids" do
+
+      before(:all) do
+        Person.identity :type => BSON::ObjectId
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:bson_id) do
+        BSON::ObjectId.new
+      end
+
+      context "when providing an object id" do
+
+        before do
+          person._id = bson_id
+        end
+
+        it "sets the id as the object id" do
+          person.id.should == bson_id
+        end
+      end
+
+      context "when providing a string" do
+
+        before do
+          person._id = bson_id.to_s
+        end
+
+        it "sets the id as the object id" do
+          person.id.should == bson_id
+        end
+      end
+
+      context "when providing an integer" do
+
+        before do
+          person._id = 2
+        end
+
+        it "sets the id as the supplied value to_s" do
+          person.id.should == 2
+        end
+      end
     end
 
-    before do
-      person._id = bson_id
+    context "when using string ids" do
+
+      before(:all) do
+        Person.identity :type => String
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:bson_id) do
+        BSON::ObjectId.new
+      end
+
+      context "when providing an object id" do
+
+        before do
+          person._id = bson_id
+        end
+
+        it "sets the id as the string of the object id" do
+          person.id.should == bson_id.to_s
+        end
+      end
+
+      context "when providing a string" do
+
+        before do
+          person._id = bson_id.to_s
+        end
+
+        it "sets the id as the string" do
+          person.id.should == bson_id.to_s
+        end
+      end
+
+      context "when providing an integer" do
+
+        before do
+          person._id = 2
+        end
+
+        it "sets the id as the supplied value to_s" do
+          person.id.should == "2"
+        end
+      end
     end
 
-    it "delegates to #id=" do
-      person.id.should == bson_id
+    context "when using integer ids" do
+
+      before(:all) do
+        Person.identity :type => Integer
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      context "when providing a string" do
+
+        before do
+          person._id = 1.to_s
+        end
+
+        it "sets the id as the integer" do
+          person.id.should == 1
+        end
+      end
+
+      context "when providing an integer" do
+
+        before do
+          person._id = 2
+        end
+
+        it "sets the id as the supplied value" do
+          person.id.should == 2
+        end
+      end
     end
   end
 
@@ -260,9 +377,13 @@ describe Mongoid::Attributes do
 
     context "when supplied hash has string values" do
 
+      let(:bson_id) do
+        BSON::ObjectId.new
+      end
+
       let!(:attributes) do
         {
-          :_id => "1",
+          :_id => bson_id,
           :title => "value",
           :age => "30",
           :terms => "true",
@@ -290,7 +411,7 @@ describe Mongoid::Attributes do
       end
 
       it "casts ids" do
-        person.attributes[:_id].should == "1"
+        person.attributes[:_id].should == bson_id
       end
 
       it "sets empty strings to nil" do

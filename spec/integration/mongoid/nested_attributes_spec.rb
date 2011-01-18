@@ -570,7 +570,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     animal.person_attributes =
-                      { :_id => "1", :title => "Madam" }
+                      { :_id => BSON::ObjectId.new.to_s, :title => "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -1752,7 +1752,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     game.person_attributes =
-                      { :_id => "1", :title => "Madam" }
+                      { :_id => BSON::ObjectId.new.to_s, :title => "Madam" }
                   end
 
                   it "updates the existing document" do

@@ -62,7 +62,7 @@ module Mongoid #:nodoc:
     #
     # @return [ BSON::ObjectId, String ] The new id.
     def id=(new_id)
-      @attributes["_id"] = new_id
+      @attributes["_id"] = _id_type.set(new_id)
     end
     alias :_id= :id=
 

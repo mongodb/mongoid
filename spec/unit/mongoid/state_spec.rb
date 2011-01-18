@@ -6,35 +6,34 @@ describe Mongoid::State do
 
     context "when calling new on the document" do
 
-      before do
-        @person = Person.new("_id" => "1")
+      let(:person) do
+        person =Person.new("_id" => BSON::ObjectId.new)
       end
 
       it "returns true" do
-        @person.new?.should == true
+        person.new?.should == true
       end
     end
 
     context "when the object has been saved" do
 
-      before do
-        @person = Person.instantiate("_id" => "1")
+      let(:person) do
+        Person.instantiate("_id" => "1")
       end
 
       it "returns false" do
-        @person.new?.should be_false
+        person.new?.should be_false
       end
-
     end
 
     context "when the object has not been saved" do
 
-      before do
-        @person = Person.new
+      let(:person) do
+        Person.new
       end
 
       it "returns true" do
-        @person.new?.should be_true
+        person.new?.should be_true
       end
     end
   end
@@ -43,85 +42,85 @@ describe Mongoid::State do
 
     context "when calling new on the document" do
 
-      before do
-        @person = Person.new("_id" => "1")
+      let(:person) do
+        Person.new("_id" => BSON::ObjectId.new)
       end
 
       it "returns true" do
-        @person.new_record?.should == true
+        person.new_record?.should == true
       end
     end
 
     context "when the object has been saved" do
 
-      before do
-        @person = Person.instantiate("_id" => "1")
+      let(:person) do
+        Person.instantiate("_id" => BSON::ObjectId.new)
       end
 
       it "returns false" do
-        @person.new_record?.should be_false
+        person.new_record?.should be_false
       end
     end
 
     context "when the object has not been saved" do
 
-      before do
-        @person = Person.new
+      let(:person) do
+        Person.new
       end
 
       it "returns true" do
-        @person.new_record?.should be_true
+        person.new_record?.should be_true
       end
     end
   end
 
   describe "#persisted?" do
 
-    before do
-      @person = Person.new
+    let(:person) do
+      Person.new
     end
 
     it "delegates to new_record?" do
-      @person.persisted?.should be_false
+      person.persisted?.should be_false
     end
   end
 
   describe "destroyed?" do
 
-    before do
-      @person = Person.new
+    let(:person) do
+      Person.new
     end
 
     context "when destroyed is true" do
 
       before do
-        @person.destroyed = true
+        person.destroyed = true
       end
 
       it "returns true" do
-        @person.destroyed?.should be_true
+        person.destroyed?.should be_true
       end
     end
 
     context "when destroyed is false" do
 
       before do
-        @person.destroyed = false
+        person.destroyed = false
       end
 
       it "returns true" do
-        @person.destroyed?.should be_false
+        person.destroyed?.should be_false
       end
     end
 
     context "when destroyed is nil" do
 
       before do
-        @person.destroyed = nil
+        person.destroyed = nil
       end
 
       it "returns false" do
-        @person.destroyed?.should be_false
+        person.destroyed?.should be_false
       end
     end
   end
