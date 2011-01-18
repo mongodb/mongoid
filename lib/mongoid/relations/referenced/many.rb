@@ -233,7 +233,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def append(document, options = {})
-          load! and target.push(document)
+          load!(options) and target.push(document)
           characterize_one(document)
           binding.bind_one(document, options)
         end
