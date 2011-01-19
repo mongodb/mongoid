@@ -47,6 +47,24 @@ module Mongoid # :nodoc:
       def update_only?
         options[:update_only] || false
       end
+
+      # Convert an id to its appropriate type.
+      #
+      # @todo Durran: Move this into a common reusable place.
+      #
+      # @example Convert the id.
+      #   builder.convert_id("4d371b444835d98b8b000010")
+      #
+      # @param [ String ] id The id, usually coming from the form.
+      #
+      # @return [ BSON::ObjectId, String, Object ] The converted id.
+      #
+      # @since 2.0.0.rc.6
+      def convert_id(id)
+        return nil unless id
+        model = metadata.klass
+        model.using_object_ids? ? BSON::ObjectId.cast!(model, id) : id.class.set(id)
+      end
     end
   end
 end
