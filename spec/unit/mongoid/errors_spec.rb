@@ -30,6 +30,30 @@ describe Mongoid::Errors do
     end
   end
 
+  describe Mongoid::Errors::UnsavedDocument do
+
+    let(:base) do
+      Person.new
+    end
+
+    let(:document) do
+      Post.new
+    end
+
+    let(:error) do
+      Mongoid::Errors::UnsavedDocument.new(base, document)
+    end
+
+    describe "#message" do
+
+      it "returns that create can not be called" do
+        error.message.should include(
+          "You cannot call create or create! through a relation"
+        )
+      end
+    end
+  end
+
   describe Mongoid::Errors::InvalidOptions do
 
     describe "#message" do
@@ -100,7 +124,7 @@ describe Mongoid::Errors do
       @document = stub(:errors => @errors)
       @error = Mongoid::Errors::Validations.new(@document)
     end
-    
+
     describe "#message" do
 
       context "default" do
@@ -110,9 +134,9 @@ describe Mongoid::Errors do
         end
       end
     end
-    
+
     describe "#document" do
-      
+
       it "contains the a reference to the document" do
         @error.document.should == @document
       end

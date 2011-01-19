@@ -37,3 +37,6 @@ nl:
           alleen deze optie met embedded_in en references_many as array.
         calling_document_find_with_nil_is_invalid:
           Het is niet toegestaan om Document#find aan te roepen met de waarde nil.
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.

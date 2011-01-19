@@ -63,3 +63,6 @@ kr:
           #Defining an inverse_of on this association is not allowed. Only
           #use this option on embedded_in or references_many as array.
 
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.

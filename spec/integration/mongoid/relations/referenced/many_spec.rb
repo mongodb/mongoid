@@ -765,28 +765,12 @@ describe Mongoid::Relations::Referenced::Many do
           Person.new
         end
 
-        let!(:post) do
+        let(:post) do
           person.posts.create(:text => "Testing")
         end
 
-        it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
-        end
-
-        it "sets the base on the inverse relation" do
-          post.person.should == person
-        end
-
-        it "sets the attributes" do
-          post.text.should == "Testing"
-        end
-
-        it "does not save the target" do
-          post.should be_a_new_record
-        end
-
-        it "adds the document to the target" do
-          person.posts.size.should == 1
+        it "raises an unsaved document error" do
+          expect { post }.to raise_error(Mongoid::Errors::UnsavedDocument)
         end
       end
 
@@ -830,28 +814,12 @@ describe Mongoid::Relations::Referenced::Many do
           Movie.new
         end
 
-        let!(:rating) do
+        let(:rating) do
           movie.ratings.create(:value => 1)
         end
 
-        it "sets the foreign key on the relation" do
-          rating.ratable_id.should == movie.id
-        end
-
-        it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
-        end
-
-        it "sets the attributes" do
-          rating.value.should == 1
-        end
-
-        it "does not save the target" do
-          rating.should be_new
-        end
-
-        it "adds the document to the target" do
-          movie.ratings.size.should == 1
+        it "raises an unsaved document error" do
+          expect { rating }.to raise_error(Mongoid::Errors::UnsavedDocument)
         end
       end
 
@@ -898,28 +866,12 @@ describe Mongoid::Relations::Referenced::Many do
           Person.new
         end
 
-        let!(:post) do
+        let(:post) do
           person.posts.create!(:title => "Testing")
         end
 
-        it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
-        end
-
-        it "sets the base on the inverse relation" do
-          post.person.should == person
-        end
-
-        it "sets the attributes" do
-          post.title.should == "Testing"
-        end
-
-        it "does not save the target" do
-          post.should be_a_new_record
-        end
-
-        it "adds the document to the target" do
-          person.posts.size.should == 1
+        it "raises an unsaved document error" do
+          expect { post }.to raise_error(Mongoid::Errors::UnsavedDocument)
         end
       end
 
@@ -972,28 +924,12 @@ describe Mongoid::Relations::Referenced::Many do
           Movie.new
         end
 
-        let!(:rating) do
+        let(:rating) do
           movie.ratings.create!(:value => 1)
         end
 
-        it "sets the foreign key on the relation" do
-          rating.ratable_id.should == movie.id
-        end
-
-        it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
-        end
-
-        it "sets the attributes" do
-          rating.value.should == 1
-        end
-
-        it "does not save the target" do
-          rating.should be_new
-        end
-
-        it "adds the document to the target" do
-          movie.ratings.size.should == 1
+        it "raises an unsaved document error" do
+          expect { rating }.to raise_error(Mongoid::Errors::UnsavedDocument)
         end
       end
 

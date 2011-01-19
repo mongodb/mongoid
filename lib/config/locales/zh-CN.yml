@@ -29,3 +29,6 @@ en:
           dependent => destroy|delete 选项只有在references_one或者references_many时候有效.
         association_cant_have_inverse_of:
           在当前的关联中，不允许定义inverse_of去,其只有在embedded_in或者references_many是数组的情况下使用
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.

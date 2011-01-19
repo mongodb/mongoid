@@ -56,6 +56,41 @@ module Mongoid #:nodoc:
           criteria.count
         end
 
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted.
+        #
+        # @example Create and save the new document.
+        #   person.posts.create(:text => "Testing")
+        #
+        # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Class ] type The optional type of document to create.
+        #
+        # @return [ Document ] The newly created document.
+        def create(attributes = nil, type = nil)
+          build(attributes, type).tap do |doc|
+            base.persisted? ? doc.save : raise_unsaved(doc)
+          end
+        end
+
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted and will raise an
+        # error if validation fails.
+        #
+        # @example Create and save the new document.
+        #   person.posts.create!(:text => "Testing")
+        #
+        # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Class ] type The optional type of document to create.
+        #
+        # @raise [ Errors::Validations ] If validation failed.
+        #
+        # @return [ Document ] The newly created document.
+        def create!(attributes = nil, type = nil)
+          build(attributes, type).tap do |doc|
+            base.persisted? ? doc.save! : raise_unsaved(doc)
+          end
+        end
+
         # Deletes all related documents from the database given the supplied
         # conditions.
         #
@@ -279,6 +314,21 @@ module Mongoid #:nodoc:
           klass.send(:with_scope, criteria) do
             klass.send(name, *args)
           end
+        end
+
+        # When the base is not yet saved and the user calls create or create!
+        # on the relation, this error will get raised.
+        #
+        # @example Raise the error.
+        #   relation.raise_unsaved(post)
+        #
+        # @param [ Document ] doc The child document getting created.
+        #
+        # @raise [ Errors::UnsavedDocument ] The error.
+        #
+        # @since 2.0.0.rc.6
+        def raise_unsaved(doc)
+          raise Errors::UnsavedDocument.new(base, doc)
         end
 
         class << self

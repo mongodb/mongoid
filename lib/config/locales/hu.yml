@@ -42,4 +42,6 @@ hu:
           esetében használható.
         calling_document_find_with_nil_is_invalid:
           Document#find parancs nil érték esetében érvénytelen.
-
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.
