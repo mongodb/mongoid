@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
-    Person.delete_all
+    [ Person, Post ].each(&:delete_all)
   end
 
   before(:all) do
@@ -354,6 +354,79 @@ describe Mongoid::Persistence do
 
         it "raises an error" do
           expect { person.save! }.to raise_error
+        end
+      end
+    end
+  end
+
+  describe "#update_attribute" do
+
+    let(:post) do
+      Post.new
+    end
+
+    context "when provided a symbol attribute name" do
+
+      context "when the document is valid" do
+
+        before do
+          post.update_attribute(:title, "Testing")
+        end
+
+        it "sets the attribute" do
+          post.title.should == "Testing"
+        end
+
+        it "saves the document" do
+          post.should be_persisted
+        end
+      end
+
+      context "when the document is invalid" do
+
+        before do
+          post.update_attribute(:title, "$invalid")
+        end
+
+        it "sets the attribute" do
+          post.title.should == "$invalid"
+        end
+
+        it "saves the document" do
+          post.should be_persisted
+        end
+      end
+    end
+
+    context "when provided a string attribute name" do
+
+      context "when the document is valid" do
+
+        before do
+          post.update_attribute("title", "Testing")
+        end
+
+        it "sets the attribute" do
+          post.title.should == "Testing"
+        end
+
+        it "saves the document" do
+          post.should be_persisted
+        end
+      end
+
+      context "when the document is invalid" do
+
+        before do
+          post.update_attribute("title", "$invalid")
+        end
+
+        it "sets the attribute" do
+          post.title.should == "$invalid"
+        end
+
+        it "saves the document" do
+          post.should be_persisted
         end
       end
     end

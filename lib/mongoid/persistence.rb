@@ -86,6 +86,22 @@ module Mongoid #:nodoc:
       Update.new(self, options).persist
     end
 
+    # Update a single attribute and persist the entire document.
+    # This skips validation but fires the callbacks.
+    #
+    # @example Update the attribute.
+    #   person.update_attribute(:title, "Sir")
+    #
+    # @param [ Symbol, String ] name The name of the attribute.
+    # @param [ Object ] value The new value of the attribute.a
+    #
+    # @return [ true, false ] True if save was successfull, false if not.
+    #
+    # @since 2.0.0.rc.6
+    def update_attribute(name, value)
+      write_attribute(name, value) and save(:validate => false)
+    end
+
     # Update the document attributes in the datbase.
     #
     # @example Update the document's attributes
