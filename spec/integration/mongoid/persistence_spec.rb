@@ -471,6 +471,59 @@ describe Mongoid::Persistence do
         Person.find(person.id).should_not be_nil
       end
     end
+
+    context "when passing in a relation" do
+
+      context "when providing a parent to a referenced in" do
+
+        let!(:person) do
+          Person.create(:ssn => "666-66-6666")
+        end
+
+        let!(:post) do
+          Post.create(:title => "Testing")
+        end
+
+        context "when the relation has not yet been touched" do
+
+          before do
+            post.update_attributes(:person => person)
+          end
+
+          it "sets the instance of the relation" do
+            person.posts.should == [ post ]
+          end
+
+          it "sets properly through method_missing" do
+            person.posts.to_a.should == [ post ]
+          end
+
+          it "persists the reference" do
+            person.posts(true).should == [ post ]
+          end
+        end
+
+        context "when the relation has been touched" do
+
+          before do
+            person.posts
+            post.update_attributes(:person => person)
+          end
+
+          it "sets the instance of the relation" do
+            person.posts.should == [ post ]
+          end
+
+          it "sets properly through method_missing" do
+            person.posts.to_a.should == [ post ]
+          end
+
+          it "persists the reference" do
+            person.posts(true).should == [ post ]
+          end
+        end
+      end
+    end
   end
 
   [ :delete_all, :destroy_all ].each do |method|
