@@ -53,20 +53,20 @@ module Mongoid #:nodoc:
       end
       alias :empty? :blank?
 
-      # Get the count of matching documents in the database for the context. 
-      # 
-      # @param [Boolean] skip_and_limit True to inclued previous skip/limit 
-      #   statements in the count; false to ignore them. Defaults to `true`.
+      # Get the count of matching documents in the database for the context.
       #
-      # Example:
+      # @example Get the count without skip and limit taken into consideration.
+      #   context.count
       #
-      # <tt>context.count</tt>
+      # @example Get the count with skip and limit applied.
+      #   context.count(true)
       #
-      # Returns:
+      # @param [Boolean] extras True to inclued previous skip/limit
+      #   statements in the count; false to ignore them. Defaults to `false`.
       #
-      # An +Integer+ count of documents.
-      def count(skip_and_limit = false)
-        @count ||= klass.collection.find(selector, process_options).count(skip_and_limit)
+      # @return [ Integer ] The count of documents.
+      def count(extras = false)
+        @count ||= klass.collection.find(selector, process_options).count(extras)
       end
 
       # Delete all the documents in the database matching the selector.

@@ -35,7 +35,7 @@ describe Mongoid::Contexts::Mongo do
   end
 
   describe "#count" do
-    
+
     context "when documents exist in the collection" do
 
       before do
