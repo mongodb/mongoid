@@ -39,7 +39,7 @@ describe Mongoid::Field do
       context "when the array is object ids" do
 
         let(:metadata) do
-          Mongoid::Relations::Metadata.new({ :inverse_class_name => "Game" })
+          Mongoid::Relations::Metadata.new({ :class_name => "Person", :inverse_class_name => "Game" })
         end
 
         let(:field) do

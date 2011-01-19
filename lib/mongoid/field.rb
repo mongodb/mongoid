@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
         type.set(object)
       else
         metadata = options[:metadata]
-        object.blank? ? type.set(object) : BSON::ObjectId.cast!(metadata.inverse_klass, object)
+        object.blank? || !metadata.klass.using_object_ids? ? type.set(object) : BSON::ObjectId.cast!(metadata.inverse_klass, object)
       end
     end
 
