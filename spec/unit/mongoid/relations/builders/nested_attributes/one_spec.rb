@@ -118,7 +118,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
 
       let(:builder) do
         described_class.new(metadata, {
-          :_id => name.id,
+          :id => name.id,
           :last_name => "Lang",
           :_destroy => true
         }, options)

@@ -87,7 +87,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       let(:attributes) do
-        { "foo" => { "_id" => address.id, "street" => "Maybachufer" } }
+        { "foo" => { "id" => address.id, "street" => "Maybachufer" } }
       end
 
       let(:builder) do
