@@ -425,7 +425,7 @@ module Mongoid # :nodoc:
             name.to_s << suffix
           end
         else
-          (polymorphic? ? self[:as].to_s : inverse_class_name.underscore) << suffix
+          polymorphic? ? "#{self[:as]}#{suffix}" : inverse_class_name.foreign_key
         end
       end
 

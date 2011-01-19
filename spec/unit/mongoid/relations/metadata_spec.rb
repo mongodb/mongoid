@@ -220,6 +220,21 @@ describe Mongoid::Relations::Metadata do
               metadata.foreign_key.should == "person_id"
             end
           end
+
+          context "when the class is namespaces" do
+
+            let(:metadata) do
+              described_class.new(
+                :name => :apple,
+                :relation => Mongoid::Relations::Referenced::In,
+                :class_name => "Fruits::Apple"
+              )
+            end
+
+            it "returns the foreign_key without the module name" do
+              metadata.foreign_key.should == "apple_id"
+            end
+          end
         end
 
         context "when references and referenced in many" do
@@ -284,16 +299,35 @@ describe Mongoid::Relations::Metadata do
 
         context "when references many" do
 
-          let(:metadata) do
-            described_class.new(
-              :name => :posts,
-              :relation => Mongoid::Relations::Referenced::Many,
-              :inverse_class_name => "Person"
-            )
+          context "when the class is not namespaced" do
+
+            let(:metadata) do
+              described_class.new(
+                :name => :posts,
+                :relation => Mongoid::Relations::Referenced::Many,
+                :inverse_class_name => "Person"
+              )
+            end
+
+            it "returns the inverse foreign key" do
+              metadata.foreign_key.should == "person_id"
+            end
           end
 
-          it "returns the inverse foreign key" do
-            metadata.foreign_key.should == "person_id"
+          context "when the class is namespaced" do
+
+            let(:metadata) do
+              described_class.new(
+                :name => :bananas,
+                :relation => Mongoid::Relations::Referenced::Many,
+                :inverse_class_name => "Fruits::Apple",
+                :class_name => "Fruits::Banana"
+              )
+            end
+
+            it "returns the foreign_key without the module name" do
+              metadata.foreign_key.should == "apple_id"
+            end
           end
         end
       end
