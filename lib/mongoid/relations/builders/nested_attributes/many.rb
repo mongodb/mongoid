@@ -95,15 +95,15 @@ module Mongoid # :nodoc:
           #
           # Example:
           #
-          # <tt>builder.process({ "_id" => 1, "street" => "Bond" })
+          # <tt>builder.process({ "id" => 1, "street" => "Bond" })
           #
           # Options:
           #
           # attrs: The single document attributes to process.
           def process(attrs)
             return if reject?(attrs)
-            if attrs[:_id]
-              document = existing.find(attrs[:_id])
+            if attrs[:id]
+              document = existing.find(attrs[:id])
               destroyable?(attrs) ? document.destroy : document.update_attributes(attrs)
             else
               existing.push(metadata.klass.new(attrs)) unless destroyable?(attrs)

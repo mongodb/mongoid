@@ -69,7 +69,7 @@ module Mongoid # :nodoc:
           #
           # True if the id part of the logic will allow an update.
           def acceptable_id?
-            id = attributes[:_id]
+            id = attributes[:id]
             existing.id == id || id.nil? || (existing.id != id && update_only?)
           end
 
@@ -83,7 +83,7 @@ module Mongoid # :nodoc:
           #
           # True if the relation should be deleted.
           def delete?
-            destroyable? && !attributes[:_id].nil?
+            destroyable? && !attributes[:id].nil?
           end
 
           # Can the existing relation potentially be deleted?

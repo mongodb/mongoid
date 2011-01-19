@@ -238,7 +238,7 @@ describe Mongoid::NestedAttributes do
 
                 before do
                   person.name_attributes =
-                    { :_id => name.id.to_s, :first_name => "Bob" }
+                    { :id => name.id.to_s, :first_name => "Bob" }
                 end
 
                 it "updates the existing document" do
@@ -250,7 +250,7 @@ describe Mongoid::NestedAttributes do
 
                 before do
                   person.name_attributes =
-                    { "_id" => name.id.to_s, "first_name" => "Bob" }
+                    { "id" => name.id.to_s, "first_name" => "Bob" }
                 end
 
                 it "updates the existing document" do
@@ -276,7 +276,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       person.name_attributes =
-                        { :_id => name.id, :_destroy => truth }
+                        { :id => name.id, :_destroy => truth }
                     end
 
                     it "destroys the existing document" do
@@ -291,7 +291,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       person.name_attributes =
-                        { :_id => name.id, :_destroy => falsehood }
+                        { :id => name.id, :_destroy => falsehood }
                     end
 
                     it "does not destroy the existing document" do
@@ -317,7 +317,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.name_attributes =
-                      { :_id => name.id, :_destroy => true }
+                      { :id => name.id, :_destroy => true }
                   end
 
                   it "does not destroy the document" do
@@ -345,7 +345,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.name_attributes =
-                      { :_id => name.id, :first_name => "Ro" }
+                      { :id => name.id, :first_name => "Ro" }
                   end
 
                   it "updates the existing document" do
@@ -357,7 +357,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.name_attributes =
-                      { :_id => "1", :first_name => "Durran" }
+                      { :id => BSON::ObjectId.new.to_s, :first_name => "Durran" }
                   end
 
                   it "updates the existing document" do
@@ -369,7 +369,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.name_attributes =
-                      { :_id => name.id, :_destroy => true }
+                      { :id => name.id, :_destroy => true }
                   end
 
                   it "destroys the existing document" do
@@ -461,7 +461,7 @@ describe Mongoid::NestedAttributes do
               context "when the id matches" do
 
                 before do
-                  animal.person_attributes = { :_id => person.id, :title => "Sir" }
+                  animal.person_attributes = { :id => person.id, :title => "Sir" }
                 end
 
                 it "updates the existing document" do
@@ -494,7 +494,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       animal.person_attributes =
-                        { :_id => person.id, :_destroy => truth }
+                        { :id => person.id, :_destroy => truth }
                     end
 
                     it "destroys the existing document" do
@@ -509,7 +509,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       animal.person_attributes =
-                        { :_id => person.id, :_destroy => falsehood }
+                        { :id => person.id, :_destroy => falsehood }
                     end
 
                     it "does not destroy the existing document" do
@@ -535,7 +535,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     animal.person_attributes =
-                      { :_id => person.id, :_destroy => true }
+                      { :id => person.id, :_destroy => true }
                   end
 
                   it "does not delete the document" do
@@ -558,7 +558,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     animal.person_attributes =
-                      { :_id => person.id, :title => "Madam" }
+                      { :id => person.id, :title => "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -570,7 +570,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     animal.person_attributes =
-                      { :_id => BSON::ObjectId.new.to_s, :title => "Madam" }
+                      { :id => BSON::ObjectId.new.to_s, :title => "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -582,7 +582,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     animal.person_attributes =
-                      { :_id => person.id, :title => "Madam", :_destroy => "true" }
+                      { :id => person.id, :title => "Madam", :_destroy => "true" }
                   end
 
                   it "deletes the existing document" do
@@ -670,8 +670,8 @@ describe Mongoid::NestedAttributes do
               before do
                 person.addresses_attributes =
                   {
-                    "foo" => { "_id" => address_one.id, "street" => "Maybachufer" },
-                    "bar" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                    "foo" => { "id" => address_one.id, "street" => "Maybachufer" },
+                    "bar" => { "id" => address_two.id, "street" => "Alexander Platz" }
                   }
               end
 
@@ -693,7 +693,7 @@ describe Mongoid::NestedAttributes do
               it "raises an error" do
                 expect {
                   person.addresses_attributes =
-                    { "foo" => { "_id" => "test", "street" => "Test" } }
+                    { "foo" => { "id" => "test", "street" => "Test" } }
                 }.to raise_error
               end
             end
@@ -722,8 +722,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.addresses_attributes =
                         {
-                          "bar" => { "_id" => address_one.id, "_destroy" => truth },
-                          "foo" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                          "bar" => { "id" => address_one.id, "_destroy" => truth },
+                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                         }
                     end
 
@@ -744,8 +744,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.addresses_attributes =
                         {
-                          "bar" => { "_id" => address_one.id, "_destroy" => falsehood },
-                          "foo" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                          "bar" => { "id" => address_one.id, "_destroy" => falsehood },
+                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                         }
                     end
 
@@ -780,8 +780,8 @@ describe Mongoid::NestedAttributes do
                       person.addresses_attributes =
                         {
                           "bar" => {
-                            "_id" => address_one.id, "street" => "Maybachufer", "_destroy" => truth },
-                          "foo" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                            "id" => address_one.id, "street" => "Maybachufer", "_destroy" => truth },
+                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                         }
                     end
 
@@ -806,8 +806,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.addresses_attributes =
                         {
-                          "bar" => { "_id" => address_one.id, "_destroy" => falsehood },
-                          "foo" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                          "bar" => { "id" => address_one.id, "_destroy" => falsehood },
+                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                         }
                     end
 
@@ -837,8 +837,8 @@ describe Mongoid::NestedAttributes do
                       person.addresses_attributes =
                         {
                           "bar" => {
-                            "_id" => address_one.id, "street" => "Maybachufer", "_destroy" => truth },
-                          "foo" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                            "id" => address_one.id, "street" => "Maybachufer", "_destroy" => truth },
+                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                         }
                     end
 
@@ -863,8 +863,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.addresses_attributes =
                         {
-                          "bar" => { "_id" => address_one.id, "_destroy" => falsehood },
-                          "foo" => { "_id" => address_two.id, "street" => "Alexander Platz" }
+                          "bar" => { "id" => address_one.id, "_destroy" => falsehood },
+                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                         }
                     end
 
@@ -1420,7 +1420,7 @@ describe Mongoid::NestedAttributes do
 
                 before do
                   person.game_attributes =
-                    { :_id => game.id, :name => "Pong" }
+                    { :id => game.id, :name => "Pong" }
                 end
 
                 it "updates the existing document" do
@@ -1432,7 +1432,7 @@ describe Mongoid::NestedAttributes do
 
                 before do
                   person.game_attributes =
-                    { "_id" => game.id, "name" => "Pong" }
+                    { "id" => game.id, "name" => "Pong" }
                 end
 
                 it "updates the existing document" do
@@ -1458,7 +1458,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       person.game_attributes =
-                        { :_id => game.id, :_destroy => truth }
+                        { :id => game.id, :_destroy => truth }
                     end
 
                     it "destroys the existing document" do
@@ -1473,7 +1473,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       person.game_attributes =
-                        { :_id => game.id, :_destroy => falsehood }
+                        { :id => game.id, :_destroy => falsehood }
                     end
 
                     it "does not destroy the existing document" do
@@ -1499,7 +1499,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.game_attributes =
-                      { :_id => game.id, :_destroy => true }
+                      { :id => game.id, :_destroy => true }
                   end
 
                   it "does not destroy the document" do
@@ -1527,7 +1527,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.game_attributes =
-                      { :_id => game.id, :name => "Donkey Kong" }
+                      { :id => game.id, :name => "Donkey Kong" }
                   end
 
                   it "updates the existing document" do
@@ -1539,7 +1539,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.game_attributes =
-                      { :_id => "1", :name => "Pong" }
+                      { :id => BSON::ObjectId.new.to_s, :name => "Pong" }
                   end
 
                   it "updates the existing document" do
@@ -1551,7 +1551,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.game_attributes =
-                      { :_id => game.id, :_destroy => true }
+                      { :id => game.id, :_destroy => true }
                   end
 
                   it "destroys the existing document" do
@@ -1643,7 +1643,7 @@ describe Mongoid::NestedAttributes do
               context "when the id matches" do
 
                 before do
-                  game.person_attributes = { :_id => person.id, :title => "Sir" }
+                  game.person_attributes = { :id => person.id, :title => "Sir" }
                 end
 
                 it "updates the existing document" do
@@ -1676,7 +1676,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       game.person_attributes =
-                        { :_id => person.id, :_destroy => truth }
+                        { :id => person.id, :_destroy => truth }
                     end
 
                     it "destroys the existing document" do
@@ -1691,7 +1691,7 @@ describe Mongoid::NestedAttributes do
 
                     before do
                       game.person_attributes =
-                        { :_id => person.id, :_destroy => falsehood }
+                        { :id => person.id, :_destroy => falsehood }
                     end
 
                     it "does not destroy the existing document" do
@@ -1717,7 +1717,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     game.person_attributes =
-                      { :_id => person.id, :_destroy => true }
+                      { :id => person.id, :_destroy => true }
                   end
 
                   it "does not delete the document" do
@@ -1740,7 +1740,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     game.person_attributes =
-                      { :_id => person.id, :title => "Madam" }
+                      { :id => person.id, :title => "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -1752,7 +1752,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     game.person_attributes =
-                      { :_id => BSON::ObjectId.new.to_s, :title => "Madam" }
+                      { :id => BSON::ObjectId.new.to_s, :title => "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -1764,7 +1764,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     game.person_attributes =
-                      { :_id => person.id, :title => "Madam", :_destroy => "true" }
+                      { :id => person.id, :title => "Madam", :_destroy => "true" }
                   end
 
                   it "deletes the existing document" do
@@ -1856,8 +1856,8 @@ describe Mongoid::NestedAttributes do
               before do
                 person.posts_attributes =
                   {
-                    "0" => { "_id" => post_one.id, "title" => "First" },
-                    "1" => { "_id" => post_two.id, "title" => "Second" }
+                    "0" => { "id" => post_one.id, "title" => "First" },
+                    "1" => { "id" => post_two.id, "title" => "Second" }
                   }
               end
 
@@ -1882,7 +1882,7 @@ describe Mongoid::NestedAttributes do
               it "raises an error" do
                 expect {
                   person.posts_attributes =
-                    { "foo" => { "_id" => "test", "title" => "Test" } }
+                    { "foo" => { "id" => "test", "title" => "Test" } }
                 }.to raise_error
               end
             end
@@ -1911,8 +1911,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.posts_attributes =
                         {
-                          "0" => { "_id" => post_one.id, "_destroy" => truth },
-                          "1" => { "_id" => post_two.id, "title" => "My Blog" }
+                          "0" => { "id" => post_one.id, "_destroy" => truth },
+                          "1" => { "id" => post_two.id, "title" => "My Blog" }
                         }
                     end
 
@@ -1936,8 +1936,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.posts_attributes =
                         {
-                          "0" => { "_id" => post_one.id, "_destroy" => falsehood },
-                          "1" => { "_id" => post_two.id, "title" => "My Blog" }
+                          "0" => { "id" => post_one.id, "_destroy" => falsehood },
+                          "1" => { "id" => post_two.id, "title" => "My Blog" }
                         }
                     end
 
@@ -1975,8 +1975,8 @@ describe Mongoid::NestedAttributes do
                       person.posts_attributes =
                         {
                           "0" => {
-                            "_id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
-                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                            "id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
+                          "1" => { "id" => post_two.id, "title" => "New Title" }
                         }
                     end
 
@@ -2004,8 +2004,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.posts_attributes =
                         {
-                          "0" => { "_id" => post_one.id, "_destroy" => falsehood },
-                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                          "0" => { "id" => post_one.id, "_destroy" => falsehood },
+                          "1" => { "id" => post_two.id, "title" => "New Title" }
                         }
                     end
 
@@ -2038,8 +2038,8 @@ describe Mongoid::NestedAttributes do
                       person.posts_attributes =
                         {
                           "0" => {
-                            "_id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
-                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                            "id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
+                          "1" => { "id" => post_two.id, "title" => "New Title" }
                         }
                     end
 
@@ -2067,8 +2067,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.posts_attributes =
                         {
-                          "0" => { "_id" => post_one.id, "_destroy" => falsehood },
-                          "1" => { "_id" => post_two.id, "title" => "New Title" }
+                          "0" => { "id" => post_one.id, "_destroy" => falsehood },
+                          "1" => { "id" => post_two.id, "title" => "New Title" }
                         }
                     end
 
@@ -2478,8 +2478,8 @@ describe Mongoid::NestedAttributes do
               before do
                 person.preferences_attributes =
                   {
-                    "0" => { "_id" => preference_one.id, "name" => "First" },
-                    "1" => { "_id" => preference_two.id, "name" => "Second" }
+                    "0" => { "id" => preference_one.id, "name" => "First" },
+                    "1" => { "id" => preference_two.id, "name" => "Second" }
                   }
               end
 
@@ -2504,7 +2504,7 @@ describe Mongoid::NestedAttributes do
               it "raises an error" do
                 expect {
                   person.preferences_attributes =
-                    { "foo" => { "_id" => "test", "name" => "Test" } }
+                    { "foo" => { "id" => "test", "name" => "Test" } }
                 }.to raise_error
               end
             end
@@ -2533,8 +2533,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.preferences_attributes =
                         {
-                          "0" => { "_id" => preference_one.id, "_destroy" => truth },
-                          "1" => { "_id" => preference_two.id, "name" => "My Blog" }
+                          "0" => { "id" => preference_one.id, "_destroy" => truth },
+                          "1" => { "id" => preference_two.id, "name" => "My Blog" }
                         }
                     end
 
@@ -2558,8 +2558,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.preferences_attributes =
                         {
-                          "0" => { "_id" => preference_one.id, "_destroy" => falsehood },
-                          "1" => { "_id" => preference_two.id, "name" => "My Blog" }
+                          "0" => { "id" => preference_one.id, "_destroy" => falsehood },
+                          "1" => { "id" => preference_two.id, "name" => "My Blog" }
                         }
                     end
 
@@ -2597,8 +2597,8 @@ describe Mongoid::NestedAttributes do
                       person.preferences_attributes =
                         {
                           "0" => {
-                            "_id" => preference_one.id, "name" => "Another Title", "_destroy" => truth },
-                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                            "id" => preference_one.id, "name" => "Another Title", "_destroy" => truth },
+                          "1" => { "id" => preference_two.id, "name" => "New Title" }
                         }
                     end
 
@@ -2626,8 +2626,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.preferences_attributes =
                         {
-                          "0" => { "_id" => preference_one.id, "_destroy" => falsehood },
-                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                          "0" => { "id" => preference_one.id, "_destroy" => falsehood },
+                          "1" => { "id" => preference_two.id, "name" => "New Title" }
                         }
                     end
 
@@ -2660,8 +2660,8 @@ describe Mongoid::NestedAttributes do
                       person.preferences_attributes =
                         {
                           "0" => {
-                            "_id" => preference_one.id, "name" => "Another Title", "_destroy" => truth },
-                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                            "id" => preference_one.id, "name" => "Another Title", "_destroy" => truth },
+                          "1" => { "id" => preference_two.id, "name" => "New Title" }
                         }
                     end
 
@@ -2689,8 +2689,8 @@ describe Mongoid::NestedAttributes do
                     before do
                       person.preferences_attributes =
                         {
-                          "0" => { "_id" => preference_one.id, "_destroy" => falsehood },
-                          "1" => { "_id" => preference_two.id, "name" => "New Title" }
+                          "0" => { "id" => preference_one.id, "_destroy" => falsehood },
+                          "1" => { "id" => preference_two.id, "name" => "New Title" }
                         }
                     end
 
