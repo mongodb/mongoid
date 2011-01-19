@@ -114,6 +114,9 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil)
       @new_record = true
       @attributes = default_attributes
+      # @todo: Durran: We know the document is polymorphic here but we have no
+      #   metadata... Can we pass the document to the field setter and get the
+      #   foreign key setter to set the type?
       process(attrs) do |document|
         yield self if block_given?
         identify
