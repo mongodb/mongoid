@@ -24,7 +24,6 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind(options = {})
-            p "BINDING IN"
             inverse = metadata.inverse(target)
             base.send(metadata.foreign_key_setter, target.id)
             if metadata.inverse_type
