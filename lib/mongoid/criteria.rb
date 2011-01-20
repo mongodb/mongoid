@@ -297,6 +297,7 @@ module Mongoid #:nodoc:
     def initialize_copy(other)
       @selector = other.selector.dup
       @options = other.options.dup
+      @context = nil
     end
 
     # Update the selector setting the operator on the value for each key in the

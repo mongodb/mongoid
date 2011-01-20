@@ -1000,4 +1000,11 @@ describe Mongoid::Criteria do
       end
     end
   end
+
+  context "when chaining criteria after an initial execute" do
+    it 'should not carry scope to cloned criteria' do
+      criteria.first
+      criteria.limit(1).context.options[:limit].should == 1
+    end
+  end
 end
