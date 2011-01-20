@@ -23,6 +23,10 @@ describe Mongoid::Config do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.replset.yml")
   end
 
+  let(:mongohq_config) do
+    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.mongohq.yml")
+  end
+
   after(:all) do
     Mongoid.configure do |config|
       name          = "mongoid_test"
@@ -155,6 +159,17 @@ describe Mongoid::Config do
       end
     end
 
+    context "when configuring with mongohq", :config => :mongohq do
+
+      let(:settings) do
+        YAML.load(ERB.new(File.new(mongohq_config).read).result)
+      end
+
+      it "sets the master db" do
+        described_class.master.name.should == "mongoid"
+      end
+    end
+
     context "when configured with replset", :config => :replset_config do
 
       let(:settings) do
@@ -164,9 +179,7 @@ describe Mongoid::Config do
       it "should create a regular Mongo::ReplSetConnection" do
         described_class.master.connection.should be_a Mongo::ReplSetConnection
       end
-
     end
-
   end
 
   describe ".logger" do
