@@ -39,7 +39,11 @@ describe Mongoid::Field do
       context "when the array is object ids" do
 
         let(:metadata) do
-          Mongoid::Relations::Metadata.new({ :inverse_class_name => "Game" })
+          Mongoid::Relations::Metadata.new(
+            :inverse_class_name => "Game",
+            :name => :person,
+            :relation => Mongoid::Relations::Referenced::In
+          )
         end
 
         let(:field) do
@@ -70,11 +74,11 @@ describe Mongoid::Field do
           end
 
           before do
-            Game.identity :type => String
+            Person.identity :type => String
           end
 
           after do
-            Game.identity :type => BSON::ObjectId
+            Person.identity :type => BSON::ObjectId
           end
 
           it "does not convert" do

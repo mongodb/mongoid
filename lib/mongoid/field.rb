@@ -51,8 +51,11 @@ module Mongoid #:nodoc:
       unless options[:identity]
         type.set(object)
       else
-        metadata = options[:metadata]
-        object.blank? ? type.set(object) : BSON::ObjectId.cast!(metadata.inverse_klass, object)
+        if object.blank?
+          type.set(object)
+        else
+          options[:metadata].constraint.convert(object)
+        end
       end
     end
 

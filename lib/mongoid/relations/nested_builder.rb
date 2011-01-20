@@ -61,9 +61,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.6
       def convert_id(id)
-        return nil unless id
-        model = metadata.klass
-        model.using_object_ids? ? BSON::ObjectId.cast!(model, id) : id.class.set(id)
+        metadata.constraint.convert(id)
       end
     end
   end

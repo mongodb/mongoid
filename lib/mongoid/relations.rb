@@ -2,6 +2,7 @@
 require "mongoid/relations/accessors"
 require "mongoid/relations/auto_save"
 require "mongoid/relations/cascading"
+require "mongoid/relations/constraint"
 require "mongoid/relations/cyclic"
 require "mongoid/relations/proxy"
 require "mongoid/relations/bindings"

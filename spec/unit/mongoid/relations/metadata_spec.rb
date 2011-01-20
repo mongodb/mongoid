@@ -68,6 +68,17 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#constraint" do
+
+    let(:metadata) do
+      described_class.new(:class_name => "Person")
+    end
+
+    it "returns the constraint object" do
+      metadata.constraint.should be_a(Mongoid::Relations::Constraint)
+    end
+  end
+
   describe "#class_name" do
 
     context "when class_name provided" do

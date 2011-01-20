@@ -96,6 +96,17 @@ describe Mongoid::Persistence do
         person.should be_persisted
       end
     end
+
+    context "when setting the composite key" do
+
+      let(:account) do
+        Account.create!(:name => "Hello")
+      end
+
+      it "saves the document" do
+        account.should be_persisted
+      end
+    end
   end
 
   [ :delete, :destroy ].each do |method|
