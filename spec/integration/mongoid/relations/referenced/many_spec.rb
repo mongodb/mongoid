@@ -1700,10 +1700,13 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
 
-    #TODO: spec for other delegated methods like : group, aggregate...?
-    context "delegated methods" do
-      it "#distinct" do
-        person.posts.distinct(:title).should =~ [ "First",  "Second"]
+    context "when delegating methods" do
+
+      describe "#distinct" do
+
+        it "returns the distinct values for the fields" do
+          person.posts.distinct(:title).should =~ [ "First",  "Second"]
+        end
       end
     end
   end

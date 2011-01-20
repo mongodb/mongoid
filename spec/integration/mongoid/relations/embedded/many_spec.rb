@@ -1293,6 +1293,17 @@ describe Mongoid::Relations::Embedded::Many do
         addresses.should == [ address_one ]
       end
     end
+
+    context "when delegating methods" do
+
+      describe "#distinct" do
+
+        it "returns the distinct values for the fields" do
+          person.addresses.distinct(:street).should =~
+            [ "Market",  "Madison"]
+        end
+      end
+    end
   end
 
   describe "#paginate" do

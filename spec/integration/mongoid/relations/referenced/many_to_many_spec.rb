@@ -1126,6 +1126,17 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         preferences.should == [ preference_one ]
       end
     end
+
+    context "when delegating methods" do
+
+      describe "#distinct" do
+
+        it "returns the distinct values for the fields" do
+          person.preferences.distinct(:name).should =~
+            [ "First",  "Second"]
+        end
+      end
+    end
   end
 
   describe "#nullify_all" do
