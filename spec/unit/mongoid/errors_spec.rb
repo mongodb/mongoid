@@ -4,6 +4,17 @@ describe Mongoid::Errors do
 
   describe Mongoid::Errors::DocumentNotFound do
 
+    describe "attribute readers" do
+
+      it 'exists for @identifiers' do
+        Mongoid::Errors::DocumentNotFound.new(Person, "3").should respond_to :identifiers
+      end
+
+      it 'exists for @klass' do
+        Mongoid::Errors::DocumentNotFound.new(Person, "3").should respond_to :klass
+      end
+    end
+
     describe "#message" do
 
       context "default" do
@@ -15,6 +26,30 @@ describe Mongoid::Errors do
         it "contains document not found" do
           @error.message.should include("Document not found")
         end
+      end
+    end
+  end
+
+  describe Mongoid::Errors::UnsavedDocument do
+
+    let(:base) do
+      Person.new
+    end
+
+    let(:document) do
+      Post.new
+    end
+
+    let(:error) do
+      Mongoid::Errors::UnsavedDocument.new(base, document)
+    end
+
+    describe "#message" do
+
+      it "returns that create can not be called" do
+        error.message.should include(
+          "You cannot call create or create! through a relation"
+        )
       end
     end
   end
@@ -89,7 +124,7 @@ describe Mongoid::Errors do
       @document = stub(:errors => @errors)
       @error = Mongoid::Errors::Validations.new(@document)
     end
-    
+
     describe "#message" do
 
       context "default" do
@@ -99,9 +134,9 @@ describe Mongoid::Errors do
         end
       end
     end
-    
+
     describe "#document" do
-      
+
       it "contains the a reference to the document" do
         @error.document.should == @document
       end

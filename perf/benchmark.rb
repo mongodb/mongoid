@@ -1,7 +1,4 @@
-require "rubygems"
-# require "ruby-prof"
 require "benchmark"
-
 require "mongoid"
 
 Mongoid.configure do |config|
@@ -14,62 +11,63 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   field :birth_date, :type => Date
-  field :title
-  embeds_one :name
-  embeds_many :addresses
-  embeds_many :phones
+  field :title, :type => String
+
+  embeds_one :name, :validate => false
+  embeds_many :addresses, :validate => false
+  embeds_many :phones, :validate => false
+
+  references_many :posts, :validate => false
+  references_one :game, :validate => false
+  references_and_referenced_in_many :preferences
 end
 
 class Name
   include Mongoid::Document
-  field :given
-  field :family
-  field :middle
-  embedded_in :person, :inverse_of => :name
+  field :given, :type => String
+  field :family, :type => String
+  field :middle, :type => String
+  embedded_in :person
 end
 
 class Address
   include Mongoid::Document
-  field :street
-  field :city
-  field :state
-  field :post_code
-  field :address_type
-  embedded_in :person, :inverse_of => :addresses
+  field :street, :type => String
+  field :city, :type => String
+  field :state, :type => String
+  field :post_code, :type => String
+  field :address_type, :type => String
+  embedded_in :person
 end
 
 class Phone
   include Mongoid::Document
   field :country_code, :type => Integer
-  field :number
-  field :phone_type
-  embedded_in :person, :inverse_of => :phones
+  field :number, :type => String
+  field :phone_type, :type => String
+  embedded_in :person
+end
+
+class Post
+  include Mongoid::Document
+  field :title, :type => String
+  field :content, :type => String
+  referenced_in :person
+end
+
+class Game
+  include Mongoid::Document
+  field :name, :type => String
+  referenced_in :person
+end
+
+class Preference
+  include Mongoid::Document
+  field :name, :type => String
+  references_and_referenced_in_many :people
 end
 
 puts "Starting benchmark..."
-
-# RubyProf.start
-
-1000.times do |n|
-  person = Person.new(:birth_date => Date.new(1970, 1, 1))
-  name = Name.new(:given => "James", :family => "Kirk", :middle => "Tiberius")
-  address = Address.new(
-    :street => "1 Starfleet Command Way",
-    :city => "San Francisco",
-    :state => "CA",
-    :post_code => "94133",
-    :type => "Work"
-  )
-  phone = Phone.new(:country_code => 1, :number => "415-555-1212", :type => "Mobile")
-  person.name = name
-  person.addresses << address
-  person.phones << phone
-  person.save
-end
-
-# result = RubyProf.stop
-# printer = RubyProf::FlatPrinter.new(result)
-# printer.print(STDOUT, 0)
 
 Benchmark.bm do |bm|
   bm.report("Saving 10k New Documents") do
@@ -119,7 +117,29 @@ Benchmark.bm do |bm|
         :type => "Home"
       )
       person.addresses << address
-      address.save
+    end
+  end
+  bm.report("Appending A New Rel 1-N Document 10k Times") do
+    person = Person.first
+    10000.times do |n|
+      person.posts.clear
+      post = Post.new(:title => "Post #{n}", :content => "Testing")
+      person.posts << post
+    end
+  end
+  bm.report("Appending A New Rel N-N Document 10k Times") do
+    person = Person.first
+    10000.times do |n|
+      person.preferences.clear
+      preference = Preference.new(:name => "Preference #{n}")
+      person.preferences << preference
+    end
+  end
+  bm.report("Appending A New Rel 1-1 Document 10k Times") do
+    person = Person.first
+    10000.times do |n|
+      game = Game.new(:name => "Final Fantasy #{n}")
+      person.game = game
     end
   end
 end
@@ -179,3 +199,32 @@ end
 # Updating The Root Document 10k Times         3.040000   0.160000   3.200000 (  3.195466)
 # Updating An Embedded Document 10k Times      2.550000   0.130000   2.680000 (  2.668367)
 # Appending A New Embedded Document 10k Times  5.080000   0.240000   5.320000 (  5.327933)
+# ---------------------------------------------------------------------------------------
+# 2.0.0.beta.20 (1.9.2)
+#
+# Saving 10k New Documents                    19.530000   0.270000  19.800000 ( 19.778292)
+# Querying & Iterating 10k Documents           1.150000   0.060000   1.210000 (  1.219632)
+# Updating The Root Document 10k Times         3.270000   0.120000   3.390000 (  3.387370)
+# Updating An Embedded Document 10k Times      2.680000   0.110000   2.790000 (  2.790347)
+# Appending A New Embedded Document 10k Times  7.230000   0.240000   7.470000 (  7.458122)
+#
+# ---------------------------------------------------------------------------------------
+# 2.0.0.rc.1 (1.9.2)
+
+# Saving 10k New Documents                    12.230000   0.130000  12.360000 ( 12.345798)
+# Querying & Iterating 10k Documents           0.560000   0.050000   0.610000 (  0.615744)
+# Updating The Root Document 10k Times         3.430000   0.090000   3.520000 (  3.520051)
+# Updating An Embedded Document 10k Times      1.810000   0.090000   1.900000 (  1.900921)
+# Appending A New Embedded Document 10k Times  6.950000   0.230000   7.180000 (  7.175059)
+#
+# ---------------------------------------------------------------------------------------
+# 2.0.0.rc.4 (1.9.2)
+#
+# Saving 10k New Documents                    11.200000   0.200000  11.400000 ( 11.389380)
+# Querying & Iterating 10k Documents           0.520000   0.040000   0.560000 (  0.559999)
+# Updating The Root Document 10k Times         3.810000   0.110000   3.920000 (  3.918684)
+# Updating An Embedded Document 10k Times      1.950000   0.100000   2.050000 (  2.048782)
+# Appending A New Embedded Document 10k Times  5.460000   0.230000   5.690000 (  5.693213)
+# Appending A New Rel 1-N Document 10k Times   4.780000   0.220000   5.000000 (  4.990632)
+# Appending A New Rel N-N Document 10k Times   4.970000   0.230000   5.200000 (  5.192329)
+# Appending A New Rel 1-1 Document 10k Times   2.740000   0.100000   2.840000 (  2.836493)

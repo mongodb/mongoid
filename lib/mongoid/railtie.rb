@@ -10,7 +10,20 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
 
-      config.generators.orm :mongoid, :migration => false
+      # Determine which generator to use. app_generators was introduced after
+      # 3.0.0.
+      #
+      # @example Get the generators method.
+      #   railtie.generators
+      #
+      # @return [ Symbol ] The method name to use.
+      #
+      # @since 2.0.0.rc.4
+      def self.generator
+        config.respond_to?(:app_generators) ? :app_generators : :generators
+      end
+
+      config.send(generator).orm :mongoid, :migration => false
 
       rake_tasks do
         load "mongoid/railties/database.rake"
@@ -18,20 +31,19 @@ module Rails #:nodoc:
 
       # Exposes Mongoid's configuration to the Rails application configuration.
       #
-      # Example:
-      #
+      # @example Set up configuration in the Rails app.
       #   module MyApplication
       #     class Application < Rails::Application
       #       config.mongoid.logger = Logger.new($stdout, :warn)
       #       config.mongoid.reconnect_time = 10
       #     end
       #   end
-      config.mongoid = ::Mongoid::Config.instance
+      config.mongoid = ::Mongoid::Config
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
       #
-      # Example mongoid.yml:
+      # @example mongoid.yml
       #
       #   defaults: &defaults
       #     host: localhost
@@ -55,18 +67,13 @@ module Rails #:nodoc:
         end
       end
 
-      # After initialization we will attempt to connect to the database, if
-      # we get an exception and can't find a mongoid.yml we will alert the user
-      # to generate one.
-      initializer "verify that mongoid is configured" do
+      # After initialization we will warn the user if we can't find a mongoid.yml and
+      # alert to create one.
+      initializer "warn when configuration is missing" do
         config.after_initialize do
-          begin
-            ::Mongoid.master
-          rescue ::Mongoid::Errors::InvalidDatabase => e
-            unless Rails.root.join("config", "mongoid.yml").file?
-              puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
-              puts "to generate one run: rails generate mongoid:config\n\n"
-            end
+          unless Rails.root.join("config", "mongoid.yml").file?
+            puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
+            puts "to generate one run: rails generate mongoid:config\n\n"
           end
         end
       end
@@ -78,10 +85,23 @@ module Rails #:nodoc:
       # environments.
       initializer "preload all application models" do |app|
         config.to_prepare do
-          ::Rails::Mongoid.load_models(app)
+          ::Rails::Mongoid.load_models(app) unless $rails_rake_task
         end
       end
 
+      # Set the proper error types for Rails. DocumentNotFound errors should be
+      # 404s and not 500s, validation errors are 422s.
+      initializer "load http errors" do |app|
+        config.after_initialize do
+          ActionDispatch::ShowExceptions.rescue_responses.update({
+            "Mongoid::Errors::DocumentNotFound" => :not_found,
+            "Mongoid::Errors::Validations" => 422
+          })
+        end
+      end
+
+      # When workers are forked in passenger and unicorn, we need to reconnect
+      # to the database to all the workers do not share the same connection.
       initializer "reconnect to master if application is preloaded" do
         config.after_initialize do
 

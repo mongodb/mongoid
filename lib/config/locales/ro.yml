@@ -1,4 +1,4 @@
-en:
+ro:
   activemodel:
     errors:
       messages:
@@ -44,4 +44,6 @@ en:
           tip embedded_in sau references_many as array.
         calling_document_find_with_nil_is_invalid:
           Folosirea metodei Document#find cu valoarea nil este invalidă.
-
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.

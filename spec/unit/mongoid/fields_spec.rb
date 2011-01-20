@@ -86,6 +86,19 @@ describe Mongoid::Fields do
         Person.new.testing?.should be_false
       end
 
+      it "adds field methods in a module to allow overriding and preserve inheritance" do
+        Person.class_eval do
+          attr_reader :testing_override_called
+          def testing=(value)
+            @testing_override_called = true
+            super
+          end
+        end
+
+        @person = Person.new
+        @person.testing = 'Test'
+        @person.testing_override_called.should be_true
+      end
     end
 
     context "when the type is an object" do

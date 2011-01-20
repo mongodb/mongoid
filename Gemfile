@@ -1,4 +1,8 @@
-# Use `bundle install` in order to install these gems
-# Use `bundle exec rake` in order to run the specs using the bundle
 source "http://rubygems.org"
 gemspec
+if RUBY_VERSION < '1.9'
+  gem 'ruby-debug'
+else
+  gem 'ruby-debug19'
+end
+

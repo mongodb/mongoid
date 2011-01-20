@@ -21,6 +21,7 @@ class Person
   field :owner_id, :type => Integer
   field :security_code
   field :reading, :type => Object
+  field :bson_id, :type => BSON::ObjectId
 
   index :age
   index :addresses
@@ -33,10 +34,10 @@ class Person
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites
-  embeds_many :videos
-  embeds_many :phone_numbers, :class_name => "Phone"
-  embeds_many :addresses do
+  embeds_many :favorites, :order => :title.desc, :validate => false, :inverse_of => :perp
+  embeds_many :videos, :order => [[ :title, :asc ]],  :validate => false
+  embeds_many :phone_numbers, :class_name => "Phone", :validate => false
+  embeds_many :addresses, :as => :addressable, :validate => false do
     def extension
       "Testing"
     end
@@ -44,9 +45,10 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
+  embeds_many :address_components, :validate => false
 
-  embeds_one :pet, :class_name => "Animal"
-  embeds_one :name do
+  embeds_one :pet, :class_name => "Animal", :validate => false
+  embeds_one :name, :as => :namable, :validate => false do
     def extension
       "Testing"
     end
@@ -55,26 +57,39 @@ class Person
     end
   end
 
-  accepts_nested_attributes_for :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
+  accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, :update_only => true
   accepts_nested_attributes_for :pet, :allow_destroy => true
   accepts_nested_attributes_for :game, :allow_destroy => true
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
+  accepts_nested_attributes_for :posts
+  accepts_nested_attributes_for :preferences
 
-  references_one :game, :dependent => :destroy do
+  references_one :game, :dependent => :destroy, :validate => false do
     def extension
       "Testing"
     end
   end
 
-  references_many :posts, :dependent => :delete do
+  references_many \
+    :posts,
+    :dependent => :delete,
+    :validate => :false,
+    :default_order => :created_at.desc do
     def extension
       "Testing"
     end
   end
-  references_many :paranoid_posts
-  references_many :preferences, :stored_as => :array, :inverse_of => :people, :index => true
-  references_many :user_accounts, :stored_as => :array, :inverse_of => :person
+  references_many :paranoid_posts, :validate => false
+  references_and_referenced_in_many \
+    :preferences,
+    :index => true,
+    :dependent => :nullify
+  references_and_referenced_in_many :user_accounts
+  references_and_referenced_in_many :houses
+
+  references_many :drugs, :autosave => true
+  references_one :account, :autosave => true
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20

@@ -1,0 +1,2 @@
+rvm_gemset_create_on_use_flag=1
+rvm use 1.9.2@mongoid

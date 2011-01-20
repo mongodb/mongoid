@@ -19,16 +19,21 @@ task :install => :build do
 end
 
 task :release => :build do
-  puts "Tagging #{Mongoid::VERSION}..."
   system "git tag -a #{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
-  puts "Pushing to Github..."
   system "git push --tags"
-  puts "Pushing to rubygems.org..."
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
 Rspec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = "spec/**/*_spec.rb"
+end
+
+Rspec::Core::RakeTask.new("spec:unit") do |spec|
+  spec.pattern = "spec/unit/**/*_spec.rb"
+end
+
+Rspec::Core::RakeTask.new("spec:integration") do |spec|
+  spec.pattern = "spec/integration/**/*_spec.rb"
 end
 
 Rspec::Core::RakeTask.new('spec:progress') do |spec|

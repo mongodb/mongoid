@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
       include Ids, Paging
-      attr_reader :criteria
+      attr_accessor :criteria
 
       delegate :blank?, :empty?, :first, :last, :to => :execute
       delegate :klass, :documents, :options, :selector, :to => :criteria
@@ -41,6 +41,32 @@ module Mongoid #:nodoc:
       def count
         @count ||= filter.size
       end
+
+      # Delete all the documents in the database matching the selector.
+      #
+      # @example Delete the documents.
+      #   context.delete_all
+      #
+      # @return [ Integer ] The number of documents deleted.
+      #
+      # @since 2.0.0.rc.1
+      def delete_all
+        count.tap { filter.each(&:delete) }
+      end
+      alias :delete :delete_all
+
+      # Destroy all the documents in the database matching the selector.
+      #
+      # @example Destroy the documents.
+      #   context.destroy_all
+      #
+      # @return [ Integer ] The number of documents destroyed.
+      #
+      # @since 2.0.0.rc.1
+      def destroy_all
+        count.tap { filter.each(&:destroy) }
+      end
+      alias :destroy :destroy_all
 
       # Gets an array of distinct values for the supplied field across the
       # entire array or the susbset given the criteria.
@@ -125,9 +151,9 @@ module Mongoid #:nodoc:
       #
       # The first document in the +Array+
       def shift
-        document = first
-        criteria.skip((options[:skip] || 0) + 1)
-        document
+        first.tap do |document|
+          self.criteria = criteria.skip((options[:skip] || 0) + 1)
+        end
       end
 
       # Get the sum of the field values for all the documents.
@@ -141,6 +167,23 @@ module Mongoid #:nodoc:
           memo ? memo += value : value
         end
       end
+
+      # Very basic update that will perform a simple atomic $set of the
+      # attributes provided in the hash. Can be expanded to later for more
+      # robust functionality.
+      #
+      # @example Update all matching documents.
+      #   context.update_all(:title => "Sir")
+      #
+      # @param [ Hash ] attributes The sets to perform.
+      #
+      # @since 2.0.0.rc.6
+      def update_all(attributes = nil)
+        iterate do |doc|
+          doc.update_attributes(attributes || {})
+        end
+      end
+      alias :update :update_all
 
       protected
       # Filters the documents against the criteria's selector

@@ -40,3 +40,6 @@ fr:
         association_cant_have_inverse_of:
           "Definir un inverse_of pour cette association n'est pas autorisé.
           Utilisez cette option seulement sur embedded_in ou references_many."
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.

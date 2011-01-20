@@ -37,4 +37,7 @@ sv:
           är endast giltigt för references_one eller references_many associationer.
         association_cant_have_inverse_of:
           Att definera inverse_of på denna association är inte tillåtet. Använd
-          endast detta alternativ på embedded_in eller references_many as array.          
+          endast detta alternativ på embedded_in eller references_many as array.
+        unsaved_document:
+          You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved.

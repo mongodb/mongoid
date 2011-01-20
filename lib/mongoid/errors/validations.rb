@@ -2,7 +2,7 @@
 module Mongoid #:nodoc
   module Errors #:nodoc
 
-    # Raised when a persisence method ending in ! fails validation. The message
+    # Raised when a persistence method ending in ! fails validation. The message
     # will contain the full error messages from the +Document+ in question.
     #
     # Example:

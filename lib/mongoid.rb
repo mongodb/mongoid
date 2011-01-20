@@ -1,5 +1,6 @@
 # encoding: utf-8
-# Copyright (c) 2009, 2010 Durran Jordan
+
+# Copyright (c) 2009 - 2011 Durran Jordan and friends.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,9 +20,7 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 require "delegate"
-require "singleton"
 require "time"
 require "ostruct"
 require "active_support/core_ext"
@@ -43,7 +42,6 @@ require "mongo"
 require "mongoid/errors"
 require "mongoid/extensions"
 require "mongoid/safe"
-require "mongoid/associations"
 require "mongoid/atomicity"
 require "mongoid/attributes"
 require "mongoid/callbacks"
@@ -51,9 +49,10 @@ require "mongoid/collection"
 require "mongoid/collections"
 require "mongoid/config"
 require "mongoid/contexts"
+require "mongoid/copyable"
 require "mongoid/criteria"
 require "mongoid/cursor"
-require "mongoid/deprecation"
+require "mongoid/default_scope"
 require "mongoid/dirty"
 require "mongoid/extras"
 require "mongoid/factory"
@@ -63,19 +62,23 @@ require "mongoid/finders"
 require "mongoid/hierarchy"
 require "mongoid/identity"
 require "mongoid/indexes"
+require "mongoid/inspection"
 require "mongoid/javascript"
 require "mongoid/json"
 require "mongoid/keys"
 require "mongoid/logger"
 require "mongoid/matchers"
-require "mongoid/memoization"
 require "mongoid/modifiers"
 require "mongoid/multi_parameter_attributes"
+require "mongoid/multi_database"
 require "mongoid/named_scope"
+require "mongoid/nested_attributes"
 require "mongoid/paths"
 require "mongoid/persistence"
+require "mongoid/relations"
 require "mongoid/safety"
 require "mongoid/scope"
+require "mongoid/serialization"
 require "mongoid/state"
 require "mongoid/timestamps"
 require "mongoid/validations"
@@ -100,7 +103,7 @@ module Mongoid #:nodoc
 
     # Sets the Mongoid configuration options. Best used by passing a block.
     #
-    # Example:
+    # @example Set up configuration options.
     #
     #   Mongoid.configure do |config|
     #     name = "mongoid_test"
@@ -113,33 +116,19 @@ module Mongoid #:nodoc
     #     ]
     #   end
     #
-    # Returns:
-    #
-    # The Mongoid +Config+ singleton instance.
+    # @return [ Config ] The configuration obejct.
     def configure
-      config = Mongoid::Config.instance
+      config = Mongoid::Config
       block_given? ? yield(config) : config
     end
-
-    # Easy convenience method for generating an alert from the
-    # deprecation module.
-    #
-    # Example:
-    #
-    # <tt>Mongoid.deprecate("Method no longer used")</tt>
-    def deprecate(message)
-      Mongoid::Deprecation.instance.alert(message)
-    end
-
     alias :config :configure
   end
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
   #
-  # Example:
-  #
-  # <tt>Mongoid.database = Mongo::Connection.new.db("test")</tt>
+  # @example Delegate the configuration methods.
+  #   Mongoid.database = Mongo::Connection.new.db("test")
   Mongoid::Config.public_instance_methods(false).each do |name|
     (class << self; self; end).class_eval <<-EOT
       def #{name}(*args)

@@ -4,19 +4,10 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     included do
       extend ActiveModel::Callbacks
+      include ActiveModel::Validations::Callbacks
 
-      # Define all the callbacks that are accepted by the document.
-      define_model_callbacks \
-        :create,
-        :destroy,
-        :initialize,
-        :save,
-        :update,
-        :validation
-    end
-
-    def valid?(*) #nodoc
-      _run_validation_callbacks { super }
+      define_model_callbacks :initialize, :only => :after
+      define_model_callbacks :create, :destroy, :save, :update
     end
   end
 end

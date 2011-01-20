@@ -11,7 +11,7 @@ module Mongoid #:nodoc
     # <tt>DocumentNotFound.new(Person, ["1", "2"])</tt>
     class DocumentNotFound < MongoidError
 
-      attr_reader :klass, :indentifiers
+      attr_reader :klass, :identifiers
 
       def initialize(klass, ids)
         @klass = klass

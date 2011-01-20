@@ -134,8 +134,9 @@ describe Mongoid::Persistence::Insert do
         end
 
         context "when we add the parent to the child" do
+
           let(:other_address) do
-            Address.new(:street => "Oxford St", :addressable => document)
+            document.addresses.build(:street => "Oxford St")
           end
 
           it "performs a $push on the embedded array" do

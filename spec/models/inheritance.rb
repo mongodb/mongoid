@@ -25,7 +25,7 @@ class Shape
   field :x, :type => Integer, :default => 0
   field :y, :type => Integer, :default => 0
 
-  embedded_in :canvas, :inverse_of => :shapes
+  embedded_in :canvas
 
   def render; end
 end
@@ -43,7 +43,7 @@ class Writer
   include Mongoid::Document
   field :speed, :type => Integer, :default => 0
 
-  embedded_in :canvas, :inverse_of => :writer
+  embedded_in :canvas
 
   def write; end
 end
@@ -58,15 +58,30 @@ end
 
 class Palette
   include Mongoid::Document
-  embedded_in :canvas, :inverse_of => :palette
+  embedded_in :canvas
   embeds_many :tools
 end
 
 class Tool
   include Mongoid::Document
-  embedded_in :palette, :inverse_of => :tools
+  embedded_in :palette
 end
 
 class Pencil < Tool; end
 
 class Eraser < Tool; end
+
+########################################
+# These are for references relationships
+########################################
+class ShippingContainer
+  include Mongoid::Document
+  references_many :vehicles
+end
+class Vehicle
+  include Mongoid::Document
+  referenced_in :shipping_container
+end
+class Car < Vehicle; end
+class Truck < Vehicle; end
+
