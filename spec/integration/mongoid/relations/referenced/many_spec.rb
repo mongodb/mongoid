@@ -1699,6 +1699,13 @@ describe Mongoid::Relations::Referenced::Many do
         posts.should == [ post_one ]
       end
     end
+
+    #TODO: spec for other delegated methods like : group, aggregate...?
+    context "delegated methods" do
+      it "#distinct" do
+        person.posts.distinct(:title).should =~ [ "First",  "Second"]
+      end
+    end
   end
 
   describe "#nullify_all" do
