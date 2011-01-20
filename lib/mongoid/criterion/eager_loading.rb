@@ -1,6 +1,5 @@
-# encoding: utf-8
-module Mongoid #:nodoc:
-  module Criterion #:nodoc:
+module Mongoid
+  module Criterion
     module EagerLoading
       # EagerLoading criterion are used when eager loading the associations.
       #
@@ -11,7 +10,7 @@ module Mongoid #:nodoc:
       # <tt>criteria.includes(:user, :post)</tt>
       #
       # Returns: <tt>self</tt>
-      attr_accessor :eager_loadings, :id_document_map, :id_associations_map
+      attr_accessor :eager_loadings, :id_documents_map, :id_associations_map
 
       def includes(*options)
         @eager_loadings = options
@@ -19,12 +18,13 @@ module Mongoid #:nodoc:
       end
 
       def preload(documents)
+        return if documents.blank?
         document_class = documents.first.class
         @eager_loadings.each do |eager_loading|
           setup_associations(documents, association_reflection(document_class, eager_loading))
         end
       end
-      
+
       private
         def ignore_includes
           @eager_loadings = nil
@@ -35,77 +35,86 @@ module Mongoid #:nodoc:
         end
 
         def setup_associations(documents, reflection)
-          if reflection.association == Mongoid::Associations::ReferencesOne
+          case reflection.macro
+          when :references_one
             setup_associations_with_ids(documents, reflection, true)
-          elsif reflection.association == Mongoid::Associations::ReferencesMany
+          when :references_many
             setup_associations_with_ids(documents, reflection, false)
-          elsif reflection.association == Mongoid::Associations::ReferencesManyAsArray
+          when :references_and_referenced_in_many
             setup_associations_with_foreign_keys(documents, reflection, false)
-          elsif reflection.association == Mongoid::Associations::ReferencedIn
+          when :referenced_in
             setup_associations_with_foreign_keys(documents, reflection, true)
           end
         end
 
         def setup_associations_with_ids(documents, reflection, one=true)
-          ids = []
-          documents.each do |document|
-            id_document_map[document.id] = document
-            ids << document.id if document.id
-          end
+          ids = association_ids(documents, reflection)
 
-          association_class = reflection.name.singularize.camelize.constantize
           ignore_includes
-          eager_associations = association_class.where(reflection.foreign_key.to_sym.in => ids).to_a
+          eager_associations = reflection.klass.where(reflection.foreign_key.to_sym.in => ids.uniq).to_a
           eager_associations.each do |eager_association|
             add_id_association(eager_association.send(reflection.foreign_key), eager_association)
           end
 
-          id_document_map.each do |id, document|
-            document.send("#{reflection.name}=", one ? id_associations_map[id].first : id_associations_map[id])
-          end
+          assign_associations(documents, reflection)
         end
 
         def setup_associations_with_foreign_keys(documents, reflection, one)
-          ids = []
-          foreign_key_name = reflection.foreign_key
-          documents.each do |document|
-            foreign_key_value = document.send(foreign_key_name)
-            if one
-              id_document_map[foreign_key_value] = document
-              ids << foreign_key_value if foreign_key_value
-            elsif foreign_key_value
-              foreign_key_value.each do |fkv|
-                id_document_map[fkv] = document
-                ids << fkv if fkv
-              end
-            end
-          end
+          ids = association_ids(documents, reflection)
 
-          association_class = reflection.name.singularize.camelize.constantize
           ignore_includes
-          eager_associations = association_class.find(ids).to_a
+          eager_associations = reflection.klass.find(ids.uniq).to_a
           eager_associations.each do |eager_association|
             add_id_association(eager_association.id, eager_association)
           end
 
-          id_document_map.each do |id, document|
-            foreign_key_value = document.send(foreign_key_name)
-            associations = \
-              if one
-                id_associations_map[foreign_key_value].first
-              else
-                foreign_key_value.collect { |fkv| id_associations_map[fkv] }.flatten.uniq
-              end
-            document.send("#{reflection.name}=", associations)
+          assign_associations(documents, reflection)
+        end
+
+        def association_ids(documents, reflection)
+          ids = []
+          key_name = reflection.key
+          documents.each do |document|
+            key_value = document.send(key_name)
+            to_array(key_value).each do |v|
+              add_id_document(v, document)
+              ids << v
+            end
+          end
+          ids
+        end
+
+        def assign_associations(documents, reflection)
+          id_documents_map.each do |id, documents|
+            documents.each do |document|
+              key_value = document.send(reflection.key)
+              associations = \
+                if key_value.is_a?(Array)
+                  key_value.collect { |v| id_associations_map[v] }
+                else
+                  id_associations_map[key_value] ? id_associations_map[key_value].first : nil
+                end
+              document.instance_variable_set("@#{reflection.name}", associations)
+            end
           end
         end
 
-        def id_document_map
-          @id_doccument_map ||= {}
+        def to_array(value)
+          array = value.is_a?(Array) ? value : [value]
+          array.compact
+        end
+
+        def id_documents_map
+          @id_documents_map ||= {}
         end
 
         def id_associations_map
           @id_associations_map ||= {}
+        end
+
+        def add_id_document(id, document)
+          id_documents_map[id] ||= []
+          id_documents_map[id] << document
         end
 
         def add_id_association(id, association)
