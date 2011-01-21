@@ -1,9 +1,12 @@
 # encoding: utf-8
+require "mongoid/attributes/processing"
+
 module Mongoid #:nodoc:
 
   # This module contains the logic for handling the internal attributes hash,
   # and how to get and set values.
   module Attributes
+    include Processing
 
     # Returns the object type. This corresponds to the name of the class that
     # this document is, which is used in determining the class to
@@ -13,6 +16,8 @@ module Mongoid #:nodoc:
     #   person._type
     #
     # @return [ String ] The name of the class the document is.
+    #
+    # @since 1.0.0
     def _type
       @attributes["_type"]
     end
@@ -25,6 +30,8 @@ module Mongoid #:nodoc:
     # @param [ String ] new_type The name of the class.
     #
     # @return [ String ] the new type.
+    #
+    # @since 1.0.0
     def _type=(new_type)
       @attributes["_type"] = new_type
     end
@@ -37,6 +44,8 @@ module Mongoid #:nodoc:
     # @param [ String, Symbol ] name The name of the attribute.
     #
     # @return [ true, false ] True if present, false if not.
+    #
+    # @since 1.0.0
     def attribute_present?(name)
       !read_attribute(name).blank?
     end
@@ -48,6 +57,8 @@ module Mongoid #:nodoc:
     #   person.id
     #
     # @return [ BSON::ObjectId, String ] The id of the document.
+    #
+    # @since 1.0.0
     def id
       @attributes["_id"]
     end
@@ -61,49 +72,12 @@ module Mongoid #:nodoc:
     # @param [ BSON::ObjectId, String ] new_id The new id.
     #
     # @return [ BSON::ObjectId, String ] The new id.
+    #
+    # @since 1.0.0
     def id=(new_id)
       @attributes["_id"] = _id_type.set(new_id)
     end
     alias :_id= :id=
-
-    # Used for allowing accessor methods for dynamic attributes.
-    #
-    # @param [ String, Symbol ] name The name of the method.
-    # @param [ Array ] *args The arguments to the method.
-    def method_missing(name, *args)
-      attr = name.to_s
-      return super unless @attributes.has_key?(attr.reader)
-      if attr.writer?
-        # "args.size > 1" allows to simulate 1.8 behavior of "*args"
-        write_attribute(attr.reader, (args.size > 1) ? args : args.first)
-      else
-        read_attribute(attr.reader)
-      end
-    end
-
-    # Process the provided attributes casting them to their proper values if a
-    # field exists for them on the document. This will be limited to only the
-    # attributes provided in the suppied +Hash+ so that no extra nil values get
-    # put into the document's attributes.
-    #
-    # @example Process the attributes.
-    #   person.process(:title => "sir", :age => 40)
-    #
-    # @param [ Hash ] attrs The attributes to set.
-    def process(attrs = nil)
-      pending = {}
-      sanitize_for_mass_assignment(attrs || {}).each_pair do |key, value|
-        if set_allowed?(key)
-          write_attribute(key, value)
-        else
-          pending[key.to_s] = value and next if relations.has_key?(key.to_s)
-          send("#{key}=", value)
-        end
-      end
-      yield self if block_given?
-      process_relations(pending)
-      setup_modifications
-    end
 
     # Read a value from the document attributes. If the value does not exist
     # it will return nil.
@@ -117,6 +91,8 @@ module Mongoid #:nodoc:
     # @param [ String, Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute.
+    #
+    # @since 1.0.0
     def read_attribute(name)
       access = name.to_s
       value = @attributes[access]
@@ -132,6 +108,8 @@ module Mongoid #:nodoc:
     #   person.remove_attribute(:title)
     #
     # @param [ String, Symbol ] name The name of the attribute to remove.
+    #
+    # @since 1.0.0
     def remove_attribute(name)
       access = name.to_s
       modify(access, @attributes.delete(name.to_s), nil)
@@ -145,6 +123,8 @@ module Mongoid #:nodoc:
     # @param [ Array ] *args The name of the method.
     #
     # @return [ true, false ] True if it does, false if not.
+    #
+    # @since 1.0.0
     def respond_to?(*args)
       (Mongoid.allow_dynamic_fields &&
         @attributes &&
@@ -164,6 +144,8 @@ module Mongoid #:nodoc:
     #
     # @param [ String, Symbol ] name The name of the attribute to update.
     # @param [ Object ] value The value to set for the attribute.
+    #
+    # @since 1.0.0
     def write_attribute(name, value)
       access = name.to_s
       modify(access, @attributes[access], typed_value_for(access, value))
@@ -181,10 +163,11 @@ module Mongoid #:nodoc:
     #   person.attributes = { :title => "Mr." }
     #
     # @param [ Hash ] attrs The new attributes to set.
+    #
+    # @since 1.0.0
     def write_attributes(attrs = nil)
-      process(attrs || {})
-      if new_record? && id.blank?
-        identify
+      process(attrs) do |document|
+        document.identify if new? && id.blank?
       end
     end
     alias :attributes= :write_attributes
@@ -197,6 +180,8 @@ module Mongoid #:nodoc:
     #   person.default_attributes
     #
     # @return [ Hash ] The default values for each field.
+    #
+    # @since 1.0.0
     def default_attributes
       default_values = defaults
       default_values.each_pair do |key, val|
@@ -205,34 +190,18 @@ module Mongoid #:nodoc:
       default_values || {}
     end
 
-    # Process all the pending relations that needed to wait until ids were set
-    # to fire off.
+    # Used for allowing accessor methods for dynamic attributes.
     #
-    # @example Process the relations.
-    #   document.process_relations({ "addressable" => person })
-    #
-    # @param [ Hash ] pending The pending relation values.
-    def process_relations(pending)
-      pending.each_pair do |name, value|
-        metadata = relations[name]
-        if value.is_a?(Hash)
-          metadata.nested_builder(value, {}).build(self)
-        else
-          send("#{name}=", value, :binding => true)
-        end
+    # @param [ String, Symbol ] name The name of the method.
+    # @param [ Array ] *args The arguments to the method.
+    def method_missing(name, *args)
+      attr = name.to_s
+      return super unless @attributes.has_key?(attr.reader)
+      if attr.writer?
+        write_attribute(attr.reader, (args.size > 1) ? args : args.first)
+      else
+        read_attribute(attr.reader)
       end
-    end
-
-    # Return true if dynamic field setting is enabled.
-    #
-    # @example Is a set allowed for this name?
-    #   person.set_allowed?(:title)
-    #
-    # @param [ String, Symbol ] key The name of the field.
-    #
-    # @return [ true, false ] True if allowed, false if not.
-    def set_allowed?(key)
-      Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
     end
 
     # Return the typecasted value for a field.
@@ -244,6 +213,8 @@ module Mongoid #:nodoc:
     # @param [ Object ] value The uncast value.
     #
     # @return [ Object ] The cast value.
+    #
+    # @since 1.0.0
     def typed_value_for(key, value)
       fields.has_key?(key) ? fields[key].set(value) : value
     end

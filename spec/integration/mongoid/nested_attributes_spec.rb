@@ -6,6 +6,119 @@ describe Mongoid::NestedAttributes do
     [ Person, Post, Game ].map(&:delete_all)
   end
 
+  describe "#initialize" do
+
+    context "when the relation is an embeds one" do
+
+      before(:all) do
+        Person.send(:undef_method, :name_attributes=)
+        Person.accepts_nested_attributes_for :name
+      end
+
+      let(:person) do
+        Person.new(:name_attributes => { :first_name => "Johnny" })
+      end
+
+      it "sets the nested attributes" do
+        person.name.first_name.should == "Johnny"
+      end
+    end
+
+    context "when the relation is an embeds many" do
+
+      before(:all) do
+        Person.send(:undef_method, :addresses_attributes=)
+        Person.accepts_nested_attributes_for :addresses
+      end
+
+      let(:person) do
+        Person.new(:addresses_attributes => { "1" => { :street => "Alexanderstr" }})
+      end
+
+      it "sets the nested attributes" do
+        person.addresses.first.street.should == "Alexanderstr"
+      end
+    end
+
+    context "when the relation is an embedded in" do
+
+      before(:all) do
+        Video.accepts_nested_attributes_for :person
+      end
+
+      let(:video) do
+        Video.new(:person_attributes => { :title => "Sir" })
+      end
+
+      it "sets the nested attributes" do
+        video.person.title.should == "Sir"
+      end
+    end
+
+    context "when the relation is a references one" do
+
+      before(:all) do
+        Person.send(:undef_method, :game_attributes=)
+        Person.accepts_nested_attributes_for :game
+      end
+
+      let(:person) do
+        Person.new(:game_attributes => { :name => "Tron" })
+      end
+
+      it "sets the nested attributes" do
+        person.game.name.should == "Tron"
+      end
+    end
+
+    context "when the relation is a references many" do
+
+      before(:all) do
+        Person.send(:undef_method, :posts_attributes=)
+        Person.accepts_nested_attributes_for :posts
+      end
+
+      let(:person) do
+        Person.new(:posts_attributes => { "1" => { :title => "First" }})
+      end
+
+      it "sets the nested attributes" do
+        person.posts.first.title.should == "First"
+      end
+    end
+
+    context "when the relation is a references and referenced in many" do
+
+      before(:all) do
+        Person.send(:undef_method, :preferences_attributes=)
+        Person.accepts_nested_attributes_for :preferences
+      end
+
+      let(:person) do
+        Person.new(:preferences_attributes => { "1" => { :name => "First" }})
+      end
+
+      it "sets the nested attributes" do
+        person.preferences.first.name.should == "First"
+      end
+    end
+
+    context "when the relation is a referenced in" do
+
+      before(:all) do
+        Post.accepts_nested_attributes_for :person
+      end
+
+      let(:post) do
+        Post.new(:person_attributes => { :title => "Sir" })
+      end
+
+      it "sets the nested attributes" do
+        post.person.title.should == "Sir"
+      end
+    end
+  end
+
   describe "##{name}_attributes=" do
 
     context "when the parent document is new" do
@@ -18,13 +131,13 @@ describe Mongoid::NestedAttributes do
 
         context "when a reject proc is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :name_attributes=)
             Person.accepts_nested_attributes_for \
               :name, :reject_if => lambda { |attrs| attrs[:first_name].blank? }
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :name_attributes=)
             Person.accepts_nested_attributes_for :name
           end
@@ -54,13 +167,13 @@ describe Mongoid::NestedAttributes do
 
         context "when :reject_if => :all_blank is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :name_attributes=)
             Person.accepts_nested_attributes_for \
               :name, :reject_if => :all_blank
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :name_attributes=)
             Person.accepts_nested_attributes_for :name
           end
@@ -105,12 +218,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is true" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :name_attributes=)
                 Person.accepts_nested_attributes_for :name, :allow_destroy => true
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :name_attributes=)
                 Person.accepts_nested_attributes_for :name
               end
@@ -126,12 +239,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is false" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :name_attributes=)
                 Person.accepts_nested_attributes_for :name, :allow_destroy => false
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :name_attributes=)
                 Person.accepts_nested_attributes_for :name
               end
@@ -175,12 +288,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name
                 end
@@ -197,12 +310,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name
                 end
@@ -260,12 +373,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name
                 end
@@ -303,12 +416,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name
                 end
@@ -328,7 +441,7 @@ describe Mongoid::NestedAttributes do
 
               context "when update only is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for \
                     :name,
@@ -336,7 +449,7 @@ describe Mongoid::NestedAttributes do
                     :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :name_attributes=)
                   Person.accepts_nested_attributes_for :name
                 end
@@ -408,12 +521,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person
                 end
@@ -429,12 +542,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person
                 end
@@ -478,12 +591,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow destroy is true" do
 
-                before :all do
+                before(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person
                 end
@@ -521,12 +634,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow destroy is false" do
 
-                before :all do
+                before(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Animal.send(:undef_method, :person_attributes=)
                   Animal.accepts_nested_attributes_for :person
                 end
@@ -611,12 +724,12 @@ describe Mongoid::NestedAttributes do
 
         context "when a limit is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :addresses_attributes=)
             Person.accepts_nested_attributes_for :addresses, :limit => 2
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :addresses_attributes=)
             Person.accepts_nested_attributes_for :addresses
           end
@@ -705,12 +818,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :addresses_attributes=)
                   Person.accepts_nested_attributes_for :addresses, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :addresses_attributes=)
                   Person.accepts_nested_attributes_for :addresses
                 end
@@ -762,12 +875,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :addresses_attributes=)
                   Person.accepts_nested_attributes_for :addresses, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :addresses_attributes=)
                   Person.accepts_nested_attributes_for :addresses
                 end
@@ -824,7 +937,7 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is undefined" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :addresses_attributes=)
                   Person.accepts_nested_attributes_for :addresses
                 end
@@ -919,13 +1032,13 @@ describe Mongoid::NestedAttributes do
 
           context "when a reject block is supplied" do
 
-            before :all do
+            before(:all) do
               Person.send(:undef_method, :addresses_attributes=)
               Person.accepts_nested_attributes_for \
                 :addresses, :reject_if => lambda { |attrs| attrs["street"].blank? }
             end
 
-            after :all do
+            after(:all) do
               Person.send(:undef_method, :addresses_attributes=)
               Person.accepts_nested_attributes_for :addresses
             end
@@ -961,13 +1074,13 @@ describe Mongoid::NestedAttributes do
 
           context "when :reject_if => :all_blank is supplied" do
 
-            before :all do
+            before(:all) do
               Person.send(:undef_method, :addresses_attributes=)
               Person.accepts_nested_attributes_for \
                 :addresses, :reject_if => :all_blank
             end
 
-            after :all do
+            after(:all) do
               Person.send(:undef_method, :addresses_attributes=)
               Person.accepts_nested_attributes_for :addresses
             end
@@ -1005,12 +1118,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is true" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :addresses_attributes=)
                 Person.accepts_nested_attributes_for :addresses, :allow_destroy => true
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :addresses_attributes=)
                 Person.accepts_nested_attributes_for :addresses
               end
@@ -1066,12 +1179,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow destroy is false" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :addresses_attributes=)
                 Person.accepts_nested_attributes_for :addresses, :allow_destroy => false
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :addresses_attributes=)
                 Person.accepts_nested_attributes_for :addresses
               end
@@ -1131,7 +1244,7 @@ describe Mongoid::NestedAttributes do
 
             context "when allow destroy is not defined" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :addresses_attributes=)
                 Person.accepts_nested_attributes_for :addresses
               end
@@ -1200,13 +1313,13 @@ describe Mongoid::NestedAttributes do
 
         context "when a reject proc is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :game_attributes=)
             Person.accepts_nested_attributes_for \
               :game, :reject_if => lambda { |attrs| attrs[:name].blank? }
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :game_attributes=)
             Person.accepts_nested_attributes_for :game
           end
@@ -1236,13 +1349,13 @@ describe Mongoid::NestedAttributes do
 
         context "when reject_if => :all_blank is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :game_attributes=)
             Person.accepts_nested_attributes_for \
               :game, :reject_if => :all_blank
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :game_attributes=)
             Person.accepts_nested_attributes_for :game
           end
@@ -1287,12 +1400,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is true" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :game_attributes=)
                 Person.accepts_nested_attributes_for :game, :allow_destroy => true
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :game_attributes=)
                 Person.accepts_nested_attributes_for :game
               end
@@ -1308,12 +1421,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is false" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :game_attributes=)
                 Person.accepts_nested_attributes_for :game, :allow_destroy => false
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :game_attributes=)
                 Person.accepts_nested_attributes_for :game
               end
@@ -1357,12 +1470,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game
                 end
@@ -1379,12 +1492,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game
                 end
@@ -1442,12 +1555,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game
                 end
@@ -1485,12 +1598,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game
                 end
@@ -1510,7 +1623,7 @@ describe Mongoid::NestedAttributes do
 
               context "when update only is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for \
                     :game,
@@ -1518,7 +1631,7 @@ describe Mongoid::NestedAttributes do
                     :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :game_attributes=)
                   Person.accepts_nested_attributes_for :game
                 end
@@ -1590,12 +1703,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person
                 end
@@ -1611,12 +1724,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person
                 end
@@ -1660,12 +1773,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow destroy is true" do
 
-                before :all do
+                before(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person
                 end
@@ -1703,12 +1816,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow destroy is false" do
 
-                before :all do
+                before(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Game.send(:undef_method, :person_attributes=)
                   Game.accepts_nested_attributes_for :person
                 end
@@ -1793,12 +1906,12 @@ describe Mongoid::NestedAttributes do
 
         context "when a limit is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :posts_attributes=)
             Person.accepts_nested_attributes_for :posts, :limit => 2
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :posts_attributes=)
             Person.accepts_nested_attributes_for :posts
           end
@@ -1894,12 +2007,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts
                 end
@@ -1957,12 +2070,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts
                 end
@@ -2025,7 +2138,7 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is undefined" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts
                 end
@@ -2126,13 +2239,13 @@ describe Mongoid::NestedAttributes do
 
           context "when a reject block is supplied" do
 
-            before :all do
+            before(:all) do
               Person.send(:undef_method, :posts_attributes=)
               Person.accepts_nested_attributes_for \
                 :posts, :reject_if => lambda { |attrs| attrs["title"].blank? }
             end
 
-            after :all do
+            after(:all) do
               Person.send(:undef_method, :posts_attributes=)
               Person.accepts_nested_attributes_for :posts
             end
@@ -2168,13 +2281,13 @@ describe Mongoid::NestedAttributes do
 
           context "when :reject_if => :all_blank is supplied" do
 
-            before :all do
+            before(:all) do
               Person.send(:undef_method, :posts_attributes=)
               Person.accepts_nested_attributes_for \
                 :posts, :reject_if => :all_blank
             end
 
-            after :all do
+            after(:all) do
               Person.send(:undef_method, :posts_attributes=)
               Person.accepts_nested_attributes_for :posts
             end
@@ -2212,12 +2325,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is true" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :posts_attributes=)
                 Person.accepts_nested_attributes_for :posts, :allow_destroy => true
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :posts_attributes=)
                 Person.accepts_nested_attributes_for :posts
               end
@@ -2273,12 +2386,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow destroy is false" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :posts_attributes=)
                 Person.accepts_nested_attributes_for :posts, :allow_destroy => false
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :posts_attributes=)
                 Person.accepts_nested_attributes_for :posts
               end
@@ -2338,7 +2451,7 @@ describe Mongoid::NestedAttributes do
 
             context "when allow destroy is not defined" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :posts_attributes=)
                 Person.accepts_nested_attributes_for :posts
               end
@@ -2415,12 +2528,12 @@ describe Mongoid::NestedAttributes do
 
         context "when a limit is specified" do
 
-          before :all do
+          before(:all) do
             Person.send(:undef_method, :preferences_attributes=)
             Person.accepts_nested_attributes_for :preferences, :limit => 2
           end
 
-          after :all do
+          after(:all) do
             Person.send(:undef_method, :preferences_attributes=)
             Person.accepts_nested_attributes_for :preferences
           end
@@ -2516,12 +2629,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :preferences_attributes=)
                   Person.accepts_nested_attributes_for :preferences, :allow_destroy => true
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :preferences_attributes=)
                   Person.accepts_nested_attributes_for :preferences
                 end
@@ -2579,12 +2692,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :preferences_attributes=)
                   Person.accepts_nested_attributes_for :preferences, :allow_destroy => false
                 end
 
-                after :all do
+                after(:all) do
                   Person.send(:undef_method, :preferences_attributes=)
                   Person.accepts_nested_attributes_for :preferences
                 end
@@ -2647,7 +2760,7 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is undefined" do
 
-                before :all do
+                before(:all) do
                   Person.send(:undef_method, :preferences_attributes=)
                   Person.accepts_nested_attributes_for :preferences
                 end
@@ -2748,13 +2861,13 @@ describe Mongoid::NestedAttributes do
 
           context "when a reject block is supplied" do
 
-            before :all do
+            before(:all) do
               Person.send(:undef_method, :preferences_attributes=)
               Person.accepts_nested_attributes_for \
                 :preferences, :reject_if => lambda { |attrs| attrs["name"].blank? }
             end
 
-            after :all do
+            after(:all) do
               Person.send(:undef_method, :preferences_attributes=)
               Person.accepts_nested_attributes_for :preferences
             end
@@ -2790,13 +2903,13 @@ describe Mongoid::NestedAttributes do
 
           context "when :reject_if => :all_blank is supplied" do
 
-            before :all do
+            before(:all) do
               Person.send(:undef_method, :preferences_attributes=)
               Person.accepts_nested_attributes_for \
                 :preferences, :reject_if => :all_blank
             end
 
-            after :all do
+            after(:all) do
               Person.send(:undef_method, :preferences_attributes=)
               Person.accepts_nested_attributes_for :preferences
             end
@@ -2834,12 +2947,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow_destroy is true" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :preferences_attributes=)
                 Person.accepts_nested_attributes_for :preferences, :allow_destroy => true
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :preferences_attributes=)
                 Person.accepts_nested_attributes_for :preferences
               end
@@ -2895,12 +3008,12 @@ describe Mongoid::NestedAttributes do
 
             context "when allow destroy is false" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :preferences_attributes=)
                 Person.accepts_nested_attributes_for :preferences, :allow_destroy => false
               end
 
-              after :all do
+              after(:all) do
                 Person.send(:undef_method, :preferences_attributes=)
                 Person.accepts_nested_attributes_for :preferences
               end
@@ -2960,7 +3073,7 @@ describe Mongoid::NestedAttributes do
 
             context "when allow destroy is not defined" do
 
-              before :all do
+              before(:all) do
                 Person.send(:undef_method, :preferences_attributes=)
                 Person.accepts_nested_attributes_for :preferences
               end

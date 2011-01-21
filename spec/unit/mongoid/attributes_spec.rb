@@ -370,7 +370,7 @@ describe Mongoid::Attributes do
         end
 
         it "raises an error" do
-          lambda { Person.new(attributes) }.should raise_error
+          lambda { Person.new({ :anothernew => "Test" }) }.should raise_error
         end
       end
     end
