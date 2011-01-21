@@ -2,32 +2,24 @@ require "spec_helper"
 
 describe Mongoid::Relations do
 
-  class TestClass
-    include Mongoid::Document
-  end
-
-  let(:klass) do
-    TestClass
-  end
-
-  before do
-    klass.relations.clear
-  end
-
   before(:all) do
     Person.identity :type => BSON::ObjectId
   end
 
   describe "#embedded?" do
 
+    let(:person) do
+      Person.new
+    end
+
     let(:document) do
-      klass.allocate
+      Email.new
     end
 
     context "when the document has a parent" do
 
       before do
-        document.parentize(stub)
+        document.parentize(person)
       end
 
       it "returns true" do
@@ -37,8 +29,18 @@ describe Mongoid::Relations do
 
     context "when the document has no parent" do
 
-      it "returns false" do
-        document.should_not be_embedded
+      context "when the document is embedded in" do
+
+        it "returns true" do
+          document.should be_embedded
+        end
+      end
+
+      context "when the document class is not embedded in" do
+
+        it "returns false" do
+          person.should_not be_embedded
+        end
       end
     end
   end

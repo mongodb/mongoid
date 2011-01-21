@@ -51,7 +51,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def embedded?
-      _parent.present?
+      cyclic ? _parent.present? : self.class.embedded?
     end
 
     # Determine if the document is part of an embeds_many relation.

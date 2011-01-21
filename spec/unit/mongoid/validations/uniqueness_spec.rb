@@ -143,7 +143,7 @@ describe Mongoid::Validations::UniquenessValidator do
     end
     context "embeds_one" do
       let(:person) { Patient.new }
-      let(:email) { Email.new(:address => "joe@example.com", :person => person) }
+      let(:email) { Email.new(:address => "joe@example.com", :patient => person) }
       let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => email.attributes) }
 
       it "no validations are run" do
@@ -153,7 +153,8 @@ describe Mongoid::Validations::UniquenessValidator do
       end
 
       context "when document has no parent" do
-        let(:person) { stub.quacks_like(nil) }
+        let(:email) { Email.new(:address => "joe@example.com") }
+
         it "no validations are run" do
           person.expects(:address).never
           validator.setup(Email)

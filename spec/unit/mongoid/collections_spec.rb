@@ -11,6 +11,23 @@ describe Mongoid::Collections do
     it "sets the collection name to the class pluralized" do
       Person.collection.name.should == "people"
     end
+
+    context "when the document is embedded" do
+
+      context "when there is no cyclic relation" do
+
+        it "raises an error" do
+          expect { Address.collection }.to raise_error
+        end
+      end
+
+      context "when a cyclic relation exists" do
+
+        it "returns the collection" do
+          Role.collection.should be_a(Mongoid::Collection)
+        end
+      end
+    end
   end
 
   describe ".collection_name=" do
@@ -37,6 +54,14 @@ describe Mongoid::Collections do
   end
 
   describe ".index_information" do
+
+    before do
+      Mongoid.autocreate_indexes = true
+    end
+
+    after do
+      Mongoid.autocreate_indexes = false
+    end
 
     it "returns index information from the collection" do
       Person.index_information["title_1"].should_not be_nil
