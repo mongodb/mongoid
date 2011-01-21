@@ -447,7 +447,6 @@ describe Mongoid::Contexts::Enumerable do
         context "when documents are not found" do
 
           it "raises an error" do
-            context.expects(:execute).returns([])
             expect { context.id_criteria(ids) }.to raise_error
           end
         end
@@ -478,7 +477,6 @@ describe Mongoid::Contexts::Enumerable do
         context "when documents are not found" do
 
           it "raises an error" do
-            context.expects(:execute).returns([])
             expect { context.id_criteria(ids) }.to raise_error
           end
         end

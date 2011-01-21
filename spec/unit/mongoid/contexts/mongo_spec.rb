@@ -785,7 +785,6 @@ describe Mongoid::Contexts::Mongo do
         context "when documents are not found" do
 
           it "raises an error" do
-            context.expects(:execute).returns([])
             lambda { context.id_criteria(ids) }.should raise_error
           end
         end
@@ -816,7 +815,6 @@ describe Mongoid::Contexts::Mongo do
         context "when documents are not found" do
 
           it "raises an error" do
-            context.expects(:execute).returns([])
             lambda { context.id_criteria(ids) }.should raise_error
           end
         end
