@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
         versions.target << last_version.clone
         versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
-        @modifications["versions"] = [ nil, versions.to_hash ] if @modifications
+        @modifications["versions"] = [ nil, versions.as_document ] if @modifications
       end
     end
 

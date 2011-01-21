@@ -81,7 +81,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] The $pushAll operations.
     def _pushes
-      pushable? ? { _path => to_hash } : {}
+      pushable? ? { _path => as_document } : {}
     end
 
     # Determine if the document can be pushed.
@@ -104,7 +104,7 @@ module Mongoid #:nodoc:
       if changed? && !new_record?
         setters
       else
-        embedded_one? && new_record? ? { _path => to_hash } : {}
+        embedded_one? && new_record? ? { _path => as_document } : {}
       end
     end
   end

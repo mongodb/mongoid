@@ -45,7 +45,7 @@ module Mongoid #:nodoc:
             options.merge(:validate => validate)
           ).persist
         else
-          collection.insert(document.to_hash, options)
+          collection.insert(document.as_document, options)
         end
       end
     end

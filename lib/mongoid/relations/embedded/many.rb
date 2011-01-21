@@ -259,15 +259,15 @@ module Mongoid # :nodoc:
         # Get this relation as as its representation in the database.
         #
         # @example Convert the relation to an attributes hash.
-        #   person.addresses.to_hash
+        #   person.addresses.as_document
         #
         # @return [ Array<Hash> ] The relation as stored in the db.
         #
         # @since 2.0.0.rc.1
-        def to_hash
+        def as_document
           target.inject([]) do |attributes, doc|
             attributes.tap do |attr|
-              attr << doc.to_hash
+              attr << doc.as_document
             end
           end
         end

@@ -466,7 +466,7 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#to_hash" do
+  describe "#as_document" do
 
     let!(:person) do
       Person.new(:title => "Sir")
@@ -485,15 +485,15 @@ describe Mongoid::Document do
     end
 
     it "includes embeds one attributes" do
-      person.to_hash.should have_key("name")
+      person.as_document.should have_key("name")
     end
 
     it "includes embeds many attributes" do
-      person.to_hash.should have_key("addresses")
+      person.as_document.should have_key("addresses")
     end
 
     it "includes second level embeds many attributes" do
-      person.to_hash["addresses"].first.should have_key("locations")
+      person.as_document["addresses"].first.should have_key("locations")
     end
   end
 

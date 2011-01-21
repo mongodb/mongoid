@@ -192,15 +192,15 @@ module Mongoid #:nodoc:
     # the current document.
     #
     # @example Get the full hierarchy.
-    #   person.to_hash
+    #   person.as_document
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
-    def to_hash
+    def as_document
       attributes = @attributes
       attributes.tap do |attrs|
         relations.select { |name, meta| meta.embedded? }.each do |name, meta|
           relation = send(name, false, :continue => false)
-          attrs[name] = relation.to_hash unless relation.blank?
+          attrs[name] = relation.as_document unless relation.blank?
         end
       end
     end

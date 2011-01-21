@@ -695,10 +695,10 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#to_hash" do
+  describe "#as_document" do
 
     it "returns an array of document hashes" do
-      relation.to_hash.should == [ { "_id" => address.id } ]
+      relation.as_document.should == [ { "_id" => address.id } ]
     end
   end
 
