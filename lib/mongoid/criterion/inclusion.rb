@@ -50,7 +50,7 @@ module Mongoid #:nodoc:
       def any_of(*args)
         clone.tap do |crit|
           criterion = @selector["$or"] || []
-          expanded = args.collect(&:expand_complex_criteria)
+          expanded = args.flatten.collect(&:expand_complex_criteria)
           crit.selector["$or"] = criterion.concat(expanded)
         end
       end
