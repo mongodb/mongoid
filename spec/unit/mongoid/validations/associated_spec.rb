@@ -27,7 +27,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the association is valid" do
 
         before do
-          @associated = stub(:to_a => [ stub(:valid? => true) ])
+          @associated = stub(:valid? => true)
           validator.validate_each(@document, :name, @associated)
         end
 
@@ -40,7 +40,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the association is invalid" do
 
         before do
-          @associated = stub(:to_a => [ stub(:valid? => false) ])
+          @associated = stub(:valid? => false)
           validator.validate_each(@document, :name, @associated)
         end
 

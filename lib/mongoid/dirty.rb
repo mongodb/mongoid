@@ -102,6 +102,7 @@ module Mongoid #:nodoc:
     #
     # <tt>person.move_changes</tt>
     def move_changes
+      @validated = false
       @previous_modifications = modifications.dup
       @modifications = {}
     end
