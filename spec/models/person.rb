@@ -1,6 +1,7 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Versioning
 
   attr_accessor :mode
 

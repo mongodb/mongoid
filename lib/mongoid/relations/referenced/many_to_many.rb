@@ -7,6 +7,25 @@ module Mongoid # :nodoc:
       # many-to-many between documents in different collections.
       class ManyToMany < Referenced::Many
 
+        # Appends a document or array of documents to the relation. Will set
+        # the parent and update the index in the process.
+        #
+        # @example Append a document.
+        #   person.addresses << address
+        #
+        # @example Push a document.
+        #   person.addresses.push(address)
+        #
+        # @example Concat with other documents.
+        #   perosn.addresses.concat([ address_one, address_two ])
+        #
+        # @param [ Document, Array<Document> ] *args Any number of documents.
+        def <<(*args)
+          options = default_options(args)
+          super(args)
+          base.save if base.persisted? && !options[:binding]
+        end
+
         # Creates a new document on the references many relation. This will
         # save the document if the parent has been persisted.
         #

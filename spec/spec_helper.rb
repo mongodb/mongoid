@@ -53,6 +53,8 @@ Rspec.configure do |config|
     return true if value == :user && !user_configured
     return true if value == :multi && !multi_configured
   })
+
+  # config.filter_run :focus => true
 end
 
 ActiveSupport::Inflector.inflections do |inflect|

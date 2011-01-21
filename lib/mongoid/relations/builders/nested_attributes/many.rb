@@ -106,6 +106,8 @@ module Mongoid # :nodoc:
               document = existing.find(convert_id(attrs[:id]))
               destroyable?(attrs) ? document.destroy : document.update_attributes(attrs)
             else
+              # @todo: Durran: Tell the push not to save the base and call it
+              #   after all processing is done. This is related to #581.
               existing.push(metadata.klass.new(attrs)) unless destroyable?(attrs)
             end
           end
