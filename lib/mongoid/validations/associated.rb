@@ -30,7 +30,6 @@ module Mongoid #:nodoc:
         unless document.validated?
           document.validated = true
           valid = value.to_a.collect { |doc| doc.nil? || doc.valid? }.all?
-          document.validated = false
           return if valid
           document.errors.add(attribute, :invalid, options.merge(:value => value))
         else

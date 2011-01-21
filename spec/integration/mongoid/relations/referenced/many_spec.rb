@@ -738,7 +738,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the documents are part of the relation" do
 
         before do
-          Rating.create(:ratable_id => movie.id)
+          Rating.create(:ratable => movie)
         end
 
         it "returns the count from the db" do
