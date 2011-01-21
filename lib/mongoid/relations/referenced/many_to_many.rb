@@ -94,38 +94,6 @@ module Mongoid # :nodoc:
           metadata.klass.destroy_all(:conditions => selector.merge(scoping))
         end
 
-        # Find the matchind document on the association, either based on id or
-        # conditions.
-        #
-        # @example Find by an id.
-        #   person.preferences.find(BSON::ObjectId.new)
-        #
-        # @example Find by multiple ids.
-        #   person.preferences.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
-        #
-        # @example Conditionally find all matching documents.
-        #   person.preferences.find(:all, :conditions => { :title => "Sir" })
-        #
-        # @example Conditionally find the first document.
-        #   person.preferences.find(:first, :conditions => { :title => "Sir" })
-        #
-        # @example Conditionally find the last document.
-        #   person.preferences.find(:last, :conditions => { :title => "Sir" })
-        #
-        # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
-        #   argument to search with.
-        # @param [ Hash ] options The options to search with.
-        #
-        # @return [ Document, Criteria ] The matching document(s).
-        def find(arg, options = {})
-          klass = metadata.klass
-          return klass.criteria.id_criteria(arg) unless arg.is_a?(Symbol)
-          selector = (options[:conditions] || {}).merge(
-            "_id" => { "$in" => base.send(metadata.foreign_key) }
-          )
-          klass.find(arg, :conditions => selector)
-        end
-
         # Removes all associations between the base document and the target
         # documents by deleting the foreign keys and the references, orphaning
         # the target documents in the process.

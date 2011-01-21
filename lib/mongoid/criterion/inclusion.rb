@@ -56,20 +56,43 @@ module Mongoid #:nodoc:
       end
       alias :or :any_of
 
-      # Using the existing criteria, find a document by a single id, multiple
-      # ids, or using a conditions hash.
+      # Find the matchind document in the criteria, either based on id or
+      # conditions.
       #
-      # @example Find a single document by id.
-      #   Person.where(:title => "Sir").find(id)
+      # @todo Durran: DRY up duplicated code in a few places.
       #
-      # @example Find multiple documents by ids.
-      #   Person.where(:title => "Sir").find([ id_one, id_two ])
+      # @example Find by an id.
+      #   criteria.find(BSON::ObjectId.new)
       #
-      # @return [ Document, Array<Document> ] The matching document(s).
+      # @example Find by multiple ids.
+      #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
       #
-      # @since 2.0.0.rc.1
+      # @example Conditionally find all matching documents.
+      #   criteria.find(:all, :conditions => { :title => "Sir" })
+      #
+      # @example Conditionally find the first document.
+      #   criteria.find(:first, :conditions => { :title => "Sir" })
+      #
+      # @example Conditionally find the last document.
+      #   criteria.find(:last, :conditions => { :title => "Sir" })
+      #
+      # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
+      #   argument to search with.
+      # @param [ Hash ] options The options to search with.
+      #
+      # @return [ Document, Criteria ] The matching document(s).
       def find(*args)
-        id_criteria(*args)
+        raise Errors::InvalidOptions.new(
+          :calling_document_find_with_nil_is_invalid, {}
+        ) if args[0].nil?
+        type, criteria = Criteria.parse!(klass, embedded, *args)
+        criteria.merge(self) if criteria.is_a?(Criteria)
+        case type
+        when :first then return criteria.one
+        when :last then return criteria.last
+        else
+          return criteria
+        end
       end
 
       # Adds a criterion to the +Criteria+ that specifies values where any can
