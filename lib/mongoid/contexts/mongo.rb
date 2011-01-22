@@ -20,7 +20,12 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, counts as values
       def aggregate
-        klass.collection.group(options[:fields], selector, { :count => 0 }, Javascript.aggregate, true)
+        klass.collection.group(
+            :key => options[:fields],
+            :cond => selector,
+            :initial => { :count => 0 },
+            :reduce => Javascript.aggregate
+        )
       end
 
       # Get the average value for the supplied field.
@@ -141,10 +146,10 @@ module Mongoid #:nodoc:
       # A +Hash+ with field values as keys, arrays of documents as values.
       def group
         klass.collection.group(
-          options[:fields],
-          selector,
-          { :group => [] },
-          Javascript.group
+          :key => options[:fields],
+          :cond => selector,
+          :initial => { :group => [] },
+          :reduce => Javascript.group
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
             Mongoid::Factory.build(klass, attrs)
@@ -287,10 +292,9 @@ module Mongoid #:nodoc:
       # and sum. Will gsub the field name in the supplied reduce function.
       def grouped(start, field, reduce)
         collection = klass.collection.group(
-          nil,
-          selector,
-          { start => "start" },
-          reduce.gsub("[field]", field)
+          :cond => selector,
+          :initial => { start => "start" },
+          :reduce => reduce.gsub("[field]", field)
         )
         collection.empty? ? nil : collection.first[start.to_s]
       end
