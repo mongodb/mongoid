@@ -199,12 +199,13 @@ module Mongoid #:nodoc:
     #
     # name: The name of the class method on the +Document+ to chain.
     # args: The arguments passed to the method.
+    # block: Optional block to pass
     #
     # Returns: <tt>Criteria</tt>
-    def method_missing(name, *args)
+    def method_missing(name, *args, &block)
       if @klass.respond_to?(name)
         @klass.send(:with_scope, self) do
-          @klass.send(name, *args)
+          @klass.send(name, *args, &block)
         end
       else
         return entries.send(name, *args)

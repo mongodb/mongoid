@@ -354,7 +354,7 @@ module Mongoid # :nodoc:
           load!(:binding => true) and return super if target.respond_to?(name)
           klass = metadata.klass
           klass.send(:with_scope, criteria) do
-            criteria.send(name, *args)
+            criteria.send(name, *args, &block)
           end
         end
 
