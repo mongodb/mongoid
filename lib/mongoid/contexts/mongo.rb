@@ -21,10 +21,10 @@ module Mongoid #:nodoc:
       # A +Hash+ with field values as keys, counts as values
       def aggregate
         klass.collection.group(
-            :key => options[:fields],
-            :cond => selector,
-            :initial => { :count => 0 },
-            :reduce => Javascript.aggregate
+          :key => options[:fields],
+          :cond => selector,
+          :initial => { :count => 0 },
+          :reduce => Javascript.aggregate
         )
       end
 
