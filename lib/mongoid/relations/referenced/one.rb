@@ -77,7 +77,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def unbind(old_target, options = {})
           binding(old_target).unbind(options)
-          old_target.delete if base.persisted? && !old_target.destroyed?
+          if base.persisted? && !old_target.destroyed? && !options[:binding]
+            old_target.delete
+          end
         end
 
         private

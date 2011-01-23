@@ -414,7 +414,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.new(:ssn => "437-11-1112")
+            Person.create(:ssn => "437-11-1112")
           end
 
           let(:game) do
@@ -436,6 +436,10 @@ describe Mongoid::Relations::Referenced::In do
 
           it "removes the foreign key value" do
             game.person_id.should be_nil
+          end
+
+          it "does not delete the child" do
+            game.should_not be_destroyed
           end
         end
       end
