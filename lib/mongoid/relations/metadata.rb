@@ -424,12 +424,16 @@ module Mongoid # :nodoc:
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
           if relation.macro == :references_and_referenced_in_many
-            name.to_s.singularize << suffix
+            "#{name.to_s.singularize}#{suffix}"
           else
-            name.to_s << suffix
+            "#{name}#{suffix}"
           end
         else
-          polymorphic? ? "#{self[:as]}#{suffix}" : inverse_class_name.foreign_key
+          if polymorphic?
+            "#{self[:as]}#{suffix}"
+          else
+            inverse_of ? "#{inverse_of}#{suffix}" : inverse_class_name.foreign_key
+          end
         end
       end
 

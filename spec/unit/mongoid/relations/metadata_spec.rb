@@ -310,6 +310,22 @@ describe Mongoid::Relations::Metadata do
 
         context "when references many" do
 
+          context "when an inverse_of is defined" do
+
+            let(:metadata) do
+              described_class.new(
+                :name => :created_streets,
+                :relation => Mongoid::Relations::Referenced::Many,
+                :inverse_class_name => "House",
+                :inverse_of => :creator
+              )
+            end
+
+            it "returns the inverse_of plus suffix" do
+              metadata.foreign_key.should == "creator_id"
+            end
+          end
+
           context "when the class is not namespaced" do
 
             let(:metadata) do
