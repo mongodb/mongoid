@@ -25,8 +25,8 @@ module Mongoid #:nodoc:
       # The +Document+, whether the insert succeeded or not.
       def persist
         return document if validate && document.invalid?(:create)
-        document.run_callbacks(:create) do
-          document.run_callbacks(:save) do
+        document.run_callbacks(:save) do
+          document.run_callbacks(:create) do
             if insert
               document.new_record = false
               document._children.each { |child| child.new_record = false }
