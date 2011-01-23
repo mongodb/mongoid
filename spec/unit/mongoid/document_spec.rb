@@ -412,6 +412,24 @@ describe Mongoid::Document do
         end
       end
     end
+
+    context "when a relation is set as nil" do
+
+      before do
+        person.instance_variable_set(:@name, nil)
+        person.expects(:collection).returns(collection)
+        collection.expects(:find_one).
+          with(:_id => person.id).returns({})
+      end
+
+      let(:reloaded) do
+        person.reload
+      end
+
+      it "removes the instance variable" do
+        reloaded.instance_variable_defined?(:@name).should be_false
+      end
+    end
   end
 
   describe "#remove_child" do

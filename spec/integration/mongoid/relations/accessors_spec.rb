@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Accessors do
 
   before do
-    [ Book, Movie, Rating, Person, Preference ].each(&:delete_all)
+    [ Book, Movie, Rating, Person, Preference, Game ].each(&:delete_all)
   end
 
   describe "\#{getter}" do

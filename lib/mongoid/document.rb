@@ -152,7 +152,7 @@ module Mongoid #:nodoc:
       @attributes = {}.merge(reloaded || {})
       tap do
         relations.keys.each do |name|
-          if relation_exists?(name)
+          if instance_variable_defined?("@#{name}")
             remove_instance_variable("@#{name}")
           end
         end
