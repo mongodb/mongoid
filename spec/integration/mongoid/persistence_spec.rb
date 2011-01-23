@@ -407,6 +407,19 @@ describe Mongoid::Persistence do
           post.should be_persisted
         end
       end
+
+      context "when the document has been destroyed" do
+
+        before do
+          post.delete
+        end
+
+        it "raises an error" do
+          expect {
+            post.update_attribute(:title, "something")
+          }.to raise_error
+        end
+      end
     end
 
     context "when provided a string attribute name" do
@@ -465,6 +478,23 @@ describe Mongoid::Persistence do
 
       it "saves the attributes" do
         from_db.pets.should be_false
+      end
+    end
+
+    context "when the document has been destroyed" do
+
+      let!(:person) do
+        Person.create(:ssn => "717-98-9999")
+      end
+
+      before do
+        person.delete
+      end
+
+      it "raises an error" do
+        expect {
+          person.update_attributes(:title => "something")
+        }.to raise_error
       end
     end
 

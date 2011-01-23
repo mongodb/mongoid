@@ -55,6 +55,7 @@ module Mongoid #:nodoc:
     # @return [ TrueClass ] True.
     def remove(options = {})
       if Remove.new(self, options).persist
+        raw_attributes.freeze
         self.destroyed = true
         cascade!
       end; true
