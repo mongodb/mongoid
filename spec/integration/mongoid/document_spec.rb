@@ -353,21 +353,40 @@ describe Mongoid::Document do
 
   describe "#reload" do
 
-    before do
-      @person = Person.new(:title => "Sir")
-      @person.save
-      @from_db = Person.find(@person.id)
-      @from_db.age = 35
-      @from_db.save
+    let(:person) do
+      Person.create(:ssn => "112-11-1121", :title => "Sir")
+    end
+
+    let!(:from_db) do
+      Person.find(person.id).tap do |peep|
+        peep.age = 35
+        peep.save
+      end
     end
 
     it "reloads the object attributes from the db" do
-      @person.reload
-      @person.age.should == 35
+      person.reload
+      person.age.should == 35
     end
 
     it "reload should return self" do
-      @person.reload.should == @from_db
+      person.reload.should == from_db
+    end
+
+    context "when the document was dirty" do
+
+      let(:person) do
+        Person.create(:ssn => "543-24-2341")
+      end
+
+      before do
+        person.title = "Sir"
+        person.reload
+      end
+
+      it "resets the dirty modifications" do
+        person.changes.should be_empty
+      end
     end
 
     context "when document not saved" do
@@ -382,15 +401,19 @@ describe Mongoid::Document do
 
     context "when embedded documents change" do
 
-      before do
-        @address = @person.addresses.create(:number => 27, :street => "Maiden Lane")
+      let!(:address) do
+        person.addresses.create(:number => 27, :street => "Maiden Lane")
       end
 
-      it "should reload (unmemoize) the associations" do
-        @person.addresses.should == [ @address ]
-        Person.collection.update({ "_id" => @person.id }, { "$set" => { "addresses" => [] } })
-        @person.reload
-        @person.addresses.should == []
+      before do
+        Person.collection.update(
+          { "_id" => person.id }, { "$set" => { "addresses" => [] } }
+        )
+        person.reload
+      end
+
+      it "should reload the association" do
+        person.addresses.should == []
       end
     end
 
@@ -398,28 +421,37 @@ describe Mongoid::Document do
 
       context "for a references_one" do
 
+        let!(:game) do
+          person.create_game(:score => 50)
+        end
+
         before do
-          @game = @person.create_game(:score => 50)
+          Game.collection.update(
+            { "_id" => game.id }, { "$set" => { "score" => 75 } }
+          )
+          person.reload
         end
 
         it "should reload the association" do
-          @person.game.should == @game
-          Game.collection.update({ "_id" => @game.id }, { "$set" => { "score" => 75 } })
-          @person.reload
-          @person.game.score.should == 75
+          person.game.score.should == 75
         end
       end
 
       context "for a referenced_in" do
 
+        let!(:game) do
+          person.create_game(:score => 50)
+        end
+
         before do
-          @game = @person.create_game(:score => 50)
+          Person.collection.update(
+            { "_id" => person.id }, { "$set" => { "title" => "Mam" } }
+          )
+          game.reload
         end
 
         it "should reload the association" do
-          Person.collection.update({ "_id" => @person.id }, { "$set" => { "title" => "Mam" } })
-          @game.reload
-          @game.person.title.should == "Mam"
+          game.person.title.should == "Mam"
         end
       end
     end
