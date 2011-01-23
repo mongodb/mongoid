@@ -204,7 +204,7 @@ module Mongoid #:nodoc:
     #
     # @return [ String ] The JSON string.
     def as_json(options = nil)
-      to_a.as_json(options)
+      entries.as_json(options)
     end
 
     class << self
