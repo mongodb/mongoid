@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
-    [ Person, Post ].each(&:delete_all)
+    [ Person, Post, Game ].each(&:delete_all)
   end
 
   before(:all) do
@@ -465,6 +465,30 @@ describe Mongoid::Persistence do
 
       it "saves the attributes" do
         from_db.pets.should be_false
+      end
+    end
+
+    context "when updating through a one-to-one relation" do
+
+      let(:person) do
+        Person.create!(:ssn => "666-77-8888")
+      end
+
+      let(:game) do
+        Game.create(:person => person)
+      end
+
+      before do
+        person.update_attributes!(:ssn => "444-44-4444")
+        game.person.update_attributes!(:ssn => "555-66-7777")
+      end
+
+      let(:from_db) do
+        Person.find(person.id)
+      end
+
+      it "saves the attributes" do
+        person.ssn.should == "555-66-7777"
       end
     end
 
