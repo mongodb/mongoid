@@ -10,7 +10,7 @@ module Mongoid # :nodoc:
         # @example Nullify the reference.
         #   strategy.cascade
         def cascade
-          relation.nullify
+          relation.nullify if relation
         end
       end
     end

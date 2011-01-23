@@ -81,24 +81,38 @@ describe Mongoid::Relations::Cascading do
 
           context "when nullifying a references one" do
 
-            let(:book) do
-              Book.create(:title => "Neuromancer")
+            context "when the relation exists" do
+
+              let(:book) do
+                Book.create(:title => "Neuromancer")
+              end
+
+              let!(:rating) do
+                book.create_rating(:value => 10)
+              end
+
+              let(:from_db) do
+                Rating.find(rating.id)
+              end
+
+              before do
+                book.send(method)
+              end
+
+              it "removes the references to the removed document" do
+                from_db.ratable_id.should be_nil
+              end
             end
 
-            let!(:rating) do
-              book.create_rating(:value => 10)
-            end
+            context "when the relation is nil" do
 
-            let(:from_db) do
-              Rating.find(rating.id)
-            end
+              let(:book) do
+                Book.create(:title => "Neuromancer")
+              end
 
-            before do
-              book.send(method)
-            end
-
-            it "removes the references to the removed document" do
-              from_db.ratable_id.should be_nil
+              it "returns nil" do
+                book.send(method).should be_true
+              end
             end
           end
 
