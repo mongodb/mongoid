@@ -6,8 +6,8 @@ module Mongoid #:nodoc:
         def set(value)
           return nil if value.blank?
           begin
-            Integer(value)
-          rescue ArgumentError => e
+            value.to_s =~ /\./ ? Float(value) : Integer(value)
+          rescue
             value
           end
         end
