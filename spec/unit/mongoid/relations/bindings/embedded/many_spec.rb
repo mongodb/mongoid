@@ -18,7 +18,7 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
     Person.relations["addresses"]
   end
 
-  describe "#bind_all" do
+  describe "#bind" do
 
     let(:binding) do
       described_class.new(person, target, metadata)

@@ -66,9 +66,9 @@ module Mongoid #:nodoc:
 
     def instantiate_object(klass, values_with_empty_parameters)
       return nil if values_with_empty_parameters.all? { |v| v.nil? }
-      
+
       values = values_with_empty_parameters.collect { |v| v.nil? ? 1 : v }
-      
+
       if klass == DateTime || klass == Date || klass == Time
         klass.send(:convert_to_time, values)
       elsif klass

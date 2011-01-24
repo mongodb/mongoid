@@ -6,6 +6,10 @@ describe Mongoid::Relations::Referenced::In do
     [ Person, Game, Post, Bar, Agent ].map(&:delete_all)
   end
 
+  let(:person) do
+    Person.create(:ssn => "555-55-1111")
+  end
+
   describe "#=" do
 
     context "when the inverse relation has no reference defined" do
@@ -282,6 +286,10 @@ describe Mongoid::Relations::Referenced::In do
 
           it "does not saves the target" do
             person.should_not be_persisted
+          end
+
+          it "sets the full inverse relationships", :focus => true do
+            post.person.posts.first.should == post
           end
         end
       end
