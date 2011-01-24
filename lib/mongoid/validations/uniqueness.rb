@@ -51,7 +51,7 @@ module Mongoid #:nodoc:
           document.errors.add(
             attribute,
             :taken,
-            options.except(:case_sensistive, :scope).merge(:value => value)
+            options.except(:case_sensitive, :scope).merge(:value => value)
           )
         end
       end
