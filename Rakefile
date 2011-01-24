@@ -32,8 +32,8 @@ Rspec::Core::RakeTask.new("spec:unit") do |spec|
   spec.pattern = "spec/unit/**/*_spec.rb"
 end
 
-Rspec::Core::RakeTask.new("spec:integration") do |spec|
-  spec.pattern = "spec/integration/**/*_spec.rb"
+Rspec::Core::RakeTask.new("spec:functional") do |spec|
+  spec.pattern = "spec/functional/**/*_spec.rb"
 end
 
 Rspec::Core::RakeTask.new('spec:progress') do |spec|
