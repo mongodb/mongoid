@@ -16,12 +16,12 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation is a many to many" do
 
-        let(:preference) do
+        let!(:preference) do
           Preference.create(:name => "Setting")
         end
 
         before do
-          person.preferences << preference
+          person.preferences << Preference.last
         end
 
         context "when reloading the relation directly" do
@@ -68,12 +68,12 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation is a many to one" do
 
-        let(:post) do
+        let!(:post) do
           Post.create(:title => "First!")
         end
 
         before do
-          person.posts << post
+          person.posts << Post.last
         end
 
         context "when reloading the relation directly" do
@@ -120,12 +120,12 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation is a references one" do
 
-        let(:game) do
+        let!(:game) do
           Game.create(:name => "Centipeded")
         end
 
         before do
-          person.game = game
+          person.game = Game.last
         end
 
         context "when reloading the relation directly" do

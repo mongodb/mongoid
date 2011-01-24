@@ -22,6 +22,7 @@ module Mongoid #:nodoc:
       def <<(*args)
         options = default_options(args)
         args.flatten.each do |doc|
+          return doc unless doc
           append(doc, options)
           doc.save if base.persisted? && !options[:binding]
         end
