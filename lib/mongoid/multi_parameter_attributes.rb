@@ -1,5 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
+  # @todo: Durran: This module needs an overhaul.
   module MultiParameterAttributes
     module Errors
       # Raised when an error occurred while doing a mass assignment to an attribute through the
