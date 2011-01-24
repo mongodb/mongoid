@@ -34,13 +34,13 @@ describe Mongoid::Criterion::EagerLoading do
 
       @post1 = @person1.posts.create(:title => "post1")
       @post2 = @person1.posts.create(:title => "post2")
-      @post3 = @person2.posts.create(:title => "post3")
+      @post3 = @person1.posts.create(:title => "post3")
       @post4 = @person2.posts.create(:title => "post4")
       @post5 = Post.create(:title => "post5")
 
       @preference1 = @person1.preferences.create(:name => "preference1")
       @preference2 = @person1.preferences.create(:name => "preference2")
-      @preference3 = @person2.preferences.create(:name => "preference3")
+      @preference3 = @person1.preferences.create(:name => "preference3")
       @preference4 = @person2.preferences.create(:name => "preference4")
       @preference5 = Preference.create(:name => "preference5")
     end
@@ -82,12 +82,12 @@ describe Mongoid::Criterion::EagerLoading do
       id_documents_map[@person3.id].should == [@person3]
 
       id_associations_map = criteria.send(:id_associations_map)
-      id_associations_map[@person1.id].should == [@post1, @post2]
-      id_associations_map[@person2.id].should == [@post3, @post4]
+      id_associations_map[@person1.id].should == [@post1, @post2, @post3]
+      id_associations_map[@person2.id].should == [@post4]
       id_associations_map[@person3.id].should == nil
 
-      @person1.posts.should == [@post1, @post2]
-      @person2.posts.should == [@post3, @post4]
+      @person1.posts.should == [@post1, @post2, @post3]
+      @person2.posts.should == [@post4]
       @person3.posts.should == []
     end
 
@@ -102,7 +102,7 @@ describe Mongoid::Criterion::EagerLoading do
       id_documents_map = criteria.send(:id_documents_map)
       id_documents_map[@preference1.id].should == [@person1]
       id_documents_map[@preference2.id].should == [@person1]
-      id_documents_map[@preference3.id].should == [@person2]
+      id_documents_map[@preference3.id].should == [@person1]
       id_documents_map[@preference4.id].should == [@person2]
       id_documents_map[@preference5.id].should == nil
 
@@ -113,8 +113,8 @@ describe Mongoid::Criterion::EagerLoading do
       id_associations_map[@preference4.id].should == [@preference4]
       id_associations_map[@preference5.id].should == nil
 
-      @person1.preferences.should == [@preference1, @preference2]
-      @person2.preferences.should == [@preference3, @preference4]
+      @person1.preferences.should == [@preference1, @preference2, @preference3]
+      @person2.preferences.should == [@preference4]
       @person3.preferences.should == []
     end
 
@@ -151,8 +151,8 @@ describe Mongoid::Criterion::EagerLoading do
         criteria.preload(posts)
 
         id_documents_map = criteria.send(:id_documents_map)
-        id_documents_map[@person1.id].should == [@post1, @post2]
-        id_documents_map[@person2.id].should == [@post3, @post4]
+        id_documents_map[@person1.id].should == [@post1, @post2, @post3]
+        id_documents_map[@person2.id].should == [@post4]
         id_documents_map[@person3.id].should == nil
 
         id_associations_map = criteria.send(:id_associations_map)
@@ -162,9 +162,25 @@ describe Mongoid::Criterion::EagerLoading do
 
         @post1.person.should == @person1
         @post2.person.should == @person1
-        @post3.person.should == @person2
+        @post3.person.should == @person1
         @post4.person.should == @person2
         @post5.person.should == nil
+      end
+    end
+
+    it "preload references_many association" do
+      people = Person.all.to_a
+      posts = Post.all.to_a
+
+      criteria = Mongoid::Criteria.new(Person)
+
+      criteria.each do |person|
+        person.posts.should be_an_instance_of Array
+        person.posts.each {|p| p.should be_an_instance_of Post}
+      end
+      criteria.includes(:posts).all.each do |person|
+        person.posts.should be_an_instance_of Array
+        person.posts.each {|p| p.should be_an_instance_of Post}
       end
     end
   end
