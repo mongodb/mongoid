@@ -39,7 +39,7 @@ module Mongoid #:nodoc:
         options = args.extract_options!
         options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
         args.each do |name|
-          nested_attributes << "#{name}_attributes="
+          self.nested_attributes += [ "#{name}_attributes=" ]
           define_method("#{name}_attributes=") do |attrs|
             relation = relations[name.to_s]
             relation.nested_builder(attrs, options).build(self)
