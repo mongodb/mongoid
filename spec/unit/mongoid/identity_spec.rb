@@ -39,18 +39,25 @@ describe Mongoid::Identity do
     end
 
     context "when class is a subclass" do
-
-      let(:browser) do
-        Browser.new
-      end
-
       before do
         Mongoid::Identity.new(browser).create
       end
 
-      it "sets the document _type to the class name" do
-        browser._type.should == "Browser"
+      context "and the subclass does not have a primary key" do
+        let(:browser){ Browser.new }
+
+        it "sets the document _type to the class name" do
+          browser._type.should == "Browser"
+        end
       end
+
+      context "and the subclass has a primary key defined" do
+        let(:browser){ Browser.new :id => 1234 }
+
+        it "sets the document _type to the class name" do
+          browser._type.should == "Browser"
+        end
+      end      
     end
 
     context "when not using inheritance" do

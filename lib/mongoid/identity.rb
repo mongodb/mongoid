@@ -12,7 +12,8 @@ module Mongoid #:nodoc:
     # @example Create the id and set the type.
     #   identity.create
     def create
-      identify and type
+      identify
+      type
     end
 
     # Create the new identity generator - this will be expanded in the future
