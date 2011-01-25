@@ -1,9 +1,6 @@
 class Service
   include Mongoid::Document
-
-  embedded_in :person
-
   field :sid
-
+  embedded_in :person
   validates_numericality_of :sid
 end
