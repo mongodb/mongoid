@@ -368,6 +368,19 @@ describe Mongoid::Persistence do
         end
       end
     end
+
+    context "with a validation error" do
+
+      subject { Person.new }
+      let!(:service) { Service.new(:person => subject, :sid => "a") }
+
+      it 'raises an error with multiple save attempts' do
+        expect { subject.save! }.should raise_error
+        expect { subject.save! }.should raise_error
+      end
+
+    end
+
   end
 
   describe "#update_attribute" do

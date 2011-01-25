@@ -47,6 +47,7 @@ class Person
     end
   end
   embeds_many :address_components, :validate => false
+  embeds_many :services
 
   embeds_one :pet, :class_name => "Animal", :validate => false
   embeds_one :name, :as => :namable, :validate => false do
