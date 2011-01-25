@@ -82,6 +82,9 @@ class Vehicle
   include Mongoid::Document
   referenced_in :shipping_container
 end
+class Bed; end
 class Car < Vehicle; end
-class Truck < Vehicle; end
+class Truck < Vehicle
+  embeds_one :bed
+end
 

@@ -226,5 +226,10 @@ describe Mongoid::Document do
       @container.vehicles.create({},Truck)
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
+
+    it "should not bleed relations from one subclass to another" do
+      Truck.relations.keys.should =~ %w/ shipping_container bed /
+      Car.relations.keys.should =~ %w/ shipping_container /
+    end
   end
 end

@@ -297,7 +297,7 @@ module Mongoid # :nodoc:
         # @param [ Symbol ] name The name of the relation.
         # @param [ Metadata ] metadata The metadata for the relation.
         def relate(name, metadata)
-          relations[name.to_s] = metadata
+          self.relations = relations.merge(name.to_s => metadata)
           getter(name, metadata).setter(name, metadata)
         end
       end
