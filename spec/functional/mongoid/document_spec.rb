@@ -660,7 +660,7 @@ describe Mongoid::Document do
 
       before do
         5.times do |n|
-          @comment.save
+          @comment.update_attribute(:title, "#{n}")
         end
       end
 

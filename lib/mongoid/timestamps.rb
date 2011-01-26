@@ -11,7 +11,7 @@ module Mongoid #:nodoc:
       field :updated_at, :type => Time
 
       set_callback :create, :before, :set_created_at
-      set_callback :save, :before, :set_updated_at
+      set_callback :save, :before, :set_updated_at, :if => :changed?
 
       class_attribute :record_timestamps
       self.record_timestamps = true

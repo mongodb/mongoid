@@ -77,4 +77,20 @@ describe Mongoid::Versioning do
       end
     end
   end
+
+  context "when the document has not changed" do
+
+    let(:person) do
+      Person.new(:created_at => Time.now.utc)
+    end
+
+    before do
+      person.new_record = false
+    end
+
+    it "does not run the versioning callbacks" do
+      person.expects(:revise).never
+      person.save
+    end
+  end
 end

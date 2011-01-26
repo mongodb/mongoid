@@ -30,7 +30,7 @@ describe Mongoid::Versioning do
 
       it "increments the version by 1" do
         8.times do |n|
-          page.save
+          page.update_attribute(:title, "#{n}")
           page.version.should == n + 1
         end
       end
