@@ -598,6 +598,36 @@ describe Mongoid::Relations::Embedded::Many do
           child_role.name.should == "CTO"
         end
       end
+
+      context "when providing nested attributes" do
+
+        let(:person) do
+          Person.create(:ssn => "555-11-2222")
+        end
+
+        let(:address) do
+          person.addresses.send(
+            method,
+            :street => "Bond",
+            :locations_attributes => { "1" => { "name" => "Home" } }
+          )
+        end
+
+        context "when followed by a save" do
+
+          before do
+            address.save
+          end
+
+          let(:location) do
+            person.reload.addresses.first.locations.first
+          end
+
+          it "persists the deeply embedded document" do
+            location.name.should == "Home"
+          end
+        end
+      end
     end
   end
 

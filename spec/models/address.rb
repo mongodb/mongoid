@@ -24,6 +24,8 @@ class Address
     end
   end
 
+  accepts_nested_attributes_for :locations
+
   referenced_in :account
 
   named_scope :rodeo, where(:street => "Rodeo Dr") do
