@@ -13,7 +13,9 @@ module Mongoid #:nodoc:
       def inspect
         "#<Mongoid::Criteria\n" <<
         "  selector: #{selector.inspect},\n" <<
-        "  options:  #{options.inspect}>\n"
+        "  options:  #{options.inspect},\n" <<
+        "  class:    #{klass},\n" <<
+        "  embedded: #{embedded}>\n"
       end
     end
   end

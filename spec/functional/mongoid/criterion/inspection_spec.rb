@@ -21,7 +21,9 @@ describe Mongoid::Criterion::Inspection do
       let(:inspection) do
         "#<Mongoid::Criteria\n" <<
         "  selector: {:age=>{\"$gt\"=>10}, :title=>\"Sir\"},\n" <<
-        "  options:  {:limit=>1}>\n"
+        "  options:  {:limit=>1},\n" <<
+        "  class:    Person,\n" <<
+        "  embedded: false>\n"
       end
 
       it "returns the selector, options, and empty array" do
@@ -38,7 +40,9 @@ describe Mongoid::Criterion::Inspection do
       let(:inspection) do
         "#<Mongoid::Criteria\n" <<
         "  selector: {:age=>{\"$gt\"=>10}, :title=>\"Sir\"},\n" <<
-        "  options:  {}>\n"
+        "  options:  {},\n" <<
+        "  class:    Person,\n" <<
+        "  embedded: false>\n"
       end
 
       it "returns the selector, options, and empty array" do
