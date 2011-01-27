@@ -254,18 +254,42 @@ describe Mongoid::Document do
 
     context "when initialize callbacks are defined" do
 
-      before do
-        Person.set_callback :initialize, :after do |doc|
-          doc.title = "Madam"
+      context "when accessing attributes" do
+
+        before do
+          Person.set_callback :initialize, :after do |doc|
+            doc.title = "Madam"
+          end
+        end
+
+        after do
+          Person.reset_callbacks(:initialize)
+        end
+
+        it "runs the callbacks" do
+          person.title.should == "Madam"
         end
       end
 
-      after do
-        Person.reset_callbacks(:initialize)
-      end
+      context "when accessing relations" do
 
-      it "runs the callbacks" do
-        person.title.should == "Madam"
+        let(:person) do
+          Person.new(:game => Game.new)
+        end
+
+        before do
+          Person.after_initialize do
+            self.game.name = "Ms. Pacman"
+          end
+        end
+
+        after do
+          Person.reset_callbacks(:initialize)
+        end
+
+        it "runs the callbacks" do
+          person.game.name.should == "Ms. Pacman"
+        end
       end
     end
 
