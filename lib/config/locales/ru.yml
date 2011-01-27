@@ -1,0 +1,44 @@
+ru:
+  activemodel:
+    errors:
+      messages:
+        taken: уже занят
+
+  mongoid:
+    errors:
+      messages:
+        document_not_found:
+          Документ класса %{klass} с id %{identifiers} не найден.
+        invalid_database:
+          База данных должная быть Mongo::DB, а не %{name}.
+        invalid_type:
+          Поле уже было определено в классе %{klass}, но получено как %{other}
+          со значением %{value}.
+        unsupported_version:
+          Версия MongoDB %{version} не поддерживается. Пожалуйста, обновитесь до
+          версии %{mongo_version}.
+        validations:
+          Документ не прошёл валидацию - %{errors}.
+        invalid_collection:
+          Доступ к коллекции для класса %{klass} запрещён, так как это вложенный
+          документ. Пожалуйста, обратитесь к коллекции через родительский документ.
+        invalid_field:
+          Определение поля с именем %{name} запрещено. Не определяйте поля
+          с именами совпадающими с внутренними атрибутами или методами Mongoid.
+          Используйте Document#instance_methods для просмотра запрещённых имён.
+        too_many_nested_attribute_records:
+          Accepting nested attributes для %{association} ограничено
+          %{limit} записями.
+        embedded_in_must_have_inverse_of:
+          Указание опции inverse_of для embedded_in ассоциации обязательно.
+        dependent_only_references_one_or_many:
+          Опция dependent => destroy|delete доступная только для
+          references_one или references_many ассоциаций.
+        association_cant_have_inverse_of:
+          Опция inverse_of не может использоваться с этой ассоциацией.
+          Используйте её с embedded_in или references_many ассоциациями.
+        calling_document_find_with_nil_is_invalid:
+          Вызов Document#find с nil запрещён
+        unsaved_document:
+          Вызов методов create или create! запрещён у реляционной ассоциации
+          (%{document}), у которой родитель (%{base}) не сохранён.
