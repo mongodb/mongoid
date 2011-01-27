@@ -32,11 +32,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def matches?(value)
-        if attribute.is_a?(Array) && !value.is_a?(Array)
-          attribute.include?(value)
-        else
-          value === attribute
-        end
+        attribute.is_a?(Array) ? attribute.include?(value) : value === attribute
       end
 
       protected
