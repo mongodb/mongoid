@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
                   inverse,
                   false,
                   OPTIONS
-                ).push(base, :continue => false)
+                ).push(base, :binding => true, :continue => false)
               end
             end
           end

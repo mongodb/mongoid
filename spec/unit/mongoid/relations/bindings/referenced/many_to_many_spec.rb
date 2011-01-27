@@ -77,6 +77,24 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       it "sets the foreign key" do
         preference_two.person_ids.should == [ person.id ]
       end
+
+      it "passes the binding options through to the inverse" do
+        person.expects(:save).never
+      end
+    end
+
+    context "when ensuring minimal saves" do
+
+      let(:preference_two) do
+        Preference.new.tap do |pref|
+          pref.new_record = false
+        end
+      end
+
+      it "does not save the parent on bind" do
+        person.expects(:save).never
+        binding.bind_one(preference_two, :continue => true)
+      end
     end
 
     context "when the document is not bindable" do
