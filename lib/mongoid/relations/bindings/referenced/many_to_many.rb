@@ -88,7 +88,9 @@ module Mongoid # :nodoc:
             if options[:continue]
               inverse = metadata.inverse(target)
               if inverse
-                doc.do_or_do_not(inverse).delete(base)
+                doc.do_or_do_not(
+                  inverse, false, OPTIONS
+                ).delete(base, :binding => true, :continue => false)
               end
             end
           end

@@ -163,6 +163,21 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
     end
 
+    context "when preventing multiple db hits" do
+
+      before do
+        binding.bind(:continue => true)
+      end
+
+      it "never performs a persistance operation" do
+        person.expects(:delete).never
+        person.expects(:save).never
+        preference.expects(:delete).never
+        preference.expects(:save).never
+        binding.unbind_one(target.first, :continue => true)
+      end
+    end
+
     context "when the documents are not unbindable" do
 
       it "does nothing" do
