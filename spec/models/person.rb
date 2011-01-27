@@ -58,6 +58,7 @@ class Person
       first_name == "Richard" && last_name == "Dawkins"
     end
   end
+  embeds_one :quiz
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, :update_only => true
@@ -66,6 +67,7 @@ class Person
   accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
   accepts_nested_attributes_for :posts
   accepts_nested_attributes_for :preferences
+  accepts_nested_attributes_for :quiz
 
   references_one :game, :dependent => :destroy, :validate => false do
     def extension

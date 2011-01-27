@@ -490,6 +490,23 @@ describe Mongoid::NestedAttributes do
                   end
                 end
               end
+
+              context "when ids are ObjectId strings" do
+
+                let(:quiz) do
+                  person.quiz = Quiz.new(:topic => "Math")
+                end
+
+                before do
+                  person.quiz_attributes = {
+                    "id" => quiz.id.to_s, :topic => "English"
+                  }
+                end
+
+                it "updates the existing document" do
+                  person.quiz.topic.should == "English"
+                end
+              end
             end
           end
         end
