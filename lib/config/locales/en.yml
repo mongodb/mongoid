@@ -1,12 +1,9 @@
 en:
-  activemodel:
-    errors:
-      messages:
-        taken: is already taken
-
   mongoid:
     errors:
       messages:
+        taken:
+          is already taken
         document_not_found:
           Document not found for class %{klass} with id(s) %{identifiers}.
         invalid_database:

@@ -1,12 +1,9 @@
 de:
-  activemodel:
-    errors:
-      messages:
-        taken: ist bereits vergeben
-
   mongoid:
     errors:
       messages:
+        taken:
+          ist bereits vergeben
         document_not_found:
           Dokument für Klasse %{klass} mit ID(s) %{identifiers} nicht gefunden.
         invalid_database:

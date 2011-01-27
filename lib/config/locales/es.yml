@@ -1,12 +1,9 @@
 es:
-  activemodel:
-    errors:
-      messages:
-        taken: ya está en uso
-
   mongoid:
     errors:
       messages:
+        taken:
+          ya está en uso
         document_not_found:
           No se encontró ningún documento para la clase %{klass} con los id(s) %{identifiers}.
         invalid_database:

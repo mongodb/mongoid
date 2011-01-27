@@ -1,12 +1,9 @@
 kr:
-  activemodel:
-    errors:
-      messages:
-        taken: 이미 사용하고있습니다 #is already taken
-
   mongoid:
     errors:
       messages:
+        taken:
+          이미 사용하고있습니다 #is already taken
         document_not_found:
           클라스 %{klass}와 id를 %{identifiers} 위한 문서를 찾을수 없습니다.
           #Document not found for class %{klass} with id(s) %{identifiers}.

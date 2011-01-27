@@ -1,12 +1,9 @@
 bg:
-  activemodel:
-    errors:
-      messages:
-        taken: е вече заето
-
   mongoid:
     errors:
       messages:
+        taken:
+          е вече заето
         document_not_found:
           Не е намерен документ %{klass} с id(та) %{identifiers}.
         invalid_database:

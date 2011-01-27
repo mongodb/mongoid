@@ -1,12 +1,9 @@
 sv:
-  activemodel:
-    errors:
-      messages:
-        taken: har redan använts
-
   mongoid:
     errors:
       messages:
+        taken:
+          har redan använts
         document_not_found:
           Inget dokument kunde hittas för klass %{klass} med id %{identifiers}.
         invalid_database:
