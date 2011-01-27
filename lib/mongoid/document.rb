@@ -249,6 +249,11 @@ module Mongoid #:nodoc:
       def _types
         @_type ||= [descendants + [self]].flatten.uniq.map(&:to_s)
       end
+
+      # Set the i18n scope to overwrite ActiveModel.
+      def i18n_scope
+        :mongoid
+      end
     end
   end
 end
