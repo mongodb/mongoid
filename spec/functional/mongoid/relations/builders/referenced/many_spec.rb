@@ -15,6 +15,16 @@ describe Mongoid::Relations::Builders::Referenced::Many do
         it "returns an empty array" do
           person.posts.should be_empty
         end
+
+        context "during initialization" do
+
+          it "returns an empty array" do
+            Person.new do |p|
+              p.posts.should be_empty
+              p.posts.metadata.should_not be_nil
+            end
+          end
+        end
       end
     end
   end

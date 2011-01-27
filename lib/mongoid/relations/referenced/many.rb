@@ -343,7 +343,7 @@ module Mongoid #:nodoc:
           #
           # @since 2.0.0.rc.1
           def builder(meta, object)
-            Builders::Referenced::Many.new(meta, object)
+            Builders::Referenced::Many.new(meta, object || [])
           end
 
           # Returns true if the relation is an embedded one. In this case
