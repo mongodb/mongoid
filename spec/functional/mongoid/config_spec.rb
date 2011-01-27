@@ -50,7 +50,7 @@ describe Mongoid::Config do
       end
 
       it "adds the language" do
-        I18n.translate("activemodel.errors.messages.taken").should ==
+        I18n.translate("mongoid.errors.messages.taken").should ==
           "ist bereits vergeben"
       end
     end
