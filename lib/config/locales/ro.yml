@@ -1,12 +1,9 @@
 ro:
-  activemodel:
-    errors:
-      messages:
-        taken: este deja folosit
-
   mongoid:
     errors:
       messages:
+        taken:
+          este deja folosit
         document_not_found:
           Nu există document în clasa %{klass} cu id %{identifiers}.
         invalid_database:

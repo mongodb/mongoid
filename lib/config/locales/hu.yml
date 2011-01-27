@@ -1,12 +1,9 @@
 hu:
-  activemodel:
-    errors:
-      messages:
-        taken: már foglalt
-
   mongoid:
     errors:
       messages:
+        taken:
+          már foglalt
         document_not_found:
           %{klass} osztályban, %{identifiers} id(k)-el nem található dokumentum.
         invalid_database:

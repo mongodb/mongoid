@@ -1,12 +1,9 @@
 nl:
-  activemodel:
-    errors:
-      messages:
-        taken: al in gebruik
-
   mongoid:
     errors:
       messages:
+        taken:
+          al in gebruik
         document_not_found:
           Document niet gevonden voor class %{klass} met de id(s) %{identifiers}.
         invalid_database:

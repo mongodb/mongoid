@@ -1,12 +1,9 @@
-en:
-  activemodel:
-    errors:
-      messages:
-        taken: 已占用
-
+zh-CN:
   mongoid:
     errors:
       messages:
+        taken:
+          已占用
         document_not_found:
           没有发现类是%{klass}id(s)是%{identifiers}的文档
         invalid_database:

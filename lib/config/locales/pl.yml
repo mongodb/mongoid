@@ -1,12 +1,9 @@
 pl:
-  activemodel:
-    errors:
-      messages:
-        taken: jest już zajęte
-
   mongoid:
     errors:
       messages:
+        taken:
+          jest już zajęte
         document_not_found:
           Nie znaleziono dokumentu dla klasy %{klass} o id %{identifiers}.
         invalid_database:

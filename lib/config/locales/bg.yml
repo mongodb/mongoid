@@ -1,12 +1,9 @@
 bg:
-  activemodel:
-    errors:
-      messages:
-        taken: е вече заето
-
   mongoid:
     errors:
       messages:
+        taken:
+          е вече заето
         document_not_found:
           Не е намерен документ %{klass} с id(та) %{identifiers}.
         invalid_database:
@@ -29,7 +26,7 @@ bg:
           Присвояването на вложини атрибути за %{association}  е
           ограничено до %{limit} записа
         embedded_in_must_have_inverse_of:
-          Опциите на embedded_in асоциацията трябва да съдържат invers_of.
+          Опциите на embedded_in асоциацията трябва да съдържат inverse_of.
         dependent_only_references_one_or_many:
           Опцията dependent => destroy|delete, която е посочена е
           валидна само за references_one или references_many връзки
