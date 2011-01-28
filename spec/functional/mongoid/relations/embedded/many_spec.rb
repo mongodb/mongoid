@@ -528,7 +528,9 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         let(:address) do
-          person.addresses.send(method, :street => "Bond")
+          person.addresses.send(method, :street => "Bond") do |address|
+            address.state = "CA"
+          end
         end
 
         it "appends to the target" do
@@ -557,6 +559,10 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "writes to the attributes" do
           address.street.should == "Bond"
+        end
+
+        it "calls the passed block" do
+          address.state.should == "CA"
         end
       end
 
@@ -725,7 +731,9 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address) do
-      person.addresses.create(:street => "Bond")
+      person.addresses.create(:street => "Bond") do |address|
+        address.state = "CA"
+      end
     end
 
     it "appends to the target" do
@@ -754,6 +762,10 @@ describe Mongoid::Relations::Embedded::Many do
 
     it "writes to the attributes" do
       address.street.should == "Bond"
+    end
+
+    it "calls the passed block" do
+      address.state.should == "CA"
     end
 
     context "when embedding a multi word named document" do
@@ -1227,7 +1239,9 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the document does not exist" do
 
       let(:found) do
-        person.addresses.find_or_create_by(:street => "King")
+        person.addresses.find_or_create_by(:street => "King") do |address|
+          address.state = "CA"
+        end
       end
 
       it "sets the new document attributes" do
@@ -1236,6 +1250,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "returns a newly persisted document" do
         found.should be_persisted
+      end
+
+      it "calls the passed block" do
+        found.state.should == "CA"
       end
     end
   end
@@ -1264,7 +1282,9 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the document does not exist" do
 
       let(:found) do
-        person.addresses.find_or_initialize_by(:street => "King")
+        person.addresses.find_or_initialize_by(:street => "King") do |address|
+          address.state = "CA"
+        end
       end
 
       it "sets the new document attributes" do
@@ -1273,6 +1293,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "returns a non persisted document" do
         found.should_not be_persisted
+      end
+
+      it "calls the passed block" do
+        found.state.should == "CA"
       end
     end
   end

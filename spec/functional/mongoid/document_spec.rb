@@ -209,6 +209,17 @@ describe Mongoid::Document do
         person.title.should == "Senorita"
         person.should_not be_a_new_record
       end
+
+      it "creates a new document and calls the passed block (setting attributes)" do
+        person = Person.find_or_create_by(:title => "Senorita") do |person|
+          person.pets = true
+          person.age  = 25
+        end
+        person.should_not be_a_new_record
+        person.title.should == "Senorita"
+        person.pets.should == true
+        person.age.should == 25
+      end
     end
   end
 
@@ -231,6 +242,17 @@ describe Mongoid::Document do
         person = Person.find_or_initialize_by(:title => "Senorita")
         person.title.should == "Senorita"
         person.should be_a_new_record
+      end
+
+      it "returns a new document and calls the passed block (setting attributes)" do
+        person = Person.find_or_initialize_by(:title => "Senorita") do |person|
+          person.pets = true
+          person.age  = 25
+        end
+        person.should be_a_new_record
+        person.title.should == "Senorita"
+        person.pets.should == true
+        person.age.should == 25
       end
     end
   end
