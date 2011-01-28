@@ -320,7 +320,8 @@ module Mongoid #:nodoc:
     # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
     def update_selector(attributes, operator)
       clone.tap do |crit|
-        attributes.each do |key, value|
+        converted = BSON::ObjectId.convert(klass, attributes || {})
+        converted.each do |key, value|
           unless crit.selector[key]
             crit.selector[key] = { operator => value }
           else

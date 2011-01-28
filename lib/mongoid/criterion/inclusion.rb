@@ -50,7 +50,8 @@ module Mongoid #:nodoc:
       def any_of(*args)
         clone.tap do |crit|
           criterion = @selector["$or"] || []
-          expanded = args.flatten.collect(&:expand_complex_criteria)
+          converted = BSON::ObjectId.convert(klass, args.flatten)
+          expanded = converted.collect(&:expand_complex_criteria)
           crit.selector["$or"] = criterion.concat(expanded)
         end
       end
@@ -140,7 +141,8 @@ module Mongoid #:nodoc:
         clone.tap do |crit|
           selector = case selector
             when String then {"$where" => selector}
-            else selector ? selector.expand_complex_criteria : {}
+            else
+              BSON::ObjectId.convert(klass, selector || {}).expand_complex_criteria
           end
 
           selector.each_pair do |key, value|

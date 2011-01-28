@@ -106,12 +106,12 @@ module Mongoid #:nodoc:
         ids.flatten!
         if ids.size > 1
           any_in(
-            :_id => ::BSON::ObjectId.cast!(klass, ids, klass.primary_key.nil?)
+            :_id => ::BSON::ObjectId.convert(klass, ids)
           )
         else
           clone.tap do |crit|
             crit.selector[:_id] =
-              ::BSON::ObjectId.cast!(klass, ids.first, klass.primary_key.nil?)
+              ::BSON::ObjectId.convert(klass, ids.first)
           end
         end
       end

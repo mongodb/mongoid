@@ -6,6 +6,24 @@ describe Mongoid::Criterion::Inclusion do
     Person.delete_all
   end
 
+  describe "#all_in" do
+
+    context "when providing string ids" do
+
+      let!(:person) do
+        Person.create(:ssn => "444-44-4444")
+      end
+
+      let(:from_db) do
+        Person.all_in(:_id => [ person.id.to_s ])
+      end
+
+      it "returns the matching documents" do
+        from_db.should == [ person ]
+      end
+    end
+  end
+
   describe "#any_in" do
 
     context "when the field value is nil" do
@@ -35,12 +53,27 @@ describe Mongoid::Criterion::Inclusion do
       context "when searching for any value" do
 
         let(:from_db) do
-          Person.criteria.in(:terms => [ true, false, nil ])
+          Person.any_in(:terms => [ true, false, nil ])
         end
 
         it "returns the matching documents" do
           from_db.should == [ person ]
         end
+      end
+    end
+
+    context "when providing string ids" do
+
+      let!(:person) do
+        Person.create(:ssn => "444-44-4444")
+      end
+
+      let(:from_db) do
+        Person.any_in(:_id => [ person.id.to_s ])
+      end
+
+      it "returns the matching documents" do
+        from_db.should == [ person ]
       end
     end
   end
@@ -78,6 +111,23 @@ describe Mongoid::Criterion::Inclusion do
 
       it "returns any matching documents" do
         from_db.should == [ person_two, person_three ]
+      end
+    end
+
+    context "when using object ids" do
+
+      context "when provided strings as params" do
+
+        let(:from_db) do
+          Person.any_of(
+            { :_id => person_one.id.to_s },
+            { :_id => person_two.id.to_s }
+          )
+        end
+
+        it "returns the matching documents" do
+          from_db.should == [ person_one, person_two ]
+        end
       end
     end
   end
@@ -198,6 +248,20 @@ describe Mongoid::Criterion::Inclusion do
         :aliases => [ "D", "Durran" ],
         :things => [ { :phone => 'HTC Incredible' } ]
       )
+    end
+
+    context "when providing string object ids" do
+
+      context "when providing a single id" do
+
+        let(:from_db) do
+          Person.where(:_id => person.id.to_s).first
+        end
+
+        it "returns the matching documents" do
+          from_db.should == person
+        end
+      end
     end
 
     context "chaining multiple wheres" do

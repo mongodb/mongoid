@@ -35,10 +35,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.7
       def convert(object)
         return object if metadata.polymorphic?
-        if metadata.klass.using_object_ids?
-          return BSON::ObjectId.cast!(metadata.klass, object)
-        end
-        object
+        BSON::ObjectId.convert(metadata.klass, object)
       end
     end
   end
