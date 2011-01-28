@@ -888,7 +888,9 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         let!(:post) do
-          person.posts.create(:text => "Testing")
+          person.posts.create(:text => "Testing") do |post|
+            post.content = "The Content"
+          end
         end
 
         it "sets the foreign key on the relation" do
@@ -905,6 +907,10 @@ describe Mongoid::Relations::Referenced::Many do
 
         it "saves the target" do
           post.should_not be_a_new_record
+        end
+
+        it "calls the passed block" do
+          post.content.should == "The Content"
         end
 
         it "adds the document to the target" do
@@ -1710,7 +1716,9 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the document does not exist" do
 
         let(:found) do
-          person.posts.find_or_create_by(:title => "Test")
+          person.posts.find_or_create_by(:title => "Test") do |post|
+            post.content = "The Content"
+          end
         end
 
         it "sets the new document attributes" do
@@ -1719,6 +1727,10 @@ describe Mongoid::Relations::Referenced::Many do
 
         it "returns a newly persisted document" do
           found.should be_persisted
+        end
+
+        it "calls the passed block" do
+          found.content.should == "The Content"
         end
       end
     end
@@ -1800,7 +1812,9 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the document does not exist" do
 
         let(:found) do
-          person.posts.find_or_initialize_by(:title => "Test")
+          person.posts.find_or_initialize_by(:title => "Test") do |post|
+            post.content = "The Content"
+          end
         end
 
         it "sets the new document attributes" do
@@ -1809,6 +1823,10 @@ describe Mongoid::Relations::Referenced::Many do
 
         it "returns a non persisted document" do
           found.should_not be_persisted
+        end
+
+        it "calls the passed block" do
+          found.content.should == "The Content"
         end
       end
     end
