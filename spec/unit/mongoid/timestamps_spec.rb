@@ -53,4 +53,16 @@ describe Mongoid::Timestamps do
       person.save
     end
   end
+
+  context "when the document is created" do
+
+    let(:person) do
+      Person.create
+    end
+
+    it "runs the update callbacks" do
+      person.updated_at.should_not be_nil
+      person.updated_at.should be_within(10).of(Time.now.utc)
+    end
+  end
 end
