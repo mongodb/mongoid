@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
     # given MongoDB expressions.
     class Default
 
-      attr_accessor :attribute
+      attr_accessor :attribute, :document
 
       # Creating a new matcher only requires the value.
       #
@@ -16,8 +16,8 @@ module Mongoid #:nodoc:
       # @param [ Object ] attribute The current attribute to check against.
       #
       # @since 1.0.0
-      def initialize(attribute)
-        @attribute = attribute
+      def initialize(attribute, document = nil)
+        @attribute, @document = attribute, document
       end
 
       # Return true if the attribute and value are equal, or if it is an array
