@@ -17,7 +17,7 @@ module Mongoid # :nodoc:
         #   person.addresses.push(address)
         #
         # @example Concat with other documents.
-        #   perosn.addresses.concat([ address_one, address_two ])
+        #   person.addresses.concat([ address_one, address_two ])
         #
         # @param [ Document, Array<Document> ] *args Any number of documents.
         def <<(*args)
