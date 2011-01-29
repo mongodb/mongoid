@@ -1730,6 +1730,43 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#nullify_all" do
 
+    context "when the inverse has not been loaded" do
+
+      let(:person) do
+        Person.create(:ssn => "999-99-9988")
+      end
+
+      let!(:post_one) do
+        person.posts.create(:title => "One")
+      end
+
+      let!(:post_two) do
+        person.posts.create(:title => "Two")
+      end
+
+      let(:from_db) do
+        Person.first
+      end
+
+      before do
+        from_db.posts.nullify_all
+      end
+
+      it "loads the targets before nullifying" do
+        from_db.posts.should be_empty
+      end
+
+      it "persists the base nullifications" do
+        Person.first.posts.should be_empty
+      end
+
+      it "persists the inverse nullifications" do
+        Post.all.each do |post|
+          post.person.should be_nil
+        end
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       let(:person) do

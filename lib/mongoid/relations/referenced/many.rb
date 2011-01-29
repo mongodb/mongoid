@@ -36,9 +36,9 @@ module Mongoid #:nodoc:
         #   person.posts.clear
         #
         # @return [ Many ] The relation emptied.
-        def clear
+        def clear(options = {})
           load! and tap do |relation|
-            relation.unbind(default_options)
+            relation.unbind(default_options(options))
             target.clear
           end
         end
@@ -200,13 +200,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          load! and target.each do |doc|
-            doc.send(metadata.foreign_key_setter, nil)
-            doc.send(
-              :remove_instance_variable, "@#{metadata.inverse(doc)}"
-            )
-            doc.save
-          end
+          clear(:binding => true, :continue => true, :nullify => true)
         end
         alias :nullify_all :nullify
 
@@ -248,7 +242,10 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def unbind(options = {})
           binding.unbind(options)
-          target.each(&:delete) if base.persisted?
+          if base.persisted?
+            target.each(&:delete) unless options[:binding]
+            target.each(&:save) if options[:nullify]
+          end
           []
         end
 
