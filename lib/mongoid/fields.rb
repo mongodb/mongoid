@@ -13,7 +13,7 @@ module Mongoid #:nodoc
 
     module ClassMethods #:nodoc
 
-      # Defines all the fields that are accessable on the Document
+      # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
       #
@@ -71,7 +71,7 @@ module Mongoid #:nodoc
       end
 
       # When inheriting, we want to copy the fields from the parent class and
-      # set the on the child to start, mimicing the behaviour of the old
+      # set the on the child to start, mimicking the behaviour of the old
       # class_inheritable_accessor that was deprecated in Rails edge.
       #
       # @example Inherit from this class.

@@ -105,7 +105,7 @@ module Mongoid # :nodoc:
         # in order to reindex the array after the operation occurs.
         #
         # @example Delete the document from the relation.
-        #   perosn.addresses.delete(address)
+        #   person.addresses.delete(address)
         #
         # @param [ Document ] document The document to be deleted.
         #
