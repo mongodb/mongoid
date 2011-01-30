@@ -189,6 +189,31 @@ module Mongoid #:nodoc:
       def skip(value = 0)
         clone.tap { |crit| crit.options[:skip] = value }
       end
+      
+      # Adds a criterion to the +Criteria+ that specifies what subrange should be
+      # retrieved from an array inside the document. This allows you to retrieve only
+      # a portion of the document's array at a time.
+      #
+      # @example Limit the number of comments to return to 10
+      #   Post.first.slice(:comments => 10)
+      #
+      # @example Retrieve only the last 10 comments
+      #   Post.first.slice(:comments => [-10, 10])
+      #
+      # @param [ Hash ] attributes subrange specification for each field.
+      #
+      # @return [ Criteria ] A new criteria with the added selector.
+      def slice(attributes)
+        attributes.each do |k, v|
+          attributes[k] = {"$slice" => v}
+        end
+        
+        clone.tap do |crit|
+          crit.options[:fields] = {} unless crit.options[:fields]
+          crit.options[:fields].merge!(attributes)
+            
+        end
+      end
 
       # Adds a criterion to the +Criteria+ that specifies a type or an Array of
       # type that must be matched.
