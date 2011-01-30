@@ -1293,12 +1293,26 @@ describe Mongoid::Relations::Embedded::Many do
 
     context "when providing a single criteria" do
 
-      let(:addresses) do
-        person.addresses.where(:state => "CA")
+      context "when using a simple criteria" do
+
+        let(:addresses) do
+          person.addresses.where(:state => "CA")
+        end
+
+        it "applies the criteria to the documents" do
+          addresses.should == [ address_one ]
+        end
       end
 
-      it "applies the criteria to the documents" do
-        addresses.should == [ address_one ]
+      context "when using an $or criteria" do
+
+        let(:addresses) do
+          person.addresses.any_of({ :state => "CA" }, { :state => "NY" })
+        end
+
+        it "applies the criteria to the documents" do
+          addresses.should == [ address_one, address_two ]
+        end
       end
     end
 

@@ -1,15 +1,5 @@
 # encoding: utf-8
-require "mongoid/matchers/default"
-require "mongoid/matchers/all"
-require "mongoid/matchers/exists"
-require "mongoid/matchers/gt"
-require "mongoid/matchers/gte"
-require "mongoid/matchers/in"
-require "mongoid/matchers/lt"
-require "mongoid/matchers/lte"
-require "mongoid/matchers/ne"
-require "mongoid/matchers/nin"
-require "mongoid/matchers/size"
+require "mongoid/matchers/strategies"
 
 module Mongoid #:nodoc:
 
@@ -28,28 +18,11 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if matches, false if not.
     def matches?(selector)
       selector.each_pair do |key, value|
-        return false unless matcher(key, value).matches?(value)
-      end; true
-    end
-
-    protected
-
-    # Get the matcher for the supplied key and value. Will determine the class
-    # name from the key.
-    #
-    # @example Get the matcher.
-    #   document.matcher(:title, { "$in" => [ "test" ] })
-    #
-    # @param [ Symbol, String ] key The field name.
-    # @param [ Object, Hash ] The value or selector.
-    #
-    # @return [ Matcher ] The matcher.
-    def matcher(key, value)
-      if value.is_a?(Hash)
-        name = "Mongoid::Matchers::#{value.keys.first.gsub("$", "").camelize}"
-        return name.constantize.new(attributes[key])
+        unless Strategies.matcher(self, key, value).matches?(value)
+          return false
+        end
       end
-      Default.new(attributes[key])
+      return true
     end
   end
 end
