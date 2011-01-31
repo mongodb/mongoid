@@ -261,12 +261,20 @@ describe Mongoid::Persistence do
 
         before do
           person.title = "King"
+          person.ssn = nil
           name.first_name = "Ryan"
         end
 
         it "saves the root document" do
           person.save
           person.title.should == "King"
+          person.ssn.should == nil
+        end
+
+        it "should drop the nil fields from the persisted record" do
+          person.save
+          record = Person.collection.find_one(:_id => person.id)
+          record.keys.should_not include('ssn')
         end
 
         it "saves embedded many relations" do
@@ -279,11 +287,14 @@ describe Mongoid::Persistence do
           person.name.first_name.should == "Ryan"
         end
 
-        it "persists with proper set and push modifiers" do
+        it "persists with proper set, unset and push modifiers" do
           person._updates.should == {
             "$set" => {
               "title" => "King",
               "name.first_name" => "Ryan"
+            },
+            "$unset" => {
+              "ssn" => 1
             },
             "$pushAll"=> {
               "addresses" => [ { "_id" => address.id, "street" => "Bond St" } ]

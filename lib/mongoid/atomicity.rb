@@ -55,6 +55,18 @@ module Mongoid #:nodoc:
           end
         end
         updates
+      end.tap do |updates|
+        sets, unsets = {}, {}
+
+        updates["$set"].each do |key, value|
+          if value.nil?
+            unsets[key] = 1
+          else
+            sets[key] = value
+          end
+        end
+
+        updates["$set"], updates["$unset"] = sets, unsets
       end.delete_if do |key, value|
         value.empty?
       end
