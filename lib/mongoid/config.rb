@@ -34,6 +34,7 @@ module Mongoid #:nodoc
       define_method("#{name}?") { send(name) }
     end
 
+    option :embedded_object_id, :default => true
     option :allow_dynamic_fields, :default => true
     option :include_root_in_json, :default => false
     option :parameterize_keys, :default => true

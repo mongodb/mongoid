@@ -49,8 +49,10 @@ module Mongoid #:nodoc:
     # @example Set the id.
     #   identity.identify
     def identify
-      document.id = compose.join(" ").identify if document.primary_key
-      document.id = generate_id if document.id.blank?
+      if Mongoid.embedded_object_id
+          document.id = compose.join(" ").identify if document.primary_key
+          document.id = generate_id if document.id.blank?
+      end
     end
 
     # Set the _type field on the document if the document is hereditary or in a
