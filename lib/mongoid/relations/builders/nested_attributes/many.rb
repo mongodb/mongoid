@@ -45,7 +45,7 @@ module Mongoid # :nodoc:
           # A new builder.
           def initialize(metadata, attributes, options = {})
             @attributes = attributes.with_indifferent_access.sort do |a, b|
-              a[0] <=> b[0]
+              a[0].to_i <=> b[0].to_i
             end
             @metadata = metadata
             @options = options
