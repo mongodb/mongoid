@@ -30,7 +30,8 @@ module Mongoid #:nodoc:
 
     # Return the scopes or default to an empty +Hash+.
     def scopes
-      read_inheritable_attribute(:scopes) || write_inheritable_attribute(:scopes, {})
+      class_attribute :scopes, :instance_writer => false
+      self.scopes || self.scopes = {}
     end
   end
 end
