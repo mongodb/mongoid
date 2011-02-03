@@ -225,9 +225,9 @@ module Mongoid #:nodoc:
       #
       # An Array with the type and criteria.
       def parse!(klass, embedded, *args)
-        if args[0].nil?
-          Errors::InvalidOptions.new("Calling Document#find with nil is invalid")
-        end
+        raise Errors::InvalidOptions.new(
+          :calling_document_find_with_nil_is_invalid, {}
+        ) if args[0].nil?
         type = args.delete_at(0) if args[0].is_a?(Symbol)
         criteria = translate(klass, embedded, *args)
         return [ type, criteria ]

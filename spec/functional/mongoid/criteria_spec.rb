@@ -99,4 +99,18 @@ describe Mongoid::Criteria do
       criteria.to_json.should include("\"ssn\":\"555-55-1212\"")
     end
   end
+
+  describe "#parse!" do
+
+    context "with nil args" do
+
+      it "raises an error" do
+        expect {
+          Mongoid::Criteria.parse!(Person, :all, nil)
+        }.to raise_error(Mongoid::Errors::InvalidOptions)
+      end
+
+    end
+
+  end
 end
