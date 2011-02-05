@@ -30,7 +30,6 @@ module Mongoid #:nodoc
     include Mongoid::JSON
     include Mongoid::Keys
     include Mongoid::Matchers
-    include Mongoid::MultiParameterAttributes
     include Mongoid::Modifiers
     include Mongoid::NestedAttributes
     include Mongoid::Paths
