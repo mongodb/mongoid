@@ -1,5 +1,6 @@
 class Game
   include Mongoid::Document
+  include Mongoid::Timestamps::Updated
   field :high_score, :type => Integer, :default => 500
   field :score, :type => Integer, :default => 0
   field :name
