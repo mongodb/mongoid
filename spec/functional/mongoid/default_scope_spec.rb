@@ -2,29 +2,19 @@ require 'spec_helper'
 
 describe Mongoid::DefaultScope do
 
-  let(:obj1) { DefaultScopeTestModel.create(:name => "C", :green => true) }
-  let(:obj2) { DefaultScopeTestModel.create(:name => "B", :green => true) }
-  let(:obj3) { DefaultScopeTestModel.create(:name => "A", :green => false) }
+  let!(:fir)   { Tree.create(:name => "Fir",   :evergreen => true ) }
+  let!(:pine)  { Tree.create(:name => "Pine",  :evergreen => true ) }
+  let!(:birch) { Tree.create(:name => "Birch", :evergreen => false) }
 
-  before(:all) do
-    class DefaultScopeTestModel
-      include Mongoid::Document
-
-      field :name
-      field :green, :type => Boolean
-
-      scope :verdant, where(:green => true)
-      default_scope asc(:name)
-    end
-
-    obj1; obj2; obj3
+  after do
+    Tree.delete_all
   end
 
   it "returns them in the correct order" do
-    DefaultScopeTestModel.all.entries.should == [ obj3, obj2, obj1 ]
+    Tree.all.entries.should == [ birch, fir, pine ]
   end
 
   it "respects other scopes" do
-    DefaultScopeTestModel.verdant.entries.should == [ obj2, obj1 ]
+    Tree.verdant.entries.should == [ fir, pine ]
   end
 end
