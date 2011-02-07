@@ -40,3 +40,6 @@ en:
         unsaved_document:
           You cannot call create or create! through a relational association
           relation (%{document}) who's parent (%{base}) is not already saved.
+        mixed_relations:
+          Referencing a(n) %{embedded} document from the %{root} document via a
+          relational association is not allowed since the %{embedded} is embedded.
