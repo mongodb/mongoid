@@ -15,10 +15,11 @@ module Mongoid #:nodoc:
     # value: The value to increment by.
     # options: Options to pass through to the driver.
     def inc(field, value, options = {})
-      current = send(field)
-      write_attribute(field, (current ? (current + value) : value))
+      current = self[field]
+      sum = current ? (current + value) : value 
+      write_attribute(field, sum)
       Inc.new(self, options).persist(field, value)
-      current + value
+      sum
     end
   end
 end
