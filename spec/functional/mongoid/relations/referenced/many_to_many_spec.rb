@@ -718,6 +718,23 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         person.preference_ids.should == [ preference_one.id, preference_two.id ]
       end
     end
+
+    context "when :dependent => :nullify is set" do
+      context "when :inverse_of is set" do
+      
+        let(:event) do
+          Event.create
+        end
+
+        before do
+          person.administrated_events << [event]
+        end
+
+        it "delete document" do
+          event.delete.should be_true
+        end
+      end
+    end
   end
 
   [ :delete_all, :destroy_all ].each do |method|
