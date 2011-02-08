@@ -183,7 +183,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     #
-    # @raise [ RuntimeError ] If :stored_as => :array is found.
+    # @raise [ RuntimeError ] Always
     # @since 2.0.0.rc.8
     def default_attributes
       raise "default_attributes is no longer valid. Plase use: apply_default_attributes."

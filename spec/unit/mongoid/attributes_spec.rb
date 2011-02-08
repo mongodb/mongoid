@@ -38,7 +38,6 @@ describe Mongoid::Attributes do
       context "when the attribute does not exist" do
 
         before do
-          p person.id
           person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
         end
 
