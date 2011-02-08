@@ -8,6 +8,23 @@ describe Mongoid::Relations::Referenced::One do
 
   describe "#=" do
 
+    context "when the relationship is an illegal embedded reference" do
+
+      let(:game) do
+        Game.new
+      end
+
+      let(:video) do
+        Video.new
+      end
+
+      it "raises a mixed relation error" do
+        expect {
+          game.video = video
+        }.to raise_error(Mongoid::Errors::MixedRelations)
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       context "when the parent is a new record" do
@@ -286,6 +303,19 @@ describe Mongoid::Relations::Referenced::One do
 
   describe "#build_#\{name}" do
 
+    context "when the relationship is an illegal embedded reference" do
+
+      let(:game) do
+        Game.new
+      end
+
+      it "raises a mixed relation error" do
+        expect {
+          game.build_video(:title => "Tron")
+        }.to raise_error(Mongoid::Errors::MixedRelations)
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       context "when using object ids" do
@@ -394,6 +424,19 @@ describe Mongoid::Relations::Referenced::One do
   end
 
   describe "#create_#\{name}" do
+
+    context "when the relationship is an illegal embedded reference" do
+
+      let(:game) do
+        Game.new
+      end
+
+      it "raises a mixed relation error" do
+        expect {
+          game.create_video(:title => "Tron")
+        }.to raise_error(Mongoid::Errors::MixedRelations)
+      end
+    end
 
     context "when the relation is not polymorphic" do
 

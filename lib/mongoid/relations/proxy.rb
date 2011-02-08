@@ -123,6 +123,34 @@ module Mongoid # :nodoc:
       def method_missing(name, *args, &block)
         target.send(name, *args, &block)
       end
+
+      # When the base document illegally references an embedded document this
+      # error will get raised.
+      #
+      # @example Raise the error.
+      #   relation.raise_mixed
+      #
+      # @raise [ Errors::MixedRelations ] The error.
+      #
+      # @since 2.0.0
+      def raise_mixed
+        raise Errors::MixedRelations.new(base.class, metadata.klass)
+      end
+
+      # When the base is not yet saved and the user calls create or create!
+      # on the relation, this error will get raised.
+      #
+      # @example Raise the error.
+      #   relation.raise_unsaved(post)
+      #
+      # @param [ Document ] doc The child document getting created.
+      #
+      # @raise [ Errors::UnsavedDocument ] The error.
+      #
+      # @since 2.0.0.rc.6
+      def raise_unsaved(doc)
+        raise Errors::UnsavedDocument.new(base, doc)
+      end
     end
   end
 end

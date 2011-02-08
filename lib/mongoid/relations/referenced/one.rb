@@ -44,6 +44,20 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Will load the target into an array if the target had not already been
+        # loaded.
+        #
+        # @example Load the relation into memory.
+        #   relation.load!
+        #
+        # @return [ One ] The relation.
+        #
+        # @since 2.0.0.rc.5
+        def load!(options = {})
+          raise_mixed if klass.embedded?
+          super(options)
+        end
+
         # Removes the association between the base document and the target
         # document by deleting the foreign key and the reference, orphaning
         # the target document in the process.
