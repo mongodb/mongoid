@@ -113,7 +113,7 @@ module Mongoid #:nodoc:
     # @return [ Document ] A new document.
     def initialize(attrs = nil)
       @new_record = true
-      @attributes = default_attributes
+      @attributes = apply_default_attributes
       process(attrs) do |document|
         yield self if block_given?
         identify
@@ -147,6 +147,7 @@ module Mongoid #:nodoc:
         raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
       end
       @attributes = {}.merge(reloaded || {})
+      apply_default_attributes
       reset_modifications
       tap do
         relations.keys.each do |name|
@@ -233,6 +234,7 @@ module Mongoid #:nodoc:
         if attributes["_id"]
           allocate.tap do |doc|
             doc.instance_variable_set(:@attributes, attributes)
+            doc.send(:apply_default_attributes)
             doc.setup_modifications
           end
         else

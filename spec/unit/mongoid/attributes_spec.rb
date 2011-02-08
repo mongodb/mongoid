@@ -4,25 +4,65 @@ describe Mongoid::Attributes do
 
   describe "#[]" do
 
-    let(:person) do
-      Person.new
-    end
+    context "when the document is a new record" do
 
-    context "when attribute does not exist" do
+      let(:person) do
+        Person.new
+      end
 
-      it "returns the default value" do
-        person[:age].should == 100
+      context "when attribute does not exist" do
+
+        it "returns the default value" do
+          person[:age].should == 100
+        end
+      end
+
+      context "when attribute is not accessible" do
+
+        before do
+          person.owner_id = 5
+        end
+
+        it "returns the value" do
+          person[:owner_id].should == 5
+        end
       end
     end
 
-    context "when attribute is not accessible" do
+    context "when the document is an existing record" do
 
-      before do
-        person.owner_id = 5
+      let(:person) do
+        Person.create
       end
 
-      it "returns the value" do
-        person[:owner_id].should == 5
+      context "when the attribute does not exist" do
+
+        before do
+          person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+        end
+
+        context "when found" do
+
+          let(:found) do
+            Person.find(person.id)
+          end
+
+          it "returns the default value" do
+            Person.find(person.id)[:age].should == 100
+            found[:age].should == 100
+          end
+        end
+
+        context "when reloaded" do
+
+          before do
+            person.reload
+          end
+
+          it "returns the default value" do
+            person[:age].should == 100
+          end
+        end
       end
     end
   end
@@ -531,51 +571,94 @@ describe Mongoid::Attributes do
 
   describe "#read_attribute" do
 
-    context "when attribute does not exist" do
+    context "when the document is a new record" do
 
-      before do
-        @person = Person.new
+      let(:person) do
+        Person.new
       end
 
-      it "returns the default value" do
-        @person.age.should == 100
-        @person.pets.should == false
+      context "when attribute does not exist" do
+
+        it "returns the default value" do
+          person.age.should == 100
+          person.pets.should == false
+        end
+
       end
 
+      context "when attribute is not accessible" do
+
+        before do
+          person.owner_id = 5
+        end
+
+        it "returns the value" do
+          person.read_attribute(:owner_id).should == 5
+        end
+      end
     end
 
-    context "when attribute is not accessible" do
+    context "when the document is an existing record" do
 
-      before do
-        @person = Person.new
-        @person.owner_id = 5
+      let(:person) do
+        Person.create
       end
 
-      it "returns the value" do
-        @person.read_attribute(:owner_id).should == 5
+      context "when the attribute does not exist" do
+
+        before do
+          person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+          person.reload
+        end
+
+        it "returns the default value" do
+          person.age.should == 100
+        end
       end
     end
   end
 
   describe "#attribute_present?" do
-    context "when attribute does not exist" do
-      before do
-        @person = Person.new
+
+    context "when document is a new record" do
+
+      let(:person) do
+        Person.new
       end
 
-      it "returns false" do
-        @person.attribute_present?(:owner_id).should be_false
+      context "when attribute does not exist" do
+        it "returns false" do
+          person.attribute_present?(:owner_id).should be_false
+        end
+      end
+
+      context "when attribute does exist" do
+        before do
+          person.owner_id = 5
+        end
+
+        it "returns true" do
+          person.attribute_present?(:owner_id).should be_true
+        end
       end
     end
 
-    context "when attribute does exist" do
-      before do
-        @person = Person.new
-        @person.owner_id = 5
+    context "when the document is an existing record" do
+
+      let(:person) do
+        Person.create
       end
 
-      it "returns true" do
-        @person.attribute_present?(:owner_id).should be_true
+      context "when the attribute does not exist" do
+
+        before do
+          person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+          person.reload
+        end
+
+        it "returns true" do
+          person.attribute_present?(:age).should be_true
+        end
       end
     end
   end
@@ -589,7 +672,6 @@ describe Mongoid::Attributes do
         person.remove_attribute(:title)
         person.title.should be_nil
       end
-
     end
 
     context "when the attribute does not exist" do
@@ -599,9 +681,7 @@ describe Mongoid::Attributes do
         person.remove_attribute(:title)
         person.title.should be_nil
       end
-
     end
-
   end
 
   describe "#write_attribute" do
@@ -668,14 +748,15 @@ describe Mongoid::Attributes do
 
   end
 
-  describe "#default_attributes" do
+  describe "#apply_default_attributes" do
 
     let(:person) { Person.new }
 
     it "typecasts proc values" do
       person.stubs(:defaults).returns("age" => lambda { "51" })
       person.expects(:typed_value_for).with("age", "51")
-      person.send(:default_attributes)
+      person.instance_variable_set(:@attributes, {})
+      person.send(:apply_default_attributes)
     end
 
   end
