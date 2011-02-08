@@ -172,6 +172,24 @@ module Mongoid #:nodoc:
     end
     alias :attributes= :write_attributes
 
+    # Set any missing default values in the attributes.
+    #
+    # @example Get the raw attributes after defaults have been applied.
+    #   person.apply_default_attributes
+    #
+    # @return [ Hash ] The raw attributes.
+    #
+    # @since 2.0.0.rc.8
+    def apply_default_attributes
+      (@attributes ||= {}).tap do |h|
+        defaults.each_pair do |key, val|
+          unless h.has_key?(key)
+            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) : val
+          end
+        end
+      end
+    end
+
     protected
 
     # Get the default values for the attributes.

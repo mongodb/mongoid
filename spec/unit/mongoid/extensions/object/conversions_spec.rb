@@ -46,12 +46,12 @@ describe Mongoid::Extensions::Object::Conversions do
         }
       end
 
-      let(:person) do
-        Person.instantiate(attributes)
+      let(:quiz) do
+        Quiz.instantiate(attributes)
       end
 
       it "converts the object to a hash" do
-        Person.set(person).except("_id").should == attributes.except("_id")
+        Quiz.set(quiz).except("_id").should == attributes.except("_id")
       end
     end
   end
