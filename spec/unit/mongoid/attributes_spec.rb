@@ -749,14 +749,15 @@ describe Mongoid::Attributes do
 
   end
 
-  describe "#default_attributes" do
+  describe "#apply_default_attributes" do
 
     let(:person) { Person.new }
 
     it "typecasts proc values" do
       person.stubs(:defaults).returns("age" => lambda { "51" })
       person.expects(:typed_value_for).with("age", "51")
-      person.send(:default_attributes)
+      person.instance_variable_set(:@attributes, {})
+      person.send(:apply_default_attributes)
     end
 
   end

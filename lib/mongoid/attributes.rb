@@ -172,6 +172,23 @@ module Mongoid #:nodoc:
     end
     alias :attributes= :write_attributes
 
+    protected
+
+    # Get the default values for the attributes.
+    #
+    # @example Get the defaults.
+    #   person.default_attributes
+    #
+    # @return [ Hash ] The default values for each field.
+    #
+    # @since 1.0.0
+    #
+    # @raise [ RuntimeError ] If :stored_as => :array is found.
+    # @since 2.0.0.rc.8
+    def default_attributes
+      raise "default_attributes is no longer valid. Plase use: apply_default_attributes."
+    end
+
     # Set any missing default values in the attributes.
     #
     # @example Get the raw attributes after defaults have been applied.
@@ -184,28 +201,11 @@ module Mongoid #:nodoc:
       (@attributes ||= {}).tap do |h|
         defaults.each_pair do |key, val|
           unless h.has_key?(key)
-            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) : val
+            val = val.call if val.respond_to?(:call)
+            h[key] = typed_value_for(key, val)
           end
         end
       end
-    end
-
-    protected
-
-    # Get the default values for the attributes.
-    #
-    # @example Get the defaults.
-    #   person.default_attributes
-    #
-    # @return [ Hash ] The default values for each field.
-    #
-    # @since 1.0.0
-    def default_attributes
-      default_values = defaults
-      default_values.each_pair do |key, val|
-        default_values[key] = typed_value_for(key, val.call) if val.respond_to?(:call)
-      end
-      default_values || {}
     end
 
     # Used for allowing accessor methods for dynamic attributes.

@@ -234,8 +234,8 @@ module Mongoid #:nodoc:
         if attributes["_id"]
           allocate.tap do |doc|
             doc.instance_variable_set(:@attributes, attributes)
+            doc.send(:apply_default_attributes)
             doc.setup_modifications
-            doc.apply_default_attributes
           end
         else
           new(attrs)
