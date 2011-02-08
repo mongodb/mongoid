@@ -10,10 +10,5 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include Created
     include Updated
-
-    included do
-      class_attribute :record_timestamps
-      self.record_timestamps = true
-    end
   end
 end
