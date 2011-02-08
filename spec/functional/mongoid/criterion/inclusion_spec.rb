@@ -276,6 +276,20 @@ describe Mongoid::Criterion::Inclusion do
           from_db.should == [ person ]
         end
       end
+
+      context "with different criteria on the same key" do
+
+        it "merges criteria" do
+          Person.where(:age.gt => 30).where(:age.lt => 40).should == [person]
+        end
+
+        it "typecasts criteria" do
+          before_dob = (dob - 1.month).to_s
+          after_dob = (dob + 1.month).to_s
+          Person.where(:dob.gt => before_dob).and(:dob.lt => after_dob).should == [person]
+        end
+
+      end
     end
 
     context "with untyped criteria" do

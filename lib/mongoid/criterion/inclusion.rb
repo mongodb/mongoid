@@ -147,7 +147,7 @@ module Mongoid #:nodoc:
 
           selector.each_pair do |key, value|
             if crit.selector.has_key?(key) && crit.selector[key].respond_to?(:merge!)
-              crit.selector[key].merge!(value)
+              crit.selector[key] = crit.selector[key].merge!(value)
             else
               crit.selector[key] = value
             end
