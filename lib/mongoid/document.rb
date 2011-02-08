@@ -147,8 +147,8 @@ module Mongoid #:nodoc:
         raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
       end
       @attributes = {}.merge(reloaded || {})
-      reset_modifications
       apply_default_attributes
+      reset_modifications
       tap do
         relations.keys.each do |name|
           if instance_variable_defined?("@#{name}")
