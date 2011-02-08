@@ -11,6 +11,11 @@ module Mongoid #:nodoc:
         field :updated_at, :type => Time
 
         set_callback :save, :before, :set_updated_at, :if => Proc.new {|d| d.new_record? || d.changed? }
+
+        unless methods.include? 'record_timestamps'
+          class_attribute :record_timestamps
+          self.record_timestamps = true
+        end
       end
 
       # Update the updated_at field on the Document to the current time.

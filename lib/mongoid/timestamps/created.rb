@@ -11,6 +11,11 @@ module Mongoid #:nodoc:
         field :created_at, :type => Time
 
         set_callback :create, :before, :set_created_at
+
+        unless methods.include? 'record_timestamps'
+          class_attribute :record_timestamps
+          self.record_timestamps = true
+        end
       end
 
       # Update the created_at field on the Document to the current time. This is

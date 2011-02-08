@@ -4,17 +4,17 @@ describe Mongoid::Timestamps::Updated do
 
   describe ".included" do
 
-    let(:game) do
-      Game.new
+    let(:agent) do
+      Agent.new
     end
 
     let(:fields) do
-      Game.fields
+      Agent.fields
     end
 
     before do
-      game.run_callbacks(:create)
-      game.run_callbacks(:save)
+      agent.run_callbacks(:create)
+      agent.run_callbacks(:save)
     end
 
     it "does not add created_at to the document" do
@@ -26,39 +26,39 @@ describe Mongoid::Timestamps::Updated do
     end
 
     it "forces the updated_at timestamps to UTC" do
-      game.updated_at.should be_within(10).of(Time.now.utc)
+      agent.updated_at.should be_within(10).of(Time.now.utc)
     end
 
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
-      Game.should.respond_to? :record_timestamps
+      Agent.should.respond_to? :record_timestamps
     end
   end
 
   context "when the document has not changed" do
 
-    let(:game) do
-      Game.new(:created_at => Time.now.utc)
+    let(:agent) do
+      Agent.new
     end
 
     before do
-      game.new_record = false
+      agent.new_record = false
     end
 
     it "does not run the update callbacks" do
-      game.expects(:updated_at=).never
-      game.save
+      agent.expects(:updated_at=).never
+      agent.save
     end
   end
 
   context "when the document is created" do
 
-    let(:game) do
-      Game.create
+    let(:agent) do
+      Agent.create
     end
 
     it "runs the update callbacks" do
-      game.updated_at.should_not be_nil
-      game.updated_at.should be_within(10).of(Time.now.utc)
+      agent.updated_at.should_not be_nil
+      agent.updated_at.should be_within(10).of(Time.now.utc)
     end
   end
 end
