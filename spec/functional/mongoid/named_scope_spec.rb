@@ -12,8 +12,13 @@ describe Mongoid::NamedScope do
       end
     end
 
-    before do
-      @document = Person.create(:title => "Dr.", :age => 65, :terms => true, :ssn => "123-22-8346")
+    let!(:document) do
+      Person.create(
+        :title => "Dr.",
+        :age => 65,
+        :terms => true,
+        :ssn => "123-22-8346"
+      )
     end
 
     after do
@@ -23,21 +28,21 @@ describe Mongoid::NamedScope do
     context "accessing a single named scope" do
 
       it "returns the document" do
-        Person.doctors.first.should == @document
+        Person.doctors.first.should == document
       end
     end
 
     context "chaining named scopes" do
 
       it "returns the document" do
-        Person.old.doctors.first.should == @document
+        Person.old.doctors.first.should == document
       end
     end
 
     context "mixing named scopes and class methods" do
 
       it "returns the document" do
-        Person.accepted.old.doctors.first.should == @document
+        Person.accepted.old.doctors.first.should == document
       end
     end
 
@@ -52,6 +57,13 @@ describe Mongoid::NamedScope do
       it "sorts the results" do
         docs = Person.alki
         docs.first.blood_alcohol_content.should == 0.4
+      end
+    end
+
+    context "when calling scopes on parent classes" do
+
+      it "inherits the scope" do
+        Doctor.minor.should == []
       end
     end
   end

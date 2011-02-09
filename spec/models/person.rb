@@ -102,6 +102,8 @@ class Person
     :inverse_of => :administrators,
     :dependent  => :nullify
 
+  scope :minor, where(:age.lt => 18)
+
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
     self.score_without_rescoring = score
