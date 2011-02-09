@@ -208,6 +208,18 @@ describe Mongoid::Criterion::Inclusion do
         end
       end
 
+      context "when providing multiple values on the same complex attribute" do
+
+        let(:criteria) do
+          base.where(:owner_id.ne => nil).and(:owner_id.ne => 1)
+        end
+
+        it "returns a criteria with the combined selector" do
+          criteria.selector.should ==
+            { :owner_id => { "$ne" => nil, "$ne" => 1 } }
+        end
+      end
+
       context "with complex criterion" do
 
         context "#all" do
