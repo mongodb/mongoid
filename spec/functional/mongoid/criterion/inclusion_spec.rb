@@ -229,6 +229,33 @@ describe Mongoid::Criterion::Inclusion do
     end
   end
 
+  describe "#near" do
+
+    let!(:berlin) do
+      Bar.create(:location => [ 52.30, 13.25 ])
+    end
+
+    let!(:prague) do
+      Bar.create(:location => [ 50.5, 14.26 ])
+    end
+
+    let!(:paris) do
+      Bar.create(:location => [ 48.48, 2.20 ])
+    end
+
+    let(:bars) do
+      Bar.near(:location => [ 41.23, 2.9 ])
+    end
+
+    before do
+      Bar.create_indexes
+    end
+
+    it "returns the documents sorted closest to furthest" do
+      bars.should == [ paris, prague, berlin ]
+    end
+  end
+
   describe "#where" do
 
     let(:dob) do
