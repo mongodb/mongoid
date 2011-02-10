@@ -164,4 +164,110 @@ describe Mongoid::Finders do
       end
     end
   end
+
+  describe ".find_or_create_by" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create(:title => "Senior", :ssn => "333-22-1111")
+      end
+
+      it "returns the document" do
+        Person.find_or_create_by(:title => "Senior").should == person
+      end
+    end
+
+    context "when the document is not found" do
+
+      context "when not providing a block" do
+
+        let!(:person) do
+          Person.find_or_create_by(:title => "Senorita", :ssn => "1234567")
+        end
+
+        it "creates a persisted document" do
+          person.should be_persisted
+        end
+
+        it "sets the attributes" do
+          person.title.should == "Senorita"
+        end
+      end
+
+      context "when providing a block" do
+
+        let!(:person) do
+          Person.find_or_create_by(:title => "Senorita", :ssn => "1") do |person|
+            person.pets = true
+          end
+        end
+
+        it "creates a persisted document" do
+          person.should be_persisted
+        end
+
+        it "sets the attributes" do
+          person.title.should == "Senorita"
+        end
+
+        it "calls the block" do
+          person.pets.should == true
+        end
+      end
+    end
+  end
+
+  describe ".find_or_initialize_by" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create(:title => "Senior", :ssn => "333-22-1111")
+      end
+
+      it "returns the document" do
+        Person.find_or_initialize_by(:title => "Senior").should == person
+      end
+    end
+
+    context "when the document is not found" do
+
+      context "when not providing a block" do
+
+        let!(:person) do
+          Person.find_or_initialize_by(:title => "Senorita", :ssn => "1234567")
+        end
+
+        it "creates a new document" do
+          person.should be_new
+        end
+
+        it "sets the attributes" do
+          person.title.should == "Senorita"
+        end
+      end
+
+      context "when providing a block" do
+
+        let!(:person) do
+          Person.find_or_initialize_by(:title => "Senorita", :ssn => "1") do |person|
+            person.pets = true
+          end
+        end
+
+        it "creates a new document" do
+          person.should be_new
+        end
+
+        it "sets the attributes" do
+          person.title.should == "Senorita"
+        end
+
+        it "calls the block" do
+          person.pets.should == true
+        end
+      end
+    end
+  end
 end
