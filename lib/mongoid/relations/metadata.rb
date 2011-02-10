@@ -403,8 +403,9 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_cyclic_inverse
+        underscored = class_name.underscore
         klass.relations.each_pair do |key, meta|
-          if key =~ /#{inverse_klass.name.underscore}/ &&
+          if key =~ /#{underscored.singularize}|#{underscored.pluralize}/ &&
             meta.relation != relation
             return key.to_sym
           end

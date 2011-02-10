@@ -640,18 +640,38 @@ describe Mongoid::Relations::Metadata do
 
       context "when in a cyclic relation" do
 
-        let(:metadata) do
-          described_class.new(
-            :name => :parent_role,
-            :class_name => "Role",
-            :inverse_class_name => "Role",
-            :relation => Mongoid::Relations::Embedded::In,
-            :cyclic => true
-          )
+        context "when the base name is included in the plural form" do
+
+          let(:metadata) do
+            described_class.new(
+              :name => :parent_role,
+              :class_name => "Role",
+              :inverse_class_name => "Role",
+              :relation => Mongoid::Relations::Embedded::In,
+              :cyclic => true
+            )
+          end
+
+          it "returns the name of the relation" do
+            metadata.inverse(Role.new).should == :child_roles
+          end
         end
 
-        it "returns the name of the relation" do
-          metadata.inverse(Role.new).should == :child_roles
+        context "when the base name is not included in the plural form" do
+
+          let(:metadata) do
+            described_class.new(
+              :name => :parent_entry,
+              :class_name => "Entry",
+              :inverse_class_name => "Entry",
+              :relation => Mongoid::Relations::Embedded::In,
+              :cyclic => true
+            )
+          end
+
+          it "returns the name of the relation" do
+            metadata.inverse(Entry.new).should == :child_entries
+          end
         end
       end
     end

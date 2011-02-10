@@ -726,56 +726,74 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#create" do
 
-    let(:person) do
-      Person.create(:ssn => "333-22-1234")
-    end
+    context "when the relation is not cyclic" do
 
-    let!(:address) do
-      person.addresses.create(:street => "Bond") do |address|
-        address.state = "CA"
+      let(:person) do
+        Person.create(:ssn => "333-22-1234")
+      end
+
+      let!(:address) do
+        person.addresses.create(:street => "Bond") do |address|
+          address.state = "CA"
+        end
+      end
+
+      it "appends to the target" do
+        person.reload.addresses.should == [ address ]
+      end
+
+      it "sets the base on the inverse relation" do
+        address.addressable.should == person
+      end
+
+      it "saves the document" do
+        address.should be_persisted
+      end
+
+      it "sets the parent on the child" do
+        address._parent.should == person
+      end
+
+      it "sets the metadata on the child" do
+        address.metadata.should_not be_nil
+      end
+
+      it "sets the index on the child" do
+        address._index.should == 0
+      end
+
+      it "writes to the attributes" do
+        address.street.should == "Bond"
+      end
+
+      it "calls the passed block" do
+        address.state.should == "CA"
+      end
+
+      context "when embedding a multi word named document" do
+
+        let!(:component) do
+          person.address_components.create(:street => "Test")
+        end
+
+        it "saves the embedded document" do
+          person.reload.address_components.first.should == component
+        end
       end
     end
 
-    it "appends to the target" do
-      person.reload.addresses.should == [ address ]
-    end
+    context "when the relation is cyclic" do
 
-    it "sets the base on the inverse relation" do
-      address.addressable.should == person
-    end
-
-    it "saves the document" do
-      address.should be_persisted
-    end
-
-    it "sets the parent on the child" do
-      address._parent.should == person
-    end
-
-    it "sets the metadata on the child" do
-      address.metadata.should_not be_nil
-    end
-
-    it "sets the index on the child" do
-      address._index.should == 0
-    end
-
-    it "writes to the attributes" do
-      address.street.should == "Bond"
-    end
-
-    it "calls the passed block" do
-      address.state.should == "CA"
-    end
-
-    context "when embedding a multi word named document" do
-
-      let!(:component) do
-        person.address_components.create(:street => "Test")
+      let!(:entry) do
+        Entry.create(:title => "hi")
       end
 
-      it "saves the embedded document" do
-        person.reload.address_components.first.should == component
+      let!(:child_entry) do
+        entry.child_entries.create(:title => "hello")
+      end
+
+      it "creates a new child" do
+        child_entry.should be_persisted
       end
     end
   end
