@@ -80,8 +80,8 @@ module Mongoid # :nodoc:
         # @param [ Class ] type Optional class to create the document with.
         #
         # @return [ Document ] The newly created document.
-        def create(attributes = {}, type = nil)
-          build(attributes, type).tap(&:save)
+        def create(attributes = {}, type = nil, &block)
+          build(attributes, type, &block).tap(&:save)
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -97,8 +97,8 @@ module Mongoid # :nodoc:
         # @raise [ Errors::Validations ] If a validation error occured.
         #
         # @return [ Document ] The newly created document.
-        def create!(attributes = {}, type = nil)
-          build(attributes, type).tap(&:save!)
+        def create!(attributes = {}, type = nil, &block)
+          build(attributes, type, &block).tap(&:save!)
         end
 
         # Delete the supplied document from the target. This method is proxied

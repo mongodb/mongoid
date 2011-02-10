@@ -40,11 +40,12 @@ module Mongoid #:nodoc:
       # @param [ Class ] type Optional class to build the document with.
       #
       # @return [ Document ] The new document.
-      def build(attributes = {}, type = nil)
+      def build(attributes = {}, type = nil, &block)
         instantiated(type).tap do |doc|
           append(doc, default_options(:binding => true))
           doc.write_attributes(attributes)
           doc.identify
+          block.call(doc) if block
         end
       end
       alias :new :build
@@ -59,8 +60,9 @@ module Mongoid #:nodoc:
       # @param [ Class ] type The optional type of document to create.
       #
       # @return [ Document ] The newly created document.
-      def create(attributes = nil, type = nil)
+      def create(attributes = nil, type = nil, &block)
         build(attributes, type).tap do |doc|
+          block.call(doc) if block
           doc.save if base.persisted?
         end
       end
@@ -103,8 +105,8 @@ module Mongoid #:nodoc:
       # @param [ Hash ] attrs The attributes to search or create with.
       #
       # @return [ Document ] An existing document or newly created one.
-      def find_or_create_by(attrs = {})
-        find_or(:create, attrs)
+      def find_or_create_by(attrs = {}, &block)
+        find_or(:create, attrs, &block)
       end
 
       # Find the first +Document+ given the conditions, or instantiates a new document
@@ -116,8 +118,8 @@ module Mongoid #:nodoc:
       # @param [ Hash ] attrs The attributes to search or initialize with.
       #
       # @return [ Document ] An existing document or newly instantiated one.
-      def find_or_initialize_by(attrs = {})
-        find_or(:build, attrs)
+      def find_or_initialize_by(attrs = {}, &block)
+        find_or(:build, attrs, &block)
       end
 
       # Gets the document as a serializable hash, used by ActiveModel's JSON and
@@ -164,8 +166,8 @@ module Mongoid #:nodoc:
       # @param [ Hash ] attrs The attributes to build with.
       #
       # @return [ Document ] A matching document or a new/created one.
-      def find_or(method, attrs = {})
-        find(:first, :conditions => attrs) || send(method, attrs)
+      def find_or(method, attrs = {}, &block)
+        find(:first, :conditions => attrs) || send(method, attrs, &block)
       end
     end
   end
