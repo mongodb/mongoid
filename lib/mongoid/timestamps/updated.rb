@@ -10,7 +10,9 @@ module Mongoid #:nodoc:
       included do
         field :updated_at, :type => Time
 
-        set_callback :save, :before, :set_updated_at, :if => Proc.new {|d| d.new_record? || d.changed? }
+        set_callback :save, :before, :set_updated_at, :if => Proc.new { |doc|
+          doc.new_record? || doc.changed?
+        }
 
         unless methods.include? 'record_timestamps'
           class_attribute :record_timestamps
