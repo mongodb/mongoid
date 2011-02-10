@@ -66,8 +66,8 @@ module Mongoid #:nodoc:
         # @param [ Class ] type The optional type of document to create.
         #
         # @return [ Document ] The newly created document.
-        def create(attributes = nil, type = nil)
-          build(attributes, type).tap do |doc|
+        def create(attributes = nil, type = nil, &block)
+          build(attributes, type, &block).tap do |doc|
             base.persisted? ? doc.save : raise_unsaved(doc)
           end
         end
@@ -85,8 +85,8 @@ module Mongoid #:nodoc:
         # @raise [ Errors::Validations ] If validation failed.
         #
         # @return [ Document ] The newly created document.
-        def create!(attributes = nil, type = nil)
-          build(attributes, type).tap do |doc|
+        def create!(attributes = nil, type = nil, &block)
+          build(attributes, type, &block).tap do |doc|
             base.persisted? ? doc.save! : raise_unsaved(doc)
           end
         end

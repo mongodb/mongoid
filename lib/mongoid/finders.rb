@@ -91,8 +91,8 @@ module Mongoid #:nodoc:
     # args: A +Hash+ of attributes
     #
     # <tt>Person.find_or_create_by(:attribute => "value")</tt>
-    def find_or_create_by(attrs = {})
-      find_or(:create, attrs)
+    def find_or_create_by(attrs = {}, &block)
+      find_or(:create, attrs, &block)
     end
 
     # Find the first +Document+ given the conditions, or instantiates a new document
@@ -103,8 +103,8 @@ module Mongoid #:nodoc:
     # args: A +Hash+ of attributes
     #
     # <tt>Person.find_or_initialize_by(:attribute => "value")</tt>
-    def find_or_initialize_by(attrs = {})
-      find_or(:new, attrs)
+    def find_or_initialize_by(attrs = {}, &block)
+      find_or(:new, attrs, &block)
     end
 
     # Find the first +Document+ given the conditions.
@@ -148,8 +148,8 @@ module Mongoid #:nodoc:
 
     protected
     # Find the first object or create/initialize it.
-    def find_or(method, attrs = {})
-      first(:conditions => attrs) || send(method, attrs)
+    def find_or(method, attrs = {}, &block)
+      first(:conditions => attrs) || send(method, attrs, &block)
     end
 
     # Initializes and returns the current scope stack.
