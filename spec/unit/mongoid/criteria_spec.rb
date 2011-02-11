@@ -818,21 +818,13 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe ".translate" do
+  describe "#search" do
+
+    let(:criteria) do
+      Person.criteria
+    end
 
     context "with a single argument" do
-
-      let(:criteria) do
-        stub
-      end
-
-      before do
-        Person.stubs(:criteria).returns(criteria)
-      end
-
-      let(:document) do
-        stub
-      end
 
       context "when the arg is a string" do
 
@@ -840,12 +832,8 @@ describe Mongoid::Criteria do
           BSON::ObjectId.new.to_s
         end
 
-        before do
-          criteria.expects(:id_criteria).with(id).returns(document)
-        end
-
-        it "delegates to #id_criteria" do
-          Mongoid::Criteria.translate(Person, false, id).should == document
+        it "adds the id selector" do
+          criteria.search(id)[1].selector.should == { :_id => BSON::ObjectId.from_string(id) }
         end
       end
 
@@ -855,12 +843,8 @@ describe Mongoid::Criteria do
           BSON::ObjectId.new
         end
 
-        before do
-          criteria.expects(:id_criteria).with(id).returns(document)
-        end
-
-        it "delegates to #id_criteria" do
-          Mongoid::Criteria.translate(Person, false, id).should == document
+        it "adds the id selector" do
+          criteria.search(id)[1].selector.should == { :_id => id }
         end
       end
     end
@@ -873,100 +857,93 @@ describe Mongoid::Criteria do
           []
         end
 
-        let(:documents) do
-          []
-        end
-
         before do
           3.times do
-            ids << BSON::ObjectId.new.to_s
-            documents << stub
+            ids << BSON::ObjectId.new
           end
-          Person.stubs(:criteria).returns(criteria)
-          criteria.expects(:id_criteria).with(ids).returns(documents)
         end
 
         it "delegates to #id_criteria" do
-          Mongoid::Criteria.translate(Person, false, ids).should == documents
+          criteria.search(ids.map(&:to_s))[1].selector.should ==
+            { :_id => { "$in" => ids } }
         end
       end
 
       context "when Person, :conditions => {}" do
 
-        let(:criteria) do
-          Mongoid::Criteria.translate(Person, false, :conditions => { :title => "Test" })
+        let(:crit) do
+          criteria.search(:all, :conditions => { :title => "Test" })[1]
         end
 
         it "returns a criteria with a selector from the conditions" do
-          criteria.selector.should == { :title => "Test" }
+          crit.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
-          criteria.klass.should == Person
+          crit.klass.should == Person
         end
       end
 
       context "when Person, :conditions => {:id => id}" do
 
-        let(:criteria) do
-          Mongoid::Criteria.translate(Person, false, :conditions => { :id => "1234e567" })
+        let(:crit) do
+          criteria.search(:all, :conditions => { :id => "1234e567" })[1]
         end
 
         it "returns a criteria with a selector from the conditions" do
-          criteria.selector.should == { :_id => "1234e567" }
+          crit.selector.should == { :_id => "1234e567" }
         end
 
         it "returns a criteria with klass Person" do
-          criteria.klass.should == Person
+          crit.klass.should == Person
         end
       end
 
       context "when :all, :conditions => {}" do
 
-        let(:criteria) do
-          Mongoid::Criteria.translate(Person, false, :conditions => { :title => "Test" })
+        let(:crit) do
+          criteria.search(:all, :conditions => { :title => "Test" })[1]
         end
 
         it "returns a criteria with a selector from the conditions" do
-          criteria.selector.should == { :title => "Test" }
+          crit.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
-          criteria.klass.should == Person
+          crit.klass.should == Person
         end
       end
 
       context "when :last, :conditions => {}" do
 
-        let(:criteria) do
-          Mongoid::Criteria.translate(Person, false, :conditions => { :title => "Test" })
+        let(:crit) do
+          criteria.search(:last, :conditions => { :title => "Test" })[1]
         end
 
         it "returns a criteria with a selector from the conditions" do
-          criteria.selector.should == { :title => "Test" }
+          crit.selector.should == { :title => "Test" }
         end
 
         it "returns a criteria with klass Person" do
-          criteria.klass.should == Person
+          crit.klass.should == Person
         end
       end
 
       context "when options are provided" do
 
-        let(:criteria) do
-          Mongoid::Criteria.translate(
-            Person,
-            false,
+        let(:crit) do
+          criteria.search(
+            :all,
             :conditions => { :title => "Test" }, :skip => 10
-          )
+          )[1]
         end
 
         it "sets the selector" do
-          criteria.selector.should == { :title => "Test" }
+          crit.selector.should == { :title => "Test" }
         end
 
         it "sets the options" do
-          criteria.options.should == { :skip => 10 }
+          crit.options.should == { :skip => 10 }
         end
       end
     end

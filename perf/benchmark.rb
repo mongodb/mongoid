@@ -5,7 +5,7 @@ Mongoid.configure do |config|
   config.master = Mongo::Connection.new.db("mongoid_perf_test")
 end
 
-Mongoid.master.collection("people").drop
+Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
 
 class Person
   include Mongoid::Document

@@ -247,7 +247,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           let(:criteria) do
-            base.id(id)
+            base.for_ids(id)
           end
 
           it "adds the _id query to the selector" do
@@ -255,7 +255,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "returns a copy" do
-            criteria.id(id).should_not eql(criteria)
+            criteria.for_ids(id).should_not eql(criteria)
           end
         end
 
@@ -266,7 +266,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           let(:criteria) do
-            base.id(id)
+            base.for_ids(id)
           end
 
           it "adds the _id query to the selector" do
@@ -274,7 +274,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "returns a copy" do
-            criteria.id(id).should_not eql(criteria)
+            criteria.for_ids(id).should_not eql(criteria)
           end
         end
       end
@@ -286,7 +286,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         let(:criteria) do
-          base.id(ids)
+          base.for_ids(ids)
         end
 
         it "adds the _id query to the selector" do
@@ -302,7 +302,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the _id query to the selector" do
-          base.id(ids).selector.should == { :_id => ids.first }
+          base.for_ids(ids).selector.should == { :_id => ids.first }
         end
       end
     end
@@ -327,7 +327,7 @@ describe Mongoid::Criterion::Optional do
         context "when the id is a string" do
 
           let(:criteria) do
-            base.id(id)
+            base.for_ids(id)
           end
 
           it "adds the _id query to the selector convert like BSON::ObjectId" do
@@ -335,7 +335,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "returns a copy" do
-            criteria.id(id).should_not eql(criteria)
+            criteria.for_ids(id).should_not eql(criteria)
           end
         end
 
@@ -346,7 +346,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           let(:criteria) do
-            base.id(id)
+            base.for_ids(id)
           end
 
           it "adds the _id query to the selector without cast" do
@@ -354,7 +354,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "returns a copy" do
-            criteria.id(id).should_not eql(criteria)
+            criteria.for_ids(id).should_not eql(criteria)
           end
         end
       end
@@ -366,7 +366,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         let(:criteria) do
-          base.id(ids)
+          base.for_ids(ids)
         end
 
         it "adds the _id query to the selector with all ids like BSON::ObjectId" do

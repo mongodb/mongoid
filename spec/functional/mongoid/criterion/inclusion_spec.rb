@@ -142,12 +142,26 @@ describe Mongoid::Criterion::Inclusion do
 
       context "when the id is found" do
 
-        let!(:from_db) do
-          Person.where(:title => "Sir").find(person.id)
+        context "when the additional criteria matches" do
+
+          let!(:from_db) do
+            Person.where(:title => "Sir").find(person.id)
+          end
+
+          it "returns the matching document" do
+            from_db.should == person
+          end
         end
 
-        it "returns the matching document" do
-          from_db.should == person
+        context "when the additional criteria does not match" do
+
+          let(:from_db) do
+            Person.where(:title => "Madam").find(person.id)
+          end
+
+          it "raises a not found error" do
+            expect { from_db }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
         end
       end
 

@@ -156,9 +156,8 @@ module Mongoid #:nodoc:
         # @param [ Hash ] options The options to search with.
         #
         # @return [ Document, Criteria ] The matching document(s).
-        def find(arg, options = {})
-          return criteria.id_criteria(arg) unless arg.is_a?(Symbol)
-          criteria.find(arg, :conditions => options[:conditions] || {})
+        def find(*args)
+          criteria.find(*args)
         end
 
         # Instantiate a new references_many relation. Will set the foreign key

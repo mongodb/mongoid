@@ -32,6 +32,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
 
       before do
         Post.expects(:find).with(
+          :all,
           :conditions => { "person_id" => object_id }
         ).returns([ post ])
         @documents = builder.build

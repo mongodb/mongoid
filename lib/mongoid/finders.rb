@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.count(:conditions => { :attribute => "value" })</tt>
     def count(*args)
-      Criteria.translate(self, false, *args).count
+      find(:all, *args).count
     end
 
     # Returns true if there are on document in database based on the
@@ -36,7 +36,7 @@ module Mongoid #:nodoc:
     #
     # <tt>Person.exists?(:conditions => { :attribute => "value" })</tt>
     def exists?(*args)
-      Criteria.translate(self, false, *args).limit(1).count == 1
+       find(:all, *args).limit(1).count == 1
     end
 
     # Helper to initialize a new +Criteria+ object for this class, or return
@@ -71,15 +71,18 @@ module Mongoid #:nodoc:
     #
     # A document or criteria.
     def find(*args)
-      raise Errors::InvalidOptions.new(
-        :calling_document_find_with_nil_is_invalid, {}
-      ) if args[0].nil?
-      type, criteria = Criteria.parse!(self, false, *args)
+      type, crit = criteria.search(*args)
       case type
-      when :first then return criteria.one
-      when :last then return criteria.last
+      when :first then return crit.one
+      when :last then return crit.last
+      when :ids
+        return (args[0].is_a?(Array) ? crit.entries : crit.one).tap do |result|
+          if Mongoid.raise_not_found_error && !args.flatten.blank?
+            raise Errors::DocumentNotFound.new(self, args) if result.blank?
+          end
+        end
       else
-        return criteria
+        return crit
       end
     end
 
@@ -143,7 +146,7 @@ module Mongoid #:nodoc:
     #
     # Returns paginated array of docs.
     def paginate(params = {})
-      Criteria.translate(self, false, params).paginate
+      find(:all, params).paginate
     end
 
     protected

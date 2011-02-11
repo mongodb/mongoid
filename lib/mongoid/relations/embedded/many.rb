@@ -164,15 +164,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Array<Document>, Document ] A single or multiple documents.
         def find(*args)
-          type, criteria = Criteria.parse!(self, true, *args)
-          case type
-          when :first then return criteria.one
-          when :last then return criteria.last
-          else
-            criteria.tap do |crit|
-              crit.documents = target if crit.is_a?(Criteria)
-            end
-          end
+          criteria.find(*args)
         end
 
         # Instantiate a new embeds_many relation.
@@ -226,8 +218,6 @@ module Mongoid # :nodoc:
         #
         # @return [ WillPaginate::Collection ] The paginated documents.
         def paginate(options)
-          criteria = Mongoid::Criteria.translate(metadata.klass, true, options)
-          criteria.documents = target
           criteria.paginate(options)
         end
 
@@ -383,7 +373,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents removed.
         def remove_all(conditions = {}, destroy = false)
-          criteria = find(conditions || {})
+          criteria = find(:all, conditions || {})
           criteria.size.tap do
             criteria.each do |doc|
               target.delete(doc)

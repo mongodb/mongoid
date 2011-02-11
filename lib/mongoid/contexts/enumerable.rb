@@ -5,7 +5,7 @@ require 'mongoid/contexts/enumerable/sort'
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
-      include Ids, Paging
+      include Paging
       attr_accessor :criteria
 
       delegate :blank?, :empty?, :first, :last, :to => :execute

@@ -2,7 +2,7 @@
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Mongo
-      include Ids, Paging
+      include Paging
       attr_accessor :criteria
 
       delegate :klass, :options, :selector, :to => :criteria

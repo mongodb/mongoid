@@ -17,7 +17,7 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             key = metadata.foreign_key
-            metadata.klass.find(:conditions => { key => object })
+            metadata.klass.all(:conditions => { key => object })
           end
         end
       end

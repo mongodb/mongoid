@@ -83,16 +83,18 @@ module Mongoid #:nodoc:
       #
       # @return [ Document, Criteria ] The matching document(s).
       def find(*args)
-        raise Errors::InvalidOptions.new(
-          :calling_document_find_with_nil_is_invalid, {}
-        ) if args[0].nil?
-        type, criteria = Criteria.parse!(klass, embedded, *args)
-        criteria.merge(self) if criteria.is_a?(Criteria)
+        type, crit = search(*args)
         case type
-        when :first then return criteria.one
-        when :last then return criteria.last
+        when :first then return crit.one
+        when :last then return crit.last
+        when :ids
+          return (args[0].is_a?(Array) ? crit.entries : crit.one).tap do |result|
+            if Mongoid.raise_not_found_error && !args.flatten.blank?
+              raise Errors::DocumentNotFound.new(klass, args) if result.blank?
+            end
+          end
         else
-          return criteria
+          return crit
         end
       end
 

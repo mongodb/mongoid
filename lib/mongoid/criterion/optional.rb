@@ -102,7 +102,7 @@ module Mongoid #:nodoc:
       # <tt>criteria.id(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])</tt>
       #
       # Returns: <tt>self</tt>
-      def id(*ids)
+      def for_ids(*ids)
         ids.flatten!
         if ids.size > 1
           any_in(

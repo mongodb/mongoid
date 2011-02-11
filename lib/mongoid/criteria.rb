@@ -47,7 +47,6 @@ module Mongoid #:nodoc:
       :execute,
       :first,
       :group,
-      :id_criteria,
       :last,
       :max,
       :min,
@@ -207,6 +206,55 @@ module Mongoid #:nodoc:
       entries.as_json(options)
     end
 
+    # Search for documents based on a variety of args.
+    #
+    # @example Find by an id.
+    #   criteria.search(BSON::ObjectId.new)
+    #
+    # @example Find by multiple ids.
+    #   criteria.search([ BSON::ObjectId.new, BSON::ObjectId.new ])
+    #
+    # @example Conditionally find all matching documents.
+    #   criteria.search(:all, :conditions => { :title => "Sir" })
+    #
+    # @example Conditionally find the first document.
+    #   criteria.search(:first, :conditions => { :title => "Sir" })
+    #
+    # @example Conditionally find the last document.
+    #   criteria.search(:last, :conditions => { :title => "Sir" })
+    #
+    # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
+    #   argument to search with.
+    # @param [ Hash ] options The options to search with.
+    #
+    # @return [ Array<Symbol, Criteria> ] The type and criteria.
+    #
+    # @since 2.0.0
+    def search(*args)
+      raise_invalid if args[0].nil?
+      type = args[0]
+      params = args[1] || {}
+      return [ :ids, for_ids(type) ] unless type.is_a?(Symbol)
+      conditions = params.delete(:conditions) || {}
+      if conditions.include?(:id)
+        conditions[:_id] = conditions[:id]
+        conditions.delete(:id)
+      end
+      return [ type, where(conditions).extras(params) ]
+    end
+
+    # Convenience method of raising an invalid options error.
+    #
+    # @example Raise the error.
+    #   criteria.raise_invalid
+    #
+    # @raise [ Errors::InvalidOptions ] The error.
+    #
+    # @since 2.0.0
+    def raise_invalid
+      raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {})
+    end
+
     class << self
 
       # Encaspulates the behavior of taking arguments and parsing them into a
@@ -225,43 +273,7 @@ module Mongoid #:nodoc:
       #
       # An Array with the type and criteria.
       def parse!(klass, embedded, *args)
-        raise Errors::InvalidOptions.new(
-          :calling_document_find_with_nil_is_invalid, {}
-        ) if args[0].nil?
-        type = args.delete_at(0) if args[0].is_a?(Symbol)
-        criteria = translate(klass, embedded, *args)
-        return [ type, criteria ]
-      end
-
-      # Translate the supplied arguments into a +Criteria+ object.
-      #
-      # If the passed in args is a single +String+, then it will
-      # construct an id +Criteria+ from it.
-      #
-      # If the passed in args are a type and a hash, then it will construct
-      # the +Criteria+ with the proper selector, options, and type.
-      #
-      # Options:
-      #
-      # args: either a +String+ or a +Symbol+, +Hash combination.
-      #
-      # Example:
-      #
-      # <tt>Criteria.translate(Person, "4ab2bc4b8ad548971900005c")</tt>
-      # <tt>Criteria.translate(Person, :conditions => { :field => "value"}, :limit => 20)</tt>
-      def translate(*args)
-        klass = args[0]
-        embedded = args[1]
-        params = args[2] || {}
-        unless params.is_a?(Hash)
-          return klass.criteria(embedded).id_criteria(params)
-        end
-        conditions = params.delete(:conditions) || {}
-        if conditions.include?(:id)
-          conditions[:_id] = conditions[:id]
-          conditions.delete(:id)
-        end
-        return klass.criteria(embedded).where(conditions).extras(params)
+        klass.criteria(embedded).search(*args)
       end
     end
 
