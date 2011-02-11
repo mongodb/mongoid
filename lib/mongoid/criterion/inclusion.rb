@@ -85,16 +85,11 @@ module Mongoid #:nodoc:
       def find(*args)
         type, crit = search(*args)
         case type
-        when :first then return crit.one
-        when :last then return crit.last
-        when :ids
-          return (args[0].is_a?(Array) ? crit.entries : crit.one).tap do |result|
-            if Mongoid.raise_not_found_error && !args.flatten.blank?
-              raise Errors::DocumentNotFound.new(klass, args) if result.blank?
-            end
-          end
+        when :first then crit.one
+        when :last then crit.last
+        when :ids then execute_or_raise(args, crit)
         else
-          return crit
+          crit
         end
       end
 
@@ -153,6 +148,29 @@ module Mongoid #:nodoc:
             else
               crit.selector[key] = value
             end
+          end
+        end
+      end
+
+      private
+
+      # Execute the criteria or raise an error if no documents found.
+      #
+      # @example Execute or raise
+      #   criteria.execute_or_raise(id, criteria)
+      #
+      # @param [ Object ] args The arguments passed.
+      # @param [ Criteria ] criteria The criteria to execute.
+      #
+      # @raise [ Errors::DocumentNotFound ] If nothing returned.
+      #
+      # @return [ Document, Array<Document> ] The document(s).
+      #
+      # @since 2.0.0
+      def execute_or_raise(args, criteria)
+        (args[0].is_a?(Array) ? criteria.entries : criteria.one).tap do |result|
+          if Mongoid.raise_not_found_error && !args.flatten.blank?
+            raise Errors::DocumentNotFound.new(klass, args) if result.blank?
           end
         end
       end
