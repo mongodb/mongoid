@@ -28,7 +28,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
-        criteria.expects(:search).with(:all, conditions)
+        criteria.expects(:find).with(:all, conditions)
       end
 
       it "finds from the collection and instantiate objects for each returned" do
@@ -40,7 +40,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
-        criteria.expects(:search).with(:all, nil)
+        criteria.expects(:find).with(:all, nil)
       end
 
       it "finds from the collection and instantiate objects for each returned" do
@@ -85,7 +85,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
-        criteria.expects(:search).with(:all, conditions).returns([ :all, criteria ])
+        criteria.expects(:find).with(:all, conditions).returns(criteria)
         criteria.expects(:count).returns(10)
       end
 
@@ -98,7 +98,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
-        criteria.expects(:search).with(:all, nil).returns([ :all, criteria ])
+        criteria.expects(:find).with(:all, nil).returns(criteria)
         criteria.expects(:count).returns(10)
       end
 
@@ -122,7 +122,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
-        criteria.expects(:search).with(:all, conditions).returns([ :all, criteria ])
+        criteria.expects(:find).with(:all, conditions).returns(criteria)
         criteria.expects(:limit).with(1).returns(criteria)
       end
 
@@ -153,7 +153,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
-        criteria.expects(:search).with(:all, nil).returns([ :all, criteria ])
+        criteria.expects(:find).with(:all, nil).returns(criteria)
         criteria.expects(:limit).with(1).returns(criteria)
       end
 

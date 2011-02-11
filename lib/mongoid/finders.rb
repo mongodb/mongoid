@@ -71,19 +71,7 @@ module Mongoid #:nodoc:
     #
     # A document or criteria.
     def find(*args)
-      type, crit = criteria.search(*args)
-      case type
-      when :first then return crit.one
-      when :last then return crit.last
-      when :ids
-        return (args[0].is_a?(Array) ? crit.entries : crit.one).tap do |result|
-          if Mongoid.raise_not_found_error && !args.flatten.blank?
-            raise Errors::DocumentNotFound.new(self, args) if result.blank?
-          end
-        end
-      else
-        return crit
-      end
+      criteria.find(*args)
     end
 
     # Find the first +Document+ given the conditions, or creates a new document
