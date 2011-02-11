@@ -38,6 +38,23 @@ describe Mongoid::NestedAttributes do
       it "sets the nested attributes" do
         person.addresses.first.street.should == "Alexanderstr"
       end
+
+      context "when there are 10 or more child records" do
+
+        let(:person) do
+          Person.new(:addresses => addresses)
+        end
+
+        let(:addresses) do
+          ('0'..'10').inject({}) do |addresses,i|
+            addresses.merge(i => {:number => i})
+          end
+        end
+
+        it "should preserve the order of the children" do
+          person.addresses.map(&:number).should == (0..10).to_a
+        end
+      end
     end
 
     context "when the relation is an embedded in" do
