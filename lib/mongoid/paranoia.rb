@@ -42,19 +42,19 @@ module Mongoid #:nodoc:
     #
     # Example:
     #
-    # <tt>document._remove</tt>
+    # <tt>document.remove</tt>
     #
     # Returns:
     #
     # true
-    def _remove(options = {})
+    def remove(options = {})
       now = Time.now
       collection.update({ :_id => self.id }, { '$set' => { :deleted_at => Time.now } })
       @attributes["deleted_at"] = now
       true
     end
 
-    alias :delete :_remove
+    alias :delete :remove
 
     # Determines if this document is destroyed.
     #

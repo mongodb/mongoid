@@ -56,7 +56,7 @@ describe Mongoid::Paranoia do
     end
   end
 
-  describe "#_remove" do
+  describe "#destroy" do
 
     before do
       @post = ParanoidPost.new
@@ -69,19 +69,44 @@ describe Mongoid::Paranoia do
       collection.expects(:update).with(
         { :_id => @post.id }, { "$set" => { :deleted_at => @time } }
       ).returns(true)
-      @post._remove
+      @post.destroy
     end
 
     it "sets the deleted flag" do
       collection.expects(:update).with(
         { :_id => @post.id }, { "$set" => { :deleted_at => @time } }
       ).returns(true)
-      @post._remove
+      @post.destroy
       @post.destroyed?.should == true
     end
   end
 
-  describe "#_restore" do
+  describe "#remove" do
+
+    before do
+      @post = ParanoidPost.new
+      @post.expects(:collection).returns(collection)
+      @time = Time.now
+      Time.stubs(:now).returns(@time)
+    end
+
+    it "sets the deleted_at flag in the database" do
+      collection.expects(:update).with(
+        { :_id => @post.id }, { "$set" => { :deleted_at => @time } }
+      ).returns(true)
+      @post.remove
+    end
+
+    it "sets the deleted flag" do
+      collection.expects(:update).with(
+        { :_id => @post.id }, { "$set" => { :deleted_at => @time } }
+      ).returns(true)
+      @post.remove
+      @post.destroyed?.should == true
+    end
+  end
+
+  describe "#restore" do
 
     before do
       @post = ParanoidPost.new(:deleted_at => Time.now)
