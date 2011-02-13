@@ -29,6 +29,21 @@ describe Mongoid::Document do
     end
   end
 
+  context "when setting bson id fields to empty strings" do
+
+    let(:post) do
+      Post.new
+    end
+
+    before do
+      post.person_id = ""
+    end
+
+    it "converts them to nil" do
+      post.person_id.should be_nil
+    end
+  end
+
   context "creating anonymous documents" do
 
     context "when defining collection" do

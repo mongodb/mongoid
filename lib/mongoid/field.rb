@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
         type.set(object)
       else
         if object.blank?
-          type.set(object)
+          type.set(object) if object.is_a?(Array)
         else
           options[:metadata].constraint.convert(object)
         end
