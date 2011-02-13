@@ -6,6 +6,8 @@ class Animal
 
   embedded_in :person
 
+  validates_format_of :name, :without => /\$\$\$/
+
   accepts_nested_attributes_for :person
 
   def tag_list
