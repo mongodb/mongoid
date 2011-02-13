@@ -580,6 +580,21 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       context "when the relation is not polymorphic" do
 
+        context "when using string keys" do
+
+          let(:agent) do
+            Agent.create(:number => "007")
+          end
+
+          before do
+            agent.accounts.create(:name => "test")
+          end
+
+          it "does not convert the string key to an object id" do
+            agent.account_ids.should == [ "test" ]
+          end
+        end
+
         context "when the parent is a new record" do
 
           let(:person) do
@@ -745,14 +760,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     context "when :dependent => :nullify is set" do
+
       context "when :inverse_of is set" do
-      
+
         let(:event) do
           Event.create
         end
 
         before do
-          person.administrated_events << [event]
+          person.administrated_events << [ event ]
         end
 
         it "delete document" do
