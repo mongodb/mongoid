@@ -235,8 +235,10 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:person_id)
       end
 
-      it "does not add associated validations" do
-        klass._validators.should be_empty
+      it "adds associated validations" do
+        klass._validators[:person].first.should be_a(
+          Mongoid::Validations::ReferencedValidator
+        )
       end
 
       context "metadata properties" do
@@ -287,7 +289,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         klass._validators[:posts].first.should be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validations::ReferencedValidator
         )
       end
 
@@ -408,7 +410,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         klass._validators[:game].first.should be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validations::ReferencedValidator
         )
       end
 

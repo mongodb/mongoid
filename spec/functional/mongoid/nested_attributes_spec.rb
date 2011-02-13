@@ -136,7 +136,7 @@ describe Mongoid::NestedAttributes do
     end
   end
 
-  describe "##{name}_attributes=" do
+  describe '##{name}_attributes=' do
 
     context "when the parent document is new" do
 
@@ -527,6 +527,18 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.pet_attributes = { :name => "$$$" }
+          end
+
+          it "propagates invalidity to parent" do
+            person.pet.should_not be_valid
+            person.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is embedded in" do
@@ -737,6 +749,18 @@ describe Mongoid::NestedAttributes do
                   end
                 end
               end
+            end
+          end
+
+          context "when the nested document is invalid" do
+
+            before do
+              animal.person_attributes = { :ssn => '$$$' }
+            end
+
+            it "does not propagate invalidity to parent" do
+              animal.person.should_not be_valid
+              animal.should be_valid
             end
           end
         end
@@ -1337,6 +1361,20 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.addresses_attributes = {
+              "0" => { :street => '123' }
+            }
+          end
+
+          it "propagates invalidity to parent" do
+            person.addresses.first.should_not be_valid
+            person.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is a references one" do
@@ -1709,6 +1747,18 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.game_attributes = { :name => '$$$' }
+          end
+
+          it "propagates invalidity to parent" do
+            person.game.should_not be_valid
+            person.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is referenced in" do
@@ -1919,6 +1969,17 @@ describe Mongoid::NestedAttributes do
                   end
                 end
               end
+            end
+          end
+
+          context "when the nested document is invalid" do
+            before do
+              game.person_attributes = { :ssn => '$$$' }
+            end
+
+            it "propagates invalidity to parent" do
+              game.person.should_not be_valid
+              game.should_not be_valid
             end
           end
         end
@@ -2544,6 +2605,20 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.posts_attributes = {
+              "0" => { :title => "$$$" }
+            }
+          end
+
+          it "propagates invalidity to parent" do
+            person.should_not be_valid
+            person.posts.first.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is a references many to many" do
@@ -3164,6 +3239,19 @@ describe Mongoid::NestedAttributes do
                 end
               end
             end
+          end
+        end
+
+        context "when the nested document is invalid" do
+          before do
+            person.preferences_attributes = {
+              "0" => { :name => 'x' }
+            }
+          end
+
+          it "propagates invalidity to parent" do
+            person.preferences.first.should_not be_valid
+            person.should_not be_valid
           end
         end
       end

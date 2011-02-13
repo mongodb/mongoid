@@ -8,6 +8,8 @@ class Game
   accepts_nested_attributes_for :person
   enslave and cache
 
+  validates_format_of :name, :without => /\$\$\$/
+
   attr_protected :_id
 
   set_callback(:initialize, :after) do |document|
