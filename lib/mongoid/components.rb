@@ -7,9 +7,7 @@ module Mongoid #:nodoc
     # module, to keep the document class from getting too cluttered.
     included do
       extend ActiveModel::Translation
-      extend Mongoid::DefaultScope
       extend Mongoid::Finders
-      extend Mongoid::NamedScope
     end
 
     include ActiveModel::Conversion
@@ -21,6 +19,7 @@ module Mongoid #:nodoc
     include Mongoid::Attributes
     include Mongoid::Collections
     include Mongoid::Copyable
+    include Mongoid::DefaultScope
     include Mongoid::Dirty
     include Mongoid::Extras
     include Mongoid::Fields
@@ -31,6 +30,7 @@ module Mongoid #:nodoc
     include Mongoid::Keys
     include Mongoid::Matchers
     include Mongoid::Modifiers
+    include Mongoid::NamedScope
     include Mongoid::NestedAttributes
     include Mongoid::Paths
     include Mongoid::Persistence

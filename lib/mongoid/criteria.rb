@@ -31,7 +31,15 @@ module Mongoid #:nodoc:
     include Criterion::Inspection
     include Criterion::Optional
 
-    attr_accessor :collection, :documents, :embedded, :ids, :klass, :options, :selector
+    attr_accessor \
+      :collection,
+      :default_applied,
+      :documents,
+      :embedded,
+      :ids,
+      :klass,
+      :options,
+      :selector
 
     delegate \
       :aggregate,

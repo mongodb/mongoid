@@ -39,16 +39,6 @@ module Mongoid #:nodoc:
        find(:all, *args).limit(1).count == 1
     end
 
-    # Helper to initialize a new +Criteria+ object for this class, or return
-    # the currently scoped +Criteria+ object.
-    #
-    # Example:
-    #
-    # <tt>Person.criteria</tt>
-    def criteria(embedded = false)
-      scope_stack.last || Criteria.new(self, embedded)
-    end
-
     # Find a +Document+ in several different ways.
     #
     # If a +String+ is provided, it will be assumed that it is a
@@ -141,24 +131,6 @@ module Mongoid #:nodoc:
     # Find the first object or create/initialize it.
     def find_or(method, attrs = {}, &block)
       first(:conditions => attrs) || send(method, attrs, &block)
-    end
-
-    # Initializes and returns the current scope stack.
-    def scope_stack
-      scope_stack_for = Thread.current[:mongoid_scope_stack] ||= {}
-      scope_stack_for[object_id] ||= []
-    end
-
-    # Pushes the provided criteria onto the scope stack, and removes it after the
-    # provided block is yielded.
-    def with_scope(criteria)
-      scope_stack = self.scope_stack
-      scope_stack << criteria
-      begin
-        yield criteria
-      ensure
-        scope_stack.pop
-      end
     end
   end
 end
