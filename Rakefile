@@ -6,6 +6,7 @@ require "spec/rake/spectask"
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
 
+task :gem => :build
 task :build do
   system "gem build mongoid.gemspec"
 end
@@ -15,6 +16,8 @@ task :install => :build do
 end
 
 task :release => :build do
+  system "git tag -a #{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
+  system "git push --tags"
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
