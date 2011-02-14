@@ -5,15 +5,14 @@ $:.unshift lib unless $:.include?(lib)
 require "mongoid/version"
 
 Gem::Specification.new do |s|
-  s.name        = "mongoid-with-auth"
+  s.name        = "mongoid"
   s.version     = Mongoid::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Durran Jordan"]
   s.email       = ["durran@gmail.com"]
   s.homepage    = "http://mongoid.org"
   s.summary     = "Elegent Persistance in Ruby for MongoDB."
-  s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby.
-  This version supports authentication to MongoDB with username and password"
+  s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
 
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "mongoid"
