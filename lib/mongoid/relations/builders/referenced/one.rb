@@ -17,6 +17,7 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             if object.is_a?(Hash)
+              object.delete(:binding)
               return Mongoid::Factory.build(metadata.klass, object)
             end
             metadata.klass.first(
