@@ -227,4 +227,131 @@ describe Mongoid::Relations::Accessors do
       end
     end
   end
+
+  context "when setting relations to empty values" do
+
+    context "when the document is a referenced in" do
+
+      let(:post) do
+        Post.new
+      end
+
+      context "when setting the relation directly" do
+
+        before do
+          post.person = ""
+        end
+
+        it "converts them to nil" do
+          post.person.should be_nil
+        end
+      end
+
+      context "when setting the foreign key" do
+
+        before do
+          post.person_id = ""
+        end
+
+        it "converts it to nil" do
+          post.person_id.should be_nil
+        end
+      end
+    end
+
+    context "when the document is a references one" do
+
+      let(:person) do
+        Person.new
+      end
+
+      context "when setting the relation directly" do
+
+        before do
+          person.game = ""
+        end
+
+        it "converts them to nil" do
+          person.game.should be_nil
+        end
+      end
+
+      context "when setting the foreign key" do
+
+        let(:game) do
+          Game.new
+        end
+
+        before do
+          game.person_id = ""
+        end
+
+        it "converts it to nil" do
+          game.person_id.should be_nil
+        end
+      end
+    end
+
+    context "when the document is a references many" do
+
+      let(:person) do
+        Person.new
+      end
+
+      context "when setting the relation directly" do
+
+        before do
+          person.posts = [ "", "" ]
+        end
+
+        it "does not add them" do
+          person.posts.should be_empty
+        end
+      end
+
+      context "when setting the foreign key" do
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          post.person_id = ""
+        end
+
+        it "converts it to nil" do
+          post.person.should be_nil
+        end
+      end
+    end
+
+    context "when the document is a references many to many" do
+
+      let(:person) do
+        Person.new
+      end
+
+      context "when setting the relation directly" do
+
+        before do
+          person.preferences = [ "", "" ]
+        end
+
+        it "does not add them" do
+          person.preferences.should be_empty
+        end
+      end
+
+      context "when setting the foreign key" do
+
+        before do
+          person.preference_ids = [ "", "" ]
+        end
+
+        it "does not add them" do
+          person.preference_ids.should be_empty
+        end
+      end
+    end
+  end
 end

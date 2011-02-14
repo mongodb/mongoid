@@ -40,6 +40,28 @@ describe Mongoid::Extensions::ObjectId::Conversions do
         end
       end
 
+      context "when provided an array of nils" do
+
+        let(:converted) do
+          BSON::ObjectId.convert(Person, [ nil, nil ])
+        end
+
+        it "returns an empty array" do
+          converted.should be_empty
+        end
+      end
+
+      context "when provided an array of empty strings" do
+
+        let(:converted) do
+          BSON::ObjectId.convert(Person, [ "", "" ])
+        end
+
+        it "returns an empty array" do
+          converted.should be_empty
+        end
+      end
+
       context "when provided a single string" do
 
         context "when the string is a valid object id" do
@@ -59,6 +81,17 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             expect {
               BSON::ObjectId.convert(Person, composite_key)
             }.to raise_error(BSON::InvalidObjectId)
+          end
+        end
+
+        context "when the string is empty" do
+
+          let(:converted) do
+            BSON::ObjectId.convert(Person, "")
+          end
+
+          it "converts to nil" do
+            converted.should be_nil
           end
         end
       end
