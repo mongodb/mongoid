@@ -12,6 +12,23 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
 
+      # Gets either the last scope on the stack or creates a new criteria.
+      #
+      # @example Get the last or new.
+      #   Person.scoping(true)
+      #
+      # @param [ true, false ] embedded Is this scope for an embedded doc?
+      # @param [ true, false ] scoped Are we applying default scoping?
+      #
+      # @return [ Criteria ] The last scope or a new one.
+      #
+      # @since 2.0.0
+      def criteria(embedded = false, scoped = true)
+        scope_stack.last || Criteria.new(self, embedded).tap do |crit|
+          return crit.fuse(default_scoping) if default_scoping && scoped
+        end
+      end
+
       # Creates a named_scope for the +Document+, similar to ActiveRecord's
       # named_scopes. +NamedScopes+ are proxied +Criteria+ objects that can be
       # chained.
@@ -55,14 +72,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def scoped(embedded = false)
-        scoping(embedded).tap do |criteria|
-          if default_scoping && !criteria.default_applied
-            criteria.default_applied = true
-            return criteria.fuse(default_scoping)
-          end
-        end
+        criteria(embedded, true)
       end
-      alias :criteria :scoped
 
       # Initializes and returns the current scope stack.
       #
@@ -88,7 +99,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def unscoped(embedded = false)
-        scoping(embedded)
+        criteria(embedded, false)
       end
 
       # Pushes the provided criteria onto the scope stack, and removes it after the
@@ -110,22 +121,6 @@ module Mongoid #:nodoc:
         ensure
           scope_stack.pop
         end
-      end
-
-      private
-
-      # Gets either the last scope on the stack or creates a new criteria.
-      #
-      # @example Get the last or new.
-      #   Person.scoping(true)
-      #
-      # @param [ true, false ] embedded Is this scope for an embedded doc?
-      #
-      # @return [ Criteria ] The last scope or a new one.
-      #
-      # @since 2.0.0
-      def scoping(embedded = false)
-        scope_stack.last || Criteria.new(self, embedded)
       end
     end
   end

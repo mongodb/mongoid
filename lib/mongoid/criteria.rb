@@ -33,7 +33,6 @@ module Mongoid #:nodoc:
 
     attr_accessor \
       :collection,
-      :default_applied,
       :documents,
       :embedded,
       :ids,
