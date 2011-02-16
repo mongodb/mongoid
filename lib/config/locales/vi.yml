@@ -4,68 +4,42 @@ en:
       messages:
         taken:
           đã bị lấy
-          # is already taken
         document_not_found:
           Không tìm thấy văn bản cho lớp %{klass} với định danh %{identifiers}.
-          # Document not found for class %{klass} with id(s) %{identifiers}.
         invalid_database:
           Cơ sở dữ liệu nên là Mongo::DB, không phải %{name}.
-          # Database should be a Mongo::DB, not %{name}.
         invalid_type:
           Trường được định nghĩa là một %{klass}, nhưng nhận được %{other} với 
           giá trị %{value}.
-          # Field was defined as a(n) %{klass}, but received a %{other} with
-          # the value %{value}.
         unsupported_version:
           MongoDB %{version} không được hỗ trợ, xin vui lòng nâng cấp
           lên %{mongo_version}.
-          # MongoDB %{version} not supported, please upgrade
-          # to %{mongo_version}.
         validations:
           Kiểm định không thành công - %{errors}.
-          # Validation failed - %{errors}.
         invalid_collection:
           Không được phép truy cập tập văn bản cuả %{klass} vì đây 
           là một văn bản nhúng, xin vui lòng truy cập tập văn bản từ 
           văn bản gốc.
-          # Access to the collection for %{klass} is not allowed since it
-          # is an embedded document, please access a collection from
-          # the root document.
         invalid_field:
           Không được phép định nghĩa tên trường là %{name}. Không định nghĩa 
           tên trường trùng với các thuộc tính có sẵn hoặc các tên hàm cuả Mongoid.
           Sử dụng Use Document#instance_methods để xem danh sách tên đã được dùng.
-          # Defining a field named %{name} is not allowed. Do not define
-          # fields that conflict with Mongoid internal attributes or method
-          # names. Use Document#instance_methods to see what names this includes.
         too_many_nested_attribute_records:
           Số lượng các thuộc tính lồng cho %{association} bị giới hạn 
           ở %{limit} bản ghi.
-          # Accepting nested attributes for %{association} is limited
-          # to %{limit} records.
         embedded_in_must_have_inverse_of:
           Phải cho thêm inverse_of vào lực chọn cuả kết hợp embedded_in.
-          # Options for embedded_in association must include inverse_of.
         dependent_only_references_one_or_many:
           Lựa chọn dependent => destroy|delete
           chỉ có hiệu lực với kết hợp references_one hoặc references_many.
-          # The dependent => destroy|delete option that was supplied
-          # is only valid on references_one or references_many associations.
         association_cant_have_inverse_of:
           Không được phép định nghĩa inverse_of cho kết hợp này. Chỉ 
           sử dụng lựa chọn này cho embedded_in or references_many as array.
-          # Defining an inverse_of on this association is not allowed. Only
-          # use this option on embedded_in or references_many as array.
         calling_document_find_with_nil_is_invalid:
           Không được phép gọi Document#find với giá trị nil
-          # Calling Document#find with nil is invalid
         unsaved_document:
           Bạn không được gọi create hoặc create! thông qua một quan hệ kết hợp 
           mà văn bản gốc (%{base}) chưa được lưu.
-          # You cannot call create or create! through a relational association
-          # relation (%{document}) who's parent (%{base}) is not already saved.
         mixed_relations:
           Không được phép tham chiếu một văn bản %{embedded} từ văn bản %{root} thông qua một 
           quan hệ kết hợp vì %{embedded} là kiểu nhúng.
-          # Referencing a(n) %{embedded} document from the %{root} document via a
-          # relational association is not allowed since the %{embedded} is embedded.
