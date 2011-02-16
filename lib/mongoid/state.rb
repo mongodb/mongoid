@@ -30,14 +30,15 @@ module Mongoid #:nodoc:
       @new_record = saved
     end
 
-    # Checks if the document has been saved to the database.
+    # Checks if the document has been saved to the database. Returns false
+    # if the document has been destroyed.
     #
     # @example Is the document persisted?
     #   person.persisted?
     #
     # @return [ true, false ] True if persisted, false if not.
     def persisted?
-      !new_record?
+      !new_record? && !destroyed?
     end
 
     # Returns true if the +Document+ has been succesfully destroyed, and false

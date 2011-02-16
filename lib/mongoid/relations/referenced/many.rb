@@ -244,7 +244,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def unbind(options = {})
           binding.unbind(options)
-          if base.persisted?
+          unless base.new_record?
             target.each(&:delete) unless options[:binding]
             target.each(&:save) if options[:nullify]
           end

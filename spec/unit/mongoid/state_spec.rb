@@ -81,7 +81,18 @@ describe Mongoid::State do
     end
 
     it "delegates to new_record?" do
-      person.persisted?.should be_false
+      person.should_not be_persisted
+    end
+
+    context "when the object has been destroyed" do
+      before do
+        person.save
+        person.destroy
+      end
+
+      it "returns false" do
+        person.should_not be_persisted
+      end
     end
   end
 
