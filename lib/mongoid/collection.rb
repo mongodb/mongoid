@@ -122,6 +122,29 @@ module Mongoid #:nodoc
       @slaves ||= Collections::Slaves.new(slaves, @name)
     end
 
+    # Updates one or more documents in the collection.
+    #
+    # @example Update documents.
+    #   collection.update(
+    #     { "_id" => BSON::OjectId.new },
+    #     { "$push" => { "addresses" => { "_id" => "street" } } },
+    #     :safe => true
+    #   )
+    #
+    # @param [ Hash ] selector The document selector.
+    # @param [ Hash ] document The modifier.
+    # @param [ Hash ] options The options.
+    #
+    # @since 2.0.0
+    def update(selector, document, options = {})
+      updater = Thread.current[:mongoid_atomic_update]
+      if updater
+        updater.consume(selector, document, options)
+      else
+        master.update(selector, document, options)
+      end
+    end
+
     protected
 
     # Determine if the read is going to the master or the slaves.

@@ -6,6 +6,7 @@ module Mongoid # :nodoc:
       # This class handles the behaviour for a document that embeds many other
       # documents within in it as an array.
       class Many < Relations::Many
+        include Atomic
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
@@ -26,7 +27,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def bind(options = {})
           binding.bind(options)
-          target.each(&:save) if base.persisted? && !options[:binding]
+          if base.persisted? && !options[:binding]
+            atomically(:$set) { target.each(&:save) }
+          end
         end
 
         # Bind the inverse relation between a single document in this proxy
@@ -238,8 +241,10 @@ module Mongoid # :nodoc:
           tap do |relation|
             relation.target = new_target || []
             if !new_target.blank?
-              unbind(old_target, options)
-              bind(options)
+              atomically(:$set) do
+                unbind(old_target, options)
+                bind(options)
+              end
             else
               unbind(old_target, options)
             end

@@ -14,7 +14,7 @@ module Mongoid # :nodoc:
 
       attr_accessor :base, :loaded, :metadata, :target
 
-      # Backwards compatibiloty with Mongoid beta releases.
+      # Backwards compatibility with Mongoid beta releases.
       delegate :klass, :to => :metadata
 
       # Convenience for setting the target and the metadata properties since
@@ -29,37 +29,23 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def init(base, target, metadata, &block)
-        @base, @building, @target, @metadata = base, false, target, metadata
-        yield block if block_given?
+        @base, @target, @metadata = base, target, metadata
+        block.call if block
         extend Module.new(&metadata.extension) if metadata.extension?
       end
 
       protected
 
-      # Yields to the block to allow the building flag to get set and unset for
-      # the supplied code.
+      # Get the collection from the root of the hierarchy.
       #
-      # @example Set the building status.
-      #   person.building { @target << Post.new }
+      # @example Get the collection.
+      #   relation.collection
       #
-      # @since 2.0.0.rc.1
-      def building(&block)
-        @building = true
-        yield block if block_given?
-        @building = false
-      end
-
-      # Convenience method for determining if we are building an association.
-      # We never want to save in this case.
+      # @return [ Collection ] The root's collection.
       #
-      # @example Are we currently building?
-      #   person.posts.building?
-      #
-      # @return [ true, false ] True if currently building, false if not.
-      #
-      # @since 2.0.0.rc.1
-      def building?
-        !!@building
+      # @since 2.0.0
+      def collection
+        @collection ||= base._root.collection
       end
 
       # Return a new document for the type of class we want to instantiate.
