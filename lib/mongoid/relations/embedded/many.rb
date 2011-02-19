@@ -241,6 +241,7 @@ module Mongoid # :nodoc:
           tap do |relation|
             relation.target = new_target || []
             if !new_target.blank?
+              reindex
               atomically(:$set) do
                 unbind(old_target, options)
                 bind(options)

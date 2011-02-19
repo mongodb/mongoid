@@ -90,6 +90,20 @@ module Mongoid # :nodoc:
         instance_variable_set("@#{name}", relation)
       end
 
+      # Replace an existing relation with a new one.
+      #
+      # @example Replace the relation.
+      #   document.substitute("addresses", Address.new)
+      #
+      # @param [ String ] name The name of the relation.
+      # @param [ Document ] object The document to replace with.
+      # @options [ Hash ] options The options.
+      #
+      # @since 2.0.0
+      def substitute(name, object, options)
+        set(name, ivar(name).substitute(object, options))
+      end
+
       module ClassMethods #:nodoc:
 
         # Defines the getter for the relation. Nothing too special here: just
@@ -144,9 +158,13 @@ module Mongoid # :nodoc:
               object, options = args.first, options(args)
               variable = "@#{name}"
               if relation_exists?(name) && !object.is_a?(Hash)
-                set(name, ivar(name).substitute(object, options))
+                substitute(name, object, options)
               else
-                build(name, object, metadata, options.merge(:eager => true))
+                if metadata.embedded? && object.blank? && send(name)
+                  substitute(name, object, options)
+                else
+                  build(name, object, metadata, options.merge(:eager => true))
+                end
               end
             end
           end

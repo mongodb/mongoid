@@ -436,12 +436,44 @@ describe Mongoid::Relations::Embedded::Many do
           person.addresses.should be_empty
         end
 
+        it "sets the relation to empty in the database" do
+          person.reload.addresses.should be_empty
+        end
+
         it "removed the inverse relation" do
           address.addressable.should be_nil
         end
 
         it "deletes the child document" do
           address.should be_destroyed
+        end
+      end
+
+      context "when setting on a reload" do
+
+        let(:person) do
+          Person.create(:ssn => "437-11-1112")
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        let(:reloaded) do
+          person.reload
+        end
+
+        before do
+          person.reload.addresses = [ address ]
+          person.reload.addresses = nil
+        end
+
+        it "sets the relation to empty" do
+          person.addresses.should be_empty
+        end
+
+        it "sets the relation to empty in the database" do
+          reloaded.addresses.should be_empty
         end
       end
     end
