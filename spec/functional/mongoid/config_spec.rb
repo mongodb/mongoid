@@ -27,6 +27,10 @@ describe Mongoid::Config do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.mongohq.yml")
   end
 
+  before(:all) do
+    Mongoid.logger = nil
+  end
+
   after(:all) do
     Mongoid.configure do |config|
       name          = "mongoid_test"

@@ -45,7 +45,8 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0
       def collection
-        @collection ||= base._root.collection
+        root = base._root
+        root.collection unless root.embedded?
       end
 
       # Return a new document for the type of class we want to instantiate.

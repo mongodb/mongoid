@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/relations/embedded/atomic/push_all"
 require "mongoid/relations/embedded/atomic/set"
 require "mongoid/relations/embedded/atomic/unset"
 
@@ -9,12 +10,13 @@ module Mongoid #:nodoc:
       # This module provides the ability for calls to be declared atomic.
       module Atomic
 
-        private
-
         MODIFIERS = {
+          :$pushAll => PushAll,
           :$set => Set,
           :$unset => Unset
         }
+
+        private
 
         # Executes a block of commands in an atomic fashion. Mongoid will
         # intercept all database upserts while in this block and combine them
@@ -55,7 +57,7 @@ module Mongoid #:nodoc:
           @executions -= 1
           if @executions.zero?
             Thread.current[:mongoid_atomic_update] = nil
-            updater.execute(collection)
+            updater.execute(collection) if collection
           end
         end
       end

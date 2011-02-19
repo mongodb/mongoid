@@ -8,6 +8,30 @@ module Mongoid # :nodoc:
       class Many < Relations::Many
         include Atomic
 
+        # Appends a document or array of documents to the relation. Will set
+        # the parent and update the index in the process.
+        #
+        # @example Append a document.
+        #   person.addresses << address
+        #
+        # @example Push a document.
+        #   person.addresses.push(address)
+        #
+        # @example Concat with other documents.
+        #   person.addresses.concat([ address_one, address_two ])
+        #
+        # @param [ Document, Array<Document> ] *args Any number of documents.
+        def <<(*args)
+          options = default_options(args)
+          atomically(:$pushAll) do
+            args.flatten.each do |doc|
+              return doc unless doc
+              append(doc, options)
+              doc.save if base.persisted? && !options[:binding]
+            end
+          end
+        end
+
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
         # database twice when setting the relations up.

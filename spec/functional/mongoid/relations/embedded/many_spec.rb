@@ -109,6 +109,33 @@ describe Mongoid::Relations::Embedded::Many do
         end
       end
 
+      context "when appending more than one document at once" do
+
+        let(:person) do
+          Person.create(:ssn => "234-44-4432")
+        end
+
+        let(:address_one) do
+          Address.new
+        end
+
+        let(:address_two) do
+          Address.new
+        end
+
+        before do
+          person.addresses.send(method, [ address_one, address_two ])
+        end
+
+        it "saves the first document" do
+          address_one.should be_persisted
+        end
+
+        it "saves the second document" do
+          address_two.should be_persisted
+        end
+      end
+
       context "when the parent and child have a cyclic relation" do
 
         context "when the parent is a new record" do
