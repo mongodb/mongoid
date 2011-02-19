@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/relations/embedded/atomic/operation"
 require "mongoid/relations/embedded/atomic/push_all"
 require "mongoid/relations/embedded/atomic/set"
 require "mongoid/relations/embedded/atomic/unset"
@@ -57,7 +58,7 @@ module Mongoid #:nodoc:
           @executions -= 1
           if @executions.zero?
             Thread.current[:mongoid_atomic_update] = nil
-            updater.execute(collection) if collection
+            updater.execute(collection)
           end
         end
       end

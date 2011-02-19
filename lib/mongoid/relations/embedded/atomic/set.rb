@@ -4,40 +4,7 @@ module Mongoid #:nodoc:
     module Embedded #:nodoc:
       module Atomic #:nodoc:
 
-        class Set
-          attr_accessor :documents, :options, :path, :selector
-
-          # Consumes an execution that was supposed to hit the database, but is
-          # now being deferred to later in favor of a single update.
-          #
-          # @example Consume the operation.
-          #   set.consume(
-          #     { "_id" => BSON::ObjectId.new },
-          #     { "addresses" => { "$pushAll" => [{ "_id" => "street" }] } },
-          #     { :multi => false, :safe => true }
-          #   )
-          #
-          # @param [ Hash ] selector The document selector.
-          # @param [ Hash ] operations The ops to set in the db.
-          # @param [ Hash ] options The persistence options.
-          #
-          # @option options [ true, false ] :multi Persist multiple at once.
-          # @option options [ true, false ] :safe Persist in safe mode.
-          #
-          # @since 2.0.0
-          def consume(selector, operations, options = {})
-            @consumed, @selector, @options = true, selector, options
-            @documents ||= []
-            parse(operations)
-          end
-
-          def consumed?
-            !!@consumed
-          end
-
-          def execute(collection)
-            collection.update(selector, operations, options) if consumed?
-          end
+        class Set < Operation
 
           # Get the merged operations for the single atomic set.
           #
