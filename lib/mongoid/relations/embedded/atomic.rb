@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/relations/embedded/atomic/set"
+require "mongoid/relations/embedded/atomic/unset"
 
 module Mongoid #:nodoc:
   module Relations #:nodoc:
@@ -11,7 +12,8 @@ module Mongoid #:nodoc:
         private
 
         MODIFIERS = {
-          :$set => Set
+          :$set => Set,
+          :$unset => Unset
         }
 
         # Executes a block of commands in an atomic fashion. Mongoid will

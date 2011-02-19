@@ -241,13 +241,9 @@ module Mongoid # :nodoc:
           tap do |relation|
             relation.target = new_target || []
             if !new_target.blank?
-              reindex
-              atomically(:$set) do
-                unbind(old_target, options)
-                bind(options)
-              end
+              atomically(:$set) { rebind(old_target, options) }
             else
-              unbind(old_target, options)
+              atomically(:$unset) { unbind(old_target, options) }
             end
           end
         end
@@ -387,6 +383,22 @@ module Mongoid # :nodoc:
             end
             reindex
           end
+        end
+
+        # Convenience method to clean up the substitute code. Unbinds the old
+        # target and reindexes.
+        #
+        # @example Rebind the relation.
+        #   relation.rebind([])
+        #
+        # @param [ Array<Document> ] old_target The old target.
+        # @param [ Hash ] options The options passed to substitute.
+        #
+        # @since 2.0.0
+        def rebind(old_target, options)
+          reindex
+          unbind(old_target, options)
+          bind(options)
         end
 
         class << self
