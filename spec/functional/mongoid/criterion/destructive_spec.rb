@@ -6,8 +6,12 @@ describe Mongoid::Criteria do
     Name.new(:first_name => "Durran")
   end
 
-  let(:address) do
+  let(:address_one) do
     Address.new(:street => "Forsterstr")
+  end
+
+  let(:address_two) do
+    Address.new(:street => "Hobrechtstr")
   end
 
   before do
@@ -19,7 +23,7 @@ describe Mongoid::Criteria do
         :title => "Sir",
         :ssn => "666-66-666#{n}",
         :name => name,
-        :addresses => [ address ]
+        :addresses => [ address_one, address_two ]
       )
     end
   end
@@ -49,24 +53,50 @@ describe Mongoid::Criteria do
 
       context "when removing embedded documents" do
 
-        let(:person) do
-          Person.where(:title => "Sir").first
+        context "when removing a single document" do
+
+          let(:person) do
+            Person.where(:title => "Sir").first
+          end
+
+          let(:criteria) do
+            person.addresses.where(:street => "Forsterstr")
+          end
+
+          let!(:removed) do
+            criteria.send(method)
+          end
+
+          it "deletes the removes the documents from the database" do
+            person.addresses.count.should == 1
+          end
+
+          it "returns the number removed" do
+            removed.should == 1
+          end
         end
 
-        let(:criteria) do
-          person.addresses.where(:street => "Forsterstr")
-        end
+        context "when removing multiple documents" do
 
-        let!(:removed) do
-          criteria.send(method)
-        end
+          let(:person) do
+            Person.where(:title => "Sir").first
+          end
 
-        it "deletes the removes the documents from the database" do
-          person.addresses.count.should == 0
-        end
+          let(:criteria) do
+            person.addresses.where(:city => nil)
+          end
 
-        it "returns the number removed" do
-          removed.should == 1
+          let!(:removed) do
+            criteria.send(method)
+          end
+
+          it "deletes the removes the documents from the database" do
+            person.addresses.count.should == 0
+          end
+
+          it "returns the number removed" do
+            removed.should == 2
+          end
         end
       end
     end

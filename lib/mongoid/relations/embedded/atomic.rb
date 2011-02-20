@@ -54,7 +54,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0
         def atomically(modifier, &block)
           updater = Thread.current[:mongoid_atomic_update] ||= MODIFIERS[modifier].new
-          execute do
+          count_executions do
             block.call if block
           end.tap do
             if @executions.zero?
@@ -74,7 +74,7 @@ module Mongoid #:nodoc:
         # @param [ Proc ] block The block to call.
         #
         # @since 2.0.0
-        def execute(&block)
+        def count_executions(&block)
           @executions ||= 0 and @executions += 1
           block.call.tap do
             @executions -=1

@@ -1,12 +1,13 @@
 # encoding: utf-8
-
 require 'mongoid/contexts/enumerable/sort'
 
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
       include Paging
-      attr_accessor :criteria
+      include Relations::Embedded::Atomic
+
+      attr_accessor :collection, :criteria
 
       delegate :blank?, :empty?, :first, :last, :to => :execute
       delegate :klass, :documents, :options, :selector, :to => :criteria
@@ -51,7 +52,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def delete_all
-        count.tap { filter.each(&:delete) }
+        atomically(:$pull) do
+          set_collection
+          count.tap { filter.each(&:delete) }
+        end
       end
       alias :delete :delete_all
 
@@ -64,7 +68,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def destroy_all
-        count.tap { filter.each(&:destroy) }
+        atomically(:$pull) do
+          set_collection
+          count.tap { filter.each(&:destroy) }
+        end
       end
       alias :destroy :destroy_all
 
@@ -210,6 +217,11 @@ module Mongoid #:nodoc:
           return documents.slice(skip..-1)
         end
         documents
+      end
+
+      def set_collection
+        root = documents.first._root
+        @collection = root.collection if root && !root.embedded?
       end
 
       # Sorts the result set if sort options have been set.
