@@ -155,7 +155,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents deleted.
         def delete_all(conditions = {})
-          remove_all(conditions, false)
+          atomically(:$pull) { remove_all(conditions, false) }
         end
 
         # Destroy all the documents in the association whilst running callbacks.
@@ -170,7 +170,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents destroyed.
         def destroy_all(conditions = {})
-          remove_all(conditions, true)
+          atomically(:$pull) { remove_all(conditions, true) }
         end
 
         # Finds a document in this association through several different

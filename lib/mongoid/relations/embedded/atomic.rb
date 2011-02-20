@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/relations/embedded/atomic/operation"
+require "mongoid/relations/embedded/atomic/pull"
 require "mongoid/relations/embedded/atomic/push_all"
 require "mongoid/relations/embedded/atomic/set"
 require "mongoid/relations/embedded/atomic/unset"
@@ -12,6 +13,7 @@ module Mongoid #:nodoc:
       module Atomic
 
         MODIFIERS = {
+          :$pull => Pull,
           :$pushAll => PushAll,
           :$set => Set,
           :$unset => Unset
@@ -51,14 +53,31 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def atomically(modifier, &block)
-          @executions ||= 0
-          @executions += 1
           updater = Thread.current[:mongoid_atomic_update] ||= MODIFIERS[modifier].new
-          block.call if block
-          @executions -= 1
-          if @executions.zero?
-            Thread.current[:mongoid_atomic_update] = nil
-            updater.execute(collection)
+          execute do
+            block.call if block
+          end.tap do
+            if @executions.zero?
+              Thread.current[:mongoid_atomic_update] = nil
+              updater.execute(collection)
+            end
+          end
+        end
+
+        # Execute the block, incrementing the executions before the call and
+        # decrementing them after in order to be able to nest blocks within
+        # each other.
+        #
+        # @example Execute and increment.
+        #   execute { block.call }
+        #
+        # @param [ Proc ] block The block to call.
+        #
+        # @since 2.0.0
+        def execute(&block)
+          @executions ||= 0 and @executions += 1
+          block.call.tap do
+            @executions -=1
           end
         end
       end

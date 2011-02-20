@@ -973,8 +973,8 @@ describe Mongoid::Relations::Embedded::Many do
 
         context "when conditions are provided" do
 
-          before do
-            @deleted = person.addresses.send(
+          let!(:deleted) do
+            person.addresses.send(
               method,
               :conditions => { :street => "Bond" }
             )
@@ -985,14 +985,14 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "returns the number deleted" do
-            @deleted.should == 1
+            deleted.should == 1
           end
         end
 
         context "when conditions are not provided" do
 
-          before do
-            @deleted = person.addresses.send(method)
+          let!(:deleted) do
+            person.addresses.send(method)
           end
 
           it "removes all documents" do
@@ -1000,7 +1000,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "returns the number deleted" do
-            @deleted.should == 2
+            deleted.should == 2
           end
         end
       end
@@ -1024,8 +1024,12 @@ describe Mongoid::Relations::Embedded::Many do
             )
           end
 
-          it "deletes the matching documents from the db" do
+          it "deletes the matching documents" do
             person.addresses.count.should == 1
+          end
+
+          it "deletes the matching documents from the db" do
+            person.reload.addresses.count.should == 1
           end
 
           it "returns the number deleted" do
@@ -1035,16 +1039,20 @@ describe Mongoid::Relations::Embedded::Many do
 
         context "when conditions are not provided" do
 
-          before do
-            @deleted = person.addresses.send(method)
+          let!(:deleted) do
+            person.addresses.send(method)
           end
 
-          it "deletes all the documents from the db" do
+          it "deletes all the documents" do
             person.addresses.count.should == 0
           end
 
+          it "deletes all the documents from the db" do
+            person.reload.addresses.count.should == 0
+          end
+
           it "returns the number deleted" do
-            @deleted.should == 2
+            deleted.should == 2
           end
         end
 
