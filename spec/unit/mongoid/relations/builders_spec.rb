@@ -2,114 +2,117 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders do
 
-  # let(:klass) do
-    # Class.new do
-      # include Mongoid::Relations
-    # end
-  # end
+  class TestClass
+    include Mongoid::Document
+  end
 
-  # let(:relation) do
-    # Mongoid::Relations::Embedded::One
-  # end
+  let(:klass) do
+    TestClass
+  end
 
-  # describe ".builder" do
+  let(:relation) do
+    Mongoid::Relations::Embedded::One
+  end
 
-    # let(:document) do
-      # klass.new
-    # end
+  describe ".builder" do
 
-    # before do
-      # document.instance_variable_set(:@attributes, {})
-      # klass.builder("name")
-    # end
+    let(:document) do
+      klass.new
+    end
 
-    # it "defines a build_* method" do
-      # document.should respond_to(:build_name)
-    # end
+    before do
+      document.instance_variable_set(:@attributes, {})
+      klass.builder("name")
+    end
 
-    # it "returns self" do
-      # klass.builder("name").should == klass
-    # end
+    it "defines a build_* method" do
+      document.should respond_to(:build_name)
+    end
 
-    # context "defined methods" do
+    it "returns self" do
+      klass.builder("name").should == klass
+    end
 
-      # let(:metadata) do
-        # Mongoid::Relations::Metadata.new(
-          # :name => :name,
-          # :relation => relation
-        # )
-      # end
+    context "defined methods" do
 
-      # before do
-        # klass.getter("name", metadata).setter("name", metadata)
-      # end
+      let(:metadata) do
+        Mongoid::Relations::Metadata.new(
+          :name => :name,
+          :relation => relation,
+          :inverse_class_name => "Person"
+        )
+      end
 
-      # describe "#build_\{relation\}" do
+      before do
+        klass.getter("name", metadata).setter("name", metadata)
+      end
 
-        # before do
-          # @relation = document.build_name(:first_name => "Obie")
-        # end
+      describe "#build_\{relation\}" do
 
-        # it "returns a new document" do
-          # @relation.should be_a_kind_of(Name)
-        # end
+        before do
+          @relation = document.build_name(:first_name => "Obie")
+        end
 
-        # it "sets the attributes on the document" do
-          # @relation.first_name.should == "Obie"
-        # end
-      # end
-    # end
-  # end
+        it "returns a new document" do
+          @relation.should be_a_kind_of(Name)
+        end
 
-  # describe ".creator" do
+        it "sets the attributes on the document" do
+          @relation.first_name.should == "Obie"
+        end
+      end
+    end
+  end
 
-    # let(:document) do
-      # klass.new
-    # end
+  describe ".creator" do
 
-    # before do
-      # document.instance_variable_set(:@attributes, {})
-      # klass.creator("name")
-    # end
+    let(:document) do
+      klass.new
+    end
 
-    # it "defines a create_* method" do
-      # document.should respond_to(:create_name)
-    # end
+    before do
+      document.instance_variable_set(:@attributes, {})
+      klass.creator("name")
+    end
 
-    # it "returns self" do
-      # klass.creator("name").should == klass
-    # end
+    it "defines a create_* method" do
+      document.should respond_to(:create_name)
+    end
 
-    # context "defined methods" do
+    it "returns self" do
+      klass.creator("name").should == klass
+    end
 
-      # let(:metadata) do
-        # Mongoid::Relations::Metadata.new(
-          # :name => :name,
-          # :relation => relation,
-          # :inverse_class_name => "Person",
-          # :as => :namable
-        # )
-      # end
+    context "defined methods" do
 
-      # before do
-        # klass.getter("name", metadata).setter("name", metadata)
-      # end
+      let(:metadata) do
+        Mongoid::Relations::Metadata.new(
+          :name => :name,
+          :relation => relation,
+          :inverse_class_name => "Person",
+          :as => :namable
+        )
+      end
 
-      # describe "#create_\{relation\}" do
+      before do
+        klass.getter("name", metadata).setter("name", metadata)
+      end
 
-        # before do
-          # Name.any_instance.expects(:save).returns(true)
-          # @relation = document.create_name(:first_name => "Obie")
-        # end
+      describe "#create_\{relation\}" do
 
-        # it "returns a newly saved document" do
-          # @relation.should be_a_kind_of(Name)
-        # end
+        before do
+          Name.any_instance.expects(:save).returns(true)
+          @relation = document.create_name(:first_name => "Obie")
+        end
 
-        # it "sets the attributes on the document" do
-          # @relation.first_name.should == "Obie"
-        # end
-      # end
-    # end
-  # end
+        it "returns a newly saved document" do
+          @relation.should be_a_kind_of(Name)
+        end
+
+        it "sets the attributes on the document" do
+          @relation.first_name.should == "Obie"
+        end
+      end
+    end
+  end
 end
