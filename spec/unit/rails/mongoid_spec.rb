@@ -20,7 +20,7 @@ describe "Rails::Mongoid" do
       { "app/models" => [ "/rails/root/app/models" ] }
     end
 
-    context "when all models are in the models directory" do
+    context "when load models config is false" do
 
       let(:files) do
         [
@@ -29,30 +29,57 @@ describe "Rails::Mongoid" do
         ]
       end
 
-      before do
-        Dir.expects(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+      before(:all) do
+        Mongoid.preload_models = false
+        Dir.stubs(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
       end
 
-      it "requires the models by basename" do
-        Rails::Mongoid.expects(:load_model).with("address")
-        Rails::Mongoid.expects(:load_model).with("user")
+      it "does not load any models" do
+        Rails::Mongoid.expects(:load_model).never
         Rails::Mongoid.load_models(app)
       end
     end
 
-    context "when models exist in subdirectories" do
+    context "when load models config is true" do
 
-      let(:files) do
-        [ "/rails/root/app/models/mongoid/behaviour.rb" ]
+      before(:all) do
+        Mongoid.preload_models = true
       end
 
-      before do
-        Dir.expects(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+      context "when all models are in the models directory" do
+
+        let(:files) do
+          [
+            "/rails/root/app/models/user.rb",
+            "/rails/root/app/models/address.rb"
+          ]
+        end
+
+        before do
+          Dir.expects(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+        end
+
+        it "requires the models by basename" do
+          Rails::Mongoid.expects(:load_model).with("address")
+          Rails::Mongoid.expects(:load_model).with("user")
+          Rails::Mongoid.load_models(app)
+        end
       end
 
-      it "requires the models by subdirectory and basename" do
-        Rails::Mongoid.expects(:load_model).with("mongoid/behaviour")
-        Rails::Mongoid.load_models(app)
+      context "when models exist in subdirectories" do
+
+        let(:files) do
+          [ "/rails/root/app/models/mongoid/behaviour.rb" ]
+        end
+
+        before do
+          Dir.expects(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+        end
+
+        it "requires the models by subdirectory and basename" do
+          Rails::Mongoid.expects(:load_model).with("mongoid/behaviour")
+          Rails::Mongoid.load_models(app)
+        end
       end
     end
   end

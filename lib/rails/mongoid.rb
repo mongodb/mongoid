@@ -12,6 +12,7 @@ module Rails #:nodoc:
     #
     # @param [ Application ] app The rails application.
     def load_models(app)
+      return unless ::Mongoid.preload_models
       app.config.paths["app/models"].each do |path|
         Dir.glob("#{path}/**/*.rb").sort.each do |file|
           load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))

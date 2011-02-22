@@ -34,17 +34,18 @@ module Mongoid #:nodoc
       define_method("#{name}?") { send(name) }
     end
 
-    option :embedded_object_id, :default => true
     option :allow_dynamic_fields, :default => true
+    option :autocreate_indexes, :default => false
+    option :binding_defaults, :default => { :binding => false, :continue => true }
+    option :embedded_object_id, :default => true
     option :include_root_in_json, :default => false
     option :parameterize_keys, :default => true
     option :persist_in_safe_mode, :default => false
+    option :preload_models, :default => true
     option :raise_not_found_error, :default => true
     option :reconnect_time, :default => 3
-    option :autocreate_indexes, :default => false
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
-    option :binding_defaults, :default => { :binding => false, :continue => true }
 
     # Adds a new I18n locale file to the load path.
     #
