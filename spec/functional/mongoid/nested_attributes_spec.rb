@@ -1191,8 +1191,8 @@ describe Mongoid::NestedAttributes do
                   before do
                     person.addresses_attributes =
                       {
-                        "bar" => { "street" => "Maybachufer", "_destroy" => falsehood },
-                        "foo" => { "street" => "Alexander Platz" }
+                        "0" => { "street" => "Maybachufer", "_destroy" => falsehood },
+                        "1" => { "street" => "Alexander Platz" }
                       }
                   end
 
@@ -1230,8 +1230,8 @@ describe Mongoid::NestedAttributes do
                   before do
                     person.addresses_attributes =
                       {
-                        "bar" => { "street" => "Maybachufer", "_destroy" => truth },
-                        "foo" => { "street" => "Alexander Platz" }
+                        "0" => { "street" => "Maybachufer", "_destroy" => truth },
+                        "1" => { "street" => "Alexander Platz" }
                       }
                   end
 
@@ -1256,8 +1256,8 @@ describe Mongoid::NestedAttributes do
                   before do
                     person.addresses_attributes =
                       {
-                        "bar" => { "street" => "Maybachufer", "_destroy" => falsehood },
-                        "foo" => { "street" => "Alexander Platz" }
+                        "0" => { "street" => "Maybachufer", "_destroy" => falsehood },
+                        "1" => { "street" => "Alexander Platz" }
                       }
                   end
 
@@ -1290,8 +1290,8 @@ describe Mongoid::NestedAttributes do
                   before do
                     person.addresses_attributes =
                       {
-                        "bar" => { "street" => "Maybachufer", "_destroy" => truth },
-                        "foo" => { "street" => "Alexander Platz" }
+                        "0" => { "street" => "Maybachufer", "_destroy" => truth },
+                        "1" => { "street" => "Alexander Platz" }
                       }
                   end
 
@@ -1316,8 +1316,8 @@ describe Mongoid::NestedAttributes do
                   before do
                     person.addresses_attributes =
                       {
-                        "bar" => { "street" => "Maybachufer", "_destroy" => falsehood },
-                        "foo" => { "street" => "Alexander Platz" }
+                        "0" => { "street" => "Maybachufer", "_destroy" => falsehood },
+                        "1" => { "street" => "Alexander Platz" }
                       }
                   end
 
