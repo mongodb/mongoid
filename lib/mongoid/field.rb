@@ -1,30 +1,37 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
+  # Defines the behaviour for defined fields in the document.
   class Field
-    attr_reader :copyable, :klass, :label, :name, :options, :type
+
+    attr_accessor :type
+    attr_reader :copyable, :klass, :label, :name, :options
 
     # Get the default value for the field.
     #
-    # Returns:
+    # @example Get the default.
+    #   field.default
     #
-    # The typecast default value.
+    # @return [ Object ] The typecast default value.
+    #
+    # @since 1.0.0
     def default
       copy.respond_to?(:call) ? copy : set(copy)
     end
 
-    # Create the new field with a name and optional additional options. Valid
-    # options are :default
+    # Create the new field with a name and optional additional options.
     #
-    # Options:
+    # @example Create the new field.
+    #   Field.new(:name, :type => String)
     #
-    # name: The name of the field as a +Symbol+.
-    # options: A +Hash+ of options for the field.
+    # @param [ Hash ] options The field options.
     #
-    # Example:
+    # @option options [ Class ] :type The class of the field.
+    # @option options [ Object ] :default The default value for the field.
+    # @option options [ String ] :label The field's label.
     #
-    # <tt>Field.new(:score, :default => 0)</tt>
+    # @since 1.0.0
     def initialize(name, options = {})
-      check_name!(name)
       @type = options[:type] || Object
       @name, @default = name, options[:default]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
@@ -40,13 +47,14 @@ module Mongoid #:nodoc:
     # If the field is an identity field, ie an id, it performs the necessary
     # cast.
     #
-    # Example:
+    # @example Get the setter value.
+    #   field.set("New Value")
     #
-    # <tt>field.set("New Value")</tt>
+    # @param [ Object ] object The value to cast to a database value.
     #
-    # Returns:
+    # @return [ Object ] The typecast value.
     #
-    # The new value.
+    # @since 1.0.0
     def set(object)
       unless options[:identity]
         type.set(object)
@@ -61,30 +69,40 @@ module Mongoid #:nodoc:
 
     # Used for retrieving the object out of the attributes hash.
     #
-    # Example:
+    # @example Get the value.
+    #   field.get("Value")
     #
-    # <tt>field.get("Value")</tt>
+    # @param [ Object ] The object to cast from the database.
     #
-    # Returns:
+    # @return [ Object ] The converted value.
     #
-    # The converted value.
+    # @since 1.0.0
     def get(object)
       type.get(object)
     end
 
     protected
-    # Slightly faster default check.
+
+    # Copy the default value if copyable.
+    #
+    # @example Copy the default.
+    #   field.copy
+    #
+    # @return [ Object ] The copied object or the original.
+    #
+    # @since 1.0.0
     def copy
       copyable ? @default.dup : @default
     end
 
-    # Check if the name is valid.
-    def check_name!(name)
-      if Mongoid.destructive_fields.include?(name.to_s)
-        raise Mongoid::Errors::InvalidField.new(name)
-      end
-    end
-
+    # Checks if the default value is of the same type as the field.
+    #
+    # @example Check the default value.
+    #   field.check_default!
+    #
+    # @raise [ Errors::InvalidType ] If the types differ.
+    #
+    # @since 1.0.0
     def check_default!
       return if @default.is_a?(Proc)
       if !@default.nil? && !@default.is_a?(type)

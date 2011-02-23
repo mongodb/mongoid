@@ -4,35 +4,41 @@ describe Mongoid::Field do
 
   describe "#default" do
 
-    before do
-      @field = Mongoid::Field.new(:score, :type => Integer, :default => 0)
+    let(:field) do
+      Mongoid::Field.new(:score, :type => Integer, :default => 0)
     end
 
     it "returns the default option" do
-      @field.default.should == 0
+      field.default.should == 0
     end
 
     it "returns the typed value" do
-      @field.expects(:set).with(0)
-      @field.default
+      field.expects(:set).with(0)
+      field.default
     end
 
     context "when the field is an array" do
 
       context "when the array is user defined" do
 
-        before do
-          @field = Mongoid::Field.new(
+        let(:field) do
+          Mongoid::Field.new(
             :vals,
             :type => Array,
             :default => [ "first" ]
           )
         end
 
-        it "dups the array" do
-          array = @field.default
+        let(:array) do
+          field.default
+        end
+
+        before do
           array << "second"
-          @field.default.should == [ "first" ]
+        end
+
+        it "dups the array" do
+          field.default.should == [ "first" ]
         end
       end
 
@@ -90,32 +96,29 @@ describe Mongoid::Field do
 
     context "when the field is a hash" do
 
-      before do
-        @field = Mongoid::Field.new(
+      let(:field) do
+        Mongoid::Field.new(
           :vals,
           :type => Hash,
           :default => { :key => "value" }
         )
       end
 
-      it "dups the hash" do
-        hash = @field.default
+      let(:hash) do
+        field.default
+      end
+
+      before do
         hash[:key_two] = "value2"
-        @field.default.should == { :key => "value" }
+      end
+
+      it "dups the hash" do
+        field.default.should == { :key => "value" }
       end
     end
   end
 
   describe "#initialize" do
-
-    context "when the field name is invalid" do
-
-      it "raises an error" do
-        lambda {
-          Mongoid::Field.new(:collection, Person)
-        }.should raise_error(Mongoid::Errors::InvalidField)
-      end
-    end
 
     context "when the default value does not match the type" do
 
@@ -133,8 +136,8 @@ describe Mongoid::Field do
 
   describe "#name" do
 
-    before do
-      @field = Mongoid::Field.new(
+    let(:field) do
+      Mongoid::Field.new(
         :score,
         :type => Integer,
         :default => 0
@@ -142,18 +145,18 @@ describe Mongoid::Field do
     end
 
     it "returns the name" do
-      @field.name.should == :score
+      field.name.should == :score
     end
   end
 
   describe "#type" do
 
-    before do
-      @field = Mongoid::Field.new(:name)
+    let(:field) do
+      Mongoid::Field.new(:name)
     end
 
     it "defaults to Object" do
-      @field.type.should == Object
+      field.type.should == Object
     end
   end
 
@@ -166,13 +169,12 @@ describe Mongoid::Field do
     it "allows a label to be set an retrieved" do
       Mongoid::Field.new(:name, :label => "Name").label.should == "Name"
     end
-
   end
 
   describe "#set" do
 
-    before do
-      @field = Mongoid::Field.new(
+    let(:field) do
+      Mongoid::Field.new(
         :score,
         :default => 10,
         :type => Integer
@@ -182,23 +184,22 @@ describe Mongoid::Field do
     context "nil is provided" do
 
       it "returns the default value" do
-        @field.set(nil).should == nil
+        field.set(nil).should == nil
       end
-
     end
 
     context "value is provided" do
 
       it "sets the value" do
-        @field.set("30").should == 30
+        field.set("30").should == 30
       end
     end
   end
 
   describe "#get" do
 
-    before do
-      @field = Mongoid::Field.new(
+    let(:field) do
+      Mongoid::Field.new(
         :score,
         :default => 10,
         :type => Integer
@@ -206,13 +207,14 @@ describe Mongoid::Field do
     end
 
     it "returns the value" do
-      @field.get(30).should == 30
+      field.get(30).should == 30
     end
   end
 
   describe "#options" do
-    before do
-      @field = Mongoid::Field.new(
+
+    let(:field) do
+      Mongoid::Field.new(
         :terrible_and_unsafe_html_goes_here,
         :sanitize => true,
         :hello => :goodbye
@@ -220,8 +222,8 @@ describe Mongoid::Field do
     end
 
     it "stores the arbitrary options" do
-      @field.options[:sanitize].should be_true
-      @field.options[:hello].should == :goodbye
+      field.options[:sanitize].should be_true
+      field.options[:hello].should == :goodbye
     end
   end
 end
