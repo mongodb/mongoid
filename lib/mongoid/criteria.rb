@@ -323,7 +323,8 @@ module Mongoid #:nodoc:
             crit.selector[key] = { operator => value }
           else
             if crit.selector[key].has_key?(operator)
-              new_value = crit.selector[key].values.first + value
+              op = operator == "$in" ? :& : :+
+              new_value = crit.selector[key].values.first.send(op, value)
               crit.selector[key] = { operator => new_value }
             else
               crit.selector[key][operator] = value

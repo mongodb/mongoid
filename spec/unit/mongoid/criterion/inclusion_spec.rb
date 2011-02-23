@@ -155,14 +155,14 @@ describe Mongoid::Criterion::Inclusion do
       let(:criteria) do
         base.
           in(:title => ["title1", "title2"]).
-          in(:title => ["title3"], :text => ["test"])
+          in(:title => ["title2", "title3"], :text => ["test"])
       end
 
-      it "appends to the existing criteria" do
+      it "intersects the existing criteria" do
         criteria.selector.should ==
           {
             :title => {
-              "$in" => ["title1", "title2", "title3"] }, :text => { "$in" => ["test"]
+              "$in" => ["title2"] }, :text => { "$in" => ["test"]
             }
           }
       end
