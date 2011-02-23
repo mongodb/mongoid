@@ -36,6 +36,7 @@ module Mongoid #:nodoc
     include Mongoid::Relations
     include Mongoid::Safety
     include Mongoid::Serialization
+    include Mongoid::Sharding
     include Mongoid::State
     include Mongoid::Validations
     include Mongoid::Callbacks
