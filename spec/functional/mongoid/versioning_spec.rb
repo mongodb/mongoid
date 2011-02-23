@@ -29,10 +29,22 @@ describe Mongoid::Versioning do
     context "when saving multiple times" do
 
       it "increments the version by 1" do
-        8.times do |n|
+        3.times do |n|
           page.update_attribute(:title, "#{n}")
           page.version.should == n + 1
         end
+      end
+    end
+
+    context "when skipping versioning" do
+
+      it "does not version" do
+        3.times do |n|
+          page.versionless do |doc|
+            doc.update_attribute(:title, "#{n}")
+          end
+        end
+        page.version.should == 1
       end
     end
   end
