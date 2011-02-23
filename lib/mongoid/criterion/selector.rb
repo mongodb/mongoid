@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def initialize(klass)
-        @fields, @klass = klass.fields.except("_id"), klass
+        @fields, @klass = klass.fields.except("_id", "_type"), klass
       end
 
       # Set the value for the supplied key, attempting to typecast the value.

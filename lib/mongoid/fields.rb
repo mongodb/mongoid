@@ -10,6 +10,7 @@ module Mongoid #:nodoc
       # These include defaults, fields
       delegate :defaults, :fields, :to => "self.class"
 
+      field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
 
       alias :id :_id

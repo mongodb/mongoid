@@ -6,36 +6,7 @@ module Mongoid #:nodoc:
   # This module contains the logic for handling the internal attributes hash,
   # and how to get and set values.
   module Attributes
-    extend ActiveSupport::Concern
     include Processing
-
-    # Returns the object type. This corresponds to the name of the class that
-    # this document is, which is used in determining the class to
-    # instantiate in various cases.
-    #
-    # @example Get the type.
-    #   person._type
-    #
-    # @return [ String ] The name of the class the document is.
-    #
-    # @since 1.0.0
-    def _type
-      @attributes["_type"]
-    end
-
-    # Set the type of the document. This should be the name of the class.
-    #
-    # @example Set the type
-    #   person._type = "Person"
-    #
-    # @param [ String ] new_type The name of the class.
-    #
-    # @return [ String ] the new type.
-    #
-    # @since 1.0.0
-    def _type=(new_type)
-      @attributes["_type"] = new_type
-    end
 
     # Determine if an attribute is present.
     #
