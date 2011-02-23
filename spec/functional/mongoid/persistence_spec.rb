@@ -8,10 +8,12 @@ describe Mongoid::Persistence do
 
   before(:all) do
     Mongoid.persist_in_safe_mode = true
+    Mongoid.parameterize_keys = false
   end
 
   after(:all) do
     Mongoid.persist_in_safe_mode = false
+    Mongoid.parameterize_keys = true
   end
 
   describe ".create" do
@@ -653,6 +655,62 @@ describe Mongoid::Persistence do
 
           it "persists the reference" do
             person.posts(true).should == [ post ]
+          end
+        end
+      end
+    end
+
+    context "when in a deeply nested hierarchy" do
+
+      let!(:person) do
+        Person.new(:title => "The Boss", :ssn => "098-76-5432")
+      end
+
+      let!(:phone_number) do
+        Phone.new(:number => "123-456-7890")
+      end
+
+      let!(:country_code) do
+        CountryCode.new(:code => 1)
+      end
+
+      before do
+        phone_number.country_code = country_code
+        person.phone_numbers << phone_number
+        person.save
+      end
+
+      it "sets the first level document" do
+        person.phone_numbers.first.should == phone_number
+      end
+
+      it "sets the second level document" do
+        person.phone_numbers.first.country_code.should == country_code
+      end
+
+      context "when updating the first level document" do
+
+        let(:phone) do
+          person.phone_numbers.first
+        end
+
+        before do
+          phone.number = "098-765-4321"
+          phone.update_attributes(:number => "098-765-4321")
+        end
+
+        it "sets the new attributes" do
+          phone.number.should == "098-765-4321"
+        end
+
+        context "when reloading the root" do
+
+          let(:reloaded) do
+            person.reload
+          end
+
+          it "saves the new attributes" do
+            reloaded.phone_numbers.first.number.should == "098-765-4321"
           end
         end
       end
