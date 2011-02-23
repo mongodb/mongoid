@@ -33,9 +33,8 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def initialize(name, options = {})
       @type = options[:type] || Object
-      @name, @default = name, options[:default]
+      @name, @default, @label = name, options[:default], options[:label]
       @copyable = (@default.is_a?(Array) || @default.is_a?(Hash))
-      @label = options[:label]
       @options = options
       check_default!
     end

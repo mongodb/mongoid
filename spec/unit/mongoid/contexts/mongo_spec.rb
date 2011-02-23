@@ -635,13 +635,17 @@ describe Mongoid::Contexts::Mongo do
 
   describe "#paginate" do
 
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
     before do
       @collection = mock
       Person.expects(:collection).returns(@collection)
-      @criteria = Person.where(:_id => "1").skip(60).limit(20)
+      @criteria = Person.where(:_id => id).skip(60).limit(20)
       @context = Mongoid::Contexts::Mongo.new(@criteria)
       @collection.expects(:find).with(
-        {:_id => "1"}, :skip => 60, :limit => 20
+        {:_id => id}, :skip => 60, :limit => 20
       ).returns([])
       @results = @context.paginate
     end
@@ -654,13 +658,18 @@ describe Mongoid::Contexts::Mongo do
   end
 
   describe "#paginate use last passed arguments" do
+
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
     before do
       @collection = mock
       Person.expects(:collection).returns(@collection)
-      @criteria = Person.where(:_id => "1").skip(60).limit(20)
+      @criteria = Person.where(:_id => id).skip(60).limit(20)
       @context = Mongoid::Contexts::Mongo.new(@criteria)
       @collection.expects(:find).with(
-        {:_id => "1"}, :skip => 20, :limit => 10
+        {:_id => id}, :skip => 20, :limit => 10
       ).returns([])
       @results = @context.paginate(:page => 3, :per_page => 10)
     end

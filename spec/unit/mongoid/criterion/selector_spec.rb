@@ -3,18 +3,34 @@ require 'mongoid/criterion/selector'
 
 describe Mongoid::Criterion::Selector do
 
-  let(:field) { stub(:type => Integer) }
+  let(:field) do
+    stub(:type => Integer)
+  end
 
   describe "#initialize" do
-    it "should store the class" do
-      klass = stub
+
+    let(:klass) do
+      stub
+    end
+
+    before do
+      klass.stubs(:fields).returns({})
+    end
+
+    it "stores the class" do
       Mongoid::Criterion::Selector.new(klass).klass.should == klass
     end
   end
 
-  describe "[]=" do
-    let(:klass) { Class.new }
-    let(:selector) { Mongoid::Criterion::Selector.new(klass) }
+  describe "#[]=" do
+
+    let(:klass) do
+      Class.new
+    end
+
+    let(:selector) do
+      Mongoid::Criterion::Selector.new(klass)
+    end
 
     it "should store the values provided" do
       klass.stubs(:fields).returns({})
@@ -37,9 +53,15 @@ describe Mongoid::Criterion::Selector do
     end
   end
 
-  describe "update" do
-    let(:klass) { Class.new }
-    let(:selector) { Mongoid::Criterion::Selector.new(klass) }
+  describe "#update" do
+
+    let(:klass) do
+      Class.new
+    end
+
+    let(:selector) do
+      Mongoid::Criterion::Selector.new(klass)
+    end
 
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
@@ -49,9 +71,15 @@ describe Mongoid::Criterion::Selector do
     end
   end
 
-  describe "merge!" do
-    let(:klass) { Class.new }
-    let(:selector) { Mongoid::Criterion::Selector.new(klass) }
+  describe "#merge!" do
+
+    let(:klass) do
+      Class.new
+    end
+
+    let(:selector) do
+      Mongoid::Criterion::Selector.new(klass)
+    end
 
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
@@ -63,8 +91,13 @@ describe Mongoid::Criterion::Selector do
 
   describe "#try_to_typecast" do
 
-    let(:klass) { Class.new }
-    let(:selector) { Mongoid::Criterion::Selector.new(klass) }
+    let(:klass) do
+      Class.new
+    end
+
+    let(:selector) do
+      Mongoid::Criterion::Selector.new(klass)
+    end
 
     context "when the key is not a declared field" do
       it "returns the value" do

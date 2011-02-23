@@ -230,7 +230,7 @@ describe Mongoid::Criterion::Optional do
     context "with not using object ids" do
 
       before do
-        @previous_id_type = Person._id_type
+        @previous_id_type = Person.fields["_id"].type
         Person.identity :type => String
       end
 
@@ -310,7 +310,7 @@ describe Mongoid::Criterion::Optional do
     context "when using object ids" do
 
       before do
-        @previous_id_type = Person._id_type
+        @previous_id_type = Person.fields["_id"].type
         Person.identity :type => BSON::ObjectId
       end
 

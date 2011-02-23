@@ -886,12 +886,16 @@ describe Mongoid::Criteria do
 
       context "when Person, :conditions => {:id => id}" do
 
+        let(:id) do
+          BSON::ObjectId.new
+        end
+
         let(:crit) do
-          criteria.search(:all, :conditions => { :id => "1234e567" })[1]
+          criteria.search(:all, :conditions => { :id => id })[1]
         end
 
         it "returns a criteria with a selector from the conditions" do
-          crit.selector.should == { :_id => "1234e567" }
+          crit.selector.should == { :_id => id }
         end
 
         it "returns a criteria with klass Person" do

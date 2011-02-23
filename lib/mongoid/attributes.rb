@@ -6,6 +6,7 @@ module Mongoid #:nodoc:
   # This module contains the logic for handling the internal attributes hash,
   # and how to get and set values.
   module Attributes
+    extend ActiveSupport::Concern
     include Processing
 
     # Returns the object type. This corresponds to the name of the class that
@@ -49,35 +50,6 @@ module Mongoid #:nodoc:
     def attribute_present?(name)
       !read_attribute(name).blank?
     end
-
-    # Get the id associated with this object. This will pull the _id value out
-    # of the attributes.
-    #
-    # @example Get the id.
-    #   person.id
-    #
-    # @return [ BSON::ObjectId, String ] The id of the document.
-    #
-    # @since 1.0.0
-    def id
-      @attributes["_id"]
-    end
-    alias :_id :id
-
-    # Set the id of the document to a new one.
-    #
-    # @example Set the id.
-    #   person.id = BSON::ObjectId.new
-    #
-    # @param [ BSON::ObjectId, String ] new_id The new id.
-    #
-    # @return [ BSON::ObjectId, String ] The new id.
-    #
-    # @since 1.0.0
-    def id=(new_id)
-      @attributes["_id"] = _id_type.set(new_id)
-    end
-    alias :_id= :id=
 
     # Read a value from the document attributes. If the value does not exist
     # it will return nil.

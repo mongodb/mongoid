@@ -14,8 +14,12 @@ describe Mongoid::Keys do
         Address.identity :type => BSON::ObjectId
       end
 
+      let(:field) do
+        Address.fields["_id"]
+      end
+
       it "sets the type of the id" do
-        Address._id_type.should == String
+        field.type.should == String
       end
     end
   end
@@ -26,16 +30,23 @@ describe Mongoid::Keys do
 
       before do
         Address.key :street
-        @address = Address.new(:street => "Testing Street Name")
+        address.run_callbacks(:save)
+      end
+
+      let(:address) do
+        Address.new(:street => "Testing Street Name")
+      end
+
+      let(:field) do
+        Address.fields["_id"]
       end
 
       it "adds the callback for primary key generation" do
-        @address.run_callbacks(:save)
-        @address.id.should == "testing-street-name"
+        address.id.should == "testing-street-name"
       end
 
       it "changes the _id_type to a string" do
-        @address._id_type.should == String
+        field.type.should == String
       end
     end
 
@@ -43,12 +54,15 @@ describe Mongoid::Keys do
 
       before do
         Address.key :street, :post_code
-        @address = Address.new(:street => "Testing Street Name", :post_code => "94123")
+        address.run_callbacks(:save)
+      end
+
+      let(:address) do
+        Address.new(:street => "Testing Street Name", :post_code => "94123")
       end
 
       it "combines all fields" do
-        @address.run_callbacks(:save)
-        @address.id.should == "testing-street-name-94123"
+        address.id.should == "testing-street-name-94123"
       end
     end
 

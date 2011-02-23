@@ -75,11 +75,11 @@ describe Mongoid::Criteria do
         )
       end
 
-      it 'should find object with String args' do
+      it 'should find the object with a matching String arg' do
         Person.find(person.id.to_s).should == person
       end
 
-      it 'should not find object with BSON::ObjectId  args' do
+      it 'should find the object with a matching BSON::ObjectId argument' do
         expect {
           Person.find(BSON::ObjectId(person.id))
         }.to raise_error
