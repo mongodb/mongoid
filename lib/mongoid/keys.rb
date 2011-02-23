@@ -11,6 +11,52 @@ module Mongoid #:nodoc:
       delegate :primary_key, :using_object_ids?, :to => "self.class"
     end
 
+    private
+
+    # Determines if any field that the document id is composed of has changed.
+    #
+    # @example Has any key field changed?
+    #   document.key_field_changed?
+    #
+    # @return [ true, false ] Has a key field changed?
+    #
+    # @since 2.0.0
+    def key_field_changed?
+      primary_key.any? { |field| changed.include?(field.to_s) }
+    end
+
+    # Sits around a save when composite keys are in play to handle the id magic
+    # if a key field has changed.
+    #
+    # @example Set the composite key.
+    #   document.set_composite_key
+    #
+    # @param [ Proc ] block The block this surrounds.
+    #
+    # @since 2.0.0
+    def set_composite_key(&block)
+      if persisted? && key_field_changed?
+        swap_composite_keys(&block)
+      else
+        identify and block.call
+      end
+    end
+
+    # Swap out the composite key only after the document has been saved.
+    #
+    # @example Swap out the keys.
+    #   document.swap_composite_keys
+    #
+    # @param [ Proc ] block The save block getting called.
+    #
+    # @since 2.0.0
+    def swap_composite_keys(&block)
+      old_id, new_id = id.dup, identify
+      @attributes["_id"] = old_id
+      block.call
+      @attributes["_id"] = new_id
+    end
+
     module ClassMethods #:nodoc:
 
       # Used for telling Mongoid on a per model basis whether to override the
@@ -51,7 +97,7 @@ module Mongoid #:nodoc:
       def key(*fields)
         self.primary_key = fields
         identity(:type => String)
-        set_callback(:save, :before, :identify)
+        set_callback(:save, :around, :set_composite_key)
       end
 
       # Convenience method for determining if we are using +BSON::ObjectIds+ as

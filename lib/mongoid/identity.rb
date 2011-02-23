@@ -12,8 +12,7 @@ module Mongoid #:nodoc:
     # @example Create the id and set the type.
     #   identity.create
     def create
-      identify
-      type
+      identify.tap { type }
     end
 
     # Create the new identity generator - this will be expanded in the future
@@ -53,6 +52,7 @@ module Mongoid #:nodoc:
         document.id = compose.join(" ").identify if document.primary_key
         document.id = generate_id if document.id.blank?
       end
+      document.id
     end
 
     # Set the _type field on the document if the document is hereditary or in a
