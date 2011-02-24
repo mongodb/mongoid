@@ -1,5 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
+  # This module contains the behaviour of Mongoid's clone/dup of documents.
   module Copyable
     extend ActiveSupport::Concern
 
@@ -17,18 +19,17 @@ module Mongoid #:nodoc:
     # the exception of the document's id and versions, and will reset all the
     # instance variables.
     #
-    # Example:
+    # This clone also includes embedded documents.
     #
-    # <tt>document.clone</tt>
-    # <tt>document.dup</tt>
+    # @example Clone the document.
+    #   document.clone
     #
-    # Options:
+    # @example Dup the document.
+    #   document.dup
     #
-    # other: The document getting cloned.
+    # @param [ Document ] other The document getting cloned.
     #
-    # Returns:
-    #
-    # A new document with all the attributes except id and versions
+    # @return [ Document ] The new document.
     def initialize_copy(other)
       @attributes = other.as_document
       instance_variables.each { |name| remove_instance_variable(name) }

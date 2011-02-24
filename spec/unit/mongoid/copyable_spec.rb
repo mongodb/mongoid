@@ -2,12 +2,16 @@ require "spec_helper"
 
 describe Mongoid::Copyable do
 
+  before do
+    Person.delete_all
+  end
+
   [ :clone, :dup ].each do |method|
 
     describe "##{method}" do
 
       let(:person) do
-        Person.new(:title => "Sir")
+        Person.new(:title => "Sir", :ssn => "234-33-3123")
       end
 
       let!(:address) do
@@ -89,6 +93,29 @@ describe Mongoid::Copyable do
           it "dups #{name}" do
             copy.instance_variable_get(name).should_not
               be_eql(person.instance_variable_get(name))
+          end
+        end
+
+        context "when saving the copy" do
+
+          let(:reloaded) do
+            copy.reload
+          end
+
+          before do
+            copy.save
+          end
+
+          it "persists the attributes" do
+            reloaded.title.should == "Sir"
+          end
+
+          it "persists the embeds many relation" do
+            reloaded.addresses.should == person.addresses
+          end
+
+          it "persists the embeds one relation" do
+            reloaded.name.should == person.name
           end
         end
       end
