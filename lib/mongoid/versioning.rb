@@ -27,9 +27,9 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def revise
-      last_version = self.class.first(:conditions => { :_id => id, :version => version })
-      if last_version
-        versions.target << last_version.clone
+      previous = find_last_version
+      if previous
+        versions.target << previous.clone
         versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
         @modifications["versions"] = [ nil, versions.as_document ] if @modifications
@@ -53,6 +53,12 @@ module Mongoid #:nodoc:
     end
 
     private
+
+    def find_last_version
+      self.class.
+        where(:_id => id).
+        any_of({ :version => version }, { :version => nil }).first
+    end
 
     # Is the document able to be revised? This is true if the document has
     # changed and we have not explicitly told it not to version.

@@ -37,21 +37,50 @@ describe Mongoid::Versioning do
 
   describe "#revise" do
 
+    let(:criteria) do
+      stub
+    end
+
+    let(:match) do
+      stub
+    end
+
     context "when a last version does not exist" do
 
-      let!(:page) do
-        WikiPage.new(:title => "1")
+      context "when versioning is new to the document" do
+
+        let!(:page) do
+          WikiPage.new(:title => "1")
+        end
+
+        before do
+          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
+          match.expects(:first).returns(nil)
+          page.revise
+        end
+
+        it "does not add any versions" do
+          page.versions.should be_empty
+        end
       end
 
-      before do
-        WikiPage.expects(:first).with(
-          :conditions => { :_id => page.id, :version => 1 }
-        ).returns(nil)
-        page.revise
-      end
+      context "when versioning has been in effect" do
 
-      it "does not add any versions" do
-        page.versions.should be_empty
+        let!(:page) do
+          WikiPage.new(:title => "1")
+        end
+
+        before do
+          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
+          match.expects(:first).returns(page)
+          page.revise
+        end
+
+        it "adds the new version" do
+          page.versions.should_not be_empty
+        end
       end
     end
 
@@ -66,9 +95,9 @@ describe Mongoid::Versioning do
       end
 
       before do
-        WikiPage.expects(:first).with(
-          :conditions => { :_id => page.id, :version => 2 }
-        ).returns(first)
+        WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+        criteria.expects(:any_of).with({ :version => 2 }, { :version => nil }).returns(match)
+        match.expects(:first).returns(first)
         page.revise
       end
 
