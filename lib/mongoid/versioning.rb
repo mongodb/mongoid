@@ -54,6 +54,15 @@ module Mongoid #:nodoc:
 
     private
 
+    # Find the previous version of this document in the database, or if the
+    # document had been saved without versioning return the persisted one.
+    #
+    # @example Find the last version.
+    #   document.find_last_version
+    #
+    # @return [ Document, nil ] The previously saved document.
+    #
+    # @since 2.0.0
     def find_last_version
       self.class.
         where(:_id => id).
