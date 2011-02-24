@@ -30,6 +30,7 @@ module Mongoid #:nodoc:
     #
     # A new document with all the attributes except id and versions
     def initialize_copy(other)
+      @attributes = other.as_document
       instance_variables.each { |name| remove_instance_variable(name) }
       COPYABLES.each do |name|
         value = other.instance_variable_get(name)
