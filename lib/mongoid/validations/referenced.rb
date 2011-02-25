@@ -10,14 +10,14 @@ module Mongoid #:nodoc:
     #
     #   class Person
     #     include Mongoid::Document
-    #     embeds_one :name
-    #     embeds_many :addresses
-    #
-    #     validates_relation :name, :addresses
+    #     references_many :posts, :validate => true
     #   end
     class ReferencedValidator < ActiveModel::EachValidator
 
-      # TODO docs
+      # Validate the document for the initialized attributes. Will not load
+      # any association that's not currently loaded.
+      #
+      # @param [ Document ] document The document to validate.
       def validate(document)
         attributes.each do |attribute|
           value = document.instance_variable_get("@#{attribute}".to_sym)
@@ -25,7 +25,16 @@ module Mongoid #:nodoc:
         end
       end
 
-      # TODO docs
+      # Validates that the already loaded associations provided are either all
+      # nil or unchanged or all valid. If neither is true then the appropriate
+      # errors will be added to the parent document.
+      #
+      # @example Validate the loaded association.
+      #   validator.validate_each(document, :name, name)
+      #
+      # @param [ Document ] document The document to validate.
+      # @param [ Symbol ] attribute The relation to validate.
+      # @param [ Object ] value The value of the relation.
       def validate_each(document, attribute, value)
         document.validated = true
         valid =
