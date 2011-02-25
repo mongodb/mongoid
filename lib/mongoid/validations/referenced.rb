@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
             true
           else
             Array.wrap(value).collect do |doc|
-              if doc.nil?
+              if doc.nil? || (!doc.changed? && !doc.new_record?)
                 true
               else
                 doc.validated? ? true : doc.valid?
