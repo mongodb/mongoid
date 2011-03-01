@@ -87,6 +87,7 @@ module Mongoid #:nodoc
       #
       # @since 2.0.0.rc.6
       def inherited(subclass)
+        super
         subclass.fields = fields.dup
       end
 
