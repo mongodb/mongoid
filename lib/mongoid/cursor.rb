@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc
   class Cursor
+    include Mongoid::Collections::Retry
     include Enumerable
     # Operations on the Mongo::Cursor object that will not get overriden by the
     # Mongoid::Cursor are defined here.
@@ -31,7 +32,11 @@ module Mongoid #:nodoc
     #
     # <tt>cursor.close</tt>
     OPERATIONS.each do |name|
-      define_method(name) { |*args| @cursor.send(name, *args) }
+      define_method(name) do |*args|
+        retry_on_connection_failure do
+          @cursor.send(name, *args)
+        end
+      end
     end
 
     # Iterate over each document in the cursor and yield to it.

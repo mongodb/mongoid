@@ -2,6 +2,7 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Master
+      include Mongoid::Collections::Retry
 
       attr_reader :collection
 
@@ -12,7 +13,11 @@ module Mongoid #:nodoc:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
       Operations::ALL.each do |name|
-        define_method(name) { |*args| collection.send(name, *args) }
+        define_method(name) do |*args|
+          retry_on_connection_failure do
+            collection.send(name, *args)
+          end
+        end
       end
 
       # Create the new database writer. Will create a collection from the

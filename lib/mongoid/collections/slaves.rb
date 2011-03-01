@@ -2,6 +2,7 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     class Slaves
+      include Mongoid::Collections::Retry
 
       attr_reader :iterator
 
@@ -12,7 +13,11 @@ module Mongoid #:nodoc:
       #
       # <tt>collection.save({ :name => "Al" })</tt>
       Operations::READ.each do |name|
-        define_method(name) { |*args| collection.send(name, *args) }
+        define_method(name) do |*args|
+          retry_on_connection_failure do
+            collection.send(name, *args)
+          end
+        end
       end
 
       # Is the collection of slaves empty or not?

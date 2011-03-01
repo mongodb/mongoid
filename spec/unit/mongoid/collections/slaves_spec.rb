@@ -75,6 +75,11 @@ describe Mongoid::Collections::Master do
         it "delegates to the collection" do
           slave.send(name)
         end
+
+        it "retries on connection failure" do
+          slave.expects(:retry_on_connection_failure).then.yields
+          slave.send(name)
+        end
       end
     end
   end
