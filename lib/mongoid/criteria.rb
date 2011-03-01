@@ -171,8 +171,9 @@ module Mongoid #:nodoc:
           crit.options.update(other.options)
           crit.documents = other.documents
         else
-          crit.selector.update(other.delete(:conditions) || {})
-          crit.options.update(other)
+          duped = other.dup
+          crit.selector.update(duped.delete(:conditions) || {})
+          crit.options.update(duped)
         end
       end
     end

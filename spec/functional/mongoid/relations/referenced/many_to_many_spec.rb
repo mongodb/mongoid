@@ -787,10 +787,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when conditions are provided" do
 
           let(:person) do
-            Person.create(:ssn => "123-32-2321").tap do |person|
-              person.preferences.create(:name => "Testing")
-              person.preferences.create(:name => "Test")
-            end
+            Person.create(:ssn => "123-32-2321")
+          end
+
+          let!(:preference_one) do
+            person.preferences.create(:name => "Testing")
+          end
+
+          let!(:preference_two) do
+            person.preferences.create(:name => "Test")
           end
 
           let!(:deleted) do
@@ -810,6 +815,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "returns the number of documents deleted" do
             deleted.should == 1
+          end
+
+          it "removes the ids from the foreign key" do
+            person.preference_ids.should == [ preference_two.id ]
           end
         end
 

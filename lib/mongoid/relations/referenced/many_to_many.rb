@@ -88,10 +88,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents deleted.
         def delete_all(conditions = nil)
-          selector = (conditions || {})[:conditions] || {}
-          target.delete_if { |doc| doc.matches?(selector) }
-          scoping = { :_id => { "$in" => base.send(metadata.foreign_key) } }
-          metadata.klass.delete_all(:conditions => selector.merge(scoping))
+          remove_all(conditions, :delete_all)
         end
 
         # Destroys all related documents from the database given the supplied
@@ -107,10 +104,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents destroyd.
         def destroy_all(conditions = nil)
-          selector = (conditions || {})[:conditions] || {}
-          target.delete_if { |doc| doc.matches?(selector) }
-          scoping = { :_id => { "$in" => base.send(metadata.foreign_key) } }
-          metadata.klass.destroy_all(:conditions => selector.merge(scoping))
+          remove_all(conditions, :destroy_all)
         end
 
         # Removes all associations between the base document and the target
@@ -221,6 +215,30 @@ module Mongoid # :nodoc:
           document.send(metadata.inverse_foreign_key).delete(base.id)
           document.send(metadata.inverse(document)).target.delete(base)
           document.save
+        end
+
+        # Remove all documents from the relation, either with a delete or a
+        # destroy depending on what this was called through.
+        #
+        # @example Destroy documents from the relation.
+        #   relation.remove_all(:conditions => { :num => 1 }, true)
+        #
+        # @param [ Hash ] conditions Conditions to filter by.
+        # @param [ true, false ] destroy If true then destroy, else delete.
+        #
+        # @return [ Integer ] The number of documents removed.
+        def remove_all(conditions = {}, method)
+          cond = conditions || {}
+          target.delete_if do |doc|
+            doc.matches?(cond[:conditions] || {})
+          end
+          ids = criteria.merge(cond).only(:_id).map(&:_id)
+          criteria.merge(cond).send(method).tap do
+            base.send(metadata.foreign_key).delete_if do |id|
+              ids.include?(id)
+            end
+            base.save
+          end
         end
 
         class << self
