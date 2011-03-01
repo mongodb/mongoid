@@ -713,6 +713,71 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context "with a conditions hash" do
+
+      context "when the other has a selector and options" do
+
+        let(:other) do
+          { :conditions => { :name => "Chloe" }, :sort => [[ :name, :asc ]] }
+        end
+
+        let(:selector) do
+          { :title => "Sir", :name => "Chloe" }
+        end
+
+        let(:options) do
+          { :skip => 40, :sort => [[:name, :asc]] }
+        end
+
+        let(:crit) do
+          criteria.where(:title => "Sir").skip(40)
+        end
+
+        let(:merged) do
+          crit.merge(other)
+        end
+
+        it "merges the selector" do
+          merged.selector.should == selector
+        end
+
+        it "merges the options" do
+          merged.options.should == options
+        end
+      end
+
+      context "when the other has no conditions" do
+
+        let(:other) do
+          { :sort => [[ :name, :asc ]] }
+        end
+
+        let(:selector) do
+          { :title => "Sir" }
+        end
+
+        let(:options) do
+          { :skip => 40, :sort => [[:name, :asc]] }
+        end
+
+        let(:crit) do
+          criteria.where(:title => "Sir").skip(40)
+        end
+
+        let(:merged) do
+          crit.merge(other)
+        end
+
+        it "merges the selector" do
+          merged.selector.should == selector
+        end
+
+        it "merges the options" do
+          merged.options.should == options
+        end
+      end
+    end
   end
 
   describe "#method_missing" do

@@ -166,9 +166,14 @@ module Mongoid #:nodoc:
     # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
     def merge(other)
       clone.tap do |crit|
-        crit.selector.update(other.selector)
-        crit.options.update(other.options)
-        crit.documents = other.documents
+        if other.is_a?(Criteria)
+          crit.selector.update(other.selector)
+          crit.options.update(other.options)
+          crit.documents = other.documents
+        else
+          crit.selector.update(other.delete(:conditions) || {})
+          crit.options.update(other)
+        end
       end
     end
 
