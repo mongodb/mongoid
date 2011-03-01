@@ -387,6 +387,10 @@ describe Mongoid::Criterion::Inclusion do
       it "returns the intersection of in and nin clauses" do
         Person.any_in(:title => ["Sir", "Mrs"]).not_in(:title => ["Mrs"]).should == [person]
       end
+
+      it "returns the intersection of two in clauses" do
+        Person.where(:title.in => ["Sir", "Mrs"]).where(:title.in => ["Sir", "Ms"]).should == [person]
+      end
     end
 
     context "with complex criterion" do
