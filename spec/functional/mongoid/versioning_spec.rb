@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Versioning do
 
+  before(:all) do
+    WikiPage.delete_all
+  end
+
   describe "#version" do
 
     let(:page) do
