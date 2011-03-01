@@ -315,7 +315,9 @@ module Mongoid #:nodoc:
     # Example:
     #
     # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
-    def update_selector(attributes, operator)
+    #
+    # @param [ Symbol ] combine The operator to use when combining sets.
+    def update_selector(attributes, operator, combine = :+)
       clone.tap do |crit|
         converted = BSON::ObjectId.convert(klass, attributes || {})
         converted.each do |key, value|
@@ -323,7 +325,7 @@ module Mongoid #:nodoc:
             crit.selector[key] = { operator => value }
           else
             if crit.selector[key].has_key?(operator)
-              new_value = crit.selector[key].values.first + value
+              new_value = crit.selector[key].values.first.send(combine, value)
               crit.selector[key] = { operator => new_value }
             else
               crit.selector[key][operator] = value

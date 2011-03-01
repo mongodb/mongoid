@@ -20,6 +20,22 @@ module Mongoid #:nodoc:
       end
       alias :all_in :all
 
+      # Adds a criterion to the +Criteria+ that specifies values where any can
+      # be matched in order to return results. This is similar to an SQL "IN"
+      # clause. The MongoDB conditional operator that will be used is "$in".
+      # Any previously matching "$in" arrays will be unioned with new
+      # arguments.
+      #
+      # @example Adding the criterion.
+      #   criteria.in(:field => ["value1"]).also_in(:field => ["value2"])
+      #
+      # @param [ Hash ] attributes Name/value pairs any can match.
+      #
+      # @return [ Criteria ] A new criteria with the added selector.
+      def also_in(attributes = {})
+        update_selector(attributes, "$in")
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values that must
       # be matched in order to return results. This is similar to a SQL "WHERE"
       # clause. This is the actual selector that will be provided to MongoDB,
@@ -105,7 +121,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] A new criteria with the added selector.
       def in(attributes = {})
-        update_selector(attributes, "$in")
+        update_selector(attributes, "$in", :&)
       end
       alias :any_in :in
 
@@ -144,7 +160,10 @@ module Mongoid #:nodoc:
 
           selector.each_pair do |key, value|
             if crit.selector.has_key?(key) && crit.selector[key].respond_to?(:merge!)
-              crit.selector[key] = crit.selector[key].merge!(value)
+              crit.selector[key] =
+                crit.selector[key].merge!(value) do |key, old, new|
+                  key == '$in' ? old & new : new
+                end
             else
               crit.selector[key] = value
             end
