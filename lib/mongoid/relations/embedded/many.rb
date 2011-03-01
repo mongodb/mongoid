@@ -398,7 +398,7 @@ module Mongoid # :nodoc:
         # @param [ true, false ] destroy If true then destroy, else delete.
         #
         # @return [ Integer ] The number of documents removed.
-        def remove_all(conditions = {}, method)
+        def remove_all(conditions = {}, method = :delete)
           criteria = find(:all, conditions || {})
           criteria.size.tap do
             criteria.each do |doc|
