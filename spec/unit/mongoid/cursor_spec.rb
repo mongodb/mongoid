@@ -31,6 +31,11 @@ describe Mongoid::Cursor do
       it "delegates to the proxy" do
         cursor.send(name)
       end
+
+      it "retries on connection failure" do
+        cursor.expects(:retry_on_connection_failure).then.yields
+        cursor.send(name)
+      end
     end
   end
 

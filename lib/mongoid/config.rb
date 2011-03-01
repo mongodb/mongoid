@@ -46,6 +46,7 @@ module Mongoid #:nodoc
     option :reconnect_time, :default => 3
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
+    option :max_retries_on_connection_failure, :default => 0
 
     # Adds a new I18n locale file to the load path.
     #
