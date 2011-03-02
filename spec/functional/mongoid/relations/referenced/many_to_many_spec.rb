@@ -132,7 +132,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     context "when the relation is not polymorphic" do
 
-      context "when the parent is a new record" do
+      context "when the parent and relation are new records" do
 
         let(:person) do
           Person.new
@@ -166,6 +166,64 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           preference.should be_new
         end
       end
+
+      
+      context "when the parent is new but the relation exists" do
+        
+        let(:person) do
+          Person.new
+        end
+        
+        let!(:preference) do
+          Preference.create
+        end
+        
+        before do
+          person.preferences = [ preference ]
+        end
+        
+        it "sets the relation" do
+          person.preferences.should == [ preference ]
+        end
+
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should == [ preference.id ]
+        end
+
+        it "sets the foreign key on the inverse relation" do
+          preference.person_ids.should == [ person.id ]
+        end
+
+        it "sets the base on the inverse relation" do
+          preference.people.first.should == person
+        end
+        
+        context "and the parent is persisted" do
+          
+          before do
+            person.save!
+            preference.reload
+          end
+          
+          it "maintains the relation" do
+            person.preferences.should == [ preference ]
+          end
+
+          it "maintains the foreign key on the relation" do
+            person.preference_ids.should == [ preference.id ]
+          end
+
+          it "maintains the foreign key on the inverse relation" do
+            preference.person_ids.should == [ person.id ]
+          end
+
+          it "maintains the base on the inverse relation" do
+            preference.people.first.should == person
+          end
+          
+        end
+      end
+
 
       context "when the parent is not a new record" do
 
