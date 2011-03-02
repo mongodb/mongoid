@@ -263,7 +263,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def append(document, options = {})
-          load!(options) and target.push(document)
+          init_target if !initialized? && !loaded?
+          target.push(document)
           characterize_one(document)
           binding.bind_one(document, options)
         end
@@ -292,6 +293,35 @@ module Mongoid #:nodoc:
         def criteria
           raise_mixed if klass.embedded?
           metadata.klass.where(metadata.foreign_key => base.id)
+        end
+
+        # Tells if the target array been initialized.
+        #
+        # @example Is the target initialized?
+        #   relation.initialized?
+        #
+        # @return [ true, false ] If the target is an array.
+        #
+        # @since 2.0.0
+        def initialized?
+          !!@initialized
+        end
+
+        # Initializes the target of the proxy as an empty array instead of
+        # hitting the database.
+        #
+        # @example Initialize the target.
+        #   relation.init_target
+        #
+        # @raise [ Errors::MixedRelations ] If the class is embedded.
+        #
+        # @return [ true ] Always true.
+        #
+        # @since 2.0.0
+        def init_target
+          raise_mixed if klass.embedded?
+          @target = []
+          @initialized = true
         end
 
         # If the target array does not respond to the supplied method then try to
