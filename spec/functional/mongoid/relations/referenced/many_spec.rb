@@ -101,6 +101,41 @@ describe Mongoid::Relations::Referenced::Many do
           it "adds the document to the target" do
             person.posts.count.should == 1
           end
+
+          context "when documents already exist on the relation" do
+
+            let(:post_two) do
+              Post.new(:title => "Test")
+            end
+
+            before do
+              person.posts.send(method, post_two)
+            end
+
+            it "sets the foreign key on the relation" do
+              post_two.person_id.should == person.id
+            end
+
+            it "sets the base on the inverse relation" do
+              post_two.person.should == person
+            end
+
+            it "sets the same instance on the inverse relation" do
+              post_two.person.should eql(person)
+            end
+
+            it "saves the target" do
+              post_two.should_not be_a_new_record
+            end
+
+            it "adds the document to the target" do
+              person.posts.count.should == 2
+            end
+
+            it "contains all documents in the target" do
+              person.posts.should == [ post, post_two ]
+            end
+          end
         end
       end
 
