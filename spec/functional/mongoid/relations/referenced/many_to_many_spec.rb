@@ -123,6 +123,45 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           it "adds the document to the target" do
             person.preferences.count.should == 1
           end
+
+          context "when documents already exist on the relation" do
+
+            let(:preference_two) do
+              Preference.new
+            end
+
+            before do
+              person.preferences.send(method, preference_two)
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference, preference_two ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id, preference_two.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference_two.person_ids.should == [ person.id ]
+            end
+
+            it "sets the base on the inverse relation" do
+              preference_two.people.should == [ person ]
+            end
+
+            it "sets the same instance on the inverse relation" do
+              preference_two.people.first.should eql(person)
+            end
+
+            it "saves the target" do
+              preference.should_not be_new
+            end
+
+            it "adds the document to the target" do
+              person.preferences.count.should == 2
+            end
+          end
         end
       end
     end
