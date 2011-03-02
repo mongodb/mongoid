@@ -200,6 +200,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         it "saves the target" do
           preference.should be_persisted
         end
+        
+        it "should persist the relation" do
+          person.reload.preferences == [ preference ]
+        end
 
         context 'when overwriting an existing relation' do
           let(:another_preference) { Preference.new }
@@ -218,6 +222,52 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it 'does not leave foreign keys of the previous relation' do
             person.preference_ids.should == [ another_preference.id ]
+          end
+          
+          it 'clears its own key on the foreign relation' do
+            preference.person_ids.should == [ ]
+          end
+          
+          context 'and person reloaded instead of saved' do
+            before do
+              person.reload
+              preference.reload
+              another_preference.reload
+            end
+            
+            it 'should have still persisted the relation between person and another_preference' do
+              person.preferences.should == [ another_preference ]
+            end
+            
+            it 'should have still persisited the relation between another_prefrence and person' do
+              another_preference.people.should == [ person ]
+            end
+            
+            it 'should no longer have any relation between preference and person' do
+              preference.people.should == [ ]
+            end
+          end
+          
+          context 'and person is saved' do
+            before do
+              person.save
+              person.reload
+              preference.reload
+              another_preference.reload
+            end
+            
+            it 'should have persisted the relation between person and another_preference' do
+              person.preferences.should == [ another_preference ]
+            end
+            
+            it 'should have persisited the relation between another_prefrence and person' do
+              another_preference.people.should == [ person ]
+            end
+            
+            it 'should no longer have any relation between preference and person' do
+              preference.people.should == [ ]
+            end
+            
           end
         end
       end

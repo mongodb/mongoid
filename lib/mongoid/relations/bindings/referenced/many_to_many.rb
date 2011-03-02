@@ -92,6 +92,8 @@ module Mongoid # :nodoc:
                   inverse, false, OPTIONS
                 ).delete(base, :binding => true, :continue => false)
               end
+            else
+              base.save if base.persisted?
             end
           end
         end
