@@ -22,9 +22,15 @@ module Mongoid # :nodoc:
         # @param [ Document, Array<Document> ] *args Any number of documents.
         def <<(*args)
           options = default_options(args)
-          super(args)
+          args.flatten.each do |doc|
+            return doc unless doc
+            append(doc, options)
+            doc.save if base.persisted? && !options[:binding]
+          end
           base.save if base.persisted? && !options[:binding]
         end
+        alias :concat :<<
+        alias :push :<<
 
         # Creates a new document on the references many relation. This will
         # save the document if the parent has been persisted.
