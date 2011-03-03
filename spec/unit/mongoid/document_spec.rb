@@ -291,6 +291,27 @@ describe Mongoid::Document do
           person.game.name.should == "Ms. Pacman"
         end
       end
+
+      context "when instantiating model" do
+
+        let(:person) do
+          Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
+        end
+
+        before do
+          Person.set_callback :initialize, :after do |doc|
+            doc.title = "Madam"
+          end
+        end
+
+        after do
+          Person.reset_callbacks(:initialize)
+        end
+
+        it "runs the callbacks" do
+          person.title.should == "Madam"
+        end
+      end
     end
 
     context "when defaults are defined" do
