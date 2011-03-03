@@ -236,6 +236,7 @@ module Mongoid #:nodoc:
             doc.instance_variable_set(:@attributes, attributes)
             doc.send(:apply_default_attributes)
             doc.setup_modifications
+            doc.run_callbacks(:initialize) { doc }
           end
         else
           new(attrs)
