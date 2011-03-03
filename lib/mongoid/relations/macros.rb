@@ -262,7 +262,7 @@ module Mongoid # :nodoc:
             options.merge(
               :relation => relation,
               :extend => block,
-              :inverse_class_name => self.model_name,
+              :inverse_class_name => self.name,
               :name => name
             )
           )
