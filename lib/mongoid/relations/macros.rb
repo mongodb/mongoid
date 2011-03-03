@@ -190,6 +190,7 @@ module Mongoid # :nodoc:
           characterize(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
+            autosave(meta)
           end
         end
         alias :has_and_belongs_to_many :references_and_referenced_in_many
