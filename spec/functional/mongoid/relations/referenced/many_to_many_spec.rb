@@ -1273,6 +1273,13 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#nil?" do
+
+    it "returns false" do
+      Person.new.preferences.should_not be_nil
+    end
+  end
+
   describe "#nullify_all" do
 
     let(:person) do
@@ -1317,6 +1324,27 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     it "saves the documents" do
       preference_one.reload.people.should_not include(person)
+    end
+  end
+
+  describe "#respond_to?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:preferences) do
+      person.preferences
+    end
+
+    context "when checking against array methods" do
+
+      [].methods.each do |method|
+
+        it "returns true for #{method}" do
+          preferences.should respond_to(method)
+        end
+      end
     end
   end
 

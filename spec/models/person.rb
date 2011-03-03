@@ -5,8 +5,9 @@ class Person
   include Mongoid::Versioning
 
   attr_accessor :mode
-	class_inheritable_hash :somebody_elses_important_class_options
-	self.somebody_elses_important_class_options = { :keep_me_around => true }
+
+  class_inheritable_hash :somebody_elses_important_class_options
+  self.somebody_elses_important_class_options = { :keep_me_around => true }
 
   field :title
   field :terms, :type => Boolean
