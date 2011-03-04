@@ -24,7 +24,7 @@ describe Mongoid::Persistence::Atomic::Inc do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$inc" => { :age => 2 } }, {}
+          person._selector, { "$inc" => { :age => 2 } }, { :safe => false }
         )
       end
 
@@ -53,7 +53,7 @@ describe Mongoid::Persistence::Atomic::Inc do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$inc" => { :score => 2 } }, {}
+          person._selector, { "$inc" => { :score => 2 } }, { :safe => false }
         )
       end
 
@@ -82,7 +82,7 @@ describe Mongoid::Persistence::Atomic::Inc do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$inc" => { :high_score => 5 } }, {}
+          person._selector, { "$inc" => { :high_score => 5 } }, { :safe => false }
         )
       end
 

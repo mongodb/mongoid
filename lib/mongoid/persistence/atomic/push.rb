@@ -18,23 +18,9 @@ module Mongoid #:nodoc:
         def persist
           document[field] = [] unless document[field]
           document.send(field).push(value).tap do |value|
-            document.collection.update(document._selector, operation, options)
+            document.collection.update(document._selector, operation("$push"), options)
             document.changes.delete(field.to_s)
           end
-        end
-
-        private
-
-        # Get the atomic operation to perform.
-        #
-        # @example Get the operation.
-        #   push.operation
-        #
-        # @return [ Hash ] The $push operation for the field and addition.
-        #
-        # @since 2.0.0
-        def operation
-          { "$push" => { field => value } }
         end
       end
     end

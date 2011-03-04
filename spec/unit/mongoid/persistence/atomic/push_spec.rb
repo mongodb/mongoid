@@ -24,7 +24,7 @@ describe Mongoid::Persistence::Atomic::Push do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$push" => { :aliases => "Bond" } }, {}
+          person._selector, { "$push" => { :aliases => "Bond" } }, { :safe => false }
         )
       end
 
@@ -61,7 +61,7 @@ describe Mongoid::Persistence::Atomic::Push do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$push" => { :aliases => "Bond" } }, {}
+          person._selector, { "$push" => { :aliases => "Bond" } }, { :safe => false }
         )
       end
 

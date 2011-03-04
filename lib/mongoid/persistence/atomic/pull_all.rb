@@ -20,26 +20,12 @@ module Mongoid #:nodoc:
             values = document.send(field)
             values.delete_if { |val| value.include?(val) }
             values.tap do
-              document.collection.update(document._selector, operation, options)
+              document.collection.update(document._selector, operation("$pullAll"), options)
               document.changes.delete(field.to_s) if document.persisted?
             end
           else
             return nil
           end
-        end
-
-        private
-
-        # Get the atomic operation to perform.
-        #
-        # @example Get the operation.
-        #   pull_all.operation
-        #
-        # @return [ Hash ] The $pullAll operation for the field and addition.
-        #
-        # @since 2.0.0
-        def operation
-          { "$pullAll" => { field => value } }
         end
       end
     end
