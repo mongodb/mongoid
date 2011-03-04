@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic/operation"
 require "mongoid/persistence/atomic/add_to_set"
+require "mongoid/persistence/atomic/inc"
 require "mongoid/persistence/atomic/pull_all"
 require "mongoid/persistence/atomic/push"
 
@@ -30,6 +31,24 @@ module Mongoid #:nodoc:
         AddToSet.new(self, field, value, options).persist
       end
 
+      # Performs an atomic $inc of the provided value on the supplied
+      # field. If the field does not exist it will be initialized as
+      # the provided value.
+      #
+      # @example Increment a field.
+      #   person.inc(:score, 2)
+      #
+      # @param [ Symbol ] field The name of the field.
+      # @param [ Integer ] value The value to increment.
+      # @param [ Hash ] options The mongo persistence options.
+      #
+      # @return [ Array<Object> ] The new value of the field.
+      #
+      # @since 2.0.0
+      def inc(field, value, options = {})
+        Inc.new(self, field, value, options).persist
+      end
+
       # Performs an atomic $pullAll of the provided value on the supplied
       # field. If the field does not exist it will be initialized as an
       # empty array.
@@ -38,7 +57,7 @@ module Mongoid #:nodoc:
       #   person.pull_all(:aliases, [ "Bond", "James" ])
       #
       # @param [ Symbol ] field The name of the field.
-      # @param [ Object ] value The value to push.
+      # @param [ Array<Object> ] value The values to pull.
       # @param [ Hash ] options The mongo persistence options.
       #
       # @return [ Array<Object> ] The new value of the field.

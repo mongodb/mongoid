@@ -29,7 +29,6 @@ module Mongoid #:nodoc
     include Mongoid::JSON
     include Mongoid::Keys
     include Mongoid::Matchers
-    include Mongoid::Modifiers
     include Mongoid::NamedScope
     include Mongoid::NestedAttributes
     include Mongoid::Paths

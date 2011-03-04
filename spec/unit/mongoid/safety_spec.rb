@@ -135,11 +135,13 @@ describe Mongoid::Safety do
     describe "#inc" do
 
       before do
-        Mongoid::Modifiers::Inc.expects(:new).with(
+        Mongoid::Persistence::Atomic::Inc.expects(:new).with(
           person,
+          :age,
+          5,
           { :safe => safety_options }
         ).returns(modifier)
-        modifier.expects(:persist).with(:age, 5).returns(true)
+        modifier.expects(:persist).returns(true)
       end
 
       context "without options provided" do
