@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/persistence/atomic"
 require "mongoid/persistence/command"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
@@ -43,6 +44,23 @@ module Mongoid #:nodoc:
     # @return [ Document ] The persisted document.
     def insert(options = {})
       Insert.new(self, options).persist
+    end
+
+    # Performs an atomic $push of the provided value on the supplied field. If
+    # the field does not exist it will be initialized as an empty array.
+    #
+    # @example Push a value on the field.
+    #   person.push(:aliases, "Bond")
+    #
+    # @param [ Symbol ] field The name of the field.
+    # @param [ Object ] value The value to push.
+    # @param [ Hash ] options The mongo persistence options.
+    #
+    # @return [ Array<Object> ] The new value of the field.
+    #
+    # @since 2.0.0
+    def push(field, value, options = {})
+      Atomic::Push.new(self, field, value, options).persist
     end
 
     # Remove the document from the datbase.
