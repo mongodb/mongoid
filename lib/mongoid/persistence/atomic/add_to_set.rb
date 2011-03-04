@@ -5,24 +5,7 @@ module Mongoid #:nodoc:
 
       # This class provides the ability to perform an explicit $addToSet
       # modification on a specific field.
-      class AddToSet
-
-        attr_reader :document, :field, :value, :options
-
-        # Initialize the new addToSet operation.
-        #
-        # @example Create a new addToSet operation.
-        #   AddToSet.new(document, :aliases, "Bond")
-        #
-        # @param [ Document ] document The document to addToSet onto.
-        # @param [ Symbol ] field The name of the array field.
-        # @param [ Object ] value The value to addToSet.
-        # @param [ Hash ] options The persistence options.
-        #
-        # @since 2.0.0
-        def initialize(document, field, value, options = {})
-          @document, @field, @value, @options = document, field, value, options
-        end
+      class AddToSet < Operation
 
         # Sends the atomic $addToSet operation to the database.
         #

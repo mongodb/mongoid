@@ -5,24 +5,7 @@ module Mongoid #:nodoc:
 
       # This class provides the ability to perform an explicit $push modification
       # on a specific field.
-      class Push
-
-        attr_reader :document, :field, :value, :options
-
-        # Initialize the new push operation.
-        #
-        # @example Create a new push operation.
-        #   Push.new(document, :aliases, "Bond")
-        #
-        # @param [ Document ] document The document to push onto.
-        # @param [ Symbol ] field The name of the array field.
-        # @param [ Object ] value The value to push.
-        # @param [ Hash ] options The persistence options.
-        #
-        # @since 2.0.0
-        def initialize(document, field, value, options = {})
-          @document, @field, @value, @options = document, field, value, options
-        end
+      class Push < Operation
 
         # Sends the atomic $push operation to the database.
         #
