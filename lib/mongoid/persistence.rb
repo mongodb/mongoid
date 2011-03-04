@@ -21,6 +21,25 @@ module Mongoid #:nodoc:
   module Persistence
     extend ActiveSupport::Concern
 
+    # Performs an atomic $addToSet of the provided value on the supplied field.
+    # If the field does not exist it will be initialized as an empty array.
+    #
+    # If the value already exists on the array it will not be added.
+    #
+    # @example Add only a unique value on the field.
+    #   person.add_to_set(:aliases, "Bond")
+    #
+    # @param [ Symbol ] field The name of the field.
+    # @param [ Object ] value The value to add.
+    # @param [ Hash ] options The mongo persistence options.
+    #
+    # @return [ Array<Object> ] The new value of the field.
+    #
+    # @since 2.0.0
+    def add_to_set(field, value, options = {})
+      Atomic::AddToSet.new(self, field, value, options).persist
+    end
+
     # Remove the document from the datbase with callbacks.
     #
     # @example Destroy a document.
