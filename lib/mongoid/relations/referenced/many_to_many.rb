@@ -248,10 +248,7 @@ module Mongoid # :nodoc:
           end
           ids = criteria.merge(cond).only(:_id).map(&:_id)
           criteria.merge(cond).send(method).tap do
-            base.send(metadata.foreign_key).delete_if do |id|
-              ids.include?(id)
-            end
-            base.save
+            base.pull_all(metadata.foreign_key, ids)
           end
         end
 
