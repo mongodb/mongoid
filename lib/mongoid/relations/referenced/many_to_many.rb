@@ -46,7 +46,10 @@ module Mongoid # :nodoc:
         # @return [ Document ] The newly created document.
         def create(attributes = nil, type = nil)
           build(attributes, type).tap do |doc|
-            doc.save and base.save if base.persisted?
+            if base.persisted?
+              doc.save
+              base.add_to_set(metadata.foreign_key, doc.id)
+            end
           end
         end
 
@@ -65,7 +68,10 @@ module Mongoid # :nodoc:
         # @return [ Document ] The newly created document.
         def create!(attributes = nil, type = nil)
           build(attributes, type).tap do |doc|
-            doc.save! and base.save! if base.persisted?
+            if base.persisted?
+              doc.save!
+              base.add_to_set(metadata.foreign_key, doc.id)
+            end
           end
         end
 

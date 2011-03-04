@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
           values.push(value) unless values.include?(value)
           values.tap do
             document.collection.update(document._selector, operation, options)
-            document.changes.delete(field.to_s)
+            document.changes.delete(field.to_s) if document.persisted?
           end
         end
 

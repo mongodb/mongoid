@@ -8,6 +8,29 @@ describe Mongoid::Persistence::Atomic::AddToSet do
 
   describe "#persist" do
 
+    context "when the document is new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let!(:added) do
+        person.add_to_set(:aliases, "Bond")
+      end
+
+      it "adds the value onto the array" do
+        person.aliases.should == [ "Bond" ]
+      end
+
+      it "does not reset the dirty flagging" do
+        person.changes.should == { "aliases" => [[], ["Bond"]] }
+      end
+
+      it "returns the new array value" do
+        added.should == [ "Bond" ]
+      end
+    end
+
     context "when the field exists" do
 
       context "when the value is unique" do
