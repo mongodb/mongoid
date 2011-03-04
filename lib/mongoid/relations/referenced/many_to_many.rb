@@ -25,9 +25,11 @@ module Mongoid # :nodoc:
           args.flatten.each do |doc|
             return doc unless doc
             append(doc, options)
-            doc.save if base.persisted? && !options[:binding]
+            if base.persisted? && !options[:binding]
+              doc.save
+              base.add_to_set(metadata.foreign_key, doc.id)
+            end
           end
-          base.save if base.persisted? && !options[:binding]
         end
         alias :concat :<<
         alias :push :<<
