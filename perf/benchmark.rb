@@ -19,7 +19,7 @@ class Person
 
   references_many :posts, :validate => false
   references_one :game, :validate => false
-  references_and_referenced_in_many :preferences
+  references_and_referenced_in_many :preferences, :validate => false
 end
 
 class Name
@@ -141,19 +141,19 @@ Benchmark.bm do |bm|
     end
   end
 
-  bm.report("[ ref:many-to-many ] Appending 100k referenced documents") do
-    100000.times do |n|
+  bm.report("[ ref:many-to-many ] Appending 10k referenced documents") do
+    10000.times do |n|
       person.preferences.create(:name => "Setting #{n}")
     end
   end
 
-  bm.report("[ ref:many-to-many ] Updating 100k referenced documents") do
+  bm.report("[ ref:many-to-many ] Updating 10k referenced documents") do
     person.preferences.each do |preference|
       preference.update_attribute(:name, "Updated")
     end
   end
 
-  bm.report("[ ref:many-to-many ] Deleting 100k referenced documents") do
+  bm.report("[ ref:many-to-many ] Deleting 10k referenced documents") do
     person.preferences.delete_all
   end
 end
