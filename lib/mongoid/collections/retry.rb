@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Collections #:nodoc:
+
+    # Provides behaviour for retrying commands on connection failure.
     module Retry
+
       # Retries command on connection failures.
       #
       # This is useful when using replica sets. When a primary server wents
@@ -13,6 +16,13 @@ module Mongoid #:nodoc:
       # no attempt will be made, immediately raising connection failure.
       # Otherwise it will attempt to make the specified number of retries
       # and then raising the exception to clients.
+      #
+      # @example Retry the command.
+      #   retry_on_connection_failure do
+      #     collection.send(name, *args)
+      #   end
+      #
+      # @since 2.0.0
       def retry_on_connection_failure
         retries = 0
         begin
