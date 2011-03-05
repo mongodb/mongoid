@@ -106,10 +106,11 @@ module Mongoid #:nodoc:
     #   person.attributes = { :title => "Mr." }
     #
     # @param [ Hash ] attrs The new attributes to set.
+    # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 1.0.0
-    def write_attributes(attrs = nil)
-      process(attrs) do |document|
+    def write_attributes(attrs = nil, guard_protected_attributes = true)
+      process(attrs, guard_protected_attributes) do |document|
         document.identify if new? && id.blank?
       end
     end

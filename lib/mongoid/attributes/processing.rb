@@ -14,10 +14,13 @@ module Mongoid #:nodoc:
       #   person.process(:title => "sir", :age => 40)
       #
       # @param [ Hash ] attrs The attributes to set.
+      # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
       #
       # @since 2.0.0.rc.7
-      def process(attrs = nil)
-        sanitize_for_mass_assignment(attrs || {}).each_pair do |key, value|
+      def process(attrs = nil, guard_protected_attributes = true)
+        attrs ||= {}
+        attrs = sanitize_for_mass_assignment(attrs) if guard_protected_attributes
+        attrs.each_pair do |key, value|
           next if pending_attribute?(key, value)
           process_attribute(key, value)
         end

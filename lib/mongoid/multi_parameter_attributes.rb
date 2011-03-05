@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
       end
     end
 
-    def process(attrs = nil)
+    def process(attrs = nil, guard_protected_attributes = true)
       if attrs
         errors = []
         attributes = {}
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
           raise Errors::MultiparameterAssignmentErrors.new(errors), "#{errors.size} error(s) on assignment of multiparameter attributes"
         end
 
-        super attributes
+        super attributes, guard_protected_attributes
       else
         super
       end
