@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
     def self.build(klass, attributes)
       attrs = {}.merge(attributes)
       type = attrs["_type"]
-      type ? type.constantize.instantiate(attrs) : klass.instantiate(attrs)
+      type.present? ? type.constantize.instantiate(attrs) : klass.instantiate(attrs)
     end
   end
 end
