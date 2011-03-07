@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/criterion/builder"
 require "mongoid/criterion/creational"
 require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
@@ -25,6 +26,7 @@ module Mongoid #:nodoc:
   # <tt>criteria.execute</tt>
   class Criteria
     include Enumerable
+    include Criterion::Builder
     include Criterion::Creational
     include Criterion::Exclusion
     include Criterion::Inclusion

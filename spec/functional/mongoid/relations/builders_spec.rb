@@ -65,4 +65,18 @@ describe Mongoid::Relations::Builders do
       end
     end
   end
+
+  describe "#build" do
+    context "with criteria applied" do
+
+      let(:person) { Person.new }
+      let(:services) { person.services.asc(:sid) }
+
+      subject { services.build }
+
+      it { should be_a_kind_of(Service) }
+      it { should_not be_persisted }
+
+    end
+  end
 end
