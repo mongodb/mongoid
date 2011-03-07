@@ -18,9 +18,9 @@ module Mongoid #:nodoc:
       # @return [ Document ] A non-persisted document.
       #
       # @since 2.0.0.rc.8
-      def build
+      def build(attrs={})
         klass.new(
-          selector.inject({}) do |hash, (key, value)|
+          selector.inject(attrs) do |hash, (key, value)|
             hash.tap do |attrs|
               unless key.to_s =~ /\$/ || value.is_a?(Hash)
                 attrs[key] = value

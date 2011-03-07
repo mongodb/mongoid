@@ -18,9 +18,9 @@ module Mongoid #:nodoc:
       # @return [ Document ] A newly created document.
       #
       # @since 2.0.0.rc.1
-      def create
+      def create(attrs={})
         klass.create(
-          selector.inject({}) do |hash, (key, value)|
+          selector.inject(attrs) do |hash, (key, value)|
             hash.tap do |attrs|
               unless key.to_s =~ /\$/ || value.is_a?(Hash)
                 attrs[key] = value
