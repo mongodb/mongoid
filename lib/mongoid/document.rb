@@ -258,5 +258,27 @@ module Mongoid #:nodoc:
         :mongoid
       end
     end
+
+    # Freezes the internal attributes of the document.
+    #
+    # @example Freeze the document
+    #   document.freeze
+    #
+    # @return [ Document ] The document.
+    def freeze
+      raw_attributes.freeze
+      self
+    end
+
+    # Checks if the document is frozen
+    #
+    # @example Check if frozen
+    #   document.frozen?
+    #
+    # @return [ true, false ] True if frozen, else false.
+    def frozen?
+      raw_attributes.frozen?
+    end
+
   end
 end

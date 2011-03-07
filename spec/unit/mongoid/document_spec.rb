@@ -609,4 +609,50 @@ describe Mongoid::Document do
       end
     end
   end
+
+  describe "#frozen?" do
+    let(:person) do
+      Person.new
+    end
+
+    context "when attributes are not frozen" do
+      it "return false" do
+        person.should_not be_frozen
+        lambda { person.title = "something" }.should_not raise_error
+      end
+    end
+
+    context "when attributes are frozen" do
+      before do
+        person.raw_attributes.freeze
+      end
+      it "return true" do
+        person.should be_frozen
+      end
+    end
+  end
+
+  describe "#freeze" do
+    let(:person) do
+      Person.new
+    end
+
+    context "when not frozen" do
+      it "freezes attributes" do
+        person.freeze.should == person
+        lambda { person.title = "something" }.should raise_error
+      end
+    end
+
+    context "when frozen" do
+      before do
+        person.raw_attributes.freeze
+      end
+      it "keeps things frozen" do
+        person.freeze
+        lambda { person.title = "something" }.should raise_error
+      end
+    end
+  end
+
 end
