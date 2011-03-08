@@ -43,7 +43,6 @@ module Mongoid #:nodoc
     option :persist_in_safe_mode, :default => false
     option :preload_models, :default => true
     option :raise_not_found_error, :default => true
-    option :reconnect_time, :default => 3
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
     option :max_retries_on_connection_failure, :default => 0

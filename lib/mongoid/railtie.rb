@@ -35,7 +35,7 @@ module Rails #:nodoc:
       #   module MyApplication
       #     class Application < Rails::Application
       #       config.mongoid.logger = Logger.new($stdout, :warn)
-      #       config.mongoid.reconnect_time = 10
+      #       config.mongoid.persist_in_safe_mode = true
       #     end
       #   end
       config.mongoid = ::Mongoid::Config
