@@ -95,10 +95,6 @@ describe Mongoid::Config do
         described_class.include_root_in_json.should == true
       end
 
-      it "sets reconnect_time" do
-        described_class.reconnect_time.should == 5
-      end
-
       it "sets parameterize keys" do
         described_class.parameterize_keys.should == false
       end
@@ -305,13 +301,6 @@ describe Mongoid::Config do
 
       it "defaults to true" do
         described_class.raise_not_found_error.should be_true
-      end
-    end
-
-    describe ".reconnect_time" do
-
-      it "defaults to 3" do
-        described_class.reconnect_time.should == 3
       end
     end
 
