@@ -39,11 +39,6 @@ module Mongoid #:nodoc:
       end
       @attributes.delete("_id")
       @attributes.delete("versions")
-      relations.select do |key, meta|
-        meta.macro == :references_and_referenced_in_many
-      end.each do |key, meta|
-        @attributes[meta.foreign_key] = []
-      end
       @new_record = true
       identify
     end

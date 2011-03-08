@@ -32,14 +32,6 @@ describe Mongoid::Copyable do
 
       context "when the document is new" do
 
-        let!(:preferences) do
-          person.preferences.build(:name => "testing")
-        end
-
-        before do
-          person.new_record = false
-        end
-
         context "when versions exist" do
 
           let(:copy) do
@@ -92,14 +84,6 @@ describe Mongoid::Copyable do
 
           it "does not copy references one documents" do
             copy.game.should be_nil
-          end
-
-          it "does not copy references many-to-many documents" do
-            copy.preferences.should be_empty
-          end
-
-          it "does not copy many-to-many ids" do
-            copy.preference_ids.should be_empty
           end
 
           Mongoid::Copyable::COPYABLES.each do |name|
