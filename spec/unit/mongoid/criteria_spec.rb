@@ -273,6 +273,44 @@ describe Mongoid::Criteria do
       end
     end
 
+    describe "#freeze" do
+
+      context "when the context has been initialized" do
+
+        let(:frozen) do
+          described_class.new(Person)
+        end
+
+        before do
+          frozen.context
+          frozen.freeze
+        end
+
+        it "does not raise an error on iteration" do
+          expect {
+            frozen.entries
+          }.to_not raise_error
+        end
+      end
+
+      context "when the context has not been initialized" do
+
+        let(:frozen) do
+          described_class.new(Person)
+        end
+
+        before do
+          frozen.freeze
+        end
+
+        it "does not raise an error on iteration" do
+          expect {
+            frozen.entries
+          }.to_not raise_error
+        end
+      end
+    end
+
     describe "#group" do
 
       before do
