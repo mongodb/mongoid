@@ -3257,4 +3257,53 @@ describe Mongoid::NestedAttributes do
       end
     end
   end
+
+  describe "#update_attributes" do
+
+    context "when the relation is an embeds many" do
+
+      let(:league) do
+        League.create
+      end
+
+      let!(:division) do
+        league.divisions.create(:name => "Old Name")
+      end
+
+      let(:params) do
+        { :divisions_attributes =>
+          { "0" => { :id => division.id.to_s, :name => "New Name" }}
+        }
+      end
+
+      before do
+        league.update_attributes(params)
+      end
+
+      it "sets the nested attributes" do
+        league.reload.divisions.first.name.should == "New Name"
+      end
+
+      context "with corrupted data" do
+
+        before do
+          league[:league] = params
+        end
+
+        let(:new_params) do
+          { :divisions_attributes =>
+            { "0" => { :id => division.id.to_s, :name => "Name" }}
+          }
+        end
+
+        before do
+          league.update_attributes(new_params)
+        end
+
+        it "sets the nested attributes" do
+          league.reload.divisions.first.name.should == "Name"
+        end
+      end
+    end
+  end
 end
