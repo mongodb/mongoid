@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
       attr_accessor :collection, :criteria
 
       delegate :blank?, :empty?, :first, :last, :to => :execute
-      delegate :klass, :documents, :options, :selector, :to => :criteria
+      delegate :klass, :documents, :options, :field_list, :selector, :to => :criteria
 
       # Return aggregation counts of the grouped documents. This will count by
       # the first field provided in the fields array.
@@ -101,7 +101,7 @@ module Mongoid #:nodoc:
       #
       # A +Hash+ with field values as keys, arrays of documents as values.
       def group
-        field = options[:fields].first
+        field = field_list.first
         execute.group_by { |doc| doc.send(field) }
       end
 

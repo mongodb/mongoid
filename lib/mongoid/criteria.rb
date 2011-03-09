@@ -40,7 +40,8 @@ module Mongoid #:nodoc:
       :ids,
       :klass,
       :options,
-      :selector
+      :selector,
+      :field_list
 
     delegate \
       :aggregate,
