@@ -2,8 +2,8 @@
 module Mongoid #:nodoc:
   module Criterion #:nodoc:
 
-    # This module defines criteria behavior for building documents in the
-    # database for specified conditions.
+    # This module defines criteria behavior for building documents for
+    # specified conditions.
     module Builder
 
       # Build a document given the selector and return it.
@@ -13,12 +13,12 @@ module Mongoid #:nodoc:
       #   Person.where(:title => "Sir").build
       #
       # @example Build with selectors getting ignored.
-      #   Person.where(:age.gt => 5).create
+      #   Person.where(:age.gt => 5).build
       #
       # @return [ Document ] A non-persisted document.
       #
-      # @since 2.0.0.rc.8
-      def build(attrs={})
+      # @since 2.0.0
+      def build(attrs = {})
         klass.new(
           selector.inject(attrs) do |hash, (key, value)|
             hash.tap do |attrs|
