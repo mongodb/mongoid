@@ -51,6 +51,7 @@ module Mongoid #:nodoc:
       # @since 1.0.0
       def scope(name, conditions = {}, &block)
         name = name.to_sym
+        valid_scope_name?(name)
         scopes[name] = Scope.new(conditions, &block)
         (class << self; self; end).class_eval <<-EOT
           def #{name}(*args)
@@ -120,6 +121,15 @@ module Mongoid #:nodoc:
           yield criteria
         ensure
           scope_stack.pop
+        end
+      end
+
+    protected
+
+      def valid_scope_name?(name)
+        if !scopes[name] && respond_to?(name, true)
+          Mongoid.logger.warn "Creating scope :#{name}. " \
+                                    "Overwriting existing method #{self.name}.#{name}."
         end
       end
     end
