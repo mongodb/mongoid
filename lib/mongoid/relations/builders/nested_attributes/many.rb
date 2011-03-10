@@ -24,10 +24,16 @@ module Mongoid # :nodoc:
             if over_limit?(attributes)
               raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
             end
-            attributes.each { |attrs| process(attrs[1]) }
+            attributes.each do |attrs|
+              if attrs.respond_to?(:with_indifferent_access)
+                process(attrs)
+              else
+                process(attrs[1])
+              end
+            end
           end
 
-          # Create the new builder for nested attributes on one-to-one
+          # Create the new builder for nested attributes on one-to-many
           # relations.
           #
           # Example:
@@ -44,8 +50,12 @@ module Mongoid # :nodoc:
           #
           # A new builder.
           def initialize(metadata, attributes, options = {})
-            @attributes = attributes.with_indifferent_access.sort do |a, b|
-              a[0].to_i <=> b[0].to_i
+            if attributes.respond_to?(:with_indifferent_access)
+              @attributes = attributes.with_indifferent_access.sort do |a, b|
+                a[0].to_i <=> b[0].to_i
+              end
+            else
+              @attributes = attributes
             end
             @metadata = metadata
             @options = options
@@ -102,8 +112,9 @@ module Mongoid # :nodoc:
           # attrs: The single document attributes to process.
           def process(attrs)
             return if reject?(attrs)
-            if attrs[:id]
-              document = existing.find(convert_id(attrs[:id]))
+            if attrs[:id] or attrs['id'] or attrs['_id']
+              id = attrs[:id] || attrs['id'] || attrs['_id']
+              document = existing.find(convert_id(id))
               destroyable?(attrs) ? document.destroy : document.update_attributes(attrs)
             else
               # @todo: Durran: Tell the push not to save the base and call it
