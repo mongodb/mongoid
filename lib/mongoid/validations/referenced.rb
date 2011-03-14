@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
       def validate_each(document, attribute, value)
         document.validated = true
         valid =
-          if !value || !value.loaded
+          if !value || !value.target
             true
           else
             Array.wrap(value).collect do |doc|
