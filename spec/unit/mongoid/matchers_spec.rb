@@ -4,6 +4,42 @@ describe Mongoid::Matchers do
 
   describe "#matches?" do
 
+    context "when document is embeded" do
+
+      let(:document) do
+        Address.new(:street => "Clarkenwell Road")
+      end
+
+      before do
+        document.locations << Location.new(:name => 'No.1')
+      end
+
+      context "when the attributes do not match" do
+
+        let(:selector) do
+          { :name => { "$in" => ["No.2"], "$ne" => nil } }
+        end
+
+        it "returns false" do
+          document.locations.first.matches?(selector).should be_false
+        end
+
+        context "when just change the selector order" do
+
+          let(:selector) do
+            { :name => { "$ne" => nil, "$in" => ["No.2"] } }
+          end
+
+          it "returns false " do
+            document.locations.first.matches?(selector).should be_false
+          end
+
+        end
+
+      end
+
+    end
+
     context "when performing simple matching" do
 
       let(:document) do
