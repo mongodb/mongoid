@@ -18,8 +18,12 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if matches, false if not.
     def matches?(selector)
       selector.each_pair do |key, value|
-        unless Strategies.matcher(self, key, value).matches?(value)
-          return false
+        if value.is_a?(Hash)
+          value.each do |item|
+            return false unless Strategies.matcher(self, key, Hash[*item]).matches?(Hash[*item])
+          end
+        else
+          return false unless Strategies.matcher(self, key, value).matches?(value)
         end
       end
       return true
