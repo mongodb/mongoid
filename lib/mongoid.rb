@@ -73,6 +73,7 @@ require "mongoid/multi_parameter_attributes"
 require "mongoid/multi_database"
 require "mongoid/named_scope"
 require "mongoid/nested_attributes"
+require "mongoid/observer"
 require "mongoid/paths"
 require "mongoid/persistence"
 require "mongoid/safety"
@@ -129,7 +130,8 @@ module Mongoid #:nodoc
   #
   # @example Delegate the configuration methods.
   #   Mongoid.database = Mongo::Connection.new.db("test")
-  Mongoid::Config.public_instance_methods(false).each do |name|
+  (Mongoid::Config.public_instance_methods(false) +
+    ActiveModel::Observing::ClassMethods.public_instance_methods(false)).each do |name|
     (class << self; self; end).class_eval <<-EOT
       def #{name}(*args)
         configure.send("#{name}", *args)

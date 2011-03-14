@@ -11,6 +11,7 @@ module Mongoid #:nodoc
   # @todo Durran: This module needs an overhaul, remove singleton, etc.
   module Config
     extend self
+    include ActiveModel::Observing
 
     attr_accessor :master, :slaves, :settings
     @settings = {}

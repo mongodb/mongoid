@@ -124,6 +124,18 @@ module Rails #:nodoc:
           end
         end
       end
+
+      # Instantitate any registered observers after Rails initialization and
+      # instantiate them after being reloaded in the development environment
+      initializer "instantiate observers" do
+        config.after_initialize do
+          ::Mongoid.instantiate_observers
+
+          ActionDispatch::Callbacks.to_prepare(:activerecord_instantiate_observers) do
+            ::Mongoid.instantiate_observers
+          end
+        end
+      end
     end
   end
 end
