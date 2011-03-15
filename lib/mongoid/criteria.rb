@@ -214,6 +214,21 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Returns true if criteria responds to the given method.
+    #
+    # Options:
+    #
+    # name: The name of the class method on the +Document+.
+    # include_private: The arguments passed to the method.
+    #
+    # Example:
+    #
+    # <tt>criteria.respond_to?(:batch_update)</tt>
+    def respond_to?(name, include_private = false)
+      # don't include klass private methods because method_missing won't call them
+      super || @klass.respond_to?(name) || entries.respond_to?(name, include_private)
+    end
+
     # Returns the selector and options as a +Hash+ that would be passed to a
     # scope for use with named scopes.
     def scoped

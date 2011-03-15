@@ -818,6 +818,48 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#respond_to?" do
+    let(:criteria) do
+      Mongoid::Criteria.new(Person)
+    end
+
+    before do
+      Person.stubs(:ages => [])
+    end
+
+    it "is true when asking about a model's class method" do
+      criteria.respond_to?(:ages).should be_true
+    end
+
+    it "is false when asking about a model's private class method even when including private methods" do
+      criteria.respond_to?(:include, true).should be_false
+    end
+
+    it "is true when asking about a criteria's entries' instance method" do
+      criteria.respond_to?(:join).should be_true
+    end
+
+    it "is false when asking about a criteria's entries' private instance methods without including private methods" do
+      criteria.respond_to?(:fork).should be_false
+    end
+
+    it "is false when asking about a criteria's entries' private instance methods when including private methods" do
+      criteria.respond_to?(:fork, true).should be_true
+    end
+
+    it "is true when asking about a criteria instance method" do
+      criteria.respond_to?(:context).should be_true
+    end
+
+    it "is false when asking about a private criteria instance method without including private methods" do
+      criteria.respond_to?(:initialize).should be_false
+    end
+
+    it "is true when asking about a private criteria instance method when including private methods" do
+      criteria.respond_to?(:initialize, true).should be_true
+    end
+  end
+
   describe "#method_missing" do
 
     let(:criteria) do
