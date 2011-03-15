@@ -28,8 +28,8 @@ module Mongoid #:nodoc:
       # @param [ Hash ] conditions The conditions to create with.
       #
       # @since 2.0.0.rc.1
-      def default_scope(conditions = {}, &block)
-        self.default_scoping = Scope.new(conditions, &block).conditions.scoped
+      def default_scope(conditions = {})
+        self.default_scoping = Scope.new(conditions).conditions.scoped
       end
     end
   end
