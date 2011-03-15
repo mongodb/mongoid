@@ -38,10 +38,10 @@ module Mongoid #:nodoc:
         changes = child._sets
         updates["$set"].update(changes)
         unless changes.empty?
-          processed[child._conficting_modification_key] = true
+          processed[child._conflicting_modification_key] = true
         end
 
-        if processed.has_key?(child._conficting_modification_key)
+        if processed.has_key?(child._conflicting_modification_key)
           target = :other
         else
           target = "$pushAll"
@@ -70,7 +70,7 @@ module Mongoid #:nodoc:
     #   person._conflicting_modification_key
     #
     # @return [ String ] The conflicting key.
-    def _conficting_modification_key
+    def _conflicting_modification_key
       _path.sub(/\..*/, '')
     end
 
