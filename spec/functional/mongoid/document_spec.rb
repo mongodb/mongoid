@@ -62,6 +62,64 @@ describe Mongoid::Document do
     end
   end
 
+  context "becoming another class" do
+    before(:all) do
+      class Manager < Person; end
+    end
+
+    %w{upcasting downcasting}.each do |ctx|
+      context ctx do
+        before(:all) do
+          if ctx == 'upcasting'
+            @klass = Manager
+            @to_become = Person
+          else
+            @klass = Person
+            @to_become = Manager
+          end
+        end
+
+        before(:each) do
+          @obj = @klass.new(:title => 'Sir')
+        end
+
+        it "copies attributes" do
+          became = @obj.becomes(@to_become)
+          became.title.should == 'Sir'
+        end
+
+        it "copies state" do
+          @obj.should be_new_record
+          became = @obj.becomes(@to_become)
+          became.should be_new_record
+
+          @obj.save
+          @obj.should_not be_new_record
+          became = @obj.becomes(@to_become)
+          became.should_not be_new_record
+
+          @obj.destroy
+          @obj.should be_destroyed
+          became = @obj.becomes(@to_become)
+          became.should be_destroyed
+        end
+
+        it "copies errors" do
+          @obj.ssn = '$$$'
+          @obj.should_not be_valid
+          @obj.errors.should include(:ssn)
+          became = @obj.becomes(@to_become)
+          became.should_not be_valid
+          became.errors.should include(:ssn)
+        end
+
+        it "raises an error when inappropriate class is provided" do
+          lambda {@obj.becomes(String)}.should raise_error(ArgumentError)
+        end
+      end
+    end
+  end
+
   describe "#db" do
 
     it "returns the mongo database" do
