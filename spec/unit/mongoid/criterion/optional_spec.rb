@@ -305,6 +305,12 @@ describe Mongoid::Criterion::Optional do
           base.for_ids(ids).selector.should == { :_id => ids.first }
         end
       end
+
+      context "backwards compatibility with previous criteria.id" do
+        it "should respond to id" do
+          base.should respond_to(:id)
+        end
+      end
     end
 
     context "when using object ids" do
