@@ -19,6 +19,7 @@ require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/object/yoda"
 require "mongoid/extensions/proc/scoping"
+require "mongoid/extensions/range/conversions"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
@@ -87,6 +88,10 @@ end
 
 class Proc #:nodoc:
   include Mongoid::Extensions::Proc::Scoping
+end
+
+class Range
+  include Mongoid::Extensions::Range::Conversions
 end
 
 class String #:nodoc
