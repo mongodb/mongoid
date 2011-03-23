@@ -12,6 +12,10 @@ describe Mongoid::Config::ReplsetDatabase do
       [["localhost", 27010], ["localhost", 27010]]
     end
 
+    let(:options) do
+      { 'database' => 'mongoid_test', 'hosts' => hosts }
+    end
+
     let(:replica_set) do
       described_class.new(options).configure
     end
@@ -24,11 +28,11 @@ describe Mongoid::Config::ReplsetDatabase do
       Mongo::ReplSetConnection.stubs(:new).returns(repl_set_connection)
     end
 
-    context "when authentication keys are not given" do
+    it "should set a logger" do
+      subject[:logger].should be_an_instance_of(Mongoid::Logger)
+    end
 
-      let(:options) do
-        { 'database' => 'mongoid_test', 'hosts' => hosts }
-      end
+    context "when authentication keys are not given" do
 
       it { should_not be_authenticating }
 
