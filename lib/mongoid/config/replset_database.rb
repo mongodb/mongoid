@@ -71,6 +71,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.5
       def initialize(options = {})
+        self[:logger] = Mongoid::Logger.new
+
         merge!(options)
       end
     end
