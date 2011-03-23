@@ -18,7 +18,37 @@ module Mongoid #:nodoc:
         #mongo likes symbols
         options = self.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo}
         connection = Mongo::ReplSetConnection.new(*(self['hosts'] << options))
+
+        if authenticating?
+          connection.add_auth(database, username, password)
+          connection.apply_saved_authentication
+        end
+
         [ connection.db(self['database']), nil ]
+      end
+
+      # Do we need to authenticate against the database?
+      #
+      # @example Are we authenticating?
+      #   db.authenticating?
+      #
+      # @return [ true, false ] True if auth is needed, false if not.
+      #
+      # @since 2.0.0.rc.7
+      def authenticating?
+        username || password
+      end
+
+      # Convenience for accessing the hash via dot notation.
+      #
+      # @example Access a value in alternate syntax.
+      #   db.host
+      #
+      # @return [ Object ] The value in the hash.
+      #
+      # @since 2.0.0.rc.7
+      def method_missing(name, *args, &block)
+        self[name.to_s]
       end
 
       # Create the new db configuration class.
