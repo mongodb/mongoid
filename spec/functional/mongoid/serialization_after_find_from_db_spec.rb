@@ -19,6 +19,7 @@ class Worm
 end
 describe Mongoid::Serialization do
   let(:data) { {:name => "Oak", :leaves => [{:insect => {:name => "Glaurung"}}, {:insect => {:name => ".303 Bookworm"}}]} }
+  let(:hash) { {"name" => "Oak", "leaves" => [{"insect" => {"name" => "Glaurung"}}, {"insect" => {"name" => ".303 Bookworm"}}]} }
   let(:root) { Root.first(:conditions => {:name => "Oak"}) }
 
   before do
@@ -26,12 +27,12 @@ describe Mongoid::Serialization do
   end
 
   it "serializes the document without the excepted fields after finding it in the database" do
-    root.to_json(:except => :_id,
+    root.serializable_hash(:except => :_id,
                  :include => { :leaves => {:except => :_id,
                                            :include => { :insect => {:except => :_id
                                                                     }
                                                        }
                                           }
-                             }).should == data.to_json
+                             }).should == hash
   end
 end
