@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.6
     def serialize_relations(attributes = {}, options = {})
-      inclusions = options.delete(:include)
+      inclusions = options[:include]
       relation_names(inclusions).each do |name|
         metadata = relations[name.to_s]
         relation = send(metadata.name, false, :eager => true)
