@@ -131,6 +131,7 @@ module Mongoid # :nodoc:
           characterize(name, Referenced::In, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
+            autosave(meta)
             validates_relation(meta)
           end
         end
