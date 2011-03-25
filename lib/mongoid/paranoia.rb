@@ -84,7 +84,7 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # A +Criteria+ for deleted_at not existing.
-      def criteria(embedded = false)
+      def criteria(embedded = false, scoped = true)
         super.where(:deleted_at.exists => false)
       end
 
