@@ -39,8 +39,7 @@ module Mongoid #:nodoc:
     def read_attribute(name)
       access = name.to_s
       value = @attributes[access]
-      typed_value = fields.has_key?(access) ? fields[access].get(value) : value
-      accessed(access, typed_value)
+      accessed(access, value)
     end
     alias :[] :read_attribute
 

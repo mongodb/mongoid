@@ -14,7 +14,6 @@ class Person
   field :pets, :type => Boolean, :default => false
   field :age, :type => Integer, :default => 100
   field :dob, :type => Date
-  field :mixed_drink, :type => MixedDrink
   field :employer_id
   field :lunch_time, :type => Time
   field :aliases, :type => Array

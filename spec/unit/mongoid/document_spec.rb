@@ -654,5 +654,4 @@ describe Mongoid::Document do
       end
     end
   end
-
 end

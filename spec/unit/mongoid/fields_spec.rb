@@ -111,26 +111,6 @@ describe Mongoid::Fields do
 
     end
 
-    context "when type is a mongoid document" do
-
-      before do
-        @person = Person.new
-        @drink = MixedDrink.new(:name => "Jack and Coke")
-        @person.mixed_drink = @drink
-      end
-
-      it "allows proper access to the object" do
-        @person.mixed_drink.should == @drink
-        @person.attributes[:mixed_drink].except(:_id).except(:_type).should ==
-          { "name" => "Jack and Coke" }
-      end
-
-      it "adds an reader method with a question mark" do
-        @person.mixed_drink?.should be_true
-      end
-
-    end
-
     context "when type is a boolean" do
 
       before do
