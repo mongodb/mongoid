@@ -55,7 +55,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def remove_attribute(name)
       access = name.to_s
-      modify(access, @attributes.delete(name.to_s), nil)
+      modify(access, @attributes.delete(access), nil)
     end
 
     # Override respond_to? so it responds properly for dynamic attributes.
