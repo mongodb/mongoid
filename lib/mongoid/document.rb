@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if the ids are equal, false if not.
     def ==(other)
       return false unless other.is_a?(Document)
-      equal?(other) || raw_attributes["_id"] == other.raw_attributes["_id"]
+      raw_attributes["_id"] == other.raw_attributes["_id"]
     end
 
     # Performs class equality checking.
