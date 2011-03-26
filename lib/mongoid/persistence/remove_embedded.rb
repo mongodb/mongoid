@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
       # +true+ or +false+, depending on if the removal passed.
       def persist
         parent = document._parent
-        parent.remove_child(document)
+        parent.remove_child(document) unless suppress?
         unless parent.new_record?
           update = { document._remover => removal_selector }
           collection.update(parent._selector, update, options.merge(:multi => false))
