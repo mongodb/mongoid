@@ -192,8 +192,9 @@ module Mongoid #:nodoc:
     #
     # <tt>person.accessed("aliases", [ "007" ])</tt>
     def accessed(name, value)
+      return value unless value.is_a?(Enumerable)
       @accessed ||= {}
-      @accessed[name] = value.dup if (value.is_a?(Array) || value.is_a?(Hash)) && !@accessed.has_key?(name)
+      @accessed[name] = value.dup unless @accessed.has_key?(name)
       value
     end
 
