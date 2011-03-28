@@ -20,8 +20,10 @@ module Mongoid #:nodoc:
           values = document.send(field)
           values.push(value) unless values.include?(value)
           values.tap do
-            document.collection.update(document._selector, operation("$addToSet"), options)
-            document.changes.delete(field.to_s) if document.persisted?
+            if document.persisted?
+              document.collection.update(document._selector, operation("$addToSet"), options)
+              document.changes.delete(field.to_s)
+            end
           end
         end
       end

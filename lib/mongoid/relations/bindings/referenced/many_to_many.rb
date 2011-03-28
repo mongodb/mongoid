@@ -41,8 +41,6 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind_one(doc, options = {})
-            keys = base.do_or_do_not(metadata.foreign_key)
-            keys.push(doc.id) unless keys.include?(doc.id)
             if options[:continue]
               inverse = metadata.inverse(target)
               if inverse
