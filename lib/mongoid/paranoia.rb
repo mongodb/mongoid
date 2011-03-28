@@ -79,12 +79,12 @@ module Mongoid #:nodoc:
     module ClassMethods #:nodoc:
 
       # Override the default +Criteria+ accessor to only get existing
-      # documents.
+      # documents. Passes all arguments up to +NamedScope.criteria+
       #
       # Returns:
       #
       # A +Criteria+ for deleted_at not existing.
-      def criteria(embedded = false)
+      def criteria(*args)
         super.where(:deleted_at.exists => false)
       end
 
