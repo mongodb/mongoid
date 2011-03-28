@@ -27,22 +27,44 @@ describe Mongoid::Document do
 
     context "when comparable is a document" do
 
-      let(:other) do
-        Person.new
-      end
-
       context "when it has the same id" do
 
-        before do
-          other.id = person.id
+        context "when the classes are not the same" do
+
+          let(:other) do
+            Post.new
+          end
+
+          before do
+            other.id = person.id
+          end
+
+          it "returns false" do
+            person.should_not == other
+          end
         end
 
-        it "returns true" do
-          person.should == other
+        context "when the classes are the same" do
+
+          let(:other) do
+            Person.new
+          end
+
+          before do
+            other.id = person.id
+          end
+
+          it "returns true" do
+            person.should == other
+          end
         end
       end
 
       context "when it has a different id" do
+
+        let(:other) do
+          Person.new
+        end
 
         context "when the instances are the same" do
 
