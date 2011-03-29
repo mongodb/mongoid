@@ -98,8 +98,8 @@ module Mongoid #:nodoc:
       #
       # Example:
       #
-      # <tt>criteria.id("4ab2bc4b8ad548971900005c")</tt>
-      # <tt>criteria.id(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])</tt>
+      # <tt>criteria.for_ids("4ab2bc4b8ad548971900005c")</tt>
+      # <tt>criteria.for_ids(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])</tt>
       #
       # Returns: <tt>self</tt>
       def for_ids(*ids)
