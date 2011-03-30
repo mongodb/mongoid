@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference ].map(&:delete_all)
+    [ Person, Preference, Event ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -160,6 +160,60 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
             it "adds the document to the target" do
               person.preferences.count.should == 2
+            end
+          end
+        end
+
+        context "when both sides have been persisted" do
+
+          let(:person) do
+            Person.create(:ssn => "123-11-5555")
+          end
+
+          let(:event) do
+            Event.create
+          end
+
+          before do
+            person.administrated_events << event
+            person.save!
+          end
+
+          it "sets the front side of the relation" do
+            person.administrated_events.should include(event)
+          end
+
+          it "sets the inverse side of the relation" do
+            event.administrators.should include(person)
+          end
+
+          context "when reloading" do
+
+            it "sets the front side of the relation" do
+              person.reload.administrated_events.should include(event)
+            end
+
+            it "sets the inverse side of the relation" do
+              event.reload.administrators.should include(person)
+            end
+          end
+
+          context "when performing a new database query" do
+
+            let(:loaded_person) do
+              Person.find(person.id)
+            end
+
+            let(:loaded_event) do
+              Event.find(event.id)
+            end
+
+            it "sets the front side of the relation" do
+              loaded_person.administrated_events.should include(event)
+            end
+
+            it "sets the inverse side of the relation" do
+              loaded_event.administrators.should include(person)
             end
           end
         end
