@@ -155,7 +155,7 @@ module Mongoid #:nodoc:
           selector = case selector
             when String then {"$where" => selector}
             else
-              BSON::ObjectId.convert(klass, selector || {}).expand_complex_criteria
+              BSON::ObjectId.convert(klass, selector || {}, false).expand_complex_criteria
           end
 
           selector.each_pair do |key, value|

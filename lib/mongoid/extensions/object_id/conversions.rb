@@ -62,21 +62,22 @@ module Mongoid #:nodoc:
         # @return [ BSON::ObjectId, Array, Hash ] The converted object ids.
         #
         # @since 2.0.0.rc.7
-        def convert(klass, args)
+        def convert(klass, args, reject_blank = true)
           return args if args.is_a?(BSON::ObjectId) || !klass.using_object_ids?
           case args
           when ::String
             args.blank? ? nil : BSON::ObjectId.from_string(args)
           when ::Array
-            args.reject(&:blank?).map do |arg|
-              convert(klass, arg)
+            args = args.reject(&:blank?) if reject_blank
+            args.map do |arg|
+              convert(klass, arg, reject_blank)
             end
           when ::Hash
             args.tap do |hash|
               hash.each_pair do |key, value|
                 next unless key.to_s =~ /id/
                 begin
-                  hash[key] = convert(klass, value)
+                  hash[key] = convert(klass, value, reject_blank)
                 rescue BSON::InvalidObjectId; end
               end
             end
