@@ -637,6 +637,15 @@ describe Mongoid::Attributes do
           person.age.should == 100
         end
       end
+
+      context 'when the field has a type converter' do
+
+        it 'should typecast values' do
+          person.account_balance = "4000000"
+          person.account_balance.should be_a(BigDecimal)
+        end
+      end
+
     end
   end
 
@@ -743,7 +752,7 @@ describe Mongoid::Attributes do
     end
   end
 
-  describe "#typed_value_for" do
+  describe "#mongo_typed_value_for" do
 
     let(:person) { Person.new }
 
@@ -753,7 +762,7 @@ describe Mongoid::Attributes do
 
       it "retuns the typed value" do
         person.fields["age"].expects(:set).with("51")
-        person.send(:typed_value_for, "age", "51")
+        person.send(:mongo_typed_value_for, "age", "51")
       end
 
     end
@@ -763,7 +772,7 @@ describe Mongoid::Attributes do
       before { person.stubs(:fields).returns({}) }
 
       it "returns the value" do
-        person.send(:typed_value_for, "age", "51").should == "51"
+        person.send(:mongo_typed_value_for, "age", "51").should == "51"
       end
 
     end
@@ -776,7 +785,7 @@ describe Mongoid::Attributes do
 
     it "typecasts proc values" do
       person.stubs(:defaults).returns("age" => lambda { "51" })
-      person.expects(:typed_value_for).with("age", "51")
+      person.expects(:mongo_typed_value_for).with("age", "51")
       person.instance_variable_set(:@attributes, {})
       person.send(:apply_default_attributes)
     end
