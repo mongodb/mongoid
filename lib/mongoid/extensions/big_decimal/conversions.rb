@@ -13,6 +13,10 @@ module Mongoid #:nodoc:
         def set(value)
           value ? value.to_s : value
         end
+
+        def permanently_cast?
+          true
+        end
       end
     end
   end

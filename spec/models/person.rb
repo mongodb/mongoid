@@ -26,6 +26,7 @@ class Person
   field :security_code
   field :reading, :type => Object
   field :bson_id, :type => BSON::ObjectId
+  field :account_balance, :type => BigDecimal
 
   index :age
   index :addresses

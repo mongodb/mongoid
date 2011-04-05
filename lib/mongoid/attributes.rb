@@ -39,7 +39,8 @@ module Mongoid #:nodoc:
     def read_attribute(name)
       access = name.to_s
       value = @attributes[access]
-      accessed(access, value)
+      typed_value = permanently_cast?(access) ? fields[access].get(value) : value
+      accessed(access, typed_value)
     end
     alias :[] :read_attribute
 
@@ -177,6 +178,10 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def typed_value_for(key, value)
       fields.has_key?(key) ? fields[key].set(value) : value
+    end
+
+    def permanently_cast?(key)
+      fields.has_key?(key) && fields[key].permanently_cast?
     end
   end
 end

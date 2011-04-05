@@ -80,6 +80,10 @@ module Mongoid #:nodoc:
       type.get(object)
     end
 
+    def permanently_cast?
+      @permanently_cast ||= (type.respond_to?(:permanently_cast?) && type.permanently_cast?)
+    end
+
     protected
 
     # Copy the default value if copyable.

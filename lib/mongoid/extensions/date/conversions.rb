@@ -12,6 +12,10 @@ module Mongoid #:nodoc:
           end
         end
 
+        def permanently_cast?
+          true
+        end
+
         protected
 
         def convert_to_time(value)

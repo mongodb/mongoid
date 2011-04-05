@@ -33,4 +33,10 @@ describe Mongoid::Extensions::BigDecimal::Conversions do
       end
     end
   end
+
+  describe "#permanently_cast?" do
+    it "returns true" do
+      BigDecimal.permanently_cast?.should be_true
+    end
+  end
 end

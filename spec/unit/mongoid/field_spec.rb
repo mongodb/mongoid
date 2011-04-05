@@ -226,4 +226,50 @@ describe Mongoid::Field do
       field.options[:hello].should == :goodbye
     end
   end
+
+  describe "#permanently_cast?" do
+
+    context "when #type.permanently_cast? returns true" do
+
+      let(:field) do
+        String.stubs(:permanently_cast? => true)
+
+        Mongoid::Field.new(
+          :name,
+          :type => String
+        )
+      end
+
+      it "returns true" do
+        field.permanently_cast?.should be_true
+      end
+    end
+
+    context "when #type.permanently_cast? returns false" do
+
+      let(:field) do
+        String.stubs(:permanently_cast? => false)
+
+        Mongoid::Field.new(
+          :name,
+          :type => String
+        )
+      end
+
+      it "returns false" do
+        field.permanently_cast?.should be_false
+      end
+    end
+
+    it "should be memoized" do
+      String.stubs(:permanently_cast? => true)
+      field = Mongoid::Field.new(:name, :type => String)
+
+      field.permanently_cast?.should be_true
+
+      String.stubs(:permanently_cast? => false)
+
+      field.permanently_cast?.should be_true
+    end
+  end
 end

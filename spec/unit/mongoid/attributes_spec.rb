@@ -637,6 +637,19 @@ describe Mongoid::Attributes do
           person.age.should == 100
         end
       end
+
+      context "when the field type is BigDecimal or Date" do
+
+        it "should permanently typecast the value for BigDecimal" do
+          person.account_balance = "4000000"
+          person.account_balance.should be_a(BigDecimal)
+        end
+
+        it "should permanently typecast the value for Date" do
+          person.last_drink_taken_at = Time.now
+          person.last_drink_taken_at.should be_a(Date)
+        end
+      end
     end
   end
 
@@ -768,6 +781,38 @@ describe Mongoid::Attributes do
 
     end
 
+  end
+
+  describe "#permanently_cast?" do
+
+    let(:person) { Person.new }
+
+    context "when the key has been specified as a field" do
+
+      context "when the field type should be permanently cast" do
+
+        it "retuns true" do
+          person.send(:permanently_cast?, "last_drink_taken_at").should be_true
+        end
+      end
+
+      context "when the field type should not be permanently cast" do
+
+        it "retuns false" do
+          person.send(:permanently_cast?, "age").should be_false
+        end
+      end
+    end
+
+    context "when the key has not been specified as a field" do
+
+      before { person.stubs(:fields).returns({}) }
+
+      it "returns false" do
+        person.send(:permanently_cast?, "age").should be_false
+      end
+
+    end
   end
 
   describe "#apply_default_attributes" do
