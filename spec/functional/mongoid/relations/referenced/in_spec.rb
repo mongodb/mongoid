@@ -46,7 +46,7 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       let(:account) do
-        Account.create(:number => 1000000)
+        Account.create(:name => "1", :number => 1000000)
       end
 
       before do

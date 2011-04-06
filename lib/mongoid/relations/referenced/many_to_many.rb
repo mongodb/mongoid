@@ -22,9 +22,32 @@ module Mongoid # :nodoc:
         # @param [ Document, Array<Document> ] *args Any number of documents.
         def <<(*args)
           options = default_options(args)
-          super(args)
-          base.save if base.persisted? && !options[:binding]
+          args.flatten.each do |doc|
+            return doc unless doc
+            append(doc, options)
+            base.add_to_set(metadata.foreign_key, doc.id)
+            doc.save if base.persisted? && !options[:binding]
+          end
         end
+        alias :concat :<<
+        alias :push :<<
+
+        # Builds a new document in the relation and appends it to the target.
+        # Takes an optional type if you want to specify a subclass.
+        #
+        # @example Build a new document on the relation.
+        #   person.people.build(:name => "Bozo")
+        #
+        # @param [ Hash ] attributes The attributes to build the document with.
+        # @param [ Class ] type Optional class to build the document with.
+        #
+        # @return [ Document ] The new document.
+        def build(attributes = {}, type = nil, &block)
+          super.tap do |doc|
+            base.send(metadata.foreign_key).push(doc.id)
+          end
+        end
+        alias :new :build
 
         # Creates a new document on the references many relation. This will
         # save the document if the parent has been persisted.
@@ -36,9 +59,10 @@ module Mongoid # :nodoc:
         # @param [ Class ] type The optional type of document to create.
         #
         # @return [ Document ] The newly created document.
-        def create(attributes = nil, type = nil)
-          build(attributes, type).tap do |doc|
-            doc.save and base.save if base.persisted?
+        def create(attributes = nil, type = nil, &block)
+          build(attributes, type, &block).tap do |doc|
+            base.add_to_set(metadata.foreign_key, doc.id)
+            doc.save if base.persisted?
           end
         end
 
@@ -55,9 +79,10 @@ module Mongoid # :nodoc:
         # @raise [ Errors::Validations ] If validation failed.
         #
         # @return [ Document ] The newly created document.
-        def create!(attributes = nil, type = nil)
-          build(attributes, type).tap do |doc|
-            doc.save! and base.save! if base.persisted?
+        def create!(attributes = nil, type = nil, &block)
+          build(attributes, type, &block).tap do |doc|
+            base.add_to_set(metadata.foreign_key, doc.id)
+            doc.save! if base.persisted?
           end
         end
 
@@ -107,6 +132,23 @@ module Mongoid # :nodoc:
           remove_all(conditions, :destroy_all)
         end
 
+        # Instantiate a new references_many relation. Will set the foreign key
+        # and the base on the inverse object.
+        #
+        # @example Create the new relation.
+        #   Referenced::ManyToMany.new(base, target, metadata)
+        #
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Array<Document> ] target The target of the relation.
+        # @param [ Metadata ] metadata The relation's metadata.
+        def initialize(base, target, metadata)
+          init(base, target, metadata) do
+            unless base.frozen?
+              base.send(metadata.foreign_key_setter, target.map(&:id))
+            end
+          end
+        end
+
         # Removes all associations between the base document and the target
         # documents by deleting the foreign keys and the references, orphaning
         # the target documents in the process.
@@ -146,6 +188,7 @@ module Mongoid # :nodoc:
             if new_target
               binding.unbind(options)
               relation.target = new_target.to_a
+              base.send(metadata.foreign_key_setter, new_target.map(&:id))
               bind(options)
             else
               relation.target = unbind(options)
@@ -235,10 +278,7 @@ module Mongoid # :nodoc:
           end
           ids = criteria.merge(cond).only(:_id).map(&:_id)
           criteria.merge(cond).send(method).tap do
-            base.send(metadata.foreign_key).delete_if do |id|
-              ids.include?(id)
-            end
-            base.save
+            base.pull_all(metadata.foreign_key, ids)
           end
         end
 

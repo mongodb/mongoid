@@ -1,4 +1,4 @@
-.DS_STORE
+.DS_Store
 coverage/*
 pkg/*
 scratch_directory/*
@@ -15,3 +15,4 @@ DONATE
 doc/*
 *.swp
 *.un~
+*~

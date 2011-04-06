@@ -1,9 +1,3 @@
-class Tag
-  include Mongoid::Document
-  field :text
-  references_and_referenced_in_many :posts
-end
-
 class Post
   include Mongoid::Document
   include Mongoid::MultiParameterAttributes

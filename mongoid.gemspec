@@ -20,9 +20,9 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", ["~> 3.0"])
   s.add_dependency("tzinfo", ["~> 0.3.22"])
   s.add_dependency("will_paginate", ["~> 3.0.pre"])
-  s.add_dependency("mongo", ["~> 1.2"])
+  s.add_dependency("mongo", ["~> 1.3"])
 
-  s.add_development_dependency("bson_ext", ["~> 1.2"])
+  s.add_development_dependency("bson_ext", ["~> 1.3"])
   s.add_development_dependency("mocha", ["= 0.9.8"])
   s.add_development_dependency("rspec", ["~> 2.4"])
   s.add_development_dependency("watchr", ["= 0.6"])

@@ -57,6 +57,30 @@ describe Mongoid::NamedScope do
         Player.scopes.should include(:deaths_over)
       end
     end
+
+    context "when overrides a class method" do
+
+      let(:logger) { stub.quacks_like(Logger.allocate) }
+
+      before do
+        Mongoid.stubs(:logger => logger)
+      end
+
+      it "sends warning message to logger on public method" do
+        logger.expects(:warn)
+        Override.scope :public_method
+      end
+
+      it "sends warning message to logger on protected method" do
+        logger.expects(:warn)
+        Override.scope :protected_method
+      end
+
+      it "sends warning message to logger on private method" do
+        logger.expects(:warn)
+        Override.scope :private_method
+      end
+    end
   end
 
   context "when chaining scopes" do

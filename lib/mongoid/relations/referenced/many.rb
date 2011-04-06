@@ -29,6 +29,9 @@ module Mongoid #:nodoc:
           target.map(&:save) if base.persisted? && !options[:binding]
         end
 
+        alias :concat :<<
+        alias :push :<<
+
         # Clear the relation. Will delete the documents from the db if they are
         # already persisted.
         #

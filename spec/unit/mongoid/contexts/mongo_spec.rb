@@ -257,7 +257,7 @@ describe Mongoid::Contexts::Mongo do
         end
 
         let(:expected_options) do
-          { :skip => 20, :fields => [ :title, :_type ] }
+          { :skip => 20, :fields => { :title => 1, :_type => 1} }
         end
 
         it "adds _type to the fields" do

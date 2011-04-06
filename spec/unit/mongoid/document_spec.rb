@@ -27,22 +27,44 @@ describe Mongoid::Document do
 
     context "when comparable is a document" do
 
-      let(:other) do
-        Person.new
-      end
-
       context "when it has the same id" do
 
-        before do
-          other.id = person.id
+        context "when the classes are not the same" do
+
+          let(:other) do
+            Post.new
+          end
+
+          before do
+            other.id = person.id
+          end
+
+          it "returns false" do
+            person.should_not == other
+          end
         end
 
-        it "returns true" do
-          person.should == other
+        context "when the classes are the same" do
+
+          let(:other) do
+            Person.new
+          end
+
+          before do
+            other.id = person.id
+          end
+
+          it "returns true" do
+            person.should == other
+          end
         end
       end
 
       context "when it has a different id" do
+
+        let(:other) do
+          Person.new
+        end
 
         context "when the instances are the same" do
 
@@ -289,6 +311,27 @@ describe Mongoid::Document do
 
         it "runs the callbacks" do
           person.game.name.should == "Ms. Pacman"
+        end
+      end
+
+      context "when instantiating model" do
+
+        let(:person) do
+          Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
+        end
+
+        before do
+          Person.set_callback :initialize, :after do |doc|
+            doc.title = "Madam"
+          end
+        end
+
+        after do
+          Person.reset_callbacks(:initialize)
+        end
+
+        it "runs the callbacks" do
+          person.title.should == "Madam"
         end
       end
     end
@@ -585,6 +628,51 @@ describe Mongoid::Document do
 
       it "returns the id as a string" do
         person.to_param.should == person.id.to_s
+      end
+    end
+  end
+
+  describe "#frozen?" do
+    let(:person) do
+      Person.new
+    end
+
+    context "when attributes are not frozen" do
+      it "return false" do
+        person.should_not be_frozen
+        lambda { person.title = "something" }.should_not raise_error
+      end
+    end
+
+    context "when attributes are frozen" do
+      before do
+        person.raw_attributes.freeze
+      end
+      it "return true" do
+        person.should be_frozen
+      end
+    end
+  end
+
+  describe "#freeze" do
+    let(:person) do
+      Person.new
+    end
+
+    context "when not frozen" do
+      it "freezes attributes" do
+        person.freeze.should == person
+        lambda { person.title = "something" }.should raise_error
+      end
+    end
+
+    context "when frozen" do
+      before do
+        person.raw_attributes.freeze
+      end
+      it "keeps things frozen" do
+        person.freeze
+        lambda { person.title = "something" }.should raise_error
       end
     end
   end

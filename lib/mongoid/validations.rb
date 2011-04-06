@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/validations/associated"
+require "mongoid/validations/referenced"
 require "mongoid/validations/uniqueness"
 
 module Mongoid #:nodoc:
@@ -104,13 +105,19 @@ module Mongoid #:nodoc:
       # was not provided or set to true.
       #
       # @example Set up validation.
-      #   Person.validate_relation(metadata)
+      #   Person.validates_relation(metadata)
       #
       # @param [ Metadata ] metadata The relation metadata.
       #
       # @since 2.0.0.rc.1
-      def validate_relation(metadata)
-        validates_associated(metadata.name) if metadata.validate?
+      def validates_relation(metadata)
+        if metadata.validate?
+          if metadata.embedded?
+            validates_associated(metadata.name)
+          else
+            validates_with(ReferencedValidator, _merge_attributes([metadata.name]))
+          end
+        end
       end
     end
   end

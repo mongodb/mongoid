@@ -136,13 +136,13 @@ describe Mongoid::Criterion::Inclusion do
   describe "#in" do
 
     let(:criteria) do
-      base.in(:title => ["title1", "title2"], :text => ["test"])
+      base.in(:title => ["title1", "title2"], :text => ["test"], :ssn => [nil, "1"])
     end
 
     it "adds the $in clause to the selector" do
       criteria.selector.should ==
         {
-          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
+          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }, :ssn => { "$in" => [nil, "1"] }
         }
     end
 

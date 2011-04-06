@@ -130,6 +130,17 @@ describe Mongoid::Attributes do
         account.balance.should == "ABBA"
       end
     end
+
+    context "when using override" do
+      let(:account) do
+        Account.new
+      end
+
+      it "ignores any protected attribute" do
+        account.write_attributes({:balance => "ABBA"}, false)
+        account.balance.should == "ABBA"
+      end
+    end
   end
 
   describe ".attr_protected" do
@@ -163,6 +174,17 @@ describe Mongoid::Attributes do
       end
 
       it "ignores any protected attribute" do
+        person.security_code.should == "ABBA"
+      end
+    end
+
+    context "when using override" do
+      let(:person) do
+        Person.new
+      end
+
+      it "ignores any protected attribute" do
+        person.write_attributes({:security_code => "ABBA"}, false)
         person.security_code.should == "ABBA"
       end
     end

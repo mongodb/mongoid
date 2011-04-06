@@ -35,7 +35,7 @@ module Rails #:nodoc:
       #   module MyApplication
       #     class Application < Rails::Application
       #       config.mongoid.logger = Logger.new($stdout, :warn)
-      #       config.mongoid.reconnect_time = 10
+      #       config.mongoid.persist_in_safe_mode = true
       #     end
       #   end
       config.mongoid = ::Mongoid::Config
@@ -121,6 +121,18 @@ module Rails #:nodoc:
                 ::Mongoid.reconnect!
               end
             end
+          end
+        end
+      end
+
+      # Instantitate any registered observers after Rails initialization and
+      # instantiate them after being reloaded in the development environment
+      initializer "instantiate observers" do
+        config.after_initialize do
+          ::Mongoid.instantiate_observers
+
+          ActionDispatch::Callbacks.to_prepare(:mongoid_instantiate_observers) do
+            ::Mongoid.instantiate_observers
           end
         end
       end

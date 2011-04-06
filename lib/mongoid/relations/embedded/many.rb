@@ -403,7 +403,7 @@ module Mongoid # :nodoc:
           criteria.size.tap do
             criteria.each do |doc|
               target.delete(doc)
-              doc.send(method)
+              doc.send(method, :suppress => true)
             end
             reindex
           end

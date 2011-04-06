@@ -39,8 +39,7 @@ module Mongoid #:nodoc:
     def read_attribute(name)
       access = name.to_s
       value = @attributes[access]
-      typed_value = fields.has_key?(access) ? fields[access].get(value) : value
-      accessed(access, typed_value)
+      accessed(access, value)
     end
     alias :[] :read_attribute
 
@@ -55,7 +54,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def remove_attribute(name)
       access = name.to_s
-      modify(access, @attributes.delete(name.to_s), nil)
+      modify(access, @attributes.delete(access), nil)
     end
 
     # Override respond_to? so it responds properly for dynamic attributes.
@@ -106,10 +105,11 @@ module Mongoid #:nodoc:
     #   person.attributes = { :title => "Mr." }
     #
     # @param [ Hash ] attrs The new attributes to set.
+    # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 1.0.0
-    def write_attributes(attrs = nil)
-      process(attrs) do |document|
+    def write_attributes(attrs = nil, guard_protected_attributes = true)
+      process(attrs, guard_protected_attributes) do |document|
         document.identify if new? && id.blank?
       end
     end

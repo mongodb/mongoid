@@ -136,7 +136,7 @@ describe Mongoid::NestedAttributes do
     end
   end
 
-  describe "##{name}_attributes=" do
+  describe '##{name}_attributes=' do
 
     context "when the parent document is new" do
 
@@ -527,6 +527,18 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.pet_attributes = { :name => "$$$" }
+          end
+
+          it "propagates invalidity to parent" do
+            person.pet.should_not be_valid
+            person.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is embedded in" do
@@ -739,6 +751,18 @@ describe Mongoid::NestedAttributes do
               end
             end
           end
+
+          context "when the nested document is invalid" do
+
+            before do
+              animal.person_attributes = { :ssn => '$$$' }
+            end
+
+            it "does not propagate invalidity to parent" do
+              animal.person.should_not be_valid
+              animal.should be_valid
+            end
+          end
         end
       end
 
@@ -802,6 +826,25 @@ describe Mongoid::NestedAttributes do
               person.addresses.size.should == 2
             end
           end
+
+          context "when an array of attributes are passed" do
+
+            let(:attributes) do
+              [
+                { "street" => "Maybachufer" },
+                { "street" => "Alexander Platz" }
+              ]
+            end
+
+            before do
+              person.addresses_attributes = attributes
+            end
+
+            it "sets the documents on the relation" do
+              person.addresses.size.should == 2
+            end
+
+          end
         end
 
         context "when ids are passed" do
@@ -828,6 +871,52 @@ describe Mongoid::NestedAttributes do
 
               it "updates the second existing document" do
                 person.addresses.second.street.should == "Alexander Platz"
+              end
+
+              it "does not add new documents" do
+                person.addresses.size.should == 2
+              end
+            end
+
+            context "when the ids match in an array of attributes" do
+
+              before do
+                person.addresses_attributes =
+                  [
+                    { "id" => address_one.id, "street" => "Maybachufer" },
+                    { "id" => address_two.id, "street" => "Alexander Platz" }
+                  ]
+              end
+
+              it "updates the first existing document" do
+                person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+              end
+
+              it "updates the second existing document" do
+                person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+              end
+
+              it "does not add new documents" do
+                person.addresses.size.should == 2
+              end
+            end
+
+            context "when the ids match in an array of attributes and start with '_'" do
+
+              before do
+                person.addresses_attributes =
+                  [
+                    { "_id" => address_one.id, "street" => "Maybachufer" },
+                    { "_id" => address_two.id, "street" => "Alexander Platz" }
+                  ]
+              end
+
+              it "updates the first existing document" do
+                person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+              end
+
+              it "updates the second existing document" do
+                person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
               end
 
               it "does not add new documents" do
@@ -1337,6 +1426,20 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.addresses_attributes = {
+              "0" => { :street => '123' }
+            }
+          end
+
+          it "propagates invalidity to parent" do
+            person.addresses.first.should_not be_valid
+            person.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is a references one" do
@@ -1709,6 +1812,18 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.game_attributes = { :name => '$$$' }
+          end
+
+          it "propagates invalidity to parent" do
+            person.game.should_not be_valid
+            person.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is referenced in" do
@@ -1919,6 +2034,17 @@ describe Mongoid::NestedAttributes do
                   end
                 end
               end
+            end
+          end
+
+          context "when the nested document is invalid" do
+            before do
+              game.person_attributes = { :ssn => '$$$' }
+            end
+
+            it "propagates invalidity to parent" do
+              game.person.should_not be_valid
+              game.should_not be_valid
             end
           end
         end
@@ -2544,6 +2670,20 @@ describe Mongoid::NestedAttributes do
             end
           end
         end
+
+        context "when the nested document is invalid" do
+
+          before do
+            person.posts_attributes = {
+              "0" => { :title => "$$$" }
+            }
+          end
+
+          it "propagates invalidity to parent" do
+            person.should_not be_valid
+            person.posts.first.should_not be_valid
+          end
+        end
       end
 
       context "when the relation is a references many to many" do
@@ -3165,6 +3305,68 @@ describe Mongoid::NestedAttributes do
               end
             end
           end
+        end
+
+        context "when the nested document is invalid" do
+          before do
+            person.preferences_attributes = {
+              "0" => { :name => 'x' }
+            }
+          end
+
+          it "propagates invalidity to parent" do
+            person.preferences.first.should_not be_valid
+            person.should_not be_valid
+          end
+        end
+      end
+    end
+  end
+
+  describe "#update_attributes" do
+
+    context "when the relation is an embeds many" do
+
+      let(:league) do
+        League.create
+      end
+
+      let!(:division) do
+        league.divisions.create(:name => "Old Name")
+      end
+
+      let(:params) do
+        { :divisions_attributes =>
+          { "0" => { :id => division.id.to_s, :name => "New Name" }}
+        }
+      end
+
+      before do
+        league.update_attributes(params)
+      end
+
+      it "sets the nested attributes" do
+        league.reload.divisions.first.name.should == "New Name"
+      end
+
+      context "with corrupted data" do
+
+        before do
+          league[:league] = params
+        end
+
+        let(:new_params) do
+          { :divisions_attributes =>
+            { "0" => { :id => division.id.to_s, :name => "Name" }}
+          }
+        end
+
+        before do
+          league.update_attributes(new_params)
+        end
+
+        it "sets the nested attributes" do
+          league.reload.divisions.first.name.should == "Name"
         end
       end
     end

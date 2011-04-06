@@ -12,6 +12,7 @@ module Mongoid #:nodoc:
         :klass,
         :options,
         :selector,
+        :suppress,
         :validate
 
       # Initialize the persistence +Command+.
@@ -28,6 +29,7 @@ module Mongoid #:nodoc:
       def initialize(document_or_class, options = {}, selector = {})
         init(document_or_class)
         validate = options[:validate]
+        @suppress = options[:suppress]
         @validate = (validate.nil? ? true : validate)
         @selector = selector
         @options = { :safe => safe_mode?(options) }
@@ -53,6 +55,16 @@ module Mongoid #:nodoc:
           @klass = document_or_class
           @collection = @klass.collection
         end
+      end
+
+      # Should we suppress parent notifications?
+      #
+      # @example Suppress notifications?
+      #   command.suppress?
+      #
+      # @return [ true, false ] Should the parent notifcations be suppressed.
+      def suppress?
+        !!@suppress
       end
     end
   end

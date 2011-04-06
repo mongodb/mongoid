@@ -196,7 +196,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.options.should == { :fields => [ :title, :age ] }
+      criteria.options.should == { :fields => {:_type => 1, :title => 1, :age => 1} }
     end
   end
 

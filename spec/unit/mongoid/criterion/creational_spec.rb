@@ -33,5 +33,21 @@ describe Mongoid::Criterion::Creational do
         criteria.create
       end
     end
+
+    context "with attributes" do
+
+      let(:criteria) do
+        Mongoid::Criteria.new(Person, false).where(:title => "Sir")
+      end
+
+      before do
+        Person.expects(:create).with(:title => "Sir", :name => "Lancelot")
+      end
+
+      it "calls create on the class with the attributes" do
+        criteria.create(:name => "Lancelot")
+      end
+    end
+
   end
 end

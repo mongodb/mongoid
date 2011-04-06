@@ -27,5 +27,17 @@ describe Mongoid::Factory do
         person.title.should == "Sir"
       end
     end
+
+    context "when _type is an empty string" do
+
+      before do
+        @attributes = { "title" => "Sir", "_type" => "" }
+      end
+
+      it "instantiates based on the type" do
+        person = Mongoid::Factory.build(Person, @attributes)
+        person.title.should == "Sir"
+      end
+    end
   end
 end

@@ -1,3 +1,4 @@
+<% module_namespacing do -%>
 class <%= class_name %><%= " < #{options[:parent].classify}" if options[:parent] %>
 <% unless options[:parent] -%>
   include Mongoid::Document
@@ -15,3 +16,4 @@ class <%= class_name %><%= " < #{options[:parent].classify}" if options[:parent]
   embedded_in :<%= attribute.name%>, :inverse_of => :<%= class_name.tableize %>
 <% end -%>
 end
+<% end -%>

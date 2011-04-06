@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Integer ] -1, 0, 1.
     def <=>(other)
-      id.to_s <=> other.id.to_s
+      raw_attributes["_id"].to_s <=> other.raw_attributes["_id"].to_s
     end
 
     # Performs equality checking on the document ids. For more robust
@@ -34,8 +34,8 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if the ids are equal, false if not.
     def ==(other)
-      return false unless other.is_a?(Document)
-      id == other.id || equal?(other)
+      self.class == other.class &&
+        raw_attributes["_id"] == other.raw_attributes["_id"]
     end
 
     # Performs class equality checking.
@@ -62,6 +62,31 @@ module Mongoid #:nodoc:
       self == (other)
     end
 
+    # Freezes the internal attributes of the document.
+    #
+    # @example Freeze the document
+    #   document.freeze
+    #
+    # @return [ Document ] The document.
+    #
+    # @since 2.0.0
+    def freeze
+      raw_attributes.freeze
+      self
+    end
+
+    # Checks if the document is frozen
+    #
+    # @example Check if frozen
+    #   document.frozen?
+    #
+    # @return [ true, false ] True if frozen, else false.
+    #
+    # @since 2.0.0
+    def frozen?
+      raw_attributes.frozen?
+    end
+
     # Delegates to id in order to allow two records of the same type and id to
     # work with something like:
     #
@@ -73,7 +98,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Integer ] The hash of the document's id.
     def hash
-      id.hash
+      raw_attributes["_id"].hash
     end
 
     # Return the attributes hash with indifferent access. Used mostly for
@@ -85,7 +110,7 @@ module Mongoid #:nodoc:
     #
     # @return [ HashWithIndifferentAccess ] The attributes.
     def attributes
-      @attributes.with_indifferent_access
+      raw_attributes.with_indifferent_access
     end
 
     # Generate an id for this +Document+.
@@ -195,7 +220,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      attributes = @attributes
+      attributes = raw_attributes
       attributes.tap do |attrs|
         relations.select { |name, meta| meta.embedded? }.each do |name, meta|
           relation = send(name, false, :continue => false)
@@ -236,6 +261,7 @@ module Mongoid #:nodoc:
             doc.instance_variable_set(:@attributes, attributes)
             doc.send(:apply_default_attributes)
             doc.setup_modifications
+            doc.run_callbacks(:initialize) { doc }
           end
         else
           new(attrs)

@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference ].map(&:delete_all)
+    [ Person, Preference, Event, Tag ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -160,6 +160,112 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
             it "adds the document to the target" do
               person.preferences.count.should == 2
+            end
+          end
+        end
+
+        context "when both sides have been persisted" do
+
+          let(:person) do
+            Person.create(:ssn => "123-11-5555")
+          end
+
+          let(:event) do
+            Event.create
+          end
+
+          before do
+            person.administrated_events << event
+          end
+
+          it "sets the front side of the relation" do
+            person.administrated_events.should == [ event ]
+          end
+
+          it "sets the inverse side of the relation" do
+            event.administrators.should == [ person ]
+          end
+
+          context "when reloading" do
+
+            it "sets the front side of the relation" do
+              person.reload.administrated_events.should == [ event ]
+            end
+
+            it "sets the inverse side of the relation" do
+              event.reload.administrators.should == [ person ]
+            end
+          end
+
+          context "when performing a new database query" do
+
+            let(:loaded_person) do
+              Person.find(person.id)
+            end
+
+            let(:loaded_event) do
+              Event.find(event.id)
+            end
+
+            it "sets the front side of the relation" do
+              loaded_person.administrated_events.should == [ event ]
+            end
+
+            it "sets the inverse side of the relation" do
+              loaded_event.administrators.should == [ person ]
+            end
+          end
+        end
+
+        context "when the relation is self referencing" do
+
+          let(:tag_one) do
+            Tag.create(:text => "one")
+          end
+
+          let(:tag_two) do
+            Tag.create(:text => "two")
+          end
+
+          before do
+            tag_one.related << tag_two
+          end
+
+          it "sets the front side of the relation" do
+            tag_one.related.should == [ tag_two ]
+          end
+
+          it "sets the inverse side of the relation" do
+            tag_two.related.should == [ tag_one ]
+          end
+
+          context "when reloading" do
+
+            it "sets the front side of the relation" do
+              tag_one.reload.related.should == [ tag_two ]
+            end
+
+            it "sets the inverse side of the relation" do
+              tag_two.reload.related.should == [ tag_one ]
+            end
+          end
+
+          context "when performing a new database query" do
+
+            let(:loaded_tag_one) do
+              Tag.find(tag_one.id)
+            end
+
+            let(:loaded_tag_two) do
+              Tag.find(tag_two.id)
+            end
+
+            it "sets the front side of the relation" do
+              loaded_tag_one.related.should == [ tag_two ]
+            end
+
+            it "sets the inverse side of the relation" do
+              loaded_tag_two.related.should == [ tag_one ]
             end
           end
         end
@@ -918,8 +1024,103 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           person.administrated_events << [ event ]
         end
 
-        it "delete document" do
+        it "deletes the document" do
           event.delete.should be_true
+        end
+      end
+    end
+
+    context "when the relationships are self referencing" do
+
+      let(:tag_one) do
+        Tag.create(:text => "one")
+      end
+
+      let(:tag_two) do
+        Tag.create(:text => "two")
+      end
+
+      before do
+        tag_one.related << tag_two
+      end
+
+      context "when deleting without reloading" do
+
+        let!(:deleted) do
+          tag_one.related.delete(tag_two)
+        end
+
+        it "deletes the document from the relation" do
+          tag_one.related.should be_empty
+        end
+
+        it "deletes the foreign key from the relation" do
+          tag_one.related_ids.should be_empty
+        end
+
+        it "removes the reference from the inverse" do
+          deleted.related.should be_empty
+        end
+
+        it "removes the foreign keys from the inverse" do
+          deleted.related_ids.should be_empty
+        end
+      end
+
+      context "when deleting with reloading" do
+
+        context "when deleting from the front side" do
+
+          let(:reloaded) do
+            tag_one.reload
+          end
+
+          let!(:deleted) do
+            reloaded.related.delete(tag_two)
+          end
+
+          it "deletes the document from the relation" do
+            reloaded.related.should be_empty
+          end
+
+          it "deletes the foreign key from the relation" do
+            reloaded.related_ids.should be_empty
+          end
+
+          it "removes the reference from the inverse" do
+            deleted.related.should be_empty
+          end
+
+          it "removes the foreign keys from the inverse" do
+            deleted.related_ids.should be_empty
+          end
+        end
+
+        context "when deleting from the inverse side" do
+
+          let(:reloaded) do
+            tag_two.reload
+          end
+
+          let!(:deleted) do
+            reloaded.related.delete(tag_one)
+          end
+
+          it "deletes the document from the relation" do
+            reloaded.related.should be_empty
+          end
+
+          it "deletes the foreign key from the relation" do
+            reloaded.related_ids.should be_empty
+          end
+
+          it "removes the reference from the inverse" do
+            deleted.related.should be_empty
+          end
+
+          it "removes the foreign keys from the inverse" do
+            deleted.related_ids.should be_empty
+          end
         end
       end
     end
@@ -1381,6 +1582,13 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#nil?" do
+
+    it "returns false" do
+      Person.new.preferences.should_not be_nil
+    end
+  end
+
   describe "#nullify_all" do
 
     let(:person) do
@@ -1425,6 +1633,27 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     it "saves the documents" do
       preference_one.reload.people.should_not include(person)
+    end
+  end
+
+  describe "#respond_to?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:preferences) do
+      person.preferences
+    end
+
+    context "when checking against array methods" do
+
+      [].methods.each do |method|
+
+        it "returns true for #{method}" do
+          preferences.should respond_to(method)
+        end
+      end
     end
   end
 

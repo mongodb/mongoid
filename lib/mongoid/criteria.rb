@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/criterion/builder"
 require "mongoid/criterion/creational"
 require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
@@ -25,6 +26,7 @@ module Mongoid #:nodoc:
   # <tt>criteria.execute</tt>
   class Criteria
     include Enumerable
+    include Criterion::Builder
     include Criterion::Creational
     include Criterion::Exclusion
     include Criterion::Inclusion
@@ -38,7 +40,8 @@ module Mongoid #:nodoc:
       :ids,
       :klass,
       :options,
-      :selector
+      :selector,
+      :field_list
 
     delegate \
       :aggregate,
@@ -124,6 +127,20 @@ module Mongoid #:nodoc:
       context.count > 0
     end
 
+    # When freezing a criteria we need to initialize the context first
+    # otherwise the setting of the context on attempted iteration will raise a
+    # runtime error.
+    #
+    # @example Freeze the criteria.
+    #   criteria.freeze
+    #
+    # @return [ Criteria ] The frozen criteria.
+    #
+    # @since 2.0.0
+    def freeze
+      context and super
+    end
+
     # Merges the supplied argument hash into a single criteria
     #
     # Options:
@@ -195,6 +212,21 @@ module Mongoid #:nodoc:
       else
         return entries.send(name, *args)
       end
+    end
+
+    # Returns true if criteria responds to the given method.
+    #
+    # Options:
+    #
+    # name: The name of the class method on the +Document+.
+    # include_private: The arguments passed to the method.
+    #
+    # Example:
+    #
+    # <tt>criteria.respond_to?(:batch_update)</tt>
+    def respond_to?(name, include_private = false)
+      # don't include klass private methods because method_missing won't call them
+      super || @klass.respond_to?(name) || entries.respond_to?(name, include_private)
     end
 
     # Returns the selector and options as a +Hash+ that would be passed to a

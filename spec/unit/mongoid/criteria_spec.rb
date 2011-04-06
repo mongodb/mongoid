@@ -273,6 +273,44 @@ describe Mongoid::Criteria do
       end
     end
 
+    describe "#freeze" do
+
+      context "when the context has been initialized" do
+
+        let(:frozen) do
+          described_class.new(Person)
+        end
+
+        before do
+          frozen.context
+          frozen.freeze
+        end
+
+        it "does not raise an error on iteration" do
+          expect {
+            frozen.entries
+          }.to_not raise_error
+        end
+      end
+
+      context "when the context has not been initialized" do
+
+        let(:frozen) do
+          described_class.new(Person)
+        end
+
+        before do
+          frozen.freeze
+        end
+
+        it "does not raise an error on iteration" do
+          expect {
+            frozen.entries
+          }.to_not raise_error
+        end
+      end
+    end
+
     describe "#group" do
 
       before do
@@ -867,6 +905,51 @@ describe Mongoid::Criteria do
         end
       end
     end
+  end
+
+
+  describe "#respond_to?" do
+
+    let(:criteria) do
+      Mongoid::Criteria.new(Person)
+    end
+
+    before do
+      Person.stubs(:ages => [])
+    end
+
+    it "is true when asking about a model's class method" do
+      criteria.respond_to?(:ages).should be_true
+    end
+
+    it "is false when asking about a model's private class method even when including private methods" do
+      criteria.respond_to?(:include, true).should be_false
+    end
+
+    it "is true when asking about a criteria's entries' instance method" do
+      criteria.respond_to?(:join).should be_true
+    end
+
+    it "is false when asking about a criteria's entries' private instance methods without including private methods" do
+      criteria.respond_to?(:fork).should be_false
+    end
+
+    it "is false when asking about a criteria's entries' private instance methods when including private methods" do
+      criteria.respond_to?(:fork, true).should be_true
+    end
+
+    it "is true when asking about a criteria instance method" do
+      criteria.respond_to?(:context).should be_true
+    end
+
+    it "is false when asking about a private criteria instance method without including private methods" do
+      criteria.respond_to?(:initialize).should be_false
+    end
+
+    it "is true when asking about a private criteria instance method when including private methods" do
+      criteria.respond_to?(:initialize, true).should be_true
+    end
+
   end
 
   describe "#scoped" do

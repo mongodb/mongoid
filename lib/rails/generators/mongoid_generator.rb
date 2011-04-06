@@ -8,7 +8,16 @@ module Mongoid #:nodoc:
 
       def self.source_root
         @_mongoid_source_root ||=
-        File.expand_path("../#{base_name}/#{generator_name}/templates", __FILE__)
+          File.expand_path("../#{base_name}/#{generator_name}/templates", __FILE__)
+      end
+
+      unless methods.include?(:module_namespacing)
+
+        # This is only defined on Rails edge at the moment, so include here now
+        # as per: https://github.com/mongoid/mongoid/issues/744
+        def module_namespacing(&block)
+          yield if block
+        end
       end
     end
 

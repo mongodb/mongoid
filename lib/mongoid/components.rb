@@ -13,6 +13,7 @@ module Mongoid #:nodoc
     include ActiveModel::Conversion
     include ActiveModel::MassAssignmentSecurity
     include ActiveModel::Naming
+    include ActiveModel::Observing
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
     include Mongoid::Atomicity
@@ -29,7 +30,6 @@ module Mongoid #:nodoc
     include Mongoid::JSON
     include Mongoid::Keys
     include Mongoid::Matchers
-    include Mongoid::Modifiers
     include Mongoid::NamedScope
     include Mongoid::NestedAttributes
     include Mongoid::Paths
@@ -37,6 +37,7 @@ module Mongoid #:nodoc
     include Mongoid::Relations
     include Mongoid::Safety
     include Mongoid::Serialization
+    include Mongoid::Sharding
     include Mongoid::State
     include Mongoid::Validations
     include Mongoid::Callbacks

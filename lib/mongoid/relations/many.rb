@@ -122,6 +122,32 @@ module Mongoid #:nodoc:
         find_or(:build, attrs, &block)
       end
 
+      # This proxy can never be nil.
+      #
+      # @example Is the proxy nil?
+      #   relation.nil?
+      #
+      # @return [ false ] Always false.
+      #
+      # @since 2.0.0
+      def nil?
+        false
+      end
+
+      # Since method_missing is overridden we should override this as well.
+      #
+      # @example Does the proxy respond to the method?
+      #   relation.respond_to?(:name)
+      #
+      # @param [ Symbol ] name The method name.
+      #
+      # @return [ true, false ] If the proxy responds to the method.
+      #
+      # @since 2.0.0
+      def respond_to?(name)
+        [].respond_to?(name) || methods.include?(name)
+      end
+
       # Gets the document as a serializable hash, used by ActiveModel's JSON and
       # XML serializers. This override is just to be able to pass the :include
       # and :except options to get associations in the hash.
@@ -141,6 +167,19 @@ module Mongoid #:nodoc:
       def serializable_hash(options = {})
         target.map { |document| document.serializable_hash(options) }
       end
+
+      # Always returns the number of documents that are in memory.
+      #
+      # @example Get the number of loaded documents.
+      #   relation.size
+      #
+      # @return [ Integer ] The number of documents in memory.
+      #
+      # @since 2.0.0
+      def size
+        target.size
+      end
+      alias :length :size
 
       private
 

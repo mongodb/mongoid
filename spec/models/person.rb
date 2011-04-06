@@ -5,15 +5,15 @@ class Person
   include Mongoid::Versioning
 
   attr_accessor :mode
-	class_inheritable_hash :somebody_elses_important_class_options
-	self.somebody_elses_important_class_options = { :keep_me_around => true }
+
+  class_inheritable_hash :somebody_elses_important_class_options
+  self.somebody_elses_important_class_options = { :keep_me_around => true }
 
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
   field :age, :type => Integer, :default => 100
   field :dob, :type => Date
-  field :mixed_drink, :type => MixedDrink
   field :employer_id
   field :lunch_time, :type => Time
   field :aliases, :type => Array
@@ -34,14 +34,16 @@ class Person
   index :title
   index :ssn, :unique => true
 
+  validates_format_of :ssn, :without => /\$\$\$/
+
   attr_reader :rescored
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites, :order => :title.desc, :validate => false, :inverse_of => :perp
-  embeds_many :videos, :order => [[ :title, :asc ]],  :validate => false
-  embeds_many :phone_numbers, :class_name => "Phone", :validate => false
-  embeds_many :addresses, :as => :addressable, :validate => false do
+  embeds_many :favorites, :order => :title.desc, :inverse_of => :perp
+  embeds_many :videos, :order => [[ :title, :asc ]]
+  embeds_many :phone_numbers, :class_name => "Phone"
+  embeds_many :addresses, :as => :addressable do
     def extension
       "Testing"
     end
@@ -49,11 +51,11 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
-  embeds_many :address_components, :validate => false
+  embeds_many :address_components
   embeds_many :services
 
-  embeds_one :pet, :class_name => "Animal", :validate => false
-  embeds_one :name, :as => :namable, :validate => false do
+  embeds_one :pet, :class_name => "Animal"
+  embeds_one :name, :as => :namable do
     def extension
       "Testing"
     end
@@ -72,7 +74,7 @@ class Person
   accepts_nested_attributes_for :preferences
   accepts_nested_attributes_for :quiz
 
-  references_one :game, :dependent => :destroy, :validate => false do
+  references_one :game, :dependent => :destroy do
     def extension
       "Testing"
     end
@@ -81,13 +83,12 @@ class Person
   references_many \
     :posts,
     :dependent => :delete,
-    :validate => :false,
     :default_order => :created_at.desc do
     def extension
       "Testing"
     end
   end
-  references_many :paranoid_posts, :validate => false
+  references_many :paranoid_posts
   references_and_referenced_in_many \
     :preferences,
     :index => true,

@@ -130,4 +130,13 @@ describe Mongoid::Paranoia do
       @post.destroyed?.should == false
     end
   end
+
+  describe ".criteria" do
+
+    it "passes along all arguments to super" do
+      ParanoidPost.criteria(false, true)
+    end
+
+  end
+
 end

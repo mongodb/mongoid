@@ -428,6 +428,10 @@ describe Mongoid::Criterion::Inclusion do
         it "returns those matching an in clause" do
           Person.where(:title.in => ["Sir", "Madam"]).should == [person]
         end
+
+        it "allows nil" do
+          Person.where(:ssn.in => [nil]).should == [person]
+        end
       end
 
       context "#lt" do

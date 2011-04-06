@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/persistence/atomic"
 require "mongoid/persistence/command"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
@@ -19,6 +20,7 @@ module Mongoid #:nodoc:
   #   document.upsert
   module Persistence
     extend ActiveSupport::Concern
+    include Atomic
 
     # Remove the document from the datbase with callbacks.
     #

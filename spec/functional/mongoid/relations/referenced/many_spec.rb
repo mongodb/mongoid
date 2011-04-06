@@ -2089,19 +2089,6 @@ describe Mongoid::Relations::Referenced::Many do
         Movie.create
       end
 
-      context "when the relationship is an illegal embedded reference" do
-
-        let(:post) do
-          Post.new
-        end
-
-        it "raises a mixed relation error" do
-          expect {
-            post.videos.send(method)
-          }.to raise_error(Mongoid::Errors::MixedRelations)
-        end
-      end
-
       context "when documents have been persisted" do
 
         let!(:rating) do
