@@ -182,6 +182,46 @@ describe Mongoid::Config do
     end
   end
 
+  describe ".load!" do
+
+    before do
+      ENV["RACK_ENV"] = "test"
+      described_class.load!(standard_config)
+    end
+
+    after do
+      described_class.reset
+    end
+
+    it "sets the master db" do
+      described_class.master.name.should == "mongoid_config_test"
+    end
+
+    it "sets allow_dynamic_fields" do
+      described_class.allow_dynamic_fields.should == false
+    end
+
+    it "sets include_root_in_json" do
+      described_class.include_root_in_json.should == true
+    end
+
+    it "sets parameterize keys" do
+      described_class.parameterize_keys.should == false
+    end
+
+    it "sets persist_in_safe_mode" do
+      described_class.persist_in_safe_mode.should == false
+    end
+
+    it "sets raise_not_found_error" do
+      described_class.raise_not_found_error.should == false
+    end
+
+    it "returns nil, which is interpreted as the local time_zone" do
+      described_class.use_utc.should be_false
+    end
+  end
+
   describe ".logger" do
 
     it "returns the config logger" do

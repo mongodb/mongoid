@@ -40,13 +40,14 @@ module Mongoid #:nodoc
     option :binding_defaults, :default => { :binding => false, :continue => true }
     option :embedded_object_id, :default => true
     option :include_root_in_json, :default => false
+    option :max_retries_on_connection_failure, :default => 0
     option :parameterize_keys, :default => true
     option :persist_in_safe_mode, :default => false
     option :preload_models, :default => true
     option :raise_not_found_error, :default => true
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
-    option :max_retries_on_connection_failure, :default => 0
+    option :use_utc, :default => false
 
     # Adds a new I18n locale file to the load path.
     #
@@ -112,6 +113,23 @@ module Mongoid #:nodoc
       end
       configure_databases(options)
       configure_extras(options["databases"])
+    end
+
+    # Load the settings from a compliant mongoid.yml file. This can be used for
+    # easy setup with frameworks other than Rails.
+    #
+    # @example Configure Mongoid.
+    #   Mongoid.load!("/path/to/mongoid.yml")
+    #
+    # @param [ String ] path The path to the file.
+    #
+    # @since 2.0.1
+    def load!(path)
+      environment = defined?(Rails) ? Rails.env : ENV["RACK_ENV"]
+      settings = YAML.load(ERB.new(File.new(path).read).result)[environment]
+      if settings.present?
+        from_hash(settings)
+      end
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -258,30 +276,6 @@ module Mongoid #:nodoc
       end
       @slaves
     end
-
-    # Sets whether the times returned from the database are in UTC or local time.
-    # If you omit this setting, then times will be returned in
-    # the local time zone.
-    #
-    # @example Set the use of UTC.
-    #   config.use_utc = true
-    #
-    # @param [ true, false ] value Whether to use UTC or not.
-    #
-    # @return [ true, false ] Are we using UTC?
-    def use_utc=(value)
-      @use_utc = value || false
-    end
-
-    # Returns whether times are return from the database in UTC. If
-    # this setting is false, then times will be returned in the local time zone.
-    #
-    # @example Are we using UTC?
-    #   config.use_utc
-    #
-    # @return [ true, false ] True if UTC, false if not.
-    attr_reader :use_utc
-    alias :use_utc? :use_utc
 
     protected
 
