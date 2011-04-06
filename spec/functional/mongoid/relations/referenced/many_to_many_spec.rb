@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference, Event, Tag ].map(&:delete_all)
+    [ Person, Preference, Event, Tag, Medical::Patient, Medical::Doctor ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -270,6 +270,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
         end
       end
+
     end
   end
 
@@ -1524,6 +1525,18 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             person.houses.distinct(:name).should == [ house.name ]
           end
         end
+      end
+    end
+
+    context "when the models are namespaced" do
+
+      let(:patient) do
+        Medical::Patient.create
+      end
+
+      it "queries using the same foreign key as the association" do
+        doctor = patient.doctors.create(:name => "dave")
+        patient.doctors.where(:name => "dave").to_a.should == [doctor]
       end
     end
   end

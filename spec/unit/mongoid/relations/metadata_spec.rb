@@ -695,6 +695,23 @@ describe Mongoid::Relations::Metadata do
         metadata.inverse_foreign_key.should == "person_ids"
       end
     end
+
+    context "when the model is namespaced" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :preferences,
+          :index => true,
+          :dependent => :nullify,
+          :relation => Mongoid::Relations::Referenced::ManyToMany,
+          :inverse_class_name => "Medical::Patient"
+        )
+      end
+
+      it "returns the inverse key without namespacing, to match the key in the other document" do
+        metadata.inverse_foreign_key.should == "patient_ids"
+      end
+    end
   end
 
   context "#inverse_klass" do

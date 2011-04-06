@@ -208,7 +208,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inverse_foreign_key
         @inverse_foreign_key ||=
-          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.underscore ) <<
+          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.split("::").last.underscore ) <<
           relation.foreign_key_suffix
       end
 
