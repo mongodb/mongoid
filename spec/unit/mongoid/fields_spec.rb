@@ -7,61 +7,103 @@ describe Mongoid::Fields do
     it "returns a hash of all the default values" do
       Game.defaults.should == { "high_score" => 500, "score" => 0 }
     end
-
   end
 
   describe "#defaults" do
 
     context "with defaults specified as a non-primitive" do
 
-      before do
-        Person.field(:hash_testing, :type => Hash, :default => {})
-        Person.field(:array_testing, :type => Array, :default => [])
-        @first_person = Person.new
-        @second_person = Person.new
+      let(:person_one) do
+        Person.new
       end
 
-      after do
-        Person.fields.delete("hash_testing")
-        Person.fields.delete("array_testing")
+      let(:person_two) do
+        Person.new
       end
 
-      it "should not return the same object when calling defaults with a default hash" do
-        @first_person.hash_testing.object_id.should_not == @second_person.hash_testing.object_id
+      context "when provided a default array" do
+
+        before do
+          Person.field(:array_testing, :type => Array, :default => [])
+        end
+
+        after do
+          Person.fields.delete("array_testing")
+        end
+
+        it "returns an equal object of a different instance" do
+          person_one.array_testing.object_id.should_not ==
+            person_two.array_testing.object_id
+        end
       end
 
-      it "should not return the same object when calling defaults with a default array" do
-        @first_person.array_testing.object_id.should_not == @second_person.array_testing.object_id
+      context "when provided a default hash" do
+
+        before do
+          Person.field(:hash_testing, :type => Hash, :default => {})
+        end
+
+        after do
+          Person.fields.delete("hash_testing")
+        end
+
+        it "returns an equal object of a different instance" do
+          person_one.hash_testing.object_id.should_not ==
+            person_two.hash_testing.object_id
+        end
       end
     end
 
     context "on parent classes" do
 
-      before do
-        @shape = Shape.new
+      let(:shape) do
+        Shape.new
       end
 
       it "does not return subclass defaults" do
-        @shape.defaults.should == { "x" => 0, "y" => 0 }
+        shape.defaults.should == { "x" => 0, "y" => 0 }
       end
-
     end
 
     context "on subclasses" do
 
-      before do
-        @circle = Circle.new
+      let(:circle) do
+        Circle.new
       end
 
       it "has the parent and child defaults" do
-        @circle.defaults.should == { "x" => 0, "y" => 0, "radius" => 0 }
+        circle.defaults.should == { "x" => 0, "y" => 0, "radius" => 0 }
       end
-
     end
-
   end
 
   describe ".field" do
+
+    context "when the field is a time" do
+
+      let!(:time) do
+        Time.now
+      end
+
+      let!(:person) do
+        Person.new(:lunch_time => time.utc)
+      end
+
+      context "when reading the field" do
+
+        before do
+          Time.zone = "Berlin"
+        end
+
+        after do
+          Time.zone = nil
+        end
+
+        it "performs the necessary time conversions" do
+          person.lunch_time.to_s.should == time.getlocal.to_s
+        end
+      end
+    end
 
     context "with no options" do
 
@@ -69,20 +111,21 @@ describe Mongoid::Fields do
         Person.field(:testing)
       end
 
+      let(:person) do
+        Person.new(:testing => "Test")
+      end
+
       it "adds a reader for the fields defined" do
-        @person = Person.new(:testing => "Test")
-        @person.testing.should == "Test"
+        person.testing.should == "Test"
       end
 
       it "adds a writer for the fields defined" do
-        @person = Person.new(:testing => "Test")
-        @person.testing = "Testy"
-        @person.testing.should == "Testy"
+        person.testing = "Testy"
+        person.testing.should == "Testy"
       end
 
-      it "adds an reader method with a question mark" do
-        @person = Person.new(:testing => "Test")
-        @person.testing?.should be_true
+      it "adds an existance method" do
+        person.testing?.should be_true
         Person.new.testing?.should be_false
       end
 
@@ -94,91 +137,91 @@ describe Mongoid::Fields do
             super
           end
         end
-
-        @person = Person.new
-        @person.testing = 'Test'
-        @person.testing_override_called.should be_true
+        person.testing = 'Test'
+        person.testing_override_called.should be_true
       end
     end
 
     context "when the type is an object" do
 
-      let(:bob) { Person.new(:reading => 10.023) }
+      let(:bob) do
+        Person.new(:reading => 10.023)
+      end
 
       it "returns the given value" do
         bob.reading.should == 10.023
       end
-
     end
 
     context "when type is a boolean" do
 
-      before do
-        @person = Person.new(:terms => true)
+      let(:person) do
+        Person.new(:terms => true)
       end
 
       it "adds an accessor method with a question mark" do
-        @person.terms?.should be_true
+        person.terms?.should be_true
       end
-
     end
 
     context "when as is specified" do
 
+      let(:person) do
+        Person.new(:alias => true)
+      end
+
       before do
         Person.field :aliased, :as => :alias, :type => Boolean
-        @person = Person.new(:alias => true)
       end
 
       it "uses the alias to write the attribute" do
-        @person.expects(:write_attribute).with("aliased", true)
-        @person.alias = true
+        person.expects(:write_attribute).with("aliased", true)
+        person.alias = true
       end
 
       it "uses the alias to read the attribute" do
-        @person.expects(:read_attribute).with("aliased")
-        @person.alias
+        person.expects(:read_attribute).with("aliased")
+        person.alias
       end
 
       it "uses the alias for the query method" do
-        @person.expects(:read_attribute).with("aliased")
-        @person.alias?
+        person.expects(:read_attribute).with("aliased")
+        person.alias?
       end
-
     end
-
   end
 
   describe "#fields" do
 
     context "on parent classes" do
 
-      before do
-        @shape = Shape.new
+      let(:shape) do
+        Shape.new
+      end
+
+      it "includes its own fields" do
+        shape.fields.keys.should include("x")
       end
 
       it "does not return subclass fields" do
-        @shape.fields.keys.should include("x")
-        @shape.fields.keys.should include("y")
-        @shape.fields.keys.should_not include("radius")
+        shape.fields.keys.should_not include("radius")
       end
-
     end
 
     context "on subclasses" do
 
-      before do
-        @circle = Circle.new
+      let(:circle) do
+        Circle.new
       end
 
-      it "has the parent and child fields" do
-        @circle.fields.keys.should include("x")
-        @circle.fields.keys.should include("y")
-        @circle.fields.keys.should include("radius")
+      it "includes the parent fields" do
+        circle.fields.keys.should include("x")
+        circle.fields.keys.should include("y")
       end
 
+      it "includes the child fields" do
+        circle.fields.keys.should include("radius")
+      end
     end
-
   end
-
 end

@@ -35,7 +35,6 @@ module Mongoid #:nodoc
       def field(name, options = {})
         access = name.to_s
         set_field(access, options)
-        attr_protected name if options[:accessible] == false
       end
 
       # Return the fields for this class.
@@ -120,7 +119,11 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The options.
       def create_accessors(name, meth, options = {})
         generated_field_methods.module_eval do
-          define_method(meth) { read_attribute(name) }
+          if [ Time, DateTime ].include?(options[:type])
+            define_method(meth) { Time.get(read_attribute(name)) }
+          else
+            define_method(meth) { read_attribute(name) }
+          end
           define_method("#{meth}=") { |value| write_attribute(name, value) }
           define_method("#{meth}?") do
             attr = read_attribute(name)
