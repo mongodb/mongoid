@@ -151,9 +151,9 @@ describe Mongoid::Extensions::Date::Conversions do
     end
   end
 
-  describe "#permanently_cast?" do
+  describe "#needs_typecasting?" do
     it "returns true" do
-      Date.permanently_cast?.should be_true
+      Date.needs_typecasting?.should be_true
     end
   end
 end

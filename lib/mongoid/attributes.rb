@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def read_attribute(name)
       access = name.to_s
-      value  = @typecasted_attributes[access] || ruby_typed_value_for(access, @attributes[access])
+      value  = ruby_typed_value_for(access, @attributes[access])
       accessed(access, value)
     end
     alias :[] :read_attribute

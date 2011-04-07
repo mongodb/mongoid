@@ -783,38 +783,6 @@ describe Mongoid::Attributes do
 
   end
 
-  describe "#permanently_cast?" do
-
-    let(:person) { Person.new }
-
-    context "when the key has been specified as a field" do
-
-      context "when the field type should be permanently cast" do
-
-        it "retuns true" do
-          person.send(:permanently_cast?, "last_drink_taken_at").should be_true
-        end
-      end
-
-      context "when the field type should not be permanently cast" do
-
-        it "retuns false" do
-          person.send(:permanently_cast?, "age").should be_false
-        end
-      end
-    end
-
-    context "when the key has not been specified as a field" do
-
-      before { person.stubs(:fields).returns({}) }
-
-      it "returns false" do
-        person.send(:permanently_cast?, "age").should be_false
-      end
-
-    end
-  end
-
   describe "#apply_default_attributes" do
 
     let(:person) { Person.new }

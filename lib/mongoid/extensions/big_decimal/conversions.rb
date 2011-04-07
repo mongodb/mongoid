@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
           value ? value.to_s : value
         end
 
-        def permanently_cast?
+        def needs_typecasting?
           true
         end
       end

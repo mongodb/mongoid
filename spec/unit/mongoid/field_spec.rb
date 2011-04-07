@@ -227,12 +227,12 @@ describe Mongoid::Field do
     end
   end
 
-  describe "#permanently_cast?" do
+  describe "#needs_typecasting?" do
 
-    context "when #type.permanently_cast? returns true" do
+    context "when #type.needs_typecasting? returns true" do
 
       let(:field) do
-        String.stubs(:permanently_cast? => true)
+        String.stubs(:needs_typecasting? => true)
 
         Mongoid::Field.new(
           :name,
@@ -241,14 +241,14 @@ describe Mongoid::Field do
       end
 
       it "returns true" do
-        field.permanently_cast?.should be_true
+        field.needs_typecasting?.should be_true
       end
     end
 
-    context "when #type.permanently_cast? returns false" do
+    context "when #type.needs_typecasting? returns false" do
 
       let(:field) do
-        String.stubs(:permanently_cast? => false)
+        String.stubs(:needs_typecasting? => false)
 
         Mongoid::Field.new(
           :name,
@@ -257,19 +257,19 @@ describe Mongoid::Field do
       end
 
       it "returns false" do
-        field.permanently_cast?.should be_false
+        field.needs_typecasting?.should be_false
       end
     end
 
     it "should be memoized" do
-      String.stubs(:permanently_cast? => true)
+      String.stubs(:needs_typecasting? => true)
       field = Mongoid::Field.new(:name, :type => String)
 
-      field.permanently_cast?.should be_true
+      field.needs_typecasting?.should be_true
 
-      String.stubs(:permanently_cast? => false)
+      String.stubs(:needs_typecasting? => false)
 
-      field.permanently_cast?.should be_true
+      field.needs_typecasting?.should be_true
     end
   end
 end

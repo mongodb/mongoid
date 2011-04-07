@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
           end
         end
 
-        def permanently_cast?
+        def needs_typecasting?
           true
         end
 
