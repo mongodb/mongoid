@@ -14,6 +14,7 @@ module Mongoid #:nodoc:
           value ? value.to_s : value
         end
 
+        # +BigDecimal+ is not inherently represented as a data type in MongoDB
         def needs_type_casting?
           true
         end
