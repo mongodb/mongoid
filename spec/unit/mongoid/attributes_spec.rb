@@ -640,12 +640,12 @@ describe Mongoid::Attributes do
 
       context "when the field type is BigDecimal or Date" do
 
-        it "should permanently typecast the value for BigDecimal" do
+        it "should typecast the value for BigDecimal" do
           person.account_balance = "4000000"
           person.account_balance.should be_a(BigDecimal)
         end
 
-        it "should permanently typecast the value for Date" do
+        it "should typecast the value for Date" do
           person.last_drink_taken_at = Time.now
           person.last_drink_taken_at.should be_a(Date)
         end

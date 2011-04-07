@@ -12,6 +12,7 @@ module Mongoid #:nodoc:
           end
         end
 
+        # +Date+ is not inherently represented as a data type in MongoDB
         def needs_type_casting?
           true
         end

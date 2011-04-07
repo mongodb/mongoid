@@ -80,6 +80,13 @@ module Mongoid #:nodoc:
       type.get(object)
     end
 
+    # Helper method that delegates to the data type as to whether or not it
+    # requires type casting.
+    #
+    # @return [ true, false ] True/False depending on whether or not MongoDB
+    #   inherently represents the data type (e.g. would return false for Date/BigDecimal)
+    #
+    # @since 2.0.1
     def needs_type_casting?
       @needs_type_casting ||= (defined?(type.needs_type_casting?) && type.needs_type_casting?)
     end

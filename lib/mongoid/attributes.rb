@@ -187,6 +187,13 @@ module Mongoid #:nodoc:
     # @example
     #   person.ruby_typed_value_for :title, "sir" # => :sir
     #
+    # @param [ Symbol ] key The field name.
+    #
+    # @param [ Object ] value the potentially cast value.
+    #
+    # @return [ Object ] The Ruby-compatible newly/previously cast value.
+    #
+    # @since 2.0.1
     def ruby_typed_value_for(key, value)
       if fields.has_key?(key) && fields[key].needs_type_casting?
         fields[key].get(value)
