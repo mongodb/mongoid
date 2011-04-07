@@ -227,12 +227,12 @@ describe Mongoid::Field do
     end
   end
 
-  describe "#needs_typecasting?" do
+  describe "#needs_type_casting?" do
 
-    context "when #type.needs_typecasting? returns true" do
+    context "when #type.needs_type_casting? returns true" do
 
       let(:field) do
-        String.stubs(:needs_typecasting? => true)
+        String.stubs(:needs_type_casting? => true)
 
         Mongoid::Field.new(
           :name,
@@ -241,14 +241,14 @@ describe Mongoid::Field do
       end
 
       it "returns true" do
-        field.needs_typecasting?.should be_true
+        field.needs_type_casting?.should be_true
       end
     end
 
-    context "when #type.needs_typecasting? returns false" do
+    context "when #type.needs_type_casting? returns false" do
 
       let(:field) do
-        String.stubs(:needs_typecasting? => false)
+        String.stubs(:needs_type_casting? => false)
 
         Mongoid::Field.new(
           :name,
@@ -257,19 +257,19 @@ describe Mongoid::Field do
       end
 
       it "returns false" do
-        field.needs_typecasting?.should be_false
+        field.needs_type_casting?.should be_false
       end
     end
 
     it "should be memoized" do
-      String.stubs(:needs_typecasting? => true)
+      String.stubs(:needs_type_casting? => true)
       field = Mongoid::Field.new(:name, :type => String)
 
-      field.needs_typecasting?.should be_true
+      field.needs_type_casting?.should be_true
 
-      String.stubs(:needs_typecasting? => false)
+      String.stubs(:needs_type_casting? => false)
 
-      field.needs_typecasting?.should be_true
+      field.needs_type_casting?.should be_true
     end
   end
 end

@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
           end
         end
 
-        def needs_typecasting?
+        def needs_type_casting?
           true
         end
 

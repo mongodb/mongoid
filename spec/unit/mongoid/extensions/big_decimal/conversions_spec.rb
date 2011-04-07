@@ -34,9 +34,9 @@ describe Mongoid::Extensions::BigDecimal::Conversions do
     end
   end
 
-  describe "#needs_typecasting?" do
+  describe "#needs_type_casting?" do
     it "returns true" do
-      BigDecimal.needs_typecasting?.should be_true
+      BigDecimal.needs_type_casting?.should be_true
     end
   end
 end
