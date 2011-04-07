@@ -1,4 +1,3 @@
-# encoding: utf-8
 module Mongoid #:nodoc:
 
   # Defines the behaviour for defined fields in the document.
@@ -56,10 +55,10 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def set(object)
       unless options[:identity]
-        type.set(object)
+        defined?(type.set) ? type.set(object) : object
       else
         if object.blank?
-          type.set(object) if object.is_a?(Array)
+          defined?(type.set) ? type.set(object) : object if object.is_a?(Array)
         else
           options[:metadata].constraint.convert(object)
         end
@@ -88,7 +87,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.1
     def needs_type_casting?
-      @needs_type_casting ||= (defined?(type.needs_type_casting?) && type.needs_type_casting?)
+      defined?(type.needs_type_casting?) ? type.needs_type_casting? : false
     end
 
     protected

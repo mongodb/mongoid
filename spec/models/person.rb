@@ -27,6 +27,8 @@ class Person
   field :reading, :type => Object
   field :bson_id, :type => BSON::ObjectId
   field :account_balance, :type => BigDecimal
+  field :birth_time, :type => DateTime
+  field :items_owned, :type => Set
 
   index :age
   index :addresses

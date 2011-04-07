@@ -17,6 +17,10 @@ module Mongoid #:nodoc:
         value
       end
 
+      def needs_type_casting?
+        true
+      end
+
       protected
 
       def strip_milliseconds(time)

@@ -13,6 +13,10 @@ module Mongoid #:nodoc:
           def set(value)
             value.to_a
           end
+
+          def needs_type_casting?
+            true
+          end
         end
       end
     end

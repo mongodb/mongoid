@@ -247,9 +247,7 @@ describe Mongoid::Field do
 
     context "when #type.needs_type_casting? returns false" do
 
-      let(:field) do
-        String.stubs(:needs_type_casting? => false)
-
+      let(:field) do 
         Mongoid::Field.new(
           :name,
           :type => String
@@ -259,17 +257,6 @@ describe Mongoid::Field do
       it "returns false" do
         field.needs_type_casting?.should be_false
       end
-    end
-
-    it "should be memoized" do
-      String.stubs(:needs_type_casting? => true)
-      field = Mongoid::Field.new(:name, :type => String)
-
-      field.needs_type_casting?.should be_true
-
-      String.stubs(:needs_type_casting? => false)
-
-      field.needs_type_casting?.should be_true
     end
   end
 end

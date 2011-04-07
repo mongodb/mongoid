@@ -639,15 +639,39 @@ describe Mongoid::Attributes do
       end
 
       context "when the field type is BigDecimal or Date" do
-
         it "should typecast the value for BigDecimal" do
-          person.account_balance = "4000000"
+          person.account_balance = 4000
           person.account_balance.should be_a(BigDecimal)
+          person.account_balance.should == 4000
         end
 
         it "should typecast the value for Date" do
-          person.last_drink_taken_at = Time.now
+          date = Date.today
+          person.last_drink_taken_at = date
           person.last_drink_taken_at.should be_a(Date)
+          person.last_drink_taken_at.should == date
+        end
+
+        it "should typecast Time properly" do
+          now = Time.utc(2011, 04, 06, 12, 00)
+          person.lunch_time = now
+          person.lunch_time.should be_a(Time)
+          person.lunch_time.should == now
+        end
+
+        it "should typecast DateTime properly" do
+          pending "Not working, it is returning a time instead, needs investigating"
+          dt = DateTime.civil(1980, 10, 01, 8, 45)
+          person.birth_time = dt
+          person.birth_time.should be_a(DateTime)
+          person.birth_time.should == dt
+        end
+        
+        it "should typecast Set properly" do
+          set = Set.new(%w(foo bar))
+          person.items_owned = set
+          person.items_owned.should be_a(Set)
+          person.items_owned.should == set
         end
       end
     end
