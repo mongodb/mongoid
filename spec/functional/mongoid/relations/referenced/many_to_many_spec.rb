@@ -991,6 +991,34 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       it "removes the base id from the inverse keys" do
         deleted.person_ids.should be_empty
       end
+      
+      
+      context "and person and preferences are reloaded without a save" do
+        
+        before do
+          person.reload
+          preference_one.reload
+          preference_two.reload
+        end
+        
+        it "should revert to have a relation to both preferences " do
+          person.preferences.should == [ preference_one, preference_two ]
+        end
+        
+        it "should retain the ids for both preferences" do
+          person.preference_ids.should == [ preference_one.id, preference_two.id ]
+        end
+        
+        it "retains the relation from preference_one to person" do
+          preference_one.people.should == [ person ]
+        end
+        
+        it "retains the id in the preference_one people keys" do
+          preference_one.person_ids.should == [ person.id ]
+        end
+        
+      end
+      
     end
 
     context "when the document does not exist" do
