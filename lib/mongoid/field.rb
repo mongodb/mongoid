@@ -80,8 +80,8 @@ module Mongoid #:nodoc:
       type.get(object)
     end
 
-    def permanently_cast?
-      @permanently_cast ||= (type.respond_to?(:permanently_cast?) && type.permanently_cast?)
+    def needs_type_casting?
+      @needs_type_casting ||= (defined?(type.needs_type_casting?) && type.needs_type_casting?)
     end
 
     protected

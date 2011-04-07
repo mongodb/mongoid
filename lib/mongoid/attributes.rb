@@ -38,9 +38,8 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def read_attribute(name)
       access = name.to_s
-      value = @attributes[access]
-      typed_value = permanently_cast?(access) ? fields[access].get(value) : value
-      accessed(access, typed_value)
+      value  = @typecasted_attributes[access] || ruby_typed_value_for(access, @attributes[access])
+      accessed(access, value)
     end
     alias :[] :read_attribute
 
@@ -91,7 +90,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def write_attribute(name, value)
       access = name.to_s
-      modify(access, @attributes[access], typed_value_for(access, value))
+      modify(access, @attributes[access], mongo_typed_value_for(access, value))
     end
     alias :[]= :write_attribute
 
@@ -145,7 +144,7 @@ module Mongoid #:nodoc:
       (@attributes ||= {}).tap do |h|
         defaults.each_pair do |key, val|
           unless h.has_key?(key)
-            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) : val
+            h[key] = val.respond_to?(:call) ? mongo_typed_value_for(key, val.call) : val
           end
         end
       end
@@ -165,23 +164,35 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Return the typecasted value for a field.
+    private
+
+    # Return the Mongo-typecasted value for a field.
     #
     # @example Get the value typecasted.
-    #   person.typed_value_for(:title, :sir)
+    #   person.typed_value_for(:title, :sir) # => "sir"
     #
     # @param [ String, Symbol ] key The field name.
     # @param [ Object ] value The uncast value.
     #
-    # @return [ Object ] The cast value.
+    # @return [ Object ] The Mongo-compatible cast value.
     #
     # @since 1.0.0
-    def typed_value_for(key, value)
+    def mongo_typed_value_for(key, value)
       fields.has_key?(key) ? fields[key].set(value) : value
     end
 
-    def permanently_cast?(key)
-      fields.has_key?(key) && fields[key].permanently_cast?
+    # Return the typecasted value of a field, which can be
+    # any Ruby object that has a converter.
+    #
+    # @example
+    #   person.ruby_typed_value_for :title, "sir" # => :sir
+    #
+    def ruby_typed_value_for(key, value)
+      if fields.has_key?(key) && fields[key].needs_type_casting?
+        fields[key].get(value)
+      else
+        value
+      end
     end
   end
 end
