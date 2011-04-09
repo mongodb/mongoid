@@ -118,13 +118,20 @@ module Mongoid #:nodoc
       # @param [ Symbol ] meth The name of the accessor.
       # @param [ Hash ] options The options.
       def create_accessors(name, meth, options = {})
+        field = fields[name]
         generated_field_methods.module_eval do
-          if [ Time, DateTime ].include?(options[:type])
-            define_method(meth) { Time.get(read_attribute(name)) }
+          if field.cast_on_read?
+            define_method(meth) do
+              field.get(read_attribute(name))
+            end
           else
-            define_method(meth) { read_attribute(name) }
+            define_method(meth) do
+              read_attribute(name)
+            end
           end
-          define_method("#{meth}=") { |value| write_attribute(name, value) }
+          define_method("#{meth}=") do |value|
+            write_attribute(name, value)
+          end
           define_method("#{meth}?") do
             attr = read_attribute(name)
             (options[:type] == Boolean) ? attr == true : attr.present?
