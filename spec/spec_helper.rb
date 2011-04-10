@@ -60,4 +60,3 @@ end
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
-

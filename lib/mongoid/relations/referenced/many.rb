@@ -6,6 +6,33 @@ module Mongoid #:nodoc:
       # This class defines the behaviour for all relations that are a
       # one-to-many between documents in different collections.
       class Many < Relations::Many
+        include Batch
+
+        # Appends a document or array of documents to the relation. Will set
+        # the parent and update the index in the process.
+        #
+        # @example Append a document.
+        #   person.posts << post
+        #
+        # @example Push a document.
+        #   person.posts.push(post)
+        #
+        # @example Concat with other documents.
+        #   person.posts.concat([ post_one, post_two ])
+        #
+        # @param [ Document, Array<Document> ] *args Any number of documents.
+        def <<(*args)
+          options = default_options(args)
+          batched do
+            args.flatten.each do |doc|
+              return doc unless doc
+              append(doc, options)
+              doc.save if base.persisted? && !options[:binding]
+            end
+          end
+        end
+        alias :concat :<<
+        alias :push :<<
 
         # Binds the base object to the inverse of the relation. This is so we
         # are referenced to the actual objects themselves and dont hit the
@@ -284,6 +311,18 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def binding(new_target = nil)
           Bindings::Referenced::Many.new(base, new_target || target, metadata)
+        end
+
+        # Get the collection of the relation in question.
+        #
+        # @example Get the collection of the relation.
+        #   relation.collection
+        #
+        # @return [ Collection ] The collection of the relation.
+        #
+        # @since 2.0.2, batch-relational-insert
+        def collection
+          metadata.klass.collection
         end
 
         # Returns the criteria object for the target class with its documents set

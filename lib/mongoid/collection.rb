@@ -94,10 +94,11 @@ module Mongoid #:nodoc
     # @param [ Hash, Array<Hash> ] documents A single document or multiples.
     # @param [ Hash ] options The options.
     #
-    # @since 2.0.2
+    # @since 2.0.2, batch-relational-insert
     def insert(documents, options = {})
       inserter = Thread.current[:mongoid_batch_insert]
       if inserter
+        inserter.consume(documents, options)
       else
         master.insert(documents, options)
       end
