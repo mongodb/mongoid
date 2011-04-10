@@ -4,7 +4,7 @@ describe Mongoid::Field do
 
   describe "#cast_on_read?" do
 
-    [ DateTime, Time, BigDecimal ].each do |klass|
+    [ Date, DateTime, Time, BigDecimal ].each do |klass|
 
       context "when the type is a #{klass}" do
 
@@ -19,7 +19,7 @@ describe Mongoid::Field do
     end
 
     [
-      Array, Binary, Boolean, Date, Float, Hash,
+      Array, Binary, Boolean, Float, Hash,
       Integer, BSON::ObjectId, Set, String, Symbol
     ].each do |klass|
 

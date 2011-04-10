@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] If the field should be cast.
     def cast_on_read?
-      [ DateTime, Time, BigDecimal ].include?(type)
+      [ BigDecimal, Date, DateTime, Time ].include?(type)
     end
 
     # Get the default value for the field.
