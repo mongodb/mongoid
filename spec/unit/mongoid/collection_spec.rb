@@ -218,4 +218,38 @@ describe Mongoid::Collection do
       end
     end
   end
+
+  describe "#insert" do
+
+    let(:document) do
+      { "$set" => { "field" => "value" } }
+    end
+
+    context "when no inserter exists on the current thread" do
+
+      it "delegates straight to the master collection" do
+        master.expects(:insert).with(document, {})
+        collection.insert(document)
+      end
+    end
+  end
+
+  describe "#update" do
+
+    let(:selector) do
+      { "_id" => BSON::ObjectId.new }
+    end
+
+    let(:document) do
+      { "$set" => { "field" => "value" } }
+    end
+
+    context "when no updater exists on the current thread" do
+
+      it "delegates straight to the master collection" do
+        master.expects(:update).with(selector, document, {})
+        collection.update(selector, document)
+      end
+    end
+  end
 end
