@@ -12,7 +12,7 @@ pt-br:
           O campo foi definido como %{klass}, mas recebeu uma instância de %{other} com
           o valor %{value}.
         unsupported_version:
-          MongoDB %{version} não é suportada, por favor atualize para a 
+          MongoDB %{version} não é suportada, por favor atualize para a
           versão %{mongo_version}.
         validations:
           A validação falhou - %{errors}.
@@ -22,7 +22,7 @@ pt-br:
           do documento raiz.
         invalid_field:
           Não é permitido definir um campo com o nome %{name}. Não defina
-          campos que entrem em conflito com os nomes dos atributos internos e métodos 
+          campos que entrem em conflito com os nomes dos atributos internos e métodos
           do Mongoid. Use Document#instance_methods para consultar esses nomes.
         too_many_nested_attribute_records:
           A aceitação de atributos encadeados para %{association} encontra-se limitada
@@ -36,5 +36,5 @@ pt-br:
           A definição de inverse_of nesta associação não é permitida. Apenas
           use esta opção em embedded_in ou references_many as array.
         unsaved_document:
-          You cannot call create or create! through a relational association
-          relation (%{document}) who's parent (%{base}) is not already saved.
+          Você não pode chamar os métodos create ou create! de uma associação
+          relacional (%{document}) cujo pai (%{base}) ainda não foi salvo.
