@@ -4,6 +4,11 @@ module Mongoid #:nodoc:
   # Defines the behaviour for defined fields in the document.
   class Field
 
+    NO_CAST_ON_READ = [
+      Array, Binary, Boolean, Float, Hash,
+      Integer, BSON::ObjectId, Set, String, Symbol
+    ]
+
     attr_accessor :type
     attr_reader :copyable, :klass, :label, :name, :options
 
@@ -15,7 +20,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] If the field should be cast.
     def cast_on_read?
-      [ BigDecimal, Date, DateTime, Time ].include?(type)
+      !NO_CAST_ON_READ.include?(type)
     end
 
     # Get the default value for the field.
