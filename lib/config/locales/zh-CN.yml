@@ -2,6 +2,8 @@ zh-CN:
   mongoid:
     errors:
       messages:
+        blank:
+          不能为空
         taken:
           已占用
         document_not_found:
