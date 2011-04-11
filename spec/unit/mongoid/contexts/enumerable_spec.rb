@@ -22,8 +22,12 @@ describe Mongoid::Contexts::Enumerable do
     Address.new(:number => 20, :street => "Broadway")
   end
 
+  let(:berlin) do
+    Address.new(:street => "Hobrechtstr")
+  end
+
   let(:docs) do
-    [ london, shanghai, melbourne, new_york ]
+    [ london, shanghai, melbourne, new_york, berlin ]
   end
 
   let(:criteria) do
@@ -47,7 +51,7 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     it "groups by the fields provided in the options" do
-      counts.size.should == 3
+      counts.size.should == 4
     end
 
     it "stores the counts in proper groups" do
@@ -60,14 +64,14 @@ describe Mongoid::Contexts::Enumerable do
   describe "#avg" do
 
     it "returns the avg value for the supplied field" do
-      context.avg(:number).should == 12.75
+      context.avg(:number).should == 10.2
     end
   end
 
   describe "#count" do
 
     it "returns the size of the enumerable" do
-      context.count.should == 4
+      context.count.should == 5
     end
   end
 
@@ -88,7 +92,7 @@ describe Mongoid::Contexts::Enumerable do
 
       it "returns an array of distinct values for the field" do
         context.distinct(:street).should ==
-          [ "Bond Street", "Nan Jing Dong Lu", "Bourke Street", "Broadway" ]
+          [ "Bond Street", "Nan Jing Dong Lu", "Bourke Street", "Broadway", "Hobrechtstr" ]
       end
     end
   end
@@ -149,7 +153,7 @@ describe Mongoid::Contexts::Enumerable do
       end
 
       it "properly skips the specified records" do
-        context.execute.size.should == 2
+        context.execute.size.should == 3
       end
     end
   end
@@ -179,7 +183,7 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     it "groups by the fields provided in the options" do
-      group.size.should == 3
+      group.size.should == 4
     end
 
     it "stores the documents in proper groups" do
@@ -268,7 +272,7 @@ describe Mongoid::Contexts::Enumerable do
   describe "#min" do
 
     it "returns the min value for the supplied field" do
-      context.min(:number).should == 1
+      context.min(:number).should == 0
     end
   end
 

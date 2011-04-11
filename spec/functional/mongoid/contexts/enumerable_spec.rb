@@ -16,7 +16,6 @@ describe Mongoid::Contexts::Enumerable do
     it "returns the specified number of documents" do
       person.addresses.criteria.limit(5).size.should == 5
     end
-
   end
 
   describe "#paginate" do
@@ -26,7 +25,6 @@ describe Mongoid::Contexts::Enumerable do
       addresses.current_page.should == 1
       addresses.size.should == 5
     end
-
   end
 
   describe "#order_by" do
@@ -66,7 +64,6 @@ describe Mongoid::Contexts::Enumerable do
           map(&:number).should == [1, 2, 4, 5, 7, 8, 0, 3, 6, 9]
       end
     end
-
   end
 
   describe "#shift" do
@@ -88,7 +85,5 @@ describe Mongoid::Contexts::Enumerable do
       person.addresses.criteria.skip(5).limit(10).
         map(&:number).should == [5, 6, 7, 8, 9]
     end
-
   end
-
 end
