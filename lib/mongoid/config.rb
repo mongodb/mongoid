@@ -137,9 +137,10 @@ module Mongoid #:nodoc
     # @example Get the logger.
     #   config.logger
     #
-    # @return [ Logger ] The configured logger or nil.
+    # @return [ Logger ] The configured logger or a default Logger instance.
     def logger
-      @logger 
+        @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout) unless defined?(@logger)
+        @logger
     end
 
     # Sets the logger for Mongoid to use.
