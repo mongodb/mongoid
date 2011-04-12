@@ -95,7 +95,7 @@ module Mongoid #:nodoc:
       #   context.execute
       #
       # @return [ Array<Document> ] Documents that matched the selector.
-      def execute(paginating = false)
+      def execute
         limit(sort(filter)) || []
       end
 
