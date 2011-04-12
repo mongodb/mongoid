@@ -129,7 +129,7 @@ module Mongoid #:nodoc:
       def valid_scope_name?(name)
         if !scopes[name] && respond_to?(name, true)
           Mongoid.logger.warn "Creating scope :#{name}. " \
-                                    "Overwriting existing method #{self.name}.#{name}."
+                                    "Overwriting existing method #{self.name}.#{name}." if Mongoid.logger
         end
       end
     end
