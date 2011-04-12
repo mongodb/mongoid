@@ -218,7 +218,7 @@ describe Mongoid::Contexts::Mongo do
       Person.expects(:collection).returns(collection)
     end
 
-    context "when not paginating" do
+    context "with a regular selector" do
 
       before do
         collection.expects(:find).with(selector, options).returns(cursor)
