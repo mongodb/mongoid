@@ -4,6 +4,11 @@ module Mongoid #:nodoc:
   # Defines the behaviour for defined fields in the document.
   class Field
 
+    NO_CAST_ON_READ = [
+      Array, Binary, Boolean, Float, Hash,
+      Integer, BSON::ObjectId, Range, Set, String, Symbol
+    ]
+
     attr_accessor :type
     attr_reader :copyable, :klass, :label, :name, :options
 
