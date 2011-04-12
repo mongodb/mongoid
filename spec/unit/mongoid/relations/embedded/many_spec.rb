@@ -618,35 +618,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#paginate" do
-
-    let(:relation) do
-      described_class.new(base, [], metadata)
-    end
-
-    before do
-      4.times do |n|
-        relation.build(:street => "#{n} Bond St", :city => "London")
-      end
-    end
-
-    context "when provided page and per page options" do
-
-      let(:addresses) do
-        relation.paginate(:page => 2, :per_page => 2)
-      end
-
-      it "returns the correct number of documents" do
-        addresses.size.should == 2
-      end
-
-      it "returns the supplied page of documents" do
-        addresses[0].street.should == "2 Bond St"
-        addresses[1].street.should == "3 Bond St"
-      end
-    end
-  end
-
   describe "#substitute" do
 
     let(:relation) do

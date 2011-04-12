@@ -366,39 +366,6 @@ describe Mongoid::Criteria do
       end
     end
 
-    describe "#page" do
-
-      before do
-        context.expects(:page).returns(1)
-      end
-
-      it "delegates to the context" do
-        criteria.page.should == 1
-      end
-    end
-
-    describe "#paginate" do
-
-      before do
-        context.expects(:paginate).returns([])
-      end
-
-      it "delegates to the context" do
-        criteria.paginate.should == []
-      end
-    end
-
-    describe "#per_page" do
-
-      before do
-        context.expects(:per_page).returns(20)
-      end
-
-      it "delegates to the context" do
-        criteria.per_page.should == 20
-      end
-    end
-
     describe "#sum" do
 
       before do
@@ -498,27 +465,11 @@ describe Mongoid::Criteria do
     end
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person).extras(:page => 1, :per_page => 20)
+      Mongoid::Criteria.new(Person)
     end
 
     before do
       Person.expects(:collection).returns(collection)
-    end
-
-    context "filtering" do
-
-      before do
-        collection.expects(:find).with(criteria.selector, criteria.options).returns([])
-        criteria.entries
-      end
-
-      it "filters out empty page params" do
-        criteria.options[:page].should be_nil
-      end
-
-      it "filters out empty per page params" do
-        criteria.options[:per_page].should be_nil
-      end
     end
 
     context "when type is :all" do

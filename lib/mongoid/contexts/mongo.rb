@@ -2,7 +2,6 @@
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Mongo
-      include Paging
       attr_accessor :criteria
 
       delegate :klass, :options, :field_list, :selector, :to => :criteria
@@ -122,14 +121,8 @@ module Mongoid #:nodoc:
       # Returns:
       #
       # An enumerable +Cursor+.
-      def execute(paginating = false)
-        cursor = klass.collection.find(selector, process_options)
-        if cursor
-          @count = cursor.count if paginating
-          cursor
-        else
-          []
-        end
+      def execute
+        klass.collection.find(selector, process_options) || []
       end
 
       # Groups the context. This will take the internally built selector and options

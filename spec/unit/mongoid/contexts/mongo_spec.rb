@@ -229,21 +229,6 @@ describe Mongoid::Contexts::Mongo do
       end
     end
 
-    context "when paginating" do
-
-      before do
-        collection.expects(:find).with(selector, options).returns(cursor)
-      end
-
-      it "returns the cursor" do
-        context.execute(true).should == cursor
-      end
-
-      it "should find the count from the cursor" do
-        context.count.should == 500
-      end
-    end
-
     context "when field options are supplied" do
 
       context "when _type not in the field list" do
@@ -601,83 +586,6 @@ describe Mongoid::Contexts::Mongo do
 
     end
 
-  end
-
-  describe "#page" do
-
-    context "when the page option exists" do
-
-      before do
-        @criteria = Mongoid::Criteria.new(Person).extras({ :page => 5 })
-        @context = Mongoid::Contexts::Mongo.new(@criteria)
-      end
-
-      it "returns the page option" do
-        @context.page.should == 5
-      end
-
-    end
-
-    context "when the page option does not exist" do
-
-      before do
-        @criteria = Mongoid::Criteria.new(Person)
-        @context = Mongoid::Contexts::Mongo.new(@criteria)
-      end
-
-      it "returns 1" do
-        @context.page.should == 1
-      end
-
-    end
-
-  end
-
-  describe "#paginate" do
-
-    let(:id) do
-      BSON::ObjectId.new
-    end
-
-    before do
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
-      @criteria = Person.where(:_id => id).skip(60).limit(20)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
-      @collection.expects(:find).with(
-        {:_id => id}, :skip => 60, :limit => 20
-      ).returns([])
-      @results = @context.paginate
-    end
-
-    it "executes and paginates the results" do
-      @results.current_page.should == 4
-      @results.per_page.should == 20
-    end
-
-  end
-
-  describe "#paginate use last passed arguments" do
-
-    let(:id) do
-      BSON::ObjectId.new
-    end
-
-    before do
-      @collection = mock
-      Person.expects(:collection).returns(@collection)
-      @criteria = Person.where(:_id => id).skip(60).limit(20)
-      @context = Mongoid::Contexts::Mongo.new(@criteria)
-      @collection.expects(:find).with(
-        {:_id => id}, :skip => 20, :limit => 10
-      ).returns([])
-      @results = @context.paginate(:page => 3, :per_page => 10)
-    end
-
-    it 'uses last passed per_page and page value' do
-      @results.current_page.should == 3
-      @results.per_page.should == 10
-    end
   end
 
   describe "#shift" do

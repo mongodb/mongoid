@@ -61,9 +61,6 @@ module Mongoid #:nodoc:
       :max,
       :min,
       :one,
-      :page,
-      :paginate,
-      :per_page,
       :shift,
       :sum,
       :update,
@@ -306,24 +303,6 @@ module Mongoid #:nodoc:
     # comparing criteria or an enumerable.
     def comparable(other)
       other.is_a?(Criteria) ? other.entries : other
-    end
-
-    # Filters the unused options out of the options +Hash+. Currently this
-    # takes into account the "page" and "per_page" options that would be passed
-    # in if using will_paginate.
-    #
-    # Example:
-    #
-    # Given a criteria with a selector of { :page => 1, :per_page => 40 }
-    #
-    # <tt>criteria.filter_options</tt> # selector: { :skip => 0, :limit => 40 }
-    def filter_options
-      page_num = @options.delete(:page)
-      per_page_num = @options.delete(:per_page)
-      if (page_num || per_page_num)
-        @options[:limit] = limits = (per_page_num || 20).to_i
-        @options[:skip] = (page_num || 1).to_i * limits - limits
-      end
     end
 
     # Clone or dup the current +Criteria+. This will return a new criteria with

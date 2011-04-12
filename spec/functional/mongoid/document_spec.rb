@@ -337,47 +337,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#paginate" do
-
-    before do
-      10.times do |num|
-        Person.create(:title => "Test-#{num}", :ssn => "55#{num}")
-      end
-    end
-
-    it "returns paginated documents" do
-      Person.paginate(:per_page => 5, :page => 2).length.should == 5
-    end
-
-    it "returns a proper count" do
-      @criteria = Person.find(:all, { :per_page => 5, :page => 1 })
-      @criteria.count.should == 10
-    end
-
-    context "when paginating $or queries" do
-
-      before do
-        @results = Person.any_of(:title => /^Test/).paginate(:page => 2, :per_page => 5)
-      end
-
-      it "returns the proper page" do
-        @results.current_page.should == 2
-      end
-
-      it "returns the proper number per page" do
-        @results.per_page.should == 5
-      end
-
-      it "returns the proper count" do
-        @results.count.should == 5
-      end
-
-      it "returns the proper total entries" do
-        @results.total_entries.should == 10
-      end
-    end
-  end
-
   describe "#reload" do
 
     let(:person) do

@@ -86,7 +86,6 @@ module Mongoid #:nodoc:
       def extras(extras)
         clone.tap do |crit|
           crit.options.merge!(extras)
-          crit.filter_options
         end
       end
 
@@ -131,13 +130,6 @@ module Mongoid #:nodoc:
       # Returns: <tt>self</tt>
       def limit(value = 20)
         clone.tap { |crit| crit.options[:limit] = value }
-      end
-
-      # Returns the offset option. If a per_page option is in the list then it
-      # will replace it with a skip parameter and return the same value. Defaults
-      # to 20 if nothing was provided.
-      def offset(*args)
-        args.size > 0 ? skip(args.first) : options[:skip]
       end
 
       # Adds a criterion to the +Criteria+ that specifies the sort order of

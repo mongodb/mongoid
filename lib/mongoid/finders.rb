@@ -113,23 +113,6 @@ module Mongoid #:nodoc:
       find(:last, *args)
     end
 
-    # Find all documents in paginated fashion given the supplied arguments.
-    # If no parameters are passed just default to offset 0 and limit 20.
-    #
-    # Options:
-    #
-    # params: A +Hash+ of params to pass to the Criteria API.
-    #
-    # Example:
-    #
-    # <tt>Person.paginate(:conditions => { :field => "Test" }, :page => 1,
-    # :per_page => 20)</tt>
-    #
-    # Returns paginated array of docs.
-    def paginate(params = {})
-      find(:all, params).paginate
-    end
-
     protected
     # Find the first object or create/initialize it.
     def find_or(method, attrs = {}, &block)

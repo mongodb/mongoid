@@ -172,42 +172,6 @@ describe Mongoid::Criterion::Optional do
   describe "#extras" do
 
     context "filtering" do
-
-      context "when page is provided" do
-
-        let(:criteria) do
-          base.extras({ :page => "2" })
-        end
-
-        it "sets the limit and skip options" do
-          criteria.page.should == 2
-          criteria.options.should == { :skip => 20, :limit => 20 }
-        end
-      end
-
-      context "when per_page is provided" do
-
-        let(:criteria) do
-          base.extras({ :per_page => 45 })
-        end
-
-        it "sets the limit and skip options" do
-          criteria.options.should == { :skip => 0, :limit => 45 }
-        end
-      end
-
-      context "when page and per_page both provided" do
-
-        let(:criteria) do
-          base.extras({ :per_page => 30, :page => "4" })
-        end
-
-        it "sets the limit and skip options" do
-          criteria.options.should == { :skip => 90, :limit => 30 }
-          criteria.page.should == 4
-        end
-      end
-
       context "when extras are provided" do
 
         let(:criteria) do
@@ -406,68 +370,6 @@ describe Mongoid::Criterion::Optional do
     end
   end
 
-  describe "#offset" do
-
-    context "when the per_page option exists" do
-
-      let(:criteria) do
-        base.extras({ :per_page => 20, :page => 3 })
-      end
-
-      it "returns the per_page option" do
-        criteria.offset.should == 40
-      end
-    end
-
-    context "when the skip option exists" do
-
-      let(:criteria) do
-        base.extras({ :skip => 20 })
-      end
-
-      it "returns the skip option" do
-        criteria.offset.should == 20
-      end
-    end
-
-    context "when an argument is provided" do
-
-      let(:criteria) do
-        base.offset(40)
-      end
-
-      it "delegates to skip" do
-        criteria.options[:skip].should == 40
-      end
-    end
-
-    context "when no option exists" do
-
-      context "when page option exists" do
-
-        let(:criteria) do
-          base.extras({ :page => 2 })
-        end
-
-        it "returns the proper skip number" do
-          criteria.offset.should == 20
-        end
-
-        it "sets the proper skip option" do
-          criteria.options[:skip].should == 20
-        end
-      end
-
-      context "when page option does not exist" do
-
-        it "returns nil" do
-          base.offset.should be_nil
-          base.options[:skip].should be_nil
-        end
-      end
-    end
-  end
-
   describe "#order_by" do
 
     context "when field names and direction specified" do
@@ -505,27 +407,6 @@ describe Mongoid::Criterion::Optional do
 
     it "returns a copy" do
       base.order_by.should_not eql(base)
-    end
-  end
-
-  describe "#page" do
-
-    context "when the page option exists" do
-
-      let(:criteria) do
-        base.extras({ :page => 5 })
-      end
-
-      it "returns the page option" do
-        criteria.page.should == 5
-      end
-    end
-
-    context "when the page option does not exist" do
-
-      it "returns 1" do
-        base.page.should == 1
-      end
     end
   end
 

@@ -232,22 +232,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Paginate the association. Will create a new criteria, set the documents
-        # on it and execute in an enumerable context.
-        #
-        # @example Paginate the relation.
-        #   person.addresses.paginate(:page => 1, :per_page => 20)
-        #
-        # @param [ Hash ] options The pagination options.
-        #
-        # @option options [ Integer ] :page The page number.
-        # @option options [ Integer ] :per_page The number on each page.
-        #
-        # @return [ WillPaginate::Collection ] The paginated documents.
-        def paginate(options)
-          criteria.paginate(options)
-        end
-
         # Substitutes the supplied target documents for the existing documents
         # in the relation.
         #

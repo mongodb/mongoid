@@ -4,7 +4,6 @@ require 'mongoid/contexts/enumerable/sort'
 module Mongoid #:nodoc:
   module Contexts #:nodoc:
     class Enumerable
-      include Paging
       include Relations::Embedded::Atomic
 
       attr_accessor :collection, :criteria
