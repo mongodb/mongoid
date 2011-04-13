@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
       Array, Binary, Boolean, Float, Hash,
       Integer, BSON::ObjectId, Set, String, Symbol
     ]
- 
+
     attr_accessor :type
     attr_reader :copyable, :klass, :label, :name, :options
 
