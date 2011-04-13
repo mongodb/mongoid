@@ -132,6 +132,13 @@ module Mongoid #:nodoc:
         clone.tap { |crit| crit.options[:limit] = value }
       end
 
+      # Returns the offset option. If a per_page option is in the list then it
+      # will replace it with a skip parameter and return the same value. Defaults
+      # to 20 if nothing was provided.
+      def offset(*args)
+        args.size > 0 ? skip(args.first) : options[:skip]
+      end
+
       # Adds a criterion to the +Criteria+ that specifies the sort order of
       # the returned documents in the database. Similar to a SQL "ORDER BY".
       #

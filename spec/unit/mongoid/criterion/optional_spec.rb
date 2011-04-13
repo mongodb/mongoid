@@ -370,6 +370,38 @@ describe Mongoid::Criterion::Optional do
     end
   end
 
+  describe "#offset" do
+
+    context "when the skip option exists" do
+
+      let(:criteria) do
+        base.extras({ :skip => 20 })
+      end
+
+      it "returns the skip option" do
+        criteria.offset.should == 20
+      end
+    end
+
+    context "when an argument is provided" do
+
+      let(:criteria) do
+        base.offset(40)
+      end
+
+      it "delegates to skip" do
+        criteria.options[:skip].should == 40
+      end
+    end
+
+    context "when no option exists" do
+      it "returns nil" do
+        base.offset.should be_nil
+        base.options[:skip].should be_nil
+      end
+    end
+  end
+
   describe "#order_by" do
 
     context "when field names and direction specified" do
