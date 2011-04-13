@@ -132,6 +132,16 @@ module Mongoid #:nodoc
       end
     end
 
+    # Returns the default logger, which is either a Rails logger of stdout logger
+    #
+    # @example Get the default logger
+    #   config.default_logger
+    #
+    # @return [ Logger ] The default Logger instance.
+    def default_logger
+      defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+    end
+
     # Returns the logger, or defaults to Rails logger or stdout logger.
     #
     # @example Get the logger.
@@ -139,8 +149,8 @@ module Mongoid #:nodoc
     #
     # @return [ Logger ] The configured logger or a default Logger instance.
     def logger
-        @logger = defined?(Rails) ? Rails.logger : ::Logger.new($stdout) unless defined?(@logger)
-        @logger
+      @logger = default_logger unless defined?(@logger)
+      @logger
     end
 
     # Sets the logger for Mongoid to use.
