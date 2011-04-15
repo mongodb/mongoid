@@ -499,7 +499,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :cyclic, :order, :versioned ]
+            [ :as, :cyclic, :order, :versioned, :cascade_callbacks ]
           end
 
           # Get the default validation setting for the relation. Determines if
