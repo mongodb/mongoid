@@ -75,6 +75,125 @@ describe Mongoid::Callbacks do
     end
   end
 
+  describe "cascaded callbacks" do
+
+    let(:artist) do
+      Artist.new(:name => "Foo Fighters")
+    end
+
+    context "on parent update" do
+
+      before do
+        artist.save!
+        artist.build_instrument(:name => "Piano")
+      end
+
+      context "child is new" do
+
+        it "should trigger create" do
+          artist.save!
+          artist.instrument.name.should == 'PIANO'
+        end
+
+        it "should not trigger update" do
+          artist.save!
+          artist.instrument.key.should_not == 'G#'
+        end
+      end
+
+      context "child is persisted" do
+
+        before do
+          artist.save!
+        end
+
+        context "child is dirty" do
+
+          before do
+            artist.instrument.name = 'Tuba'
+          end
+
+          it "should trigger update" do
+            artist.save!
+            artist.instrument.key.should == 'G#'
+          end
+        end
+
+        context "child is not dirty" do
+
+          it "should not trigger update" do
+            artist.save!
+            artist.instrument.key.should_not == 'G#'
+          end
+        end
+      end
+    end
+
+    context "when enabled" do
+
+      let(:label) do
+        Label.new(:name => "Tower Records")
+      end
+
+      let(:instrument) do
+        Instrument.new(:name => "Harpsichord")
+      end
+
+      before do
+        artist.labels << label
+        artist.instrument = instrument
+      end
+
+      context "embeds_many" do
+
+        it "should cascade callbacks" do
+          label.expects(:after_save_stub)
+          artist.save!
+        end
+      end
+
+      context "embeds_one" do
+
+        it "should cascade callbacks" do
+          instrument.expects(:after_save_stub)
+          artist.save!
+        end
+      end
+    end
+
+    context "when disabled" do
+
+      let(:song) do
+        Song.new
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        artist.songs << song
+        artist.address = address
+      end
+
+      context "embeds_many" do
+
+        it "should not cascade callbacks" do
+          song.expects(:after_save_stub).never
+          artist.save!
+        end
+      end
+
+      context "embeds_one" do
+
+        it "should not cascade callbacks" do
+          address.expects(:after_save_stub).never
+          artist.save!
+        end
+      end
+    end
+  end
+
   describe ".before_create" do
 
     before do
