@@ -111,7 +111,7 @@ module Mongoid #:nodoc
       options.except("database", "slaves", "databases").each_pair do |name, value|
         send("#{name}=", value) if respond_to?("#{name}=")
       end
-      configure_databases(options)
+      @master, @slaves = configure_databases(options)
       configure_extras(options["databases"])
     end
 
@@ -232,7 +232,7 @@ module Mongoid #:nodoc
     # @return [ Mongo::DB ] The master database.
     def master
       unless @master
-        configure_databases(@settings) unless @settings.blank?
+        @master, @slaves = configure_databases(@settings) unless @settings.blank?
         raise Errors::InvalidDatabase.new(nil) unless @master
       end
       if @reconnect
@@ -295,7 +295,7 @@ module Mongoid #:nodoc
     # @return [ Array<Mongo::DB>, nil ] The slave databases.
     def slaves
       unless @slaves
-        configure_databases(@settings) if @settings && @settings[:database]
+        @master, @slaves = configure_databases(@settings) if @settings && @settings[:database]
       end
       @slaves
     end
@@ -337,9 +337,9 @@ module Mongoid #:nodoc
     # @since 2.0.0.rc.1
     def configure_databases(options)
       if options.has_key?('hosts')
-        @master, @slaves = ReplsetDatabase.new(options).configure
+        ReplsetDatabase.new(options).configure
       else
-        @master, @slaves = Database.new(options).configure
+        Database.new(options).configure
       end
     end
 
@@ -354,7 +354,7 @@ module Mongoid #:nodoc
     def configure_extras(extras)
       @databases = (extras || []).inject({}) do |dbs, (name, options)|
         dbs.tap do |extra|
-        dbs[name], dbs["#{name}_slaves"] = Database.new(options).configure
+        dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
         end
       end
     end

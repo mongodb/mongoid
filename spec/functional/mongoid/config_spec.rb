@@ -179,6 +179,10 @@ describe Mongoid::Config do
       it "should create a regular Mongo::ReplSetConnection" do
         described_class.master.connection.should be_a Mongo::ReplSetConnection
       end
+
+      it "should create regular Mongo::ReplSetConnection(s) for multiple databases" do
+        described_class.databases["shard_replset"].connection.should be_a Mongo::ReplSetConnection
+      end
     end
   end
 
