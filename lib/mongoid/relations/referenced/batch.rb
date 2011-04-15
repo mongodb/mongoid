@@ -37,13 +37,11 @@ module Mongoid #:nodoc:
         # @since 2.0.2, batch-relational-insert
         def batched(&block)
           inserter = Thread.current[:mongoid_batch_insert] ||= Insert.new
-          count_executions do
-            block.call if block
-          end.tap do
-            if @executions.zero?
-              Thread.current[:mongoid_batch_insert] = nil
-              inserter.execute(collection)
-            end
+          count_executions(&block)
+        ensure
+          if @executions.zero?
+            Thread.current[:mongoid_batch_insert] = nil
+            inserter.execute(collection)
           end
         end
 
@@ -59,11 +57,12 @@ module Mongoid #:nodoc:
         # @param [ Proc ] block The block to call.
         #
         # @since 2.0.2, batch-relational-insert
-        def count_executions(&block)
-          @executions ||= 0 and @executions += 1
-          block.call.tap do
-            @executions -=1
-          end
+        def count_executions
+          @executions ||= 0
+          @executions += 1
+          yield
+        ensure
+          @executions -=1
         end
       end
     end
