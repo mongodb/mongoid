@@ -13,3 +13,8 @@ defaults: &defaults
 test:
   <<: *defaults
   database: mongoid_config_test
+  databases:
+    shard_replset:
+      hosts: [ [localhost, 27017], [localhost, 27017] ]
+      database: multi_db_replset_test
+      reconnect_time: 5
