@@ -317,6 +317,29 @@ describe Mongoid::Config do
     end
   end
 
+  describe ".purge!" do
+
+    before do
+      Person.create(:ssn => "123-44-1200")
+      Post.create(:title => "testing")
+    end
+
+    context "when no collection name is provided" do
+
+      let!(:collections) do
+        Mongoid.purge!
+      end
+
+      it "purges the person collection" do
+        Person.count.should == 0
+      end
+
+      it "purges the post collection" do
+        Post.count.should == 0
+      end
+    end
+  end
+
   context "when defining options" do
 
     before do
