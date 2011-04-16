@@ -163,6 +163,18 @@ module Mongoid #:nodoc
       @logger = logger
     end
 
+    # Purge all data in all collections, including indexes.
+    #
+    # @example Purge all data.
+    #   Mongoid::Config.purge!
+    #
+    # @since 2.0.2
+    def purge!
+      master.collections.map do |collection|
+        collection.drop if collection.name !~ /system/
+      end
+    end
+
     # Sets whether the times returned from the database use the ruby or
     # the ActiveSupport time zone.
     # If you omit this setting, then times will use the ruby time zone.
