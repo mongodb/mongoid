@@ -5,13 +5,42 @@ module Mongoid #:nodoc
   module Collections
     extend ActiveSupport::Concern
     included do
-      cattr_accessor :_collection, :collection_name
-      self.collection_name = self.name.collectionize
-
+      cattr_accessor :root_model, :parent_model
       delegate :collection, :db, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:
+      def inherited(subclass)
+        super
+        subclass.parent_model = self.name
+        subclass.root_model = self.root_model || subclass.parent_model
+        return if embedded? && !cyclic
+
+        subclass.collection_name = self.collection_name
+        subclass._collection = self.collection
+      end
+
+      # Sets the collection name. this method is thread-safe
+      def collection_name=(v)
+        self._collection = nil # invalidate current collection
+        Thread.current[:"_#{self.root_model||self.name}_collection_name"] = v
+      end
+
+      # Returns the collection name. this method is thread-safe
+      def collection_name
+        Thread.current[:"_#{self.root_model||self.name}_collection_name"] ||= self.name.collectionize
+      end
+
+      #:nodoc:
+      def _collection=(v)
+        Thread.current[:"_#{self.root_model||self.name}_collection"] = v
+      end
+
+      #:nodoc:
+      def _collection
+        Thread.current[:"_#{self.root_model||self.name}_collection"]
+      end
+      
       # Returns the collection associated with this +Document+. If the
       # document is embedded, there will be no collection associated
       # with it.

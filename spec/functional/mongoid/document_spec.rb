@@ -148,6 +148,16 @@ describe Mongoid::Document do
       it "returns the root document collection" do
         Browser.collection.should == Canvas.collection
       end
+      
+      it "returns the root model" do
+        Browser.root_model == Canvas
+        Firefox.root_model == Canvas
+      end
+      
+      it "returns the parent model" do
+        Browser.parent_model == Canvas
+        Firefox.parent_model == Browser
+      end
     end
 
     context "on a namespaced document" do
