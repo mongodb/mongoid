@@ -4,33 +4,50 @@ describe Mongoid::Inspection do
 
   describe "#inspect" do
 
-    context "with allow_dynamic_fields = false" do
+    context "when not allowing dynamic fields" do
+
       before do
         Mongoid.configure.allow_dynamic_fields = false
-        @person = Person.new :title => "CEO"
       end
 
-      it "returns a pretty string of class name and attributes" do
-        attrs = Person.fields.map do |name, field|
-          "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name].inspect}"
-        end * ", "
-        @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
+      let(:person) do
+        Person.new(:title => "CEO")
+      end
+
+      let(:attributes) do
+        Person.fields.map do |name, field|
+          unless name == "_id"
+            "#{name}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
+          end
+        end.compact * ", "
+      end
+
+      it "returns a string of class name and attributes" do
+        person.inspect.should == "#<Person _id: #{person.id}, #{attributes}>"
       end
     end
 
-    context "with allow_dynamic_fields = true" do
-      before do
-        Mongoid.configure.allow_dynamic_fields = true
-        @person = Person.new(:title => "CEO", :some_attribute => "foo")
-        @person.addresses << Address.new(:street => "test")
+    context "when allowing dynamic fields" do
+
+      let(:person) do
+        Person.new(:title => "CEO", :some_attribute => "foo")
       end
 
-      it "returns a pretty string of class name, attributes, and dynamic attributes" do
-        attrs = Person.fields.map do |name, field|
-          "#{name}: #{@person.attributes[name].nil? ? "nil" : @person.attributes[name].inspect}"
-        end * ", "
-        attrs << ", some_attribute: #{@person.attributes['some_attribute'].inspect}"
-        @person.inspect.should == "#<Person _id: #{@person.id}, #{attrs}>"
+      let(:attributes) do
+        Person.fields.map do |name, field|
+          unless name == "_id"
+            "#{name}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
+          end
+        end.compact * ", "
+      end
+
+      before do
+        Mongoid.configure.allow_dynamic_fields = true
+        attributes << ", some_attribute: #{person.attributes['some_attribute'].inspect}"
+      end
+
+      it "returns a string of class name, attributes, and dynamic attributes" do
+        person.inspect.should == "#<Person _id: #{person.id}, #{attributes}>"
       end
     end
   end

@@ -31,8 +31,10 @@ module Mongoid #:nodoc
     # An array of pretty printed field values.
     def inspect_fields
       fields.map do |name, field|
-        "#{name}: #{@attributes[name].inspect}"
-      end
+        unless name == "_id"
+          "#{name}: #{@attributes[name].inspect}"
+        end
+      end.compact
     end
 
     # Get an array of inspected dynamic fields for the document.
