@@ -116,7 +116,6 @@ describe Mongoid::Serialization do
                 end
 
                 it "includes the specific ralations" do
-                  puts hash.inspect
                   relation_hash[0]["locations"].should == [{ "name" => "Home" }]
                   relation_hash[1]["locations"].should == [{ "name" => "Hotel" }]
                 end
