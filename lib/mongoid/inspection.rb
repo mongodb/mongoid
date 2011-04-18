@@ -1,17 +1,17 @@
 # encoding: utf-8
 module Mongoid #:nodoc
-  module Inspection #:nodoc
+
+  # Contains the bahviour around inspecting documents via
+  # <tt>Object#inspect</tt>.
+  module Inspection
 
     # Returns the class name plus its attributes. If using dynamic fields will
     # include those as well.
     #
-    # Example:
+    # @example Inspect the document.
+    #   person.inspect
     #
-    # <tt>person.inspect</tt>
-    #
-    # Returns:
-    #
-    # A nice pretty string to look at.
+    # @return [ String ] A nice pretty string to look at.
     def inspect
       inspection = []
       inspection.concat(inspect_fields).concat(inspect_dynamic_fields)
@@ -22,13 +22,10 @@ module Mongoid #:nodoc
 
     # Get an array of inspected fields for the document.
     #
-    # Example:
+    # @example Inspect the defined fields.
+    #   document.inspect_fields
     #
-    # <tt>inspect_fields</tt>
-    #
-    # Returns:
-    #
-    # An array of pretty printed field values.
+    # @return [ String ] An array of pretty printed field values.
     def inspect_fields
       fields.map do |name, field|
         unless name == "_id"
@@ -39,13 +36,10 @@ module Mongoid #:nodoc
 
     # Get an array of inspected dynamic fields for the document.
     #
-    # Example:
+    # @example Inspect the dynamic fields.
+    #   document.inspect_dynamic_fields
     #
-    # <tt>inspect_dynamic_fields</tt>
-    #
-    # Returns:
-    #
-    # An array of pretty printed dynamic field values.
+    # @return [ String ] An array of pretty printed dynamic field values.
     def inspect_dynamic_fields
       if Mongoid.allow_dynamic_fields
         keys = @attributes.keys - fields.keys - relations.keys - ["_id", "_type"]
