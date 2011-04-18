@@ -91,7 +91,7 @@ describe Mongoid::Serialization do
                 })
               end
 
-              it "includes the second relation" do
+              it "includes the first relation" do
                 relation_hash[0]["locations"].should == [{ "name" => "Home" }]
               end
 
