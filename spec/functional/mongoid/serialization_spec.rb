@@ -91,8 +91,35 @@ describe Mongoid::Serialization do
                 })
               end
 
-              it "includes the specified relation" do
+              it "includes the second relation" do
                 relation_hash[0]["locations"].should == [{ "name" => "Home" }]
+              end
+
+              context "after retrieved from database" do
+
+                let(:db_person) { Person.all.last }
+
+                let!(:second_location) do
+                  address_two.locations.build(:name => "Hotel")
+                end
+
+                let(:hash) do
+                  db_person.serializable_hash(
+                    :include => { :addresses => {
+                      :except => :_id, :include => { :locations => { :except => :_id } }
+                    }
+                  })
+                end
+
+                before do
+                  person.save
+                end
+
+                it "includes the specific ralations" do
+                  puts hash.inspect
+                  relation_hash[0]["locations"].should == [{ "name" => "Home" }]
+                  relation_hash[1]["locations"].should == [{ "name" => "Hotel" }]
+                end
               end
             end
 
