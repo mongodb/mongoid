@@ -434,6 +434,13 @@ describe Mongoid::Criterion::Inclusion do
         end
       end
 
+      context "#in (range value)" do
+
+        it "returns those matching an gte and lte clause" do
+          Person.where(:age.in => 30..40).should == [person]
+        end
+      end
+
       context "#lt" do
 
         it "returns those matching a lt clause" do

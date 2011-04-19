@@ -318,6 +318,18 @@ describe Mongoid::Criterion::Inclusion do
           end
         end
 
+        context "#in (with range value)" do
+
+          let(:criteria) do
+            base.where(:age.in => 10..20)
+          end
+
+          it "returns a selector matching an gte and lte clause" do
+            criteria.selector.should ==
+              { :age => { "$gte" => 10, "$lte" => 20 } }
+          end
+        end
+
         context "#lt" do
 
           let(:criteria) do
