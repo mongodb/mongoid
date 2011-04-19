@@ -66,7 +66,12 @@ module Mongoid #:nodoc:
           return args if args.is_a?(BSON::ObjectId) || !klass.using_object_ids?
           case args
           when ::String
-            args.blank? ? nil : BSON::ObjectId.from_string(args)
+            return nil if args.blank?
+            if args.is_a?(Mongoid::Criterion::Unconvertable)
+              args
+            else
+              BSON::ObjectId.from_string(args)
+            end
           when ::Array
             args = args.reject(&:blank?) if reject_blank
             args.map do |arg|

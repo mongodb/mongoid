@@ -8,7 +8,8 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       stub(
         :klass => Post,
         :name => :posts,
-        :foreign_key => "person_id"
+        :foreign_key => "person_id",
+        :inverse_klass => Person
       )
     end
 
@@ -31,10 +32,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       before do
-        Post.expects(:find).with(
-          :all,
-          :conditions => { "person_id" => object_id }
-        ).returns([ post ])
+        Post.expects(:where).with("person_id" => object_id).returns([ post ])
         @documents = builder.build
       end
 
