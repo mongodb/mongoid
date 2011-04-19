@@ -202,6 +202,26 @@ describe Mongoid::Relations::Referenced::Many do
             movie.ratings.count.should == 1
           end
         end
+
+        context "when parent has String identity" do
+
+          before do
+            Movie.identity :type => String
+            movie.ratings.create
+          end
+
+          after do
+            Movie.identity :type => BSON::ObjectId
+          end
+
+          let(:movie) do
+            Movie.create
+          end
+
+          it "should have rating references" do
+            movie.ratings.count.should == 1
+          end
+        end
       end
     end
   end

@@ -7,6 +7,7 @@ require "mongoid/criterion/inclusion"
 require "mongoid/criterion/inspection"
 require "mongoid/criterion/optional"
 require "mongoid/criterion/selector"
+require "mongoid/criterion/unconvertable"
 
 module Mongoid #:nodoc:
 

@@ -291,6 +291,28 @@ describe Mongoid::Criterion::Inclusion do
       )
     end
 
+    context "when providing 24 character strings" do
+
+      context "when the field is not an id field" do
+
+        let(:string) do
+          BSON::ObjectId.new.to_s
+        end
+
+        let!(:person) do
+          Person.create(:title => string)
+        end
+
+        let(:from_db) do
+          Person.where(:title => string)
+        end
+
+        it "does not convert the field to a bson id" do
+          from_db.should == [ person ]
+        end
+      end
+    end
+
     context "when providing string object ids" do
 
       context "when providing a single id" do

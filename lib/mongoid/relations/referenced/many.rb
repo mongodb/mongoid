@@ -325,6 +325,26 @@ module Mongoid #:nodoc:
           metadata.klass.collection
         end
 
+        # Get the value for the foreign key in convertable or unconvertable
+        # form.
+        #
+        # @todo Durran: Find a common place for this.
+        #
+        # @example Get the value.
+        #   relation.convertable
+        #
+        # @return [ String, Unconvertable, BSON::ObjectId ] The string or object id.
+        #
+        # @since 2.0.2
+        def convertable
+          inverse = metadata.inverse_klass
+          if inverse.using_object_ids? || base.id.is_a?(BSON::ObjectId)
+            base.id
+          else
+            Mongoid::Criterion::Unconvertable.new(base.id)
+          end
+        end
+
         # Returns the criteria object for the target class with its documents set
         # to target.
         #
@@ -334,7 +354,7 @@ module Mongoid #:nodoc:
         # @return [ Criteria ] A new criteria.
         def criteria
           raise_mixed if klass.embedded?
-          metadata.klass.where(metadata.foreign_key => base.id)
+          metadata.klass.where(metadata.foreign_key => convertable)
         end
 
         # Tells if the target array been initialized.
