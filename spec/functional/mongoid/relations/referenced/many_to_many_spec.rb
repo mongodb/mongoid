@@ -467,6 +467,33 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#avg" do
+
+    let(:person) do
+      Person.create(:ssn => "123-45-6789")
+    end
+
+    let(:preference_one) do
+      Preference.create(:ranking => 5)
+    end
+
+    let(:preference_two) do
+      Preference.create(:ranking => 10)
+    end
+
+    before do
+      person.preferences.push(preference_one, preference_two)
+    end
+
+    let(:avg) do
+      person.preferences.avg(:ranking)
+    end
+
+    it "returns the avg value of the supplied field" do
+      avg.should == 7.5
+    end
+  end
+
   [ :build, :new ].each do |method|
 
     describe "##{method}" do
@@ -1404,6 +1431,33 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#max" do
+
+    let(:person) do
+      Person.create(:ssn => "123-45-6789")
+    end
+
+    let(:preference_one) do
+      Preference.create(:ranking => 5)
+    end
+
+    let(:preference_two) do
+      Preference.create(:ranking => 10)
+    end
+
+    before do
+      person.preferences.push(preference_one, preference_two)
+    end
+
+    let(:max) do
+      person.preferences.max(:ranking)
+    end
+
+    it "returns the max value of the supplied field" do
+      max.should == 10
+    end
+  end
+
   describe "#method_missing" do
 
     let!(:person) do
@@ -1471,6 +1525,33 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
         end
       end
+    end
+  end
+
+  describe "#min" do
+
+    let(:person) do
+      Person.create(:ssn => "123-45-6789")
+    end
+
+    let(:preference_one) do
+      Preference.create(:ranking => 5)
+    end
+
+    let(:preference_two) do
+      Preference.create(:ranking => 10)
+    end
+
+    before do
+      person.preferences.push(preference_one, preference_two)
+    end
+
+    let(:min) do
+      person.preferences.min(:ranking)
+    end
+
+    it "returns the min value of the supplied field" do
+      min.should == 5
     end
   end
 
@@ -1546,6 +1627,33 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           preferences.should respond_to(method)
         end
       end
+    end
+  end
+
+  describe "#sum" do
+
+    let(:person) do
+      Person.create(:ssn => "123-45-6789")
+    end
+
+    let(:preference_one) do
+      Preference.create(:ranking => 5)
+    end
+
+    let(:preference_two) do
+      Preference.create(:ranking => 10)
+    end
+
+    before do
+      person.preferences.push(preference_one, preference_two)
+    end
+
+    let(:sum) do
+      person.preferences.sum(:ranking)
+    end
+
+    it "returns the sum value of the supplied field" do
+      sum.should == 15
     end
   end
 

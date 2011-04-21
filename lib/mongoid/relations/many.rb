@@ -6,6 +6,8 @@ module Mongoid #:nodoc:
     # proxies.
     class Many < Proxy
 
+      delegate :avg, :max, :min, :sum, :to => :criteria
+
       # Appends a document or array of documents to the relation. Will set
       # the parent and update the index in the process.
       #
