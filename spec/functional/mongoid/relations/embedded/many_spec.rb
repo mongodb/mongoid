@@ -576,6 +576,33 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#avg" do
+
+    let(:person) do
+      Person.new(:ssn => "123-45-6789")
+    end
+
+    let(:address_one) do
+      Address.new(:number => 5)
+    end
+
+    let(:address_two) do
+      Address.new(:number => 10)
+    end
+
+    before do
+      person.addresses.push(address_one, address_two)
+    end
+
+    let(:avg) do
+      person.addresses.avg(:number)
+    end
+
+    it "returns the average value of the supplied field" do
+      avg.should == 7.5
+    end
+  end
+
   [ :build, :new ].each do |method|
 
     describe "#build" do
@@ -1386,6 +1413,33 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#max" do
+
+    let(:person) do
+      Person.new(:ssn => "123-45-6789")
+    end
+
+    let(:address_one) do
+      Address.new(:number => 5)
+    end
+
+    let(:address_two) do
+      Address.new(:number => 10)
+    end
+
+    before do
+      person.addresses.push(address_one, address_two)
+    end
+
+    let(:max) do
+      person.addresses.max(:number)
+    end
+
+    it "returns the max value of the supplied field" do
+      max.should == 10
+    end
+  end
+
   describe "#method_missing" do
 
     let!(:person) do
@@ -1459,6 +1513,33 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#min" do
+
+    let(:person) do
+      Person.new(:ssn => "123-45-6789")
+    end
+
+    let(:address_one) do
+      Address.new(:number => 5)
+    end
+
+    let(:address_two) do
+      Address.new(:number => 10)
+    end
+
+    before do
+      person.addresses.push(address_one, address_two)
+    end
+
+    let(:min) do
+      person.addresses.min(:number)
+    end
+
+    it "returns the min value of the supplied field" do
+      min.should == 5
+    end
+  end
+
   [ :size, :length ].each do |method|
 
     describe "##{method}" do
@@ -1475,6 +1556,33 @@ describe Mongoid::Relations::Embedded::Many do
       it "returns the number of persisted documents" do
         person.addresses.send(method).should == 2
       end
+    end
+  end
+
+  describe "#sum" do
+
+    let(:person) do
+      Person.new(:ssn => "123-45-6789")
+    end
+
+    let(:address_one) do
+      Address.new(:number => 5)
+    end
+
+    let(:address_two) do
+      Address.new(:number => 10)
+    end
+
+    before do
+      person.addresses.push(address_one, address_two)
+    end
+
+    let(:sum) do
+      person.addresses.sum(:number)
+    end
+
+    it "returns the sum of all the supplied field values" do
+      sum.should == 15
     end
   end
 
