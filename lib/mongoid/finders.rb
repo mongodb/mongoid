@@ -34,6 +34,11 @@ module Mongoid #:nodoc:
       find(:all, *args).count
     end
 
+    # Returns true if count is zero
+    def empty?
+      count == 0
+    end
+
     # Returns true if there are on document in database based on the
     # provided arguments.
     #
