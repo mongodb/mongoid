@@ -102,7 +102,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0.rc.6
     def update_attribute(name, value)
-      write_attribute(name, value) and save(:validate => false)
+      write_attribute(name, value); save(:validate => false)
     end
 
     # Update the document attributes in the datbase.
