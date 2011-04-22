@@ -1,3 +1,4 @@
+$:.unshift('.')
 require "spec_helper"
 
 describe Mongoid::Document do
@@ -587,6 +588,8 @@ describe Mongoid::Document do
 
       it "should return the id field correctly" do
         @person.to_json.should include('"_id":"'+@person.id.to_s+'"')
+        @person.to_json( include: :addresses ).should include('Jing')
+        @person.to_json(only: [:title, :age], include: :addresses ).should include('Jing')
       end
     end
 
@@ -602,6 +605,22 @@ describe Mongoid::Document do
 
       it "should return the id field correctly" do
         @person.to_json.should include('"_id":"'+@person.id.to_s+'"')
+      end
+    end
+
+    context "multiple persisted documents" do
+      it "should handle complex includes" do
+        @person.save
+        @person2 = Person.new(:title => "Sir", :age => 30)
+        @address2 = Address.new(:street => "Xi")
+        @person2.addresses << @address2
+        @person2.save
+        r = Person.all.to_json(only: [:title, :age], include: {addresses: {only: :street}} )
+        r.should include('Xi')
+        r.should include('Jing')
+        r = Person.all.to_json(only: [:title, :age], include: addresses)
+        r.should include('Xi')
+        r.should include('Jing')
       end
     end
   end
