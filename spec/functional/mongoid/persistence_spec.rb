@@ -450,6 +450,18 @@ describe Mongoid::Persistence do
         end
       end
 
+      context "when updating to the same value" do
+        before do
+          post.update_attribute(:title, "Testing")
+        end
+
+        it "can update to the save value" do
+          post.update_attribute(:title, "Testing").should be_true
+        end
+        
+      end
+
+
       context "when the document is invalid" do
 
         before do
