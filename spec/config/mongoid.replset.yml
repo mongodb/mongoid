@@ -18,3 +18,9 @@ test:
       hosts: [ [localhost, 27017], [localhost, 27017] ]
       database: multi_db_replset_test
       reconnect_time: 5
+
+authenticated:
+  <<: *defaults
+  database: mongoid_config_authenticated_test
+  username: mongoid
+  password: test

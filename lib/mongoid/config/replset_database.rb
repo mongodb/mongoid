@@ -17,14 +17,14 @@ module Mongoid #:nodoc:
         #yes, construction is weird but the driver wants "A list of host-port pairs ending with a hash containing any options"
         #mongo likes symbols
         options = self.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo}
-        connection = Mongo::ReplSetConnection.new(*(self['hosts'] << options))
+        connection = Mongo::ReplSetConnection.new(*(hosts << options))
 
         if authenticating?
           connection.add_auth(database, username, password)
           connection.apply_saved_authentication
         end
 
-        [ connection.db(self['database']), nil ]
+        [ connection.db(database), nil ]
       end
 
       # Do we need to authenticate against the database?
@@ -34,7 +34,7 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] True if auth is needed, false if not.
       #
-      # @since 2.0.0.rc.7
+      # @since 2.0.2
       def authenticating?
         username || password
       end
@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Object ] The value in the hash.
       #
-      # @since 2.0.0.rc.7
+      # @since 2.0.2
       def method_missing(name, *args, &block)
         self[name.to_s]
       end
@@ -71,8 +71,6 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.5
       def initialize(options = {})
-        self[:logger] = Mongoid::Logger.new
-
         merge!(options)
       end
     end
