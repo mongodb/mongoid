@@ -1,11 +1,6 @@
 development:
   host: localhost
   database: <%= database_name || app_name %>_development
-  # slaves:
-  #   - host: slave1.local
-  #     port: 27018
-  #   - host: slave2.local
-  #     port: 27019
 
 test:
   host: localhost
@@ -18,3 +13,8 @@ production:
   username: <%%= ENV['MONGOID_USERNAME'] %>
   password: <%%= ENV['MONGOID_PASSWORD'] %>
   database: <%%= ENV['MONGOID_DATABASE'] %>
+  # slaves:
+  #   - host: slave1.local
+  #     port: 27018
+  #   - host: slave2.local
+  #     port: 27019
