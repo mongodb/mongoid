@@ -27,5 +27,49 @@ describe Mongoid::Config::ReplsetDatabase do
     it "does not configure specific slaves" do
       replica_set[1].should be_nil
     end
+
+    context "without authentication details" do
+
+      let(:replica_set) do
+        described_class.new(options['test']).configure
+      end
+
+      let(:repl_set_connection) do
+        stub.quacks_like(Mongo::ReplSetConnection.allocate)
+      end
+
+      before do
+        Mongo::ReplSetConnection.stubs(:new).returns(repl_set_connection)
+      end
+
+      it "should not add authentication or apply" do
+        repl_set_connection.expects(:db)
+        repl_set_connection.expects(:add_auth).never
+        repl_set_connection.expects(:apply_saved_authentication).never
+        replica_set
+      end
+    end
+
+    context "with authentication details" do
+
+      let(:replica_set) do
+        described_class.new(options['authenticated']).configure
+      end
+
+      let(:repl_set_connection) do
+        stub.quacks_like(Mongo::ReplSetConnection.allocate)
+      end
+
+      before do
+        Mongo::ReplSetConnection.stubs(:new).returns(repl_set_connection)
+      end
+
+      it "should add authentication and apply" do
+        repl_set_connection.expects(:db)
+        repl_set_connection.expects(:add_auth).with(options['authenticated']['database'], options['authenticated']['username'], options['authenticated']['password'])
+        repl_set_connection.expects(:apply_saved_authentication)
+        replica_set
+      end
+    end
   end
 end
