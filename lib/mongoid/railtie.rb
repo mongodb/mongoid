@@ -129,7 +129,7 @@ module Rails #:nodoc:
         config.after_initialize do
           ::Mongoid.instantiate_observers
 
-          ActionDispatch::Callbacks.to_prepare(:mongoid_instantiate_observers) do
+          ActionDispatch::Callbacks.to_prepare do
             ::Mongoid.instantiate_observers
           end
         end
