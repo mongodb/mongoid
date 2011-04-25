@@ -133,6 +133,16 @@ describe Mongoid::Persistence::Update do
           update.persist.should == true
         end
       end
+      
+      context "when before_save callback returns false" do
+        before do
+          Patient.set_callback :save, :before, lambda { |r| return false }
+        end
+        
+        it "returns false" do
+          document.save.should == false
+        end
+      end
 
       context "when the document is embedded" do
 

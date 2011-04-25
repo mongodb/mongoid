@@ -50,11 +50,12 @@ module Mongoid #:nodoc:
                 child.move_changes
                 child.new_record = false if child.new_record?
               end
+              true
             else
               return false
             end
           end
-        end; true
+        end
       end
 
       protected
