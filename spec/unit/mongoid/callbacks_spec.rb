@@ -103,14 +103,14 @@ describe Mongoid::Callbacks do
       end
     end
   end
-  
+
   describe ".before_save" do
 
     before do
       @artist = Artist.create(:name => "Depeche Mode")
       @artist.name = "The Mountain Goats"
     end
-    
+
     after do
       @artist.delete
     end
@@ -135,9 +135,9 @@ describe Mongoid::Callbacks do
       end
     end
   end
-  
+
   describe ".before_destroy" do
-  
+
     before do
       @artist = Artist.create(:name => "Depeche Mode")
       @artist.name = "The Mountain Goats"
@@ -167,5 +167,5 @@ describe Mongoid::Callbacks do
       end
     end
   end
-  
+
 end

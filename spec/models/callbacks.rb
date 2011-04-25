@@ -13,11 +13,11 @@ class Artist
   def before_create_stub
     true
   end
-  
+
   def before_save_stub
     true
   end
-  
+
   def before_destroy_stub
     true
   end
