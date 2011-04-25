@@ -6,9 +6,19 @@ class Artist
 
   before_create :before_create_stub
   after_create :create_songs
+  before_save :before_save_stub
+  before_destroy :before_destroy_stub
 
   protected
   def before_create_stub
+    true
+  end
+  
+  def before_save_stub
+    true
+  end
+  
+  def before_destroy_stub
     true
   end
 
