@@ -156,7 +156,7 @@ module Mongoid #:nodoc:
     # @param [ Array ] *args The arguments to the method.
     def method_missing(name, *args)
       attr = name.to_s
-      return super unless @attributes.has_key?(attr.reader)
+      return super unless attributes.has_key?(attr.reader)
       if attr.writer?
         write_attribute(attr.reader, (args.size > 1) ? args : args.first)
       else
