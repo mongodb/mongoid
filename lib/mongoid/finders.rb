@@ -118,6 +118,11 @@ module Mongoid #:nodoc:
       find(:last, *args)
     end
 
+    # Returns true if one or more +Documents+ ar in the result
+    def present?
+      !empty?
+    end
+
     protected
     # Find the first object or create/initialize it.
     def find_or(method, attrs = {}, &block)
