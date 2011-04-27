@@ -208,6 +208,31 @@ describe Mongoid::Matchers do
         end
       end
 
+      context "with an $in selector on Array" do
+
+        context "when the attributes match" do
+
+          let(:selector) do
+            { :services => { "$in" => [ "first" ] } }
+          end
+
+          it "returns true" do
+            document.matches?(selector).should be_true
+          end
+        end
+
+        context "when the attributes do not match" do
+
+          let(:selector) do
+            { :number => { "$in" => [ "none" ] } }
+          end
+
+          it "returns false" do
+            document.matches?(selector).should be_false
+          end
+        end
+      end
+
       context "with an $in selector" do
 
         context "when the attributes match" do
@@ -300,6 +325,31 @@ describe Mongoid::Matchers do
 
           let(:selector) do
             { :number => { "$ne" => 100 } }
+          end
+
+          it "returns false" do
+            document.matches?(selector).should be_false
+          end
+        end
+      end
+
+      context "with a $nin selector on Array" do
+
+        context "when the attributes match" do
+
+          let(:selector) do
+            { :services => { "$nin" => [ "none" ] } }
+          end
+
+          it "returns true" do
+            document.matches?(selector).should be_true
+          end
+        end
+
+        context "when the attributes do not match" do
+
+          let(:selector) do
+            { :services => { "$nin" => [ "first" ] } }
           end
 
           it "returns false" do
