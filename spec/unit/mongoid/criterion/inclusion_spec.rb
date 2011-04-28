@@ -242,6 +242,17 @@ describe Mongoid::Criterion::Inclusion do
             criteria.selector.should == { :aliases => "007" }
           end
         end
+
+        context "when a value is a range" do
+
+          let(:event) do
+            Mongoid::Criteria.new(Event).where(:age => (30..40))
+          end
+
+          it "returns a criteria where with a range converted to a hash" do
+            event.selector.should == { :age => { "min" => 30, "max" => 40 } }
+          end
+        end
       end
 
       context "when providing multiple values on the same complex attribute" do

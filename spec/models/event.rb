@@ -3,6 +3,7 @@ class Event
 
   field :title
   field :date, :type => Date
+  field :age, :type => Range
   references_and_referenced_in_many \
     :administrators,
     :class_name => 'Person',

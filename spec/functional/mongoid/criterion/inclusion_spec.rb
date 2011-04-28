@@ -327,6 +327,21 @@ describe Mongoid::Criterion::Inclusion do
       end
     end
 
+    context "when providing a range value" do
+
+      let(:event) do
+        Event.create(:age => 30..40)
+      end
+
+      let(:from_db) do
+        Event.where(:age => 30..40)
+      end
+
+      it "returns the matching documents" do
+        from_db.should == [ event ]
+      end
+    end
+
     context "chaining multiple wheres" do
 
       context "when chaining on the same key" do
