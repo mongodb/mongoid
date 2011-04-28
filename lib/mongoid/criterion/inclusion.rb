@@ -156,7 +156,7 @@ module Mongoid #:nodoc:
             when String then {"$where" => selector}
             else
               selector.clone.each_pair do |k, value|
-                if k.is_a?(Mongoid::Criterion::Complex) && k.operator == "in" && value.is_a?(Range)
+                if value.is_a?(Range) and k.is_a?(Mongoid::Criterion::Complex)
                   case k.operator
                     when "in" then
                       selector.delete k
