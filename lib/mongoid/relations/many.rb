@@ -48,6 +48,7 @@ module Mongoid #:nodoc:
           doc.identify
           append(doc, default_options(:binding => true))
           block.call(doc) if block
+          doc.run_callbacks(:build) { doc }
         end
       end
       alias :new :build
