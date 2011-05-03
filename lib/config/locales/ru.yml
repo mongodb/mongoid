@@ -7,7 +7,7 @@ ru:
         document_not_found:
           Документ класса %{klass} с id %{identifiers} не найден.
         invalid_database:
-          База данных должная быть Mongo::DB, а не %{name}.
+          База данных должна быть Mongo::DB, а не %{name}.
         invalid_type:
           Поле уже было определено в классе %{klass}, но получено как %{other}
           со значением %{value}.
