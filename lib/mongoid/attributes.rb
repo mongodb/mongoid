@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def read_attribute(name)
       access = name.to_s
-      value = @attributes[access]
+      value = attributes[access]
       accessed(access, value)
     end
     alias :[] :read_attribute
@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def remove_attribute(name)
       access = name.to_s
-      modify(access, @attributes.delete(access), nil)
+      modify(access, attributes.delete(access), nil)
     end
 
     # Override respond_to? so it responds properly for dynamic attributes.
@@ -72,8 +72,8 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def respond_to?(*args)
       (Mongoid.allow_dynamic_fields &&
-        @attributes &&
-        @attributes.has_key?(args.first.to_s)
+        attributes &&
+        attributes.has_key?(args.first.to_s)
       ) || super
     end
 
@@ -93,7 +93,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def write_attribute(name, value)
       access = name.to_s
-      modify(access, @attributes[access], typed_value_for(access, value))
+      modify(access, attributes[access], typed_value_for(access, value))
     end
     alias :[]= :write_attribute
 

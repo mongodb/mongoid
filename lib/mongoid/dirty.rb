@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
     # The old field value.
     def attribute_was(name)
       change = modifications[name]
-      change ? change[0] : @attributes[name]
+      change ? change[0] : attributes[name]
     end
 
     # Gets the names of all the fields that have changed in the document.
@@ -157,7 +157,7 @@ module Mongoid #:nodoc:
     # The old field value.
     def reset_attribute!(name)
       value = attribute_was(name)
-      value ? @attributes[name] = value : @attributes.delete(name)
+      value ? attributes[name] = value : attributes.delete(name)
       modifications.delete(name)
     end
 
@@ -210,7 +210,7 @@ module Mongoid #:nodoc:
     def modifications
       reset_modifications unless @modifications && @accessed
       @accessed.each_pair do |field, value|
-        current = @attributes[field]
+        current = attributes[field]
         @modifications[field] = [ value, current ] if current != value
       end
       @accessed.clear
@@ -223,7 +223,7 @@ module Mongoid #:nodoc:
     #
     # <tt>person.modify("name", "Jack", "John")</tt>
     def modify(name, old_value, new_value)
-      @attributes[name] = new_value
+      attributes[name] = new_value
       if @modifications && (old_value != new_value)
         original = @modifications[name].first if @modifications[name]
         @modifications[name] = [ (original || old_value), new_value ]
