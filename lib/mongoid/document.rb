@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Integer ] -1, 0, 1.
     def <=>(other)
-      raw_attributes["_id"].to_s <=> other.raw_attributes["_id"].to_s
+      attributes["_id"].to_s <=> other.attributes["_id"].to_s
     end
 
     # Performs equality checking on the document ids. For more robust
@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if the ids are equal, false if not.
     def ==(other)
       self.class == other.class &&
-        raw_attributes["_id"] == other.raw_attributes["_id"]
+        attributes["_id"] == other.attributes["_id"]
     end
 
     # Performs class equality checking.
@@ -71,7 +71,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def freeze
-      raw_attributes.freeze
+      attributes.freeze
       self
     end
 
@@ -198,8 +198,8 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      attributes = raw_attributes
-      attributes.tap do |attrs|
+      attribs = attributes
+      attribs.tap do |attrs|
         relations.select { |name, meta| meta.embedded? }.each do |name, meta|
           relation = send(name, false, :continue => false)
           attrs[name] = relation.as_document unless relation.blank?
