@@ -14,7 +14,7 @@ describe Mongoid::Attributes do
     end
 
     it "has an entry in the attributes" do
-      person.reload.attributes.should have_key(:score)
+      person.reload.attributes.should have_key("score")
     end
   end
 

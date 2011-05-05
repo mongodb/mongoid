@@ -101,18 +101,6 @@ module Mongoid #:nodoc:
       raw_attributes["_id"].hash
     end
 
-    # Return the attributes hash with indifferent access. Used mostly for
-    # convenience - use +Document#raw_attributes+ where you dont care if the
-    # keys are all strings.
-    #
-    # @example Get the attributes.
-    #   person.attributes
-    #
-    # @return [ HashWithIndifferentAccess ] The attributes.
-    def attributes
-      raw_attributes.with_indifferent_access
-    end
-
     # Generate an id for this +Document+.
     #
     # @example Create the id.
@@ -144,16 +132,6 @@ module Mongoid #:nodoc:
         identify
       end
       run_callbacks(:initialize) { self }
-    end
-
-    # Return the attributes hash.
-    #
-    # @example Get the untouched attributes.
-    #   person.raw_attributes
-    #
-    # @return [ Hash ] This document's attributes.
-    def raw_attributes
-      @attributes
     end
 
     # Reloads the +Document+ attributes from the database. If the document has

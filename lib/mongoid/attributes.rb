@@ -8,6 +8,9 @@ module Mongoid #:nodoc:
   module Attributes
     include Processing
 
+    attr_reader :attributes
+    alias :raw_attributes :attributes
+
     # Determine if an attribute is present.
     #
     # @example Is the attribute present?

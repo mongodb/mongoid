@@ -185,7 +185,7 @@ describe Mongoid::Document do
       else
         person.id.should be_a_kind_of(String)
       end
-      person.attributes[:title].should == "Test"
+      person[:title].should == "Test"
     end
 
     context "when creating a has many" do

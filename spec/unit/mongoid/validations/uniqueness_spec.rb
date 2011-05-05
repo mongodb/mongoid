@@ -178,7 +178,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
         validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
       end
@@ -191,7 +191,7 @@ describe Mongoid::Validations::UniquenessValidator do
                                                                       :scope => [:employer_id, :terms]) }
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
         @criteria.expects(:where).with(:terms => true).returns(@criteria)
         validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
@@ -199,7 +199,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     end
   end
-  
+
   describe "#validate_each with case sensitive true" do
 
     before do
@@ -500,7 +500,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
         validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
       end
@@ -513,7 +513,7 @@ describe Mongoid::Validations::UniquenessValidator do
                                                                       :scope => [:employer_id, :terms], :case_sensitive => true) }
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes[:employer_id]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
         @criteria.expects(:where).with(:terms => true).returns(@criteria)
         validator.setup(Person)
         validator.validate_each(@document, :title, "Sir")
