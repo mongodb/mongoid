@@ -45,7 +45,7 @@ module Mongoid #:nodoc:
         end
 
         Array.wrap(options[:scope]).each do |item|
-          criteria = criteria.where(item => document.attributes[item])
+          criteria = criteria.where(item => document.attributes[item.to_s])
         end
         if criteria.exists?
           document.errors.add(

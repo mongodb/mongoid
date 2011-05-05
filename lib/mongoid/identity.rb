@@ -72,7 +72,7 @@ module Mongoid #:nodoc:
     # @return [ Array<Object> ] The array of keys.
     def compose
       document.primary_key.collect do |key|
-        document.attributes[key]
+        document.attributes[key.to_s]
       end.reject { |val| val.nil? }
     end
 

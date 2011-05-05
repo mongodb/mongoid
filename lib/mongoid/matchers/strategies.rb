@@ -49,12 +49,12 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.7
       def matcher(document, key, value)
         if value.is_a?(Hash)
-          MATCHERS[value.keys.first].new(document.attributes[key])
+          MATCHERS[value.keys.first].new(document.attributes[key.to_s])
         else
           if key == "$or"
             Matchers::Or.new(value, document)
           else
-            Default.new(document.attributes[key])
+            Default.new(document.attributes[key.to_s])
           end
         end
       end

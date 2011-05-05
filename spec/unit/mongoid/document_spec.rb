@@ -172,7 +172,7 @@ describe Mongoid::Document do
     end
 
     it "returns the attributes with indifferent access" do
-      person.attributes[:title].should == "Sir"
+      person[:title].should == "Sir"
     end
   end
 

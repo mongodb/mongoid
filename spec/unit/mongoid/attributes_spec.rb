@@ -404,14 +404,14 @@ describe Mongoid::Attributes do
         context "when attribute is a string" do
 
           it "adds the string to the attributes" do
-            person.attributes[:nofieldstring].should == "Testing"
+            person.attributes["nofieldstring"].should == "Testing"
           end
         end
 
         context "when attribute is not a string" do
 
           it "adds a cast value to the attributes" do
-            person.attributes[:nofieldint].should == 5
+            person.attributes["nofieldint"].should == 5
           end
         end
       end
@@ -465,19 +465,19 @@ describe Mongoid::Attributes do
       end
 
       it "casts integers" do
-        person.attributes[:age].should == 30
+        person[:age].should == 30
       end
 
       it "casts booleans" do
-        person.attributes[:terms].should == true
+        person[:terms].should == true
       end
 
       it "casts ids" do
-        person.attributes[:_id].should == bson_id
+        person[:_id].should == bson_id
       end
 
       it "sets empty strings to nil" do
-        person.attributes[:score].should be_nil
+        person[:score].should be_nil
       end
     end
 
@@ -840,7 +840,6 @@ describe Mongoid::Attributes do
             @name.attributes.should ==
               { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2" }
           end
-
         end
 
         context "when child is part of a has many" do
@@ -856,12 +855,8 @@ describe Mongoid::Attributes do
             @address.attributes.should ==
               { "_id" => "test", "street" => "Test2" }
           end
-
         end
-
       end
     end
-
   end
-
 end
