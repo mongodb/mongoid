@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
 
         module ClassMethods
           def set(value)
-            value.respond_to?(:raw_attributes) ? value.raw_attributes : value
+            value.respond_to?(:attributes) ? value.attributes : value
           end
 
           def get(value)
