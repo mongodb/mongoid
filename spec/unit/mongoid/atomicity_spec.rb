@@ -14,10 +14,11 @@ describe Mongoid::Atomicity do
 
         before do
           person.title = "Sir"
+          person.ssn = nil
         end
 
         it "returns the atomic updates" do
-          person._updates.should == { "$set" => { "title" => "Sir" } }
+          person._updates.should == { "$set" => { "title" => "Sir" }, "$unset" => {"ssn" => 1 } }
         end
 
         context "when an embeds many child is added" do
@@ -26,10 +27,11 @@ describe Mongoid::Atomicity do
             person.addresses.build(:street => "Oxford St")
           end
 
-          it "returns a $set and $pushAll for modifications" do
+          it "returns a $set, $unset and $pushAll for modifications" do
             person._updates.should ==
               {
                 "$set" => { "title" => "Sir" },
+                "$unset" => {"ssn" => 1 },
                 "$pushAll" => { "addresses" => [
                     { "_id" => "oxford-st", "street" => "Oxford St" }
                   ]}
@@ -43,13 +45,14 @@ describe Mongoid::Atomicity do
             person.build_name(:first_name => "Lionel")
           end
 
-          it "returns a $set for modifications" do
+          it "returns a $set and $unset for modifications" do
             person._updates.should ==
               {
                 "$set" => {
                   "title" => "Sir",
                   "name" => { "_id" => "lionel", "first_name" => "Lionel" }
-                }
+                },
+                "$unset" => {"ssn" => 1 }
               }
           end
         end
@@ -57,34 +60,42 @@ describe Mongoid::Atomicity do
         context "when an existing embeds many gets modified" do
 
           let!(:address) do
-            person.addresses.create(:street => "Oxford St")
+            person.addresses.create(:street => "Oxford St", :post_code => 90210)
           end
 
           before do
             address.street = "Bond St"
+            address.post_code = nil
           end
 
-          it "returns the $set with correct position and modifications" do
+          it "returns the $set and $unset with correct position and modifications" do
             person._updates.should ==
-              { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" } }
+              { "$set"   => { "title" => "Sir", "addresses.0.street" => "Bond St" },
+                "$unset" => { "ssn" => 1, "addresses.0.post_code" => 1 } }
           end
 
           context "when an existing 2nd level embedded child gets modified" do
 
             let!(:location) do
-              address.locations.create(:name => "Home")
+              address.locations.create(:name => "Home", :style => "Art Deco")
             end
 
             before do
               location.name = "Work"
+              location.style = nil
             end
 
-            it "returns the $set with correct positions and modifications" do
+            it "returns the $set and $unset with correct positions and modifications" do
               person._updates.should ==
                 { "$set" => {
-                  "title" => "Sir",
-                  "addresses.0.street" => "Bond St",
-                  "addresses.0.locations.0.name" => "Work" }
+                    "title" => "Sir",
+                    "addresses.0.street" => "Bond St",
+                    "addresses.0.locations.0.name" => "Work" },
+                  "$unset" => {
+                    "ssn" => 1,
+                    "addresses.0.post_code" => 1,
+                    "addresses.0.locations.0.style" => 1
+                  }
                 }
             end
           end
@@ -95,12 +106,16 @@ describe Mongoid::Atomicity do
               address.locations.build(:name => "Home")
             end
 
-            it "returns the $set with correct positions and modifications" do
+            it "returns the $set and $unset with correct positions and modifications" do
               person._updates.should ==
                 {
                   "$set" => {
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
+                  },
+                  "$unset" => {
+                    "ssn" => 1,
+                    "addresses.0.post_code" => 1
                   },
                   :other => {
                     "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
@@ -119,12 +134,16 @@ describe Mongoid::Atomicity do
               new_address.locations.build(:name => "Home")
             end
 
-            it "returns the $set for 1st level and other for the 2nd level" do
+            it "returns the $set and $unset for 1st level and other for the 2nd level" do
               person._updates.should ==
                 {
                   "$set" => {
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
+                  },
+                  "$unset" => {
+                    "ssn" => 1,
+                    "addresses.0.post_code" => 1
                   },
                   :other => {
                     "addresses" => [{
@@ -155,7 +174,10 @@ describe Mongoid::Atomicity do
             person._updates.should ==
               {
                 "$set" => {
-                  "title" => "Sir",
+                  "title" => "Sir"
+                },
+                "$unset" => {
+                  "ssn" => 1
                 },
                 "$pushAll" => {
                   "addresses" => [{
