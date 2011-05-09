@@ -40,7 +40,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       Person.new
     end
 
-    context "when attributes are rejectable" do
+    context "when attributes are rejectable by prox" do
 
       let(:options) do
         { :reject_if => lambda { |attrs| attrs[:first_name].blank? } }
@@ -58,6 +58,27 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         person.name.should be_nil
       end
     end
+
+    context "when attributes are rejectable by symbol" do
+
+      let(:options) do
+        { :reject_if => :reject_if_name_is_blank }
+      end
+
+      let(:builder) do
+        described_class.new(metadata, { :last_name => "Lang" }, options)
+      end
+
+      before do
+        builder.build(person)
+      end
+
+      it "does not change the relation" do
+        person.name.should be_nil
+      end
+    end
+
+
 
     context "when attributes are updatable" do
 

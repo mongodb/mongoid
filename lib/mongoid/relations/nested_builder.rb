@@ -25,14 +25,21 @@ module Mongoid # :nodoc:
       # @example Is there a reject proc?
       #   builder.reject?
       #
-      # @param [ Hash ] attrs The attributes to check for rejection.
+      # @param [ Hash, Symbol ] attrs The attributes to check for rejection.
       #
-      # @return [ true, false ] True and call proc if rejectable, false if not.
+      # @return [ true, false ] True and call proc or method if rejectable, false if not.
       #
       # @since 2.0.0.rc.1
       def reject?(attrs)
-        criteria = options[:reject_if]
-        criteria ? criteria.call(attrs) : false
+        case callback = options[:reject_if]
+        when Symbol
+          # Right, what goes here?
+          # ActiveRecord code: method(callback).arity == 0 ? send(callback) : send(callback, attributes)
+        when Proc
+          callback.call(attrs)
+        else
+         false
+        end
       end
 
       # Determines if only updates can occur. Only valid for one-to-one
