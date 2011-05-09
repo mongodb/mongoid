@@ -383,10 +383,6 @@ describe Mongoid::Document do
       it "creates a new document" do
         person.should be_a(Person)
       end
-
-      it "creates an id" do
-        person.id.should be_a(BSON::ObjectId)
-      end
     end
   end
 

@@ -11,7 +11,7 @@ describe Mongoid::Extensions::Object::Conversions do
     context "when the value is a mongoid document" do
 
       it "instantiates a new class from the attributes" do
-        Person.get(attributes).should == Person.new(attributes)
+        Person.get(attributes).should == Person.instantiate(attributes)
       end
     end
 

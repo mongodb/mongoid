@@ -26,24 +26,5 @@ describe Mongoid::Relations::Builders::Embedded::In do
         document.should == object
       end
     end
-
-    context "when attributes are provided" do
-
-      let(:builder) do
-        described_class.new(metadata, { :title => "Sir" })
-      end
-
-      let(:document) do
-        builder.build
-      end
-
-      it "returns a new document" do
-        document.should be_a_kind_of(Person)
-      end
-
-      it "sets the attributes on the document" do
-        document.title.should == "Sir"
-      end
-    end
   end
 end

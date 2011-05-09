@@ -16,13 +16,21 @@ describe Mongoid::Relations::Builders do
 
   describe ".builder" do
 
+    let(:metadata) do
+      Mongoid::Relations::Metadata.new(
+        :name => :name,
+        :relation => relation,
+        :inverse_class_name => "Person"
+      )
+    end
+
     let(:document) do
       klass.new
     end
 
     before do
       document.instance_variable_set(:@attributes, {})
-      klass.builder("name")
+      klass.builder("name", metadata)
     end
 
     it "defines a build_* method" do
@@ -30,18 +38,10 @@ describe Mongoid::Relations::Builders do
     end
 
     it "returns self" do
-      klass.builder("name").should == klass
+      klass.builder("name", metadata).should == klass
     end
 
     context "defined methods" do
-
-      let(:metadata) do
-        Mongoid::Relations::Metadata.new(
-          :name => :name,
-          :relation => relation,
-          :inverse_class_name => "Person"
-        )
-      end
 
       before do
         klass.getter("name", metadata).setter("name", metadata)

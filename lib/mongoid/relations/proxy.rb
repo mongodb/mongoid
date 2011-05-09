@@ -62,7 +62,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def instantiated(type = nil)
-        type ? type.instantiate : metadata.klass.instantiate
+        type ? type.new : metadata.klass.new
       end
 
       # Determines if the target been loaded into memory or not.

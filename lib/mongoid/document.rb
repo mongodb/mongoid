@@ -257,15 +257,11 @@ module Mongoid #:nodoc:
       # @return [ Document ] A new document.
       def instantiate(attrs = nil)
         attributes = attrs || {}
-        if attributes["_id"]
-          allocate.tap do |doc|
-            doc.instance_variable_set(:@attributes, attributes)
-            doc.send(:apply_default_attributes)
-            doc.setup_modifications
-            doc.run_callbacks(:initialize) { doc }
-          end
-        else
-          new(attrs)
+        allocate.tap do |doc|
+          doc.instance_variable_set(:@attributes, attributes)
+          doc.send(:apply_default_attributes)
+          doc.setup_modifications
+          doc.run_callbacks(:initialize) { doc }
         end
       end
 
