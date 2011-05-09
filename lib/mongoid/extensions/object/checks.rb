@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
         # @return [ true, false ] True if empty or nil, false if not.
         #
         # @since 2.0.2
-        def vacant?
+        def _vacant?
           is_a?(::Enumerable) || is_a?(::String) ? empty? : !self
         end
       end
