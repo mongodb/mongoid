@@ -189,7 +189,7 @@ module Mongoid #:nodoc:
       def execute_or_raise(args, criteria)
         (args[0].is_a?(Array) ? criteria.entries : criteria.one).tap do |result|
           if Mongoid.raise_not_found_error && !args.flatten.blank?
-            raise Errors::DocumentNotFound.new(klass, args) if result.blank?
+            raise Errors::DocumentNotFound.new(klass, args) if result._vacant?
           end
         end
       end

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Object::Checks do
 
-  describe "#vacant?" do
+  describe "#_vacant?" do
 
     context "when the object is an array" do
 
@@ -13,7 +13,7 @@ describe Mongoid::Extensions::Object::Checks do
         end
 
         it "returns true" do
-          object.should be_vacant
+          object.should be__vacant
         end
       end
 
@@ -24,7 +24,7 @@ describe Mongoid::Extensions::Object::Checks do
         end
 
         it "returns false" do
-          object.should_not be_vacant
+          object.should_not be__vacant
         end
       end
     end
@@ -38,7 +38,7 @@ describe Mongoid::Extensions::Object::Checks do
         end
 
         it "returns true" do
-          object.should be_vacant
+          object.should be__vacant
         end
       end
 
@@ -49,7 +49,7 @@ describe Mongoid::Extensions::Object::Checks do
         end
 
         it "returns false" do
-          object.should_not be_vacant
+          object.should_not be__vacant
         end
       end
     end
@@ -57,21 +57,21 @@ describe Mongoid::Extensions::Object::Checks do
     context "when the object is nil" do
 
       it "returns true" do
-        nil.should be_vacant
+        nil.should be__vacant
       end
     end
 
     context "when the object is an empty string" do
 
       it "returns true" do
-        "".should be_vacant
+        "".should be__vacant
       end
     end
 
     context "when the object is not nil" do
 
       it "returns false" do
-        "testing".should_not be_vacant
+        "testing".should_not be__vacant
       end
     end
   end
