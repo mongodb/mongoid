@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Serialization do
 
+  before do
+    Person.delete_all
+  end
+
   describe "#serializable_hash" do
 
     let(:person) do
@@ -24,6 +28,25 @@ describe Mongoid::Serialization do
 
           let(:relation_hash) do
             hash["addresses"]
+          end
+
+          context "when the ids were not loaded" do
+
+            before do
+              person.save
+            end
+
+            let(:from_db) do
+              Person.only("addresses.street").first
+            end
+
+            let(:hash) do
+              from_db.serializable_hash
+            end
+
+            it "does not generate new ids" do
+              hash["addresses"].first["_id"].should be_nil
+            end
           end
 
           context "when providing the include as a symbol" do

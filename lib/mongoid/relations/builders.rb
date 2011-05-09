@@ -45,11 +45,11 @@ module Mongoid # :nodoc:
         # @return [ Class ] The class being set up.
         #
         # @since 2.0.0.rc.1
-        def builder(name)
+        def builder(name, metadata)
           tap do
             define_method("build_#{name}") do |*args|
-              attributes = (args.any? ? args : []) + [{:binding => true}]
-              send("#{name}=", *attributes)
+              document = Factory.build(metadata.klass, args.first || {}, false)
+              send("#{name}=", document, :binding => true)
             end
           end
         end

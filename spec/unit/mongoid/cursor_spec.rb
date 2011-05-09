@@ -54,7 +54,7 @@ describe Mongoid::Cursor do
 
     it "yields to the next document" do
       cursor.each do |doc|
-        doc.attributes.except("_id").should == Person.new.attributes.except("_id")
+        doc.attributes.except("_id").should == Person.instantiate.attributes.except("_id")
       end
     end
   end
@@ -67,7 +67,7 @@ describe Mongoid::Cursor do
 
     it "returns the next document from the proxied cursor" do
       doc = cursor.next_document
-      doc.attributes.except("_id").should == Person.new.attributes.except("_id")
+      doc.attributes.except("_id").should == Person.instantiate.attributes.except("_id")
     end
   end
 
@@ -79,7 +79,7 @@ describe Mongoid::Cursor do
 
     it "converts the proxy cursor to an array of documents" do
       docs = cursor.to_a
-      docs[0].attributes.except("_id").should == Person.new.attributes.except("_id")
+      docs[0].attributes.except("_id").should == Person.instantiate.attributes.except("_id")
     end
   end
 end
