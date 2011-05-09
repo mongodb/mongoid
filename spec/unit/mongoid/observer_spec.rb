@@ -1,17 +1,37 @@
 require "spec_helper"
 
 describe Mongoid::Observer do
-  after { CallbackRecorder.instance.reset }
 
-  it { ActorObserver.instance.should be_a_kind_of(ActiveModel::Observer) }
+  before do
+    [ Actor, Actress ].each(&:delete_all)
+  end
 
-  it "observes descendent classes" do
-    actor_observer = ActorObserver.instance
-    actor = Actor.create!(:name => "Johnny Depp")
-    actor_observer.last_after_create_record.try(:name).should == actor.name
+  after do
+    CallbackRecorder.instance.reset
+  end
 
-    actress = Actress.create!(:name => "Tina Fey")
-    actor_observer.last_after_create_record.try(:name).should == actress.name
+  it "is an instance of an active model observer" do
+    ActorObserver.instance.should be_a_kind_of(ActiveModel::Observer)
+  end
+
+  context "when the observer has descendants" do
+
+    let!(:observer) do
+      ActorObserver.instance
+    end
+
+    let(:actor) do
+      Actor.create!(:name => "Johnny Depp")
+    end
+
+    let(:actress) do
+      Actress.create!(:name => "Tina Fey")
+    end
+
+    it "observes descendent class" do
+      actor and observer.last_after_create_record.try(:name).should == actor.name
+      actress and observer.last_after_create_record.try(:name).should == actress.name
+    end
   end
 
   it "observes after_initialize" do
