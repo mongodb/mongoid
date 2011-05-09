@@ -25,7 +25,7 @@ module Mongoid # :nodoc:
       # @example Is there a reject proc?
       #   builder.reject?
       #
-      # @param [ Hash, Symbol ] attrs The attributes to check for rejection.
+      # @param [ Hash ] attrs The attributes to check for rejection.
       #
       # @return [ true, false ] True and call proc or method if rejectable, false if not.
       #

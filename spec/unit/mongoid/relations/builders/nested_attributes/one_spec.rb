@@ -40,7 +40,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       Person.new
     end
 
-    context "when attributes are rejectable by prox" do
+    context "when attributes are rejectable using a proc" do
 
       let(:options) do
         { :reject_if => lambda { |attrs| attrs[:first_name].blank? } }
@@ -59,7 +59,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
     end
 
-    context "when attributes are rejectable by symbol" do
+    context "when attributes are rejectable using a symbol" do
 
       let(:options) do
         { :reject_if => :reject_if_name_is_blank }
