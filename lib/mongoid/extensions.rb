@@ -15,6 +15,7 @@ require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/nil/collectionization"
+require "mongoid/extensions/object/checks"
 require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/object/yoda"
@@ -81,6 +82,7 @@ class NilClass #:nodoc
 end
 
 class Object #:nodoc:
+  include Mongoid::Extensions::Object::Checks
   include Mongoid::Extensions::Object::Conversions
   include Mongoid::Extensions::Object::Reflections
   include Mongoid::Extensions::Object::Yoda
