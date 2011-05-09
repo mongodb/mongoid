@@ -16,7 +16,7 @@ module Mongoid # :nodoc:
           # @return [ Document ] A single document.
           def build(type = nil)
             return object unless object.is_a?(Hash)
-            Mongoid::Factory.build(metadata.klass, object)
+            Mongoid::Factory.from_db(metadata.klass, object)
           end
         end
       end
