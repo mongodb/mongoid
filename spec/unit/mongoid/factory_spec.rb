@@ -40,4 +40,67 @@ describe Mongoid::Factory do
       end
     end
   end
+
+  describe ".from_db" do
+
+    context "when a type is in the attributes" do
+
+      context "when the type is a class" do
+
+        let(:attributes) do
+          { "_type" => "Person", "title" => "Sir" }
+        end
+
+        let(:document) do
+          described_class.from_db(Address, attributes)
+        end
+
+        it "generates based on the type" do
+          document.should be_a(Person)
+        end
+
+        it "sets the attributes" do
+          document.title.should == "Sir"
+        end
+      end
+
+      context "when the type is empty" do
+
+        let(:attributes) do
+          { "_type" => "", "title" => "Sir" }
+        end
+
+        let(:document) do
+          described_class.from_db(Person, attributes)
+        end
+
+        it "generates based on the provided class" do
+          document.should be_a(Person)
+        end
+
+        it "sets the attributes" do
+          document.title.should == "Sir"
+        end
+      end
+    end
+
+    context "when a type is not in the attributes" do
+
+      let(:attributes) do
+        { "title" => "Sir" }
+      end
+
+      let(:document) do
+        described_class.from_db(Person, attributes)
+      end
+
+      it "generates based on the provided class" do
+        document.should be_a(Person)
+      end
+
+      it "sets the attributes" do
+        document.title.should == "Sir"
+      end
+    end
+  end
 end

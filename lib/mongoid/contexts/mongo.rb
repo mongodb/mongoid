@@ -145,7 +145,7 @@ module Mongoid #:nodoc:
           :reduce => Javascript.group
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
-            Mongoid::Factory.build(klass, attrs)
+            Mongoid::Factory.from_db(klass, attrs)
           end
           docs
         end
@@ -196,7 +196,7 @@ module Mongoid #:nodoc:
         sorting = [[:_id, :asc]] unless sorting
         opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
         attributes = klass.collection.find_one(selector, opts)
-        attributes ? Mongoid::Factory.build(klass, attributes) : nil
+        attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
 
       # Return the max value for a field.
@@ -246,7 +246,7 @@ module Mongoid #:nodoc:
       # The first document in the collection.
       def one
         attributes = klass.collection.find_one(selector, process_options)
-        attributes ? Mongoid::Factory.build(klass, attributes) : nil
+        attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
 
       alias :first :one

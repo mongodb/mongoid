@@ -14,29 +14,24 @@ module Mongoid #:nodoc:
     # @param [ Hash ] attributes The document attributes.
     #
     # @return [ Document ] The instantiated document.
-    def build(klass, attributes = {}, loading = true)
-      attrs = {}.merge(attributes)
-      type = attrs["_type"]
-      if type.present?
-        instantiate(attrs, type.constantize, loading)
-      else
-        instantiate(attrs, klass, loading)
-      end
+    def build(klass, attributes = {})
+      type = (attributes || {})["_type"]
+      type.blank? ? klass.new(attributes) : type.constantize.new(attributes)
     end
 
-    private
-
-    # Instantiate the document. If we are loading from the database then use
-    # instantiate, otherwise use new.
+    # Builds a new +Document+ from the supplied attributes loaded from the
+    # database.
     #
-    # @example Instantiate the document.
-    #   factory.instantiate({}, Person, true)
+    # @example Build the document.
+    #   Mongoid::Factory.from_db(Person, { "name" => "Durran" })
     #
-    # @return [ Document ] The document..
+    # @param [ Class ] klass The class to instantiate from if _type is not present.
+    # @param [ Hash ] attributes The document attributes.
     #
-    # @since 2.0.2
-    def instantiate(attributes, klass, loading)
-      loading ? klass.instantiate(attributes) : klass.new(attributes)
+    # @return [ Document ] The instantiated document.
+    def from_db(klass, attributes = {})
+      type = attributes["_type"]
+      type.blank? ? klass.instantiate(attributes) : type.constantize.instantiate(attributes)
     end
   end
 end

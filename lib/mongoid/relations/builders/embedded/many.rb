@@ -21,7 +21,7 @@ module Mongoid # :nodoc:
             return object if object.first.is_a?(Document)
             object.inject([]) do |documents, attrs|
               documents.tap do |docs|
-                docs << Mongoid::Factory.build(metadata.klass, attrs)
+                docs << Mongoid::Factory.from_db(metadata.klass, attrs)
               end
             end
           end
