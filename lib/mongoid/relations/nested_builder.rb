@@ -34,7 +34,7 @@ module Mongoid # :nodoc:
       def reject?(document, attrs)
         case callback = options[:reject_if]
         when Symbol
-          document.class.method(callback).arity == 0 ? document.class.send(callback) : document.class.send(callback, attrs)
+          document.method(callback).arity == 0 ? document.send(callback) : document.send(callback, attrs)
         when Proc
           callback.call(attrs)
         else

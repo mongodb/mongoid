@@ -136,11 +136,11 @@ class Person
     end
   end
 
-  def self.reject_if_city_is_empty(attrs)
+  def reject_if_city_is_empty(attrs)
     attrs[:city].blank?
   end
 
-  def self.reject_if_name_is_blank(attrs)
+  def reject_if_name_is_blank(attrs)
     attrs[:first_name].blank?
   end
 end
