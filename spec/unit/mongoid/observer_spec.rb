@@ -6,8 +6,12 @@ describe Mongoid::Observer do
     [ Actor, Actress ].each(&:delete_all)
   end
 
+  let(:recorder) do
+    CallbackRecorder.instance
+  end
+
   after do
-    CallbackRecorder.instance.reset
+    recorder.reset
   end
 
   it "is an instance of an active model observer" do
@@ -34,59 +38,119 @@ describe Mongoid::Observer do
     end
   end
 
-  it "observes after_initialize" do
-    observer = CallbackRecorder.instance
-    actor = Actor.new
+  context "when the document is new" do
 
-    observer.last_callback.should == :after_initialize
-    observer.call_count[:after_initialize].should == 1
-    observer.last_record[:after_initialize].should eq(actor)
-  end
+    let!(:actor) do
+      Actor.new
+    end
 
-  [:before_create, :after_create, :around_create, :before_save, :after_save, :around_save].each do |callback|
-    it "observes #{callback} when creating" do
-      observer = CallbackRecorder.instance
-      actor = Actor.create!
-      actor.should be_persisted
+    it "observes after initialize" do
+      recorder.last_callback.should == :after_initialize
+    end
 
-      observer.call_count[callback].should == 1
-      observer.last_record[callback].should eq(actor)
+    it "calls after initialize once" do
+      recorder.call_count[:after_initialize].should == 1
+    end
+
+    it "contains the model of the callback" do
+      recorder.last_record[:after_initialize].should eq(actor)
     end
   end
 
-  [:before_update, :after_update, :around_update, :before_save, :after_save, :around_save].each do |callback|
-    it "observes #{callback} when updating" do
-      observer = CallbackRecorder.instance
-      actor = Actor.create!
-      observer.reset
-      actor.update_attributes! :name => "Johnny Depp"
-      actor.should be_persisted
+  context "when the document is being created" do
 
-      observer.call_count[callback].should == 1
-      observer.last_record[callback].should eq(actor)
+    let!(:actor) do
+      Actor.create!
+    end
+
+    [ :before_create,
+      :after_create,
+      :around_create,
+      :before_save,
+      :after_save,
+      :around_save ].each do |callback|
+
+      it "observes #{callback}" do
+        recorder.call_count[callback].should == 1
+      end
+
+      it "contains the model of the callback" do
+        recorder.last_record[callback].should eq(actor)
+      end
     end
   end
 
-  [:before_destroy, :after_destroy, :around_destroy].each do |callback|
-    it "observes #{callback}" do
-      observer = CallbackRecorder.instance
-      actor = Actor.create!.tap(&:destroy)
-      actor.should be_destroyed
+  context "when the document is being updated" do
 
-      observer.call_count[callback].should == 1
-      observer.last_record[callback].should eq(actor)
+    let!(:actor) do
+      Actor.create!
+    end
+
+    [ :before_update,
+      :after_update,
+      :around_update,
+      :before_save,
+      :after_save,
+      :around_save ].each do |callback|
+
+      before do
+        recorder.reset
+        actor.update_attributes!(:name => "Johnny Depp")
+      end
+
+      it "observes #{callback}" do
+        recorder.call_count[callback].should == 1
+      end
+
+      it "contains the model of the callback" do
+        recorder.last_record[callback].should eq(actor)
+      end
     end
   end
 
-  [:before_validation, :after_validation].each do |callback|
-    it "observes #{callback}" do
-      observer = CallbackRecorder.instance
-      actor = Actor.new
-      validity = actor.valid?
-      validity.should be_true
+  context "when the document is being destroyed" do
 
-      observer.call_count[callback].should == 1
-      observer.last_record[callback].should eq(actor)
+    let!(:actor) do
+      Actor.create!
+    end
+
+    [ :before_destroy, :after_destroy, :around_destroy ].each do |callback|
+
+      before do
+        recorder.reset
+        actor.destroy
+      end
+
+      it "observes #{callback}" do
+        recorder.call_count[callback].should == 1
+      end
+
+      it "contains the model of the callback" do
+        recorder.last_record[callback].should eq(actor)
+      end
+    end
+  end
+
+  context "when the document is being validated" do
+
+    let!(:actor) do
+      Actor.new
+    end
+
+    [:before_validation, :after_validation].each do |callback|
+
+      before do
+        recorder.reset
+        actor.valid?
+      end
+
+      it "observes #{callback}" do
+        recorder.call_count[callback].should == 1
+      end
+
+      it "contains the model of the callback" do
+        recorder.last_record[callback].should eq(actor)
+      end
     end
   end
 end
