@@ -25,16 +25,16 @@ module Mongoid # :nodoc:
       # @example Is there a reject proc?
       #   builder.reject?
       #
+      # @param The parent document of the relation
       # @param [ Hash ] attrs The attributes to check for rejection.
       #
       # @return [ true, false ] True and call proc or method if rejectable, false if not.
       #
       # @since 2.0.0.rc.1
-      def reject?(attrs)
+      def reject?(document, attrs)
         case callback = options[:reject_if]
         when Symbol
-          # Right, what goes here?
-          # ActiveRecord code: method(callback).arity == 0 ? send(callback) : send(callback, attributes)
+          document.class.method(callback).arity == 0 ? document.class.send(callback) : document.class.send(callback, attrs)
         when Proc
           callback.call(attrs)
         else

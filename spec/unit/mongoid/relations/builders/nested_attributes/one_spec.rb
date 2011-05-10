@@ -195,7 +195,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns true" do
-          builder.reject?({ :last_name => "Lang" }).should be_true
+          builder.reject?(builder, { :last_name => "Lang" }).should be_true
         end
       end
 
@@ -206,7 +206,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns false" do
-          builder.reject?({ :first_name => "Lang" }).should be_false
+          builder.reject?(builder, { :first_name => "Lang" }).should be_false
         end
       end
     end
@@ -218,7 +218,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.reject?({ :first_name => "Lang" }).should be_false
+        builder.reject?(builder, { :first_name => "Lang" }).should be_false
       end
     end
   end
