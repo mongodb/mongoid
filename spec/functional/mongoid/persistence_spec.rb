@@ -456,7 +456,7 @@ describe Mongoid::Persistence do
           post.update_attribute(:title, "Testing")
         end
 
-        it "can update to the save value" do
+        it "returns true" do
           post.update_attribute(:title, "Testing").should be_true
         end
       end
