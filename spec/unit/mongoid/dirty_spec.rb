@@ -490,7 +490,7 @@ describe Mongoid::Dirty do
         stub
       end
 
-      it "check existing instance methods with both string and symbol arguments" do
+      it "checks for existing instance methods with both string and symbol arguments" do
         Person.expects(:instance_methods).at_least_once.returns(method_list)
         method_list.expects(:'include?').with('fieldname_change')
         method_list.expects(:'include?').with('fieldname_changed?')
