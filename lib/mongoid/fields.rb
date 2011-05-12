@@ -107,6 +107,30 @@ module Mongoid #:nodoc
           fields[name] = field
           create_accessors(name, meth, options)
           add_dirty_methods(name)
+          process_options(field)
+        end
+      end
+
+      # Run through all custom options stored in Mongoid::Field.options and
+      # execute the handler if the option is provided.
+      #
+      # @example
+      #   Mongoid::Field.option :custom do
+      #     puts "called"
+      #   end
+      #
+      #   field = Mongoid::Field.new(:test, :custom => true)
+      #   Person.process_options(field)
+      #   # => "called"
+      #
+      # @param [ Field ] field the field to process
+      def process_options(field)
+        options = field.options
+
+        Field.options.each do |option_name, handler|
+          if options.has_key?(option_name)
+            handler.call(self, field, options[option_name])
+          end
         end
       end
 
