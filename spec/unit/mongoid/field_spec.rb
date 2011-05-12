@@ -2,6 +2,31 @@ require "spec_helper"
 
 describe Mongoid::Field do
 
+  describe ".options" do
+
+    it "returns a hash of custom options" do
+      Mongoid::Field.options.should be_a Hash
+    end
+
+    it "is memoized" do
+      Mongoid::Field.options.should equal Mongoid::Field.options
+    end
+  end
+
+  describe ".option" do
+
+    let(:options) { Mongoid::Field.options }
+
+    let(:handler) do
+      proc {}
+    end
+
+    it "stores the custom option in the options hash" do
+      options.expects(:[]=).with(:option, handler)
+      Mongoid::Field.option(:option, &handler)
+    end
+  end
+
   describe "#cast_on_read?" do
 
     [ Date, DateTime, Time, BigDecimal, Image ].each do |klass|

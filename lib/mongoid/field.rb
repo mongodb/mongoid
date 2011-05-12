@@ -12,6 +12,40 @@ module Mongoid #:nodoc:
     attr_accessor :type
     attr_reader :copyable, :klass, :label, :name, :options
 
+    class << self
+
+      # Return a map of custom option names to their handlers.
+      #
+      # @example
+      #   Mongoid::Field.options
+      #   # => { :required => #<Proc:0x00000100976b38> }
+      #
+      # @return [ Hash ] the option map
+      def options
+        @options ||= {}
+      end
+
+      # Stores the provided block to be run when the option name specified is
+      # defined on a field.
+      #
+      # No assumptions are made about what sort of work the handler might
+      # perform, so it will always be called if the `option_name` key is
+      # provided in the field definition -- even if it is false or nil.
+      #
+      # @example
+      #   Mongoid::Field.option :required do |model, field, value|
+      #     model.validates_presence_of field if value
+      #   end
+      #
+      # @param [ Symbol ] option_name the option name to match against
+      # @param [ Proc ] block the handler to execute when the option is
+      #   provided.
+      def option(option_name, &block)
+        options[option_name] = block
+      end
+
+    end
+
     # When reading the field do we need to cast the value? This holds true when
     # times are stored or for big decimals which are stored as strings.
     #
