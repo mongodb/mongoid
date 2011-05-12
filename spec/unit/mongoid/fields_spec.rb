@@ -79,6 +79,10 @@ describe Mongoid::Fields do
 
   describe ".field" do
 
+    it "returns the generated field" do
+      Person.field(:testing).should equal Person.fields["testing"]
+    end
+
     context "when the field is a time" do
 
       let!(:time) do

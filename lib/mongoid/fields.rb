@@ -32,6 +32,8 @@ module Mongoid #:nodoc
       # @option options [ Class ] :type The type of the field.
       # @option options [ String ] :label The label for the field.
       # @option options [ Object, Proc ] :default The field's default
+      #
+      # @return [ Field ] The generated field
       def field(name, options = {})
         access = name.to_s
         set_field(access, options)
@@ -101,9 +103,11 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The hash of options.
       def set_field(name, options = {})
         meth = options.delete(:as) || name
-        fields[name] = Field.new(name, options)
-        create_accessors(name, meth, options)
-        add_dirty_methods(name)
+        Field.new(name, options).tap do |field|
+          fields[name] = field
+          create_accessors(name, meth, options)
+          add_dirty_methods(name)
+        end
       end
 
       # Create the field accessors.
