@@ -481,4 +481,30 @@ describe Mongoid::Dirty do
       end
     end
   end
+
+  describe "#initialization" do
+    
+    context "when ::add_dirty_methods is called" do
+
+      let!(:method_list) do
+        stub
+      end
+
+      it "checks for existing instance methods with both string and symbol arguments" do
+        Person.expects(:instance_methods).at_least_once.returns(method_list)
+        method_list.expects(:'include?').with('fieldname_change')
+        method_list.expects(:'include?').with('fieldname_changed?')
+        method_list.expects(:'include?').with('fieldname_was')
+        method_list.expects(:'include?').with('reset_fieldname!')
+        method_list.expects(:'include?').with(:'fieldname_change')
+        method_list.expects(:'include?').with(:'fieldname_changed?')
+        method_list.expects(:'include?').with(:'fieldname_was')
+        method_list.expects(:'include?').with(:'reset_fieldname!')
+
+        Person.send(:add_dirty_methods, 'fieldname')
+      end
+      
+    end
+
+  end
 end
