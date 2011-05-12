@@ -32,6 +32,8 @@ module Mongoid #:nodoc
       # @option options [ Class ] :type The type of the field.
       # @option options [ String ] :label The label for the field.
       # @option options [ Object, Proc ] :default The field's default
+      #
+      # @return [ Field ] The generated field
       def field(name, options = {})
         access = name.to_s
         set_field(access, options)
@@ -101,9 +103,35 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The hash of options.
       def set_field(name, options = {})
         meth = options.delete(:as) || name
-        fields[name] = Field.new(name, options)
-        create_accessors(name, meth, options)
-        add_dirty_methods(name)
+        Field.new(name, options).tap do |field|
+          fields[name] = field
+          create_accessors(name, meth, options)
+          add_dirty_methods(name)
+          process_options(field)
+        end
+      end
+
+      # Run through all custom options stored in Mongoid::Field.options and
+      # execute the handler if the option is provided.
+      #
+      # @example
+      #   Mongoid::Field.option :custom do
+      #     puts "called"
+      #   end
+      #
+      #   field = Mongoid::Field.new(:test, :custom => true)
+      #   Person.process_options(field)
+      #   # => "called"
+      #
+      # @param [ Field ] field the field to process
+      def process_options(field)
+        options = field.options
+
+        Field.options.each do |option_name, handler|
+          if options.has_key?(option_name)
+            handler.call(self, field, options[option_name])
+          end
+        end
       end
 
       # Create the field accessors.
