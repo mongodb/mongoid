@@ -79,6 +79,10 @@ describe Mongoid::Fields do
 
   describe ".field" do
 
+    it "returns the generated field" do
+      Person.field(:testing).should equal Person.fields["testing"]
+    end
+
     context "when the field is a time" do
 
       let!(:time) do
@@ -187,6 +191,61 @@ describe Mongoid::Fields do
       it "uses the alias for the query method" do
         person.expects(:read_attribute).with("aliased")
         person.alias?
+      end
+    end
+
+    context "custom options" do
+
+      let(:handler) do
+        proc {}
+      end
+
+      before do
+        Mongoid::Field.option :option, &handler
+      end
+
+      context "when option is provided" do
+
+        it "calls the handler with the model" do
+          handler.expects(:call).with do |model|
+            model.should eql Person
+          end
+
+          Person.field :custom, :option => true
+        end
+
+        it "calls the handler with the field" do
+          handler.expects(:call).with do |_,field,_|
+            field.should eql Person.fields["custom"]
+          end
+
+          Person.field :custom, :option => true
+        end
+
+        it "calls the handler with the option value" do
+          handler.expects(:call).with do |_,_,value|
+            value.should eql true
+          end
+
+          Person.field :custom, :option => true
+        end
+      end
+
+      context "when option is nil" do
+
+        it "calls the handler" do
+          handler.expects(:call)
+          Person.field :custom, :option => nil
+        end
+      end
+
+      context "when option is not provided" do
+
+        it "does not call the handler" do
+          handler.expects(:call).never
+
+          Person.field :custom
+        end
       end
     end
   end
