@@ -45,7 +45,10 @@ class Binary #:nodoc
   extend Mongoid::Extensions::Binary::Conversions
 end
 
-class Boolean #:nodoc
+unless defined?(Boolean)
+  class Boolean; end
+end
+Boolean.module_eval do #:nodoc
   include Mongoid::Extensions::Boolean::Conversions
 end
 
