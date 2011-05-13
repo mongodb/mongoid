@@ -20,7 +20,9 @@ class Array #:nodoc
 end
 
 class Binary; end #:nodoc:
-class Boolean; end #:nodoc:
+unless defined?(Boolean)
+  class Boolean; end
+end
 
 class FalseClass #:nodoc
   include Mongoid::Extensions::FalseClass::Equality
