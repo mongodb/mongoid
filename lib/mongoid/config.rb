@@ -79,9 +79,22 @@ module Mongoid #:nodoc
       @databases || {}
     end
 
-    # @todo Durran: There were no tests around the databases setter, not sure
-    # what the exact expectation was. Set with a hash?
+    # Set extra databases using a hash.
+    #
+    # @example Set the extra databases.
+    #   config.databases =  { "secondary" => {
+    #                            "database" => "secondary_config_test",
+    #                            "host" => "localhost",
+    #                            "port" => 27017
+    #                           }
+    #                       }
+    #
+    # @return [ Hash ] A hash of secondary databases.
     def databases=(databases)
+      return unless databases
+      @settings["databases"] = databases
+      configure_extras(@settings["databases"])
+      @databases || {}
     end
 
     # Return field names that could cause destructive things to happen if
