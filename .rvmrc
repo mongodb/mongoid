@@ -1,2 +1,48 @@
-rvm_gemset_create_on_use_flag=1
-rvm use 1.9.2@mongoid
+#!/usr/bin/env bash
+
+# This is an RVM Project .rvmrc file, used to automatically load the ruby
+# development environment upon cd'ing into the directory
+
+# First we specify our desired <ruby>[@<gemset>], the @gemset name is optional.
+environment_id="ruby-1.9.2-p180@mongoid"
+
+#
+# First we attempt to load the desired environment directly from the environment
+# file. This is very fast and efficicent compared to running through the entire
+# CLI and selector. If you want feedback on which environment was used then
+# insert the word 'use' after --create as this triggers verbose mode.
+#
+if [[ -d "${rvm_path:-$HOME/.rvm}/environments" \
+  && -s "${rvm_path:-$HOME/.rvm}/environments/$environment_id" ]] ; then
+  \. "${rvm_path:-$HOME/.rvm}/environments/$environment_id"
+
+  [[ -s ".rvm/hooks/after_use" ]] && . ".rvm/hooks/after_use"
+else
+  # If the environment file has not yet been created, use the RVM CLI to select.
+  rvm --create use  "$environment_id"
+fi
+
+#
+# If you use an RVM gemset file to install a list of gems (*.gems), you can have
+# it be automatically loaded. Uncomment the following and adjust the filename if
+# necessary.
+#
+# filename=".gems"
+# if [[ -s "$filename" ]] ; then
+#   rvm gemset import "$filename" | grep -v already | grep -v listed | grep -v complete | sed '/^$/d'
+# fi
+
+#
+# If you use bundler and would like to run bundle each time you enter the
+# directory, you can uncomment the following code.
+#
+#   # Ensure that Bundler is installed. Install it if it is not.
+#   if ! command -v bundle >/dev/null; then
+#      printf "The rubygem 'bundler' is not installed. Installing it now.\n"
+#      gem install bundler
+#   fi
+#
+#   # Bundle while reducing excess noise.
+#   printf "Bundling your gems. This may take a few minutes on a fresh clone.\n"
+#   bundle | grep -v '^Using ' | grep -v ' is complete' | sed '/^$/d'
+#
