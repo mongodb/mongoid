@@ -24,19 +24,19 @@ task :release => :build do
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
-Rspec::Core::RakeTask.new(:spec) do |spec|
+RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
-Rspec::Core::RakeTask.new("spec:unit") do |spec|
+RSpec::Core::RakeTask.new("spec:unit") do |spec|
   spec.pattern = "spec/unit/**/*_spec.rb"
 end
 
-Rspec::Core::RakeTask.new("spec:functional") do |spec|
+RSpec::Core::RakeTask.new("spec:functional") do |spec|
   spec.pattern = "spec/functional/**/*_spec.rb"
 end
 
-Rspec::Core::RakeTask.new('spec:progress') do |spec|
+RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.rspec_opts = %w(--format progress)
   spec.pattern = "spec/**/*_spec.rb"
 end
