@@ -77,6 +77,25 @@ describe Mongoid::Criterion::Exclusion do
     end
   end
 
+  describe "#fields" do
+
+    let(:criteria) do
+      base.fields(:field => 1)
+    end
+
+    let(:options) do
+      criteria.options[:fields]
+    end
+
+    it "adds the exclusion to the options" do
+      options.should == { :field => 1 }
+    end
+
+    it "returns a copy" do
+      base.fields(:field => 1).should_not eql(base)
+    end
+  end
+
   describe "#not_in" do
 
     let(:criteria) do
