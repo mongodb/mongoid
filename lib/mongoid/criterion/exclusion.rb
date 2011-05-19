@@ -24,6 +24,10 @@ module Mongoid #:nodoc:
         update_selector(attributes, "$ne")
       end
 
+      def fields(attributes = nil)
+        clone.tap { |crit| crit.options[:fields] = attributes || {} }
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values where none
       # should match in order to return results. This is similar to an SQL
       # "NOT IN" clause. The MongoDB conditional operator that will be
