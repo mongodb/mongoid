@@ -3,7 +3,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
 # We use merge keys in our test config files, which Psych dislikes,
 # so forcing Syck YAML Parser for now
-require 'yaml' 
+require "yaml"
+
 YAML::ENGINE.yamler = 'syck'
 
 MODELS = File.join(File.dirname(__FILE__), "models")
@@ -26,11 +27,10 @@ end
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
 Dir[ File.join(SUPPORT, "*.rb") ].each { |file| require File.basename(file) }
 
-Rspec.configure do |config|
+RSpec.configure do |config|
   config.mock_with(:mocha)
-  config.after(:suite) do
-    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
-  end
+
+  config.after(:suite) { Mongoid.purge! }
 
   # We need to filter out the specs that hit the slave databases if 2 slaves
   # are not confiured and running locally.
