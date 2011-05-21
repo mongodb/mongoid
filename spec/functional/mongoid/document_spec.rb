@@ -64,7 +64,9 @@ describe Mongoid::Document do
 
   context "becoming another class" do
     before(:all) do
-      class Manager < Person; end
+      class Manager < Person
+        field :level, :default => 1
+      end
     end
 
     %w{upcasting downcasting}.each do |ctx|
@@ -112,11 +114,25 @@ describe Mongoid::Document do
           became.should_not be_valid
           became.errors.should include(:ssn)
         end
+        
+        it "sets the class type" do
+          became = @obj.becomes(@to_become)          
+          became._type.should == @to_become.to_s
+        end
 
         it "raises an error when inappropriate class is provided" do
           lambda {@obj.becomes(String)}.should raise_error(ArgumentError)
         end
       end
+    end
+    
+    context "upcasting to class with default attributes" do
+      
+      it "applies default attributes" do
+        @obj = Person.new(:title => 'Sir').becomes(Manager)
+        @obj.level.should == 1
+      end
+      
     end
   end
 

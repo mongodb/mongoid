@@ -223,10 +223,13 @@ module Mongoid #:nodoc:
         raise ArgumentError, 'A class which includes Mongoid::Document is expected'
       end
       became = klass.new
-      became.instance_variable_set('@attributes', @attributes)
+      became.instance_variable_set('@attributes', frozen? ? raw_attributes.dup : raw_attributes)
       became.instance_variable_set('@errors', @errors)
       became.instance_variable_set('@new_record', new_record?)
       became.instance_variable_set('@destroyed', destroyed?)
+      became.send(:apply_default_attributes)
+      became._type = klass.to_s
+            
       became
     end
 
