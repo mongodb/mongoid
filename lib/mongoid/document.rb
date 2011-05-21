@@ -227,6 +227,7 @@ module Mongoid #:nodoc:
       became.instance_variable_set('@errors', @errors)
       became.instance_variable_set('@new_record', new_record?)
       became.instance_variable_set('@destroyed', destroyed?)
+      became.send(:apply_default_attributes)
       became
     end
 
