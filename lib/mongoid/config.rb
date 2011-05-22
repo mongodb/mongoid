@@ -280,6 +280,11 @@ module Mongoid #:nodoc
     #
     # @return [ Array<Mongo::DB> ] The slave DB instances.
     def slaves=(dbs)
+      warn(
+        "Using Mongoid for traditional slave databases will be removed in the " +
+        "next release in preference of replica sets. Please change your setup " +
+        "accordingly."
+      )
       return unless dbs
       dbs.each do |db|
         check_database!(db)
