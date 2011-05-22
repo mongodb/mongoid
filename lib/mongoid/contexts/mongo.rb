@@ -162,7 +162,6 @@ module Mongoid #:nodoc:
         if klass.hereditary? && !criteria.selector.keys.include?(:_type)
           @criteria = criteria.in(:_type => criteria.klass._types)
         end
-        @criteria.enslave if klass.enslaved?
         @criteria.cache if klass.cached?
       end
 

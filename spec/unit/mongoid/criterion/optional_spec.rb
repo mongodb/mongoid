@@ -154,21 +154,6 @@ describe Mongoid::Criterion::Optional do
     end
   end
 
-  describe "#enslave" do
-
-    let(:criteria) do
-      base.enslave
-    end
-
-    it "sets the enslaved option on the criteria" do
-      criteria.options[:enslave].should be_true
-    end
-
-    it "returns a copy" do
-      base.enslave.should_not eql(base)
-    end
-  end
-
   describe "#extras" do
 
     context "filtering" do

@@ -32,11 +32,6 @@ RSpec.configure do |config|
 
   config.after(:suite) { Mongoid.purge! }
 
-  # We need to filter out the specs that hit the slave databases if 2 slaves
-  # are not confiured and running locally.
-  slaves_configured = Support::Slaves.configured?
-  warn(Support::Slaves.message) unless slaves_configured
-
   # We filter out the specs that require authentication if the database has not
   # had the mongoid user set up properly.
   user_configured = Support::Authentication.configured?
@@ -54,7 +49,6 @@ RSpec.configure do |config|
 
   config.filter_run_excluding(:config => lambda { |value|
     return true if value == :mongohq && !mongohq_configured
-    return true if value == :slaves && !slaves_configured
     return true if value == :user && !user_configured
     return true if value == :multi && !multi_configured
   })
