@@ -222,12 +222,12 @@ module Mongoid #:nodoc:
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, 'A class which includes Mongoid::Document is expected'
       end
-      became = klass.new
-      became.instance_variable_set('@attributes', @attributes)
-      became.instance_variable_set('@errors', @errors)
-      became.instance_variable_set('@new_record', new_record?)
-      became.instance_variable_set('@destroyed', destroyed?)
-      became
+      klass.new.tap do |became|
+        became.instance_variable_set('@attributes', @attributes)
+        became.instance_variable_set('@errors', @errors)
+        became.instance_variable_set('@new_record', new_record?)
+        became.instance_variable_set('@destroyed', destroyed?)
+      end
     end
 
     module ClassMethods #:nodoc:
