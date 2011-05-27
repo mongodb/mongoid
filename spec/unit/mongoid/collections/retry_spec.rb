@@ -15,7 +15,7 @@ describe Mongoid::Collections::Retry do
       "do something here"
     end
   end
-  
+
   subject { SomeCollection.new }
 
   before do
