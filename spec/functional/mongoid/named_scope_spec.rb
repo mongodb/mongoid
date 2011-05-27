@@ -61,11 +61,11 @@ describe Mongoid::NamedScope do
     end
 
     context "when an class attribute is defined" do
-      
+
       it "should be accessible" do
         Person.somebody_elses_important_class_options.should == { :keep_me_around => true }
       end
-      
+
     end
 
     context "when calling scopes on parent classes" do
@@ -73,11 +73,11 @@ describe Mongoid::NamedScope do
       it "inherits the scope" do
         Doctor.minor.should == []
       end
-      
+
       it "inherits the class attribute methods" do
         Doctor.somebody_elses_important_class_options.should == { :keep_me_around => true }
       end
-      
+
     end
   end
 end
