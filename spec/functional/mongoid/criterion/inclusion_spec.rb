@@ -291,6 +291,31 @@ describe Mongoid::Criterion::Inclusion do
       )
     end
 
+
+    context "when providing empty string criteria" do
+      before do
+        class DevProject
+          include Mongoid::Document
+          field :dev_id, :type => String
+          field :user_id
+        end
+      end
+
+      let!(:user_id) { BSON::ObjectId.new }
+
+      let!(:new_doc) {
+        DevProject.create(
+          :dev_id => "",
+          :user_id => user_id
+        )
+      }
+
+      it "should return the matching document" do
+        DevProject.where(:dev_id => "", :user_id => user_id).first.should ==  new_doc
+      end
+    end
+
+
     context "when providing 24 character strings" do
 
       context "when the field is not an id field" do
