@@ -19,8 +19,8 @@ module Mongoid # :nodoc:
       # @return [ Builder ] The builder for the relation.
       #
       # @since 2.0.0.rc.1
-      def builder(object)
-        relation.builder(self, object)
+      def builder(object, loading = false)
+        relation.builder(self, object, loading)
       end
 
       # Returns the name of the strategy used for handling dependent relations.

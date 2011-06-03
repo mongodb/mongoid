@@ -23,7 +23,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def build(name, object, metadata, options = {})
-        relation = create_relation(object, metadata)
+        relation = create_relation(object, metadata, options[:loading])
         set(name, relation).tap do |relation|
           relation.load!(options) if relation && options[:eager]
         end
@@ -54,9 +54,9 @@ module Mongoid # :nodoc:
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def create_relation(object, metadata)
+      def create_relation(object, metadata, loading = false)
         type = @attributes[metadata.inverse_type]
-        target = metadata.builder(object).build(type)
+        target = metadata.builder(object, loading).build(type)
         target ? metadata.relation.new(self, target, metadata) : nil
       end
 
@@ -131,7 +131,7 @@ module Mongoid # :nodoc:
                   name,
                   @attributes[metadata.key],
                   metadata,
-                  options.merge(:binding => true, :eager => metadata.embedded?)
+                  options.merge(:binding => true, :eager => metadata.embedded?, :loading => true)
                 )
               end
             end
