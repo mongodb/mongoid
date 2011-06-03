@@ -5,6 +5,7 @@ class Animal
   key :name
 
   embedded_in :person
+  embedded_in :circus
 
   validates_format_of :name, :without => /\$\$\$/
 
