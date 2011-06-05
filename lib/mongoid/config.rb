@@ -268,6 +268,16 @@ module Mongoid #:nodoc
       settings.clear
     end
 
+    # @deprecated User replica sets instead.
+    def slaves
+      slave_warning!
+    end
+
+    # @deprecated User replica sets instead.
+    def slaves=(dbs)
+      slave_warning!
+    end
+
     protected
 
     # Check if the database is valid and the correct version.
@@ -325,6 +335,15 @@ module Mongoid #:nodoc
         dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
         end
       end
+    end
+
+    # Temporarily here so people can move to replica sets.
+    def slave_warning!
+      warn(
+        "Using Mongoid for traditional slave databases will be removed in the " +
+        "next release in preference of replica sets. Please change your setup " +
+        "accordingly."
+      )
     end
   end
 end
