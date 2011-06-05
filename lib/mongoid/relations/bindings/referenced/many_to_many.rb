@@ -75,6 +75,8 @@ module Mongoid # :nodoc:
           # @example Unbind the document.
           #   person.preferences.unbind_one(document)
           #
+          # @todo Durran: Get rid of persistence operation in this method.
+          #
           # @param [ Hash ] options The binding options.
           #
           # @option options [ true, false ] :continue Continue binding the inverse.
