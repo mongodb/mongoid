@@ -92,7 +92,8 @@ class Person
   references_and_referenced_in_many \
     :preferences,
     :index => true,
-    :dependent => :nullify
+    :dependent => :nullify,
+    :autosave => true
   references_and_referenced_in_many :user_accounts
   references_and_referenced_in_many :houses
 
