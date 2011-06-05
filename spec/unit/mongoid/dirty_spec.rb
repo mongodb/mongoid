@@ -483,7 +483,7 @@ describe Mongoid::Dirty do
   end
 
   describe "#initialization" do
-    
+
     context "when ::add_dirty_methods is called" do
 
       let!(:method_list) do
@@ -503,7 +503,7 @@ describe Mongoid::Dirty do
 
         Person.send(:add_dirty_methods, 'fieldname')
       end
-      
+
     end
 
   end
