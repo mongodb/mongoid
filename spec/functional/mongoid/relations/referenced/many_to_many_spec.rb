@@ -1012,11 +1012,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "removes the inverse reference" do
-        deleted.people.should be_empty
+        deleted.reload.people.should be_empty
       end
 
       it "removes the base id from the inverse keys" do
-        deleted.person_ids.should be_empty
+        deleted.reload.person_ids.should be_empty
       end
       
       
