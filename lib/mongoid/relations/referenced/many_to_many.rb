@@ -193,6 +193,7 @@ module Mongoid # :nodoc:
             else
               relation.target = unbind(options)
             end
+            base.save if base.persisted? && !options[:binding]
           end
         end
 
