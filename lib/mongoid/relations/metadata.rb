@@ -212,20 +212,6 @@ module Mongoid # :nodoc:
           relation.foreign_key_suffix
       end
 
-      # Used for relational many to many only. This determines the name of the
-      # foreign key setter field on the inverse side of the relation, since in this
-      # case there are keys on both sides.
-      #
-      # @example Find the inverse foreign key setter
-      #   metadata.inverse_foreign_key_setter
-      #
-      # @return [ String ] The foreign key setter on the inverse.
-      #
-      # @since 2.0.3
-      def inverse_foreign_key_setter
-        @inverse_foreign_key_setter ||= "#{inverse_foreign_key}="
-      end
-
       # Returns the inverse class of the proxied relation.
       #
       # @example Get the inverse class.
