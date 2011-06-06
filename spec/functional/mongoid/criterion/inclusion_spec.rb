@@ -327,6 +327,21 @@ describe Mongoid::Criterion::Inclusion do
       end
     end
 
+    context "when providing a range value" do
+
+      let(:event) do
+        Event.create(:age => 30..40)
+      end
+
+      let(:from_db) do
+        Event.where(:age => 30..40)
+      end
+
+      it "returns the matching documents" do
+        from_db.should == [ event ]
+      end
+    end
+
     context "chaining multiple wheres" do
 
       context "when chaining on the same key" do
@@ -453,6 +468,13 @@ describe Mongoid::Criterion::Inclusion do
 
         it "allows nil" do
           Person.where(:ssn.in => [nil]).should == [person]
+        end
+      end
+
+      context "#in (range value)" do
+
+        it "returns those matching an gte and lte clause" do
+          Person.where(:age.in => 30..40).should == [person]
         end
       end
 

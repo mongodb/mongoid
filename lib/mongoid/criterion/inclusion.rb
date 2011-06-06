@@ -155,6 +155,16 @@ module Mongoid #:nodoc:
           selector = case selector
             when String then {"$where" => selector}
             else
+              selector.clone.each_pair do |k, value|
+                if value.is_a?(Range) and k.is_a?(Mongoid::Criterion::Complex)
+                  case k.operator
+                    when "in" then
+                      selector.delete k
+                      selector[Mongoid::Criterion::Complex.new({:operator => "gte", :key => k.key})] = value.min
+                      selector[Mongoid::Criterion::Complex.new({:operator => "lte", :key => k.key})] = value.max
+                    end
+                end
+              end unless selector.nil?
               BSON::ObjectId.convert(klass, selector || {}, false).expand_complex_criteria
           end
 

@@ -242,6 +242,17 @@ describe Mongoid::Criterion::Inclusion do
             criteria.selector.should == { :aliases => "007" }
           end
         end
+
+        context "when a value is a range" do
+
+          let(:event) do
+            Mongoid::Criteria.new(Event).where(:age => (30..40))
+          end
+
+          it "returns a criteria where with a range converted to a hash" do
+            event.selector.should == { :age => { "min" => 30, "max" => 40 } }
+          end
+        end
       end
 
       context "when providing multiple values on the same complex attribute" do
@@ -315,6 +326,18 @@ describe Mongoid::Criterion::Inclusion do
           it "returns a selector matching an in clause" do
             criteria.selector.should ==
               { :title => { "$in" => ["Sir", "Madam"] } }
+          end
+        end
+
+        context "#in (with range value)" do
+
+          let(:criteria) do
+            base.where(:age.in => 10..20)
+          end
+
+          it "returns a selector matching an gte and lte clause" do
+            criteria.selector.should ==
+              { :age => { "$gte" => 10, "$lte" => 20 } }
           end
         end
 
