@@ -5,7 +5,7 @@ hu:
         taken:
           már foglalt
         document_not_found:
-          %{klass} osztályban, %{identifiers} id(k)-el nem található dokumentum.
+          "%{klass} osztályban, %{identifiers} id(k)-el nem található dokumentum."
         invalid_database:
           Az adatbázisnak Mongo::DB-nek kellene lennie, nem %{name}.
         invalid_type:
@@ -17,16 +17,16 @@ hu:
         validations:
           Érvénytelen - %{errors}.
         invalid_collection:
-          %{klass} osztálybeli kollekcióhoz való hozzáférés nem engedélyezett,
+          "%{klass} osztálybeli kollekcióhoz való hozzáférés nem engedélyezett,
           mivel egy beágyazott dokumentum. A kollekció a gyökér dokumentumból
-          érhető el.
+          érhető el."
         invalid_field:
-          %{name} mező név nem engedélyezett, mivel a Mongoid által használt
+          "%{name} mező név nem engedélyezett, mivel a Mongoid által használt
           belső tulajdonság vagy eljárás névvel eggyezik. Használja a
-          Document#instance_methods parancsot ezen nevek lekérdezéséhez.
+          Document#instance_methods parancsot ezen nevek lekérdezéséhez."
         too_many_nested_attribute_records:
-          %{association} esetében a beágyazott tulajdonságok %{limit} számú
-          bejegyzésre elfogadhatóak.
+          "%{association} esetében a beágyazott tulajdonságok %{limit} számú
+          bejegyzésre elfogadhatóak."
         embedded_in_must_have_inverse_of:
           Az embedded_in tipusú kapcsolat esetében kötelező az inverse_of
           opció használata.

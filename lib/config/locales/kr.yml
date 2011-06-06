@@ -27,7 +27,7 @@ kr:
           #Validation failed - %{errors}.
 
         invalid_collection:
-          %{klass} 를 위한 콜렉션에 접근하는것은 임베디드 문서이게 때문에 허락되지 않습니다. 루트 문서에서 콜렉션을 접근해 주세요
+          "%{klass} 를 위한 콜렉션에 접근하는것은 임베디드 문서이게 때문에 허락되지 않습니다. 루트 문서에서 콜렉션을 접근해 주세요"
           #Access to the collection for %{klass} is not allowed since it
           #is an embedded document, please access a collection from
           #the root document.
@@ -41,7 +41,7 @@ kr:
           #names. Use Document#instance_methods to see what names this includes.
 
         too_many_nested_attribute_records:
-          %{association} 을 위한 내부의 속성을 수용하는것은 %{limit}데이터로 제한되어있습니다.
+          "%{association} 을 위한 내부의 속성을 수용하는것은 %{limit}데이터로 제한되어있습니다."
           #Accepting nested attributes for %{association} is limited
           #to %{limit} records.
 
