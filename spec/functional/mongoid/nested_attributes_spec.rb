@@ -102,6 +102,7 @@ describe Mongoid::NestedAttributes do
       it "sets the nested attributes" do
         person.posts.first.title.should == "First"
       end
+
     end
 
     context "when the relation is a references and referenced in many" do
@@ -134,6 +135,156 @@ describe Mongoid::NestedAttributes do
         post.person.title.should == "Sir"
       end
     end
+    
+    context "when the nested attributes contain inherited classes" do
+
+        context "when the relation is a has one" do
+
+          before(:all) do
+            Zoo.send(:undef_method, :mammal_attributes=)
+            Zoo.accepts_nested_attributes_for :mammal
+          end
+
+          let(:zoo) do
+            Zoo.new(:mammal_attributes => {
+              "_type"=>"Moose",
+              "name"=>"Bullwinkle",
+              "antlers"=>2
+            })
+          end
+
+          it "builds the mammal" do
+            zoo.mammal.should_not be_nil
+          end
+
+          it "sets the type of the mammal to Moose" do
+            zoo.mammal.class.should == Moose
+          end
+
+          it "sets the right attributes for the mammal" do
+            zoo.mammal.name.should == "Bullwinkle"
+            zoo.mammal.antlers.should == 2
+          end
+
+        end
+        
+        context "when the relation is an embeds one" do
+
+          before(:all) do
+            Zoo.send(:undef_method, :reptile_attributes=)
+            Zoo.accepts_nested_attributes_for :reptile
+          end
+
+          let(:zoo) do
+            Zoo.new(:reptile_attributes => {
+              "_type"=>"Snake",
+              "name"=>"Monty",
+              "length"=>20
+            })
+          end
+
+          it "builds the reptile" do
+            zoo.reptile.should_not be_nil
+          end
+
+          it "sets the type of the reptile to Snake" do
+            zoo.reptile.class.should == Snake
+          end
+
+          it "sets the right attributes for the reptile" do
+            zoo.reptile.name.should == "Monty"
+            zoo.reptile.length.should == 20
+          end
+        end
+
+        context "when the relation is a has many" do
+
+          before(:all) do
+            Zoo.send(:undef_method, :mammals_attributes=)
+            Zoo.accepts_nested_attributes_for :mammals
+          end
+
+          let(:zoo) do
+            Zoo.new(:mammals_attributes => [{
+              "_type"=>"Moose",
+              "name"=>"Bullwinkle",
+              "antlers"=>2
+            }, {
+              "_type"=>"Cheetah",
+              "name"=>"Chester",
+              "speed"=>75
+            }])
+          end
+
+          it "builds both mammals" do
+            zoo.mammals.size.should == 2
+          end
+
+          it "sets the type of the first mammal to Moose" do
+            zoo.mammals.first.class.should == Moose
+          end
+
+          it "sets the type of the second mammal to Cheetah" do
+            zoo.mammals.last.class.should == Cheetah
+          end
+
+          it "sets the right attributes for the moose" do
+            zoo.mammals.first.name.should == "Bullwinkle"
+            zoo.mammals.first.antlers.should == 2
+          end
+
+          it "sets the right attributes for the cheetah" do
+            zoo.mammals.last.name.should == "Chester"
+            zoo.mammals.last.speed.should == 75
+          end
+
+        end
+
+        context "when the relation is an embedds many" do
+
+          before(:all) do
+            Zoo.send(:undef_method, :reptiles_attributes=)
+            Zoo.accepts_nested_attributes_for :reptiles
+          end
+
+          let(:zoo) do
+            Zoo.new(:reptiles_attributes => [{
+              "_type"=>"Snake",
+              "name"=>"Monty",
+              "length"=>20
+            }, {
+              "_type"=>"FrilledLizard",
+              "name"=>"Bill",
+              "color"=>"red"
+            }])
+          end
+
+          it "builds both reptiles" do
+            zoo.reptiles.size.should == 2
+          end
+
+          it "sets the type of the first reptile to Snake" do
+            zoo.reptiles.first.class.should == Snake
+          end
+
+          it "sets the type of the second reptile to FrilledLizard" do
+            zoo.reptiles.last.class.should == FrilledLizard
+          end
+
+          it "sets the right attributes for the snake" do
+            zoo.reptiles.first.name.should == "Monty"
+            zoo.reptiles.first.length.should == 20
+          end
+
+          it "sets the right attributes for the frilled lizard" do
+            zoo.reptiles.last.name.should == "Bill"
+            zoo.reptiles.last.color.should == "red"
+          end
+
+        end
+
+    end
+
   end
 
   describe '##{name}_attributes=' do
