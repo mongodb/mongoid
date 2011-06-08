@@ -27,7 +27,7 @@ module Mongoid # :nodoc:
             if update?
               existing.attributes = attributes
             elsif replace?
-              klass = Object::const_get(attributes['_type']) if attributes['_type']
+              klass = attributes['_type'].constantize if attributes['_type']
               klass = metadata.klass if klass.nil? || !klass.new.is_a?(metadata.klass)
               parent.send(metadata.setter, klass.new(attributes))
             elsif delete?
