@@ -6,7 +6,7 @@ class Person
 
   attr_accessor :mode
 
-  class_inheritable_hash :somebody_elses_important_class_options
+  class_attribute :somebody_elses_important_class_options
   self.somebody_elses_important_class_options = { :keep_me_around => true }
 
   field :title
@@ -92,7 +92,8 @@ class Person
   references_and_referenced_in_many \
     :preferences,
     :index => true,
-    :dependent => :nullify
+    :dependent => :nullify,
+    :autosave => true
   references_and_referenced_in_many :user_accounts
   references_and_referenced_in_many :houses
 

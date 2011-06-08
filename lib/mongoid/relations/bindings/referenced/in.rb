@@ -27,7 +27,7 @@ module Mongoid # :nodoc:
             inverse = metadata.inverse(target)
             base.send(metadata.foreign_key_setter, target.id)
             if metadata.inverse_type
-              base.send(metadata.inverse_type_setter, target.class.name)
+              base.send(metadata.inverse_type_setter, target.class.model_name)
             end
             if inverse
               base.metadata = target.reflect_on_association(inverse)

@@ -13,7 +13,7 @@ module Mongoid #:nodoc
     extend self
     include ActiveModel::Observing
 
-    attr_accessor :master, :slaves, :settings
+    attr_accessor :master, :settings
     @settings = {}
 
     # Define a configuration option with a default.
@@ -268,36 +268,14 @@ module Mongoid #:nodoc
       settings.clear
     end
 
-    # Sets the Mongo::DB slave databases to be used. If the objects provided
-    # are not valid +Mongo::DBs+ an error will be raised.
-    #
-    # @example Set the slaves.
-    #   config.slaves = [ Mongo::Connection.db("test") ]
-    #
-    # @param [ Array<Mongo::DB> ] dbs The slave databases.
-    #
-    # @raise [ Errors::InvalidDatabase ] If the slaves arent valid objects.
-    #
-    # @return [ Array<Mongo::DB> ] The slave DB instances.
-    def slaves=(dbs)
-      return unless dbs
-      dbs.each do |db|
-        check_database!(db)
-      end
-      @slaves = dbs
+    # @deprecated User replica sets instead.
+    def slaves
+      slave_warning!
     end
 
-    # Returns the slave databases or nil if none have been set.
-    #
-    # @example Get the slaves.
-    #   config.slaves
-    #
-    # @return [ Array<Mongo::DB>, nil ] The slave databases.
-    def slaves
-      unless @slaves
-        @master, @slaves = configure_databases(@settings) if @settings && @settings[:database]
-      end
-      @slaves
+    # @deprecated User replica sets instead.
+    def slaves=(dbs)
+      slave_warning!
     end
 
     protected
@@ -357,6 +335,15 @@ module Mongoid #:nodoc
         dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
         end
       end
+    end
+
+    # Temporarily here so people can move to replica sets.
+    def slave_warning!
+      warn(
+        "Using Mongoid for traditional slave databases will be removed in the " +
+        "next release in preference of replica sets. Please change your setup " +
+        "accordingly."
+      )
     end
   end
 end

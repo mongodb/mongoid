@@ -96,7 +96,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document, options = {})
           target.delete(document).tap do |doc|
-            binding.unbind_one(doc, default_options.merge!(options)) if doc
+            if doc
+              binding.unbind_one(doc, default_options.merge!(options))
+            end
           end
         end
 
@@ -193,6 +195,7 @@ module Mongoid # :nodoc:
             else
               relation.target = unbind(options)
             end
+            base.save if base.persisted? && !options[:binding]
           end
         end
 
