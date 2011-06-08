@@ -720,6 +720,21 @@ describe Mongoid::Relations::Embedded::Many do
           end
         end
       end
+
+      context "when providing _type" do
+        class Clip < Video
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        it "instantiates a proper class" do
+          clip = person.videos.build({'_type' => 'Clip'})
+          clip.should be_a_kind_of(Clip)
+        end
+
+      end
     end
   end
 
