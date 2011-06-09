@@ -6,9 +6,13 @@ module Mongoid #:nodoc:
       # Adds fields to be sorted in ascending order. Will add them in the order
       # they were passed into the method.
       #
-      # Example:
+      # @example Sort in ascending order.
+      #   criteria.ascending(:title, :dob)
+      #   criteria.asc(:title, :dob)
       #
-      # <tt>criteria.ascending(:title, :dob)</tt>
+      # @param [ Array<Symbol> ] fields The fields to sort on.
+      #
+      # @return [ Criteria ] The cloned criteria.
       def ascending(*fields)
         clone.tap do |crit|
           crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
@@ -22,18 +26,20 @@ module Mongoid #:nodoc:
       # times, however this is not advisable when working with large data sets
       # as the entire results will get stored in memory.
       #
-      # Example:
+      # @example Flag the criteria as cached.
+      #   criteria.cache
       #
-      # <tt>criteria.cache</tt>
+      # @return [ Criteria ] The cloned criteria.
       def cache
         clone.tap { |crit| crit.options.merge!(:cache => true) }
       end
 
       # Will return true if the cache option has been set.
       #
-      # Example:
+      # @example Is the criteria cached?
+      #   criteria.cached?
       #
-      # <tt>criteria.cached?</tt>
+      # @return [ true, false ] If the criteria is flagged as cached.
       def cached?
         options[:cache] == true
       end
@@ -41,9 +47,13 @@ module Mongoid #:nodoc:
       # Adds fields to be sorted in descending order. Will add them in the order
       # they were passed into the method.
       #
-      # Example:
+      # @example Sort the criteria in descending order.
+      #   criteria.descending(:title, :dob)
+      #   criteria.desc(:title, :dob)
       #
-      # <tt>criteria.descending(:title, :dob)</tt>
+      # @param [ Array<Symbol> ] fields The fields to sort on.
+      #
+      # @return [ Criteria ] The cloned criteria.
       def descending(*fields)
         clone.tap do |crit|
           crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
@@ -55,15 +65,12 @@ module Mongoid #:nodoc:
       # Adds a criterion to the +Criteria+ that specifies additional options
       # to be passed to the Ruby driver, in the exact format for the driver.
       #
-      # Options:
+      # @example Add extra params to the criteria.
+      #   criteria.extras(:limit => 20, :skip => 40)
       #
-      # extras: A +Hash+ that gets set to the driver options.
+      # @param [ Hash ] extras The extra driver options.
       #
-      # Example:
-      #
-      # <tt>criteria.extras(:limit => 20, :skip => 40)</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] The cloned criteria.
       def extras(extras)
         clone.tap do |crit|
           crit.options.merge!(extras)
@@ -72,16 +79,15 @@ module Mongoid #:nodoc:
 
       # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
       #
-      # Options:
+      # @example Add a single id criteria.
+      #   criteria.for_ids("4ab2bc4b8ad548971900005c")
       #
-      # object_id: A single id or an array of ids in +String+ or <tt>BSON::ObjectId</tt> format
+      # @example Add multiple id criteria.
+      #   criteria.for_ids(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])
       #
-      # Example:
+      # @param [ Array ] ids: A single id or an array of ids.
       #
-      # <tt>criteria.for_ids("4ab2bc4b8ad548971900005c")</tt>
-      # <tt>criteria.for_ids(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] The cloned criteria.
       def for_ids(*ids)
         ids.flatten!
         if ids.size > 1
@@ -97,18 +103,15 @@ module Mongoid #:nodoc:
       end
 
       # Adds a criterion to the +Criteria+ that specifies the maximum number of
-      # results to return. This is mostly used in conjunction with <tt>skip()</tt>
+      # results to return. This is mostly used in conjunction with skip()
       # to handle paginated results.
       #
-      # Options:
+      # @example Limit the result set size.
+      #   criteria.limit(100)
       #
-      # value: An +Integer+ specifying the max number of results. Defaults to 20.
+      # @param [ Integer ] value The max number of results.
       #
-      # Example:
-      #
-      # <tt>criteria.limit(100)</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] The cloned criteria.
       def limit(value = 20)
         clone.tap { |crit| crit.options[:limit] = value }
       end
@@ -116,6 +119,11 @@ module Mongoid #:nodoc:
       # Returns the offset option. If a per_page option is in the list then it
       # will replace it with a skip parameter and return the same value. Defaults
       # to 20 if nothing was provided.
+      #
+      # @example Get the offset.
+      #   criteria.offset(10)
+      #
+      # @return [ Integer ] The number of documents to skip.
       def offset(*args)
         args.size > 0 ? skip(args.first) : options[:skip]
       end
@@ -123,15 +131,12 @@ module Mongoid #:nodoc:
       # Adds a criterion to the +Criteria+ that specifies the sort order of
       # the returned documents in the database. Similar to a SQL "ORDER BY".
       #
-      # Options:
+      # @example Order by specific fields.
+      #   criteria.order_by([[:field1, :asc], [:field2, :desc]])
       #
-      # params: An +Array+ of [field, direction] sorting pairs.
+      # @param [ Array ] params: An +Array+ of [field, direction] sorting pairs.
       #
-      # Example:
-      #
-      # <tt>criteria.order_by([[:field1, :asc], [:field2, :desc]])</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] The cloned criteria.
       def order_by(*args)
         clone.tap do |crit|
           crit.options[:sort] = [] unless options[:sort] || args.first.nil?
@@ -154,35 +159,29 @@ module Mongoid #:nodoc:
 
       # Adds a criterion to the +Criteria+ that specifies how many results to skip
       # when returning Documents. This is mostly used in conjunction with
-      # <tt>limit()</tt> to handle paginated results, and is similar to the
+      # limit() to handle paginated results, and is similar to the
       # traditional "offset" parameter.
       #
-      # Options:
+      # @example Skip a specified number of documents.
+      #   criteria.skip(20)
       #
-      # value: An +Integer+ specifying the number of results to skip. Defaults to 0.
+      # @param [ Integer ] value The number of results to skip.
       #
-      # Example:
-      #
-      # <tt>criteria.skip(20)</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] The cloned criteria.
       def skip(value = 0)
         clone.tap { |crit| crit.options[:skip] = value }
       end
 
       # Adds a criterion to the +Criteria+ that specifies a type or an Array of
-      # type that must be matched.
+      # types that must be matched.
       #
-      # Options:
+      # @example Match only specific models.
+      #   criteria.type('Browser')
+      #   criteria.type(['Firefox', 'Browser'])
       #
-      # types : An +Array+ of types of a +String+ representing the Type of you search
+      # @param [ Array<String> ] types The types to match against.
       #
-      # Example:
-      #
-      # <tt>criteria.type('Browser')</tt>
-      # <tt>criteria.type(['Firefox', 'Browser'])</tt>
-      #
-      # Returns: <tt>self</tt>
+      # @return [ Criteria ] The cloned criteria.
       def type(types)
         types = [types] unless types.is_a?(Array)
         any_in(:_type => types)
