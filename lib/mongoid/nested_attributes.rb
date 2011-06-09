@@ -1,5 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
+  # Mongoid's implementation of Rails' nested attributes.
   module NestedAttributes
     extend ActiveSupport::Concern
 
@@ -10,7 +12,8 @@ module Mongoid #:nodoc:
       delegate :nested_attributes, :to => "self.class"
     end
 
-    module ClassMethods
+    module ClassMethods #:nodoc:
+
       REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |_, value| value.blank? } }
 
       # Used when needing to update related models from a parent relation. Can
