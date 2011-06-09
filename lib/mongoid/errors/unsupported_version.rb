@@ -4,9 +4,8 @@ module Mongoid #:nodoc
 
     # Raised when the database version is not supported by Mongoid.
     #
-    # Example:
-    #
-    # <tt>UnsupportedVersion.new(Mongo::ServerVersion.new("1.3.1"))</tt>
+    # @example Create the error.
+    #   UnsupportedVersion.new(Mongo::ServerVersion.new("1.3.1"))
     class UnsupportedVersion < MongoidError
       def initialize(version)
         super(

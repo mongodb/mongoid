@@ -4,9 +4,8 @@ module Mongoid #:nodoc
 
     # Raised when invalid options are passed into a constructor or method.
     #
-    # Example:
-    #
-    # <tt>InvalidOptions.new</tt>
+    # @example Create the error.
+    #   InvalidOptions.new
     class InvalidOptions < MongoidError
       def initialize(key, options)
         super(translate(key, options))

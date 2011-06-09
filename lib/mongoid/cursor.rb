@@ -1,8 +1,11 @@
 # encoding: utf-8
 module Mongoid #:nodoc
+
+  # Mongoid wrapper of the Ruby Driver cursor.
   class Cursor
     include Mongoid::Collections::Retry
     include Enumerable
+
     # Operations on the Mongo::Cursor object that will not get overriden by the
     # Mongoid::Cursor are defined here.
     OPERATIONS = [
@@ -24,42 +27,35 @@ module Mongoid #:nodoc
       :timeout
     ]
 
-    attr_reader :collection
+    attr_reader :collection, :cursor, :klass
 
     # The operations above will all delegate to the proxied Mongo::Cursor.
-    #
-    # Example:
-    #
-    # <tt>cursor.close</tt>
     OPERATIONS.each do |name|
       define_method(name) do |*args|
         retry_on_connection_failure do
-          @cursor.send(name, *args)
+          cursor.send(name, *args)
         end
       end
     end
 
     # Iterate over each document in the cursor and yield to it.
     #
-    # Example:
-    #
-    # <tt>cursor.each { |doc| p doc.title }</tt>
+    # @example Iterate over the cursor.
+    #   cursor.each { |doc| p doc.title }
     def each
-      @cursor.each do |document|
-        yield Mongoid::Factory.from_db(@klass, document)
+      cursor.each do |document|
+        yield Mongoid::Factory.from_db(klass, document)
       end
     end
 
     # Create the new +Mongoid::Cursor+.
     #
-    # Options:
+    # @example Instantiate the cursor.
+    #   Mongoid::Cursor.new(Person, cursor)
     #
-    # collection: The Mongoid::Collection instance.
-    # cursor: The Mongo::Cursor to be proxied.
-    #
-    # Example:
-    #
-    # <tt>Mongoid::Cursor.new(Person, cursor)</tt>
+    # @param [ Class ] klass The class associated with the cursor.
+    # @param [ Collection ] collection The Mongoid::Collection instance.
+    # @param [ Mongo::Cursor ] cursor The Mongo::Cursor to be proxied.
     def initialize(klass, collection, cursor)
       @klass, @collection, @cursor = klass, collection, cursor
     end
@@ -67,20 +63,22 @@ module Mongoid #:nodoc
     # Return the next document in the cursor. Will instantiate a new Mongoid
     # document with the attributes.
     #
-    # Example:
+    # @example Get the next document.
+    #   cursor.next_document
     #
-    # <tt>cursor.next_document</tt>
+    # @return [ Document ] The next document in the cursor.
     def next_document
-      Mongoid::Factory.from_db(@klass, @cursor.next_document)
+      Mongoid::Factory.from_db(klass, cursor.next_document)
     end
 
     # Returns an array of all the documents in the cursor.
     #
-    # Example:
+    # @example Get the cursor as an array.
+    #   cursor.to_a
     #
-    # <tt>cursor.to_a</tt>
+    # @return [ Array<Document> ] An array of documents.
     def to_a
-      @cursor.to_a.collect { |attrs| Mongoid::Factory.from_db(@klass, attrs) }
+      cursor.to_a.collect { |attrs| Mongoid::Factory.from_db(klass, attrs) }
     end
   end
 end
