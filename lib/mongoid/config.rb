@@ -177,30 +177,18 @@ module Mongoid #:nodoc
 
     # Sets whether the times returned from the database use the ruby or
     # the ActiveSupport time zone.
-    # If you omit this setting, then times will use the ruby time zone.
     #
-    # Example:
+    # @note If you omit this setting, then times will use the ruby time zone.
     #
-    # <tt>Config.use_activesupport_time_zone = true</tt>
+    # @example Set the time zone config.
+    #   Config.use_activesupport_time_zone = true
     #
-    # Returns:
+    # @param [ true, false ] value Whether to use Active Support time zones.
     #
-    # A boolean
+    # @return [ true, false ] The supplied value or false if nil.
     def use_activesupport_time_zone=(value)
       @use_activesupport_time_zone = value || false
     end
-
-    # Sets whether the times returned from the database use the ruby or
-    # the ActiveSupport time zone.
-    # If the setting is false, then times will use the ruby time zone.
-    #
-    # Example:
-    #
-    # <tt>Config.use_activesupport_time_zone</tt>
-    #
-    # Returns:
-    #
-    # A boolean
     attr_reader :use_activesupport_time_zone
     alias_method :use_activesupport_time_zone?, :use_activesupport_time_zone
 
