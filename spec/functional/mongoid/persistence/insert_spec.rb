@@ -21,6 +21,17 @@ describe Mongoid::Persistence::Insert do
         agent.expects(:before_create_callback).once
         agent.save
       end
+
+      it "doesn't have changed fields after it is saved" do
+        # making a change before saving
+        agent.title = 'Foo'
+        agent.changed?.should be_true
+        agent.changed.should include 'title'
+        agent.save.should be_true
+        # after saved
+        agent.changed?.should be_false
+        agent.changed.should be_empty
+      end
     end
 
     context "when the document is embedded" do
@@ -32,6 +43,18 @@ describe Mongoid::Persistence::Insert do
         name.expects(:before_create_callback).once
         name.save
       end
+
+      it "doesn't have changed fields after the parent is saved" do
+        # making a change before saving
+        name.last_name = 'Foo'
+        name.changed?.should be_true
+        name.changed.should include 'last_name'
+        agent.save.should be_true
+        # after saved
+        name.changed?.should be_false
+        name.changed.should be_empty
+      end
+
     end
 
   end
