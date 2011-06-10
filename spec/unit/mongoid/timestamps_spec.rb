@@ -64,7 +64,7 @@ describe Mongoid::Timestamps do
       person.new_record = false
     end
 
-    it "does not run the update callbacks" do
+    it "does not set updated at" do
       person.updated_at = DateTime.parse("2001-06-12")
       person.expects(:updated_at=).never
       person.save
