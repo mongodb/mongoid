@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
       def ascending(*fields)
         clone.tap do |crit|
           crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
-          fields.flatten.each { |field| crit.options[:sort] << [ field, :asc ] }
+          fields.flatten.each { |field| merge_options(crit.options[:sort], [ field, :asc ]) }
         end
       end
       alias :asc :ascending
@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
       def descending(*fields)
         clone.tap do |crit|
           crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
-          fields.flatten.each { |field| crit.options[:sort] << [ field, :desc ] }
+          fields.flatten.each { |field| merge_options(crit.options[:sort], [ field, :desc ]) }
         end
       end
       alias :desc :descending
@@ -144,13 +144,13 @@ module Mongoid #:nodoc:
           case arguments
           when Hash
             arguments.each do |field, direction|
-              crit.options[:sort] << [ field, direction ]
+              merge_options(crit.options[:sort], [ field, direction ])
             end
-          when Array
-            crit.options[:sort].concat(arguments)
+            when Array
+            merge_options(crit.options[:sort],arguments)
           when Complex
             args.flatten.each do |complex|
-              crit.options[:sort] << [ complex.key, complex.operator.to_sym ]
+              merge_options(crit.options[:sort], [ complex.key, complex.operator.to_sym ])
             end
           end
         end
@@ -187,6 +187,29 @@ module Mongoid #:nodoc:
         any_in(:_type => types)
       end
 
+      private
+
+
+      # Merge options for order_by criterion
+      # Allow only one order direction for same field
+      #
+      # @example Merge ordering options
+      #   criteria.merge_options([[:title, :asc], [:created_at, :asc]], [:title, :desc])
+      #
+      #
+      # @param [ Array<Array> ] Existing options
+      # @param [ Array ] New option for merge.
+      #
+      # @since 2.0.3
+      def merge_options(options, new_option)
+        old_option = options.assoc(new_option.first)
+
+        if old_option
+          options[options.index(old_option)] = new_option.flatten
+        else
+          options << new_option.flatten
+        end
+      end
     end
   end
 end

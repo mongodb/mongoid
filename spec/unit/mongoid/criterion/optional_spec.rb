@@ -29,6 +29,29 @@ describe Mongoid::Criterion::Optional do
         criteria.options[:sort].should be_nil
       end
     end
+
+    context "when chained" do
+      context "before another order on this field" do
+        let(:criteria) do
+          base.ascending(:title).order_by(:title.desc)
+        end
+
+        it "overwrites by last" do
+         criteria.options[:sort].should == [[:title, :desc]]
+        end
+      end
+
+      context "after another order on this field" do
+        let(:criteria) do
+          base.order_by(:title.desc).ascending(:title)
+        end
+
+        it "overwrite previous" do
+         criteria.options[:sort].should == [[:title, :asc]]
+        end
+      end
+    end
+
   end
 
   describe "#asc" do
@@ -125,6 +148,28 @@ describe Mongoid::Criterion::Optional do
 
       it "does not modify the sort criteria" do
         criteria.options[:sort].should be_nil
+      end
+    end
+
+    context "when chained" do
+      context "before another order on this field" do
+        let(:criteria) do
+          base.descending(:title).order_by(:title.asc)
+        end
+
+        it "overwrites by last" do
+         criteria.options[:sort].should == [[:title, :asc]]
+        end
+      end
+
+      context "after another order on this field" do
+        let(:criteria) do
+          base.order_by(:title.asc).descending(:title)
+        end
+
+        it "overwrite previous" do
+         criteria.options[:sort].should == [[:title, :desc]]
+        end
       end
     end
   end
@@ -424,6 +469,24 @@ describe Mongoid::Criterion::Optional do
 
     it "returns a copy" do
       base.order_by.should_not eql(base)
+    end
+
+    context "when chained" do
+      let(:criteria) do
+        base.order_by(:title => :asc).order_by(:text => :desc).order_by(:title.desc)
+      end
+
+      it "merge criterias" do
+        criteria.options[:sort].should have(2).items
+      end
+
+      it "add to options last chained criterion on same field" do
+        criteria.options[:sort].should include([:title, :desc])
+      end
+
+      it "don't add to options not last chained criterion on same field"  do
+        criteria.options[:sort].should_not include([:title, :asc])
+      end
     end
   end
 
