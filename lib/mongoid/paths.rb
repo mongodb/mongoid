@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
-  module Paths #:nodoc:
+
+  # Contains logic for determining the path selectors for atomic updates.
+  module Paths
     extend ActiveSupport::Concern
+
     included do
       cattr_accessor :__path
       attr_accessor :_index
@@ -10,9 +13,10 @@ module Mongoid #:nodoc:
     # Get the insertion modifier for the document. Will be nil on root
     # documents, $set on embeds_one, $push on embeds_many.
     #
-    # Example:
+    # @example Get the insert operation.
+    #   name.inserter
     #
-    # <tt>name.inserter</tt>
+    # @return [ String ] The pull or set operator.
     def _inserter
       embedded? ? (embedded_many? ? "$push" : "$set") : nil
     end
@@ -20,9 +24,10 @@ module Mongoid #:nodoc:
     # Return the path to this +Document+ in JSON notation, used for atomic
     # updates via $set in MongoDB.
     #
-    # Example:
+    # @example Get the path to this document.
+    #   address.path
     #
-    # <tt>address.path # returns "addresses"</tt>
+    # @return [ String ] The path to the document in the database.
     def _path
       _position.sub!(/\.\d+$/, '') || _position
     end
@@ -30,20 +35,26 @@ module Mongoid #:nodoc:
 
     # Returns the positional operator of this document for modification.
     #
-    # Example:
+    # @example Get the positional operator.
+    #   address.position
     #
-    # <tt>address.position</tt>
+    # @return [ String ] The positional operator with indexes.
     def _position
       locator = _index ? (new_record? ? "" : ".#{_index}") : ""
-      embedded? ? "#{_parent._position}#{"." unless _parent._position.blank?}#{metadata.name.to_s}#{locator}" : ""
+      if embedded?
+        "#{_parent._position}#{"." unless _parent._position.blank?}#{metadata.name.to_s}#{locator}"
+      else
+        ""
+      end
     end
 
     # Get the removal modifier for the document. Will be nil on root
     # documents, $unset on embeds_one, $set on embeds_many.
     #
-    # Example:
+    # @example Get the removal operator.
+    #   name.remover
     #
-    # <tt>name.remover</tt>
+    # @return [ String ] The pull or unset operation.
     def _remover
       embedded? ? (_index ? "$pull" : "$unset") : nil
     end
@@ -51,11 +62,13 @@ module Mongoid #:nodoc:
     # Return the selector for this document to be matched exactly for use
     # with MongoDB's $ operator.
     #
-    # Example:
+    # @example Get the selector.
+    #   address.selector
     #
-    # <tt>address.selector</tt>
+    # @return [ String ] The exact selector for this document.
     def _selector
-      (embedded? ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }).merge(shard_key_selector)
+      (embedded? ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }).
+        merge(shard_key_selector)
     end
   end
 end

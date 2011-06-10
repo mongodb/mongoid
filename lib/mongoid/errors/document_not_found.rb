@@ -6,9 +6,8 @@ module Mongoid #:nodoc
     # does not exist. If multiple ids were passed then it will display all of
     # those.
     #
-    # Example:
-    #
-    # <tt>DocumentNotFound.new(Person, ["1", "2"])</tt>
+    # @example Create the error.
+    #   DocumentNotFound.new(Person, ["1", "2"])
     class DocumentNotFound < MongoidError
 
       attr_reader :klass, :identifiers
@@ -20,7 +19,7 @@ module Mongoid #:nodoc
         super(
           translate(
             "document_not_found",
-            { :klass => klass.name, :identifiers => @identifiers }
+            { :klass => klass.name, :identifiers => identifiers }
           )
         )
       end

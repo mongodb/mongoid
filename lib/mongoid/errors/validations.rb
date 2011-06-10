@@ -5,9 +5,8 @@ module Mongoid #:nodoc
     # Raised when a persistence method ending in ! fails validation. The message
     # will contain the full error messages from the +Document+ in question.
     #
-    # Example:
-    #
-    # <tt>Validations.new(person.errors)</tt>
+    # @example Create the error.
+    #   Validations.new(person.errors)
     class Validations < MongoidError
       attr_reader :document
       def initialize(document)

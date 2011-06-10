@@ -4,15 +4,21 @@ require "mongoid/contexts/mongo"
 
 module Mongoid
   module Contexts
+    extend self
+
     # Determines the context to be used for this criteria. If the class is an
     # embedded document, then the context will be the array in the has_many
     # association it is in. If the class is a root, then the database itself
     # will be the context.
     #
-    # Example:
+    # @example Get the context for the criteria.
+    #   Contexts.context_for(criteria)
     #
-    # <tt>Contexts.context_for(criteria)</tt>
-    def self.context_for(criteria, embedded = false)
+    # @param [ Criteria ] criteria The criteria to use.
+    # @param [ true, false ] embedded Whether this is on embedded documents.
+    #
+    # @return [ Enumerable, Mongo ] The appropriate context.
+    def context_for(criteria, embedded = false)
       embedded ? Enumerable.new(criteria) : Mongo.new(criteria)
     end
   end

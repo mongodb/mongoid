@@ -15,13 +15,14 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Find +Documents+ given the conditions.
+    # Find all documents that match the given conditions.
     #
-    # Options:
+    # @example Find all matching documents given conditions.
+    #   Person.all(:conditions => { :attribute => "value" })
     #
-    # args: A +Hash+ with a conditions key and other options
+    # @param [ Array ] args The conditions with options.
     #
-    # <tt>Person.all(:conditions => { :attribute => "value" })</tt>
+    # @return [ Criteria ] The matching documents.
     def all(*args)
       find(:all, *args)
     end
@@ -29,12 +30,22 @@ module Mongoid #:nodoc:
     # Returns a count of matching records in the database based on the
     # provided arguments.
     #
-    # <tt>Person.count(:conditions => { :attribute => "value" })</tt>
+    # @example Get the count of matching documents.
+    #   Person.count(:conditions => { :attribute => "value" })
+    #
+    # @param [ Array ] args The conditions.
+    #
+    # @return [ Integer ] The number of matching documents.
     def count(*args)
       find(:all, *args).count
     end
 
     # Returns true if count is zero
+    #
+    # @example Are there no saved documents for this model?
+    #   Person.empty?
+    #
+    # @return [ true, false ] If the collection is empty.
     def empty?
       count == 0
     end
@@ -42,7 +53,10 @@ module Mongoid #:nodoc:
     # Returns true if there are on document in database based on the
     # provided arguments.
     #
-    # <tt>Person.exists?(:conditions => { :attribute => "value" })</tt>
+    # @example Do any documents exist for the conditions?
+    #   Person.exists?(:conditions => { :attribute => "value" })
+    #
+    # @param [ Array ] args The conditions.
     def exists?(*args)
        find(:all, *args).limit(1).count == 1
     end
@@ -55,71 +69,83 @@ module Mongoid #:nodoc:
     # it will attempt to find either a single +Document+ or multiples based
     # on the conditions provided and the first parameter.
     #
-    # Example:
+    # @example Find the first matching document.
+    #   Person.find(:first, :conditions => { :attribute => "value" })
     #
-    # <tt>Person.find(:first, :conditions => { :attribute => "value" })</tt>
-    # <tt>Person.find(:all, :conditions => { :attribute => "value" })</tt>
-    # <tt>Person.find(BSON::ObjectId)</tt>
+    # @example Find all matching documents.
+    #   Person.find(:all, :conditions => { :attribute => "value" })
     #
-    # Options:
+    # @example Find a single document by an id.
+    #   Person.find(BSON::ObjectId)
     #
-    # args: An assortment of finder options.
+    # @param [ Array ] args An assortment of finder options.
     #
-    # Returns:
-    #
-    # A document or criteria.
+    # @return [ Document, nil, Criteria ] A document or matching documents.
     def find(*args)
       criteria.find(*args)
     end
 
     # Find the first +Document+ given the conditions, or creates a new document
-    # with the conditions that were supplied
+    # with the conditions that were supplied.
     #
-    # Options:
+    # @example Find or create the document.
+    #   Person.find_or_create_by(:attribute => "value")
     #
-    # args: A +Hash+ of attributes
+    # @param [ Hash ] attrs The attributes to check.
     #
-    # <tt>Person.find_or_create_by(:attribute => "value")</tt>
+    # @return [ Document ] A matching or newly created document.
     def find_or_create_by(attrs = {}, &block)
       find_or(:create, attrs, &block)
     end
 
-    # Find the first +Document+ given the conditions, or instantiates a new document
-    # with the conditions that were supplied
+    # Find the first +Document+ given the conditions, or initializes a new document
+    # with the conditions that were supplied.
     #
-    # Options:
+    # @example Find or initialize the document.
+    #   Person.find_or_initialize_by(:attribute => "value")
     #
-    # args: A +Hash+ of attributes
+    # @param [ Hash ] attrs The attributes to check.
     #
-    # <tt>Person.find_or_initialize_by(:attribute => "value")</tt>
+    # @return [ Document ] A matching or newly initialized document.
     def find_or_initialize_by(attrs = {}, &block)
       find_or(:new, attrs, &block)
     end
 
     # Find the first +Document+ given the conditions.
     #
-    # Options:
+    # @example Find the first document.
+    #   Person.first(:conditions => { :attribute => "value" })
     #
-    # args: A +Hash+ with a conditions key and other options
+    # @param [ Array ] args The conditions with options.
     #
-    # <tt>Person.first(:conditions => { :attribute => "value" })</tt>
+    # @return [ Document ] The first matching document.
     def first(*args)
       find(:first, *args)
     end
 
     # Find the last +Document+ given the conditions.
     #
-    # Options:
+    # @example Find the last document.
+    #   Person.last(:conditions => { :attribute => "value" })
     #
-    # args: A +Hash+ with a conditions key and other options
+    # @param [ Array ] args The conditions with options.
     #
-    # <tt>Person.last(:conditions => { :attribute => "value" })</tt>
+    # @return [ Document ] The last matching document.
     def last(*args)
       find(:last, *args)
     end
 
     protected
+
     # Find the first object or create/initialize it.
+    #
+    # @example Find or perform an action.
+    #   Person.find_or(:create, :name => "Dev")
+    #
+    # @param [ Symbol ] method The method to invoke.
+    # @param [ Hash ] attrs The attributes to query or set.
+    #
+    # @return [ Document ] The first or new document.
     def find_or(method, attrs = {}, &block)
       first(:conditions => attrs) || send(method, attrs, &block)
     end

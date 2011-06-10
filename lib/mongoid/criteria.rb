@@ -13,18 +13,15 @@ module Mongoid #:nodoc:
 
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
   # objects from the database. It is a DSL that essentially sets up the
-  # selector and options arguments that get passed on to a <tt>Mongo::Collection</tt>
+  # selector and options arguments that get passed on to a Mongo::Collection
   # in the Ruby driver. Each method on the +Criteria+ returns self to they
   # can be chained in order to create a readable criterion to be executed
   # against the database.
   #
-  # Example setup:
-  #
-  # <tt>criteria = Criteria.new</tt>
-  #
-  # <tt>criteria.only(:field).where(:field => "value").skip(20).limit(20)</tt>
-  #
-  # <tt>criteria.execute</tt>
+  # @example Create and execute a criteria.
+  #   criteria = Criteria.new
+  #   criteria.only(:field).where(:field => "value").skip(20).limit(20)
+  #   criteria.execute
   class Criteria
     include Enumerable
     include Criterion::Builder
@@ -69,12 +66,22 @@ module Mongoid #:nodoc:
 
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.
+    #
+    # @example Concat 2 criteria.
+    #   criteria + criteria
+    #
+    # @param [ Criteria ] other The other criteria.
     def +(other)
       entries + comparable(other)
     end
 
     # Returns the difference between the criteria and another enumerable. If
     # the other is a +Criteria+ then it needs to get the collection from it.
+    #
+    # @example Get the difference of 2 criteria.
+    #   criteria - criteria
+    #
+    # @param [ Criteria ] other The other criteria.
     def -(other)
       entries - comparable(other)
     end
@@ -82,11 +89,11 @@ module Mongoid #:nodoc:
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.
     #
-    # This will force a database load when called if an enumerable is passed.
+    # @note This will force a database load when called if an enumerable is passed.
     #
-    # Options:
+    # @param [ Object ] other The other +Enumerable+ or +Criteria+ to compare to.
     #
-    # other: The other +Enumerable+ or +Criteria+ to compare to.
+    # @return [ true, false ] If the objects are equal.
     def ==(other)
       case other
       when Criteria
@@ -102,6 +109,11 @@ module Mongoid #:nodoc:
     #
     # This will return an Enumerable context if the class is embedded,
     # otherwise it will return a Mongo context for root classes.
+    #
+    # @example Get the appropriate context.
+    #   criteria.context
+    #
+    # @return [ Mongo, Enumerable ] The appropriate context.
     def context
       @context ||= Contexts.context_for(self, embedded)
     end
@@ -109,18 +121,20 @@ module Mongoid #:nodoc:
     # Iterate over each +Document+ in the results. This can take an optional
     # block to pass to each argument in the results.
     #
-    # Example:
+    # @example Iterate over the criteria results.
+    #   criteria.each { |doc| p doc }
     #
-    # <tt>criteria.each { |doc| p doc }</tt>
+    # @return [ Criteria ] The criteria itself.
     def each(&block)
       tap { context.iterate(&block) }
     end
 
-    # Return true if the criteria has some Document or not
+    # Return true if the criteria has some Document or not.
     #
-    # Example:
+    # @example Are there any documents for the criteria?
+    #   criteria.exists?
     #
-    # <tt>criteria.exists?</tt>
+    # @return [ true, false ] If documents match.
     def exists?
       context.count > 0
     end
@@ -141,15 +155,12 @@ module Mongoid #:nodoc:
 
     # Merges the supplied argument hash into a single criteria
     #
-    # Options:
+    # @example Fuse the criteria and the object.
+    #   criteria.fuse(:where => { :field => "value"}, :limit => 20)
     #
-    # criteria_conditions: Hash of criteria keys, and parameter values
+    # @param [ Hash ] criteria_conditions Criteria keys and values.
     #
-    # Example:
-    #
-    # <tt>criteria.fuse(:where => { :field => "value"}, :limit => 20)</tt>
-    #
-    # Returns <tt>self</tt>
+    # @return [ Criteria ] self.
     def fuse(criteria_conditions = {})
       criteria_conditions.inject(self) do |criteria, (key, value)|
         criteria.send(key, value)
@@ -159,10 +170,11 @@ module Mongoid #:nodoc:
     # Create the new +Criteria+ object. This will initialize the selector
     # and options hashes, as well as the type of criteria.
     #
-    # Options:
+    # @example Instantiate a new criteria.
+    #   Criteria.new(Model, true)
     #
-    # type: One of :all, :first:, or :last
-    # klass: The class to execute on.
+    # @param [ Class ] klass The model the criteria is for.
+    # @param [ true, false ] embedded Is the criteria for embedded docs.
     def initialize(klass, embedded = false)
       @selector = Criterion::Selector.new(klass)
       @options, @klass, @documents, @embedded = {}, klass, [], embedded
@@ -172,13 +184,15 @@ module Mongoid #:nodoc:
     # +Criteria+ or a +Hash+. This is used to combine multiple scopes together,
     # where a chained scope situation may be desired.
     #
-    # Options:
+    # @example Merge the criteria with a conditions hash.
+    #   criteria.merge({ :conditions => { :title => "Sir" } })
     #
-    # other: The +Criteria+ or +Hash+ to merge with.
+    # @example Merge the criteria with another criteria.
+    #   criteri.merge(other_criteria)
     #
-    # Example:
+    # @param [ Criteria, Hash ] other The other criterion to merge with.
     #
-    # <tt>criteria.merge({ :conditions => { :title => "Sir" } })</tt>
+    # @return [ Criteria ] A cloned self.
     def merge(other)
       clone.tap do |crit|
         if other.is_a?(Criteria)
@@ -193,36 +207,15 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Used for chaining +Criteria+ scopes together in the for of class methods
-    # on the +Document+ the criteria is for.
-    #
-    # Options:
-    #
-    # name: The name of the class method on the +Document+ to chain.
-    # args: The arguments passed to the method.
-    # block: Optional block to pass
-    #
-    # Returns: <tt>Criteria</tt>
-    def method_missing(name, *args, &block)
-      if @klass.respond_to?(name)
-        @klass.send(:with_scope, self) do
-          @klass.send(name, *args, &block)
-        end
-      else
-        return entries.send(name, *args)
-      end
-    end
-
     # Returns true if criteria responds to the given method.
     #
-    # Options:
+    # @example Does the criteria respond to the method?
+    #   crtiteria.respond_to?(:each)
     #
-    # name: The name of the class method on the +Document+.
-    # include_private: The arguments passed to the method.
+    # @param [ Symbol ] name The name of the class method on the +Document+.
+    # @param [ true, false ] include_private Whether to include privates.
     #
-    # Example:
-    #
-    # <tt>criteria.respond_to?(:batch_update)</tt>
+    # @return [ true, false ] If the criteria responds to the method.
     def respond_to?(name, include_private = false)
       # don't include klass private methods because method_missing won't call them
       super || @klass.respond_to?(name) || entries.respond_to?(name, include_private)
@@ -230,6 +223,11 @@ module Mongoid #:nodoc:
 
     # Returns the selector and options as a +Hash+ that would be passed to a
     # scope for use with named scopes.
+    #
+    # @example Get the criteria as a scoped hash.
+    #   criteria.scoped
+    #
+    # @return [ Hash ] The criteria as a scoped hash.
     def scoped
       scope_options = @options.dup
       sorting = scope_options.delete(:sort)
@@ -303,6 +301,13 @@ module Mongoid #:nodoc:
 
     # Return the entries of the other criteria or the object. Used for
     # comparing criteria or an enumerable.
+    #
+    # @example Get the comparable version.
+    #   criteria.comparable(other)
+    #
+    # @param [ Criteria ] other Another criteria.
+    #
+    # @return [ Array ] The array to compare with.
     def comparable(other)
       other.is_a?(Criteria) ? other.entries : other
     end
@@ -310,31 +315,41 @@ module Mongoid #:nodoc:
     # Clone or dup the current +Criteria+. This will return a new criteria with
     # the selector, options, klass, embedded options, etc intact.
     #
-    # Example:
+    # @example Clone a criteria.
+    #   criteria.clone
     #
-    # <tt>criteria.clone</tt>
-    # <tt>criteria.dup</tt>
+    # @example Dup a criteria.
+    #   criteria.dup
     #
-    # Options:
+    # @param [ Criteria ] other The criteria getting cloned.
     #
-    # other: The criteria getting cloned.
-    #
-    # Returns:
-    #
-    # A new identical criteria
+    # @return [ nil ] nil.
     def initialize_copy(other)
       @selector = other.selector.dup
       @options = other.options.dup
       @context = nil
     end
 
+    # Used for chaining +Criteria+ scopes together in the for of class methods
+    # on the +Document+ the criteria is for.
+    def method_missing(name, *args, &block)
+      if @klass.respond_to?(name)
+        @klass.send(:with_scope, self) do
+          @klass.send(name, *args, &block)
+        end
+      else
+        return entries.send(name, *args)
+      end
+    end
+
     # Update the selector setting the operator on the value for each key in the
     # supplied attributes +Hash+.
     #
-    # Example:
+    # @example Update the selector.
+    #   criteria.update_selector({ :field => "value" }, "$in")
     #
-    # <tt>criteria.update_selector({ :field => "value" }, "$in")</tt>
-    #
+    # @param [ Hash, Array ] attributes The values to convert and apply.
+    # @param [ String ] operator The MongoDB operator.
     # @param [ Symbol ] combine The operator to use when combining sets.
     def update_selector(attributes, operator, combine = :+)
       clone.tap do |crit|
