@@ -21,12 +21,12 @@ module Mongoid #:nodoc:
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            res &&= Strategies.matcher(document, key, value).matches?(value) 
+            res &&= Strategies.matcher(document, key, value).matches?(value)
             break unless res
           end
           return res if res
         end
-        return false 
+        return false
       end
     end
   end
