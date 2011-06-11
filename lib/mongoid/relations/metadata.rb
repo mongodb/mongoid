@@ -174,6 +174,7 @@ module Mongoid # :nodoc:
         "  key:                  #{key},\n" <<
         "  macro:                #{macro},\n" <<
         "  name:                 #{name},\n" <<
+        "  order:                #{order.inspect || "No"},\n" <<
         "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<
         "  relation:             #{relation},\n" <<
         "  setter:               #{setter}>\n"
@@ -357,6 +358,20 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def validate?
         self[:validate] != false
+      end
+
+
+      # Returns default order for this association.
+      #
+      # @example Get default order
+      #   metadata.order # => #<Mongoid::Criterion::Complex:0x00000102a8a450 @key=:rating, @operator="asc">
+      #
+      # @return [Mongoid::Criterion::Complex, nil] nil if doesn't set
+      #
+      # @since 2.0.3
+
+      def order
+        @order ||= self[:order]
       end
 
       private

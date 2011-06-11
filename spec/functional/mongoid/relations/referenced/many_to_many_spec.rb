@@ -1817,4 +1817,36 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  context "then association has order" do
+    let(:person) do
+      Person.create(:ssn => "999-99-9999")
+    end
+
+    let(:preference_one) do
+      Preference.create(:name => 'preference-1', :value => 10)
+    end
+
+    let(:preference_two) do
+      Preference.create(:name => 'preference-2', :value => 20)
+    end
+
+    let(:preference_three) do
+      Preference.create(:name => 'preference-3', :value => 20)
+    end
+
+    before do
+      person.preferences.nullify_all
+      person.preferences.push(preference_one, preference_two, preference_three)
+    end
+
+    it "order documents" do
+      person.preferences(true).should == [preference_two, preference_three, preference_one]
+    end
+
+    it "chaining order criterias" do
+      person.preferences.order_by(:name.desc).to_a.should == [preference_three, preference_two, preference_one]
+    end
+  end
+
 end

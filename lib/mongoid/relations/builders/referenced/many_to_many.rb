@@ -17,7 +17,11 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object.try(:dup) unless query?
             begin
-              metadata.klass.find(object)
+              if metadata.order
+                metadata.klass.order_by(metadata.order).find(object)
+              else
+                metadata.klass.find(object)
+              end
             rescue Errors::DocumentNotFound
               return []
             end

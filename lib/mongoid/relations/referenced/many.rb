@@ -354,7 +354,12 @@ module Mongoid #:nodoc:
         # @return [ Criteria ] A new criteria.
         def criteria
           raise_mixed if klass.embedded?
-          metadata.klass.where(metadata.foreign_key => convertable)
+          if metadata.order
+            metadata.klass.where(metadata.foreign_key => convertable)\
+                          .order_by(metadata.order)
+          else
+            metadata.klass.where(metadata.foreign_key => convertable)
+          end
         end
 
         # Tells if the target array been initialized.

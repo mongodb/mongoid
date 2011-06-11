@@ -83,7 +83,7 @@ class Person
   references_many \
     :posts,
     :dependent => :delete,
-    :default_order => :created_at.desc do
+    :order => :rating.desc do
     def extension
       "Testing"
     end
@@ -93,7 +93,8 @@ class Person
     :preferences,
     :index => true,
     :dependent => :nullify,
-    :autosave => true
+    :autosave => true,
+    :order => :value.desc
   references_and_referenced_in_many :user_accounts
   references_and_referenced_in_many :houses
 

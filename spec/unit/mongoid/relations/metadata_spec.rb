@@ -466,6 +466,7 @@ describe Mongoid::Relations::Metadata do
         "  key:                  #{metadata.key},\n" <<
         "  macro:                #{metadata.macro},\n" <<
         "  name:                 #{metadata.name},\n" <<
+        "  order:                #{metadata.order.inspect || "No"},\n" <<
         "  polymorphic:          #{metadata.polymorphic? ? "Yes" : "No"},\n" <<
         "  relation:             #{metadata.relation},\n" <<
         "  setter:               #{metadata.setter}>\n"
@@ -830,6 +831,17 @@ describe Mongoid::Relations::Metadata do
         end
       end
     end
+  end
+
+  context "#order" do
+    let(:metadata) do
+      described_class.new(:order => :raiting.asc)
+    end
+
+    it "returns order criteria" do
+      metadata.order.should == :raiting.asc
+    end
+
   end
 
   context "#klass" do
