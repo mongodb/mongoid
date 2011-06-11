@@ -16,28 +16,21 @@ module Mongoid #:nodoc:
       # Remove the document from the database: delegates to the MongoDB
       # collection remove method.
       #
-      # Example:
+      # @example Remove the document.
+      #   Remove.persist
       #
-      # <tt>Remove.persist</tt>
-      #
-      # Returns:
-      #
-      # +true+ if success, +false+ if not.
+      # @return [ true ] Always true.
       def persist
-        remove
-      end
-
-      protected
-      # Remove the document from the database.
-      def remove
-        if document.embedded?
-          Persistence::RemoveEmbedded.new(
-            document,
-            options.merge(:validate => validate, :suppress => suppress)
-          ).persist
-        else
-          collection.remove({ :_id => document.id }, options)
-        end; true
+        true.tap do
+          if document.embedded?
+            Persistence::RemoveEmbedded.new(
+              document,
+              options.merge(:validate => validate, :suppress => suppress)
+            ).persist
+          else
+            collection.remove({ :_id => document.id }, options)
+          end
+        end
       end
     end
   end

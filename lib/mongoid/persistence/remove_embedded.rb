@@ -18,30 +18,45 @@ module Mongoid #:nodoc:
       # then either an $unset or $set will occur, depending if it's an
       # embeds_one or embeds_many.
       #
-      # Example:
+      # @example Remove an embedded document.
+      #   RemoveEmbedded.persist
       #
-      # <tt>RemoveEmbedded.persist</tt>
-      #
-      # Returns:
-      #
-      # +true+ or +false+, depending on if the removal passed.
+      # @return [ true ] Always true.
       def persist
-        parent = document._parent
-        parent.remove_child(document) unless suppress?
-        unless parent.new_record?
-          update = { document._remover => removal_selector }
-          collection.update(parent._selector, update, options.merge(:multi => false))
-        end; true
+        true.tap do
+          parent = document._parent
+          parent.remove_child(document) unless suppress?
+          unless parent.new_record?
+            update = { document._remover => removal_selector }
+            collection.update(parent._selector, update, options.merge(:multi => false))
+          end
+        end
       end
 
       protected
+
       # Get the value to pass to the removal modifier.
+      #
+      # @example Get the setter.
+      #   command.setter
+      #
+      # @return [ BSON::ObjectId, true ] The id or true.
       def setter
         document._index ? document.id : true
       end
 
+      # Get the removal selector.
+      #
+      # @example Get the selector.
+      #   command.removal_selector
+      #
+      # @return [ Hash ] The removal selector.
       def removal_selector
-        document._index ? { document._pull => { "_id" => document.id } } : { document._path => setter }
+        if document._index
+          { document._pull => { "_id" => document.id } }
+        else
+          { document._path => setter }
+        end
       end
     end
   end
