@@ -8,7 +8,5 @@ describe Mongoid::Extensions::Hash::Scoping do
       { :where => { :active => true } }.scoped.should ==
         { :where => { :active => true } }
     end
-
   end
-
 end

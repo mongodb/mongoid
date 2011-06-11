@@ -2,7 +2,10 @@
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module String #:nodoc:
-      module Inflections #:nodoc:
+
+      # This module contains convenience methods for string inflection and
+      # conversion.
+      module Inflections
 
         ActiveSupport::Inflector.inflections do |inflect|
           inflect.singular("address", "address")
@@ -55,10 +58,22 @@ module Mongoid #:nodoc:
           "descending" => "ascending"
         }
 
+        # Convert the string to a collection friendly name.
+        #
+        # @example Collectionize the string.
+        #   "namespace/model".collectionize
+        #
+        # @return [ String ] The string in collection friendly form.
         def collectionize
           tableize.gsub("/", "_")
         end
 
+        # Convert this string to a key friendly string.
+        #
+        # @example Convert to key.
+        #   "testing".identify
+        #
+        # @return [ String ] The key friendly string.
         def identify
           if Mongoid.parameterize_keys
             key = ""
@@ -68,26 +83,32 @@ module Mongoid #:nodoc:
           end
         end
 
-        def labelize
-          underscore.humanize
-        end
-
+        # Get the inverted sorting option.
+        #
+        # @example Get the inverted option.
+        #   "asc".invert
+        #
+        # @return [ String ] The string inverted.
         def invert
           REVERSALS[self]
         end
 
-        def singular?
-          singularize == self
-        end
-
-        def plural?
-          pluralize == self
-        end
-
+        # Get the string as a getter string.
+        #
+        # @example Get the reader/getter
+        #   "model=".reader
+        #
+        # @return [ String ] The string stripped of "=".
         def reader
           writer? ? gsub("=", "") : self
         end
 
+        # Is this string a writer?
+        #
+        # @example Is the string a setter method?
+        #   "model=".writer?
+        #
+        # @return [ true, false ] If the string contains "=".
         def writer?
           include?("=")
         end
