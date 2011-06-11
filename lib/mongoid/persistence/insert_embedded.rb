@@ -18,25 +18,23 @@ module Mongoid #:nodoc:
       # new record, we will call save on the parent, otherwise we will $push
       # the document onto the parent.
       #
-      # Example:
+      # @example Insert an embedded document.
+      #   Insert.persist
       #
-      # <tt>Insert.persist</tt>
-      #
-      # Returns:
-      #
-      # The +Document+, whether the insert succeeded or not.
+      # @return [ Document ] The document to be inserted.
       def persist
         return document if validate && document.invalid?(:create)
-        parent = document._parent
-        if parent.new_record?
-          parent.insert
-        else
-          update = { document._inserter => { document._position => document.as_document } }
-          collection.update(parent._selector, update, options.merge(:multi => false))
-          document.new_record = false
-          document.move_changes
+        document.tap do |doc|
+          parent = doc._parent
+          if parent.new_record?
+            parent.insert
+          else
+            update = { doc._inserter => { doc._position => doc.as_document } }
+            collection.update(parent._selector, update, options.merge(:multi => false))
+            doc.new_record = false
+            doc.move_changes
+          end
         end
-        document
       end
     end
   end

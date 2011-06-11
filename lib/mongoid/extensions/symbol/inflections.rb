@@ -2,7 +2,10 @@
 module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Symbol #:nodoc:
-      module Inflections #:nodoc:
+
+      # This module contains convenience methods for symbol inflection and
+      # conversion.
+      module Inflections
 
         REVERSALS = {
           :asc => :desc,
@@ -11,21 +14,44 @@ module Mongoid #:nodoc:
           :descending => :ascending
         }
 
+        # Get the inverted sorting option.
+        #
+        # @example Get the inverted option.
+        #   :asc.invert
+        #
+        # @return [ String ] The string inverted.
         def invert
           REVERSALS[self]
         end
 
-        def singular?
-          to_s.singular?
-        end
-
-        def plural?
-          to_s.plural?
-        end
-
-        [ "asc", "ascending", "desc", "descending", "gt", "lt", "gte",
-          "lte", "ne", "near", "in", "nin", "mod", "all", "size", "exists",
-          "within", ["matches","elemMatch"] ].each do |oper|
+        # Define all the necessary methods on symbol to support Mongoid's
+        # complex criterion.
+        #
+        # @example A greater than criterion.
+        #   :field.gt => 5
+        #
+        # @return [ Criterion::Complex ] The criterion.
+        #
+        # @since 1.0.0
+        [
+          "all",
+          "asc",
+          "ascending",
+          "desc",
+          "descending",
+          "exists",
+          "gt",
+          "gte",
+          "in",
+          "lt",
+          "lte",
+          "mod",
+          "ne",
+          "near",
+          "nin",
+          "size",
+          "within",
+          ["matches","elemMatch"] ].each do |oper|
           m, oper = oper
           oper = m unless oper
           class_eval <<-OPERATORS

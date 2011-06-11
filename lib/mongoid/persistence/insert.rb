@@ -16,28 +16,33 @@ module Mongoid #:nodoc:
       # Insert the new document in the database. This delegates to the standard
       # MongoDB collection's insert command.
       #
-      # Example:
+      # @example Insert the document.
+      #   Insert.persist
       #
-      # <tt>Insert.persist</tt>
-      #
-      # Returns:
-      #
-      # The +Document+, whether the insert succeeded or not.
+      # @return [ Document ] The document to be inserted.
       def persist
         return document if validate && document.invalid?(:create)
-        document.run_callbacks(:save) do
-          document.run_callbacks(:create) do
-            if insert
-              document.new_record = false
-              document._children.each { |child| child.new_record = false }
-              document.move_changes
+        document.tap do |doc|
+          doc.run_callbacks(:save) do
+            doc.run_callbacks(:create) do
+              if insert
+                doc.new_record = false
+                doc._children.each { |child| child.new_record = false }
+                doc.move_changes
+              end
             end
           end
-        end; document
+        end
       end
 
       protected
+
       # Insert the document into the database.
+      #
+      # @example Insert the document.
+      #   insert.insert
+      #
+      # @return [ true, false ] If the insert succeeded.
       def insert
         if document.embedded?
           Persistence::InsertEmbedded.new(

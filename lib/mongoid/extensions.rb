@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/extensions/time_conversions"
 require "mongoid/extensions/array/conversions"
-require "mongoid/extensions/array/parentization"
 require "mongoid/extensions/set/conversions"
 require "mongoid/extensions/big_decimal/conversions"
 require "mongoid/extensions/binary/conversions"
@@ -30,7 +29,6 @@ require "mongoid/extensions/object_id/conversions"
 
 class Array #:nodoc
   include Mongoid::Extensions::Array::Conversions
-  include Mongoid::Extensions::Array::Parentization
 end
 
 class Set #:nodoc
