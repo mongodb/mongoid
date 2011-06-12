@@ -207,7 +207,7 @@ describe Mongoid::Fields do
       context "when option is provided" do
 
         it "calls the handler with the model" do
-          handler.expects(:call).with do |model|
+          handler.expects(:call).with do |model,_,_|
             model.should eql Person
           end
 

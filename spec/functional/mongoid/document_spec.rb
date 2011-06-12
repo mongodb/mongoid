@@ -705,7 +705,7 @@ describe Mongoid::Document do
          'My pidgeon`s birthday' => Date.new(1981, 2, 2) }.each do |title, date|
           event = Event.new(:title => title, :date => date)
           event.owner = @owner
-          event.save
+          event.save!
         end
       end
 
@@ -714,7 +714,7 @@ describe Mongoid::Document do
         @owner.events.each_day(Date.new(1981, 1, 2), Date.new(1981, 2, 2)) do |date, collection|
           rounds << {:date => date, :collection => collection}
         end
-        rounds
+        rounds.sort_by { |round| round[:date] }
       end
 
       it "should pass the block" do
@@ -730,7 +730,7 @@ describe Mongoid::Document do
          'My pidgeon`s birthday' => Date.new(1981, 2, 2) }.each do |title, date|
           birthday = Birthday.new(:title => title, :date => date)
           birthday.owner = @owner
-          birthday.save
+          birthday.save!
         end
       end
 
@@ -739,7 +739,7 @@ describe Mongoid::Document do
         @owner.birthdays.each_day(Date.new(1981, 1, 2), Date.new(1981, 2, 2)) do |date, collection|
           rounds << {:date => date, :collection => collection}
         end
-        rounds
+        rounds.sort_by { |round| round[:date] }
       end
 
       it "should pass the block" do
