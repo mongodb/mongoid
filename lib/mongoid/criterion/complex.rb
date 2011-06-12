@@ -22,6 +22,18 @@ module Mongoid #:nodoc:
         @key, @operator = opts[:key], opts[:operator]
       end
 
+      # Create a query from a given value
+      #
+      # @example Create query.
+      #   criterion.to_query(value)
+      #
+      # @param [ query ] query Query to pass to operator.
+      #
+      # @return [ Hash ] The combined operator and query.
+      def to_mongo_query(v)
+        {"$#{@operator}" => v}
+      end
+
       # Get the criterion as a hash.
       #
       # @example Get the criterion as a hash.
