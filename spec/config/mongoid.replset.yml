@@ -1,4 +1,4 @@
-defaults: &defaults
+test:
   hosts: [[localhost, 27017], [localhost, 27017]]
   read_secondary: true
   allow_dynamic_fields: false
@@ -9,9 +9,6 @@ defaults: &defaults
   persist_types: false
   option_no_exist: false
   skip_version_check: false
-
-test:
-  <<: *defaults
   database: mongoid_config_test
   databases:
     shard_replset:
@@ -20,7 +17,16 @@ test:
       reconnect_time: 5
 
 authenticated:
-  <<: *defaults
+  hosts: [[localhost, 27017], [localhost, 27017]]
+  read_secondary: true
+  allow_dynamic_fields: false
+  parameterize_keys: false
+  persist_in_safe_mode: false
+  raise_not_found_error: false
+  reconnect_time: 5
+  persist_types: false
+  option_no_exist: false
+  skip_version_check: false
   database: mongoid_config_authenticated_test
   username: mongoid
   password: test
