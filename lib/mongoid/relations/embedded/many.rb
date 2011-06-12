@@ -335,7 +335,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          metadata.klass.criteria(true).tap do |criterion|
+          klass.criteria(true).tap do |criterion|
             criterion.documents = target
           end
         end
@@ -352,7 +352,6 @@ module Mongoid # :nodoc:
         # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
           load!(:binding => true) and return super if target.respond_to?(name)
-          klass = metadata.klass
           klass.send(:with_scope, criteria) do
             criteria.send(name, *args, &block)
           end

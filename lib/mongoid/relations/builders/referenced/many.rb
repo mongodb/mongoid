@@ -17,12 +17,14 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             return [] if object.is_a?(Array)
-            key = metadata.foreign_key
-
             if metadata.order
-              metadata.klass.where(key => convertable(metadata, object)).order_by(metadata.order)
+              metadata.klass.where(
+                metadata.foreign_key => convertable(metadata, object)
+              ).order_by(metadata.order)
             else
-              metadata.klass.where(key => convertable(metadata, object))
+              metadata.klass.where(
+                metadata.foreign_key => convertable(metadata, object)
+              )
             end
           end
 

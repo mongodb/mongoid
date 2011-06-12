@@ -244,12 +244,11 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          if metadata.inverse
-            crt = metadata.klass.any_in(metadata.inverse_foreign_key => [ base.id ])
+          crt = if metadata.inverse
+            klass.any_in(metadata.inverse_foreign_key => [ base.id ])
           else
-            crt = metadata.klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
+            klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
           end
-
           crt.tap do |c|
             c.order_by(metadata.order) if metadata.order
           end

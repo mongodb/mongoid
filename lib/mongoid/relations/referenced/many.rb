@@ -137,7 +137,7 @@ module Mongoid #:nodoc:
           raise_mixed if klass.embedded?
           selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
-          metadata.klass.delete_all(
+          klass.delete_all(
             :conditions => criteria.selector.merge(selector)
           )
         end
@@ -158,7 +158,7 @@ module Mongoid #:nodoc:
           raise_mixed if klass.embedded?
           selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
-          metadata.klass.destroy_all(
+          klass.destroy_all(
             :conditions => criteria.selector.merge(selector)
           )
         end
@@ -322,7 +322,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.2, batch-relational-insert
         def collection
-          metadata.klass.collection
+          klass.collection
         end
 
         # Get the value for the foreign key in convertable or unconvertable
@@ -355,10 +355,9 @@ module Mongoid #:nodoc:
         def criteria
           raise_mixed if klass.embedded?
           if metadata.order
-            metadata.klass.where(metadata.foreign_key => convertable)\
-                          .order_by(metadata.order)
+            klass.where(metadata.foreign_key => convertable).order_by(metadata.order)
           else
-            metadata.klass.where(metadata.foreign_key => convertable)
+            klass.where(metadata.foreign_key => convertable)
           end
         end
 
@@ -403,7 +402,6 @@ module Mongoid #:nodoc:
         # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
           load!(:binding => true) and return super if [].respond_to?(name)
-          klass = metadata.klass
           klass.send(:with_scope, criteria) do
             criteria.send(name, *args, &block)
           end
