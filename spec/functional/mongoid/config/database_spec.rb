@@ -197,6 +197,23 @@ describe Mongoid::Config::Database do
           end
         end
       end
+
+      context "when arbitrary options are specified", :config => :user  do
+
+        let(:options) do
+          {
+            "host" => "localhost",
+            "port" => "27017",
+            "database" => "mongoid",
+            "connect" => false,
+            "booyaho" => "temptahoo",
+          }
+        end
+
+        it "connect=false doesn't connect Mongo::Connection" do
+          connection.should_not be_connected
+        end
+      end
     end
   end
 end
