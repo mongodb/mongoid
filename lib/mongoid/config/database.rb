@@ -6,6 +6,9 @@ module Mongoid #:nodoc:
     # database from options.
     class Database < Hash
 
+      # keys to remove from self to not pass through to Mongo::Connection
+      PRIVATE_OPTIONS = %w(uri database username password)
+
       # Configure the database connections. This will return an array
       # containing the master and an array of slaves.
       #
@@ -142,11 +145,12 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def optional(slave = false)
-        {
+        ({
           :pool_size => pool_size,
           :logger => Mongoid::Logger.new,
           :slave_ok => slave
-        }
+        }).merge(self).reject { |k,v| PRIVATE_OPTIONS.include? k }.
+          inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo} # mongo likes symbols
       end
 
       # Get a Mongo compliant URI for the database connection.
