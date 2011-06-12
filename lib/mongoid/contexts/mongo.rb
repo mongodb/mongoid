@@ -324,7 +324,7 @@ module Mongoid #:nodoc:
       # Filters the field list. If no fields have been supplied, then it will be
       # empty. If fields have been defined then _type will be included as well.
       #
-      # @exmaple Process the field list.
+      # @example Process the field list.
       #   context.process_options
       #
       # @return [ Hash ] The options.
