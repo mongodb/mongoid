@@ -36,15 +36,9 @@ RSpec.configure do |config|
   mongohq_configured = Support::MongoHQ.configured?
   warn(Support::MongoHQ.message) unless mongohq_configured
 
-  # Filter out the specs for the secondary database tests if the secondary
-  # master and slaves are not running.
-  multi_configured = Support::Multi.configured?
-  warn(Support::Multi.message) unless multi_configured
-
   config.filter_run_excluding(:config => lambda { |value|
     return true if value == :mongohq && !mongohq_configured
     return true if value == :user && !user_configured
-    return true if value == :multi && !multi_configured
   })
 
   # config.filter_run :focus => true

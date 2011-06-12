@@ -118,7 +118,7 @@ describe Mongoid::Config do
       end
     end
 
-    context "when configuring with multiple databases", :config => :multi do
+    context "when configuring with multiple databases" do
 
       let(:settings) do
         YAML.load(ERB.new(File.new(multi_config).read).result)

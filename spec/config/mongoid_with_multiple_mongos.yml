@@ -10,7 +10,6 @@ test:
     secondary:
       database: secondary_config_test
       host: localhost
-      port: 27020
       slaves:
         # - host: localhost
         #   port: 27021
