@@ -23,7 +23,7 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 * #974 Fix attribute_present? to work correctly then attribute value is false, thanks to @nickhoffman (Gregory Man)
 
-* #960 create indexes rake task is not recognizing a lot of mongoid models because it has problems guessing their model names from filenames (adyard)
+* #960 create indexes rake task is not recognizing a lot of mongoid models because it has problems guessing their model names from filenames (Tobias Schlottke)
 
 * #874 Deleting from a M-M reference is one-sided (nickhoffman, davekrupinski)
 
