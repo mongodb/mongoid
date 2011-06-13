@@ -3412,10 +3412,14 @@ describe Mongoid::NestedAttributes do
       end
 
       before do
-        pizza.update_attributes(params)
+        pizza.attributes = params
       end
 
+      it "sets nested object to be dirty" do
+        pizza.reload.toppings.first.should be_changed
+      end
       it "sets nested attributes" do
+        pizza.update
         pizza.reload.toppings.first.name.should == "Pepperoni"
       end
     end
