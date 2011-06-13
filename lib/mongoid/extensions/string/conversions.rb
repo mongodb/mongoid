@@ -22,28 +22,28 @@ module Mongoid #:nodoc:
           # Return the string.
           #
           # @example Return the string.
-          #   String.get("test")
+          #   String.try_bson("test")
           #
           # @param [ String ] value The string.
           #
           # @return [ String ] The string unmodified.
           #
           # @since 1.0.0
-          def get(value)
+          def try_bson(value)
             value
           end
 
           # Set the object as a mongo string.
           #
           # @example Cast the object.
-          #   String.set("testing")
+          #   String.from_bson("testing")
           #
           # @param [ Object ] value The object to cast.
           #
           # @return [ String ] The object to_s or nil.
           #
           # @since 1.0.0
-          def set(value)
+          def from_bson(value)
             value.to_s unless value.nil?
           end
         end

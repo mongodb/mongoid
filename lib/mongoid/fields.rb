@@ -150,7 +150,7 @@ module Mongoid #:nodoc
         generated_field_methods.module_eval do
           if field.cast_on_read?
             define_method(meth) do
-              field.get(read_attribute(name))
+              field.try_bson(read_attribute(name))
             end
           else
             define_method(meth) do

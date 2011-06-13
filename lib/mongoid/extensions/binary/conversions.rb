@@ -9,28 +9,28 @@ module Mongoid #:nodoc:
         # Get the value from the db hash.
         #
         # @example Get the value.
-        #   Binary.get(binary)
+        #   Binary.try_bson(binary)
         #
         # @param [ Binary ] value The binary.
         #
         # @return [ Binary ] The passed in value.
         #
         # @since 1.0.0
-        def get(value)
+        def try_bson(value)
           value
         end
 
         # Set the value in the db hash.
         #
         # @example Set the value.
-        #   Binary.set(binary)
+        #   Binary.from_bson(binary)
         #
         # @param [ Binary ] value The binary.
         #
         # @return [ Binary ] The passed in value.
         #
         # @since 1.0.0
-        def set(value)
+        def from_bson(value)
           value
         end
       end

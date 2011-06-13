@@ -24,7 +24,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def build(name, object, metadata, options = {})
         relation = create_relation(object, metadata)
-        set(name, relation).tap do |relation|
+        from_bson(name, relation).tap do |relation|
           relation.load!(options) if relation && options[:eager]
         end
       end
@@ -78,7 +78,7 @@ module Mongoid # :nodoc:
       # provided name. Used as a helper just for code cleanliness.
       #
       # @example Set the proxy on the document.
-      #   person.set(:addresses, addresses)
+      #   person.from_bson(:addresses, addresses)
       #
       # @param [ String, Symbol ] name The name of the relation.
       # @param [ Proxy ] relation The relation to set.
@@ -86,7 +86,7 @@ module Mongoid # :nodoc:
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def set(name, relation)
+      def from_bson(name, relation)
         instance_variable_set("@#{name}", relation)
       end
 
@@ -101,7 +101,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0
       def substitute(name, object, options)
-        set(name, ivar(name).substitute(object, options))
+        from_bson(name, ivar(name).substitute(object, options))
       end
 
       module ClassMethods #:nodoc:

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Complex do
 
-  let(:complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "$gt") }
+  let(:complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "gt") }
 
   describe "#initialize" do
 
@@ -11,12 +11,24 @@ describe Mongoid::Criterion::Complex do
     end
 
     it "sets the operator" do
-      complex.operator.should == "$gt"
+      complex.operator.should == "gt"
+    end
+  end
+
+  context "when creating query" do
+    let(:test_query) { 10 }
+
+    it "operator should be present" do
+      complex.to_mongo_query(test_query).keys.first.should == "$#{complex.operator}"
+    end
+
+    it "should have correct query" do
+      complex.to_mongo_query(test_query)["$#{complex.operator}"].should == test_query
     end
   end
 
   context "when comparing equivalent objects" do
-    let(:equivalent_complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "$gt") }
+    let(:equivalent_complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "gt") }
 
     it "is identifiable as equal" do
       complex.should == equivalent_complex
@@ -28,7 +40,7 @@ describe Mongoid::Criterion::Complex do
   end
 
   context "when comparing different objects" do
-    let(:different_complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "$lt") }
+    let(:different_complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "lt") }
 
     it "is identifiable as different" do
       complex.should_not == different_complex

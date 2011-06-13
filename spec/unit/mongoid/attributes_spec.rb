@@ -786,7 +786,7 @@ describe Mongoid::Attributes do
       before { person.stubs(:fields).returns({"age" => Integer}) }
 
       it "retuns the typed value" do
-        person.fields["age"].expects(:set).with("51")
+        person.fields["age"].expects(:from_bson).with("51")
         person.send(:typed_value_for, "age", "51")
       end
 

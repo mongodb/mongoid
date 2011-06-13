@@ -2,26 +2,26 @@ require "spec_helper"
 
 describe Mongoid::Extensions::String::Conversions do
 
-  describe ".get" do
+  describe ".try_bson" do
 
     it "returns the string" do
-      String.get("test").should == "test"
+      String.try_bson("test").should == "test"
     end
   end
 
-  describe ".set" do
+  describe ".from_bson" do
 
     context "when the value is not nil" do
 
       it "returns the object to_s" do
-        String.set(1).should == "1"
+        String.from_bson(1).should == "1"
       end
     end
 
     context "when the value is nil" do
 
       it "returns nil" do
-        String.set(nil).should be_nil
+        String.from_bson(nil).should be_nil
       end
     end
   end

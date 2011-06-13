@@ -9,13 +9,13 @@ describe Mongoid::Extensions::BigDecimal::Conversions do
   describe "#get" do
 
     it "converts the string to a big decimal" do
-      BigDecimal.get("123456.789").should == number
+      BigDecimal.try_bson("123456.789").should == number
     end
 
     context "when nil" do
 
       it "returns nil" do
-        BigDecimal.get(nil).should be_nil
+        BigDecimal.try_bson(nil).should be_nil
       end
     end
   end
@@ -23,13 +23,13 @@ describe Mongoid::Extensions::BigDecimal::Conversions do
   describe "#set" do
 
     it "converts the big decimal to a string" do
-      BigDecimal.set(number).should == "123456.789"
+      BigDecimal.from_bson(number).should == "123456.789"
     end
 
     context "when nil" do
 
       it "returns nil" do
-        BigDecimal.set(nil).should be_nil
+        BigDecimal.from_bson(nil).should be_nil
       end
     end
   end

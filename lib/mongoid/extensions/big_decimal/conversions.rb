@@ -11,28 +11,28 @@ module Mongoid #:nodoc:
         # Get the string as a +BigDecimal+.
         #
         # @example Get the cast value.
-        #   BigDecimal.get("2.223123414")
+        #   BigDecimal.try_bson("2.223123414")
         #
         # @param [ String ] value The string to convert.
         #
         # @return [ BigDecimal, nil ] The cast value or nil.
         #
         # @since 1.0.0
-        def get(value)
+        def try_bson(value)
           value ? ::BigDecimal.new(value) : value
         end
 
         # Set the value in the hash as a string.
         #
         # @example Set the value.
-        #   BigDecimal.set(decimal)
+        #   BigDecimal.from_bson(decimal)
         #
         # @param [ BigDecimal ] value The number to stringify.
         #
         # @return [ String, nil ] The value as a string or nil.
         #
         # @since 1.0.0
-        def set(value)
+        def from_bson(value)
           value ? value.to_s : value
         end
       end

@@ -9,14 +9,14 @@ describe Mongoid::Extensions::Binary::Conversions do
   describe "#get" do
 
     it "returns self" do
-      Binary.get(bin).should == bin
+      Binary.try_bson(bin).should == bin
     end
   end
 
   describe "#set" do
 
     it "returns self" do
-      Binary.set(bin).should == bin
+      Binary.from_bson(bin).should == bin
     end
   end
 end

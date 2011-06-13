@@ -24,28 +24,28 @@ module Mongoid #:nodoc:
           # Convert the hash to a range.
           #
           # @example Convert the hash.
-          #   Range.get({ "min" => 1, "max" => 10 })
+          #   Range.try_bson({ "min" => 1, "max" => 10 })
           #
           # @param [ Hash ] value The hash to convert.
           #
           # @return [ Range, nil ] The converted range.
           #
           # @since 2.0.0
-          def get(value)
+          def try_bson(value)
             value.nil? ? nil : ::Range.new(value["min"], value["max"])
           end
 
           # Convert the range to a hash.
           #
           # @example Convert the range.
-          #   Range.set(1..3)
+          #   Range.from_bson(1..3)
           #
           # @param [ Range ] value The range to convert.
           #
           # @return [ Hash ] The range as a hash.
           #
           # @since 2.0.0
-          def set(value)
+          def from_bson(value)
             value.nil? ? nil : value.to_hash
           end
         end

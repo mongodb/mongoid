@@ -347,14 +347,14 @@ describe Mongoid::Extensions::ObjectId::Conversions do
     end
   end
 
-  describe ".get" do
+  describe ".try_bson" do
 
     it "returns self" do
-      BSON::ObjectId.get(object_id).should == object_id
+      BSON::ObjectId.try_bson(object_id).should == object_id
     end
   end
 
-  describe ".set" do
+  describe ".from_bson" do
 
     let(:object_id_string) do
       "4c52c439931a90ab29000003"
@@ -363,14 +363,14 @@ describe Mongoid::Extensions::ObjectId::Conversions do
     context "with a blank string" do
 
       it "returns nil" do
-        BSON::ObjectId.set("").should be_nil
+        BSON::ObjectId.from_bson("").should be_nil
       end
     end
 
     context "with a populated string" do
 
       it "returns an object id" do
-        BSON::ObjectId.set(object_id_string).should ==
+        BSON::ObjectId.from_bson(object_id_string).should ==
           BSON::ObjectId.from_string(object_id_string)
       end
     end
@@ -378,7 +378,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
     context "with an object id" do
 
       it "returns self" do
-        BSON::ObjectId.set(object_id).should == object_id
+        BSON::ObjectId.from_bson(object_id).should == object_id
       end
     end
   end

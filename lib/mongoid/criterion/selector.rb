@@ -100,7 +100,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def typecast_value_for(field, value)
-        return field.set(value) if field.type === value
+        return field.from_bson(value) if field.type === value
         case value
         when Hash
           value = value.dup
@@ -112,7 +112,7 @@ module Mongoid #:nodoc:
         when Regexp
           value
         else
-          field.type == Array ? value.class.set(value) : field.set(value)
+          field.type == Array ? value.class.from_bson(value) : field.from_bson(value)
         end
       end
 
@@ -131,9 +131,9 @@ module Mongoid #:nodoc:
       def typecast_hash_value(field, key, value)
         case key
         when "$exists"
-          Boolean.set(value)
+          Boolean.from_bson(value)
         when "$size"
-          Integer.set(value)
+          Integer.from_bson(value)
         else
           typecast_value_for(field, value)
         end

@@ -13,14 +13,14 @@ module Mongoid #:nodoc:
           # itself.
           #
           # @example Get the object.
-          #   Object.get("testing")
+          #   Object.try_bson("testing")
           #
           # @param [ Object ] value The value to convert.
           #
           # @return [ Object, Document ] The converted object.
           #
           # @since 1.0.0
-          def get(value)
+          def try_bson(value)
             if value && respond_to?(:instantiate)
               instantiate(value)
             else
@@ -31,14 +31,14 @@ module Mongoid #:nodoc:
           # Cast the object for storage.
           #
           # @example Convert the object to a storable state.
-          #   Object.set(Person.new)
+          #   Object.from_bson(Person.new)
           #
           # @param [ Object, Document ] value The object to convert.
           #
           # @return [ Object, Hash ] The object converted.
           #
           # @since 1.0.0
-          def set(value)
+          def from_bson(value)
             value.respond_to?(:attributes) ? value.attributes : value
           end
         end
