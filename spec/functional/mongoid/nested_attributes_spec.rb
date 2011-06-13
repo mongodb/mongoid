@@ -3370,19 +3370,19 @@ describe Mongoid::NestedAttributes do
         end
       end
     end
-    context "when the relation 'has_one'" do
 
+    context "when the relation 'has_one'" do
       let(:pizza) do
         Pizza.create
       end
 
-      let!(:topping) do
-        pizza.create_topping(:name => "Sausage")
+      let!(:crust) do
+        pizza.create_crust(:type => "Thin")
       end
 
       let(:params) do
-        { :topping_attributes =>
-          { :name => "Pepperoni" }
+        { :crust_attributes =>
+          { :type => "Thick" }
         }
       end
 
@@ -3391,7 +3391,32 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets nested attributes" do
-        pizza.reload.topping.name.should == "Pepperoni"
+        pizza.reload.crust.type.should == "Thick"
+      end
+    end
+    
+    context "when the relation 'has_many'" do
+
+      let(:pizza) do
+        Pizza.create
+      end
+
+      let!(:crust) do
+        pizza.toppings.create(:name => "Sausage")
+      end
+
+      let(:params) do
+        { :toppings_attributes =>
+          { "0" => {:name => "Pepperoni"} }
+        }
+      end
+
+      before do
+        pizza.update_attributes(params)
+      end
+
+      it "sets nested attributes" do
+        pizza.reload.toppings.first.name.should == "Pepperoni"
       end
     end
   end
