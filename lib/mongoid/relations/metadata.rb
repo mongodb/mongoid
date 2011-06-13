@@ -368,8 +368,7 @@ module Mongoid # :nodoc:
       #
       # @return [Mongoid::Criterion::Complex, nil] nil if doesn't set
       #
-      # @since 2.0.3
-
+      # @since 2.1.0
       def order
         @order ||= self[:order]
       end

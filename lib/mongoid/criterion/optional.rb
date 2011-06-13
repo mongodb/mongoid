@@ -200,7 +200,7 @@ module Mongoid #:nodoc:
       # @param [ Array<Array> ] Existing options
       # @param [ Array ] New option for merge.
       #
-      # @since 2.0.3
+      # @since 2.1.0
       def merge_options(options, new_option)
         old_option = options.assoc(new_option.first)
 

@@ -281,7 +281,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Module, nil ] The extension or nil.
         #
-        # @since 2.0.3
+        # @since 2.1.0
         def create_extension_module(name, &block)
           if block
             extension_module_name = "#{self.to_s.demodulize}#{name.to_s.camelize}RelationExtension"
