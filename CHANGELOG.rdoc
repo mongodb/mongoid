@@ -12,16 +12,29 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 === New Features
 
 * #587 Added order preference to many and many to many associations (Gregory Man)
+
 * Added ability to chain order_by statements (Gregory Man)
+
 * #961 Allow arbitrary Mongo::Connection options to pass through Mongoid::Config::Database object. (Morgan Nelson)
+
 * Enable autosave for many to many references. (Dave Krupinski)
 
 === Bug Fixes
 
 * #974 Fix attribute_present? to work correctly then attribute value is false, thanks to @nickhoffman (Gregory Man)
+
 * #960 create indexes rake task is not recognizing a lot of mongoid models because it has problems guessing their model names from filenames (adyard)
+
 * #874 Deleting from a M-M reference is one-sided (nickhoffman, davekrupinski)
+
 * Replace deprecated class_inheritable_hash dropped in Rails 3.1+ (Konstantin Shabanov)
+
 * Fix inconsistent state when replacing an entire many to many relation
+
 * Don't clobber inheritable attributes when adding subclass field inheritance (Dave Krupinski)
+
 * #914 Querying embedded documents with '$or' selector (Max Golovnia)
+
+* #514 Fix marshaling of documents with relation extensions (Chris Griego)
+
+  Metadata#extension now returns a Module, instead of a Proc, when an extension is defined.

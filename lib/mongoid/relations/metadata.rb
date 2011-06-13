@@ -72,12 +72,12 @@ module Mongoid # :nodoc:
         @embedded ||= (macro == :embeds_one || macro == :embeds_many)
       end
 
-      # Returns the extension of the relation. This can be a proc or module.
+      # Returns the extension of the relation.
       #
       # @example Get the relation extension.
       #   metadata.extension
       #
-      # @return [ Proc ] The extension or nil.
+      # @return [ Module ] The extension or nil.
       #
       # @since 2.0.0.rc.1
       def extension
