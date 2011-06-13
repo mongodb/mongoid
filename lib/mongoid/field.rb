@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def default
-      copy.respond_to?(:call) ? copy : set(copy)
+      copy.respond_to?(:call) ? copy : from_bson(copy)
     end
 
     # Create the new field with a name and optional additional options.
@@ -97,19 +97,19 @@ module Mongoid #:nodoc:
     # cast.
     #
     # @example Get the setter value.
-    #   field.set("New Value")
+    #   field.from_bson("New Value")
     #
     # @param [ Object ] object The value to cast to a database value.
     #
     # @return [ Object ] The typecast value.
     #
     # @since 1.0.0
-    def set(object)
+    def from_bson(object)
       unless options[:identity]
-        type.set(object)
+        type.from_bson(object)
       else
         if object.blank?
-          type.set(object) if object.is_a?(Array)
+          type.from_bson(object) if object.is_a?(Array)
         else
           options[:metadata].constraint.convert(object)
         end
@@ -119,15 +119,15 @@ module Mongoid #:nodoc:
     # Used for retrieving the object out of the attributes hash.
     #
     # @example Get the value.
-    #   field.get("Value")
+    #   field.try_bson("Value")
     #
     # @param [ Object ] The object to cast from the database.
     #
     # @return [ Object ] The converted value.
     #
     # @since 1.0.0
-    def get(object)
-      type.get(object)
+    def try_bson(object)
+      type.try_bson(object)
     end
 
     protected

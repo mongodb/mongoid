@@ -72,7 +72,7 @@ describe Mongoid::Field do
     end
 
     it "returns the typed value" do
-      field.expects(:set).with(0)
+      field.expects(:from_bson).with(0)
       field.default
     end
 
@@ -128,7 +128,7 @@ describe Mongoid::Field do
           end
 
           it "performs conversion on the ids if strings" do
-            field.set([object_id.to_s]).should == [object_id]
+            field.from_bson([object_id.to_s]).should == [object_id]
           end
         end
 
@@ -147,7 +147,7 @@ describe Mongoid::Field do
           end
 
           it "does not convert" do
-            field.set([object_id.to_s]).should == [object_id.to_s]
+            field.from_bson([object_id.to_s]).should == [object_id.to_s]
           end
         end
       end
@@ -243,14 +243,14 @@ describe Mongoid::Field do
     context "nil is provided" do
 
       it "returns the default value" do
-        field.set(nil).should == nil
+        field.from_bson(nil).should == nil
       end
     end
 
     context "value is provided" do
 
       it "sets the value" do
-        field.set("30").should == 30
+        field.from_bson("30").should == 30
       end
     end
   end
@@ -266,7 +266,7 @@ describe Mongoid::Field do
     end
 
     it "returns the value" do
-      field.get(30).should == 30
+      field.try_bson(30).should == 30
     end
   end
 

@@ -27,14 +27,14 @@ module Mongoid #:nodoc:
           # Set the boolean from the passed in value.
           #
           # @example Set the boolean.
-          #   Boolean.set("1")
+          #   Boolean.from_bson("1")
           #
           # @param [ String, Integer, true, false ] value The value to cast.
           #
           # @return [ true, false ] The boolean.
           #
           # @since 1.0.0
-          def set(value)
+          def from_bson(value)
             value = BOOLEAN_MAP[value]
             value.nil? ? nil : value
           end
@@ -42,14 +42,14 @@ module Mongoid #:nodoc:
           # Get the boolean value.
           #
           # @example Get the value.
-          #   Boolean.get(true)
+          #   Boolean.try_bson(true)
           #
           # @param [ true, false ] value The value.
           #
           # @return [ true, false ] The passed in value.
           #
           # @since 1.0.0
-          def get(value)
+          def try_bson(value)
             value
           end
         end

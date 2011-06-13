@@ -9,28 +9,28 @@ module Mongoid #:nodoc:
         # Get the value.
         #
         # @example Get the float value.
-        #   Float.get(1.0222)
+        #   Float.try_bson(1.0222)
         #
         # @param [ Float ] value The float.
         #
         # @return [ Float ] The passed in value.
         #
         # @since 1.0.0
-        def get(value)
+        def try_bson(value)
           value
         end
 
         # Cast the value to a float.
         #
         # @example Cast the value.
-        #   Float.set("1.02")
+        #   Float.from_bson("1.02")
         #
         # @param [ String, Float ] value The value to cast.
         #
         # @return [ Float ] The converted value.
         #
         # @since 1.0.0
-        def set(value)
+        def from_bson(value)
           return nil if value.blank?
           begin
             Float(value)

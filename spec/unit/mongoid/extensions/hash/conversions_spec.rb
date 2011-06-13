@@ -2,18 +2,18 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Hash::Conversions do
 
-  describe ".get" do
+  describe ".try_bson" do
 
     it "returns the hash" do
-      Hash.get({ :field => "test" }).should == { :field => "test" }
+      Hash.try_bson({ :field => "test" }).should == { :field => "test" }
     end
 
   end
 
-  describe ".set" do
+  describe ".from_bson" do
 
     it "returns the hash" do
-      Hash.set({ :field => "test" }).should == { :field => "test" }
+      Hash.from_bson({ :field => "test" }).should == { :field => "test" }
     end
   end
 end

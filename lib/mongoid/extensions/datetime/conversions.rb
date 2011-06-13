@@ -9,14 +9,14 @@ module Mongoid #:nodoc:
         # Get the value as a datetime.
         #
         # @example Cast to a datetime.
-        #   DateTime.get(value)
+        #   DateTime.try_bson(value)
         #
         # @param [ Date, Time ] value The value to convert.
         #
         # @return [ DateTime ] The converted date.
         #
         # @since 1.0.0
-        def get(value)
+        def try_bson(value)
           super.try(:to_datetime)
         end
       end

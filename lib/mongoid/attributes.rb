@@ -179,7 +179,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].set(value) : value
+      fields.has_key?(key) ? fields[key].from_bson(value) : value
     end
   end
 end

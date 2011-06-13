@@ -11,22 +11,22 @@ describe Mongoid::Extensions::Object::Conversions do
     context "when the value is a mongoid document" do
 
       it "instantiates a new class from the attributes" do
-        Person.get(attributes).should == Person.instantiate(attributes)
+        Person.try_bson(attributes).should == Person.instantiate(attributes)
       end
     end
 
     context "when the value is a primitive type" do
 
       it "it returns the value" do
-        Object.get(12).should == 12
-        Object.get(13.04).should == 13.04
+        Object.try_bson(12).should == 12
+        Object.try_bson(13.04).should == 13.04
       end
     end
 
     context "when the value is nil" do
 
       it "returns nil" do
-        Person.get(nil).should be_nil
+        Person.try_bson(nil).should be_nil
       end
     end
   end
@@ -51,7 +51,7 @@ describe Mongoid::Extensions::Object::Conversions do
       end
 
       it "converts the object to a hash" do
-        Quiz.set(quiz).except("_id").should == attributes.except("_id")
+        Quiz.from_bson(quiz).except("_id").should == attributes.except("_id")
       end
     end
   end

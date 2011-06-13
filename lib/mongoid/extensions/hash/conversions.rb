@@ -12,28 +12,28 @@ module Mongoid #:nodoc:
           # Returns the hash value.
           #
           # @example Cast the hash.
-          #   Hash.get({})
+          #   Hash.try_bson({})
           #
           # @param [ Hash ] value The hash.
           #
           # @return [ Hash ] The provided hash.
           #
           # @since 1.0.0
-          def get(value)
+          def try_bson(value)
             value
           end
 
           # Returns the hash value.
           #
           # @example Cast the hash.
-          #   Hash.set({})
+          #   Hash.from_bson({})
           #
           # @param [ Hash ] value The hash.
           #
           # @return [ Hash ] The provided hash.
           #
           # @since 1.0.0
-          def set(value)
+          def from_bson(value)
             value
           end
         end

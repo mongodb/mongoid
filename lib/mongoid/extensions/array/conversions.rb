@@ -28,8 +28,8 @@ module Mongoid #:nodoc:
             end
             value
           end
-          alias :get :raise_or_return
-          alias :set :raise_or_return
+          alias :try_bson :raise_or_return
+          alias :from_bson :raise_or_return
         end
       end
     end

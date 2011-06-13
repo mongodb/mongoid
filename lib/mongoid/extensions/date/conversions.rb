@@ -9,14 +9,14 @@ module Mongoid #:nodoc:
         # Get the value as a date.
         #
         # @example Get the value as a date.
-        #   Date.get(value)
+        #   Date.try_bson(value)
         #
         # @param [ Time ] value The time to convert.
         #
         # @return [ Time ] The time as a date.
         #
         # @since 1.0.0
-        def get(value)
+        def try_bson(value)
           return nil if value.blank?
           if Mongoid::Config.use_utc?
             value.to_date

@@ -2,26 +2,26 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Range::Conversions do
 
-  describe ".get" do
+  describe ".try_bson" do
 
     it "returns the range" do
-      Range.get({"min" => 1, "max" => 3}).should == (1..3)
+      Range.try_bson({"min" => 1, "max" => 3}).should == (1..3)
     end
   end
 
-  describe ".set" do
+  describe ".from_bson" do
 
     context "when the value is not nil" do
 
       it "returns the object to_hash" do
-        Range.set(1..3).should == {"min" => 1, "max" => 3}
+        Range.from_bson(1..3).should == {"min" => 1, "max" => 3}
       end
     end
 
     context "when the value is nil" do
 
       it "returns nil" do
-        Range.set(nil).should be_nil
+        Range.from_bson(nil).should be_nil
       end
     end
   end

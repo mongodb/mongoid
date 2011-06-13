@@ -12,28 +12,28 @@ module Mongoid #:nodoc:
           # Gets the symbol.
           #
           # @example Get the symbol.
-          #   Symbol.get(:test)
+          #   Symbol.try_bson(:test)
           #
           # @param [ Symbol ] value The symbol.
           #
           # @return [ Symbol ] The symbol untouched.
           #
           # @since 1.0.0
-          def get(value)
+          def try_bson(value)
             value
           end
 
           # Convert the object to a symbol.
           #
           # @example Convert the object.
-          #   Symbol.set("test")
+          #   Symbol.from_bson("test")
           #
           # @param [ String ] value The string to convert.
           #
           # @return [ Symbol ] The converted symbol.
           #
           # @since 1.0.0
-          def set(value)
+          def from_bson(value)
             (value.nil? or (value.respond_to?(:empty?) && value.empty?)) ? nil : value.to_sym
           end
         end

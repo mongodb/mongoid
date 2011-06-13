@@ -8,14 +8,14 @@ module Mongoid #:nodoc:
       # Get the provided value as a time.
       #
       # @example Get the value as a time.
-      #   Time.get(Date.today)
+      #   Time.try_bson(Date.today)
       #
       # @param [ Object ] value The time-like object to convert.
       #
       # @return [ Time ] The converted time.
       #
       # @since 1.0.0
-      def get(value)
+      def try_bson(value)
         return nil if value.blank?
         value = value.getlocal unless Mongoid::Config.use_utc?
         if Mongoid::Config.use_activesupport_time_zone?
@@ -28,14 +28,14 @@ module Mongoid #:nodoc:
       # Convert the provided object to a UTC time to store in the database.
       #
       # @example Set the time.
-      #   Time.set(Date.today)
+      #   Time.from_bson(Date.today)
       #
       # @param [ String, Date, DateTime, Array ] value The object to cast.
       #
       # @return [ Time ] The object as a UTC time.
       #
       # @since 1.0.0
-      def set(value)
+      def from_bson(value)
         return nil if value.blank?
         time = convert_to_time(value)
         strip_milliseconds(time).utc
