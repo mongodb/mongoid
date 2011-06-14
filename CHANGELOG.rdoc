@@ -1,0 +1,42 @@
+= Overview
+
+For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
+
+== 2.1.0 (unreleased)
+
+=== Major Changes
+
+* Traditional slave support has been removed from Mongoid.
+  Replica sets should be used in place of traditional master and slave setups.
+
+=== New Features
+
+* #587 Added order preference to many and many to many associations (Gregory Man)
+
+* Added ability to chain order_by statements (Gregory Man)
+
+* #961 Allow arbitrary Mongo::Connection options to pass through Mongoid::Config::Database object. (Morgan Nelson)
+
+* Enable autosave for many to many references. (Dave Krupinski)
+
+=== Bug Fixes
+
+* #974 Fix attribute_present? to work correctly then attribute value is false, thanks to @nickhoffman (Gregory Man)
+
+* #960 create indexes rake task is not recognizing a lot of mongoid models because it has problems guessing their model names from filenames (Tobias Schlottke)
+
+* #874 Deleting from a M-M reference is one-sided (nickhoffman, davekrupinski)
+
+* Replace deprecated class_inheritable_hash dropped in Rails 3.1+ (Konstantin Shabanov)
+
+* Fix inconsistent state when replacing an entire many to many relation
+
+* Don't clobber inheritable attributes when adding subclass field inheritance (Dave Krupinski)
+
+* #914 Querying embedded documents with '$or' selector (Max Golovnia)
+
+* #514 Fix marshaling of documents with relation extensions (Chris Griego)
+
+  Metadata#extension now returns a Module, instead of a Proc, when an extension is defined.
+
+* #837 When allow_dynamic_fields is set to false and loading an embedded document with an unrecognized field, an exception is raised.

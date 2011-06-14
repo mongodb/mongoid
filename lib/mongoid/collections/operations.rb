@@ -2,6 +2,7 @@
 module Mongoid #:nodoc:
   module Collections #:nodoc:
     module Operations #:nodoc:
+
       # Constant definining all the read operations available for a
       # Mongo:Collection. This is used in delegation.
       READ = [

@@ -277,7 +277,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     context "when the relation is not polymorphic" do
 
-      context "when the parent is a new record" do
+      context "when the parent and relation are new records" do
 
         let(:person) do
           Person.new
@@ -309,6 +309,63 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "does not save the target" do
           preference.should be_new
+        end
+      end
+
+
+      context "when the parent is new but the relation exists" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let!(:preference) do
+          Preference.create
+        end
+
+        before do
+          person.preferences = [ preference ]
+        end
+
+        it "sets the relation" do
+          person.preferences.should == [ preference ]
+        end
+
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should == [ preference.id ]
+        end
+
+        it "sets the foreign key on the inverse relation" do
+          preference.person_ids.should == [ person.id ]
+        end
+
+        it "sets the base on the inverse relation" do
+          preference.people.first.should == person
+        end
+
+        context "and the parent is persisted" do
+
+          before do
+            person.save!
+            preference.reload
+          end
+
+          it "maintains the relation" do
+            person.preferences.should == [ preference ]
+          end
+
+          it "maintains the foreign key on the relation" do
+            person.preference_ids.should == [ preference.id ]
+          end
+
+          it "maintains the foreign key on the inverse relation" do
+            preference.person_ids.should == [ person.id ]
+          end
+
+          it "maintains the base on the inverse relation" do
+            preference.people.first.should == person
+          end
+
         end
       end
 
@@ -346,23 +403,77 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           preference.should be_persisted
         end
 
-        context 'when overwriting an existing relation' do
-          let(:another_preference) { Preference.new }
+        it "should persist the relation" do
+          person.reload.preferences == [ preference ]
+        end
+
+        context "when overwriting an existing relation" do
+
+          let(:another_preference) do
+            Preference.new
+          end
 
           before do
             person.preferences = [ another_preference ]
           end
 
-          it 'sets the relation' do
+          it "sets the relation" do
             person.preferences.should == [ another_preference ]
           end
 
-          it 'saves the target' do
+          it "saves the target" do
             another_preference.should be_persisted
           end
 
-          it 'does not leave foreign keys of the previous relation' do
+          it "does not leave foreign keys of the previous relation" do
             person.preference_ids.should == [ another_preference.id ]
+          end
+
+          it "clears its own key on the foreign relation" do
+            preference.person_ids.should == []
+          end
+
+          context "and person reloaded instead of saved" do
+
+            before do
+              person.reload
+              preference.reload
+              another_preference.reload
+            end
+
+            it "persists the relation between person and another_preference" do
+              person.preferences.should == [ another_preference ]
+            end
+
+            it "persists the relation between another_prefrence and person" do
+              another_preference.people.should == [ person ]
+            end
+
+            it "no longer has any relation between preference and person" do
+              preference.people.should == []
+            end
+          end
+
+          context "and person is saved" do
+
+            before do
+              person.save
+              person.reload
+              preference.reload
+              another_preference.reload
+            end
+
+            it "should have persisted the relation between person and another_preference" do
+              person.preferences.should == [ another_preference ]
+            end
+
+            it "should have persisited the relation between another_prefrence and person" do
+              another_preference.people.should == [ person ]
+            end
+
+            it "should no longer have any relation between preference and person" do
+              preference.people.should == [ ]
+            end
           end
         end
       end
@@ -904,11 +1015,28 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "removes the inverse reference" do
-        deleted.people.should be_empty
+        deleted.reload.people.should be_empty
       end
 
       it "removes the base id from the inverse keys" do
-        deleted.person_ids.should be_empty
+        deleted.reload.person_ids.should be_empty
+      end
+
+      context "and person and preferences are reloaded without a save" do
+
+        before do
+          person.reload
+          preference_one.reload
+          preference_two.reload
+        end
+
+        it "should revert to have a relation to both preferences " do
+          person.preferences.should == [ preference_one, preference_two ]
+        end
+
+        it "should retain the ids for both preferences" do
+          person.preference_ids.should == [ preference_one.id, preference_two.id ]
+        end
       end
     end
 
@@ -1689,4 +1817,36 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  context "then association has order" do
+    let(:person) do
+      Person.create(:ssn => "999-99-9999")
+    end
+
+    let(:preference_one) do
+      Preference.create(:name => 'preference-1', :value => 10)
+    end
+
+    let(:preference_two) do
+      Preference.create(:name => 'preference-2', :value => 20)
+    end
+
+    let(:preference_three) do
+      Preference.create(:name => 'preference-3', :value => 20)
+    end
+
+    before do
+      person.preferences.nullify_all
+      person.preferences.push(preference_one, preference_two, preference_three)
+    end
+
+    it "order documents" do
+      person.preferences(true).should == [preference_two, preference_three, preference_one]
+    end
+
+    it "chaining order criterias" do
+      person.preferences.order_by(:name.desc).to_a.should == [preference_three, preference_two, preference_one]
+    end
+  end
+
 end

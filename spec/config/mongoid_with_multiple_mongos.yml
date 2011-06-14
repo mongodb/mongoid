@@ -1,20 +1,20 @@
-defaults: &defaults
+test:
+  database: mongoid_config_test
   host: localhost
   slaves:
-    - host: localhost
-      port: 27018
-    - host: localhost
-      port: 27019
+    # - host: localhost
+    #   port: 27018
+    # - host: localhost
+    #   port: 27019
   databases:
     secondary:
       database: secondary_config_test
       host: localhost
-      port: 27020
       slaves:
-        - host: localhost
-          port: 27021
-        - host: localhost
-          port: 27022
+        # - host: localhost
+        #   port: 27021
+        # - host: localhost
+        #   port: 27022
   allow_dynamic_fields: false
   parameterize_keys: false
   persist_in_safe_mode: false
@@ -23,7 +23,3 @@ defaults: &defaults
   persist_types: false
   option_no_exist: false
   skip_version_check: false
-
-test:
-  <<: *defaults
-  database: mongoid_config_test

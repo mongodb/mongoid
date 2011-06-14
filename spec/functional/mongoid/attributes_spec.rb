@@ -34,8 +34,38 @@ describe Mongoid::Attributes do
       Person.create
     end
 
+    after do
+      Person.delete_all
+    end
+
     it "does not override the default" do
       person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
+    end
+  end
+
+  context "when dynamic fields are not allowed" do
+
+    before do
+      Mongoid.configure.allow_dynamic_fields = false
+    end
+
+    after do
+      Mongoid.configure.allow_dynamic_fields = true
+    end
+
+    context "and an embedded document has been persisted with a field that is no longer recognized" do
+
+      before do
+        Person.collection.insert 'pet' => { 'unrecognized_field' => true }
+      end
+
+      after do
+        Person.delete_all
+      end
+
+      it "allows access to the legacy data" do
+        Person.first.pet.read_attribute(:unrecognized_field).should == true
+      end
     end
   end
 end

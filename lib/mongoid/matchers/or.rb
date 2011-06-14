@@ -17,11 +17,14 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.7
       def matches?(conditions)
         conditions.each do |condition|
-          key = condition.keys.first
-          value = condition.values.first
-          if Strategies.matcher(document, key, value).matches?(value)
-            return true
+          res = true
+          condition.keys.each do |k|
+            key = k
+            value = condition[k]
+            res &&= Strategies.matcher(document, key, value).matches?(value)
+            break unless res
           end
+          return res if res
         end
         return false
       end

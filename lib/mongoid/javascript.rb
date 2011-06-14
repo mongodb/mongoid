@@ -7,9 +7,8 @@ module Mongoid #:nodoc:
     # Load the javascript functions and define a class method for each one,
     # that memoizes the value.
     #
-    # Example:
-    #
-    # <tt>Mongoid::Javascript.aggregate</tt>
+    # @example Get the function.
+    #   Mongoid::Javascript.aggregate
     YAML.load(File.read(FUNCTIONS)).each_pair do |key, function|
       (class << self; self; end).class_eval <<-EOT
         def #{key}

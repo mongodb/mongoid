@@ -65,7 +65,7 @@ namespace :db do
       Dir.glob("app/models/**/*.rb").sort.each do |file|
         model_path = file[0..-4].split('/')[2..-1]
         begin
-          klass = model_path.map(&:classify).join('::').constantize
+          klass = model_path.map(&:camelize).join('::').constantize
           if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
             documents << klass
           end

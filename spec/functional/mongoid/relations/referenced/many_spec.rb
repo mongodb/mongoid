@@ -2241,4 +2241,36 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
   end
+
+  context "then association has order" do
+    let(:person) do
+      Person.create(:ssn => "999-99-9999")
+    end
+
+    let(:post_one) do
+      Post.create(:rating => 10, :title => '1')
+    end
+
+    let(:post_two) do
+      Post.create(:rating => 20, :title => '2')
+    end
+
+    let(:post_three) do
+      Post.create(:rating => 20, :title => '3')
+    end
+
+
+    before do
+      person.posts.nullify_all
+      person.posts.push(post_one, post_two, post_three)
+    end
+
+    it "order documents" do
+      person.posts(true).should == [post_two, post_three, post_one]
+    end
+
+    it "chaining order criterias" do
+      person.posts.order_by(:title.desc).to_a.should == [post_three, post_two, post_one]
+    end
+  end
 end

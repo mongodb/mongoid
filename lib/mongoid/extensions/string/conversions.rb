@@ -7,23 +7,42 @@ module Mongoid #:nodoc:
 
         # Convert the string to an array with the string in it.
         #
-        # Example:
+        # @example Convert the string to an array.
+        #   "Testing".to_a
         #
-        # <tt>"Testing".to_a</tt>
+        # @return [ Array ] An array with only the string in it.
         #
-        # Returns:
-        #
-        # An array with only the string in it.
+        # @since 1.0.0
         def to_a
           [ self ]
         end
 
         module ClassMethods #:nodoc:
 
+          # Return the string.
+          #
+          # @example Return the string.
+          #   String.get("test")
+          #
+          # @param [ String ] value The string.
+          #
+          # @return [ String ] The string unmodified.
+          #
+          # @since 1.0.0
           def get(value)
             value
           end
 
+          # Set the object as a mongo string.
+          #
+          # @example Cast the object.
+          #   String.set("testing")
+          #
+          # @param [ Object ] value The object to cast.
+          #
+          # @return [ String ] The object to_s or nil.
+          #
+          # @since 1.0.0
           def set(value)
             value.to_s unless value.nil?
           end

@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
       class_option :versioning, :type => :boolean, :default => false, :desc => "Enable mongoid versioning"
 
       def create_model_file
-        template "model.rb", File.join("app/models", class_path, "#{file_name}.rb")
+        template "model.rb.tt", File.join("app/models", class_path, "#{file_name}.rb")
       end
 
       hook_for :test_framework

@@ -5,7 +5,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
   describe "#build" do
 
     let(:metadata) do
-      stub(
+      stub_everything(
         :klass => Post,
         :name => :posts,
         :foreign_key => "person_id",
@@ -37,6 +37,41 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       it "sets the documents" do
+        @documents.should == [ post ]
+      end
+    end
+
+    context "when order specified" do
+      let(:metadata) do
+        stub_everything(
+          :klass => Post,
+          :name => :posts,
+          :foreign_key => "person_id",
+          :inverse_klass => Person,
+          :order => :rating.asc
+        )
+      end
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:object) do
+        object_id
+      end
+
+      let(:post) do
+        stub
+      end
+
+      before do
+        criteria = stub
+        criteria.expects(:order_by).returns([ post ])
+        Post.expects(:where).returns(criteria)
+        @documents = builder.build
+      end
+
+      it "ordered by specified filed" do
         @documents.should == [ post ]
       end
     end

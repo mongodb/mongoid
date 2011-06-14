@@ -1,12 +1,6 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
-# We use merge keys in our test config files, which Psych dislikes,
-# so forcing Syck YAML Parser for now
-require "yaml"
-
-YAML::ENGINE.yamler = 'syck'
-
 MODELS = File.join(File.dirname(__FILE__), "models")
 SUPPORT = File.join(File.dirname(__FILE__), "support")
 $LOAD_PATH.unshift(MODELS)
@@ -32,11 +26,6 @@ RSpec.configure do |config|
 
   config.after(:suite) { Mongoid.purge! }
 
-  # We need to filter out the specs that hit the slave databases if 2 slaves
-  # are not confiured and running locally.
-  slaves_configured = Support::Slaves.configured?
-  warn(Support::Slaves.message) unless slaves_configured
-
   # We filter out the specs that require authentication if the database has not
   # had the mongoid user set up properly.
   user_configured = Support::Authentication.configured?
@@ -47,16 +36,9 @@ RSpec.configure do |config|
   mongohq_configured = Support::MongoHQ.configured?
   warn(Support::MongoHQ.message) unless mongohq_configured
 
-  # Filter out the specs for the secondary database tests if the secondary
-  # master and slaves are not running.
-  multi_configured = Support::Multi.configured?
-  warn(Support::Multi.message) unless multi_configured
-
   config.filter_run_excluding(:config => lambda { |value|
     return true if value == :mongohq && !mongohq_configured
-    return true if value == :slaves && !slaves_configured
     return true if value == :user && !user_configured
-    return true if value == :multi && !multi_configured
   })
 
   # config.filter_run :focus => true

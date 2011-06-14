@@ -6,9 +6,8 @@ module Mongoid #:nodoc
     # by attempting to set an object on the db that is not a +Mongo::DB+, or
     # not setting anything at all.
     #
-    # Example:
-    #
-    # <tt>InvalidDatabase.new("Not a DB")</tt>
+    # @example Create the error.
+    #   InvalidDatabase.new("Not a DB")
     class InvalidDatabase < MongoidError
       def initialize(database)
         super(

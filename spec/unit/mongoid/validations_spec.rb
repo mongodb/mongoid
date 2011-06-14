@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Validations do
 
-  before(:all) do
-    Person.logger = nil
-  end
-
   let(:klass) { MixedDrink }
 
   describe "#read_attribute_for_validation" do

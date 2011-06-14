@@ -68,22 +68,6 @@ describe Mongoid::Collections do
     end
   end
 
-  describe ".logger=" do
-
-    before do
-      @logger = stub.quacks_like(Logger.allocate)
-      Person.logger = @logger
-    end
-
-    after do
-      Person.logger = nil
-    end
-
-    it "sets the logger on the connection" do
-      Person.db.connection.logger.should == @logger
-    end
-  end
-
   describe ".store_in" do
 
     context "on a parent class" do

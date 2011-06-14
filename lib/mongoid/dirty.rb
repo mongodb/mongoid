@@ -5,45 +5,43 @@ module Mongoid #:nodoc:
 
     # Gets the changes for a specific field.
     #
-    # Example:
-    #
+    # @example Get an attribute change.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.attribute_change("title") # [ "Sir", "Madam" ]
     #
-    # Returns:
+    # @param [ String ] name The attribute to check.
     #
-    # An +Array+ containing the old and new values.
+    # @return [ Array ] The old and new values.
     def attribute_change(name)
       modifications[name]
     end
 
     # Determines if a specific field has chaged.
     #
-    # Example:
-    #
+    # @example Has an attribute changed?
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.attribute_changed?("title") # true
     #
-    # Returns:
+    # @param [ String ] name The attribute to check.
     #
-    # +true+ if changed, +false+ if not.
+    # @return [ true, false ] If the attribute has changed.
     def attribute_changed?(name)
       modifications.include?(name)
     end
 
     # Gets the old value for a specific field.
     #
-    # Example:
+    # @example
     #
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.attribute_was("title") # "Sir"
     #
-    # Returns:
+    # @param [ String ] name The attribute to check.
     #
-    # The old field value.
+    # @return [ Object ] The old field value.
     def attribute_was(name)
       change = modifications[name]
       change ? change[0] : attributes[name]
@@ -51,30 +49,24 @@ module Mongoid #:nodoc:
 
     # Gets the names of all the fields that have changed in the document.
     #
-    # Example:
-    #
+    # @example Get the changed names.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.changed # returns [ "title" ]
     #
-    # Returns:
-    #
-    # An +Array+ of changed field names.
+    # @return [ Array ] The changed field names.
     def changed
       modifications.keys
     end
 
     # Alerts to whether the document has been modified or not.
     #
-    # Example:
-    #
+    # @example Has the document been modified?
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.changed? # returns true
     #
-    # Returns:
-    #
-    # +true+ if changed, +false+ if not.
+    # @return [ true, false ] If the document is changed.
     def changed?
       !modifications.empty?
     end
@@ -83,24 +75,20 @@ module Mongoid #:nodoc:
     # with the keys being the names of the fields, and the values being an
     # +Array+ with the old value and new value.
     #
-    # Example:
-    #
+    # @example Get all the changes.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.changes # returns { "title" => [ "Sir", "Madam" ] }
     #
-    # Returns:
-    #
-    # A +Hash+ of changes.
+    # @return [ Hash ] All changes to the document.
     def changes
       modifications
     end
 
     # Call this method after save, so the changes can be properly switched.
     #
-    # Example:
-    #
-    # <tt>person.move_changes</tt>
+    # @example Move the changes to previous.
+    #   person.move_changes
     def move_changes
       @validated = false
       @previous_modifications = modifications.dup
@@ -110,15 +98,12 @@ module Mongoid #:nodoc:
     # Gets all the new values for each of the changed fields, to be passed to
     # a MongoDB $set modifier.
     #
-    # Example:
-    #
+    # @example Get the setters for the atomic updates.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.setters # returns { "title" => "Madam" }
     #
-    # Returns:
-    #
-    # A +Hash+ of new values.
+    # @return [ Hash ] A +Hash+ of atomic setters.
     def setters
       modifications.inject({}) do |sets, (field, changes)|
         key = embedded? ? "#{_position}.#{field}" : field
@@ -129,32 +114,28 @@ module Mongoid #:nodoc:
     # Gets all the modifications that have happened to the object before the
     # object was saved.
     #
-    # Example:
-    #
+    # @example Get the changes from the last update.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.save!
     #   person.previous_changes # returns { "title" => [ "Sir", "Madam" ] }
     #
-    # Returns:
-    #
-    # A +Hash+ of changes before save.
+    # @return [ Hash ] The changes before the last save.
     def previous_changes
       @previous_modifications
     end
 
     # Resets a changed field back to its old value.
     #
-    # Example:
-    #
+    # @example Reset the field value.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.reset_attribute!("title")
     #   person.title # "Sir"
     #
-    # Returns:
+    # @param [ String ] name The name of the attribute.
     #
-    # The old field value.
+    # @return [ Object ] The old field value.
     def reset_attribute!(name)
       value = attribute_was(name)
       value ? attributes[name] = value : attributes.delete(name)
@@ -164,9 +145,8 @@ module Mongoid #:nodoc:
     # Sets up the modifications hash. This occurs just after the document is
     # instantiated.
     #
-    # Example:
-    #
-    # <tt>document.setup_notifications</tt>
+    # @example Init the modifications hashes.
+    #   document.setup_notifications
     def setup_modifications
       @accessed ||= {}
       @modifications ||= {}
@@ -176,9 +156,8 @@ module Mongoid #:nodoc:
     # Reset all modifications for the document. This will wipe all the marked
     # changes, but not reset the values.
     #
-    # Example:
-    #
-    # <tt>document.reset_modifications</tt>
+    # @example Reset all modifications.
+    #   document.reset_modifications
     def reset_modifications
       @accessed = {}
       @modifications = {}
@@ -188,9 +167,13 @@ module Mongoid #:nodoc:
 
     # Audit the original value for a field that can be modified in place.
     #
-    # Example:
+    # @example Set a value as being accessed.
+    #   person.accessed("aliases", [ "007" ])
     #
-    # <tt>person.accessed("aliases", [ "007" ])</tt>
+    # @param [ String ] name The name of the field.
+    # @param [ Object ] value The new value.
+    #
+    # @return [ Object ] The new value.
     def accessed(name, value)
       return value unless value.is_a?(Enumerable)
       @accessed ||= {}
@@ -200,13 +183,10 @@ module Mongoid #:nodoc:
 
     # Get all normal modifications plus in place potential changes.
     #
-    # Example:
+    # @example Get all the modiciations.
+    #   person.modifications
     #
-    # <tt>person.modifications</tt>
-    #
-    # Returns:
-    #
-    # All changes to the document.
+    # @return [ Hash ] All changes to the document.
     def modifications
       reset_modifications unless @modifications && @accessed
       @accessed.each_pair do |field, value|
@@ -219,9 +199,12 @@ module Mongoid #:nodoc:
 
     # Audit the change of a field's value.
     #
-    # Example:
+    # @example Modify a field.
+    #   person.modify("name", "Jack", "John")
     #
-    # <tt>person.modify("name", "Jack", "John")</tt>
+    # @param [ String ] name The name of the field.
+    # @param [ Object ] old_value The old value.
+    # @param [ Object ] new_value The new value.
     def modify(name, old_value, new_value)
       attributes[name] = new_value
       if @modifications && (old_value != new_value)
@@ -231,22 +214,39 @@ module Mongoid #:nodoc:
     end
 
     module ClassMethods #:nodoc:
+
       # Add the dynamic dirty methods. These are custom methods defined on a
       # field by field basis that wrap the dirty attribute methods.
       #
-      # Example:
-      #
+      # @example Create the extra dirty methods.
       #   person = Person.new(:title => "Sir")
       #   person.title = "Madam"
       #   person.title_change # [ "Sir", "Madam" ]
       #   person.title_changed? # true
       #   person.title_was # "Sir"
       #   person.reset_title!
+      #
+      # @param [ String ] name The name of the attributes.
       def add_dirty_methods(name)
-        define_method("#{name}_change") { attribute_change(name) } unless instance_methods.include?("#{name}_change") || instance_methods.include?(:"#{name}_change") 
-        define_method("#{name}_changed?") { attribute_changed?(name) } unless instance_methods.include?("#{name}_changed?") || instance_methods.include?(:"#{name}_changed?")
-        define_method("#{name}_was") { attribute_was(name) } unless instance_methods.include?("#{name}_was") || instance_methods.include?(:"#{name}_was")
-        define_method("reset_#{name}!") { reset_attribute!(name) } unless instance_methods.include?("reset_#{name}!") || instance_methods.include?(:"reset_#{name}!")
+        unless instance_methods.include?("#{name}_change") ||
+          instance_methods.include?(:"#{name}_change")
+          define_method("#{name}_change") { attribute_change(name) }
+        end
+
+        unless instance_methods.include?("#{name}_changed?") ||
+          instance_methods.include?(:"#{name}_changed?")
+          define_method("#{name}_changed?") { attribute_changed?(name) }
+        end
+
+        unless instance_methods.include?("#{name}_was") ||
+          instance_methods.include?(:"#{name}_was")
+          define_method("#{name}_was") { attribute_was(name) }
+        end
+
+        unless instance_methods.include?("reset_#{name}!") ||
+          instance_methods.include?(:"reset_#{name}!")
+          define_method("reset_#{name}!") { reset_attribute!(name) }
+        end
       end
     end
   end

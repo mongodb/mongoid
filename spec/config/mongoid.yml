@@ -1,4 +1,5 @@
-defaults: &defaults
+test:
+  database: mongoid_config_test
   host: localhost
   slaves:
     # - host: localhost
@@ -15,7 +16,3 @@ defaults: &defaults
   persist_types: false
   option_no_exist: false
   skip_version_check: false
-
-test:
-  <<: *defaults
-  database: mongoid_config_test

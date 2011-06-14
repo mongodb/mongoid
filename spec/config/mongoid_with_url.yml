@@ -1,9 +1,6 @@
-defaults: &defaults
+development:
   uri: "mongodb://localhost/sushi"
 
-development:
-  <<: *defaults
-
 test:
-  <<: *defaults
+  uri: "mongodb://localhost/sushi"
   database: sushi_test

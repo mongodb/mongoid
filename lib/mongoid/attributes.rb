@@ -22,7 +22,8 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def attribute_present?(name)
-      !read_attribute(name).blank?
+      attribute = read_attribute(name)
+      ! attribute.blank? || attribute == false
     end
 
     # Read a value from the document attributes. If the value does not exist

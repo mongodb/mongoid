@@ -5,9 +5,8 @@ module Mongoid #:nodoc
     # This error is raised when trying to create a field that conflicts with
     # a Mongoid internal attribute or method.
     #
-    # Example:
-    #
-    # <tt>InvalidField.new('collection')</tt>
+    # @example Create the error.
+    #   InvalidField.new('collection')
     class InvalidField < MongoidError
       def initialize(name)
         super(

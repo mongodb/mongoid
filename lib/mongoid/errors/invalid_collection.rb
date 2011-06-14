@@ -5,9 +5,8 @@ module Mongoid #:nodoc
     # This error is raised when trying to access a Mongo::Collection from an
     # embedded document.
     #
-    # Example:
-    #
-    # <tt>InvalidCollection.new(Address)</tt>
+    # @example Create the error.
+    #   InvalidCollection.new(Address)
     class InvalidCollection < MongoidError
       def initialize(klass)
         super(

@@ -97,7 +97,7 @@ module Mongoid # :nodoc:
       #
       # @param [ String ] name The name of the relation.
       # @param [ Document ] object The document to replace with.
-      # @options [ Hash ] options The options.
+      # @param [ Hash ] options The options.
       #
       # @since 2.0.0
       def substitute(name, object, options)

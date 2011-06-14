@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
+
     # Persistence commands extend from this class to get basic functionality on
     # initialization.
     class Command
@@ -17,15 +18,13 @@ module Mongoid #:nodoc:
 
       # Initialize the persistence +Command+.
       #
-      # Options:
+      # @example Delete all documents.
+      #   DeleteAll.new(Person, { :validate => true }, {})
       #
-      # document_or_class: The +Document+ or +Class+ to get the collection.
-      # options: Options like validation or safe mode.
-      # selector: Optional selector to use in query.
-      #
-      # Example:
-      #
-      # <tt>DeleteAll.new(Person, { :validate => true }, {})</tt>
+      # @param [ Document, Class ] document_or_class Where to get the
+      #   collection.
+      # @param [ Hash ] options The options to pass to the db.
+      # @param [ Hash ] selector Optional selector to use in query.
       def initialize(document_or_class, options = {}, selector = {})
         init(document_or_class)
         validate = options[:validate]
@@ -40,13 +39,10 @@ module Mongoid #:nodoc:
       # Setup the proper instance variables based on if the supplied argument
       # was a document object or a class object.
       #
-      # Example:
+      # @example Init the command.
+      #   command.init(document_or_class)
       #
-      # <tt>init(document_or_class)</tt>
-      #
-      # Options:
-      #
-      # document_or_class: A document or a class.
+      # @param [ Document, Class ] document_or_class A document or a class.
       def init(document_or_class)
         if document_or_class.is_a?(Mongoid::Document)
           @document = document_or_class

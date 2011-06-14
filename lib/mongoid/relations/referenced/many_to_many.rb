@@ -96,7 +96,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document, options = {})
           target.delete(document).tap do |doc|
-            binding.unbind_one(doc, default_options.merge!(options)) if doc
+            if doc
+              binding.unbind_one(doc, default_options.merge!(options))
+            end
           end
         end
 
@@ -193,6 +195,7 @@ module Mongoid # :nodoc:
             else
               relation.target = unbind(options)
             end
+            base.save if base.persisted? && !options[:binding]
           end
         end
 
@@ -241,10 +244,13 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          if metadata.inverse
-            metadata.klass.any_in(metadata.inverse_foreign_key => [ base.id ])
+          crt = if metadata.inverse
+            klass.any_in(metadata.inverse_foreign_key => [ base.id ])
           else
-            metadata.klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
+            klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
+          end
+          crt.tap do |c|
+            c.order_by(metadata.order) if metadata.order
           end
         end
 

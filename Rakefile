@@ -2,7 +2,7 @@ require "bundler"
 Bundler.setup
 
 require "rake"
-require "rake/rdoctask"
+require "rdoc/task"
 require "rspec"
 require "rspec/core/rake_task"
 
@@ -41,10 +41,11 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
-Rake::RDocTask.new do |rdoc|
+RDoc::Task.new do |rdoc|
   rdoc.rdoc_dir = "rdoc"
   rdoc.title = "mongoid #{Mongoid::VERSION}"
   rdoc.rdoc_files.include("README*")
+  rdoc.rdoc_files.include("CHANGELOG*")
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 

@@ -683,6 +683,40 @@ describe Mongoid::Attributes do
         end
       end
     end
+
+    context "when the value is boolean" do
+      let(:person) do
+        Person.new
+      end
+
+      context "when attribute does not exist" do
+        context "when the value is true" do
+
+          it "return true"  do
+            person.terms = false
+            person.attribute_present?(:terms).should be_true
+          end
+        end
+
+        context "when the value is false" do
+          it "return true"  do
+            person.terms = false
+            person.attribute_present?(:terms).should be_true
+          end
+        end
+      end
+    end
+
+    context "when the value is blank string" do
+      let(:person) do
+        Person.new(:title => '')
+      end
+
+      it "return false" do
+        person.attribute_present?(:title).should be_false
+      end
+
+    end
   end
 
   describe "#remove_attribute" do

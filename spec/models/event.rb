@@ -9,7 +9,7 @@ class Event
     :inverse_of => :administrated_events,
     :dependent => :nullify
   referenced_in :owner
-  
+
   def self.each_day(start_date, end_date)
     groups = only(:date).asc(:date).where(:date.gte => start_date, :date.lte => end_date).group
     groups.each do |hash|
