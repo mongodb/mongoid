@@ -78,4 +78,3 @@ module Mongoid #:nodoc:
     end
   end
 end
-

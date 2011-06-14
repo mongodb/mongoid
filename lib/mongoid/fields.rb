@@ -5,6 +5,7 @@ require "mongoid/fields/custom/array"
 require "mongoid/fields/custom/big_decimal"
 require "mongoid/fields/custom/boolean"
 require "mongoid/fields/custom/date"
+require "mongoid/fields/custom/date_time"
 
 module Mongoid #:nodoc
 
