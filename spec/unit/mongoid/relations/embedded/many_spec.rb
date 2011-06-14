@@ -719,4 +719,14 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  describe "respond_to?" do
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    it "supports 'include_private = boolean'" do
+      expect { relation.respond_to?(:Rational, true) }.not_to raise_error
+    end
+  end
 end
