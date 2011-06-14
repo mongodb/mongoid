@@ -3371,58 +3371,86 @@ describe Mongoid::NestedAttributes do
       end
     end
 
-    context "when the relation 'has_one'" do
+    context "with 'has_one' association" do
       let(:pizza) do
         Pizza.create
       end
 
-      let!(:crust) do
-        pizza.create_crust(:type => "Thin")
+      context "that is valid" do
+        let!(:crust) do
+          pizza.create_crust(:type => "Thin")
+        end
+        let(:params) do
+          { :crust_attributes =>
+            { :type => "Thick" }
+          }
+        end
+        before do
+          pizza.update_attributes(params)
+        end
+        it "should set nested object to a dirty state" do
+          pizza.crust.should be_type_changed
+        end
+        it "should update nested attributes" do
+          pizza.reload.crust.type.should == "Thick"
+        end
       end
 
-      let(:params) do
-        { :crust_attributes =>
-          { :type => "Thick" }
-        }
+      context "that is invalid" do
+        Crust.validates_presence_of :type
+        let!(:crust) do
+          pizza.create_crust
+        end
+        it "should set nested object to be invalid" do
+          crust.should_not be_valid
+        end
+        it "should add error to nested object" do
+          crust.errors[:name].should be_present
+        end
       end
-
-      before do
-        pizza.update_attributes(params)
-      end
-      it "sets nested object to be dirty" do
-        pizza.crust.should be_type_changed
-      end
-      it "sets nested attributes" do
-        pizza.reload.crust.type.should == "Thick"
-      end
+      
     end
     
-    context "when the relation 'has_many'" do
+    context "with 'has_many' association" do
 
       let(:pizza) do
         Pizza.create
       end
+      
+      context "that is valid" do
+        let!(:topping) do
+          pizza.toppings.create(:name => "Sausage")
+        end
 
-      let!(:topping) do
-        pizza.toppings.create(:name => "Sausage")
-      end
+        let(:params) do
+          { :toppings_attributes =>
+            { "0" => {:name => "Pepperoni", :id => topping.id.to_s} }
+          }
+        end
 
-      let(:params) do
-        { :toppings_attributes =>
-          { "0" => {:name => "Pepperoni", :id => topping.id.to_s} }
-        }
-      end
+        before do
+          pizza.attributes = params
+        end
 
-      before do
-        pizza.attributes = params
+        it "should set nested object to be dirty" do
+          pizza.toppings.first.should be_name_changed
+        end
+        it "should update nested attributes" do
+          pizza.update
+          pizza.reload.toppings.first.name.should == "Pepperoni"
+        end
       end
-
-      it "sets nested object to be dirty" do
-        pizza.toppings.first.should be_name_changed
-      end
-      it "sets nested attributes" do
-        pizza.update
-        pizza.reload.toppings.first.name.should == "Pepperoni"
+      context "that is invalid" do
+        Topping.validates_presence_of :name
+        let!(:topping) do
+          pizza.toppings.create(:name => "Sausage")
+        end
+        it "should set nested object to be invalid" do
+          topping.should_not be_valid
+        end
+        it "should add error to nested object" do
+          topping.errors[:name].should be_present
+        end
       end
     end
   end
