@@ -17,6 +17,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def default
+          return nil unless default_value
           default_value.respond_to?(:call) ? default_value.call : default_value.dup
         end
 

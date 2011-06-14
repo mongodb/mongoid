@@ -28,7 +28,11 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def default
-        default_value.respond_to?(:call) ? default_value.call : default_value
+        if default_value.respond_to?(:call)
+          serialize(default_value.call)
+        else
+          serialize(default_value)
+        end
       end
 
       # Deserialize this field from the type stored in MongoDB to the type
@@ -76,6 +80,18 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def serialize(object); object; end
       alias :set :serialize
+
+      # Get the type of this field - inferred from the class name.
+      #
+      # @example Get the type.
+      #   field.type
+      #
+      # @return [ Class ] The name of the class.
+      #
+      # @since 2.1.0
+      def type
+        @type ||= options[:type] || Object
+      end
 
       class << self
 
@@ -129,18 +145,6 @@ module Mongoid #:nodoc:
         if !default_value.nil? && !default_value.is_a?(type)
           raise Mongoid::Errors::InvalidType.new(type, default_value)
         end
-      end
-
-      # Get the type of this field - inferred from the class name.
-      #
-      # @example Get the type.
-      #   field.type
-      #
-      # @return [ Class ] The name of the class.
-      #
-      # @since 2.1.0
-      def type
-        @type ||= options[:type] || Object
       end
     end
   end

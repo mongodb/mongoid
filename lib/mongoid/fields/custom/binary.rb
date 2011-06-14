@@ -2,10 +2,9 @@
 module Mongoid #:nodoc:
   module Fields #:nodoc:
     module Custom #:nodoc:
-      # Defines the behaviour for date fields.
-      class Time
+      # Defines the behaviour for binary fields.
+      class Binary
         include Definable
-        include Timekeeping
       end
     end
   end
