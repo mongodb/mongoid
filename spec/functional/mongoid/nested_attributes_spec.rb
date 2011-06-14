@@ -3389,7 +3389,9 @@ describe Mongoid::NestedAttributes do
       before do
         pizza.update_attributes(params)
       end
-
+      it "sets nested object to be dirty" do
+        pizza.crust.should be_type_changed
+      end
       it "sets nested attributes" do
         pizza.reload.crust.type.should == "Thick"
       end
