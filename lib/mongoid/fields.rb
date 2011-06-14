@@ -7,6 +7,7 @@ require "mongoid/fields/custom/boolean"
 require "mongoid/fields/custom/date"
 require "mongoid/fields/custom/date_time"
 require "mongoid/fields/custom/float"
+require "mongoid/fields/custom/hash"
 require "mongoid/fields/custom/integer"
 require "mongoid/fields/custom/object"
 require "mongoid/fields/custom/object_id"
@@ -14,6 +15,7 @@ require "mongoid/fields/custom/range"
 require "mongoid/fields/custom/set"
 require "mongoid/fields/custom/string"
 require "mongoid/fields/custom/symbol"
+require "mongoid/fields/custom/time"
 
 module Mongoid #:nodoc
 

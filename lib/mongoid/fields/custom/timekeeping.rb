@@ -6,6 +6,46 @@ module Mongoid #:nodoc:
       # This module contains shared behaviour for date conversions.
       module Timekeeping
 
+        # Deserialize this field from the type stored in MongoDB to the type
+        # defined on the model.
+        #
+        # @example Deserialize the field.
+        #   field.deserialize(object)
+        #
+        # @param [ Object ] object The object to cast.
+        #
+        # @return [ Time ] The converted time.
+        #
+        # @since 2.1.0
+        def deserialize(object)
+          return nil if object.blank?
+          object = object.getlocal unless Mongoid::Config.use_utc?
+          if Mongoid::Config.use_activesupport_time_zone?
+            time_zone = Mongoid::Config.use_utc? ? 'UTC' : ::Time.zone
+            object = object.in_time_zone(time_zone)
+          end
+          object
+        end
+        alias :get :deserialize
+
+        # Serialize the object from the type defined in the model to a MongoDB
+        # compatible object to store.
+        #
+        # @example Serialize the field.
+        #   field.serialize(object)
+        #
+        # @param [ Object ] object The object to cast.
+        #
+        # @return [ Time ] The converted UTC time.
+        #
+        # @since 2.1.0
+        def serialize(object)
+          return nil if object.blank?
+          time = convert_to_time(object)
+          strip_milliseconds(time).utc
+        end
+        alias :set :serialize
+
         # Convert the provided object to a UTC time to store in the database.
         #
         # @example Set the time.
