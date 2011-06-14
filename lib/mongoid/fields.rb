@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/fields/base"
+require "mongoid/fields/custom/array"
 
 module Mongoid #:nodoc
 
