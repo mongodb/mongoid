@@ -17,42 +17,36 @@ describe Mongoid::Fields::Custom::BigDecimal do
     end
   end
 
-  [ :deserialize, :get ].each do |method|
+  describe "#deserialize" do
 
-    describe "##{method}" do
+    context "when the the value is a string" do
 
-      context "when the the value is a string" do
-
-        it "returns a big decimal" do
-          field.send(method, number.to_s).should == number
-        end
+      it "returns a big decimal" do
+        field.deserialize(number.to_s).should == number
       end
+    end
 
-      context "when the value is nil" do
+    context "when the value is nil" do
 
-        it "returns nil" do
-          field.send(method, nil).should be_nil
-        end
+      it "returns nil" do
+        field.deserialize(nil).should be_nil
       end
     end
   end
 
-  [ :serialize, :set ].each do |method|
+  describe "#serialize" do
 
-    describe "##{method}" do
+    context "when the value is a big decimal" do
 
-      context "when the value is a big decimal" do
-
-        it "returns a string" do
-          field.send(method, number).should == number.to_s
-        end
+      it "returns a string" do
+        field.serialize(number).should == number.to_s
       end
+    end
 
-      context "when the value is nil" do
+    context "when the value is nil" do
 
-        it "returns nil" do
-          field.send(method, nil).should be_nil
-        end
+      it "returns nil" do
+        field.serialize(nil).should be_nil
       end
     end
   end

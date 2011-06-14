@@ -1,8 +1,10 @@
 # encoding: utf-8
 require "mongoid/fields/base"
+require "mongoid/fields/custom/timekeeping"
 require "mongoid/fields/custom/array"
 require "mongoid/fields/custom/big_decimal"
 require "mongoid/fields/custom/boolean"
+require "mongoid/fields/custom/date"
 
 module Mongoid #:nodoc
 

@@ -54,60 +54,54 @@ describe Mongoid::Fields::Custom::Array do
     end
   end
 
-  [ :deserialize, :get ].each do |method|
+  describe "#deserialize" do
 
-    describe "##{method}" do
+    context "when the value is not an array" do
 
-      context "when the value is not an array" do
-
-        it "raises an error" do
-          expect {
-            field.send(method, "test")
-          }.to raise_error(Mongoid::Errors::InvalidType)
-        end
+      it "raises an error" do
+        expect {
+          field.deserialize("test")
+        }.to raise_error(Mongoid::Errors::InvalidType)
       end
+    end
 
-      context "when the value is nil" do
+    context "when the value is nil" do
 
-        it "returns nil" do
-          field.send(method, nil).should be_nil
-        end
+      it "returns nil" do
+        field.deserialize(nil).should be_nil
       end
+    end
 
-      context "when the value is an array" do
+    context "when the value is an array" do
 
-        it "returns the array" do
-          field.send(method, ["test"]).should == ["test"]
-        end
+      it "returns the array" do
+        field.deserialize(["test"]).should == ["test"]
       end
     end
   end
 
-  [ :serialize, :set ].each do |method|
+  describe "#serialize" do
 
-    describe "##{method}" do
+    context "when the value is not an array" do
 
-      context "when the value is not an array" do
-
-        it "raises an error" do
-          expect {
-            field.send(method, "test")
-          }.to raise_error(Mongoid::Errors::InvalidType)
-        end
+      it "raises an error" do
+        expect {
+          field.serialize("test")
+        }.to raise_error(Mongoid::Errors::InvalidType)
       end
+    end
 
-      context "when the value is nil" do
+    context "when the value is nil" do
 
-        it "returns nil" do
-          field.send(method, nil).should be_nil
-        end
+      it "returns nil" do
+        field.serialize(nil).should be_nil
       end
+    end
 
-      context "when the value is an array" do
+    context "when the value is an array" do
 
-        it "returns the array" do
-          field.send(method, ["test"]).should == ["test"]
-        end
+      it "returns the array" do
+        field.serialize(["test"]).should == ["test"]
       end
     end
   end

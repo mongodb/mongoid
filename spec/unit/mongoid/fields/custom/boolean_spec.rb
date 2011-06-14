@@ -6,53 +6,47 @@ describe Mongoid::Fields::Custom::Boolean do
     described_class.new(:test, :type => Boolean)
   end
 
-  [ :deserialize, :get ].each do |method|
+  describe "#deserialize" do
 
-    describe "##{method}" do
-
-      it "returns the value" do
-        field.send(method, true).should be_true
-      end
+    it "returns the value" do
+      field.deserialize(true).should be_true
     end
   end
 
-  [ :serialize, :set ].each do |method|
+  describe "#serialize" do
 
-    describe "##{method}" do
+    context "when provided true" do
 
-      context "when provided true" do
-
-        it "returns true" do
-          field.send(method, "true").should be_true
-        end
+      it "returns true" do
+        field.serialize("true").should be_true
       end
+    end
 
-      context "when provided false" do
+    context "when provided false" do
 
-        it "returns false" do
-          field.send(method, "false").should be_false
-        end
+      it "returns false" do
+        field.serialize("false").should be_false
       end
+    end
 
-      context "when provided 0" do
+    context "when provided 0" do
 
-        it "returns false" do
-          field.send(method, "0").should be_false
-        end
+      it "returns false" do
+        field.serialize("0").should be_false
       end
+    end
 
-      context "when provided 1" do
+    context "when provided 1" do
 
-        it "returns true" do
-          field.send(method, "1").should be_true
-        end
+      it "returns true" do
+        field.serialize("1").should be_true
       end
+    end
 
-      context "when provided nil" do
+    context "when provided nil" do
 
-        it "returns nil" do
-          field.send(method, nil).should be_nil
-        end
+      it "returns nil" do
+        field.serialize(nil).should be_nil
       end
     end
   end
