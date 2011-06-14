@@ -9,6 +9,7 @@ require "mongoid/fields/custom/date_time"
 require "mongoid/fields/custom/float"
 require "mongoid/fields/custom/integer"
 require "mongoid/fields/custom/object_id"
+require "mongoid/fields/custom/range"
 
 module Mongoid #:nodoc
 
