@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/fields/base"
+
 module Mongoid #:nodoc
 
   # This module defines behaviour for fields.
