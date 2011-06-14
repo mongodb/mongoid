@@ -146,7 +146,7 @@ module Mongoid #:nodoc:
       # @return [ true, false ] If the proxy responds to the method.
       #
       # @since 2.0.0
-      def respond_to?(name, include_private = false)
+      def respond_to?(name)
         [].respond_to?(name) || methods.include?(name)
       end
 
