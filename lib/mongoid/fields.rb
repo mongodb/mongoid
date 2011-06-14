@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/fields/base"
 require "mongoid/fields/custom/array"
+require "mongoid/fields/custom/big_decimal"
 
 module Mongoid #:nodoc
 
