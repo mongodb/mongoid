@@ -38,3 +38,5 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * #514 Fix marshaling of documents with relation extensions (Chris Griego)
 
   Metadata#extension now returns a Module, instead of a Proc, when an extension is defined.
+
+* #837 When allow_dynamic_fields is set to false and loading an embedded document with an unrecognized field, an exception is raised.
