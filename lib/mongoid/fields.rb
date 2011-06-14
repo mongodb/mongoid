@@ -10,6 +10,7 @@ require "mongoid/fields/custom/float"
 require "mongoid/fields/custom/integer"
 require "mongoid/fields/custom/object_id"
 require "mongoid/fields/custom/range"
+require "mongoid/fields/custom/set"
 
 module Mongoid #:nodoc
 
