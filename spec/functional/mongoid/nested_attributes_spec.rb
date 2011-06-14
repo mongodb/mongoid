@@ -3401,13 +3401,13 @@ describe Mongoid::NestedAttributes do
         Pizza.create
       end
 
-      let!(:crust) do
+      let!(:topping) do
         pizza.toppings.create(:name => "Sausage")
       end
 
       let(:params) do
         { :toppings_attributes =>
-          { "0" => {:name => "Pepperoni"} }
+          { "0" => {:name => "Pepperoni", :id => topping.id.to_s} }
         }
       end
 
@@ -3416,7 +3416,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets nested object to be dirty" do
-        pizza.reload.toppings.first.should be_changed
+        pizza.toppings.first.should be_name_changed
       end
       it "sets nested attributes" do
         pizza.update
