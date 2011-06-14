@@ -2,6 +2,7 @@
 require "mongoid/fields/base"
 require "mongoid/fields/custom/array"
 require "mongoid/fields/custom/big_decimal"
+require "mongoid/fields/custom/boolean"
 
 module Mongoid #:nodoc
 
