@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Custom #:nodoc:
 
       # Defines the behaviour for symbol fields.
-      class Symbol < Base
+      class Symbol
+        include Definable
 
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.

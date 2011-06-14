@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Custom #:nodoc:
 
       # Defines the behaviour for big decimal fields.
-      class BigDecimal < Base
+      class BigDecimal
+        include Definable
 
         # When reading the field do we need to cast the value? This holds true when
         # times are stored or for big decimals which are stored as strings.

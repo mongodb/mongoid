@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Custom #:nodoc:
 
       # Defines the behaviour for date time fields.
-      class DateTime < Base
+      class DateTime
+        include Definable
         include Timekeeping
 
         # When reading the field do we need to cast the value? This holds true when

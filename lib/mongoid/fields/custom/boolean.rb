@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Custom #:nodoc:
 
       # Defines the behaviour for boolean fields.
-      class Boolean < Base
+      class Boolean
+        include Definable
 
         MAPPINGS = {
           true => true,

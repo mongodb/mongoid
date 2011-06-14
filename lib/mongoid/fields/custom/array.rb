@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Custom #:nodoc:
 
       # Defines the behaviour for array fields.
-      class Array < Base
+      class Array
+        include Definable
 
         # Get the default value for the field. If the default is a proc call
         # it, otherwise clone the array.

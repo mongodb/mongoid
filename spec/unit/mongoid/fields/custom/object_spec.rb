@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Fields::Base do
+describe Mongoid::Fields::Custom::Object do
 
   describe "#cast_on_read?" do
 

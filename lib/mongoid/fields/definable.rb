@@ -3,7 +3,7 @@ module Mongoid #:nodoc:
   module Fields #:nodoc:
 
     # Defines the behaviour for defined fields in the document.
-    class Base
+    module Definable
 
       # Set readers for the instance variables.
       attr_reader :default_value, :label, :name, :options

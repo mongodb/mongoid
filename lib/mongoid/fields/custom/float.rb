@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Custom #:nodoc:
 
       # Defines the behaviour for float fields.
-      class Float < Base
+      class Float
+        include Definable
 
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
