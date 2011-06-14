@@ -11,6 +11,8 @@ require "mongoid/fields/custom/integer"
 require "mongoid/fields/custom/object_id"
 require "mongoid/fields/custom/range"
 require "mongoid/fields/custom/set"
+require "mongoid/fields/custom/string"
+require "mongoid/fields/custom/symbol"
 
 module Mongoid #:nodoc
 
