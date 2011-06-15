@@ -783,10 +783,14 @@ describe Mongoid::Attributes do
 
     context "when the key has been specified as a field" do
 
-      before { person.stubs(:fields).returns({"age" => Integer}) }
+      before do
+        person.stubs(:fields).returns(
+          { "age" => Mongoid::Fields::Serializable::Integer.new(:age) }
+        )
+      end
 
       it "retuns the typed value" do
-        person.fields["age"].expects(:set).with("51")
+        person.fields["age"].expects(:serialize).with("51")
         person.send(:typed_value_for, "age", "51")
       end
 

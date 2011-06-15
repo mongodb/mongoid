@@ -76,7 +76,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.beta.1
       def identity(options = {})
-        fields["_id"].type = options[:type]
+        replace_field("_id", options[:type])
         @object_ids = id_is_object
       end
 
@@ -124,7 +124,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def id_is_object
-        fields["_id"].type == BSON::ObjectId
+        fields["_id"].is_a?(Fields::Serializable::ObjectId)
       end
     end
   end

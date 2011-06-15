@@ -20,6 +20,7 @@ require "mongoid/fields/serializable/symbol"
 require "mongoid/fields/serializable/time"
 require "mongoid/fields/serializable/time_with_zone"
 require "mongoid/fields/serializable/foreign_keys/array"
+require "mongoid/fields/serializable/foreign_keys/object"
 
 module Mongoid #:nodoc
 
@@ -139,7 +140,9 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
         meth = options.delete(:as) || name
-        Field.new(name, options).tap do |field|
+        Mappings.for(
+          options[:type], options[:identity]
+        ).new(name, options).tap do |field|
           fields[name] = field
           create_accessors(name, meth, options)
           add_dirty_methods(name)
@@ -186,7 +189,7 @@ module Mongoid #:nodoc
         generated_field_methods.module_eval do
           if field.cast_on_read?
             define_method(meth) do
-              field.get(read_attribute(name))
+              field.deserialize(read_attribute(name))
             end
           else
             define_method(meth) do

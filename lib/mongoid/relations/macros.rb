@@ -190,7 +190,7 @@ module Mongoid # :nodoc:
         def references_and_referenced_in_many(name, options = {}, &block)
           characterize(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)
-            reference(meta)
+            reference(meta, Array)
             autosave(meta)
             validates_relation(meta)
           end
@@ -263,12 +263,11 @@ module Mongoid # :nodoc:
         # @since 2.1.0
         def create_extension_module(name, &block)
           if block
-            extension_module_name = "#{self.to_s.demodulize}#{name.to_s.camelize}RelationExtension"
-
+            extension_module_name =
+              "#{self.to_s.demodulize}#{name.to_s.camelize}RelationExtension"
             silence_warnings do
               self.const_set(extension_module_name, Module.new(&block))
             end
-
             "#{self}::#{extension_module_name}".constantize
           end
         end
@@ -280,12 +279,13 @@ module Mongoid # :nodoc:
         #   Person.reference(metadata)
         #
         # @param [ Metadata ] metadata The metadata for the relation.
-        def reference(metadata)
+        def reference(metadata, type = Object)
           polymorph(metadata).cascade(metadata)
           if metadata.relation.stores_foreign_key?
             key = metadata.foreign_key
             field(
               key,
+              :type => type,
               :identity => true,
               :metadata => metadata,
               :default => metadata.foreign_key_default
