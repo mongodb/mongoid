@@ -21,22 +21,6 @@ module Mongoid #:nodoc:
           default_value.respond_to?(:call) ? default_value.call : default_value.dup
         end
 
-        # Deserialize this field from the type stored in MongoDB to the type
-        # defined on the model
-        #
-        # @example Deserialize the field.
-        #   field.deserialize(object)
-        #
-        # @param [ Object ] object The object to cast.
-        #
-        # @return [ Array ] The converted object.
-        #
-        # @since 2.1.0
-        def deserialize(object)
-          raise_or_return(object)
-        end
-        alias :get :deserialize
-
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
         #

@@ -7,17 +7,6 @@ module Mongoid #:nodoc:
       class Set
         include Serializable
 
-        # When reading the field do we need to cast the value? This holds true when
-        # times are stored or for big decimals which are stored as strings.
-        #
-        # @example Typecast on a read?
-        #   field.cast_on_read?
-        #
-        # @return [ true ] Date fields cast on read.
-        #
-        # @since 2.1.0
-        def cast_on_read?; true; end
-
         # Deserialize this field from the type stored in MongoDB to the type
         # defined on the model.
         #

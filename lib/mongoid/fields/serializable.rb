@@ -3,6 +3,25 @@ module Mongoid #:nodoc:
   module Fields #:nodoc:
 
     # Defines the behaviour for defined fields in the document.
+    #
+    # For people who want to have custom field types in their
+    # applications and want control over the serialization process
+    # to and from the domain model and MongoDB you will need to include
+    # this module in your custom type class. You will also need to define
+    # either a #serialize and #deserialize instance method, where previously
+    # these were a .set and .get class method respectively.
+    #
+    #   class MyCustomType
+    #     include Mongoid::Fields::Serializable
+    #
+    #     def deserialize(object)
+    #       # Do something to convert it from Mongo to my type.
+    #     end
+    #
+    #     def serialize(object)
+    #       # Do something to convert from my type to MongoDB friendly.
+    #     end
+    #   end
     module Serializable
 
       # Set readers for the instance variables.
@@ -17,7 +36,10 @@ module Mongoid #:nodoc:
       # @return [ true, false ] If the field should be cast.
       #
       # @since 2.1.0
-      def cast_on_read?; false; end
+      def cast_on_read?
+        @cast_on_read ||=
+          self.class.public_instance_methods(false).include?(:deserialize)
+      end
 
       # Get the default value for the field.
       #

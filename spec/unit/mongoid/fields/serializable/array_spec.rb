@@ -54,32 +54,6 @@ describe Mongoid::Fields::Serializable::Array do
     end
   end
 
-  describe "#deserialize" do
-
-    context "when the value is not an array" do
-
-      it "raises an error" do
-        expect {
-          field.deserialize("test")
-        }.to raise_error(Mongoid::Errors::InvalidType)
-      end
-    end
-
-    context "when the value is nil" do
-
-      it "returns nil" do
-        field.deserialize(nil).should be_nil
-      end
-    end
-
-    context "when the value is an array" do
-
-      it "returns the array" do
-        field.deserialize(["test"]).should == ["test"]
-      end
-    end
-  end
-
   describe "#serialize" do
 
     context "when the value is not an array" do
