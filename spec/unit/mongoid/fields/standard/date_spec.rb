@@ -17,6 +17,24 @@ describe Mongoid::Fields::Standard::Date do
     end
   end
 
+  describe "#default" do
+
+    context "when provided a proc" do
+
+      let(:field) do
+        described_class.new(
+          :test,
+          :type => Date,
+          :default => lambda { 1.day.ago }
+        )
+      end
+
+      it "serializes the result of the call" do
+        field.default.should be_a(Time)
+      end
+    end
+  end
+
   describe "#deserialize" do
 
     let(:time) { Time.now.utc }
