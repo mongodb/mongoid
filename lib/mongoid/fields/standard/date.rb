@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
 
       # Defines the behaviour for date fields.
       class Date
-        include Definable
+        include Serializable
         include Timekeeping
 
         # Deserialize this field from the type stored in MongoDB to the type

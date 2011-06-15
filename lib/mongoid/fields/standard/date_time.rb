@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
 
       # Defines the behaviour for date time fields.
       class DateTime
-        include Definable
+        include Serializable
         include Timekeeping
 
         # When reading the field do we need to cast the value? This holds true when

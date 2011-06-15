@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Standard #:nodoc:
       # Defines the behaviour for date fields.
       class Time
-        include Definable
+        include Serializable
         include Timekeeping
       end
     end

@@ -1,5 +1,5 @@
 # encoding: utf-8
-require "mongoid/fields/definable"
+require "mongoid/fields/serializable"
 require "mongoid/fields/standard/timekeeping"
 require "mongoid/fields/standard/array"
 require "mongoid/fields/standard/big_decimal"
@@ -120,7 +120,7 @@ module Mongoid #:nodoc
       # @param [ String ] name The name of the field.
       # @param [ Class ] type The new type of field.
       #
-      # @return [ Definable ] The new field.
+      # @return [ Serializable ] The new field.
       #
       # @since 2.1.0
       def replace_field(name, type)

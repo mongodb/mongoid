@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
 
       # Defines the behaviour for boolean fields.
       class Boolean
-        include Definable
+        include Serializable
 
         MAPPINGS = {
           true => true,

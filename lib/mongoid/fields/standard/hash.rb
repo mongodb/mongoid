@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Standard #:nodoc:
       # Defines the behaviour for hash fields.
       class Hash
-        include Definable
+        include Serializable
 
         # Get the default value for the field. If the default is a proc call
         # it, otherwise clone the array.

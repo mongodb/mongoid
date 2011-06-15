@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
 
       # Defines the behaviour for integer fields.
       class Integer
-        include Definable
+        include Serializable
 
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.

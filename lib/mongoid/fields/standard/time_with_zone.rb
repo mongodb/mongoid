@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Standard #:nodoc:
       # Defines the behaviour for time with zone fields.
       class TimeWithZone
-        include Definable
+        include Serializable
         include Timekeeping
       end
     end

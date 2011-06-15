@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Standard #:nodoc:
       # Defines the behaviour for object fields.
       class Object
-        include Definable
+        include Serializable
       end
     end
   end
