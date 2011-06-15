@@ -18,10 +18,11 @@ module Mongoid #:nodoc
       # @return [ Class ] The class of the custom field.
       #
       # @since 2.1.0
-      def for(klass)
+      def for(klass, foreign_key = false)
         return Serializable::Object unless klass
         return Serializable::ObjectId if klass == BSON::ObjectId
         return Serializable::TimeWithZone if klass == ActiveSupport::TimeWithZone
+        return Serializable::ForeignKeys::Array if foreign_key
         begin
           "Mongoid::Fields::Serializable::#{klass}".constantize
         rescue NameError

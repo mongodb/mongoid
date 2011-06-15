@@ -10,12 +10,30 @@ describe Mongoid::Fields::Mappings do
 
     context "when given an Array" do
 
-      let(:klass) do
-        Array
+      context "when asking for a foreign key field" do
+
+        let(:definable) do
+          described_class.for(klass, true)
+        end
+
+        let(:klass) do
+          Array
+        end
+
+        it "returns the standard definable field" do
+          definable.should eq(Mongoid::Fields::Serializable::ForeignKeys::Array)
+        end
       end
 
-      it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Serializable::Array)
+      context "when passed no foreign key option" do
+
+        let(:klass) do
+          Array
+        end
+
+        it "returns the standard definable field" do
+          definable.should eq(Mongoid::Fields::Serializable::Array)
+        end
       end
     end
 
