@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/fields/mappings"
 require "mongoid/fields/serializable"
 require "mongoid/fields/serializable/timekeeping"
 require "mongoid/fields/serializable/array"
@@ -18,7 +19,7 @@ require "mongoid/fields/serializable/string"
 require "mongoid/fields/serializable/symbol"
 require "mongoid/fields/serializable/time"
 require "mongoid/fields/serializable/time_with_zone"
-require "mongoid/fields/mappings"
+require "mongoid/fields/serializable/foreign_keys/array"
 
 module Mongoid #:nodoc
 
