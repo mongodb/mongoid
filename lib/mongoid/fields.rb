@@ -1,21 +1,24 @@
 # encoding: utf-8
 require "mongoid/fields/definable"
-require "mongoid/fields/custom/timekeeping"
-require "mongoid/fields/custom/array"
-require "mongoid/fields/custom/big_decimal"
-require "mongoid/fields/custom/boolean"
-require "mongoid/fields/custom/date"
-require "mongoid/fields/custom/date_time"
-require "mongoid/fields/custom/float"
-require "mongoid/fields/custom/hash"
-require "mongoid/fields/custom/integer"
-require "mongoid/fields/custom/object"
-require "mongoid/fields/custom/object_id"
-require "mongoid/fields/custom/range"
-require "mongoid/fields/custom/set"
-require "mongoid/fields/custom/string"
-require "mongoid/fields/custom/symbol"
-require "mongoid/fields/custom/time"
+require "mongoid/fields/standard/timekeeping"
+require "mongoid/fields/standard/array"
+require "mongoid/fields/standard/big_decimal"
+require "mongoid/fields/standard/binary"
+require "mongoid/fields/standard/boolean"
+require "mongoid/fields/standard/date"
+require "mongoid/fields/standard/date_time"
+require "mongoid/fields/standard/float"
+require "mongoid/fields/standard/hash"
+require "mongoid/fields/standard/integer"
+require "mongoid/fields/standard/object"
+require "mongoid/fields/standard/object_id"
+require "mongoid/fields/standard/range"
+require "mongoid/fields/standard/set"
+require "mongoid/fields/standard/string"
+require "mongoid/fields/standard/symbol"
+require "mongoid/fields/standard/time"
+require "mongoid/fields/standard/time_with_zone"
+require "mongoid/fields/mappings"
 
 module Mongoid #:nodoc
 
@@ -37,6 +40,20 @@ module Mongoid #:nodoc
 
     module ClassMethods #:nodoc
 
+      # Returns the default values for the fields on the document.
+      #
+      # @example Get the defaults.
+      #   Person.defaults
+      #
+      # @return [ Hash ] The field defaults.
+      def defaults
+        fields.inject({}) do |defs, (field_name,field)|
+          next(defs) if field.default.nil?
+          defs[field_name.to_s] = field.default
+          defs
+        end
+      end
+
       # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
@@ -53,8 +70,7 @@ module Mongoid #:nodoc
       #
       # @return [ Field ] The generated field
       def field(name, options = {})
-        access = name.to_s
-        set_field(access, options)
+        add_field(name.to_s, options)
       end
 
       # Return the fields for this class.
@@ -81,20 +97,6 @@ module Mongoid #:nodoc
         @fields = fields
       end
 
-      # Returns the default values for the fields on the document.
-      #
-      # @example Get the defaults.
-      #   Person.defaults
-      #
-      # @return [ Hash ] The field defaults.
-      def defaults
-        fields.inject({}) do |defs, (field_name,field)|
-          next(defs) if field.default.nil?
-          defs[field_name.to_s] = field.default
-          defs
-        end
-      end
-
       # When inheriting, we want to copy the fields from the parent class and
       # set the on the child to start, mimicking the behaviour of the old
       # class_inheritable_accessor that was deprecated in Rails edge.
@@ -110,16 +112,31 @@ module Mongoid #:nodoc
         subclass.fields = fields.dup
       end
 
+      # Replace a field with a new type.
+      #
+      # @example Replace the field.
+      #   Model.replace_field("_id", String)
+      #
+      # @param [ String ] name The name of the field.
+      # @param [ Class ] type The new type of field.
+      #
+      # @return [ Definable ] The new field.
+      #
+      # @since 2.1.0
+      def replace_field(name, type)
+        add_field(name, fields[name].options.merge(:type => type))
+      end
+
       protected
 
       # Define a field attribute for the +Document+.
       #
       # @example Set the field.
-      #   Person.set_field(:name, :default => "Test")
+      #   Person.add_field(:name, :default => "Test")
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The hash of options.
-      def set_field(name, options = {})
+      def add_field(name, options = {})
         meth = options.delete(:as) || name
         Field.new(name, options).tap do |field|
           fields[name] = field
