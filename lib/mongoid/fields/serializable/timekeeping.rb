@@ -26,7 +26,6 @@ module Mongoid #:nodoc:
           end
           object
         end
-        alias :get :deserialize
 
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
@@ -44,7 +43,6 @@ module Mongoid #:nodoc:
           time = convert_to_time(object)
           strip_milliseconds(time).utc
         end
-        alias :set :serialize
 
         # Convert the provided object to a UTC time to store in the database.
         #

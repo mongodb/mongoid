@@ -21,7 +21,6 @@ module Mongoid #:nodoc:
         def deserialize(object)
           object.nil? ? nil : ::Range.new(object["min"], object["max"])
         end
-        alias :get :deserialize
 
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
@@ -37,7 +36,6 @@ module Mongoid #:nodoc:
         def serialize(object)
           object.nil? ? nil : { "min" => object.min, "max" => object.max }
         end
-        alias :set :serialize
       end
     end
   end

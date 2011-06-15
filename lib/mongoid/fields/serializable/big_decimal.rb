@@ -21,7 +21,6 @@ module Mongoid #:nodoc:
         def deserialize(object)
           object ? ::BigDecimal.new(object) : object
         end
-        alias :get :deserialize
 
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
@@ -37,7 +36,6 @@ module Mongoid #:nodoc:
         def serialize(object)
           object ? object.to_s : object
         end
-        alias :set :serialize
       end
     end
   end

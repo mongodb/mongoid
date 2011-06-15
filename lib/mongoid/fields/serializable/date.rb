@@ -27,7 +27,6 @@ module Mongoid #:nodoc:
             ::Date.new(object.year, object.month, object.day)
           end
         end
-        alias :get :deserialize
 
         protected
 

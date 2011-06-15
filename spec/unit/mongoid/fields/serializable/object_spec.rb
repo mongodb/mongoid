@@ -38,21 +38,18 @@ describe Mongoid::Fields::Serializable::Object do
     end
   end
 
-  [ :deserialize, :get ].each do |method|
+  describe "#deserialize" do
 
     let(:field) do
       described_class.new(:test)
     end
 
-    describe "##{method}" do
+    let(:value) do
+      field.deserialize("testing")
+    end
 
-      let(:value) do
-        field.send(method, "testing")
-      end
-
-      it "returns the provided value" do
-        value.should == "testing"
-      end
+    it "returns the provided value" do
+      value.should == "testing"
     end
   end
 
@@ -102,21 +99,18 @@ describe Mongoid::Fields::Serializable::Object do
     end
   end
 
-  [ :serialize, :set ].each do |method|
+  describe "#serialize" do
 
     let(:field) do
       described_class.new(:test)
     end
 
-    describe "##{method}" do
+    let(:value) do
+      field.serialize("testing")
+    end
 
-      let(:value) do
-        field.send(method, "testing")
-      end
-
-      it "returns the provided value" do
-        value.should == "testing"
-      end
+    it "returns the provided value" do
+      value.should == "testing"
     end
   end
 end

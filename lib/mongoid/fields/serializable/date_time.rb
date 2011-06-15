@@ -22,7 +22,6 @@ module Mongoid #:nodoc:
         def deserialize(object)
           object.try(:to_datetime)
         end
-        alias :get :deserialize
       end
     end
   end

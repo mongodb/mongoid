@@ -69,7 +69,6 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def deserialize(object); object; end
-      alias :get :deserialize
 
       # Create the new field with a name and optional additional options.
       #
@@ -100,7 +99,6 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def serialize(object); object; end
-      alias :set :serialize
 
       class << self
 
