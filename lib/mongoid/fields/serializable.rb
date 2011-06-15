@@ -80,18 +80,6 @@ module Mongoid #:nodoc:
       def serialize(object); object; end
       alias :set :serialize
 
-      # Get the type of this field - inferred from the class name.
-      #
-      # @example Get the type.
-      #   field.type
-      #
-      # @return [ Class ] The name of the class.
-      #
-      # @since 2.1.0
-      def type
-        @type ||= options[:type] || Object
-      end
-
       class << self
 
         # Return a map of custom option names to their handlers.
