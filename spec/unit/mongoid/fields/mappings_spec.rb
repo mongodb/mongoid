@@ -15,7 +15,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Array)
+        definable.should eq(Mongoid::Fields::Serializable::Array)
       end
     end
 
@@ -26,7 +26,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::BigDecimal)
+        definable.should eq(Mongoid::Fields::Serializable::BigDecimal)
       end
     end
 
@@ -37,7 +37,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Binary)
+        definable.should eq(Mongoid::Fields::Serializable::Binary)
       end
     end
 
@@ -48,7 +48,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Boolean)
+        definable.should eq(Mongoid::Fields::Serializable::Boolean)
       end
     end
 
@@ -59,7 +59,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::DateTime)
+        definable.should eq(Mongoid::Fields::Serializable::DateTime)
       end
     end
 
@@ -70,7 +70,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Date)
+        definable.should eq(Mongoid::Fields::Serializable::Date)
       end
     end
 
@@ -81,7 +81,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Float)
+        definable.should eq(Mongoid::Fields::Serializable::Float)
       end
     end
 
@@ -92,7 +92,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Hash)
+        definable.should eq(Mongoid::Fields::Serializable::Hash)
       end
     end
 
@@ -103,7 +103,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Integer)
+        definable.should eq(Mongoid::Fields::Serializable::Integer)
       end
     end
 
@@ -114,7 +114,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Object)
+        definable.should eq(Mongoid::Fields::Serializable::Object)
       end
     end
 
@@ -125,7 +125,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::ObjectId)
+        definable.should eq(Mongoid::Fields::Serializable::ObjectId)
       end
     end
 
@@ -136,7 +136,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Range)
+        definable.should eq(Mongoid::Fields::Serializable::Range)
       end
     end
 
@@ -147,7 +147,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Set)
+        definable.should eq(Mongoid::Fields::Serializable::Set)
       end
     end
 
@@ -158,7 +158,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::String)
+        definable.should eq(Mongoid::Fields::Serializable::String)
       end
     end
 
@@ -169,7 +169,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Symbol)
+        definable.should eq(Mongoid::Fields::Serializable::Symbol)
       end
     end
 
@@ -180,7 +180,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::Time)
+        definable.should eq(Mongoid::Fields::Serializable::Time)
       end
     end
 
@@ -191,7 +191,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the standard definable field" do
-        definable.should eq(Mongoid::Fields::Standard::TimeWithZone)
+        definable.should eq(Mongoid::Fields::Serializable::TimeWithZone)
       end
     end
 
@@ -213,7 +213,7 @@ describe Mongoid::Fields::Mappings do
       end
 
       it "returns the object standard type" do
-        definable.should eq(Mongoid::Fields::Standard::Object)
+        definable.should eq(Mongoid::Fields::Serializable::Object)
       end
     end
   end

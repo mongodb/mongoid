@@ -64,7 +64,6 @@ module Mongoid #:nodoc:
       def initialize(name, options = {})
         @name, @options = name, options
         @default_value, @label = options[:default], options[:label]
-        check_default!
       end
 
       # Serialize the object from the type defined in the model to a MongoDB
@@ -127,23 +126,6 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def option(option_name, &block)
           options[option_name] = block
-        end
-      end
-
-      protected
-
-      # Checks if the default value is of the same type as the field.
-      #
-      # @example Check the default value.
-      #   field.check_default!
-      #
-      # @raise [ Errors::InvalidType ] If the types differ.
-      #
-      # @since 2.1.0
-      def check_default!
-        return if default_value.is_a?(Proc)
-        if !default_value.nil? && !default_value.is_a?(type)
-          raise Mongoid::Errors::InvalidType.new(type, default_value)
         end
       end
     end

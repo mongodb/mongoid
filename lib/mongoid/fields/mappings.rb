@@ -19,11 +19,11 @@ module Mongoid #:nodoc
       #
       # @since 2.1.0
       def for(klass)
-        return Standard::Object unless klass
-        return Standard::ObjectId if klass == BSON::ObjectId
-        return Standard::TimeWithZone if klass == ActiveSupport::TimeWithZone
+        return Serializable::Object unless klass
+        return Serializable::ObjectId if klass == BSON::ObjectId
+        return Serializable::TimeWithZone if klass == ActiveSupport::TimeWithZone
         begin
-          "Mongoid::Fields::Standard::#{klass}".constantize
+          "Mongoid::Fields::Serializable::#{klass}".constantize
         rescue NameError
           klass
         end
