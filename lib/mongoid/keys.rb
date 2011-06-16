@@ -7,7 +7,8 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :primary_key, :object_ids
+      cattr_accessor :primary_key, :using_object_ids
+      @using_object_ids = true
       delegate :primary_key, :using_object_ids?, :to => "self.class"
     end
 
@@ -76,8 +77,9 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.beta.1
       def identity(options = {})
-        replace_field("_id", options[:type])
-        @object_ids = id_is_object
+        type = options[:type]
+        replace_field("_id", type)
+        @using_object_ids = (type == BSON::ObjectId)
       end
 
       # Defines the field that will be used for the id of this +Document+. This
@@ -110,21 +112,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def using_object_ids?
-        @object_ids ||= id_is_object
-      end
-
-      private
-
-      # Is the id field type an object id?
-      #
-      # @example Is type an object id.
-      #   Class.id_is_object
-      #
-      # @return [ true, false ] Is the id an object id.
-      #
-      # @since 2.0.0
-      def id_is_object
-        fields["_id"].is_a?(Fields::Serializable::ObjectId)
+        @using_object_ids
       end
     end
   end
