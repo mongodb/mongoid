@@ -80,7 +80,6 @@ namespace :db do
     def find_constant_from_path_array model_path
       begin
         klass = model_path.map(&:camelize).join('::').constantize
-        puts klass.name
       rescue LoadError => e
         # Try to constantize the model when organized in a subdir of models, but not namespaced under a module
         klass = model_path.last.camelize.constantize
