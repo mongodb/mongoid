@@ -146,7 +146,7 @@ module Mongoid #:nodoc:
             arguments.each do |field, direction|
               merge_options(crit.options[:sort], [ field, direction ])
             end
-            when Array
+          when Array
             merge_options(crit.options[:sort],arguments)
           when Complex
             args.flatten.each do |complex|
