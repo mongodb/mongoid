@@ -1,9 +1,7 @@
 # encoding: utf-8
-require "mongoid/extensions/boolean/conversions"
 require "mongoid/extensions/false_class/equality"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
-require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/nil/collectionization"
 require "mongoid/extensions/object/checks"
 require "mongoid/extensions/object/reflections"
@@ -16,10 +14,7 @@ require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/object_id/conversions"
 
 class Binary; end #:nodoc:
-
-class Boolean #:nodoc:
-  extend Mongoid::Extensions::Boolean::Conversions
-end
+class Boolean; end #:nodoc:
 
 class FalseClass #:nodoc
   include Mongoid::Extensions::FalseClass::Equality
@@ -28,10 +23,6 @@ end
 class Hash #:nodoc
   include Mongoid::Extensions::Hash::CriteriaHelpers
   include Mongoid::Extensions::Hash::Scoping
-end
-
-class Integer #:nodoc:
-  extend Mongoid::Extensions::Integer::Conversions
 end
 
 class NilClass #:nodoc

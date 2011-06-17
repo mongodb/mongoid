@@ -131,7 +131,7 @@ describe Mongoid::Criterion::Selector do
         let(:field) { stub(:type => Array) }
 
         it "allows the simple value to be set" do
-          String.expects(:mongoize).with("007")
+          Mongoid::Serialization.expects(:mongoize).with("007", String)
           selector.send(:typecast_value_for, field, "007")
         end
       end
@@ -184,7 +184,7 @@ describe Mongoid::Criterion::Selector do
 
           it "typecasts the value" do
             value = {"$exists" => "true"}
-            Boolean.expects(:mongoize).with("true")
+            Mongoid::Serialization.expects(:mongoize).with("true", Boolean)
             selector.send(:typecast_value_for, field, value)
           end
         end
@@ -199,7 +199,7 @@ describe Mongoid::Criterion::Selector do
 
           it "typecasts the value" do
             value = {"$size" => "2"}
-            Integer.expects(:mongoize).with("2")
+            Mongoid::Serialization.expects(:mongoize).with("2", Integer)
             selector.send(:typecast_value_for, field, value)
           end
         end

@@ -113,11 +113,7 @@ module Mongoid #:nodoc:
           value
         else
           if field.type == Array
-            begin
-              value.class.mongoize(value)
-            rescue NameError
-              value
-            end
+            Serialization.mongoize(value, value.class)
           else
             field.serialize(value)
           end
@@ -139,9 +135,9 @@ module Mongoid #:nodoc:
       def typecast_hash_value(field, key, value)
         case key
         when "$exists"
-          Boolean.mongoize(value)
+          Serialization.mongoize(value, Boolean)
         when "$size"
-          Integer.mongoize(value)
+          Serialization.mongoize(value, Integer)
         else
           typecast_value_for(field, value)
         end

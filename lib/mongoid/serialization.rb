@@ -33,6 +33,27 @@ module Mongoid # :nodoc:
       end
     end
 
+    class << self
+
+      # Serialize the provided object into a Mongo friendly value, using the
+      # field serialization method for the passed in type. If no type is
+      # given then we assume generic object serialization, which just returns
+      # the value itself.
+      #
+      # @example Mongoize the object.
+      #   Mongoid::Serialization.mongoize(time, Time)
+      #
+      # @param [ Object ] object The object to convert.
+      # @param [ Class ] klass The type of the object.
+      #
+      # @return [ Object ] The converted object.
+      #
+      # @since 2.1.0
+      def mongoize(object, klass = Object)
+        Fields::Mappings.for(klass).new(:mongoize).serialize(object)
+      end
+    end
+
     private
 
     # For each of the provided include options, get the relation needed and
