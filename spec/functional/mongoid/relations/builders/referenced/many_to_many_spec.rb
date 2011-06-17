@@ -28,7 +28,5 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
       end
     end
-
-    pending "Github 246: Should return documents in same order as ids"
   end
 end
