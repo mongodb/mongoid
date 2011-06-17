@@ -1,77 +1,36 @@
 # encoding: utf-8
-require "mongoid/extensions/time_conversions"
-require "mongoid/extensions/array/conversions"
-require "mongoid/extensions/set/conversions"
-require "mongoid/extensions/big_decimal/conversions"
-require "mongoid/extensions/binary/conversions"
 require "mongoid/extensions/boolean/conversions"
-require "mongoid/extensions/date/conversions"
-require "mongoid/extensions/datetime/conversions"
 require "mongoid/extensions/false_class/equality"
-require "mongoid/extensions/float/conversions"
-require "mongoid/extensions/hash/conversions"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/integer/conversions"
 require "mongoid/extensions/nil/collectionization"
 require "mongoid/extensions/object/checks"
-require "mongoid/extensions/object/conversions"
 require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/object/yoda"
 require "mongoid/extensions/proc/scoping"
-require "mongoid/extensions/range/conversions"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
-require "mongoid/extensions/symbol/conversions"
 require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/object_id/conversions"
 
-class Array #:nodoc
-  include Mongoid::Extensions::Array::Conversions
-end
+class Binary; end #:nodoc:
 
-class Set #:nodoc
-  include Mongoid::Extensions::Set::Conversions
-end
-
-class BigDecimal #:nodoc
-  extend Mongoid::Extensions::BigDecimal::Conversions
-end
-
-class Binary #:nodoc
-  extend Mongoid::Extensions::Binary::Conversions
-end
-
-class Boolean #:nodoc
-  include Mongoid::Extensions::Boolean::Conversions
-end
-
-class DateTime #:nodoc
-  extend Mongoid::Extensions::TimeConversions
-  extend Mongoid::Extensions::DateTime::Conversions
-end
-
-class Date #:nodoc
-  extend Mongoid::Extensions::TimeConversions
-  extend Mongoid::Extensions::Date::Conversions
+class Boolean #:nodoc:
+  extend Mongoid::Extensions::Boolean::Conversions
 end
 
 class FalseClass #:nodoc
   include Mongoid::Extensions::FalseClass::Equality
 end
 
-class Float #:nodoc
-  extend Mongoid::Extensions::Float::Conversions
-end
-
 class Hash #:nodoc
   include Mongoid::Extensions::Hash::CriteriaHelpers
   include Mongoid::Extensions::Hash::Scoping
-  include Mongoid::Extensions::Hash::Conversions
 end
 
-class Integer #:nodoc
+class Integer #:nodoc:
   extend Mongoid::Extensions::Integer::Conversions
 end
 
@@ -81,7 +40,6 @@ end
 
 class Object #:nodoc:
   include Mongoid::Extensions::Object::Checks
-  include Mongoid::Extensions::Object::Conversions
   include Mongoid::Extensions::Object::Reflections
   include Mongoid::Extensions::Object::Yoda
 end
@@ -90,23 +48,14 @@ class Proc #:nodoc:
   include Mongoid::Extensions::Proc::Scoping
 end
 
-class Range
-  include Mongoid::Extensions::Range::Conversions
-end
-
 class String #:nodoc
-  include Mongoid::Extensions::String::Inflections
   include Mongoid::Extensions::String::Conversions
+  include Mongoid::Extensions::String::Inflections
 end
 
 class Symbol #:nodoc
   remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
   include Mongoid::Extensions::Symbol::Inflections
-  include Mongoid::Extensions::Symbol::Conversions
-end
-
-class Time #:nodoc
-  extend Mongoid::Extensions::TimeConversions
 end
 
 class TrueClass #:nodoc

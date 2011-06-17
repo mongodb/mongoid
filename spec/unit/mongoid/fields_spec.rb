@@ -201,7 +201,7 @@ describe Mongoid::Fields do
       end
 
       before do
-        Mongoid::Field.option :option, &handler
+        Mongoid::Fields::Serializable.option :option, &handler
       end
 
       context "when option is provided" do

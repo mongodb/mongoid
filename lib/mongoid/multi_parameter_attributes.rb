@@ -65,8 +65,8 @@ module Mongoid #:nodoc:
         multi_parameter_attributes.each_pair do |key, values|
           begin
             values = (values.keys.min..values.keys.max).map { |i| values[i] }
-            klass = self.class.fields[key].try(:type)
-            attributes[key] = instantiate_object(klass, values)
+            field = self.class.fields[key]
+            attributes[key] = instantiate_object(field, values)
           rescue => e
             errors << Errors::AttributeAssignmentError.new(
               "error on assignment #{values.inspect} to #{key}", e, key
@@ -89,13 +89,12 @@ module Mongoid #:nodoc:
 
     protected
 
-    def instantiate_object(klass, values_with_empty_parameters)
+    def instantiate_object(field, values_with_empty_parameters)
       return nil if values_with_empty_parameters.all? { |v| v.nil? }
-
       values = values_with_empty_parameters.collect { |v| v.nil? ? 1 : v }
-
+      klass = field.type
       if klass == DateTime || klass == Date || klass == Time
-        klass.send(:convert_to_time, values)
+        field.serialize(values)
       elsif klass
         klass.new *values
       else

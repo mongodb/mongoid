@@ -166,7 +166,7 @@ module Mongoid #:nodoc
       def process_options(field)
         options = field.options
 
-        Field.options.each do |option_name, handler|
+        Serializable.options.each do |option_name, handler|
           if options.has_key?(option_name)
             handler.call(self, field, options[option_name])
           end

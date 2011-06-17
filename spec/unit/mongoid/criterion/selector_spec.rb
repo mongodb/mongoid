@@ -108,13 +108,12 @@ describe Mongoid::Criterion::Selector do
 
     context "when the key is a declared field" do
       it "returns the typecast value" do
-        field = stub
+        field = stub_everything
         klass.stubs(:fields).returns({"age" => field})
         selector.expects(:typecast_value_for).with(field, "45")
         selector.send(:try_to_typecast, "age", "45")
       end
     end
-
   end
 
   describe "#typecast_value_for" do
@@ -132,7 +131,7 @@ describe Mongoid::Criterion::Selector do
         let(:field) { stub(:type => Array) }
 
         it "allows the simple value to be set" do
-          String.expects(:set).with("007")
+          String.expects(:mongoize).with("007")
           selector.send(:typecast_value_for, field, "007")
         end
       end
@@ -185,10 +184,9 @@ describe Mongoid::Criterion::Selector do
 
           it "typecasts the value" do
             value = {"$exists" => "true"}
-            Boolean.expects(:set).with("true")
+            Boolean.expects(:mongoize).with("true")
             selector.send(:typecast_value_for, field, value)
           end
-
         end
 
         context "when the hash is a $size query" do
@@ -201,15 +199,14 @@ describe Mongoid::Criterion::Selector do
 
           it "typecasts the value" do
             value = {"$size" => "2"}
-            Integer.expects(:set).with("2")
+            Integer.expects(:mongoize).with("2")
             selector.send(:typecast_value_for, field, value)
           end
-
         end
-
       end
 
       context "and the field type is a hash" do
+
         before { field.stubs(:type => Hash) }
 
         it "should let the field typecast the value" do
@@ -217,9 +214,7 @@ describe Mongoid::Criterion::Selector do
           field.expects(:serialize).with(value).once
           selector.send(:typecast_value_for, field, value)
         end
-
       end
-
     end
   end
 end

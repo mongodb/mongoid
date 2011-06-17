@@ -2,21 +2,21 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Integer::Conversions do
 
-  describe "#set" do
+  describe "#mongoize" do
 
     context "when the value is a number" do
 
       context "when the value is an integer" do
 
         it "it returns the integer" do
-          Integer.set(3).should == 3
+          Integer.mongoize(3).should == 3
         end
       end
 
       context "when the value is a decimal" do
 
         it "returns the decimal" do
-          Integer.set(2.5).should == 2.5
+          Integer.mongoize(2.5).should == 2.5
         end
       end
     end
@@ -26,37 +26,30 @@ describe Mongoid::Extensions::Integer::Conversions do
       context "when the string is non numerical" do
 
         it "returns the string" do
-          Integer.set("foo").should == "foo"
+          Integer.mongoize("foo").should == "foo"
         end
       end
 
       context "when the string is numerical" do
 
         it "returns the integer value for the string" do
-          Integer.set("3").should == 3
+          Integer.mongoize("3").should == 3
         end
       end
 
       context "when the string is empty" do
 
         it "returns an empty string" do
-          Integer.set("").should be_nil
+          Integer.mongoize("").should be_nil
         end
       end
 
       context "when the string is nil" do
 
         it "returns nil" do
-          Integer.set(nil).should be_nil
+          Integer.mongoize(nil).should be_nil
         end
       end
-    end
-  end
-
-  describe "#get" do
-
-    it "returns the integer" do
-      Integer.get(3).should == 3
     end
   end
 end
