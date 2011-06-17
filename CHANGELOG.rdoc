@@ -9,6 +9,10 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * Traditional slave support has been removed from Mongoid.
   Replica sets should be used in place of traditional master and slave setups.
 
+* Custom field serialization has changed. Please see
+{serializable}[https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields/serializable.rb]
+for changes.
+
 === New Features
 
 * #587 Added order preference to many and many to many associations (Gregory Man)
