@@ -40,6 +40,43 @@ module Mongoid #:nodoc
       alias :id= :_id=
     end
 
+    class << self
+
+      # Stores the provided block to be run when the option name specified is
+      # defined on a field.
+      #
+      # No assumptions are made about what sort of work the handler might
+      # perform, so it will always be called if the `option_name` key is
+      # provided in the field definition -- even if it is false or nil.
+      #
+      # @example
+      #   Mongoid::Fields.option :required do |model, field, value|
+      #     model.validates_presence_of field if value
+      #   end
+      #
+      # @param [ Symbol ] option_name the option name to match against
+      # @param [ Proc ] block the handler to execute when the option is
+      #   provided.
+      #
+      # @since 2.1.0
+      def option(option_name, &block)
+        options[option_name] = block
+      end
+
+      # Return a map of custom option names to their handlers.
+      #
+      # @example
+      #   Mongoid::Fields.options
+      #   # => { :required => #<Proc:0x00000100976b38> }
+      #
+      # @return [ Hash ] the option map
+      #
+      # @since 2.1.0
+      def options
+        @options ||= {}
+      end
+    end
+
     module ClassMethods #:nodoc
 
       # Returns the default values for the fields on the document.
@@ -150,25 +187,25 @@ module Mongoid #:nodoc
         end
       end
 
-      # Run through all custom options stored in Mongoid::Field.options and
+      # Run through all custom options stored in Mongoid::Fields.options and
       # execute the handler if the option is provided.
       #
       # @example
-      #   Mongoid::Field.option :custom do
+      #   Mongoid::Fields.option :custom do
       #     puts "called"
       #   end
       #
-      #   field = Mongoid::Field.new(:test, :custom => true)
+      #   field = Mongoid::Fields.new(:test, :custom => true)
       #   Person.process_options(field)
       #   # => "called"
       #
       # @param [ Field ] field the field to process
       def process_options(field)
-        options = field.options
+        field_options = field.options
 
-        Serializable.options.each do |option_name, handler|
-          if options.has_key?(option_name)
-            handler.call(self, field, options[option_name])
+        Fields.options.each do |option_name, handler|
+          if field_options.has_key?(option_name)
+            handler.call(self, field, field_options[option_name])
           end
         end
       end

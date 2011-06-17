@@ -75,7 +75,7 @@ describe Mongoid::Fields::Serializable::Object do
   describe ".option" do
 
     let(:options) do
-      Mongoid::Fields::Serializable.options
+      Mongoid::Fields.options
     end
 
     let(:handler) do
@@ -84,19 +84,19 @@ describe Mongoid::Fields::Serializable::Object do
 
     it "stores the custom option in the options hash" do
       options.expects(:[]=).with(:option, handler)
-      Mongoid::Fields::Serializable.option(:option, &handler)
+      Mongoid::Fields.option(:option, &handler)
     end
   end
 
   describe ".options" do
 
     it "returns a hash of custom options" do
-      Mongoid::Fields::Serializable.options.should be_a Hash
+      Mongoid::Fields.options.should be_a Hash
     end
 
     it "is memoized" do
-      Mongoid::Fields::Serializable.options.should
-        equal(Mongoid::Fields::Serializable.options)
+      Mongoid::Fields.options.should
+        equal(Mongoid::Fields.options)
     end
   end
 
