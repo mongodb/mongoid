@@ -139,7 +139,7 @@ describe Mongoid::Associations do
         @favorite = @person.favorites.build
       end
 
-      it "should properly" do
+      it "should properly build the association with custom class name defined in the associated class" do
         @favorite.liker.should == @person
       end
     end
