@@ -65,7 +65,7 @@ namespace :db do
       Dir.glob("app/models/**/*.rb").sort.each do |file|
         model_path = file[0..-4].split('/')[2..-1]
         begin
-          klass = model_path.map(&:camelize).join('::').constantize
+          klass = find_constant_from_path_array model_path
           if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
             documents << klass
           end
@@ -75,6 +75,16 @@ namespace :db do
         end
       end
       documents
+    end
+
+    def find_constant_from_path_array model_path
+      begin
+        klass = model_path.map(&:camelize).join('::').constantize
+      rescue LoadError => e
+        # Try to constantize the model when organized in a subdir of models, but not namespaced under a module
+        klass = model_path.last.camelize.constantize
+      end
+      return klass
     end
 
     desc 'Create the indexes defined on your mongoid models'
