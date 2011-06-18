@@ -37,8 +37,9 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def cast_on_read?
-        @cast_on_read ||=
-          self.class.public_instance_methods(false).include?(:deserialize)
+        return @cast_on_read if defined?(@cast_on_read)
+        @cast_on_read =
+          self.class.public_instance_methods(false).map(&:to_sym).include?(:deserialize)
       end
 
       # Get the default value for the field.
