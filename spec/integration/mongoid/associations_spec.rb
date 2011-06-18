@@ -134,6 +134,16 @@ describe Mongoid::Associations do
       from_db.posts.should == [@post]
     end
 
+    describe "#build with custom class name" do
+      before do
+        @favorite = @person.favorites.build
+      end
+
+      it "should properly" do
+        @favorite.liker.should == @person
+      end
+    end
+
     describe "#build" do
 
       before do
