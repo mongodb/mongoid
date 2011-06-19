@@ -140,6 +140,10 @@ describe Mongoid::Document do
     after do
       Firefox.delete_all
     end
+    
+    it 'should find object with String args' do
+      Firefox.find(@firefox.id.to_s).should == @firefox
+    end
 
     it "returns subclasses for querying parents" do
       firefox = Canvas.where(:name => "firefox").first

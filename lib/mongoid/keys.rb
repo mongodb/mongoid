@@ -113,8 +113,9 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def using_object_ids?
-        @using_object_ids
+        (self.superclass == Object) ? @using_object_ids : (@using_object_ids.nil? ? self.superclass.using_object_ids? : @using_object_ids)
       end
+      
     end
   end
 end
