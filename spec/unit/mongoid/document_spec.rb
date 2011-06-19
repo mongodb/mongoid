@@ -453,10 +453,6 @@ describe Mongoid::Document do
           Mongoid.raise_not_found_error = true
         end
 
-        after do
-          Mongoid.raise_not_found_error = false
-        end
-
         it "raises an error" do
           expect {
             person.reload
@@ -468,6 +464,10 @@ describe Mongoid::Document do
 
         before do
           Mongoid.raise_not_found_error = false
+        end
+
+        after do
+          Mongoid.raise_not_found_error = true
         end
 
         it "sets the attributes to empty" do

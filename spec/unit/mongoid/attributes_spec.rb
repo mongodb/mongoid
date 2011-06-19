@@ -56,7 +56,9 @@ describe Mongoid::Attributes do
         context "when reloaded" do
 
           before do
+            Mongoid.raise_not_found_error = false
             person.reload
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns the default value" do
@@ -630,7 +632,9 @@ describe Mongoid::Attributes do
 
         before do
           person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+          Mongoid.raise_not_found_error = false
           person.reload
+          Mongoid.raise_not_found_error = true
         end
 
         it "returns the default value" do
@@ -675,7 +679,9 @@ describe Mongoid::Attributes do
 
         before do
           person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+          Mongoid.raise_not_found_error = false
           person.reload
+          Mongoid.raise_not_found_error = true
         end
 
         it "returns true" do

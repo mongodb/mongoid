@@ -380,10 +380,6 @@ describe Mongoid::Relations::Embedded::Many do
             Mongoid.raise_not_found_error = true
           end
 
-          after do
-            Mongoid.raise_not_found_error = false
-          end
-
           it "raises an error" do
             expect {
               relation.find(BSON::ObjectId.new)
@@ -399,6 +395,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns nil" do
@@ -429,10 +429,6 @@ describe Mongoid::Relations::Embedded::Many do
             Mongoid.raise_not_found_error = true
           end
 
-          after do
-            Mongoid.raise_not_found_error = false
-          end
-
           it "raises an error" do
             expect {
               relation.find([ BSON::ObjectId.new ])
@@ -448,6 +444,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns an empty array" do

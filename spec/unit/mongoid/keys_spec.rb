@@ -72,6 +72,12 @@ describe Mongoid::Keys do
         Firefox.key :name
       end
 
+      after do
+        Firefox.primary_key = nil
+        Firefox.identity :type => BSON::ObjectId
+        Firefox.skip_callback(:save, :around, :set_composite_key)
+      end
+
       it "sets the key for the entire hierarchy" do
         Canvas.primary_key.should == [:name]
       end
