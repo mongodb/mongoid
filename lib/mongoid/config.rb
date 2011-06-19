@@ -125,7 +125,7 @@ module Mongoid #:nodoc
     #
     # @since 2.0.1
     def load!(path)
-      environment = defined?(Rails) ? Rails.env : ENV["RACK_ENV"]
+      environment = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV["RACK_ENV"]
       settings = YAML.load(ERB.new(File.new(path).read).result)[environment]
       if settings.present?
         from_hash(settings)
@@ -139,7 +139,7 @@ module Mongoid #:nodoc
     #
     # @return [ Logger ] The default Logger instance.
     def default_logger
-      defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+      defined?(Rails) && Rails.respond_to?(:logger) ? Rails.logger : ::Logger.new($stdout)
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
