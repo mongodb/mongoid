@@ -41,6 +41,7 @@ describe Mongoid::Config do
 
       before do
         described_class.add_language("de")
+        I18n.reload!
         I18n.locale = :de
       end
 
