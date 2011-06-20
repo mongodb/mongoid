@@ -26,6 +26,7 @@ class Person
   field :security_code
   field :reading, :type => Object
   field :bson_id, :type => BSON::ObjectId
+  field :date_time, :type => DateTime
 
   index :age
   index :addresses

@@ -281,13 +281,15 @@ describe Mongoid::Criterion::Inclusion do
     end
 
     let!(:person) do
+      @date_time = DateTime.now
       Person.create(
         :title => "Sir",
         :dob => dob,
         :lunch_time => lunch_time,
         :age => 33,
         :aliases => [ "D", "Durran" ],
-        :things => [ { :phone => 'HTC Incredible' } ]
+        :things => [ { :phone => 'HTC Incredible' } ],
+        :date_time => @date_time
       )
     end
 
@@ -350,6 +352,8 @@ describe Mongoid::Criterion::Inclusion do
           before_dob = (dob - 1.month).to_s
           after_dob = (dob + 1.month).to_s
           Person.where(:dob.gt => before_dob).and(:dob.lt => after_dob).should == [person]
+
+          Person.where(:dob.gte => @date_time).should == [person]
         end
 
       end
@@ -439,9 +443,9 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       context "#gte" do
-
         it "returns those matching a gte clause" do
           Person.where(:age.gte => 33).should == [person]
+          Person.where(:dob.gte => dob).should == [person]
         end
       end
 
