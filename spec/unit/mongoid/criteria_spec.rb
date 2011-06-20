@@ -378,7 +378,6 @@ describe Mongoid::Criteria do
     end
   end
 
-
   describe "#clone" do
 
     let(:criteria) do
@@ -858,7 +857,6 @@ describe Mongoid::Criteria do
     end
   end
 
-
   describe "#respond_to?" do
 
     let(:criteria) do
@@ -874,7 +872,7 @@ describe Mongoid::Criteria do
     end
 
     it "is false when asking about a model's private class method even when including private methods" do
-      criteria.respond_to?(:include, true).should be_false
+      criteria.respond_to?(:alias_method, true).should be_false
     end
 
     it "is true when asking about a criteria's entries' instance method" do
@@ -894,11 +892,11 @@ describe Mongoid::Criteria do
     end
 
     it "is false when asking about a private criteria instance method without including private methods" do
-      criteria.respond_to?(:initialize).should be_false
+      criteria.respond_to?(:gsub).should be_false
     end
 
     it "is true when asking about a private criteria instance method when including private methods" do
-      criteria.respond_to?(:initialize, true).should be_true
+      criteria.respond_to?(:gsub, true).should be_true
     end
 
   end
