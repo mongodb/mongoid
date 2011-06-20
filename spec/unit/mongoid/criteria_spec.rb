@@ -892,11 +892,11 @@ describe Mongoid::Criteria do
     end
 
     it "is false when asking about a private criteria instance method without including private methods" do
-      criteria.respond_to?(:gsub).should be_false
+      criteria.respond_to?(:puts).should be_false
     end
 
     it "is true when asking about a private criteria instance method when including private methods" do
-      criteria.respond_to?(:gsub, true).should be_true
+      criteria.respond_to?(:puts, true).should be_true
     end
 
   end
