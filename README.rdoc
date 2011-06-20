@@ -11,10 +11,9 @@ Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 
 == Compatibility
 
-Mongoid is developed against Ruby 1.8.7, 1.9.2, 1.9.3, REE, and JRuby.
+Mongoid is tested against Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius, and JRuby.
 
-http://travis-ci.org/mongoid/mongoid.png
-{Build History}[http://travis-ci.org/mongoid/mongoid]
+http://travis-ci.org/mongoid/mongoid.png  {Build History}[http://travis-ci.org/mongoid/mongoid]
 
 = Documentation
 
