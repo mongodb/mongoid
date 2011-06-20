@@ -56,6 +56,7 @@ describe Mongoid::Collections do
   describe ".index_information" do
 
     before do
+      Person.delete_all
       Mongoid.autocreate_indexes = true
     end
 
