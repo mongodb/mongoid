@@ -70,7 +70,11 @@ module Mongoid #:nodoc:
       #
       # Returns: <tt>self</tt>
       def id(*args)
-        (args.flatten.size > 1) ? self.in(:_id => args.flatten) : (@selector[:_id] = args.first)
+        if args.flatten.size > 1 or args.first.is_a?(Array)
+          self.in(:_id => args.flatten)
+        else
+          @selector[:_id] = args.first
+        end
         self
       end
 

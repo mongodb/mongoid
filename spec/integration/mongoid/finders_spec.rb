@@ -99,6 +99,11 @@ describe Mongoid::Finders do
 
         context "when the documents are found" do
 
+          it "returns an array of the documents even if the array of one id is given" do
+            @people = Person.find([@documents.map(&:id).first])
+            @people.should == [@documents.first]
+          end
+
           it "returns an array of the documents" do
             @people = Person.find(@documents.map(&:id))
             @people.should == @documents
