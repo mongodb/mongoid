@@ -252,7 +252,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Collection ] The root collection.
       def set_collection
-        root = documents.first._root
+        root = documents.first.try(:_root)
         @collection = root.collection if root && !root.embedded?
       end
 
