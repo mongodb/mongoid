@@ -35,7 +35,7 @@ describe Mongoid::Dirty do
     end
 
     it "marks changed fields" do
-      person.changed.should == [ "title", "ssn", "some_dynamic_field" ]
+      person.changed.should =~ [ "title", "ssn", "some_dynamic_field" ]
     end
 
     it "marks the field as changed" do
@@ -53,7 +53,7 @@ describe Mongoid::Dirty do
     it "allows reset of field changes" do
       person.reset_title!
       person.title.should == "MC"
-      person.changed.should == [ "ssn", "some_dynamic_field" ]
+      person.changed.should =~ [ "ssn", "some_dynamic_field" ]
     end
 
     context "after a save" do

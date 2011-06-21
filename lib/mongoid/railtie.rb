@@ -98,31 +98,6 @@ module Rails #:nodoc:
         end
       end
 
-      # When workers are forked in passenger and unicorn, we need to reconnect
-      # to the database to all the workers do not share the same connection.
-      initializer "reconnect to master if application is preloaded" do
-        config.after_initialize do
-
-          # Unicorn clears the START_CTX when a worker is forked, so if we have
-          # data in START_CTX then we know we're being preloaded. Unicorn does
-          # not provide application-level hooks for executing code after the
-          # process has forked, so we reconnect lazily.
-          if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
-            ::Mongoid.reconnect!(false)
-          end
-
-          # Passenger provides the :starting_worker_process event for executing
-          # code after it has forked, so we use that and reconnect immediately.
-          if defined?(PhusionPassenger)
-            PhusionPassenger.on_event(:starting_worker_process) do |forked|
-              if forked
-                ::Mongoid.reconnect!
-              end
-            end
-          end
-        end
-      end
-
       # Instantitate any registered observers after Rails initialization and
       # instantiate them after being reloaded in the development environment
       initializer "instantiate observers" do

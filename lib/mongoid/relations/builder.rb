@@ -7,7 +7,7 @@ module Mongoid # :nodoc:
     # supplied attributes hash.
     class Builder
 
-      attr_reader :metadata, :object
+      attr_reader :metadata, :object, :loading
       # Instantiate the new builder for a relation.
       #
       # @example Create the builder.
@@ -18,8 +18,9 @@ module Mongoid # :nodoc:
       #   id to query with.
       #
       # @since 2.0.0.rc.1
-      def initialize(metadata, object)
+      def initialize(metadata, object, loading = false)
         @metadata, @object = metadata, object
+        @loading = loading
       end
 
       protected

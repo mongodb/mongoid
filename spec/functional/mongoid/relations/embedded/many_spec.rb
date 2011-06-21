@@ -1588,6 +1588,66 @@ describe Mongoid::Relations::Embedded::Many do
 
   context "when deeply embedding documents" do
 
+    context "when building the tree through hashes" do
+
+      let(:circus) do
+        Circus.new(hash)
+      end
+
+      let(:animal) do
+        circus.animals.first
+      end
+
+      let(:animal_name) do
+        "Lion"
+      end
+
+      let(:tag_list) do
+        "tigers, bears, oh my"
+      end
+
+      context "when the hash uses stringified keys" do
+
+        let(:hash) do
+          { 'animals' => [{ 'name' => animal_name, 'tag_list' => tag_list }] }
+        end
+
+        it "sets up the hierarchy" do
+          animal.circus.should == circus
+        end
+
+        it "assigns the attributes" do
+          animal.name.should == animal_name
+        end
+
+        it "uses custom writer methods" do
+          animal.tag_list.should == tag_list
+        end
+
+      end
+
+      context "when the hash uses symbolized keys" do
+
+        let(:hash) do
+          { :animals => [{ :name => animal_name, :tag_list => tag_list }] }
+        end
+
+        it "sets up the hierarchy" do
+          animal.circus.should == circus
+        end
+
+        it "assigns the attributes" do
+          animal.name.should == animal_name
+        end
+
+        it "uses custom writer methods" do
+          animal.tag_list.should == tag_list
+        end
+
+      end
+
+    end
+
     context "when building the tree through pushes" do
 
       let(:quiz) do
