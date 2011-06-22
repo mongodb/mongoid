@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
       class Operation
         include Mongoid::Safe
 
-        attr_reader :document, :field, :value, :options
+        attr_accessor :document, :field, :value, :options
 
         # Initialize the new pullAll operation.
         #
