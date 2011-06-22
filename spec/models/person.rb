@@ -65,6 +65,8 @@ class Person
     end
   end
 
+  has_many_related :favorites, :class_name => 'MixedDrink'
+
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
     self.score_without_rescoring = score

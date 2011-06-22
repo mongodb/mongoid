@@ -23,7 +23,14 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def build(attributes = {})
         load_target
-        name = @parent.class.to_s.underscore
+        inverse_assoc = @klass.associations.values.detect { |assoc|
+          assoc.klass == @parent.class && assoc.association == Mongoid::Associations::BelongsToRelated
+        }
+        name = if inverse_assoc
+          inverse_assoc.name
+        else
+          @parent.class.to_s.underscore
+        end
         object = @klass.instantiate(attributes.merge(name => @parent))
         @target << object
         object
