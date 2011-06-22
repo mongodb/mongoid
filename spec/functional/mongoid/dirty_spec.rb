@@ -83,6 +83,22 @@ describe Mongoid::Dirty do
         person.score.should be_nil
       end
     end
+
+    context "when the tracked attribute changes by dirty value another attribute" do
+      let(:alaska_party_at) { @alaska_party_at }
+
+      before do
+        @alaska_party_at = person.last_drink_taken_at
+        person.last_drink_taken_at = Time.now.in_time_zone("Moscow").to_date
+
+        person.drunk_days << person.last_drink_taken_at_was
+      end
+
+      it "change tracks correctly" do
+        person.drunk_days_change.should == [[], [alaska_party_at]]
+      end
+    end
+
   end
 
   context "when associations are getting changed" do

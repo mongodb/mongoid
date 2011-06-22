@@ -183,7 +183,7 @@ module Mongoid #:nodoc:
 
     # Get all normal modifications plus in place potential changes.
     #
-    # @example Get all the modiciations.
+    # @example Get all the modificiations.
     #   person.modifications
     #
     # @return [ Hash ] All changes to the document.
@@ -191,9 +191,11 @@ module Mongoid #:nodoc:
       reset_modifications unless @modifications && @accessed
       @accessed.each_pair do |field, value|
         current = attributes[field]
-        @modifications[field] = [ value, current ] if current != value
+        if current != value
+          @modifications[field] = [ value, current ]
+          @accessed.delete(field)
+        end
       end
-      @accessed.clear
       @modifications
     end
 
