@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
           self.field = field.to_s
           document.attributes.delete(field)
           collection.update(document._selector, operation("$unset"), options)
-          document.changes.delete(value)
+          document.remove_change(value)
         end
       end
     end

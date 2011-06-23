@@ -53,7 +53,7 @@ describe Mongoid::Dirty do
     it "allows reset of field changes" do
       person.reset_title!
       person.title.should == "MC"
-      person.changed.should =~ [ "ssn", "some_dynamic_field" ]
+      person.changed.should =~ [ "ssn", "some_dynamic_field", "title" ]
     end
 
     context "after a save" do

@@ -182,7 +182,6 @@ module Mongoid #:nodoc
         ).new(name, options).tap do |field|
           fields[name] = field
           create_accessors(name, meth, options)
-          add_dirty_methods(name)
           process_options(field)
         end
       end
@@ -230,7 +229,11 @@ module Mongoid #:nodoc
             end
           else
             define_method(meth) do
-              read_attribute(name)
+              read_attribute(name).tap do |value|
+                if value.is_a?(Enumerable)
+                  changed_attributes[name] = value.clone
+                end
+              end
             end
           end
           define_method("#{meth}=") do |value|

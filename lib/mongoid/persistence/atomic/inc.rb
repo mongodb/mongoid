@@ -19,7 +19,7 @@ module Mongoid #:nodoc:
           document[field] = current + value
           document[field].tap do
             collection.update(document._selector, operation("$inc"), options)
-            document.changes.delete(field.to_s)
+            document.remove_change(field)
           end
         end
       end

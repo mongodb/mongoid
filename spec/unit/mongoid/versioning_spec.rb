@@ -126,7 +126,7 @@ describe Mongoid::Versioning do
   context "when the document has not changed" do
 
     let(:person) do
-      Person.new(:created_at => Time.now.utc)
+      Person.instantiate(:created_at => Time.now.utc)
     end
 
     before do

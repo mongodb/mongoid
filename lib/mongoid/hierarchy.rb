@@ -33,12 +33,12 @@ module Mongoid #:nodoc
       #
       # @return [ Array<Document> ] All child documents in the hierarchy.
       def _children
-        relations.inject([]) do |children, (name, metadata)|
-          children.tap do |kids|
-            if metadata.embedded? && name != "versions"
+        [].tap do |children|
+          relations.each do |name, metadata|
+            if metadata.embedded?
               child = send(name)
               child.to_a.each do |doc|
-                kids.push(doc).concat(doc._children)
+                children.push(doc).concat(doc._children)
               end unless child.blank?
             end
           end

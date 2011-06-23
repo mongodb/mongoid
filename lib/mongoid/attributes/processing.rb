@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
           process_attribute(key, value)
         end
         yield self if block_given?
-        process_pending and setup_modifications
+        process_pending
       end
 
       protected

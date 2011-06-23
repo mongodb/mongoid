@@ -68,10 +68,6 @@ describe Mongoid::Persistence::Atomic::Bit do
           person.changes["age"].should be_nil
         end
 
-        it "resets the document dirty flag" do
-          person.should_not be_changed
-        end
-
         it "returns the new field value" do
           result.should == 12
         end
@@ -108,10 +104,6 @@ describe Mongoid::Persistence::Atomic::Bit do
           person.changes["age"].should be_nil
         end
 
-        it "resets the document dirty flag" do
-          person.should_not be_changed
-        end
-
         it "returns the new field value" do
           result.should == 61
         end
@@ -146,10 +138,6 @@ describe Mongoid::Persistence::Atomic::Bit do
 
         it "removes the field from the dirty attributes" do
           person.changes["age"].should be_nil
-        end
-
-        it "resets the document dirty flag" do
-          person.should_not be_changed
         end
 
         it "returns the new field value" do

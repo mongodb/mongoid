@@ -41,9 +41,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def read_attribute(name)
-      access = name.to_s
-      value = attributes[access]
-      accessed(access, value)
+      attributes[name.to_s]
     end
     alias :[] :read_attribute
 
@@ -58,7 +56,8 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def remove_attribute(name)
       access = name.to_s
-      modify(access, attributes.delete(access), nil)
+      attribute_will_change!(access)
+      attributes.delete(access)
     end
 
     # Override respond_to? so it responds properly for dynamic attributes.
@@ -94,7 +93,10 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def write_attribute(name, value)
       access = name.to_s
-      modify(access, attributes[access], typed_value_for(access, value))
+      typed_value_for(access, value).tap do |value|
+        attribute_will_change!(access) unless attributes[access] == value
+        attributes[access] = value
+      end
     end
     alias :[]= :write_attribute
 

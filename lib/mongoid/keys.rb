@@ -10,6 +10,8 @@ module Mongoid #:nodoc:
       cattr_accessor :primary_key, :using_object_ids
       @using_object_ids = true
       delegate :primary_key, :using_object_ids?, :to => "self.class"
+
+      attr_reader :identifier
     end
 
     private
@@ -52,10 +54,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def swap_composite_keys(&block)
-      old_id, new_id = id.dup, identify
-      @attributes["_id"] = old_id
+      @identifier, new_id = id.dup, identify
       block.call
-      @attributes["_id"] = new_id
+      @identifier = nil
     end
 
     module ClassMethods #:nodoc:

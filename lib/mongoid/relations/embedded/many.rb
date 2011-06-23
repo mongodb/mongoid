@@ -265,9 +265,9 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def as_document
-          target.inject([]) do |attributes, doc|
-            attributes.tap do |attr|
-              attr << doc.as_document
+          [].tap do |attributes|
+            target.each do |doc|
+              attributes << doc.as_document
             end
           end
         end

@@ -19,7 +19,7 @@ module Mongoid #:nodoc:
           document[field] = [] unless document[field]
           document.send(field).push(value).tap do |value|
             collection.update(document._selector, operation("$push"), options)
-            document.changes.delete(field.to_s)
+            document.remove_change(field)
           end
         end
       end

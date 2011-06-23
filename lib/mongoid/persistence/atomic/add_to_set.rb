@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
           values.tap do
             if document.persisted?
               collection.update(document._selector, operation("$addToSet"), options)
-              document.changes.delete(field.to_s)
+              document.remove_change(field)
             end
           end
         end

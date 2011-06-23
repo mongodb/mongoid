@@ -45,10 +45,6 @@ describe Mongoid::Persistence::Atomic::Pop do
           person.changes["aliases"].should be_nil
         end
 
-        it "resets the document dirty flag" do
-          person.should_not be_changed
-        end
-
         it "returns the new array value" do
           popped.should == [ "008", "009" ]
         end
@@ -81,10 +77,6 @@ describe Mongoid::Persistence::Atomic::Pop do
           person.changes["aliases"].should be_nil
         end
 
-        it "resets the document dirty flag" do
-          person.should_not be_changed
-        end
-
         it "returns the new array value" do
           popped.should == [ "007", "008" ]
         end
@@ -111,10 +103,6 @@ describe Mongoid::Persistence::Atomic::Pop do
 
       it "removes the field from the dirty attributes" do
         person.changes["aliases"].should be_nil
-      end
-
-      it "resets the document dirty flag" do
-        person.should_not be_changed
       end
 
       it "returns nil" do

@@ -67,8 +67,14 @@ module Mongoid #:nodoc:
     #
     # @return [ String ] The exact selector for this document.
     def _selector
-      (embedded? ? _parent._selector.merge("#{_path}._id" => id) : { "_id" => id }).
-        merge(shard_key_selector)
+      {}.tap do |selector|
+        if embedded?
+          selector.merge!(_parent._selector.merge("#{_path}._id" => identifier || id))
+        else
+          selector.merge!("_id" => identifier || id)
+        end
+        selector.merge!(shard_key_selector)
+      end
     end
   end
 end

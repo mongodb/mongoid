@@ -43,10 +43,6 @@ describe Mongoid::Persistence::Atomic::Pull do
         person.changes["aliases"].should be_nil
       end
 
-      it "resets the document dirty flag" do
-        person.should_not be_changed
-      end
-
       it "returns the new array value" do
         pulled.should == [ "007", "009" ]
       end
@@ -72,10 +68,6 @@ describe Mongoid::Persistence::Atomic::Pull do
 
       it "removes the field from the dirty attributes" do
         person.changes["aliases"].should be_nil
-      end
-
-      it "resets the document dirty flag" do
-        person.should_not be_changed
       end
 
       it "returns nil" do

@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
             values.delete(value)
             values.tap do
               collection.update(document._selector, operation("$pull"), options)
-              document.changes.delete(field.to_s) if document.persisted?
+              document.remove_change(field) if document.persisted?
             end
           else
             return nil
