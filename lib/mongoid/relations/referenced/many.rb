@@ -53,7 +53,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def bind(options = {})
           binding.bind(options)
-          target.map(&:save) if base.persisted? && !options[:binding]
+          target.map { |doc| doc.save } if base.persisted? && !options[:binding]
         end
 
         alias :concat :<<
@@ -275,8 +275,8 @@ module Mongoid #:nodoc:
         def unbind(options = {})
           binding.unbind(options)
           unless base.new_record?
-            target.each(&:delete) unless options[:binding]
-            target.each(&:save) if options[:nullify]
+            target.each { |doc| doc.delete } unless options[:binding]
+            target.each { |doc| doc.save } if options[:nullify]
           end
           []
         end

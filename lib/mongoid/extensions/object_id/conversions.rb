@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
               BSON::ObjectId.from_string(args)
             end
           when ::Array
-            args = args.reject(&:blank?) if reject_blank
+            args = args.reject { |arg| arg.blank? } if reject_blank
             args.map do |arg|
               convert(klass, arg, reject_blank)
             end

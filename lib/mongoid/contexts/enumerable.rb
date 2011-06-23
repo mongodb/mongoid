@@ -56,7 +56,9 @@ module Mongoid #:nodoc:
       def delete_all
         atomically(:$pull) do
           set_collection
-          count.tap { filter.each(&:delete) }
+          count.tap do
+            filter.each { |doc| doc.delete }
+          end
         end
       end
       alias :delete :delete_all
@@ -72,7 +74,9 @@ module Mongoid #:nodoc:
       def destroy_all
         atomically(:$pull) do
           set_collection
-          count.tap { filter.each(&:destroy) }
+          count.tap do
+            filter.each { |doc| doc.destroy }
+          end
         end
       end
       alias :destroy :destroy_all
