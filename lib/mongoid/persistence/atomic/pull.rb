@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
             values = document.send(field)
             values.delete(value)
             values.tap do
-              document.collection.update(document._selector, operation("$pull"), options)
+              collection.update(document._selector, operation("$pull"), options)
               document.changes.delete(field.to_s) if document.persisted?
             end
           else

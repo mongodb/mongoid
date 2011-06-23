@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
         def persist
           self.field = field.to_s
           document.attributes.delete(field)
-          document.collection.update(document._selector, operation("$unset"), options)
+          collection.update(document._selector, operation("$unset"), options)
           document.changes.delete(value)
         end
       end

@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
           values.push(value) unless values.include?(value)
           values.tap do
             if document.persisted?
-              document.collection.update(document._selector, operation("$addToSet"), options)
+              collection.update(document._selector, operation("$addToSet"), options)
               document.changes.delete(field.to_s)
             end
           end
