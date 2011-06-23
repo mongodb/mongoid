@@ -9,6 +9,18 @@ module Mongoid #:nodoc:
 
         attr_accessor :document, :field, :value, :options
 
+        # Get the collection to be used for persistence.
+        #
+        # @example Get the collection.
+        #   operation.collection
+        #
+        # @return [ Collection ] The root collection.
+        #
+        # @since 2.1.0
+        def collection
+          document._root.collection
+        end
+
         # Initialize the new pullAll operation.
         #
         # @example Create a new pullAll operation.
@@ -36,7 +48,20 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def operation(modifier)
-          { modifier => { field => value } }
+          { modifier => { path => value } }
+        end
+
+        # Get the path to the field that is getting atomically updated.
+        #
+        # @example Get the path.
+        #   operation.path
+        #
+        # @return [ String, Symbol ] The path to the field.
+        #
+        # @since 2.1.0
+        def path
+          position = document._position
+          position.blank? ? field : "#{position}.#{field}"
         end
       end
     end
