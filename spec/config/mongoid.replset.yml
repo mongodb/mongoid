@@ -5,7 +5,7 @@ test:
   parameterize_keys: false
   persist_in_safe_mode: false
   raise_not_found_error: false
-  reconnect_time: 5
+  max_retries_on_connection_failure: 5
   persist_types: false
   option_no_exist: false
   skip_version_check: false
@@ -14,7 +14,7 @@ test:
     shard_replset:
       hosts: [ [localhost, 27017], [localhost, 27017] ]
       database: multi_db_replset_test
-      reconnect_time: 5
+      max_retries_on_connection_failure: 5
 
 authenticated:
   hosts: [[localhost, 27017], [localhost, 27017]]
@@ -23,7 +23,7 @@ authenticated:
   parameterize_keys: false
   persist_in_safe_mode: false
   raise_not_found_error: false
-  reconnect_time: 5
+  max_retries_on_connection_failure: 5
   persist_types: false
   option_no_exist: false
   skip_version_check: false
