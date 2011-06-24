@@ -228,23 +228,21 @@ module Mongoid #:nodoc:
       #
       # @param [ String ] name The name of the attributes.
       def add_dirty_methods(name)
-        unless instance_methods.include?("#{name}_change") ||
-          instance_methods.include?(:"#{name}_change")
+        instance_methods_array = instance_methods
+        ruby18 = /^1\.8/ === RUBY_VERSION
+        unless instance_methods_array.include?(ruby18 ? "#{name}_change" : :"#{name}_change")
           define_method("#{name}_change") { attribute_change(name) }
         end
 
-        unless instance_methods.include?("#{name}_changed?") ||
-          instance_methods.include?(:"#{name}_changed?")
+        unless instance_methods_array.include?(ruby18 ? "#{name}_changed?" : :"#{name}_changed?")
           define_method("#{name}_changed?") { attribute_changed?(name) }
         end
 
-        unless instance_methods.include?("#{name}_was") ||
-          instance_methods.include?(:"#{name}_was")
+        unless instance_methods_array.include?(ruby18 ? "#{name}_was" : :"#{name}_was")
           define_method("#{name}_was") { attribute_was(name) }
         end
 
-        unless instance_methods.include?("reset_#{name}!") ||
-          instance_methods.include?(:"reset_#{name}!")
+        unless instance_methods_array.include?(ruby18 ? "reset_#{name}!" : :"reset_#{name}!")
           define_method("reset_#{name}!") { reset_attribute!(name) }
         end
       end
