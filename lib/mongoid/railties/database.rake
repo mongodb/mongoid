@@ -3,7 +3,7 @@ namespace :db do
   if not Rake::Task.task_defined?("db:drop")
     desc 'Drops all the collections for the database for the current Rails.env'
     task :drop => :environment do
-      Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+      Mongoid.master.collections.select {|c| c.name !~ /system/ }.each { |c| c.drop }
     end
   end
 
@@ -65,7 +65,7 @@ namespace :db do
       Dir.glob("app/models/**/*.rb").sort.each do |file|
         model_path = file[0..-4].split('/')[2..-1]
         begin
-          klass = model_path.map(&:camelize).join('::').constantize
+          klass = model_path.map { |path| path.camelize }.join('::').constantize
           if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
             documents << klass
           end

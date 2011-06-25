@@ -3,22 +3,22 @@ module Mongoid #:nodoc:
   module Persistence #:nodoc:
     module Atomic #:nodoc:
 
-      # This class provides the ability to perform an explicit $push modification
+      # This class provides the ability to perform an explicit $pushAll modification
       # on a specific field.
-      class Push < Operation
+      class PushAll < Operation
 
-        # Sends the atomic $push operation to the database.
+        # Sends the atomic $pushAll operation to the database.
         #
         # @example Persist the new values.
-        #   push.persist
+        #   pushAll.persist
         #
         # @return [ Object ] The new array value.
         #
-        # @since 2.0.0
+        # @since 2.1.0
         def persist
           document[field] = [] unless document[field]
-          document.send(field).push(value).tap do |value|
-            collection.update(document._selector, operation("$push"), options)
+          document.send(field).concat(value).tap do |value|
+            collection.update(document._selector, operation("$pushAll"), options)
             document.changes.delete(field.to_s)
           end
         end

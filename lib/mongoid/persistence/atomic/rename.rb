@@ -3,8 +3,8 @@ module Mongoid #:nodoc:
   module Persistence #:nodoc:
     module Atomic #:nodoc:
 
-      # This class provides atomic $inc behaviour.
-      class Inc < Operation
+      # Performs an atomic rename operation.
+      class Rename < Operation
 
         # Sends the atomic $inc operation to the database.
         #
@@ -13,13 +13,13 @@ module Mongoid #:nodoc:
         #
         # @return [ Object ] The new integer value.
         #
-        # @since 2.0.0
+        # @since 2.1.0
         def persist
-          current = document[field] || 0
-          document[field] = current + value
-          document[field].tap do
-            collection.update(document._selector, operation("$inc"), options)
-            document.changes.delete(field.to_s)
+          self.value, self.field = value.to_s, field.to_s
+          document[value] = document.attributes.delete(field)
+          document[value].tap do
+            collection.update(document._selector, operation("$rename"), options)
+            document.changes.delete(value)
           end
         end
       end

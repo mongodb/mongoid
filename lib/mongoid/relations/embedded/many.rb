@@ -52,7 +52,7 @@ module Mongoid # :nodoc:
         def bind(options = {})
           binding.bind(options)
           if base.persisted? && !options[:binding]
-            atomically(:$set) { target.each(&:save) }
+            atomically(:$set) { target.each { |doc| doc.save } }
           end
         end
 
@@ -94,7 +94,7 @@ module Mongoid # :nodoc:
         # @return [ Integer ] The total number of persisted embedded docs, as
         #   flagged by the #persisted? method.
         def count
-          target.select(&:persisted?).size
+          target.select { |doc| doc.persisted? }.size
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -108,7 +108,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Document ] The newly created document.
         def create(attributes = {}, type = nil, &block)
-          build(attributes, type, &block).tap(&:save)
+          build(attributes, type, &block).tap { |doc| doc.save }
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -125,7 +125,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Document ] The newly created document.
         def create!(attributes = {}, type = nil, &block)
-          build(attributes, type, &block).tap(&:save!)
+          build(attributes, type, &block).tap { |doc| doc.save! }
         end
 
         # Delete the supplied document from the target. This method is proxied

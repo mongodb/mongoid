@@ -96,7 +96,7 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 
 module Mongoid #:nodoc
 
-  MONGODB_VERSION = "1.6.0"
+  MONGODB_VERSION = "1.8.0"
 
   class << self
 

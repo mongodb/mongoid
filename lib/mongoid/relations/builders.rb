@@ -69,7 +69,7 @@ module Mongoid # :nodoc:
         def creator(name)
           tap do
             define_method("create_#{name}") do |*args|
-              send("build_#{name}", *args).tap(&:save)
+              send("build_#{name}", *args).tap { |doc| doc.save }
             end
           end
         end

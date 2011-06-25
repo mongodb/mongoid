@@ -3,24 +3,24 @@ module Mongoid #:nodoc:
   module Persistence #:nodoc:
     module Atomic #:nodoc:
 
-      # This class provides the ability to perform an explicit $pullAll
+      # This class provides the ability to perform an explicit $pop
       # modification on a specific field.
-      class PullAll < Operation
+      class Pop < Operation
 
-        # Sends the atomic $pullAll operation to the database.
+        # Sends the atomic $pop operation to the database.
         #
         # @example Persist the new values.
-        #   pull_all.persist
+        #   pop.persist
         #
         # @return [ Object ] The new array value.
         #
-        # @since 2.0.0
+        # @since 2.1.0
         def persist
           if document[field]
             values = document.send(field)
-            values.delete_if { |val| value.include?(val) }
+            value > 0 ? values.pop : values.shift
             values.tap do
-              collection.update(document._selector, operation("$pullAll"), options)
+              collection.update(document._selector, operation("$pop"), options)
               document.changes.delete(field.to_s) if document.persisted?
             end
           else
