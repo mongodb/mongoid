@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Atomicity do
+describe Mongoid::Atomic do
 
   describe "#_updates" do
 
