@@ -19,8 +19,8 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)
-            object.inject([]) do |documents, attrs|
-              documents.tap do |docs|
+            [].tap do |docs|
+              object.each do | attrs|
                 if loading
                   docs << Mongoid::Factory.from_db(metadata.klass, attrs)
                 else

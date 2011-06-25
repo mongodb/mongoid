@@ -86,10 +86,11 @@ module Mongoid #:nodoc
       #
       # @return [ Hash ] The field defaults.
       def defaults
-        fields.inject({}) do |defs, (field_name,field)|
-          next(defs) if field.default.nil?
-          defs[field_name.to_s] = field.default
-          defs
+        {}.tap do |defs|
+          fields.each_pair do |field_name, field|
+            next if field.default.nil?
+            defs[field_name.to_s] = field.default
+          end
         end
       end
 
