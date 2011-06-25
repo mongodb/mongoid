@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
     #
     # @return [ String ] The pull or set operator.
     def _inserter
-      embedded? ? (embedded_many? ? "$push" : "$set") : nil
+      @inserter ||= (embedded? ? (embedded_many? ? "$push" : "$set") : nil)
     end
 
     # Return the path to this +Document+ in JSON notation, used for atomic
@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
     #
     # @return [ String ] The path to the document in the database.
     def _path
-      _position.sub!(/\.\d+$/, '') || _position
+      @_path ||= (_position.sub!(/\.\d+$/, '') || _position)
     end
     alias :_pull :_path
 
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
     #
     # @return [ String ] The pull or unset operation.
     def _remover
-      embedded? ? (_index ? "$pull" : "$unset") : nil
+      @_remover ||= (embedded? ? (_index ? "$pull" : "$unset") : nil)
     end
 
     # Return the selector for this document to be matched exactly for use
