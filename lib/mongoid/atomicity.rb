@@ -3,9 +3,6 @@ module Mongoid #:nodoc:
 
   # This module contains the logic for supporting atomic operations against the
   # database.
-  #
-  # @todo Durran: Refactor class out into separate objects for each type of
-  #   update.
   module Atomicity
     extend ActiveSupport::Concern
 
@@ -32,47 +29,14 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] The updates and their modifiers.
     def _updates
-      processed = {}
-
-      _children.inject({ "$set" => _sets, "$pushAll" => {}, :other => {} }) do |updates, child|
-        changes = child._sets
-        updates["$set"].update(changes)
-        unless changes.empty?
-          processed[child._conflicting_modification_key] = true
+      Atomic::Modifiers.new.set(_sets).tap do |mods|
+        _children.each do |child|
+          mods.set(child._sets).push(child._pushes)
         end
-
-        if processed.has_key?(child._conflicting_modification_key)
-          target = :other
-        else
-          target = "$pushAll"
-        end
-
-        child._pushes.each do |attr, val|
-          if updates[target].has_key?(attr)
-            updates[target][attr] << val
-          else
-            updates[target].update({attr => [val]})
-          end
-        end
-        updates
-      end.delete_if do |key, value|
-        value.empty?
       end
     end
 
     protected
-
-    # Get the key used to check for conflicting modifications.  For now, we
-    # just use the first component of _path, and discard the first period
-    # and everything that follows.
-    #
-    # @example Get the key.
-    #   person._conflicting_modification_key
-    #
-    # @return [ String ] The conflicting key.
-    def _conflicting_modification_key
-      _path.sub(/\..*/, '')
-    end
 
     # Get all the push attributes that need to occur.
     #
