@@ -65,7 +65,7 @@ module Mongoid #:nodoc:
       # @return [ true ] Always true.
       def update
         true.tap do
-          updates = document._updates
+          updates = document.atomic_updates
           unless updates.empty?
             other_pushes = updates.delete(:other)
             collection.update(document._selector, updates, options.merge(:multi => false))

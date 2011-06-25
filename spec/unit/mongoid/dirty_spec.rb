@@ -47,7 +47,7 @@ describe Mongoid::Dirty do
       end
     end
 
-    pending "when the attribute is modified in place" do
+    context "when the attribute is modified in place" do
 
       context "when the attribute is an array" do
 
@@ -77,7 +77,7 @@ describe Mongoid::Dirty do
 
           it "returns an array of the original value and new value" do
             person.send(:attribute_change, "aliases").should ==
-              [ [ "Grand Poobah" ],  [ "Dark Helmet", "Colonel Sanders" ] ]
+              [ [ "Dark Helmet" ],  [ "Dark Helmet", "Colonel Sanders" ] ]
           end
         end
       end
@@ -93,7 +93,7 @@ describe Mongoid::Dirty do
         end
 
         it "returns an array of the original value and new value" do
-          person.attribute_change("map").should ==
+          person.send(:attribute_change, "map").should ==
             [ { :location => "Home" }, { :location => "Work" } ]
         end
 
@@ -109,8 +109,8 @@ describe Mongoid::Dirty do
           end
 
           it "returns an array of the original value and new value" do
-            person.attribute_change("map").should ==
-              [ { :location => "Home" }, { :location => "Work", :lat => 20.0 } ]
+            person.send(:attribute_change, "map").should ==
+              [ { :location => "Work" }, { :location => "Work", :lat => 20.0 } ]
           end
         end
       end

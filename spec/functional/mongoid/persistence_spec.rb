@@ -282,7 +282,7 @@ describe Mongoid::Persistence do
         end
 
         it "persists with proper set and push modifiers" do
-          person._updates.should == {
+          person.atomic_updates.should == {
             "$set" => {
               "title" => "King",
               "name.first_name" => "Ryan"
