@@ -223,4 +223,12 @@ describe Mongoid::Relations::Embedded::One do
       end
     end
   end
+
+  describe ".valid_options" do
+
+    it "returns the valid options" do
+      described_class.valid_options.should ==
+        [ :as, :cyclic ]
+    end
+  end
 end

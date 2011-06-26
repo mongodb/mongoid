@@ -11,6 +11,9 @@ id:
         invalid_type:
           Field didefinisikan sebagai %{klass}, tetapi menerima %{other} dengan
           value %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} tidak di support, silakan upgrade
           ke %{mongo_version}.

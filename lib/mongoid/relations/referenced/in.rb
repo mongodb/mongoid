@@ -209,6 +209,18 @@ module Mongoid # :nodoc:
           def stores_foreign_key?
             true
           end
+
+          # Get the valid options allowed with this relation.
+          #
+          # @example Get the valid options.
+          #   Relation.valid_options
+          #
+          # @return [ Array<Symbol> ] The valid options.
+          #
+          # @since 2.1.0
+          def valid_options
+            [ :autosave, :foreign_key, :index, :polymorphic ]
+          end
         end
       end
     end

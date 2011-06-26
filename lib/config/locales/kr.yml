@@ -10,6 +10,9 @@ kr:
           데이타베이스가 Mongo::DB이어야 합니다, %{name}이면 안됩니다.
         invalid_type:
           데이터 필드가 %{klass} 처럼 정의를 내립니다. 하지만 그것은  %{other}를 %{value} 으로 산출되어  받습니다
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} 를 사용할수 없습니다. %{mongo_version} 으로 업그레이드 시켜주세요.
         validations:

@@ -149,6 +149,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def initialize(properties = {})
+        Options.validate!(properties)
         merge!(properties)
       end
 

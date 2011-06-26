@@ -12,6 +12,9 @@ zh-CN:
           数据库应该是Mongo::DB,而不是%{name}.
         invalid_type:
           在类%{klass}中定义了字段,实际值是%{value}的%{other}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} 版本已过期，请升级到 %{mongo_version}.
         validations:

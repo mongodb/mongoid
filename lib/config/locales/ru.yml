@@ -11,6 +11,9 @@ ru:
         invalid_type:
           Поле уже было определено в классе %{klass}, но получено как %{other}
           со значением %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           Версия MongoDB %{version} не поддерживается. Пожалуйста, обновитесь до
           версии %{mongo_version}.

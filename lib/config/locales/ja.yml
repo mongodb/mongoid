@@ -10,6 +10,9 @@ ja:
           次のDatabaseは利用できませんでした。%{name}
         invalid_type:
           このフィールドは %{klass} で定義されていますが、%{other}に対し %{value} という値が送信されました。
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} はサポートしていません。 %{mongo_version}にアップグレードをしてください。
         validations:
