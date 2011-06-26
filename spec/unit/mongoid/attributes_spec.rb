@@ -32,7 +32,7 @@ describe Mongoid::Attributes do
     context "when the document is an existing record" do
 
       let(:person) do
-        Person.create
+        Person.create(:ssn => "123-11-4412")
       end
 
       context "when the attribute does not exist" do
@@ -48,7 +48,6 @@ describe Mongoid::Attributes do
           end
 
           it "returns the default value" do
-            Person.find(person.id)[:age].should == 100
             found[:age].should == 100
           end
         end
