@@ -150,7 +150,7 @@ module Mongoid #:nodoc:
         raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
       end
       @attributes = {}.merge(reloaded || {})
-      @changed_attributes.clear
+      changed_attributes.clear
       apply_default_attributes
       tap do
         relations.keys.each do |name|

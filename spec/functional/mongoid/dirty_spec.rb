@@ -6,6 +6,25 @@ describe Mongoid::Dirty do
     Person.delete_all
   end
 
+  context "when reloading an unchanged document" do
+
+    let!(:person) do
+      Person.create(:ssn => "452-11-1092")
+    end
+
+    let(:from_db) do
+      Person.find(person.id)
+    end
+
+    before do
+      from_db.reload
+    end
+
+    it "clears the changed attributes" do
+      from_db.changed_attributes.should be_empty
+    end
+  end
+
   context "when fields are getting changed" do
 
     let(:person) do
