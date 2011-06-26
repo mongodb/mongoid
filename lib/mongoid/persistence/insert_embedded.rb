@@ -32,7 +32,6 @@ module Mongoid #:nodoc:
             update = { doc._inserter => { doc._position => doc.as_document } }
             collection.update(parent._selector, update, options.merge(:multi => false))
             doc.new_record = false
-            doc.move_changes
           end
         end
       end

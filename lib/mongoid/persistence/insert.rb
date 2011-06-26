@@ -28,10 +28,10 @@ module Mongoid #:nodoc:
               if insert
                 doc.new_record = false
                 doc._children.each { |child| child.new_record = false }
-                doc.move_changes
               end
             end
           end
+          doc.move_changes
         end
       end
 

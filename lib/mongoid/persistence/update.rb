@@ -39,20 +39,15 @@ module Mongoid #:nodoc:
       # @return [ true, false ] If the save passed.
       def persist
         return false if validate && document.invalid?(:update)
-        document.run_callbacks(:save) do
-          document.run_callbacks(:update) do
-            if update
-              document.move_changes
-              document._children.each do |child|
-                child.move_changes
-                child.new_record = false if child.new_record?
-              end
-              true
-            else
-              return false
-            end
-          end
+        value = document.run_callbacks(:save) do
+          document.run_callbacks(:update) { update }
         end
+        document.move_changes
+        document._children.each do |child|
+          child.move_changes
+          child.new_record = false
+        end
+        return value
       end
 
       protected
@@ -64,18 +59,17 @@ module Mongoid #:nodoc:
       #
       # @return [ true ] Always true.
       def update
-        true.tap do
-          updates = document.atomic_updates
-          unless updates.empty?
-            other_pushes = updates.delete(:other)
-            collection.update(document._selector, updates, options.merge(:multi => false))
-            collection.update(
-              document._selector,
-              { "$pushAll" => other_pushes },
-              options.merge(:multi => false)
-            ) if other_pushes
-          end
+        updates = document.atomic_updates
+        unless updates.empty?
+          other_pushes = updates.delete(:other)
+          collection.update(document._selector, updates, options.merge(:multi => false))
+          collection.update(
+            document._selector,
+            { "$pushAll" => other_pushes },
+            options.merge(:multi => false)
+          ) if other_pushes
         end
+        return true
       end
     end
   end

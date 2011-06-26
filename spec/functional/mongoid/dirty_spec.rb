@@ -85,6 +85,55 @@ describe Mongoid::Dirty do
     end
   end
 
+  context "when accessing dirty attributes in callbacks" do
+
+    context "when the document is persisted" do
+
+      let!(:acolyte) do
+        Acolyte.create(:name => "callback-test")
+      end
+
+      before do
+        Acolyte.set_callback(:save, :after, :if => :callback_test?) do |doc|
+          doc.changes.should == { "status" => [ nil, "testing" ] }
+        end
+      end
+
+      after do
+        Acolyte._save_callbacks.reject! do |callback|
+          callback.kind == :after
+        end
+      end
+
+      it "retains the changes until after all callbacks" do
+        acolyte.update_attribute(:status, "testing")
+      end
+    end
+
+    context "when the document is new" do
+
+      let!(:acolyte) do
+        Acolyte.new(:name => "callback-test")
+      end
+
+      before do
+        Acolyte.set_callback(:save, :after, :if => :callback_test?) do |doc|
+          doc.changes["name"].should == [ nil, "callback-test" ]
+        end
+      end
+
+      after do
+        Acolyte._save_callbacks.reject! do |callback|
+          callback.kind == :after
+        end
+      end
+
+      it "retains the changes until after all callbacks" do
+        acolyte.save
+      end
+    end
+  end
+
   context "when associations are getting changed" do
 
     let(:person) do
