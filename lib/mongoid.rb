@@ -95,39 +95,36 @@ end
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
 module Mongoid #:nodoc
+  extend self
 
   MONGODB_VERSION = "1.8.0"
 
-  class << self
-
-    # Sets the Mongoid configuration options. Best used by passing a block.
-    #
-    # @example Set up configuration options.
-    #
-    #   Mongoid.configure do |config|
-    #     name = "mongoid_test"
-    #     host = "localhost"
-    #     config.allow_dynamic_fields = false
-    #     config.master = Mongo::Connection.new.db(name)
-    #     config.slaves = [
-    #       Mongo::Connection.new(host, 27018, :slave_ok => true).db(name),
-    #       Mongo::Connection.new(host, 27019, :slave_ok => true).db(name)
-    #     ]
-    #   end
-    #
-    # @return [ Config ] The configuration obejct.
-    def configure
-      config = Mongoid::Config
-      block_given? ? yield(config) : config
-    end
-    alias :config :configure
+  # Sets the Mongoid configuration options. Best used by passing a block.
+  #
+  # @example Set up configuration options.
+  #   Mongoid.configure do |config|
+  #     name = "mongoid_test"
+  #     host = "localhost"
+  #     config.allow_dynamic_fields = false
+  #     config.master = Mongo::Connection.new.db(name)
+  #   end
+  #
+  # @return [ Config ] The configuration obejct.
+  #
+  # @since 1.0.0
+  def configure
+    config = Mongoid::Config
+    block_given? ? yield(config) : config
   end
+  alias :config :configure
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
   #
   # @example Delegate the configuration methods.
   #   Mongoid.database = Mongo::Connection.new.db("test")
+  #
+  # @since 1.0.0
   (Mongoid::Config.public_instance_methods(false) +
     ActiveModel::Observing::ClassMethods.public_instance_methods(false)).each do |name|
     (class << self; self; end).class_eval <<-EOT
