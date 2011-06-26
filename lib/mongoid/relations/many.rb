@@ -43,8 +43,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The new document.
       def build(attributes = {}, type = nil, &block)
-        instantiated(type).tap do |doc|
-          doc.write_attributes(attributes)
+        Mongoid::Factory.build(type || metadata.klass, attributes).tap do |doc|
           doc.identify
           append(doc, default_options(:binding => true))
           block.call(doc) if block

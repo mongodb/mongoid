@@ -539,6 +539,23 @@ describe Mongoid::NestedAttributes do
             person.should_not be_valid
           end
         end
+
+        context "when a type is passed" do
+
+          let(:canvas) do
+            Canvas.new
+          end
+
+          before do
+            Canvas.send(:undef_method, :writer_attributes=)
+            Canvas.accepts_nested_attributes_for :writer
+            canvas.writer_attributes = { :_type => "HtmlWriter" }
+          end
+
+          it "instantiates an object of the given type" do
+            canvas.writer.class.should == HtmlWriter
+          end
+        end
       end
 
       context "when the relation is embedded in" do
@@ -762,6 +779,21 @@ describe Mongoid::NestedAttributes do
               animal.person.should_not be_valid
               animal.should be_valid
             end
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:tool) do
+            Tool.new
+          end
+
+          before do
+            tool.palette_attributes ={ :_type => "BigPalette" }
+          end
+
+          it "instantiates an object of the given type" do
+            tool.palette.class.should == BigPalette
           end
         end
       end
@@ -1438,6 +1470,27 @@ describe Mongoid::NestedAttributes do
           it "propagates invalidity to parent" do
             person.addresses.first.should_not be_valid
             person.should_not be_valid
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:canvas) do
+            Canvas.new
+          end
+
+          before do
+            Canvas.send(:undef_method, :shapes_attributes=)
+            Canvas.accepts_nested_attributes_for :shapes
+            canvas.shapes_attributes =
+              {
+                "foo" => { "_type" => "Square" },
+                "bar" => { "_type" => "Circle" }
+              }
+          end
+
+          it "instantiates an object of the given type" do
+            canvas.shapes.map(&:class).should == [Square, Circle]
           end
         end
       end
