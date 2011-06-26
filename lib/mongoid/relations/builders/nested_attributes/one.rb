@@ -27,7 +27,7 @@ module Mongoid # :nodoc:
             if update?
               existing.attributes = attributes
             elsif replace?
-              parent.send(metadata.setter, metadata.klass.new(attributes))
+              parent.send(metadata.setter, Mongoid::Factory.build(metadata.klass, attributes))
             elsif delete?
               parent.send(metadata.setter, nil)
             end
