@@ -2311,7 +2311,10 @@ describe Mongoid::NestedAttributes do
                       person.posts_attributes =
                         {
                           "0" => {
-                            "id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
+                            "id" => post_one.id,
+                            "title" => "Another Title",
+                            "_destroy" => truth
+                          },
                           "1" => { "id" => post_two.id, "title" => "New Title" }
                         }
                     end
@@ -2319,11 +2322,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        person.posts(true).first.title.should == "Another Title"
+                        person.posts(true).find(post_one.id).title.should == "Another Title"
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).last.title.should == "New Title"
+                        person.posts(true).find(post_two.id).title.should == "New Title"
                       end
 
                       it "does not add additional documents" do
