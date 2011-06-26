@@ -6,6 +6,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 === Major Changes
 
+* Mongoid now requires MongoDB 1.8.x in order to properly support the #bit and
+  #rename atomic operations.
+
 * Traditional slave support has been removed from Mongoid.
   Replica sets should be used in place of traditional master and slave setups.
 
@@ -22,6 +25,9 @@ for changes.
 * #961 Allow arbitrary Mongo::Connection options to pass through Mongoid::Config::Database object. (Morgan Nelson)
 
 * Enable autosave for many to many references. (Dave Krupinski)
+
+* The following explicit atomic operations have been added: Model#bit,
+  Model#pop, Model#pull, Model#push_all, Model#rename, Model#unset.
 
 === Bug Fixes
 
