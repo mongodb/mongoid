@@ -76,7 +76,7 @@ end
 puts "Starting profiler"
 
 PerfTools::CpuProfiler.start("perf/mongoid_profile_insert") do
-  10000.times do |n|
+  100000.times do |n|
     Person.create(:birth_date => Date.new(1970, 1, 1))
   end
 end
