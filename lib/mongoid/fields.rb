@@ -205,7 +205,7 @@ module Mongoid #:nodoc
       def process_options(field)
         field_options = field.options
 
-        Fields.options.each do |option_name, handler|
+        Fields.options.each_pair do |option_name, handler|
           if field_options.has_key?(option_name)
             handler.call(self, field, field_options[option_name])
           end

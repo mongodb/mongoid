@@ -60,7 +60,7 @@ module Mongoid #:nodoc:
     # @return [ Hash ] A +Hash+ of atomic setters.
     def setters
       {}.tap do |modifications|
-        changes.each do |field, changes|
+        changes.each_pair do |field, changes|
           key = embedded? ? "#{_position}.#{field}" : field
           modifications[key] = changes[1]
         end

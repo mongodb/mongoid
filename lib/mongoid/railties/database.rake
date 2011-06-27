@@ -90,7 +90,7 @@ namespace :db do
           convert_ids(v)
         end
       elsif obj.is_a?(Hash)
-        obj.each do |k, v|
+        obj.each_pair do |k, v|
           obj[k] = convert_ids(v)
         end
       else

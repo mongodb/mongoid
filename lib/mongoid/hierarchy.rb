@@ -34,7 +34,7 @@ module Mongoid #:nodoc
       # @return [ Array<Document> ] All child documents in the hierarchy.
       def _children
         [].tap do |children|
-          relations.each do |name, metadata|
+          relations.each_pair do |name, metadata|
             if metadata.embedded?
               child = send(name)
               child.to_a.each do |doc|

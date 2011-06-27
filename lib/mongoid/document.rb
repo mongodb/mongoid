@@ -200,7 +200,7 @@ module Mongoid #:nodoc:
     def as_document
       attribs = attributes
       attribs.tap do |attrs|
-        relations.select { |name, meta| meta.embedded? }.each do |name, meta|
+        relations.select { |name, meta| meta.embedded? }.each_pair do |name, meta|
           relation = send(name, false, :continue => false)
           attrs[name] = relation.as_document unless relation.blank?
         end

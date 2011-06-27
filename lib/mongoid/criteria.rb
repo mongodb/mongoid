@@ -354,7 +354,7 @@ module Mongoid #:nodoc:
     def update_selector(attributes, operator, combine = :+)
       clone.tap do |crit|
         converted = BSON::ObjectId.convert(klass, attributes || {})
-        converted.each do |key, value|
+        converted.each_pair do |key, value|
           unless crit.selector[key]
             crit.selector[key] = { operator => value }
           else
