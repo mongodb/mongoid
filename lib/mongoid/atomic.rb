@@ -31,9 +31,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def atomic_updates
-      Modifiers.new.set(atomic_sets).tap do |mods|
+      Modifiers.new.tap do |mods|
+        mods.set(atomic_sets)
         _children.each do |child|
-          mods.set(child.atomic_sets).push(child.atomic_pushes)
+          mods.set(child.atomic_sets)
+          mods.push(child.atomic_pushes)
         end
       end
     end
