@@ -8,6 +8,54 @@ module Mongoid # :nodoc:
 
       delegate :foreign_key_default, :stores_foreign_key?, :to => :relation
 
+      # Returns the as option of the relation.
+      #
+      # @example Get the as option.
+      #   metadata.as
+      #
+      # @return [ true, false ] The as option.
+      #
+      # @since 2.1.0
+      def as
+        self[:as]
+      end
+
+      # Tells whether an as option exists.
+      #
+      # @example Is the as option set?
+      #   metadata.as?
+      #
+      # @return [ true, false ] True if an as exists, false if not.
+      #
+      # @since 2.0.0.rc.1
+      def as?
+        !!as
+      end
+
+      # Returns the autosave option of the relation.
+      #
+      # @example Get the autosave option.
+      #   metadata.autosave
+      #
+      # @return [ true, false ] The autosave option.
+      #
+      # @since 2.1.0
+      def autosave
+        self[:autosave]
+      end
+
+      # Does the metadata have a autosave option?
+      #
+      # @example Is the relation autosaving?
+      #   metadata.autosave?
+      #
+      # @return [ true, false ] If the relation autosaves.
+      #
+      # @since 2.1.0
+      def autosave?
+        !!autosave
+      end
+
       # Gets a relation builder associated with the relation this metadata is
       # for.
       #
@@ -55,8 +103,64 @@ module Mongoid # :nodoc:
         @class_name ||= (self[:class_name] || classify)
       end
 
+      # Get the foreign key contraint for the metadata.
+      #
+      # @example Get the constaint.
+      #   metadata.constraint
+      #
+      # @return [ Constraint ] The constraint.
+      #
+      # @since 2.0.0.rc.1
       def constraint
         @constraint ||= Constraint.new(self)
+      end
+
+      # Returns the cyclic option of the relation.
+      #
+      # @example Get the cyclic option.
+      #   metadata.cyclic
+      #
+      # @return [ true, false ] The cyclic option.
+      #
+      # @since 2.1.0
+      def cyclic
+        self[:cyclic]
+      end
+
+      # Does the metadata have a cyclic option?
+      #
+      # @example Is the metadata cyclic?
+      #   metadata.cyclic?
+      #
+      # @return [ true, false ] If the metadata is cyclic.
+      #
+      # @since 2.1.0
+      def cyclic?
+        !!cyclic
+      end
+
+      # Returns the dependent option of the relation.
+      #
+      # @example Get the dependent option.
+      #   metadata.dependent
+      #
+      # @return [ Symbol ] The dependent option.
+      #
+      # @since 2.1.0
+      def dependent
+        self[:dependent]
+      end
+
+      # Does the metadata have a dependent option?
+      #
+      # @example Is the metadata performing cascades?
+      #   metadata.dependent?
+      #
+      # @return [ true, false ] If the metadata cascades.
+      #
+      # @since 2.1.0
+      def dependent?
+        !!dependent
       end
 
       # Will determine if the relation is an embedded one or not. Currently
@@ -128,6 +232,18 @@ module Mongoid # :nodoc:
         @foreign_key_setter ||= "#{foreign_key}="
       end
 
+      # Returns the index option of the relation.
+      #
+      # @example Get the index option.
+      #   metadata.index
+      #
+      # @return [ true, false ] The index option.
+      #
+      # @since 2.1.0
+      def index
+        self[:index]
+      end
+
       # Tells whether a foreign key index exists on the relation.
       #
       # @example Is the key indexed?
@@ -137,7 +253,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def indexed?
-        !!self[:index]
+        !!index
       end
 
       # Instantiate new metadata for a relation.
@@ -198,6 +314,30 @@ module Mongoid # :nodoc:
         @inverse ||= (cyclic? ? cyclic_inverse : inverse_relation)
       end
 
+      # Returns the inverse_class_name option of the relation.
+      #
+      # @example Get the inverse_class_name option.
+      #   metadata.inverse_class_name
+      #
+      # @return [ true, false ] The inverse_class_name option.
+      #
+      # @since 2.1.0
+      def inverse_class_name
+        self[:inverse_class_name]
+      end
+
+      # Returns the if the inverse class name option exists.
+      #
+      # @example Is an inverse class name defined?
+      #   metadata.inverse_class_name?
+      #
+      # @return [ true, false ] If the inverse if defined.
+      #
+      # @since 2.1.0
+      def inverse_class_name?
+        !!inverse_class_name
+      end
+
       # Used for relational many to many only. This determines the name of the
       # foreign key field on the inverse side of the relation, since in this
       # case there are keys on both sides.
@@ -224,6 +364,30 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inverse_klass
         @inverse_klass ||= inverse_class_name.constantize
+      end
+
+      # Returns the inverse_of option of the relation.
+      #
+      # @example Get the inverse_of option.
+      #   metadata.inverse_of
+      #
+      # @return [ true, false ] The inverse_of option.
+      #
+      # @since 2.1.0
+      def inverse_of
+        self[:inverse_of]
+      end
+
+      # Does the metadata have a inverse_of option?
+      #
+      # @example Is an inverse_of defined?
+      #   metadata.inverse_of?
+      #
+      # @return [ true, false ] If the relation has an inverse_of defined.
+      #
+      # @since 2.1.0
+      def inverse_of?
+        !!inverse_of
       end
 
       # Returns the setter for the inverse side of the relation.
@@ -308,6 +472,30 @@ module Mongoid # :nodoc:
         relation.macro
       end
 
+      # Get the name associated with this metadata.
+      #
+      # @example Get the name.
+      #   metadata.name
+      #
+      # @return [ Symbol ] The name.
+      #
+      # @since 2.1.0
+      def name
+        self[:name]
+      end
+
+      # Is the name defined?
+      #
+      # @example Is the name defined?
+      #   metadata.name?
+      #
+      # @return [ true, false ] If the name is defined.
+      #
+      # @since 2.1.0
+      def name?
+        !!name
+      end
+
       # Gets a relation nested builder associated with the relation this metadata
       # is for. Nested builders are used in conjunction with nested attributes.
       #
@@ -336,6 +524,18 @@ module Mongoid # :nodoc:
         @polymorphic ||= (!!self[:as] || !!self[:polymorphic])
       end
 
+      # Get the relation associated with this metadata.
+      #
+      # @example Get the relation.
+      #   metadata.relation
+      #
+      # @return [ Proxy ] The relation proxy class.
+      #
+      # @since 2.1.0
+      def relation
+        self[:relation]
+      end
+
       # Gets the method name used to set this relation.
       #
       # @example Get the setter.
@@ -361,17 +561,28 @@ module Mongoid # :nodoc:
         self[:validate] != false
       end
 
-
       # Returns default order for this association.
       #
       # @example Get default order
-      #   metadata.order # => #<Mongoid::Criterion::Complex:0x00000102a8a450 @key=:rating, @operator="asc">
+      #   metadata.order
       #
-      # @return [Mongoid::Criterion::Complex, nil] nil if doesn't set
+      # @return [ Criterion::Complex, nil] nil if doesn't set
       #
       # @since 2.1.0
       def order
-        @order ||= self[:order]
+        self[:order]
+      end
+
+      # Is a default order set?
+      #
+      # @example Is the order set?
+      #   metadata.order?
+      #
+      # @return [ true, false ] If the order is set.
+      #
+      # @since 2.1.0
+      def order?
+        !!order
       end
 
       private
@@ -528,26 +739,6 @@ module Mongoid # :nodoc:
         other.to_a.first.relations.each_pair do |key, meta|
           return meta.name if meta.as == name
         end
-      end
-
-      # Handles two different cases - the first is a convenience for JSON like
-      # access to the hash instead of having to call []. The second is a
-      # delegation of the "*?" methods to has_key? as a convenience to check
-      # for existence of a value.
-      #
-      # @example Extras provided by this method.
-      #   metadata.name
-      #   metadata.name?
-      #
-      # @param [ Symbol ] name The name of the method.
-      # @param [ Array ] args The arguments passed to the method.
-      #
-      # @return [ Object ] Either the value or a boolen.
-      #
-      # @since 2.0.0.rc.1
-      def method_missing(name, *args)
-        method = name.to_s
-        method =~ /\?/ ? has_key?(method.sub('?', '').to_sym) : self[name]
       end
     end
   end
