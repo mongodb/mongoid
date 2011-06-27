@@ -1,0 +1,16 @@
+Starting benchmark...
+      user     system      total        real
+[ root ] Create 1 million basic new documents476.930000   9.660000 486.590000 (486.193874)
+[ root ] Querying and iterating 1 million documents 40.870000   2.990000  43.860000 ( 44.035773)
+[ root ] Updating 1 million documents577.360000  16.590000 593.950000 (593.976492)
+[ emb:one-to-many ] Appending 1k embedded documents to a single document  0.490000   0.010000   0.500000 (  0.495272)
+[ emb:one-to-many ] Updating 1k embedded documents  0.260000   0.010000   0.270000 (  0.271724)
+[ emb:one-to-many ] Deleting 1k embedded documents  1.460000   0.000000   1.460000 (  1.465560)
+[ emb:one-to-one ] Changing out 1k embedded documents  0.410000   0.010000   0.420000 (  0.417085)
+[ ref:one-to-many ] Appending 100k referenced documents 52.450000   1.090000  53.540000 ( 53.489723)
+[ ref:one-to-many ] Updating 100k referenced documents 31.700000   0.970000  32.670000 ( 32.641183)
+[ ref:one-to-many ] Deleting 100k referenced documents  0.050000   0.000000   0.050000 (  0.100016)
+[ ref:one-to-one ] Changing out 100k referenced documents 40.780000   1.170000  41.950000 ( 41.926763)
+[ ref:many-to-many ] Appending 10k referenced documents 47.910000   0.230000  48.140000 ( 48.098521)
+[ ref:many-to-many ] Updating 10k referenced documents  2.050000   0.100000   2.150000 (  2.144931)
+[ ref:many-to-many ] Deleting 10k referenced documents 37.500000   0.050000  37.550000 ( 37.534867)
