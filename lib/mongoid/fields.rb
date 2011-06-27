@@ -232,11 +232,11 @@ module Mongoid #:nodoc
             end
           else
             define_method(meth) do
-              read_attribute(name).tap do |value|
-                if value.is_a?(Enumerable)
-                  changed_attributes[name] = value.clone
-                end
+              value = read_attribute(name)
+              if value.is_a?(Array) || value.is_a?(Hash)
+                changed_attributes[name] = value.clone
               end
+              value
             end
           end
           define_method("#{meth}=") do |value|

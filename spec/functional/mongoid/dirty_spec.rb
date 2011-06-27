@@ -104,7 +104,7 @@ describe Mongoid::Dirty do
       end
 
       it "clears changes" do
-        person.changed?.should == false
+        person.should_not be_changed
       end
 
       it "stores previous changes" do
