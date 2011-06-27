@@ -4,6 +4,28 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include ActiveModel::Dirty
 
+    # Get the changed values for the document. This is a hash with the name of
+    # the field as the keys, and the values being an array of previous and
+    # current pairs.
+    #
+    # @example Get the changes.
+    #   document.changes
+    #
+    # @note This is overriding the AM::Dirty implementation to handle
+    #   enumerable fields being in the hash when not actually changed.
+    #
+    # @return [ Hash ] The changed values.
+    #
+    # @since 2.1.0
+    def changes
+      {}.tap do |hash|
+        changed.each do |name|
+          change = attribute_change(name)
+          hash[name] = change if change[0] != change[1]
+        end
+      end
+    end
+
     # Call this method after save, so the changes can be properly switched.
     #
     # @example Move the changes to previous.
