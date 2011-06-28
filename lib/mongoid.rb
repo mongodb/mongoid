@@ -125,12 +125,6 @@ module Mongoid #:nodoc
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  (Mongoid::Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false)).each do |name|
-    (class << self; self; end).class_eval <<-EOT
-      def #{name}(*args)
-        configure.send("#{name}", *args)
-      end
-    EOT
-  end
+  delegate *(Mongoid::Config.public_instance_methods(false) +
+    ActiveModel::Observing::ClassMethods.public_instance_methods(false)), :to => Config
 end
