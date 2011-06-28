@@ -75,16 +75,32 @@ end
 
 puts "Starting profiler"
 
-PerfTools::CpuProfiler.start("perf/mongoid_profile_insert") do
-  100000.times do |n|
-    Person.create(:birth_date => Date.new(1970, 1, 1))
+def without_gc
+  GC.disable
+  yield
+  GC.enable
+  GC.start
+end
+
+without_gc do
+  puts "Profile 100,000 inserts"
+  PerfTools::CpuProfiler.start("perf/mongoid_profile_insert") do
+    100000.times do |n|
+      Person.create(:birth_date => Date.new(1970, 1, 1))
+    end
   end
 end
 
-PerfTools::CpuProfiler.start("perf/mongoid_profile_query") do
-  Person.all.each { |person| person.birth_date }
+without_gc do
+  puts "Profile loading 100,000 documents"
+  PerfTools::CpuProfiler.start("perf/mongoid_profile_query") do
+    Person.all.each { |person| person.birth_date }
+  end
 end
 
-PerfTools::CpuProfiler.start("perf/mongoid_profile_update") do
-  Person.all.each { |person| person.update_attribute(:title, "Updated") }
+without_gc do
+  puts "Profile 100,000 updates"
+  PerfTools::CpuProfiler.start("perf/mongoid_profile_update") do
+    Person.all.each { |person| person.update_attribute(:title, "Updated") }
+  end
 end
