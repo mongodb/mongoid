@@ -177,6 +177,31 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#blank?" do
+
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    context "when the relation contains elements" do
+
+      it "returns false" do
+        relation.should_not be_blank
+      end
+    end
+
+    context "when the relation contains no elements" do
+
+      before do
+        relation.target = []
+      end
+
+      it "returns true" do
+        relation.should be_blank
+      end
+    end
+  end
+
   describe ".builder" do
 
     let(:relation) do
