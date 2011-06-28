@@ -77,17 +77,17 @@ puts "Starting benchmark..."
 
 Benchmark.bm do |bm|
 
-  bm.report("[ root ] Create 1 million basic new documents") do
+  bm.report("[ root ] #create [ 1,000,000 ]") do
     1000000.times do |n|
       Person.create(:birth_date => Date.new(1970, 1, 1))
     end
   end
 
-  bm.report("[ root ] Querying and iterating 1 million documents") do
+  bm.report("[ root ] #each [ 1,000,000 ]") do
     Person.all.each { |person| person.birth_date }
   end
 
-  bm.report("[ root ] Updating 1 million documents") do
+  bm.report("[ root ] #update_attribute [ 1,000,000 ]") do
     Person.all.each { |person| person.update_attribute(:title, "Updated") }
   end
 
@@ -137,7 +137,7 @@ Benchmark.bm do |bm|
     end
   end
 
-  bm.report("[ emb:one-to-many ] #save [ 1000 ]") do
+  bm.report("[ emb:one-to-many ] #update_attribute [ 1000 ]") do
     person.addresses.each do |address|
       address.update_attribute(:address_type, "Home")
     end
