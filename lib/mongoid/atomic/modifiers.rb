@@ -36,7 +36,7 @@ module Mongoid #:nodoc:
       def set(modifications)
         modifications.each_pair do |field, value|
           sets.update(field => value)
-          fields << field.sub(/\..*/, "")
+          fields << field.split(".", 2)[0]
         end
       end
 
@@ -54,7 +54,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def conflicting?(field)
-        fields.include?(field.sub(/\..*/, ""))
+        fields.include?(field.split(".", 2)[0])
       end
 
       # Get the push operations that would have conflicted with the sets.
