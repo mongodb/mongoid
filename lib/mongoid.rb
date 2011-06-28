@@ -113,8 +113,7 @@ module Mongoid #:nodoc
   #
   # @since 1.0.0
   def configure
-    config = Mongoid::Config
-    block_given? ? yield(config) : config
+    block_given? ? yield(Config) : Config
   end
   alias :config :configure
 
@@ -125,6 +124,7 @@ module Mongoid #:nodoc
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  delegate *(Mongoid::Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false)), :to => Config
+  delegate *(Config.public_instance_methods(false) +
+    ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
+    { :to => Config })
 end
