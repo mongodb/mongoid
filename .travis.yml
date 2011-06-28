@@ -5,3 +5,4 @@ rvm:
   - ree
   - jruby
   - rbx
+  - rbx-2.0.0pre

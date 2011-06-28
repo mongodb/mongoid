@@ -64,8 +64,15 @@ describe Mongoid::Persistence::Atomic::Bit do
 
     context "when chaining bitwise operations" do
 
+      let(:hash) do
+        BSON::OrderedHash.new.tap do |h|
+          h[:and] = 13
+          h[:or] = 10
+        end
+      end
+
       let!(:bit) do
-        person.bit(:age, { :and => 13, :or => 10 })
+        person.bit(:age, hash)
       end
 
       it "performs the bitwise operation" do
