@@ -44,6 +44,22 @@ describe Mongoid::Matchers::Gte do
 
     end
 
+    context "a Time value" do
+      let(:matcher) { Mongoid::Matchers::Gte.new(@time = Time.now) }
+
+      it "returns false" do
+        matcher.matches?("$gte" => @time).should be_true
+      end
+    end
+
+    context "a DateTime value" do
+      let(:matcher) { Mongoid::Matchers::Gte.new(@time = DateTime.now) }
+
+      it "returns false" do
+        matcher.matches?("$gte" => @time).should be_true
+      end
+    end
+
   end
 
 end
