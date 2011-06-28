@@ -54,3 +54,5 @@ for changes.
 * #963 Initializing array of embedded documents via hash regressed (Chris Griego, Morgan Nelson)
 
 * Mongoid::Config.reset resets the options to their default values.
+
+* Mongoid::Fields.defaults is memoized for faster instantiation of models.

@@ -135,7 +135,8 @@ module Mongoid #:nodoc:
       (@attributes ||= {}).tap do |h|
         defaults.each_pair do |key, val|
           unless h.has_key?(key)
-            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) : val
+            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) :
+              val.duplicable? ? val.dup : val
           end
         end
       end

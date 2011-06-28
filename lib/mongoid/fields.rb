@@ -88,10 +88,11 @@ module Mongoid #:nodoc
       #
       # @return [ Hash ] The field defaults.
       def defaults
-        {}.tap do |defs|
+        @defaults ||= {}.tap do |defs|
           fields.each_pair do |field_name, field|
-            next if field.default.nil?
-            defs[field_name.to_s] = field.default
+            unless (default = field.default).nil?
+              defs[field_name.to_s] = default
+            end
           end
         end
       end
@@ -179,6 +180,8 @@ module Mongoid #:nodoc
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
+        @defaults = nil if @defaults
+
         meth = options.delete(:as) || name
         Mappings.for(
           options[:type], options[:identity]
