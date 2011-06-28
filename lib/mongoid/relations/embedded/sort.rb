@@ -17,12 +17,12 @@ module Mongoid # :nodoc:
         def sort_documents!(documents, metadata)
           sort_options = Criteria.new(metadata.klass).order_by(metadata.order).options[:sort]
 
-          documents.sort_by! do |document|
+          docs = documents.sort_by do |document|
             sort_options.map do |key, direction|
               Contexts::Enumerable::Sort.new(document.read_attribute(key), direction)
             end
           end
-
+          documents.replace(docs)
         end
 	    end
     end
