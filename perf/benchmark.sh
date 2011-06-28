@@ -1,1 +1,1 @@
-bundle exec ruby perf/benchmark.rb > perf/reports/benchmark.txt
+bundle exec ruby perf/benchmark.rb
