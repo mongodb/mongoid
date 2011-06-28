@@ -52,3 +52,5 @@ for changes.
 * #837 When allow_dynamic_fields is set to false and loading an embedded document with an unrecognized field, an exception is raised.
 
 * #963 Initializing array of embedded documents via hash regressed (Chris Griego, Morgan Nelson)
+
+* Mongoid::Config.reset resets the options to their default values.
