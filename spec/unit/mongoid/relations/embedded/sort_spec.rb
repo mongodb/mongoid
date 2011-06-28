@@ -16,7 +16,7 @@ describe Mongoid::Relations::Embedded::Sort do
   describe "#sort_documents_by_criteria!" do
     context "with single sort criteria" do
       context "defined as Criterion::Complex" do
-        let(:criteria) { :weight.desc }
+        let(:criteria) { :height.desc }
 
         it "order documents" do
           order
@@ -25,7 +25,7 @@ describe Mongoid::Relations::Embedded::Sort do
       end
 
       context "defined as Array" do
-        let(:criteria) { [:weight, :desc] }
+        let(:criteria) { [:height, :desc] }
 
         it "order documents" do
           order
@@ -34,7 +34,7 @@ describe Mongoid::Relations::Embedded::Sort do
       end
 
       context "defined as Hash" do
-        let(:criteria) { {:weight => :desc} }
+        let(:criteria) { {:height => :desc} }
 
         it "order documents" do
           order
