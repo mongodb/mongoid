@@ -93,7 +93,21 @@ Benchmark.bm do |bm|
 
   person = Person.first
 
-  bm.report("[ emb:one-to-many ] Appending 1k embedded documents to a single document") do
+  bm.report("[ emb:one-to-many ] #build [ 1000 ]") do
+    1000.times do |n|
+      person.addresses.build(
+        :street => "Wienerstr. #{n}",
+        :city => "Berlin",
+        :post_code => "10999"
+      )
+    end
+  end
+
+  bm.report("[ emb:one-to-many ] #clear [ 1000 ]") do
+    person.addresses.clear
+  end
+
+  bm.report("[ emb:one-to-many ] #create [ 1000 ]") do
     1000.times do |n|
       person.addresses.create(
         :street => "Wienerstr. #{n}",
@@ -103,15 +117,43 @@ Benchmark.bm do |bm|
     end
   end
 
-  bm.report("[ emb:one-to-many ] Updating 1k embedded documents") do
+  bm.report("[ emb:one-to-many ] #count [ 1000 ]") do
+    person.addresses.count
+  end
+
+  bm.report("[ emb:one-to-many ] #delete_all [ 1000 ]") do
+    person.addresses.delete_all
+  end
+
+  bm.report("[ emb:one-to-many ] #push [ 1000 ]") do
+    1000.times do |n|
+      person.addresses.push(
+        Address.new(
+          :street => "Wienerstr. #{n}",
+          :city => "Berlin",
+          :post_code => "10999"
+        )
+      )
+    end
+  end
+
+  bm.report("[ emb:one-to-many ] #save [ 1000 ]") do
     person.addresses.each do |address|
       address.update_attribute(:address_type, "Home")
     end
   end
 
-  bm.report("[ emb:one-to-many ] Deleting 1k embedded documents") do
-    person.addresses.delete_all
+  address = person.addresses.last
+
+  bm.report("[ emb:one-to-many ] #find [ 1000 ]") do
+    person.addresses.find(address.id)
   end
+
+  bm.report("[ emb:one-to-many ] #delete [ 1000 ]") do
+    person.addresses.delete(address)
+  end
+
+  person.addresses.delete_all
 
   bm.report("[ emb:one-to-one ] Changing out 1k embedded documents") do
     1000.times do |n|
