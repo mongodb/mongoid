@@ -17,3 +17,4 @@ doc/*
 *~
 *.rbc
 mongoid_prof*
+perf/reports
