@@ -19,7 +19,7 @@ module Mongoid #:nodoc
         super(
           translate(
             "invalid_options",
-            { :name => name, :invalid => invalid, :valid => valid }
+            { :name => name, :invalid => invalid, :valid => valid.join(', ') }
           )
         )
       end
