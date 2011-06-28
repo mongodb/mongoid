@@ -202,7 +202,7 @@ module Mongoid #:nodoc:
             raise ArgumentError, "Please don't use hash to define multiple orders " +
                 "due to the fact that hash doesn't have order this may cause unpredictable results"
           end
-          arguments.each do |field, direction|
+          arguments.each_pair do |field, direction|
             merge_options(crit.options[:sort], [ field, direction ])
           end
         when Array

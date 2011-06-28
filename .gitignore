@@ -16,3 +16,4 @@ doc/*
 *.un~
 *~
 *.rbc
+mongoid_prof*

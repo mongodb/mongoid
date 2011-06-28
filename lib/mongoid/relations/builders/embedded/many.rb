@@ -20,7 +20,7 @@ module Mongoid # :nodoc:
             return [] if object.blank?
             return object if object.first.is_a?(Document)
             [].tap do |docs|
-              object.each do | attrs|
+              object.each do |attrs|
                 if loading
                   docs << Mongoid::Factory.from_db(metadata.klass, attrs)
                 else

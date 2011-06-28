@@ -61,13 +61,16 @@ module Mongoid #:nodoc:
       def update
         updates = document.atomic_updates
         unless updates.empty?
-          other_pushes = updates.delete(:other)
-          collection.update(document._selector, updates, options.merge(:multi => false))
-          collection.update(
-            document._selector,
-            { "$pushAll" => other_pushes },
-            options.merge(:multi => false)
-          ) if other_pushes
+          others = updates.delete(:other)
+          selector = document._selector
+          collection.update(selector, updates, options.merge!(:multi => false))
+          if others
+            collection.update(
+              selector,
+              { "$pushAll" => others },
+              options.merge!(:multi => false)
+            )
+          end
         end
         return true
       end

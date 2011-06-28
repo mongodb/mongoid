@@ -3,7 +3,29 @@ require "spec_helper"
 describe Mongoid::Dirty do
 
   before do
-    Person.delete_all
+    [ Person, Preference ].each(&:delete_all)
+  end
+
+  context "when accessing an array field" do
+
+    let!(:person) do
+      Person.create(:ssn => "342-89-2431")
+    end
+
+    let(:from_db) do
+      Person.find(person.id)
+    end
+
+    context "when the field is not changed" do
+
+      before do
+        from_db.preference_ids
+      end
+
+      it "does not get marked as dirty" do
+        from_db.changes["preference_ids"].should be_nil
+      end
+    end
   end
 
   context "when reloading an unchanged document" do
@@ -82,7 +104,7 @@ describe Mongoid::Dirty do
       end
 
       it "clears changes" do
-        person.changed?.should == false
+        person.should_not be_changed
       end
 
       it "stores previous changes" do

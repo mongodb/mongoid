@@ -591,7 +591,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.index?.should == false
+        metadata.indexed?.should == false
       end
     end
 

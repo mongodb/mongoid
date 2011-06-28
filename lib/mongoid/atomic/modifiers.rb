@@ -15,14 +15,12 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def push(modifications)
-        tap do
-          modifications.each_pair do |field, value|
-            mods = conflicting?(field) ? conflicts : pushes
-            if mods.has_key?(field)
-              mods[field].push(value)
-            else
-              mods[field] = [ value ]
-            end
+        modifications.each_pair do |field, value|
+          mods = conflicting?(field) ? conflicts : pushes
+          if mods.has_key?(field)
+            mods[field].push(value)
+          else
+            mods[field] = [ value ]
           end
         end
       end
@@ -36,11 +34,9 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def set(modifications)
-        tap do
-          modifications.each_pair do |field, value|
-            sets.update(field => value)
-            fields << field.sub(/\..*/, "")
-          end
+        modifications.each_pair do |field, value|
+          sets.update(field => value)
+          fields << field.sub(/\..*/, "")
         end
       end
 

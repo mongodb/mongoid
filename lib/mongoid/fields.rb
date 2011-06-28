@@ -205,7 +205,7 @@ module Mongoid #:nodoc
       def process_options(field)
         field_options = field.options
 
-        Fields.options.each do |option_name, handler|
+        Fields.options.each_pair do |option_name, handler|
           if field_options.has_key?(option_name)
             handler.call(self, field, field_options[option_name])
           end
@@ -232,11 +232,11 @@ module Mongoid #:nodoc
             end
           else
             define_method(meth) do
-              read_attribute(name).tap do |value|
-                if value.is_a?(Enumerable)
-                  changed_attributes[name] = value.clone
-                end
+              value = read_attribute(name)
+              if value.is_a?(Array) || value.is_a?(Hash)
+                changed_attributes[name] = value.clone
               end
+              value
             end
           end
           define_method("#{meth}=") do |value|
