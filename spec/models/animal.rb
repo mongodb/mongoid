@@ -1,6 +1,8 @@
 class Animal
   include Mongoid::Document
   field :name
+  field :height, :type => Integer
+  field :weight, :type => Integer
   field :tags, :type => Array
   key :name
 
