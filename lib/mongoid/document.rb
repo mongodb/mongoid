@@ -6,7 +6,6 @@ module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
     include Mongoid::Components
-    include Mongoid::MultiDatabase
 
     included do
       attr_reader :new_record
@@ -198,11 +197,12 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      attribs = attributes
-      attribs.tap do |attrs|
-        relations.select { |name, meta| meta.embedded? }.each do |name, meta|
-          relation = send(name, false, :continue => false)
-          attrs[name] = relation.as_document unless relation.blank?
+      attributes.tap do |attrs|
+        relations.each_pair do |name, meta|
+          if meta.embedded?
+            relation = send(name, false, :continue => false)
+            attrs[name] = relation.as_document unless relation.blank?
+          end
         end
       end
     end

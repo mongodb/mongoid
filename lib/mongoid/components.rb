@@ -41,5 +41,6 @@ module Mongoid #:nodoc
     include Mongoid::State
     include Mongoid::Validations
     include Mongoid::Callbacks
+    include Mongoid::MultiDatabase
   end
 end

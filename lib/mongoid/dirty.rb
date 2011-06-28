@@ -28,11 +28,17 @@ module Mongoid #:nodoc:
 
     # Call this method after save, so the changes can be properly switched.
     #
+    # This will unset the memoized children array, set new record to
+    # false, set the document as validated, and move the dirty changes.
+    #
     # @example Move the changes to previous.
     #   person.move_changes
+    #
+    # @since 2.1.0
     def move_changes
-      @validated = false
+      @_children = nil
       @previously_changed = changes
+      @validated = false
       changed_attributes.clear
     end
 

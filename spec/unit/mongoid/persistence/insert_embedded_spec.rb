@@ -87,11 +87,6 @@ describe Mongoid::Persistence::Insert do
           root_set_expectation.call
           insert.persist.should == email
         end
-
-        it "sets new_record to false" do
-          root_set_expectation.call
-          insert.persist.new_record?.should be_false
-        end
       end
     end
 

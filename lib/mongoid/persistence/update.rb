@@ -42,11 +42,11 @@ module Mongoid #:nodoc:
         value = document.run_callbacks(:save) do
           document.run_callbacks(:update) { update }
         end
-        document.move_changes
         document._children.each do |child|
           child.move_changes
           child.new_record = false
         end
+        document.move_changes
         return value
       end
 

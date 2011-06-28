@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
     #   first component of the two key paths matches.
     #
     # @example Get the updates that need to occur.
-    #   person.atomic_updates
+    #   person.atomic_updates(children)
     #
     # @return [ Hash ] The updates and their modifiers.
     #
