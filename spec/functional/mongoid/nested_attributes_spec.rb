@@ -1877,6 +1877,23 @@ describe Mongoid::NestedAttributes do
             person.should_not be_valid
           end
         end
+
+        context "when a type is passed" do
+
+          let(:driver) do
+            Driver.new
+          end
+
+          before do
+            Driver.send(:undef_method, :vehicle_attributes=)
+            Driver.accepts_nested_attributes_for :vehicle
+            driver.vehicle_attributes = { "_type" => "Truck" }
+          end
+
+          it "instantiates an object of the given type" do
+            driver.vehicle.class.should == Truck
+          end
+        end
       end
 
       context "when the relation is referenced in" do
@@ -2099,6 +2116,23 @@ describe Mongoid::NestedAttributes do
               game.person.should_not be_valid
               game.should_not be_valid
             end
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:vehicle) do
+            Vehicle.new
+          end
+
+          before do
+            Vehicle.send(:undef_method, :driver_attributes=)
+            Vehicle.accepts_nested_attributes_for :driver
+            vehicle.driver_attributes = { "_type" => "Learner" }
+          end
+
+          it "instantiates an object of the given type" do
+            vehicle.driver.class.should == Learner
           end
         end
       end
@@ -2738,6 +2772,27 @@ describe Mongoid::NestedAttributes do
           it "propagates invalidity to parent" do
             person.should_not be_valid
             person.posts.first.should_not be_valid
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:shipping_container) do
+            ShippingContainer.new
+          end
+
+          before do
+            ShippingContainer.send(:undef_method, :vehicles_attributes=)
+            ShippingContainer.accepts_nested_attributes_for :vehicles
+            shipping_container.vehicles_attributes =
+              {
+                "foo" => { "_type" => "Car" },
+                "bar" => { "_type" => "Truck" }
+              }
+          end
+
+          it "instantiates an object of the given type" do
+            shipping_container.vehicles.map(&:class).should == [Car, Truck]
           end
         end
       end
