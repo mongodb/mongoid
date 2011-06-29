@@ -16,5 +16,6 @@ doc/*
 *.un~
 *~
 *.rbc
-mongoid_prof*
-perf/reports
+*.profile
+*.profile.pdf
+*.symbols
