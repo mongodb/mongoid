@@ -241,8 +241,8 @@ describe Mongoid::Document do
 
 
     it "should not bleed relations from one subclass to another" do
-      Truck.relations.keys.should =~ %w/ shipping_container bed /
-      Car.relations.keys.should =~ %w/ shipping_container /
+      Truck.relations.keys.should =~ %w/ shipping_container driver bed /
+      Car.relations.keys.should =~ %w/ shipping_container driver /
     end
   end
 end
