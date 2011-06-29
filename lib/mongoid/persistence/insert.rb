@@ -27,7 +27,10 @@ module Mongoid #:nodoc:
             doc.run_callbacks(:create) do
               if insert
                 doc.new_record = false
-                doc._children.each { |child| child.new_record = false }
+                doc._children.each do |child| 
+                  child.move_changes
+                  child.new_record = false
+                end
               end
             end
           end
