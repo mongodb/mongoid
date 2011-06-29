@@ -6,3 +6,5 @@ rvm:
   - jruby
   - rbx
   - rbx-2.0.0pre
+before_script:
+  - mongo mongoid_test --eval 'db.addUser("mongoid", "test");'
