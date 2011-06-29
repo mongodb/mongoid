@@ -116,7 +116,9 @@ module Mongoid # :nodoc:
               document = existing.find(convert_id(id))
               destroyable?(attrs) ? document.destroy : document.update_attributes(attrs)
             else
-              existing.push(metadata.klass.new(attrs)) unless destroyable?(attrs)
+              klass = attrs['_type'].constantize if attrs['_type']
+              klass = metadata.klass if klass.nil? || !klass.new.is_a?(metadata.klass)
+              existing.push(klass.new(attrs)) unless destroyable?(attrs)
             end
           end
         end
