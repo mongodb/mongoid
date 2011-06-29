@@ -15,9 +15,7 @@ module Mongoid #:nodoc
     #
     # @example Delegate the operation.
     #   collection.save({ :name => "Al" })
-    Collections::Operations::PROXIED.each do |name|
-      define_method(name) { |*args| master.send(name, *args) }
-    end
+    delegate *(Collections::Operations::PROXIED.dup << {:to => :master})
 
     # Find documents from the database given a selector and options.
     #
