@@ -14,6 +14,16 @@ describe Mongoid::Factory do
         person = Mongoid::Factory.build(Person, @attributes)
         person.title.should == "Sir"
       end
+
+      it "does not instantiate classes other than the given or its subclasses" do
+        person = Mongoid::Factory.build(Person, { "_type" => "Canvas" })
+        person.class.should == Person
+      end
+
+      it "does instantiate subclasses of the given class" do
+        person = Mongoid::Factory.build(Person, { "_type" => "Doctor" })
+        person.class.should == Doctor
+      end
     end
 
     context "when _type is not preset" do

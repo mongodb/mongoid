@@ -116,7 +116,7 @@ module Mongoid # :nodoc:
               document = existing.find(convert_id(id))
               destroyable?(attrs) ? document.destroy : document.update_attributes(attrs)
             else
-              existing.push(metadata.klass.new(attrs)) unless destroyable?(attrs)
+              existing.push(Mongoid::Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
             end
           end
         end
