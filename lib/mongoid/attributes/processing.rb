@@ -30,9 +30,9 @@ module Mongoid #:nodoc:
 
       protected
 
-      # If the key provided a relation or a nested attribute, where we have to
-      # hold off on the setting of the attribute until everything else has been
-      # set?
+      # If the key provided is the name of a relation or a nested attribute, we
+      # need to wait until all other attributes are set before processing
+      # these.
       #
       # @example Is the attribute pending?
       #   document.pending_attribute?(:name, "Durran")
