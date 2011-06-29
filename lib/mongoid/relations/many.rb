@@ -43,6 +43,13 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The new document.
       def build(attributes = {}, type = nil, &block)
+        if not type and attributes and klass = attributes.delete('_type')
+          type = begin
+            klass.constantize
+          rescue NameError => e
+            nil
+          end
+        end
         instantiated(type).tap do |doc|
           doc.write_attributes(attributes)
           doc.identify
