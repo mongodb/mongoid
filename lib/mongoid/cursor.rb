@@ -31,11 +31,13 @@ module Mongoid #:nodoc
 
     # The operations above will all delegate to the proxied Mongo::Cursor.
     OPERATIONS.each do |name|
-      define_method(name) do |*args|
-        retry_on_connection_failure do
-          cursor.send(name, *args)
+      class_eval <<-EOS, __FILE__, __LINE__
+        def #{name}(*args)
+          retry_on_connection_failure do
+            cursor.#{name}(*args)
+          end
         end
-      end
+      EOS
     end
 
     # Iterate over each document in the cursor and yield to it.
