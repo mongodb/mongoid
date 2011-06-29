@@ -397,7 +397,7 @@ module Mongoid # :nodoc:
           criteria = find(:all, conditions || {})
           criteria.size.tap do
             criteria.each do |doc|
-              target.delete(doc)
+              target.delete_at(target.index(doc))
               doc.send(method, :suppress => true)
             end
             reindex
