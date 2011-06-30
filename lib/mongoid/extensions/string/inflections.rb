@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
           "*" => "-astx-",
           "+" => "-plus-",
           "," => "-comma-",
-          "-" => "-dash-",
+          "-" => "-",
           "." => "-period-",
           "/" => "-fwdslsh-",
           ":" => "-colon-",
