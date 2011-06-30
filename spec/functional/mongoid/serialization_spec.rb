@@ -409,6 +409,18 @@ describe Mongoid::Serialization do
       it "uses the mongoid configuration" do
         person.to_json.should include("person")
       end
+      
+      context "when including root in json with relations" do
+
+        let!(:json) do
+          person.posts.build(:title => "First")
+          person.as_json(:include => :posts)
+        end
+
+        it "include root in json of children" do
+          json["person"]["posts"].first.keys.should include("post")
+        end
+      end
     end
 
     context "when not including root in json" do

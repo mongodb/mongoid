@@ -77,7 +77,7 @@ module Mongoid # :nodoc:
         relation = send(metadata.name, false, :eager => true)
         if relation
           attributes[metadata.name.to_s] =
-            relation.serializable_hash(relation_options(inclusions, options, name))
+            relation.as_json(relation_options(inclusions, options, name))
         end
       end
     end
