@@ -2,6 +2,7 @@
 module Mongoid #:nodoc
   module Hierarchy #:nodoc
     extend ActiveSupport::Concern
+
     included do
       attr_accessor :_parent
     end
@@ -39,8 +40,9 @@ module Mongoid #:nodoc
               if metadata.embedded?
                 child = send(name)
                 child.to_a.each do |doc|
-                  children.push(doc).concat(doc._children)
-                end unless child.blank?
+                  children.push(doc)
+                  children.concat(doc._children) unless name == "versions"
+                end if child
               end
             end
           end

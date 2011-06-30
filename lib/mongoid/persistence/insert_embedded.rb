@@ -29,8 +29,10 @@ module Mongoid #:nodoc:
           if parent.new_record?
             parent.insert
           else
-            update = { doc._inserter => { doc._position => doc.as_document } }
-            collection.update(parent._selector, update, options.merge(:multi => false))
+            update = {
+              doc.atomic_insert_modifier => { doc.atomic_position => doc.as_document }
+            }
+            collection.update(parent.atomic_selector, update, options.merge(:multi => false))
             doc.new_record = false
           end
         end

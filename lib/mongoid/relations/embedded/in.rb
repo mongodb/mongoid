@@ -154,6 +154,20 @@ module Mongoid # :nodoc:
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
 
+          # Get the path calculator for the supplied document.
+          #
+          # @example Get the path calculator.
+          #   Proxy.path(document)
+          #
+          # @param [ Document ] document The document to calculate on.
+          #
+          # @return [ Root ] The root atomic path calculator.
+          #
+          # @since 2.1.0
+          def path(document)
+            Mongoid::Atomic::Paths::Root.new(document)
+          end
+
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Paths do
+describe Mongoid::Atomic::Paths do
 
   let(:person) do
     Person.new
@@ -18,70 +18,56 @@ describe Mongoid::Paths do
     Name.new
   end
 
-  describe "#._remover" do
+  describe "#.atomic_delete_modifier" do
 
     before do
       person.addresses << address
       person.name = name
     end
 
-    context "when document is root" do
-
-      it "returns nil" do
-        person._remover.should be_nil
-      end
-    end
-
     context "when document is an embeds_one" do
 
       it "returns $unset" do
-        name._remover.should == "$unset"
+        name.atomic_delete_modifier.should == "$unset"
       end
     end
 
     context "when document is an embeds_many" do
 
       it "returns $pull" do
-        address._remover.should == "$pull"
+        address.atomic_delete_modifier.should == "$pull"
       end
     end
   end
 
-  describe "#._inserter" do
+  describe "#.atomic_insert_modifier" do
 
     before do
       person.addresses << address
       person.name = name
     end
 
-    context "when document is root" do
-
-      it "returns nil" do
-        person._inserter.should be_nil
-      end
-    end
-
     context "when document is an embeds_one" do
 
       it "returns $set" do
-        name._inserter.should == "$set"
+        name.atomic_insert_modifier.should == "$set"
       end
     end
 
     context "when document is an embeds_many" do
 
       it "returns $push" do
-        address._inserter.should == "$push"
+        address.atomic_insert_modifier.should == "$push"
       end
     end
   end
 
-  describe "#._path" do
+  describe "#.atomic_path" do
 
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person._path.should == ""
+        person.atomic_path.should == ""
       end
     end
 
@@ -92,7 +78,7 @@ describe Mongoid::Paths do
       end
 
       it "returns the inverse_of value of the association" do
-        address._path.should == "addresses"
+        address.atomic_path.should == "addresses"
       end
     end
 
@@ -104,17 +90,17 @@ describe Mongoid::Paths do
       end
 
       it "returns the JSON notation to the document" do
-        location._path.should == "addresses.locations"
+        location.atomic_path.should == "addresses.locations"
       end
     end
   end
 
-  describe "#._selector" do
+  describe "#.atomic_selector" do
 
     context "when the document is a parent" do
 
-      it "returns an id._selector" do
-        person._selector.should == { "_id" => person.id }
+      it "returns an id.atomic_selector" do
+        person.atomic_selector.should == { "_id" => person.id }
       end
     end
 
@@ -124,8 +110,8 @@ describe Mongoid::Paths do
         person.addresses << address
       end
 
-      it "returns the association with id._selector" do
-        address._selector.should == { "_id" => person.id, "addresses._id" => address.id }
+      it "returns the association with id.atomic_selector" do
+        address.atomic_selector.should == { "_id" => person.id, "addresses._id" => address.id }
       end
     end
 
@@ -137,18 +123,18 @@ describe Mongoid::Paths do
       end
 
       it "returns the JSON notation to the document with ids" do
-        location._selector.should ==
+        location.atomic_selector.should ==
           { "_id" => person.id, "addresses._id" => address.id, "addresses.locations._id" => location.id }
       end
     end
   end
 
-  describe "#._position" do
+  describe "#.atomic_position" do
 
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person._position.should == ""
+        person.atomic_position.should == ""
       end
     end
 
@@ -160,8 +146,8 @@ describe Mongoid::Paths do
 
       context "when the document is new" do
 
-        it "returns the._path without index" do
-          address._position.should == "addresses"
+        it "returns the.atomic_path without index" do
+          address.atomic_position.should == "addresses"
         end
       end
 
@@ -171,8 +157,8 @@ describe Mongoid::Paths do
           address.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the._path plus index" do
-          address._position.should == "addresses.0"
+        it "returns the.atomic_path plus index" do
+          address.atomic_position.should == "addresses.0"
         end
       end
     end
@@ -188,8 +174,8 @@ describe Mongoid::Paths do
 
       context "when the document is new" do
 
-        it "returns the._path with parent indexes" do
-          location._position.should == "addresses.0.locations"
+        it "returns the.atomic_path with parent indexes" do
+          location.atomic_position.should == "addresses.0.locations"
         end
       end
 
@@ -199,19 +185,19 @@ describe Mongoid::Paths do
           location.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the._path plus index" do
-          location._position.should == "addresses.0.locations.1"
+        it "returns the.atomic_path plus index" do
+          location.atomic_position.should == "addresses.0.locations.1"
         end
       end
     end
   end
 
-  describe "#._pull" do
+  describe "#.atomic_path" do
 
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person._pull.should == ""
+        person.atomic_path.should == ""
       end
     end
 
@@ -227,8 +213,8 @@ describe Mongoid::Paths do
           address.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the._path without the index" do
-          address._pull.should == "addresses"
+        it "returns the.atomic_path without the index" do
+          address.atomic_path.should == "addresses"
         end
 
         context "and there are 10 or more documents" do
@@ -239,8 +225,8 @@ describe Mongoid::Paths do
             end
           end
 
-          it "returns the._path without the index" do
-            address._pull.should == "addresses"
+          it "returns the.atomic_path without the index" do
+            address.atomic_path.should == "addresses"
           end
 
         end
@@ -262,8 +248,8 @@ describe Mongoid::Paths do
           location.instance_variable_set(:@new_record, false)
         end
 
-        it "returns the._path plus index" do
-          location._pull.should == "addresses.0.locations"
+        it "returns the.atomic_path plus index" do
+          location.atomic_path.should == "addresses.0.locations"
         end
 
       end

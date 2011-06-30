@@ -27,7 +27,7 @@ describe Mongoid::Persistence::Atomic::Pop do
         before do
           person.new_record = false
           collection.expects(:update).with(
-            person._selector,
+            person.atomic_selector,
             { "$pop" => { :aliases => -1 } },
             { :safe => false }
           )
@@ -59,7 +59,7 @@ describe Mongoid::Persistence::Atomic::Pop do
         before do
           person.new_record = false
           collection.expects(:update).with(
-            person._selector,
+            person.atomic_selector,
             { "$pop" => { :aliases => 1 } },
             { :safe => false }
           )

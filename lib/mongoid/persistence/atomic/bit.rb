@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
             result
           end
           document[field].tap do
-            collection.update(document._selector, operation("$bit"), options)
+            collection.update(document.atomic_selector, operation("$bit"), options)
             document.remove_change(field)
           end
         end

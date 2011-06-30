@@ -512,6 +512,20 @@ module Mongoid # :nodoc:
         relation.nested_builder(self, attributes, options)
       end
 
+      # Get the path calculator for the supplied document.
+      #
+      # @example Get the path calculator.
+      #   metadata.path(document)
+      #
+      # @param [ Document ] document The document to calculate on.
+      #
+      # @return [ Object ] The atomic path calculator.
+      #
+      # @since 2.1.0
+      def path(document)
+        relation.path(document)
+      end
+
       # Returns true if the relation is polymorphic.
       #
       # @example Is the relation polymorphic?

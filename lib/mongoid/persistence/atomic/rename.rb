@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
           self.value, self.field = value.to_s, field.to_s
           document[value] = document.attributes.delete(field)
           document[value].tap do
-            collection.update(document._selector, operation("$rename"), options)
+            collection.update(document.atomic_selector, operation("$rename"), options)
             document.remove_change(value)
           end
         end

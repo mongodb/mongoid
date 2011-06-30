@@ -27,8 +27,8 @@ module Mongoid #:nodoc:
           parent = document._parent
           parent.remove_child(document) unless suppress?
           unless parent.new_record?
-            update = { document._remover => removal_selector }
-            collection.update(parent._selector, update, options.merge(:multi => false))
+            update = { document.atomic_delete_modifier => removal_selector }
+            collection.update(parent.atomic_selector, update, options.merge(:multi => false))
           end
         end
       end
@@ -53,9 +53,9 @@ module Mongoid #:nodoc:
       # @return [ Hash ] The removal selector.
       def removal_selector
         if document._index
-          { document._pull => { "_id" => document.id } }
+          { document.atomic_path => { "_id" => document.id } }
         else
-          { document._path => setter }
+          { document.atomic_path => setter }
         end
       end
     end

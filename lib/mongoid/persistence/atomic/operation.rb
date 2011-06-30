@@ -60,7 +60,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def path
-          position = document._position
+          position = document.atomic_position
           position.blank? ? field : "#{position}.#{field}"
         end
       end

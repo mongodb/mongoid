@@ -27,7 +27,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
         before do
           person.new_record = false
           collection.expects(:update).with(
-            person._selector,
+            person.atomic_selector,
             { "$addToSet" => { :aliases => "Bond" } },
             :safe => false
           )
@@ -63,7 +63,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
         before do
           person.new_record = false
           collection.expects(:update).with(
-            person._selector,
+            person.atomic_selector,
             { "$addToSet" => { :aliases => "Bond" } },
             :safe => false
           )
@@ -100,7 +100,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
       before do
         person.new_record = false
         collection.expects(:update).with(
-          person._selector,
+          person.atomic_selector,
           { "$addToSet" => { :aliases => "Bond" } },
           :safe => false
         )

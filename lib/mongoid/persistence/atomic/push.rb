@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
         def persist
           document[field] = [] unless document[field]
           document.send(field).push(value).tap do |value|
-            collection.update(document._selector, operation("$push"), options)
+            collection.update(document.atomic_selector, operation("$push"), options)
             document.remove_change(field)
           end
         end

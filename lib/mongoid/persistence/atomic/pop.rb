@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
             values = document.send(field)
             value > 0 ? values.pop : values.shift
             values.tap do
-              collection.update(document._selector, operation("$pop"), options)
+              collection.update(document.atomic_selector, operation("$pop"), options)
               document.remove_change(field) if document.persisted?
             end
           else

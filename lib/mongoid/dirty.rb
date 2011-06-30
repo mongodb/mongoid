@@ -67,7 +67,7 @@ module Mongoid #:nodoc:
     def setters
       {}.tap do |modifications|
         changes.each_pair do |field, changes|
-          key = embedded? ? "#{_position}.#{field}" : field
+          key = embedded? ? "#{atomic_position}.#{field}" : field
           modifications[key] = changes[1]
         end
       end

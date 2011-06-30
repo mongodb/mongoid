@@ -62,7 +62,7 @@ module Mongoid #:nodoc:
         updates = document.atomic_updates
         unless updates.empty?
           others = updates.delete(:other)
-          selector = document._selector
+          selector = document.atomic_selector
           collection.update(selector, updates, options.merge!(:multi => false))
           if others
             collection.update(
