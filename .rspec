@@ -1,2 +1,2 @@
 --colour
---format documentation
+--format <%= ENV["CI"] ? 'progress' : 'documentation'%>
