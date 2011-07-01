@@ -2,6 +2,25 @@ require "spec_helper"
 
 describe Mongoid::Dirty do
 
+  context "when fields have been defined pre-dirty inclusion" do
+
+    let(:person) do
+      Person.new
+    end
+
+    it "defines a _change method" do
+      person.updated_at_change.should be_nil
+    end
+
+    it "defines a _changed? method" do
+      person.updated_at_changed?.should eq(false)
+    end
+
+    it "defines a _changes method" do
+      person.updated_at_was.should be_nil
+    end
+  end
+
   describe "#attribute_change" do
 
     context "when the attribute has changed" do
