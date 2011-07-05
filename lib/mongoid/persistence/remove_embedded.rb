@@ -34,16 +34,6 @@ module Mongoid #:nodoc:
 
       protected
 
-      # Get the value to pass to the removal modifier.
-      #
-      # @example Get the setter.
-      #   command.setter
-      #
-      # @return [ BSON::ObjectId, true ] The id or true.
-      def setter
-        document._index ? document.id : true
-      end
-
       # Get the removal selector.
       #
       # @example Get the selector.
@@ -54,7 +44,7 @@ module Mongoid #:nodoc:
         if document._index
           { document.atomic_path => { "_id" => document.id } }
         else
-          { document.atomic_path => setter }
+          { document.atomic_path => true }
         end
       end
     end
