@@ -23,14 +23,13 @@ module Mongoid #:nodoc:
       #
       # @return [ true ] Always true.
       def persist
-        true.tap do
-          parent = document._parent
-          parent.remove_child(document) unless suppress?
-          unless parent.new_record?
-            update = { document.atomic_delete_modifier => removal_selector }
-            collection.update(parent.atomic_selector, update, options.merge(:multi => false))
-          end
+        parent = document._parent
+        parent.remove_child(document) if notifying_parent?
+        unless parent.new_record?
+          update = { document.atomic_delete_modifier => removal_selector }
+          collection.update(parent.atomic_selector, update, options)
         end
+        return true
       end
 
       protected

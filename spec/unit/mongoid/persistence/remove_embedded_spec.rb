@@ -33,7 +33,6 @@ describe Mongoid::Persistence::RemoveEmbedded do
         collection.expects(:update).with(
           { "_id" => document.id, "addresses._id" => address.id },
           { "$pull" => { "addresses.0.locations" => { "_id" => location.id } } },
-          :multi => false,
           :safe => false
         ).returns("Object")
       }
@@ -44,7 +43,6 @@ describe Mongoid::Persistence::RemoveEmbedded do
         collection.expects(:update).with(
           { "_id" => document.id },
           { "$pull" => { "addresses" => { "_id" => address.id } } },
-          :multi => false,
           :safe => false
         ).returns("Object")
       }
@@ -55,7 +53,6 @@ describe Mongoid::Persistence::RemoveEmbedded do
         collection.expects(:update).with(
           { "_id" => document.id },
           { "$unset" => { "email" => true } },
-          :multi => false,
           :safe => false
         ).returns("Object")
       }

@@ -21,16 +21,15 @@ module Mongoid #:nodoc:
       #
       # @return [ true ] Always true.
       def persist
-        true.tap do
-          if document.embedded?
-            Persistence::RemoveEmbedded.new(
-              document,
-              options.merge(:validate => validate, :suppress => suppress)
-            ).persist
-          else
-            collection.remove({ :_id => document.id }, options)
-          end
+        if document.embedded?
+          Persistence::RemoveEmbedded.new(
+            document,
+            options.merge!(:validate => validating?, :suppress => !notifying_parent?)
+          ).persist
+        else
+          collection.remove({ :_id => document.id }, options)
         end
+        return true
       end
     end
   end

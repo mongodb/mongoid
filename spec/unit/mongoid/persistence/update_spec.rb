@@ -42,7 +42,7 @@ describe Mongoid::Persistence::Update do
     end
 
     it "defaults validation to true" do
-      update.validate.should == true
+      update.should be_validating
     end
   end
 
@@ -53,7 +53,6 @@ describe Mongoid::Persistence::Update do
         collection.expects(:update).with(
           { "_id" => document.id },
           { "$set" => document.setters },
-          :multi => false,
           :safe => false
         ).returns("Object")
       }
@@ -64,7 +63,6 @@ describe Mongoid::Persistence::Update do
         collection.expects(:update).with(
           { "_id" => document.id, "addresses._id" => address.id },
           { "$set" => address.setters },
-          :multi => false,
           :safe => false
         ).returns("Object")
       }
@@ -75,7 +73,6 @@ describe Mongoid::Persistence::Update do
         collection.expects(:update).with(
           { "_id" => root_category.id, "categories._id" => category.id, "categories.0.categories._id" => leaf_category.id },
           { "$set" => leaf_category.setters },
-          :multi => false,
           :safe => false
         ).returns("Object")
       }
@@ -120,12 +117,11 @@ describe Mongoid::Persistence::Update do
       context "when not validating" do
 
         before do
-          update.instance_variable_set(:@validate, false)
-          document.stubs(:valid?).returns(false)
+          update.instance_variable_set(:@validating, false)
         end
 
         after do
-          update.instance_variable_set(:@validate, true)
+          update.instance_variable_set(:@validating, true)
         end
 
         it "updates the document in the database" do
@@ -141,7 +137,6 @@ describe Mongoid::Persistence::Update do
         end
 
         before do
-          # TODO: What to do about composite keys?
           document.addresses << address
           address.city = "London"
         end

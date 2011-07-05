@@ -71,6 +71,22 @@ module Mongoid #:nodoc
         self._parent = document
       end
 
+      # After children are persisted we can call this to move all their changes
+      # and flag them as persisted in one call.
+      #
+      # @example Reset the children.
+      #   document.reset_persisted_children
+      #
+      # @return [ Array<Document> ] The children.
+      #
+      # @since 2.1.0
+      def reset_persisted_children
+        _children.each do |child|
+          child.move_changes
+          child.new_record = false
+        end
+      end
+
       # Return the root document in the object graph. If the current document
       # is the root object in the graph it will return self.
       #

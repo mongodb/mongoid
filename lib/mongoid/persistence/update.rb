@@ -38,14 +38,11 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] If the save passed.
       def persist
-        return false if validate && document.invalid?(:update)
+        return false if validating? && document.invalid?(:update)
         value = document.run_callbacks(:save) do
           document.run_callbacks(:update) { update }
         end
-        document._children.each do |child|
-          child.move_changes
-          child.new_record = false
-        end
+        document.reset_persisted_children
         document.move_changes
         return value
       end
@@ -63,13 +60,9 @@ module Mongoid #:nodoc:
         unless updates.empty?
           others = updates.delete(:other)
           selector = document.atomic_selector
-          collection.update(selector, updates, options.merge!(:multi => false))
+          collection.update(selector, updates, options)
           if others
-            collection.update(
-              selector,
-              { "$pushAll" => others },
-              options.merge!(:multi => false)
-            )
+            collection.update(selector, { "$pushAll" => others }, options)
           end
         end
         return true

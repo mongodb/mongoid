@@ -33,7 +33,7 @@ describe Mongoid::Persistence::Remove do
     end
 
     it "defaults validation to true" do
-      remove.validate.should == true
+      remove.should be_validating
     end
 
     it "sets the options" do
@@ -82,7 +82,7 @@ describe Mongoid::Persistence::Remove do
       it "delegates to the embedded persister" do
         Mongoid::Persistence::RemoveEmbedded.expects(:new).with(
           address,
-          { :validate => true, :safe => false, :suppress => nil }
+          { :validate => true, :safe => false, :suppress => false }
         ).returns(persister)
         persister.expects(:persist).returns(true)
         remove.persist.should == true

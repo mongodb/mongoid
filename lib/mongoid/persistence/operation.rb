@@ -4,9 +4,9 @@ module Mongoid #:nodoc:
 
     # Persistence operations extend from this class to get basic functionality
     # on initialization.
-    class Command
+    class Operation
 
-      attr_reader :document, :selector
+      attr_reader :document
 
       # Get the collection we should be persisting to.
       #
@@ -17,8 +17,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def collection
-        @collection ||=
-          document.respond_to?(:_root) ? document._root.collection : document.collection
+        @collection ||= document._root.collection
       end
 
       # Instantiate the new persistence operation.

@@ -33,7 +33,7 @@ describe Mongoid::Persistence::Insert do
     end
 
     it "defaults validation to true" do
-      insert.validate.should == true
+      insert.should be_validating
     end
 
     it "sets the options" do
@@ -105,12 +105,11 @@ describe Mongoid::Persistence::Insert do
     context "when not validating" do
 
       before do
-        insert.instance_variable_set(:@validate, false)
-        document.stubs(:valid?).returns(false)
+        insert.instance_variable_set(:@validating, false)
       end
 
       after do
-        insert.instance_variable_set(:@validate, true)
+        insert.instance_variable_set(:@validating, true)
       end
 
       it "inserts the document in the database" do

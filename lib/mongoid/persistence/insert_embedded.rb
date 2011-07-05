@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The document to be inserted.
       def persist
-        return document if validate && document.invalid?(:create)
+        return document if validating? && document.invalid?(:create)
         document.tap do |doc|
           parent = doc._parent
           if parent.new_record?
@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
             update = {
               doc.atomic_insert_modifier => { doc.atomic_position => doc.as_document }
             }
-            collection.update(parent.atomic_selector, update, options.merge(:multi => false))
+            collection.update(parent.atomic_selector, update, options)
             doc.new_record = false
           end
         end

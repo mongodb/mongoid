@@ -21,16 +21,13 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The document to be inserted.
       def persist
-        return document if validate && document.invalid?(:create)
+        return document if validating? && document.invalid?(:create)
         document.tap do |doc|
           doc.run_callbacks(:save) do
             doc.run_callbacks(:create) do
               if insert
                 doc.new_record = false
-                doc._children.each do |child|
-                  child.move_changes
-                  child.new_record = false
-                end
+                doc.reset_persisted_children
               end
             end
           end
@@ -50,7 +47,7 @@ module Mongoid #:nodoc:
         if document.embedded?
           Persistence::InsertEmbedded.new(
             document,
-            options.merge(:validate => validate)
+            options.merge!(:validate => validating?)
           ).persist
         else
           collection.insert(document.as_document, options)

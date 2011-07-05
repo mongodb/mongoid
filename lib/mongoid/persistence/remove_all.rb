@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The number of documents removed.
       def persist
-        select = (klass.hereditary? ? selector.merge(:_type => klass.name) : selector)
+        select = (document.hereditary? ? selector.merge!(:_type => document.name) : selector)
         collection.find(select).count.tap do
           collection.remove(select, options)
         end
