@@ -5,7 +5,6 @@ module Mongoid #:nodoc:
 
       # This is the superclass for all atomic operation objects.
       class Operation
-        include Mongoid::Safe
 
         attr_accessor :document, :field, :value, :options
 
@@ -34,7 +33,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0
         def initialize(document, field, value, options = {})
           @document, @field, @value = document, field, value
-          @options = { :safe => safe_mode?(options) }
+          @options = { :safe => options[:safe] || Mongoid.persist_in_safe_mode }
         end
 
         # Get the atomic operation to perform.
