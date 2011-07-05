@@ -153,7 +153,6 @@ module Mongoid #:nodoc
       def inherited(subclass)
         super
         subclass.fields = fields.dup
-        subclass.using_object_ids = using_object_ids
       end
 
       # Replace a field with a new type.
