@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def identity_map
-      Thread.current[:"[mongoid]:identity-map"]
+      Thread.current[:"[mongoid]:identity-map"] ||= IdentityMap.new
     end
 
     # Get the insert consumer from the current thread.
