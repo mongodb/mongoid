@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
     def changes
       {}.tap do |hash|
         changed.each do |name|
-          change = attribute_change(name)
+          change = [changed_attributes[name], attributes[name]] if attribute_changed?(name)
           hash[name] = change if change[0] != change[1]
         end
       end
