@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
       # @return [ true ] Always true.
       def persist
         if document.embedded?
-          Persistence::RemoveEmbedded.new(
+          RemoveEmbedded.new(
             document,
             options.merge!(:validate => validating?, :suppress => !notifying_parent?)
           ).persist

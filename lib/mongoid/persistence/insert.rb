@@ -45,7 +45,7 @@ module Mongoid #:nodoc:
       # @return [ true, false ] If the insert succeeded.
       def insert
         if document.embedded?
-          Persistence::InsertEmbedded.new(
+          InsertEmbedded.new(
             document,
             options.merge!(:validate => validating?)
           ).persist
