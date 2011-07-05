@@ -17,8 +17,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def collection
-        @collection ||=
-          document.respond_to?(:_root) ? document._root.collection : document.collection
+        @collection ||= document._root.collection
       end
 
       # Instantiate the new persistence operation.
