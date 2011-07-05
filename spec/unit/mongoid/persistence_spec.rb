@@ -73,17 +73,22 @@ describe Mongoid::Persistence do
 
     context "when conditions provided" do
 
-      let(:remove_all) do
-        stub.quacks_like(Mongoid::Persistence::RemoveAll.allocate)
+      let(:collection) do
+        stub
+      end
+
+      let(:cursor) do
+        stub
       end
 
       before do
-        Mongoid::Persistence::RemoveAll.expects(:new).with(
-          Person,
-          { :validate => false },
-          { :field => "value" }
-        ).returns(remove_all)
-        remove_all.expects(:persist).returns(30)
+        Person.expects(:collection).twice.returns(collection)
+        collection.expects(:find).with(:field => "value").returns(cursor)
+        cursor.expects(:count).returns(30)
+        collection.expects(:remove).with(
+          { :field => "value" },
+          :safe => Mongoid.persist_in_safe_mode
+        )
       end
 
       it "removes all documents from the collection for the conditions" do
@@ -97,17 +102,23 @@ describe Mongoid::Persistence do
 
     context "when conditions not provided" do
 
+      let(:collection) do
+        stub
+      end
+
+      let(:cursor) do
+        stub
+      end
+
       let(:remove_all) do
         stub.quacks_like(Mongoid::Persistence::RemoveAll.allocate)
       end
 
       before do
-        Mongoid::Persistence::RemoveAll.expects(:new).with(
-          Person,
-          { :validate => false },
-          {}
-        ).returns(remove_all)
-        remove_all.expects(:persist).returns(30)
+        Person.expects(:collection).twice.returns(collection)
+        collection.expects(:find).with({}).returns(cursor)
+        cursor.expects(:count).returns(30)
+        collection.expects(:remove).with({}, :safe => Mongoid.persist_in_safe_mode)
       end
 
       it "removes all documents from the collection" do

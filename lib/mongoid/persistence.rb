@@ -198,12 +198,12 @@ module Mongoid #:nodoc:
       # @param [ Hash ] conditions Optional conditions to delete by.
       #
       # @return [ Integer ] The number of documents deleted.
-      def delete_all(conditions = {})
-        RemoveAll.new(
-          self,
-          { :validate => false },
-          conditions[:conditions] || {}
-        ).persist
+      def delete_all(conditions = nil)
+        selector = (conditions || {})[:conditions] || {}
+        selector.merge!(:_type => name) if hereditary?
+        collection.find(selector).count.tap do
+          collection.remove(selector, :safe => Mongoid.persist_in_safe_mode)
+        end
       end
 
       # Delete all documents given the supplied conditions. If no conditions
