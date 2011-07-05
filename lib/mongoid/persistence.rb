@@ -4,7 +4,6 @@ require "mongoid/persistence/command"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
 require "mongoid/persistence/remove"
-require "mongoid/persistence/remove_all"
 require "mongoid/persistence/remove_embedded"
 require "mongoid/persistence/update"
 

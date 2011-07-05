@@ -381,15 +381,21 @@ describe Mongoid::Safety do
 
     describe "#delete_all" do
 
+      let(:collection) do
+        stub
+      end
+
+      let(:cursor) do
+        stub
+      end
+
       context "without conditions provided" do
 
         before do
-          Mongoid::Persistence::RemoveAll.expects(:new).with(
-            Person,
-            { :validate => false, :safe => safety_options },
-            {}
-          ).returns(command)
-          command.expects(:persist).returns(true)
+          Person.expects(:collection).twice.returns(collection)
+          collection.expects(:find).with({}).returns(cursor)
+          cursor.expects(:count).returns(30)
+          collection.expects(:remove).with({}, :safe => safety_options)
         end
 
         it "sends the safe mode option to the command" do
@@ -400,12 +406,12 @@ describe Mongoid::Safety do
       context "with conditions provided" do
 
         before do
-          Mongoid::Persistence::RemoveAll.expects(:new).with(
-            Person,
-            { :validate => false, :safe => safety_options },
-            { :title => "Sir" }
-          ).returns(command)
-          command.expects(:persist).returns(true)
+          Person.expects(:collection).twice.returns(collection)
+          collection.expects(:find).with({ :title => "Sir" }).returns(cursor)
+          cursor.expects(:count).returns(30)
+          collection.expects(:remove).with(
+            { :title => "Sir" }, :safe => safety_options
+          )
         end
 
         it "sends the safe mode option to the command" do
