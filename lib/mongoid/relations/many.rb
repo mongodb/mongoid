@@ -149,6 +149,10 @@ module Mongoid #:nodoc:
         [].respond_to?(name, include_private) || super
       end
 
+      def scoped
+        super
+      end
+
       # Gets the document as a serializable hash, used by ActiveModel's JSON and
       # XML serializers. This override is just to be able to pass the :include
       # and :except options to get associations in the hash.
