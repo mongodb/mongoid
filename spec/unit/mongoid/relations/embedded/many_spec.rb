@@ -753,6 +753,16 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "scoped" do
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    it "scoped should return hash" do
+      relation.scoped.should be_a_kind_of(Hash)
+    end
+  end
+
   describe "respond_to?" do
     let(:relation) do
       described_class.new(base, target, metadata)
