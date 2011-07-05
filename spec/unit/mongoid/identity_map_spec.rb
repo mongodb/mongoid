@@ -6,6 +6,40 @@ describe Mongoid::IdentityMap do
     described_class.new
   end
 
+  describe "#clear" do
+
+    before do
+      identity_map.set(Person.new)
+    end
+
+    let!(:clear) do
+      identity_map.clear
+    end
+
+    it "empties the identity map" do
+      identity_map.should be_empty
+    end
+
+    it "returns an empty hash" do
+      clear.should eq({})
+    end
+  end
+
+  describe ".clear" do
+
+    before do
+      described_class.set(Person.new)
+    end
+
+    let!(:clear) do
+      described_class.clear
+    end
+
+    it "returns an empty hash" do
+      clear.should eq({})
+    end
+  end
+
   describe "#get" do
 
     let(:document) do

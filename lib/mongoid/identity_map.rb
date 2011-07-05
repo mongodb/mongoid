@@ -81,7 +81,7 @@ module Mongoid #:nodoc:
       #   IdentityMap.set_multi([ doc_one, doc_two ])
       #
       # @since 2.1.0
-      delegate :get, :get_multi, :set, :set_multi,
+      delegate :clear, :get, :get_multi, :set, :set_multi,
         :to => :"Mongoid::Threaded.identity_map"
     end
   end
