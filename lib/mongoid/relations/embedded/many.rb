@@ -24,7 +24,7 @@ module Mongoid # :nodoc:
         def <<(*args)
           options = default_options(args)
           atomically(:$pushAll) do
-            args.compact.flatten.each do |doc|
+            sanitize!(args).flatten.each do |doc|
               return doc unless doc
               append(doc, options)
               doc.save if base.persisted? && !options[:binding]
@@ -257,7 +257,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(new_target, options = {})
-          new_target.compact! unless new_target.nil?
+          sanitize!(new_target)
 
           old_target = target
           tap do |relation|
@@ -310,6 +310,21 @@ module Mongoid # :nodoc:
         end
 
         private
+
+        # Sanitizes the child documents that are being embedded, to prevent nil documents
+        # from being embedded
+        #
+        # @example Sanitize an array of child documents
+        #   sanitize!(phone_numbers)
+        #
+        # @param [ children ] children The array of child documents to sanitize
+        #
+        # @return [ Array ] The sanitized array of child documents
+        def sanitize!(children)
+          return unless children
+          children.compact!
+          return children
+        end
 
         # Appends the document to the target array, updating the index on the
         # document at the same time.
