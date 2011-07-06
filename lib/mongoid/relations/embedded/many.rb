@@ -24,7 +24,7 @@ module Mongoid # :nodoc:
         def <<(*args)
           options = default_options(args)
           atomically(:$pushAll) do
-            args.flatten.each do |doc|
+            args.compact.flatten.each do |doc|
               return doc unless doc
               append(doc, options)
               doc.save if base.persisted? && !options[:binding]
@@ -257,7 +257,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(new_target, options = {})
-          new_target.compact! unless new_target.nil?
+          new_target = new_target.compact unless new_target.nil?
 
           old_target = target
           tap do |relation|
