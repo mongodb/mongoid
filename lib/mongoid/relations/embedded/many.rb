@@ -257,7 +257,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(new_target, options = {})
-          new_target = new_target.compact unless new_target.nil?
+          new_target.compact! unless new_target.nil?
 
           old_target = target
           tap do |relation|
