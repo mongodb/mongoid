@@ -10,7 +10,7 @@ describe "embeds many with a nil element" do
   end
 
   let (:office_phone) do
-    Phone.new :number => "555-555-5555"
+    Phone.new :number => "666-666-6666"
   end
 
   describe "replacing the entire embedded list" do
@@ -77,7 +77,7 @@ describe "embeds many with a nil element" do
 
       it "should ignore the nil and persist the remaining items" do
         reloaded = Person.find(person.id)
-        reloaded.phone_numbers.should == [nil, home_phone, office_phone]
+        reloaded.phone_numbers.should == [home_phone, office_phone]
       end
     end
 
@@ -91,7 +91,7 @@ describe "embeds many with a nil element" do
 
       it "should ignore the nil and persist the remaining items" do
         reloaded = Person.find(person.id)
-        reloaded.phone_numbers.should == [nil, home_phone, office_phone]
+        reloaded.phone_numbers.should == [home_phone, office_phone]
       end
     end
 
@@ -105,7 +105,7 @@ describe "embeds many with a nil element" do
 
       it "should ignore the nil and persist the remaining items" do
         reloaded = Person.find(person.id)
-        reloaded.phone_numbers.should == [nil, home_phone, office_phone]
+        reloaded.phone_numbers.should == [home_phone, office_phone]
       end
     end
   
