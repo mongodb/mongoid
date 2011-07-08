@@ -85,7 +85,7 @@ describe Mongoid::Safety do
     describe "#delete" do
 
       before do
-        Mongoid::Persistence::Remove.expects(:new).with(
+        Mongoid::Persistence::Operations::Remove.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -110,7 +110,7 @@ describe Mongoid::Safety do
     describe "#destroy" do
 
       before do
-        Mongoid::Persistence::Remove.expects(:new).with(
+        Mongoid::Persistence::Operations::Remove.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -162,7 +162,7 @@ describe Mongoid::Safety do
     describe "#insert" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -187,7 +187,7 @@ describe Mongoid::Safety do
     describe "#save!" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -212,7 +212,7 @@ describe Mongoid::Safety do
     describe "#update" do
 
       before do
-        Mongoid::Persistence::Update.expects(:new).with(
+        Mongoid::Persistence::Operations::Update.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -237,7 +237,7 @@ describe Mongoid::Safety do
     describe "#update_attributes" do
 
       before do
-        Mongoid::Persistence::Update.expects(:new).with(
+        Mongoid::Persistence::Operations::Update.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -255,7 +255,7 @@ describe Mongoid::Safety do
     describe "#update_attributes" do
 
       before do
-        Mongoid::Persistence::Update.expects(:new).with(
+        Mongoid::Persistence::Operations::Update.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -273,7 +273,7 @@ describe Mongoid::Safety do
     describe "#upsert" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -330,7 +330,7 @@ describe Mongoid::Safety do
     describe "#create" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -356,7 +356,7 @@ describe Mongoid::Safety do
     describe "#create!" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)
@@ -423,7 +423,7 @@ describe Mongoid::Safety do
     describe "#destroy_all" do
 
       before do
-        Mongoid::Persistence::Remove.expects(:new).with(
+        Mongoid::Persistence::Operations::Remove.expects(:new).with(
           person,
           { :safe => safety_options }
         ).returns(command)

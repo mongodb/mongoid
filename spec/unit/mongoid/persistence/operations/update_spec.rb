@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Update do
+describe Mongoid::Persistence::Operations::Update do
 
   let(:document) do
     Patient.instantiate("_id" => BSON::ObjectId.new)
@@ -30,7 +30,7 @@ describe Mongoid::Persistence::Update do
   describe "#initialize" do
 
     let(:update) do
-      Mongoid::Persistence::Update.new(document)
+      described_class.new(document)
     end
 
     it "sets the document" do
@@ -79,7 +79,7 @@ describe Mongoid::Persistence::Update do
     end
 
     let(:update) do
-      Mongoid::Persistence::Update.new(document)
+      described_class.new(document)
     end
 
     context "when the document is changed" do
@@ -133,7 +133,7 @@ describe Mongoid::Persistence::Update do
       context "when the document is embedded" do
 
         let(:embedded) do
-          Mongoid::Persistence::Update.new(address)
+          described_class.new(address)
         end
 
         before do

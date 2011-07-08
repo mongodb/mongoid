@@ -1,14 +1,9 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
-require "mongoid/persistence/operations"
 require "mongoid/persistence/deletion"
 require "mongoid/persistence/insertion"
 require "mongoid/persistence/modification"
-require "mongoid/persistence/insert"
-require "mongoid/persistence/insert_embedded"
-require "mongoid/persistence/remove"
-require "mongoid/persistence/remove_embedded"
-require "mongoid/persistence/update"
+require "mongoid/persistence/operations"
 
 module Mongoid #:nodoc:
 
@@ -46,7 +41,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The persisted document.
     def insert(options = {})
-      (embedded? ? InsertEmbedded : Insert).new(self, options).persist
+      Operations.insert(self, options).persist
     end
 
     # Remove the document from the datbase.
@@ -58,7 +53,7 @@ module Mongoid #:nodoc:
     #
     # @return [ TrueClass ] True.
     def remove(options = {})
-      (embedded? ? RemoveEmbedded : Remove).new(self, options).persist
+      Operations.remove(self, options).persist
     end
     alias :delete :remove
 
@@ -84,7 +79,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if succeeded, false if not.
     def update(options = {})
-      Update.new(self, options).persist
+      Operations.update(self, options).persist
     end
 
     # Update a single attribute and persist the entire document.

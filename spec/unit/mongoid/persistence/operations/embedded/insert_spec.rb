@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Insert do
+describe Mongoid::Persistence::Operations::Embedded::Insert do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -62,7 +62,7 @@ describe Mongoid::Persistence::Insert do
       context "when the parent is new" do
 
         let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(email)
+          described_class.new(email)
         end
 
         it "notifies its changes to parent and inserts the parent" do
@@ -74,7 +74,7 @@ describe Mongoid::Persistence::Insert do
       context "when the parent is not new" do
 
         let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(email)
+          described_class.new(email)
         end
 
         before do
@@ -97,7 +97,7 @@ describe Mongoid::Persistence::Insert do
       context "when the parent is new" do
 
         let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(address)
+          described_class.new(address)
         end
 
         it "notifies its changes to the parent and inserts the parent" do
@@ -114,7 +114,7 @@ describe Mongoid::Persistence::Insert do
       context "when the parent is not new" do
 
         let(:insert) do
-          Mongoid::Persistence::InsertEmbedded.new(address)
+          described_class.new(address)
         end
 
         before do
@@ -138,7 +138,7 @@ describe Mongoid::Persistence::Insert do
               { "$push" => { "addresses" => other_address.raw_attributes } },
               :safe => false
             ).returns("Object")
-            Mongoid::Persistence::InsertEmbedded.new(other_address).persist.should == other_address
+            described_class.new(other_address).persist.should == other_address
           end
         end
       end

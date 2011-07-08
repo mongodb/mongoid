@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::RemoveEmbedded do
+describe Mongoid::Persistence::Operations::Embedded::Remove do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -67,7 +67,7 @@ describe Mongoid::Persistence::RemoveEmbedded do
       context "when the parent is new" do
 
         let(:remove) do
-          Mongoid::Persistence::RemoveEmbedded.new(email)
+          described_class.new(email)
         end
 
         it "notifies its changes to parent and removes the parent" do
@@ -79,7 +79,7 @@ describe Mongoid::Persistence::RemoveEmbedded do
       context "when the parent is not new" do
 
         let(:remove) do
-          Mongoid::Persistence::RemoveEmbedded.new(email)
+          described_class.new(email)
         end
 
         before do
@@ -103,7 +103,7 @@ describe Mongoid::Persistence::RemoveEmbedded do
       context "when the parent is new" do
 
         let(:remove) do
-          Mongoid::Persistence::RemoveEmbedded.new(address)
+          described_class.new(address)
         end
 
         it "notifies its changes to the parent and removes the document" do
@@ -115,7 +115,7 @@ describe Mongoid::Persistence::RemoveEmbedded do
       context "when the parent is not new" do
 
         let(:remove) do
-          Mongoid::Persistence::RemoveEmbedded.new(address)
+          described_class.new(address)
         end
 
         before do
@@ -131,7 +131,7 @@ describe Mongoid::Persistence::RemoveEmbedded do
       context "when embedded multiple levels" do
 
         let(:remove) do
-          Mongoid::Persistence::RemoveEmbedded.new(location)
+          described_class.new(location)
         end
 
         before do

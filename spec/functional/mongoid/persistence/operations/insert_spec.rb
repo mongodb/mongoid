@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Insert do
+describe Mongoid::Persistence::Operations::Insert do
 
   before do
     Agent.delete_all
@@ -33,6 +33,5 @@ describe Mongoid::Persistence::Insert do
         name.save
       end
     end
-
   end
 end

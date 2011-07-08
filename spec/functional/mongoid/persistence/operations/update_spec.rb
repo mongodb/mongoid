@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Update do
+describe Mongoid::Persistence::Operations::Update do
 
   before do
     Person.delete_all
@@ -24,7 +24,7 @@ describe Mongoid::Persistence::Update do
       end
 
       it "updates the document in the database" do
-        update = Mongoid::Persistence::Update.new(@person)
+        update = described_class.new(@person)
         update.persist
         from_db = Person.find(@person.id)
         from_db.title.should == "Grand Poobah"
@@ -38,7 +38,7 @@ describe Mongoid::Persistence::Update do
       end
 
       it "returns true" do
-        update = Mongoid::Persistence::Update.new(@person)
+        update = described_class.new(@person)
         update.persist.should == true
       end
     end

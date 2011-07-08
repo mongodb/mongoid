@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Remove do
+describe Mongoid::Persistence::Operations::Remove do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -21,7 +21,7 @@ describe Mongoid::Persistence::Remove do
   describe "#initialize" do
 
     let(:remove) do
-      Mongoid::Persistence::Remove.new(document)
+      described_class.new(document)
     end
 
     it "sets the document" do
@@ -54,7 +54,7 @@ describe Mongoid::Persistence::Remove do
     end
 
     let(:remove) do
-      Mongoid::Persistence::Remove.new(document)
+      described_class.new(document)
     end
 
     context "when the document is a root document" do

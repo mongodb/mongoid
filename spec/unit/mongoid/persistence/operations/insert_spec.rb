@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Insert do
+describe Mongoid::Persistence::Operations::Insert do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -21,7 +21,7 @@ describe Mongoid::Persistence::Insert do
   describe "#initialize" do
 
     let(:insert) do
-      Mongoid::Persistence::Insert.new(document)
+      described_class.new(document)
     end
 
     it "sets the document" do
@@ -64,7 +64,7 @@ describe Mongoid::Persistence::Insert do
     end
 
     let(:insert) do
-      Mongoid::Persistence::Insert.new(document)
+      described_class.new(document)
     end
 
     context "when the document is valid" do

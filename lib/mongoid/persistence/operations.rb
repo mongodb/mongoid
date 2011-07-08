@@ -1,4 +1,10 @@
 # encoding: utf-8
+require "mongoid/persistence/operations/insert"
+require "mongoid/persistence/operations/remove"
+require "mongoid/persistence/operations/update"
+require "mongoid/persistence/operations/embedded/insert"
+require "mongoid/persistence/operations/embedded/remove"
+
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
 
@@ -153,6 +159,54 @@ module Mongoid #:nodoc:
           if conflicts
             @conflicts = { "$pushAll" => conflicts }
           end
+        end
+      end
+
+      class << self
+
+        # Get the appropriate removal operation based on the document.
+        #
+        # @example Get the deletion operation.
+        #   Operations.remove(doc, options)
+        #
+        # @param [ Document ] doc The document to persist.
+        # @param [ Hash ] options The persistence options.
+        #
+        # @return [ Operations ] The operation.
+        #
+        # @since 2.1.0
+        def remove(doc, options = {})
+          (doc.embedded? ? Embedded::Remove : Remove).new(doc, options)
+        end
+
+        # Get the appropriate insertion operation based on the document.
+        #
+        # @example Get the insertion operation.
+        #   Operations.insert(doc, options)
+        #
+        # @param [ Document ] doc The document to persist.
+        # @param [ Hash ] options The persistence options.
+        #
+        # @return [ Operations ] The operation.
+        #
+        # @since 2.1.0
+        def insert(doc, options = {})
+          (doc.embedded? ? Embedded::Insert : Insert).new(doc, options)
+        end
+
+        # Get the appropriate update operation based on the document.
+        #
+        # @example Get the update operation.
+        #   Operations.update(doc, options)
+        #
+        # @param [ Document ] doc The document to persist.
+        # @param [ Hash ] options The persistence options.
+        #
+        # @return [ Operations ] The operation.
+        #
+        # @since 2.1.0
+        def update(doc, options = {})
+          Update.new(doc, options)
         end
       end
     end
