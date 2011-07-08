@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
     #   document.delete!
     def delete!
       @destroyed = true
-      Mongoid::Persistence::Remove.new(self).persist
+      (embedded? ? Persistence::RemoveEmbedded : Persistence::Remove).new(self).persist
     end
 
     # Delete the +Document+, will set the deleted_at timestamp and not actually

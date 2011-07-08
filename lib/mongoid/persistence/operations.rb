@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
     # on initialization.
     module Operations
 
-      attr_reader :document, :selector
+      attr_reader :document
 
       # Get the collection we should be persisting to.
       #
@@ -18,6 +18,12 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def collection
         @collection ||= document._root.collection
+      end
+
+      def deletes
+        { document.atomic_delete_modifier =>
+          { document.atomic_path =>
+            document._index ? { "_id" => document.id } : true } }
       end
 
       # Instantiate the new persistence operation.

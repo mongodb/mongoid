@@ -64,29 +64,5 @@ describe Mongoid::Persistence::Remove do
         remove.persist.should == true
       end
     end
-
-    context "when the document is embedded" do
-
-      before do
-        document.addresses << address
-      end
-
-      let(:remove) do
-        Mongoid::Persistence::Remove.new(address)
-      end
-
-      let(:persister) do
-        stub.quacks_like(Mongoid::Persistence::RemoveEmbedded.allocate)
-      end
-
-      it "delegates to the embedded persister" do
-        Mongoid::Persistence::RemoveEmbedded.expects(:new).with(
-          address,
-          { :validate => true, :safe => false, :suppress => false }
-        ).returns(persister)
-        persister.expects(:persist).returns(true)
-        remove.persist.should == true
-      end
-    end
   end
 end

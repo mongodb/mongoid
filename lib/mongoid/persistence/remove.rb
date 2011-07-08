@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
     #     false
     #   );
     class Remove
-      include Operations
+      include Deletion, Operations
 
       # Remove the document from the database: delegates to the MongoDB
       # collection remove method.
@@ -22,15 +22,9 @@ module Mongoid #:nodoc:
       #
       # @return [ true ] Always true.
       def persist
-        if document.embedded?
-          RemoveEmbedded.new(
-            document,
-            options.merge!(:validate => validating?, :suppress => !notifying_parent?)
-          ).persist
-        else
-          collection.remove({ :_id => document.id }, options)
+        prepare do |doc|
+          collection.remove({ :_id => doc.id }, options)
         end
-        return true
       end
     end
   end

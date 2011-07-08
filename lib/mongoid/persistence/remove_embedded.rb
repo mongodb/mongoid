@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
     #     false
     #   );
     class RemoveEmbedded
-      include Operations
+      include Deletion, Operations
 
       # Remove the document from the database. If the parent is a new record,
       # it will get removed in Ruby only. If the parent is not a new record
@@ -24,28 +24,11 @@ module Mongoid #:nodoc:
       #
       # @return [ true ] Always true.
       def persist
-        parent = document._parent
-        parent.remove_child(document) if notifying_parent?
-        unless parent.new_record?
-          update = { document.atomic_delete_modifier => removal_selector }
-          collection.update(parent.atomic_selector, update, options)
-        end
-        return true
-      end
-
-      protected
-
-      # Get the removal selector.
-      #
-      # @example Get the selector.
-      #   command.removal_selector
-      #
-      # @return [ Hash ] The removal selector.
-      def removal_selector
-        if document._index
-          { document.atomic_path => { "_id" => document.id } }
-        else
-          { document.atomic_path => true }
+        prepare do |doc|
+          parent.remove_child(doc) if notifying_parent?
+          if parent.persisted?
+            collection.update(parent.atomic_selector, deletes, options)
+          end
         end
       end
     end

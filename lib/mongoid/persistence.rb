@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
 require "mongoid/persistence/operations"
+require "mongoid/persistence/deletion"
 require "mongoid/persistence/insertion"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
@@ -56,11 +57,7 @@ module Mongoid #:nodoc:
     #
     # @return [ TrueClass ] True.
     def remove(options = {})
-      if Remove.new(self, options).persist
-        attributes.freeze
-        self.destroyed = true
-        cascade!
-      end; true
+      (embedded? ? RemoveEmbedded : Remove).new(self, options).persist
     end
     alias :delete :remove
 
