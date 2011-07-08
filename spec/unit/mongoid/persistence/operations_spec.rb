@@ -182,6 +182,21 @@ describe Mongoid::Persistence::Operations do
     end
   end
 
+  describe "#parent" do
+
+    let(:child) do
+      document.addresses.build(:street => "Unter den Linden")
+    end
+
+    let(:operation) do
+      @klass.new(child)
+    end
+
+    it "returns the document's parent" do
+      operation.parent.should eq(document)
+    end
+  end
+
   describe "#validating?" do
 
     let(:operation) do

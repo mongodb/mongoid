@@ -1,0 +1,37 @@
+# encoding: utf-8
+module Mongoid #:nodoc:
+  module Persistence #:nodoc:
+
+    # Contains common logic for insertion operations.
+    module Insertion
+
+      # Wrap all the common insertion logic for both root and embedded
+      # documents and then yield to the block.
+      #
+      # @example Execute common insertion logic.
+      #   insert do
+      #     collection.insert({ :field => "value })
+      #   end
+      #
+      # @param [ Proc ] block The block to call.
+      #
+      # @return [ Document ] The inserted document.
+      #
+      # @since 2.1.0
+      def insert(&block)
+        document.tap do |doc|
+          unless validating? && document.invalid?(:create)
+            doc.run_callbacks(:save) do
+              doc.run_callbacks(:create) do
+                yield(doc)
+                doc.new_record = false
+                doc.reset_persisted_children and true
+              end
+            end
+            doc.move_changes
+          end
+        end
+      end
+    end
+  end
+end

@@ -8,12 +8,13 @@ module Mongoid #:nodoc:
     #
     # The underlying query resembles the following MongoDB query:
     #
-    #   collection.insert(
-    #     { "_id" : 1, "field" : "value" },
+    #   collection.update(
+    #     { "_id" : 1 },
+    #     { "$push" : { "field" : "value" } },
     #     false
     #   );
     class InsertEmbedded
-      include Operations
+      include Insertion, Operations
 
       # Insert the new document in the database. If the document's parent is a
       # new record, we will call save on the parent, otherwise we will $push
@@ -24,17 +25,14 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The document to be inserted.
       def persist
-        return document if validating? && document.invalid?(:create)
-        document.tap do |doc|
-          parent = doc._parent
-          if parent.new_record?
+        insert do |doc|
+          if parent.new?
             parent.insert
           else
             update = {
               doc.atomic_insert_modifier => { doc.atomic_position => doc.as_document }
             }
             collection.update(parent.atomic_selector, update, options)
-            doc.new_record = false
           end
         end
       end

@@ -60,6 +60,18 @@ module Mongoid #:nodoc:
         { :safe => @options[:safe] || Mongoid.persist_in_safe_mode }
       end
 
+      # Get the parent of the provided document.
+      #
+      # @example Get the parent.
+      #   operation.parent
+      #
+      # @return [ Document ] The parent document.
+      #
+      # @since 2.1.0
+      def parent
+        document._parent
+      end
+
       # Should we be running validations on this persistence operation?
       # Defaults to true.
       #

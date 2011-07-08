@@ -118,29 +118,5 @@ describe Mongoid::Persistence::Insert do
         document.new_record?.should == false
       end
     end
-
-    context "when the document is embedded" do
-
-      before do
-        document.addresses << address
-      end
-
-      let(:insert) do
-        Mongoid::Persistence::Insert.new(address)
-      end
-
-      let(:persister) do
-        stub.quacks_like(Mongoid::Persistence::InsertEmbedded.allocate)
-      end
-
-      it "delegates to the embedded persister" do
-        Mongoid::Persistence::InsertEmbedded.expects(:new).with(
-          address,
-          { :validate => true, :safe => false }
-        ).returns(persister)
-        persister.expects(:persist).returns(address)
-        insert.persist.should == address
-      end
-    end
   end
 end

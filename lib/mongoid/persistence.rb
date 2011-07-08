@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
 require "mongoid/persistence/operations"
+require "mongoid/persistence/insertion"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
 require "mongoid/persistence/remove"
@@ -43,7 +44,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The persisted document.
     def insert(options = {})
-      Insert.new(self, options).persist
+      (embedded? ? InsertEmbedded : Insert).new(self, options).persist
     end
 
     # Remove the document from the datbase.
