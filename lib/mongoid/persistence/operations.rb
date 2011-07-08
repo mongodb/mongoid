@@ -33,6 +33,19 @@ module Mongoid #:nodoc:
         @document, @options = document, options
       end
 
+      # Get the atomic insert for embedded documents, either a push or set.
+      #
+      # @example Get the inserts.
+      #   operation.inserts
+      #
+      # @return [ Hash ] The insert ops.
+      #
+      # @since 2.1.0
+      def inserts
+        { document.atomic_insert_modifier =>
+          { document.atomic_position => document.as_document } }
+      end
+
       # Should the parent document (in the case of embedded persistence) be
       # notified of the child deletion. This is used when calling delete from
       # the associations themselves.

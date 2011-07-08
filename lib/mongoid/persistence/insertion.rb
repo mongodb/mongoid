@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
       # documents and then yield to the block.
       #
       # @example Execute common insertion logic.
-      #   insert do
+      #   prepare do |doc|
       #     collection.insert({ :field => "value })
       #   end
       #
@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
       # @return [ Document ] The inserted document.
       #
       # @since 2.1.0
-      def insert(&block)
+      def prepare(&block)
         document.tap do |doc|
           unless validating? && document.invalid?(:create)
             doc.run_callbacks(:save) do

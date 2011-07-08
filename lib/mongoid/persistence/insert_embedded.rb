@@ -25,14 +25,11 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The document to be inserted.
       def persist
-        insert do |doc|
+        prepare do |doc|
           if parent.new?
             parent.insert
           else
-            update = {
-              doc.atomic_insert_modifier => { doc.atomic_position => doc.as_document }
-            }
-            collection.update(parent.atomic_selector, update, options)
+            collection.update(parent.atomic_selector, inserts, options)
           end
         end
       end
