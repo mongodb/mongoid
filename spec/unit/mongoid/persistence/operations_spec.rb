@@ -53,6 +53,51 @@ describe Mongoid::Persistence::Operations do
     end
   end
 
+  describe "#deletes" do
+
+    context "when the child is an embeds one" do
+
+      let(:child) do
+        document.build_name(:first_name => "Syd")
+      end
+
+      let(:operation) do
+        @klass.new(child)
+      end
+
+      let(:deletes) do
+        operation.deletes
+      end
+
+      it "returns the delete atomic modifiers" do
+        deletes.should eq(
+          { "$unset" => { "name" => true } }
+        )
+      end
+    end
+
+    context "when the child is an embeds many" do
+
+      let(:child) do
+        document.addresses.build(:street => "Unter den Linden")
+      end
+
+      let(:operation) do
+        @klass.new(child)
+      end
+
+      let(:deletes) do
+        operation.deletes
+      end
+
+      it "returns the delete atomic modifiers" do
+        deletes.should eq(
+          { "$pull" => { "addresses" => { "_id" => "unter-den-linden" } } }
+        )
+      end
+    end
+  end
+
   describe "#inserts" do
 
     let(:child) do

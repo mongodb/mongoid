@@ -20,6 +20,14 @@ module Mongoid #:nodoc:
         @collection ||= document._root.collection
       end
 
+      # Get the atomic delete operations for embedded documents.
+      #
+      # @example Get the atomic deletes.
+      #   operation.deletes
+      #
+      # @return [ Hash ] The atomic delete selector.
+      #
+      # @since 2.1.0
       def deletes
         { document.atomic_delete_modifier =>
           { document.atomic_path =>
