@@ -32,6 +32,21 @@ module Mongoid #:nodoc:
       matching.empty? ? nil : matching
     end
 
+    # Remove a single document from the identity map.
+    #
+    # @example Remove the document from the map.
+    #   identity_map.remove(id)
+    #
+    # @param [ Document ] id The id of the document to remove.
+    #
+    # @return [ Document ] The removed document.
+    #
+    # @since 2.1.0
+    def remove(id)
+      return unless id
+      delete(id)
+    end
+
     # Puts a document in the identity map, accessed by it's id.
     #
     # @example Put the document in the map.
@@ -81,7 +96,7 @@ module Mongoid #:nodoc:
       #   IdentityMap.set_multi([ doc_one, doc_two ])
       #
       # @since 2.1.0
-      delegate :clear, :get, :get_multi, :set, :set_multi,
+      delegate :clear, :get, :get_multi, :remove, :set, :set_multi,
         :to => :"Mongoid::Threaded.identity_map"
     end
   end

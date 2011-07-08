@@ -188,6 +188,43 @@ describe Mongoid::IdentityMap do
     end
   end
 
+  describe "#remove" do
+
+    let(:document) do
+      Person.new
+    end
+
+    before do
+      identity_map.set(document)
+    end
+
+    context "when provided an id" do
+
+      let!(:removed) do
+        identity_map.remove(document.id)
+      end
+
+      it "removes the document from the map" do
+        identity_map.should be_empty
+      end
+
+      it "returns the document" do
+        removed.should eq(document)
+      end
+    end
+
+    context "when provided nil" do
+
+      let!(:removed) do
+        identity_map.remove(nil)
+      end
+
+      it "returns nil" do
+        removed.should be_nil
+      end
+    end
+  end
+
   describe "#set" do
 
     context "when setting a document" do

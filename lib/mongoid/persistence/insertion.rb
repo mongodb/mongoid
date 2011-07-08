@@ -24,6 +24,7 @@ module Mongoid #:nodoc:
             doc.run_callbacks(:save) do
               doc.run_callbacks(:create) do
                 yield(doc)
+                IdentityMap.set(doc)
                 doc.new_record = false
                 doc.reset_persisted_children and true
               end
