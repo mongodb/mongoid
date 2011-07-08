@@ -11,7 +11,8 @@ module Mongoid #:nodoc:
     #     { "_id" : 1, "field" : "value" },
     #     false
     #   );
-    class Insert < Command
+    class Insert
+      include Operations
 
       # Insert the new document in the database. This delegates to the standard
       # MongoDB collection's insert command.

@@ -11,7 +11,8 @@ module Mongoid #:nodoc:
     #     { "_id" : 1 },
     #     false
     #   );
-    class Remove < Command
+    class Remove
+      include Operations
 
       # Remove the document from the database: delegates to the MongoDB
       # collection remove method.

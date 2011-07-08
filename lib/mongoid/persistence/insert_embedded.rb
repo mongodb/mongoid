@@ -12,7 +12,8 @@ module Mongoid #:nodoc:
     #     { "_id" : 1, "field" : "value" },
     #     false
     #   );
-    class InsertEmbedded < Command
+    class InsertEmbedded
+      include Operations
 
       # Insert the new document in the database. If the document's parent is a
       # new record, we will call save on the parent, otherwise we will $push

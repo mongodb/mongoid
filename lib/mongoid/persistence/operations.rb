@@ -2,9 +2,9 @@
 module Mongoid #:nodoc:
   module Persistence #:nodoc:
 
-    # Persistence operations extend from this class to get basic functionality
+    # Persistence operations include this module to get basic functionality
     # on initialization.
-    class Command
+    module Operations
 
       attr_reader :document, :selector
 

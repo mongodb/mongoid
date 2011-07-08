@@ -1,9 +1,15 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Command do
+describe Mongoid::Persistence::Operations do
 
   let(:document) do
     Person.new
+  end
+
+  before(:all) do
+    @klass = Class.new do
+      include Mongoid::Persistence::Operations
+    end
   end
 
   describe "#collection" do
@@ -15,7 +21,7 @@ describe Mongoid::Persistence::Command do
     context "when the document is a root" do
 
       let(:operation) do
-        described_class.new(document, options)
+        @klass.new(document, options)
       end
 
       let(:collection) do
@@ -34,7 +40,7 @@ describe Mongoid::Persistence::Command do
       end
 
       let(:operation) do
-        described_class.new(name, options)
+        @klass.new(name, options)
       end
 
       let(:collection) do
@@ -50,7 +56,7 @@ describe Mongoid::Persistence::Command do
   describe "#notifying_parent?" do
 
     let(:operation) do
-      described_class.new(document, options)
+      @klass.new(document, options)
     end
 
     context "when the suppress option is true" do
@@ -90,7 +96,7 @@ describe Mongoid::Persistence::Command do
   describe "#options" do
 
     let(:operation) do
-      described_class.new(document, options)
+      @klass.new(document, options)
     end
 
     context "safe is true" do
@@ -179,7 +185,7 @@ describe Mongoid::Persistence::Command do
   describe "#validating?" do
 
     let(:operation) do
-      described_class.new(document, options)
+      @klass.new(document, options)
     end
 
     context "when validate option is true" do

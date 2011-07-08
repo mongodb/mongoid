@@ -1,6 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
-require "mongoid/persistence/command"
+require "mongoid/persistence/operations"
 require "mongoid/persistence/insert"
 require "mongoid/persistence/insert_embedded"
 require "mongoid/persistence/remove"

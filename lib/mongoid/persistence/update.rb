@@ -28,7 +28,8 @@ module Mongoid #:nodoc:
     #     false
     #   );
     #
-    class Update < Command
+    class Update
+      include Operations
 
       # Persist the document that is to be updated to the database. This will
       # only write changed fields via MongoDB's $set modifier operation.

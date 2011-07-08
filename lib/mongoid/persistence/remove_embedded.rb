@@ -11,7 +11,8 @@ module Mongoid #:nodoc:
     #     { "_id" : 1 },
     #     false
     #   );
-    class RemoveEmbedded < Command
+    class RemoveEmbedded
+      include Operations
 
       # Remove the document from the database. If the parent is a new record,
       # it will get removed in Ruby only. If the parent is not a new record

@@ -1107,18 +1107,18 @@ describe Mongoid::Relations::Embedded::Many do
           end
         end
       end
-      
+
       context "when the documents empty" do
-        
+
         context "when scoped" do
           let!(:deleted) do
             person.addresses.without_postcode.send(method)
           end
-          
+
           it "deletes all the documents" do
             person.addresses.count.should == 0
           end
-        
+
           it "deletes all the documents from the db" do
             person.reload.addresses.count.should == 0
           end
@@ -1127,20 +1127,20 @@ describe Mongoid::Relations::Embedded::Many do
             deleted.should == 0
           end
         end
-        
+
         context "when conditions are provided" do
-          
+
           let!(:deleted) do
             person.addresses.send(
               method,
               :conditions => { :street => "Bond" }
             )
           end
-        
+
           it "deletes all the documents" do
             person.addresses.count.should == 0
           end
-        
+
           it "deletes all the documents from the db" do
             person.reload.addresses.count.should == 0
           end
@@ -1149,17 +1149,17 @@ describe Mongoid::Relations::Embedded::Many do
             deleted.should == 0
           end
         end
-        
+
         context "when conditions are not provided" do
-          
+
           let!(:deleted) do
             person.addresses.send(method)
           end
-        
+
           it "deletes all the documents" do
             person.addresses.count.should == 0
           end
-        
+
           it "deletes all the documents from the db" do
             person.reload.addresses.count.should == 0
           end
