@@ -45,6 +45,15 @@ describe Mongoid::Finders do
             }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
+
+        context "find by title" do
+          it "returns the document is found" do
+            Person.find_by_title("Mrs").should == person
+            Person.find_by_title_and_ssn("Mrs", "122").should == person
+            Person.find_last_by_title_and_ssn("Mrs", "122").should == person
+            Person.find_first_by_title_and_ssn("Mrs", "122").should == person
+          end
+        end
       end
 
       context "when passed an array of ids" do
