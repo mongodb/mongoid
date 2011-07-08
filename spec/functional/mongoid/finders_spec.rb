@@ -45,6 +45,24 @@ describe Mongoid::Finders do
             }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
+
+        context "find by title" do
+          it "returns the document is found" do
+            Person.find_by_title("Mrs.").should == Person.where("title" => "Mrs.")
+            Person.find_by_title("Mrs.").last.should == person
+            Person.find_by_title_and_ssn("Mrs.", "another").last.should == person
+            Person.find_last_by_title_and_ssn("Mrs.", "another").should == person
+            Person.find_first_by_title_and_ssn("Mrs.", "another").should == person
+          end
+        end
+
+        context "find method not exist" do
+          it "raise an error" do
+            expect {
+              Person.no_method
+            }.to raise_error(NoMethodError)            
+          end
+        end
       end
 
       context "when passed an array of ids" do

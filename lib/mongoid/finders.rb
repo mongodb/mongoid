@@ -7,10 +7,10 @@ module Mongoid #:nodoc:
 
     # Delegate to the criteria methods that are natural for creating a new
     # criteria.
-    critera_methods = [ :all_in, :any_in, :any_of, :asc, :ascending, :avg,
-                        :desc, :descending, :excludes, :limit, :max, :min,
-                        :not_in, :only, :order_by, :skip, :sum, :without,
-                        :where, :update, :update_all, :near ]
+    critera_methods = [:all_in, :any_in, :any_of, :asc, :ascending, :avg,
+                       :desc, :descending, :excludes, :limit, :max, :min,
+                       :not_in, :only, :order_by, :skip, :sum, :without,
+                       :where, :update, :update_all, :near]
     delegate *(critera_methods.dup << {:to => :criteria})
 
     # Find all documents that match the given conditions.
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Array ] args The conditions.
     def exists?(*args)
-       find(:all, *args).limit(1).count == 1
+      find(:all, *args).limit(1).count == 1
     end
 
     # Find a +Document+ in several different ways.
@@ -131,6 +131,20 @@ module Mongoid #:nodoc:
     # @return [ Document ] The last matching document.
     def last(*args)
       find(:last, *args)
+    end
+
+    def method_missing(method_id, *arguments, &block)
+      conditions = {}
+      case method_id.to_s
+        when /^find_(all|last||first)_?by_([_a-zA-Z]\w*)$/
+          finder_type = !$1.blank? ? $1.to_sym : :all
+          $2.split(/_and_/).each_with_index do |attr, i|
+            conditions[attr] = arguments[i]
+          end
+          find(finder_type, :conditions => conditions)
+        else
+          super
+      end
     end
 
     protected
