@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
     # on initialization.
     module Operations
 
-      attr_reader :document
+      attr_reader :conflicts, :document
 
       # Get the collection we should be persisting to.
       #
@@ -99,6 +99,31 @@ module Mongoid #:nodoc:
         document._parent
       end
 
+      # Get the atomic selector for the document.
+      #
+      # @example Get the selector.
+      #   operation.selector.
+      #
+      # @return [ Hash ] The mongodb selector.
+      #
+      # @since 2.1.0
+      def selector
+        @selector ||= document.atomic_selector
+      end
+
+      # Get the atomic updates for the document without the conflicting
+      # modifications.
+      #
+      # @example Get the atomic updates.
+      #   operation.updates
+      #
+      # @return [ Hash ] The updates sans conflicting mods.
+      #
+      # @since 2.1.0
+      def updates
+        @updates ||= init_updates
+      end
+
       # Should we be running validations on this persistence operation?
       # Defaults to true.
       #
@@ -110,6 +135,25 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def validating?
         @validating ||= @options[:validate].nil? ? true : @options[:validate]
+      end
+
+      private
+
+      # Initialize the atomic updates and conflicting modifications.
+      #
+      # @example Initialize the updates.
+      #   operation.init_updates
+      #
+      # @return [ Hash ] The atomic updates.
+      #
+      # @since 2.1.0
+      def init_updates
+        document.atomic_updates.tap do |updates|
+          conflicts = updates.delete(:other)
+          if conflicts
+            @conflicts = { "$pushAll" => conflicts }
+          end
+        end
       end
     end
   end

@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The document to be inserted.
       def persist
-        prepare do |doc|
+        prepare do
           if parent.new?
             parent.insert
           else

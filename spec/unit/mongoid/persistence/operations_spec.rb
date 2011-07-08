@@ -263,6 +263,88 @@ describe Mongoid::Persistence::Operations do
     end
   end
 
+  describe "#selector" do
+
+    let(:operation) do
+      @klass.new(document)
+    end
+
+    it "returns the document's atomic selector" do
+      operation.selector.should eq(document.atomic_selector)
+    end
+  end
+
+  describe "#updates" do
+
+    context "when there are no conflicting mods" do
+
+      let(:operation) do
+        @klass.new(document)
+      end
+
+      let(:updates) do
+        operation.updates
+      end
+
+      it "returns the updates" do
+        updates.should eq(document.atomic_updates)
+      end
+    end
+
+    context "when conflicting mods exist" do
+
+      let!(:document) do
+        Person.new.tap do |person|
+          person.new_record = false
+          person.move_changes
+        end
+      end
+
+      let!(:child) do
+        document.addresses.build(:street => "Unter den Linden").tap do |doc|
+          doc.new_record = false
+        end
+      end
+
+      let!(:conflict) do
+        document.addresses.build(:street => "Freiderichstr")
+      end
+
+      let(:operation) do
+        @klass.new(document)
+      end
+
+      let!(:updates) do
+        operation.updates
+      end
+
+      let!(:conflicts) do
+        operation.conflicts
+      end
+
+      it "returns the updates without conflicts" do
+        updates.should eq(
+          {
+            "$set" => {
+            "addresses.0.street" => "Unter den Linden",
+            "addresses.0._id" => "unter-den-linden"
+            }
+          }
+        )
+      end
+
+      it "sets the conflicts" do
+        conflicts.should eq(
+          {
+            "$pushAll" => {
+            "addresses" => [ { "street" => "Freiderichstr", "_id" => "freiderichstr" } ]
+            }
+          }
+        )
+      end
+    end
+  end
+
   describe "#validating?" do
 
     let(:operation) do

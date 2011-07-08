@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
     #   );
     #
     class Update
-      include Operations
+      include Modification, Operations
 
       # Persist the document that is to be updated to the database. This will
       # only write changed fields via MongoDB's $set modifier operation.
@@ -39,34 +39,12 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] If the save passed.
       def persist
-        return false if validating? && document.invalid?(:update)
-        value = document.run_callbacks(:save) do
-          document.run_callbacks(:update) { update }
-        end
-        document.reset_persisted_children
-        document.move_changes
-        return value
-      end
-
-      protected
-
-      # Update the document in the database atomically.
-      #
-      # @example Update the document.
-      #   command.update
-      #
-      # @return [ true ] Always true.
-      def update
-        updates = document.atomic_updates
-        unless updates.empty?
-          others = updates.delete(:other)
-          selector = document.atomic_selector
-          collection.update(selector, updates, options)
-          if others
-            collection.update(selector, { "$pushAll" => others }, options)
+        prepare do
+          unless updates.empty?
+            collection.update(selector, updates, options)
+            collection.update(selector, conflicts, options) if conflicts
           end
         end
-        return true
       end
     end
   end
