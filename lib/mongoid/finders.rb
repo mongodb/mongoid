@@ -143,7 +143,7 @@ module Mongoid #:nodoc:
           end
           find(finder_type, :conditions => conditions)
         else
-          return nil
+          super
       end
     end
 
