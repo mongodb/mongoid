@@ -137,7 +137,7 @@ module Mongoid #:nodoc:
       conditions = {}
       case method_id.to_s
         when /^find_(all|last||first)_?by_([_a-zA-Z]\w*)$/
-          finder_type = $1.to_sym
+          finder_type = !$1.blank? ? $1.to_sym : :all
           $2.split(/_and_/).each_with_index do |attr, i|
             conditions[attr] = arguments[i]
           end
@@ -145,7 +145,7 @@ module Mongoid #:nodoc:
         else
           return nil
       end
-    ends
+    end
 
     protected
 

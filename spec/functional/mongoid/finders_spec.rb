@@ -47,11 +47,11 @@ describe Mongoid::Finders do
         end
 
         context "find by title" do
-          it "returns the document is found" do
-            Person.find_by_title("Mrs").should == person
-            Person.find_by_title_and_ssn("Mrs", "122").should == person
-            Person.find_last_by_title_and_ssn("Mrs", "122").should == person
-            Person.find_first_by_title_and_ssn("Mrs", "122").should == person
+          it "returns the document is found" do            
+            Person.find_by_title("Mrs.").last.should == person
+            Person.find_by_title_and_ssn("Mrs.", "another").last.should == person
+            Person.find_last_by_title_and_ssn("Mrs.", "another").should == person
+            Person.find_first_by_title_and_ssn("Mrs.", "another").should == person
           end
         end
       end
