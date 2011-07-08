@@ -27,11 +27,10 @@ module Mongoid #:nodoc:
       #
       # @param [ Document ] document The document to persist.
       # @param [ Hash ] options The persistence options.
-      # @param [ Hash ] selector The MongoDB selector.
       #
       # @since 2.1.0
-      def initialize(document, options = {}, selector = {})
-        @document, @options, @selector = document, options, selector
+      def initialize(document, options = {})
+        @document, @options = document, options
       end
 
       # Should the parent document (in the case of embedded persistence) be
