@@ -8,7 +8,7 @@ describe Mongoid::Criterion::Exclusion do
 
   describe "#excludes" do
 
-    let(:person) do
+    let!(:person) do
       Person.create(
         :title => "Sir",
         :age => 100,
@@ -36,6 +36,24 @@ describe Mongoid::Criterion::Exclusion do
 
       it "it properly excludes the documents" do
         documents.should be_empty
+      end
+    end
+  end
+
+  describe "#without" do
+
+    let!(:person) do
+      Person.create(:ssn => "123-22-1212")
+    end
+
+    context "when used in a named scope" do
+
+      let(:documents) do
+        Person.without_ssn
+      end
+
+      it "limits the document fields" do
+        documents.first.ssn.should be_nil
       end
     end
   end

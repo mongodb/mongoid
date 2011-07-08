@@ -1,5 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
+
+  # This module contains all the callback hooks for Mongoid.
   module Callbacks
     extend ActiveSupport::Concern
 

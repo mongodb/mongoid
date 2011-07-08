@@ -1,8 +1,11 @@
 class Image
-  def self.get(value)
+  include Mongoid::Fields::Serializable
+
+  def deserialize(value)
     value.to_s
   end
-  def self.set(value)
+
+  def serialize(value)
     value.to_s
   end
 end

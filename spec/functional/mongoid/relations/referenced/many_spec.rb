@@ -1417,10 +1417,6 @@ describe Mongoid::Relations::Referenced::Many do
               Mongoid.raise_not_found_error = true
             end
 
-            after do
-              Mongoid.raise_not_found_error = false
-            end
-
             it "raises an error" do
               expect {
                 person.posts.find(BSON::ObjectId.new)
@@ -1436,6 +1432,10 @@ describe Mongoid::Relations::Referenced::Many do
 
             before do
               Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
             end
 
             it "returns nil" do
@@ -1466,10 +1466,6 @@ describe Mongoid::Relations::Referenced::Many do
               Mongoid.raise_not_found_error = true
             end
 
-            after do
-              Mongoid.raise_not_found_error = false
-            end
-
             it "raises an error" do
               expect {
                 person.posts.find([ BSON::ObjectId.new ])
@@ -1485,6 +1481,10 @@ describe Mongoid::Relations::Referenced::Many do
 
             before do
               Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
             end
 
             it "returns an empty array" do
@@ -1605,10 +1605,6 @@ describe Mongoid::Relations::Referenced::Many do
               Mongoid.raise_not_found_error = true
             end
 
-            after do
-              Mongoid.raise_not_found_error = false
-            end
-
             it "raises an error" do
               expect {
                 movie.ratings.find(BSON::ObjectId.new)
@@ -1624,6 +1620,10 @@ describe Mongoid::Relations::Referenced::Many do
 
             before do
               Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
             end
 
             it "returns nil" do
@@ -1654,10 +1654,6 @@ describe Mongoid::Relations::Referenced::Many do
               Mongoid.raise_not_found_error = true
             end
 
-            after do
-              Mongoid.raise_not_found_error = false
-            end
-
             it "raises an error" do
               expect {
                 movie.ratings.find([ BSON::ObjectId.new ])
@@ -1673,6 +1669,10 @@ describe Mongoid::Relations::Referenced::Many do
 
             before do
               Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
             end
 
             it "returns an empty array" do
@@ -2239,6 +2239,38 @@ describe Mongoid::Relations::Referenced::Many do
           movie.ratings.send(method).should == 2
         end
       end
+    end
+  end
+
+  context "then association has order" do
+    let(:person) do
+      Person.create(:ssn => "999-99-9999")
+    end
+
+    let(:post_one) do
+      Post.create(:rating => 10, :title => '1')
+    end
+
+    let(:post_two) do
+      Post.create(:rating => 20, :title => '2')
+    end
+
+    let(:post_three) do
+      Post.create(:rating => 20, :title => '3')
+    end
+
+
+    before do
+      person.posts.nullify_all
+      person.posts.push(post_one, post_two, post_three)
+    end
+
+    it "order documents" do
+      person.posts(true).should == [post_two, post_three, post_one]
+    end
+
+    it "chaining order criterias" do
+      person.posts.order_by(:title.desc).to_a.should == [post_three, post_two, post_one]
     end
   end
 end

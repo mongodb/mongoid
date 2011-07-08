@@ -10,6 +10,9 @@ ja:
           次のDatabaseは利用できませんでした。%{name}
         invalid_type:
           このフィールドは %{klass} で定義されていますが、%{other}に対し %{value} という値が送信されました。
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} はサポートしていません。 %{mongo_version}にアップグレードをしてください。
         validations:
@@ -37,4 +40,4 @@ ja:
           リレーションを通して create もしくは create! を呼び出すことが出来ませんでした。
           %{document} の 親ドキュメント (%{base}) は保存されていません。
         mixed_relations:
-          %{embedded} ドキュメント に対して %{root} ドキュメントからリレーション関係を用いて、参照することはできません。
+          "%{embedded} ドキュメント に対して %{root} ドキュメントからリレーション関係を用いて、参照することはできません。"

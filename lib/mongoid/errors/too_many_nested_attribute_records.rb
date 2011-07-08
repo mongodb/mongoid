@@ -4,9 +4,8 @@ module Mongoid #:nodoc
     # This error is raised when trying to create set nested records above the
     # specified :limit
     #
-    # Example:
-    #
-    #<tt>TooManyNestedAttributeRecords.new('association', limit)
+    # @example Create the error.
+    #   TooManyNestedAttributeRecords.new('association', limit)
     class TooManyNestedAttributeRecords < MongoidError
       def initialize(association, limit)
         super(

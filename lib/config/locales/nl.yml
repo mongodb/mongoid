@@ -11,6 +11,9 @@ nl:
         invalid_type:
           Veld was gedefinieerd als een %{klass}, maar ontvangen als %{other} met
           de waarde %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} wordt niet ondersteund, upgrade naar versie %{mongo_version}.
         validations:

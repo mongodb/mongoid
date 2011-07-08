@@ -11,6 +11,9 @@ sv:
         invalid_type:
           Fältet var definerat som %{klass}, men fick %{other} med
           värdet %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} stöds ej, vänligen upgradera
           till %{mongo_version}.

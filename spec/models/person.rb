@@ -6,7 +6,7 @@ class Person
 
   attr_accessor :mode
 
-  class_inheritable_hash :somebody_elses_important_class_options
+  class_attribute :somebody_elses_important_class_options
   self.somebody_elses_important_class_options = { :keep_me_around => true }
 
   field :title
@@ -83,7 +83,7 @@ class Person
   references_many \
     :posts,
     :dependent => :delete,
-    :default_order => :created_at.desc do
+    :order => :rating.desc do
     def extension
       "Testing"
     end
@@ -92,7 +92,9 @@ class Person
   references_and_referenced_in_many \
     :preferences,
     :index => true,
-    :dependent => :nullify
+    :dependent => :nullify,
+    :autosave => true,
+    :order => :value.desc
   references_and_referenced_in_many :user_accounts
   references_and_referenced_in_many :houses
 
@@ -106,6 +108,7 @@ class Person
     :dependent  => :nullify
 
   scope :minor, where(:age.lt => 18)
+  scope :without_ssn, without(:ssn)
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20

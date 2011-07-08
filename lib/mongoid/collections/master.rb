@@ -14,11 +14,13 @@ module Mongoid #:nodoc:
       # @example Proxy the driver save.
       #   collection.save({ :name => "Al" })
       Operations::ALL.each do |name|
-        define_method(name) do |*args|
-          retry_on_connection_failure do
-            collection.send(name, *args)
+        class_eval <<-EOS, __FILE__, __LINE__
+          def #{name}(*args)
+            retry_on_connection_failure do
+              collection.#{name}(*args)
+            end
           end
-        end
+        EOS
       end
 
       # Create the new database writer. Will create a collection from the

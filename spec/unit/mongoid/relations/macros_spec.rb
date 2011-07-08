@@ -119,6 +119,25 @@ describe Mongoid::Relations::Macros do
       end
     end
 
+    context 'when defining order on relation' do
+
+      before do
+        klass.embeds_many(:addresses, :order => :number.asc)
+      end
+
+      let(:metadata) do
+        klass.relations["addresses"]
+      end
+
+      it "adds metadata to klass" do
+        metadata.order.should_not be_nil
+      end
+
+      it "returns Mongoid::Criterion::Complex" do
+        metadata.order.should be_kind_of(Mongoid::Criterion::Complex)
+      end
+    end
+
     context "when setting validate to false" do
 
       before do
@@ -309,6 +328,25 @@ describe Mongoid::Relations::Macros do
       end
     end
 
+    context 'when defining order on relation' do
+
+      before do
+        klass.references_many(:posts, :order => :rating.asc)
+      end
+
+      let(:metadata) do
+        klass.relations["posts"]
+      end
+
+      it "adds metadata to klass" do
+        metadata.order.should_not be_nil
+      end
+
+      it "returns Mongoid::Criterion::Complex" do
+        metadata.order.should be_kind_of(Mongoid::Criterion::Complex)
+      end
+    end
+
     context "when setting validate to false" do
 
       before do
@@ -353,6 +391,26 @@ describe Mongoid::Relations::Macros do
       it "creates the field for the foreign key" do
         klass.allocate.should respond_to(:preference_ids)
       end
+
+      context 'when defining order on relation' do
+
+        before do
+          klass.references_and_referenced_in_many(:preferences, :order => :ranking.asc)
+        end
+
+        let(:metadata) do
+          klass.relations["preferences"]
+        end
+
+        it "adds metadata to klass" do
+          metadata.order.should_not be_nil
+        end
+
+        it "returns Mongoid::Criterion::Complex" do
+          metadata.order.should be_kind_of(Mongoid::Criterion::Complex)
+        end
+      end
+
 
       context "metadata properties" do
 

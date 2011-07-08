@@ -7,9 +7,18 @@ describe Mongoid::Callbacks do
   end
 
   it "CALLBACKS includes all callbacks" do
-    Mongoid::Callbacks::CALLBACKS.should =~ TestClass.methods.map(&:to_s).grep(/^(before|after|around)_/).map(&:to_sym).reject do |method|
-      # deprecated callbacks
-      [:after_validation_on_create, :after_validation_on_update, :before_validation_on_create, :before_validation_on_update].include? method
+    Mongoid::Callbacks::CALLBACKS.should =~
+      TestClass.methods.map(&:to_s).
+        grep(/^(before|after|around)_/).
+        map(&:to_sym).
+        reject do |method|
+          # deprecated callbacks
+          [
+            :after_validation_on_create,
+            :after_validation_on_update,
+            :before_validation_on_create,
+            :before_validation_on_update
+          ].include?(method)
     end
   end
 

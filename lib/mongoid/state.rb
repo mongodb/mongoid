@@ -63,5 +63,39 @@ module Mongoid #:nodoc:
     def destroyed=(destroyed)
       @destroyed = destroyed && true
     end
+
+    # Determine if the document can be pushed.
+    #
+    # @example Is this pushable?
+    #   person.pushable?
+    #
+    # @return [ true, false ] Is the document new and embedded?
+    def pushable?
+      new? && embedded_many? && _parent.persisted?
+    end
+
+    # Determine if the document can be set.
+    #
+    # @example Is this settable?
+    #   person.settable?
+    #
+    # @return [ true, false ] Is this document a new embeds one?
+    #
+    # @since 2.1.0
+    def settable?
+      new? && embedded_one?
+    end
+
+    # Is the document updateable?
+    #
+    # @example Is the document updateable?
+    #   person.updateable?
+    #
+    # @return [ true, false ] If the document is changed and persisted.
+    #
+    # @since 2.1.0
+    def updateable?
+      persisted? && changed?
+    end
   end
 end

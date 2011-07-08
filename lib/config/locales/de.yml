@@ -11,6 +11,9 @@ de:
         invalid_type:
           Feld wurde als a(n) %{klass} definiert, doch der Wert %{value} vom Typ
           %{other} wurde übergeben.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} wird nicht unterstützt, bitte auf Version
           %{mongo_version} aktualisieren.

@@ -96,7 +96,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document, options = {})
           target.delete(document).tap do |doc|
-            binding.unbind_one(doc, default_options.merge!(options)) if doc
+            if doc
+              binding.unbind_one(doc, default_options.merge!(options))
+            end
           end
         end
 
@@ -144,7 +146,7 @@ module Mongoid # :nodoc:
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             unless base.frozen?
-              base.send(metadata.foreign_key_setter, target.map(&:id))
+              base.send(metadata.foreign_key_setter, target.map { |doc| doc.id })
             end
           end
         end
@@ -188,11 +190,12 @@ module Mongoid # :nodoc:
             if new_target
               binding.unbind(options)
               relation.target = new_target.to_a
-              base.send(metadata.foreign_key_setter, new_target.map(&:id))
+              base.send(metadata.foreign_key_setter, new_target.map { |doc| doc.id })
               bind(options)
             else
               relation.target = unbind(options)
             end
+            base.save if base.persisted? && !options[:binding]
           end
         end
 
@@ -212,7 +215,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def unbind(options = {})
-          target.each(&:delete) if base.persisted?
+          target.each { |doc| doc.delete } if base.persisted?
           binding.unbind(options)
           []
         end
@@ -241,10 +244,13 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          if metadata.inverse
-            metadata.klass.any_in(metadata.inverse_foreign_key => [ base.id ])
+          crt = if metadata.inverse
+            klass.any_in(metadata.inverse_foreign_key => [ base.id ])
           else
-            metadata.klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
+            klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
+          end
+          crt.tap do |c|
+            c.order_by(metadata.order) if metadata.order
           end
         end
 
@@ -275,7 +281,7 @@ module Mongoid # :nodoc:
           target.delete_if do |doc|
             doc.matches?(cond[:conditions] || {})
           end
-          ids = criteria.merge(cond).only(:_id).map(&:_id)
+          ids = criteria.merge(cond).only(:_id).map { |con| con._id }
           criteria.merge(cond).send(method).tap do
             base.pull_all(metadata.foreign_key, ids)
           end
@@ -296,8 +302,8 @@ module Mongoid # :nodoc:
           # @return [ Builder ] A new builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object)
-            Builders::Referenced::ManyToMany.new(meta, object)
+          def builder(meta, object, loading = false)
+            Builders::Referenced::ManyToMany.new(meta, object, loading)
           end
 
           # Returns true if the relation is an embedded one. In this case
@@ -374,6 +380,20 @@ module Mongoid # :nodoc:
             Builders::NestedAttributes::Many.new(metadata, attributes, options)
           end
 
+          # Get the path calculator for the supplied document.
+          #
+          # @example Get the path calculator.
+          #   Proxy.path(document)
+          #
+          # @param [ Document ] document The document to calculate on.
+          #
+          # @return [ Root ] The root atomic path calculator.
+          #
+          # @since 2.1.0
+          def path(document)
+            Mongoid::Atomic::Paths::Root.new(document)
+          end
+
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
@@ -385,6 +405,18 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def stores_foreign_key?
             true
+          end
+
+          # Get the valid options allowed with this relation.
+          #
+          # @example Get the valid options.
+          #   Relation.valid_options
+          #
+          # @return [ Array<Symbol> ] The valid options.
+          #
+          # @since 2.1.0
+          def valid_options
+            [ :autosave, :dependent, :foreign_key, :index, :order ]
           end
         end
       end

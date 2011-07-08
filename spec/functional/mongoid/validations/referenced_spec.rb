@@ -36,6 +36,11 @@ describe Mongoid::Validations::ReferencedValidator do
 
       before do
         person.game = game
+        Mongoid.raise_not_found_error = false
+      end
+
+      after do
+        Mongoid.raise_not_found_error = true
       end
 
       it "never loads the relation" do
@@ -81,6 +86,11 @@ describe Mongoid::Validations::ReferencedValidator do
 
       before do
         person.preferences << preference
+        Mongoid.raise_not_found_error = false
+      end
+
+      after do
+        Mongoid.raise_not_found_error = true
       end
 
       it "never loads the relation" do

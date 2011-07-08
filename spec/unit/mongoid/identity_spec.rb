@@ -103,12 +103,7 @@ describe Mongoid::Identity do
         context "when using object ids" do
 
           before do
-            Person.identity(:type => BSON::ObjectId)
             Mongoid::Identity.new(person).create
-          end
-
-          after do
-            Person.identity(:type => String)
           end
 
           it "sets the id to a mongo object id" do
@@ -119,7 +114,12 @@ describe Mongoid::Identity do
         context "when not using object ids" do
 
           before do
+            Person.identity(:type => String)
             Mongoid::Identity.new(person).create
+          end
+
+          after do
+            Person.identity(:type => BSON::ObjectId)
           end
 
           it "sets the id to a mongo object id string" do

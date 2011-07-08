@@ -165,7 +165,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The newly created document.
       def create(attributes = {}, &block)
-        new(attributes, &block).tap(&:save)
+        new(attributes, &block).tap { |doc| doc.save }
       end
 
       # Create a new document. This will instantiate a new document and

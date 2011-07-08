@@ -208,4 +208,12 @@ describe Mongoid::Relations::Embedded::In do
       end
     end
   end
+
+  describe ".valid_options" do
+
+    it "returns the valid options" do
+      described_class.valid_options.should ==
+        [ :cyclic, :polymorphic ]
+    end
+  end
 end

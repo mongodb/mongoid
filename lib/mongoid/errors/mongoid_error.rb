@@ -11,14 +11,13 @@ module Mongoid #:nodoc
       # Given the key of the specific error and the options hash, translate the
       # message.
       #
-      # Options:
+      # @example Translate the message.
+      #   error.translate("errors", :key => value)
       #
-      # key: The key of the error in the locales.
-      # options: The objects to pass to create the message.
+      # @param [ String ] key The key of the error in the locales.
+      # @param [ Hash ] options The objects to pass to create the message.
       #
-      # Returns:
-      #
-      # A localized error message string.
+      # @return [ String ] A localized error message string.
       def translate(key, options)
         ::I18n.translate("#{BASE_KEY}.#{key}", options)
       end

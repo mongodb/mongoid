@@ -11,6 +11,9 @@ ro:
         invalid_type:
           Câmpul a fost definit ca şi un(o) %{klass}, dar valoarea
           recepţionată %{value} este de clasa %{other}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           Versiunea MongoDB %{version} nu este suportată.
           Vă rugăm să folosiţi versiunea %{mongo_version}.

@@ -1,11 +1,4 @@
-defaults: &defaults
-  host: localhost
-  # slaves:
-  # - host: slave1.local
-  # - port: 27018
-
 test:
-  <<: *defaults
   host: flame.mongohq.com
   port: 27040
   username: <%= ENV["MONGOHQ_USER_MONGOID"] %>

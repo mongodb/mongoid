@@ -28,6 +28,7 @@ class Address
 
   referenced_in :account
 
+  scope :without_postcode, where(:postcode => nil)
   named_scope :rodeo, where(:street => "Rodeo Dr") do
     def mansion?
       all? { |address| address.street == "Rodeo Dr" }

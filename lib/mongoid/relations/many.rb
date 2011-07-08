@@ -43,8 +43,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The new document.
       def build(attributes = {}, type = nil, &block)
-        instantiated(type).tap do |doc|
-          doc.write_attributes(attributes)
+        Mongoid::Factory.build(type || metadata.klass, attributes).tap do |doc|
           doc.identify
           append(doc, default_options(:binding => true))
           block.call(doc) if block
@@ -146,8 +145,8 @@ module Mongoid #:nodoc:
       # @return [ true, false ] If the proxy responds to the method.
       #
       # @since 2.0.0
-      def respond_to?(name)
-        [].respond_to?(name) || methods.include?(name)
+      def respond_to?(name, include_private = false)
+        [].respond_to?(name, include_private) || super
       end
 
       # Gets the document as a serializable hash, used by ActiveModel's JSON and

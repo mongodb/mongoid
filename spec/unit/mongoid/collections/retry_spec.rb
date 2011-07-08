@@ -15,11 +15,16 @@ describe Mongoid::Collections::Retry do
       "do something here"
     end
   end
-  
+
   subject { SomeCollection.new }
+
+  let(:logger) { stub.quacks_like(Logger.allocate) }
 
   before do
     Kernel.stubs(:sleep)
+
+    logger.expects(:warn).at_least(0)
+    Mongoid.stubs(:logger => logger)
   end
 
   describe "when a connection failure occurs" do
@@ -100,6 +105,11 @@ describe Mongoid::Collections::Retry do
 
       it "should return the result of the command" do
         subject.perform.should == result
+      end
+
+      it "sends warning message to logger on retry attempts" do
+        logger.expects(:warn).with { |value| value =~ /1/ }
+        subject.perform
       end
     end
   end

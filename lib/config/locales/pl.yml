@@ -11,6 +11,9 @@ pl:
         invalid_type:
           Pole zostało zdefiniowane jako %{klass}, ale otrzymano %{other}
           z wartością %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} nie jest wspierane,
           zaktualizuj do %{mongo_version}.

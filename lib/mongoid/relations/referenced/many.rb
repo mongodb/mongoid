@@ -53,7 +53,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def bind(options = {})
           binding.bind(options)
-          target.map(&:save) if base.persisted? && !options[:binding]
+          target.map { |doc| doc.save } if base.persisted? && !options[:binding]
         end
 
         alias :concat :<<
@@ -137,7 +137,7 @@ module Mongoid #:nodoc:
           raise_mixed if klass.embedded?
           selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
-          metadata.klass.delete_all(
+          klass.delete_all(
             :conditions => criteria.selector.merge(selector)
           )
         end
@@ -158,7 +158,7 @@ module Mongoid #:nodoc:
           raise_mixed if klass.embedded?
           selector = (conditions || {})[:conditions] || {}
           target.delete_if { |doc| doc.matches?(selector) }
-          metadata.klass.destroy_all(
+          klass.destroy_all(
             :conditions => criteria.selector.merge(selector)
           )
         end
@@ -275,8 +275,8 @@ module Mongoid #:nodoc:
         def unbind(options = {})
           binding.unbind(options)
           unless base.new_record?
-            target.each(&:delete) unless options[:binding]
-            target.each(&:save) if options[:nullify]
+            target.each { |doc| doc.delete } unless options[:binding]
+            target.each { |doc| doc.save } if options[:nullify]
           end
           []
         end
@@ -322,7 +322,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.2, batch-relational-insert
         def collection
-          metadata.klass.collection
+          klass.collection
         end
 
         # Get the value for the foreign key in convertable or unconvertable
@@ -354,7 +354,11 @@ module Mongoid #:nodoc:
         # @return [ Criteria ] A new criteria.
         def criteria
           raise_mixed if klass.embedded?
-          metadata.klass.where(metadata.foreign_key => convertable)
+          if metadata.order
+            klass.where(metadata.foreign_key => convertable).order_by(metadata.order)
+          else
+            klass.where(metadata.foreign_key => convertable)
+          end
         end
 
         # Tells if the target array been initialized.
@@ -398,7 +402,6 @@ module Mongoid #:nodoc:
         # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
           load!(:binding => true) and return super if [].respond_to?(name)
-          klass = metadata.klass
           klass.send(:with_scope, criteria) do
             criteria.send(name, *args, &block)
           end
@@ -419,8 +422,8 @@ module Mongoid #:nodoc:
           # @return [ Builder ] A new builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object)
-            Builders::Referenced::Many.new(meta, object || [])
+          def builder(meta, object, loading = false)
+            Builders::Referenced::Many.new(meta, object || [], loading)
           end
 
           # Returns true if the relation is an embedded one. In this case
@@ -497,6 +500,20 @@ module Mongoid #:nodoc:
             Builders::NestedAttributes::Many.new(metadata, attributes, options)
           end
 
+          # Get the path calculator for the supplied document.
+          #
+          # @example Get the path calculator.
+          #   Proxy.path(document)
+          #
+          # @param [ Document ] document The document to calculate on.
+          #
+          # @return [ Root ] The root atomic path calculator.
+          #
+          # @since 2.1.0
+          def path(document)
+            Mongoid::Atomic::Paths::Root.new(document)
+          end
+
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
@@ -508,6 +525,18 @@ module Mongoid #:nodoc:
           # @since 2.0.0.rc.1
           def stores_foreign_key?
             false
+          end
+
+          # Get the valid options allowed with this relation.
+          #
+          # @example Get the valid options.
+          #   Relation.valid_options
+          #
+          # @return [ Array<Symbol> ] The valid options.
+          #
+          # @since 2.1.0
+          def valid_options
+            [ :as, :autosave, :dependent, :foreign_key, :order ]
           end
         end
       end

@@ -49,4 +49,12 @@ describe Mongoid::Relations::Referenced::One do
       described_class.stores_foreign_key?.should == false
     end
   end
+
+  describe ".valid_options" do
+
+    it "returns the valid options" do
+      described_class.valid_options.should ==
+        [ :as, :autosave, :dependent, :foreign_key ]
+    end
+  end
 end

@@ -13,8 +13,9 @@ module Mongoid #:nodoc
     extend self
     include ActiveModel::Observing
 
-    attr_accessor :master, :slaves, :settings
+    attr_accessor :master, :settings, :defaults
     @settings = {}
+    @defaults = {}
 
     # Define a configuration option with a default.
     #
@@ -28,11 +29,21 @@ module Mongoid #:nodoc
     #
     # @since 2.0.0.rc.1
     def option(name, options = {})
-      define_method(name) do
-        settings.has_key?(name) ? settings[name] : options[:default]
-      end
-      define_method("#{name}=") { |value| settings[name] = value }
-      define_method("#{name}?") { send(name) }
+      defaults[name] = settings[name] = options[:default]
+
+      class_eval <<-RUBY
+        def #{name}
+          settings[#{name.inspect}]
+        end
+
+        def #{name}=(value)
+          settings[#{name.inspect}] = value
+        end
+
+        def #{name}?
+          #{name}
+        end
+      RUBY
     end
 
     option :allow_dynamic_fields, :default => true
@@ -125,7 +136,7 @@ module Mongoid #:nodoc
     #
     # @since 2.0.1
     def load!(path)
-      environment = defined?(Rails) ? Rails.env : ENV["RACK_ENV"]
+      environment = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV["RACK_ENV"]
       settings = YAML.load(ERB.new(File.new(path).read).result)[environment]
       if settings.present?
         from_hash(settings)
@@ -139,7 +150,7 @@ module Mongoid #:nodoc
     #
     # @return [ Logger ] The default Logger instance.
     def default_logger
-      defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+      defined?(Rails) && Rails.respond_to?(:logger) ? Rails.logger : ::Logger.new($stdout)
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -177,30 +188,18 @@ module Mongoid #:nodoc
 
     # Sets whether the times returned from the database use the ruby or
     # the ActiveSupport time zone.
-    # If you omit this setting, then times will use the ruby time zone.
     #
-    # Example:
+    # @note If you omit this setting, then times will use the ruby time zone.
     #
-    # <tt>Config.use_activesupport_time_zone = true</tt>
+    # @example Set the time zone config.
+    #   Config.use_activesupport_time_zone = true
     #
-    # Returns:
+    # @param [ true, false ] value Whether to use Active Support time zones.
     #
-    # A boolean
+    # @return [ true, false ] The supplied value or false if nil.
     def use_activesupport_time_zone=(value)
       @use_activesupport_time_zone = value || false
     end
-
-    # Sets whether the times returned from the database use the ruby or
-    # the ActiveSupport time zone.
-    # If the setting is false, then times will use the ruby time zone.
-    #
-    # Example:
-    #
-    # <tt>Config.use_activesupport_time_zone</tt>
-    #
-    # Returns:
-    #
-    # A boolean
     attr_reader :use_activesupport_time_zone
     alias_method :use_activesupport_time_zone?, :use_activesupport_time_zone
 
@@ -265,39 +264,17 @@ module Mongoid #:nodoc
     # @example Reset the configuration options.
     #   config.reset
     def reset
-      settings.clear
+      settings.replace(defaults)
     end
 
-    # Sets the Mongo::DB slave databases to be used. If the objects provided
-    # are not valid +Mongo::DBs+ an error will be raised.
-    #
-    # @example Set the slaves.
-    #   config.slaves = [ Mongo::Connection.db("test") ]
-    #
-    # @param [ Array<Mongo::DB> ] dbs The slave databases.
-    #
-    # @raise [ Errors::InvalidDatabase ] If the slaves arent valid objects.
-    #
-    # @return [ Array<Mongo::DB> ] The slave DB instances.
-    def slaves=(dbs)
-      return unless dbs
-      dbs.each do |db|
-        check_database!(db)
-      end
-      @slaves = dbs
-    end
-
-    # Returns the slave databases or nil if none have been set.
-    #
-    # @example Get the slaves.
-    #   config.slaves
-    #
-    # @return [ Array<Mongo::DB>, nil ] The slave databases.
+    # @deprecated User replica sets instead.
     def slaves
-      unless @slaves
-        @master, @slaves = configure_databases(@settings) if @settings && @settings[:database]
-      end
-      @slaves
+      slave_warning!
+    end
+
+    # @deprecated User replica sets instead.
+    def slaves=(dbs)
+      slave_warning!
     end
 
     protected
@@ -357,6 +334,15 @@ module Mongoid #:nodoc
         dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
         end
       end
+    end
+
+    # Temporarily here so people can move to replica sets.
+    def slave_warning!
+      warn(
+        "Using Mongoid for traditional slave databases will be removed in the " +
+        "next release in preference of replica sets. Please change your setup " +
+        "accordingly."
+      )
     end
   end
 end

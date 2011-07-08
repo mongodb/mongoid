@@ -42,7 +42,7 @@ require "mongoid/errors"
 require "mongoid/extensions"
 require "mongoid/safe"
 require "mongoid/relations"
-require "mongoid/atomicity"
+require "mongoid/atomic"
 require "mongoid/attributes"
 require "mongoid/callbacks"
 require "mongoid/collection"
@@ -56,7 +56,6 @@ require "mongoid/default_scope"
 require "mongoid/dirty"
 require "mongoid/extras"
 require "mongoid/factory"
-require "mongoid/field"
 require "mongoid/fields"
 require "mongoid/finders"
 require "mongoid/hierarchy"
@@ -73,7 +72,6 @@ require "mongoid/multi_database"
 require "mongoid/named_scope"
 require "mongoid/nested_attributes"
 require "mongoid/observer"
-require "mongoid/paths"
 require "mongoid/persistence"
 require "mongoid/safety"
 require "mongoid/scope"
@@ -96,45 +94,36 @@ end
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
 module Mongoid #:nodoc
+  extend self
 
-  MONGODB_VERSION = "1.6.0"
+  MONGODB_VERSION = "1.8.0"
 
-  class << self
-
-    # Sets the Mongoid configuration options. Best used by passing a block.
-    #
-    # @example Set up configuration options.
-    #
-    #   Mongoid.configure do |config|
-    #     name = "mongoid_test"
-    #     host = "localhost"
-    #     config.allow_dynamic_fields = false
-    #     config.master = Mongo::Connection.new.db(name)
-    #     config.slaves = [
-    #       Mongo::Connection.new(host, 27018, :slave_ok => true).db(name),
-    #       Mongo::Connection.new(host, 27019, :slave_ok => true).db(name)
-    #     ]
-    #   end
-    #
-    # @return [ Config ] The configuration obejct.
-    def configure
-      config = Mongoid::Config
-      block_given? ? yield(config) : config
-    end
-    alias :config :configure
+  # Sets the Mongoid configuration options. Best used by passing a block.
+  #
+  # @example Set up configuration options.
+  #   Mongoid.configure do |config|
+  #     name = "mongoid_test"
+  #     host = "localhost"
+  #     config.allow_dynamic_fields = false
+  #     config.master = Mongo::Connection.new.db(name)
+  #   end
+  #
+  # @return [ Config ] The configuration obejct.
+  #
+  # @since 1.0.0
+  def configure
+    block_given? ? yield(Config) : Config
   end
+  alias :config :configure
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
   #
   # @example Delegate the configuration methods.
   #   Mongoid.database = Mongo::Connection.new.db("test")
-  (Mongoid::Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false)).each do |name|
-    (class << self; self; end).class_eval <<-EOT
-      def #{name}(*args)
-        configure.send("#{name}", *args)
-      end
-    EOT
-  end
+  #
+  # @since 1.0.0
+  delegate *(Config.public_instance_methods(false) +
+    ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
+    { :to => Config })
 end

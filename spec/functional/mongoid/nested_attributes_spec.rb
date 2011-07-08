@@ -539,6 +539,23 @@ describe Mongoid::NestedAttributes do
             person.should_not be_valid
           end
         end
+
+        context "when a type is passed" do
+
+          let(:canvas) do
+            Canvas.new
+          end
+
+          before do
+            Canvas.send(:undef_method, :writer_attributes=)
+            Canvas.accepts_nested_attributes_for :writer
+            canvas.writer_attributes = { :_type => "HtmlWriter" }
+          end
+
+          it "instantiates an object of the given type" do
+            canvas.writer.class.should == HtmlWriter
+          end
+        end
       end
 
       context "when the relation is embedded in" do
@@ -762,6 +779,21 @@ describe Mongoid::NestedAttributes do
               animal.person.should_not be_valid
               animal.should be_valid
             end
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:tool) do
+            Tool.new
+          end
+
+          before do
+            tool.palette_attributes ={ :_type => "BigPalette" }
+          end
+
+          it "instantiates an object of the given type" do
+            tool.palette.class.should == BigPalette
           end
         end
       end
@@ -1440,6 +1472,27 @@ describe Mongoid::NestedAttributes do
             person.should_not be_valid
           end
         end
+
+        context "when a type is passed" do
+
+          let(:canvas) do
+            Canvas.new
+          end
+
+          before do
+            Canvas.send(:undef_method, :shapes_attributes=)
+            Canvas.accepts_nested_attributes_for :shapes
+            canvas.shapes_attributes =
+              {
+                "foo" => { "_type" => "Square" },
+                "bar" => { "_type" => "Circle" }
+              }
+          end
+
+          it "instantiates an object of the given type" do
+            canvas.shapes.map(&:class).should == [Square, Circle]
+          end
+        end
       end
 
       context "when the relation is a references one" do
@@ -1824,6 +1877,23 @@ describe Mongoid::NestedAttributes do
             person.should_not be_valid
           end
         end
+
+        context "when a type is passed" do
+
+          let(:driver) do
+            Driver.new
+          end
+
+          before do
+            Driver.send(:undef_method, :vehicle_attributes=)
+            Driver.accepts_nested_attributes_for :vehicle
+            driver.vehicle_attributes = { "_type" => "Truck" }
+          end
+
+          it "instantiates an object of the given type" do
+            driver.vehicle.class.should == Truck
+          end
+        end
       end
 
       context "when the relation is referenced in" do
@@ -2046,6 +2116,23 @@ describe Mongoid::NestedAttributes do
               game.person.should_not be_valid
               game.should_not be_valid
             end
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:vehicle) do
+            Vehicle.new
+          end
+
+          before do
+            Vehicle.send(:undef_method, :driver_attributes=)
+            Vehicle.accepts_nested_attributes_for :driver
+            vehicle.driver_attributes = { "_type" => "Learner" }
+          end
+
+          it "instantiates an object of the given type" do
+            vehicle.driver.class.should == Learner
           end
         end
       end
@@ -2311,7 +2398,10 @@ describe Mongoid::NestedAttributes do
                       person.posts_attributes =
                         {
                           "0" => {
-                            "id" => post_one.id, "title" => "Another Title", "_destroy" => truth },
+                            "id" => post_one.id,
+                            "title" => "Another Title",
+                            "_destroy" => truth
+                          },
                           "1" => { "id" => post_two.id, "title" => "New Title" }
                         }
                     end
@@ -2319,11 +2409,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        person.posts(true).first.title.should == "Another Title"
+                        person.posts(true).find(post_one.id).title.should == "Another Title"
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).last.title.should == "New Title"
+                        person.posts(true).find(post_two.id).title.should == "New Title"
                       end
 
                       it "does not add additional documents" do
@@ -2682,6 +2772,27 @@ describe Mongoid::NestedAttributes do
           it "propagates invalidity to parent" do
             person.should_not be_valid
             person.posts.first.should_not be_valid
+          end
+        end
+
+        context "when a type is passed" do
+
+          let(:shipping_container) do
+            ShippingContainer.new
+          end
+
+          before do
+            ShippingContainer.send(:undef_method, :vehicles_attributes=)
+            ShippingContainer.accepts_nested_attributes_for :vehicles
+            shipping_container.vehicles_attributes =
+              {
+                "foo" => { "_type" => "Car" },
+                "bar" => { "_type" => "Truck" }
+              }
+          end
+
+          it "instantiates an object of the given type" do
+            shipping_container.vehicles.map(&:class).should == [Car, Truck]
           end
         end
       end

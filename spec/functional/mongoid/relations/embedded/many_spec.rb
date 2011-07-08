@@ -1107,6 +1107,68 @@ describe Mongoid::Relations::Embedded::Many do
           end
         end
       end
+      
+      context "when the documents empty" do
+        
+        context "when scoped" do
+          let!(:deleted) do
+            person.addresses.without_postcode.send(method)
+          end
+          
+          it "deletes all the documents" do
+            person.addresses.count.should == 0
+          end
+        
+          it "deletes all the documents from the db" do
+            person.reload.addresses.count.should == 0
+          end
+
+          it "returns the number deleted" do
+            deleted.should == 0
+          end
+        end
+        
+        context "when conditions are provided" do
+          
+          let!(:deleted) do
+            person.addresses.send(
+              method,
+              :conditions => { :street => "Bond" }
+            )
+          end
+        
+          it "deletes all the documents" do
+            person.addresses.count.should == 0
+          end
+        
+          it "deletes all the documents from the db" do
+            person.reload.addresses.count.should == 0
+          end
+
+          it "returns the number deleted" do
+            deleted.should == 0
+          end
+        end
+        
+        context "when conditions are not provided" do
+          
+          let!(:deleted) do
+            person.addresses.send(method)
+          end
+        
+          it "deletes all the documents" do
+            person.addresses.count.should == 0
+          end
+        
+          it "deletes all the documents from the db" do
+            person.reload.addresses.count.should == 0
+          end
+
+          it "returns the number deleted" do
+            deleted.should == 0
+          end
+        end
+      end
     end
   end
 
@@ -1174,10 +1236,6 @@ describe Mongoid::Relations::Embedded::Many do
             Mongoid.raise_not_found_error = true
           end
 
-          after do
-            Mongoid.raise_not_found_error = false
-          end
-
           it "raises an error" do
             expect {
               person.addresses.find(BSON::ObjectId.new)
@@ -1193,6 +1251,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns nil" do
@@ -1223,10 +1285,6 @@ describe Mongoid::Relations::Embedded::Many do
             Mongoid.raise_not_found_error = true
           end
 
-          after do
-            Mongoid.raise_not_found_error = false
-          end
-
           it "raises an error" do
             expect {
               person.addresses.find([ BSON::ObjectId.new ])
@@ -1242,6 +1300,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns an empty array" do
@@ -1587,6 +1649,66 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   context "when deeply embedding documents" do
+
+    context "when building the tree through hashes" do
+
+      let(:circus) do
+        Circus.new(hash)
+      end
+
+      let(:animal) do
+        circus.animals.first
+      end
+
+      let(:animal_name) do
+        "Lion"
+      end
+
+      let(:tag_list) do
+        "tigers, bears, oh my"
+      end
+
+      context "when the hash uses stringified keys" do
+
+        let(:hash) do
+          { 'animals' => [{ 'name' => animal_name, 'tag_list' => tag_list }] }
+        end
+
+        it "sets up the hierarchy" do
+          animal.circus.should == circus
+        end
+
+        it "assigns the attributes" do
+          animal.name.should == animal_name
+        end
+
+        it "uses custom writer methods" do
+          animal.tag_list.should == tag_list
+        end
+
+      end
+
+      context "when the hash uses symbolized keys" do
+
+        let(:hash) do
+          { :animals => [{ :name => animal_name, :tag_list => tag_list }] }
+        end
+
+        it "sets up the hierarchy" do
+          animal.circus.should == circus
+        end
+
+        it "assigns the attributes" do
+          animal.name.should == animal_name
+        end
+
+        it "uses custom writer methods" do
+          animal.tag_list.should == tag_list
+        end
+
+      end
+
+    end
 
     context "when building the tree through pushes" do
 

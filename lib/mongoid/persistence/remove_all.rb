@@ -16,20 +16,11 @@ module Mongoid #:nodoc:
       # Remove the document from the database: delegates to the MongoDB
       # collection remove method.
       #
-      # Example:
+      # @example Remove all documents.
+      #   Remove.persist
       #
-      # <tt>Remove.persist</tt>
-      #
-      # Returns:
-      #
-      # +true+ if success, +false+ if not.
+      # @return [ Integer ] The number of documents removed.
       def persist
-        remove
-      end
-
-      protected
-      # Remove the document from the database.
-      def remove
         select = (klass.hereditary? ? selector.merge(:_type => klass.name) : selector)
         collection.find(select).count.tap do
           collection.remove(select, options)

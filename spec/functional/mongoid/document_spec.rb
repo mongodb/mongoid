@@ -698,50 +698,50 @@ describe Mongoid::Document do
       Event.collection.drop
       User.collection.drop
     end
-    
+
     context "called on a reference_many object" do
       before do
-        {'My birthday' => Date.new(1981, 2, 1), 'My cat`s birthday' => Date.new(1981, 2, 1), 
+        {'My birthday' => Date.new(1981, 2, 1), 'My cat`s birthday' => Date.new(1981, 2, 1),
          'My pidgeon`s birthday' => Date.new(1981, 2, 2) }.each do |title, date|
           event = Event.new(:title => title, :date => date)
           event.owner = @owner
-          event.save
-        end                
+          event.save!
+        end
       end
-      
+
       let(:events) do
         rounds = []
         @owner.events.each_day(Date.new(1981, 1, 2), Date.new(1981, 2, 2)) do |date, collection|
           rounds << {:date => date, :collection => collection}
         end
-        rounds
-      end            
-    
+        rounds.sort_by { |round| round[:date] }
+      end
+
       it "should pass the block" do
         events.length.should == 2
         events.first[:collection].length.should == 2
         events.last[:collection].length.should == 1
       end
     end
-    
+
     context "called on an embeds_many object" do
       before do
-        {'My birthday' => Date.new(1981, 2, 1), 'My cat`s birthday' => Date.new(1981, 2, 1), 
+        {'My birthday' => Date.new(1981, 2, 1), 'My cat`s birthday' => Date.new(1981, 2, 1),
          'My pidgeon`s birthday' => Date.new(1981, 2, 2) }.each do |title, date|
           birthday = Birthday.new(:title => title, :date => date)
           birthday.owner = @owner
-          birthday.save
-        end                
+          birthday.save!
+        end
       end
-      
+
       let(:birthdays) do
         rounds = []
         @owner.birthdays.each_day(Date.new(1981, 1, 2), Date.new(1981, 2, 2)) do |date, collection|
           rounds << {:date => date, :collection => collection}
         end
-        rounds
-      end            
-    
+        rounds.sort_by { |round| round[:date] }
+      end
+
       it "should pass the block" do
         birthdays.length.should == 2
         birthdays.first[:collection].length.should == 2

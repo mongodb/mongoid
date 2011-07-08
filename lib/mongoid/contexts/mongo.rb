@@ -11,13 +11,10 @@ module Mongoid #:nodoc:
       # collection itself will be retrieved from the class provided, and once the
       # query has returned it will provided a grouping of keys with counts.
       #
-      # Example:
+      # @example Aggreate the context.
+      #   context.aggregate
       #
-      # <tt>context.aggregate</tt>
-      #
-      # Returns:
-      #
-      # A +Hash+ with field values as keys, counts as values
+      # @return [ Hash ] A +Hash+ with field values as keys, counts as values
       def aggregate
         klass.collection.group(
           :key => field_list,
@@ -34,13 +31,12 @@ module Mongoid #:nodoc:
       # collection itself will be retrieved from the class provided, and once the
       # query has returned it will provided a grouping of keys with averages.
       #
-      # Example:
+      # @example Get the average for a field.
+      #   context.avg(:age)
       #
-      # <tt>context.avg(:age)</tt>
+      # @param [ Symbol ] field The field to get the average for.
       #
-      # Returns:
-      #
-      # A numeric value that is the average.
+      # @return [ Numeric ] A numeric value that is the average.
       def avg(field)
         total = sum(field)
         total ? (total / count) : nil
@@ -49,9 +45,10 @@ module Mongoid #:nodoc:
       # Determine if the context is empty or blank given the criteria. Will
       # perform a quick has_one asking only for the id.
       #
-      # Example:
+      # @example Is the context empty?
+      #   context.blank?a
       #
-      # <tt>context.blank?</tt>
+      # @return [ true, false ] True if blank.
       def blank?
         klass.collection.find_one(selector, { :fields => [ :_id ] }).nil?
       end
@@ -102,9 +99,12 @@ module Mongoid #:nodoc:
       # Gets an array of distinct values for the supplied field across the
       # entire collection or the susbset given the criteria.
       #
-      # Example:
+      # @example Get the distinct values.
+      #   context.distinct(:title)
       #
-      # <tt>context.distinct(:title)</tt>
+      # @param [ Symbol ] field The field to get the values for.
+      #
+      # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
         klass.collection.distinct(field, selector)
       end
@@ -114,29 +114,35 @@ module Mongoid #:nodoc:
       # collection itself will be retrieved from the class provided, and once the
       # query has returned new documents of the type of class provided will be instantiated.
       #
-      # Example:
+      # @example Execute the criteria on the context.
+      #   context.execute
       #
-      # <tt>context.execute</tt>
-      #
-      # Returns:
-      #
-      # An enumerable +Cursor+.
+      # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
         klass.collection.find(selector, process_options) || []
       end
+
+      # Return the first result for the +Context+.
+      #
+      # @example Get the first document.
+      #   context.one
+      #
+      # @return [ Document ] The first document in the collection.
+      def first
+        attributes = klass.collection.find_one(selector, process_options)
+        attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
+      end
+      alias :one :first
 
       # Groups the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the
       # query has returned it will provided a grouping of keys with objects.
       #
-      # Example:
+      # @example Get the criteria as a group.
+      #   context.group
       #
-      # <tt>context.group</tt>
-      #
-      # Returns:
-      #
-      # A +Hash+ with field values as keys, arrays of documents as values.
+      # @return [ Hash ] Hash with field values as keys, arrays of documents as values.
       def group
         klass.collection.group(
           :key => field_list,
@@ -154,24 +160,23 @@ module Mongoid #:nodoc:
       # Create the new mongo context. This will execute the queries given the
       # selector and options against the database.
       #
-      # Example:
+      # @example Create a new context.
+      #   Mongoid::Contexts::Mongo.new(criteria)
       #
-      # <tt>Mongoid::Contexts::Mongo.new(criteria)</tt>
+      # @param [ Criteria ] criteria The criteria to create with.
       def initialize(criteria)
         @criteria = criteria
         if klass.hereditary? && !criteria.selector.keys.include?(:_type)
           @criteria = criteria.in(:_type => criteria.klass._types)
         end
-        @criteria.enslave if klass.enslaved?
         @criteria.cache if klass.cached?
       end
 
       # Iterate over each +Document+ in the results. This can take an optional
       # block to pass to each argument in the results.
       #
-      # Example:
-      #
-      # <tt>context.iterate { |doc| p doc }</tt>
+      # @example Iterate over the results.
+      #   context.iterate { |doc| p doc }
       def iterate(&block)
         return caching(&block) if criteria.cached?
         if block_given?
@@ -183,13 +188,10 @@ module Mongoid #:nodoc:
       # the collection with the sorting reversed. If no sorting parameters have
       # been provided it will default to ids.
       #
-      # Example:
+      # @example Get the last document.
+      #   context.last
       #
-      # <tt>context.last</tt>
-      #
-      # Returns:
-      #
-      # The last document in the collection.
+      # @return [ Document ] The last document in the collection.
       def last
         opts = process_options
         sorting = opts[:sort]
@@ -206,13 +208,12 @@ module Mongoid #:nodoc:
       # collection itself will be retrieved from the class provided, and once the
       # query has returned it will provided a grouping of keys with sums.
       #
-      # Example:
+      # @example Get the max value.
+      #   context.max(:age)
       #
-      # <tt>context.max(:age)</tt>
+      # @param [ Symbol ] field The field to get the max for.
       #
-      # Returns:
-      #
-      # A numeric max value.
+      # @return [ Numeric ] A numeric max value.
       def max(field)
         grouped(:max, field.to_s, Javascript.max)
       end
@@ -224,43 +225,25 @@ module Mongoid #:nodoc:
       # collection itself will be retrieved from the class provided, and once the
       # query has returned it will provided a grouping of keys with sums.
       #
-      # Example:
+      # @example Get the min value.
+      #   context.min(:age)
       #
-      # <tt>context.min(:age)</tt>
+      # @param [ Symbol ] field The field to get the min for.
       #
-      # Returns:
-      #
-      # A numeric minimum value.
+      # @return [ Numeric ] A numeric minimum value.
       def min(field)
         grouped(:min, field.to_s, Javascript.min)
       end
 
-      # Return the first result for the +Context+.
-      #
-      # Example:
-      #
-      # <tt>context.one</tt>
-      #
-      # Return:
-      #
-      # The first document in the collection.
-      def one
-        attributes = klass.collection.find_one(selector, process_options)
-        attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
-      end
-
-      alias :first :one
-
       # Return the first result for the +Context+ and skip it
       # for successive calls.
       #
-      # Returns:
+      # @example Get the first document and shift.
+      #   context.shift
       #
-      # The first document in the collection.
+      # @return [ Document ] The first document in the collection.
       def shift
-        document = first
-        criteria.skip((options[:skip] || 0) + 1)
-        document
+        first.tap { criteria.skip((options[:skip] || 0) + 1) }
       end
 
       # Sum the context.
@@ -270,41 +253,14 @@ module Mongoid #:nodoc:
       # collection itself will be retrieved from the class provided, and once the
       # query has returned it will provided a grouping of keys with sums.
       #
-      # Example:
+      # @example Get the sum for a field.
+      #   context.sum(:age)
       #
-      # <tt>context.sum(:age)</tt>
+      # @param [ Symbol ] field The field who's values to sum.
       #
-      # Returns:
-      #
-      # A numeric value that is the sum.
+      # @return [ Numeric ] A numeric value that is the sum.
       def sum(field)
         grouped(:sum, field.to_s, Javascript.sum)
-      end
-
-      # Common functionality for grouping operations. Currently used by min, max
-      # and sum. Will gsub the field name in the supplied reduce function.
-      def grouped(start, field, reduce)
-        collection = klass.collection.group(
-          :cond => selector,
-          :initial => { start => "start" },
-          :reduce => reduce.gsub("[field]", field)
-        )
-        collection.empty? ? nil : collection.first[start.to_s]
-      end
-
-      # Filters the field list. If no fields have been supplied, then it will be
-      # empty. If fields have been defined then _type will be included as well.
-      def process_options
-        fields = options[:fields]
-        if fields && fields.size > 0 && !fields.include?(:_type)
-          if fields.kind_of?(Hash)
-            fields[:_type] = 1 if fields.first.last != 0 # Not excluding
-          else
-            fields << :type
-          end
-          options[:fields] = fields
-        end
-        options.dup
       end
 
       # Very basic update that will perform a simple atomic $set of the
@@ -330,6 +286,9 @@ module Mongoid #:nodoc:
       protected
 
       # Iterate over each +Document+ in the results and cache the collection.
+      #
+      # @example Execute with caching.
+      #   context.caching
       def caching(&block)
         if defined? @collection
           @collection.each(&block)
@@ -340,6 +299,46 @@ module Mongoid #:nodoc:
             yield doc if block_given?
           end
         end
+      end
+
+      # Common functionality for grouping operations. Currently used by min, max
+      # and sum. Will gsub the field name in the supplied reduce function.
+      #
+      # @example Execute the group function.
+      #   context.group(0, :avg, "")
+      #
+      # @param [ Object ] start The value to start the map/reduce with.
+      # @param [ String ] field The field to aggregate.
+      # @param [ String ] reduce The reduce JS function.
+      #
+      # @return [ Numeric ] A numeric result.
+      def grouped(start, field, reduce)
+        collection = klass.collection.group(
+          :cond => selector,
+          :initial => { start => "start" },
+          :reduce => reduce.gsub("[field]", field)
+        )
+        collection.empty? ? nil : collection.first[start.to_s]
+      end
+
+      # Filters the field list. If no fields have been supplied, then it will be
+      # empty. If fields have been defined then _type will be included as well.
+      #
+      # @example Process the field list.
+      #   context.process_options
+      #
+      # @return [ Hash ] The options.
+      def process_options
+        fields = options[:fields]
+        if fields && fields.size > 0 && !fields.include?(:_type)
+          if fields.kind_of?(Hash)
+            fields[:_type] = 1 if fields.first.last != 0 # Not excluding
+          else
+            fields << :type
+          end
+          options[:fields] = fields
+        end
+        options.dup
       end
     end
   end

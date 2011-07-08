@@ -33,44 +33,46 @@ module Mongoid #:nodoc:
       # Persist the document that is to be updated to the database. This will
       # only write changed fields via MongoDB's $set modifier operation.
       #
-      # Example:
+      # @example Update the document.
+      #   Update.persist
       #
-      # <tt>Update.persist</tt>
-      #
-      # Returns:
-      #
-      # +true+ or +false+, depending on validation.
+      # @return [ true, false ] If the save passed.
       def persist
         return false if validate && document.invalid?(:update)
-        document.run_callbacks(:save) do
-          document.run_callbacks(:update) do
-            if update
-              document.move_changes
-              document._children.each do |child|
-                child.move_changes
-                child.new_record = false if child.new_record?
-              end
-              true
-            else
-              return false
-            end
-          end
+        value = document.run_callbacks(:save) do
+          document.run_callbacks(:update) { update }
         end
+        document._children.each do |child|
+          child.move_changes
+          child.new_record = false
+        end
+        document.move_changes
+        return value
       end
 
       protected
+
       # Update the document in the database atomically.
+      #
+      # @example Update the document.
+      #   command.update
+      #
+      # @return [ true ] Always true.
       def update
-        updates = document._updates
+        updates = document.atomic_updates
         unless updates.empty?
-          other_pushes = updates.delete(:other)
-          collection.update(document._selector, updates, options.merge(:multi => false))
-          collection.update(
-            document._selector,
-            { "$pushAll" => other_pushes },
-            options.merge(:multi => false)
-          ) if other_pushes
-        end; true
+          others = updates.delete(:other)
+          selector = document.atomic_selector
+          collection.update(selector, updates, options.merge!(:multi => false))
+          if others
+            collection.update(
+              selector,
+              { "$pushAll" => others },
+              options.merge!(:multi => false)
+            )
+          end
+        end
+        return true
       end
     end
   end

@@ -7,26 +7,14 @@ module Mongoid #:nodoc:
 
         # Convert the string to an array with the string in it.
         #
-        # Example:
+        # @example Convert the string to an array.
+        #   "Testing".to_a
         #
-        # <tt>"Testing".to_a</tt>
+        # @return [ Array ] An array with only the string in it.
         #
-        # Returns:
-        #
-        # An array with only the string in it.
+        # @since 1.0.0
         def to_a
           [ self ]
-        end
-
-        module ClassMethods #:nodoc:
-
-          def get(value)
-            value
-          end
-
-          def set(value)
-            value.to_s unless value.nil?
-          end
         end
       end
     end

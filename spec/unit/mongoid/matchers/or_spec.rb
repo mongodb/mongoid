@@ -80,6 +80,28 @@ describe Mongoid::Matchers::Or do
           matches.should be_false
         end
       end
+     
+      context "when expression contain multiple fields" do
+
+        let(:matches) do
+          matcher.matches?(
+            [
+              { :title => "Sir", :age => 23 },
+              { :title => "King", :age => 100 }
+            ]
+          )
+        end
+
+        before do
+          person.title = "Sir"
+          person.age = 100
+        end
+
+        it "returns false" do
+          matches.should be_false
+        end
+      end
+
     end
   end
 end

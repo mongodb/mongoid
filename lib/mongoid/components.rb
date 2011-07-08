@@ -16,7 +16,7 @@ module Mongoid #:nodoc
     include ActiveModel::Observing
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
-    include Mongoid::Atomicity
+    include Mongoid::Atomic
     include Mongoid::Attributes
     include Mongoid::Collections
     include Mongoid::Copyable
@@ -32,7 +32,6 @@ module Mongoid #:nodoc
     include Mongoid::Matchers
     include Mongoid::NamedScope
     include Mongoid::NestedAttributes
-    include Mongoid::Paths
     include Mongoid::Persistence
     include Mongoid::Relations
     include Mongoid::Safety
@@ -41,5 +40,6 @@ module Mongoid #:nodoc
     include Mongoid::State
     include Mongoid::Validations
     include Mongoid::Callbacks
+    include Mongoid::MultiDatabase
   end
 end

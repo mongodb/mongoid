@@ -31,7 +31,7 @@ module Mongoid # :nodoc:
       def init(base, target, metadata, &block)
         @base, @target, @metadata = base, target, metadata
         block.call if block
-        extend Module.new(&metadata.extension) if metadata.extension?
+        extend metadata.extension if metadata.extension?
       end
 
       protected

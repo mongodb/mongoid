@@ -151,28 +151,6 @@ describe Mongoid::Persistence::Update do
           embedded.persist
         end
       end
-
-      pending "when the document is a tree" do
-
-        let(:leaf_category) do
-          Category.instantiate("_id" => BSON::ObjectId.new, "name" => 'Ruby')
-        end
-
-        let(:embedded) do
-          Mongoid::Persistence::Update.new(leaf_category)
-        end
-
-        before do
-          category.categories << leaf_category
-          root_category.categories << category
-          leaf_category.name = 'C++'
-        end
-
-        it "performs a $set for the embedded changed fields" do
-          tree_set_expectation.call
-          embedded.persist
-        end
-      end
     end
   end
 end

@@ -11,6 +11,9 @@ fr:
         invalid_type:
           Le champ a été défini comme un(e) %{klass} mais a reçu un(e)
           %{other} avec la valeur %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           "MongoDB %{version} n'est pas supporté, veuillez mettre à jour avec
           %{mongo_version}"

@@ -7,7 +7,10 @@ en:
         document_not_found:
           Document not found for class %{klass} with id(s) %{identifiers}.
         invalid_database:
-          Database should be a Mongo::DB, not %{name}.
+          "Database should be a Mongo::DB, not %{name}."
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         invalid_type:
           Field was defined as a(n) %{klass}, but received a %{other} with
           the value %{value}.
@@ -38,8 +41,8 @@ en:
         calling_document_find_with_nil_is_invalid:
           Calling Document#find with nil is invalid
         unsaved_document:
-          You cannot call create or create! through a relational association
-          relation (%{document}) who's parent (%{base}) is not already saved.
+          "You cannot call create or create! through a relational association
+          relation (%{document}) who's parent (%{base}) is not already saved."
         mixed_relations:
           Referencing a(n) %{embedded} document from the %{root} document via a
           relational association is not allowed since the %{embedded} is embedded.

@@ -6,7 +6,6 @@ module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
     include Mongoid::Components
-    include Mongoid::MultiDatabase
 
     included do
       attr_reader :new_record
@@ -127,7 +126,7 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil)
       @new_record = true
       @attributes = apply_default_attributes
-      process(attrs) do |document|
+      process(attrs) do
         yield self if block_given?
         identify
       end
@@ -150,8 +149,8 @@ module Mongoid #:nodoc:
         raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
       end
       @attributes = {}.merge(reloaded || {})
+      changed_attributes.clear
       apply_default_attributes
-      reset_modifications
       tap do
         relations.keys.each do |name|
           if instance_variable_defined?("@#{name}")
@@ -198,11 +197,12 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      attribs = attributes
-      attribs.tap do |attrs|
-        relations.select { |name, meta| meta.embedded? }.each do |name, meta|
-          relation = send(name, false, :continue => false)
-          attrs[name] = relation.as_document unless relation.blank?
+      attributes.tap do |attrs|
+        relations.each_pair do |name, meta|
+          if meta.embedded?
+            relation = send(name, false, :continue => false)
+            attrs[name] = relation.as_document unless relation.blank?
+          end
         end
       end
     end
@@ -222,12 +222,12 @@ module Mongoid #:nodoc:
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, 'A class which includes Mongoid::Document is expected'
       end
-      became = klass.new
-      became.instance_variable_set('@attributes', @attributes)
-      became.instance_variable_set('@errors', @errors)
-      became.instance_variable_set('@new_record', new_record?)
-      became.instance_variable_set('@destroyed', destroyed?)
-      became
+      klass.new.tap do |became|
+        became.instance_variable_set('@attributes', @attributes)
+        became.instance_variable_set('@errors', @errors)
+        became.instance_variable_set('@new_record', new_record?)
+        became.instance_variable_set('@destroyed', destroyed?)
+      end
     end
 
     module ClassMethods #:nodoc:
@@ -260,7 +260,6 @@ module Mongoid #:nodoc:
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
           doc.send(:apply_default_attributes)
-          doc.setup_modifications
           doc.run_callbacks(:initialize) { doc }
         end
       end
@@ -272,7 +271,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Array<Class> ] All subclasses of the current document.
       def _types
-        @_type ||= [descendants + [self]].flatten.uniq.map(&:to_s)
+        @_type ||= [descendants + [self]].flatten.uniq.map { |t| t.to_s }
       end
 
       # Set the i18n scope to overwrite ActiveModel.

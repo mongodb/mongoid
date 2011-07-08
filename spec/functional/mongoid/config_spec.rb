@@ -11,10 +11,6 @@ describe Mongoid::Config do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_utc.yml")
   end
 
-  let(:slaves_config) do
-    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_slaves.yml")
-  end
-
   let(:multi_config) do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_multiple_mongos.yml")
   end
@@ -35,7 +31,6 @@ describe Mongoid::Config do
     Mongoid.configure do |config|
       name          = "mongoid_test"
       config.master = Mongo::Connection.new.db(name)
-      config.slaves = []
       config.logger = nil
     end
   end
@@ -46,6 +41,7 @@ describe Mongoid::Config do
 
       before do
         described_class.add_language("de")
+        I18n.reload!
         I18n.locale = :de
       end
 
@@ -112,17 +108,6 @@ describe Mongoid::Config do
       end
     end
 
-    context "when configuring with slaves", :config => :slaves do
-
-      let(:settings) do
-        YAML.load(ERB.new(File.new(slaves_config).read).result)
-      end
-
-      it "sets the slave databases" do
-        described_class.slaves.first.name.should == "mongoid_config_test"
-      end
-    end
-
     context "when configuring with utc time" do
 
       let(:settings) do
@@ -134,7 +119,7 @@ describe Mongoid::Config do
       end
     end
 
-    context "when configuring with multiple databases", :config => :multi do
+    context "when configuring with multiple databases" do
 
       let(:settings) do
         YAML.load(ERB.new(File.new(multi_config).read).result)
@@ -416,60 +401,8 @@ describe Mongoid::Config do
 
   describe ".reset" do
 
-    it "clears out the settings" do
-      described_class.reset.should == {}
-    end
-  end
-
-  describe ".slaves", :config => :slaves do
-
-    context "when slaves exist" do
-
-      before do
-        described_class.slaves = [
-          Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
-        ]
-      end
-
-      it "returns the slaves" do
-        described_class.slaves.first.name.should == "mongoid_test"
-      end
-    end
-
-    context "when no slaves exist" do
-
-      before do
-        described_class.slaves = []
-      end
-
-      it "returns an empty array" do
-        described_class.slaves.should be_empty
-      end
-    end
-  end
-
-  describe ".slaves=", :config => :slaves do
-
-    context "when provided databases" do
-
-      before do
-        described_class.slaves = [
-          Mongo::Connection.new("localhost", 27018, :slave_ok => true).db("mongoid_test")
-        ]
-      end
-
-      it "sets the slaves" do
-        described_class.slaves.first.name.should == "mongoid_test"
-      end
-    end
-
-    context "when not provided databases" do
-
-      it "raises an error" do
-        expect {
-          described_class.slaves = [:testing]
-        }.to raise_error(Mongoid::Errors::InvalidDatabase)
-      end
+    it "reverts to the defaults" do
+      described_class.reset.should == described_class.defaults
     end
   end
 end

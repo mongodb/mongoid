@@ -6,29 +6,24 @@ describe Mongoid::Extensions::Proc::Scoping do
 
     context "when the proc accessed a hash" do
 
-      before do
-        @proc = lambda { |number| { :where => { :count => number } } }
+      let(:proc) do
+        lambda { |number| { :where => { :count => number } } }
       end
 
       it "calls the hash with the args" do
-        @proc.scoped(10).should == { :where => { :count => 10 } }
+        proc.scoped(10).should == { :where => { :count => 10 } }
       end
-
     end
 
     context "when the proc calls a criteria" do
 
-      before do
-        @proc = lambda { |title| Person.where(:title => title) }
+      let(:proc) do
+        lambda { |title| Person.where(:title => title) }
       end
 
       it "returns the criteria scoped" do
-        @proc.scoped("Sir").should ==
-          { :where => { :title => "Sir" } }
+        proc.scoped("Sir").should == { :where => { :title => "Sir" } }
       end
-
     end
-
   end
-
 end

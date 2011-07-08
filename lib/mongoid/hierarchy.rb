@@ -2,6 +2,7 @@
 module Mongoid #:nodoc
   module Hierarchy #:nodoc
     extend ActiveSupport::Concern
+
     included do
       attr_accessor :_parent
     end
@@ -33,16 +34,18 @@ module Mongoid #:nodoc
       #
       # @return [ Array<Document> ] All child documents in the hierarchy.
       def _children
-        relations.inject([]) do |children, (name, metadata)|
-          children.tap do |kids|
-            if metadata.embedded? && name != "versions"
-              child = send(name)
-              child.to_a.each do |doc|
-                kids.push(doc).concat(doc._children)
-              end unless child.blank?
+        @_children ||=
+          [].tap do |children|
+            relations.each_pair do |name, metadata|
+              if metadata.embedded?
+                child = send(name)
+                child.to_a.each do |doc|
+                  children.push(doc)
+                  children.concat(doc._children) unless name == "versions"
+                end if child
+              end
             end
           end
-        end
       end
 
       # Determines if the document is a subclass of another document.

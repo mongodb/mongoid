@@ -10,11 +10,18 @@ module Mongoid #:nodoc:
     included do
       field :version, :type => Integer, :default => 1
 
-      embeds_many :versions, :class_name => self.name, :validate => false
+      embeds_many \
+        :versions,
+        :class_name => self.name,
+        :validate => false,
+        :cyclic => true,
+        :versioned => true
+
       set_callback :save, :before, :revise, :if => :revisable?
 
       class_attribute :version_max
       delegate :version_max, :to => "self.class"
+      self.cyclic = true
     end
 
     # Create a new version of the +Document+. This will load the previous
@@ -27,12 +34,11 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def revise
-      previous = find_last_version
-      if previous
-        versions.target << previous.clone
+      previous = previous_revision
+      if previous && changed?
+        new_version = versions.build(previous.attributes.except("versions"))
         versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
-        @modifications["versions"] = [ nil, versions.as_document ] if @modifications
       end
     end
 
@@ -63,7 +69,7 @@ module Mongoid #:nodoc:
     # @return [ Document, nil ] The previously saved document.
     #
     # @since 2.0.0
-    def find_last_version
+    def previous_revision
       self.class.
         where(:_id => id).
         any_of({ :version => version }, { :version => nil }).first

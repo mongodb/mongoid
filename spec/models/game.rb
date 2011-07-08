@@ -6,7 +6,7 @@ class Game
   referenced_in :person, :index => true
   references_one :video, :validate => false
   accepts_nested_attributes_for :person
-  enslave and cache
+  cache
 
   validates_format_of :name, :without => /\$\$\$/
 

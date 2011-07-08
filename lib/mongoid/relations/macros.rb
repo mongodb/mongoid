@@ -157,7 +157,6 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def references_many(name, options = {}, &block)
-          check_options(options)
           characterize(name, Referenced::Many, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
@@ -191,7 +190,8 @@ module Mongoid # :nodoc:
         def references_and_referenced_in_many(name, options = {}, &block)
           characterize(name, Referenced::ManyToMany, options, &block).tap do |meta|
             relate(name, meta)
-            reference(meta)
+            reference(meta, Array)
+            autosave(meta)
             validates_relation(meta)
           end
         end
@@ -228,26 +228,6 @@ module Mongoid # :nodoc:
 
         private
 
-        # Temporary check while people switch over to the new macro. Will be
-        # deleted in 2.0.0.
-        #
-        # @example Check the options.
-        #   Person.check_options({})
-        #
-        # @param [ Hash ] options The options given to the relational many.
-        #
-        # @raise [ RuntimeError ] If :stored_as => :array is found.
-        #
-        # @since 2.0.0.rc.1
-        def check_options(options = {})
-          if options[:stored_as] == :array
-            raise RuntimeError.new(
-              "Macro: references_many :name, :stored_as => :array " <<
-              "Is no longer valid. Please use: references_and_referenced_in_many :name"
-            )
-          end
-        end
-
         # Create the metadata for the relation.
         #
         # @example Create the metadata.
@@ -263,11 +243,33 @@ module Mongoid # :nodoc:
           Metadata.new(
             options.merge(
               :relation => relation,
-              :extend => block,
+              :extend => create_extension_module(name, &block),
               :inverse_class_name => self.name,
               :name => name
             )
           )
+        end
+
+        # Generate a named extension module suitable for marshaling
+        #
+        # @example Get the module.
+        #   Person.create_extension_module(:posts, &block)
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Proc ] block Optional block for defining extensions.
+        #
+        # @return [ Module, nil ] The extension or nil.
+        #
+        # @since 2.1.0
+        def create_extension_module(name, &block)
+          if block
+            extension_module_name =
+              "#{self.to_s.demodulize}#{name.to_s.camelize}RelationExtension"
+            silence_warnings do
+              self.const_set(extension_module_name, Module.new(&block))
+            end
+            "#{self}::#{extension_module_name}".constantize
+          end
         end
 
         # Defines a field to be used as a foreign key in the relation and
@@ -277,12 +279,13 @@ module Mongoid # :nodoc:
         #   Person.reference(metadata)
         #
         # @param [ Metadata ] metadata The metadata for the relation.
-        def reference(metadata)
+        def reference(metadata, type = Object)
           polymorph(metadata).cascade(metadata)
           if metadata.relation.stores_foreign_key?
             key = metadata.foreign_key
             field(
               key,
+              :type => type,
               :identity => true,
               :metadata => metadata,
               :default => metadata.foreign_key_default

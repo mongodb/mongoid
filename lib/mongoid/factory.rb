@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = {})
       type = (attributes || {})["_type"]
-      type.blank? ? klass.new(attributes) : type.constantize.new(attributes)
+      (type && klass._types.include?(type)) ? type.constantize.new(attributes) : klass.new(attributes)
     end
 
     # Builds a new +Document+ from the supplied attributes loaded from the

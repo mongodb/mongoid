@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Keys do
 
+  before do
+    Person.delete_all
+  end
+
   context "when the id has changed" do
 
     let(:person) do

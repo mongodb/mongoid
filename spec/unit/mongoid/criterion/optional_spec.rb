@@ -29,6 +29,29 @@ describe Mongoid::Criterion::Optional do
         criteria.options[:sort].should be_nil
       end
     end
+
+    context "when chained" do
+      context "before another order on this field" do
+        let(:criteria) do
+          base.ascending(:title).order_by(:title.desc)
+        end
+
+        it "overwrites by last" do
+         criteria.options[:sort].should == [[:title, :desc]]
+        end
+      end
+
+      context "after another order on this field" do
+        let(:criteria) do
+          base.order_by(:title.desc).ascending(:title)
+        end
+
+        it "overwrite previous" do
+         criteria.options[:sort].should == [[:title, :asc]]
+        end
+      end
+    end
+
   end
 
   describe "#asc" do
@@ -127,6 +150,28 @@ describe Mongoid::Criterion::Optional do
         criteria.options[:sort].should be_nil
       end
     end
+
+    context "when chained" do
+      context "before another order on this field" do
+        let(:criteria) do
+          base.descending(:title).order_by(:title.asc)
+        end
+
+        it "overwrites by last" do
+         criteria.options[:sort].should == [[:title, :asc]]
+        end
+      end
+
+      context "after another order on this field" do
+        let(:criteria) do
+          base.order_by(:title.asc).descending(:title)
+        end
+
+        it "overwrite previous" do
+         criteria.options[:sort].should == [[:title, :desc]]
+        end
+      end
+    end
   end
 
   describe "#desc" do
@@ -151,21 +196,6 @@ describe Mongoid::Criterion::Optional do
       it "does not modify the sort criteria" do
         criteria.options[:sort].should be_nil
       end
-    end
-  end
-
-  describe "#enslave" do
-
-    let(:criteria) do
-      base.enslave
-    end
-
-    it "sets the enslaved option on the criteria" do
-      criteria.options[:enslave].should be_true
-    end
-
-    it "returns a copy" do
-      base.enslave.should_not eql(base)
     end
   end
 
@@ -418,13 +448,36 @@ describe Mongoid::Criterion::Optional do
     context "when providing a hash of options" do
 
       let(:criteria) do
-        base.order_by(:title => :asc, :text => :desc)
+        base.order_by(:title => :asc)
+      end
+
+      it "adds the sort to the options" do
+        criteria.options[:sort].should include([:title, :asc])
+      end
+    end
+
+    context "when providing a array of hashes of options" do
+
+      let(:criteria) do
+        base.order_by({:title => :asc}, {:text => :desc})
       end
 
       it "adds the sort to the options" do
         criteria.options[:sort].should include([:title, :asc], [:text, :desc])
       end
     end
+
+    context "when providing a hash of multiple options" do
+
+      let(:criteria) do
+        base.order_by(:title => :asc, :text => :desc)
+      end
+
+      it "adds the sort to the options" do
+        expect { criteria }.to raise_exception(ArgumentError)
+      end
+    end
+
 
     context "when providing multiple symbols" do
 
@@ -439,6 +492,46 @@ describe Mongoid::Criterion::Optional do
 
     it "returns a copy" do
       base.order_by.should_not eql(base)
+    end
+
+    context "when chained" do
+      let(:criteria) do
+        base.order_by(:title => :asc).order_by(:text => :desc).order_by(:title.desc)
+      end
+
+      it "merge criterias" do
+        criteria.options[:sort].should have(2).items
+      end
+
+      it "add to options last chained criterion on same field" do
+        criteria.options[:sort].should include([:title, :desc])
+      end
+
+      it "don't add to options not last chained criterion on same field"  do
+        criteria.options[:sort].should_not include([:title, :asc])
+      end
+    end
+
+    context "when chained with mixed defenitions" do
+      let(:criteria) do
+        base.order_by(:title => :asc).order_by([ {:text => :desc}, :title.desc ])
+      end
+
+      it "merge criterias" do
+        criteria.options[:sort].should have(2).items
+      end
+
+      it "add to options last chained criterion on same field" do
+        criteria.options[:sort].should include([:title, :desc])
+      end
+
+      it "add to options last chained criterion" do
+        criteria.options[:sort].should include([:text, :desc])
+      end
+
+      it "don't add to options not last chained criterion on same field"  do
+        criteria.options[:sort].should_not include([:title, :asc])
+      end
     end
   end
 

@@ -11,6 +11,9 @@ pt:
         invalid_type:
           O campo foi definido como %{klass}, mas recebeu uma instância de %{other} com
           o valor %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} não é suportada, por favor actualize para a 
           versão %{mongo_version}.
