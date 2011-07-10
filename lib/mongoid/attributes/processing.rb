@@ -94,7 +94,7 @@ module Mongoid #:nodoc:
         if Mongoid.allow_dynamic_fields && !respond_to?("#{name}=")
           write_attribute(name, value)
         else
-          send("#{name}=", value)
+          respond_to?(:"#{name}=") ? send(:"#{name}=", value) : raise(Mongoid::Errors::UnknownAttributeError, "unknown attribute: #{name}")
         end
       end
 
