@@ -72,5 +72,23 @@ module Mongoid #:nodoc:
         end
       end
     end
+
+    private
+
+    # Get the current value for the specified attribute, if the attribute has changed.
+    #
+    # @note This is overriding the AM::Dirty implementation to read from the mongoid 
+    #   attributes hash, which may contain a serialized version of the attributes data. It is
+    #   necessary to read the serialized version as the changed value, to allow updates to
+    #   the MongoDB document to persist correctly. For example, if a DateTime field is updated
+    #   it must be persisted as a UTC Time. 
+    #
+    # @return [ Object ] The current value of the field, or nil if no change made.
+    #
+    # @since 2.1.0
+    def attribute_change(attr)
+      [changed_attributes[attr], attributes[attr]] if attribute_changed?(attr)
+    end
+
   end
 end
