@@ -58,4 +58,7 @@ class BSON::ObjectId #:nodoc
   def as_json(options = nil)
     to_s
   end
+  def to_xml(options = nil)
+    ActiveSupport::XmlMini.to_tag(options[:root], self.to_s, options)
+  end
 end
