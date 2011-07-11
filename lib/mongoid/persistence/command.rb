@@ -44,7 +44,7 @@ module Mongoid #:nodoc:
       #
       # @param [ Document, Class ] document_or_class A document or a class.
       def init(document_or_class)
-        if document_or_class.is_a?(Mongoid::Document)
+        if document_or_class.kind_of?(Mongoid::Document)
           @document = document_or_class
           @collection = @document.embedded? ? @document._root.collection : @document.collection
         else
