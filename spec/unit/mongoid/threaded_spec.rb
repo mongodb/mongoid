@@ -36,6 +36,13 @@ describe Mongoid::Threaded do
     end
   end
 
+  describe "#scope_stack" do
+
+    it "returns the default with the scope stack key" do
+      described_class.scope_stack.should be_a(Hash)
+    end
+  end
+
   describe "#update" do
 
     before do

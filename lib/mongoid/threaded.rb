@@ -50,8 +50,22 @@ module Mongoid #:nodoc:
     #   Threaded.update
     #
     # @return [ Object ] The atomic update consumer.
+    #
+    # @since 2.1.0
     def update
       Thread.current[:"[mongoid]:update-consumer"]
+    end
+
+    # Get the mongoid scope stack for chained criteria.
+    #
+    # @example Get the scope stack.
+    #   Threaded.scope_stack
+    #
+    # @return [ Hash ] The scope stack.
+    #
+    # @since 2.1.0
+    def scope_stack
+      Thread.current[:"[mongoid]:scope-stack"] ||= {}
     end
 
     # Set the update consumer on the current thread.
