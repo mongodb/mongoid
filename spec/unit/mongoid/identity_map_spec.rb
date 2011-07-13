@@ -175,4 +175,14 @@ describe Mongoid::IdentityMap do
       end
     end
   end
+
+  context "when accessing hash methods directly" do
+
+    Hash.public_instance_methods(false).each do |method|
+
+      it "can access #{method} at the class level" do
+        described_class.should respond_to(method)
+      end
+    end
+  end
 end
