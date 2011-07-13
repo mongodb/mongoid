@@ -20,7 +20,6 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def prepare(&block)
         yield(document)
-        IdentityMap.remove(document.id)
         document.freeze
         document.destroyed = true
         document.cascade! and true
