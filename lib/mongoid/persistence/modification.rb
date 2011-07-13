@@ -27,6 +27,7 @@ module Mongoid #:nodoc:
         end.tap do
           document.reset_persisted_children
           document.move_changes
+          Threaded.clear_safety_options!
         end
       end
     end

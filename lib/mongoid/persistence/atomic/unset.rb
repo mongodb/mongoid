@@ -18,6 +18,7 @@ module Mongoid #:nodoc:
           self.field = field.to_s
           document.attributes.delete(field)
           collection.update(document.atomic_selector, operation("$unset"), options)
+          Threaded.clear_safety_options!
           document.remove_change(value)
         end
       end

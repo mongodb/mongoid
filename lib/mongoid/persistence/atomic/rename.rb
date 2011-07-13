@@ -20,6 +20,7 @@ module Mongoid #:nodoc:
           document[value].tap do
             collection.update(document.atomic_selector, operation("$rename"), options)
             document.remove_change(value)
+            Threaded.clear_safety_options!
           end
         end
       end

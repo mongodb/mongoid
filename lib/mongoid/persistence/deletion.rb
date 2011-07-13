@@ -22,7 +22,9 @@ module Mongoid #:nodoc:
         yield(document)
         document.freeze
         document.destroyed = true
-        document.cascade! and true
+        document.cascade!
+        Threaded.clear_safety_options!
+        true
       end
     end
   end

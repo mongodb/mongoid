@@ -90,7 +90,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def options
-        { :safe => @options[:safe] || Mongoid.persist_in_safe_mode }
+        Safety.merge_safety_options(@options)
       end
 
       # Get the parent of the provided document.

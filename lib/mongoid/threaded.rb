@@ -6,6 +6,10 @@ module Mongoid #:nodoc:
   module Threaded
     extend self
 
+    def clear_safety_options!
+      Thread.current[:"[mongoid]:safety-options"] = nil
+    end
+
     # Get the identity map off the current thread.
     #
     # @example Get the identity map.
@@ -54,6 +58,14 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def update
       Thread.current[:"[mongoid]:update-consumer"]
+    end
+
+    def safety_options
+      Thread.current[:"[mongoid]:safety-options"]
+    end
+
+    def safety_options=(options)
+      Thread.current[:"[mongoid]:safety-options"] = options
     end
 
     # Get the mongoid scope stack for chained criteria.

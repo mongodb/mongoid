@@ -24,6 +24,7 @@ module Mongoid #:nodoc:
               collection.update(document.atomic_selector, operation("$addToSet"), options)
               document.remove_change(field)
             end
+            Threaded.clear_safety_options!
           end
         end
       end

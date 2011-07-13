@@ -22,8 +22,10 @@ module Mongoid #:nodoc:
             values.tap do
               collection.update(document.atomic_selector, operation("$pullAll"), options)
               document.remove_change(field) if document.persisted?
+              Threaded.clear_safety_options!
             end
           else
+            Threaded.clear_safety_options!
             return nil
           end
         end

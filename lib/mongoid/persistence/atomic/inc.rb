@@ -20,6 +20,7 @@ module Mongoid #:nodoc:
           document[field].tap do
             collection.update(document.atomic_selector, operation("$inc"), options)
             document.remove_change(field)
+            Threaded.clear_safety_options!
           end
         end
       end

@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0
         def initialize(document, field, value, options = {})
           @document, @field, @value = document, field, value
-          @options = { :safe => options[:safe] || Mongoid.persist_in_safe_mode }
+          @options = Safety.merge_safety_options(options)
         end
 
         # Get the atomic operation to perform.
@@ -61,6 +61,12 @@ module Mongoid #:nodoc:
         def path
           position = document.atomic_position
           position.blank? ? field : "#{position}.#{field}"
+        end
+
+        def safety_options(options)
+          { :safe => options[:safe] ||
+            Threaded.safety_options ||
+            Mongoid.persist_in_safe_mode }
         end
       end
     end
