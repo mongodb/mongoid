@@ -670,6 +670,117 @@ describe Mongoid::Persistence do
         end
       end
     end
+    
+    context "when in a references_and_referenced_in_many relationship" do
+    
+      let!(:person) do
+        Person.create!(:title => "The Boss")
+      end
+      
+      let!(:girlfriend_house) do
+        House.create!(:name => "Girlfriend")
+      end
+      
+      let!(:wife_house) do
+        House.create!(:name => "Wife")
+      end
+
+      let!(:exwife_house) do
+        House.create!(:name => "Ex-Wife")
+      end
+      
+      context "persists a reference" do
+      
+        it "assigned directly" do
+          person.houses = [ wife_house ]
+          person.save!
+          person.reload.houses.should == [ wife_house ]
+        end
+
+        it "via update_attributes" do
+          person.update_attributes({:houses => [ wife_house ]})
+          person.houses.should == [ wife_house ]
+          person.reload.houses.should == [ wife_house ]
+        end
+        
+        it "via update_attributes with id" do
+          person.update_attributes({:houses => [ wife_house.id ]})
+          person.houses.should == [ wife_house ]
+          person.reload.houses.should == [ wife_house ]
+        end
+        
+      end
+      
+      context "persists many references" do
+
+        it "via update_attributes" do
+          person.update_attributes({:houses => [ wife_house, exwife_house, girlfriend_house ]})
+          person.houses.sort.should == [ girlfriend_house, wife_house, exwife_house ]
+          # BUGBUG?: comes back in reverse (?) or random order
+          person.reload.houses.sort.should == [ girlfriend_house, wife_house, exwife_house ]
+        end
+
+        it "via update_attributes with id" do
+          person.update_attributes({:houses => [ wife_house.id, exwife_house.id, girlfriend_house.id ]})
+          person.houses.sort.should == [ girlfriend_house, wife_house, exwife_house ]
+          person.reload.houses.sort.should == [ girlfriend_house, wife_house, exwife_house ]
+        end
+        
+      end
+      
+      context "edits references" do
+        before do
+          person.update_attributes({:houses => [ wife_house ]})
+        end
+        
+        it "via update_attributes" do
+          person.update_attributes({:houses => [ girlfriend_house, exwife_house ]})
+          person.houses.sort.should == [ girlfriend_house, exwife_house ]          
+          person.reload.houses.sort.should == [ girlfriend_house, exwife_house ]
+        end
+      end
+      
+      context "removes references" do
+      
+        before do
+          person.update_attributes({:houses => [ wife_house, exwife_house, girlfriend_house ]})
+        end
+
+        it "via update_attributes with two left" do
+          person.update_attributes({:houses => [ girlfriend_house, exwife_house ]})
+          person.houses.sort.should == [ girlfriend_house, exwife_house ]          
+          person.reload.houses.sort.should == [ girlfriend_house, exwife_house ]
+        end
+        
+        it "via update_attributes with one left" do
+          person.update_attributes({:houses => [ girlfriend_house ]})
+          person.houses.should == [ girlfriend_house ]          
+          person.reload.houses.should == [ girlfriend_house ]
+        end
+
+        it "via update_attributes with id with one left" do
+          # BUGBUG?: once i did update_attributes, another update_attributes with id fails unless the instance is reloaded
+          person.reload
+          person.update_attributes({:houses => [ girlfriend_house.id ]})
+          person.houses.should == [ girlfriend_house ] 
+          person.reload.houses.should == [ girlfriend_house ]
+        end
+
+        it "via update_attributes with none left" do
+          person.update_attributes({:houses => [ ]})
+          person.houses.should == [ ]
+          person.reload.houses.should == [ ]
+        end
+        
+        it "via update_attributes with nil" do
+          person.update_attributes({:houses => nil})
+          person.houses.should == [ ]
+          person.reload.houses.should == [ ]
+        end
+        
+      end
+          
+    end
 
     context "when in a deeply nested hierarchy" do
 
