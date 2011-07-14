@@ -285,16 +285,14 @@ module Mongoid # :nodoc:
         "  cyclic:               #{cyclic || "No"},\n" <<
         "  dependent:            #{dependent || "None"},\n" <<
         "  inverse_of:           #{inverse_of || "N/A"},\n" <<
-        "  inverse_setter:       #{inverse_setter},\n" <<
-        "  inverse_type:         #{inverse_type || "N/A"},\n" <<
-        "  inverse_type_setter:  #{inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{key},\n" <<
         "  macro:                #{macro},\n" <<
         "  name:                 #{name},\n" <<
         "  order:                #{order.inspect || "No"},\n" <<
-        "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<
+        "  polymorphic:          #{polymorphic? || "No"},\n" <<
         "  relation:             #{relation},\n" <<
-        "  setter:               #{setter}>\n"
+        "  setter:               #{setter},\n" <<
+        "  versioned:            #{versioned? || "No"}>\n"
       end
 
       # Get the name of the inverse relation if it exists. If this is a
@@ -573,6 +571,10 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def validate?
         self[:validate] != false
+      end
+
+      def versioned?
+        !!self[:versioned]
       end
 
       # Returns default order for this association.

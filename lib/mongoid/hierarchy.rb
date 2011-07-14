@@ -41,7 +41,7 @@ module Mongoid #:nodoc
                 child = send(name)
                 child.to_a.each do |doc|
                   children.push(doc)
-                  children.concat(doc._children) unless name == "versions"
+                  children.concat(doc._children) unless metadata.versioned?
                 end if child
               end
             end
