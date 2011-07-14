@@ -968,7 +968,7 @@ describe Mongoid::Relations::Metadata do
       let(:metadata) do
         described_class.new(
           :name => :versions,
-          :relation => Mongoid::Relations::Embedded::Many,
+          :relation => Mongoid::Relations::Embedded::Many
         )
       end
 
