@@ -55,25 +55,6 @@ module Mongoid #:nodoc:
         self[name.to_s]
       end
 
-      # Get the options used in creating the database connection.
-      #
-      # @example Get the options.
-      #   db.options
-      #
-      # @param [ true, false ] slave Are the options for a slave db?
-      #
-      # @return [ Hash ] The hash of configuration options.
-      #
-      # @since 2.0.0.rc.1
-      def optional(slave = false)
-        ({
-          :pool_size => pool_size,
-          :logger => Mongoid::Logger.new,
-          :slave_ok => slave
-        }).merge(self).reject { |k,v| PRIVATE_OPTIONS.include? k }.
-          inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo} # mongo likes symbols
-      end
-
       # Create the new db configuration class.
       #
       # @example Initialize the class.
