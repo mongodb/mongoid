@@ -185,4 +185,28 @@ describe Mongoid::IdentityMap do
       end
     end
   end
+
+  context "when executing in a fiber" do
+
+    if RUBY_VERSION.to_f >= 1.9
+
+      describe "#.get" do
+
+        let(:document) do
+          Person.new
+        end
+
+        let(:fiber) do
+          Fiber.new do
+            described_class.set(document)
+            described_class.get(document.id).should eq(document)
+          end
+        end
+
+        it "gets the object from the identity map" do
+          fiber.resume
+        end
+      end
+    end
+  end
 end
