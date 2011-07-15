@@ -6,8 +6,8 @@ class Comment
   field :text, :type => String
   key :text, :type => String
 
-  referenced_in :movie
-  referenced_in :rating
+  belongs_to :movie
+  belongs_to :rating
   validates :title, :presence => true
   validates :movie, :rating, :associated => true
 end

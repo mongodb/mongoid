@@ -4,9 +4,9 @@ class ParanoidPost
   include Mongoid::Timestamps
   include Mongoid::Paranoia
   field :title
-  referenced_in :person
+  belongs_to :person
 
-  references_and_referenced_in_many :tags
+  has_and_belongs_to_many :tags
 
   named_scope :recent, where(:created_at => { "$lt" => Time.now, "$gt" => 30.days.ago })
 

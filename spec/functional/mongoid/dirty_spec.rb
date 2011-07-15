@@ -6,6 +6,27 @@ describe Mongoid::Dirty do
     [ Person, Preference ].each(&:delete_all)
   end
 
+  context "when modifying a many to many key" do
+
+    let!(:person) do
+      Person.create(:ssn => "342-89-2439")
+    end
+
+    let!(:preference) do
+      Preference.create(:name => "dirty")
+    end
+
+    before do
+      person.update_attributes(:preference_ids => [ preference.id ])
+    end
+
+    it "records the foreign key dirty changes" do
+      person.previous_changes.should eq({
+        "preference_ids" => [[], [ preference.id ]], "version" => [1, 2]
+      })
+    end
+  end
+
   context "when accessing an array field" do
 
     let!(:person) do
