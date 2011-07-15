@@ -107,6 +107,25 @@ module Mongoid #:nodoc
   end
   alias :config :configure
 
+  # We can process a unit of work in Mongoid and have the identity map
+  # automatically clear itself out after the work is complete.
+  #
+  # @example Process a unit of work.
+  #   Mongoid.unit_of_work do
+  #     Person.create(:title => "Sir")
+  #   end
+  #
+  # @return [ Object ] The result of the block.
+  #
+  # @since 2.1.0
+  def unit_of_work
+    begin
+      yield if block_given?
+    ensure
+      IdentityMap.clear
+    end
+  end
+
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
   #
