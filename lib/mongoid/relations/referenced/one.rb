@@ -68,8 +68,8 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def nullify
           target.send(metadata.foreign_key_setter, nil)
-          target.send(:remove_instance_variable, "@#{metadata.inverse(target)}")
-          base.send(:remove_instance_variable, "@#{metadata.name}")
+          target.remove_ivar(metadata.inverse(target))
+          base.remove_ivar(metadata.name)
           target.save
         end
 
