@@ -5,7 +5,8 @@ module Mongoid #:nodoc:
 
       # This class provides the ability to perform an explicit $pop
       # modification on a specific field.
-      class Pop < Operation
+      class Pop
+        include Operation
 
         # Sends the atomic $pop operation to the database.
         #
@@ -16,17 +17,15 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persist
-          if document[field]
-            values = document.send(field)
-            value > 0 ? values.pop : values.shift
-            values.tap do
-              collection.update(document.atomic_selector, operation("$pop"), options)
-              document.remove_change(field) if document.persisted?
-              Threaded.clear_safety_options!
+          prepare do
+            if document[field]
+              values = document.send(field)
+              value > 0 ? values.pop : values.shift
+              values.tap do
+                collection.update(document.atomic_selector, operation("$pop"), options)
+                document.remove_change(field) if document.persisted?
+              end
             end
-          else
-            Threaded.clear_safety_options!
-            return nil
           end
         end
       end

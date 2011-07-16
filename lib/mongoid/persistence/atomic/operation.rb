@@ -3,8 +3,8 @@ module Mongoid #:nodoc:
   module Persistence #:nodoc:
     module Atomic #:nodoc:
 
-      # This is the superclass for all atomic operation objects.
-      class Operation
+      # This is the included module for all atomic operation objects.
+      module Operation
 
         attr_accessor :document, :field, :value, :options
 
@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def initialize(document, field, value, options = {})
-          @document, @field, @value = document, field, value
+          @document, @field, @value = document, field.to_s, value
           @options = Safety.merge_safety_options(options)
         end
 
@@ -63,10 +63,21 @@ module Mongoid #:nodoc:
           position.blank? ? field : "#{position}.#{field}"
         end
 
-        def safety_options(options)
-          { :safe => options[:safe] ||
-            Threaded.safety_options ||
-            Mongoid.persist_in_safe_mode }
+        # All atomic operations use this with a block to ensure saftey options
+        # clear out after the execution.
+        #
+        # @example Prepare the operation.
+        #   prepare do
+        #     collection.update
+        #   end
+        #
+        # @return [ Object ] The yielded value.
+        #
+        # @since 2.1.0
+        def prepare
+          yield(document).tap do
+            Threaded.clear_safety_options!
+          end
         end
       end
     end

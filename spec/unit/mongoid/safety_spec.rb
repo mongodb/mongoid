@@ -22,7 +22,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$addToSet" => { :aliases => "Bond" } },
+          { "$addToSet" => { "aliases" => "Bond" } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).add_to_set(:aliases, "Bond")
@@ -38,7 +38,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$addToSet" => { :aliases => "Bond" } },
+          { "$addToSet" => { "aliases" => "Bond" } },
           :safe => true
         )
         person.safely.add_to_set(:aliases, "Bond")
@@ -61,7 +61,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$bit" => { :age => { :and => 12 } } },
+          { "$bit" => { "age" => { :and => 12 } } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).bit(:age, { :and => 12 })
@@ -77,7 +77,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$bit" => { :age => { :and => 12 } } },
+          { "$bit" => { "age" => { :and => 12 } } },
           :safe => true
         )
         person.safely.bit(:age, { :and => 12 })
@@ -298,7 +298,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$inc" => { :age => 2 } },
+          { "$inc" => { "age" => 2 } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).inc(:age, 2)
@@ -314,7 +314,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$inc" => { :age => 2 } },
+          { "$inc" => { "age" => 2 } },
           :safe => true
         )
         person.safely.inc(:age, 2)
@@ -374,7 +374,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pop" => { :aliases => 2 } },
+          { "$pop" => { "aliases" => 2 } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).pop(:aliases, 2)
@@ -390,7 +390,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pop" => { :aliases => 2 } },
+          { "$pop" => { "aliases" => 2 } },
           :safe => true
         )
         person.safely.pop(:aliases, 2)
@@ -413,7 +413,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pull" => { :aliases => "Bond" } },
+          { "$pull" => { "aliases" => "Bond" } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).pull(:aliases, "Bond")
@@ -429,7 +429,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pull" => { :aliases => "Bond" } },
+          { "$pull" => { "aliases" => "Bond" } },
           :safe => true
         )
         person.safely.pull(:aliases, "Bond")
@@ -452,7 +452,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pullAll" => { :aliases => [ "Bond" ] } },
+          { "$pullAll" => { "aliases" => [ "Bond" ] } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).pull_all(:aliases, [ "Bond" ])
@@ -468,7 +468,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pullAll" => { :aliases => [ "Bond" ] } },
+          { "$pullAll" => { "aliases" => [ "Bond" ] } },
           :safe => true
         )
         person.safely.pull_all(:aliases, [ "Bond" ])
@@ -491,7 +491,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$push" => { :aliases => "Bond" } },
+          { "$push" => { "aliases" => "Bond" } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).push(:aliases, "Bond")
@@ -507,7 +507,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$push" => { :aliases => "Bond" } },
+          { "$push" => { "aliases" => "Bond" } },
           :safe => true
         )
         person.safely.push(:aliases, "Bond")
@@ -530,7 +530,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pushAll" => { :aliases => [ "Bond" ] } },
+          { "$pushAll" => { "aliases" => [ "Bond" ] } },
           :safe => { :w => 2 }
         )
         person.safely(:w => 2).push_all(:aliases, [ "Bond" ])
@@ -546,7 +546,7 @@ describe Mongoid::Safety do
       before do
         collection.expects(:update).with(
           { "_id" => person.id },
-          { "$pushAll" => { :aliases => [ "Bond" ] } },
+          { "$pushAll" => { "aliases" => [ "Bond" ] } },
           :safe => true
         )
         person.safely.push_all(:aliases, [ "Bond" ])
