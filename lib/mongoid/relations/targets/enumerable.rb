@@ -46,6 +46,26 @@ module Mongoid #:nodoc:
         end
         alias :push :<<
 
+        # Clears out all the documents in this enumerable. If passed a block it
+        # will yield to each document that is in memory.
+        #
+        # @example Clear out the enumerable.
+        #   enumerable.clear
+        #
+        # @example Clear out the enumerable with a block.
+        #   enumerable.clear do |doc|
+        #     doc.unbind
+        #   end
+        #
+        # @return [ Array<Document> ] The cleared out added docs.
+        #
+        # @since 2.1.0
+        def clear
+          unloaded.delete_all if unloaded
+          in_memory { |doc| yield(doc) } if block_given?
+          loaded.clear and added.clear
+        end
+
         # Iterating over this enumerable has to handle a few different
         # scenarios.
         #

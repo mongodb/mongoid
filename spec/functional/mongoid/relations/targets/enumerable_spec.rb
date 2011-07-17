@@ -121,6 +121,56 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#clear" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1234")
+    end
+
+    let!(:post) do
+      Post.create(:person_id => person.id)
+    end
+
+    let!(:post_two) do
+      Post.create(:person_id => person.id)
+    end
+
+    let(:criteria) do
+      Post.where(:person_id => person.id)
+    end
+
+    let(:enumerable) do
+      described_class.new(criteria)
+    end
+
+    before do
+      enumerable.loaded << post
+      enumerable << post
+    end
+
+    let!(:clear) do
+      enumerable.clear do |doc|
+        doc.should be_a(Post)
+      end
+    end
+
+    it "deletes the entire criteria" do
+      criteria.entries.should eq([])
+    end
+
+    it "clears out the loaded docs" do
+      enumerable.loaded.should be_empty
+    end
+
+    it "clears out the added docs" do
+      enumerable.added.should be_empty
+    end
+
+    it "retains its loaded state" do
+      enumerable.should_not be_loaded
+    end
+  end
+
   describe "#each" do
 
     let(:person) do
