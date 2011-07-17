@@ -44,6 +44,7 @@ module Mongoid #:nodoc:
         def <<(document)
           added << document
         end
+        alias :push :<<
 
         # Iterating over this enumerable has to handle a few different
         # scenarios.
@@ -68,10 +69,7 @@ module Mongoid #:nodoc:
             loaded.each { |doc| yield(doc) }
           else
             unloaded.each do |doc|
-              unless added.include?(doc)
-                loaded.push(doc)
-                yield(doc)
-              end
+              loaded.push(doc) and yield(doc) unless added.include?(doc)
             end
           end
           added.each { |doc| yield(doc) }
@@ -110,6 +108,23 @@ module Mongoid #:nodoc:
           entries.inspect
         end
 
+        # Return all the documents in the enumerable that have been loaded or
+        # added.
+        #
+        # @note When passed a block it yields to each document.
+        #
+        # @example Get the in memory docs.
+        #   enumerable.in_memory
+        #
+        # @return [ Array<Document> ] The in memory docs.
+        #
+        # @since 2.1.0
+        def in_memory
+          (loaded + added).tap do |docs|
+            docs.each { |doc| yield(doc) } if block_given?
+          end
+        end
+
         # Has the enumerable been loaded? This will be true if the criteria has
         # been executed or we manually load the entire thing.
         #
@@ -122,6 +137,20 @@ module Mongoid #:nodoc:
         def loaded?
           !!@executed
         end
+
+        # Gets the total size of this enumerable. This is a combination of all
+        # the persisted and unpersisted documents.
+        #
+        # @example Get the size.
+        #   enumerable.size
+        #
+        # @return [ Integer ] The size of the enumerable.
+        #
+        # @since 2.1.0
+        def size
+          (loaded? ? loaded.count : unloaded.count) + added.count{ |d| d.new? }
+        end
+        alias :length :size
       end
     end
   end

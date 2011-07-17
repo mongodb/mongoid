@@ -287,4 +287,165 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
     end
   end
+
+  describe "#in_memory" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when the enumerable is loaded" do
+
+      let(:post) do
+        Post.new
+      end
+
+      let(:enumerable) do
+        described_class.new([ post ])
+      end
+
+      let(:post_two) do
+        Post.new
+      end
+
+      before do
+        enumerable << post_two
+      end
+
+      let(:in_memory) do
+        enumerable.in_memory
+      end
+
+      it "returns the loaded and added docs" do
+        in_memory.should eq([ post, post_two ])
+      end
+    end
+
+    context "when the enumerable is not loaded" do
+
+      let(:post) do
+        Post.new(:person_id => person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(Post.where(:person_id => person.id))
+      end
+
+      let(:post_two) do
+        Post.new(:person_id => person.id)
+      end
+
+      before do
+        enumerable << post_two
+      end
+
+      let(:in_memory) do
+        enumerable.in_memory
+      end
+
+      it "returns the added docs" do
+        in_memory.should eq([ post_two ])
+      end
+    end
+
+    context "when passed a block" do
+
+      let(:enumerable) do
+        described_class.new(Post.where(:person_id => person.id))
+      end
+
+      let(:post_two) do
+        Post.new(:person_id => person.id)
+      end
+
+      before do
+        enumerable << post_two
+      end
+
+      it "yields to each in memory document" do
+        enumerable.in_memory do |doc|
+          doc.should eq(post_two)
+        end
+      end
+    end
+  end
+
+  describe "#size" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1238")
+    end
+
+    let!(:post) do
+      Post.create(:person_id => person.id)
+    end
+
+    context "when the enumerable is loaded" do
+
+      let(:enumerable) do
+        described_class.new([ post ])
+      end
+
+      let(:post_two) do
+        Post.new(:person_id => person.id)
+      end
+
+      before do
+        enumerable << post_two
+      end
+
+      let(:size) do
+        enumerable.size
+      end
+
+      it "returns the loaded size plus added size" do
+        size.should eq(2)
+      end
+    end
+
+    context "when the enumerable is not loaded" do
+
+      let(:enumerable) do
+        described_class.new(Post.where(:person_id => person.id))
+      end
+
+      context "when the added contains new documents" do
+
+        let(:post_two) do
+          Post.new(:person_id => person.id)
+        end
+
+        before do
+          enumerable << post_two
+        end
+
+        let(:size) do
+          enumerable.size
+        end
+
+        it "returns the unloaded count plus added new size" do
+          size.should eq(2)
+        end
+      end
+
+      context "when the added contains persisted documents" do
+
+        let(:post_two) do
+          Post.create(:person_id => person.id)
+        end
+
+        before do
+          enumerable << post_two
+        end
+
+        let(:size) do
+          enumerable.size
+        end
+
+        it "returns the unloaded count plus added new size" do
+          size.should eq(2)
+        end
+      end
+    end
+  end
 end
