@@ -171,6 +171,119 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#delete" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1234")
+    end
+
+    context "when the document is loaded" do
+
+      let!(:post) do
+        Post.create(:person_id => person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new([ post ])
+      end
+
+      let!(:deleted) do
+        enumerable.delete(post)
+      end
+
+      it "deletes the document from the enumerable" do
+        enumerable.loaded.should be_empty
+      end
+
+      it "returns the document" do
+        deleted.should eq(post)
+      end
+    end
+
+    context "when the document is added" do
+
+      let!(:post) do
+        Post.new
+      end
+
+      let(:criteria) do
+        Person.where(:person_id => person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      before do
+        enumerable << post
+      end
+
+      let!(:deleted) do
+        enumerable.delete(post)
+      end
+
+      it "removes the document from the added docs" do
+        enumerable.added.should be_empty
+      end
+
+      it "returns the document" do
+        deleted.should eq(post)
+      end
+    end
+
+    context "when the document is unloaded" do
+
+      let!(:post) do
+        Post.create(:person_id => person.id)
+      end
+
+      let(:criteria) do
+        Person.where(:person_id => person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:deleted) do
+        enumerable.delete(post)
+      end
+
+      it "does not load the document" do
+        enumerable.loaded.should be_empty
+      end
+
+      it "returns nil" do
+        deleted.should be_nil
+      end
+    end
+
+    context "when the document is not found" do
+
+      let!(:post) do
+        Post.create(:person_id => person.id)
+      end
+
+      let(:criteria) do
+        Person.where(:person_id => person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new([ post ])
+      end
+
+      let!(:deleted) do
+        enumerable.delete(Post.new) do |doc|
+          doc.should be_nil
+        end
+      end
+
+      it "returns nil" do
+        deleted.should be_nil
+      end
+    end
+  end
+
   describe "#each" do
 
     let(:person) do

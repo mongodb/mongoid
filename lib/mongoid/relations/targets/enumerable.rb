@@ -66,6 +66,22 @@ module Mongoid #:nodoc:
           loaded.clear and added.clear
         end
 
+        # Delete the supplied document from the enumerable.
+        #
+        # @example Delete the document.
+        #   enumerable.delete(document)
+        #
+        # @param [ Document ] document The document to delete.
+        #
+        # @return [ Document ] The deleted document.
+        #
+        # @since 2.1.0
+        def delete(document)
+          loaded.delete(document) || added.delete(document).tap do |doc|
+            yield(doc) if block_given?
+          end
+        end
+
         # Iterating over this enumerable has to handle a few different
         # scenarios.
         #
