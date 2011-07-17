@@ -138,6 +138,19 @@ module Mongoid #:nodoc:
           !!@executed
         end
 
+        # Reset the enumerable back to it's persisted state.
+        #
+        # @example Reset the enumerable.
+        #   enumerable.reset
+        #
+        # @return [ false ] Always false.
+        #
+        # @since 2.1.0
+        def reset
+          loaded.clear and added.clear
+          @executed = false
+        end
+
         # Gets the total size of this enumerable. This is a combination of all
         # the persisted and unpersisted documents.
         #

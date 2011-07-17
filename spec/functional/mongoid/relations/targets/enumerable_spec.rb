@@ -370,6 +370,45 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#reset" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1238")
+    end
+
+    let(:post) do
+      Post.create(:person_id => person.id)
+    end
+
+    let(:post_two) do
+      Post.create(:person_id => person.id)
+    end
+
+    let(:enumerable) do
+      described_class.new([ post ])
+    end
+
+    before do
+      enumerable << post_two
+    end
+
+    let!(:reset) do
+      enumerable.reset
+    end
+
+    it "is not loaded" do
+      enumerable.should_not be_loaded
+    end
+
+    it "clears out the loaded docs" do
+      enumerable.loaded.should be_empty
+    end
+
+    it "clears out the added docs" do
+      enumerable.added.should be_empty
+    end
+  end
+
   describe "#size" do
 
     let(:person) do
