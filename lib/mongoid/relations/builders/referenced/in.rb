@@ -17,7 +17,8 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             begin
-              (type ? type.constantize : metadata.klass).find(object)
+              klass = type ? type.constantize : metadata.klass
+              IdentityMap.get(klass, object) || klass.find(object)
             rescue Errors::DocumentNotFound
               return nil
             end

@@ -19,6 +19,21 @@ module Mongoid #:nodoc:
       documents_for(klass)[id]
     end
 
+    # Remove the document from the identity map.
+    #
+    # @example Remove the document.
+    #   map.removed(person)
+    #
+    # @param [ Document ] document The document to remove.
+    #
+    # @return [ Document, nil ] The removed document.
+    #
+    # @since 2.1.0
+    def remove(document)
+      return unless document && document.id
+      documents_for(document.class).delete(document.id)
+    end
+
     # Puts a document in the identity map, accessed by it's id.
     #
     # @example Put the document in the map.

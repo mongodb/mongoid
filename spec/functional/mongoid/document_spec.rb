@@ -433,7 +433,7 @@ describe Mongoid::Document do
           Person.collection.update(
             { "_id" => person.id }, { "$set" => { "title" => "Mam" } }
           )
-          game.reload
+          person.reload
         end
 
         it "should reload the association" do

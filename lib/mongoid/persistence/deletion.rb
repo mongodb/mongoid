@@ -23,6 +23,7 @@ module Mongoid #:nodoc:
         document.freeze
         document.destroyed = true
         document.cascade!
+        IdentityMap.remove(document)
         Threaded.clear_safety_options!
         true
       end

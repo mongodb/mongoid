@@ -20,11 +20,11 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
       end
 
       let(:in_map) do
-        Mongoid::IdentityMap.get(Person, address.id)
+        Mongoid::IdentityMap.get(Address, address.id)
       end
 
-      it "does not put the document in the identity map" do
-        in_map.should be_nil
+      it "puts the document in the identity map" do
+        in_map.should eq(address)
       end
     end
   end
