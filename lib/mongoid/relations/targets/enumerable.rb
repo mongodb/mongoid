@@ -69,6 +69,8 @@ module Mongoid #:nodoc:
 
         # Delete the supplied document from the enumerable.
         #
+        # @note This operation loads all documents from the database.
+        #
         # @example Delete the document.
         #   enumerable.delete(document)
         #
@@ -81,6 +83,23 @@ module Mongoid #:nodoc:
           load_all! and (loaded.delete(document) || added.delete(document)).tap do |doc|
             yield(doc) if block_given?
           end
+        end
+
+        # Deletes every document in the enumerable for where the block returns
+        # true.
+        #
+        # @note This operation loads all documents from the database.
+        #
+        # @example Delete all matching documents.
+        #   enumerable.delete_if do |doc|
+        #     dod.id == id
+        #   end
+        #
+        # @return [ Array<Document> ] The remaining docs.
+        #
+        # @since 2.1.0
+        def delete_if(&block)
+          load_all! and loaded.delete_if(&block) + added.delete_if(&block)
         end
 
         # Iterating over this enumerable has to handle a few different
