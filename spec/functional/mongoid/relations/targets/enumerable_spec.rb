@@ -154,10 +154,6 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
     end
 
-    it "deletes the entire criteria" do
-      criteria.entries.should eq([])
-    end
-
     it "clears out the loaded docs" do
       enumerable.loaded.should be_empty
     end
@@ -238,7 +234,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let(:criteria) do
-        Person.where(:person_id => person.id)
+        Post.where(:person_id => person.id)
       end
 
       let!(:enumerable) do

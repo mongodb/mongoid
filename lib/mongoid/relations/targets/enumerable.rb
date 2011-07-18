@@ -61,8 +61,9 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def clear
-          unloaded.delete_all if unloaded
-          in_memory { |doc| yield(doc) } if block_given?
+          if block_given?
+            in_memory { |doc| yield(doc) }
+          end
           loaded.clear and added.clear
         end
 
@@ -77,7 +78,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def delete(document)
-          loaded.delete(document) || added.delete(document).tap do |doc|
+          (loaded.delete(document) || added.delete(document)).tap do |doc|
             yield(doc) if block_given?
           end
         end
