@@ -23,7 +23,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
       end
 
       it "does not reset the dirty flagging" do
-        person.changes["aliases"].should == [[], ["Bond"]]
+        person.changes["aliases"].should == [nil, ["Bond"]]
       end
 
       it "returns the new array value" do
