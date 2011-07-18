@@ -127,6 +127,27 @@ describe Mongoid::IdentityMap do
       end
     end
 
+    context "when setting a document with a nil id" do
+
+      let(:document) do
+        Person.new.tap do |person|
+          person.id = nil
+        end
+      end
+
+      let!(:set) do
+        identity_map.set(document)
+      end
+
+      it "does not put the object in the identity map" do
+        identity_map.get(nil).should be_nil
+      end
+
+      it "returns nil" do
+        set.should be_nil
+      end
+    end
+
     context "when setting nil" do
 
       let!(:set) do

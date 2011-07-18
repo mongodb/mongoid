@@ -260,6 +260,7 @@ module Mongoid #:nodoc:
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
           doc.send(:apply_default_attributes)
+          IdentityMap.set(doc)
           doc.run_callbacks(:initialize) { doc }
         end
       end

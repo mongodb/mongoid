@@ -361,8 +361,12 @@ describe Mongoid::Document do
 
     context "when an id exists" do
 
-      let(:person) do
-        Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
+      let(:id) do
+        BSON::ObjectId.new
+      end
+
+      let!(:person) do
+        Person.instantiate("_id" => id, "title" => "Sir")
       end
 
       it "sets the attributes" do
@@ -371,6 +375,10 @@ describe Mongoid::Document do
 
       it "sets persisted to true" do
         person.should be_persisted
+      end
+
+      it "puts the document in the identity map" do
+        Mongoid::IdentityMap.get(id).should eq(person)
       end
     end
 

@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def set(document)
-      return unless document
+      return unless document && document.id
       self[document.id] = document
     end
 
