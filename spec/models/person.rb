@@ -127,6 +127,12 @@ class Person
     self.employer_id = emp.id
   end
 
+  before_save :savable?
+
+  def savable?
+    self.mode != :prevent_save
+  end
+
   class << self
     def accepted
       criteria.where(:terms => true)

@@ -24,10 +24,12 @@ module Mongoid #:nodoc:
           document.run_callbacks(:update) do
             yield(document); true
           end
-        end.tap do
-          document.reset_persisted_children
-          document.move_changes
-          Threaded.clear_safety_options!
+        end.tap do |result|
+          unless result == false
+            document.reset_persisted_children
+            document.move_changes
+            Threaded.clear_safety_options!
+          end
         end
       end
     end

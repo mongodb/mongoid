@@ -21,15 +21,18 @@ module Mongoid #:nodoc:
       def prepare(&block)
         document.tap do |doc|
           unless validating? && document.invalid?(:create)
-            doc.run_callbacks(:save) do
+            result = doc.run_callbacks(:save) do
               doc.run_callbacks(:create) do
                 yield(doc)
                 doc.new_record = false
                 doc.reset_persisted_children and true
               end
             end
-            doc.move_changes
-            Threaded.clear_safety_options!
+
+            unless result == false
+              doc.move_changes
+              Threaded.clear_safety_options!
+            end
           end
         end
       end

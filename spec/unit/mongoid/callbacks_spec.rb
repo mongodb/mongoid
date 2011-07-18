@@ -115,32 +115,67 @@ describe Mongoid::Callbacks do
 
   describe ".before_save" do
 
-    before do
-      @artist = Artist.create(:name => "Depeche Mode")
-      @artist.name = "The Mountain Goats"
-    end
+    context "when creating" do
 
-    after do
-      @artist.delete
-    end
-
-    context "callback returns true" do
-      before do
-        @artist.expects(:before_save_stub).returns(true)
+      let(:artist) do
+        Artist.new(:name => "Depeche Mode")
       end
 
-      it "should return true" do
-        @artist.save.should == true
+      after do
+        artist.delete
+      end
+
+      context "callback returns true" do
+        before do
+          artist.expects(:before_save_stub).returns(true)
+        end
+
+        it "should return true" do
+          artist.save.should == true
+        end
+      end
+
+      context "callback returns false" do
+        before do
+          artist.expects(:before_save_stub).returns(false)
+        end
+
+        it "should return false" do
+          artist.save.should == false
+        end
       end
     end
 
-    context "callback returns false" do
-      before do
-        @artist.expects(:before_save_stub).returns(false)
+    context "when updating" do
+
+      let(:artist) do
+        Artist.create(:name => "Depeche Mode").tap do |artist|
+          artist.name = "The Mountain Goats"
+        end
       end
 
-      it "should return false" do
-        @artist.save.should == false
+      after do
+        artist.delete
+      end
+
+      context "callback returns true" do
+        before do
+          artist.expects(:before_save_stub).returns(true)
+        end
+
+        it "should return true" do
+          artist.save.should == true
+        end
+      end
+
+      context "callback returns false" do
+        before do
+          artist.expects(:before_save_stub).returns(false)
+        end
+
+        it "should return false" do
+          artist.save.should == false
+        end
       end
     end
   end
