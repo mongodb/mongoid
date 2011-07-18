@@ -181,6 +181,14 @@ module Mongoid #:nodoc:
           end
         end
 
+        # Loads all the documents in the enumerable from the database.
+        #
+        # @example Load all the documents.
+        #   enumerable.load_all!
+        #
+        # @return [ true ] That the enumerable is loaded.
+        #
+        # @since 2.1.0
         def load_all!
           entries and @executed = true
         end
