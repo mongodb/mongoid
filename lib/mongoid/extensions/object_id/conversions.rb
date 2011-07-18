@@ -41,10 +41,8 @@ module Mongoid #:nodoc:
               BSON::ObjectId.from_string(args)
             end
           when ::Array
-            args = args.reject { |arg| arg.blank? } if reject_blank
-            args.map do |arg|
-              convert(klass, arg, reject_blank)
-            end
+            args.delete_if { |arg| arg.blank? } if reject_blank
+            args.replace(args.map { |arg| convert(klass, arg, reject_blank) })
           when ::Hash
             args.tap do |hash|
               hash.each_pair do |key, value|

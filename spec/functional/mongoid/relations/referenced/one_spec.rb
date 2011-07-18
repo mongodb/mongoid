@@ -562,10 +562,6 @@ describe Mongoid::Relations::Referenced::One do
       it "removes the reference from the target" do
         game.person.should be_nil
       end
-
-      it "removes the reference from the base" do
-        person.game.should be_nil
-      end
     end
 
     context "when the instance has been reloaded" do
@@ -588,10 +584,6 @@ describe Mongoid::Relations::Referenced::One do
 
       it "removes the reference from the target" do
         game_reloaded.person.should be_nil
-      end
-
-      it "removes the reference from the base" do
-        from_db.game.should be_nil
       end
     end
   end

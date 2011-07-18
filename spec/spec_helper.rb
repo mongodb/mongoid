@@ -14,6 +14,7 @@ LOGGER = Logger.new($stdout)
 
 Mongoid.configure do |config|
   name = "mongoid_test"
+  # config.master = Mongo::Connection.new("localhost", 27017, :logger => LOGGER).db(name)
   config.master = Mongo::Connection.new.db(name)
   config.logger = nil
 end

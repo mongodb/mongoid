@@ -23,14 +23,12 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind(options = {})
-            if options[:continue]
-              target.do_or_do_not(
-                metadata.inverse_setter(target),
-                base,
-                :binding => true,
-                :continue => false
-              )
+          def bind
+            target.parentize(base)
+            unless binding?
+              binding do
+                target.do_or_do_not(metadata.inverse_setter(target), base)
+              end
             end
           end
           alias :bind_one :bind
@@ -48,14 +46,11 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def unbind(options = {})
-            if options[:continue]
-              target.do_or_do_not(
-                metadata.inverse_setter(target),
-                nil,
-                :binding => true,
-                :continue => false
-              )
+          def unbind
+            unless binding?
+              binding do
+                target.do_or_do_not(metadata.inverse_setter(target), nil)
+              end
             end
           end
           alias :unbind_one :unbind

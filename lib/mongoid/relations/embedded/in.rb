@@ -8,28 +8,6 @@ module Mongoid # :nodoc:
       # multiple documents.
       class In < Relations::One
 
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
-        #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
-        #
-        # @example Bind the relation.
-        #   name.person.bind(:continue => true)
-        #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def bind(options = {})
-          binding.bind(options)
-          base.save if target.persisted? && !options[:binding]
-        end
-
         # Instantiate a new embedded_in relation.
         #
         # @example Create the new relation.
@@ -43,29 +21,32 @@ module Mongoid # :nodoc:
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             characterize_one(target)
-            base.parentize(target)
+            bind_one
+            base.save if persistable?
           end
         end
 
-        # Unbinds the base object to the inverse of the relation. This occurs
-        # when setting a side of the relation to nil.
+        # Substitutes the supplied target documents for the existing document
+        # in the relation.
         #
-        # Will delete the object if necessary.
+        # @example Substitute the new document.
+        #   person.name.substitute(new_name)
         #
-        # @example Unbind the relation.
-        #   name.person.unbind(:continue => false)
+        # @param [ Document ] other A document to replace the target.
         #
-        # @param [ Proxy ] old_target The previous target of the relation.
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
+        # @return [ Document, nil ] The relation or nil.
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target, options = {})
-          binding(old_target).unbind(options)
-          base.delete if old_target.persisted? && !base.destroyed?
+        def substitute(replacement)
+          tap do |proxy|
+            proxy.unbind_one
+            unless replacement
+              base.delete unless binding?
+              return nil
+            end
+            proxy.target = replacement
+            proxy.bind_one
+          end
         end
 
         private
@@ -80,8 +61,17 @@ module Mongoid # :nodoc:
         # @return [ Binding ] A binding object.
         #
         # @since 2.0.0.rc.1
-        def binding(new_target = nil)
-          Bindings::Embedded::In.new(base, new_target || target, metadata)
+        def binding
+          Bindings::Embedded::In.new(base, target, metadata)
+        end
+
+        def characterize_one(document)
+          inverse = metadata.inverse(document)
+          base.metadata = document.reflect_on_association(inverse)
+        end
+
+        def persistable?
+          target.persisted? && !binding? && !building?
         end
 
         class << self

@@ -16,6 +16,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 {serializable}[https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields/serializable.rb]
 for changes.
 
+* :autosave => true on relational associations now saves on update as well as
+  create.
+
 === New Features
 
 * #587 Added order preference to many and many to many associations (Gregory Man)

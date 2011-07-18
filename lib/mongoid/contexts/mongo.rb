@@ -194,9 +194,9 @@ module Mongoid #:nodoc:
       # @return [ Document ] The last document in the collection.
       def last
         opts = process_options
-        sorting = opts[:sort]
-        sorting = [[:_id, :asc]] unless sorting
-        opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
+        sorting = opts[:sort] ||= []
+        sorting << [:_id, :asc]
+        opts[:sort] = sorting.map{ |option| [ option[0], option[1].invert ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end

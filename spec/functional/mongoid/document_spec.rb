@@ -256,7 +256,7 @@ describe Mongoid::Document do
         @person.addresses.first.destroy
         @person.name.should_not be_nil
         @person.name.destroy
-        @person.addresses.first.should be_nil
+        @person.addresses.should be_empty
         @person.name.should be_nil
       end
     end
@@ -419,6 +419,7 @@ describe Mongoid::Document do
         end
 
         pending "should reload the association" do
+          # @todo: Durran clear out associations in identity map here?
           person.game.score.should == 75
         end
       end
@@ -437,6 +438,7 @@ describe Mongoid::Document do
         end
 
         pending "should reload the association" do
+          # @todo: Durran clear out associations in identity map here?
           game.person.title.should == "Mam"
         end
       end

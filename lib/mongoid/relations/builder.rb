@@ -8,6 +8,7 @@ module Mongoid # :nodoc:
     class Builder
 
       attr_reader :metadata, :object, :loading
+
       # Instantiate the new builder for a relation.
       #
       # @example Create the builder.

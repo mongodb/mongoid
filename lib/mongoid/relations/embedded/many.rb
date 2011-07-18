@@ -22,69 +22,35 @@ module Mongoid # :nodoc:
         #
         # @param [ Document, Array<Document> ] *args Any number of documents.
         def <<(*args)
-          options = default_options(args)
           atomically(:$pushAll) do
             args.flatten.each do |doc|
-              return doc unless doc
-              append(doc, options)
-              doc.save if base.persisted? && !options[:binding]
+              next unless doc
+              append(doc)
+              doc.save if base.persisted? && !binding?
             end
           end
         end
         alias :concat :<<
         alias :push :<<
 
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
+        # Builds a new document in the relation and appends it to the target.
+        # Takes an optional type if you want to specify a subclass.
         #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
+        # @example Build a new document on the relation.
+        #   person.people.build(:name => "Bozo")
         #
-        # @example Bind the relation.
-        #   person.addresses.bind(:continue => true)
+        # @param [ Hash ] attributes The attributes to build the document with.
+        # @param [ Class ] type Optional class to build the document with.
         #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def bind(options = {})
-          binding.bind(options)
-          if base.persisted? && !options[:binding]
-            atomically(:$set) { target.each { |doc| doc.save } }
+        # @return [ Document ] The new document.
+        def build(attributes = {}, type = nil)
+          Factory.build(type || metadata.klass, attributes).tap do |doc|
+            doc.identify
+            append(doc)
+            yield(doc) if block_given?
           end
         end
-
-        # Bind the inverse relation between a single document in this proxy
-        # instead of the entire target.
-        #
-        # Used when appending to the target instead of setting the entire
-        # thing.
-        #
-        # @example Bind a single document.
-        #   person.addressses.bind_one(address)
-        #
-        # @param [ Document ] document The document to bind.
-        #
-        # @since 2.0.0.rc.1
-        def bind_one(document, options = {})
-          binding.bind_one(document, options)
-        end
-
-        # Is the relation empty?
-        #
-        # @example Is the relation empty??
-        #   person.addresses.blank?
-        #
-        # @return [ true, false ] If the relation is empty or not.
-        #
-        # @since 2.1.0
-        def blank?
-          size == 0
-        end
+        alias :new :build
 
         # Clear the relation. Will delete the documents from the db if they are
         # already persisted.
@@ -94,7 +60,13 @@ module Mongoid # :nodoc:
         #
         # @return [ Many ] The empty relation.
         def clear
-          load! and substitute(nil)
+          atomically(:$unset) do
+            target.each do |doc|
+              doc.delete unless doc.destroyed?
+              unbind_one(doc) unless binding?
+            end
+          end
+          target.clear
         end
 
         # Returns a count of the number of documents in the association that have
@@ -154,7 +126,10 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def delete(document)
-          target.delete(document).tap { reindex }
+          target.delete(document).tap do |doc|
+            unbind_one(doc) if doc && !binding?
+            reindex
+          end
         end
 
         # Delete all the documents in the association without running callbacks.
@@ -221,29 +196,14 @@ module Mongoid # :nodoc:
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             target.each_with_index do |doc, index|
-              characterize_one(doc)
-              doc.parentize(base)
+              integrate(doc)
               doc._index = index
             end
           end
         end
 
-        # Will load the target into an array if the target had not already been
-        # loaded.
-        #
-        # @example Load the relation into memory.
-        #   relation.load!
-        #
-        # @return [ Many ] The relation.
-        #
-        # @since 2.0.0.rc.5
-        def load!(options = {})
-          tap do |relation|
-            unless relation.loaded?
-              relation.bind(options)
-              relation.loaded = true
-            end
-          end
+        def in_memory
+          target
         end
 
         # Substitutes the supplied target documents for the existing documents
@@ -258,14 +218,19 @@ module Mongoid # :nodoc:
         # @return [ Many ] The proxied relation.
         #
         # @since 2.0.0.rc.1
-        def substitute(new_target, options = {})
-          old_target = target
-          tap do |relation|
-            relation.target = new_target || []
-            if !new_target.blank?
-              atomically(:$set) { rebind(old_target, options) }
+        def substitute(replacement)
+          tap do |proxy|
+            if replacement.blank?
+              proxy.clear
             else
-              atomically(:$unset) { unbind(old_target, options) }
+              atomically(:$set) do
+                proxy.target = replacement
+                proxy.target.each_with_index do |doc, index|
+                  integrate(doc)
+                  doc._index = index
+                  doc.save if base.persisted?
+                end
+              end
             end
           end
         end
@@ -286,29 +251,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Unbind the inverse relation from this set of documents. Used when the
-        # entire proxy has been cleared, set to nil or empty, or replaced.
-        #
-        # @example Unbind the relation.
-        #   person.addresses.unbind(target, :continue => false)
-        #
-        # @param [ Array<Document> ] old_target The relations previous target.
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def unbind(old_target, options = {})
-          binding(old_target).unbind(options)
-          if base.persisted?
-            old_target.each do |doc|
-              doc.delete unless doc.destroyed?
-            end
-          end
-        end
-
         private
 
         # Appends the document to the target array, updating the index on the
@@ -320,10 +262,9 @@ module Mongoid # :nodoc:
         # @param [ Document ] document The document to append to the target.
         #
         # @since 2.0.0.rc.1
-        def append(document, options = {})
-          load! and target.push(document)
-          characterize_one(document)
-          bind_one(document, options)
+        def append(document)
+          target.push(document)
+          integrate(document)
           document._index = target.size - 1
         end
 
@@ -337,8 +278,8 @@ module Mongoid # :nodoc:
         # @return [ Binding ] The many binding.
         #
         # @since 2.0.0.rc.1
-        def binding(new_target = nil)
-          Bindings::Embedded::Many.new(base, new_target || target, metadata)
+        def binding
+          Bindings::Embedded::Many.new(base, target, metadata)
         end
 
         # Returns the criteria object for the target class with its documents set
@@ -354,6 +295,11 @@ module Mongoid # :nodoc:
           end
         end
 
+        def integrate(document)
+          characterize_one(document)
+          bind_one(document) unless binding?
+        end
+
         # If the target array does not respond to the supplied method then try to
         # find a named scope or criteria on the class and send the call there.
         #
@@ -365,7 +311,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria, Object ] A Criteria or return value from the target.
         def method_missing(name, *args, &block)
-          load!(:binding => true) and return super if target.respond_to?(name)
+          return super if target.respond_to?(name)
           klass.send(:with_scope, criteria) do
             criteria.send(name, *args, &block)
           end
@@ -404,22 +350,6 @@ module Mongoid # :nodoc:
             end
             reindex
           end
-        end
-
-        # Convenience method to clean up the substitute code. Unbinds the old
-        # target and reindexes.
-        #
-        # @example Rebind the relation.
-        #   relation.rebind([])
-        #
-        # @param [ Array<Document> ] old_target The old target.
-        # @param [ Hash ] options The options passed to substitute.
-        #
-        # @since 2.0.0
-        def rebind(old_target, options)
-          reindex
-          unbind(old_target, options)
-          bind(options)
         end
 
         class << self

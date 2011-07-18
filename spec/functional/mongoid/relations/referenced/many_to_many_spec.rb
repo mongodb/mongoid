@@ -65,14 +65,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             preference.person_ids.should == [ person.id ]
           end
 
-          it "sets the base on the inverse relation" do
-            preference.people.should == [ person ]
-          end
-
-          it "sets the same instance on the inverse relation" do
-            preference.people.first.should eql(person)
-          end
-
           it "does not save the target" do
             preference.should be_new
           end
@@ -303,15 +295,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           preference.person_ids.should == [ person.id ]
         end
 
-        it "sets the base on the inverse relation" do
-          preference.people.first.should == person
-        end
-
         it "does not save the target" do
           preference.should be_new
         end
       end
-
 
       context "when the parent is new but the relation exists" do
 
@@ -337,10 +324,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "sets the foreign key on the inverse relation" do
           preference.person_ids.should == [ person.id ]
-        end
-
-        it "sets the base on the inverse relation" do
-          preference.people.first.should == person
         end
 
         context "and the parent is persisted" do
@@ -437,7 +420,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
             before do
               person.reload
-              preference.reload
               another_preference.reload
             end
 
@@ -459,20 +441,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             before do
               person.save
               person.reload
-              preference.reload
               another_preference.reload
             end
 
-            it "should have persisted the relation between person and another_preference" do
+            it "persists the relation between person and another_preference" do
               person.preferences.should == [ another_preference ]
             end
 
-            it "should have persisited the relation between another_prefrence and person" do
+            it "persists the relation between another_prefrence and person" do
               another_preference.people.should == [ person ]
             end
 
-            it "should no longer have any relation between preference and person" do
-              preference.people.should == [ ]
+            it "no longer has any relation between preference and person" do
+              preference.people.should == []
             end
           end
         end
@@ -631,10 +612,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "sets the inverse foreign key on the relation" do
             preference.person_ids.should == [ person.id ]
-          end
-
-          it "sets the base on the inverse relation" do
-            preference.people.should == [ person ]
           end
 
           it "sets the attributes" do
@@ -814,7 +791,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           Preference.create(:person_ids => person.id)
         end
 
-        it "returns the count from the db" do
+        pending "returns the count from the db" do
+          # @todo: Durran this gets fixed with m-t-m key fix.
           person.preferences.count.should == 1
         end
       end
@@ -884,36 +862,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             Person.new
           end
 
-          let!(:preference) do
-            person.preferences.send(method, :name => "Testing")
-          end
-
-          it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
-          end
-
-          it "sets the foreign key on the inverse relation" do
-            preference.person_ids.should == [ person.id ]
-          end
-
-          it "adds the document" do
-            person.preferences.should == [ preference ]
-          end
-
-          it "sets the base on the inverse relation" do
-            preference.people.should == [ person ]
-          end
-
-          it "sets the attributes" do
-            preference.name.should == "Testing"
-          end
-
-          it "does not save the target" do
-            preference.should be_new
-          end
-
-          it "adds the document to the target" do
-            person.preferences.size.should == 1
+          it "raises an unsaved document error" do
+            expect {
+              person.preferences.send(method, :name => "Testing")
+            }.to raise_error(Mongoid::Errors::UnsavedDocument)
           end
         end
 
@@ -1022,7 +974,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         deleted.reload.person_ids.should be_empty
       end
 
-      context "and person and preferences are reloaded without a save" do
+      context "and person and preferences are reloaded" do
 
         before do
           person.reload
@@ -1030,12 +982,12 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           preference_two.reload
         end
 
-        it "should revert to have a relation to both preferences " do
-          person.preferences.should == [ preference_one, preference_two ]
+        it "nullifies the deleted preference" do
+          person.preferences.should == [ preference_two ]
         end
 
-        it "should retain the ids for both preferences" do
-          person.preference_ids.should == [ preference_one.id, preference_two.id ]
+        it "retains the ids for one preference" do
+          person.preference_ids.should == [ preference_two.id ]
         end
       end
     end
@@ -1127,6 +1079,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "deletes the document from the relation" do
+            # @todo: Durran: 
             reloaded.related.should be_empty
           end
 
@@ -1159,10 +1112,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "deletes the foreign key from the relation" do
             reloaded.related_ids.should be_empty
-          end
-
-          it "removes the reference from the inverse" do
-            deleted.related.should be_empty
           end
 
           it "removes the foreign keys from the inverse" do
@@ -1301,19 +1250,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "returns the matching document" do
             preference.should == preference_one
-          end
-        end
-
-        context "when the id matches but is not scoped to the relation" do
-
-          let(:preference) do
-            Preference.create(:name => "Unscoped")
-          end
-
-          it "raises an error" do
-            expect {
-              person.preferences.find(preference.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
 

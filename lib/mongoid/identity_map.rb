@@ -4,20 +4,6 @@ module Mongoid #:nodoc:
   # Defines behaviour for the identity map in Mongoid.
   class IdentityMap < Hash
 
-    # Get the documents in the identity map for a specific class.
-    #
-    # @example Get the documents for the class.
-    #   map.documents_for(Person)
-    #
-    # @param [ Class ] klass The class to retrieve.
-    #
-    # @return [ Hash ] The documents.
-    #
-    # @since 2.1.0
-    def documents_for(klass)
-      self[klass] ||= {}
-    end
-
     # Get a document from the identity map by its id.
     #
     # @example Get the document from the map.
@@ -31,6 +17,18 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def get(klass, id)
       documents_for(klass)[id]
+    end
+
+    def match_all(criteria)
+      documents_for(criteria.klass).values.select do |doc|
+        doc.matches?(criteria.selector)
+      end
+    end
+
+    def match_one(criteria)
+      documents_for(criteria.klass).values.detect do |doc|
+        doc.matches?(criteria.selector)
+      end
     end
 
     # Remove the document from the identity map.
@@ -61,6 +59,22 @@ module Mongoid #:nodoc:
     def set(document)
       return unless document && document.id
       documents_for(document.class)[document.id] = document
+    end
+
+    private
+
+    # Get the documents in the identity map for a specific class.
+    #
+    # @example Get the documents for the class.
+    #   map.documents_for(Person)
+    #
+    # @param [ Class ] klass The class to retrieve.
+    #
+    # @return [ Hash ] The documents.
+    #
+    # @since 2.1.0
+    def documents_for(klass)
+      self[klass] ||= {}
     end
 
     class << self

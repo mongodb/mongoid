@@ -24,23 +24,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def build(name, object, metadata, options = {})
         relation = create_relation(object, metadata, options[:loading])
-        set(name, relation).tap do |relation|
-          relation.load!(options) if relation && options[:eager]
-        end
-      end
-
-      # Return the options passed to the builders.
-      #
-      # @example Get the options.
-      #   person.configurables(document, :continue => true)
-      #
-      # @param [ Array ] args The arguments to check.
-      #
-      # @return [ Hash ] The options.
-      #
-      # @since 2.0.0.rc.1
-      def options(args)
-        Mongoid.binding_defaults.merge(args.extract_options!)
+        set(name, relation)
       end
 
       # Create a relation from an object and metadata.
@@ -100,8 +84,8 @@ module Mongoid # :nodoc:
       # @param [ Hash ] options The options.
       #
       # @since 2.0.0
-      def substitute(name, object, options)
-        set(name, ivar(name).substitute(object, options))
+      def substitute(name, object)
+        set(name, ivar(name).substitute(object))
       end
 
       module ClassMethods #:nodoc:
@@ -123,16 +107,12 @@ module Mongoid # :nodoc:
           tap do
             define_method(name) do |*args|
               reload, variable = args.first, "@#{name}"
-              options = options(args)
               if instance_variable_defined?(variable) && !reload
                 instance_variable_get(variable)
               else
-                build(
-                  name,
-                  @attributes[metadata.key],
-                  metadata,
-                  options.merge(:binding => true, :eager => metadata.embedded?, :loading => true)
-                )
+                building do
+                  build(name, attributes[metadata.key], metadata, :loading => true)
+                end
               end
             end
           end
@@ -155,15 +135,14 @@ module Mongoid # :nodoc:
         def setter(name, metadata)
           tap do
             define_method("#{name}=") do |*args|
-              object, options = args.first, options(args)
-              variable = "@#{name}"
+              object = args.first
               if relation_exists?(name) && !object.is_a?(Hash)
-                substitute(name, object, options)
+                substitute(name, object)
               else
                 if metadata.embedded? && object.blank? && send(name)
-                  substitute(name, object, options)
+                  substitute(name, object)
                 else
-                  build(name, object, metadata, options.merge(:eager => true))
+                  build(name, object, metadata)
                 end
               end
             end

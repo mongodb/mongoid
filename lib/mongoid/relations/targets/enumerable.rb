@@ -11,10 +11,10 @@ module Mongoid #:nodoc:
 
         # The three main instance variables are collections of documents.
         #
-        # @attribute [r] added Documents that have been appended.
-        # @attribute [r] loaded Persisted documents that have been loaded.
-        # @attribute [r] unloaded A criteria representing persisted docs.
-        attr_reader :added, :loaded, :unloaded
+        # @attribute [rw] added Documents that have been appended.
+        # @attribute [rw] loaded Persisted documents that have been loaded.
+        # @attribute [rw] unloaded A criteria representing persisted docs.
+        attr_accessor :added, :loaded, :unloaded
 
         # Check if the enumerable is equal to the other object.
         #
@@ -69,8 +69,6 @@ module Mongoid #:nodoc:
 
         # Delete the supplied document from the enumerable.
         #
-        # @note This operation loads all documents from the database.
-        #
         # @example Delete the document.
         #   enumerable.delete(document)
         #
@@ -80,7 +78,13 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def delete(document)
-          load_all! and (loaded.delete(document) || added.delete(document)).tap do |doc|
+          (loaded.delete(document) || added.delete(document)).tap do |doc|
+            unless doc
+              if unloaded && unloaded.where(:_id => document.id).exists?
+                yield(document) if block_given?
+                return document
+              end
+            end
             yield(doc) if block_given?
           end
         end
@@ -132,6 +136,36 @@ module Mongoid #:nodoc:
           @executed = true
         end
 
+        # Is the enumerable empty? Will determine if the count is zero based on
+        # whether or not it is loaded.
+        #
+        # @example Is the enumerable empty?
+        #   enumerable.empty?
+        #
+        # @return [ true, false ] If the enumerable is empty.
+        #
+        # @since 2.1.0
+        def empty?
+          if loaded?
+            in_memory.count == 0
+          else
+            unloaded.count + added.count == 0
+          end
+        end
+
+        # Get the first document in the enumerable. Will check the persisted
+        # documents first. Does not load the entire enumerable.
+        #
+        # @example Get the first document.
+        #   enumerable.first
+        #
+        # @return [ Document ] The first document found.
+        #
+        # @since 2.1.0
+        def first
+          (loaded? ? loaded.first : unloaded.first) || added.first
+        end
+
         # Initialize the new enumerable either with a criteria or an array.
         #
         # @example Initialize the enumerable with a criteria.
@@ -181,6 +215,19 @@ module Mongoid #:nodoc:
           end
         end
 
+        # Get the last document in the enumerable. Will check the new
+        # documents first. Does not load the entire enumerable.
+        #
+        # @example Get the last document.
+        #   enumerable.last
+        #
+        # @return [ Document ] The last document found.
+        #
+        # @since 2.1.0
+        def last
+          added.last || (loaded? ? loaded.last : unloaded.last)
+        end
+
         # Loads all the documents in the enumerable from the database.
         #
         # @example Load all the documents.
@@ -217,6 +264,22 @@ module Mongoid #:nodoc:
           @executed = false
         end
 
+        # Does this enumerable respond to the provided method?
+        #
+        # @example Does the enumerable respond to the method?
+        #   enumerable.respond_to?(:sum)
+        #
+        # @param [ String, Symbol ] name The name of the method.
+        # @param [ true, false ] include_private Whether to include private
+        #   methods.
+        #
+        # @return [ true, false ] Whether the enumerable responds.
+        #
+        # @since 2.1.0
+        def respond_to?(name, include_private = false)
+          [].respond_to?(name, include_private) || super
+        end
+
         # Gets the total size of this enumerable. This is a combination of all
         # the persisted and unpersisted documents.
         #
@@ -230,6 +293,26 @@ module Mongoid #:nodoc:
           (loaded? ? loaded.count : unloaded.count) + added.count{ |d| d.new? }
         end
         alias :length :size
+
+        # Return all the unique documents in the enumerable.
+        #
+        # @note This operation loads all documents from the database.
+        #
+        # @example Get all the unique documents.
+        #   enumerable.uniq
+        #
+        # @return [ Array<Document> ] The unique documents.
+        #
+        # @since 2.1.0
+        def uniq
+          entries.uniq
+        end
+
+        private
+
+        def method_missing(name, *args, &block)
+          entries.send(name, *args, &block)
+        end
       end
     end
   end

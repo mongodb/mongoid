@@ -503,43 +503,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#remove_child" do
-
-    let(:person) do
-      Person.new
-    end
-
-    context "when child is an embeds one" do
-
-      let!(:name) do
-        person.build_name(:first_name => "James")
-      end
-
-      before do
-        person.remove_child(name)
-      end
-
-      it "removes the relation instance" do
-        person.name.should be_nil
-      end
-    end
-
-    context "when child is an embeds many" do
-
-      let!(:address) do
-        person.addresses.build(:street => "Upper St")
-      end
-
-      before do
-        person.remove_child(address)
-      end
-
-      it "removes the document from the relation target" do
-        person.addresses.should be_empty
-      end
-    end
-  end
-
   describe "#to_a" do
 
     let(:person) do

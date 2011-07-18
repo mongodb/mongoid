@@ -147,6 +147,36 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#destructive?" do
+
+    context "when the relation has a destructive dependent option" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Referenced::Many,
+          :dependent => :destroy
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_destructive
+      end
+    end
+
+    context "when no dependent option" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_destructive
+      end
+    end
+  end
+
   describe "#embedded?" do
 
     context "when the relation is embedded" do

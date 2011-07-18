@@ -11,7 +11,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
   end
 
   let(:target) do
-    [ post ]
+    Mongoid::Relations::Targets::Enumerable.new([ post ])
   end
 
   let(:metadata) do
@@ -29,7 +29,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       before do
         person.expects(:save).never
         post.expects(:save).never
-        binding.bind(:continue => true)
+        binding.bind
       end
 
       it "sets the inverse relation" do
@@ -67,7 +67,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       end
 
       before do
-        binding.bind_one(post_two, :continue => true)
+        binding.bind_one(post_two)
       end
 
       it "sets the inverse relation" do
@@ -97,10 +97,10 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
     context "when the documents are unbindable" do
 
       before do
-        binding.bind(:continue => true)
+        binding.bind
         person.expects(:delete).never
         post.expects(:delete).never
-        binding.unbind(:continue => true)
+        binding.unbind
       end
 
       it "removes the inverse relation" do
@@ -130,10 +130,10 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
     context "when the documents are unbindable" do
 
       before do
-        binding.bind(:continue => true)
+        binding.bind
         person.expects(:delete).never
         post.expects(:delete).never
-        binding.unbind_one(target.first, :continue => true)
+        binding.unbind_one(target.first)
       end
 
       it "removes the inverse relation" do

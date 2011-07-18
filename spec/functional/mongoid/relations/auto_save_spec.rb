@@ -134,8 +134,8 @@ describe Mongoid::Relations::AutoSave do
             ghost.save
           end
 
-          it "does not save the relation" do
-            movie.should_not be_persisted
+          it "saves the relation" do
+            movie.should be_persisted
           end
         end
       end

@@ -451,7 +451,7 @@ describe Mongoid::Contexts::Mongo do
       before do
         collection.expects(:find_one).with(
           {},
-          { :sort => [[:title, :desc]] }
+          { :sort => [[:title, :desc], [:_id, :desc]] }
         ).returns(
           { "title" => "Sir", "_type" => "Person" }
         )

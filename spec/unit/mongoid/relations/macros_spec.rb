@@ -256,7 +256,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds associated validations" do
         klass._validators[:person].first.should be_a(
-          Mongoid::Validations::ReferencedValidator
+          Mongoid::Validations::AssociatedValidator
         )
       end
 
@@ -308,7 +308,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         klass._validators[:posts].first.should be_a(
-          Mongoid::Validations::ReferencedValidator
+          Mongoid::Validations::AssociatedValidator
         )
       end
 
@@ -468,7 +468,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         klass._validators[:game].first.should be_a(
-          Mongoid::Validations::ReferencedValidator
+          Mongoid::Validations::AssociatedValidator
         )
       end
 

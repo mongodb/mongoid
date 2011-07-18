@@ -22,9 +22,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def autosave(metadata)
           if metadata.autosave?
-            set_callback :create, :after do |document|
+            set_callback :save, :after do |document|
               relation = document.send(metadata.name)
-              relation.to_a.each { |doc| doc.save } if relation
+              relation.in_memory.each { |doc| doc.save } if relation
             end
           end
         end

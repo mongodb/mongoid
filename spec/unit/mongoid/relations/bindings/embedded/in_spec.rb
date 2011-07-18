@@ -33,7 +33,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
       context "when the document is bindable" do
 
         before do
-          binding.bind(:continue => true)
+          binding.bind
         end
 
         it "parentizes the documents" do
@@ -67,7 +67,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
       context "when the document is bindable" do
 
         before do
-          binding.bind(:continue => true)
+          binding.bind
         end
 
         it "parentizes the documents" do

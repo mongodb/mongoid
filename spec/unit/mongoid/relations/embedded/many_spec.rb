@@ -83,69 +83,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#bind" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    before do
-      binding_klass.expects(:new).returns(binding)
-      binding.expects(:bind)
-    end
-
-    context "when building" do
-
-      it "does not save the target docs" do
-        address.expects(:save).never
-        relation.bind(:continue => true)
-      end
-    end
-
-    context "when not building" do
-
-      context "when the base is persisted" do
-
-        before do
-          base.expects(:persisted?).returns(true)
-        end
-
-        it "saves all target docs" do
-          address.expects(:save).returns(true)
-          relation.bind
-        end
-      end
-
-      context "when the base is not persisted" do
-
-        it "does not save any docs" do
-          address.expects(:save).never
-          relation.bind
-        end
-      end
-    end
-  end
-
-  describe "#bind_one" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    let(:document) do
-      Address.new
-    end
-
-    before do
-      binding_klass.expects(:new).returns(binding)
-    end
-
-    it "binds the document" do
-      binding.expects(:bind_one).with(document, :continue => true)
-      relation.bind_one(document, :continue => true)
-    end
-  end
-
   describe "#build" do
 
     let(:relation) do
@@ -643,105 +580,10 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#substitute" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    context "when passing documents" do
-
-      let(:document) do
-        Address.new(:street => "Broadway")
-      end
-
-      before do
-        relation.loaded = true
-        binding_klass.expects(:new).twice.returns(binding)
-        binding.expects(:unbind)
-        binding.expects(:bind).returns(true)
-        @substitute = relation.substitute([ document ])
-      end
-
-      it "sets a new target" do
-        relation.target.should == [ document ]
-      end
-
-      it "returns the relation" do
-        @substitute.should == relation
-      end
-    end
-
-    context "when passing nil" do
-
-      before do
-        relation.loaded = true
-        binding_klass.expects(:new).returns(binding)
-        binding.expects(:unbind)
-        @substitute = relation.substitute(nil)
-      end
-
-      it "sets a new target" do
-        relation.target.should == []
-      end
-
-      it "returns the relation" do
-        @substitute.should be_empty
-      end
-    end
-  end
-
   describe "#as_document" do
 
     it "returns an array of document hashes" do
       relation.as_document.should == [ { "_id" => address.id } ]
-    end
-  end
-
-  describe "#unbind" do
-
-    let(:relation) do
-      described_class.new(base, [], metadata)
-    end
-
-    let!(:document) do
-      Address.new
-    end
-
-    context "when the base is persisted" do
-
-      context "when the target has not been destroyed" do
-
-        before do
-          base.expects(:persisted?).returns(true)
-        end
-
-        it "deletes the target" do
-          document.expects(:delete).returns(true)
-          relation.unbind([ document ])
-        end
-      end
-
-      context "when the target is already destroyed" do
-
-        before do
-          base.expects(:persisted?).returns(true)
-          document.expects(:destroyed?).returns(true)
-        end
-
-        it "does not delete the target" do
-          target.expects(:delete).never
-          relation.unbind([ document ])
-        end
-      end
-    end
-
-    context "when the base is not persisted" do
-
-      it "does not delete the target" do
-        document.expects(:delete).never
-        relation.unbind([ document ])
-      end
     end
   end
 
@@ -754,6 +596,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   describe "respond_to?" do
+
     let(:relation) do
       described_class.new(base, target, metadata)
     end
