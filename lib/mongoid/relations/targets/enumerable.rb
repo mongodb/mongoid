@@ -78,7 +78,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def delete(document)
-          (loaded.delete(document) || added.delete(document)).tap do |doc|
+          load_all! and (loaded.delete(document) || added.delete(document)).tap do |doc|
             yield(doc) if block_given?
           end
         end
@@ -160,6 +160,10 @@ module Mongoid #:nodoc:
           (loaded + added).tap do |docs|
             docs.each { |doc| yield(doc) } if block_given?
           end
+        end
+
+        def load_all!
+          entries and @executed = true
         end
 
         # Has the enumerable been loaded? This will be true if the criteria has

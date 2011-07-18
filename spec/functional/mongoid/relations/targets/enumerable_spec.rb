@@ -249,8 +249,8 @@ describe Mongoid::Relations::Targets::Enumerable do
         enumerable.loaded.should be_empty
       end
 
-      it "returns nil" do
-        deleted.should be_nil
+      it "returns the document" do
+        deleted.should eq(post)
       end
     end
 
@@ -526,6 +526,41 @@ describe Mongoid::Relations::Targets::Enumerable do
           doc.should eq(post_two)
         end
       end
+    end
+  end
+
+  describe "#load_all!" do
+
+    let(:person) do
+      Person.create(:ssn => "422-21-9687")
+    end
+
+    let!(:post) do
+      Post.create(:person_id => person.id)
+    end
+
+    let(:criteria) do
+      Post.where(:person_id => person.id)
+    end
+
+    let!(:enumerable) do
+      described_class.new(criteria)
+    end
+
+    let!(:loaded) do
+      enumerable.load_all!
+    end
+
+    it "loads all the unloaded documents" do
+      enumerable.loaded.should eq([ post ])
+    end
+
+    it "returns true" do
+      loaded.should be_true
+    end
+
+    it "sets loaded to true" do
+      enumerable.should be_loaded
     end
   end
 
