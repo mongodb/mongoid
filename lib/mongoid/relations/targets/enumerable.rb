@@ -189,9 +189,7 @@ module Mongoid #:nodoc:
         # @return [ true ] That the enumerable is loaded.
         #
         # @since 2.1.0
-        def load_all!
-          entries and @executed = true
-        end
+        alias :load_all! :entries
 
         # Has the enumerable been loaded? This will be true if the criteria has
         # been executed or we manually load the entire thing.
