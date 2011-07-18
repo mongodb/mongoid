@@ -16,7 +16,7 @@ describe Mongoid::Persistence::Operations::Insert do
       end
 
       let(:in_map) do
-        Mongoid::IdentityMap.get(person.id)
+        Mongoid::IdentityMap.get(Person, person.id)
       end
 
       it "does not put the document in the identity map" do

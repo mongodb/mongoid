@@ -53,7 +53,7 @@ describe Mongoid::IdentityMap do
       end
 
       let(:get) do
-        identity_map.get(document.id)
+        identity_map.get(Person, document.id)
       end
 
       it "returns the matching document" do
@@ -64,7 +64,7 @@ describe Mongoid::IdentityMap do
     context "when the document does not exist in the map" do
 
       let(:get) do
-        identity_map.get(document.id)
+        identity_map.get(Person, document.id)
       end
 
       it "returns nil" do
@@ -86,7 +86,7 @@ describe Mongoid::IdentityMap do
       end
 
       let(:get) do
-        described_class.get(document.id)
+        described_class.get(Person, document.id)
       end
 
       it "returns the matching document" do
@@ -97,7 +97,7 @@ describe Mongoid::IdentityMap do
     context "when the document does not exist in the map" do
 
       let(:get) do
-        described_class.get(document.id)
+        described_class.get(Person, document.id)
       end
 
       it "returns nil" do
@@ -119,7 +119,7 @@ describe Mongoid::IdentityMap do
       end
 
       it "puts the object in the identity map" do
-        identity_map.get(document.id).should eq(document)
+        identity_map.get(Person, document.id).should eq(document)
       end
 
       it "returns the document" do
@@ -140,7 +140,7 @@ describe Mongoid::IdentityMap do
       end
 
       it "does not put the object in the identity map" do
-        identity_map.get(nil).should be_nil
+        identity_map.get(nil, nil).should be_nil
       end
 
       it "returns nil" do
@@ -177,7 +177,7 @@ describe Mongoid::IdentityMap do
       end
 
       it "puts the object in the identity map" do
-        described_class.get(document.id).should eq(document)
+        described_class.get(Person, document.id).should eq(document)
       end
 
       it "returns the document" do
@@ -220,7 +220,7 @@ describe Mongoid::IdentityMap do
         let(:fiber) do
           Fiber.new do
             described_class.set(document)
-            described_class.get(document.id).should eq(document)
+            described_class.get(Person, document.id).should eq(document)
           end
         end
 

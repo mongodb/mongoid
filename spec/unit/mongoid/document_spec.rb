@@ -378,7 +378,7 @@ describe Mongoid::Document do
       end
 
       it "puts the document in the identity map" do
-        Mongoid::IdentityMap.get(id).should eq(person)
+        Mongoid::IdentityMap.get(Person, id).should eq(person)
       end
     end
 

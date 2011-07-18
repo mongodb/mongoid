@@ -20,7 +20,7 @@ describe Mongoid::Persistence::Operations::Remove do
       end
 
       let(:in_map) do
-        Mongoid::IdentityMap.get(person.id)
+        Mongoid::IdentityMap.get(Person, person.id)
       end
 
       it "removes the document from the identity map" do
