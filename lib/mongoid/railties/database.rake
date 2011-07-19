@@ -2,9 +2,7 @@ namespace :db do
 
   unless Rake::Task.task_defined?("db:drop")
     desc 'Drops all the collections for the database for the current Rails.env'
-    task :drop => :environment do
-      Mongoid.master.collections.select {|c| c.name !~ /system/ }.each { |c| c.drop }
-    end
+    task :drop => "mongoid:drop"
   end
 
   unless Rake::Task.task_defined?("db:seed")
@@ -169,6 +167,11 @@ namespace :db do
         collection = Mongoid.master.collection(collection_name)
         collection.db["#{collection.name}_old"].drop
       end
+    end
+
+    desc "Drops the database for the current Rails.env"
+    task :drop => :environment do
+      Mongoid.master.collections.select {|c| c.name !~ /system/ }.each { |c| c.drop }
     end
 
     ########
