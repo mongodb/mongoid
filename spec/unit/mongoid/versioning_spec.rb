@@ -113,7 +113,7 @@ describe Mongoid::Versioning do
 
       it "does not create a new version" do
         page.transient_property = 'a new value'
-        page.versioned_fields_changed?.should be_false
+        page.versionable_attributes_changed?.should be_false
         page.expects(:revise).never
         page.save
       end
