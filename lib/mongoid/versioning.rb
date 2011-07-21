@@ -136,13 +136,14 @@ module Mongoid #:nodoc:
     # Dynamic attributes are always versioned.
     #
     # @param [ Hash ] A hash with field names as keys.
+    #
     # @return [ Hash ] The hash without non-versioned columns.
     #
     # @since 2.1.0
     def only_versioned_attributes(hash)
-      hash.select do |field_name, value|
-        field = self.class.fields[field_name]
-        !field || field.options[:versioned] != false
+      hash.select do |name, value|
+        field = fields[name]
+        field.nil? || field.versioned?
       end
     end
 
@@ -159,7 +160,6 @@ module Mongoid #:nodoc:
       def max_versions(number)
         self.version_max = number.to_i
       end
-
     end
   end
 end

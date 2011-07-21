@@ -3,17 +3,17 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::String do
 
   let(:field) do
-    described_class.new(:test, :type => String)
+    described_class.new(:test, :type => String, :vresioned => true)
   end
 
-  describe ".deserialize" do
+  describe "#deserialize" do
 
     it "returns the string" do
       field.deserialize("test").should == "test"
     end
   end
 
-  describe ".serialize" do
+  describe "#serialize" do
 
     context "when the value is not nil" do
 
@@ -26,6 +26,42 @@ describe Mongoid::Fields::Serializable::String do
 
       it "returns nil" do
         field.serialize(nil).should be_nil
+      end
+    end
+  end
+
+  describe "#versioned?" do
+
+    context "when the field is versioned" do
+
+      let(:field) do
+        described_class.new(:test, :type => String, :versioned => true)
+      end
+
+      it "returns true" do
+        field.should be_versioned
+      end
+    end
+
+    context "when the versioning option is nil" do
+
+      let(:field) do
+        described_class.new(:test, :type => String)
+      end
+
+      it "returns true" do
+        field.should be_versioned
+      end
+    end
+
+    context "when the field is not versioned" do
+
+      let(:field) do
+        described_class.new(:test, :type => String, :versioned => false)
+      end
+
+      it "returns false" do
+        field.should_not be_versioned
       end
     end
   end
