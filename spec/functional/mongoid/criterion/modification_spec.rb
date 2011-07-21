@@ -160,11 +160,11 @@ describe Mongoid::Criteria do
             end
 
             it "updates the matching documents" do
-              from_db.posts.first.title.should == "Berlin"
+              from_db.posts.where(:title => "Berlin").count.should eq(1)
             end
 
             it "does not update non matching documents" do
-              from_db.posts.last.title.should == "Second"
+              from_db.posts.where(:title => "Second").count.should eq(1)
             end
           end
         end
