@@ -133,6 +133,7 @@ module Mongoid #:nodoc:
     end
 
     # Filters fields that should not be versioned out of an attributes hash.
+    # Dynamic attributes are always versioned.
     #
     # @param [ Hash ] A hash with field names as keys.
     # @return [ Hash ] The hash without non-versioned columns.
@@ -141,7 +142,7 @@ module Mongoid #:nodoc:
     def only_versioned_attributes(hash)
       hash.select do |field_name, value|
         field = self.class.fields[field_name]
-        field && field.options[:versioned] != false
+        !field || field.options[:versioned] != false
       end
     end
 

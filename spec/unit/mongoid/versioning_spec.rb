@@ -121,7 +121,8 @@ describe Mongoid::Versioning do
 
     context "when creating a new version" do
       let(:page) do
-        WikiPage.create(:transient_property => 'a temporary value')
+        WikiPage.create(:transient_property => 'a temporary value',
+                        :dynamic_attribute => 'dynamic')
       end
 
       before do
@@ -131,6 +132,10 @@ describe Mongoid::Versioning do
 
       it "does not include excluded attributes in the version" do
         page.versions.last.transient_property.should be_nil
+      end
+
+      it "includes dynamic attributes in the version" do
+        page.versions.last.dynamic_attribute.should == 'dynamic'
       end
     end
 
