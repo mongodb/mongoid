@@ -23,6 +23,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 === New Features
 
+* #1067 Fields now accept a :versioned attribute to be able to disable what
+  fields are versioned with Mongoid::Versioning. (Jim Benton)
+
 * #587 Added order preference to many and many to many associations (Gregory Man)
 
 * Added ability to chain order_by statements (Gregory Man)
