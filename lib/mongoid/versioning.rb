@@ -35,8 +35,8 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def revise
       previous = previous_revision
-      if previous && versionable_attributes_changed?
-        new_version = versions.build(previous.versionable_attributes)
+      if previous && versioned_attributes_changed?
+        new_version = versions.build(previous.versioned_attributes)
         versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
       end
@@ -45,21 +45,21 @@ module Mongoid #:nodoc:
     # Filters the results of +changes+ by removing any fields that should
     # not be versioned.
     #
-    # @return [ Hash ] A hash of versionable changed attributes.
+    # @return [ Hash ] A hash of versioned changed attributes.
     #
     # @since 2.1.0
-    def versionable_changes
-      only_versionable_attributes(changes)
+    def versioned_changes
+      only_versioned_attributes(changes)
     end
 
     # Filters the results of +attributes+ by removing any fields that should
     # not be versioned.
     #
-    # @return [ Hash ] A hash of versionable attributes.
+    # @return [ Hash ] A hash of versioned attributes.
     #
     # @since 2.1.0
-    def versionable_attributes
-      only_versionable_attributes(attributes)
+    def versioned_attributes
+      only_versioned_attributes(attributes)
     end
 
     # Check if any versioned fields have been modified. This is similar
@@ -69,8 +69,8 @@ module Mongoid #:nodoc:
     # @return [ Boolean ] Whether fields that will be versioned have changed.
     #
     # @since 2.1.0
-    def versionable_attributes_changed?
-      !versionable_changes.empty?
+    def versioned_attributes_changed?
+      !versioned_changes.empty?
     end
 
     # Executes a block that temporarily disables versioning. This is for cases
@@ -116,7 +116,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def revisable?
-      versionable_attributes_changed? && !versionless?
+      versioned_attributes_changed? && !versionless?
     end
 
     # Are we in versionless mode? This is true if in a versionless block on the
@@ -138,10 +138,10 @@ module Mongoid #:nodoc:
     # @return [ Hash ] The hash without non-versioned columns.
     #
     # @since 2.1.0
-    def only_versionable_attributes(hash)
-      hash.except('versions').select do |field_name, value|
+    def only_versioned_attributes(hash)
+      hash.select do |field_name, value|
         field = self.class.fields[field_name]
-        field && field.options[:versionable] != false
+        field && field.options[:versioned] != false
       end
     end
 
