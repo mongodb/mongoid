@@ -141,9 +141,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def only_versioned_attributes(hash)
-      hash.select do |name, value|
-        field = fields[name]
-        field.nil? || field.versioned?
+      {}.tap do |versioned|
+        hash.each_pair do |name, value|
+          field = fields[name]
+          versioned[name] = value if !field || field.versioned?
+        end
       end
     end
 
