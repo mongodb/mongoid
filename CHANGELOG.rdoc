@@ -21,6 +21,10 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
   * #434 Documents now are flagged as dirty when brand new or the state on instantiation differs from the database state. This is consistent with ActiveRecord.
   * #323 Mongoid now supports [field]_will_change! from ActiveModel::Dirty
 
+* Mongoid will no longer preload models in Rails development mode. Please
+  specifically require models in development mode that use more than 1 level of
+  inheritance.
+
 === New Features
 
 * #1067 Fields now accept a :versioned attribute to be able to disable what
