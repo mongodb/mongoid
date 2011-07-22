@@ -41,6 +41,8 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * The following explicit atomic operations have been added: Model#bit,
   Model#pop, Model#pull, Model#push_all, Model#rename, Model#unset.
 
+* Added exception translations for Hindi. (Sukeerthi Adiga)
+
 === Bug Fixes
 
 * #974 Fix attribute_present? to work correctly then attribute value is false, thanks to @nickhoffman (Gregory Man)
