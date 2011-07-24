@@ -342,6 +342,13 @@ describe Mongoid::Config do
       end
     end
 
+    describe ".identity_map_enabled" do
+
+      it "defaults to false" do
+        described_class.identity_map_enabled.should be_false
+      end
+    end
+
     describe ".include_root_in_json" do
 
       it "defaults to false" do
