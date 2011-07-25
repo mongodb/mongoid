@@ -45,6 +45,21 @@ module Mongoid # :nodoc:
 
         private
 
+        # Appends the document to the target array, updating the index on the
+        # document at the same time.
+        #
+        # @example Append the document to the relation.
+        #   relation.append(document)
+        #
+        # @param [ Document ] document The document to append to the target.
+        #
+        # @since 2.0.0.rc.1
+        def append(document)
+          target.push(document)
+          characterize_one(document)
+          bind_one(document)
+        end
+
         # Instantiate the binding associated with this relation.
         #
         # @example Get the binding.

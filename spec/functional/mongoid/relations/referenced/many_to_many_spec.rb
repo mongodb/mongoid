@@ -1754,7 +1754,31 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  context "then association has order" do
+  context "when binding the relation multiple times" do
+
+    let(:person) do
+      Person.create(:ssn => "123-66-6666")
+    end
+
+    let(:preference) do
+      person.preferences.create(:name => "testing")
+    end
+
+    before do
+      2.times do
+        person.preferences.each do |preference|
+          preference.person_ids.should eq([ person.id ])
+        end
+      end
+    end
+
+    it "does not duplicate foreign keys" do
+      person.preference_ids.should eq([ preference.id ])
+    end
+  end
+
+  context "when the association has order criteria" do
+
     let(:person) do
       Person.create(:ssn => "999-99-9999")
     end
@@ -1776,13 +1800,14 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       person.preferences.push(preference_one, preference_two, preference_three)
     end
 
-    it "order documents" do
+    it "orders the documents" do
       person.preferences(true).should == [preference_two, preference_three, preference_one]
     end
 
-    it "chaining order criterias" do
-      person.preferences.order_by(:name.desc).to_a.should == [preference_three, preference_two, preference_one]
+    it "chains default criteria with additional" do
+      person.preferences.order_by(:name.desc).to_a.should eq(
+        [preference_three, preference_two, preference_one]
+      )
     end
   end
-
 end

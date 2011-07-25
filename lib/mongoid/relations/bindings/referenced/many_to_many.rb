@@ -32,7 +32,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind_one(doc)
-            base.add_to_set(metadata.foreign_key, doc.id)
+            base.push(metadata.foreign_key, doc.id)
             unless binding?
               binding do
                 inverse = metadata.inverse(target)
