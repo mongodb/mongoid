@@ -498,12 +498,12 @@ describe Mongoid::Relations::Targets::Enumerable do
           end
         end
 
-        it "does not add the unloaded to the loaded docs" do
-          enumerable.loaded.should eq([])
+        it "it removes the persisted doc from the added." do
+          enumerable.added.should eq([])
         end
 
-        it "keeps the appended in the added docs" do
-          enumerable.added.should eq([ post ])
+        it "adds the persisted added doc to the loaded" do
+          enumerable.loaded.should eq([ post ])
         end
 
         it "stays loaded" do

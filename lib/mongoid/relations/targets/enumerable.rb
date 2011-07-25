@@ -128,8 +128,9 @@ module Mongoid #:nodoc:
           if loaded?
             loaded.each { |doc| yield(doc) }
           else
+            added.delete_if { |doc| doc.persisted? }
             unloaded.each do |doc|
-              loaded.push(doc) and yield(doc) unless added.include?(doc)
+              loaded.push(doc) and yield(doc)
             end
           end
           added.each { |doc| yield(doc) }
