@@ -25,7 +25,7 @@ describe Mongoid::Persistence::Atomic::PushAll do
       before do
         collection.expects(:update).with(
           person.atomic_selector,
-          { "$pushAll" => { :aliases => [ "Bond", "James" ] } }, { :safe => false }
+          { "$pushAll" => { "aliases" => [ "Bond", "James" ] } }, { :safe => false }
         )
       end
 
@@ -59,7 +59,7 @@ describe Mongoid::Persistence::Atomic::PushAll do
       before do
         collection.expects(:update).with(
           person.atomic_selector,
-          { "$pushAll" => { :aliases => [ "Bond", "James" ] } }, { :safe => false }
+          { "$pushAll" => { "aliases" => [ "Bond", "James" ] } }, { :safe => false }
         )
       end
 

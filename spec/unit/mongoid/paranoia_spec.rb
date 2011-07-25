@@ -7,7 +7,7 @@ describe Mongoid::Paranoia do
   end
 
   let(:command) do
-    stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+    stub.quacks_like(Mongoid::Persistence::Operations::Remove.allocate)
   end
 
   describe "#delete!" do
@@ -17,13 +17,13 @@ describe Mongoid::Paranoia do
     end
 
     it "removes the document from the database" do
-      Mongoid::Persistence::Remove.expects(:new).with(@post).returns(command)
+      Mongoid::Persistence::Operations::Remove.expects(:new).with(@post, {}).returns(command)
       command.expects(:persist).returns(true)
       @post.delete!
     end
 
     it "sets destroyed to true" do
-      Mongoid::Persistence::Remove.expects(:new).with(@post).returns(command)
+      Mongoid::Persistence::Operations::Remove.expects(:new).with(@post, {}).returns(command)
       command.expects(:persist).returns(true)
       @post.delete!
       @post.destroyed?.should == true

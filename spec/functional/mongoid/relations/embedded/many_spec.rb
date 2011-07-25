@@ -3,7 +3,36 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    [ Person, Account, Quiz, Role ].map(&:delete_all)
+    [ Person, Account, Acolyte, Quiz, Role ].map(&:delete_all)
+  end
+
+  context "when embedding children named versions" do
+
+    let(:acolyte) do
+      Acolyte.create(:name => "test")
+    end
+
+    context "when creating a child" do
+
+      let(:version) do
+        acolyte.versions.create(:number => 1)
+      end
+
+      it "allows the operation" do
+        version.number.should eq(1)
+      end
+
+      context "when reloading the parent" do
+
+        let(:from_db) do
+          acolyte.reload
+        end
+
+        it "saves the child versions" do
+          from_db.versions.should eq([ version ])
+        end
+      end
+    end
   end
 
   context "when validating the parent before accessing the child" do
@@ -1107,18 +1136,18 @@ describe Mongoid::Relations::Embedded::Many do
           end
         end
       end
-      
+
       context "when the documents empty" do
-        
+
         context "when scoped" do
           let!(:deleted) do
             person.addresses.without_postcode.send(method)
           end
-          
+
           it "deletes all the documents" do
             person.addresses.count.should == 0
           end
-        
+
           it "deletes all the documents from the db" do
             person.reload.addresses.count.should == 0
           end
@@ -1127,20 +1156,20 @@ describe Mongoid::Relations::Embedded::Many do
             deleted.should == 0
           end
         end
-        
+
         context "when conditions are provided" do
-          
+
           let!(:deleted) do
             person.addresses.send(
               method,
               :conditions => { :street => "Bond" }
             )
           end
-        
+
           it "deletes all the documents" do
             person.addresses.count.should == 0
           end
-        
+
           it "deletes all the documents from the db" do
             person.reload.addresses.count.should == 0
           end
@@ -1149,17 +1178,17 @@ describe Mongoid::Relations::Embedded::Many do
             deleted.should == 0
           end
         end
-        
+
         context "when conditions are not provided" do
-          
+
           let!(:deleted) do
             person.addresses.send(method)
           end
-        
+
           it "deletes all the documents" do
             person.addresses.count.should == 0
           end
-        
+
           it "deletes all the documents from the db" do
             person.reload.addresses.count.should == 0
           end

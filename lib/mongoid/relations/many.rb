@@ -42,11 +42,11 @@ module Mongoid #:nodoc:
       # @param [ Class ] type Optional class to build the document with.
       #
       # @return [ Document ] The new document.
-      def build(attributes = {}, type = nil, &block)
+      def build(attributes = {}, type = nil)
         Mongoid::Factory.build(type || metadata.klass, attributes).tap do |doc|
           doc.identify
           append(doc, default_options(:binding => true))
-          block.call(doc) if block
+          yield(doc) if block_given?
         end
       end
       alias :new :build
@@ -61,9 +61,9 @@ module Mongoid #:nodoc:
       # @param [ Class ] type The optional type of document to create.
       #
       # @return [ Document ] The newly created document.
-      def create(attributes = nil, type = nil, &block)
+      def create(attributes = nil, type = nil)
         build(attributes, type).tap do |doc|
-          block.call(doc) if block
+          yield(doc) if block_given?
           doc.save if base.persisted?
         end
       end

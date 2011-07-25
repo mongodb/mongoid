@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Atomic #:nodoc:
 
       # This class provides atomic $inc behaviour.
-      class Inc < Operation
+      class Inc
+        include Operation
 
         # Sends the atomic $inc operation to the database.
         #
@@ -15,11 +16,13 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def persist
-          current = document[field] || 0
-          document[field] = current + value
-          document[field].tap do
-            collection.update(document.atomic_selector, operation("$inc"), options)
-            document.remove_change(field)
+          prepare do
+            current = document[field] || 0
+            document[field] = current + value
+            document[field].tap do
+              collection.update(document.atomic_selector, operation("$inc"), options)
+              document.remove_change(field)
+            end
           end
         end
       end

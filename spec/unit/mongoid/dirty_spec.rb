@@ -23,10 +23,10 @@ describe Mongoid::Dirty do
 
   describe "#attribute_change" do
 
-    context "when the attribute has changed" do
+    context "when the attribute has changed from the persisted value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -44,10 +44,25 @@ describe Mongoid::Dirty do
       end
     end
 
+    context "when the attribute has changed from the default value" do
+
+      let(:person) do
+        Person.new(:pets => true)
+      end
+
+      it "returns an array of the default value and new value" do
+        person.send(:attribute_change, "pets").should == [ false, true ]
+      end
+
+      it "allows access via (attribute)_change" do
+        person.pets_change.should == [ false, true ]
+      end
+    end
+
     context "when the attribute changes multiple times" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -57,12 +72,12 @@ describe Mongoid::Dirty do
 
       it "returns an array of the original value and new value" do
         person.send(:attribute_change, "title").should ==
-          [ "Captain Obvious", "Dark Helmet" ]
+          [ "Grand Poobah", "Dark Helmet" ]
       end
 
       it "allows access via (attribute)_change" do
         person.title_change.should ==
-          [ "Captain Obvious", "Dark Helmet" ]
+          [ "Grand Poobah", "Dark Helmet" ]
       end
     end
 
@@ -71,7 +86,7 @@ describe Mongoid::Dirty do
       context "when the attribute is an array" do
 
         let(:person) do
-          Person.new(:aliases => [ "Grand Poobah" ])
+          Person.new(:aliases => [ "Grand Poobah" ]).tap(&:move_changes)
         end
 
         before do
@@ -96,7 +111,7 @@ describe Mongoid::Dirty do
 
           it "returns an array of the original value and new value" do
             person.send(:attribute_change, "aliases").should ==
-              [ [ "Dark Helmet" ],  [ "Dark Helmet", "Colonel Sanders" ] ]
+              [ [ "Grand Poobah" ],  [ "Dark Helmet", "Colonel Sanders" ] ]
           end
         end
       end
@@ -104,7 +119,7 @@ describe Mongoid::Dirty do
       context "when the attribute is a hash" do
 
         let(:person) do
-          Person.new(:map => { :location => "Home" })
+          Person.new(:map => { :location => "Home" }).tap(&:move_changes)
         end
 
         before do
@@ -129,31 +144,40 @@ describe Mongoid::Dirty do
 
           it "returns an array of the original value and new value" do
             person.send(:attribute_change, "map").should ==
-              [ { :location => "Work" }, { :location => "Work", :lat => 20.0 } ]
+              [ { :location => "Home" }, { :location => "Work", :lat => 20.0 } ]
           end
         end
       end
     end
 
-    context "when the attribute has not changed" do
+    context "when the attribute has not changed from the persisted value" do
 
       let(:person) do
         Person.new(:title => nil)
       end
 
-      it "returns an empty array" do
+      it "returns nil" do
         person.send(:attribute_change, "title").should be_nil
+      end
+    end
+
+    context "when the attribute has not changed from the default value" do
+      let(:person) do
+        Person.new
+      end
+
+      it "returns nil" do
+        person.send(:attribute_change, "pets").should be_nil
       end
     end
 
     context "when the attribute has been set with the same value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       before do
-        person.move_changes
         person.title = "Grand Poobah"
       end
 
@@ -165,11 +189,10 @@ describe Mongoid::Dirty do
     context "when the attribute is removed" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       before do
-        person.move_changes
         person.remove_attribute(:title)
       end
 
@@ -182,7 +205,7 @@ describe Mongoid::Dirty do
 
   describe "#attribute_changed?" do
 
-    context "when the attribute has changed" do
+    context "when the attribute has changed from the persisted value" do
 
       let(:person) do
         Person.new(:title => "Grand Poobah")
@@ -201,28 +224,54 @@ describe Mongoid::Dirty do
       end
     end
 
-    context "when the attribute has not changed" do
+    context "when the attribute has changed from the default value" do
 
-      let!(:person) do
-        Person.new(:title => "Grand Poobah")
+      let(:person) do
+        Person.new
       end
 
       before do
-        person.move_changes
+        person.pets = true
+      end
+
+      it "returns true" do
+        person.send(:attribute_changed?, "pets").should == true
+      end
+
+      it "allows access via (attribute)_changed?" do
+        person.pets_changed?.should == true
+      end
+    end
+
+    context "when the attribute has not changed the persisted value" do
+
+      let!(:person) do
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       it "returns false" do
         person.send(:attribute_changed?, "title").should == false
       end
     end
+
+    context "when the attribute has not changed from the default value" do
+
+      let!(:person) do
+        Person.new
+      end
+
+      it "returns false" do
+        person.send(:attribute_changed?, "pets").should == false
+      end
+    end
   end
 
   describe "#attribute_was" do
 
-    context "when the attribute has changed" do
+    context "when the attribute has changed from the persisted value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -238,18 +287,44 @@ describe Mongoid::Dirty do
       end
     end
 
-    context "when the attribute has not changed" do
+    context "when the attribute has changed from the default value" do
 
-      let!(:person) do
-        Person.new(:title => "Grand Poobah")
+      let(:person) do
+        Person.new
       end
 
       before do
-        person.move_changes
+        person.pets = true
+      end
+
+      it "returns the default value" do
+        person.send(:attribute_was, "pets").should == false
+      end
+
+      it "allows access via (attribute)_was" do
+        person.pets_was.should == false
+      end
+    end
+
+    context "when the attribute has not changed from the persisted value" do
+
+      let!(:person) do
+        Person.new(:title => "Grand Poobah").tap(&:move_changes)
       end
 
       it "returns the original value" do
         person.send(:attribute_was, "title").should == "Grand Poobah"
+      end
+    end
+
+    context "when the attribute has not changed from the default value" do
+
+      let(:person) do
+        Person.new
+      end
+
+      it "returns the default value" do
+        person.send(:attribute_was, "pets").should == false
       end
     end
   end
@@ -435,7 +510,7 @@ describe Mongoid::Dirty do
 
       it "returns the changes before the save" do
         person.previous_changes["title"].should ==
-          [ "Grand Poobah", "Captain Obvious" ]
+          [ nil, "Captain Obvious" ]
       end
     end
 

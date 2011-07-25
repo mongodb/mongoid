@@ -85,8 +85,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def scope_stack
-        scope_stack_for = Thread.current[:mongoid_scope_stack] ||= {}
-        scope_stack_for[object_id] ||= []
+        Threaded.scope_stack[object_id] ||= []
       end
 
       # Get a criteria object for the class, ignoring default scoping.

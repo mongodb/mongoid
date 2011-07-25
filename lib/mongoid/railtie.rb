@@ -76,17 +76,6 @@ module Rails #:nodoc:
         end
       end
 
-      # Due to all models not getting loaded and messing up inheritance queries
-      # and indexing, we need to preload the models in order to address this.
-      #
-      # This will happen every request in development, once in ther other
-      # environments.
-      initializer "preload all application models" do |app|
-        config.to_prepare do
-          ::Rails::Mongoid.load_models(app) unless $rails_rake_task
-        end
-      end
-
       # Set the proper error types for Rails. DocumentNotFound errors should be
       # 404s and not 500s, validation errors are 422s.
       initializer "load http errors" do |app|

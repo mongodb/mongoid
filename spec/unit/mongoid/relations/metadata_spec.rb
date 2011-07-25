@@ -485,16 +485,14 @@ describe Mongoid::Relations::Metadata do
         "  cyclic:               #{metadata.cyclic || "No"},\n" <<
         "  dependent:            #{metadata.dependent || "None"},\n" <<
         "  inverse_of:           #{metadata.inverse_of || "N/A"},\n" <<
-        "  inverse_setter:       #{metadata.inverse_setter},\n" <<
-        "  inverse_type:         #{metadata.inverse_type || "N/A"},\n" <<
-        "  inverse_type_setter:  #{metadata.inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{metadata.key},\n" <<
         "  macro:                #{metadata.macro},\n" <<
         "  name:                 #{metadata.name},\n" <<
         "  order:                #{metadata.order.inspect || "No"},\n" <<
         "  polymorphic:          #{metadata.polymorphic? ? "Yes" : "No"},\n" <<
         "  relation:             #{metadata.relation},\n" <<
-        "  setter:               #{metadata.setter}>\n"
+        "  setter:               #{metadata.setter},\n" <<
+        "  versioned:            #{metadata.versioned? || "No"}>\n"
     end
   end
 
@@ -930,6 +928,53 @@ describe Mongoid::Relations::Metadata do
     it "returns the nested builder from the relation" do
       metadata.nested_builder(attributes, options).should
         be_a_kind_of(Mongoid::Relations::Builders::NestedAttributes::One)
+    end
+  end
+
+  describe "#versioned?" do
+
+    context "when versioned is true" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :versions,
+          :relation => Mongoid::Relations::Embedded::Many,
+          :versioned => true
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_versioned
+      end
+    end
+
+    context "when versioned is false" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :versions,
+          :relation => Mongoid::Relations::Embedded::Many,
+          :versioned => false
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_versioned
+      end
+    end
+
+    context "when versioned is nil" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :versions,
+          :relation => Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_versioned
+      end
     end
   end
 

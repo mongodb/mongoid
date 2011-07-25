@@ -1,12 +1,9 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
-require "mongoid/persistence/command"
-require "mongoid/persistence/insert"
-require "mongoid/persistence/insert_embedded"
-require "mongoid/persistence/remove"
-require "mongoid/persistence/remove_all"
-require "mongoid/persistence/remove_embedded"
-require "mongoid/persistence/update"
+require "mongoid/persistence/deletion"
+require "mongoid/persistence/insertion"
+require "mongoid/persistence/modification"
+require "mongoid/persistence/operations"
 
 module Mongoid #:nodoc:
 
@@ -44,7 +41,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The persisted document.
     def insert(options = {})
-      Insert.new(self, options).persist
+      Operations.insert(self, options).persist
     end
 
     # Remove the document from the datbase.
@@ -56,11 +53,7 @@ module Mongoid #:nodoc:
     #
     # @return [ TrueClass ] True.
     def remove(options = {})
-      if Remove.new(self, options).persist
-        attributes.freeze
-        self.destroyed = true
-        cascade!
-      end; true
+      Operations.remove(self, options).persist
     end
     alias :delete :remove
 
@@ -86,7 +79,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if succeeded, false if not.
     def update(options = {})
-      Update.new(self, options).persist
+      Operations.update(self, options).persist
     end
 
     # Update a single attribute and persist the entire document.
@@ -198,12 +191,13 @@ module Mongoid #:nodoc:
       # @param [ Hash ] conditions Optional conditions to delete by.
       #
       # @return [ Integer ] The number of documents deleted.
-      def delete_all(conditions = {})
-        RemoveAll.new(
-          self,
-          { :validate => false },
-          conditions[:conditions] || {}
-        ).persist
+      def delete_all(conditions = nil)
+        selector = (conditions || {})[:conditions] || {}
+        selector.merge!(:_type => name) if hereditary?
+        collection.find(selector).count.tap do
+          collection.remove(selector, Safety.merge_safety_options)
+          Threaded.clear_safety_options!
+        end
       end
 
       # Delete all documents given the supplied conditions. If no conditions

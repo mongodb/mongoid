@@ -31,7 +31,7 @@ describe Mongoid::Relations::Embedded::Atomic do
 
         it "puts the updater on the current thread" do
           klass.send(:atomically, :$set) do
-            Thread.current[:mongoid_atomic_update].should == set
+            Mongoid::Threaded.update.should == set
           end
         end
       end
@@ -40,7 +40,7 @@ describe Mongoid::Relations::Embedded::Atomic do
 
         it "removes the updater from the current thread" do
           klass.send(:atomically, :$set)
-          Thread.current[:mongoid_atomic_update].should be_nil
+          Mongoid::Threaded.update.should be_nil
         end
       end
     end

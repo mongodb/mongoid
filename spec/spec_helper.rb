@@ -25,6 +25,7 @@ RSpec.configure do |config|
   config.mock_with(:mocha)
 
   config.after(:suite) { Mongoid.purge! }
+  config.before(:each) { Mongoid::IdentityMap.clear }
 
   # We filter out the specs that require authentication if the database has not
   # had the mongoid user set up properly.

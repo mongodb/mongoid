@@ -74,13 +74,13 @@ class Person
   accepts_nested_attributes_for :preferences
   accepts_nested_attributes_for :quiz
 
-  references_one :game, :dependent => :destroy do
+  has_one :game, :dependent => :destroy do
     def extension
       "Testing"
     end
   end
 
-  references_many \
+  has_many \
     :posts,
     :dependent => :delete,
     :order => :rating.desc do
@@ -88,20 +88,20 @@ class Person
       "Testing"
     end
   end
-  references_many :paranoid_posts
-  references_and_referenced_in_many \
+  has_many :paranoid_posts
+  has_and_belongs_to_many \
     :preferences,
     :index => true,
     :dependent => :nullify,
     :autosave => true,
     :order => :value.desc
-  references_and_referenced_in_many :user_accounts
-  references_and_referenced_in_many :houses
+  has_and_belongs_to_many :user_accounts
+  has_and_belongs_to_many :houses
 
-  references_many :drugs, :autosave => true
-  references_one :account, :autosave => true
+  has_many :drugs, :autosave => true
+  has_one :account, :autosave => true
 
-  references_and_referenced_in_many \
+  has_and_belongs_to_many \
     :administrated_events,
     :class_name => 'Event',
     :inverse_of => :administrators,
@@ -125,6 +125,12 @@ class Person
 
   def employer=(emp)
     self.employer_id = emp.id
+  end
+
+  before_save :savable?
+
+  def savable?
+    self.mode != :prevent_save
   end
 
   class << self

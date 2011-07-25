@@ -2,466 +2,813 @@ require "spec_helper"
 
 describe Mongoid::Safety do
 
-  describe ".safely" do
+  let(:collection) do
+    stub
+  end
 
-    context "default" do
-      let(:proxy) do
-        Person.safely
+  before do
+    Person.stubs(:collection).returns(collection)
+    Acolyte.stubs(:collection).returns(collection)
+  end
+
+  describe "#add_to_set" do
+
+    let(:person) do
+      Person.new.tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$addToSet" => { "aliases" => "Bond" } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).add_to_set(:aliases, "Bond")
       end
 
-      it "returns a safe proxy" do
-        proxy.should be_an_instance_of(Mongoid::Safety::Proxy)
-      end
-
-      it "proxies the class" do
-        proxy.target.should == Person
-      end
-
-      it "defaults the safety options to true" do
-        proxy.safety_options.should be_true
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
 
-    context "with options" do
-      let(:proxy) { Person.safely(:w => 2) }
+    context "when not providing options" do
 
-      it "returns a safe proxy" do
-        proxy.should be_an_instance_of(Mongoid::Safety::Proxy)
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$addToSet" => { "aliases" => "Bond" } },
+          :safe => true
+        )
+        person.safely.add_to_set(:aliases, "Bond")
       end
 
-      it "proxies the class" do
-        proxy.target.should == Person
-      end
-
-      it "stores the safety options" do
-        proxy.safety_options.should == {:w => 2}
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
   end
 
-  describe "#safely" do
+  describe "#bit" do
+
+    let(:person) do
+      Person.new.tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$bit" => { "age" => { :and => 12 } } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).bit(:age, { :and => 12 })
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$bit" => { "age" => { :and => 12 } } },
+          :safe => true
+        )
+        person.safely.bit(:age, { :and => 12 })
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe ".create" do
+
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:insert).with(
+          { "_id" => id, "name" => "John" },
+          :safe => { :w => 2 }
+        )
+        Acolyte.safely(:w => 2).create(:id => id, :name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:insert).with(
+          { "_id" => id, "name" => "John" },
+          :safe => true
+        )
+        Acolyte.safely.create(:id => id, :name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe ".create!" do
+
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:insert).with(
+          { "_id" => id, "name" => "John" },
+          :safe => { :w => 2 }
+        )
+        Acolyte.safely(:w => 2).create!(:id => id, :name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:insert).with(
+          { "_id" => id, "name" => "John" },
+          :safe => true
+        )
+        Acolyte.safely.create!(:id => id, :name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#delete" do
 
     let(:person) do
       Person.new
     end
 
-    context "default" do
-      let(:proxy) do
-        person.safely
+    context "when providing options" do
+
+      before do
+        collection.expects(:remove).with({ :_id => person.id }, :safe => { :w => 2 })
+        person.safely(:w => 2).delete
       end
 
-      it "returns a safe proxy" do
-        proxy.should be_an_instance_of(Mongoid::Safety::Proxy)
-      end
-
-      it "proxies the document" do
-        proxy.target.should == person
-      end
-
-      it "defaults the safety value to true" do
-        proxy.safety_options.should be_true
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
 
-    context "with options" do
-      let(:proxy) { person.safely(:w => 2) }
+    context "when not providing options" do
 
-      it "returns a safe proxy" do
-        proxy.should be_an_instance_of(Mongoid::Safety::Proxy)
+      before do
+        collection.expects(:remove).with({ :_id => person.id }, :safe => true)
+        person.safely.delete
       end
 
-      it "proxies the class" do
-        proxy.target.should == person
-      end
-
-      it "stores the safety options" do
-        proxy.safety_options.should == {:w => 2}
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
   end
 
-  shared_examples_for 'a safely persisting document instance' do
+  describe ".delete_all" do
 
-    describe "#delete" do
+    context "when providing options" do
 
       before do
-        Mongoid::Persistence::Remove.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
+        collection.expects(:find).with({}).returns([])
+        collection.expects(:remove).with({}, :safe => { :w => 2 })
+        Person.safely(:w => 2).delete_all
       end
 
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.delete
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.delete(:safe => true)
-        end
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
 
-    describe "#destroy" do
+    context "when not providing options" do
 
       before do
-        Mongoid::Persistence::Remove.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
+        collection.expects(:find).with({}).returns([])
+        collection.expects(:remove).with({}, :safe => true)
+        Person.safely.delete_all
       end
 
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.destroy
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.destroy(:safe => true)
-        end
-      end
-    end
-
-    describe "#inc" do
-
-      before do
-        Mongoid::Persistence::Atomic::Inc.expects(:new).with(
-          person,
-          :age,
-          5,
-          { :safe => safety_options }
-        ).returns(modifier)
-        modifier.expects(:persist).returns(true)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.inc(:age, 5)
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.inc(:age, 5, :safe => true)
-        end
-      end
-    end
-
-    describe "#insert" do
-
-      before do
-        Mongoid::Persistence::Insert.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.insert
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.insert(:safe => true)
-        end
-      end
-    end
-
-    describe "#save!" do
-
-      before do
-        Mongoid::Persistence::Insert.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.insert
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.insert(:safe => true)
-        end
-      end
-    end
-
-    describe "#update" do
-
-      before do
-        Mongoid::Persistence::Update.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.update
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.update(:safe => true)
-        end
-      end
-    end
-
-    describe "#update_attributes" do
-
-      before do
-        Mongoid::Persistence::Update.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.update_attributes(:title => "Sir")
-        end
-      end
-    end
-
-    describe "#update_attributes" do
-
-      before do
-        Mongoid::Persistence::Update.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(true)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.update_attributes!(:title => "Sir")
-        end
-      end
-    end
-
-    describe "#upsert" do
-
-      before do
-        Mongoid::Persistence::Insert.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(person)
-      end
-
-      context "without options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.upsert
-        end
-      end
-
-      context "with options provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.upsert(:safe => true)
-        end
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
   end
 
-  context "when proxying a document instance" do
-
-    let(:command) do
-      stub
-    end
-
-    let(:modifier) do
-      stub
-    end
+  describe "#destroy" do
 
     let(:person) do
       Person.new
     end
 
-    context "when using default safety level" do
-      let(:safety_options) { true }
-      let(:proxy) { person.safely }
-
-      it_behaves_like 'a safely persisting document instance'
-    end
-
-    context "when using specified safety level" do
-      let(:safety_options) { {:w => true} }
-      let(:proxy) { person.safely(safety_options) }
-
-      it_behaves_like 'a safely persisting document instance'
-    end
-
-  end
-
-  shared_examples_for 'a safely persisting class' do
-    describe "#create" do
+    context "when providing options" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        Person.expects(:new).returns(person)
-        command.expects(:persist).returns(person)
+        collection.expects(:remove).with({ :_id => person.id }, :safe => { :w => 2 })
+        person.safely(:w => 2).destroy
       end
 
-      context "without attributes provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.create
-        end
-      end
-
-      context "with attributes provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.create(:title => "Sir")
-        end
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
 
-    describe "#create!" do
+    context "when not providing options" do
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        Person.expects(:new).returns(person)
-        command.expects(:persist).returns(person)
+        collection.expects(:remove).with({ :_id => person.id }, :safe => true)
+        person.safely.destroy
       end
 
-      context "without attributes provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.create!
-        end
-      end
-
-      context "with attributes provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.create!(:title => "Sir")
-        end
-      end
-    end
-
-    describe "#delete_all" do
-
-      context "without conditions provided" do
-
-        before do
-          Mongoid::Persistence::RemoveAll.expects(:new).with(
-            Person,
-            { :validate => false, :safe => safety_options },
-            {}
-          ).returns(command)
-          command.expects(:persist).returns(true)
-        end
-
-        it "sends the safe mode option to the command" do
-          proxy.delete_all
-        end
-      end
-
-      context "with conditions provided" do
-
-        before do
-          Mongoid::Persistence::RemoveAll.expects(:new).with(
-            Person,
-            { :validate => false, :safe => safety_options },
-            { :title => "Sir" }
-          ).returns(command)
-          command.expects(:persist).returns(true)
-        end
-
-        it "sends the safe mode option to the command" do
-          proxy.delete_all(:conditions => { :title => "Sir" })
-        end
-      end
-    end
-
-    describe "#destroy_all" do
-
-      before do
-        Mongoid::Persistence::Remove.expects(:new).with(
-          person,
-          { :safe => safety_options }
-        ).returns(command)
-        command.expects(:persist).returns(person)
-        Person.expects(:all).returns([ person ])
-      end
-
-      context "without onditions provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.destroy_all
-        end
-      end
-
-      context "with conditions provided" do
-
-        it "sends the safe mode option to the command" do
-          proxy.destroy_all(:conditions => { :title => "Sir" })
-        end
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
       end
     end
   end
 
-  context "when proxying a class" do
-
-    let(:command) do
-      stub
-    end
+  describe ".destroy_all" do
 
     let(:person) do
       Person.new
     end
 
-    context "when using default safety level" do
-      let(:safety_options) { true }
-      let(:proxy) { Person.safely }
-      it_behaves_like 'a safely persisting class'
+    context "when providing options" do
+
+      before do
+        collection.expects(:find).with({}, {}).twice.returns([ person ])
+        collection.expects(:remove).with({ :_id => person.id }, :safe => { :w => 2 })
+        Person.safely(:w => 2).destroy_all
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
     end
 
-    context "when using a specified safety level" do
-      let(:safety_options) { {:w => 2} }
-      let(:proxy) { Person.safely(safety_options) }
-      it_behaves_like 'a safely persisting class'
+    context "when not providing options" do
+
+      before do
+        collection.expects(:find).with({}, {}).twice.returns([ person ])
+        collection.expects(:remove).with({ :_id => person.id }, :safe => true)
+        Person.safely.destroy_all
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#inc" do
+
+    let(:person) do
+      Person.new.tap { |p| p.new_record = false }
     end
 
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$inc" => { "age" => 2 } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).inc(:age, 2)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$inc" => { "age" => 2 } },
+          :safe => true
+        )
+        person.safely.inc(:age, 2)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#insert" do
+
+    let(:acolyte) do
+      Acolyte.new(:name => "John")
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:insert).with(
+          { "_id" => acolyte.id, "name" => "John" },
+          :safe => { :w => 2 }
+        )
+        acolyte.safely(:w => 2).insert
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:insert).with(
+          { "_id" => acolyte.id, "name" => "John" },
+          :safe => true
+        )
+        acolyte.safely.insert
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#pop" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pop" => { "aliases" => 2 } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).pop(:aliases, 2)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pop" => { "aliases" => 2 } },
+          :safe => true
+        )
+        person.safely.pop(:aliases, 2)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#pull" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pull" => { "aliases" => "Bond" } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).pull(:aliases, "Bond")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pull" => { "aliases" => "Bond" } },
+          :safe => true
+        )
+        person.safely.pull(:aliases, "Bond")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#pull_all" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pullAll" => { "aliases" => [ "Bond" ] } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).pull_all(:aliases, [ "Bond" ])
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pullAll" => { "aliases" => [ "Bond" ] } },
+          :safe => true
+        )
+        person.safely.pull_all(:aliases, [ "Bond" ])
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#push" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$push" => { "aliases" => "Bond" } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).push(:aliases, "Bond")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$push" => { "aliases" => "Bond" } },
+          :safe => true
+        )
+        person.safely.push(:aliases, "Bond")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#push_all" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pushAll" => { "aliases" => [ "Bond" ] } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).push_all(:aliases, [ "Bond" ])
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$pushAll" => { "aliases" => [ "Bond" ] } },
+          :safe => true
+        )
+        person.safely.push_all(:aliases, [ "Bond" ])
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#rename" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$rename" => { "aliases" => "handles" } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).rename(:aliases, :handles)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$rename" => { "aliases" => "handles" } },
+          :safe => true
+        )
+        person.safely.rename(:aliases, :handles)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#save" do
+
+    let(:acolyte) do
+      Acolyte.new.tap do |a|
+        a.new_record = false
+        a.move_changes
+      end
+    end
+
+    before do
+      acolyte.name = "John"
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => { :w => 2 }
+        )
+        acolyte.safely(:w => 2).save
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => true
+        )
+        acolyte.safely.save
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#save!" do
+
+    let(:acolyte) do
+      Acolyte.new.tap do |a|
+        a.new_record = false
+        a.move_changes
+      end
+    end
+
+    before do
+      acolyte.name = "John"
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => { :w => 2 }
+        )
+        acolyte.safely(:w => 2).save!
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => true
+        )
+        acolyte.safely.save!
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#unset" do
+
+    let(:person) do
+      Person.new(:aliases => []).tap { |p| p.new_record = false }
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$unset" => { "aliases" => 1 } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).unset(:aliases)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$unset" => { "aliases" => 1 } },
+          :safe => true
+        )
+        person.safely.unset(:aliases)
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#update_attributes" do
+
+    let(:acolyte) do
+      Acolyte.new.tap do |a|
+        a.new_record = false
+        a.move_changes
+      end
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => { :w => 2 }
+        )
+        acolyte.safely(:w => 2).update_attributes(:name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => true
+        )
+        acolyte.safely.update_attributes(:name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
+
+  describe "#update_attributes!" do
+
+    let(:acolyte) do
+      Acolyte.new.tap do |a|
+        a.new_record = false
+        a.move_changes
+      end
+    end
+
+    context "when providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => { :w => 2 }
+        )
+        acolyte.safely(:w => 2).update_attributes!(:name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+
+    context "when not providing options" do
+
+      before do
+        collection.expects(:update).with(
+          { "_id" => acolyte.id },
+          { "$set" => { "name" => "John" } },
+          :safe => true
+        )
+        acolyte.safely.update_attributes!(:name => "John")
+      end
+
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
   end
 end

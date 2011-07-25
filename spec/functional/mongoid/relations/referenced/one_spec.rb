@@ -549,20 +549,50 @@ describe Mongoid::Relations::Referenced::One do
       person.create_game(:name => "Starcraft II")
     end
 
-    before do
-      person.game.nullify
+    context "when the instance has been set" do
+
+      before do
+        person.game.nullify
+      end
+
+      it "removes the foreign key from the target" do
+        game.person_id.should be_nil
+      end
+
+      it "removes the reference from the target" do
+        game.person.should be_nil
+      end
+
+      it "removes the reference from the base" do
+        person.game.should be_nil
+      end
     end
 
-    it "removes the foreign key from the target" do
-      game.person_id.should be_nil
-    end
+    context "when the instance has been reloaded" do
 
-    it "removes the reference from the target" do
-      game.person.should be_nil
-    end
+      let(:from_db) do
+        Person.find(person.id)
+      end
 
-    it "removes the reference from the base" do
-      person.game.should be_nil
+      let(:game_reloaded) do
+        Game.find(game.id)
+      end
+
+      before do
+        from_db.game.nullify
+      end
+
+      it "removes the foreign key from the target" do
+        game_reloaded.person_id.should be_nil
+      end
+
+      it "removes the reference from the target" do
+        game_reloaded.person.should be_nil
+      end
+
+      it "removes the reference from the base" do
+        from_db.game.should be_nil
+      end
     end
   end
 end

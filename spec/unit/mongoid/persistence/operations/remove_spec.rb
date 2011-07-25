@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Remove do
+describe Mongoid::Persistence::Operations::Remove do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -21,7 +21,7 @@ describe Mongoid::Persistence::Remove do
   describe "#initialize" do
 
     let(:remove) do
-      Mongoid::Persistence::Remove.new(document)
+      described_class.new(document)
     end
 
     it "sets the document" do
@@ -33,7 +33,7 @@ describe Mongoid::Persistence::Remove do
     end
 
     it "defaults validation to true" do
-      remove.validate.should == true
+      remove.should be_validating
     end
 
     it "sets the options" do
@@ -54,37 +54,13 @@ describe Mongoid::Persistence::Remove do
     end
 
     let(:remove) do
-      Mongoid::Persistence::Remove.new(document)
+      described_class.new(document)
     end
 
     context "when the document is a root document" do
 
       it "removes the document from the collection" do
         root_delete_expectation.call
-        remove.persist.should == true
-      end
-    end
-
-    context "when the document is embedded" do
-
-      before do
-        document.addresses << address
-      end
-
-      let(:remove) do
-        Mongoid::Persistence::Remove.new(address)
-      end
-
-      let(:persister) do
-        stub.quacks_like(Mongoid::Persistence::RemoveEmbedded.allocate)
-      end
-
-      it "delegates to the embedded persister" do
-        Mongoid::Persistence::RemoveEmbedded.expects(:new).with(
-          address,
-          { :validate => true, :safe => false, :suppress => nil }
-        ).returns(persister)
-        persister.expects(:persist).returns(true)
         remove.persist.should == true
       end
     end

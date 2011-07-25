@@ -13,10 +13,22 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
   Replica sets should be used in place of traditional master and slave setups.
 
 * Custom field serialization has changed. Please see
-{serializable}[https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields/serializable.rb]
-for changes.
+  {serializable}[https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields/serializable.rb]
+  for changes.
+
+* The dirty attribute tracking has been switched to use ActiveModel, this brings many bug fixes and changes:
+  * #756 After callbacks and observers see what was changed instead of changes just made being in previous_changes
+  * #434 Documents now are flagged as dirty when brand new or the state on instantiation differs from the database state. This is consistent with ActiveRecord.
+  * #323 Mongoid now supports [field]_will_change! from ActiveModel::Dirty
+
+* Mongoid will no longer preload models in Rails development mode. Please
+  specifically require models in development mode that use more than 1 level of
+  inheritance.
 
 === New Features
+
+* #1067 Fields now accept a :versioned attribute to be able to disable what
+  fields are versioned with Mongoid::Versioning. (Jim Benton)
 
 * #587 Added order preference to many and many to many associations (Gregory Man)
 
@@ -28,6 +40,8 @@ for changes.
 
 * The following explicit atomic operations have been added: Model#bit,
   Model#pop, Model#pull, Model#push_all, Model#rename, Model#unset.
+
+* Added exception translations for Hindi. (Sukeerthi Adiga)
 
 === Bug Fixes
 

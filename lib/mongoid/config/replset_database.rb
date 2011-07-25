@@ -14,9 +14,13 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.5
       def configure
-        #yes, construction is weird but the driver wants "A list of host-port pairs ending with a hash containing any options"
-        #mongo likes symbols
-        options = self.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo}
+        # yes, construction is weird but the driver wants 
+        # "A list of host-port pairs ending with a hash containing any options"
+        # mongo likes symbols
+        options = self.inject({ :logger => Mongoid::Logger.new }) do |memo, (k, v)|
+          memo[k.to_sym] = v
+          memo
+        end
         connection = Mongo::ReplSetConnection.new(*(hosts << options))
 
         if authenticating?

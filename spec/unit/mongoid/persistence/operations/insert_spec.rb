@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Insert do
+describe Mongoid::Persistence::Operations::Insert do
 
   let(:document) do
     Patient.new(:title => "Mr")
@@ -21,7 +21,7 @@ describe Mongoid::Persistence::Insert do
   describe "#initialize" do
 
     let(:insert) do
-      Mongoid::Persistence::Insert.new(document)
+      described_class.new(document)
     end
 
     it "sets the document" do
@@ -33,7 +33,7 @@ describe Mongoid::Persistence::Insert do
     end
 
     it "defaults validation to true" do
-      insert.validate.should == true
+      insert.should be_validating
     end
 
     it "sets the options" do
@@ -64,7 +64,7 @@ describe Mongoid::Persistence::Insert do
     end
 
     let(:insert) do
-      Mongoid::Persistence::Insert.new(document)
+      described_class.new(document)
     end
 
     context "when the document is valid" do
@@ -105,42 +105,17 @@ describe Mongoid::Persistence::Insert do
     context "when not validating" do
 
       before do
-        insert.instance_variable_set(:@validate, false)
-        document.stubs(:valid?).returns(false)
+        insert.instance_variable_set(:@validating, false)
       end
 
       after do
-        insert.instance_variable_set(:@validate, true)
+        insert.instance_variable_set(:@validating, true)
       end
 
       it "inserts the document in the database" do
         root_set_expectation.call
         insert.persist
         document.new_record?.should == false
-      end
-    end
-
-    context "when the document is embedded" do
-
-      before do
-        document.addresses << address
-      end
-
-      let(:insert) do
-        Mongoid::Persistence::Insert.new(address)
-      end
-
-      let(:persister) do
-        stub.quacks_like(Mongoid::Persistence::InsertEmbedded.allocate)
-      end
-
-      it "delegates to the embedded persister" do
-        Mongoid::Persistence::InsertEmbedded.expects(:new).with(
-          address,
-          { :validate => true, :safe => false }
-        ).returns(persister)
-        persister.expects(:persist).returns(address)
-        insert.persist.should == address
       end
     end
   end

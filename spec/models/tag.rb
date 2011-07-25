@@ -1,6 +1,7 @@
 class Tag
   include Mongoid::Document
   field :text, :type => String
-  references_and_referenced_in_many :posts
-  references_and_referenced_in_many :related, :class_name => "Tag"
+  has_and_belongs_to_many :actors
+  has_and_belongs_to_many :posts
+  has_and_belongs_to_many :related, :class_name => "Tag"
 end

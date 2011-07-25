@@ -22,26 +22,16 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require "delegate"
 require "time"
-require "ostruct"
 require "active_support/core_ext"
 require 'active_support/json'
 require "active_support/inflector"
 require "active_support/time_with_zone"
 require "active_model"
-require "active_model/callbacks"
-require "active_model/conversion"
-require "active_model/errors"
-require "active_model/mass_assignment_security"
-require "active_model/naming"
-require "active_model/serialization"
-require "active_model/translation"
-require "active_model/validator"
-require "active_model/validations"
 require "mongo"
 require "mongoid/errors"
 require "mongoid/extensions"
-require "mongoid/safe"
 require "mongoid/relations"
+require "mongoid/threaded"
 require "mongoid/atomic"
 require "mongoid/attributes"
 require "mongoid/callbacks"
@@ -60,6 +50,7 @@ require "mongoid/fields"
 require "mongoid/finders"
 require "mongoid/hierarchy"
 require "mongoid/identity"
+require "mongoid/identity_map"
 require "mongoid/indexes"
 require "mongoid/inspection"
 require "mongoid/javascript"
@@ -85,9 +76,16 @@ require "mongoid/components"
 require "mongoid/paranoia"
 require "mongoid/document"
 
-# add railtie
+# If we are using Rails then we will include the Mongoid railtie. This has all
+# the nifty initializers that Mongoid needs.
 if defined?(Rails)
   require "mongoid/railtie"
+end
+
+# If we are using any Rack based application then we need the Mongoid rack
+# middleware to ensure our app is running properly.
+if defined?(Rack)
+  require "rack/mongoid"
 end
 
 # add english load path by default
@@ -115,6 +113,25 @@ module Mongoid #:nodoc
     block_given? ? yield(Config) : Config
   end
   alias :config :configure
+
+  # We can process a unit of work in Mongoid and have the identity map
+  # automatically clear itself out after the work is complete.
+  #
+  # @example Process a unit of work.
+  #   Mongoid.unit_of_work do
+  #     Person.create(:title => "Sir")
+  #   end
+  #
+  # @return [ Object ] The result of the block.
+  #
+  # @since 2.1.0
+  def unit_of_work
+    begin
+      yield if block_given?
+    ensure
+      IdentityMap.clear
+    end
+  end
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
