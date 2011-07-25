@@ -60,6 +60,14 @@ module Mongoid # :nodoc:
           Bindings::Embedded::One.new(base, target, metadata)
         end
 
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
         def persistable?
           base.persisted? && !binding? && !building?
         end

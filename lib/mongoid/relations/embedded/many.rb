@@ -26,7 +26,7 @@ module Mongoid # :nodoc:
             args.flatten.each do |doc|
               next unless doc
               append(doc)
-              doc.save if base.persisted? && !binding?
+              doc.save if persistable?
             end
           end
         end
@@ -202,6 +202,14 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Get all the documents in the relation that are loaded into memory.
+        #
+        # @example Get the in memory documents.
+        #   relation.in_memory
+        #
+        # @return [ Array<Document> ] The documents in memory.
+        #
+        # @since 2.1.0
         def in_memory
           target
         end
@@ -295,9 +303,18 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Integrate the document into the relation. will set its metadata and
+        # attempt to bind the inverse.
+        #
+        # @example Integrate the document.
+        #   relation.integrate(document)
+        #
+        # @param [ Document ] document The document to integrate.
+        #
+        # @since 2.1.0
         def integrate(document)
           characterize_one(document)
-          bind_one(document) unless binding?
+          bind_one(document)
         end
 
         # If the target array does not respond to the supplied method then try to
@@ -315,6 +332,18 @@ module Mongoid # :nodoc:
           klass.send(:with_scope, criteria) do
             criteria.send(name, *args, &block)
           end
+        end
+
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
+        def persistable?
+          base.persisted? && !binding?
         end
 
         # Reindex all the target elements. This is useful when performing

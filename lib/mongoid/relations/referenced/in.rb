@@ -63,6 +63,14 @@ module Mongoid # :nodoc:
           Bindings::Referenced::In.new(base, target, metadata)
         end
 
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
         def persistable?
           target.persisted? && !binding? && !building?
         end
@@ -86,6 +94,18 @@ module Mongoid # :nodoc:
             Builders::Referenced::In.new(meta, object, loading)
           end
 
+          # Get the standard criteria used for querying this relation.
+          #
+          # @example Get the criteria.
+          #   Proxy.criteria(meta, id, Model)
+          #
+          # @param [ Metadata ] metadata The metadata.
+          # @param [ Object ] object The value of the foreign key.
+          # @param [ Class ] type The optional type.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 2.1.0
           def criteria(metadata, object, type = nil)
             type.where(:_id => object)
           end

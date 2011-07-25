@@ -65,11 +65,27 @@ module Mongoid # :nodoc:
           Bindings::Embedded::In.new(base, target, metadata)
         end
 
+        # Characterize the document.
+        #
+        # @example Set the base metadata.
+        #   relation.characterize_one(document)
+        #
+        # @param [ Document ] document The document to set the metadata on.
+        #
+        # @since 2.1.0
         def characterize_one(document)
           inverse = metadata.inverse(document)
           base.metadata = document.reflect_on_association(inverse)
         end
 
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
         def persistable?
           target.persisted? && !binding? && !building?
         end
