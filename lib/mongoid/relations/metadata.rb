@@ -379,6 +379,10 @@ module Mongoid # :nodoc:
         @inverse_klass ||= inverse_class_name.constantize
       end
 
+      def inverse_metadata(document)
+        document.reflect_on_association(inverse(document))
+      end
+
       # Returns the inverse_of option of the relation.
       #
       # @example Get the inverse_of option.

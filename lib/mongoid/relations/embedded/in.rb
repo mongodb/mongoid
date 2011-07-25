@@ -74,8 +74,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def characterize_one(document)
-          inverse = metadata.inverse(document)
-          base.metadata = document.reflect_on_association(inverse)
+          base.metadata = metadata.inverse_metadata(document)
         end
 
         # Are we able to persist this relation?

@@ -18,7 +18,9 @@ module Mongoid # :nodoc:
       # @since 2.1.0
       def binding
         Threaded.binding = true
-        yield.tap { Threaded.binding = false }
+        yield
+      ensure
+        Threaded.binding = false
       end
 
       # Is the current thread in binding mode?

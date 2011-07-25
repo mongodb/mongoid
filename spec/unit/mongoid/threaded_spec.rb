@@ -52,6 +52,10 @@ describe Mongoid::Threaded do
       described_class.binding = true
     end
 
+    after do
+      described_class.binding = false
+    end
+
     it "sets the binding mode" do
       described_class.should be_binding
     end
@@ -94,17 +98,6 @@ describe Mongoid::Threaded do
       it "returns false" do
         described_class.should_not be_building
       end
-    end
-  end
-
-  describe "#binding=" do
-
-    before do
-      described_class.binding = true
-    end
-
-    it "sets the binding mode" do
-      described_class.should be_binding
     end
   end
 

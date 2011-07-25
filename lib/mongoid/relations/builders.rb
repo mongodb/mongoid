@@ -44,7 +44,9 @@ module Mongoid # :nodoc:
       # @since 2.1.0
       def building
         Threaded.building = true
-        yield.tap { Threaded.building = false }
+        yield
+      ensure
+        Threaded.building = false
       end
 
       module ClassMethods #:nodoc:

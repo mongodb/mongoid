@@ -158,7 +158,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     context "embeds_one" do
 
-      let(:person) do
+      let!(:person) do
         Patient.new
       end
 

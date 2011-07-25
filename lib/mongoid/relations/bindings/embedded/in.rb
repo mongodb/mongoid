@@ -24,13 +24,12 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind
+            base.metadata = metadata.inverse_metadata(target)
+            base.parentize(target)
             unless binding?
-              inverse = metadata.inverse(target)
-              base.metadata = target.reflect_on_association(inverse)
-              base.parentize(target)
               binding do
                 if base.embedded_many?
-                  target.do_or_do_not(inverse).push(base)
+                  target.do_or_do_not(metadata.inverse(target)).push(base)
                 else
                   target.do_or_do_not(metadata.inverse_setter(target), base)
                 end
