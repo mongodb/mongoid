@@ -22,12 +22,12 @@ describe 'valdations for array attributes' do
   context "when an array attribute has been updated and it is retrieved, flattened and iterated" do
     let(:changes) do
       manufacturer.products = updated_products
-      changes = manufacturer.changes
+      manufacturer.changes
+    end
 
+    before do
       attrs = manufacturer.attributes
       [attrs].flatten.each { |attr| } # do nothing. this mimics ActiveModel::Errors#add_on_blank, line 223
-      
-      changes
     end
 
     it "should not destroy the models change list" do
