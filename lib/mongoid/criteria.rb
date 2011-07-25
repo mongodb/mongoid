@@ -46,6 +46,8 @@ module Mongoid #:nodoc:
       :avg,
       :blank?,
       :count,
+      :size,
+      :length,
       :delete,
       :delete_all,
       :destroy,

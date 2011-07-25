@@ -69,6 +69,8 @@ module Mongoid #:nodoc:
       def count(extras = false)
         @count ||= klass.collection.find(selector, process_options).count(extras)
       end
+      alias :size :count
+      alias :length :count
 
       # Delete all the documents in the database matching the selector.
       #
