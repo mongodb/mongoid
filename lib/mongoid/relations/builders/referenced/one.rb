@@ -17,7 +17,7 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             criteria = metadata.criteria(object)
-            IdentityMap.match_one(criteria) || criteria.first
+            IdentityMap.match(criteria) || criteria.first
           end
         end
       end

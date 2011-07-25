@@ -16,16 +16,22 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def get(klass, id)
+      return nil unless Mongoid.identity_map_enabled?
       documents_for(klass)[id]
     end
 
-    def match_all(criteria)
-      documents_for(criteria.klass).values.select do |doc|
-        doc.matches?(criteria.selector)
-      end
-    end
-
-    def match_one(criteria)
+    # Get a single document that matches the provided criteria.
+    #
+    # @example Get the document for the criteria.
+    #   map.match(Person.where(:_id => id))
+    #
+    # @param [ Criteria ] criteria The criteria to match.
+    #
+    # @return [ Document ] The first matching document.
+    #
+    # @since 2.1.0
+    def match(criteria)
+      return nil unless Mongoid.identity_map_enabled?
       documents_for(criteria.klass).values.detect do |doc|
         doc.matches?(criteria.selector)
       end
@@ -42,7 +48,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def remove(document)
-      return unless document && document.id
+      return nil unless Mongoid.identity_map_enabled? && document && document.id
       documents_for(document.class).delete(document.id)
     end
 
@@ -57,7 +63,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def set(document)
-      return unless document && document.id
+      return nil unless Mongoid.identity_map_enabled? && document && document.id
       documents_for(document.class)[document.id] = document
     end
 

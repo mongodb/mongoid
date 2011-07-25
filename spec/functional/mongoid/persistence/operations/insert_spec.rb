@@ -4,7 +4,14 @@ describe Mongoid::Persistence::Operations::Insert do
 
   before do
     Person.delete_all
-    Mongoid::IdentityMap.clear
+  end
+
+  before(:all) do
+    Mongoid.identity_map_enabled = true
+  end
+
+  after(:all) do
+    Mongoid.identity_map_enabled = false
   end
 
   describe "#persist" do

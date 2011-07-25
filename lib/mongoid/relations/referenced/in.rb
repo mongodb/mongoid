@@ -87,7 +87,7 @@ module Mongoid # :nodoc:
           end
 
           def criteria(metadata, object, type = nil)
-            type.where(metadata.foreign_key => object)
+            type.where(:_id => object)
           end
 
           # Returns true if the relation is an embedded one. In this case

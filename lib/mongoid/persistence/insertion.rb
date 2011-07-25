@@ -29,7 +29,6 @@ module Mongoid #:nodoc:
               end
             end
             doc.move_changes
-            IdentityMap.set(doc)
             Threaded.clear_safety_options!
           end
         end

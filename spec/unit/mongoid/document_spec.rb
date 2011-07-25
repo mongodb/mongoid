@@ -361,6 +361,14 @@ describe Mongoid::Document do
 
     context "when an id exists" do
 
+      before do
+        Mongoid.identity_map_enabled = true
+      end
+
+      after do
+        Mongoid.identity_map_enabled = false
+      end
+
       let(:id) do
         BSON::ObjectId.new
       end

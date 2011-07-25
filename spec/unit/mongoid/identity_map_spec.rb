@@ -2,6 +2,14 @@ require "spec_helper"
 
 describe Mongoid::IdentityMap do
 
+  before(:all) do
+    Mongoid.identity_map_enabled = true
+  end
+
+  after(:all) do
+    Mongoid.identity_map_enabled = false
+  end
+
   let(:identity_map) do
     described_class.new
   end
@@ -104,6 +112,70 @@ describe Mongoid::IdentityMap do
         get.should be_nil
       end
     end
+
+    context "when the mongoid identity map is disabled" do
+
+      before do
+        Mongoid.identity_map_enabled = false
+      end
+
+      after do
+        Mongoid.identity_map_enabled = true
+      end
+
+      let(:get) do
+        described_class.get(Person, document.id)
+      end
+
+      it "returns nil" do
+        get.should be_nil
+      end
+    end
+  end
+
+  describe "#match" do
+
+    let(:document) do
+      Person.new
+    end
+
+    context "when the criteria matches" do
+
+      let(:criteria) do
+        Person.where(:_id => document.id)
+      end
+
+      before do
+        described_class.set(document)
+      end
+
+      let(:match) do
+        described_class.match(criteria)
+      end
+
+      it "returns the document" do
+        match.should eq(document)
+      end
+    end
+
+    context "when the criteria does not match" do
+
+      let(:criteria) do
+        Person.where(:_id => BSON::ObjectId.new)
+      end
+
+      before do
+        described_class.set(document)
+      end
+
+      let(:match) do
+        described_class.match(criteria)
+      end
+
+      it "returns nil" do
+        match.should be_nil
+      end
+    end
   end
 
   describe "#remove" do
@@ -165,20 +237,50 @@ describe Mongoid::IdentityMap do
 
     context "when setting a document" do
 
-      let(:document) do
-        Person.new
+      context "when the identity map is enabled" do
+
+        let(:document) do
+          Person.new
+        end
+
+        let!(:set) do
+          identity_map.set(document)
+        end
+
+        it "puts the object in the identity map" do
+          identity_map.get(Person, document.id).should eq(document)
+        end
+
+        it "returns the document" do
+          set.should eq(document)
+        end
       end
 
-      let!(:set) do
-        identity_map.set(document)
-      end
+      context "when the identity map is disabled" do
 
-      it "puts the object in the identity map" do
-        identity_map.get(Person, document.id).should eq(document)
-      end
+        before do
+          Mongoid.identity_map_enabled = false
+        end
 
-      it "returns the document" do
-        set.should eq(document)
+        after do
+          Mongoid.identity_map_enabled = true
+        end
+
+        let(:document) do
+          Person.new
+        end
+
+        let!(:set) do
+          identity_map.set(document)
+        end
+
+        it "does not put the object in the identity map" do
+          identity_map.should be_empty
+        end
+
+        it "returns nil" do
+          set.should be_nil
+        end
       end
     end
 

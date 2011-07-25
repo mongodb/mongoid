@@ -22,7 +22,12 @@ describe Mongoid::Relations::Builders::Referenced::One do
     context "when the document is persisted" do
 
       before do
+        Mongoid.identity_map_enabled = true
         person.save
+      end
+
+      after do
+        Mongoid.identity_map_enabled = false
       end
 
       let!(:game) do
