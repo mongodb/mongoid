@@ -424,7 +424,7 @@ module Mongoid #:nodoc:
         # @return [ Integer ] The number of documents deleted.
         #
         # @since 2.1.0
-        def remove_all(conditions = nil, method)
+        def remove_all(conditions = nil, method = :delete_all)
           selector = (conditions || {})[:conditions] || {}
           klass.send(method, :conditions => selector.merge!(criteria.selector)).tap do
             [ target.loaded, target.added ].each do |docs|
