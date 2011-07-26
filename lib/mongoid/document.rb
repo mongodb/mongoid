@@ -214,6 +214,20 @@ module Mongoid #:nodoc:
       end
     end
 
+    private
+
+    # Implement this for calls to flatten on array.
+    #
+    # @example Get the document as an array.
+    #   document.to_ary
+    #
+    # @return [ nil ] Always nil.
+    #
+    # @since 2.1.0
+    def to_ary
+      nil
+    end
+
     module ClassMethods #:nodoc:
 
       # Performs class equality checking.
