@@ -336,6 +336,17 @@ describe Mongoid::Contexts::Mongo do
         context.selector[:_type].should be_nil
       end
     end
+    
+    it 'set the cache if the class has cache defined' do
+      klass.stubs(:cached? => true)
+      context.options[:cache].should be_true
+    end
+
+    it 'not set the cache if the class has cache defined' do
+      klass.stubs(:cached? => false)
+      context.options[:cache].should_not be_true
+    end
+    
   end
 
   describe "#iterate" do
