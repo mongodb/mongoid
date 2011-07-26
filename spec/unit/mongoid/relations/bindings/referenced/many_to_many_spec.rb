@@ -18,42 +18,6 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     Person.relations["preferences"]
   end
 
-  describe "#bind" do
-
-    let(:binding) do
-      described_class.new(person, target, metadata)
-    end
-
-    context "when the documents are bindable" do
-
-      before do
-        person.expects(:save).never
-        preference.expects(:save).never
-        binding.bind
-      end
-
-      it "sets the inverse relation" do
-        preference.people.should == [ person ]
-      end
-
-      it "sets the foreign key" do
-        preference.person_ids.should == [ person.id ]
-      end
-    end
-
-    context "when the documents are not bindable" do
-
-      before do
-        preference.people << person
-      end
-
-      it "does nothing" do
-        person.preferences.expects(:<<).never
-        binding.bind
-      end
-    end
-  end
-
   describe "#bind_one" do
 
     let(:binding) do
@@ -106,39 +70,6 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     end
   end
 
-  describe "#unbind" do
-
-    let(:binding) do
-      described_class.new(person, target, metadata)
-    end
-
-    context "when the documents are unbindable" do
-
-      before do
-        binding.bind
-        person.expects(:delete).never
-        preference.expects(:delete).never
-        binding.unbind
-      end
-
-      it "removes the inverse relation" do
-        preference.people.should be_empty
-      end
-
-      it "removed the foreign keys" do
-        preference.person_ids.should be_empty
-      end
-    end
-
-    context "when the documents are not unbindable" do
-
-      it "does nothing" do
-        person.expects(:preferences=).never
-        binding.unbind
-      end
-    end
-  end
-
   describe "#unbind_one" do
 
     let(:binding) do
@@ -148,7 +79,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     context "when the documents are unbindable" do
 
       before do
-        binding.bind
+        binding.bind_one(target.first)
         person.expects(:delete).never
         preference.expects(:delete).never
         binding.unbind_one(target.first)
@@ -166,7 +97,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     context "when preventing multiple db hits" do
 
       before do
-        binding.bind
+        binding.bind_one(target.first)
       end
 
       it "never performs a persistance operation" do

@@ -498,10 +498,6 @@ describe Mongoid::Relations::Targets::Enumerable do
           end
         end
 
-        it "it removes the persisted doc from the added." do
-          enumerable.added.should eq([])
-        end
-
         it "adds the persisted added doc to the loaded" do
           enumerable.loaded.should eq([ post ])
         end

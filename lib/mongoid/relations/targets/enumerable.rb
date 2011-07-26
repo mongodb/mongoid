@@ -126,14 +126,19 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def each
           if loaded?
-            loaded.each { |doc| yield(doc) }
+            loaded.each do |doc|
+              yield(doc)
+            end
           else
-            added.delete_if { |doc| doc.persisted? }
             unloaded.each do |doc|
-              loaded.push(doc) and yield(doc)
+              loaded.push(doc)
+              yield(doc)
             end
           end
-          added.each { |doc| yield(doc) }
+          added.each do |doc|
+            next unless doc.new?
+            yield(doc)
+          end
           @executed = true
         end
 
