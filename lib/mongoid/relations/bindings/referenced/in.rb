@@ -22,16 +22,16 @@ module Mongoid # :nodoc:
             unless binding?
               binding do
                 inverse = metadata.inverse(target)
-                base.do_or_do_not(metadata.foreign_key_setter, target.id)
+                base.send(metadata.foreign_key_setter, target.id)
                 if metadata.inverse_type
-                  base.do_or_do_not(metadata.inverse_type_setter, target.class.model_name)
+                  base.send(metadata.inverse_type_setter, target.class.model_name)
                 end
                 if inverse
-                  base.metadata = target.reflect_on_association(inverse)
+                  base.metadata = metadata.inverse_metadata(target)
                   if base.referenced_many?
-                    target.do_or_do_not(inverse).push(base)
+                    target.send(inverse).push(base)
                   else
-                    target.do_or_do_not(metadata.inverse_setter(target), base)
+                    target.send(metadata.inverse_setter(target), base)
                   end
                 end
               end
@@ -50,10 +50,17 @@ module Mongoid # :nodoc:
           def unbind
             unless binding?
               binding do
-                base.do_or_do_not(metadata.foreign_key_setter, nil)
-                target.do_or_do_not(metadata.inverse_setter(target), nil)
+                inverse = metadata.inverse(target)
+                base.send(metadata.foreign_key_setter, nil)
                 if metadata.inverse_type
-                  base.do_or_do_not(metadata.inverse_type_setter, nil)
+                  base.send(metadata.inverse_type_setter, nil)
+                end
+                if inverse
+                  if base.referenced_many?
+                    target.send(inverse).delete(base)
+                  else
+                    target.send(metadata.inverse_setter(target), nil)
+                  end
                 end
               end
             end
