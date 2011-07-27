@@ -15,7 +15,7 @@ it:
           "Invalid option :%{invalid} provided to relation :%{name}. Valid options
           are: %{valid}."
         unsupported_version:
-          MongoDB %{version} not è supportato, aggiorna a %{mongo_version}.
+          MongoDB %{version} non è supportato, aggiorna a %{mongo_version}.
         validations:
           Validazione fallita - %{errors}.
         invalid_collection:
