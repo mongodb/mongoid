@@ -4,23 +4,23 @@ require "spec_helper"
 describe Mongoid::Config do
 
   let(:standard_config) do
-    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
+    get_file("mongoid.yml")
   end
 
   let(:utc_config) do
-    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_utc.yml")
+    get_file("mongoid_with_utc.yml")
   end
 
   let(:multi_config) do
-    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid_with_multiple_mongos.yml")
+    get_file("mongoid_with_multiple_mongos.yml")
   end
 
   let(:replset_config) do
-    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.replset.yml")
+    get_file("mongoid.replset.yml")
   end
 
   let(:mongohq_config) do
-    File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.mongohq.yml")
+    get_file("mongoid.mongohq.yml")
   end
 
   before(:all) do
@@ -399,3 +399,5 @@ describe Mongoid::Config do
     end
   end
 end
+
+

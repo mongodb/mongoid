@@ -42,3 +42,6 @@ ru:
         unsaved_document:
           Вызов методов create или create! запрещён у реляционной ассоциации
           (%{document}), у которой родитель (%{base}) не сохранён.
+        mixed_relations:
+          Referencing a(n) %{embedded} document from the %{root} document via a
+          relational association is not allowed since the %{embedded} is embedded.

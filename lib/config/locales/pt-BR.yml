@@ -41,3 +41,6 @@ pt-BR:
         unsaved_document:
           Você não pode chamar os métodos create ou create! de uma associação
           relacional (%{document}) cujo pai (%{base}) ainda não foi salvo.
+        mixed_relations:
+          Referencing a(n) %{embedded} document from the %{root} document via a
+          relational association is not allowed since the %{embedded} is embedded.

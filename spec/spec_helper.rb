@@ -48,3 +48,7 @@ end
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
+
+def get_file(filename)
+  File.join(File.dirname(__FILE__),"config", "#{filename}")
+end
