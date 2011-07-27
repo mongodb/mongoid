@@ -253,22 +253,18 @@ Benchmark.bm do |bm|
         person.posts.delete_all
       end
 
+      person.posts.clear
+      GC.start
+
       bm.report("#push             ") do
         i.times do |n|
           person.posts.push(Post.new(:title => "Posting #{n}"))
         end
       end
 
-      bm.report("#save             ") do
+      bm.report("#each             ") do
         person.posts.each do |post|
-          post.content = "Test"
-          post.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        person.posts.each do |post|
-          post.update_attribute(:content, "Testing")
+          post
         end
       end
 
@@ -282,7 +278,8 @@ Benchmark.bm do |bm|
         person.posts.delete(post)
       end
 
-      person.posts.delete_all
+      person.posts.clear
+      GC.start
     end
   end
 
@@ -296,7 +293,7 @@ Benchmark.bm do |bm|
 
       bm.report("#relation=        ") do
         i.times do |n|
-          person.name = Game.new(:name => "Final Fantasy #{n}")
+          person.game = Game.new(:name => "Final Fantasy #{n}")
         end
       end
     end
@@ -334,22 +331,18 @@ Benchmark.bm do |bm|
         person.preferences.delete_all
       end
 
+      person.preferences.clear
+      GC.start
+
       bm.report("#push             ") do
         i.times do |n|
           person.preferences.push(Preference.new(:name => "Preference #{n}"))
         end
       end
 
-      bm.report("#save             ") do
+      bm.report("#each             ") do
         person.preferences.each do |preference|
-          preference.name = "Test"
-          preference.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        person.preferences.each do |preference|
-          preference.update_attribute(:name, "Testing")
+          preference
         end
       end
 
@@ -363,7 +356,7 @@ Benchmark.bm do |bm|
         person.preferences.delete(preference)
       end
 
-      person.preferences.delete_all
+      person.preferences.clear
     end
   end
 end

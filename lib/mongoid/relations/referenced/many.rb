@@ -427,11 +427,9 @@ module Mongoid #:nodoc:
         def remove_all(conditions = nil, method = :delete_all)
           selector = (conditions || {})[:conditions] || {}
           klass.send(method, :conditions => selector.merge!(criteria.selector)).tap do
-            [ target.loaded, target.added ].each do |docs|
-              docs.delete_if do |doc|
-                if doc.matches?(selector)
-                  unbind_one(doc) and true
-                end
+            target.delete_if do |doc|
+              if doc.matches?(selector)
+                unbind_one(doc) and true
               end
             end
           end

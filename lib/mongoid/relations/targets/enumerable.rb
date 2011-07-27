@@ -103,7 +103,11 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def delete_if(&block)
-          load_all! and loaded.delete_if(&block) + added.delete_if(&block)
+          load_all!
+          tap do
+            loaded.delete_if(&block)
+            added.delete_if(&block)
+          end
         end
 
         # Iterating over this enumerable has to handle a few different
