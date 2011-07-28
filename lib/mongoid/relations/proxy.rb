@@ -111,6 +111,14 @@ module Mongoid # :nodoc:
         target.send(name, *args, &block)
       end
 
+      def respond_to?(name, include_private = false)
+        super
+      end
+
+      def scoped
+        super
+      end
+
       # When the base document illegally references an embedded document this
       # error will get raised.
       #

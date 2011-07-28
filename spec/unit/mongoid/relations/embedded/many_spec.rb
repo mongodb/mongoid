@@ -753,6 +753,16 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "scoped" do
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    it "scoped should return hash" do
+      relation.scoped.should be_a_kind_of(Hash)
+    end
+  end
+
   describe "respond_to?" do
     let(:relation) do
       described_class.new(base, target, metadata)
@@ -762,4 +772,21 @@ describe Mongoid::Relations::Embedded::Many do
       expect { relation.respond_to?(:Rational, true) }.not_to raise_error
     end
   end
+
+
+  describe "respond_to? with has_many" do
+    let (:person) do
+      Person.new
+    end
+
+    let (:phone_numbers) do
+      person.phone_numbers
+    end
+
+    it "respond_to? :scoped should return true" do
+      phone_numbers.respond_to?(:scoped).should == true
+    end
+
+  end
+
 end
