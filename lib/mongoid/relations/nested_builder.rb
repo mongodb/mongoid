@@ -25,14 +25,21 @@ module Mongoid # :nodoc:
       # @example Is there a reject proc?
       #   builder.reject?
       #
+      # @param The parent document of the relation
       # @param [ Hash ] attrs The attributes to check for rejection.
       #
-      # @return [ true, false ] True and call proc if rejectable, false if not.
+      # @return [ true, false ] True and call proc or method if rejectable, false if not.
       #
       # @since 2.0.0.rc.1
-      def reject?(attrs)
-        criteria = options[:reject_if]
-        criteria ? criteria.call(attrs) : false
+      def reject?(document, attrs)
+        case callback = options[:reject_if]
+        when Symbol
+          document.method(callback).arity == 0 ? document.send(callback) : document.send(callback, attrs)
+        when Proc
+          callback.call(attrs)
+        else
+         false
+        end
       end
 
       # Determines if only updates can occur. Only valid for one-to-one

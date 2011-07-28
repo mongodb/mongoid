@@ -22,7 +22,7 @@ module Mongoid # :nodoc:
           #
           # parent: The parent document of the relation.
           def build(parent)
-            return if reject?(attributes)
+            return if reject?(parent, attributes)
             @existing = parent.send(metadata.name)
             if update?
               existing.attributes = attributes
