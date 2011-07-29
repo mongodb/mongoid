@@ -169,7 +169,7 @@ module Mongoid #:nodoc:
         if klass.hereditary? && !criteria.selector.keys.include?(:_type)
           @criteria = criteria.in(:_type => criteria.klass._types)
         end
-        @criteria.cache if klass.cached?
+        @criteria = @criteria.cache if klass.cached?
       end
 
       # Iterate over each +Document+ in the results. This can take an optional
