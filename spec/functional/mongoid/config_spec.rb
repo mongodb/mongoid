@@ -363,6 +363,13 @@ describe Mongoid::Config do
       end
     end
 
+    describe ".preload_models" do
+
+      it "defaults to false" do
+        described_class.preload_models.should be_false
+      end
+    end
+
     describe ".raise_not_found_error" do
 
       it "defaults to true" do
