@@ -70,7 +70,7 @@ describe Mongoid::Persistence::Operations::Embedded::Remove do
           described_class.new(email)
         end
 
-        it "notifies its changes to parent and removes the parent" do
+        it "marks the document as detroyed" do
           remove.persist.should == true
           document.email.should be_nil
         end
@@ -106,9 +106,9 @@ describe Mongoid::Persistence::Operations::Embedded::Remove do
           described_class.new(address)
         end
 
-        it "notifies its changes to the parent and removes the document" do
+        it "marks the document as destroyed" do
           remove.persist.should == true
-          document.addresses.should == []
+          document.addresses.should be_empty
         end
       end
 

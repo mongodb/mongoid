@@ -4,7 +4,14 @@ describe Mongoid::Persistence::Operations::Insert do
 
   before do
     Person.delete_all
-    Mongoid::IdentityMap.clear
+  end
+
+  before(:all) do
+    Mongoid.identity_map_enabled = true
+  end
+
+  after(:all) do
+    Mongoid.identity_map_enabled = false
   end
 
   describe "#persist" do
@@ -16,11 +23,11 @@ describe Mongoid::Persistence::Operations::Insert do
       end
 
       let(:in_map) do
-        Mongoid::IdentityMap.get(person.id)
+        Mongoid::IdentityMap.get(Person, person.id)
       end
 
-      it "does not put the document in the identity map" do
-        in_map.should be_nil
+      it "puts the document in the identity map" do
+        in_map.should eq(person)
       end
     end
   end

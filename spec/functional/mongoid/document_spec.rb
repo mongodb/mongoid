@@ -256,7 +256,7 @@ describe Mongoid::Document do
         @person.addresses.first.destroy
         @person.name.should_not be_nil
         @person.name.destroy
-        @person.addresses.first.should be_nil
+        @person.addresses.should be_empty
         @person.name.should be_nil
       end
     end
@@ -418,7 +418,7 @@ describe Mongoid::Document do
           person.reload
         end
 
-        it "should reload the association" do
+        it "reloads the association" do
           person.game.score.should == 75
         end
       end
@@ -436,7 +436,7 @@ describe Mongoid::Document do
           game.reload
         end
 
-        it "should reload the association" do
+        it "reloads the association" do
           game.person.title.should == "Mam"
         end
       end

@@ -9,7 +9,8 @@ describe Mongoid::Relations::Builders::Referenced::Many do
         :klass => Post,
         :name => :posts,
         :foreign_key => "person_id",
-        :inverse_klass => Person
+        :inverse_klass => Person,
+        :criteria => [ post ]
       )
     end
 
@@ -32,7 +33,6 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       before do
-        Post.expects(:where).with("person_id" => object_id).returns([ post ])
         @documents = builder.build
       end
 
@@ -42,13 +42,15 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     end
 
     context "when order specified" do
+
       let(:metadata) do
         stub_everything(
           :klass => Post,
           :name => :posts,
           :foreign_key => "person_id",
           :inverse_klass => Person,
-          :order => :rating.asc
+          :order => :rating.asc,
+          :criteria => [ post ]
         )
       end
 
@@ -65,9 +67,6 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       before do
-        criteria = stub
-        criteria.expects(:order_by).returns([ post ])
-        Post.expects(:where).returns(criteria)
         @documents = builder.build
       end
 
@@ -77,6 +76,15 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     end
 
     context "when provided a object" do
+
+      let(:metadata) do
+        stub_everything(
+          :klass => Post,
+          :name => :posts,
+          :foreign_key => "person_id",
+          :inverse_klass => Person
+        )
+      end
 
       let(:object) do
         [ Person.new ]

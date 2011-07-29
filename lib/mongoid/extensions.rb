@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/extensions/array/deletion"
 require "mongoid/extensions/false_class/equality"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
@@ -12,6 +13,10 @@ require "mongoid/extensions/string/inflections"
 require "mongoid/extensions/symbol/inflections"
 require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/object_id/conversions"
+
+class Array #:nodoc
+  include Mongoid::Extensions::Array::Deletion
+end
 
 class Binary; end #:nodoc:
 class Boolean; end #:nodoc:

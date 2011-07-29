@@ -23,6 +23,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 * Mongoid model preloading in development mode now defaults to false.
 
+* :autosave => true on relational associations now saves on update as well as
+  create.
+
 === New Features
 
 * #1067 Fields now accept a :versioned attribute to be able to disable what

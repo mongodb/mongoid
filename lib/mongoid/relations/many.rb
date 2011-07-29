@@ -7,84 +7,18 @@ module Mongoid #:nodoc:
     class Many < Proxy
 
       delegate :avg, :max, :min, :sum, :to => :criteria
+      delegate :length, :size, :to => :target
 
-      # Appends a document or array of documents to the relation. Will set
-      # the parent and update the index in the process.
+      # Is the relation empty?
       #
-      # @example Append a document.
-      #   person.addresses << address
+      # @example Is the relation empty??
+      #   person.addresses.blank?
       #
-      # @example Push a document.
-      #   person.addresses.push(address)
+      # @return [ true, false ] If the relation is empty or not.
       #
-      # @example Concat with other documents.
-      #   person.addresses.concat([ address_one, address_two ])
-      #
-      # @param [ Document, Array<Document> ] *args Any number of documents.
-      def <<(*args)
-        options = default_options(args)
-        args.flatten.each do |doc|
-          return doc unless doc
-          append(doc, options)
-          doc.save if base.persisted? && !options[:binding]
-        end
-      end
-      alias :concat :<<
-      alias :push :<<
-
-      # Builds a new document in the relation and appends it to the target.
-      # Takes an optional type if you want to specify a subclass.
-      #
-      # @example Build a new document on the relation.
-      #   person.people.build(:name => "Bozo")
-      #
-      # @param [ Hash ] attributes The attributes to build the document with.
-      # @param [ Class ] type Optional class to build the document with.
-      #
-      # @return [ Document ] The new document.
-      def build(attributes = {}, type = nil)
-        Mongoid::Factory.build(type || metadata.klass, attributes).tap do |doc|
-          doc.identify
-          append(doc, default_options(:binding => true))
-          yield(doc) if block_given?
-        end
-      end
-      alias :new :build
-
-      # Creates a new document on the references many relation. This will
-      # save the document if the parent has been persisted.
-      #
-      # @example Create and save the new document.
-      #   person.posts.create(:text => "Testing")
-      #
-      # @param [ Hash ] attributes The attributes to create with.
-      # @param [ Class ] type The optional type of document to create.
-      #
-      # @return [ Document ] The newly created document.
-      def create(attributes = nil, type = nil)
-        build(attributes, type).tap do |doc|
-          yield(doc) if block_given?
-          doc.save if base.persisted?
-        end
-      end
-
-      # Creates a new document on the references many relation. This will
-      # save the document if the parent has been persisted and will raise an
-      # error if validation fails.
-      #
-      # @example Create and save the new document.
-      #   person.posts.create!(:text => "Testing")
-      #
-      # @param [ Hash ] attributes The attributes to create with.
-      # @param [ Class ] type The optional type of document to create.
-      #
-      # @raise [ Errors::Validations ] If validation failed.
-      #
-      # @return [ Document ] The newly created document.
-      def create!(attributes = nil, type = nil)
-        build(attributes, type).tap do |doc|
-          doc.save! if base.persisted?
-        end
+      # @since 2.1.0
+      def blank?
+        size == 0
       end
 
       # Determine if any documents in this relation exist in the database.
@@ -169,33 +103,7 @@ module Mongoid #:nodoc:
         target.map { |document| document.serializable_hash(options) }
       end
 
-      # Always returns the number of documents that are in memory.
-      #
-      # @example Get the number of loaded documents.
-      #   relation.size
-      #
-      # @return [ Integer ] The number of documents in memory.
-      #
-      # @since 2.0.0
-      def size
-        target.size
-      end
-      alias :length :size
-
       private
-
-      # Get the default options used in binding functions.
-      #
-      # @example Get the default options.
-      #   relation.default_options(:continue => true)
-      #
-      # @param [ Hash, Array ] args The arguments to parse from.
-      #
-      # @return [ Hash ] The options merged with the actuals.
-      def default_options(args = {})
-        options = args.is_a?(Hash) ? args : args.extract_options!
-        Mongoid.binding_defaults.merge(options)
-      end
 
       # Find the first object given the supplied attributes or create/initialize it.
       #

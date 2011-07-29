@@ -71,6 +71,22 @@ module Mongoid #:nodoc
         self._parent = document
       end
 
+      # Remove a child document from this parent. If an embeds one then set to
+      # nil, otherwise remove from the embeds many.
+      #
+      # This is called from the +RemoveEmbedded+ persistence command.
+      #
+      # @example Remove the child.
+      #   document.remove_child(child)
+      #
+      # @param [ Document ] child The child (embedded) document to remove.
+      #
+      # @since 2.0.0.beta.1
+      def remove_child(child)
+        name = child.metadata.name
+        child.embedded_one? ? remove_ivar(name) : send(name).delete(child)
+      end
+
       # After children are persisted we can call this to move all their changes
       # and flag them as persisted in one call.
       #

@@ -1,87 +1,12 @@
 require "benchmark"
 require "mongoid"
+require "./perf/models"
 
 Mongoid.configure do |config|
   config.master = Mongo::Connection.new.db("mongoid_perf_test")
 end
 
 Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
-
-class Person
-  include Mongoid::Document
-
-  field :birth_date, :type => Date
-  field :title, :type => String
-
-  embeds_one :name, :validate => false
-  embeds_many :addresses, :validate => false
-  embeds_many :phones, :validate => false
-
-  references_many :posts, :validate => false
-  references_one :game, :validate => false
-  references_and_referenced_in_many :preferences, :validate => false
-
-  index [[ "_id", Mongo::ASCENDING ], [ "addresses._id", Mongo::ASCENDING ]]
-  index [[ "_id", Mongo::ASCENDING ], [ "name._id", Mongo::ASCENDING ]]
-  index "preference_ids"
-end
-
-class Name
-  include Mongoid::Document
-
-  field :given, :type => String
-  field :family, :type => String
-  field :middle, :type => String
-  embedded_in :person
-end
-
-class Address
-  include Mongoid::Document
-
-  field :street, :type => String
-  field :city, :type => String
-  field :state, :type => String
-  field :post_code, :type => String
-  field :address_type, :type => String
-  embedded_in :person
-end
-
-class Phone
-  include Mongoid::Document
-
-  field :country_code, :type => Integer
-  field :number, :type => String
-  field :phone_type, :type => String
-  embedded_in :person
-end
-
-class Post
-  include Mongoid::Document
-
-  field :title, :type => String
-  field :content, :type => String
-  referenced_in :person
-
-  index "person_id"
-end
-
-class Game
-  include Mongoid::Document
-
-  field :name, :type => String
-  referenced_in :person
-
-  index "person_id"
-end
-
-class Preference
-  include Mongoid::Document
-
-  field :name, :type => String
-  references_and_referenced_in_many :people
-
-  index "person_ids"
-end
 
 puts "Creating indexes..."
 
@@ -109,6 +34,10 @@ Benchmark.bm do |bm|
         Person.all.each { |person| person.birth_date }
       end
 
+      bm.report("#find             ") do
+        Person.find(Person.first.id)
+      end
+
       bm.report("#save             ") do
         Person.all.each do |person|
           person.title = "Testing"
@@ -123,6 +52,8 @@ Benchmark.bm do |bm|
       Person.delete_all
     end
   end
+
+  GC.start
 
   person = Person.create(:birth_date => Date.new(1970, 1, 1))
 
@@ -166,28 +97,25 @@ Benchmark.bm do |bm|
         person.addresses.delete_all
       end
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.addresses.push(
-            Address.new(
-              :street => "Wienerstr. #{n}",
-              :city => "Berlin",
-              :post_code => "10999"
-            )
-          )
+      person.addresses.clear
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        [].tap do |addresses|
+          i.times do |n|
+            addresses << Address.new(
+                :street => "Wienerstr. #{n}",
+                :city => "Berlin",
+                :post_code => "10999"
+              )
+          end
+          person.addresses.push(addresses)
         end
       end
 
-      bm.report("#save             ") do
+      bm.report("#each             ") do
         person.addresses.each do |address|
-          address.address_type = "Work"
-          address.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        person.addresses.each do |address|
-          address.update_attribute(:address_type, "Home")
+          address.street
         end
       end
 
@@ -205,6 +133,8 @@ Benchmark.bm do |bm|
     end
   end
 
+  GC.start
+
   puts "\n[ Embedded 1-1 Benchmarks ]"
 
   [ 1000, 10000 ].each do |i|
@@ -220,6 +150,8 @@ Benchmark.bm do |bm|
       end
     end
   end
+
+  GC.start
 
   puts "\n[ Referenced 1-n Benchmarks ]"
 
@@ -253,22 +185,21 @@ Benchmark.bm do |bm|
         person.posts.delete_all
       end
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.posts.push(Post.new(:title => "Posting #{n}"))
+      person.posts.clear
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        [].tap do |posts|
+          i.times do |n|
+            posts << Post.new(:title => "Posting #{n}")
+          end
+          person.posts.push(posts)
         end
       end
 
-      bm.report("#save             ") do
+      bm.report("#each             ") do
         person.posts.each do |post|
-          post.content = "Test"
-          post.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        person.posts.each do |post|
-          post.update_attribute(:content, "Testing")
+          post.title
         end
       end
 
@@ -282,7 +213,8 @@ Benchmark.bm do |bm|
         person.posts.delete(post)
       end
 
-      person.posts.delete_all
+      person.posts.clear
+      GC.start
     end
   end
 
@@ -296,11 +228,13 @@ Benchmark.bm do |bm|
 
       bm.report("#relation=        ") do
         i.times do |n|
-          person.name = Game.new(:name => "Final Fantasy #{n}")
+          person.game = Game.new(:name => "Final Fantasy #{n}")
         end
       end
     end
   end
+
+  GC.start
 
   puts "\n[ Referenced n-n Benchmarks ]"
 
@@ -310,20 +244,19 @@ Benchmark.bm do |bm|
 
       puts "[ #{i} ]"
 
+      GC.disable
+
       bm.report("#build            ") do
         i.times do |n|
           person.preferences.build(:name => "Preference #{n}")
         end
       end
 
+      GC.enable
+      GC.start
+
       bm.report("#clear            ") do
         person.preferences.clear
-      end
-
-      bm.report("#create           ") do
-        i.times do |n|
-          person.preferences.create(:name => "Preference #{n}")
-        end
       end
 
       bm.report("#count            ") do
@@ -334,22 +267,21 @@ Benchmark.bm do |bm|
         person.preferences.delete_all
       end
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.preferences.push(Preference.new(:name => "Preference #{n}"))
+      person.preferences.clear
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        [].tap do |preferences|
+          i.times do |n|
+            preferences << Preference.new(:name => "Preference #{n}")
+          end
+          person.preferences.push(preferences)
         end
       end
 
-      bm.report("#save             ") do
+      bm.report("#each             ") do
         person.preferences.each do |preference|
-          preference.name = "Test"
-          preference.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        person.preferences.each do |preference|
-          preference.update_attribute(:name, "Testing")
+          preference.name
         end
       end
 
@@ -363,7 +295,8 @@ Benchmark.bm do |bm|
         person.preferences.delete(preference)
       end
 
-      person.preferences.delete_all
+      person.preferences.clear
+      GC.start
     end
   end
 end

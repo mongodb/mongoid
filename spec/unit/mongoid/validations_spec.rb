@@ -31,8 +31,12 @@ describe Mongoid::Validations do
         person.read_attribute_for_validation(:addresses)
       end
 
+      let(:documents) do
+        Mongoid::Relations::Targets::Enumerable.new([ address ])
+      end
+
       before do
-        person.expects(:addresses).with(false, :eager => true).returns([ address ])
+        person.instance_variable_set(:@addresses, documents)
       end
 
       it "returns the value" do

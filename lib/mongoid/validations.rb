@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "mongoid/validations/associated"
-require "mongoid/validations/referenced"
 require "mongoid/validations/uniqueness"
 
 module Mongoid #:nodoc:
@@ -27,7 +26,8 @@ module Mongoid #:nodoc:
     # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
       if relations[attr.to_s]
-        send(attr, false, :eager => true)
+        relation = ivar(attr)
+        relation ? relation.in_memory : nil
       else
         send(attr)
       end
@@ -112,11 +112,7 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.1
       def validates_relation(metadata)
         if metadata.validate?
-          if metadata.embedded?
-            validates_associated(metadata.name)
-          else
-            validates_with(ReferencedValidator, _merge_attributes([metadata.name]))
-          end
+          validates_associated(metadata.name)
         end
       end
     end

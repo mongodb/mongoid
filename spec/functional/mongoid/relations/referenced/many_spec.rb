@@ -14,23 +14,6 @@ describe Mongoid::Relations::Referenced::Many do
 
     describe "##{method}" do
 
-      context "when the relationship is an illegal embedded reference" do
-
-        let(:post) do
-          Post.new
-        end
-
-        let(:video) do
-          Video.new
-        end
-
-        it "raises a mixed relation error" do
-          expect {
-            post.videos.send(method, video)
-          }.to raise_error(Mongoid::Errors::MixedRelations)
-        end
-      end
-
       context "when the relations are not polymorphic" do
 
         context "when the parent is a new record" do
@@ -48,11 +31,11 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            post.person_id.should == person.id
+            post.person_id.should eq(person.id)
           end
 
           it "sets the base on the inverse relation" do
-            post.person.should == person
+            post.person.should eq(person)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -64,7 +47,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            person.posts.size.should == 1
+            person.posts.size.should eq(1)
           end
         end
 
@@ -83,11 +66,11 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            post.person_id.should == person.id
+            post.person_id.should eq(person.id)
           end
 
           it "sets the base on the inverse relation" do
-            post.person.should == person
+            post.person.should eq(person)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -95,11 +78,11 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "saves the target" do
-            post.should_not be_a_new_record
+            post.should be_persisted
           end
 
           it "adds the document to the target" do
-            person.posts.count.should == 1
+            person.posts.count.should eq(1)
           end
 
           context "when documents already exist on the relation" do
@@ -113,11 +96,11 @@ describe Mongoid::Relations::Referenced::Many do
             end
 
             it "sets the foreign key on the relation" do
-              post_two.person_id.should == person.id
+              post_two.person_id.should eq(person.id)
             end
 
             it "sets the base on the inverse relation" do
-              post_two.person.should == person
+              post_two.person.should eq(person)
             end
 
             it "sets the same instance on the inverse relation" do
@@ -125,15 +108,15 @@ describe Mongoid::Relations::Referenced::Many do
             end
 
             it "saves the target" do
-              post_two.should_not be_a_new_record
+              post_two.should be_persisted
             end
 
             it "adds the document to the target" do
-              person.posts.count.should == 2
+              person.posts.count.should eq(2)
             end
 
             it "contains all documents in the target" do
-              person.posts.should == [ post, post_two ]
+              person.posts.should eq([ post, post_two ])
             end
           end
         end
@@ -156,11 +139,11 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            rating.ratable_id.should == movie.id
+            rating.ratable_id.should eq(movie.id)
           end
 
           it "sets the base on the inverse relation" do
-            rating.ratable.should == movie
+            rating.ratable.should eq(movie)
           end
 
           it "does not save the target" do
@@ -168,7 +151,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            movie.ratings.size.should == 1
+            movie.ratings.size.should eq(1)
           end
         end
 
@@ -187,19 +170,19 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            rating.ratable_id.should == movie.id
+            rating.ratable_id.should eq(movie.id)
           end
 
           it "sets the base on the inverse relation" do
-            rating.ratable.should == movie
+            rating.ratable.should eq(movie)
           end
 
           it "saves the target" do
-            rating.should_not be_new
+            rating.should be_persisted
           end
 
           it "adds the document to the target" do
-            movie.ratings.count.should == 1
+            movie.ratings.count.should eq(1)
           end
         end
 
@@ -207,7 +190,7 @@ describe Mongoid::Relations::Referenced::Many do
 
           before do
             Movie.identity :type => String
-            movie.ratings.create
+            movie.ratings << Rating.new
           end
 
           after do
@@ -219,7 +202,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "should have rating references" do
-            movie.ratings.count.should == 1
+            movie.ratings.count.should eq(1)
           end
         end
       end
@@ -227,23 +210,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#=" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      let(:video) do
-        Video.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos = [ video ]
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the relation is not polymorphic" do
 
@@ -377,23 +343,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#= nil" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      let(:video) do
-        Video.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos = nil
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the relation is not polymorphic" do
 
@@ -553,19 +502,6 @@ describe Mongoid::Relations::Referenced::Many do
 
     describe "##{method}" do
 
-      context "when the relationship is an illegal embedded reference" do
-
-        let(:post) do
-          Post.new
-        end
-
-        it "raises a mixed relation error" do
-          expect {
-            post.videos.send(method, :title => "Dune")
-          }.to raise_error(Mongoid::Errors::MixedRelations)
-        end
-      end
-
       context "when the relation is not polymorphic" do
 
         context "when the parent is a new record" do
@@ -707,19 +643,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#clear" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.clear
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the relation is not polymorphic" do
 
@@ -870,19 +793,6 @@ describe Mongoid::Relations::Referenced::Many do
       Movie.create
     end
 
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.count
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
-
     context "when documents have been persisted" do
 
       let!(:rating) do
@@ -932,19 +842,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#create" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.create(:title => "Test")
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the relation is not polymorphic" do
 
@@ -1052,19 +949,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#create!" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.create!(:title => "Test")
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the relation is not polymorphic" do
 
@@ -1183,22 +1067,136 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#delete" do
+
+    let!(:person) do
+      Person.create(:ssn => "123-11-1111")
+    end
+
+    context "when the document is found" do
+
+      context "when no dependent option is set" do
+
+        context "when the document is loaded" do
+
+          let!(:drug) do
+            person.drugs.create
+          end
+
+          let!(:deleted) do
+            person.drugs.delete(drug)
+          end
+
+          it "returns the document" do
+            deleted.should eq(drug)
+          end
+
+          it "deletes the foreign key" do
+            drug.person_id.should be_nil
+          end
+
+          it "removes the document from the relation" do
+            person.drugs.should_not include(drug)
+          end
+        end
+
+        context "when the document is not loaded" do
+
+          let!(:drug) do
+            Drug.create(:person_id => person.id)
+          end
+
+          let!(:deleted) do
+            person.drugs.delete(drug)
+          end
+
+          it "returns the document" do
+            deleted.should eq(drug)
+          end
+
+          it "deletes the foreign key" do
+            drug.person_id.should be_nil
+          end
+
+          it "removes the document from the relation" do
+            person.drugs.should_not include(drug)
+          end
+        end
+      end
+
+      context "when dependent is delete" do
+
+        context "when the document is loaded" do
+
+          let!(:post) do
+            person.posts.create(:title => "test")
+          end
+
+          let!(:deleted) do
+            person.posts.delete(post)
+          end
+
+          it "returns the document" do
+            deleted.should eq(post)
+          end
+
+          it "deletes the document" do
+            post.should be_destroyed
+          end
+
+          it "removes the document from the relation" do
+            person.posts.should_not include(post)
+          end
+        end
+
+        context "when the document is not loaded" do
+
+          let!(:post) do
+            Post.create(:title => "foo", :person_id => person.id)
+          end
+
+          let!(:deleted) do
+            person.posts.delete(post)
+          end
+
+          it "returns the document" do
+            deleted.should eq(post)
+          end
+
+          it "deletes the document" do
+            post.should be_destroyed
+          end
+
+          it "removes the document from the relation" do
+            person.posts.should_not include(post)
+          end
+        end
+      end
+    end
+
+    context "when the document is not found" do
+
+      let!(:post) do
+        Post.create(:title => "foo")
+      end
+
+      let!(:deleted) do
+        person.posts.delete(post)
+      end
+
+      it "returns nil" do
+        deleted.should be_nil
+      end
+
+      it "does not delete the document" do
+        post.should be_persisted
+      end
+    end
+  end
+
   [ :delete_all, :destroy_all ].each do |method|
 
     describe "##{method}" do
-
-      context "when the relationship is an illegal embedded reference" do
-
-        let(:post) do
-          Post.new
-        end
-
-        it "raises a mixed relation error" do
-          expect {
-            post.videos.send(method, :conditions => { :title => "Test" })
-          }.to raise_error(Mongoid::Errors::MixedRelations)
-        end
-      end
 
       context "when the relation is not polymorphic" do
 
@@ -1318,19 +1316,6 @@ describe Mongoid::Relations::Referenced::Many do
       Person.create(:ssn => "292-19-4232")
     end
 
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.exists?
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
-
     context "when documents exist in the database" do
 
       before do
@@ -1355,19 +1340,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#find" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.find(BSON::ObjectId.new)
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the relation is not polymorphic" do
 
@@ -1761,19 +1733,6 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find_or_create_by" do
 
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.find_or_create_by(:title => "Testing")
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
-
     context "when the relation is not polymorphic" do
 
       let(:person) do
@@ -1857,19 +1816,6 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find_or_initialize_by" do
 
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.find_or_initialize_by(:title => "Testing")
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
-
     context "when the relation is not polymorphic" do
 
       let(:person) do
@@ -1947,6 +1893,22 @@ describe Mongoid::Relations::Referenced::Many do
         it "returns a non persisted document" do
           found.should_not be_persisted
         end
+      end
+    end
+  end
+
+  describe "#initialize" do
+
+    context "when an illegal mixed relation exists" do
+
+      let(:post) do
+        Post.new
+      end
+
+      it "raises an error" do
+        expect {
+          post.videos
+        }.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
   end
@@ -2064,19 +2026,6 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#nullify_all" do
-
-    context "when the relationship is an illegal embedded reference" do
-
-      let(:post) do
-        Post.new
-      end
-
-      it "raises a mixed relation error" do
-        expect {
-          post.videos.nullify_all
-        }.to raise_error(Mongoid::Errors::MixedRelations)
-      end
-    end
 
     context "when the inverse has not been loaded" do
 
@@ -2223,7 +2172,7 @@ describe Mongoid::Relations::Referenced::Many do
           movie.ratings.create(:value => 1)
         end
 
-        it "returns 0" do
+        it "returns 1" do
           movie.ratings.send(method).should == 1
         end
       end

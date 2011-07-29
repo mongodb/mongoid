@@ -41,7 +41,6 @@ module Mongoid #:nodoc:
         ensure
           if @executions.zero?
             Threaded.insert = nil
-            raise_mixed if embedded?
             inserter.execute(collection)
           end
         end

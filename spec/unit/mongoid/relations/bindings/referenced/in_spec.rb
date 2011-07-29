@@ -35,7 +35,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         before do
           person.expects(:save).never
           game.expects(:save).never
-          binding.bind(:continue => true)
+          binding.bind
         end
 
         it "sets the inverse relation" do
@@ -71,7 +71,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         before do
           person.expects(:save).never
           post.expects(:save).never
-          binding.bind(:continue => true)
+          binding.bind
         end
 
         it "sets the inverse relation" do

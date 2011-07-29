@@ -361,8 +361,20 @@ describe Mongoid::Document do
 
     context "when an id exists" do
 
-      let(:person) do
-        Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
+      before do
+        Mongoid.identity_map_enabled = true
+      end
+
+      after do
+        Mongoid.identity_map_enabled = false
+      end
+
+      let(:id) do
+        BSON::ObjectId.new
+      end
+
+      let!(:person) do
+        Person.instantiate("_id" => id, "title" => "Sir")
       end
 
       it "sets the attributes" do
@@ -371,6 +383,10 @@ describe Mongoid::Document do
 
       it "sets persisted to true" do
         person.should be_persisted
+      end
+
+      it "puts the document in the identity map" do
+        Mongoid::IdentityMap.get(Person, id).should eq(person)
       end
     end
 
@@ -491,43 +507,6 @@ describe Mongoid::Document do
 
       it "removes the instance variable" do
         reloaded.instance_variable_defined?(:@name).should be_false
-      end
-    end
-  end
-
-  describe "#remove_child" do
-
-    let(:person) do
-      Person.new
-    end
-
-    context "when child is an embeds one" do
-
-      let!(:name) do
-        person.build_name(:first_name => "James")
-      end
-
-      before do
-        person.remove_child(name)
-      end
-
-      it "removes the relation instance" do
-        person.name.should be_nil
-      end
-    end
-
-    context "when child is an embeds many" do
-
-      let!(:address) do
-        person.addresses.build(:street => "Upper St")
-      end
-
-      before do
-        person.remove_child(address)
-      end
-
-      it "removes the document from the relation target" do
-        person.addresses.should be_empty
       end
     end
   end

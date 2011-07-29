@@ -244,6 +244,25 @@ describe Mongoid::Criterion::Inclusion do
         end
       end
 
+      context "when merging a simple value into a complex one" do
+
+        let(:id) do
+          BSON::ObjectId.new
+        end
+
+        let(:criteria) do
+          base.any_in(:_id => [ id ])
+        end
+
+        let(:merged) do
+          criteria.where(:_id => id)
+        end
+
+        it "overwrites the initial value" do
+          merged.selector.should eq({ :_id => id })
+        end
+      end
+
       context "when providing multiple values on the same complex attribute" do
 
         let(:criteria) do

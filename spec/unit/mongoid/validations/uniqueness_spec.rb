@@ -4,11 +4,13 @@ describe Mongoid::Validations::UniquenessValidator do
 
   describe "#validate_each" do
 
-    before do
-      @document = Person.new
+    let(:document) do
+      Person.new
     end
 
-    let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes) }
+    let(:validator) do
+      described_class.new(:attributes => document.attributes)
+    end
 
     context "when a document exists with the attribute value" do
 
@@ -16,15 +18,15 @@ describe Mongoid::Validations::UniquenessValidator do
         @criteria = stub(:exists? => true)
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
       it "adds the errors to the document" do
-        @document.errors[:title].should_not be_empty
+        document.errors[:title].should_not be_empty
       end
 
       it "should translate the error in english" do
-        @document.errors[:title][0].should == "is already taken"
+        document.errors[:title][0].should == "is already taken"
       end
     end
 
@@ -48,11 +50,11 @@ describe Mongoid::Validations::UniquenessValidator do
         @criteria = stub(:exists? => false)
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
       it "adds no errors" do
-        @document.errors[:title].should be_empty
+        document.errors[:title].should be_empty
       end
     end
 
@@ -130,21 +132,43 @@ describe Mongoid::Validations::UniquenessValidator do
   describe "#validate_each with embedded document" do
 
     context "embeds_many" do
-      let(:person) { Person.new }
-      let(:favorite) { person.favorites.build(:title => "pizza") }
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => favorite.attributes) }
-      let(:criteria) { stub(:exists? => false) }
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:favorite) do
+        person.favorites.build(:title => "pizza")
+      end
+
+      let(:validator) do
+        described_class.new(:attributes => favorite.attributes)
+      end
+
+      let(:criteria) do
+        stub(:exists? => false)
+      end
 
       it "excludes by attribute and id" do
-        person.favorites.expects(:where).with(:title => "pizza", :_id => {'$ne' => favorite.id}).returns(criteria)
         validator.setup(Favorite)
         validator.validate_each(favorite, :title, "pizza")
+        favorite.errors.should be_empty
       end
     end
+
     context "embeds_one" do
-      let(:person) { Patient.new }
-      let(:email) { Email.new(:address => "joe@example.com", :patient => person) }
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => email.attributes) }
+
+      let!(:person) do
+        Patient.new
+      end
+
+      let(:email) do
+        Email.new(:address => "joe@example.com", :patient => person)
+      end
+
+      let(:validator) do
+        described_class.new(:attributes => email.attributes)
+      end
 
       it "no validations are run" do
         email.expects(:where).never
@@ -153,7 +177,10 @@ describe Mongoid::Validations::UniquenessValidator do
       end
 
       context "when document has no parent" do
-        let(:email) { Email.new(:address => "joe@example.com") }
+
+        let(:email) do
+          Email.new(:address => "joe@example.com")
+        end
 
         it "no validations are run" do
           person.expects(:address).never
@@ -166,35 +193,38 @@ describe Mongoid::Validations::UniquenessValidator do
 
   describe "#validate_each with :scope option given" do
 
+    let(:document) do
+      Person.new(:employer_id => 3, :terms => true, :title => "")
+    end
+
     before do
-      @document = Person.new(:employer_id => 3, :terms => true, :title => "")
       @criteria = stub(:exists? => false)
     end
 
     describe "as a symbol" do
 
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes,
+      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => document.attributes,
                                                                       :scope => :employer_id) }
 
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => document.attributes["employer_id"]).returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
     end
 
     describe "as an array" do
 
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes,
+      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => document.attributes,
                                                                       :scope => [:employer_id, :terms]) }
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => document.attributes["employer_id"]).returns(@criteria)
         @criteria.expects(:where).with(:terms => true).returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
     end
@@ -202,11 +232,13 @@ describe Mongoid::Validations::UniquenessValidator do
 
   describe "#validate_each with case sensitive true" do
 
-    before do
-      @document = Person.new
+    let(:document) do
+      Person.new
     end
 
-    let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, :case_sensitive => true) }
+    let(:validator) do
+      described_class.new(:attributes => document.attributes, :case_sensitive => true)
+    end
 
     context "when a document exists with the attribute value" do
 
@@ -214,15 +246,15 @@ describe Mongoid::Validations::UniquenessValidator do
         @criteria = stub(:exists? => true)
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
       it "adds the errors to the document" do
-        @document.errors[:title].should_not be_empty
+        document.errors[:title].should_not be_empty
       end
 
       it "should translate the error in english" do
-        @document.errors[:title][0].should == "is already taken"
+        document.errors[:title][0].should == "is already taken"
       end
     end
 
@@ -246,11 +278,11 @@ describe Mongoid::Validations::UniquenessValidator do
         @criteria = stub(:exists? => false)
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
       it "adds no errors" do
-        @document.errors[:title].should be_empty
+        document.errors[:title].should be_empty
       end
     end
 
@@ -327,11 +359,13 @@ describe Mongoid::Validations::UniquenessValidator do
 
   describe "#validate_each with case sensitive false" do
 
-    before do
-      @document = Person.new
+    let(:document) do
+      Person.new
     end
 
-    let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes, :case_sensitive => false) }
+    let(:validator) do
+      described_class.new(:attributes => document.attributes, :case_sensitive => false)
+    end
 
     context "when a document exists with the attribute value" do
 
@@ -339,15 +373,15 @@ describe Mongoid::Validations::UniquenessValidator do
         @criteria = stub(:exists? => true)
         Person.expects(:where).with(:title => /^Sir$/i).returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
       it "adds the errors to the document" do
-        @document.errors[:title].should_not be_empty
+        document.errors[:title].should_not be_empty
       end
 
       it "should translate the error in english" do
-        @document.errors[:title][0].should == "is already taken"
+        document.errors[:title][0].should == "is already taken"
       end
     end
 
@@ -371,11 +405,11 @@ describe Mongoid::Validations::UniquenessValidator do
         @criteria = stub(:exists? => false)
         Person.expects(:where).with(:title => /^Sir$/i).returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
       it "adds no errors" do
-        @document.errors[:title].should be_empty
+        document.errors[:title].should be_empty
       end
     end
 
@@ -453,21 +487,43 @@ describe Mongoid::Validations::UniquenessValidator do
   describe "#validate_each with embedded document" do
 
     context "embeds_many" do
-      let(:person) { Person.new }
-      let(:favorite) { person.favorites.build(:title => "pizza") }
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => favorite.attributes, :case_sensitive => true) }
-      let(:criteria) { stub(:exists? => false) }
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:favorite) do
+        person.favorites.build(:title => "pizza")
+      end
+
+      let(:validator) do
+        described_class.new(:attributes => favorite.attributes, :case_sensitive => true)
+      end
+
+      let(:criteria) do
+        stub(:exists? => false)
+      end
 
       it "excludes by attribute and id" do
-        person.favorites.expects(:where).with(:title => "pizza", :_id => {'$ne' => favorite.id}).returns(criteria)
         validator.setup(Favorite)
         validator.validate_each(favorite, :title, "pizza")
+        favorite.errors.should be_empty
       end
     end
+
     context "embeds_one" do
-      let(:person) { Patient.new }
-      let(:email) { Email.new(:address => "joe@example.com", :person => person) }
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => email.attributes, :case_sensitive => true) }
+
+      let(:person) do
+        Patient.new
+      end
+
+      let(:email) do
+        Email.new(:address => "joe@example.com", :person => person)
+      end
+
+      let(:validator) do
+        described_class.new(:attributes => email.attributes, :case_sensitive => true)
+      end
 
       it "no validations are run" do
         email.expects(:where).never
@@ -488,37 +544,49 @@ describe Mongoid::Validations::UniquenessValidator do
 
   describe "#validate_each with :scope option given" do
 
+    let(:document) do
+      Person.new(:employer_id => 3, :terms => true, :title => "")
+    end
+
     before do
-      @document = Person.new(:employer_id => 3, :terms => true, :title => "")
       @criteria = stub(:exists? => false)
     end
 
     describe "as a symbol" do
 
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes,
-                                                                      :scope => :employer_id, :case_sensitive => true) }
+      let(:validator) do
+        described_class.new(
+          :attributes => document.attributes,
+          :scope => :employer_id,
+          :case_sensitive => true
+        )
+      end
 
       it "should query only scoped documents" do
         Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => document.attributes["employer_id"]).returns(@criteria)
         validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+        validator.validate_each(document, :title, "Sir")
       end
 
     end
 
     describe "as an array" do
 
-      let(:validator) { Mongoid::Validations::UniquenessValidator.new(:attributes => @document.attributes,
-                                                                      :scope => [:employer_id, :terms], :case_sensitive => true) }
-      it "should query only scoped documents" do
-        Person.expects(:where).with(:title => "Sir").returns(@criteria)
-        @criteria.expects(:where).with(:employer_id => @document.attributes["employer_id"]).returns(@criteria)
-        @criteria.expects(:where).with(:terms => true).returns(@criteria)
-        validator.setup(Person)
-        validator.validate_each(@document, :title, "Sir")
+      let(:validator) do
+        described_class.new(
+          :attributes => document.attributes,
+          :scope => [:employer_id, :terms],
+          :case_sensitive => true)
       end
 
+      it "should query only scoped documents" do
+        Person.expects(:where).with(:title => "Sir").returns(@criteria)
+        @criteria.expects(:where).with(:employer_id => document.attributes["employer_id"]).returns(@criteria)
+        @criteria.expects(:where).with(:terms => true).returns(@criteria)
+        validator.setup(Person)
+        validator.validate_each(document, :title, "Sir")
+      end
     end
   end
 end

@@ -23,25 +23,16 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind(options = {})
-            inverse = metadata.inverse(target)
-            base.metadata = target.reflect_on_association(inverse)
+          def bind
+            base.metadata = metadata.inverse_metadata(target)
             base.parentize(target)
-            if options[:continue]
-              if base.embedded_many?
-                target.do_or_do_not(
-                  inverse,
-                  false,
-                  :binding => true,
-                  :continue => false
-                ).push(base, :binding => true, :continue => false)
-              else
-                target.do_or_do_not(
-                  metadata.inverse_setter(target),
-                  base,
-                  :binding => true,
-                  :continue => false
-                )
+            unless binding?
+              binding do
+                if base.embedded_many?
+                  target.do_or_do_not(metadata.inverse(target)).push(base)
+                else
+                  target.do_or_do_not(metadata.inverse_setter(target), base)
+                end
               end
             end
           end
@@ -59,18 +50,14 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :continue Do we continue unbinding?
           #
           # @since 2.0.0.rc.1
-          def unbind(options = {})
-            if options[:continue]
-              if base.embedded_many?
-                inverse = metadata.inverse(target)
-                target.do_or_do_not(inverse).delete(base)
-              else
-                target.do_or_do_not(
-                  metadata.inverse_setter(target),
-                  nil,
-                  :binding => true,
-                  :continue => false
-                )
+          def unbind
+            unless binding?
+              binding do
+                if base.embedded_many?
+                  target.do_or_do_not(metadata.inverse(target)).delete(base)
+                else
+                  target.do_or_do_not(metadata.inverse_setter(target), nil)
+                end
               end
             end
           end
