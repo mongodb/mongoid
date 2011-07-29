@@ -59,7 +59,7 @@ Benchmark.bm do |bm|
 
   puts "\n[ Embedded 1-n Benchmarks ]"
 
-  [ 1000, 2000 ].each do |i|
+  [ 1000, 10000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -97,28 +97,25 @@ Benchmark.bm do |bm|
         person.addresses.delete_all
       end
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.addresses.push(
-            Address.new(
-              :street => "Wienerstr. #{n}",
-              :city => "Berlin",
-              :post_code => "10999"
-            )
-          )
+      person.addresses.clear
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        [].tap do |addresses|
+          i.times do |n|
+            addresses << Address.new(
+                :street => "Wienerstr. #{n}",
+                :city => "Berlin",
+                :post_code => "10999"
+              )
+          end
+          person.addresses.push(addresses)
         end
       end
 
-      bm.report("#save             ") do
+      bm.report("#each             ") do
         person.addresses.each do |address|
-          address.address_type = "Work"
-          address.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        person.addresses.each do |address|
-          address.update_attribute(:address_type, "Home")
+          address
         end
       end
 
@@ -136,9 +133,11 @@ Benchmark.bm do |bm|
     end
   end
 
+  GC.start
+
   puts "\n[ Embedded 1-1 Benchmarks ]"
 
-  [ 1000, 2000 ].each do |i|
+  [ 1000, 10000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -151,6 +150,8 @@ Benchmark.bm do |bm|
       end
     end
   end
+
+  GC.start
 
   puts "\n[ Referenced 1-n Benchmarks ]"
 
@@ -187,9 +188,12 @@ Benchmark.bm do |bm|
       person.posts.clear
       GC.start
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.posts.push(Post.new(:title => "Posting #{n}"))
+      bm.report("#push (batch)     ") do
+        [].tap do |posts|
+          i.times do |n|
+            posts << Post.new(:title => "Posting #{n}")
+          end
+          person.posts.push(posts)
         end
       end
 
@@ -230,6 +234,8 @@ Benchmark.bm do |bm|
     end
   end
 
+  GC.start
+
   puts "\n[ Referenced n-n Benchmarks ]"
 
   [ 1000, 10000 ].each do |i|
@@ -238,21 +244,31 @@ Benchmark.bm do |bm|
 
       puts "[ #{i} ]"
 
+      GC.disable
+
       bm.report("#build            ") do
         i.times do |n|
           person.preferences.build(:name => "Preference #{n}")
         end
       end
 
+      GC.enable
+      GC.start
+
       bm.report("#clear            ") do
         person.preferences.clear
       end
+
+      GC.disable
 
       bm.report("#create           ") do
         i.times do |n|
           person.preferences.create(:name => "Preference #{n}")
         end
       end
+
+      GC.enable
+      GC.start
 
       bm.report("#count            ") do
         person.preferences.count
@@ -265,9 +281,12 @@ Benchmark.bm do |bm|
       person.preferences.clear
       GC.start
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.preferences.push(Preference.new(:name => "Preference #{n}"))
+      bm.report("#push (batch)     ") do
+        [].tap do |preferences|
+          i.times do |n|
+            preferences << Preference.new(:name => "Preference #{n}")
+          end
+          person.preferences.push(preferences)
         end
       end
 
@@ -288,6 +307,7 @@ Benchmark.bm do |bm|
       end
 
       person.preferences.clear
+      GC.start
     end
   end
 end

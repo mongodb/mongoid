@@ -3,7 +3,7 @@ require "mongoid"
 require "./perf/models"
 
 Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db("mongoid_perf_test")
+  config.master = Mongo::Connection.new().db("mongoid_perf_test")
 end
 
 Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
@@ -50,7 +50,7 @@ without_gc do
   end
 end
 
-person = Person.first
+person = Person.create(:title => "Sir")
 
 without_gc do
   puts "[ Embedded 1-n #build ]"
@@ -257,7 +257,7 @@ end
 without_gc do
   puts "[ Referenced n-n #build ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_n_build.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.preferences.build(:name => "Preference #{n}")
     end
   end
@@ -273,7 +273,7 @@ end
 without_gc do
   puts "[ Referenced n-n #create ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_n_create.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.preferences.create(:name => "Preference #{n}")
     end
   end
@@ -296,7 +296,7 @@ end
 without_gc do
   puts "[ Referenced n-n #push ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_n_push.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.preferences.push(Preference.new(:name => "Preference #{n}"))
     end
   end
