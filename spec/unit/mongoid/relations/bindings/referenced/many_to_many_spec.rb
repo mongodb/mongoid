@@ -34,11 +34,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
         binding.bind_one(preference_two)
       end
 
-      it "sets the inverse relation" do
-        preference_two.people.should == [ person ]
-      end
-
-      it "sets the foreign key" do
+      it "sets the inverse foreign key" do
         preference_two.person_ids.should == [ person.id ]
       end
 

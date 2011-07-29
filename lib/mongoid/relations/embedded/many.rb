@@ -60,13 +60,9 @@ module Mongoid # :nodoc:
         #
         # @return [ Many ] The empty relation.
         def clear
-          atomically(:$unset) do
-            target.each do |doc|
-              doc.delete unless doc.destroyed?
-              unbind_one(doc) unless binding?
-            end
+          tap do |proxy|
+            atomically(:$unset) { proxy.delete_all }
           end
-          target.clear
         end
 
         # Returns a count of the number of documents in the association that have
@@ -126,7 +122,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def delete(document)
-          target.delete(document).tap do |doc|
+          target.delete_one(document).tap do |doc|
             unbind_one(doc) if doc && !binding?
             reindex
           end
@@ -374,7 +370,8 @@ module Mongoid # :nodoc:
           criteria = find(:all, conditions || {})
           criteria.size.tap do
             criteria.each do |doc|
-              target.delete_at(target.index(doc))
+              target.delete_one(doc)
+              unbind_one(doc)
               doc.send(method, :suppress => true)
             end
             reindex

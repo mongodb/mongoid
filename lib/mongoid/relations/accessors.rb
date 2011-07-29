@@ -24,7 +24,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def build(name, object, metadata, options = {})
         relation = create_relation(object, metadata, options[:loading])
-        set(name, relation)
+        set_relation(name, relation)
       end
 
       # Create a relation from an object and metadata.
@@ -70,7 +70,7 @@ module Mongoid # :nodoc:
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def set(name, relation)
+      def set_relation(name, relation)
         instance_variable_set("@#{name}", relation)
       end
 
@@ -85,7 +85,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0
       def substitute(name, object)
-        set(name, ivar(name).substitute(object))
+        set_relation(name, ivar(name).substitute(object))
       end
 
       module ClassMethods #:nodoc:

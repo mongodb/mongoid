@@ -234,7 +234,7 @@ module Mongoid #:nodoc:
           init(base, Targets::Enumerable.new(target), metadata) do |proxy|
             raise_mixed if klass.embedded?
             batched do
-              proxy.target.in_memory do |doc|
+              proxy.in_memory do |doc|
                 characterize_one(doc)
                 bind_one(doc)
                 doc.save if persistable?

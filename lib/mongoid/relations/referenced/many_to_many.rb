@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "perftools"
+
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
@@ -7,8 +9,104 @@ module Mongoid # :nodoc:
       # many-to-many between documents in different collections.
       class ManyToMany < Many
 
+        # Appends a document or array of documents to the relation. Will set
+        # the parent and update the index in the process.
+        #
+        # @example Append a document.
+        #   person.posts << post
+        #
+        # @example Push a document.
+        #   person.posts.push(post)
+        #
+        # @example Concat with other documents.
+        #   person.posts.concat([ post_one, post_two ])
+        #
+        # @param [ Document, Array<Document> ] *args Any number of documents.
+        #
+        # @return [ Array<Document> ] The loaded docs.
+        #
+        # @since 2.0.0.beta.1
+        def <<(*args)
+          batched do
+            [].tap do |ids|
+              args.flatten.each do |doc|
+                next unless doc
+                append(doc)
+                if persistable?
+                  ids.push(doc.id)
+                  doc.save
+                else
+                  base.send(metadata.foreign_key).push(doc.id)
+                end
+              end
+              base.push_all(metadata.foreign_key, ids) if persistable?
+            end
+          end
+        end
         alias :concat :<<
         alias :push :<<
+
+        # Build a new document from the attributes and append it to this
+        # relation without saving.
+        #
+        # @example Build a new document on the relation.
+        #   person.posts.build(:title => "A new post")
+        #
+        # @param [ Hash ] attributes The attributes of the new document.
+        # @param [ Class ] type The optional subclass to build.
+        #
+        # @return [ Document ] The new document.
+        #
+        # @since 2.0.0.beta.1
+        def build(attributes = {}, type = nil)
+          Factory.build(type || klass, attributes).tap do |doc|
+            base.send(metadata.foreign_key).push(doc.id)
+            append(doc)
+            yield(doc) if block_given?
+          end
+        end
+        alias :new :build
+
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted.
+        #
+        # @example Create and save the new document.
+        #   person.posts.create(:text => "Testing")
+        #
+        # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Class ] type The optional type of document to create.
+        #
+        # @return [ Document ] The newly created document.
+        #
+        # @since 2.0.0.beta.1
+        def create(attributes = nil, type = nil, &block)
+          super.tap do |doc|
+            base.send(metadata.foreign_key).delete_one(doc.id)
+            base.push(metadata.foreign_key, doc.id)
+          end
+        end
+
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted and will raise an
+        # error if validation fails.
+        #
+        # @example Create and save the new document.
+        #   person.posts.create!(:text => "Testing")
+        #
+        # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Class ] type The optional type of document to create.
+        #
+        # @raise [ Errors::Validations ] If validation failed.
+        #
+        # @return [ Document ] The newly created document.
+        #
+        # @since 2.0.0.beta.1
+        def create!(attributes = nil, type = nil, &block)
+          super.tap do |doc|
+            base.send(metadata.foreign_key).delete_one(doc.id)
+            base.push(metadata.foreign_key, doc.id)
+          end
+        end
 
         # Delete the document from the relation. This will set the foreign key
         # on the document to nil. If the dependent options on the relation are
@@ -23,7 +121,40 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def delete(document)
-          super.tap { |doc| base.save if doc && persistable? }
+          super.tap do |doc|
+            if doc && persistable?
+              base.pull(metadata.foreign_key, doc.id)
+            end
+          end
+        end
+
+        # Instantiate a new references_many relation. Will set the foreign key
+        # and the base on the inverse object.
+        #
+        # @example Create the new relation.
+        #   Referenced::Many.new(base, target, metadata)
+        #
+        # @param [ Document ] base The document this relation hangs off of.
+        # @param [ Array<Document> ] target The target of the relation.
+        # @param [ Metadata ] metadata The relation's metadata.
+        #
+        # @since 2.0.0.beta.1
+        def initialize(base, target, metadata)
+          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
+            raise_mixed if klass.embedded?
+            batched do
+              proxy.in_memory do |doc|
+                characterize_one(doc)
+                bind_one(doc)
+                if persistable?
+                  base.push(metadata.foreign_key, doc.id)
+                  doc.save
+                else
+                  base.send(metadata.foreign_key).push(doc.id)
+                end
+              end
+            end
+          end
         end
 
         # Removes all associations between the base document and the target
@@ -35,6 +166,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
+          # @todo: Durran: This is wrong.
           criteria.update(metadata.inverse_foreign_key => [])
           # We need to update the inverse as well.
           target.clear do |doc|

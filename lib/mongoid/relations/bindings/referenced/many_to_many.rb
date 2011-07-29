@@ -17,11 +17,10 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind_one(doc)
-            base.push(metadata.foreign_key, doc.id)
             unless binding?
               binding do
-                inverse = metadata.inverse(target)
-                doc.send(inverse).push(base) if inverse
+                inverse_keys = doc.do_or_do_not(metadata.inverse_foreign_key)
+                inverse_keys.push(base.id) if inverse_keys
               end
             end
           end
@@ -33,11 +32,11 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind_one(doc)
-            base.pull(metadata.foreign_key, doc.id)
             unless binding?
               binding do
-                inverse = metadata.inverse(target)
-                doc.send(inverse).delete(base) if inverse
+                base.send(metadata.foreign_key).delete_one(doc.id)
+                inverse_keys = doc.do_or_do_not(metadata.inverse_foreign_key)
+                inverse_keys.delete_one(base.id) if inverse_keys
               end
             end
           end
