@@ -115,7 +115,7 @@ Benchmark.bm do |bm|
 
       bm.report("#each             ") do
         person.addresses.each do |address|
-          address
+          address.street
         end
       end
 
@@ -199,7 +199,7 @@ Benchmark.bm do |bm|
 
       bm.report("#each             ") do
         person.posts.each do |post|
-          post
+          post.title
         end
       end
 
@@ -259,17 +259,6 @@ Benchmark.bm do |bm|
         person.preferences.clear
       end
 
-      GC.disable
-
-      bm.report("#create           ") do
-        i.times do |n|
-          person.preferences.create(:name => "Preference #{n}")
-        end
-      end
-
-      GC.enable
-      GC.start
-
       bm.report("#count            ") do
         person.preferences.count
       end
@@ -292,7 +281,7 @@ Benchmark.bm do |bm|
 
       bm.report("#each             ") do
         person.preferences.each do |preference|
-          preference
+          preference.name
         end
       end
 
