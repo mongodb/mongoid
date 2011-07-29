@@ -31,7 +31,7 @@ module Mongoid # :nodoc:
                   if base.referenced_many?
                     target.send(inverse).push(base)
                   else
-                    target.send(metadata.inverse_setter(target), base)
+                    target.do_or_do_not(metadata.inverse_setter(target), base)
                   end
                 end
               end
