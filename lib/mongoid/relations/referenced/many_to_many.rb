@@ -1,6 +1,4 @@
 # encoding: utf-8
-require "perftools"
-
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Referenced #:nodoc:
