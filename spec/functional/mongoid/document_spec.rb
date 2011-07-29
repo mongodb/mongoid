@@ -418,8 +418,7 @@ describe Mongoid::Document do
           person.reload
         end
 
-        pending "should reload the association" do
-          # @todo: Durran clear out associations in identity map here?
+        it "reloads the association" do
           person.game.score.should == 75
         end
       end
@@ -437,8 +436,7 @@ describe Mongoid::Document do
           game.reload
         end
 
-        pending "should reload the association" do
-          # @todo: Durran clear out associations in identity map here?
+        it "reloads the association" do
           game.person.title.should == "Mam"
         end
       end
