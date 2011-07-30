@@ -41,6 +41,14 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       it "passes the binding options through to the inverse" do
         person.expects(:save).never
       end
+
+      it "syncs the base" do
+        person.should be_synced("preference_ids")
+      end
+
+      it "syncs the inverse" do
+        preference_two.should be_synced("person_ids")
+      end
     end
 
     context "when ensuring minimal saves" do
@@ -87,6 +95,14 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
 
       it "removed the foreign keys" do
         preference.person_ids.should be_empty
+      end
+
+      it "syncs the base" do
+        person.should be_synced("preference_ids")
+      end
+
+      it "syncs the inverse" do
+        preference.should be_synced("person_ids")
       end
     end
 

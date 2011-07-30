@@ -22,6 +22,7 @@ require "mongoid/relations/referenced/many"
 require "mongoid/relations/referenced/many_to_many"
 require "mongoid/relations/referenced/one"
 require "mongoid/relations/reflections"
+require "mongoid/relations/synchronization"
 require "mongoid/relations/metadata"
 require "mongoid/relations/macros"
 
@@ -40,6 +41,7 @@ module Mongoid # :nodoc:
     include Macros
     include Polymorphic
     include Reflections
+    include Synchronization
 
     included do
       attr_accessor :metadata

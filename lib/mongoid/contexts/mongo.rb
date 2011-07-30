@@ -6,6 +6,14 @@ module Mongoid #:nodoc:
 
       delegate :klass, :options, :field_list, :selector, :to => :criteria
 
+      def add_to_set(field, value)
+        klass.collection.update(
+          selector,
+          { "$addToSet" => { field => value } },
+          :multi => true
+        )
+      end
+
       # Aggregate the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the
@@ -235,6 +243,14 @@ module Mongoid #:nodoc:
         grouped(:min, field.to_s, Javascript.min)
       end
 
+      def pull(field, value)
+        klass.collection.update(
+          selector,
+          { "$pull" => { field => value } },
+          :multi => true
+        )
+      end
+
       # Return the first result for the +Context+ and skip it
       # for successive calls.
       #
@@ -266,6 +282,8 @@ module Mongoid #:nodoc:
       # Very basic update that will perform a simple atomic $set of the
       # attributes provided in the hash. Can be expanded to later for more
       # robust functionality.
+      #
+      # @todo Fix safe mode options.
       #
       # @example Update all matching documents.
       #   context.update_all(:title => "Sir")

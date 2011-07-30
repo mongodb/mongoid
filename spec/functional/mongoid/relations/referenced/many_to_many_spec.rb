@@ -788,12 +788,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when the documents are part of the relation" do
 
         before do
-          Preference.create(:person_ids => person.id)
+          Preference.create(:person_ids => [ person.id ])
         end
 
-        pending "returns the count from the db" do
-          # @todo: Durran this gets fixed with m-t-m key fix.
-          person.preferences.count.should == 1
+        it "returns the count from the db" do
+          person.reload.preferences.count.should == 1
         end
       end
 

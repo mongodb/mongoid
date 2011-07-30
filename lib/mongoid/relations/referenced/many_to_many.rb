@@ -37,7 +37,10 @@ module Mongoid # :nodoc:
                   base.send(metadata.foreign_key).push(doc.id)
                 end
               end
-              base.push_all(metadata.foreign_key, ids) if persistable?
+              if persistable?
+                base.push_all(metadata.foreign_key, ids)
+                base.synced[metadata.foreign_key] = false
+              end
             end
           end
         end
@@ -81,6 +84,7 @@ module Mongoid # :nodoc:
           super.tap do |doc|
             base.send(metadata.foreign_key).delete_one(doc.id)
             base.push(metadata.foreign_key, doc.id)
+            base.synced[metadata.foreign_key] = false
           end
         end
 
@@ -103,6 +107,7 @@ module Mongoid # :nodoc:
           super.tap do |doc|
             base.send(metadata.foreign_key).delete_one(doc.id)
             base.push(metadata.foreign_key, doc.id)
+            base.synced[metadata.foreign_key] = false
           end
         end
 
@@ -122,6 +127,7 @@ module Mongoid # :nodoc:
           super.tap do |doc|
             if doc && persistable?
               base.pull(metadata.foreign_key, doc.id)
+              base.synced[metadata.foreign_key] = false
             end
           end
         end
@@ -146,6 +152,7 @@ module Mongoid # :nodoc:
                 bind_one(doc)
                 if persistable?
                   base.push(metadata.foreign_key, doc.id)
+                  base.synced[metadata.foreign_key] = false
                   doc.save
                 else
                   base.send(metadata.foreign_key).push(doc.id)

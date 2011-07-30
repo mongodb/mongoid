@@ -234,6 +234,10 @@ module Mongoid # :nodoc:
         @foreign_key ||= determine_foreign_key
       end
 
+      def foreign_key_check
+        @foreign_key_check ||= "#{foreign_key}_changed?"
+      end
+
       # Returns the name of the method used to set the foreign key on a
       # document.
       #

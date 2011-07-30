@@ -193,6 +193,7 @@ module Mongoid # :nodoc:
             reference(meta, Array)
             autosave(meta)
             validates_relation(meta)
+            synced(meta)
           end
         end
         alias :has_and_belongs_to_many :references_and_referenced_in_many

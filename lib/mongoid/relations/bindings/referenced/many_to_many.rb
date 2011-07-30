@@ -21,6 +21,8 @@ module Mongoid # :nodoc:
               binding do
                 inverse_keys = doc.do_or_do_not(metadata.inverse_foreign_key)
                 inverse_keys.push(base.id) if inverse_keys
+                base.synced[metadata.foreign_key] = true
+                doc.synced[metadata.inverse_foreign_key] = true
               end
             end
           end
@@ -37,6 +39,8 @@ module Mongoid # :nodoc:
                 base.send(metadata.foreign_key).delete_one(doc.id)
                 inverse_keys = doc.do_or_do_not(metadata.inverse_foreign_key)
                 inverse_keys.delete_one(base.id) if inverse_keys
+                base.synced[metadata.foreign_key] = true
+                doc.synced[metadata.inverse_foreign_key] = true
               end
             end
           end

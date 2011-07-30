@@ -42,6 +42,7 @@ module Mongoid #:nodoc:
       :field_list
 
     delegate \
+      :add_to_set,
       :aggregate,
       :avg,
       :blank?,
@@ -59,6 +60,7 @@ module Mongoid #:nodoc:
       :max,
       :min,
       :one,
+      :pull,
       :shift,
       :sum,
       :update,
