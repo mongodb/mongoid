@@ -7,5 +7,4 @@ describe "locales" do
       expect { YAML.load_file(file) }.to_not raise_error
     end
   end
-
 end
