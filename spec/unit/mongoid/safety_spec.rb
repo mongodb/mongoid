@@ -172,8 +172,8 @@ describe Mongoid::Safety do
     context "when providing options" do
 
       before do
-        collection.expects(:remove).with({ :_id => person.id }, :safe => { :w => 2 })
-        person.safely(:w => 2).delete
+        collection.expects(:remove).with({ :_id => person.id }, :safe => { :fsync => true })
+        person.safely(:fsync => true).delete
       end
 
       it "clears the safety options post persist" do
@@ -232,8 +232,8 @@ describe Mongoid::Safety do
     context "when providing options" do
 
       before do
-        collection.expects(:remove).with({ :_id => person.id }, :safe => { :w => 2 })
-        person.safely(:w => 2).destroy
+        collection.expects(:remove).with({ :_id => person.id }, :safe => { :fsync => true })
+        person.safely(:fsync => true).destroy
       end
 
       it "clears the safety options post persist" do
@@ -264,8 +264,8 @@ describe Mongoid::Safety do
 
       before do
         collection.expects(:find).with({}, {}).twice.returns([ person ])
-        collection.expects(:remove).with({ :_id => person.id }, :safe => { :w => 2 })
-        Person.safely(:w => 2).destroy_all
+        collection.expects(:remove).with({ :_id => person.id }, :safe => { :fsync => true })
+        Person.safely(:fsync => true).destroy_all
       end
 
       it "clears the safety options post persist" do

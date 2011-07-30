@@ -234,6 +234,14 @@ module Mongoid # :nodoc:
         @foreign_key ||= determine_foreign_key
       end
 
+      # Get the name of the method to check if the foreign key has changed.
+      #
+      # @example Get the foreign key check method.
+      #   metadata.foreign_key_check
+      #
+      # @return [ String ] The foreign key check.
+      #
+      # @since 2.1.0
       def foreign_key_check
         @foreign_key_check ||= "#{foreign_key}_changed?"
       end

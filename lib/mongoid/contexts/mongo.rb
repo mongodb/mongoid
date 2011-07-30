@@ -6,6 +6,17 @@ module Mongoid #:nodoc:
 
       delegate :klass, :options, :field_list, :selector, :to => :criteria
 
+      # Perform an add to set on the matching documents.
+      #
+      # @example Add to set on all matching.
+      #   Person.where(:name => "Alex").add_to_set(:aliases, "value")
+      #
+      # @param [ String ] field The field to add to.
+      # @param [ Object ] value The value to add.
+      #
+      # @return [ Object ] The update value.
+      #
+      # @since 2.1.0
       def add_to_set(field, value)
         klass.collection.update(
           selector,
@@ -243,6 +254,17 @@ module Mongoid #:nodoc:
         grouped(:min, field.to_s, Javascript.min)
       end
 
+      # Perform a pull on the matching documents.
+      #
+      # @example Pull on all matching.
+      #   Person.where(:name => "Alex").pull(:aliases, "value")
+      #
+      # @param [ String ] field The field to pull from.
+      # @param [ Object ] value The value to pull.
+      #
+      # @return [ Object ] The update value.
+      #
+      # @since 2.1.0
       def pull(field, value)
         klass.collection.update(
           selector,
@@ -283,8 +305,6 @@ module Mongoid #:nodoc:
       # attributes provided in the hash. Can be expanded to later for more
       # robust functionality.
       #
-      # @todo Fix safe mode options.
-      #
       # @example Update all matching documents.
       #   context.update_all(:title => "Sir")
       #
@@ -295,9 +315,10 @@ module Mongoid #:nodoc:
         klass.collection.update(
           selector,
           { "$set" => attributes },
-          :multi => true,
-          :safe => Mongoid.persist_in_safe_mode
-        )
+          Safety.merge_safety_options(:multi => true)
+        ).tap do
+          Threaded.clear_safety_options!
+        end
       end
       alias :update :update_all
 
