@@ -912,24 +912,50 @@ describe Mongoid::NestedAttributes do
 
             context "when the ids match in an array of attributes" do
 
-              before do
-                person.addresses_attributes =
-                  [
-                    { "id" => address_one.id, "street" => "Maybachufer" },
-                    { "id" => address_two.id, "street" => "Alexander Platz" }
-                  ]
+              context "when passing in id" do
+
+                before do
+                  person.addresses_attributes =
+                    [
+                      { "id" => address_one.id, "street" => "Maybachufer" },
+                      { "id" => address_two.id, "street" => "Alexander Platz" }
+                    ]
+                end
+
+                it "updates the first existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                end
+
+                it "updates the second existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                end
+
+                it "does not add new documents" do
+                  person.addresses.size.should == 2
+                end
               end
 
-              it "updates the first existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
-              end
+              context "when passing in _id" do
 
-              it "updates the second existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
-              end
+                before do
+                  person.addresses_attributes =
+                    [
+                      { "_id" => address_one.id, "street" => "Maybachufer" },
+                      { "_id" => address_two.id, "street" => "Alexander Platz" }
+                    ]
+                end
 
-              it "does not add new documents" do
-                person.addresses.size.should == 2
+                it "updates the first existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                end
+
+                it "updates the second existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                end
+
+                it "does not add new documents" do
+                  person.addresses.size.should == 2
+                end
               end
             end
 
