@@ -642,6 +642,21 @@ describe Mongoid::Relations::Metadata do
 
     context "when an inverse relation exists" do
 
+      context "when multiple relations against the same class exist" do
+
+        let(:metadata) do
+          described_class.new(
+            :inverse_class_name => "User",
+            :name => :shop,
+            :relation => Mongoid::Relations::Referenced::One
+          )
+        end
+
+        it "returns the name of the inverse with the matching inverse of" do
+          metadata.inverse.should eq(:user)
+        end
+      end
+
       context "when inverse_of is defined" do
 
         let(:metadata) do
@@ -1013,8 +1028,6 @@ describe Mongoid::Relations::Metadata do
     PROPERTIES = [
       "as",
       "cyclic",
-      "inverse_class_name",
-      "inverse_of",
       "name",
       "order"
     ]

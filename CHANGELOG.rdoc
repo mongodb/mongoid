@@ -8,6 +8,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 * #1082 Alias size and length to count on criteria. (Adam Greene)
 
+* #1044 When multiple relations are defined for the same class, always return
+  the default inverse first if inverse_of is not defined.
+
 == 2.1.1
 
 === Bug Fixes

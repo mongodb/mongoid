@@ -391,6 +391,16 @@ module Mongoid # :nodoc:
         @inverse_klass ||= inverse_class_name.constantize
       end
 
+      # Get the metadata for the inverse relation.
+      #
+      # @example Get the inverse metadata.
+      #   metadata.inverse_metadata(doc)
+      #
+      # @param [ Document ] document The document to check.
+      #
+      # @return [ Metadata ] The inverse metadata.
+      #
+      # @since 2.1.0
       def inverse_metadata(document)
         document.reflect_on_association(inverse(document))
       end
@@ -767,9 +777,10 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_inverse_relation
+        default = klass.relations[inverse_klass.name.underscore]
+        return default.name if default
         klass.relations.each_pair do |key, meta|
-          if key == inverse_klass.name.underscore ||
-            meta.class_name == inverse_class_name
+          if meta.class_name == inverse_class_name
             return key.to_sym
           end
         end
