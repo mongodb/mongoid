@@ -237,6 +237,28 @@ describe Mongoid::Criteria do
       end
     end
 
+    describe "#size" do
+
+      before do
+        context.expects(:size).returns(10)
+      end
+
+      it "delegates to the context" do
+        criteria.size.should == 10
+      end
+    end
+
+    describe "#length" do
+
+      before do
+        context.expects(:length).returns(10)
+      end
+
+      it "delegates to the context" do
+        criteria.length.should == 10
+      end
+    end
+
     describe "#exists?" do
 
       context "when there are documents in the db" do
