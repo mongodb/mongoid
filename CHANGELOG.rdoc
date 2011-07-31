@@ -13,6 +13,9 @@ pushing new documents.
 
 * #1026 model#update_attribute now can update booleans to false.
 
+* #618 Crack XML library breaks Mongoid by adding #attributes method to the
+  String class. (Stephen McGinty)
+
 == 2.1.0
 
 === Major Changes
