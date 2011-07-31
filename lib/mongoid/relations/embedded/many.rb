@@ -228,7 +228,7 @@ module Mongoid # :nodoc:
               proxy.clear
             else
               atomically(:$set) do
-                proxy.target = replacement
+                proxy.target = replacement.compact
                 proxy.target.each_with_index do |doc, index|
                   integrate(doc)
                   doc._index = index
