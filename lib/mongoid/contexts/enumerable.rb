@@ -42,8 +42,10 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The count of documents.
       def count
-        @count ||= filter.size
+        @count ||= execute.size
       end
+      alias :length :count
+      alias :size :count
 
       # Delete all the documents in the database matching the selector.
       #

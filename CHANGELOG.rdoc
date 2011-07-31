@@ -2,7 +2,15 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.2
+
+* #1082 Alias size and length to count on criteria. (Adam Greene)
+
+=== Bug Fixes
+
 == 2.1.1
+
+=== Bug Fixes
 
 * #1021, #719 Many to many relations dont trigger extra database queries when
 pushing new documents.
