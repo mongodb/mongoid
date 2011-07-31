@@ -11,6 +11,8 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * #1044 When multiple relations are defined for the same class, always return
   the default inverse first if inverse_of is not defined.
 
+* #710 Nested attributes accept both id and _id in hashes or arrays.
+
 == 2.1.1
 
 === Bug Fixes
