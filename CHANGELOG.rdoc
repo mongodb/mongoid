@@ -2,7 +2,16 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
-== 2.1.0 (unreleased)
+== 2.1.1
+
+* #1021, #719 Many to many relations dont trigger extra database queries when
+pushing new documents.
+
+* #607 Calling create on large associations does not load the entire relation.
+
+* #1064 Mongoid::Paranoia should respect unscoped and scoped.
+
+== 2.1.0
 
 === Major Changes
 
@@ -25,6 +34,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 * :autosave => true on relational associations now saves on update as well as
   create.
+
+* Mongoid now has an identity map for simple find by id queries. See the
+  website for documentation.
 
 === New Features
 

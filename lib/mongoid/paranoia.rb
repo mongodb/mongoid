@@ -56,6 +56,7 @@ module Mongoid #:nodoc:
     #
     # @example Is the document destroyed?
     #   person.destroyed?
+
     #
     # @return [ true, false ] If the document is destroyed.
     def destroyed?
@@ -83,8 +84,8 @@ module Mongoid #:nodoc:
       # @param [ Array ] args The arguments.
       #
       # @return [ Criteria ] The paranoid compliant criteria.
-      def criteria(*args)
-        super.where(:deleted_at.exists => false)
+      def criteria(embedded = false, scoped = true)
+        scoped ? super.where(:deleted_at.exists => false) : super
       end
 
       # Find deleted documents
