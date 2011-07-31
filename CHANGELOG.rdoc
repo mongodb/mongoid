@@ -13,7 +13,7 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 === Bug Fixes
 
 * #1021, #719 Many to many relations dont trigger extra database queries when
-pushing new documents.
+  pushing new documents.
 
 * #607 Calling create on large associations does not load the entire relation.
 
