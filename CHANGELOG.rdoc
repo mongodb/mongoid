@@ -11,6 +11,8 @@ pushing new documents.
 
 * #1064 Mongoid::Paranoia should respect unscoped and scoped.
 
+* #1026 model#update_attribute now can update booleans to false.
+
 == 2.1.0
 
 === Major Changes
