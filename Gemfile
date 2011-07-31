@@ -1,6 +1,8 @@
 source "http://rubygems.org"
 gemspec
 
+gem "rake"
+
 platforms :mri_18 do
   gem "ruby-debug"
   gem "SystemTimer"
