@@ -4,9 +4,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 == 2.1.2
 
-* #1082 Alias size and length to count on criteria. (Adam Greene)
-
 === Bug Fixes
+
+* #1082 Alias size and length to count on criteria. (Adam Greene)
 
 == 2.1.1
 
