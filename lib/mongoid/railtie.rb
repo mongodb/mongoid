@@ -111,6 +111,11 @@ module Rails #:nodoc:
         end
       end
 
+      # Need to include the Mongoid identity map middleware.
+      initializer "include the identity map" do |app|
+        app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
+      end
+
       # Instantitate any registered observers after Rails initialization and
       # instantiate them after being reloaded in the development environment
       initializer "instantiate observers" do
