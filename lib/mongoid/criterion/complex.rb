@@ -32,6 +32,17 @@ module Mongoid #:nodoc:
         [@key, @operator].hash
       end
 
+      # Create a mongo query with given value
+      #
+      # @example Create query
+      #   criterion.to_mongo_hash(value)
+      #
+      # @params [] Whatever is a valid input for given operator
+      # @return [ Hash ] The query
+      def to_mongo_query(v)
+        {"$#{self.operator}" => v}
+      end
+
       # Is the criterion equal to the other?
       #
       # @example Check equality.
