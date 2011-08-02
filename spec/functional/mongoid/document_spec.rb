@@ -359,6 +359,22 @@ describe Mongoid::Document do
       person.reload.should == from_db
     end
 
+    context "when an after initialize callback is defined" do
+
+      let!(:book) do
+        Book.create(:title => "Snow Crash")
+      end
+
+      before do
+        book.update_attribute(:chapters, 50)
+        book.reload
+      end
+
+      it "runs the callback" do
+        book.chapters.should eq(5)
+      end
+    end
+
     context "when the document was dirty" do
 
       let(:person) do

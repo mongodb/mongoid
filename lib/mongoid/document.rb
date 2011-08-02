@@ -159,6 +159,7 @@ module Mongoid #:nodoc:
             remove_instance_variable("@#{name}")
           end
         end
+        run_callbacks(:initialize)
       end
     end
 
