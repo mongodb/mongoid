@@ -1561,11 +1561,19 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address_one) do
-      person.addresses.create(:street => "Market", :state => "CA")
+      person.addresses.create(
+        :street => "Market",
+        :state => "CA",
+        :services => [ "1", "2" ]
+      )
     end
 
     let!(:address_two) do
-      person.addresses.create(:street => "Madison", :state => "NY")
+      person.addresses.create(
+        :street => "Madison",
+        :state => "NY",
+        :services => [ "1", "2" ]
+      )
     end
 
     context "when providing a single criteria" do
@@ -1585,6 +1593,17 @@ describe Mongoid::Relations::Embedded::Many do
 
         let(:addresses) do
           person.addresses.any_of({ :state => "CA" }, { :state => "NY" })
+        end
+
+        it "applies the criteria to the documents" do
+          addresses.should == [ address_one, address_two ]
+        end
+      end
+
+      context "when using array comparison" do
+
+        let(:addresses) do
+          person.addresses.where(:services => [ "1" "2" ])
         end
 
         it "applies the criteria to the documents" do
