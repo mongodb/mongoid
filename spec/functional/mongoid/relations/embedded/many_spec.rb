@@ -6,6 +6,29 @@ describe Mongoid::Relations::Embedded::Many do
     [ Person, Account, Acolyte, Quiz, Role ].map(&:delete_all)
   end
 
+  context "when updating the parent with all attributes" do
+
+    let!(:person) do
+      Person.create(:ssn => "333-33-2111")
+    end
+
+    let!(:address) do
+      person.addresses.create
+    end
+
+    before do
+      person.update_attributes(person.attributes)
+    end
+
+    it "does not duplicate the embedded documents" do
+      person.addresses.should eq([ address ])
+    end
+
+    it "does not persist duplicate embedded documents" do
+      person.reload.addresses.should eq([ address ])
+    end
+  end
+
   context "when embedding children named versions" do
 
     let(:acolyte) do
