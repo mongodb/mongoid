@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::NestedAttributes do
 
   before do
-    [ Person, Post, Game ].map(&:delete_all)
+    [ Person, Post, Game, Account ].map(&:delete_all)
   end
 
   describe "#initialize" do
@@ -1710,6 +1710,22 @@ describe Mongoid::NestedAttributes do
 
               it "replaces the document" do
                 person.game.name.should == "Pong"
+              end
+            end
+
+            context "when updating attributes" do
+
+              let!(:person) do
+                Person.create(:ssn => "512-231-4141")
+              end
+
+              before do
+                person.account = Account.create(:name => "home", :nickname => "test")
+                person.update_attributes(:account_attributes => { :nickname => "update" })
+              end
+
+              it "persists the attribute changes" do
+                person.reload.account.nickname.should eq("update")
               end
             end
 

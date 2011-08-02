@@ -1603,7 +1603,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when using array comparison" do
 
         let(:addresses) do
-          person.addresses.where(:services => [ "1" "2" ])
+          person.addresses.where(:services => [ "1", "2" ])
         end
 
         it "applies the criteria to the documents" do
