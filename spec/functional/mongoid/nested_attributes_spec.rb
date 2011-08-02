@@ -1013,20 +1013,51 @@ describe Mongoid::NestedAttributes do
 
                   context "when passed a #{truth} with destroy" do
 
-                    before do
-                      person.addresses_attributes =
-                        {
-                          "bar" => { "id" => address_one.id, "_destroy" => truth },
-                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
-                        }
+                    context "when the parent is new" do
+
+                      before do
+                        person.addresses_attributes =
+                          {
+                            "bar" => { "id" => address_one.id.to_s, "_destroy" => truth },
+                            "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
+                          }
+                      end
+
+                      it "deletes the marked document" do
+                        person.addresses.size.should == 1
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.addresses.first.street.should == "Alexander Platz"
+                      end
                     end
 
-                    it "deletes the marked document" do
-                      person.addresses.size.should == 1
-                    end
+                    context "when the parent is persisted" do
 
-                    it "does not delete the unmarked document" do
-                      person.addresses.first.street.should == "Alexander Platz"
+                      let!(:persisted) do
+                        Person.create(:ssn => "123-12-1111") do |p|
+                          p.addresses << [ address_one, address_two ]
+                        end
+                      end
+
+                      before do
+                        persisted.addresses_attributes =
+                          {
+                            "bar" => { "id" => address_one.id, "_destroy" => truth },
+                            "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
+                          }
+                        persisted.save
+                      end
+
+                      it "deletes the marked document" do
+                        persisted.reload.addresses.count.should eq(1)
+                      end
+
+                      it "does not delete the unmarked document" do
+                        persisted.reload.addresses.first.street.should eq(
+                          "Alexander Platz"
+                        )
+                      end
                     end
                   end
                 end

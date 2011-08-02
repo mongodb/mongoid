@@ -123,7 +123,10 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document)
           target.delete_one(document).tap do |doc|
-            unbind_one(doc) if doc && !binding?
+            if doc && !binding?
+              unbind_one(doc)
+              doc.delete(:suppress => true)
+            end
             reindex
           end
         end
