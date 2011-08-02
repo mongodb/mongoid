@@ -772,6 +772,22 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
+    context "when appending to a loaded relation" do
+
+      let!(:preference) do
+        person.preferences.create(:name => "setting")
+      end
+
+      before do
+        person.preferences.count
+        person.preferences << Preference.create(:name => "two")
+      end
+
+      it "returns the number of persisted documents" do
+        person.preferences.count.should eq(2)
+      end
+    end
+
     context "when documents have not been persisted" do
 
       let!(:preference) do
