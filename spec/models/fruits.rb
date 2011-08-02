@@ -2,6 +2,7 @@ module Fruits
   class Apple
     include Mongoid::Document
     has_many :bananas, :class_name => "Fruits::Banana"
+    recursively_embeds_many
   end
 
   class Banana
