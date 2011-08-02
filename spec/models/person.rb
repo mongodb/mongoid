@@ -66,7 +66,6 @@ class Person
   embeds_one :quiz
 
   accepts_nested_attributes_for :addresses
-  accepts_nested_attributes_for :account
   accepts_nested_attributes_for :name, :update_only => true
   accepts_nested_attributes_for :pet, :allow_destroy => true
   accepts_nested_attributes_for :game, :allow_destroy => true
