@@ -363,13 +363,28 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#ne" do
 
-          let(:criteria) do
-            base.where(:age.ne => 50)
+          context "when a value is provided" do
+
+            let(:criteria) do
+              base.where(:age.ne => 50)
+            end
+
+            it "returns a selector matching a ne clause" do
+              criteria.selector.should ==
+                { :age => { "$ne" => 50 } }
+            end
           end
 
-          it "returns a selector matching a ne clause" do
-            criteria.selector.should ==
-              { :age => { "$ne" => 50 } }
+          context "when the value is blank" do
+
+            let(:criteria) do
+              base.where(:title.ne => "")
+            end
+
+            it "returns a selector matching a ne clause" do
+              criteria.selector.should ==
+                { :title => { "$ne" => "" } }
+            end
           end
         end
 
