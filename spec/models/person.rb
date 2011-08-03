@@ -40,9 +40,9 @@ class Person
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites, :order => :title.desc, :inverse_of => :perp
-  embeds_many :videos, :order => [[ :title, :asc ]]
-  embeds_many :phone_numbers, :class_name => "Phone"
+  embeds_many :favorites, :order => :title.desc, :inverse_of => :perp, :validate => false
+  embeds_many :videos, :order => [[ :title, :asc ]], :validate => false
+  embeds_many :phone_numbers, :class_name => "Phone", :validate => false
   embeds_many :addresses, :as => :addressable do
     def extension
       "Testing"
@@ -51,11 +51,11 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
-  embeds_many :address_components
+  embeds_many :address_components, :validate => false
   embeds_many :services
 
   embeds_one :pet, :class_name => "Animal"
-  embeds_one :name, :as => :namable do
+  embeds_one :name, :as => :namable, :validate => false do
     def extension
       "Testing"
     end
@@ -63,7 +63,7 @@ class Person
       first_name == "Richard" && last_name == "Dawkins"
     end
   end
-  embeds_one :quiz
+  embeds_one :quiz, :validate => false
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, :update_only => true
@@ -88,24 +88,25 @@ class Person
       "Testing"
     end
   end
-  has_many :paranoid_posts
+  has_many :paranoid_posts, :validate => false
   has_and_belongs_to_many \
     :preferences,
     :index => true,
     :dependent => :nullify,
     :autosave => true,
     :order => :value.desc
-  has_and_belongs_to_many :user_accounts
-  has_and_belongs_to_many :houses
+  has_and_belongs_to_many :user_accounts, :validate => false
+  has_and_belongs_to_many :houses, :validate => false
 
-  has_many :drugs, :autosave => true
-  has_one :account, :autosave => true
+  has_many :drugs, :autosave => true, :validate => false
+  has_one :account, :autosave => true, :validate => false
 
   has_and_belongs_to_many \
     :administrated_events,
     :class_name => 'Event',
     :inverse_of => :administrators,
-    :dependent  => :nullify
+    :dependent  => :nullify,
+    :validate => false
 
   scope :minor, where(:age.lt => 18)
   scope :without_ssn, without(:ssn)

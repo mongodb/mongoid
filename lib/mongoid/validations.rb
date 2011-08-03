@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
     # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
       if relations[attr.to_s]
-        relation = ivar(attr)
+        relation = send(attr)
         relation ? relation.in_memory : nil
       else
         send(attr)
