@@ -2,6 +2,11 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.4
+
+This was a specific release to get a Psych generated gemspec so no more parse
+errors would occur on those rubies that were using the new YAML parser.
+
 == 2.1.3
 
 === Bug Fixes
