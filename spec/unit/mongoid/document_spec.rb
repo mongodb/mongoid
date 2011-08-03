@@ -109,6 +109,13 @@ describe Mongoid::Document do
         (klass === Person).should be_true
       end
     end
+
+    context "when the comparable is a subclass" do
+
+      it "returns false" do
+        (Person === Doctor).should be_false
+      end
+    end
   end
 
   describe "#===" do
@@ -117,6 +124,13 @@ describe Mongoid::Document do
 
       it "returns true" do
         (person === Person.new).should be_true
+      end
+    end
+
+    context "when the comparable is a subclass" do
+
+      it "returns true" do
+        (person === Doctor.new).should be_true
       end
     end
   end
