@@ -60,23 +60,6 @@ module Mongoid #:nodoc:
         end
         alias :new :build
 
-        # Clear the relation. Will delete the documents from the db if they are
-        # already persisted.
-        #
-        # @example Clear the relation.
-        #   person.posts.clear
-        #
-        # @return [ Many ] The relation emptied.
-        #
-        # @since 2.0.0.beta.1
-        def clear
-          criteria.delete_all
-          target.clear do |doc|
-            unbind_one(doc)
-            doc.destroyed = true
-          end
-        end
-
         # Creates a new document on the references many relation. This will
         # save the document if the parent has been persisted.
         #
@@ -259,6 +242,24 @@ module Mongoid #:nodoc:
         end
         alias :nullify_all :nullify
 
+        # Clear the relation. Will delete the documents from the db if they are
+        # already persisted.
+        #
+        # @example Clear the relation.
+        #   person.posts.clear
+        #
+        # @return [ Many ] The relation emptied.
+        #
+        # @since 2.0.0.beta.1
+        def purge
+          criteria.delete_all
+          target.clear do |doc|
+            unbind_one(doc)
+            doc.destroyed = true
+          end
+        end
+        alias :clear :purge
+
         # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary
         # deletion.
@@ -273,7 +274,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            proxy.clear
+            proxy.purge
             proxy.push(replacement) if replacement
           end
         end

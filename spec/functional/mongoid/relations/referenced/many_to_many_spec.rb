@@ -705,11 +705,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             preference.person_ids.should_not include(person.id)
           end
 
-          it "marks the documents as deleted" do
-            preference.should be_destroyed
+          it "does not delete the documents" do
+            preference.should_not be_destroyed
           end
 
-          it "deletes the documents from the db" do
+          it "persists the nullification" do
             person.reload.preferences.should be_empty
           end
 

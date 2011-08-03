@@ -171,14 +171,19 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          # @todo: Durran: This is wrong.
-          criteria.update(metadata.inverse_foreign_key => [])
-          # We need to update the inverse as well.
+          criteria.pull(metadata.inverse_foreign_key, base.id)
+          unless base.destroyed?
+            base.set(
+              metadata.foreign_key,
+              base.send(metadata.foreign_key).clear
+            )
+          end
           target.clear do |doc|
             unbind_one(doc)
           end
         end
         alias :nullify_all :nullify
+        alias :clear :nullify
 
         private
 
