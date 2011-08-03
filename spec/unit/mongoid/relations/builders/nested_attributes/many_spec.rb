@@ -85,21 +85,42 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       let!(:address) do
         person.addresses.build(:street => "Alexander Platz")
       end
-
-      let(:attributes) do
-        { "foo" => { "id" => address.id, "street" => "Maybachufer" } }
-      end
-
-      let(:builder) do
-        described_class.new(metadata, attributes)
-      end
-
+      
+            
       before do
         builder.build(person)
       end
 
-      it "updates existing documents" do
-        person.addresses.first.street.should == "Maybachufer"
+      context "and ids are Strings" do
+
+        let(:builder) do
+          described_class.new(metadata, attributes)
+        end
+
+        let(:attributes) do
+          { "foo" => { "id" => address.id, "street" => "Maybachufer" } }
+        end
+
+        it "updates existing documents" do
+          person.addresses.first.street.should == "Maybachufer"
+        end
+ 
+      end
+
+      context "and ids are Symbols" do
+
+        let(:builder) do
+          described_class.new(metadata, attributes)
+        end
+
+        let(:attributes) do
+          { "foo" => { :id => address.id, "street" => "Magnificent Mile" } }
+        end
+
+        it "updates existing documents" do
+          person.addresses.first.street.should == "Magnificent Mile"
+        end
+         
       end
     end
 
