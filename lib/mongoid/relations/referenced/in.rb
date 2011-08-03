@@ -9,27 +9,6 @@ module Mongoid # :nodoc:
       # collection.
       class In < Relations::One
 
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
-        #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
-        #
-        # @example Bind the relation.
-        #   game.person.bind
-        #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def bind(options = {})
-          binding.bind(options)
-        end
-
         # Instantiate a new referenced_in relation.
         #
         # @example Create the new relation.
@@ -42,6 +21,7 @@ module Mongoid # :nodoc:
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             characterize_one(target)
+            bind_one
           end
         end
 
@@ -57,35 +37,14 @@ module Mongoid # :nodoc:
         # @return [ In, nil ] The relation or nil.
         #
         # @since 2.0.0.rc.1
-        def substitute(new_target, options = {})
-          old_target = target
-          tap do |relation|
-            relation.target = new_target
-            if new_target
-              bind(options)
-            else
-              unbind(old_target, options)
-              nil
-            end
+        def substitute(replacement)
+          tap do |proxy|
+            proxy.unbind_one
+            proxy.target.delete if persistable?
+            return nil unless replacement
+            proxy.target = replacement
+            proxy.bind_one
           end
-        end
-
-        # Unbinds the base object to the inverse of the relation. This occurs
-        # when setting a side of the relation to nil.
-        #
-        # @example Unbind the relation.
-        #   game.person.unbind
-        #
-        # @param [ Document, Array<Document> ] old_target The previous target.
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def unbind(old_target, options = {})
-          binding(old_target).unbind(options)
         end
 
         private
@@ -100,8 +59,20 @@ module Mongoid # :nodoc:
         # @return [ Binding ] The binding object.
         #
         # @since 2.0.0.rc.1
-        def binding(new_target = nil)
-          Bindings::Referenced::In.new(base, new_target || target, metadata)
+        def binding
+          Bindings::Referenced::In.new(base, target, metadata)
+        end
+
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
+        def persistable?
+          target.persisted? && !binding? && !building?
         end
 
         class << self
@@ -121,6 +92,22 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def builder(meta, object, loading = false)
             Builders::Referenced::In.new(meta, object, loading)
+          end
+
+          # Get the standard criteria used for querying this relation.
+          #
+          # @example Get the criteria.
+          #   Proxy.criteria(meta, id, Model)
+          #
+          # @param [ Metadata ] metadata The metadata.
+          # @param [ Object ] object The value of the foreign key.
+          # @param [ Class ] type The optional type.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 2.1.0
+          def criteria(metadata, object, type = nil)
+            type.where(:_id => object)
           end
 
           # Returns true if the relation is an embedded one. In this case

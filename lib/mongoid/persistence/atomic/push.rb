@@ -5,7 +5,8 @@ module Mongoid #:nodoc:
 
       # This class provides the ability to perform an explicit $push modification
       # on a specific field.
-      class Push < Operation
+      class Push
+        include Operation
 
         # Sends the atomic $push operation to the database.
         #
@@ -16,10 +17,12 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def persist
-          document[field] = [] unless document[field]
-          document.send(field).push(value).tap do |value|
-            collection.update(document.atomic_selector, operation("$push"), options)
-            document.remove_change(field)
+          prepare do
+            document[field] = [] unless document[field]
+            document.send(field).push(value).tap do |value|
+              collection.update(document.atomic_selector, operation("$push"), options)
+              document.remove_change(field)
+            end
           end
         end
       end

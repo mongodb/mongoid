@@ -20,8 +20,27 @@ module Mongoid #:nodoc:
         def ivar(name)
           if instance_variable_defined?("@#{name}")
             return instance_variable_get("@#{name}")
+          else
+            false
           end
-          nil
+        end
+
+        # Remove the instance variable for the provided name.
+        #
+        # @example Remove the instance variable
+        #   document.remove_ivar("person")
+        #
+        # @param [ String ] name The name of the variable.
+        #
+        # @return [ true, false ] If the variable was defined.
+        #
+        # @since 2.1.0
+        def remove_ivar(name)
+          if instance_variable_defined?("@#{name}")
+            return remove_instance_variable("@#{name}")
+          else
+            false
+          end
         end
       end
     end

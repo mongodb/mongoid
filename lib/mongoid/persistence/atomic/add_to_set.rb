@@ -5,7 +5,8 @@ module Mongoid #:nodoc:
 
       # This class provides the ability to perform an explicit $addToSet
       # modification on a specific field.
-      class AddToSet < Operation
+      class AddToSet
+        include Operation
 
         # Sends the atomic $addToSet operation to the database.
         #
@@ -16,13 +17,15 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def persist
-          document[field] = [] unless document[field]
-          values = document.send(field)
-          values.push(value) unless values.include?(value)
-          values.tap do
-            if document.persisted?
-              collection.update(document.atomic_selector, operation("$addToSet"), options)
-              document.remove_change(field)
+          prepare do
+            document[field] = [] unless document[field]
+            values = document.send(field)
+            values.push(value) unless values.include?(value)
+            values.tap do
+              if document.persisted?
+                collection.update(document.atomic_selector, operation("$addToSet"), options)
+                document.remove_change(field)
+              end
             end
           end
         end

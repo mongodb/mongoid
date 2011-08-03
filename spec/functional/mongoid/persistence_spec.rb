@@ -420,6 +420,35 @@ describe Mongoid::Persistence do
       Post.new
     end
 
+    context "when setting a boolean field" do
+
+      context "when the field is true" do
+
+        let(:person) do
+          Person.new(:ssn => "234-11-1232", :terms => true)
+        end
+
+        context "when setting to false" do
+
+          before do
+            person.update_attribute(:terms, false)
+          end
+
+          it "persists the document" do
+            person.should be_persisted
+          end
+
+          it "changes the attribute value" do
+            person.terms.should be_false
+          end
+
+          it "persists the changes" do
+            person.reload.terms.should be_false
+          end
+        end
+      end
+    end
+
     context "when saving with a hash field with invalid keys" do
 
       let(:person) do

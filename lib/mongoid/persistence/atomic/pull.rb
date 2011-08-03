@@ -5,7 +5,8 @@ module Mongoid #:nodoc:
 
       # This class provides the ability to perform an explicit $pull
       # modification on a specific field.
-      class Pull < Operation
+      class Pull
+        include Operation
 
         # Sends the atomic $pull operation to the database.
         #
@@ -16,15 +17,15 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persist
-          if document[field]
-            values = document.send(field)
-            values.delete(value)
-            values.tap do
-              collection.update(document.atomic_selector, operation("$pull"), options)
-              document.remove_change(field) if document.persisted?
+          prepare do
+            if document[field]
+              values = document.send(field)
+              values.delete(value)
+              values.tap do
+                collection.update(document.atomic_selector, operation("$pull"), options)
+                document.remove_change(field) if document.persisted?
+              end
             end
-          else
-            return nil
           end
         end
       end

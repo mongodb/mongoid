@@ -17,6 +17,8 @@ module Mongoid # :nodoc:
       # Backwards compatibility with Mongoid beta releases.
       delegate :klass, :to => :metadata
 
+      delegate :bind_one, :unbind_one, :to => :binding
+
       # Convenience for setting the target and the metadata properties since
       # all proxies will need to do this.
       #
@@ -28,13 +30,37 @@ module Mongoid # :nodoc:
       # @param [ Metadata ] metadata The relation's metadata.
       #
       # @since 2.0.0.rc.1
-      def init(base, target, metadata, &block)
+      def init(base, target, metadata)
         @base, @target, @metadata = base, target, metadata
-        block.call if block
+        yield(self) if block_given?
         extend metadata.extension if metadata.extension?
       end
 
       protected
+
+      # Is the current thread in binding mode?
+      #
+      # @example Is the current thread in binding mode?
+      #   proxy.binding?
+      #
+      # @return [ true, false ] If the thread is binding.
+      #
+      # @since 2.1.0
+      def binding?
+        Threaded.binding?
+      end
+
+      # Is the current thread in building mode?
+      #
+      # @example Is the current thread in building mode?
+      #   proxy.building?
+      #
+      # @return [ true, false ] If the thread is building.
+      #
+      # @since 2.1.0
+      def building?
+        Threaded.building?
+      end
 
       # Get the collection from the root of the hierarchy.
       #
@@ -63,31 +89,6 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def instantiated(type = nil)
         type ? type.new : metadata.klass.new
-      end
-
-      # Determines if the target been loaded into memory or not.
-      #
-      # @example Is the proxy loaded?
-      #   proxy.loaded?
-      #
-      # @return [ true, false ] True if loaded, false if not.
-      #
-      # @since 2.0.0.rc.1
-      def loaded?
-        !!@loaded
-      end
-
-      # Takes the supplied documents and sets the metadata on them. Used when
-      # creating new documents and adding them to the relation.
-      #
-      # @example Set the metadata.
-      #   proxy.characterize(addresses)
-      #
-      # @param [ Array<Document> ] documents The documents to set metadata on.
-      #
-      # @since 2.0.0.rc.4
-      def characterize(documents)
-        documents.each { |doc| characterize_one(doc) }
       end
 
       # Takes the supplied document and sets the metadata on it.

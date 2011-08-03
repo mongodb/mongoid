@@ -25,6 +25,17 @@ describe Mongoid::NamedScope do
       Person.delete_all
     end
 
+    context "when accessing an any_of scope first" do
+
+      let(:criteria) do
+        Person.search("Dr.").old
+      end
+
+      it "returns the correct results" do
+        criteria.should eq([ document ])
+      end
+    end
+
     context "accessing a single named scope" do
 
       it "returns the document" do

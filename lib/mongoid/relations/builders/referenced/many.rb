@@ -17,15 +17,7 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             return [] if object.is_a?(Array)
-            if metadata.order
-              metadata.klass.where(
-                metadata.foreign_key => convertable(metadata, object)
-              ).order_by(metadata.order)
-            else
-              metadata.klass.where(
-                metadata.foreign_key => convertable(metadata, object)
-              )
-            end
+            metadata.criteria(convertable(metadata, object))
           end
 
           private
@@ -44,7 +36,7 @@ module Mongoid # :nodoc:
             if inverse.using_object_ids? || object.is_a?(BSON::ObjectId)
               object
             else
-              Mongoid::Criterion::Unconvertable.new(object)
+              Criterion::Unconvertable.new(object)
             end
           end
         end

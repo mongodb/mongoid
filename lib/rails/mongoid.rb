@@ -3,23 +3,6 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     extend self
 
-    # Use the application configuration to get every model and require it, so
-    # that indexing and inheritance work in both development and production
-    # with the same results.
-    #
-    # @example Load all the application models.
-    #   Rails::Mongoid.load_models(app)
-    #
-    # @param [ Application ] app The rails application.
-    def load_models(app)
-      return unless ::Mongoid.preload_models
-      app.config.paths["app/models"].each do |path|
-        Dir.glob("#{path}/**/*.rb").sort.each do |file|
-          load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))
-        end
-      end
-    end
-
     # Recursive function to create all the indexes for the model, then
     # potentially and subclass of the model since both are still root
     # documents in the hierarchy.
@@ -37,6 +20,23 @@ module Rails #:nodoc:
         Logger.new($stdout).info("Generating indexes for #{model}")
         model.create_indexes
         index_children(model.descendants)
+      end
+    end
+
+    # Use the application configuration to get every model and require it, so
+    # that indexing and inheritance work in both development and production
+    # with the same results.
+    #
+    # @example Load all the application models.
+    #   Rails::Mongoid.load_models(app)
+    #
+    # @param [ Application ] app The rails application.
+    def load_models(app)
+      return unless ::Mongoid.preload_models
+      app.config.paths["app/models"].each do |path|
+        Dir.glob("#{path}/**/*.rb").sort.each do |file|
+          load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))
+        end
       end
     end
 

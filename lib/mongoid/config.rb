@@ -50,11 +50,12 @@ module Mongoid #:nodoc
     option :autocreate_indexes, :default => false
     option :binding_defaults, :default => { :binding => false, :continue => true }
     option :embedded_object_id, :default => true
+    option :identity_map_enabled, :default => false
     option :include_root_in_json, :default => false
     option :max_retries_on_connection_failure, :default => 0
     option :parameterize_keys, :default => true
     option :persist_in_safe_mode, :default => false
-    option :preload_models, :default => true
+    option :preload_models, :default => false
     option :raise_not_found_error, :default => true
     option :skip_version_check, :default => false
     option :time_zone, :default => nil

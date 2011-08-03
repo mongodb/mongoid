@@ -7,6 +7,7 @@ require "mongoid/version"
 Gem::Specification.new do |s|
   s.name        = "mongoid"
   s.version     = Mongoid::VERSION
+  s.date        = Mongoid::VERSION_DATE
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Durran Jordan"]
   s.email       = ["durran@gmail.com"]
@@ -23,9 +24,9 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("rdoc", ["~> 3.5.0"])
   s.add_development_dependency("bson_ext", ["~> 1.3"])
-  s.add_development_dependency("mocha", ["= 0.9.8"])
+  s.add_development_dependency("mocha", ["~> 0.9.8"])
   s.add_development_dependency("rspec", ["~> 2.6"])
-  s.add_development_dependency("watchr", ["= 0.6"])
+  s.add_development_dependency("watchr", ["~> 0.6"])
 
   s.files        = Dir.glob("lib/**/*") + %w(LICENSE README.rdoc Rakefile)
   s.require_path = 'lib'

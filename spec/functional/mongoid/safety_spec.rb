@@ -64,6 +64,15 @@ describe Mongoid::Safety do
           }.should raise_error(Mongo::OperationFailure)
         end
       end
+
+      context "when a validation error occurs" do
+
+        it "raises the validation error" do
+          expect {
+            Account.safely.create!(:name => "this name is way too long")
+          }.to raise_error(Mongoid::Errors::Validations)
+        end
+      end
     end
 
     describe ".save" do
@@ -102,6 +111,19 @@ describe Mongoid::Safety do
           lambda {
             person.safely.save!(:ssn => "432-97-1113")
           }.should raise_error(Mongo::OperationFailure)
+        end
+      end
+
+      context "when a validation error occurs" do
+
+        let(:account) do
+          Account.new(:name => "this name is way too long")
+        end
+
+        it "raises the validation error" do
+          expect {
+            account.safely.save!
+          }.to raise_error(Mongoid::Errors::Validations)
         end
       end
     end

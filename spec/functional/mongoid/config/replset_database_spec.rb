@@ -31,7 +31,7 @@ describe Mongoid::Config::ReplsetDatabase do
     context "without authentication details" do
 
       let(:replica_set) do
-        described_class.new(options['test']).configure
+        described_class.new(options['test'])
       end
 
       let(:repl_set_connection) do
@@ -40,13 +40,14 @@ describe Mongoid::Config::ReplsetDatabase do
 
       before do
         Mongo::ReplSetConnection.stubs(:new).returns(repl_set_connection)
-      end
-
-      it "should not add authentication or apply" do
         repl_set_connection.expects(:db)
         repl_set_connection.expects(:add_auth).never
         repl_set_connection.expects(:apply_saved_authentication).never
-        replica_set
+        replica_set.configure
+      end
+
+      it "sets up the default mongoid logger" do
+        replica_set.logger.should eq(Mongoid::Config.logger)
       end
     end
 

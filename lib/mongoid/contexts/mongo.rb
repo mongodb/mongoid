@@ -6,6 +6,25 @@ module Mongoid #:nodoc:
 
       delegate :klass, :options, :field_list, :selector, :to => :criteria
 
+      # Perform an add to set on the matching documents.
+      #
+      # @example Add to set on all matching.
+      #   Person.where(:name => "Alex").add_to_set(:aliases, "value")
+      #
+      # @param [ String ] field The field to add to.
+      # @param [ Object ] value The value to add.
+      #
+      # @return [ Object ] The update value.
+      #
+      # @since 2.1.0
+      def add_to_set(field, value)
+        klass.collection.update(
+          selector,
+          { "$addToSet" => { field => value } },
+          :multi => true
+        )
+      end
+
       # Aggregate the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the
@@ -69,6 +88,8 @@ module Mongoid #:nodoc:
       def count(extras = false)
         @count ||= klass.collection.find(selector, process_options).count(extras)
       end
+      alias :size :count
+      alias :length :count
 
       # Delete all the documents in the database matching the selector.
       #
@@ -194,9 +215,9 @@ module Mongoid #:nodoc:
       # @return [ Document ] The last document in the collection.
       def last
         opts = process_options
-        sorting = opts[:sort]
-        sorting = [[:_id, :asc]] unless sorting
-        opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
+        sorting = opts[:sort] ||= []
+        sorting << [:_id, :asc]
+        opts[:sort] = sorting.map{ |option| [ option[0], option[1].invert ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
@@ -233,6 +254,25 @@ module Mongoid #:nodoc:
       # @return [ Numeric ] A numeric minimum value.
       def min(field)
         grouped(:min, field.to_s, Javascript.min)
+      end
+
+      # Perform a pull on the matching documents.
+      #
+      # @example Pull on all matching.
+      #   Person.where(:name => "Alex").pull(:aliases, "value")
+      #
+      # @param [ String ] field The field to pull from.
+      # @param [ Object ] value The value to pull.
+      #
+      # @return [ Object ] The update value.
+      #
+      # @since 2.1.0
+      def pull(field, value)
+        klass.collection.update(
+          selector,
+          { "$pull" => { field => value } },
+          :multi => true
+        )
       end
 
       # Return the first result for the +Context+ and skip it
@@ -277,9 +317,10 @@ module Mongoid #:nodoc:
         klass.collection.update(
           selector,
           { "$set" => attributes },
-          :multi => true,
-          :safe => Mongoid.persist_in_safe_mode
-        )
+          Safety.merge_safety_options(:multi => true)
+        ).tap do
+          Threaded.clear_safety_options!
+        end
       end
       alias :update :update_all
 

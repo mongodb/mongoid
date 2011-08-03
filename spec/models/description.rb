@@ -3,8 +3,8 @@ class Description
 
   field :details
 
-  referenced_in :user
-  referenced_in :updater, :class_name => 'User'
+  belongs_to :user
+  belongs_to :updater, :class_name => 'User'
 
   validates :user, :associated => true
   validates :details, :presence => true

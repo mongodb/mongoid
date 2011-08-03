@@ -60,8 +60,7 @@ module Rails #:nodoc:
       initializer "setup database" do
         config_file = Rails.root.join("config", "mongoid.yml")
         if config_file.file?
-          settings = YAML.load(ERB.new(config_file.read).result)[Rails.env]
-          ::Mongoid.from_hash(settings) if settings.present?
+          ::Mongoid.load!(config_file)
         end
       end
 
@@ -76,6 +75,17 @@ module Rails #:nodoc:
         end
       end
 
+      # Set the proper error types for Rails. DocumentNotFound errors should be
+      # 404s and not 500s, validation errors are 422s.
+      initializer "load http errors" do |app|
+        config.after_initialize do
+          ActionDispatch::ShowExceptions.rescue_responses.update({
+            "Mongoid::Errors::DocumentNotFound" => :not_found,
+            "Mongoid::Errors::Validations" => 422
+          })
+        end
+      end
+
       # Due to all models not getting loaded and messing up inheritance queries
       # and indexing, we need to preload the models in order to address this.
       #
@@ -87,15 +97,23 @@ module Rails #:nodoc:
         end
       end
 
-      # Set the proper error types for Rails. DocumentNotFound errors should be
-      # 404s and not 500s, validation errors are 422s.
-      initializer "load http errors" do |app|
+      # This initializer warns the user that preloading models is set to false,
+      # and queries will be inconsistent in dev mode if models are using
+      # inheritance.
+      initializer "warn of preload models configuration" do |app|
         config.after_initialize do
-          ActionDispatch::ShowExceptions.rescue_responses.update({
-            "Mongoid::Errors::DocumentNotFound" => :not_found,
-            "Mongoid::Errors::Validations" => 422
-          })
+          if !::Mongoid.preload_models && !Rails.configuration.cache_classes
+            puts "\nMongoid preload_models is set to false. If you are using"
+            puts "inheritance in your application model please set this to true or "
+            puts "you will experience querying inconsistencies in dev mode. Note that"
+            puts "this will severely decrease performance in dev mode only.\n\n"
+          end
         end
+      end
+
+      # Need to include the Mongoid identity map middleware.
+      initializer "include the identity map" do |app|
+        app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
       end
 
       # Instantitate any registered observers after Rails initialization and

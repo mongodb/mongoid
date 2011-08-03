@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      self.class == other.class
+      other.is_a?(self.class)
     end
 
     # Delegates to ==. Used when needing checks in hashes.
@@ -124,13 +124,15 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil)
-      @new_record = true
-      @attributes = apply_default_attributes
-      process(attrs) do
-        yield self if block_given?
-        identify
+      building do
+        @new_record = true
+        @attributes = apply_default_attributes
+        process(attrs) do
+          yield self if block_given?
+          identify
+        end
+        run_callbacks(:initialize) { self }
       end
-      run_callbacks(:initialize) { self }
     end
 
     # Reloads the +Document+ attributes from the database. If the document has
@@ -157,24 +159,7 @@ module Mongoid #:nodoc:
             remove_instance_variable("@#{name}")
           end
         end
-      end
-    end
-
-    # Remove a child document from this parent. If an embeds one then set to
-    # nil, otherwise remove from the embeds many.
-    #
-    # This is called from the +RemoveEmbedded+ persistence command.
-    #
-    # @example Remove the child.
-    #   document.remove_child(child)
-    #
-    # @param [ Document ] child The child (embedded) document to remove.
-    def remove_child(child)
-      name = child.metadata.name
-      if child.embedded_one?
-        remove_instance_variable("@#{name}") if instance_variable_defined?("@#{name}")
-      else
-        send(name).delete(child)
+        run_callbacks(:initialize)
       end
     end
 
@@ -230,6 +215,20 @@ module Mongoid #:nodoc:
       end
     end
 
+    private
+
+    # Implement this for calls to flatten on array.
+    #
+    # @example Get the document as an array.
+    #   document.to_ary
+    #
+    # @return [ nil ] Always nil.
+    #
+    # @since 2.1.0
+    def to_ary
+      nil
+    end
+
     module ClassMethods #:nodoc:
 
       # Performs class equality checking.
@@ -260,6 +259,7 @@ module Mongoid #:nodoc:
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
           doc.send(:apply_default_attributes)
+          IdentityMap.set(doc)
           doc.run_callbacks(:initialize) { doc }
         end
       end
