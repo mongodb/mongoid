@@ -2,6 +2,44 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.3
+
+=== Bug Fixes
+
+* #1109 Fixed validations not loading one to ones into memory.
+
+* #1107 Mongoid no longer wants required mongoid/railtie in application.rb
+
+* #1102 Fixed nested attributes deletion.
+
+* #1097 Reload now runs after_initialize callbacks.
+
+* #1079 Embeds many no longer duplicates documents.
+
+* #1078 Fixed array criteria matching on embedded documents.
+
+* #1028 Implement scoped on one-to-many and many-to-many relations.
+
+* #988 Many-to-many clear no longer deletes the child documents.
+
+* #977 Autosaving relations works also through nested attributes.
+
+* #972 Recursive embedding now handles namespacing on generated names.
+
+* #943 Don't override Document#attributes.
+
+* #893 Verify count is not caching on many to many relations.
+
+* #815 Verify after_initialize is run in the correct place.
+
+* #793 Verify any_of scopes chain properly with any other scope.
+
+* #776 Fixed mongoid case quality when dealing with subclasses.
+
+* #747 Fixed complex criteria using its keys to render its string value.
+
+* #721 safely now properly raises validation errors when they occur.
+
 == 2.1.2
 
 === Bug Fixes
