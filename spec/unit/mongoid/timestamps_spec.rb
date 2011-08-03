@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Timestamps do
 
+  it "should include Mongoid::Timestamps::Time" do
+    described_class.should include Mongoid::Timestamps::Timer
+  end
+
   describe ".included" do
 
     let(:person) do

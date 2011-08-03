@@ -6,7 +6,7 @@ require "mongoid/version"
 
 Gem::Specification.new do |s|
   s.name        = "mongoid"
-  s.version     = Mongoid::VERSION
+  s.version     = "#{Mongoid::VERSION}.prost"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Durran Jordan"]
   s.email       = ["durran@gmail.com"]

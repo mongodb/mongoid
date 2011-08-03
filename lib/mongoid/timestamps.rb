@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/timestamps/created"
 require "mongoid/timestamps/updated"
+require "mongoid/timestamps/timer"
 
 module Mongoid #:nodoc:
 
@@ -8,6 +9,7 @@ module Mongoid #:nodoc:
   # updated at timestamps.
   module Timestamps
     extend ActiveSupport::Concern
+    include Timer
     include Created
     include Updated
   end
