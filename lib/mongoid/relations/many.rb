@@ -83,6 +83,18 @@ module Mongoid #:nodoc:
         [].respond_to?(name, include_private) || super
       end
 
+      # This is public access to the relation's criteria.
+      #
+      # @example Get the scoped relation.
+      #   relation.scoped
+      #
+      # @return [ Criteria ] The scoped criteria.
+      #
+      # @since 2.1.0
+      def scoped
+        criteria
+      end
+
       # Gets the document as a serializable hash, used by ActiveModel's JSON and
       # XML serializers. This override is just to be able to pass the :include
       # and :except options to get associations in the hash.

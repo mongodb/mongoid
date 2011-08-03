@@ -2158,6 +2158,25 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#scoped" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:scoped) do
+      person.posts.scoped
+    end
+
+    it "returns the relation criteria" do
+      scoped.should be_a(Mongoid::Criteria)
+    end
+
+    it "returns with an empty selector" do
+      scoped.selector.should eq({ "person_id" => person.id })
+    end
+  end
+
   [ :size, :length ].each do |method|
 
     describe "##{method}" do

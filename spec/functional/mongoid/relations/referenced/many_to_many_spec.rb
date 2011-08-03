@@ -1736,6 +1736,25 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#scoped" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:scoped) do
+      person.preferences.scoped
+    end
+
+    it "returns the relation criteria" do
+      scoped.should be_a(Mongoid::Criteria)
+    end
+
+    it "returns with an empty selector" do
+      scoped.selector.should eq({ :_id => { "$in" => [] }})
+    end
+  end
+
   [ :size, :length ].each do |method|
 
     describe "##{method}" do

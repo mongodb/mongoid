@@ -1673,6 +1673,25 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#scoped" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:scoped) do
+      person.addresses.scoped
+    end
+
+    it "returns the relation criteria" do
+      scoped.should be_a(Mongoid::Criteria)
+    end
+
+    it "returns with an empty selector" do
+      scoped.selector.should be_empty
+    end
+  end
+
   [ :size, :length ].each do |method|
 
     describe "##{method}" do
