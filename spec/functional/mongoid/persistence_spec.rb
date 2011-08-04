@@ -420,6 +420,25 @@ describe Mongoid::Persistence do
       Post.new
     end
 
+    context "when setting an array field" do
+
+      let(:person) do
+        Person.create(:ssn => "432-11-1123", :aliases => [])
+      end
+
+      before do
+        person.update_attribute(:aliases, person.aliases << "Bond")
+      end
+
+      it "sets the new value in the document" do
+        person.aliases.should eq([ "Bond" ])
+      end
+
+      it "persists the changes" do
+        person.reload.aliases.should eq([ "Bond" ])
+      end
+    end
+
     context "when setting a boolean field" do
 
       context "when the field is true" do
