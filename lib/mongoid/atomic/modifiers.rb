@@ -35,6 +35,7 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def set(modifications)
         modifications.each_pair do |field, value|
+          next if field == "_id"
           sets.update(field => value)
           fields << field.split(".", 2)[0]
         end
