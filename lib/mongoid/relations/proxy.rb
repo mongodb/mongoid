@@ -9,7 +9,7 @@ module Mongoid # :nodoc:
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-          method =~ /(^__|^send$|^object_id$|^extend$|^tap$)/
+          method =~ /(^__|^send$|^object_id$|^extend$|^respond_to\?$|^tap$)/
       end
 
       attr_accessor :base, :loaded, :metadata, :target

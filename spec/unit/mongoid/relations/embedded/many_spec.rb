@@ -595,14 +595,48 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "respond_to?" do
+  describe "#respond_to?" do
 
-    let(:relation) do
-      described_class.new(base, target, metadata)
+    let(:person) do
+      Person.new
+    end
+
+    let(:addresses) do
+      person.addresses
+    end
+
+    Array.public_instance_methods.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          addresses.respond_to?(method).should be_true
+        end
+      end
+    end
+
+    Mongoid::Relations::Embedded::Many.public_instance_methods.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          addresses.respond_to?(method).should be_true
+        end
+      end
+    end
+
+    Address.scopes.keys.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          addresses.respond_to?(method).should be_true
+        end
+      end
     end
 
     it "supports 'include_private = boolean'" do
-      expect { relation.respond_to?(:Rational, true) }.not_to raise_error
+      expect { addresses.respond_to?(:Rational, true) }.not_to raise_error
     end
   end
 end
