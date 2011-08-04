@@ -80,7 +80,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def respond_to?(name, include_private = false)
-        [].respond_to?(name, include_private) || super
+        [].respond_to?(name, include_private) ||
+          klass.respond_to?(name, include_private) || super
       end
 
       # This is public access to the relation's criteria.
