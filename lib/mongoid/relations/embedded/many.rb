@@ -124,8 +124,8 @@ module Mongoid # :nodoc:
         def delete(document)
           target.delete_one(document).tap do |doc|
             if doc && !binding?
-              unbind_one(doc)
               doc.delete(:suppress => true)
+              unbind_one(doc)
             end
             reindex
           end
@@ -374,8 +374,8 @@ module Mongoid # :nodoc:
           criteria.size.tap do
             criteria.each do |doc|
               target.delete_one(doc)
-              unbind_one(doc)
               doc.send(method, :suppress => true)
+              unbind_one(doc)
             end
             reindex
           end

@@ -3,7 +3,26 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    [ Person, Account, Acolyte, Quiz, Role ].map(&:delete_all)
+    [ Person, Account, Acolyte, League, Quiz, Role ].map(&:delete_all)
+  end
+
+  context "when accessing the parent in a destroy callback" do
+
+    let!(:league) do
+      League.create
+    end
+
+    let!(:division) do
+      league.divisions.create
+    end
+
+    before do
+      league.destroy
+    end
+
+    it "retains the reference to the parent" do
+      league.name.should eq("Destroyed")
+    end
   end
 
   context "when updating the parent with all attributes" do
