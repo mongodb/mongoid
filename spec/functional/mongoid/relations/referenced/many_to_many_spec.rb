@@ -1844,4 +1844,36 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       )
     end
   end
+
+  pending "when the parent is not a new record and freshly loaded" do
+
+    let(:person) do
+      Person.create(:ssn => "437-11-1110")
+    end
+
+    let(:preference) do
+      Preference.new
+    end
+
+    before do
+      person.preferences = [ preference ]
+      person.save
+      # person.reload
+      person.preferences = nil
+    end
+
+    it "sets the relation to an empty array" do
+      person.preferences.should be_empty
+    end
+
+    it "removes the foreign key values" do
+      person.preference_ids.should be_empty
+    end
+
+    it "deletes the target from the database" do
+      expect {
+        preference.reload
+      }.to raise_error(Mongoid::Errors::DocumentNotFound)
+    end
+  end
 end
