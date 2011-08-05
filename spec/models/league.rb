@@ -6,7 +6,6 @@ class League
   before_destroy :destroy_children
 
   def destroy_children
-    p "here"
     divisions.destroy_all
   end
 end
