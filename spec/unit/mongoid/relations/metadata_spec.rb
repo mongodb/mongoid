@@ -343,6 +343,26 @@ describe Mongoid::Relations::Metadata do
               metadata.foreign_key.should == "follower_ids"
             end
           end
+
+          context "when the class is namespaced" do
+            let(:metadata) do
+              described_class.new(
+                :name => :bananas,
+                :relation => Mongoid::Relations::Referenced::ManyToMany,
+                :inverse_class_name => "Fruits::Apple",
+                :class_name => "Fruits::Banana"
+              )
+            end
+
+            it "returns the foreign_key without the module name" do
+              metadata.foreign_key.should == "banana_ids"
+            end
+
+            it "returns the inverse_foreign_key without the module name" do
+              metadata.inverse_foreign_key.should == "apple_ids"
+            end
+
+          end
         end
       end
 
