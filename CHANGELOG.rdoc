@@ -2,6 +2,20 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.5
+
+=== Resolved Issues
+
+* #1116 Embedded children retain reference to parent in destroy callbacks.
+
+* #1110, #1115 Don't memoize metadata related helpers on documents.
+
+* #1112 db:create_indexes no longer indexes subclasses multiple times.
+
+* #1111, #1098 Don't set _id in $set operations.
+
+* #1007 Update attribute properly tracks array changes.
+
 == 2.1.4
 
 This was a specific release to get a Psych generated gemspec so no more parse
@@ -9,7 +23,7 @@ errors would occur on those rubies that were using the new YAML parser.
 
 == 2.1.3
 
-=== Bug Fixes
+=== Resolved Issues
 
 * #1109 Fixed validations not loading one to ones into memory.
 
@@ -47,7 +61,7 @@ errors would occur on those rubies that were using the new YAML parser.
 
 == 2.1.2
 
-=== Bug Fixes
+=== Resolved Issues
 
 * #1082 Alias size and length to count on criteria. (Adam Greene)
 
@@ -61,7 +75,7 @@ errors would occur on those rubies that were using the new YAML parser.
 
 == 2.1.1
 
-=== Bug Fixes
+=== Resolved Issues
 
 * #1021, #719 Many to many relations dont trigger extra database queries when
   pushing new documents.
@@ -120,7 +134,7 @@ errors would occur on those rubies that were using the new YAML parser.
 
 * Added exception translations for Hindi. (Sukeerthi Adiga)
 
-=== Bug Fixes
+=== Resolved Issues
 
 * #974 Fix attribute_present? to work correctly then attribute value is false, thanks to @nickhoffman (Gregory Man)
 
