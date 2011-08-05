@@ -69,7 +69,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def embedded_many?
-      @embedded_many ||= (metadata && metadata.macro == :embeds_many)
+      metadata && metadata.macro == :embeds_many
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -81,7 +81,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def embedded_one?
-      @embedded_one ||= (metadata && metadata.macro == :embeds_one)
+      metadata && metadata.macro == :embeds_one
     end
 
     # Determine if the document is part of an references_many relation.
@@ -93,7 +93,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      @referenced_many ||= (metadata && metadata.macro == :references_many)
+      metadata && metadata.macro == :references_many
     end
 
     # Determine if the document is part of an references_one relation.
@@ -105,7 +105,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      @referenced_one ||= (metadata && metadata.macro == :references_one)
+      metadata && metadata.macro == :references_one
     end
   end
 end

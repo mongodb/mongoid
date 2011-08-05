@@ -3,11 +3,37 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    [ Person, Game, Post, Bar, Agent ].map(&:delete_all)
+    [ Person, Game, Post, Bar, Agent, Comment, Movie, Account ].map(&:delete_all)
   end
 
   let(:person) do
     Person.create(:ssn => "555-55-1111")
+  end
+
+  context "when the document belongs to a has one and has many" do
+
+    let(:movie) do
+      Movie.create(:name => "Infernal Affairs")
+    end
+
+    let(:account) do
+      Account.create(:name => "Leung")
+    end
+
+    context "when creating the document" do
+
+      let(:comment) do
+        Comment.create(:movie => movie, :account => account)
+      end
+
+      it "sets the correct has one" do
+        comment.account.should eq(account)
+      end
+
+      it "sets the correct has many" do
+        comment.movie.should eq(movie)
+      end
+    end
   end
 
   describe "#=" do
