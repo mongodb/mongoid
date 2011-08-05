@@ -40,9 +40,9 @@ class Person
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites, :order => :title.desc, :inverse_of => :perp
-  embeds_many :videos, :order => [[ :title, :asc ]]
-  embeds_many :phone_numbers, :class_name => "Phone"
+  embeds_many :favorites, :order => :title.desc, :inverse_of => :perp, :validate => false
+  embeds_many :videos, :order => [[ :title, :asc ]], :validate => false
+  embeds_many :phone_numbers, :class_name => "Phone", :validate => false
   embeds_many :addresses, :as => :addressable do
     def extension
       "Testing"
@@ -51,11 +51,11 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
-  embeds_many :address_components
+  embeds_many :address_components, :validate => false
   embeds_many :services
 
   embeds_one :pet, :class_name => "Animal"
-  embeds_one :name, :as => :namable do
+  embeds_one :name, :as => :namable, :validate => false do
     def extension
       "Testing"
     end
@@ -63,7 +63,7 @@ class Person
       first_name == "Richard" && last_name == "Dawkins"
     end
   end
-  embeds_one :quiz
+  embeds_one :quiz, :validate => false
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, :update_only => true
@@ -74,13 +74,13 @@ class Person
   accepts_nested_attributes_for :preferences
   accepts_nested_attributes_for :quiz
 
-  references_one :game, :dependent => :destroy do
+  has_one :game, :dependent => :destroy do
     def extension
       "Testing"
     end
   end
 
-  references_many \
+  has_many \
     :posts,
     :dependent => :delete,
     :order => :rating.desc do
@@ -88,27 +88,29 @@ class Person
       "Testing"
     end
   end
-  references_many :paranoid_posts
-  references_and_referenced_in_many \
+  has_many :paranoid_posts, :validate => false
+  has_and_belongs_to_many \
     :preferences,
     :index => true,
     :dependent => :nullify,
     :autosave => true,
     :order => :value.desc
-  references_and_referenced_in_many :user_accounts
-  references_and_referenced_in_many :houses
+  has_and_belongs_to_many :user_accounts, :validate => false
+  has_and_belongs_to_many :houses, :validate => false
 
-  references_many :drugs, :autosave => true
-  references_one :account, :autosave => true
+  has_many :drugs, :autosave => true, :validate => false
+  has_one :account, :autosave => true, :validate => false
 
-  references_and_referenced_in_many \
+  has_and_belongs_to_many \
     :administrated_events,
     :class_name => 'Event',
     :inverse_of => :administrators,
-    :dependent  => :nullify
+    :dependent  => :nullify,
+    :validate => false
 
   scope :minor, where(:age.lt => 18)
   scope :without_ssn, without(:ssn)
+  scope :search, lambda { |query| any_of({ :title => query }) }
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
@@ -125,6 +127,12 @@ class Person
 
   def employer=(emp)
     self.employer_id = emp.id
+  end
+
+  before_save :savable?
+
+  def savable?
+    self.mode != :prevent_save
   end
 
   class << self

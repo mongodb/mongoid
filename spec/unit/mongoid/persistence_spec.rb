@@ -9,7 +9,7 @@ describe Mongoid::Persistence do
   describe ".create" do
 
     let(:insert) do
-      stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
     end
 
     let(:patient) do
@@ -33,7 +33,7 @@ describe Mongoid::Persistence do
   describe ".create!" do
 
     let(:insert) do
-      stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
     end
 
     let(:patient) do
@@ -73,17 +73,22 @@ describe Mongoid::Persistence do
 
     context "when conditions provided" do
 
-      let(:remove_all) do
-        stub.quacks_like(Mongoid::Persistence::RemoveAll.allocate)
+      let(:collection) do
+        stub
+      end
+
+      let(:cursor) do
+        stub
       end
 
       before do
-        Mongoid::Persistence::RemoveAll.expects(:new).with(
-          Person,
-          { :validate => false },
-          { :field => "value" }
-        ).returns(remove_all)
-        remove_all.expects(:persist).returns(30)
+        Person.expects(:collection).twice.returns(collection)
+        collection.expects(:find).with(:field => "value").returns(cursor)
+        cursor.expects(:count).returns(30)
+        collection.expects(:remove).with(
+          { :field => "value" },
+          :safe => Mongoid.persist_in_safe_mode
+        )
       end
 
       it "removes all documents from the collection for the conditions" do
@@ -97,17 +102,19 @@ describe Mongoid::Persistence do
 
     context "when conditions not provided" do
 
-      let(:remove_all) do
-        stub.quacks_like(Mongoid::Persistence::RemoveAll.allocate)
+      let(:collection) do
+        stub
+      end
+
+      let(:cursor) do
+        stub
       end
 
       before do
-        Mongoid::Persistence::RemoveAll.expects(:new).with(
-          Person,
-          { :validate => false },
-          {}
-        ).returns(remove_all)
-        remove_all.expects(:persist).returns(30)
+        Person.expects(:collection).twice.returns(collection)
+        collection.expects(:find).with({}).returns(cursor)
+        cursor.expects(:count).returns(30)
+        collection.expects(:remove).with({}, :safe => Mongoid.persist_in_safe_mode)
       end
 
       it "removes all documents from the collection" do
@@ -123,7 +130,7 @@ describe Mongoid::Persistence do
   describe ".destroy_all" do
 
     let(:remove) do
-      stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Remove.allocate)
     end
 
     context "when conditions provided" do
@@ -131,7 +138,7 @@ describe Mongoid::Persistence do
       before do
         Person.expects(:all).with(:conditions => { :title => "Sir" }).returns([ person ])
         person.expects(:run_callbacks).with(:destroy).yields
-        Mongoid::Persistence::Remove.expects(:new).with(person, {}).returns(remove)
+        Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
         remove.expects(:persist).returns(true)
       end
 
@@ -149,7 +156,7 @@ describe Mongoid::Persistence do
       before do
         Person.expects(:all).with({}).returns([ person ])
         person.expects(:run_callbacks).with(:destroy).yields
-        Mongoid::Persistence::Remove.expects(:new).with(person, {}).returns(remove)
+        Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
         remove.expects(:persist).returns(true)
       end
 
@@ -166,11 +173,11 @@ describe Mongoid::Persistence do
   describe "#delete" do
 
     let(:remove) do
-      stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Remove.allocate)
     end
 
     before do
-      Mongoid::Persistence::Remove.expects(:new).with(person, {}).returns(remove)
+      Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
     end
 
     it "delegates to the remove persistence command" do
@@ -182,11 +189,11 @@ describe Mongoid::Persistence do
   describe "#destroy" do
 
     let(:remove) do
-      stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Remove.allocate)
     end
 
     before do
-      Mongoid::Persistence::Remove.expects(:new).with(person, {}).returns(remove)
+      Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
     end
 
     it "delegates to the remove persistence command" do
@@ -199,11 +206,11 @@ describe Mongoid::Persistence do
   describe "#insert" do
 
     let(:insert) do
-      stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
     end
 
     before do
-      Mongoid::Persistence::Insert.expects(:new).with(person, {}).returns(insert)
+      Mongoid::Persistence::Operations::Insert.expects(:new).with(person, {}).returns(insert)
     end
 
     it "delegates to the insert persistence command" do
@@ -215,11 +222,11 @@ describe Mongoid::Persistence do
   describe "#remove" do
 
     let(:remove) do
-      stub.quacks_like(Mongoid::Persistence::Remove.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Remove.allocate)
     end
 
     before do
-      Mongoid::Persistence::Remove.expects(:new).with(person, {}).returns(remove)
+      Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
     end
 
     it "delegates to the remove persistence command" do
@@ -233,11 +240,11 @@ describe Mongoid::Persistence do
     context "when the document is new" do
 
       let(:insert) do
-        stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
       end
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(person, {}).returns(insert)
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(person, {}).returns(insert)
       end
 
       it "delegates to the insert persistence command" do
@@ -255,12 +262,12 @@ describe Mongoid::Persistence do
     context "when the document is not new" do
 
       let(:update) do
-        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
       end
 
       before do
         person.instance_variable_set(:@new_record, false)
-        Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+        Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
       end
 
       it "delegates to the update persistence command" do
@@ -280,12 +287,12 @@ describe Mongoid::Persistence do
     context "when validation passes" do
 
       let(:update) do
-        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
       end
 
       before do
         person.instance_variable_set(:@new_record, false)
-        Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+        Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
         update.expects(:persist).returns(true)
       end
 
@@ -297,12 +304,12 @@ describe Mongoid::Persistence do
     context "when validation failes" do
 
       let(:update) do
-        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
       end
 
       before do
         person.instance_variable_set(:@new_record, false)
-        Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+        Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
         update.expects(:persist).returns(false)
       end
 
@@ -315,11 +322,11 @@ describe Mongoid::Persistence do
   describe "#update" do
 
     let(:update) do
-      stub.quacks_like(Mongoid::Persistence::Update.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
     end
 
     before do
-      Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+      Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
     end
 
     it "delegates to the update persistence command" do
@@ -331,12 +338,12 @@ describe Mongoid::Persistence do
   describe "#update_attributes" do
 
     let(:update) do
-      stub.quacks_like(Mongoid::Persistence::Update.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
     end
 
     before do
       person.instance_variable_set(:@new_record, false)
-      Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+      Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
     end
 
     it "writes attributes and performs an update" do
@@ -349,12 +356,12 @@ describe Mongoid::Persistence do
   describe "#update_attributes!" do
 
     let(:update) do
-      stub.quacks_like(Mongoid::Persistence::Update.allocate)
+      stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
     end
 
     before do
       person.instance_variable_set(:@new_record, false)
-      Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+      Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
     end
 
     context "when validation passes" do
@@ -382,11 +389,11 @@ describe Mongoid::Persistence do
     context "when passing a hash as a validation parameter" do
 
       let(:insert) do
-        stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
       end
 
       before do
-        Mongoid::Persistence::Insert.expects(:new).with(
+        Mongoid::Persistence::Operations::Insert.expects(:new).with(
           person,
           { :validate => false }
         ).returns(insert)
@@ -401,13 +408,13 @@ describe Mongoid::Persistence do
     context "when the document is new" do
 
       let(:insert) do
-        stub.quacks_like(Mongoid::Persistence::Insert.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
       end
 
       context "when validation passes" do
 
         before do
-          Mongoid::Persistence::Insert.expects(:new).with(person, {}).returns(insert)
+          Mongoid::Persistence::Operations::Insert.expects(:new).with(person, {}).returns(insert)
         end
 
         it "delegates to the insert persistence command" do
@@ -426,7 +433,7 @@ describe Mongoid::Persistence do
       context "when validation fails" do
 
         before do
-          Mongoid::Persistence::Insert.expects(:new).with(person, {}).returns(insert)
+          Mongoid::Persistence::Operations::Insert.expects(:new).with(person, {}).returns(insert)
         end
 
         it "returns false" do
@@ -439,12 +446,12 @@ describe Mongoid::Persistence do
     context "when the document is not new" do
 
       let(:update) do
-        stub.quacks_like(Mongoid::Persistence::Update.allocate)
+        stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
       end
 
       before do
         person.instance_variable_set(:@new_record, false)
-        Mongoid::Persistence::Update.expects(:new).with(person, {}).returns(update)
+        Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
       end
 
       it "delegates to the update persistence command" do

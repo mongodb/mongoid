@@ -424,6 +424,14 @@ describe Mongoid::Serialization do
   end
 
   describe "#to_xml" do
+    
+    context "BSON::ObjectId" do
+      let(:person) { Person.new }
+
+      it "serializes as string" do
+        person.to_xml.should include("<_id>#{person.id}</_id>")
+      end
+    end
 
     context "when an Array field is defined" do
 

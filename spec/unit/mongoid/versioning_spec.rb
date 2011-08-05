@@ -106,6 +106,55 @@ describe Mongoid::Versioning do
       end
     end
 
+    context "when excluded fields change" do
+      let(:page) do
+        WikiPage.create
+      end
+
+      it "does not create a new version" do
+        page.transient_property = 'a new value'
+        page.versioned_attributes_changed?.should be_false
+        page.expects(:revise).never
+        page.save
+      end
+    end
+
+    context "when creating a new version" do
+      let(:page) do
+        WikiPage.create(:transient_property => 'a temporary value',
+                        :dynamic_attribute => 'dynamic')
+      end
+
+      before do
+        page.title = "A New Title"
+        page.save
+      end
+
+      it "does not include excluded attributes in the version" do
+        page.versions.last.transient_property.should be_nil
+      end
+
+      it "includes dynamic attributes in the version" do
+        page.versions.last.dynamic_attribute.should == 'dynamic'
+      end
+    end
+
+    context "when excluded fields change" do
+      let(:page) do
+        WikiPage.create
+      end
+
+      before do
+        page.new_record = false
+      end
+
+      it "does not create a new version" do
+        page.transient_property = 'a new value'
+        page.expects(:revise).never
+        page.save
+      end
+    end
+
     context "when skipping versioning" do
 
       let(:person) do

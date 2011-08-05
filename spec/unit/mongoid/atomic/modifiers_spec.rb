@@ -50,7 +50,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "does not contain any push operations" do
-        modifiers.should == {}
+        modifiers.should eq({})
       end
     end
 
@@ -67,13 +67,14 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should ==
+          modifiers.should eq(
             { "$pushAll" =>
               { "addresses" => [
                   { "street" => "Oxford St" }
                 ]
               }
             }
+          )
         end
       end
 
@@ -93,7 +94,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should ==
+          modifiers.should eq(
             { "$pushAll" =>
               { "addresses" => [
                   { "street" => "Hobrechtstr." },
@@ -101,6 +102,7 @@ describe Mongoid::Atomic::Modifiers do
                 ]
               }
             }
+          )
         end
       end
     end
@@ -121,7 +123,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "adds the push all modifiers to the conflicts hash" do
-        modifiers.should ==
+        modifiers.should eq(
           { "$set" => { "addresses.0.street" => "Bond" },
             :other =>
             { "addresses" => [
@@ -129,6 +131,7 @@ describe Mongoid::Atomic::Modifiers do
               ]
             }
           }
+        )
       end
     end
   end
@@ -148,7 +151,22 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the sets to the modifiers" do
-          modifiers.should == { "$set" => { "title" => "Sir" } }
+          modifiers.should eq({ "$set" => { "title" => "Sir" } })
+        end
+      end
+
+      context "when the sets contain an id" do
+
+        let(:sets) do
+          { "_id" => BSON::ObjectId.new }
+        end
+
+        before do
+          modifiers.set(sets)
+        end
+
+        it "does not include the id sets" do
+          modifiers.should eq({})
         end
       end
 
@@ -159,7 +177,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "does not contain set operations" do
-          modifiers.should == {}
+          modifiers.should eq({})
         end
       end
     end

@@ -3,11 +3,37 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    [ Person, Game, Post, Bar, Agent ].map(&:delete_all)
+    [ Person, Game, Post, Bar, Agent, Comment, Movie, Account ].map(&:delete_all)
   end
 
   let(:person) do
     Person.create(:ssn => "555-55-1111")
+  end
+
+  context "when the document belongs to a has one and has many" do
+
+    let(:movie) do
+      Movie.create(:name => "Infernal Affairs")
+    end
+
+    let(:account) do
+      Account.create(:name => "Leung")
+    end
+
+    context "when creating the document" do
+
+      let(:comment) do
+        Comment.create(:movie => movie, :account => account)
+      end
+
+      it "sets the correct has one" do
+        comment.account.should eq(account)
+      end
+
+      it "sets the correct has many" do
+        comment.movie.should eq(movie)
+      end
+    end
   end
 
   describe "#=" do
@@ -241,14 +267,6 @@ describe Mongoid::Relations::Referenced::In do
             post.person_id.should == person.id
           end
 
-          it "sets the base on the inverse relation" do
-            person.posts.should == [ post ]
-          end
-
-          it "sets the same instance on the inverse relation" do
-            person.posts.first.should eql(post)
-          end
-
           it "does not save the target" do
             person.should_not be_persisted
           end
@@ -276,20 +294,8 @@ describe Mongoid::Relations::Referenced::In do
             post.person_id.should == person.id
           end
 
-          it "sets the base on the inverse relation" do
-            person.posts.should == [ post ]
-          end
-
-          it "sets the same instance on the inverse relation" do
-            person.posts.first.should eql(post)
-          end
-
           it "does not saves the target" do
             person.should_not be_persisted
-          end
-
-          it "sets the full inverse relationships", :focus => true do
-            post.person.posts.first.should == post
           end
         end
       end
@@ -318,10 +324,6 @@ describe Mongoid::Relations::Referenced::In do
             rating.ratable_id.should == movie.id
           end
 
-          it "sets the base on the inverse relation" do
-            movie.ratings.should == [ rating ]
-          end
-
           it "does not save the target" do
             movie.should_not be_persisted
           end
@@ -347,10 +349,6 @@ describe Mongoid::Relations::Referenced::In do
 
           it "sets the foreign key of the relation" do
             rating.ratable_id.should == movie.id
-          end
-
-          it "sets the base on the inverse relation" do
-            movie.ratings.should == [ rating ]
           end
 
           it "does not saves the target" do

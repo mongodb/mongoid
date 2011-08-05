@@ -7,28 +7,6 @@ module Mongoid # :nodoc:
       # one-to-one between documents in different collections.
       class One < Relations::One
 
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
-        #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
-        #
-        # @example Bind the relation.
-        #   person.game.bind(:continue => false)
-        #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def bind(options = {})
-          binding.bind(options)
-          target.save if base.persisted? && !options[:binding]
-        end
-
         # Instantiate a new references_one relation. Will set the foreign key
         # and the base on the inverse object.
         #
@@ -40,22 +18,11 @@ module Mongoid # :nodoc:
         # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
           init(base, target, metadata) do
+            raise_mixed if klass.embedded?
             characterize_one(target)
+            bind_one
+            target.save if persistable?
           end
-        end
-
-        # Will load the target into an array if the target had not already been
-        # loaded.
-        #
-        # @example Load the relation into memory.
-        #   relation.load!
-        #
-        # @return [ One ] The relation.
-        #
-        # @since 2.0.0.rc.5
-        def load!(options = {})
-          raise_mixed if klass.embedded?
-          super(options)
         end
 
         # Removes the association between the base document and the target
@@ -67,32 +34,29 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          target.send(metadata.foreign_key_setter, nil)
-          target.send(:remove_instance_variable, "@#{metadata.inverse(target)}")
-          base.send(:remove_instance_variable, "@#{metadata.name}")
+          unbind_one
           target.save
         end
 
-        # Unbinds the base object to the inverse of the relation. This occurs
-        # when setting a side of the relation to nil.
+        # Substitutes the supplied target document for the existing document
+        # in the relation. If the new target is nil, perform the necessary
+        # deletion.
         #
-        # Will delete the object if necessary.
+        # @example Replace the relation.
+        #   person.game.substitute(new_game)
         #
-        # @example Unbind the relation.
-        #   person.game.unbind(name, :continue => true)
+        # @param [ Array<Document> ] replacement The replacement target.
         #
-        # @param [ Document ] old_target The previous target of the relation.
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
+        # @return [ One ] The relation.
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target, options = {})
-          binding(old_target).unbind(options)
-          if base.persisted? && !old_target.destroyed? && !options[:binding]
-            old_target.delete
+        def substitute(replacement)
+          tap do |proxy|
+            proxy.unbind_one
+            proxy.target.delete if persistable?
+            return nil unless replacement
+            proxy.target = replacement
+            proxy.bind_one
           end
         end
 
@@ -106,8 +70,20 @@ module Mongoid # :nodoc:
         # @param [ Document ] new_target The new target of the relation.
         #
         # @return [ Binding ] The binding object.
-        def binding(new_target = nil)
-          Bindings::Referenced::One.new(base, new_target || target, metadata)
+        def binding
+          Bindings::Referenced::One.new(base, target, metadata)
+        end
+
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
+        def persistable?
+          base.persisted? && !binding? && !building?
         end
 
         class << self
@@ -127,6 +103,22 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def builder(meta, object, loading = false)
             Builders::Referenced::One.new(meta, object, loading)
+          end
+
+          # Get the standard criteria used for querying this relation.
+          #
+          # @example Get the criteria.
+          #   Proxy.criteria(meta, id, Model)
+          #
+          # @param [ Metadata ] metadata The metadata.
+          # @param [ Object ] object The value of the foreign key.
+          # @param [ Class ] type The optional type.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 2.1.0
+          def criteria(metadata, object, type = nil)
+            metadata.klass.where(metadata.foreign_key => object)
           end
 
           # Returns true if the relation is an embedded one. In this case

@@ -159,7 +159,9 @@ module Mongoid #:nodoc:
           end
 
           selector.each_pair do |key, value|
-            if crit.selector.has_key?(key) && crit.selector[key].respond_to?(:merge!)
+            if crit.selector.has_key?(key) &&
+              crit.selector[key].respond_to?(:merge!) &&
+              value.respond_to?(:merge!)
               crit.selector[key] =
                 crit.selector[key].merge!(value) do |key, old, new|
                   key == '$in' ? old & new : new

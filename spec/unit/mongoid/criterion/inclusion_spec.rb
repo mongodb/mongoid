@@ -244,6 +244,25 @@ describe Mongoid::Criterion::Inclusion do
         end
       end
 
+      context "when merging a simple value into a complex one" do
+
+        let(:id) do
+          BSON::ObjectId.new
+        end
+
+        let(:criteria) do
+          base.any_in(:_id => [ id ])
+        end
+
+        let(:merged) do
+          criteria.where(:_id => id)
+        end
+
+        it "overwrites the initial value" do
+          merged.selector.should eq({ :_id => id })
+        end
+      end
+
       context "when providing multiple values on the same complex attribute" do
 
         let(:criteria) do
@@ -344,13 +363,28 @@ describe Mongoid::Criterion::Inclusion do
 
         context "#ne" do
 
-          let(:criteria) do
-            base.where(:age.ne => 50)
+          context "when a value is provided" do
+
+            let(:criteria) do
+              base.where(:age.ne => 50)
+            end
+
+            it "returns a selector matching a ne clause" do
+              criteria.selector.should ==
+                { :age => { "$ne" => 50 } }
+            end
           end
 
-          it "returns a selector matching a ne clause" do
-            criteria.selector.should ==
-              { :age => { "$ne" => 50 } }
+          context "when the value is blank" do
+
+            let(:criteria) do
+              base.where(:title.ne => "")
+            end
+
+            it "returns a selector matching a ne clause" do
+              criteria.selector.should ==
+                { :title => { "$ne" => "" } }
+            end
           end
         end
 

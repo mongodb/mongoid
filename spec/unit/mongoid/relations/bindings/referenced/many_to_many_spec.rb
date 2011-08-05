@@ -11,47 +11,11 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
   end
 
   let(:target) do
-    [ preference ]
+    Mongoid::Relations::Targets::Enumerable.new([ preference ])
   end
 
   let(:metadata) do
     Person.relations["preferences"]
-  end
-
-  describe "#bind" do
-
-    let(:binding) do
-      described_class.new(person, target, metadata)
-    end
-
-    context "when the documents are bindable" do
-
-      before do
-        person.expects(:save).never
-        preference.expects(:save).never
-        binding.bind(:continue => true)
-      end
-
-      it "sets the inverse relation" do
-        preference.people.should == [ person ]
-      end
-
-      it "sets the foreign key" do
-        preference.person_ids.should == [ person.id ]
-      end
-    end
-
-    context "when the documents are not bindable" do
-
-      before do
-        preference.people << person
-      end
-
-      it "does nothing" do
-        person.preferences.expects(:<<).never
-        binding.bind
-      end
-    end
   end
 
   describe "#bind_one" do
@@ -67,19 +31,23 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       before do
-        binding.bind_one(preference_two, :continue => true)
+        binding.bind_one(preference_two)
       end
 
-      it "sets the inverse relation" do
-        preference_two.people.should == [ person ]
-      end
-
-      it "sets the foreign key" do
+      it "sets the inverse foreign key" do
         preference_two.person_ids.should == [ person.id ]
       end
 
       it "passes the binding options through to the inverse" do
         person.expects(:save).never
+      end
+
+      it "syncs the base" do
+        person.should be_synced("preference_ids")
+      end
+
+      it "syncs the inverse" do
+        preference_two.should be_synced("person_ids")
       end
     end
 
@@ -93,7 +61,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
 
       it "does not save the parent on bind" do
         person.expects(:save).never
-        binding.bind_one(preference_two, :continue => true)
+        binding.bind_one(preference_two)
       end
     end
 
@@ -102,39 +70,6 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       it "does nothing" do
         person.preferences.expects(:<<).never
         binding.bind_one(preference)
-      end
-    end
-  end
-
-  describe "#unbind" do
-
-    let(:binding) do
-      described_class.new(person, target, metadata)
-    end
-
-    context "when the documents are unbindable" do
-
-      before do
-        binding.bind(:continue => true)
-        person.expects(:delete).never
-        preference.expects(:delete).never
-        binding.unbind(:continue => true)
-      end
-
-      it "removes the inverse relation" do
-        preference.people.should be_empty
-      end
-
-      it "removed the foreign keys" do
-        preference.person_ids.should be_empty
-      end
-    end
-
-    context "when the documents are not unbindable" do
-
-      it "does nothing" do
-        person.expects(:preferences=).never
-        binding.unbind
       end
     end
   end
@@ -148,10 +83,10 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     context "when the documents are unbindable" do
 
       before do
-        binding.bind(:continue => true)
+        binding.bind_one(target.first)
         person.expects(:delete).never
         preference.expects(:delete).never
-        binding.unbind_one(target.first, :continue => true)
+        binding.unbind_one(target.first)
       end
 
       it "removes the inverse relation" do
@@ -161,12 +96,20 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       it "removed the foreign keys" do
         preference.person_ids.should be_empty
       end
+
+      it "syncs the base" do
+        person.should be_synced("preference_ids")
+      end
+
+      it "syncs the inverse" do
+        preference.should be_synced("person_ids")
+      end
     end
 
     context "when preventing multiple db hits" do
 
       before do
-        binding.bind(:continue => true)
+        binding.bind_one(target.first)
       end
 
       it "never performs a persistance operation" do
@@ -174,7 +117,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
         person.expects(:save).never
         preference.expects(:delete).never
         preference.expects(:save).never
-        binding.unbind_one(target.first, :continue => true)
+        binding.unbind_one(target.first)
       end
     end
 

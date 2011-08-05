@@ -115,6 +115,21 @@ module Mongoid # :nodoc:
         @constraint ||= Constraint.new(self)
       end
 
+      # Get the criteria that is used to query for this metadata's relation.
+      #
+      # @example Get the criteria.
+      #   metadata.criteria([ id_one, id_two ])
+      #
+      # @param [ Object ] object The foreign key used for the query.
+      #
+      # @return [ Criteria ] The criteria.
+      #
+      # @since 2.1.0
+      def criteria(object, type = nil)
+        query = relation.criteria(self, object, type)
+        order ? query.order_by(order) : query
+      end
+
       # Returns the cyclic option of the relation.
       #
       # @example Get the cyclic option.
@@ -219,6 +234,18 @@ module Mongoid # :nodoc:
         @foreign_key ||= determine_foreign_key
       end
 
+      # Get the name of the method to check if the foreign key has changed.
+      #
+      # @example Get the foreign key check method.
+      #   metadata.foreign_key_check
+      #
+      # @return [ String ] The foreign key check.
+      #
+      # @since 2.1.0
+      def foreign_key_check
+        @foreign_key_check ||= "#{foreign_key}_changed?"
+      end
+
       # Returns the name of the method used to set the foreign key on a
       # document.
       #
@@ -285,16 +312,14 @@ module Mongoid # :nodoc:
         "  cyclic:               #{cyclic || "No"},\n" <<
         "  dependent:            #{dependent || "None"},\n" <<
         "  inverse_of:           #{inverse_of || "N/A"},\n" <<
-        "  inverse_setter:       #{inverse_setter},\n" <<
-        "  inverse_type:         #{inverse_type || "N/A"},\n" <<
-        "  inverse_type_setter:  #{inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{key},\n" <<
         "  macro:                #{macro},\n" <<
         "  name:                 #{name},\n" <<
         "  order:                #{order.inspect || "No"},\n" <<
-        "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<
+        "  polymorphic:          #{polymorphic? || "No"},\n" <<
         "  relation:             #{relation},\n" <<
-        "  setter:               #{setter}>\n"
+        "  setter:               #{setter},\n" <<
+        "  versioned:            #{versioned? || "No"}>\n"
       end
 
       # Get the name of the inverse relation if it exists. If this is a
@@ -350,7 +375,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inverse_foreign_key
         @inverse_foreign_key ||=
-          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.underscore ) <<
+          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.demodulize.underscore ) <<
           relation.foreign_key_suffix
       end
 
@@ -364,6 +389,20 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inverse_klass
         @inverse_klass ||= inverse_class_name.constantize
+      end
+
+      # Get the metadata for the inverse relation.
+      #
+      # @example Get the inverse metadata.
+      #   metadata.inverse_metadata(doc)
+      #
+      # @param [ Document ] document The document to check.
+      #
+      # @return [ Metadata ] The inverse metadata.
+      #
+      # @since 2.1.0
+      def inverse_metadata(document)
+        document.reflect_on_association(inverse(document))
       end
 
       # Returns the inverse_of option of the relation.
@@ -401,7 +440,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_setter(other = nil)
-        inverse(other).to_s << "="
+        "#{inverse(other)}="
       end
 
       # Returns the name of the field in which to store the name of the class
@@ -414,11 +453,8 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_type
-        if relation.stores_foreign_key? && polymorphic?
-          (polymorphic? ? name.to_s : class_name.underscore) << "_type"
-        else
-          return nil
-        end
+        @inverse_type ||=
+          relation.stores_foreign_key? && polymorphic? ? "#{name}_type" : nil
       end
 
       # Gets the setter for the field that sets the type of document on a
@@ -431,7 +467,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_type_setter
-        inverse_type ? inverse_type << "=" : nil
+        @inverse_type_setter ||= inverse_type ? "#{inverse_type}=" : nil
       end
 
       # This returns the key that is to be used to grab the attributes for the
@@ -494,6 +530,19 @@ module Mongoid # :nodoc:
       # @since 2.1.0
       def name?
         !!name
+      end
+
+      # Does the relation have a destructive dependent option specified. This
+      # is true for :dependent => :delete and :dependent => :destroy.
+      #
+      # @example Is the relation destructive?
+      #   metadata.destructive?
+      #
+      # @return [ true, false ] If the relation is destructive.
+      #
+      # @since 2.1.0
+      def destructive?
+        @destructive ||= (dependent == :delete || dependent == :destroy)
       end
 
       # Gets a relation nested builder associated with the relation this metadata
@@ -563,6 +612,32 @@ module Mongoid # :nodoc:
         @setter ||= "#{name.to_s}="
       end
 
+      # Returns the name of the field in which to store the name of the class
+      # for the polymorphic relation.
+      #
+      # @example Get the name of the field.
+      #   metadata.inverse_type
+      #
+      # @return [ String ] The name of the field for storing the type.
+      #
+      # @since 2.0.0.rc.1
+      def type
+        @type ||= polymorphic? ? "#{as.to_s}_type" : nil
+      end
+
+      # Gets the setter for the field that sets the type of document on a
+      # polymorphic relation.
+      #
+      # @example Get the inverse type setter.
+      #   metadata.inverse_type_setter
+      #
+      # @return [ String ] The name of the setter.
+      #
+      # @since 2.0.0.rc.1
+      def type_setter
+        @type_setter ||= type ? "#{type}=" : nil
+      end
+
       # Are we validating this relation automatically?
       #
       # @example Is automatic validation on?
@@ -573,6 +648,18 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def validate?
         self[:validate] != false
+      end
+
+      # Is this relation using Mongoid's internal versioning system?
+      #
+      # @example Is this relation versioned?
+      #   metadata.versioned?
+      #
+      # @return [ true, false ] If the relation uses Mongoid versioning.
+      #
+      # @since 2.1.0
+      def versioned?
+        !!self[:versioned]
       end
 
       # Returns default order for this association.
@@ -690,9 +777,10 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_inverse_relation
+        default = klass.relations[inverse_klass.name.underscore]
+        return default.name if default
         klass.relations.each_pair do |key, meta|
-          if key == inverse_klass.name.underscore ||
-            meta.class_name == inverse_class_name
+          if meta.class_name == inverse_class_name
             return key.to_sym
           end
         end
@@ -750,7 +838,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def lookup_inverse(other)
         return nil unless other
-        other.to_a.first.relations.each_pair do |key, meta|
+        other.class.relations.each_pair do |key, meta|
           return meta.name if meta.as == name
         end
       end

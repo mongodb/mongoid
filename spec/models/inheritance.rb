@@ -84,14 +84,14 @@ class Eraser < Tool; end
 ########################################
 class ShippingContainer
   include Mongoid::Document
-  references_many :vehicles
+  has_many :vehicles
 
   accepts_nested_attributes_for :vehicles
 end
 class Vehicle
   include Mongoid::Document
-  referenced_in :shipping_container
-  referenced_in :driver
+  belongs_to :shipping_container
+  belongs_to :driver
 
   accepts_nested_attributes_for :driver
   accepts_nested_attributes_for :shipping_containers
@@ -105,7 +105,7 @@ end
 class Driver
   include Mongoid::Document
 
-  references_one :vehicle
+  has_one :vehicle
   accepts_nested_attributes_for :vehicle
 end
 

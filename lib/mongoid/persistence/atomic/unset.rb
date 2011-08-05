@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     module Atomic #:nodoc:
 
       # Performs atomic $unset operations.
-      class Unset < Operation
+      class Unset
+        include Operation
 
         # Sends the atomic $unset operation to the database.
         #
@@ -15,10 +16,11 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persist
-          self.field = field.to_s
-          document.attributes.delete(field)
-          collection.update(document.atomic_selector, operation("$unset"), options)
-          document.remove_change(value)
+          prepare do
+            document.attributes.delete(field)
+            collection.update(document.atomic_selector, operation("$unset"), options)
+            document.remove_change(value)
+          end
         end
       end
     end

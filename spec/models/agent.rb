@@ -4,7 +4,7 @@ class Agent
   field :title
   field :number
   embeds_many :names, :as => :namable
-  referenced_in :game
+  belongs_to :game
 
-  references_and_referenced_in_many :accounts
+  has_and_belongs_to_many :accounts
 end

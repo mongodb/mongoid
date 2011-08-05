@@ -5,46 +5,65 @@ module Mongoid # :nodoc:
 
       # This class defines the behaviour for all relations that are a
       # many-to-many between documents in different collections.
-      class ManyToMany < Referenced::Many
+      class ManyToMany < Many
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
         # @example Append a document.
-        #   person.addresses << address
+        #   person.posts << post
         #
         # @example Push a document.
-        #   person.addresses.push(address)
+        #   person.posts.push(post)
         #
         # @example Concat with other documents.
-        #   person.addresses.concat([ address_one, address_two ])
+        #   person.posts.concat([ post_one, post_two ])
         #
         # @param [ Document, Array<Document> ] *args Any number of documents.
+        #
+        # @return [ Array<Document> ] The loaded docs.
+        #
+        # @since 2.0.0.beta.1
         def <<(*args)
-          options = default_options(args)
-          args.flatten.each do |doc|
-            return doc unless doc
-            append(doc, options)
-            base.add_to_set(metadata.foreign_key, doc.id)
-            doc.save if base.persisted? && !options[:binding]
+          batched do
+            [].tap do |ids|
+              args.flatten.each do |doc|
+                next unless doc
+                append(doc)
+                if persistable?
+                  ids.push(doc.id)
+                  doc.save
+                else
+                  base.send(metadata.foreign_key).push(doc.id)
+                end
+              end
+              if persistable?
+                base.push_all(metadata.foreign_key, ids)
+                base.synced[metadata.foreign_key] = false
+              end
+            end
           end
         end
         alias :concat :<<
         alias :push :<<
 
-        # Builds a new document in the relation and appends it to the target.
-        # Takes an optional type if you want to specify a subclass.
+        # Build a new document from the attributes and append it to this
+        # relation without saving.
         #
         # @example Build a new document on the relation.
-        #   person.people.build(:name => "Bozo")
+        #   person.posts.build(:title => "A new post")
         #
-        # @param [ Hash ] attributes The attributes to build the document with.
-        # @param [ Class ] type Optional class to build the document with.
+        # @param [ Hash ] attributes The attributes of the new document.
+        # @param [ Class ] type The optional subclass to build.
         #
         # @return [ Document ] The new document.
-        def build(attributes = {}, type = nil, &block)
-          super.tap do |doc|
+        #
+        # @since 2.0.0.beta.1
+        def build(attributes = {}, type = nil)
+          Factory.build(type || klass, attributes).tap do |doc|
             base.send(metadata.foreign_key).push(doc.id)
+            append(doc)
+            yield(doc) if block_given?
           end
         end
         alias :new :build
@@ -53,16 +72,19 @@ module Mongoid # :nodoc:
         # save the document if the parent has been persisted.
         #
         # @example Create and save the new document.
-        #   person.preferences.create(:text => "Testing")
+        #   person.posts.create(:text => "Testing")
         #
         # @param [ Hash ] attributes The attributes to create with.
         # @param [ Class ] type The optional type of document to create.
         #
         # @return [ Document ] The newly created document.
+        #
+        # @since 2.0.0.beta.1
         def create(attributes = nil, type = nil, &block)
-          build(attributes, type, &block).tap do |doc|
-            base.add_to_set(metadata.foreign_key, doc.id)
-            doc.save if base.persisted?
+          super.tap do |doc|
+            base.send(metadata.foreign_key).delete_one(doc.id)
+            base.push(metadata.foreign_key, doc.id)
+            base.synced[metadata.foreign_key] = false
           end
         end
 
@@ -71,7 +93,7 @@ module Mongoid # :nodoc:
         # error if validation fails.
         #
         # @example Create and save the new document.
-        #   person.preferences.create!(:text => "Testing")
+        #   person.posts.create!(:text => "Testing")
         #
         # @param [ Hash ] attributes The attributes to create with.
         # @param [ Class ] type The optional type of document to create.
@@ -79,74 +101,63 @@ module Mongoid # :nodoc:
         # @raise [ Errors::Validations ] If validation failed.
         #
         # @return [ Document ] The newly created document.
+        #
+        # @since 2.0.0.beta.1
         def create!(attributes = nil, type = nil, &block)
-          build(attributes, type, &block).tap do |doc|
-            base.add_to_set(metadata.foreign_key, doc.id)
-            doc.save! if base.persisted?
+          super.tap do |doc|
+            base.send(metadata.foreign_key).delete_one(doc.id)
+            base.push(metadata.foreign_key, doc.id)
+            base.synced[metadata.foreign_key] = false
           end
         end
 
-        # Delete a single document from the relation.
+        # Delete the document from the relation. This will set the foreign key
+        # on the document to nil. If the dependent options on the relation are
+        # :delete or :destroy the appropriate removal will occur.
         #
-        # @example Delete a document.
-        #   person.preferences.delete(preference)
+        # @example Delete the document.
+        #   person.posts.delete(post)
         #
-        # @param [ Document ] document The document to delete.
+        # @param [ Document ] document The document to remove.
         #
-        # @since 2.0.0.rc.1
-        def delete(document, options = {})
-          target.delete(document).tap do |doc|
-            if doc
-              binding.unbind_one(doc, default_options.merge!(options))
+        # @return [ Document ] The matching document.
+        #
+        # @since 2.1.0
+        def delete(document)
+          super.tap do |doc|
+            if doc && persistable?
+              base.pull(metadata.foreign_key, doc.id)
+              base.synced[metadata.foreign_key] = false
             end
           end
-        end
-
-        # Deletes all related documents from the database given the supplied
-        # conditions.
-        #
-        # @example Delete all documents in the relation.
-        #   person.preferences.delete_all
-        #
-        # @example Conditonally delete all documents in the relation.
-        #   person.preferences.delete_all(:conditions => { :title => "Testing" })
-        #
-        # @param [ Hash ] conditions Optional conditions to delete with.
-        #
-        # @return [ Integer ] The number of documents deleted.
-        def delete_all(conditions = nil)
-          remove_all(conditions, :delete_all)
-        end
-
-        # Destroys all related documents from the database given the supplied
-        # conditions.
-        #
-        # @example Destroy all documents in the relation.
-        #   person.preferences.destroy_all
-        #
-        # @example Conditonally destroy all documents in the relation.
-        #   person.preferences.destroy_all(:conditions => { :title => "Testing" })
-        #
-        # @param [ Hash ] conditions Optional conditions to destroy with.
-        #
-        # @return [ Integer ] The number of documents destroyd.
-        def destroy_all(conditions = nil)
-          remove_all(conditions, :destroy_all)
         end
 
         # Instantiate a new references_many relation. Will set the foreign key
         # and the base on the inverse object.
         #
         # @example Create the new relation.
-        #   Referenced::ManyToMany.new(base, target, metadata)
+        #   Referenced::Many.new(base, target, metadata)
         #
         # @param [ Document ] base The document this relation hangs off of.
         # @param [ Array<Document> ] target The target of the relation.
         # @param [ Metadata ] metadata The relation's metadata.
+        #
+        # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
-          init(base, target, metadata) do
-            unless base.frozen?
-              base.send(metadata.foreign_key_setter, target.map { |doc| doc.id })
+          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
+            raise_mixed if klass.embedded?
+            batched do
+              proxy.in_memory do |doc|
+                characterize_one(doc)
+                bind_one(doc)
+                if persistable?
+                  base.push(metadata.foreign_key, doc.id)
+                  base.synced[metadata.foreign_key] = false
+                  doc.save
+                else
+                  base.send(metadata.foreign_key).push(doc.id)
+                end
+              end
             end
           end
         end
@@ -160,80 +171,47 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          load! and target.each do |doc|
-            base.send(metadata.foreign_key).delete(doc.id)
-            dereference(doc)
+          criteria.pull(metadata.inverse_foreign_key, base.id)
+          unless base.destroyed?
+            base.set(
+              metadata.foreign_key,
+              base.send(metadata.foreign_key).clear
+            )
           end
-          target.clear
+          target.clear do |doc|
+            unbind_one(doc)
+          end
         end
         alias :nullify_all :nullify
-
-        # Substitutes the supplied target documents for the existing documents
-        # in the relation. If the new target is nil, perform the necessary
-        # deletion.
-        #
-        # @example Replace the relation.
-        #   person.posts.substitute(new_name)
-        #
-        # @param [ Array<Document> ] target The replacement target.
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @return [ Many ] The relation.
-        #
-        # @since 2.0.0.rc.1
-        def substitute(new_target, options = {})
-          tap do |relation|
-            if new_target
-              binding.unbind(options)
-              relation.target = new_target.to_a
-              base.send(metadata.foreign_key_setter, new_target.map { |doc| doc.id })
-              bind(options)
-            else
-              relation.target = unbind(options)
-            end
-            base.save if base.persisted? && !options[:binding]
-          end
-        end
-
-        # Unbinds the base object to the inverse of the relation. This occurs
-        # when setting a side of the relation to nil.
-        #
-        # Will delete the object if necessary.
-        #
-        # @example Unbind the target.
-        #   person.posts.unbind
-        #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def unbind(options = {})
-          target.each { |doc| doc.delete } if base.persisted?
-          binding.unbind(options)
-          []
-        end
+        alias :clear :nullify
 
         private
+
+        # Appends the document to the target array, updating the index on the
+        # document at the same time.
+        #
+        # @example Append the document to the relation.
+        #   relation.append(document)
+        #
+        # @param [ Document ] document The document to append to the target.
+        #
+        # @since 2.0.0.rc.1
+        def append(document)
+          target.push(document)
+          characterize_one(document)
+          bind_one(document)
+        end
 
         # Instantiate the binding associated with this relation.
         #
         # @example Get the binding.
         #   relation.binding([ address ])
         #
-        # @param [ Array<Document> ] new_target The new documents to bind with.
-        #
         # @return [ Binding ] The binding.
         #
         # @since 2.0.0.rc.1
-        def binding(new_target = nil)
-          Bindings::Referenced::ManyToMany.new(base, new_target || target, metadata)
+        def binding
+          Bindings::Referenced::ManyToMany.new(base, target, metadata)
         end
 
         # Returns the criteria object for the target class with its documents set
@@ -244,47 +222,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          crt = if metadata.inverse
-            klass.any_in(metadata.inverse_foreign_key => [ base.id ])
-          else
-            klass.where(:_id => { "$in" => base.send(metadata.foreign_key) })
-          end
-          crt.tap do |c|
-            c.order_by(metadata.order) if metadata.order
-          end
-        end
-
-        # Dereferences the supplied document from the base of the relation.
-        #
-        # @example Dereference the document.
-        #   person.preferences.dereference(preference)
-        #
-        # @param [ Document ] document The document to dereference.
-        def dereference(document)
-          document.send(metadata.inverse_foreign_key).delete(base.id)
-          document.send(metadata.inverse(document)).target.delete(base)
-          document.save
-        end
-
-        # Remove all documents from the relation, either with a delete or a
-        # destroy depending on what this was called through.
-        #
-        # @example Destroy documents from the relation.
-        #   relation.remove_all(:conditions => { :num => 1 }, true)
-        #
-        # @param [ Hash ] conditions Conditions to filter by.
-        # @param [ true, false ] destroy If true then destroy, else delete.
-        #
-        # @return [ Integer ] The number of documents removed.
-        def remove_all(conditions = {}, method = :destroy)
-          cond = conditions || {}
-          target.delete_if do |doc|
-            doc.matches?(cond[:conditions] || {})
-          end
-          ids = criteria.merge(cond).only(:_id).map { |con| con._id }
-          criteria.merge(cond).send(method).tap do
-            base.pull_all(metadata.foreign_key, ids)
-          end
+          ManyToMany.criteria(metadata, base.send(metadata.foreign_key))
         end
 
         class << self
@@ -304,6 +242,10 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def builder(meta, object, loading = false)
             Builders::Referenced::ManyToMany.new(meta, object, loading)
+          end
+
+          def criteria(metadata, object, type = nil)
+            metadata.klass.any_in(:_id => object)
           end
 
           # Returns true if the relation is an embedded one. In this case

@@ -3,6 +3,27 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     extend self
 
+    # Create indexes for each model given the provided pattern and the class is
+    # not embedded.
+    #
+    # @example Create all the indexes.
+    #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
+    #
+    # @param [ String ] pattern The file matching pattern.
+    #
+    # @return [ Array<String> ] The file names.
+    #
+    # @since 2.1.0
+    def create_indexes(pattern)
+      Dir.glob(pattern).each do |file|
+        model = determine_model(file)
+        if model
+          Logger.new($stdout).info("Generating indexes for #{model}")
+          model.create_indexes
+        end
+      end
+    end
+
     # Use the application configuration to get every model and require it, so
     # that indexing and inheritance work in both development and production
     # with the same results.
@@ -20,26 +41,6 @@ module Rails #:nodoc:
       end
     end
 
-    # Recursive function to create all the indexes for the model, then
-    # potentially and subclass of the model since both are still root
-    # documents in the hierarchy.
-    #
-    # Note there is a tricky naming scheme going on here that needs to be
-    # revisisted. Module.descendants vs Class.descendents is way too
-    # confusing.
-    #
-    # @example Index the children.
-    #   Rails::Mongoid.index_children(classes)
-    #
-    # @param [ Array<Class> ] children The child model classes.
-    def index_children(children)
-      children.each do |model|
-        Logger.new($stdout).info("Generating indexes for #{model}")
-        model.create_indexes
-        index_children(model.descendants)
-      end
-    end
-
     private
 
     # I don't want to mock out kernel for unit testing purposes, so added this
@@ -53,6 +54,27 @@ module Rails #:nodoc:
     # @since 2.0.0.rc.3
     def load_model(file)
       require_dependency(file)
+    end
+
+    # Given the provided file name, determine the model and return the class.
+    #
+    # @example Determine the model from the file.
+    #   Rails::Mongoid.determine_model("app/models/person.rb")
+    #
+    # @param [ String ] file The filename.
+    #
+    # @return [ Class ] The model.
+    #
+    # @since 2.1.0
+    def determine_model(file)
+      model_path = file[0..-4].split('/')[2..-1]
+      begin
+        klass = model_path.map { |path| path.camelize }.join('::').constantize
+        if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
+          return klass
+        end
+      rescue => e
+      end
     end
   end
 end

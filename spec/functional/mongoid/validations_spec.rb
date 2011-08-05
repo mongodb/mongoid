@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Validations do
 
+  before do
+    [ Pizza, Topping ].each(&:delete_all)
+  end
+
   let(:account) do
     Account.new(:name => "Testing a really long name.")
   end
@@ -35,6 +39,26 @@ describe Mongoid::Validations do
         it "defaults the context to :update" do
           account.should be_valid
         end
+      end
+    end
+
+    context "when the document is fresh from the database" do
+
+      let!(:pizza) do
+        Pizza.new(:name => "chicago")
+      end
+
+      before do
+        pizza.build_topping(:name => "cheese")
+        pizza.save
+      end
+
+      let(:from_db) do
+        Pizza.first
+      end
+
+      it "loads the required association from the db" do
+        from_db.should be_valid
       end
     end
 

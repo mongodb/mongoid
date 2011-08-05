@@ -244,7 +244,7 @@ module Mongoid #:nodoc
             define_method(meth) do
               value = read_attribute(name)
               if value.is_a?(Array) || value.is_a?(Hash)
-                changed_attributes[name] = value.clone
+                changed_attributes[name] = value.clone unless attribute_changed?(name)
               end
               value
             end

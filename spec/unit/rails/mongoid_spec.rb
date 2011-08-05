@@ -6,6 +6,38 @@ describe "Rails::Mongoid" do
     require "rails/mongoid"
   end
 
+  describe ".create_indexes" do
+
+    let(:model_paths) do
+      Dir.glob("spec/models/**/*.rb")
+    end
+
+    let(:models) do
+      [].tap do |documents|
+        model_paths.each do |file|
+          model_path = file[0..-4].split('/')[2..-1]
+          begin
+            klass = model_path.map { |path| path.camelize }.join('::').constantize
+            if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
+              documents << klass
+            end
+          rescue => e
+          end
+        end
+      end
+    end
+
+    before do
+      models.each do |klass|
+        klass.expects(:create_indexes).once
+      end
+    end
+
+    it "creates the indexes for each model" do
+      Rails::Mongoid.create_indexes("spec/models/**/*.rb")
+    end
+  end
+
   describe ".load_models" do
 
     let(:app) do

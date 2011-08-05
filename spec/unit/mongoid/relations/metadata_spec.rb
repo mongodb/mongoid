@@ -147,6 +147,36 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#destructive?" do
+
+    context "when the relation has a destructive dependent option" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Referenced::Many,
+          :dependent => :destroy
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_destructive
+      end
+    end
+
+    context "when no dependent option" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_destructive
+      end
+    end
+  end
+
   describe "#embedded?" do
 
     context "when the relation is embedded" do
@@ -312,6 +342,26 @@ describe Mongoid::Relations::Metadata do
             it "returns the foreign_key" do
               metadata.foreign_key.should == "follower_ids"
             end
+          end
+
+          context "when the class is namespaced" do
+            let(:metadata) do
+              described_class.new(
+                :name => :bananas,
+                :relation => Mongoid::Relations::Referenced::ManyToMany,
+                :inverse_class_name => "Fruits::Apple",
+                :class_name => "Fruits::Banana"
+              )
+            end
+
+            it "returns the foreign_key without the module name" do
+              metadata.foreign_key.should == "banana_ids"
+            end
+
+            it "returns the inverse_foreign_key without the module name" do
+              metadata.inverse_foreign_key.should == "apple_ids"
+            end
+
           end
         end
       end
@@ -485,16 +535,14 @@ describe Mongoid::Relations::Metadata do
         "  cyclic:               #{metadata.cyclic || "No"},\n" <<
         "  dependent:            #{metadata.dependent || "None"},\n" <<
         "  inverse_of:           #{metadata.inverse_of || "N/A"},\n" <<
-        "  inverse_setter:       #{metadata.inverse_setter},\n" <<
-        "  inverse_type:         #{metadata.inverse_type || "N/A"},\n" <<
-        "  inverse_type_setter:  #{metadata.inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{metadata.key},\n" <<
         "  macro:                #{metadata.macro},\n" <<
         "  name:                 #{metadata.name},\n" <<
         "  order:                #{metadata.order.inspect || "No"},\n" <<
         "  polymorphic:          #{metadata.polymorphic? ? "Yes" : "No"},\n" <<
         "  relation:             #{metadata.relation},\n" <<
-        "  setter:               #{metadata.setter}>\n"
+        "  setter:               #{metadata.setter},\n" <<
+        "  versioned:            #{metadata.versioned? || "No"}>\n"
     end
   end
 
@@ -613,6 +661,21 @@ describe Mongoid::Relations::Metadata do
   context "#inverse" do
 
     context "when an inverse relation exists" do
+
+      context "when multiple relations against the same class exist" do
+
+        let(:metadata) do
+          described_class.new(
+            :inverse_class_name => "User",
+            :name => :shop,
+            :relation => Mongoid::Relations::Referenced::One
+          )
+        end
+
+        it "returns the name of the inverse with the matching inverse of" do
+          metadata.inverse.should eq(:user)
+        end
+      end
 
       context "when inverse_of is defined" do
 
@@ -933,13 +996,58 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#versioned?" do
+
+    context "when versioned is true" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :versions,
+          :relation => Mongoid::Relations::Embedded::Many,
+          :versioned => true
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_versioned
+      end
+    end
+
+    context "when versioned is false" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :versions,
+          :relation => Mongoid::Relations::Embedded::Many,
+          :versioned => false
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_versioned
+      end
+    end
+
+    context "when versioned is nil" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :versions,
+          :relation => Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_versioned
+      end
+    end
+  end
+
   context "properties" do
 
     PROPERTIES = [
       "as",
       "cyclic",
-      "inverse_class_name",
-      "inverse_of",
       "name",
       "order"
     ]

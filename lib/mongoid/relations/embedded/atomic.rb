@@ -53,12 +53,12 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def atomically(modifier, &block)
-          updater = Thread.current[:mongoid_atomic_update] ||= MODIFIERS[modifier].new
+          updater = Threaded.update ||= MODIFIERS[modifier].new
           count_executions do
             block.call if block
           end.tap do
             if @executions.zero?
-              Thread.current[:mongoid_atomic_update] = nil
+              Threaded.update = nil
               updater.execute(collection)
             end
           end
