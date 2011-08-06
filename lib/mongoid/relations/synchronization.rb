@@ -61,6 +61,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.0
       def update_inverse_keys(meta)
+        return unless changes.has_key?(meta.foreign_key)
         old, new = changes[meta.foreign_key]
         meta.criteria(new - old).add_to_set(meta.inverse_foreign_key, id)
         meta.criteria(old - new).pull(meta.inverse_foreign_key, id)
