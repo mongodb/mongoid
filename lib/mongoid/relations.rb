@@ -107,5 +107,22 @@ module Mongoid # :nodoc:
     def referenced_one?
       metadata && metadata.macro == :references_one
     end
+
+    # Convenience method for iterating through the loaded relations and
+    # reloading them.
+    #
+    # @example Reload the relations.
+    #   document.reload_relations
+    #
+    # @return [ Hash ] The relations metadata.
+    #
+    # @since 2.1.6
+    def reload_relations
+      relations.each_pair do |name, meta|
+        if instance_variable_defined?("@#{name}")
+          remove_instance_variable("@#{name}")
+        end
+      end
+    end
   end
 end

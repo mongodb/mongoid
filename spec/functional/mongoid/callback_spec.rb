@@ -90,10 +90,9 @@ describe Mongoid::Callbacks do
         expect { person.save }.not_to change { person.changed? }
       end
 
-      pending "child documents are left dirty" do
-        # @todo: Durran: This failed after merge... Why?
+      it "child documents are not left dirty" do
         address.should be_changed
-        expect { person.save }.not_to change { address.changed? }
+        expect { person.save }.to change { address.changed? }
       end
     end
   end

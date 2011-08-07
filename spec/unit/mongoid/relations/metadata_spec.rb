@@ -951,7 +951,7 @@ describe Mongoid::Relations::Metadata do
 
   end
 
-  context "#klass" do
+  describe "#klass" do
 
     let(:metadata) do
       described_class.new(
@@ -965,7 +965,32 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  context "#macro" do
+  describe "#many?" do
+
+    context "when the relation is a many" do
+
+      let(:metadata) do
+        described_class.new(:relation => Mongoid::Relations::Embedded::Many)
+      end
+
+      it "returns true" do
+        metadata.should be_many
+      end
+    end
+
+    context "when the relation is not a many" do
+
+      let(:metadata) do
+        described_class.new(:relation => Mongoid::Relations::Embedded::One)
+      end
+
+      it "returns false" do
+        metadata.should_not be_many
+      end
+    end
+  end
+
+  describe "#macro" do
 
     let(:metadata) do
       described_class.new(:relation => Mongoid::Relations::Embedded::One)

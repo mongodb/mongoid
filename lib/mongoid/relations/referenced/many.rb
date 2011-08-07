@@ -214,15 +214,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
+          init(base, Targets::Enumerable.new(target), metadata) do
             raise_mixed if klass.embedded?
-            batched do
-              proxy.in_memory do |doc|
-                characterize_one(doc)
-                bind_one(doc)
-                doc.save if persistable?
-              end
-            end
           end
         end
 
@@ -275,7 +268,7 @@ module Mongoid #:nodoc:
         def substitute(replacement)
           tap do |proxy|
             proxy.purge
-            proxy.push(replacement) if replacement
+            proxy.push(replacement.compact) if replacement
           end
         end
 

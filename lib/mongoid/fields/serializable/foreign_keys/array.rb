@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
           #
           # @since 2.1.0
           def serialize(object)
-            object.blank? ? [] : constraint.convert(object)
+            object ? constraint.convert(object) : []
           end
 
           protected

@@ -231,6 +231,9 @@ module Mongoid # :nodoc:
               proxy.clear
             else
               atomically(:$set) do
+                if replacement.first.is_a?(Hash)
+                  replacement = Many.builder(metadata, replacement).build
+                end
                 proxy.target = replacement.compact
                 proxy.target.each_with_index do |doc, index|
                   integrate(doc)

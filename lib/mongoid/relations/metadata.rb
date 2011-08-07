@@ -496,6 +496,18 @@ module Mongoid # :nodoc:
         @klass ||= class_name.constantize
       end
 
+      # Is this metadata representing a one to many or many to many relation?
+      #
+      # @example Is the relation a many?
+      #   metadata.many?
+      #
+      # @return [ true, false ] If the relation is a many.
+      #
+      # @since 2.1.6
+      def many?
+        @many ||= relation.macro =~ /many/
+      end
+
       # Returns the macro for the relation of this metadata.
       #
       # @example Get the macro.

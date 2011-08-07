@@ -48,6 +48,28 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Array do
         )
       end
 
+      context "when provided nil" do
+
+        it "returns an empty array" do
+          field.serialize(nil).should eq([])
+        end
+      end
+
+      context "when provided an empty array" do
+
+        let(:array) do
+          []
+        end
+
+        it "returns an empty array" do
+          field.serialize(array).should eq(array)
+        end
+
+        it "returns the same instance" do
+          field.serialize(array).should equal(array)
+        end
+      end
+
       context "when using object ids" do
 
         let(:object_id) do

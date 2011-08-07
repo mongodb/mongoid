@@ -132,36 +132,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Instantiate a new references_many relation. Will set the foreign key
-        # and the base on the inverse object.
-        #
-        # @example Create the new relation.
-        #   Referenced::Many.new(base, target, metadata)
-        #
-        # @param [ Document ] base The document this relation hangs off of.
-        # @param [ Array<Document> ] target The target of the relation.
-        # @param [ Metadata ] metadata The relation's metadata.
-        #
-        # @since 2.0.0.beta.1
-        def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
-            raise_mixed if klass.embedded?
-            batched do
-              proxy.in_memory do |doc|
-                characterize_one(doc)
-                bind_one(doc)
-                if persistable?
-                  base.push(metadata.foreign_key, doc.id)
-                  base.synced[metadata.foreign_key] = false
-                  doc.save
-                else
-                  base.send(metadata.foreign_key).push(doc.id)
-                end
-              end
-            end
-          end
-        end
-
         # Removes all associations between the base document and the target
         # documents by deleting the foreign keys and the references, orphaning
         # the target documents in the process.
@@ -184,6 +154,27 @@ module Mongoid # :nodoc:
         end
         alias :nullify_all :nullify
         alias :clear :nullify
+
+        # Clear the relation. Will delete the documents from the db if they are
+        # already persisted.
+        #
+        # @example Clear the relation.
+        #   person.posts.clear
+        #
+        # @return [ Many ] The relation emptied.
+        #
+        # @since 2.0.0.beta.1
+        def purge
+          criteria.delete_all
+          base.set(
+            metadata.foreign_key,
+            base.send(metadata.foreign_key).clear
+          )
+          target.clear do |doc|
+            unbind_one(doc)
+            doc.destroyed = true
+          end
+        end
 
         private
 
@@ -244,6 +235,19 @@ module Mongoid # :nodoc:
             Builders::Referenced::ManyToMany.new(meta, object, loading)
           end
 
+          # Create the standard criteria for this relation given the supplied
+          # metadata and object.
+          #
+          # @example Get the criteria.
+          #   Proxy.criteria(meta, object)
+          #
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Object ] object The object for the criteria.
+          # @param [ Class ] type The criteria class.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 2.1.0
           def criteria(metadata, object, type = nil)
             metadata.klass.any_in(:_id => object)
           end
