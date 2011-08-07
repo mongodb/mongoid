@@ -242,11 +242,11 @@ module Mongoid #:nodoc
             end
           else
             define_method(meth) do
-              value = read_attribute(name)
-              if value.is_a?(Array) || value.is_a?(Hash)
-                changed_attributes[name] = value.clone unless attribute_changed?(name)
+              read_attribute(name).tap do |value|
+                if value.is_a?(Array) || value.is_a?(Hash)
+                  changed_attributes[name] = value.clone unless attribute_changed?(name)
+                end
               end
-              value
             end
           end
           define_method("#{meth}=") do |value|
