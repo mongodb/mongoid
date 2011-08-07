@@ -902,4 +902,32 @@ describe Mongoid::Attributes do
       end
     end
   end
+
+  describe "#alias_attribute" do
+    
+    let(:klass) do
+      class AliasAttributeTestClass
+        include Mongoid::Document
+        field :name, :type => String
+        alias_attribute :title, :name
+      end
+      AliasAttributeTestClass.new
+    end
+    
+    it "sets and accesses :name fine" do
+      klass.name = "baseline"
+      klass.name.should == "baseline"
+    end
+    
+    it "aliases :name value as :title" do
+      klass.name = "a value"
+      klass.title.should == "a value"
+    end
+    
+    it "aliases :name= as :title=" do
+      klass.title = "a title value"
+      klass.name.should == "a title value"
+    end
+  end
+
 end
