@@ -288,7 +288,6 @@ describe Mongoid::Dirty do
 
           before do
             person.move_changes
-            p "-"
             person.aliases
           end
 
@@ -332,11 +331,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns the old value" do
-        person.send(:attribute_was, "title").should == "Grand Poobah"
+        person.send(:attribute_was, "title").should eq("Grand Poobah")
       end
 
       it "allows access via (attribute)_was" do
-        person.title_was.should == "Grand Poobah"
+        person.title_was.should eq("Grand Poobah")
       end
     end
 
@@ -366,7 +365,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns the original value" do
-        person.send(:attribute_was, "title").should == "Grand Poobah"
+        person.send(:attribute_was, "title").should eq("Grand Poobah")
       end
     end
 
@@ -395,7 +394,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an array of changed field names" do
-        person.changed.should == [ "title" ]
+        person.changed.should eq([ "title" ])
       end
     end
 
@@ -406,7 +405,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty array" do
-        person.changed.should == []
+        person.changed.should eq([])
       end
     end
   end
@@ -453,8 +452,9 @@ describe Mongoid::Dirty do
       end
 
       it "returns a hash of changes" do
-        person.changes.should ==
+        person.changes.should eq(
           { "title" => [ nil, "Captain Obvious" ] }
+        )
       end
     end
 
@@ -465,7 +465,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty hash" do
-        person.changes.should == {}
+        person.changes.should be_empty
       end
     end
   end
@@ -485,8 +485,9 @@ describe Mongoid::Dirty do
         end
 
         it "returns a hash of field names and new values" do
-          person.setters.should ==
+          person.setters.should eq(
             { "title" => "Captain Obvious" }
+          )
         end
       end
 
@@ -508,8 +509,9 @@ describe Mongoid::Dirty do
         end
 
         it "returns a hash of field names and new values" do
-          address.setters.should ==
+          address.setters.should eq(
             { "addresses.0.street" => "Bond St" }
+          )
         end
 
         context "when the document is embedded multiple levels" do
@@ -525,8 +527,9 @@ describe Mongoid::Dirty do
           end
 
           it "returns the proper hash with locations" do
-            location.setters.should ==
+            location.setters.should eq(
               { "addresses.0.locations.0.name" => "Work" }
+            )
           end
         end
       end
@@ -539,7 +542,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty hash" do
-        person.setters.should == {}
+        person.setters.should be_empty
       end
     end
   end
@@ -562,8 +565,9 @@ describe Mongoid::Dirty do
       end
 
       it "returns the changes before the save" do
-        person.previous_changes["title"].should ==
+        person.previous_changes["title"].should eq(
           [ nil, "Captain Obvious" ]
+        )
       end
     end
 
@@ -585,21 +589,19 @@ describe Mongoid::Dirty do
 
       before do
         person.title = "Captain Obvious"
+        person.send(:reset_attribute!, "title")
       end
 
       it "resets the value to the original" do
-        person.send(:reset_attribute!, "title")
         person.title.should be_nil
       end
 
       it "allows access via reset_(attribute)!" do
-        person.reset_title!
         person.title.should be_nil
       end
 
       it "removes the field from the changes" do
-        person.reset_title!
-        person.changed.should == [ "title" ]
+        person.changed.should eq([ "title" ])
       end
     end
 
@@ -609,8 +611,11 @@ describe Mongoid::Dirty do
         Person.instantiate(:title => "Grand Poobah")
       end
 
-      it "does nothing" do
+      before do
         person.send(:reset_attribute!, "title")
+      end
+
+      it "does nothing" do
         person.title.should be_nil
       end
     end
