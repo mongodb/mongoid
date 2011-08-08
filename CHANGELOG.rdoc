@@ -2,6 +2,10 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.7
+
+This was a specific release to fix MRI 1.8.7 breakages introduced by 2.1.6.
+
 == 2.1.6
 
 === Resolved Issues
