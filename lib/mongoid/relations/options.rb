@@ -15,7 +15,8 @@ module Mongoid # :nodoc:
         :inverse_of,
         :name,
         :relation,
-        :validate
+        :validate,
+        :index
       ]
 
       # Determine if the provided options are valid for the relation.
