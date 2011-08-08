@@ -2,6 +2,21 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.6
+
+=== Resolved Issues
+
+* #1126 Fix setting of relations with other relation proxies.
+
+* #1122 Hash and array fields now properly flag as dirty on access and change.
+
+* #656 Fixed reload breaking relations on unsetting of already loaded
+  associations.
+
+* #647 Prefer #unset to #remove_attribute for removing values.
+
+* #290 Verify pushes into deeply embedded documents.
+
 == 2.1.5
 
 === Resolved Issues
