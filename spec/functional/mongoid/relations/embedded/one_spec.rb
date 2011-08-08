@@ -564,4 +564,55 @@ describe Mongoid::Relations::Embedded::One do
       end
     end
   end
+
+  context "when replacing the relation with another" do
+
+    let!(:person) do
+      Person.create(:ssn => "354-21-9678")
+    end
+
+    let!(:patient) do
+      Patient.create(:title => "Sick")
+    end
+
+    let!(:name) do
+      person.create_name(:first_name => "Karl")
+    end
+
+    before do
+      patient.name = person.name
+    end
+
+    it "sets the same documents" do
+      patient.name.should eq(name)
+    end
+
+    it "sets a cloned relation" do
+      patient.name.should_not equal(person.name)
+    end
+
+    it "does not remove the previous reference" do
+      person.name.should eq(name)
+    end
+
+    context "when reloading" do
+
+      before do
+        person.reload
+        patient.reload
+      end
+
+      it "sets the same documents" do
+        patient.name.should eq(name)
+      end
+
+      it "sets a cloned relation" do
+        patient.name.should_not equal(person.name)
+      end
+
+      it "does not remove the previous reference" do
+        person.name.should eq(name)
+      end
+    end
+  end
 end

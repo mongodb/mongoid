@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference, Event, Tag ].map(&:delete_all)
+    [ Person, Preference, Event, Tag, UserAccount ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -1906,6 +1906,53 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       expect {
         preference.reload
       }.to raise_error(Mongoid::Errors::DocumentNotFound)
+    end
+  end
+
+  context "when replacing the relation with another" do
+
+    let!(:preference) do
+      Preference.create(:name => "test")
+    end
+
+    let!(:user_account) do
+      UserAccount.create(
+        :name => "work",
+        :username => "rell111",
+        :email => "test@1tb.com"
+      )
+    end
+
+    let!(:person) do
+      preference.people.create(:ssn => "123-41-1123", :title => "Sir")
+    end
+
+    before do
+      user_account.people = preference.people
+    end
+
+    it "does not set the same relation" do
+      user_account.people.should_not eq([ person ])
+    end
+
+    it "sets a cloned relation" do
+      user_account.people.first.title.should eq("Sir")
+    end
+
+    it "sets a new foreign key" do
+      user_account.people.first.user_account_ids.should eq([ user_account.id ])
+    end
+
+    it "does not remove the previous reference" do
+      preference.people.should eq([ person ])
+    end
+
+    it "does not remove the previous foreign key" do
+      preference.person_ids.should eq([ person.id ])
+    end
+
+    it "does not remove the previous inverse foreign key" do
+      person.preference_ids.should eq([ preference.id ])
     end
   end
 end

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::One do
 
   before do
-    [ Person, Game, Bar ].map(&:delete_all)
+    [ Person, Game, Bar, Book ].map(&:delete_all)
   end
 
   describe "#=" do
@@ -584,6 +584,75 @@ describe Mongoid::Relations::Referenced::One do
 
       it "removes the reference from the target" do
         game_reloaded.person.should be_nil
+      end
+    end
+  end
+
+  context "when replacing the relation with another" do
+
+    let!(:book) do
+      Book.create(:name => "Snow Crash")
+    end
+
+    let!(:bar) do
+      Bar.create(:name => "Halo")
+    end
+
+    let!(:rating) do
+      book.create_rating(:value => 4)
+    end
+
+    before do
+      bar.rating = book.rating
+      bar.save
+    end
+
+    it "does not set the same relation" do
+      bar.rating.should_not eq(rating)
+    end
+
+    it "sets a cloned relation" do
+      bar.rating.value.should eq(4)
+    end
+
+    it "sets a new foreign key" do
+      bar.rating.ratable_id.should eq(bar.id)
+    end
+
+    it "does not remove the previous reference" do
+      book.rating.should eq(rating)
+    end
+
+    it "does not remove the previous foreign key" do
+      rating.ratable_id.should eq(book.id)
+    end
+
+    context "when reloading" do
+
+      before do
+        bar.reload
+        book.reload
+        rating.reload
+      end
+
+      it "does not set the same relation" do
+        bar.rating.should_not eq(rating)
+      end
+
+      it "sets a cloned relation" do
+        bar.rating.value.should eq(4)
+      end
+
+      it "sets a new foreign key" do
+        bar.rating.ratable_id.should eq(bar.id)
+      end
+
+      it "does not remove the previous reference" do
+        book.rating.should eq(rating)
+      end
+
+      it "does not remove the previous foreign key" do
+        rating.ratable_id.should eq(book.id)
       end
     end
   end

@@ -10,32 +10,6 @@ describe Mongoid::Relations::Referenced::In do
     Person.create(:ssn => "555-55-1111")
   end
 
-  context "when the document belongs to a has one and has many" do
-
-    let(:movie) do
-      Movie.create(:name => "Infernal Affairs")
-    end
-
-    let(:account) do
-      Account.create(:name => "Leung")
-    end
-
-    context "when creating the document" do
-
-      let(:comment) do
-        Comment.create(:movie => movie, :account => account)
-      end
-
-      it "sets the correct has one" do
-        comment.account.should eq(account)
-      end
-
-      it "sets the correct has many" do
-        comment.movie.should eq(movie)
-      end
-    end
-  end
-
   describe "#=" do
 
     context "when the inverse relation has no reference defined" do
@@ -628,6 +602,92 @@ describe Mongoid::Relations::Referenced::In do
             rating.ratable_id.should be_nil
           end
         end
+      end
+    end
+  end
+
+  context "when replacing the relation with another" do
+
+    let!(:person) do
+      Person.create(:ssn => "321-99-8888")
+    end
+
+    let!(:post) do
+      Post.create(:title => "test")
+    end
+
+    let!(:game) do
+      person.create_game(:name => "Tron")
+    end
+
+    before do
+      post.person = game.person
+      post.save
+    end
+
+    it "clones the relation" do
+      post.person.should eq(person)
+    end
+
+    it "sets the foreign key" do
+      post.person_id.should eq(person.id)
+    end
+
+    it "does not remove the previous relation" do
+      game.person.should eq(person)
+    end
+
+    it "does not remove the previous foreign key" do
+      game.person_id.should eq(person.id)
+    end
+
+    context "when reloading" do
+
+      before do
+        post.reload
+        game.reload
+      end
+
+      it "persists the relation" do
+        post.reload.person.should eq(person)
+      end
+
+      it "persists the foreign key" do
+        post.reload.person_id.should eq(game.person_id)
+      end
+
+      it "does not remove the previous relation" do
+        game.person.should eq(person)
+      end
+
+      it "does not remove the previous foreign key" do
+        game.person_id.should eq(person.id)
+      end
+    end
+  end
+
+  context "when the document belongs to a has one and has many" do
+
+    let(:movie) do
+      Movie.create(:name => "Infernal Affairs")
+    end
+
+    let(:account) do
+      Account.create(:name => "Leung")
+    end
+
+    context "when creating the document" do
+
+      let(:comment) do
+        Comment.create(:movie => movie, :account => account)
+      end
+
+      it "sets the correct has one" do
+        comment.account.should eq(account)
+      end
+
+      it "sets the correct has many" do
+        comment.movie.should eq(movie)
       end
     end
   end

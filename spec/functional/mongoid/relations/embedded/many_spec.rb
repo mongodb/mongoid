@@ -3,115 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    [ Person, Account, Acolyte, League, Quiz, Role ].map(&:delete_all)
-  end
-
-  context "when accessing the parent in a destroy callback" do
-
-    let!(:league) do
-      League.create
-    end
-
-    let!(:division) do
-      league.divisions.create
-    end
-
-    before do
-      league.destroy
-    end
-
-    it "retains the reference to the parent" do
-      league.name.should eq("Destroyed")
-    end
-  end
-
-  context "when updating the parent with all attributes" do
-
-    let!(:person) do
-      Person.create(:ssn => "333-33-2111")
-    end
-
-    let!(:address) do
-      person.addresses.create
-    end
-
-    before do
-      person.update_attributes(person.attributes)
-    end
-
-    it "does not duplicate the embedded documents" do
-      person.addresses.should eq([ address ])
-    end
-
-    it "does not persist duplicate embedded documents" do
-      person.reload.addresses.should eq([ address ])
-    end
-  end
-
-  context "when embedding children named versions" do
-
-    let(:acolyte) do
-      Acolyte.create(:name => "test")
-    end
-
-    context "when creating a child" do
-
-      let(:version) do
-        acolyte.versions.create(:number => 1)
-      end
-
-      it "allows the operation" do
-        version.number.should eq(1)
-      end
-
-      context "when reloading the parent" do
-
-        let(:from_db) do
-          acolyte.reload
-        end
-
-        it "saves the child versions" do
-          from_db.versions.should eq([ version ])
-        end
-      end
-    end
-  end
-
-  context "when validating the parent before accessing the child" do
-
-    let!(:account) do
-      Account.new(:name => "Testing").tap do |acct|
-        acct.memberships.build
-        acct.save
-      end
-    end
-
-    let(:from_db) do
-      Account.first
-    end
-
-    context "when saving" do
-
-      before do
-        account.name = ""
-        account.save
-      end
-
-      it "does not lose the parent reference" do
-        from_db.memberships.first.account.should == account
-      end
-    end
-
-    context "when updating attributes" do
-
-      before do
-        from_db.update_attributes(:name => "")
-      end
-
-      it "does not lose the parent reference" do
-        from_db.memberships.first.account.should == account
-      end
-    end
+    [ Person, Account, Acolyte, League, Quiz, Role, Patient ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -2050,4 +1942,164 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when replacing the relation with another" do
+
+    let!(:person) do
+      Person.create(:ssn => "354-21-9678")
+    end
+
+    let!(:patient) do
+      Patient.create(:title => "Sick")
+    end
+
+    let!(:address) do
+      person.addresses.create(:street => "Karl Marx Str")
+    end
+
+    before do
+      patient.addresses = person.addresses
+    end
+
+    it "sets the same documents" do
+      patient.addresses.should eq([ address ])
+    end
+
+    it "sets a cloned relation" do
+      patient.addresses.should_not equal(person.addresses)
+    end
+
+    it "does not remove the previous reference" do
+      person.addresses.should eq([ address ])
+    end
+
+    context "when reloading" do
+
+      before do
+        person.reload
+        patient.reload
+      end
+
+      it "sets the same documents" do
+        patient.addresses.should eq([ address ])
+      end
+
+      it "sets a cloned relation" do
+        patient.addresses.should_not equal(person.addresses)
+      end
+
+      it "does not remove the previous reference" do
+        person.addresses.should eq([ address ])
+      end
+    end
+  end
+
+  context "when accessing the parent in a destroy callback" do
+
+    let!(:league) do
+      League.create
+    end
+
+    let!(:division) do
+      league.divisions.create
+    end
+
+    before do
+      league.destroy
+    end
+
+    it "retains the reference to the parent" do
+      league.name.should eq("Destroyed")
+    end
+  end
+
+  context "when updating the parent with all attributes" do
+
+    let!(:person) do
+      Person.create(:ssn => "333-33-2111")
+    end
+
+    let!(:address) do
+      person.addresses.create
+    end
+
+    before do
+      person.update_attributes(person.attributes)
+    end
+
+    it "does not duplicate the embedded documents" do
+      person.addresses.should eq([ address ])
+    end
+
+    it "does not persist duplicate embedded documents" do
+      person.reload.addresses.should eq([ address ])
+    end
+  end
+
+  context "when embedding children named versions" do
+
+    let(:acolyte) do
+      Acolyte.create(:name => "test")
+    end
+
+    context "when creating a child" do
+
+      let(:version) do
+        acolyte.versions.create(:number => 1)
+      end
+
+      it "allows the operation" do
+        version.number.should eq(1)
+      end
+
+      context "when reloading the parent" do
+
+        let(:from_db) do
+          acolyte.reload
+        end
+
+        it "saves the child versions" do
+          from_db.versions.should eq([ version ])
+        end
+      end
+    end
+  end
+
+  context "when validating the parent before accessing the child" do
+
+    let!(:account) do
+      Account.new(:name => "Testing").tap do |acct|
+        acct.memberships.build
+        acct.save
+      end
+    end
+
+    let(:from_db) do
+      Account.first
+    end
+
+    context "when saving" do
+
+      before do
+        account.name = ""
+        account.save
+      end
+
+      it "does not lose the parent reference" do
+        from_db.memberships.first.account.should == account
+      end
+    end
+
+    context "when updating attributes" do
+
+      before do
+        from_db.update_attributes(:name => "")
+      end
+
+      it "does not lose the parent reference" do
+        from_db.memberships.first.account.should == account
+      end
+    end
+  end
+
 end

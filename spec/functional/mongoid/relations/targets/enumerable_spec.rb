@@ -167,6 +167,54 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#clone" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1234")
+    end
+
+    let!(:post) do
+      Post.create(:title => "one", :person_id => person.id)
+    end
+
+    let!(:post_two) do
+      Post.create(:title => "two", :person_id => person.id)
+    end
+
+    let(:criteria) do
+      Post.where(:person_id => person.id)
+    end
+
+    let(:enumerable) do
+      described_class.new(criteria)
+    end
+
+    before do
+      enumerable << post
+      enumerable << post_two
+    end
+
+    let(:cloned) do
+      enumerable.clone
+    end
+
+    it "clones the first document in the enumerable" do
+      cloned.first.title.should eq("one")
+    end
+
+    it "does not retain the first id" do
+      cloned.first.should_not eq(post)
+    end
+
+    it "clones the last document in the enumerable" do
+      cloned.last.title.should eq("two")
+    end
+
+    it "does not retain the last id" do
+      cloned.last.should_not eq(post_two)
+    end
+  end
+
   describe "#delete" do
 
     let(:person) do

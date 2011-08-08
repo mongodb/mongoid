@@ -26,6 +26,18 @@ module Mongoid # :nodoc:
           end
         end
 
+        # This substituable does not clone.
+        #
+        # @example Get the substitutable.
+        #   proxy.substitutable
+        #
+        # @return [ Object ] The target.
+        #
+        # @since 2.1.6
+        def substitutable
+          target
+        end
+
         # Substitutes the supplied target documents for the existing document
         # in the relation.
         #
@@ -44,6 +56,7 @@ module Mongoid # :nodoc:
               base.delete unless binding?
               return nil
             end
+            base.new_record = true
             proxy.target = replacement
             proxy.bind_one
           end

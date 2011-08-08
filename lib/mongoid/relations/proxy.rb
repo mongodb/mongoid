@@ -35,6 +35,19 @@ module Mongoid # :nodoc:
         extend metadata.extension if metadata.extension?
       end
 
+      # The default substitutable object for a relation proxy is the clone of
+      # the target.
+      #
+      # @example Get the substitutable.
+      #   proxy.substitutable
+      #
+      # @return [ Object ] A clone of the target.
+      #
+      # @since 2.1.6
+      def substitutable
+        target.clone
+      end
+
       protected
 
       # Is the current thread in binding mode?

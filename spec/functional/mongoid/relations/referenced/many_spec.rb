@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   before do
-    [ Person, Post, Movie, Rating ].map(&:delete_all)
+    [ Person, Post, Movie, Rating, Game ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -2239,6 +2239,74 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "chaining order criterias" do
       person.posts.order_by(:title.desc).to_a.should == [post_three, post_two, post_one]
+    end
+  end
+
+  context "when replacing the relation with another" do
+
+    let!(:movie) do
+      Movie.create(:name => "Neuromancer")
+    end
+
+    let!(:game) do
+      Game.create(:name => "Halo")
+    end
+
+    let!(:rating) do
+      movie.ratings.create(:value => 4)
+    end
+
+    before do
+      game.ratings = movie.ratings
+    end
+
+    it "does not set the same relation" do
+      game.ratings.should_not eq([ rating ])
+    end
+
+    it "sets a cloned relation" do
+      game.ratings.first.value.should eq(4)
+    end
+
+    it "sets a new foreign key" do
+      game.ratings.first.ratable_id.should eq(game.id)
+    end
+
+    it "does not remove the previous reference" do
+      movie.ratings.should eq([ rating ])
+    end
+
+    it "does not remove the previous foreign key" do
+      rating.ratable_id.should eq(movie.id)
+    end
+
+    context "when reloading" do
+
+      before do
+        game.reload
+        movie.reload
+        rating.reload
+      end
+
+      it "does not set the same relation" do
+        game.ratings.should_not eq([ rating ])
+      end
+
+      it "sets a cloned relation" do
+        game.ratings.first.value.should eq(4)
+      end
+
+      it "sets a new foreign key" do
+        game.ratings.first.ratable_id.should eq(game.id)
+      end
+
+      it "does not remove the previous reference" do
+        movie.ratings.should eq([ rating ])
+      end
+
+      it "does not remove the previous foreign key" do
+        rating.ratable_id.should eq(movie.id)
+      end
     end
   end
 end
