@@ -16,10 +16,13 @@ module Rails #:nodoc:
     # @since 2.1.0
     def create_indexes(pattern)
       Dir.glob(pattern).each do |file|
-        model = determine_model(file)
-        if model
-          Logger.new($stdout).info("Generating indexes for #{model}")
-          model.create_indexes
+        begin
+          model = determine_model(file)
+          if model
+            model.create_indexes
+            Logger.new($stdout).info("Generated indexes for #{model}")
+          end
+        rescue => e
         end
       end
     end
@@ -68,12 +71,9 @@ module Rails #:nodoc:
     # @since 2.1.0
     def determine_model(file)
       model_path = file[0..-4].split('/')[2..-1]
-      begin
-        klass = model_path.map { |path| path.camelize }.join('::').constantize
-        if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
-          return klass
-        end
-      rescue => e
+      klass = model_path.map { |path| path.camelize }.join('::').constantize
+      if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
+        return klass
       end
     end
   end

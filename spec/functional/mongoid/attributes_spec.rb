@@ -2,15 +2,14 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
+  before do
+    [ Person, Agent ].each(&:delete_all)
+  end
+
   context "when persisting nil attributes" do
 
     let!(:person) do
       Person.create(:score => nil, :ssn => "555-66-7777")
-    end
-
-    after do
-      Person.delete_all
-      Agent.delete_all
     end
 
     it "has an entry in the attributes" do
@@ -31,11 +30,7 @@ describe Mongoid::Attributes do
   context "when default values are defined" do
 
     let(:person) do
-      Person.create
-    end
-
-    after do
-      Person.delete_all
+      Person.create(:ssn => "123-77-7763")
     end
 
     it "does not override the default" do
@@ -57,10 +52,6 @@ describe Mongoid::Attributes do
 
       before do
         Person.collection.insert 'pet' => { 'unrecognized_field' => true }
-      end
-
-      after do
-        Person.delete_all
       end
 
       it "allows access to the legacy data" do

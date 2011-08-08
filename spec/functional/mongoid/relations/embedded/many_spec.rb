@@ -1943,57 +1943,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  context "when replacing the relation with another" do
-
-    let!(:person) do
-      Person.create(:ssn => "354-21-9678")
-    end
-
-    let!(:patient) do
-      Patient.create(:title => "Sick")
-    end
-
-    let!(:address) do
-      person.addresses.create(:street => "Karl Marx Str")
-    end
-
-    before do
-      patient.addresses = person.addresses
-    end
-
-    it "sets the same documents" do
-      patient.addresses.should eq([ address ])
-    end
-
-    it "sets a cloned relation" do
-      patient.addresses.should_not equal(person.addresses)
-    end
-
-    it "does not remove the previous reference" do
-      person.addresses.should eq([ address ])
-    end
-
-    context "when reloading" do
-
-      before do
-        person.reload
-        patient.reload
-      end
-
-      it "sets the same documents" do
-        patient.addresses.should eq([ address ])
-      end
-
-      it "sets a cloned relation" do
-        patient.addresses.should_not equal(person.addresses)
-      end
-
-      it "does not remove the previous reference" do
-        person.addresses.should eq([ address ])
-      end
-    end
-  end
-
   context "when accessing the parent in a destroy callback" do
 
     let!(:league) do

@@ -45,7 +45,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.6
       def substitutable
-        target.clone
+        target
       end
 
       protected
