@@ -1720,27 +1720,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  describe "#respond_to?" do
-
-    let(:person) do
-      Person.new
-    end
-
-    let(:preferences) do
-      person.preferences
-    end
-
-    context "when checking against array methods" do
-
-      [].methods.each do |method|
-
-        it "returns true for #{method}" do
-          preferences.should respond_to(method)
-        end
-      end
-    end
-  end
-
   describe "#sum" do
 
     let(:person) do
