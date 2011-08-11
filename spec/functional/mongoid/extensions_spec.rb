@@ -2,11 +2,17 @@ require "spec_helper"
 
 describe Mongoid::Extensions do
 
+  before do
+    Person.delete_all
+  end
+
   context "setting floating point numbers" do
 
     context "when value is an empty string" do
 
-      let(:person) { Person.new(:ssn => "555555555555555") }
+      let(:person) do
+        Person.new(:ssn => "555-55-5555")
+      end
 
       before do
         Person.validates_numericality_of :blood_alcohol_content, :allow_blank => true
@@ -20,8 +26,13 @@ describe Mongoid::Extensions do
 
   context "setting association foreign keys" do
 
-    let(:game) { Game.new }
-    let(:person) { Person.create(:ssn => "555555555555555") }
+    let(:game) do
+      Game.new
+    end
+
+    let(:person) do
+      Person.create(:ssn => "543-11-9999")
+    end
 
     context "when value is an empty string" do
 
