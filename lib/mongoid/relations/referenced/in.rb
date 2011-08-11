@@ -40,8 +40,8 @@ module Mongoid # :nodoc:
         def substitute(replacement)
           tap do |proxy|
             proxy.unbind_one
-            proxy.target.delete if persistable?
             return nil unless replacement
+            proxy.target.delete if persistable?
             proxy.target = replacement
             proxy.bind_one
           end

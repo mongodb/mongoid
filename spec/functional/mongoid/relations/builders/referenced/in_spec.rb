@@ -59,5 +59,23 @@ describe Mongoid::Relations::Builders::Referenced::In do
         game.person.should equal(person)
       end
     end
+
+    context 'setting an associated document to nil' do
+      let(:person) { Person.create }
+      let(:game) { Game.create(:person => person) }
+
+      before do
+        game.person = nil
+        game.save
+      end
+
+      it 'sets the person_id to nil' do
+        game.person_id.should be_nil
+      end
+
+      it 'does not delete the person' do
+        Person.find(person.id).should == person
+      end
+    end
   end
 end
