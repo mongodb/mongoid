@@ -2051,4 +2051,46 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  context "when moving an embedded document from one parent to another" do
+
+    let!(:person_one) do
+      Person.create(:ssn => "455-11-1234")
+    end
+
+    let!(:person_two) do
+      Person.create(:ssn => "455-12-1234")
+    end
+
+    let!(:address) do
+      person_one.addresses.create(:street => "Kudamm")
+    end
+
+    before do
+      person_two.addresses << address
+    end
+
+    it "adds the document to the new paarent" do
+      person_two.addresses.should eq([ address ])
+    end
+
+    it "sets the new parent on the document" do
+      address._parent.should eq(person_two)
+    end
+
+    context "when reloading the documents" do
+
+      before do
+        person_one.reload
+        person_two.reload
+      end
+
+      it "persists the change to the new parent" do
+        person_two.addresses.should eq([ address ])
+      end
+
+      it "keeps the address on the previous document" do
+        person_one.addresses.should eq([ address ])
+      end
+    end
+  end
 end
