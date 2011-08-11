@@ -52,6 +52,23 @@ describe Mongoid::Fields do
             person_two.hash_testing.object_id
         end
       end
+
+      context 'when provided a default proc' do
+
+        before do
+          Person.field(:generated_testing, :type => Float, :default => lambda { Time.now.to_f })
+        end
+
+        after do
+          Person.fields.delete("generated_testing")
+        end
+
+        it "returns an equal object of a different instance" do
+          person_one.generated_testing.object_id.should_not ==
+            person_two.generated_testing.object_id
+        end
+
+      end
     end
 
     context "on parent classes" do

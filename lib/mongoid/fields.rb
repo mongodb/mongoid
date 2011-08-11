@@ -88,7 +88,7 @@ module Mongoid #:nodoc
       #
       # @return [ Hash ] The field defaults.
       def defaults
-        @defaults ||= {}.tap do |defs|
+        {}.tap do |defs|
           fields.each_pair do |field_name, field|
             unless (default = field.default).nil?
               defs[field_name.to_s] = default
