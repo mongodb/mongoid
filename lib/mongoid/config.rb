@@ -49,7 +49,6 @@ module Mongoid #:nodoc
     option :allow_dynamic_fields, :default => true
     option :autocreate_indexes, :default => false
     option :binding_defaults, :default => { :binding => false, :continue => true }
-    option :embedded_object_id, :default => true
     option :identity_map_enabled, :default => false
     option :include_root_in_json, :default => false
     option :max_retries_on_connection_failure, :default => 0
