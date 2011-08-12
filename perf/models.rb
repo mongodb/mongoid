@@ -35,15 +35,6 @@ class Address
   embedded_in :person
 end
 
-class Phone
-  include Mongoid::Document
-
-  field :country_code, :type => Integer
-  field :number, :type => String
-  field :phone_type, :type => String
-  embedded_in :person
-end
-
 class Post
   include Mongoid::Document
 
@@ -67,7 +58,7 @@ class Preference
   include Mongoid::Document
 
   field :name, :type => String
-  has_and_belongs_to_many :people
+  has_and_belongs_to_many :people, :validate => false
 
   index "person_ids"
 end
