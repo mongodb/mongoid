@@ -89,13 +89,19 @@ module Mongoid #:nodoc
       #
       # @return [ Hash ] The field defaults.
       def defaults
-        {}.tap do |defs|
-          fields.each_pair do |field_name, field|
-            unless (default = field.default).nil?
-              defs[field_name.to_s] = default
-            end
-          end
-        end
+        @defaults ||= []
+      end
+
+      # Set the defaults for the class.
+      #
+      # @example Set the defaults.
+      #   Person.defaults = defaults
+      #
+      # @param [ Array ] defaults The array of defaults to set.
+      #
+      # @since 2.0.0.rc.6
+      def defaults=(defaults)
+        @defaults = defaults
       end
 
       # Defines all the fields that are accessible on the Document
@@ -153,7 +159,7 @@ module Mongoid #:nodoc
       # @since 2.0.0.rc.6
       def inherited(subclass)
         super
-        subclass.fields = fields.dup
+        subclass.defaults, subclass.fields = defaults.dup, fields.dup
       end
 
       # Replace a field with a new type.
@@ -181,13 +187,12 @@ module Mongoid #:nodoc
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
-        @defaults = nil if @defaults
-
         meth = options.delete(:as) || name
         Mappings.for(
           options[:type], options[:identity]
         ).new(name, options).tap do |field|
           fields[name] = field
+          defaults << name unless field.default_value.nil?
           create_accessors(name, meth, options)
           process_options(field)
 

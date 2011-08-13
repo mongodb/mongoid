@@ -818,12 +818,8 @@ describe Mongoid::Attributes do
     let(:person) { Person.new }
 
     it "typecasts proc values" do
-      person.stubs(:defaults).returns("age" => lambda { "51" })
-      person.expects(:typed_value_for).with("age", "51")
-      person.instance_variable_set(:@attributes, {})
-      person.send(:apply_default_attributes)
+      person.age.should eq(100)
     end
-
   end
 
   [:attributes=, :write_attributes].each do |method|

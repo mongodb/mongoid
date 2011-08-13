@@ -12,7 +12,7 @@ class Person
   field :title
   field :terms, :type => Boolean
   field :pets, :type => Boolean, :default => false
-  field :age, :type => Integer, :default => 100
+  field :age, :type => Integer, :default => "100"
   field :dob, :type => Date
   field :employer_id
   field :lunch_time, :type => Time
