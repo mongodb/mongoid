@@ -7,12 +7,9 @@ module Mongoid # :nodoc:
     module Reflections
       extend ActiveSupport::Concern
 
-      included do
-
-        delegate \
-          :reflect_on_association,
-          :reflect_on_all_associations, :to => "self.class"
-      end
+      delegate \
+        :reflect_on_association,
+        :reflect_on_all_associations, :to => "self.class"
 
       module ClassMethods #:nodoc
 

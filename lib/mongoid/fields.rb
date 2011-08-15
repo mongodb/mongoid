@@ -31,11 +31,9 @@ module Mongoid #:nodoc
   module Fields
     extend ActiveSupport::Concern
 
-    included do
-      # Set up the class attributes that must be available to all subclasses.
-      # These include defaults, fields
-      delegate :defaults, :fields, :to => "self.class"
+    delegate :defaults, :fields, :to => "self.class"
 
+    included do
       field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
 

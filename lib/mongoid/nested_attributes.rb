@@ -5,11 +5,11 @@ module Mongoid #:nodoc:
   module NestedAttributes
     extend ActiveSupport::Concern
 
+    delegate :nested_attributes, :to => "self.class"
+
     included do
       class_attribute :nested_attributes
       self.nested_attributes = []
-
-      delegate :nested_attributes, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:

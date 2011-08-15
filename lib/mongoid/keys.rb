@@ -6,12 +6,12 @@ module Mongoid #:nodoc:
   module Keys
     extend ActiveSupport::Concern
 
+    attr_reader :identifier
+    delegate :primary_key, :using_object_ids?, :to => "self.class"
+
     included do
       cattr_accessor :primary_key, :using_object_ids
       self.using_object_ids = true
-      delegate :primary_key, :using_object_ids?, :to => "self.class"
-
-      attr_reader :identifier
     end
 
     private

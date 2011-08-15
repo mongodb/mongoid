@@ -5,11 +5,11 @@ module Mongoid #:nodoc
   module Sharding
     extend ActiveSupport::Concern
 
+    delegate :shard_key_fields, :to => "self.class"
+
     included do
       cattr_accessor :shard_key_fields
       self.shard_key_fields = []
-
-      delegate :shard_key_fields, :to => "self.class"
     end
 
     # Get the document selector with the defined shard keys.
