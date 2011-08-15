@@ -29,6 +29,7 @@ describe Mongoid::Fields do
 
         after do
           Person.fields.delete("array_testing")
+          Person.defaults.delete_one("array_testing")
         end
 
         it "returns an equal object of a different instance" do
@@ -53,21 +54,49 @@ describe Mongoid::Fields do
         end
       end
 
-      context 'when provided a default proc' do
+      context "when provided a default proc" do
 
-        before do
-          Person.field(:generated_testing, :type => Float, :default => lambda { Time.now.to_f })
+        context "when the proc has no argument" do
+
+          before do
+            Person.field(
+              :generated_testing,
+              :type => Float,
+              :default => lambda { Time.now.to_f }
+            )
+          end
+
+          after do
+            Person.fields.delete("generated_testing")
+            Person.defaults.delete_one("generated_testing")
+          end
+
+          it "returns an equal object of a different instance" do
+            person_one.generated_testing.object_id.should_not eq(
+              person_two.generated_testing.object_id
+            )
+          end
         end
 
-        after do
-          Person.fields.delete("generated_testing")
-        end
+        context "when the proc has an argument" do
 
-        it "returns an equal object of a different instance" do
-          person_one.generated_testing.object_id.should_not ==
-            person_two.generated_testing.object_id
-        end
+          before do
+            Person.field(
+              :rank,
+              :type => Integer,
+              :default => lambda { |doc| doc.title? ? 1 : 2 }
+            )
+          end
 
+          after do
+            Person.fields.delete("rank")
+            Person.defaults.delete_one("rank")
+          end
+
+          it "yields the document to the proc" do
+            Person.new.rank.should eq(2)
+          end
+        end
       end
     end
 

@@ -174,6 +174,7 @@ module Mongoid #:nodoc
       #
       # @since 2.1.0
       def replace_field(name, type)
+        defaults.delete_one(name)
         add_field(name, fields[name].options.merge(:type => type))
       end
 
@@ -192,7 +193,7 @@ module Mongoid #:nodoc
           options[:type], options[:identity]
         ).new(name, options).tap do |field|
           fields[name] = field
-          defaults << name unless field.default_value.nil?
+          defaults << name unless field.default.nil?
           create_accessors(name, meth, options)
           process_options(field)
 

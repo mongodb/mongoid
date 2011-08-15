@@ -2,15 +2,16 @@ require "spec_helper"
 
 describe Mongoid::Fields::Serializable::ForeignKeys::Array do
 
-  describe "#default" do
+  describe "#eval_default" do
 
     let(:default) do
-      [ "test" ]
+      [ BSON::ObjectId.new ]
     end
 
     let(:field) do
       described_class.new(
         :vals,
+        :metadata => Person.relations["posts"],
         :type => Array,
         :default => default,
         :identity => true
@@ -18,11 +19,11 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Array do
     end
 
     it "dups the default value" do
-      field.default.should_not equal(default)
+      field.eval_default(nil).should_not equal(default)
     end
 
     it "returns the correct value" do
-      field.default.should == default
+      field.eval_default(nil).should == default
     end
   end
 

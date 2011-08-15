@@ -8,19 +8,6 @@ module Mongoid #:nodoc:
         class Array
           include Serializable
 
-          # Get the default value for the field. If the default is a proc call
-          # it, otherwise clone the array.
-          #
-          # @example Get the default.
-          #   field.default
-          #
-          # @return [ Object ] The default value cloned.
-          #
-          # @since 2.1.0
-          def default
-            default_value.dup
-          end
-
           # Serialize the object from the type defined in the model to a MongoDB
           # compatible object to store.
           #

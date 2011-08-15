@@ -137,7 +137,9 @@ module Mongoid #:nodoc:
       (@attributes ||= {}).tap do |attrs|
         defaults.each do |name|
           unless attrs.has_key?(name)
-            attrs[name] = fields[name].default if fields.has_key?(name)
+            if field = fields[name]
+              attrs[name] = field.eval_default(self)
+            end
           end
         end
       end

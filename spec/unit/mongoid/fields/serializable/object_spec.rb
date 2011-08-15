@@ -13,7 +13,7 @@ describe Mongoid::Fields::Serializable::Object do
     end
   end
 
-  describe "#default" do
+  describe "#eval_default" do
 
     context "when the default value is a proc" do
 
@@ -22,7 +22,7 @@ describe Mongoid::Fields::Serializable::Object do
       end
 
       it "returns the called proc" do
-        field.default.should == 1
+        field.eval_default(nil).should == 1
       end
     end
 

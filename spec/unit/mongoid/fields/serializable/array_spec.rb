@@ -13,7 +13,7 @@ describe Mongoid::Fields::Serializable::Array do
     end
   end
 
-  describe "#default" do
+  describe "#eval_default" do
 
     context "when the default is a proc" do
 
@@ -26,7 +26,7 @@ describe Mongoid::Fields::Serializable::Array do
       end
 
       it "calls the proc" do
-        field.default.should == [ "test" ]
+        field.eval_default(nil).should == [ "test" ]
       end
     end
 
@@ -45,11 +45,11 @@ describe Mongoid::Fields::Serializable::Array do
       end
 
       it "returns the correct value" do
-        field.default.should == default
+        field.eval_default(nil).should == default
       end
 
       it "returns a duped array" do
-        field.default.should_not equal(default)
+        field.eval_default(nil).should_not equal(default)
       end
     end
   end
