@@ -57,6 +57,7 @@ module Mongoid # :nodoc:
             return nil unless replacement
             proxy.target = replacement
             proxy.bind_one
+            replacement.save if persistable?
           end
         end
 

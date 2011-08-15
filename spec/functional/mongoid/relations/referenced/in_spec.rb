@@ -691,4 +691,65 @@ describe Mongoid::Relations::Referenced::In do
       end
     end
   end
+
+  context "when reloading the relation" do
+
+    let!(:person_one) do
+      Person.create(:ssn => "243-41-9678", :title => "Mr.")
+    end
+
+    let!(:person_two) do
+      Person.create(:ssn => "243-41-9699", :title => "Sir")
+    end
+
+    let!(:game) do
+      Game.create(:name => "Starcraft 2")
+    end
+
+    before do
+      game.person = person_one
+      game.save
+    end
+
+    context "when the relation references the same document" do
+
+      before do
+        Person.collection.update(
+          { :_id => person_one.id }, { "$set" => { :title => "Madam" }}
+        )
+      end
+
+      let(:reloaded) do
+        game.person(true)
+      end
+
+      it "reloads the document from the database" do
+        reloaded.title.should eq("Madam")
+      end
+
+      it "sets a new document instance" do
+        reloaded.should_not equal(person_one)
+      end
+    end
+
+    context "when the relation references a different document" do
+
+      before do
+        game.person_id = person_two.id
+        game.save
+      end
+
+      let(:reloaded) do
+        game.person(true)
+      end
+
+      it "reloads the new document from the database" do
+        reloaded.title.should eq("Sir")
+      end
+
+      it "sets a new document instance" do
+        reloaded.should_not equal(person_one)
+      end
+    end
+  end
 end
