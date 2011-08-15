@@ -78,13 +78,13 @@ describe Mongoid::Fields do
           end
         end
 
-        context "when the proc has an argument" do
+        context "when the proc has to be evaluated on the document" do
 
           before do
             Person.field(
               :rank,
               :type => Integer,
-              :default => lambda { |doc| doc.title? ? 1 : 2 }
+              :default => lambda { title? ? 1 : 2 }
             )
           end
 

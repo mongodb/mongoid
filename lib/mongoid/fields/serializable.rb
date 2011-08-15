@@ -70,7 +70,7 @@ module Mongoid #:nodoc:
       # @since 2.1.8
       def eval_default(doc)
         if default.respond_to?(:call)
-          default.arity > 0 ? serialize(default.call(doc)) : serialize(default.call)
+          serialize(doc.instance_exec(&default))
         else
           serialize(default.duplicable? ? default.dup : default)
         end
