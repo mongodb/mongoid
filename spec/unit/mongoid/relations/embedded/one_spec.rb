@@ -116,6 +116,10 @@ describe Mongoid::Relations::Embedded::One do
         end
       end
     end
+
+    it "responds to persisted?" do
+      document.should respond_to(:persisted?)
+    end
   end
 
   describe ".valid_options" do
