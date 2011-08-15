@@ -103,12 +103,7 @@ module Mongoid #:nodoc
     #
     # @return [ Array<String> ] An array of bad field names.
     def destructive_fields
-      @destructive_fields ||= lambda {
-        klass = Class.new do
-          include Mongoid::Document
-        end
-        klass.instance_methods(true).collect { |method| method.to_s }
-      }.call
+      Components.prohibited_methods
     end
 
     # Configure mongoid from a hash. This is usually called after parsing a

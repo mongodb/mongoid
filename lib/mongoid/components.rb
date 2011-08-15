@@ -79,6 +79,8 @@ module Mongoid #:nodoc
       #   Mongoid::Components.prohibited_methods
       #
       # @return [ Array<Symbol> ]
+      #
+      # @since 2.1.8
       def prohibited_methods
         @prohibited_methods ||= MODULES.inject([]) do |methods, mod|
           methods.tap do |mets|

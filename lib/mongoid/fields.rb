@@ -118,6 +118,7 @@ module Mongoid #:nodoc
       #
       # @return [ Field ] The generated field
       def field(name, options = {})
+        check_field_name!(name)
         add_field(name.to_s, options)
       end
 
@@ -224,6 +225,22 @@ module Mongoid #:nodoc
           if field_options.has_key?(option_name)
             handler.call(self, field, field_options[option_name])
           end
+        end
+      end
+
+      # Determine if the field name is allowed, if not raise an error.
+      #
+      # @example Check the field name.
+      #   Model.check_field_name!(:collection)
+      #
+      # @param [ Symbol ] name The field name.
+      #
+      # @raise [ Errors::InvalidField ] If the name is not allowed.
+      #
+      # @since 2.1.8
+      def check_field_name!(name)
+        if Mongoid.destructive_fields.include?(name)
+          raise Errors::InvalidField.new(name)
         end
       end
 

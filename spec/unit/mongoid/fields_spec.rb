@@ -129,6 +129,15 @@ describe Mongoid::Fields do
       Person.field(:testing).should equal Person.fields["testing"]
     end
 
+    context "when the field name conflicts with mongoid's internals" do
+
+      it "raises an error" do
+        expect {
+          Person.field(:identifier)
+        }.to raise_error(Mongoid::Errors::InvalidField)
+      end
+    end
+
     context "when the field is a time" do
 
       let!(:time) do
