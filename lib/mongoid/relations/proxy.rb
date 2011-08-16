@@ -151,6 +151,18 @@ module Mongoid # :nodoc:
       def raise_unsaved(doc)
         raise Errors::UnsavedDocument.new(base, doc)
       end
+
+      # Get the class of the root document in the hierarchy.
+      #
+      # @example Get the root's class.
+      #   proxy.root_class
+      #
+      # @return [ Class ] The root class.
+      #
+      # @since 2.1.8
+      def root_class
+        @root_class ||= base._root.class
+      end
     end
   end
 end

@@ -154,8 +154,8 @@ module Mongoid #:nodoc:
     # @return [ Object ] The atomic update consumer.
     #
     # @since 2.1.0
-    def update
-      Thread.current[:"[mongoid]:update-consumer"]
+    def update_consumer(klass)
+      Thread.current[:"[mongoid][#{klass}]:update-consumer"]
     end
 
     # Set the update consumer on the current thread.
@@ -168,8 +168,8 @@ module Mongoid #:nodoc:
     # @return [ Object ] The update consumer.
     #
     # @since 2.1.0
-    def update=(consumer)
-      Thread.current[:"[mongoid]:update-consumer"] = consumer
+    def set_update_consumer(klass, consumer)
+      Thread.current[:"[mongoid][#{klass}]:update-consumer"] = consumer
     end
   end
 end

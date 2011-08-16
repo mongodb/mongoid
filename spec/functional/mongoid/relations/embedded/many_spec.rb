@@ -248,7 +248,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "deletes the old documents" do
-        person.reload.addresses.should == [ address ]
+        person.reload.addresses.should eq([ address ])
       end
     end
 

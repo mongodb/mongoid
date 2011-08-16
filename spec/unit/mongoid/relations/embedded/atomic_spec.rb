@@ -8,6 +8,10 @@ describe Mongoid::Relations::Embedded::Atomic do
     def collection
       []
     end
+
+    def root_class
+      Person
+    end
   end
 
   describe "#atomically" do
@@ -31,7 +35,7 @@ describe Mongoid::Relations::Embedded::Atomic do
 
         it "puts the updater on the current thread" do
           klass.send(:atomically, :$set) do
-            Mongoid::Threaded.update.should == set
+            Mongoid::Threaded.update_consumer(Person).should eq(set)
           end
         end
       end
@@ -40,7 +44,7 @@ describe Mongoid::Relations::Embedded::Atomic do
 
         it "removes the updater from the current thread" do
           klass.send(:atomically, :$set)
-          Mongoid::Threaded.update.should be_nil
+          Mongoid::Threaded.update_consumer(Person).should be_nil
         end
       end
     end
