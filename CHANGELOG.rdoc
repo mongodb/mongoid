@@ -2,6 +2,31 @@
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
+== 2.1.8
+
+=== Resolved Issues
+
+* #1148 Fixed respond_to? on all relations to return properly.
+
+* #1146 Added back the Mongoid destructive fields check when defining fields.
+
+* #1141 Fixed conversions of nil values in criteria.
+
+* #1131 Verified Mongoid/Kaminari paginating correctly.
+
+* #1105 Fixed atomic update consumer to be scoped to class.
+
+* #1075 self in default lambdas and procs now references the document
+  instance.
+
+* #740 Removed embedded_object_id configuration parameter.
+
+* #661 Fixed metadata caching on embedded documents.
+
+* #595 Fixed relation reload flagging.
+
+* #410 Moving documents from one relation to another now works as expected.
+
 == 2.1.7
 
 This was a specific release to fix MRI 1.8.7 breakages introduced by 2.1.6.
