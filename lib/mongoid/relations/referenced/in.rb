@@ -41,7 +41,6 @@ module Mongoid # :nodoc:
           tap do |proxy|
             proxy.unbind_one
             return nil unless replacement
-            proxy.target.delete if persistable?
             proxy.target = replacement
             proxy.bind_one
           end
