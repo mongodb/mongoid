@@ -135,11 +135,6 @@ module Mongoid #:nodoc:
       # @note This will work for embedded relations that reference another
       #   collection via belongs_to as well.
       #
-      # @todo Durran: don't execute until the criteria itself is executed.
-      #
-      # @todo Durran: push the criteria generation into the relations
-      #   themselves to avoid the macro check.
-      #
       # @example Eager load the provided relations.
       #   Person.includes(:posts, :game)
       #
@@ -151,20 +146,21 @@ module Mongoid #:nodoc:
       # @since 2.2.0
       def includes(*relations)
         relations.each do |name|
-          metadata = klass.reflect_on_association(name)
-          if metadata.macro == :referenced_in
-            metadata.klass.any_in(
-              :_id => only(metadata.foreign_key).map { |doc|
-                doc.send(metadata.foreign_key)
-              }.uniq
-            ).entries
-          else
-            metadata.klass.any_in(
-              metadata.foreign_key => only(:_id).map { |doc| doc.id }.uniq
-            ).entries
-          end
+          inclusions.push(klass.reflect_on_association(name))
         end
         clone
+      end
+
+      # Get a list of criteria that are to be executed for eager loading.
+      #
+      # @example Get the eager loading inclusions.
+      #   Person.includes(:game).inclusions
+      #
+      # @return [ Array<Metadata> ] The inclusions.
+      #
+      # @since 2.2.0
+      def inclusions
+        @inclusions ||= []
       end
 
       # Adds a criterion to the +Criteria+ that specifies values to do

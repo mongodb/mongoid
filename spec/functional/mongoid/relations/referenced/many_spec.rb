@@ -1310,6 +1310,29 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe ".eager_load" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-12-5243")
+    end
+
+    let!(:post) do
+      person.posts.create(:title => "testing")
+    end
+
+    let(:metadata) do
+      Person.relations["posts"]
+    end
+
+    let(:eager) do
+      described_class.eager_load(metadata, Person.all)
+    end
+
+    it "returns the appropriate criteria" do
+      eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+    end
+  end
+
   describe "#exists?" do
 
     let!(:person) do

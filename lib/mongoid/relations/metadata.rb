@@ -178,6 +178,23 @@ module Mongoid # :nodoc:
         !!dependent
       end
 
+      # Get the criteria needed to eager load this relation.
+      #
+      # @example Get the eager loading criteria.
+      #   metadata.eager_load(criteria)
+      #
+      # @param [ Criteria ] criteria The criteria to load from.
+      #
+      # @return [ Criteria ] The eager loading criteria.
+      #
+      # @since 2.2.0
+      def eager_load(criteria)
+        relation.eager_load(
+          self,
+          criteria.clone.tap { |crit| crit.inclusions.clear }
+        )
+      end
+
       # Will determine if the relation is an embedded one or not. Currently
       # only checks against embeds one and many.
       #

@@ -606,6 +606,29 @@ describe Mongoid::Relations::Referenced::In do
     end
   end
 
+  describe ".eager_load" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-12-5243")
+    end
+
+    let!(:post) do
+      person.posts.create(:title => "testing")
+    end
+
+    let(:metadata) do
+      Post.relations["person"]
+    end
+
+    let(:eager) do
+      described_class.eager_load(metadata, Post.all)
+    end
+
+    it "returns the appropriate criteria" do
+      eager.selector.should eq({ :_id => { "$in" => [ person.id ] }})
+    end
+  end
+
   context "when replacing the relation with another" do
 
     let!(:person) do

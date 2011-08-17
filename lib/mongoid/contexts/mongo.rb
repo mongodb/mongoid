@@ -140,6 +140,13 @@ module Mongoid #:nodoc:
       #
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
+        # @todo Durran: Need to do something special here or somewhere else for
+        #   the has_many and has_and_belongs_to_many. Documents are in the
+        #   identity map but the builders don't know how to get them out
+        #   efficiently.
+        criteria.inclusions.reject! do |metadata|
+          metadata.eager_load(criteria).entries
+        end
         klass.collection.find(selector, process_options) || []
       end
 

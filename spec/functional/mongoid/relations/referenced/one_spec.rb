@@ -539,6 +539,29 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
+  describe ".eager_load" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-12-5243")
+    end
+
+    let!(:game) do
+      person.create_game(:name => "Tron")
+    end
+
+    let(:metadata) do
+      Person.relations["game"]
+    end
+
+    let(:eager) do
+      described_class.eager_load(metadata, Person.all)
+    end
+
+    it "returns the appropriate criteria" do
+      eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+    end
+  end
+
   describe "#nullify" do
 
     let(:person) do

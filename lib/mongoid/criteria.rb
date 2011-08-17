@@ -154,7 +154,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def freeze
-      context and super
+      context and inclusions and super
     end
 
     # Merges the supplied argument hash into a single criteria

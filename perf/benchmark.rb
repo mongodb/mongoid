@@ -299,4 +299,32 @@ Benchmark.bm do |bm|
       GC.start
     end
   end
+
+  100000.times do |n|
+
+    Person.create(:title => "#{n}").tap do |person|
+      person.posts.create(:title => "#{n}")
+    end
+  end
+
+  puts "\n[ Iterate with association load belongs_to ]"
+
+  Mongoid.unit_of_work do
+
+    bm.report("#each [ normal ] ") do
+      Post.all.each do |post|
+        post.person.title
+      end
+    end
+
+    Mongoid.identity_map_enabled = true
+
+    bm.report("#each [ eager ]  ") do
+      Post.includes(:person).each do |post|
+        post.person.title
+      end
+    end
+
+    Mongoid.identity_map_enabled = false
+  end
 end

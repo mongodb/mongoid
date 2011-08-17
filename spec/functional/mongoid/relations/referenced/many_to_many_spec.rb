@@ -1242,6 +1242,29 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe ".eager_load" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-12-5243")
+    end
+
+    let!(:preference) do
+      person.preferences.create(:name => "setting")
+    end
+
+    let(:metadata) do
+      Person.relations["preferences"]
+    end
+
+    let(:eager) do
+      described_class.eager_load(metadata, Person.all)
+    end
+
+    it "returns the appropriate criteria" do
+      eager.selector.should eq({ :_id => { "$in" => [ preference.id ] }})
+    end
+  end
+
   describe "#exists?" do
 
     let!(:person) do
