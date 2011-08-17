@@ -125,6 +125,48 @@ module Mongoid #:nodoc:
       end
       alias :any_in :in
 
+      # Eager loads all the provided relations. Will load all the documents
+      # into the identity map who's ids match based on the extra query for the
+      # ids.
+      #
+      # @note This will only work if Mongoid's identity map is enabled. To do
+      #   so set identity_map_enabled: true in your mongoid.yml
+      #
+      # @note This will work for embedded relations that reference another
+      #   collection via belongs_to as well.
+      #
+      # @todo Durran: don't execute until the criteria itself is executed.
+      #
+      # @todo Durran: push the criteria generation into the relations
+      #   themselves to avoid the macro check.
+      #
+      # @example Eager load the provided relations.
+      #   Person.includes(:posts, :game)
+      #
+      # @param [ Array<Symbol> ] relations The names of the relations to eager
+      #   load.
+      #
+      # @return [ Criteria ] The cloned criteria.
+      #
+      # @since 2.2.0
+      def includes(*relations)
+        relations.each do |name|
+          metadata = klass.reflect_on_association(name)
+          if metadata.macro == :referenced_in
+            metadata.klass.any_in(
+              :_id => only(metadata.foreign_key).map { |doc|
+                doc.send(metadata.foreign_key)
+              }.uniq
+            ).entries
+          else
+            metadata.klass.any_in(
+              metadata.foreign_key => only(:_id).map { |doc| doc.id }.uniq
+            ).entries
+          end
+        end
+        clone
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values to do
       # geospacial searches by. The field must be indexed with the "2d" option.
       #

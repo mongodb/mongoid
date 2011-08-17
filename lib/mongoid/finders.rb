@@ -8,10 +8,10 @@ module Mongoid #:nodoc:
     # Delegate to the criteria methods that are natural for creating a new
     # criteria.
     critera_methods = [ :all_in, :any_in, :any_of, :asc, :ascending, :avg,
-                        :desc, :descending, :excludes, :limit, :max, :min,
-                        :not_in, :only, :order_by, :skip, :sum, :without,
-                        :where, :update, :update_all, :near ]
-    delegate *(critera_methods.dup << {:to => :criteria})
+                        :desc, :descending, :excludes, :includes, :limit,
+                        :max, :min, :not_in, :only, :order_by, :skip, :sum,
+                        :without, :where, :update, :update_all, :near ]
+    delegate *(critera_methods.dup << { :to => :criteria })
 
     # Find all documents that match the given conditions.
     #
