@@ -353,37 +353,6 @@ describe Mongoid::Criterion::Inclusion do
         Mongoid::IdentityMap[Person][person_two.id].should eq(person_two)
       end
     end
-
-    context "when including a has and belongs to many" do
-
-      let!(:preference_one) do
-        person.preferences.create(:name => "one")
-      end
-
-      let!(:preference_two) do
-        person.preferences.create(:name => "two")
-      end
-
-      before do
-        Mongoid::IdentityMap.clear
-      end
-
-      let!(:criteria) do
-        Person.includes(:preferences).entries
-      end
-
-      it "returns the correct documents" do
-        criteria.should eq([ person ])
-      end
-
-      it "inserts the first document into the identity map" do
-        Mongoid::IdentityMap[Preference][preference_one.id].should eq(preference_one)
-      end
-
-      it "inserts the second document into the identity map" do
-        Mongoid::IdentityMap[Preference][preference_two.id].should eq(preference_two)
-      end
-    end
   end
 
   describe "#near" do

@@ -608,6 +608,14 @@ describe Mongoid::Relations::Referenced::In do
 
   describe ".eager_load" do
 
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
     let!(:person) do
       Person.create(:ssn => "243-12-5243")
     end
@@ -624,8 +632,12 @@ describe Mongoid::Relations::Referenced::In do
       described_class.eager_load(metadata, Post.all)
     end
 
-    it "returns the appropriate criteria" do
-      eager.selector.should eq({ :_id => { "$in" => [ person.id ] }})
+    let!(:map) do
+      Mongoid::IdentityMap.get(Person, person.id)
+    end
+
+    it "puts the document in the identity map" do
+      map.should eq(person)
     end
   end
 

@@ -265,10 +265,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.2.0
           def eager_load(metadata, criteria)
-            metadata.klass.any_in(
-              :_id => criteria.only(metadata.foreign_key).map do |doc|
-                doc.send(metadata.foreign_key)
-              end.flatten.uniq
+            raise RuntimeError.new(
+              "Eager loading many-to-many relations is not supported."
             )
           end
 

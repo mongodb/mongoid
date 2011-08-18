@@ -300,31 +300,57 @@ Benchmark.bm do |bm|
     end
   end
 
-  100000.times do |n|
+  [ 1000, 10000].each do |i|
 
-    Person.create(:title => "#{n}").tap do |person|
-      person.posts.create(:title => "#{n}")
-    end
-  end
+    GC.start
 
-  puts "\n[ Iterate with association load belongs_to ]"
+    i.times do |n|
 
-  Mongoid.unit_of_work do
-
-    bm.report("#each [ normal ] ") do
-      Post.all.each do |post|
-        post.person.title
+      Person.create(:title => "#{n}").tap do |person|
+        person.posts.create(:title => "#{n}")
       end
     end
 
-    Mongoid.identity_map_enabled = true
+    puts "\n[ Iterate with association load 1-1 ]"
 
-    bm.report("#each [ eager ]  ") do
-      Post.includes(:person).each do |post|
-        post.person.title
+    Mongoid.unit_of_work do
+
+      bm.report("#each [ normal ] ") do
+        Post.all.each do |post|
+          post.person.title
+        end
       end
+
+      Mongoid.identity_map_enabled = true
+
+      bm.report("#each [ eager ]  ") do
+        Post.includes(:person).each do |post|
+          post.person.title
+        end
+      end
+
+      Mongoid.identity_map_enabled = false
     end
 
-    Mongoid.identity_map_enabled = false
+    puts "\n[ Iterate with association load 1-n ]"
+
+    Mongoid.unit_of_work do
+
+      bm.report("#each [ normal ] ") do
+        Person.all.each do |person|
+          person.posts.each { |post| post.title }
+        end
+      end
+
+      Mongoid.identity_map_enabled = true
+
+      bm.report("#each [ eager ]  ") do
+        Person.includes(:posts).each do |person|
+          person.posts.each { |post| post.title }
+        end
+      end
+
+      Mongoid.identity_map_enabled = false
+    end
   end
 end

@@ -133,47 +133,44 @@ describe Mongoid::IdentityMap do
     end
   end
 
-  describe "#match" do
+  describe "#get_selector" do
 
-    let(:document) do
+    let!(:person) do
       Person.new
     end
 
-    context "when the criteria matches" do
+    let!(:post_one) do
+      Post.new(:person => person)
+    end
 
-      let(:criteria) do
-        Person.where(:_id => document.id)
-      end
+    let!(:post_two) do
+      Post.new(:person => person)
+    end
+
+    context "when there are documents in the map" do
 
       before do
-        described_class.set(document)
+        identity_map.set_many(post_one, :person_id => person.id)
+        identity_map.set_many(post_two, :person_id => person.id)
       end
 
-      let(:match) do
-        described_class.match(criteria)
+      let(:documents) do
+        identity_map.get_selector(Post, :person_id => person.id)
       end
 
-      it "returns the document" do
-        match.should eq(document)
+      it "returns the matching documents" do
+        documents.should eq([ post_one, post_two ])
       end
     end
 
-    context "when the criteria does not match" do
+    context "when there are no documents in the map" do
 
-      let(:criteria) do
-        Person.where(:_id => BSON::ObjectId.new)
-      end
-
-      before do
-        described_class.set(document)
-      end
-
-      let(:match) do
-        described_class.match(criteria)
+      let(:documents) do
+        identity_map.get_selector(Post, :person_id => person.id)
       end
 
       it "returns nil" do
-        match.should be_nil
+        documents.should be_nil
       end
     end
   end
@@ -317,6 +314,63 @@ describe Mongoid::IdentityMap do
 
       it "returns nil" do
         set.should be_nil
+      end
+    end
+  end
+
+  describe "#set_many" do
+
+    let!(:person) do
+      Person.new
+    end
+
+    let!(:post_one) do
+      Post.new(:person => person)
+    end
+
+    let!(:post_two) do
+      Post.new(:person => person)
+    end
+
+    context "when no documents exist for the selector" do
+
+      let!(:set) do
+        identity_map.set_many(post_one, { :person_id => person.id })
+        identity_map.set_many(post_two, { :person_id => person.id })
+      end
+
+      let(:documents) do
+        identity_map[Post][{ :person_id => person.id }]
+      end
+
+      it "puts the documents in the map" do
+        documents.should eq([ post_one, post_two ])
+      end
+    end
+  end
+
+  describe "#set_one" do
+
+    let!(:person) do
+      Person.new
+    end
+
+    let!(:post_one) do
+      Post.new(:person => person)
+    end
+
+    context "when no documents exist for the selector" do
+
+      let!(:set) do
+        identity_map.set_one(post_one, { :person_id => person.id })
+      end
+
+      let(:document) do
+        identity_map[Post][{ :person_id => person.id }]
+      end
+
+      it "puts the documents in the map" do
+        document.should eq(post_one)
       end
     end
   end

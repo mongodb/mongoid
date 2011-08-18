@@ -541,6 +541,14 @@ describe Mongoid::Relations::Referenced::One do
 
   describe ".eager_load" do
 
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
     let!(:person) do
       Person.create(:ssn => "243-12-5243")
     end
@@ -553,12 +561,20 @@ describe Mongoid::Relations::Referenced::One do
       Person.relations["game"]
     end
 
-    let(:eager) do
+    let!(:eager) do
       described_class.eager_load(metadata, Person.all)
+    end
+
+    let(:map) do
+      Mongoid::IdentityMap.get_selector(Game, "person_id" => person.id)
     end
 
     it "returns the appropriate criteria" do
       eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+    end
+
+    it "puts the documents in the identity map" do
+      map.should eq(game)
     end
   end
 

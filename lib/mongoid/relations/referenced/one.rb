@@ -138,7 +138,12 @@ module Mongoid # :nodoc:
             metadata.klass.any_in(
               metadata.foreign_key =>
                 criteria.only(:_id).map { |doc| doc.id }.uniq
-            )
+            ).each do |doc|
+              IdentityMap.set_one(
+                doc,
+                metadata.foreign_key => doc.send(metadata.foreign_key)
+              )
+            end
           end
 
           # Returns true if the relation is an embedded one. In this case

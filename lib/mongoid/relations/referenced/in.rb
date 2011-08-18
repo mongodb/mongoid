@@ -127,7 +127,7 @@ module Mongoid # :nodoc:
                 criteria.only(metadata.foreign_key).map do |doc|
                   doc.send(metadata.foreign_key)
                 end.uniq
-            )
+            ).entries
           end
 
           # Returns true if the relation is an embedded one. In this case

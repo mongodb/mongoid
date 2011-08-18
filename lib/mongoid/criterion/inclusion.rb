@@ -135,6 +135,11 @@ module Mongoid #:nodoc:
       # @note This will work for embedded relations that reference another
       #   collection via belongs_to as well.
       #
+      # @note Eager loading brings all the documents into memory, so there is a
+      #   sweet spot on the performance gains. Internal benchmarks show that
+      #   eager loading becomes slower around 100k documents, but this will
+      #   naturally depend on the specific application.
+      #
       # @example Eager load the provided relations.
       #   Person.includes(:posts, :game)
       #

@@ -17,7 +17,8 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             return [] if object.is_a?(Array)
-            metadata.criteria(convertable(metadata, object))
+            crit = metadata.criteria(convertable(metadata, object))
+            IdentityMap.get_selector(crit.klass, crit.selector) || crit
           end
 
           private
