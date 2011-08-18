@@ -154,27 +154,7 @@ module Mongoid # :nodoc:
         end
         alias :nullify_all :nullify
         alias :clear :nullify
-
-        # Clear the relation. Will delete the documents from the db if they are
-        # already persisted.
-        #
-        # @example Clear the relation.
-        #   person.posts.clear
-        #
-        # @return [ Many ] The relation emptied.
-        #
-        # @since 2.0.0.beta.1
-        def purge
-          criteria.delete_all
-          base.set(
-            metadata.foreign_key,
-            base.send(metadata.foreign_key).clear
-          )
-          target.clear do |doc|
-            unbind_one(doc)
-            doc.destroyed = true
-          end
-        end
+        alias :purge :nullify
 
         private
 
