@@ -2463,6 +2463,11 @@ describe Mongoid::NestedAttributes do
                   Person.accepts_nested_attributes_for :posts
                 end
 
+                after(:all) do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts
+                end
+
                 [ 1, "1", true, "true" ].each do |truth|
 
                   context "when passed a #{truth} with destroy" do
