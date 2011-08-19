@@ -98,4 +98,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         [ :autosave, :dependent, :foreign_key, :index, :order ]
     end
   end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
+    end
+  end
 end

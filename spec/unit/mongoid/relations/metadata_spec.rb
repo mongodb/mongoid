@@ -1021,6 +1021,59 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#validate?" do
+
+    context "when validate is provided" do
+
+      context "when validate is true" do
+
+        let(:metadata) do
+          described_class.new(
+            :name => :posts,
+            :inverse_class_name => "Post",
+            :relation => Mongoid::Relations::Referenced::Many,
+            :validate => true
+          )
+        end
+
+        it "returns true" do
+          metadata.validate?.should eq(true)
+        end
+      end
+
+      context "when validate is false" do
+
+        let(:metadata) do
+          described_class.new(
+            :name => :posts,
+            :inverse_class_name => "Post",
+            :relation => Mongoid::Relations::Referenced::Many,
+            :validate => false
+          )
+        end
+
+        it "returns false" do
+          metadata.validate?.should eq(false)
+        end
+      end
+    end
+
+    context "when validate is not provided" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :posts,
+          :inverse_class_name => "Post",
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      it "returns the relation default" do
+        metadata.validate?.should eq(true)
+      end
+    end
+  end
+
   describe "#versioned?" do
 
     context "when versioned is true" do

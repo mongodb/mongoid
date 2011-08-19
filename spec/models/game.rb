@@ -3,7 +3,7 @@ class Game
   field :high_score, :type => Integer, :default => 500
   field :score, :type => Integer, :default => 0
   field :name
-  belongs_to :person, :index => true
+  belongs_to :person, :index => true, :validate => true
   has_one :video, :validate => false
   has_many :ratings, :as => :ratable, :dependent => :nullify
   accepts_nested_attributes_for :person

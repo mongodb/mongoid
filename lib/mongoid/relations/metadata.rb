@@ -659,7 +659,11 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def validate?
-        self[:validate] != false
+        unless self[:validate].nil?
+          self[:validate]
+        else
+          self[:validate] = relation.validation_default
+        end
       end
 
       # Is this relation using Mongoid's internal versioning system?

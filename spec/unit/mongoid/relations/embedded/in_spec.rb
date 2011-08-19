@@ -125,4 +125,11 @@ describe Mongoid::Relations::Embedded::In do
         [ :cyclic, :polymorphic ]
     end
   end
+
+  describe ".validation_default" do
+
+    it "returns false" do
+      described_class.validation_default.should eq(false)
+    end
+  end
 end
