@@ -43,10 +43,10 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.0
       def building
-        Threaded.building = true
+        Threaded.begin_build
         yield
       ensure
-        Threaded.building = false
+        Threaded.exit_build
       end
 
       module ClassMethods #:nodoc:

@@ -6,6 +6,18 @@ module Mongoid #:nodoc:
   module Threaded
     extend self
 
+    # Begins a building block.
+    #
+    # @example Begin the build.
+    #   Threaded.begin_build
+    #
+    # @return [ true ] Always true.
+    #
+    # @since 2.1.9
+    def begin_build
+      build_stack.push(true)
+    end
+
     # Is the current thread in binding mode?
     #
     # @example Is the thread in binding mode?
@@ -41,21 +53,20 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def building?
-      Thread.current[:"[mongoid]:building-mode"] ||= false
+      !build_stack.empty?
     end
 
-    # Set the building mode for the current thread.
+    # Get the build stack for the current thread. Is simply an array of calls
+    # to Mongoid's building method.
     #
-    # @example Set the building mode.
-    #   Threaded.building = true
+    # @example Get the build stack.
+    #   Threaded.build_stack
     #
-    # @param [ true, false ] mode The current building mode.
+    # @return [ Array ] The array of build calls.
     #
-    # @return [ true, false ] The current building mode.
-    #
-    # @since 2.1.0
-    def building=(mode)
-      Thread.current[:"[mongoid]:building-mode"] = mode
+    # @since 2.1.9
+    def build_stack
+      Thread.current[:"[mongoid]:build-stack"] ||= []
     end
 
     # Clear out all the safety options set using the safely proxy.
@@ -68,6 +79,18 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def clear_safety_options!
       Thread.current[:"[mongoid]:safety-options"] = nil
+    end
+
+    # Exit the building block.
+    #
+    # @example Exit the building block.
+    #   Threaded.exit_build
+    #
+    # @return [ true ] The last element in the stack.
+    #
+    # @since 2.1.9
+    def exit_build
+      build_stack.pop
     end
 
     # Get the identity map off the current thread.
