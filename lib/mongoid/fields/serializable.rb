@@ -25,7 +25,7 @@ module Mongoid #:nodoc:
     module Serializable
 
       # Set readers for the instance variables.
-      attr_reader :default_value, :label, :name, :options
+      attr_reader :default, :label, :name, :options
 
       # When reading the field do we need to cast the value? This holds true when
       # times are stored or for big decimals which are stored as strings.
@@ -44,22 +44,6 @@ module Mongoid #:nodoc:
           end.include?(:deserialize)
       end
 
-      # Get the default value for the field.
-      #
-      # @example Get the default.
-      #   field.default
-      #
-      # @return [ Object ] The default value.
-      #
-      # @since 2.1.0
-      def default
-        if default_value.respond_to?(:call)
-          serialize(default_value.call)
-        else
-          serialize(default_value)
-        end
-      end
-
       # Deserialize this field from the type stored in MongoDB to the type
       # defined on the model
       #
@@ -72,6 +56,25 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def deserialize(object); object; end
+
+      # Evaluate the default value and return it. Will handle the
+      # serialization, proc calls, and duplication if necessary.
+      #
+      # @example Evaluate the default value.
+      #   field.eval_default(document)
+      #
+      # @param [ Document ] doc The document the field belongs to.
+      #
+      # @return [ Object ] The serialized default value.
+      #
+      # @since 2.1.8
+      def eval_default(doc)
+        if default.respond_to?(:call)
+          serialize(doc.instance_exec(&default))
+        else
+          serialize(default.duplicable? ? default.dup : default)
+        end
+      end
 
       # Create the new field with a name and optional additional options.
       #
@@ -87,7 +90,7 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def initialize(name, options = {})
         @name, @options = name, options
-        @default_value, @label = options[:default], options[:label]
+        @default, @label = options[:default], options[:label]
       end
 
       # Serialize the object from the type defined in the model to a MongoDB

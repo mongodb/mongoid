@@ -125,6 +125,49 @@ module Mongoid #:nodoc:
       end
       alias :any_in :in
 
+      # Eager loads all the provided relations. Will load all the documents
+      # into the identity map who's ids match based on the extra query for the
+      # ids.
+      #
+      # @note This will only work if Mongoid's identity map is enabled. To do
+      #   so set identity_map_enabled: true in your mongoid.yml
+      #
+      # @note This will work for embedded relations that reference another
+      #   collection via belongs_to as well.
+      #
+      # @note Eager loading brings all the documents into memory, so there is a
+      #   sweet spot on the performance gains. Internal benchmarks show that
+      #   eager loading becomes slower around 100k documents, but this will
+      #   naturally depend on the specific application.
+      #
+      # @example Eager load the provided relations.
+      #   Person.includes(:posts, :game)
+      #
+      # @param [ Array<Symbol> ] relations The names of the relations to eager
+      #   load.
+      #
+      # @return [ Criteria ] The cloned criteria.
+      #
+      # @since 2.2.0
+      def includes(*relations)
+        relations.each do |name|
+          inclusions.push(klass.reflect_on_association(name))
+        end
+        clone
+      end
+
+      # Get a list of criteria that are to be executed for eager loading.
+      #
+      # @example Get the eager loading inclusions.
+      #   Person.includes(:game).inclusions
+      #
+      # @return [ Array<Metadata> ] The inclusions.
+      #
+      # @since 2.2.0
+      def inclusions
+        @inclusions ||= []
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values to do
       # geospacial searches by. The field must be indexed with the "2d" option.
       #

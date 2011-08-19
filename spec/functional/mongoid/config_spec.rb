@@ -59,7 +59,7 @@ describe Mongoid::Config do
   describe ".destructive_fields" do
 
     it "returns a list of method names" do
-      described_class.destructive_fields.should include("process")
+      described_class.destructive_fields.should include(:process)
     end
   end
 

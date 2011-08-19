@@ -5,6 +5,7 @@ class Game
   field :name
   belongs_to :person, :index => true
   has_one :video, :validate => false
+  has_many :ratings, :as => :ratable, :dependent => :nullify
   accepts_nested_attributes_for :person
   cache
 

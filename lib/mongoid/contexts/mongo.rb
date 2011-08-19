@@ -140,6 +140,9 @@ module Mongoid #:nodoc:
       #
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
+        criteria.inclusions.reject! do |metadata|
+          metadata.eager_load(criteria)
+        end
         klass.collection.find(selector, process_options) || []
       end
 

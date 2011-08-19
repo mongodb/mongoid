@@ -11,6 +11,7 @@ class Account
   belongs_to :person
   has_many :alerts
   has_and_belongs_to_many :agents
+  has_one :comment, :validate => false
 
   attr_accessible :nickname, :name
 

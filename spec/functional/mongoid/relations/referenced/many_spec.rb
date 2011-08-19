@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   before do
-    [ Person, Post, Movie, Rating ].map(&:delete_all)
+    [ Person, Post, Movie, Rating, Game ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -1310,6 +1310,45 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe ".eager_load" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    let!(:person) do
+      Person.create(:ssn => "243-12-5243")
+    end
+
+    let!(:post) do
+      person.posts.create(:title => "testing")
+    end
+
+    let(:metadata) do
+      Person.relations["posts"]
+    end
+
+    let!(:eager) do
+      described_class.eager_load(metadata, Person.all)
+    end
+
+    let(:map) do
+      Mongoid::IdentityMap.get_selector(Post, "person_id" => person.id)
+    end
+
+    it "returns the appropriate criteria" do
+      eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+    end
+
+    it "puts the documents in the identity map" do
+      map.should eq([ post ])
+    end
+  end
+
   describe "#exists?" do
 
     let!(:person) do
@@ -2210,7 +2249,8 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  context "then association has order" do
+  context "when the association has an order defined" do
+
     let(:person) do
       Person.create(:ssn => "999-99-9999")
     end
@@ -2227,7 +2267,6 @@ describe Mongoid::Relations::Referenced::Many do
       Post.create(:rating => 20, :title => '3')
     end
 
-
     before do
       person.posts.nullify_all
       person.posts.push(post_one, post_two, post_three)
@@ -2239,6 +2278,57 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "chaining order criterias" do
       person.posts.order_by(:title.desc).to_a.should == [post_three, post_two, post_one]
+    end
+  end
+
+  context "when reloading the relation" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-41-9678")
+    end
+
+    let!(:post_one) do
+      Post.create(:title => "one")
+    end
+
+    let!(:post_two) do
+      Post.create(:title => "two")
+    end
+
+    before do
+      person.posts << post_one
+    end
+
+    context "when the relation references the same documents" do
+
+      before do
+        Post.collection.update(
+          { :_id => post_one.id }, { "$set" => { :title => "reloaded" }}
+        )
+      end
+
+      let(:reloaded) do
+        person.posts(true)
+      end
+
+      it "reloads the document from the database" do
+        reloaded.first.title.should eq("reloaded")
+      end
+    end
+
+    context "when the relation references different documents" do
+
+      before do
+        person.posts << post_two
+      end
+
+      let(:reloaded) do
+        person.posts(true)
+      end
+
+      it "reloads the new document from the database" do
+        reloaded.should eq([ post_one, post_two ])
+      end
     end
   end
 end

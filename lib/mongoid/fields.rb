@@ -13,6 +13,7 @@ require "mongoid/fields/serializable/hash"
 require "mongoid/fields/serializable/integer"
 require "mongoid/fields/serializable/bignum"
 require "mongoid/fields/serializable/fixnum"
+require "mongoid/fields/serializable/nil_class"
 require "mongoid/fields/serializable/object"
 require "mongoid/fields/serializable/object_id"
 require "mongoid/fields/serializable/range"
@@ -30,11 +31,9 @@ module Mongoid #:nodoc
   module Fields
     extend ActiveSupport::Concern
 
-    included do
-      # Set up the class attributes that must be available to all subclasses.
-      # These include defaults, fields
-      delegate :defaults, :fields, :to => "self.class"
+    delegate :defaults, :fields, :to => "self.class"
 
+    included do
       field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
 
@@ -88,13 +87,19 @@ module Mongoid #:nodoc
       #
       # @return [ Hash ] The field defaults.
       def defaults
-        @defaults ||= {}.tap do |defs|
-          fields.each_pair do |field_name, field|
-            unless (default = field.default).nil?
-              defs[field_name.to_s] = default
-            end
-          end
-        end
+        @defaults ||= []
+      end
+
+      # Set the defaults for the class.
+      #
+      # @example Set the defaults.
+      #   Person.defaults = defaults
+      #
+      # @param [ Array ] defaults The array of defaults to set.
+      #
+      # @since 2.0.0.rc.6
+      def defaults=(defaults)
+        @defaults = defaults
       end
 
       # Defines all the fields that are accessible on the Document
@@ -113,6 +118,7 @@ module Mongoid #:nodoc
       #
       # @return [ Field ] The generated field
       def field(name, options = {})
+        check_field_name!(name)
         add_field(name.to_s, options)
       end
 
@@ -152,7 +158,7 @@ module Mongoid #:nodoc
       # @since 2.0.0.rc.6
       def inherited(subclass)
         super
-        subclass.fields = fields.dup
+        subclass.defaults, subclass.fields = defaults.dup, fields.dup
       end
 
       # Replace a field with a new type.
@@ -167,6 +173,7 @@ module Mongoid #:nodoc
       #
       # @since 2.1.0
       def replace_field(name, type)
+        defaults.delete_one(name)
         add_field(name, fields[name].options.merge(:type => type))
       end
 
@@ -180,13 +187,12 @@ module Mongoid #:nodoc
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
-        @defaults = nil if @defaults
-
         meth = options.delete(:as) || name
         Mappings.for(
           options[:type], options[:identity]
         ).new(name, options).tap do |field|
           fields[name] = field
+          defaults << name unless field.default.nil?
           create_accessors(name, meth, options)
           process_options(field)
 
@@ -222,6 +228,22 @@ module Mongoid #:nodoc
         end
       end
 
+      # Determine if the field name is allowed, if not raise an error.
+      #
+      # @example Check the field name.
+      #   Model.check_field_name!(:collection)
+      #
+      # @param [ Symbol ] name The field name.
+      #
+      # @raise [ Errors::InvalidField ] If the name is not allowed.
+      #
+      # @since 2.1.8
+      def check_field_name!(name)
+        if Mongoid.destructive_fields.include?(name)
+          raise Errors::InvalidField.new(name)
+        end
+      end
+
       # Create the field accessors.
       #
       # @example Generate the accessors.
@@ -242,11 +264,11 @@ module Mongoid #:nodoc
             end
           else
             define_method(meth) do
-              value = read_attribute(name)
-              if value.is_a?(Array) || value.is_a?(Hash)
-                changed_attributes[name] = value.clone unless attribute_changed?(name)
+              read_attribute(name).tap do |value|
+                if value.is_a?(Array) || value.is_a?(Hash)
+                  changed_attributes[name] = value.clone unless attribute_changed?(name)
+                end
               end
-              value
             end
           end
           define_method("#{meth}=") do |value|

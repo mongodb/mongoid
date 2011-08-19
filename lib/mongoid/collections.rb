@@ -6,11 +6,11 @@ module Mongoid #:nodoc
   module Collections
     extend ActiveSupport::Concern
 
+    delegate :collection, :db, :to => "self.class"
+
     included do
       cattr_accessor :_collection, :collection_name
       self.collection_name = self.name.collectionize
-
-      delegate :collection, :db, :to => "self.class"
     end
 
     module ClassMethods #:nodoc:

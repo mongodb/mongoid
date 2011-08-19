@@ -818,12 +818,8 @@ describe Mongoid::Attributes do
     let(:person) { Person.new }
 
     it "typecasts proc values" do
-      person.stubs(:defaults).returns("age" => lambda { "51" })
-      person.expects(:typed_value_for).with("age", "51")
-      person.instance_variable_set(:@attributes, {})
-      person.send(:apply_default_attributes)
+      person.age.should eq(100)
     end
-
   end
 
   [:attributes=, :write_attributes].each do |method|
@@ -900,6 +896,33 @@ describe Mongoid::Attributes do
           end
         end
       end
+    end
+  end
+
+  pending "#alias_attribute" do
+
+    let(:klass) do
+      class AliasAttributeTestClass
+        include Mongoid::Document
+        field :name, :type => String
+        alias_attribute :title, :name
+      end
+      AliasAttributeTestClass.new
+    end
+
+    it "sets and accesses :name fine" do
+      klass.name = "baseline"
+      klass.name.should == "baseline"
+    end
+
+    it "aliases :name value as :title" do
+      klass.name = "a value"
+      klass.title.should == "a value"
+    end
+
+    it "aliases :name= as :title=" do
+      klass.title = "a title value"
+      klass.name.should == "a title value"
     end
   end
 end

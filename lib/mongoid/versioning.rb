@@ -7,6 +7,8 @@ module Mongoid #:nodoc:
   module Versioning
     extend ActiveSupport::Concern
 
+    delegate :version_max, :to => "self.class"
+
     included do
       field :version, :type => Integer, :default => 1
 
@@ -20,7 +22,6 @@ module Mongoid #:nodoc:
       set_callback :save, :before, :revise, :if => :revisable?
 
       class_attribute :version_max
-      delegate :version_max, :to => "self.class"
       self.cyclic = true
     end
 

@@ -6,16 +6,35 @@ describe "Rails::Mongoid" do
     require "rails/mongoid"
   end
 
-  describe ".index_children" do
+  describe ".create_indexes" do
 
-    let(:child) do
-      stub(:to_s => "Model")
+    let(:model_paths) do
+      Dir.glob("spec/models/**/*.rb")
     end
 
-    it "creates the indexes for the child model" do
-      child.expects(:create_indexes)
-      child.expects(:descendants).returns([])
-      Rails::Mongoid.index_children([ child ])
+    let(:models) do
+      [].tap do |documents|
+        model_paths.each do |file|
+          model_path = file[0..-4].split('/')[2..-1]
+          begin
+            klass = model_path.map { |path| path.camelize }.join('::').constantize
+            if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
+              documents << klass
+            end
+          rescue => e
+          end
+        end
+      end
+    end
+
+    before do
+      models.each do |klass|
+        klass.expects(:create_indexes).once
+      end
+    end
+
+    it "creates the indexes for each model" do
+      Rails::Mongoid.create_indexes("spec/models/**/*.rb")
     end
   end
 

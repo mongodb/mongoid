@@ -124,8 +124,8 @@ module Mongoid # :nodoc:
         def delete(document)
           target.delete_one(document).tap do |doc|
             if doc && !binding?
-              unbind_one(doc)
               doc.delete(:suppress => true)
+              unbind_one(doc)
             end
             reindex
           end
@@ -231,6 +231,9 @@ module Mongoid # :nodoc:
               proxy.clear
             else
               atomically(:$set) do
+                if replacement.first.is_a?(Hash)
+                  replacement = Many.builder(metadata, replacement).build
+                end
                 proxy.target = replacement.compact
                 proxy.target.each_with_index do |doc, index|
                   integrate(doc)
@@ -374,8 +377,8 @@ module Mongoid # :nodoc:
           criteria.size.tap do
             criteria.each do |doc|
               target.delete_one(doc)
-              unbind_one(doc)
               doc.send(method, :suppress => true)
+              unbind_one(doc)
             end
             reindex
           end

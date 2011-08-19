@@ -44,6 +44,7 @@ module Mongoid # :nodoc:
               base.delete unless binding?
               return nil
             end
+            base.new_record = true
             proxy.target = replacement
             proxy.bind_one
           end

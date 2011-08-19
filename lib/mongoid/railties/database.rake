@@ -79,7 +79,7 @@ namespace :db do
 
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
-      ::Rails::Mongoid.index_children(get_mongoid_models)
+      ::Rails::Mongoid.create_indexes("app/models/**/*.rb")
     end
 
     def convert_ids(obj)

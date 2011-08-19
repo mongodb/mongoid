@@ -154,11 +154,7 @@ module Mongoid #:nodoc:
       changed_attributes.clear
       apply_default_attributes
       tap do
-        relations.keys.each do |name|
-          if instance_variable_defined?("@#{name}")
-            remove_instance_variable("@#{name}")
-          end
-        end
+        reload_relations
         run_callbacks(:initialize)
       end
     end

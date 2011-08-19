@@ -5,10 +5,11 @@ module Mongoid #:nodoc:
   module Extras
     extend ActiveSupport::Concern
 
+    delegate :cached?, :to => "self.class"
+
     included do
       class_attribute :cached
       self.cached = false
-      delegate :cached?, :to => "self.class"
     end
 
     module ClassMethods #:nodoc

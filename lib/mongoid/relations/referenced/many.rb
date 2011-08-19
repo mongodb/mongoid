@@ -214,15 +214,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
+          init(base, Targets::Enumerable.new(target), metadata) do
             raise_mixed if klass.embedded?
-            batched do
-              proxy.in_memory do |doc|
-                characterize_one(doc)
-                bind_one(doc)
-                doc.save if persistable?
-              end
-            end
           end
         end
 
@@ -275,7 +268,7 @@ module Mongoid #:nodoc:
         def substitute(replacement)
           tap do |proxy|
             proxy.purge
-            proxy.push(replacement) if replacement
+            proxy.push(replacement.compact) if replacement
           end
         end
 
@@ -469,6 +462,29 @@ module Mongoid #:nodoc:
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
             metadata.klass.where(metadata.foreign_key => object)
+          end
+
+          # Eager load the relation based on the criteria.
+          #
+          # @example Eager load the criteria.
+          #   Proxy.eager_load(metadata, criteria)
+          #
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Criteria ] criteria The criteria being used.
+          #
+          # @return [ Criteria ] The criteria to eager load the relation.
+          #
+          # @since 2.2.0
+          def eager_load(metadata, criteria)
+            metadata.klass.any_in(
+              metadata.foreign_key =>
+                criteria.only(:_id).map { |doc| doc.id }.uniq
+            ).each do |doc|
+              IdentityMap.set_many(
+                doc,
+                metadata.foreign_key => doc.send(metadata.foreign_key)
+              )
+            end
           end
 
           # Returns true if the relation is an embedded one. In this case

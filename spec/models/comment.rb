@@ -6,6 +6,7 @@ class Comment
   field :text, :type => String
   key :text, :type => String
 
+  belongs_to :account
   belongs_to :movie
   belongs_to :rating
   validates :title, :presence => true

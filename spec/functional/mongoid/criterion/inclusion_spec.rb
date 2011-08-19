@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Inclusion do
 
   before do
-    Person.delete_all
+    [ Person, Post, Game ].each(&:delete_all)
   end
 
   describe "#all_in" do
@@ -239,6 +239,118 @@ describe Mongoid::Criterion::Inclusion do
             from_db.should be_empty
           end
         end
+      end
+    end
+  end
+
+  describe "#includes" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    let!(:person) do
+      Person.create(:ssn => "123-12-1211")
+    end
+
+    context "when including a has many" do
+
+      let!(:post_one) do
+        person.posts.create(:title => "one")
+      end
+
+      let!(:post_two) do
+        person.posts.create(:title => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Person.includes(:posts).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Post][post_one.id].should eq(post_one)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Post][post_two.id].should eq(post_two)
+      end
+    end
+
+    context "when including a has one" do
+
+      let!(:game_one) do
+        person.create_game(:name => "one")
+      end
+
+      let!(:game_two) do
+        person.create_game(:name => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Person.includes(:game).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Game][game_one.id].should eq(game_one)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Game][game_two.id].should eq(game_two)
+      end
+    end
+
+    context "when including a belongs to" do
+
+      let(:person_two) do
+        Person.create(:ssn => "243-11-0978")
+      end
+
+      let!(:game_one) do
+        person.create_game(:name => "one")
+      end
+
+      let!(:game_two) do
+        person_two.create_game(:name => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Game.includes(:person).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ game_one, game_two ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Person][person.id].should eq(person)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Person][person_two.id].should eq(person_two)
       end
     end
   end

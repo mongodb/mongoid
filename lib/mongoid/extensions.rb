@@ -6,6 +6,7 @@ require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/nil/collectionization"
 require "mongoid/extensions/object/checks"
 require "mongoid/extensions/object/reflections"
+require "mongoid/extensions/object/substitutable"
 require "mongoid/extensions/object/yoda"
 require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/conversions"
@@ -37,6 +38,7 @@ end
 class Object #:nodoc:
   include Mongoid::Extensions::Object::Checks
   include Mongoid::Extensions::Object::Reflections
+  include Mongoid::Extensions::Object::Substitutable
   include Mongoid::Extensions::Object::Yoda
 end
 

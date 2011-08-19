@@ -343,6 +343,26 @@ describe Mongoid::Relations::Metadata do
               metadata.foreign_key.should == "follower_ids"
             end
           end
+
+          context "when the class is namespaced" do
+            let(:metadata) do
+              described_class.new(
+                :name => :bananas,
+                :relation => Mongoid::Relations::Referenced::ManyToMany,
+                :inverse_class_name => "Fruits::Apple",
+                :class_name => "Fruits::Banana"
+              )
+            end
+
+            it "returns the foreign_key without the module name" do
+              metadata.foreign_key.should == "banana_ids"
+            end
+
+            it "returns the inverse_foreign_key without the module name" do
+              metadata.inverse_foreign_key.should == "apple_ids"
+            end
+
+          end
         end
       end
 
@@ -931,7 +951,7 @@ describe Mongoid::Relations::Metadata do
 
   end
 
-  context "#klass" do
+  describe "#klass" do
 
     let(:metadata) do
       described_class.new(
@@ -945,7 +965,32 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  context "#macro" do
+  describe "#many?" do
+
+    context "when the relation is a many" do
+
+      let(:metadata) do
+        described_class.new(:relation => Mongoid::Relations::Embedded::Many)
+      end
+
+      it "returns true" do
+        metadata.should be_many
+      end
+    end
+
+    context "when the relation is not a many" do
+
+      let(:metadata) do
+        described_class.new(:relation => Mongoid::Relations::Embedded::One)
+      end
+
+      it "returns false" do
+        metadata.should_not be_many
+      end
+    end
+  end
+
+  describe "#macro" do
 
     let(:metadata) do
       described_class.new(:relation => Mongoid::Relations::Embedded::One)

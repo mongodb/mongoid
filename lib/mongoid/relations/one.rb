@@ -17,6 +17,20 @@ module Mongoid # :nodoc:
       def in_memory
         [ target ]
       end
+
+      # Since method_missing is overridden we should override this as well.
+      #
+      # @example Does the proxy respond to the method?
+      #   relation.respond_to?(:name)
+      #
+      # @param [ Symbol ] name The method name.
+      #
+      # @return [ true, false ] If the proxy responds to the method.
+      #
+      # @since 2.1.8
+      def respond_to?(name, include_private = false)
+        target.respond_to?(name, include_private) || super
+      end
     end
   end
 end

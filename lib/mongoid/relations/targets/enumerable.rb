@@ -67,6 +67,20 @@ module Mongoid #:nodoc:
           loaded.clear and added.clear
         end
 
+        # Clones each document in the enumerable.
+        #
+        # @note This loads all documents into memory.
+        #
+        # @example Clone the enumerable.
+        #   enumerable.clone
+        #
+        # @return [ Array<Document> ] An array clone of the enumerable.
+        #
+        # @since 2.1.6
+        def clone
+          collect { |doc| doc.clone }
+        end
+
         # Delete the supplied document from the enumerable.
         #
         # @example Delete the document.

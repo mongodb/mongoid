@@ -26,7 +26,7 @@ en:
         invalid_field:
           Defining a field named %{name} is not allowed. Do not define
           fields that conflict with Mongoid internal attributes or method
-          names. Use Document#instance_methods to see what names this includes.
+          names. Use Mongoid.destructive_fields to see what names this includes.
         too_many_nested_attribute_records:
           Accepting nested attributes for %{association} is limited
           to %{limit} records.

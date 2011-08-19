@@ -234,12 +234,26 @@ describe Mongoid::Criterion::Inclusion do
 
         context "when field defined as an array" do
 
-          let(:criteria) do
-            base.where(:aliases => "007")
+          context "when the value is not an array" do
+
+            let(:criteria) do
+              base.where(:aliases => "007")
+            end
+
+            it "does not convert the value" do
+              criteria.selector.should == { :aliases => "007" }
+            end
           end
 
-          it "allows a single value to be passed" do
-            criteria.selector.should == { :aliases => "007" }
+          context "when the value is nil" do
+
+            let(:criteria) do
+              base.where(:aliases => nil)
+            end
+
+            it "does not convert the value" do
+              criteria.selector.should == { :aliases => nil }
+            end
           end
         end
       end

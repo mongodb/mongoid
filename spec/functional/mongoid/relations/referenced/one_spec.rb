@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::One do
 
   before do
-    [ Person, Game, Bar ].map(&:delete_all)
+    [ Person, Game, Bar, Book ].map(&:delete_all)
   end
 
   describe "#=" do
@@ -539,6 +539,45 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
+  describe ".eager_load" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    let!(:person) do
+      Person.create(:ssn => "243-12-5243")
+    end
+
+    let!(:game) do
+      person.create_game(:name => "Tron")
+    end
+
+    let(:metadata) do
+      Person.relations["game"]
+    end
+
+    let!(:eager) do
+      described_class.eager_load(metadata, Person.all)
+    end
+
+    let(:map) do
+      Mongoid::IdentityMap.get_selector(Game, "person_id" => person.id)
+    end
+
+    it "returns the appropriate criteria" do
+      eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+    end
+
+    it "puts the documents in the identity map" do
+      map.should eq(game)
+    end
+  end
+
   describe "#nullify" do
 
     let(:person) do
@@ -584,6 +623,65 @@ describe Mongoid::Relations::Referenced::One do
 
       it "removes the reference from the target" do
         game_reloaded.person.should be_nil
+      end
+    end
+  end
+
+  context "when reloading the relation" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-41-9678", :title => "Mr.")
+    end
+
+    let!(:game_one) do
+      Game.create(:name => "Warcraft 3")
+    end
+
+    let!(:game_two) do
+      Game.create(:name => "Starcraft 2")
+    end
+
+    before do
+      person.game = game_one
+    end
+
+    context "when the relation references the same document" do
+
+      before do
+        Game.collection.update(
+          { :_id => game_one.id }, { "$set" => { :name => "Diablo 2" }}
+        )
+      end
+
+      let(:reloaded) do
+        person.game(true)
+      end
+
+      it "reloads the document from the database" do
+        reloaded.name.should eq("Diablo 2")
+      end
+
+      it "sets a new document instance" do
+        reloaded.should_not equal(game_one)
+      end
+    end
+
+    context "when the relation references a different document" do
+
+      before do
+        person.game = game_two
+      end
+
+      let(:reloaded) do
+        person.game(true)
+      end
+
+      it "reloads the new document from the database" do
+        reloaded.name.should eq("Starcraft 2")
+      end
+
+      it "sets a new document instance" do
+        reloaded.should_not equal(game_one)
       end
     end
   end

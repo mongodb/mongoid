@@ -134,11 +134,12 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0.rc.8
     def apply_default_attributes
-      (@attributes ||= {}).tap do |h|
-        defaults.each_pair do |key, val|
-          unless h.has_key?(key)
-            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) :
-              val.duplicable? ? val.dup : val
+      (@attributes ||= {}).tap do |attrs|
+        defaults.each do |name|
+          unless attrs.has_key?(name)
+            if field = fields[name]
+              attrs[name] = field.eval_default(self)
+            end
           end
         end
       end
