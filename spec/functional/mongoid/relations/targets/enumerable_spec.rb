@@ -819,6 +819,27 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#is_a?" do
+
+    let(:enumerable) do
+      described_class.new(Post.all)
+    end
+
+    context "when checking against enumerable" do
+
+      it "returns true" do
+        enumerable.is_a?(::Enumerable).should be_true
+      end
+    end
+
+    context "when checking against array" do
+
+      it "returns true" do
+        enumerable.is_a?(Array).should be_true
+      end
+    end
+  end
+
   describe "#last" do
 
     let(:person) do
@@ -950,6 +971,27 @@ describe Mongoid::Relations::Targets::Enumerable do
         it "returns nil" do
           last.should be_nil
         end
+      end
+    end
+  end
+
+  describe "#kind_of?" do
+
+    let(:enumerable) do
+      described_class.new(Post.all)
+    end
+
+    context "when checking against enumerable" do
+
+      it "returns true" do
+        enumerable.kind_of?(::Enumerable).should be_true
+      end
+    end
+
+    context "when checking against array" do
+
+      it "returns true" do
+        enumerable.kind_of?(Array).should be_true
       end
     end
   end
