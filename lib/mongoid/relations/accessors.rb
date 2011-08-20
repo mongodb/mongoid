@@ -124,7 +124,7 @@ module Mongoid # :nodoc:
               if relation_exists?(name) || metadata.many?
                 set_relation(name, send(name).substitute(object.substitutable))
               else
-                set_relation(name, build(name, object.substitutable, metadata))
+                build(name, object.substitutable, metadata)
               end
             end
           end
