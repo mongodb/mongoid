@@ -75,7 +75,9 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def characterize_one(document)
-          base.metadata = metadata.inverse_metadata(document)
+          unless base.metadata
+            base.metadata = metadata.inverse_metadata(document)
+          end
         end
 
         # Are we able to persist this relation?

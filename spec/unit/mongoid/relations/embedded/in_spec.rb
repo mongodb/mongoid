@@ -72,6 +72,29 @@ describe Mongoid::Relations::Embedded::In do
     it "parentizes the child" do
       relation.base._parent.should == target
     end
+
+    context "when the base already has metadata" do
+
+      let(:base) do
+        Name.new
+      end
+
+      before do
+        base.metadata = Mongoid::Relations::Metadata.new(
+          :relation => described_class,
+          :inverse_class_name => "Name",
+          :name => :person
+        )
+      end
+
+      let(:relation) do
+        described_class.new(base, target, metadata)
+      end
+
+      it "does not set new metadata" do
+        base.metadata.should_not eq(metadata)
+      end
+    end
   end
 
   describe ".macro" do
