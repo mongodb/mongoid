@@ -679,15 +679,32 @@ describe Mongoid::Relations::Metadata do
 
       context "when inverse_of is defined" do
 
-        let(:metadata) do
-          described_class.new(
-            :inverse_of => :crazy_name,
-            :relation => Mongoid::Relations::Referenced::In
-          )
+        context "when inverse_of is a symbol" do
+
+          let(:metadata) do
+            described_class.new(
+              :inverse_of => nil,
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          it "returns nil" do
+            metadata.inverse.should be_nil
+          end
         end
 
-        it "returns the name of the inverse_of property" do
-          metadata.inverse.should == :crazy_name
+        context "when inverse_of is nil" do
+
+          let(:metadata) do
+            described_class.new(
+              :inverse_of => :crazy_name,
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          it "returns the name of the inverse_of property" do
+            metadata.inverse.should == :crazy_name
+          end
         end
       end
 
