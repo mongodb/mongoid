@@ -17,10 +17,10 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.0
       def binding
-        Threaded.binding = true
+        Threaded.begin_bind
         yield
       ensure
-        Threaded.binding = false
+        Threaded.exit_bind
       end
 
       # Is the current thread in binding mode?

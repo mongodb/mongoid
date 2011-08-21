@@ -121,7 +121,8 @@ module Mongoid # :nodoc:
         def setter(name, metadata)
           tap do
             define_method("#{name}=") do |object|
-              if relation_exists?(name) || metadata.many?
+              if relation_exists?(name) || metadata.many? ||
+                (object.blank? && send(name))
                 set_relation(name, send(name).substitute(object.substitutable))
               else
                 build(name, object.substitutable, metadata)
