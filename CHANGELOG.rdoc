@@ -14,6 +14,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * Relations can now take a module as a value to the :extend option. (Roman
   Shterenzon)
 
+* Capped collections can be created by passing the options to the .store_in
+  macro: Person.store_in :people, capped: true, max: 1000000
+
 == 2.1.9
 
 === Resolved Issues
