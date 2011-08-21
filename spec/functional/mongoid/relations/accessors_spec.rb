@@ -169,6 +169,26 @@ describe Mongoid::Relations::Accessors do
           end
         end
       end
+
+      context "when the relation is an embeds one" do
+
+        context "when the relation is auto built" do
+
+          let (:person) do
+            Person.new
+          end
+
+          it "should automatically be built when the getter is called" do
+            person.expects(:build_passport).once
+            person.passport
+          end
+
+          it "should not be built when :autobuild option is false" do
+            person.expects(:build_passport).never
+            person.passport(:autobuild => false)
+          end
+        end
+      end
     end
 
     context "when the relation is polymorphic" do
@@ -224,6 +244,117 @@ describe Mongoid::Relations::Accessors do
         it "returns the correct document" do
           rating.should == book_rating
         end
+      end
+    end
+  end
+
+  describe "\#{getter}?" do
+
+    context "when the relation is not persisted" do
+
+      context "when the relation exists" do
+
+        let(:person) do
+          Person.new(
+            :passport => Passport.new,
+            :addresses => [Address.new]
+          )
+        end
+
+        context "when it is a one relation" do
+
+          it "returns true" do
+            person.passport?.should == true
+          end
+        end
+
+        context "when it is a many relation" do
+
+          it "returns true" do
+            person.addresses?.should == true
+          end
+        end
+      end
+
+      context "when the relation does not exist" do
+
+        let(:person) do
+          Person.new
+        end
+
+        context "when it is a one relation" do
+
+          it "returns false" do
+            person.passport?.should == false
+          end
+        end
+
+        context "when it is a many relation" do
+
+          it "returns false" do
+            person.addresses?.should == false
+          end
+        end
+      end
+    end
+
+    context "when the relation is persisted" do
+
+      context "when the relation exists" do
+
+        let(:person) do
+          Person.create(
+            :passport => Passport.new,
+            :addresses => [Address.new]
+          )
+        end
+
+        context "when it is a one relation" do
+
+          it "returns true" do
+            person.passport?.should == true
+          end
+        end
+
+        context "when it is a many relation" do
+
+          it "returns true" do
+            person.addresses?.should == true
+          end
+        end
+      end
+
+      context "when the relation does not exist" do
+
+        let(:person) do
+          Person.create
+        end
+
+        context "when it is a one relation" do
+
+          it "returns false" do
+            person.passport?.should == false
+          end
+        end
+
+        context "when it is a many relation" do
+
+          it "returns false" do
+            person.addresses?.should == false
+          end
+        end
+      end
+    end
+
+    context "when the relation is auto built" do
+
+      let(:person) do
+        Person.new
+      end
+
+      it "does not build the unaccessed relation" do
+        person.expects(:build_passport).never
+        person.passport?
       end
     end
   end
@@ -290,6 +421,19 @@ describe Mongoid::Relations::Accessors do
           game.person_id.should be_nil
         end
       end
+
+      context "when the document is auto built" do
+
+        it "should automatically be built when the getter is called" do
+          person.expects(:build_book).once
+          person.book
+        end
+
+        it "should not be built when :autobuild option is false" do
+          person.expects(:build_book).never
+          person.book(:autobuild => false)
+        end
+      end
     end
 
     context "when the document is a references many" do
@@ -329,6 +473,23 @@ describe Mongoid::Relations::Accessors do
         it "does not add them" do
           person.preference_ids.should be_empty
         end
+      end
+    end
+
+    context "when the document is a referenced in" do
+
+      let(:book) do
+        Book.new
+      end
+
+      it "should automatically be built when the getter is called" do
+        book.expects(:build_person).once
+        book.person
+      end
+
+      it "should not build when :autobuild option is false" do
+        book.expects(:build_person).never
+        book.person(:autobuild => false)
       end
     end
   end

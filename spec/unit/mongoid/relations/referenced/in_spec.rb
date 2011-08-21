@@ -79,7 +79,7 @@ describe Mongoid::Relations::Referenced::In do
 
     it "returns the valid options" do
       described_class.valid_options.should ==
-        [ :autosave, :foreign_key, :index, :polymorphic ]
+        [ :autobuild, :autosave, :foreign_key, :index, :polymorphic ]
     end
   end
 

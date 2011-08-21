@@ -183,7 +183,7 @@ module Mongoid #:nodoc:
       attributes.tap do |attrs|
         relations.each_pair do |name, meta|
           if meta.embedded?
-            relation = send(name)
+            relation = send(name, :autobuild => false)
             attrs[name] = relation.as_document unless relation.blank?
           end
         end

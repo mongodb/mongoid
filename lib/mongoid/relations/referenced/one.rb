@@ -249,7 +249,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :autosave, :dependent, :foreign_key ]
+            [ :as, :autobuild, :autosave, :dependent, :foreign_key ]
           end
 
           # Get the default validation setting for the relation. Determines if

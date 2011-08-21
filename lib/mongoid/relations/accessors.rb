@@ -92,14 +92,25 @@ module Mongoid # :nodoc:
         def getter(name, metadata)
           tap do
             define_method(name) do |*args|
+              options = args.extract_options!
+              options[:autobuild] = true unless options.key?(:autobuild)
               reload, variable = args.first, "@#{name}"
-              if instance_variable_defined?(variable) && !reload
+              value = if instance_variable_defined?(variable) && !reload
                 instance_variable_get(variable)
               else
                 _building do
                   build(name, attributes[metadata.key], metadata, :loading => true)
                 end
               end
+              if value.nil? && metadata.autobuild && options[:autobuild]
+                send("build_#{name}")
+              else
+                value
+              end
+            end
+
+            define_method("#{name}?") do
+              !ivar(name).blank?
             end
           end
         end

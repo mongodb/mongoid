@@ -64,6 +64,14 @@ describe Mongoid::Hierarchy do
         person._children.should include(location)
       end
     end
+
+    context "with an autobuild relation" do
+
+      it "does not build the relation" do
+        person.expects(:build_passport).never
+        person._children
+      end
+    end
   end
 
   describe ".hereditary?" do

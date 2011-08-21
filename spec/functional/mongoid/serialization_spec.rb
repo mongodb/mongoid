@@ -474,6 +474,14 @@ describe Mongoid::Serialization do
             end
           end
         end
+
+        context "when the relation is auto built" do
+
+          it "should not build the unaccessed relation" do
+            person.expects(:build_passport).never
+            person.serializable_hash(:include => :passport)
+          end
+        end
       end
     end
   end
