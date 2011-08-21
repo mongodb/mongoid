@@ -11,6 +11,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
   be enabled in order to function. Set identity_map_enabled: true in your
   mongoid.yml
 
+* Relations can now take a module as a value to the :extend option. (Roman
+  Shterenzon)
+
 == 2.1.9
 
 === Resolved Issues
