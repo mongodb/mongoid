@@ -825,23 +825,52 @@ describe Mongoid::Attributes do
   [:attributes=, :write_attributes].each do |method|
     describe "##{method}" do
 
-      context "typecasting" do
+      context "when nested" do
+
+        let(:person) do
+          Person.new
+        end
 
         before do
-          @person = Person.new
-          @attributes = { :age => "50" }
+          person.send(method, { :videos => [{:title => "Fight Club"}] })
         end
 
-        it "properly casts values" do
-          @person.send(method, @attributes)
-          @person.age.should == 50
+        it "should set nested documents" do
+          person.videos.first.title.should eq("Fight Club")
+        end
+      end
+
+      context "typecasting" do
+
+        let(:person) do
+          Person.new
         end
 
-        it "allows passing of nil" do
-          @person.send(method, nil)
-          @person.age.should == 100
+        let(:attributes) do
+          { :age => "50" }
         end
 
+        context "when passing a hash" do
+
+          before do
+            person.send(method, attributes)
+          end
+
+          it "properly casts values" do
+            person.age.should eq(50)
+          end
+        end
+
+        context "when passing nil" do
+
+          before do
+            person.send(method, nil)
+          end
+
+          it "does not set anything" do
+            person.age.should eq(100)
+          end
+        end
       end
 
       context "on a parent document" do

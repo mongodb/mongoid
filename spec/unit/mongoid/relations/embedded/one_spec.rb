@@ -129,4 +129,11 @@ describe Mongoid::Relations::Embedded::One do
         [ :as, :cyclic ]
     end
   end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
+    end
+  end
 end

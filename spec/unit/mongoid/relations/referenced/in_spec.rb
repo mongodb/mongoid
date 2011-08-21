@@ -82,4 +82,11 @@ describe Mongoid::Relations::Referenced::In do
         [ :autosave, :foreign_key, :index, :polymorphic ]
     end
   end
+
+  describe ".validation_default" do
+
+    it "returns false" do
+      described_class.validation_default.should eq(false)
+    end
+  end
 end

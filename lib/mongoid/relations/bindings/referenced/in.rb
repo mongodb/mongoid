@@ -27,11 +27,14 @@ module Mongoid # :nodoc:
                   base.send(metadata.inverse_type_setter, target.class.model_name)
                 end
                 if inverse
-                  base.metadata = metadata.inverse_metadata(target)
-                  if base.referenced_many?
-                    target.send(inverse).push(base)
-                  else
-                    target.do_or_do_not(metadata.inverse_setter(target), base)
+                  inverse_metadata = metadata.inverse_metadata(target)
+                  if inverse_metadata != metadata
+                    base.metadata = inverse_metadata
+                    if base.referenced_many?
+                      target.send(inverse).push(base)
+                    else
+                      target.do_or_do_not(metadata.inverse_setter(target), base)
+                    end
                   end
                 end
               end

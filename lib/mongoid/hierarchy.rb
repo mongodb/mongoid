@@ -84,7 +84,7 @@ module Mongoid #:nodoc
       # @since 2.0.0.beta.1
       def remove_child(child)
         name = child.metadata.name
-        child.embedded_one? ? remove_ivar(name) : send(name).delete(child)
+        child.embedded_one? ? remove_ivar(name) : send(name).delete_one(child)
       end
 
       # After children are persisted we can call this to move all their changes

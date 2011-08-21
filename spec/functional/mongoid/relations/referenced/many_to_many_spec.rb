@@ -554,8 +554,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             preference.person_ids.should be_empty
           end
 
-          it "deletes the target from the database" do
-            preference.should be_destroyed
+          it "does not delete the target from the database" do
+            preference.should_not be_destroyed
           end
         end
 
@@ -1894,10 +1894,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       person.preference_ids.should be_empty
     end
 
-    it "deletes the target from the database" do
+    it "does not delete the target from the database" do
       expect {
         preference.reload
-      }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      }.not_to raise_error(Mongoid::Errors::DocumentNotFound)
     end
   end
 

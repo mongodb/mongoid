@@ -6,6 +6,21 @@ describe Mongoid::Threaded do
     stub
   end
 
+  describe "#begin_bind" do
+
+    before do
+      described_class.begin_bind
+    end
+
+    after do
+      described_class.bind_stack.clear
+    end
+
+    it "adds a boolen to the bind stack" do
+      described_class.bind_stack.should eq([ true ])
+    end
+  end
+
   describe "#binding?" do
 
     context "when binding is not set" do
@@ -15,14 +30,14 @@ describe Mongoid::Threaded do
       end
     end
 
-    context "when binding is true" do
+    context "when binding has elements" do
 
       before do
-        Thread.current[:"[mongoid]:binding-mode"] = true
+        Thread.current[:"[mongoid]:bind-stack"] = [ true ]
       end
 
       after do
-        Thread.current[:"[mongoid]:binding-mode"] = nil
+        Thread.current[:"[mongoid]:bind-stack"] = []
       end
 
       it "returns true" do
@@ -30,14 +45,10 @@ describe Mongoid::Threaded do
       end
     end
 
-    context "when binding is false" do
+    context "when binding has no elements" do
 
       before do
-        Thread.current[:"[mongoid]:binding-mode"] = false
-      end
-
-      after do
-        Thread.current[:"[mongoid]:binding-mode"] = nil
+        Thread.current[:"[mongoid]:bind-stack"] = []
       end
 
       it "returns false" do
@@ -46,18 +57,51 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#binding=" do
+  describe "#bind_stack" do
+
+    context "when no bind stack has been initialized" do
+
+      let(:binding) do
+        described_class.bind_stack
+      end
+
+      it "returns an empty stack" do
+        binding.should eq([])
+      end
+    end
+
+    context "when a bind stack has been initialized" do
+
+      before do
+        Thread.current[:"[mongoid]:bind-stack"] = [ true ]
+      end
+
+      let(:binding) do
+        described_class.bind_stack
+      end
+
+      after do
+        Thread.current[:"[mongoid]:bind-stack"] = []
+      end
+
+      it "returns the stack" do
+        binding.should eq([ true ])
+      end
+    end
+  end
+
+  describe "#begin_build" do
 
     before do
-      described_class.binding = true
+      described_class.begin_build
     end
 
     after do
-      described_class.binding = false
+      described_class.build_stack.clear
     end
 
-    it "sets the binding mode" do
-      described_class.should be_binding
+    it "adds a boolen to the build stack" do
+      described_class.build_stack.should eq([ true ])
     end
   end
 
@@ -70,14 +114,14 @@ describe Mongoid::Threaded do
       end
     end
 
-    context "when building is true" do
+    context "when building has elements" do
 
       before do
-        Thread.current[:"[mongoid]:building-mode"] = true
+        Thread.current[:"[mongoid]:build-stack"] = [ true ]
       end
 
       after do
-        Thread.current[:"[mongoid]:building-mode"] = nil
+        Thread.current[:"[mongoid]:build-stack"] = []
       end
 
       it "returns true" do
@@ -85,14 +129,10 @@ describe Mongoid::Threaded do
       end
     end
 
-    context "when building is false" do
+    context "when building has no elements" do
 
       before do
-        Thread.current[:"[mongoid]:building-mode"] = false
-      end
-
-      after do
-        Thread.current[:"[mongoid]:building-mode"] = nil
+        Thread.current[:"[mongoid]:build-stack"] = []
       end
 
       it "returns false" do
@@ -101,6 +141,39 @@ describe Mongoid::Threaded do
     end
   end
 
+  describe "#build_stack" do
+
+    context "when no build stack has been initialized" do
+
+      let(:building) do
+        described_class.build_stack
+      end
+
+      it "returns an empty stack" do
+        building.should eq([])
+      end
+    end
+
+    context "when a build stack has been initialized" do
+
+      before do
+        Thread.current[:"[mongoid]:build-stack"] = [ true ]
+      end
+
+      let(:building) do
+        described_class.build_stack
+      end
+
+      after do
+        Thread.current[:"[mongoid]:build-stack"] = []
+      end
+
+      it "returns the stack" do
+        building.should eq([ true ])
+      end
+    end
+  end
+
   describe "#clear_safety_options!" do
 
     before do
@@ -122,6 +195,38 @@ describe Mongoid::Threaded do
 
     it "removes all safety options" do
       described_class.safety_options.should be_nil
+    end
+  end
+
+  describe "#exit_bind" do
+
+    before do
+      described_class.begin_bind
+      described_class.exit_bind
+    end
+
+    after do
+      described_class.bind_stack.clear
+    end
+
+    it "adds a boolen to the bind stack" do
+      described_class.bind_stack.should be_empty
+    end
+  end
+
+  describe "#exit_build" do
+
+    before do
+      described_class.begin_build
+      described_class.exit_build
+    end
+
+    after do
+      described_class.build_stack.clear
+    end
+
+    it "adds a boolen to the build stack" do
+      described_class.build_stack.should be_empty
     end
   end
 
@@ -227,6 +332,70 @@ describe Mongoid::Threaded do
 
     it "sets the object with the update key" do
       described_class.update_consumer(Person).should eq(object)
+    end
+  end
+
+  describe "#begin_validate" do
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      described_class.begin_validate(person)
+    end
+
+    after do
+      described_class.exit_validate(person)
+    end
+
+    it "marks the document as being validated" do
+      described_class.validations_for(Person).should eq([ person.id ])
+    end
+  end
+
+  describe "#exit_validate" do
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      described_class.begin_validate(person)
+      described_class.exit_validate(person)
+    end
+
+    it "unmarks the document as being validated" do
+      described_class.validations_for(Person).should be_empty
+    end
+  end
+
+  describe "#validated?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when the document is validated" do
+
+      before do
+        described_class.begin_validate(person)
+      end
+
+      after do
+        described_class.exit_validate(person)
+      end
+
+      it "returns true" do
+        described_class.validated?(person).should be_true
+      end
+    end
+
+    context "when the document is not validated" do
+
+      it "returns false" do
+        described_class.validated?(person).should be_false
+      end
     end
   end
 end

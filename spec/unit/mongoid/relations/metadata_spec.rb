@@ -679,15 +679,32 @@ describe Mongoid::Relations::Metadata do
 
       context "when inverse_of is defined" do
 
-        let(:metadata) do
-          described_class.new(
-            :inverse_of => :crazy_name,
-            :relation => Mongoid::Relations::Referenced::In
-          )
+        context "when inverse_of is a symbol" do
+
+          let(:metadata) do
+            described_class.new(
+              :inverse_of => nil,
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          it "returns nil" do
+            metadata.inverse.should be_nil
+          end
         end
 
-        it "returns the name of the inverse_of property" do
-          metadata.inverse.should == :crazy_name
+        context "when inverse_of is nil" do
+
+          let(:metadata) do
+            described_class.new(
+              :inverse_of => :crazy_name,
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          it "returns the name of the inverse_of property" do
+            metadata.inverse.should == :crazy_name
+          end
         end
       end
 
@@ -1018,6 +1035,59 @@ describe Mongoid::Relations::Metadata do
     it "returns the nested builder from the relation" do
       metadata.nested_builder(attributes, options).should
         be_a_kind_of(Mongoid::Relations::Builders::NestedAttributes::One)
+    end
+  end
+
+  describe "#validate?" do
+
+    context "when validate is provided" do
+
+      context "when validate is true" do
+
+        let(:metadata) do
+          described_class.new(
+            :name => :posts,
+            :inverse_class_name => "Post",
+            :relation => Mongoid::Relations::Referenced::Many,
+            :validate => true
+          )
+        end
+
+        it "returns true" do
+          metadata.validate?.should eq(true)
+        end
+      end
+
+      context "when validate is false" do
+
+        let(:metadata) do
+          described_class.new(
+            :name => :posts,
+            :inverse_class_name => "Post",
+            :relation => Mongoid::Relations::Referenced::Many,
+            :validate => false
+          )
+        end
+
+        it "returns false" do
+          metadata.validate?.should eq(false)
+        end
+      end
+    end
+
+    context "when validate is not provided" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :posts,
+          :inverse_class_name => "Post",
+          :relation => Mongoid::Relations::Referenced::Many
+        )
+      end
+
+      it "returns the relation default" do
+        metadata.validate?.should eq(true)
+      end
     end
   end
 

@@ -4,10 +4,44 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 == 2.2.0
 
+=== New Features
+
 * Mongoid now contains eager loading in the form of Criteria#includes(*args).
   This works on all relational associations and requires the identity map to
   be enabled in order to function. Set identity_map_enabled: true in your
   mongoid.yml
+
+== 2.1.9
+
+=== Resolved Issues
+
+* #1159 Fixed build blocks not to cancel out each other when nested.
+
+* #1154 Don't delete many-to-many documents on empty array set.
+
+* #1153 Retain parent document reference in after callbacks.
+
+* #1151 Fix associated validation infinite loop on self referencing documents.
+
+* #1150 Validates associated on belongs_to is false by default.
+
+* #1149 Fixed metadata setting on belongs to relations.
+
+* #1145 Metadata inverse should return nil if inverse_of was set as nil.
+
+* #1139 Enumerable targets now quack like arrays.
+
+* #1136 Setting belongs_to parent to nil no longer deletes the parent.
+
+* #1120 Don't call in_memory on relations if they don't respond to it.
+
+* #1075 Set self in default procs to the document instance.
+
+* #1072 Writing attributes for nested documents can take a hash or array of
+  hashes.
+
+* #990 Embedded documents can use a single embedded_in with multiple parent
+  definitions.
 
 == 2.1.8
 

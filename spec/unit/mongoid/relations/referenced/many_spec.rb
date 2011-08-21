@@ -98,4 +98,11 @@ describe Mongoid::Relations::Referenced::Many do
         [ :as, :autosave, :dependent, :foreign_key, :order ]
     end
   end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
+    end
+  end
 end

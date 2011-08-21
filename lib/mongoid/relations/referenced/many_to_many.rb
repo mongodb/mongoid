@@ -154,27 +154,7 @@ module Mongoid # :nodoc:
         end
         alias :nullify_all :nullify
         alias :clear :nullify
-
-        # Clear the relation. Will delete the documents from the db if they are
-        # already persisted.
-        #
-        # @example Clear the relation.
-        #   person.posts.clear
-        #
-        # @return [ Many ] The relation emptied.
-        #
-        # @since 2.0.0.beta.1
-        def purge
-          criteria.delete_all
-          base.set(
-            metadata.foreign_key,
-            base.send(metadata.foreign_key).clear
-          )
-          target.clear do |doc|
-            unbind_one(doc)
-            doc.destroyed = true
-          end
-        end
+        alias :purge :nullify
 
         private
 
@@ -381,6 +361,19 @@ module Mongoid # :nodoc:
           # @since 2.1.0
           def valid_options
             [ :autosave, :dependent, :foreign_key, :index, :order ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
           end
         end
       end

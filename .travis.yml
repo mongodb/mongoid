@@ -1,11 +1,11 @@
 rvm:
   - ruby-head
-  - 1.9.3
-  - 1.9.2
-  - 1.8.7
   - jruby
-  - ree
   - rbx
+  - 1.9.3
+  - 1.8.7
+  - 1.9.2
+  - ree
   - rbx-2.0.0pre
 before_script:
   - mongo mongoid_test --eval 'db.addUser("mongoid", "test");'

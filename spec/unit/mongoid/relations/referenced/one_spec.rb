@@ -82,4 +82,11 @@ describe Mongoid::Relations::Referenced::One do
         [ :as, :autosave, :dependent, :foreign_key ]
     end
   end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
+    end
+  end
 end

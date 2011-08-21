@@ -258,6 +258,19 @@ module Mongoid # :nodoc:
           def valid_options
             [ :as, :autosave, :dependent, :foreign_key ]
           end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
+          end
         end
       end
     end

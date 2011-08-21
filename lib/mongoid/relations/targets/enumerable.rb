@@ -16,6 +16,8 @@ module Mongoid #:nodoc:
         # @attribute [rw] unloaded A criteria representing persisted docs.
         attr_accessor :added, :loaded, :unloaded
 
+        delegate :===, :is_a?, :kind_of?, :to => :added
+
         # Check if the enumerable is equal to the other object.
         #
         # @example Check equality.

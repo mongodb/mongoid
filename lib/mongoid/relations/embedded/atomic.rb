@@ -46,6 +46,8 @@ module Mongoid #:nodoc:
         #     person.addresses.push([ address_one, address_two ])
         #   end
         #
+        # @todo Durran: Move executions to thread local stack.
+        #
         # @param [ Symbol ] modifier The atomic modifier to perform.
         # @param [ Proc ] block The block to execute.
         #

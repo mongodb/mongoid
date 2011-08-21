@@ -2327,12 +2327,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before(:all) do
+                before do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts, :allow_destroy => true
                 end
 
-                after(:all) do
+                after do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts
                 end
@@ -2390,12 +2390,12 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is false" do
 
-                before(:all) do
+                before do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts, :allow_destroy => false
                 end
 
-                after(:all) do
+                after do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts
                 end
@@ -2459,6 +2459,11 @@ describe Mongoid::NestedAttributes do
               context "when allow_destroy is undefined" do
 
                 before(:all) do
+                  Person.send(:undef_method, :posts_attributes=)
+                  Person.accepts_nested_attributes_for :posts
+                end
+
+                after(:all) do
                   Person.send(:undef_method, :posts_attributes=)
                   Person.accepts_nested_attributes_for :posts
                 end

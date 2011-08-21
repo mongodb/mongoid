@@ -351,7 +351,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse(other = nil)
-        return self[:inverse_of] if inverse_of?
+        return self[:inverse_of] if has_key?(:inverse_of)
         return self[:as] || lookup_inverse(other) if polymorphic?
         @inverse ||= (cyclic? ? cyclic_inverse : inverse_relation)
       end
@@ -676,7 +676,11 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def validate?
-        self[:validate] != false
+        unless self[:validate].nil?
+          self[:validate]
+        else
+          self[:validate] = relation.validation_default
+        end
       end
 
       # Is this relation using Mongoid's internal versioning system?

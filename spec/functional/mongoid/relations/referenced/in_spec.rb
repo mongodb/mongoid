@@ -641,6 +641,32 @@ describe Mongoid::Relations::Referenced::In do
     end
   end
 
+  context "when the relation is self referencing" do
+
+    let(:game_one) do
+      Game.new(:name => "Diablo")
+    end
+
+    let(:game_two) do
+      Game.new(:name => "Warcraft")
+    end
+
+    context "when setting the parent" do
+
+      before do
+        game_one.parent = game_two
+      end
+
+      it "sets the parent" do
+        game_one.parent.should eq(game_two)
+      end
+
+      it "does not set the parent recursively" do
+        game_two.parent.should be_nil
+      end
+    end
+  end
+
   context "when replacing the relation with another" do
 
     let!(:person) do
