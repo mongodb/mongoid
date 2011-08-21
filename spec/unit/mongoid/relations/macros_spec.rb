@@ -534,4 +534,37 @@ describe Mongoid::Relations::Macros do
         be_a_kind_of(Mongoid::Relations::Metadata)
     end
   end
+
+  describe "Proxy extensions" do
+
+    class Person
+      include Mongoid::Document
+    end
+
+    class Name
+      include Mongoid::Document
+
+      module Extension
+        def short_name
+          "spec"
+        end
+      end
+    end
+
+    let(:inst) {Person.new(:name => Name.new)}
+
+    it "supports creating extension from a block" do
+      Person.embeds_one(:name) do
+        def full_name
+          "spec"
+        end
+      end
+      inst.name.full_name.should == "spec"
+    end
+
+    it "supports creating extension from a module" do
+      Person.embeds_one(:name, :extend => Name::Extension)
+      inst.name.short_name.should == "spec"
+    end
+  end
 end
