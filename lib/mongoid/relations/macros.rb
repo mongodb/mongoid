@@ -7,10 +7,6 @@ module Mongoid # :nodoc:
     module Macros
       extend ActiveSupport::Concern
 
-      # Convenience methods for the instance to know about attributes that
-      # are located at the class level.
-      delegate :associations, :relations, :to => "self.class"
-
       included do
         cattr_accessor :embedded
         class_attribute :relations
@@ -26,6 +22,19 @@ module Mongoid # :nodoc:
           alias :embedded? :embedded
         end
       end
+
+      # Get the metadata for all the defined relations.
+      #
+      # @note Refactored from using delegate for class load performance.
+      #
+      # @example Get the relations.
+      #   model.relations
+      #
+      # @return [ Hash<String, Metadata> ] The relation metadata.
+      def relations
+        self.class.relations
+      end
+      alias :associations :relations
 
       module ClassMethods #:nodoc:
 

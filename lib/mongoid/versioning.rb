@@ -7,8 +7,6 @@ module Mongoid #:nodoc:
   module Versioning
     extend ActiveSupport::Concern
 
-    delegate :version_max, :to => "self.class"
-
     included do
       field :version, :type => Integer, :default => 1
 
@@ -23,6 +21,18 @@ module Mongoid #:nodoc:
 
       class_attribute :version_max
       self.cyclic = true
+    end
+
+    # Get the maximum number of versions to store.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the max versions.
+    #   model.version_max
+    #
+    # @return [ Integer ] The max number of versions.
+    def version_max
+      self.class.version_max
     end
 
     # Create a new version of the +Document+. This will load the previous

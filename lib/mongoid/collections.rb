@@ -6,11 +6,39 @@ module Mongoid #:nodoc
   module Collections
     extend ActiveSupport::Concern
 
-    delegate :collection, :db, :to => "self.class"
-
     included do
       cattr_accessor :_collection, :collection_name
       self.collection_name = self.name.collectionize
+    end
+
+    # Get the collection for the class.
+    #
+    # @note Defining methods instead of delegate to avoid calls to
+    #   Kernel.caller for class load performance reasons.
+    #
+    # @example Get the collection.
+    #   person.collection
+    #
+    # @return [ Collection ] The class collection.
+    #
+    # @since 1.0.0
+    def collection
+      self.class.collection
+    end
+
+    # Get the database for the class.
+    #
+    # @note Defining methods instead of delegate to avoid calls to
+    #   Kernel.caller for class load performance reasons.
+    #
+    # @example Get the database.
+    #   person.db
+    #
+    # @return [ DB ] The class db.
+    #
+    # @since 1.0.0
+    def db
+      self.class.db
     end
 
     module ClassMethods #:nodoc:

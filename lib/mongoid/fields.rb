@@ -31,14 +31,36 @@ module Mongoid #:nodoc
   module Fields
     extend ActiveSupport::Concern
 
-    delegate :defaults, :fields, :to => "self.class"
-
     included do
       field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
 
       alias :id :_id
       alias :id= :_id=
+    end
+
+    # Get the default fields.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the defaults.
+    #   model.defaults
+    #
+    # @return [ Array<String> ] The default field names.
+    def defaults
+      self.class.defaults
+    end
+
+    # Get the document's fields.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the fields.
+    #   model.fields
+    #
+    # @return [ Hash ] The fields.
+    def fields
+      self.class.fields
     end
 
     class << self

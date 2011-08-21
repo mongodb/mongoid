@@ -15,7 +15,6 @@ module Mongoid # :nodoc:
       included do
         class_attribute :cascades
         self.cascades = []
-        delegate :cascades, :to => "self.class"
       end
 
       # Perform all cascading deletes, destroys, or nullifies. Will delegate to
@@ -31,6 +30,18 @@ module Mongoid # :nodoc:
           strategy = metadata.cascade_strategy
           strategy.new(self, metadata).cascade
         end
+      end
+
+      # Get the cascading definitions.
+      #
+      # @note Refactored from using delegate for class load performance.
+      #
+      # @example Get the cascades.
+      #   model.cascades
+      #
+      # @return [ Array<String> ] The cascading relation names.
+      def cascades
+        self.class.cascades
       end
 
       module ClassMethods #:nodoc:

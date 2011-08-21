@@ -9,7 +9,18 @@ module Mongoid # :nodoc:
 
       included do
         class_attribute :polymorphic
-        delegate :polymorphic?, :to => "self.class"
+      end
+
+      # Is the document in a polymorphic relation?
+      #
+      # @note Refactored from using delegate for class load performance.
+      #
+      # @example Is the document polymorphic?
+      #   model.polymorphic?
+      #
+      # @return [ true, false ] If the document is in a polymorphic relation.
+      def polymorphic?
+        self.class.polymorphic?
       end
 
       module ClassMethods #:nodoc:

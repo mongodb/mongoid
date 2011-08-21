@@ -7,11 +7,34 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     attr_reader :identifier
-    delegate :primary_key, :using_object_ids?, :to => "self.class"
 
     included do
       cattr_accessor :primary_key, :using_object_ids
       self.using_object_ids = true
+    end
+
+    # Get the document's primary key.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the primary key.
+    #   model.primary_key
+    #
+    # @return [ Array ] The primary key
+    def primary_key
+      self.class.primary_key
+    end
+
+    # Is the document using object ids?
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Is the document using object ids?
+    #   model.using_object_ids?
+    #
+    # @return [ true, false ] Using object ids.
+    def using_object_ids?
+      self.class.using_object_ids?
     end
 
     private
