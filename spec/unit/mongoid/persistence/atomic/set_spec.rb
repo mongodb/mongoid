@@ -10,6 +10,10 @@ describe Mongoid::Persistence::Atomic::Set do
     person.stubs(:collection).returns(collection)
   end
 
+  after do
+    person.unstub(:collection)
+  end
+
   describe "#set" do
 
     let(:reloaded) do

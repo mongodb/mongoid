@@ -598,6 +598,10 @@ describe Mongoid::Contexts::Mongo do
       Person.stubs(:collection).returns(collection)
     end
 
+    after do
+      Person.unstub(:collection)
+    end
+
     it "returns the first document" do
       context.expects(:first).returns(collection.first)
       context.shift.should == collection.first
