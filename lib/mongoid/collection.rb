@@ -56,8 +56,14 @@ module Mongoid #:nodoc
     #
     # @param [ Class ] klass The class the collection is for.
     # @param [ String ] name The name of the collection.
-    def initialize(klass, name)
-      @klass, @name = klass, name
+    # @param [ Hash ] options The collection options.
+    #
+    # @option options [ true, false ] :capped If the collection is capped.
+    # @option options [ Integer ] :size The capped collection size.
+    # @option options [ Integer ] :max The maximum number of docs in the
+    #   capped collection.
+    def initialize(klass, name, options = {})
+      @klass, @name, @options = klass, name, options || {}
     end
 
     # Inserts one or more documents in the collection.
@@ -106,7 +112,7 @@ module Mongoid #:nodoc
     def master(options = {})
       options.delete(:cache)
       db = Mongoid.databases[klass.database] || Mongoid.master
-      @master ||= Collections::Master.new(db, @name)
+      @master ||= Collections::Master.new(db, @name, @options)
     end
 
     # Updates one or more documents in the collection.

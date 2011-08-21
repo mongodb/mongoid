@@ -15,7 +15,7 @@ describe Mongoid::Collections::Master do
   end
 
   before do
-    db.expects(:collection).with("people").returns(collection)
+    db.expects(:create_collection).with("people", {}).returns(collection)
   end
 
   context "Mongo::Collection operations" do

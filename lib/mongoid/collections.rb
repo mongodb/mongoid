@@ -81,9 +81,20 @@ module Mongoid #:nodoc
       #
       # @example Store in a separate collection than the default.
       #   Model.store_in :population
-      def store_in(name)
+      #
+      # @example Store in a capped collection.
+      #   Model.store_in :population, :capped => true, :max => 10000
+      #
+      # @param [ Symbol ] name The name of the collection.
+      # @param [ Hash ] options The collection options.
+      #
+      # @option options [ true, false ] :capped If the collection is capped.
+      # @option options [ Integer ] :size The capped collection size.
+      # @option options [ Integer ] :max The maximum number of docs in the
+      #   capped collection.
+      def store_in(name, options = {})
         self.collection_name = name.to_s
-        set_collection
+        set_collection(options)
       end
 
       protected
@@ -93,9 +104,16 @@ module Mongoid #:nodoc
       # @example Set the collection.
       #   Model.set_collection
       #
+      # @param [ Hash ] options The collection options.
+      #
+      # @option options [ true, false ] :capped If the collection is capped.
+      # @option options [ Integer ] :size The capped collection size.
+      # @option options [ Integer ] :max The maximum number of docs in the
+      #   capped collection.
+
       # @return [ Collection ] The Mongoid collection wrapper.
-      def set_collection
-        self._collection = Mongoid::Collection.new(self, self.collection_name)
+      def set_collection(options = {})
+        self._collection = Collection.new(self, self.collection_name, options)
       end
     end
   end
