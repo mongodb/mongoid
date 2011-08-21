@@ -241,12 +241,11 @@ module Mongoid # :nodoc:
         #
         # @return [ Metadata ] The metadata for the relation.
         def characterize(name, relation, options, &block)
-          Metadata.new(
-          {
-              :relation => relation,
-              :extend => create_extension_module(name, &block),
-              :inverse_class_name => self.name,
-              :name => name
+          Metadata.new({
+            :relation => relation,
+            :extend => create_extension_module(name, &block),
+            :inverse_class_name => self.name,
+            :name => name
           }.merge(options))
         end
 

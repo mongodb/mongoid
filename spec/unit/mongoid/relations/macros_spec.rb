@@ -535,13 +535,13 @@ describe Mongoid::Relations::Macros do
     end
   end
 
-  describe "Proxy extensions" do
+  context "when creating an association with an extension" do
 
-    class Person
+    class Peep
       include Mongoid::Document
     end
 
-    class Name
+    class Handle
       include Mongoid::Document
 
       module Extension
@@ -551,20 +551,34 @@ describe Mongoid::Relations::Macros do
       end
     end
 
-    let(:inst) {Person.new(:name => Name.new)}
-
-    it "supports creating extension from a block" do
-      Person.embeds_one(:name) do
-        def full_name
-          "spec"
-        end
-      end
-      inst.name.full_name.should == "spec"
+    let(:peep) do
+      Peep.new(:handle => Handle.new)
     end
 
-    it "supports creating extension from a module" do
-      Person.embeds_one(:name, :extend => Name::Extension)
-      inst.name.short_name.should == "spec"
+    context "when the extension is a block" do
+
+      before do
+        Peep.embeds_one(:handle) do
+          def full_name
+            "spec"
+          end
+        end
+      end
+
+      it "extends the relation" do
+        peep.handle.full_name.should eq("spec")
+      end
+    end
+
+    context "when the extension is a module" do
+
+      before do
+        Peep.embeds_one(:handle, :extend => Handle::Extension)
+      end
+
+      it "extends the relation" do
+        peep.handle.short_name.should eq("spec")
+      end
     end
   end
 end
