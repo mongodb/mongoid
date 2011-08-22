@@ -1,5 +1,5 @@
 Overview
---------
+======= =
 
 About Mongoid
 -------------
@@ -21,7 +21,8 @@ Mongoid is tested against Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius, and JRuby.
 
 [Build History](http://travis-ci.org/mongoid/mongoid)
 
-= Documentation
+Documentation
+-------------
 
 Please see the new Mongoid website for up-to-date documentation:
 [mongoid.org](http://mongoid.org)
