@@ -1,10 +1,10 @@
-# Overview
+= Overview
 
 For instructions on upgrading to newer versions, visit {mongoid.org}[http://mongoid.org/docs/upgrading.html].
 
-## 2.2.0
+== 2.2.0
 
-### New Features
+=== New Features
 
 * Mongoid now contains eager loading in the form of Criteria#includes(*args).
   This works on all relational associations and requires the identity map to
@@ -17,9 +17,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * Capped collections can be created by passing the options to the .store_in
   macro: Person.store_in :people, capped: true, max: 1000000
 
-## 2.1.9
+== 2.1.9
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1159 Fixed build blocks not to cancel out each other when nested.
 
@@ -49,9 +49,9 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 * #990 Embedded documents can use a single embedded_in with multiple parent
   definitions.
 
-## 2.1.8
+== 2.1.8
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1148 Fixed respond_to? on all relations to return properly.
 
@@ -74,13 +74,13 @@ For instructions on upgrading to newer versions, visit {mongoid.org}[http://mong
 
 * #410 Moving documents from one relation to another now works as expected.
 
-## 2.1.7
+== 2.1.7
 
 This was a specific release to fix MRI 1.8.7 breakages introduced by 2.1.6.
 
-## 2.1.6
+== 2.1.6
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1126 Fix setting of relations with other relation proxies.
 
@@ -93,9 +93,9 @@ This was a specific release to fix MRI 1.8.7 breakages introduced by 2.1.6.
 
 * #290 Verify pushes into deeply embedded documents.
 
-## 2.1.5
+== 2.1.5
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1116 Embedded children retain reference to parent in destroy callbacks.
 
@@ -107,14 +107,14 @@ This was a specific release to fix MRI 1.8.7 breakages introduced by 2.1.6.
 
 * #1007 Update attribute properly tracks array changes.
 
-## 2.1.4
+== 2.1.4
 
 This was a specific release to get a Psych generated gemspec so no more parse
 errors would occur on those rubies that were using the new YAML parser.
 
-## 2.1.3
+== 2.1.3
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1109 Fixed validations not loading one to ones into memory.
 
@@ -150,9 +150,9 @@ errors would occur on those rubies that were using the new YAML parser.
 
 * #721 safely now properly raises validation errors when they occur.
 
-## 2.1.2
+== 2.1.2
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1082 Alias size and length to count on criteria. (Adam Greene)
 
@@ -164,9 +164,9 @@ errors would occur on those rubies that were using the new YAML parser.
 * #1047 Ignore nil values passed to embeds_man pushes and substitution.
   (Derick Bailey)
 
-## 2.1.1
+== 2.1.1
 
-### Resolved Issues
+=== Resolved Issues
 
 * #1021, #719 Many to many relations dont trigger extra database queries when
   pushing new documents.
@@ -180,9 +180,9 @@ errors would occur on those rubies that were using the new YAML parser.
 * #618 Crack XML library breaks Mongoid by adding #attributes method to the
   String class. (Stephen McGinty)
 
-## 2.1.0
+== 2.1.0
 
-### Major Changes
+=== Major Changes
 
 * Mongoid now requires MongoDB 1.8.x in order to properly support the #bit and
   #rename atomic operations.
@@ -201,13 +201,13 @@ errors would occur on those rubies that were using the new YAML parser.
 
 * Mongoid model preloading in development mode now defaults to false.
 
-* :autosave #> true on relational associations now saves on update as well as
+* :autosave => true on relational associations now saves on update as well as
   create.
 
 * Mongoid now has an identity map for simple find by id queries. See the
   website for documentation.
 
-### New Features
+=== New Features
 
 * #1067 Fields now accept a :versioned attribute to be able to disable what
   fields are versioned with Mongoid::Versioning. (Jim Benton)
@@ -225,7 +225,7 @@ errors would occur on those rubies that were using the new YAML parser.
 
 * Added exception translations for Hindi. (Sukeerthi Adiga)
 
-### Resolved Issues
+=== Resolved Issues
 
 * #974 Fix attribute_present? to work correctly then attribute value is false, thanks to @nickhoffman (Gregory Man)
 
