@@ -166,7 +166,10 @@ module Mongoid #:nodoc
     #
     # @return [ Logger ] The newly set logger.
     def logger=(logger)
-      @logger = logger
+      case logger
+        when Logger then @logger = logger
+        when false, nil then @logger = nil
+      end
     end
 
     # Purge all data in all collections, including indexes.

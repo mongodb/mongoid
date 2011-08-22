@@ -106,6 +106,10 @@ describe Mongoid::Config do
       it "returns nil, which is interpreted as the local time_zone" do
         described_class.use_utc.should be_false
       end
+
+      it "sets the logger to nil" do
+        described_class.logger.should be_nil
+      end
     end
 
     context "when configuring with utc time" do
