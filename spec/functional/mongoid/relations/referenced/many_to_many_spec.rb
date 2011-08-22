@@ -7,7 +7,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference, Event, Tag, UserAccount, Agent, Account ].map(&:delete_all)
+    [ Person, Preference, Event, Tag,
+      UserAccount, Agent, Account, Business, User ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -1807,6 +1808,83 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "returns the total number of documents" do
           person.preferences.send(method).should == 2
+        end
+      end
+    end
+  end
+
+  context "when setting both sides in a single call" do
+
+    context "when the documents are new" do
+
+      let(:user) do
+        User.new(:name => "testing")
+      end
+
+      let(:business) do
+        Business.new(:name => "serious", :owners => [ user ])
+      end
+
+      before do
+        user.businesses = [ business ]
+      end
+
+      it "sets the businesses" do
+        user.businesses.should eq([ business ])
+      end
+
+      it "sets the inverse users" do
+        user.businesses.first.owners.first.should eq(user)
+      end
+
+      it "sets the inverse businesses" do
+        business.owners.should eq([ user ])
+      end
+    end
+
+    context "when the documents are persisted" do
+
+      let(:user) do
+        User.create(:name => "tst")
+      end
+
+      let(:business) do
+        Business.create(:name => "srs", :owners => [ user ])
+      end
+
+      before do
+        user.businesses = [ business ]
+      end
+
+      it "sets the businesses" do
+        user.businesses.should eq([ business ])
+      end
+
+      it "sets the inverse users" do
+        user.businesses.first.owners.first.should eq(user)
+      end
+
+      it "sets the inverse businesses" do
+        business.owners.should eq([ user ])
+      end
+
+      context "when reloading" do
+
+        before do
+          user.reload
+          business.reload
+        end
+
+        it "persists the businesses" do
+          user.businesses.should eq([ business ])
+        end
+
+        it "persists the inverse users" do
+          user.businesses.first.owners.first.should eq(user)
+        end
+
+        it "persists the inverse businesses" do
+          business.owners.should eq([ user ])
         end
       end
     end
