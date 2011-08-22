@@ -649,6 +649,7 @@ describe Mongoid::Document do
     end
 
     context "when not frozen" do
+
       it "freezes attributes" do
         person.freeze.should == person
         lambda { person.title = "something" }.should raise_error
@@ -656,9 +657,11 @@ describe Mongoid::Document do
     end
 
     context "when frozen" do
+
       before do
         person.raw_attributes.freeze
       end
+
       it "keeps things frozen" do
         person.freeze
         lambda { person.title = "something" }.should raise_error
