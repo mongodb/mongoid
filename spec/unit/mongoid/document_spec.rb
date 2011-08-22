@@ -665,4 +665,16 @@ describe Mongoid::Document do
       end
     end
   end
+
+  describe "logger" do
+    it "has a class logger method" do
+      Person.should respond_to(:logger)
+      Person.logger.should == Mongoid.logger
+    end
+
+    it "has a private logger method" do
+      person = Person.new
+      person.send(:logger).should == Mongoid.logger
+    end
+  end
 end
