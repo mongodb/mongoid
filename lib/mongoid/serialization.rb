@@ -74,7 +74,7 @@ module Mongoid # :nodoc:
       inclusions = options[:include]
       relation_names(inclusions).each do |name|
         metadata = relations[name.to_s]
-        relation = send(metadata.name, false, :eager => true)
+        relation = send(metadata.name)
         if relation
           attributes[metadata.name.to_s] =
             relation.serializable_hash(relation_options(inclusions, options, name))

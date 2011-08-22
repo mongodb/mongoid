@@ -320,6 +320,18 @@ module Mongoid #:nodoc:
         end
         alias :length :size
 
+        # Need to specifically send #to_json to the entries.
+        #
+        # @example Get the enumerable as json.
+        #   enumerable.to_json
+        #
+        # @return [ String ] The entries all loaded as a string.
+        #
+        # @since 2.2.0
+        def to_json
+          entries.to_json
+        end
+
         # Return all the unique documents in the enumerable.
         #
         # @note This operation loads all documents from the database.
