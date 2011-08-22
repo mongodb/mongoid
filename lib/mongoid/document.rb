@@ -216,6 +216,8 @@ module Mongoid #:nodoc:
     # Returns the logger
     #
     # @return [ Logger ] The configured logger or a default Logger instance.
+    #
+    # @since 2.2.0
     def logger
       Mongoid.logger
     end
@@ -278,6 +280,8 @@ module Mongoid #:nodoc:
       end
 
       # Set the i18n scope to overwrite ActiveModel.
+      #
+      # @return [ Symbol ] :mongoid
       def i18n_scope
         :mongoid
       end
@@ -288,6 +292,8 @@ module Mongoid #:nodoc:
       #   Person.logger
       #
       # @return [ Logger ] The configured logger or a default Logger instance.
+      #
+      # @since 2.2.0
       def logger
         Mongoid.logger
       end

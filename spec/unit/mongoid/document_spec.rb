@@ -666,15 +666,21 @@ describe Mongoid::Document do
     end
   end
 
-  describe "logger" do
-    it "has a class logger method" do
-      Person.should respond_to(:logger)
-      Person.logger.should == Mongoid.logger
+  describe ".logger" do
+
+    it "returns the mongoid logger" do
+      Person.logger.should eq(Mongoid.logger)
+    end
+  end
+
+  describe "#logger" do
+
+    let(:person) do
+      Person.new
     end
 
-    it "has a private logger method" do
-      person = Person.new
-      person.send(:logger).should == Mongoid.logger
+    it "returns the mongoid logger" do
+      person.send(:logger).should eq(Mongoid.logger)
     end
   end
 end
