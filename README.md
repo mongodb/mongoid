@@ -1,31 +1,38 @@
-= Overview
+Overview
+--------
 
-== About Mongoid
+About Mongoid
+-------------
 
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 
-== Project Tracking
+Project Tracking
+----------------
 
-* {Mongoid Google Group}[http://groups.google.com/group/mongoid]
-* {Mongoid Website and Documentation}[http://mongoid.org]
+* [Mongoid Google Group](http://groups.google.com/group/mongoid)
+* [Mongoid Website and Documentation](http://mongoid.org)
 
-== Compatibility
+Compatibility
+-------------
 
 Mongoid is tested against Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius, and JRuby.
 
 <img src="https://secure.travis-ci.org/mongoid/mongoid.png?branch=master&.png"/>
 
-{Build History}[http://travis-ci.org/mongoid/mongoid]
+[Build History](http://travis-ci.org/mongoid/mongoid)
 
 = Documentation
 
 Please see the new Mongoid website for up-to-date documentation:
-{mongoid.org}[http://mongoid.org]
+[mongoid.org](http://mongoid.org)
 
-= Donating
-* {Support Mongoid at Pledgie}[http://www.pledgie.com/campaigns/7757]
+Donating
+--------
 
-= License
+* [Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
+
+License
+-------
 
 Copyright (c) 2009, 2010, 2011 Durran Jordan
 
@@ -40,7 +47,6 @@ the following conditions:
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -49,6 +55,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-= Credits
+Credits
+-------
 
 Durran Jordan: durran at gmail dot com
