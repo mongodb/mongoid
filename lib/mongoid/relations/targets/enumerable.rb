@@ -325,11 +325,13 @@ module Mongoid #:nodoc:
         # @example Get the enumerable as json.
         #   enumerable.to_json
         #
+        # @param [ Hash ] options Optional parameters.
+        #
         # @return [ String ] The entries all loaded as a string.
         #
         # @since 2.2.0
-        def to_json
-          entries.to_json
+        def to_json(options = {})
+          entries.to_json(options)
         end
 
         # Return all the unique documents in the enumerable.
