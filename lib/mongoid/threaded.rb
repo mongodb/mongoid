@@ -30,6 +30,18 @@ module Mongoid #:nodoc:
       build_stack.push(true)
     end
 
+    # Begins a createing block.
+    #
+    # @example Begin the create.
+    #   Threaded.begin_create
+    #
+    # @return [ true ] Always true.
+    #
+    # @since 2.1.9
+    def begin_create
+      create_stack.push(true)
+    end
+
     # Begin validating a document on the current thread.
     #
     # @example Begin validation.
@@ -66,6 +78,18 @@ module Mongoid #:nodoc:
       !build_stack.empty?
     end
 
+    # Is the current thread in creating mode?
+    #
+    # @example Is the thread in creating mode?
+    #   Threaded.creating?
+    #
+    # @return [ true, false ] If the thread is in creating mode?
+    #
+    # @since 2.1.0
+    def creating?
+      !create_stack.empty?
+    end
+
     # Get the bind stack for the current thread. Is simply an array of calls
     # to Mongoid's binding method.
     #
@@ -90,6 +114,19 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def build_stack
       Thread.current[:"[mongoid]:build-stack"] ||= []
+    end
+
+    # Get the create stack for the current thread. Is simply an array of calls
+    # to Mongoid's creating method.
+    #
+    # @example Get the create stack.
+    #   Threaded.create_stack
+    #
+    # @return [ Array ] The array of create calls.
+    #
+    # @since 2.1.9
+    def create_stack
+      Thread.current[:"[mongoid]:create-stack"] ||= []
     end
 
     # Clear out all the safety options set using the safely proxy.
@@ -126,6 +163,18 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def exit_build
       build_stack.pop
+    end
+
+    # Exit the creating block.
+    #
+    # @example Exit the creating block.
+    #   Threaded.exit_create
+    #
+    # @return [ true ] The last element in the stack.
+    #
+    # @since 2.1.9
+    def exit_create
+      create_stack.pop
     end
 
     # Exit validating a document on the current thread.

@@ -159,7 +159,9 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The newly created document.
       def create(attributes = {}, &block)
-        new(attributes, &block).tap { |doc| doc.save }
+        creating do
+          new(attributes, &block).tap { |doc| doc.save }
+        end
       end
 
       # Create a new document. This will instantiate a new document and
@@ -174,9 +176,11 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The newly created document.
       def create!(attributes = {}, &block)
-        document = new(attributes, &block)
-        fail_validate!(document) if document.insert.errors.any?
-        document
+        creating do
+          document = new(attributes, &block)
+          fail_validate!(document) if document.insert.errors.any?
+          document
+        end
       end
 
       # Delete all documents given the supplied conditions. If no conditions
@@ -229,6 +233,25 @@ module Mongoid #:nodoc:
       # @param [ Document ] document The document to fail.
       def fail_validate!(document)
         raise Errors::Validations.new(document)
+      end
+
+      private
+
+      # Execute a block in creating mode.
+      #
+      # @example Execute in creating mode.
+      #   creating do
+      #     relation.push(doc)
+      #   end
+      #
+      # @return [ Object ] The return value of the block.
+      #
+      # @since 2.1.0
+      def creating
+        Threaded.begin_create
+        yield
+      ensure
+        Threaded.exit_create
       end
     end
   end

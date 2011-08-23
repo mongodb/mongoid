@@ -30,14 +30,14 @@ module Mongoid # :nodoc:
               args.flatten.each do |doc|
                 next unless doc
                 append(doc)
-                if persistable?
+                if persistable? || creating?
                   ids.push(doc.id)
                   doc.save
                 else
                   base.send(metadata.foreign_key).push(doc.id)
                 end
               end
-              if persistable?
+              if persistable? || creating?
                 base.push_all(metadata.foreign_key, ids)
                 base.synced[metadata.foreign_key] = false
               end

@@ -1842,6 +1842,53 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
+    context "when one side is persisted" do
+
+      let!(:user) do
+        User.new(:name => "testing")
+      end
+
+      let!(:business) do
+        Business.create(:name => "serious", :owners => [ user ])
+      end
+
+      before do
+        user.businesses = [ business ]
+      end
+
+      it "sets the businesses" do
+        user.businesses.should eq([ business ])
+      end
+
+      it "sets the inverse users" do
+        user.businesses.first.owners.first.should eq(user)
+      end
+
+      it "sets the inverse businesses" do
+        business.owners.should eq([ user ])
+      end
+
+      context "when reloading" do
+
+        before do
+          user.reload
+          business.reload
+        end
+
+        it "persists the businesses" do
+          user.businesses.should eq([ business ])
+        end
+
+        it "persists the inverse users" do
+          user.businesses.first.owners.first.should eq(user)
+        end
+
+        it "persists the inverse businesses" do
+          business.owners.should eq([ user ])
+        end
+      end
+    end
+
     context "when the documents are persisted" do
 
       let(:user) do

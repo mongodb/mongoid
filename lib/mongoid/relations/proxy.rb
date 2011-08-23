@@ -74,6 +74,18 @@ module Mongoid # :nodoc:
         Threaded.building?
       end
 
+      # Is the current thread in creating mode?
+      #
+      # @example Is the current thread in creating mode?
+      #   proxy.creating?
+      #
+      # @return [ true, false ] If the thread is creating.
+      #
+      # @since 2.1.0
+      def creating?
+        Threaded.creating?
+      end
+
       # Get the collection from the root of the hierarchy.
       #
       # @example Get the collection.
