@@ -945,6 +945,15 @@ describe Mongoid::Criteria do
 
     context "with a single argument" do
 
+      context "when the arg is nil" do
+
+        it "adds the id selector" do
+          expect {
+            criteria.search(nil)
+          }.to raise_error(Mongoid::Errors::InvalidFind)
+        end
+      end
+
       context "when the arg is a string" do
 
         let(:id) do

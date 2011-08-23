@@ -298,7 +298,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def raise_invalid
-      raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {})
+      raise Errors::InvalidFind.new
     end
 
     protected
