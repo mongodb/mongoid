@@ -4,6 +4,8 @@ en:
       messages:
         taken:
           "पहले ही ले लिया है"
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           "%{identifiers}  id(s) के साथ, वर्ग %{klass} के लिए दस्तावेज़ नहीं मिला."
         invalid_database:

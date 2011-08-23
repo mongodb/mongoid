@@ -4,6 +4,8 @@ pl:
       messages:
         taken:
           jest już zajęte
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Nie znaleziono dokumentu dla klasy %{klass} o id %{identifiers}.
         invalid_database:

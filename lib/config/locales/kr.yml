@@ -4,6 +4,8 @@ kr:
       messages:
         taken:
           이미 사용하고있습니다
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           클라스 %{klass}와 id를 %{identifiers} 위한 문서를 찾을수 없습니다.
         invalid_database:

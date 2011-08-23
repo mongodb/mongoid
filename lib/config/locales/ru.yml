@@ -4,6 +4,8 @@ ru:
       messages:
         taken:
           уже занят
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Документ класса %{klass} с id %{identifiers} не найден.
         invalid_database:

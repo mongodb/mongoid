@@ -4,6 +4,8 @@ id:
       messages:
         taken:
           telah digunakan
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Dokumen tidak ditemukan untuk kelas %{klass} dengan id %{identifiers}.
         invalid_database:

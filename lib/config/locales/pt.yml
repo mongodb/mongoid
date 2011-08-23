@@ -4,6 +4,8 @@ pt:
       messages:
         taken:
           já está utilizada
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Nenhum documento encontrado para a classe %{klass} com os id(s) %{identifiers}.
         invalid_database:

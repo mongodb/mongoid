@@ -4,6 +4,8 @@ vi:
       messages:
         taken:
           đã bị lấy
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Không tìm thấy văn bản cho lớp %{klass} với định danh %{identifiers}.
         invalid_database:

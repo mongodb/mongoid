@@ -4,6 +4,8 @@ sv:
       messages:
         taken:
           har redan använts
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Inget dokument kunde hittas för klass %{klass} med id %{identifiers}.
         invalid_database:

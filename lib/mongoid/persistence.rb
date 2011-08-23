@@ -67,7 +67,11 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if validation passed.
     def save!(options = {})
-      self.class.fail_validate!(self) unless upsert(options); true
+      unless upsert(options)
+        self.class.fail_validate!(self) if errors.any?
+        self.class.fail_callback!(self, :save!)
+      end
+      return true
     end
 
     # Update the document in the datbase.
@@ -124,7 +128,10 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if validation passed.
     def update_attributes!(attributes = {})
       update_attributes(attributes).tap do |result|
-        self.class.fail_validate!(self) unless result
+        unless result
+          self.class.fail_validate!(self) if errors.any?
+          self.class.fail_callback!(self, :update_attributes!)
+        end
       end
     end
 
@@ -177,9 +184,10 @@ module Mongoid #:nodoc:
       # @return [ Document ] The newly created document.
       def create!(attributes = {}, &block)
         creating do
-          document = new(attributes, &block)
-          fail_validate!(document) if document.insert.errors.any?
-          document
+          new(attributes, &block).tap do |doc|
+            fail_validate!(doc) if doc.insert.errors.any?
+            fail_callback!(doc, :create!) if doc.new?
+          end
         end
       end
 
@@ -233,6 +241,19 @@ module Mongoid #:nodoc:
       # @param [ Document ] document The document to fail.
       def fail_validate!(document)
         raise Errors::Validations.new(document)
+      end
+
+      # Raise an error if a callback failed.
+      #
+      # @example Raise the callback error.
+      #   Person.fail_callback!(person, :create!)
+      #
+      # @param [ Document ] document The document to fail.
+      # @param [ Symbol ] method The method being called.
+      #
+      # @since 2.2.0
+      def fail_callback!(document, method)
+        raise Errors::Callback.new(document.class, method)
       end
 
       private

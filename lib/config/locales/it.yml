@@ -4,6 +4,8 @@ it:
       messages:
         taken:
           è già utilizzato
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Documento non trovato per la classe %{klass} con id(s) %{identifiers}.
         invalid_database:

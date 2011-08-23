@@ -4,6 +4,8 @@ bg:
       messages:
         taken:
           е вече заето
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Не е намерен документ %{klass} с id(та) %{identifiers}.
         invalid_database:

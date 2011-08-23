@@ -4,6 +4,8 @@ ro:
       messages:
         taken:
           este deja folosit
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Nu există document în clasa %{klass} cu id %{identifiers}.
         invalid_database:

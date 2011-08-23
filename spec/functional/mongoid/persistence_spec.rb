@@ -109,6 +109,13 @@ describe Mongoid::Persistence do
         account.should be_persisted
       end
     end
+
+    context "when a callback returns false" do
+
+      it "raises a callback error" do
+        expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)
+      end
+    end
   end
 
   [ :delete, :destroy ].each do |method|
@@ -410,6 +417,17 @@ describe Mongoid::Persistence do
       it 'raises an error with multiple save attempts' do
         expect { subject.save! }.should raise_error
         expect { subject.save! }.should raise_error
+      end
+    end
+
+    context "when a callback returns false" do
+
+      let(:oscar) do
+        Oscar.new
+      end
+
+      it "raises a callback error" do
+        expect { oscar.save! }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end
@@ -772,6 +790,22 @@ describe Mongoid::Persistence do
             reloaded.phone_numbers.first.number.should == "098-765-4321"
           end
         end
+      end
+    end
+  end
+
+  describe "#update_attributes!" do
+
+    context "when a callback returns false" do
+
+      let(:oscar) do
+        Oscar.new
+      end
+
+      it "raises a callback error" do
+        expect {
+          oscar.update_attributes!(:title => "The Grouch")
+        }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end

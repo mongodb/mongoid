@@ -4,6 +4,8 @@ ja:
       messages:
         taken:
           はすでに使用されています
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           次のDocumentは見つかりませんでした。class %{klass} with id(s) %{identifiers}
         invalid_database:

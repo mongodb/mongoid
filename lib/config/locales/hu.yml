@@ -4,6 +4,8 @@ hu:
       messages:
         taken:
           már foglalt
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           "%{klass} osztályban, %{identifiers} id(k)-el nem található dokumentum."
         invalid_database:

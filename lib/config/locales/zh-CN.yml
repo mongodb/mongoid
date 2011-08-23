@@ -4,6 +4,8 @@ zh-CN:
       messages:
         blank:
           不能为空
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         taken:
           已占用
         document_not_found:
