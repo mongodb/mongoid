@@ -174,15 +174,87 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#clear_safety_options!" do
+  describe "#begin_create" do
 
     before do
-      described_class.safety_options = { :w => 3 }
-      described_class.clear_safety_options!
+      described_class.begin_create
     end
 
-    it "removes all safety options" do
-      described_class.safety_options.should be_nil
+    after do
+      described_class.create_stack.clear
+    end
+
+    it "adds a boolen to the create stack" do
+      described_class.create_stack.should eq([ true ])
+    end
+  end
+
+  describe "#creating?" do
+
+    context "when creating is not set" do
+
+      it "returns false" do
+        described_class.should_not be_creating
+      end
+    end
+
+    context "when creating has elements" do
+
+      before do
+        Thread.current[:"[mongoid]:create-stack"] = [ true ]
+      end
+
+      after do
+        Thread.current[:"[mongoid]:create-stack"] = []
+      end
+
+      it "returns true" do
+        described_class.should be_creating
+      end
+    end
+
+    context "when creating has no elements" do
+
+      before do
+        Thread.current[:"[mongoid]:create-stack"] = []
+      end
+
+      it "returns false" do
+        described_class.should_not be_creating
+      end
+    end
+  end
+
+  describe "#create_stack" do
+
+    context "when no create stack has been initialized" do
+
+      let(:creating) do
+        described_class.create_stack
+      end
+
+      it "returns an empty stack" do
+        creating.should eq([])
+      end
+    end
+
+    context "when a create stack has been initialized" do
+
+      before do
+        Thread.current[:"[mongoid]:create-stack"] = [ true ]
+      end
+
+      let(:creating) do
+        described_class.create_stack
+      end
+
+      after do
+        Thread.current[:"[mongoid]:create-stack"] = []
+      end
+
+      it "returns the stack" do
+        creating.should eq([ true ])
+      end
     end
   end
 
@@ -227,6 +299,22 @@ describe Mongoid::Threaded do
 
     it "adds a boolen to the build stack" do
       described_class.build_stack.should be_empty
+    end
+  end
+
+  describe "#exit_create" do
+
+    before do
+      described_class.begin_create
+      described_class.exit_create
+    end
+
+    after do
+      described_class.create_stack.clear
+    end
+
+    it "adds a boolen to the create stack" do
+      described_class.create_stack.should be_empty
     end
   end
 
