@@ -12,9 +12,15 @@ describe Mongoid::Timestamps::Updated do
       Agent.fields
     end
 
+    let(:updated_at) do
+      Time.utc 2011, 8, 2
+    end
+
     before do
       agent.run_callbacks(:create)
       agent.run_callbacks(:save)
+
+      Mongoid::Timestamps::Timer.stubs(:time).returns(updated_at)
     end
 
     it "does not add created_at to the document" do
@@ -25,8 +31,8 @@ describe Mongoid::Timestamps::Updated do
       fields["updated_at"].should_not be_nil
     end
 
-    it "forces the updated_at timestamps to UTC" do
-      agent.updated_at.should be_within(10).of(Time.now.utc)
+    it "sets updated_at with Timer.time value" do
+      agent.updated_at.should be updated_at
     end
 
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
