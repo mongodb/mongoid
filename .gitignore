@@ -19,3 +19,4 @@ doc/*
 *.profile
 *.profile.pdf
 *.symbols
+.rvmrc

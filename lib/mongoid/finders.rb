@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "tmpdir"
+
 module Mongoid #:nodoc:
 
   # This module defines the finder methods that hang off the document at the
@@ -93,8 +95,11 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] A matching or newly created document.
     def find_or_create_by(attrs = {}, &block)
-      find_or(:create, attrs, &block)
-    end
+      File.open("#{Dir.tmpdir}/mongoid_ipc.lock", "w") do |f|
+        f.flock(File::LOCK_EX)
+        find_or(:create, attrs, &block)
+      end # critical section over multiple proceses
+    end # def find_or_create_by
 
     # Find the first +Document+ given the conditions, or initializes a new document
     # with the conditions that were supplied.
