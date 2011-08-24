@@ -341,7 +341,7 @@ module Mongoid #:nodoc:
         #
         # @param [ Hash ] options Optional parameters.
         #
-        # @return [ String ] The entries all loaded as a string.
+        # @return [ Hash ] The entries all loaded as a hash.
         #
         # @since 2.2.0
         def as_json(options = {})
