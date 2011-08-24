@@ -44,6 +44,18 @@ module Mongoid #:nodoc:
           end.include?(:deserialize)
       end
 
+      # Get the constraint from the metadata once.
+      #
+      # @example Get the constraint.
+      #   field.constraint
+      #
+      # @return [ Constraint ] The relation's contraint.
+      #
+      # @since 2.1.0
+      def constraint
+        @constraint ||= metadata.constraint
+      end
+
       # Deserialize this field from the type stored in MongoDB to the type
       # defined on the model
       #
@@ -91,6 +103,30 @@ module Mongoid #:nodoc:
       def initialize(name, options = {})
         @name, @options = name, options
         @default, @label = options[:default], options[:label]
+      end
+
+      # Get the metadata for the field if its a foreign key.
+      #
+      # @example Get the metadata.
+      #   field.metadata
+      #
+      # @return [ Metadata ] The relation metadata.
+      #
+      # @since 2.2.0
+      def metadata
+        @metadata ||= options[:metadata]
+      end
+
+      # Is the field a BSON::ObjectId?
+      #
+      # @example Is the field a BSON::ObjectId?
+      #   field.object_id_field?
+      #
+      # @return [ true, false ] If the field is a BSON::ObjectId.
+      #
+      # @since 2.2.0
+      def object_id_field?
+        @object_id_field ||= (type == BSON::ObjectId)
       end
 
       # Serialize the object from the type defined in the model to a MongoDB

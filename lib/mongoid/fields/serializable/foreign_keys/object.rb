@@ -8,6 +8,19 @@ module Mongoid #:nodoc:
         class Object
           include Serializable
 
+          # Is the field a BSON::ObjectId?
+          #
+          # @example Is the field a BSON::ObjectId?
+          #   field.object_id_field?
+          #
+          # @return [ true, false ] If the field is a BSON::ObjectId.
+          #
+          # @since 2.2.0
+          def object_id_field?
+            @object_id_field ||=
+              metadata.polymorphic? ? true : metadata.klass.using_object_ids?
+          end
+
           # Serialize the object from the type defined in the model to a MongoDB
           # compatible object to store.
           #
@@ -21,20 +34,6 @@ module Mongoid #:nodoc:
           # @since 2.1.0
           def serialize(object)
             object.blank? ? nil : constraint.convert(object)
-          end
-
-          protected
-
-          # Get the constraint from the metadata once.
-          #
-          # @example Get the constraint.
-          #   field.constraint
-          #
-          # @return [ Constraint ] The relation's contraint.
-          #
-          # @since 2.1.0
-          def constraint
-            @constraint ||= options[:metadata].constraint
           end
         end
       end

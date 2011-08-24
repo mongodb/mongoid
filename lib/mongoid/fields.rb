@@ -183,6 +183,23 @@ module Mongoid #:nodoc
         subclass.defaults, subclass.fields = defaults.dup, fields.dup
       end
 
+      # Is the field with the provided name a BSON::ObjectId?
+      #
+      # @example Is the field a BSON::ObjectId?
+      #   Person.object_id_field?(:name)
+      #
+      # @param [ String, Symbol ] name The name of the field.
+      #
+      # @return [ true, false ] If the field is a BSON::ObjectId.
+      #
+      # @since 2.2.0
+      def object_id_field?(name)
+        field_name = name.to_s
+        field_name = "_id" if field_name == "id"
+        field = fields[field_name]
+        field ? field.object_id_field? : false
+      end
+
       # Replace a field with a new type.
       #
       # @example Replace the field.

@@ -46,7 +46,7 @@ module Mongoid #:nodoc:
           when ::Hash
             args.tap do |hash|
               hash.each_pair do |key, value|
-                next unless key.to_s =~ /id/
+                next unless klass.object_id_field?(key)
                 begin
                   hash[key] = convert(klass, value, reject_blank)
                 rescue BSON::InvalidObjectId; end

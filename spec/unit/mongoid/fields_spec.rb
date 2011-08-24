@@ -339,6 +339,91 @@ describe Mongoid::Fields do
     end
   end
 
+  describe ".object_id_field?" do
+
+    context "when the field exists" do
+
+      context "when the field is of type BSON::ObjectId" do
+
+        context "when the field is the _id" do
+
+          it "returns true" do
+            Person.object_id_field?(:_id).should be_true
+          end
+        end
+
+        context "when the field is a single foreign key" do
+
+          context "when the relation is not polymorphic" do
+
+            it "returns true" do
+              Post.object_id_field?(:person_id).should be_true
+            end
+          end
+
+          context "when the relation is polymorphic" do
+
+            it "returns true" do
+              Rating.object_id_field?(:ratable_id).should be_true
+            end
+          end
+        end
+
+        context "when the field is a multi foreign key" do
+
+          it "returns true" do
+            Person.object_id_field?(:preference_ids).should be_true
+          end
+        end
+
+        context "when the field is not a foreign key" do
+
+          it "returns true" do
+            Person.object_id_field?(:bson_id).should be_true
+          end
+        end
+      end
+
+      context "when the field is not an object id" do
+
+        context "when the field is an id" do
+
+          it "returns false" do
+            Address.object_id_field?(:_id).should be_false
+          end
+        end
+
+        context "when the field is a normal field" do
+
+          it "returns false" do
+            Person.object_id_field?(:title).should be_false
+          end
+        end
+
+        context "when the field is a single foreign key" do
+
+          it "returns true" do
+            Alert.object_id_field?(:account_id).should be_false
+          end
+        end
+
+        context "when the field is a multi foreign key" do
+
+          it "returns false" do
+            Agent.object_id_field?(:account_ids).should be_false
+          end
+        end
+      end
+    end
+
+    context "when the field does not exist" do
+
+      it "returns false" do
+        Person.object_id_field?(:some_random_name).should be_false
+      end
+    end
+  end
+
   describe ".replace_field" do
 
     let!(:original) do

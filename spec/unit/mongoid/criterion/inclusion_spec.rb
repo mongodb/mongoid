@@ -255,6 +255,17 @@ describe Mongoid::Criterion::Inclusion do
               criteria.selector.should == { :aliases => nil }
             end
           end
+
+          context "when the value is an empty string" do
+
+            let(:criteria) do
+              base.where(:foreign_identity => "")
+            end
+
+            it "does not convert the value to nil" do
+              criteria.selector.should eq(:foreign_identity => "")
+            end
+          end
         end
       end
 
