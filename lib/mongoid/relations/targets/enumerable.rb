@@ -320,7 +320,7 @@ module Mongoid #:nodoc:
         end
         alias :length :size
 
-        # Need to specifically send #to_json to the entries.
+        # Send #to_json to the entries.
         #
         # @example Get the enumerable as json.
         #   enumerable.to_json
@@ -332,6 +332,20 @@ module Mongoid #:nodoc:
         # @since 2.2.0
         def to_json(options = {})
           entries.to_json(options)
+        end
+
+        # Send #as_json to the entries, without encoding.
+        #
+        # @example Get the enumerable as json.
+        #   enumerable.as_json
+        #
+        # @param [ Hash ] options Optional parameters.
+        #
+        # @return [ Hash ] The entries all loaded as a hash.
+        #
+        # @since 2.2.0
+        def as_json(options = {})
+          entries.as_json(options)
         end
 
         # Return all the unique documents in the enumerable.
