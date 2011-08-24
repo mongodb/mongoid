@@ -221,12 +221,30 @@ describe Mongoid::Relations::Embedded::Many do
         Address.new
       end
 
-      before do
-        person.addresses = [ address ]
+      context "when setting directly" do
+
+        before do
+          person.addresses = [ address ]
+        end
+
+        it "saves the target" do
+          address.should be_persisted
+        end
       end
 
-      it "saves the target" do
-        address.should be_persisted
+      context "when setting via the parent attributes" do
+
+        before do
+          person.attributes = { :addresses => [ address ] }
+        end
+
+        it "sets the relation" do
+          person.addresses.should eq([ address ])
+        end
+
+        it "does not save the target" do
+          address.should_not be_persisted
+        end
       end
     end
 
@@ -407,7 +425,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
       end
 
-      context "when the documents are not new records" do
+      context "when the parent is persisted" do
 
         let(:person) do
           Person.create(:ssn => "437-11-1112")
@@ -417,25 +435,56 @@ describe Mongoid::Relations::Embedded::Many do
           Address.new
         end
 
-        before do
-          person.addresses = [ address ]
-          person.addresses = nil
+        context "when setting directly" do
+
+          before do
+            person.addresses = [ address ]
+            person.addresses = nil
+          end
+
+          it "sets the relation to empty" do
+            person.addresses.should be_empty
+          end
+
+          it "sets the relation to empty in the database" do
+            person.reload.addresses.should be_empty
+          end
+
+          it "removed the inverse relation" do
+            address.addressable.should be_nil
+          end
+
+          it "deletes the child document" do
+            address.should be_destroyed
+          end
         end
 
-        it "sets the relation to empty" do
-          person.addresses.should be_empty
-        end
+        context "when setting via attributes" do
 
-        it "sets the relation to empty in the database" do
-          person.reload.addresses.should be_empty
-        end
+          before do
+            person.addresses = [ address ]
+            person.attributes = { :addresses => nil }
+          end
 
-        it "removed the inverse relation" do
-          address.addressable.should be_nil
-        end
+          it "sets the relation to empty" do
+            person.addresses.should be_empty
+          end
 
-        it "deletes the child document" do
-          address.should be_destroyed
+          it "does not delete the child document" do
+            address.should_not be_destroyed
+          end
+
+          context "when saving the parent" do
+
+            before do
+              person.save
+              person.reload
+            end
+
+            it "persists the deletion" do
+              person.addresses.should be_empty
+            end
+          end
         end
       end
 

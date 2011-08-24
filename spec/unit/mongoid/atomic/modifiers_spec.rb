@@ -182,4 +182,36 @@ describe Mongoid::Atomic::Modifiers do
       end
     end
   end
+
+  describe "#unset" do
+
+    describe "when adding to the root level" do
+
+      context "when the unsets have values" do
+
+        let(:unsets) do
+          [ "addresses" ]
+        end
+
+        before do
+          modifiers.unset(unsets)
+        end
+
+        it "adds the unsets to the modifiers" do
+          modifiers.should eq({ "$unset" => { "addresses" => true } })
+        end
+      end
+
+      context "when the unsets are empty" do
+
+        before do
+          modifiers.unset([])
+        end
+
+        it "does not contain unset operations" do
+          modifiers.should eq({})
+        end
+      end
+    end
+  end
 end

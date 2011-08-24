@@ -54,8 +54,10 @@ module Mongoid #:nodoc:
         args.each do |name|
           self.nested_attributes += [ "#{name}_attributes=" ]
           define_method("#{name}_attributes=") do |attrs|
-            relation = relations[name.to_s]
-            relation.nested_builder(attrs, options).build(self)
+            assigning do
+              relation = relations[name.to_s]
+              relation.nested_builder(attrs, options).build(self)
+            end
           end
         end
       end

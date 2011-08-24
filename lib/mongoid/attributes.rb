@@ -55,9 +55,11 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def remove_attribute(name)
-      access = name.to_s
-      attribute_will_change!(access)
-      attributes.delete(access)
+      assigning do
+        access = name.to_s
+        attribute_will_change!(access)
+        attributes.delete(access)
+      end
     end
 
     # Override respond_to? so it responds properly for dynamic attributes.
@@ -92,12 +94,14 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      access = name.to_s
-      typed_value_for(access, value).tap do |value|
-        unless attributes[access] == value || attribute_changed?(access)
-          attribute_will_change!(access)
+      assigning do
+        access = name.to_s
+        typed_value_for(access, value).tap do |value|
+          unless attributes[access] == value || attribute_changed?(access)
+            attribute_will_change!(access)
+          end
+          attributes[access] = value
         end
-        attributes[access] = value
       end
     end
     alias :[]= :write_attribute
@@ -117,8 +121,10 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attributes(attrs = nil, guard_protected_attributes = true)
-      process(attrs, guard_protected_attributes) do |document|
-        document.identify if new? && id.blank?
+      assigning do
+        process(attrs, guard_protected_attributes) do |document|
+          document.identify if new? && id.blank?
+        end
       end
     end
     alias :attributes= :write_attributes
@@ -142,6 +148,27 @@ module Mongoid #:nodoc:
             end
           end
         end
+      end
+    end
+
+    # Begin the assignment of attributes. While in this block embedded
+    # documents will not autosave themselves in order to allow the document to
+    # be in a valid state.
+    #
+    # @example Execute the assignment.
+    #   assigning do
+    #     person.attributes = { :addresses => [ address ] }
+    #   end
+    #
+    # @return [ Object ] The yielded value.
+    #
+    # @since 2.2.0
+    def assigning
+      begin
+        Threaded.begin_assign
+        yield
+      ensure
+        Threaded.exit_assign
       end
     end
 

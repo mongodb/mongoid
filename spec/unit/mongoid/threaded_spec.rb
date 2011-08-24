@@ -6,6 +6,90 @@ describe Mongoid::Threaded do
     stub
   end
 
+  describe "#begin_assign" do
+
+    before do
+      described_class.begin_assign
+    end
+
+    after do
+      described_class.assign_stack.clear
+    end
+
+    it "adds a boolen to the assign stack" do
+      described_class.assign_stack.should eq([ true ])
+    end
+  end
+
+  describe "#assigning?" do
+
+    context "when assigning is not set" do
+
+      it "returns false" do
+        described_class.should_not be_assigning
+      end
+    end
+
+    context "when assigning has elements" do
+
+      before do
+        Thread.current[:"[mongoid]:assign-stack"] = [ true ]
+      end
+
+      after do
+        Thread.current[:"[mongoid]:assign-stack"] = []
+      end
+
+      it "returns true" do
+        described_class.should be_assigning
+      end
+    end
+
+    context "when assigning has no elements" do
+
+      before do
+        Thread.current[:"[mongoid]:assign-stack"] = []
+      end
+
+      it "returns false" do
+        described_class.should_not be_assigning
+      end
+    end
+  end
+
+  describe "#assign_stack" do
+
+    context "when no assign stack has been initialized" do
+
+      let(:assigning) do
+        described_class.assign_stack
+      end
+
+      it "returns an empty stack" do
+        assigning.should eq([])
+      end
+    end
+
+    context "when a assign stack has been initialized" do
+
+      before do
+        Thread.current[:"[mongoid]:assign-stack"] = [ true ]
+      end
+
+      let(:assigning) do
+        described_class.assign_stack
+      end
+
+      after do
+        Thread.current[:"[mongoid]:assign-stack"] = []
+      end
+
+      it "returns the stack" do
+        assigning.should eq([ true ])
+      end
+    end
+  end
+
   describe "#begin_bind" do
 
     before do
@@ -267,6 +351,22 @@ describe Mongoid::Threaded do
 
     it "removes all safety options" do
       described_class.safety_options.should be_nil
+    end
+  end
+
+  describe "#exit_assign" do
+
+    before do
+      described_class.begin_assign
+      described_class.exit_assign
+    end
+
+    after do
+      described_class.assign_stack.clear
+    end
+
+    it "adds a boolen to the assign stack" do
+      described_class.assign_stack.should be_empty
     end
   end
 

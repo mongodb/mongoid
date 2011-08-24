@@ -50,6 +50,18 @@ module Mongoid # :nodoc:
 
       protected
 
+      # Is the current thread in assigning mode?
+      #
+      # @example Is the current thread in assigning mode?
+      #   proxy.assigning?
+      #
+      # @return [ true, false ] If the thread is assigning.
+      #
+      # @since 2.1.0
+      def assigning?
+        Threaded.assigning?
+      end
+
       # Is the current thread in binding mode?
       #
       # @example Is the current thread in binding mode?

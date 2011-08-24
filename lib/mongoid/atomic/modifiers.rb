@@ -41,6 +41,20 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Adds unset operations to the modifiers hash.
+      #
+      # @example Add unset operations.
+      #   modifiers.unset([ "addresses" ])
+      #
+      # @param [ Array<String> ] modifications The unset relation names.
+      #
+      # @since 2.2.0
+      def unset(modifications)
+        modifications.each do |field|
+          unsets.update(field => true)
+        end
+      end
+
       private
 
       # Determines whether or not the provided field has a conflicting
@@ -104,6 +118,18 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def sets
         self["$set"] ||= {}
+      end
+
+      # Get the $unset operations or initialize a new one.
+      #
+      # @example Get the $unset operations.
+      #   modifiers.unsets
+      #
+      # @return [ Hash ] The $unset operations.
+      #
+      # @since 2.2.0
+      def unsets
+        self["$unset"] ||= {}
       end
     end
   end

@@ -142,6 +142,50 @@ describe Mongoid::NestedAttributes do
 
       context "when the relation is an embeds one" do
 
+        context "when the parent document is persisted" do
+
+          let(:person) do
+            Person.create(:ssn => "465-23-0789")
+          end
+
+          before do
+            Person.send(:undef_method, :name_attributes=)
+            Person.accepts_nested_attributes_for :name
+          end
+
+          after do
+            Person.send(:undef_method, :name_attributes=)
+            Person.accepts_nested_attributes_for :name
+          end
+
+          context "when setting the child attributes" do
+
+            before do
+              person.name_attributes = { :last_name => "Fischer" }
+            end
+
+            it "sets the child document" do
+              person.name.last_name.should eq("Fischer")
+            end
+
+            it "does not persist the child document" do
+              person.name.should_not be_persisted
+            end
+
+            context "when saving the parent" do
+
+              before do
+                person.save
+                person.reload
+              end
+
+              it "persists the child document" do
+                person.name.should be_persisted
+              end
+            end
+          end
+        end
+
         let(:person) do
           Person.new
         end
@@ -799,6 +843,54 @@ describe Mongoid::NestedAttributes do
       end
 
       context "when the relation is an embeds many" do
+
+        context "when the parent document is persisted" do
+
+          let(:person) do
+            Person.create(:ssn => "465-23-0789")
+          end
+
+          before do
+            Person.send(:undef_method, :addresses_attributes=)
+            Person.accepts_nested_attributes_for :addresses
+          end
+
+          after do
+            Person.send(:undef_method, :addresses_attributes=)
+            Person.accepts_nested_attributes_for :addresses
+          end
+
+          context "when setting the child attributes" do
+
+            let(:attributes) do
+              { "foo" => { "street" => "Maybachufer" } }
+            end
+
+            before do
+              person.addresses_attributes = attributes
+            end
+
+            it "sets the child documents" do
+              person.addresses.first.street.should eq("Maybachufer")
+            end
+
+            it "does not persist the child documents" do
+              person.addresses.first.should_not be_persisted
+            end
+
+            context "when saving the parent" do
+
+              before do
+                person.save
+                person.reload
+              end
+
+              it "saves the child documents" do
+                person.addresses.first.should be_persisted
+              end
+            end
+          end
+        end
 
         let(:person) do
           Person.new

@@ -68,7 +68,13 @@ describe Mongoid::Callbacks do
     context "when updating a document" do
 
       let(:person) do
-        Person.create.tap { |person| person.attributes = { :mode => :prevent_save, :title => "Associate", :addresses => [ address ] } }
+        Person.create.tap do |person|
+          person.attributes = {
+            :mode => :prevent_save,
+            :title => "Associate",
+            :addresses => [ address ]
+          }
+        end
       end
 
       after do
@@ -90,9 +96,9 @@ describe Mongoid::Callbacks do
         expect { person.save }.not_to change { person.changed? }
       end
 
-      it "child documents are not left dirty" do
+      it "child documents are left dirty" do
         address.should be_changed
-        expect { person.save }.to change { address.changed? }
+        expect { person.save }.not_to change { address.changed? }
       end
     end
   end

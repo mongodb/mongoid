@@ -6,6 +6,18 @@ module Mongoid #:nodoc:
   module Threaded
     extend self
 
+    # Begins a assigning block.
+    #
+    # @example Begin the assign.
+    #   Threaded.begin_assign
+    #
+    # @return [ true ] Always true.
+    #
+    # @since 2.1.9
+    def begin_assign
+      assign_stack.push(true)
+    end
+
     # Begins a binding block.
     #
     # @example Begin the bind.
@@ -30,7 +42,7 @@ module Mongoid #:nodoc:
       build_stack.push(true)
     end
 
-    # Begins a createing block.
+    # Begins a creating block.
     #
     # @example Begin the create.
     #   Threaded.begin_create
@@ -52,6 +64,18 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def begin_validate(document)
       validations_for(document.class).push(document.id)
+    end
+
+    # Is the current thread in assigning mode?
+    #
+    # @example Is the thread in assigning mode?
+    #   Threaded.assigning?
+    #
+    # @return [ true, false ] If the thread is in assigning mode?
+    #
+    # @since 2.1.0
+    def assigning?
+      !assign_stack.empty?
     end
 
     # Is the current thread in binding mode?
@@ -88,6 +112,19 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def creating?
       !create_stack.empty?
+    end
+
+    # Get the assign stack for the current thread. Is simply an array of calls
+    # to Mongoid's assigning method.
+    #
+    # @example Get the assign stack.
+    #   Threaded.assign_stack
+    #
+    # @return [ Array ] The array of assign calls.
+    #
+    # @since 2.1.9
+    def assign_stack
+      Thread.current[:"[mongoid]:assign-stack"] ||= []
     end
 
     # Get the bind stack for the current thread. Is simply an array of calls
@@ -139,6 +176,18 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def clear_safety_options!
       Thread.current[:"[mongoid]:safety-options"] = nil
+    end
+
+    # Exit the assigning block.
+    #
+    # @example Exit the assigning block.
+    #   Threaded.exit_assign
+    #
+    # @return [ true ] The last element in the stack.
+    #
+    # @since 2.1.9
+    def exit_assign
+      assign_stack.pop
     end
 
     # Exit the binding block.

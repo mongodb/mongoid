@@ -41,6 +41,7 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def atomic_updates
       Modifiers.new.tap do |mods|
+        mods.unset(atomic_unsets)
         mods.set(atomic_sets)
         _children.each do |child|
           mods.set(child.atomic_sets)
@@ -126,6 +127,10 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def atomic_sets
       updateable? ? setters : settable? ? { atomic_path => as_document } : {}
+    end
+
+    def atomic_unsets
+      @atomic_unsets ||= []
     end
 
     private

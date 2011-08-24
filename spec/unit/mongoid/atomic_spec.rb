@@ -2,7 +2,11 @@ require "spec_helper"
 
 describe Mongoid::Atomic do
 
-  describe "#atomi.atomic_updates" do
+  before do
+    Person.delete_all
+  end
+
+  describe "#atomic_updates" do
 
     context "when the document is persisted" do
 
@@ -106,6 +110,24 @@ describe Mongoid::Atomic do
                     "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
                   }
                 }
+            end
+          end
+
+          context "when an embedded child gets unset" do
+
+            before do
+              person.attributes = { :addresses => nil }
+            end
+
+            let(:updates) do
+              person.atomic_updates
+            end
+
+            it "returns the $set for the first level and $unset for other." do
+              updates.should eq({
+                "$unset" => { "addresses" => true },
+                "$set" => { "title" => "Sir" }
+              })
             end
           end
 

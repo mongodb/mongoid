@@ -41,6 +41,7 @@ module Mongoid #:nodoc:
       @_children = nil
       @previously_changed = changes
       @validated = false
+      atomic_unsets.clear
       changed_attributes.clear
     end
 
