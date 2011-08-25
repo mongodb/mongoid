@@ -110,7 +110,7 @@ module Mongoid # :nodoc:
             end
 
             define_method("#{name}?") do
-              !ivar(name).blank?
+              !send(name, :autobuild => false).blank?
             end
           end
         end

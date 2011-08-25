@@ -309,6 +309,10 @@ describe Mongoid::Relations::Accessors do
           )
         end
 
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
         context "when it is a one relation" do
 
           it "returns true" do
@@ -320,6 +324,13 @@ describe Mongoid::Relations::Accessors do
 
           it "returns true" do
             person.addresses?.should == true
+          end
+        end
+
+        context "when it has been retrieved from the database" do
+
+          it "returns true" do
+            from_db.passport?.should == true
           end
         end
       end
