@@ -27,6 +27,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rspec", ["~> 2.6"])
   s.add_development_dependency("watchr", ["~> 0.6"])
 
-  s.files        = Dir.glob("lib/**/*") + %w(LICENSE README.rdoc Rakefile)
+  s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.require_path = 'lib'
 end
