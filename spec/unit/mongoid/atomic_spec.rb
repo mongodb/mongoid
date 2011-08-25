@@ -106,8 +106,10 @@ describe Mongoid::Atomic do
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
                   },
-                  :other => {
-                    "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
+                  :conflicts => {
+                    "$pushAll" => {
+                      "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
+                    }
                   }
                 }
             end
@@ -148,15 +150,17 @@ describe Mongoid::Atomic do
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
                   },
-                  :other => {
-                    "addresses" => [{
-                      "_id" => new_address.id,
-                      "street" => "Another",
-                      "locations" => [
-                        "_id" => location.id,
-                        "name" => "Home"
-                      ]
-                    }]
+                  :conflicts => {
+                    "$pushAll" => {
+                      "addresses" => [{
+                        "_id" => new_address.id,
+                        "street" => "Another",
+                        "locations" => [
+                          "_id" => location.id,
+                          "name" => "Home"
+                        ]
+                      }]
+                    }
                   }
                 }
             end

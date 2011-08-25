@@ -43,7 +43,9 @@ module Mongoid #:nodoc:
           prepare do
             unless updates.empty?
               collection.update(selector, updates, options)
-              collection.update(selector, conflicts, options) if conflicts
+              conflicts.each_pair do |key, value|
+                collection.update(selector, { key => value }, options)
+              end
             end
           end
         end

@@ -12,13 +12,12 @@ module Mongoid # :nodoc:
           # the existing relation, a replacement of the relation with a new
           # document, or a removal of the relation.
           #
-          # Example:
+          # @example Build the nested attrs.
+          #   many.build(person)
           #
-          # <tt>many.build(person)</tt>
+          # @param [ Document ] parent The parent document of the relation.
           #
-          # Options:
-          #
-          # parent: The parent document of the relation.
+          # @return [ Array ] The attributes.
           def build(parent)
             @existing = parent.send(metadata.name)
             if over_limit?(attributes)
@@ -36,19 +35,12 @@ module Mongoid # :nodoc:
           # Create the new builder for nested attributes on one-to-many
           # relations.
           #
-          # Example:
+          # @example Initialize the builder.
+          #   One.new(metadata, attributes, options)
           #
-          # <tt>One.new(metadata, attributes, options)</tt>
-          #
-          # Options:
-          #
-          # metadata: The relation metadata
-          # attributes: The attributes hash to attempt to set.
-          # options: The options defined.
-          #
-          # Returns:
-          #
-          # A new builder.
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes hash to attempt to set.
+          # @param [ Hash ] options The options defined.
           def initialize(metadata, attributes, options = {})
             if attributes.respond_to?(:with_indifferent_access)
               @attributes = attributes.with_indifferent_access.sort do |a, b|
@@ -65,17 +57,12 @@ module Mongoid # :nodoc:
 
           # Can the existing relation potentially be deleted?
           #
-          # Example:
+          # @example Is the document destroyable?
+          #   destroyable?({ :_destroy => "1" })
           #
-          # <tt>destroyable?({ :_destroy => "1" })</tt>
+          # @parma [ Hash ] attributes The attributes to pull the flag from.
           #
-          # Options:
-          #
-          # attributes: The attributes to pull the flag from.
-          #
-          # Returns:
-          #
-          # True if the relation can potentially be deleted.
+          # @return [ true, false ] If the relation can potentially be deleted.
           def destroyable?(attributes)
             destroy = attributes.delete(:_destroy)
             [ 1, "1", true, "true" ].include?(destroy) && allow_destroy?
@@ -84,17 +71,12 @@ module Mongoid # :nodoc:
           # Are the supplied attributes of greater number than the supplied
           # limit?
           #
-          # Example:
+          # @example Are we over the set limit?
+          #   builder.over_limit?({ "street" => "Bond" })
           #
-          # <tt>builder.over_limit?({ "street" => "Bond" })</tt>
+          # @param [ Hash ] attributes The attributes being set.
           #
-          # Options:
-          #
-          # attributes: The attributes being set.
-          #
-          # Returns:
-          #
-          # True if a limit supplied and the attributes are of greater number.
+          # @return [ true, false ] If the attributes exceed the limit.
           def over_limit?(attributes)
             limit = options[:limit]
             limit ? attributes.size > limit : false
@@ -103,20 +85,21 @@ module Mongoid # :nodoc:
           # Process each set of attributes one at a time for each potential
           # new, existing, or ignored document.
           #
-          # Example:
+          # @example Process the attributes
+          #   builder.process({ "id" => 1, "street" => "Bond" })
           #
-          # <tt>builder.process({ "id" => 1, "street" => "Bond" })
-          #
-          # Options:
-          #
-          # attrs: The single document attributes to process.
+          # @param [ Hash ] attrs The single document attributes to process.
           def process(attrs)
             return if reject?(attrs)
             if id = attrs["id"] || attrs["_id"]
-              document = existing.find(convert_id(id))
-              destroyable?(attrs) ? existing.delete(document) : document.update_attributes(attrs)
+              doc = existing.find(convert_id(id))
+              if destroyable?(attrs)
+                existing.delete(doc)
+              else
+                metadata.embedded? ? doc.attributes = attrs : doc.update_attributes(attrs)
+              end
             else
-              existing.push(Mongoid::Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
+              existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
             end
           end
         end

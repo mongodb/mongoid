@@ -150,7 +150,7 @@ describe Mongoid::NestedAttributes do
 
           before do
             Person.send(:undef_method, :name_attributes=)
-            Person.accepts_nested_attributes_for :name
+            Person.accepts_nested_attributes_for :name, :allow_destroy => true
           end
 
           after do
@@ -1136,19 +1136,56 @@ describe Mongoid::NestedAttributes do
                         persisted.addresses_attributes =
                           {
                             "bar" => { "id" => address_one.id, "_destroy" => truth },
-                            "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
+                            "foo" => { "id" => address_two.id, "street" => "Alexander Platz" },
+                            "baz" => { "street" => "Potsdammer Platz" }
                           }
-                        persisted.save
                       end
 
-                      it "deletes the marked document" do
-                        persisted.reload.addresses.count.should eq(1)
+                      it "removes the first document from the relation" do
+                        persisted.addresses.size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        persisted.reload.addresses.first.street.should eq(
+                        persisted.addresses.first.street.should eq(
                           "Alexander Platz"
                         )
+                      end
+
+                      it "adds the new document to the relation" do
+                        persisted.addresses.last.street.should eq(
+                          "Potsdammer Platz"
+                        )
+                      end
+
+                      it "has the proper persisted count" do
+                        persisted.addresses.count.should eq(1)
+                      end
+
+                      it "does not delete the removed document" do
+                        address_one.should_not be_destroyed
+                      end
+
+                      context "when saving the parent" do
+
+                        before do
+                          persisted.safely.save
+                        end
+
+                        it "deletes the marked document from the relation" do
+                          persisted.reload.addresses.count.should eq(2)
+                        end
+
+                        it "does not delete the unmarked document" do
+                          persisted.reload.addresses.first.street.should eq(
+                            "Alexander Platz"
+                          )
+                        end
+
+                        it "persists the new document to the relation" do
+                          persisted.reload.addresses.last.street.should eq(
+                            "Potsdammer Platz"
+                          )
+                        end
                       end
                     end
                   end

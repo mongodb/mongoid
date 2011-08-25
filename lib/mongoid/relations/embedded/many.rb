@@ -124,7 +124,13 @@ module Mongoid # :nodoc:
         def delete(document)
           target.delete_one(document).tap do |doc|
             if doc && !binding?
-              doc.delete(:suppress => true)
+              if assigning?
+                # @todo: Durran: Add atomic pulls to the modifiers, will
+                # probably need to incorporate conflicting mods as well.
+                base.add_atomic_pull(doc)
+              else
+                doc.delete(:suppress => true)
+              end
               unbind_one(doc)
             end
             reindex
