@@ -28,6 +28,7 @@ module Mongoid #:nodoc:
         :drop,
         :drop_index,
         :drop_indexes,
+        :find_and_modify,
         :insert,
         :remove,
         :rename,
