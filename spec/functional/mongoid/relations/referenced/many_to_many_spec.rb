@@ -224,7 +224,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           let(:exhibitor) do
-            Exhibitor.create(exhibition: exhibition)
+            Exhibitor.create(:exhibition => exhibition)
           end
 
           before do
