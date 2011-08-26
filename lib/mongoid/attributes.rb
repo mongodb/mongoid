@@ -25,6 +25,7 @@ module Mongoid #:nodoc:
       attribute = read_attribute(name)
       ! attribute.blank? || attribute == false
     end
+    alias :has_attribute? :attribute_present?
 
     # Read a value from the document attributes. If the value does not exist
     # it will return nil.
