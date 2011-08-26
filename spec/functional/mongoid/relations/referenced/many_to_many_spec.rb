@@ -7,8 +7,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference, Event, Tag,
-      UserAccount, Agent, Account, Business, User ].map(&:delete_all)
+    [
+      Person, Preference, Event, Tag,
+      UserAccount, Agent, Account, Business, User,
+      Artwork, Exhibition, Exhibitor
+    ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -207,6 +210,29 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             it "sets the inverse side of the relation" do
               loaded_event.administrators.should == [ person ]
             end
+          end
+        end
+
+        context "when the relation also includes a has_many relation" do
+
+          let(:artwork) do
+            Artwork.create
+          end
+
+          let(:exhibition) do
+            Exhibition.create
+          end
+
+          let(:exhibitor) do
+            Exhibitor.create(exhibition: exhibition)
+          end
+
+          before do
+            artwork.exhibitors << exhibitor
+          end
+
+          it "creates a single artwork object" do
+            Artwork.count.should == 1
           end
         end
 
