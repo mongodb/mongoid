@@ -1127,7 +1127,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "deletes the document from the relation" do
-            # @todo: Durran: 
+            # @todo: Durran:
             reloaded.related.should be_empty
           end
 
@@ -1809,6 +1809,39 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         it "returns the total number of documents" do
           person.preferences.send(method).should == 2
         end
+      end
+    end
+  end
+
+  context "when setting the ids directly after the documents" do
+
+    let!(:person) do
+      Person.create!(:ssn => "132-11-1433", :title => "The Boss")
+    end
+
+    let!(:girlfriend_house) do
+      House.create!(:name => "Girlfriend")
+    end
+
+    let!(:wife_house) do
+      House.create!(:name => "Wife")
+    end
+
+    let!(:exwife_house) do
+      House.create!(:name => "Ex-Wife")
+    end
+
+    before do
+      person.update_attributes(
+        :houses => [ wife_house, exwife_house, girlfriend_house ]
+      )
+      person.update_attributes(:house_ids => [ girlfriend_house.id ])
+    end
+
+    context "when reloading" do
+
+      it "properly sets the references" do
+        person.houses(true).should eq([ girlfriend_house ])
       end
     end
   end
