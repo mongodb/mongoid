@@ -17,6 +17,47 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * Capped collections can be created by passing the options to the `#store_in`
   macro: `Person.store_in :people, capped: true, max: 1000000`
 
+* Mongoid::Collection now supports `collection.find_and_modify`
+
+* `Document#has_attribute?` now aliases to `Document#attribute_present?`
+
+* \#930 You can now turn off the Mongoid logger via the mongoid.yml by
+doing `logger: false`
+
+* \#909 We now raise a `Mongoid::Errors::Callback` exception if persisting with
+a bang method and a callback returns false, instead of the uninformative
+validations error from before.
+
+### Major Changes
+
+* \#1173 has_many relations no longer delete all documents on a set of the relation
+ (= [ doc_one, doc_two ]) but look to the dependent option to determine what
+ behaviour should occur. :delete and :destroy will behave as before, :nullify and
+ no option specified will both nullify the old documents without deleting.
+
+* \#1142, \#767 Embedded relations no longer immediately persist atomically
+when accessed via a parent attributes set. This includes nested attributes setting
+and `attributes=` or `write_attributes`. The child changes then remain dirty and
+atomically update when save is called on them or the parent document.
+
+### Resolved Issues
+
+* \#1190 Fixed the gemspec errors due to changing README and CHANGELOG to markdown.
+
+* \#1180, \#1084, \#955 Mongoid now checks the field types rather than if the name
+contains `/id/` when trying to convert to object ids on criteria.
+
+* \#1176 Enumerable targets should always return the in memory documents first,
+when calling `#first`
+
+* \#1175 Make sure both sides of many to many relations are in sync during a create.
+
+* \#1172 Referenced enumerable relations now properly handle `#to_json`
+(Daniel Doubrovkine)
+
+* \#1040 Increased performance of class load times by removing all delegate calls
+to self.class.
+
 ## 2.1.9
 
 ### Resolved Issues
