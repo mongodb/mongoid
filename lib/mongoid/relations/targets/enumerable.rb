@@ -189,7 +189,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def first
-          (loaded? ? loaded.first : unloaded.first) || added.first
+          added.first || (loaded? ? loaded.first : unloaded.first)
         end
 
         # Initialize the new enumerable either with a criteria or an array.
