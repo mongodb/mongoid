@@ -245,10 +245,14 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def purge
-          criteria.delete_all
-          target.clear do |doc|
-            unbind_one(doc)
-            doc.destroyed = true
+          unless metadata.destructive?
+            nullify
+          else
+            criteria.delete_all
+            target.clear do |doc|
+              unbind_one(doc)
+              doc.destroyed = true
+            end
           end
         end
         alias :clear :purge

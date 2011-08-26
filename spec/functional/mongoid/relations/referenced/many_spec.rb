@@ -380,29 +380,60 @@ describe Mongoid::Relations::Referenced::Many do
           Person.create(:ssn => "437-11-1112")
         end
 
-        let(:post) do
-          Post.new
+        context "when dependent is destructive" do
+
+          let(:post) do
+            Post.new
+          end
+
+          before do
+            person.posts = [ post ]
+            person.posts = nil
+          end
+
+          it "sets the relation to empty" do
+            person.posts.should be_empty
+          end
+
+          it "removed the inverse relation" do
+            post.person.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            post.person_id.should be_nil
+          end
+
+          it "deletes the target from the database" do
+            post.should be_destroyed
+          end
         end
 
-        before do
-          person.posts = [ post ]
-          person.posts = nil
-        end
+        context "when dependent is not destructive" do
 
-        it "sets the relation to empty" do
-          person.posts.should be_empty
-        end
+          let(:drug) do
+            Drug.new(:name => "Oxycodone")
+          end
 
-        it "removed the inverse relation" do
-          post.person.should be_nil
-        end
+          before do
+            person.drugs = [ drug ]
+            person.drugs = nil
+          end
 
-        it "removes the foreign key value" do
-          post.person_id.should be_nil
-        end
+          it "sets the relation to empty" do
+            person.drugs.should be_empty
+          end
 
-        it "deletes the target from the database" do
-          post.should be_destroyed
+          it "removed the inverse relation" do
+            drug.person.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            drug.person_id.should be_nil
+          end
+
+          it "nullifies the relation" do
+            drug.should_not be_destroyed
+          end
         end
       end
     end
@@ -464,8 +495,11 @@ describe Mongoid::Relations::Referenced::Many do
           rating.ratable_id.should be_nil
         end
 
-        it "deletes the target from the database" do
-          rating.should be_destroyed
+        context "when dependent is nullify" do
+
+          it "does not delete the target from the database" do
+            rating.should_not be_destroyed
+          end
         end
       end
     end
@@ -737,8 +771,8 @@ describe Mongoid::Relations::Referenced::Many do
             movie.ratings.should be_empty
           end
 
-          it "marks the documents as deleted" do
-            rating.should be_destroyed
+          it "handles the proper dependent strategy" do
+            rating.should_not be_destroyed
           end
 
           it "deletes the documents from the db" do
