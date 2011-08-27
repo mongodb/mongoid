@@ -137,7 +137,9 @@ module Mongoid # :nodoc:
           def eager_load(metadata, criteria)
             metadata.klass.any_in(
               metadata.foreign_key =>
-                criteria.only(:_id).map { |doc| doc.id }.uniq
+                criteria.klass.collection.driver.find(
+                  criteria.selector, { :fields => { :_id => 1 }}
+                ).map { |doc| doc["_id"] }.uniq
             ).each do |doc|
               IdentityMap.set_one(
                 doc,

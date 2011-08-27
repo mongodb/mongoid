@@ -205,6 +205,341 @@ describe Mongoid::Criterion::Inclusion do
     end
   end
 
+  describe "#includes" do
+
+    before(:all) do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after(:all) do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when including a has many" do
+
+      let(:driver) do
+        stub
+      end
+
+      let(:collection) do
+        stub(:driver => driver)
+      end
+
+      let(:post_collection) do
+        stub
+      end
+
+      before do
+        Person.stubs(:collection).returns(collection)
+        Post.stubs(:collection).returns(post_collection)
+      end
+
+      context "when the includes is the first call" do
+
+        let(:criteria) do
+          base.includes(:posts)
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new(:person_id => person.id)
+        end
+
+        let(:fields) do
+          { :fields => { :_id => 1 }}
+        end
+
+        let(:ids) do
+          [{ "_id" => person.id }]
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap
+        end
+
+        before do
+          driver.expects(:find).with({}, fields).returns(ids)
+          collection.expects(:find).with({}, {}).returns([ person ])
+          post_collection.expects(:find).with(
+            { "person_id" => { "$in" => [ person.id ] }}, {}
+          ).returns([ post ])
+        end
+
+        it "returns the documents" do
+          criteria.entries.should eq([ person ])
+        end
+
+        it "puts the related documents in the identity map" do
+          criteria.entries
+          map[Post][{"person_id" => person.id}].should eq([ post ])
+        end
+      end
+
+      context "when the includes is not the last call" do
+
+        let(:criteria) do
+          base.includes(:posts).all
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new(:person_id => person.id)
+        end
+
+        let(:fields) do
+          { :fields => { :_id => 1 }}
+        end
+
+        let(:ids) do
+          [{ "_id" => person.id }]
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap
+        end
+
+        before do
+          driver.expects(:find).with({}, fields).returns(ids)
+          collection.expects(:find).with({}, {}).returns([ person ])
+          post_collection.expects(:find).with(
+            { "person_id" => { "$in" => [ person.id ] }}, {}
+          ).returns([ post ])
+        end
+
+        it "returns the documents" do
+          criteria.entries.should eq([ person ])
+        end
+
+        it "puts the related documents in the identity map" do
+          criteria.entries
+          map[Post][{"person_id" => person.id}].should eq([ post ])
+        end
+      end
+    end
+
+    context "when including a has one" do
+
+      let(:driver) do
+        stub
+      end
+
+      let(:collection) do
+        stub(:driver => driver)
+      end
+
+      let(:game_collection) do
+        stub
+      end
+
+      before do
+        Person.stubs(:collection).returns(collection)
+        Game.stubs(:collection).returns(game_collection)
+      end
+
+      context "when the includes is the first call" do
+
+        let(:criteria) do
+          base.includes(:game)
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:game) do
+          Game.new(:person_id => person.id)
+        end
+
+        let(:fields) do
+          { :fields => { :_id => 1 }}
+        end
+
+        let(:ids) do
+          [{ "_id" => person.id }]
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap
+        end
+
+        before do
+          driver.expects(:find).with({}, fields).returns(ids)
+          collection.expects(:find).with({}, {}).returns([ person ])
+          game_collection.expects(:find).with(
+            { "person_id" => { "$in" => [ person.id ] }}, {}
+          ).returns([ game ])
+        end
+
+        it "returns the documents" do
+          criteria.entries.should eq([ person ])
+        end
+
+        it "puts the related documents in the identity map" do
+          criteria.entries
+          map[Game][{"person_id" => person.id}].should eq(game)
+        end
+      end
+
+      context "when the includes is not the last call" do
+
+        let(:criteria) do
+          base.includes(:game).all
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:game) do
+          Game.new(:person_id => person.id)
+        end
+
+        let(:fields) do
+          { :fields => { :_id => 1 }}
+        end
+
+        let(:ids) do
+          [{ "_id" => person.id }]
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap
+        end
+
+        before do
+          driver.expects(:find).with({}, fields).returns(ids)
+          collection.expects(:find).with({}, {}).returns([ person ])
+          game_collection.expects(:find).with(
+            { "person_id" => { "$in" => [ person.id ] }}, {}
+          ).returns([ game ])
+        end
+
+        it "returns the documents" do
+          criteria.entries.should eq([ person ])
+        end
+
+        it "puts the related documents in the identity map" do
+          criteria.entries
+          map[Game][{"person_id" => person.id}].should eq(game)
+        end
+      end
+    end
+
+    context "when including a belongs to" do
+
+      let(:driver) do
+        stub
+      end
+
+      let(:collection) do
+        stub
+      end
+
+      let(:game_collection) do
+        stub(:driver => driver)
+      end
+
+      before do
+        Game.stubs(:collection).returns(game_collection)
+        Person.stubs(:collection).returns(collection)
+      end
+
+      context "when the includes is the first call" do
+
+        let(:criteria) do
+          Mongoid::Criteria.new(Game).includes(:person)
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:game) do
+          Game.new(:person_id => person.id)
+        end
+
+        let(:fields) do
+          { :fields => { "person_id" => 1 }}
+        end
+
+        let(:ids) do
+          [{ "person_id" => person.id }]
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap
+        end
+
+        before do
+          driver.expects(:find).with({}, fields).returns(ids)
+          game_collection.expects(:find).with({}, {}).returns([ game ])
+          collection.expects(:find).with(
+            { "_id" => { "$in" => [ person.id ] }}, {}
+          ).returns([ person ])
+        end
+
+        it "returns the documents" do
+          criteria.entries.should eq([ game ])
+        end
+
+        it "puts the related documents in the identity map" do
+          criteria.entries
+          map[Person][person.id].should eq(person)
+        end
+      end
+
+      context "when the includes is not the last call" do
+
+        let(:criteria) do
+          Mongoid::Criteria.new(Game).includes(:person).all
+        end
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:game) do
+          Game.new(:person_id => person.id)
+        end
+
+        let(:fields) do
+          { :fields => { "person_id" => 1 }}
+        end
+
+        let(:ids) do
+          [{ "person_id" => person.id }]
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap
+        end
+
+        before do
+          driver.expects(:find).with({}, fields).returns(ids)
+          game_collection.expects(:find).with({}, {}).returns([ game ])
+          collection.expects(:find).with(
+            { "_id" => { "$in" => [ person.id ] }}, {}
+          ).returns([ person ])
+        end
+
+        it "returns the documents" do
+          criteria.entries.should eq([ game ])
+        end
+
+        it "puts the related documents in the identity map" do
+          criteria.entries
+          map[Person][person.id].should eq(person)
+        end
+      end
+    end
+  end
+
   describe "#near" do
 
     let(:criteria) do

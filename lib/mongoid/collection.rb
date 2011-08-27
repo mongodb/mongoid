@@ -17,6 +17,18 @@ module Mongoid #:nodoc
     #   collection.save({ :name => "Al" })
     delegate *(Collections::Operations::PROXIED.dup << {:to => :master})
 
+    # Get the unwrapped driver collection for this mongoid collection.
+    #
+    # @example Get the driver collection.
+    #   collection.driver
+    #
+    # @return [ Mongo::Collection ] The driver collection.
+    #
+    # @since 2.2.0
+    def driver
+      master.collection
+    end
+
     # Find documents from the database given a selector and options.
     #
     # @example Find documents in the collection.

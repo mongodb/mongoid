@@ -123,11 +123,13 @@ module Mongoid # :nodoc:
           # @since 2.2.0
           def eager_load(metadata, criteria)
             metadata.klass.any_in(
-              :_id =>
-                criteria.only(metadata.foreign_key).map do |doc|
-                  doc.send(metadata.foreign_key)
-                end.uniq
-            ).entries
+              "_id" =>
+                criteria.klass.collection.driver.find(
+                  criteria.selector, { :fields => { metadata.foreign_key => 1 }}
+                ).map { |doc| doc[metadata.foreign_key] }.uniq
+            ).each do |doc|
+              IdentityMap.set(doc)
+            end
           end
 
           # Returns true if the relation is an embedded one. In this case
