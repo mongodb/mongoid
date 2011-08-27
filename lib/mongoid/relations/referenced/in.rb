@@ -122,12 +122,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.2.0
           def eager_load(metadata, criteria)
-            metadata.klass.any_in(
-              "_id" =>
-                criteria.klass.collection.driver.find(
-                  criteria.selector, { :fields => { metadata.foreign_key => 1 }}
-                ).map { |doc| doc[metadata.foreign_key] }.uniq
-            ).each do |doc|
+            klass, foreign_key = metadata.klass, metadata.foreign_key
+            klass.any_in("_id" => criteria.load_ids(foreign_key)).each do |doc|
               IdentityMap.set(doc)
             end
           end

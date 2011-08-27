@@ -249,7 +249,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let(:fields) do
-          { :fields => { :_id => 1 }}
+          { :fields => { "_id" => 1 }}
         end
 
         let(:ids) do
@@ -293,7 +293,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let(:fields) do
-          { :fields => { :_id => 1 }}
+          { :fields => { "_id" => 1 }}
         end
 
         let(:ids) do
@@ -357,7 +357,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let(:fields) do
-          { :fields => { :_id => 1 }}
+          { :fields => { "_id" => 1 }}
         end
 
         let(:ids) do
@@ -401,7 +401,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let(:fields) do
-          { :fields => { :_id => 1 }}
+          { :fields => { "_id" => 1 }}
         end
 
         let(:ids) do

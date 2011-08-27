@@ -73,6 +73,23 @@ module Mongoid #:nodoc:
       end
       alias :or :any_of
 
+      # Loads an array of ids only for the current criteria. Used by eager
+      # loading to determine the documents to load.
+      #
+      # @example Load the related ids.
+      #   criteria.load_ids("person_id")
+      #
+      # @param [ String ] key The id or foriegn key string.
+      #
+      # @return [ Array<String, BSON::ObjectId> ] The ids to load.
+      #
+      # @since 2.2.0
+      def load_ids(key)
+        klass.collection.driver.find(
+          selector, { :fields => { key => 1 }}
+        ).map { |doc| doc[key] }.uniq
+      end
+
       # Find the matchind document in the criteria, either based on id or
       # conditions.
       #
