@@ -142,7 +142,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def nullify
           criteria.pull(metadata.inverse_foreign_key, base.id)
-          unless base.destroyed?
+          if persistable?
             base.set(
               metadata.foreign_key,
               base.send(metadata.foreign_key).clear
