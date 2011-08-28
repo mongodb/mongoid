@@ -41,7 +41,7 @@ module Mongoid # :nodoc:
           tap do |proxy|
             proxy.unbind_one
             unless replacement
-              base.delete unless binding?
+              base.delete if persistable?
               return nil
             end
             base.new_record = true
