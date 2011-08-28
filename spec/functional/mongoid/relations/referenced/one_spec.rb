@@ -549,32 +549,74 @@ describe Mongoid::Relations::Referenced::One do
       Mongoid.identity_map_enabled = false
     end
 
-    let!(:person) do
-      Person.create(:ssn => "243-12-5243")
+    context "when the relation is not polymorphic" do
+
+      let!(:person) do
+        Person.create(:ssn => "243-12-5243")
+      end
+
+      let!(:game) do
+        person.create_game(:name => "Tron")
+      end
+
+      let(:metadata) do
+        Person.relations["game"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Person.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Game, "person_id" => person.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq(game)
+      end
     end
 
-    let!(:game) do
-      person.create_game(:name => "Tron")
-    end
+    context "when the relation is polymorphic" do
 
-    let(:metadata) do
-      Person.relations["game"]
-    end
+      let!(:book) do
+        Book.create(:name => "Game of Thrones")
+      end
 
-    let!(:eager) do
-      described_class.eager_load(metadata, Person.all)
-    end
+      let!(:movie) do
+        Movie.create(:name => "Bladerunner")
+      end
 
-    let(:map) do
-      Mongoid::IdentityMap.get(Game, "person_id" => person.id)
-    end
+      let!(:movie_rating) do
+        movie.ratings.create(:value => 10)
+      end
 
-    it "returns the appropriate criteria" do
-      eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
-    end
+      let!(:book_rating) do
+        book.create_rating(:value => 10)
+      end
 
-    it "puts the documents in the identity map" do
-      map.should eq(game)
+      let(:metadata) do
+        Book.relations["rating"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Book.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Rating, "ratable_id" => book.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "ratable_id" => { "$in" => [ book.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq(book_rating)
+      end
     end
   end
 

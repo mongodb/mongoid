@@ -1354,32 +1354,74 @@ describe Mongoid::Relations::Referenced::Many do
       Mongoid.identity_map_enabled = false
     end
 
-    let!(:person) do
-      Person.create(:ssn => "243-12-5243")
+    context "when the relation is not polymorphic" do
+
+      let!(:person) do
+        Person.create(:ssn => "243-12-5243")
+      end
+
+      let!(:post) do
+        person.posts.create(:title => "testing")
+      end
+
+      let(:metadata) do
+        Person.relations["posts"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Person.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Post, "person_id" => person.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq([ post ])
+      end
     end
 
-    let!(:post) do
-      person.posts.create(:title => "testing")
-    end
+    context "when the relation is polymorphic" do
 
-    let(:metadata) do
-      Person.relations["posts"]
-    end
+      let!(:movie) do
+        Movie.create(:name => "Bladerunner")
+      end
 
-    let!(:eager) do
-      described_class.eager_load(metadata, Person.all)
-    end
+      let!(:book) do
+        Book.create(:name => "Game of Thrones")
+      end
 
-    let(:map) do
-      Mongoid::IdentityMap.get(Post, "person_id" => person.id)
-    end
+      let!(:movie_rating) do
+        movie.ratings.create(:value => 10)
+      end
 
-    it "returns the appropriate criteria" do
-      eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
-    end
+      let!(:book_rating) do
+        book.create_rating(:value => 10)
+      end
 
-    it "puts the documents in the identity map" do
-      map.should eq([ post ])
+      let(:metadata) do
+        Movie.relations["ratings"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Movie.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Rating, "ratable_id" => movie.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "ratable_id" => { "$in" => [ movie.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq([ movie_rating ])
+      end
     end
   end
 
