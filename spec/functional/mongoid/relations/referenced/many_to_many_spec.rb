@@ -1278,7 +1278,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     it "raises an error" do
       expect {
         described_class.eager_load(metadata, Person.all)
-      }.to raise_error
+      }.to raise_error(Mongoid::Errors::EagerLoad)
     end
   end
 

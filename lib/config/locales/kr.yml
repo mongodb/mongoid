@@ -8,6 +8,9 @@ kr:
           "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           클라스 %{klass}와 id를 %{identifiers} 위한 문서를 찾을수 없습니다.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          relation."
         invalid_database:
           데이타베이스가 Mongo::DB이어야 합니다, %{name}이면 안됩니다.
         invalid_type:

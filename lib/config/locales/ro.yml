@@ -8,6 +8,9 @@ ro:
           "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Nu există document în clasa %{klass} cu id %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          relation."
         invalid_database:
           Baza de date ar trebui să fie de tipul Mongo::DB, nu %{name}.
         invalid_type:

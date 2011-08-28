@@ -245,9 +245,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.2.0
           def eager_load(metadata, criteria)
-            raise RuntimeError.new(
-              "Eager loading many-to-many relations is not supported."
-            )
+            raise Errors::EagerLoad.new(metadata.name)
           end
 
           # Returns true if the relation is an embedded one. In this case
