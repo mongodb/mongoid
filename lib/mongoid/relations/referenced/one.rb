@@ -136,7 +136,7 @@ module Mongoid # :nodoc:
           # @since 2.2.0
           def eager_load(metadata, criteria)
             klass, foreign_key = metadata.klass, metadata.foreign_key
-            klass.any_in(foreign_key => criteria.load_ids("_id")).each do |doc|
+            klass.any_in(foreign_key => criteria.load_ids("_id").uniq).each do |doc|
               IdentityMap.set_one(doc, foreign_key => doc.send(foreign_key))
             end
           end
