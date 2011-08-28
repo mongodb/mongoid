@@ -616,28 +616,44 @@ describe Mongoid::Relations::Referenced::In do
       Mongoid.identity_map_enabled = false
     end
 
-    let!(:person) do
-      Person.create(:ssn => "243-12-5243")
+    context "when the relation is not polymorphic" do
+
+      let!(:person) do
+        Person.create(:ssn => "243-12-5243")
+      end
+
+      let!(:post) do
+        person.posts.create(:title => "testing")
+      end
+
+      let(:metadata) do
+        Post.relations["person"]
+      end
+
+      let(:eager) do
+        described_class.eager_load(metadata, Post.all)
+      end
+
+      let!(:map) do
+        Mongoid::IdentityMap.get(Person, person.id)
+      end
+
+      it "puts the document in the identity map" do
+        map.should eq(person)
+      end
     end
 
-    let!(:post) do
-      person.posts.create(:title => "testing")
-    end
+    context "when the relation is polymorphic" do
 
-    let(:metadata) do
-      Post.relations["person"]
-    end
+      let(:metadata) do
+        Rating.relations["ratable"]
+      end
 
-    let(:eager) do
-      described_class.eager_load(metadata, Post.all)
-    end
-
-    let!(:map) do
-      Mongoid::IdentityMap.get(Person, person.id)
-    end
-
-    it "puts the document in the identity map" do
-      map.should eq(person)
+      it "raises an error" do
+        expect {
+          described_class.eager_load(metadata, Rating.all)
+        }.to raise_error(Mongoid::Errors::EagerLoad)
+      end
     end
   end
 

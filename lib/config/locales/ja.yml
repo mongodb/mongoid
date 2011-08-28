@@ -10,7 +10,7 @@ ja:
           次のDocumentは見つかりませんでした。class %{klass} with id(s) %{identifiers}
         eager_load:
           "Eager loading :%{name} is not supported due to it being a many-to-many
-          relation."
+          or polymorphic belongs_to relation."
         invalid_database:
           次のDatabaseは利用できませんでした。%{name}
         invalid_type:

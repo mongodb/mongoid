@@ -10,7 +10,7 @@ ru:
           Документ класса %{klass} с id %{identifiers} не найден.
         eager_load:
           "Eager loading :%{name} is not supported due to it being a many-to-many
-          relation."
+          or polymorphic belongs_to relation."
         invalid_database:
           База данных должна быть Mongo::DB, а не %{name}.
         invalid_type:
