@@ -10,30 +10,14 @@ module Mongoid #:nodoc:
     #   map.get(Person, id)
     #
     # @param [ Class ] klass The class of the document.
-    # @param [ Object ] id The document id.
+    # @param [ Object, Hash ] idenfier The document id or selector.
     #
     # @return [ Document ] The matching document.
     #
     # @since 2.1.0
-    def get(klass, id)
+    def get(klass, identifier)
       return nil unless Mongoid.identity_map_enabled?
-      documents_for(klass)[id]
-    end
-
-    # Get a single document that matches the provided criteria.
-    #
-    # @example Get the document for the criteria.
-    #   map.match(Person, :id => id)
-    #
-    # @param [ Class ] klass The class of the documents.
-    # @param [ Hash ] selector The selector to match.
-    #
-    # @return [ <Array>Document ] The matching documents.
-    #
-    # @since 2.2.0
-    def get_selector(klass, selector)
-      return nil unless Mongoid.identity_map_enabled?
-      documents_for(klass)[selector]
+      documents_for(klass)[identifier]
     end
 
     # Remove the document from the identity map.

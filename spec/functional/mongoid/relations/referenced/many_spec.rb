@@ -1371,7 +1371,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     let(:map) do
-      Mongoid::IdentityMap.get_selector(Post, "person_id" => person.id)
+      Mongoid::IdentityMap.get(Post, "person_id" => person.id)
     end
 
     it "returns the appropriate criteria" do

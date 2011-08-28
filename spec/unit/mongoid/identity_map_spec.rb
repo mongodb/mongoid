@@ -50,33 +50,74 @@ describe Mongoid::IdentityMap do
 
   describe "#get" do
 
-    let(:document) do
+    let!(:person) do
       Person.new
     end
 
-    context "when the document exists in the identity map" do
+    context "when getting by id" do
 
-      before do
-        identity_map.set(document)
+      context "when the document exists in the identity map" do
+
+        before do
+          identity_map.set(person)
+        end
+
+        let(:get) do
+          identity_map.get(Person, person.id)
+        end
+
+        it "returns the matching person" do
+          get.should eq(person)
+        end
       end
 
-      let(:get) do
-        identity_map.get(Person, document.id)
-      end
+      context "when the person does not exist in the map" do
 
-      it "returns the matching document" do
-        get.should eq(document)
+        let(:get) do
+          identity_map.get(Person, person.id)
+        end
+
+        it "returns nil" do
+          get.should be_nil
+        end
       end
     end
 
-    context "when the document does not exist in the map" do
+    context "when getting by selector" do
 
-      let(:get) do
-        identity_map.get(Person, document.id)
+      let!(:post_one) do
+        Post.new(:person => person)
       end
 
-      it "returns nil" do
-        get.should be_nil
+      let!(:post_two) do
+        Post.new(:person => person)
+      end
+
+      context "when there are documents in the map" do
+
+        before do
+          identity_map.set_many(post_one, :person_id => person.id)
+          identity_map.set_many(post_two, :person_id => person.id)
+        end
+
+        let(:documents) do
+          identity_map.get(Post, :person_id => person.id)
+        end
+
+        it "returns the matching documents" do
+          documents.should eq([ post_one, post_two ])
+        end
+      end
+
+      context "when there are no documents in the map" do
+
+        let(:documents) do
+          identity_map.get(Post, :person_id => person.id)
+        end
+
+        it "returns nil" do
+          documents.should be_nil
+        end
       end
     end
   end
@@ -135,44 +176,6 @@ describe Mongoid::IdentityMap do
 
   describe "#get_selector" do
 
-    let!(:person) do
-      Person.new
-    end
-
-    let!(:post_one) do
-      Post.new(:person => person)
-    end
-
-    let!(:post_two) do
-      Post.new(:person => person)
-    end
-
-    context "when there are documents in the map" do
-
-      before do
-        identity_map.set_many(post_one, :person_id => person.id)
-        identity_map.set_many(post_two, :person_id => person.id)
-      end
-
-      let(:documents) do
-        identity_map.get_selector(Post, :person_id => person.id)
-      end
-
-      it "returns the matching documents" do
-        documents.should eq([ post_one, post_two ])
-      end
-    end
-
-    context "when there are no documents in the map" do
-
-      let(:documents) do
-        identity_map.get_selector(Post, :person_id => person.id)
-      end
-
-      it "returns nil" do
-        documents.should be_nil
-      end
-    end
   end
 
   describe "#remove" do

@@ -566,7 +566,7 @@ describe Mongoid::Relations::Referenced::One do
     end
 
     let(:map) do
-      Mongoid::IdentityMap.get_selector(Game, "person_id" => person.id)
+      Mongoid::IdentityMap.get(Game, "person_id" => person.id)
     end
 
     it "returns the appropriate criteria" do
