@@ -6,7 +6,7 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 ### New Features
 
-* Mongoid now contains eager loading in the form of `Criteria#includes(|*args)`.
+* Mongoid now contains eager loading in the form of `Criteria#includes(*args)`.
   This works on all relational associations and requires the identity map to
   be enabled in order to function. Set `identity_map_enabled: true` in your
   `mongoid.yml`.
