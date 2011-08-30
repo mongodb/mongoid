@@ -844,8 +844,8 @@ describe Mongoid::Relations::Referenced::Many do
         movie.ratings.build(:value => 1)
       end
 
-      it "returns 0" do
-        movie.ratings.count.should == 0
+      it "returns 1" do
+        movie.ratings.count.should == 1
       end
     end
 
@@ -1448,8 +1448,8 @@ describe Mongoid::Relations::Referenced::Many do
         person.posts.build
       end
 
-      it "returns false" do
-        person.posts.exists?.should == false
+      it "returns true" do
+        person.posts.exists?.should == true
       end
     end
   end

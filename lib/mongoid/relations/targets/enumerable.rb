@@ -319,6 +319,7 @@ module Mongoid #:nodoc:
           (loaded? ? loaded.count : unloaded.count) + added.count{ |d| d.new? }
         end
         alias :length :size
+        alias :count :size
 
         # Send #to_json to the entries.
         #
