@@ -183,7 +183,7 @@ describe Mongoid::Paranoia do
       end
 
       it "returns a scoped criteria" do
-        criteria.selector.should eq({ :deleted_at => { "$exists" => false }})
+        criteria.selector.should eq({ :deleted_at => nil })
       end
     end
 
@@ -206,7 +206,7 @@ describe Mongoid::Paranoia do
     end
 
     it "returns a scoped criteria" do
-      scoped.selector.should eq({ :deleted_at => { "$exists" => false }})
+      scoped.selector.should eq({ :deleted_at => nil })
     end
   end
 
