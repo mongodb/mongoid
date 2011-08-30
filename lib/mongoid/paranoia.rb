@@ -85,7 +85,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The paranoid compliant criteria.
       def criteria(embedded = false, scoped = true)
-        scoped ? super.where(:deleted_at.exists => false) : super
+        scoped ? super.merge({ :conditions => { :deleted_at => nil } }) : super
       end
 
       # Find deleted documents
@@ -97,7 +97,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The deleted criteria.
       def deleted
-        where(:deleted_at.exists => true)
+        where(:deleted_at.ne => nil)
       end
     end
   end
