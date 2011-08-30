@@ -231,7 +231,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            if replacement.blank?
+            if replacement.blank? && !proxy.blank?
               if assigning?
                 base.atomic_unsets.push(proxy.first.atomic_path)
               end
