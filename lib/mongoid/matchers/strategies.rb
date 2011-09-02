@@ -49,15 +49,26 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.7
       def matcher(document, key, value)
         if value.is_a?(Hash)
-          MATCHERS[value.keys.first].new(document.attributes[key.to_s])
+          MATCHERS[value.keys.first].new(extract_attribute(document, key))
         else
           if key == "$or"
             Matchers::Or.new(value, document)
           else
-            Default.new(document.attributes[key.to_s])
+            Default.new(extract_attribute(document, key))
           end
         end
       end
+      
+      private
+      
+      def extract_attribute(document, key)
+        if (key_string = key.to_s) =~ /.+\..+/
+          key_string.split('.').inject(document.attributes){|attribs, key| attribs.try(:[],key) }
+        else
+          document.attributes[key_string]
+        end
+      end
+      
     end
   end
 end
