@@ -232,7 +232,7 @@ module Mongoid # :nodoc:
         def substitute(replacement)
           tap do |proxy|
             if replacement.blank?
-              if assigning?
+              if assigning? && !proxy.empty?
                 base.atomic_unsets.push(proxy.first.atomic_path)
               end
               proxy.clear
