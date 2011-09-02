@@ -11,7 +11,7 @@ describe Mongoid::Matchers do
       end
 
       before do
-        document.locations << Location.new(:name => 'No.1')
+        document.locations << Location.new(:name => 'No.1', :info => { 'door' => 'Red'} )
       end
 
       context "when the attributes do not match" do
@@ -36,6 +36,37 @@ describe Mongoid::Matchers do
 
         end
 
+      end
+      
+      context "when matching embedded hash values" do
+
+        context "when the contents match" do
+          let(:selector){ { 'info.door' => 'Red' } }
+        
+          
+          it "returns true " do
+            document.locations.first.matches?(selector).should be_true
+          end
+          
+        end
+ 
+        context "when the contents do not match" do
+          let(:selector){ { 'info.door' => 'Blue' } }
+          
+          it "returns false" do
+            document.locations.first.matches?(selector).should be_false
+          end
+          
+        end
+        
+        context "when the contents do not exist" do
+          let(:selector){ { 'info.something_else' => 'Red' } }
+          
+          it "returns false" do
+            document.locations.first.matches?(selector).should be_false
+          end
+          
+        end
       end
 
     end
