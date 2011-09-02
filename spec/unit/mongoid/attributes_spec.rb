@@ -984,6 +984,21 @@ describe Mongoid::Attributes do
             @owner.pet.vet_visits.size.should == 1
           end
         end
+
+        context "when the parent has an empty embeds_many" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:attributes) do
+            { :services => [] }
+          end
+
+          it "does not raise an error" do
+            person.send(method, attributes)
+          end
+        end
       end
 
       context "on a child document" do
