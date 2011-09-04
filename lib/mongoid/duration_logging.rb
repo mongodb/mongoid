@@ -1,12 +1,9 @@
-require "mongo"
-
-module Mongo
-  # patch Mongo::Connection to include custom instrument method
-  class Connection
+module Mongoid
+  module DurationLogging
     def instrumenter
       @instrumenter ||= ActiveSupport::Notifications.instrumenter
     end
-    
+
     def instrument(name, payload = {}, &blk)
       instrumenter.instrument(
         "db.mongoid",
