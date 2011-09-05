@@ -107,6 +107,30 @@ module Mongoid #:nodoc:
     end
     alias :[]= :write_attribute
 
+    
+    # Allows you to set all the attributes for a particular mass-assignment security role 
+    # by passing in a hash of attributes with keys matching the attribute names
+    # (which again matches the column names)  and the role name using the :as option.
+    # To bypass mass-assignment security you can use the :without_protection => true option.
+    #
+    # @example Assign the attributes.
+    #   person.assign_attributes(:title => "Mr.")
+    #
+    # @example Assign the attributes (with a role).
+    #   person.assign_attributes({ :title => "Mr." }, :as => :admin)
+    #
+    # @param [ Hash ] attrs The new attributes to set.
+    # @param [ Hash ] options Supported options: :without_protection, :as
+    #
+    # @since 2.2.1
+    def assign_attributes(attrs = nil, options = {})
+      assigning do
+        process(attrs, options[:as] || :default, !options[:without_protection]) do |document|
+          document.identify if new? && id.blank?
+        end
+      end
+    end    
+
     # Writes the supplied attributes hash to the document. This will only
     # overwrite existing attributes if they are present in the new +Hash+, all
     # others will be preserved.
@@ -122,11 +146,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attributes(attrs = nil, guard_protected_attributes = true)
-      assigning do
-        process(attrs, guard_protected_attributes) do |document|
-          document.identify if new? && id.blank?
-        end
-      end
+      assign_attributes(attrs, :without_protection => !guard_protected_attributes)
     end
     alias :attributes= :write_attributes
 
