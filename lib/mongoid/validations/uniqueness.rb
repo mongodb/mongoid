@@ -30,24 +30,25 @@ module Mongoid #:nodoc:
       # @param [ Object ] value The value of the field.
       #
       # @todo Durran: This method needs refactoring.
-      def validate_each(document, attribute, value)
+      def validate_each(document, attribute, value)        
         if document.embedded?
           return if document._parent.nil?
           criteria = document._parent.send(document.metadata.name)
           # If the parent document embeds_one, no need to validate uniqueness
           return if criteria.is_a?(Mongoid::Document)
-          criteria = criteria.where(attribute => unique_search_value(value), :_id => {'$ne' => document._id})
+          criteria = criteria.where(attribute => unique_search_value(value))
         else
           criteria = @klass.where(attribute => unique_search_value(value))
-          unless document.new_record?
-            criteria = criteria.where(:_id => {'$ne' => document._id})
-          end
         end
 
         Array.wrap(options[:scope]).each do |item|
           criteria = criteria.where(item => document.attributes[item.to_s])
         end
-        if criteria.exists?
+
+        existing = criteria.only(:_id).execute.collect { |d| d['_id'] } 
+        existing -= [ document.id ] if document.embedded? || document.persisted?
+        
+        unless existing.empty?
           document.errors.add(
             attribute,
             :taken,
