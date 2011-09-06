@@ -38,6 +38,9 @@ module Mongoid #:nodoc:
           return if criteria.is_a?(Mongoid::Document)
           criteria = criteria.where(attribute => unique_search_value(value), :_id => {'$ne' => document._id})
         else
+          # No need to validate uniqueness of attribute if document already
+          # persists and the attribute value is unchanged.
+          return if document.persisted? and !document.send("#{attribute}_changed?")
           criteria = @klass.where(attribute => unique_search_value(value))
           unless document.new_record?
             criteria = criteria.where(:_id => {'$ne' => document._id})
