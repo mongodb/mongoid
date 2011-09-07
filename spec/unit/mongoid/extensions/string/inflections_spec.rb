@@ -109,4 +109,22 @@ describe Mongoid::Extensions::String::Inflections do
     end
 
   end
+
+  describe "#singularize" do
+
+    context "when string is address" do
+
+      it "returns address" do
+        "address".singularize.should == "address"
+      end
+    end
+
+    context "when string is address_profiles" do
+
+      it "returns address_profile" do
+        "address_profiles".singularize.should == "address_profile"
+      end
+    end
+
+  end
 end
