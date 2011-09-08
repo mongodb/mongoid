@@ -40,7 +40,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       Person.new
     end
 
-    context "when attributes are rejectable" do
+    context "when attributes are rejectable using a proc" do
 
       let(:options) do
         { :reject_if => lambda { |attrs| attrs[:first_name].blank? } }
@@ -58,6 +58,27 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         person.name.should be_nil
       end
     end
+
+    context "when attributes are rejectable using a symbol" do
+
+      let(:options) do
+        { :reject_if => :reject_if_name_is_blank }
+      end
+
+      let(:builder) do
+        described_class.new(metadata, { :last_name => "Lang" }, options)
+      end
+
+      before do
+        builder.build(person)
+      end
+
+      it "does not change the relation" do
+        person.name.should be_nil
+      end
+    end
+
+
 
     context "when attributes are updatable" do
 
@@ -174,7 +195,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns true" do
-          builder.reject?({ :last_name => "Lang" }).should be_true
+          builder.reject?(builder, { :last_name => "Lang" }).should be_true
         end
       end
 
@@ -185,7 +206,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns false" do
-          builder.reject?({ :first_name => "Lang" }).should be_false
+          builder.reject?(builder, { :first_name => "Lang" }).should be_false
         end
       end
     end
@@ -197,7 +218,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.reject?({ :first_name => "Lang" }).should be_false
+        builder.reject?(builder, { :first_name => "Lang" }).should be_false
       end
     end
   end

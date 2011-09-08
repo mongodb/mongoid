@@ -45,7 +45,7 @@ module Mongoid #:nodoc:
       #   by a hash of options.
       #
       # @option *args [ true, false ] :allow_destroy Can deletion occur?
-      # @option *args [ Proc ] :reject_if Block to reject documents with.
+      # @option *args [ Proc, Symbol ] :reject_if Block or symbol pointing to a class method to reject documents with.
       # @option *args [ Integer ] :limit The max number to create.
       # @option *args [ true, false ] :update_only Only update existing docs.
       def accepts_nested_attributes_for(*args)
