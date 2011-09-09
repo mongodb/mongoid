@@ -362,7 +362,8 @@ module Mongoid #:nodoc:
           :initial => { start => "start" },
           :reduce => reduce.gsub("[field]", field)
         )
-        collection.empty? ? nil : collection.first[start.to_s]
+        value = collection.empty? ? nil : collection.first[start.to_s]
+        value ? (value.nan? ? nil : value) : value
       end
 
       # Filters the field list. If no fields have been supplied, then it will be
