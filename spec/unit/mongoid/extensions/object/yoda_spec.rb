@@ -24,7 +24,7 @@ describe Mongoid::Extensions::Object::Yoda do
         end
 
         it "returns the result of the method" do
-          result.should == "Yoda,Luke"
+          result.should eq("Yoda,Luke")
         end
       end
 
@@ -37,6 +37,24 @@ describe Mongoid::Extensions::Object::Yoda do
         it "returns the result of the method" do
           result.should be_nil
         end
+      end
+    end
+  end
+
+  describe "#you_must" do
+
+    context "when the object is frozen" do
+
+      let(:person) do
+        Person.new.tap { |peep| peep.freeze }
+      end
+
+      let(:result) do
+        person.you_must(:aliases=, [])
+      end
+
+      it "returns nil" do
+        result.should be_nil
       end
     end
   end
