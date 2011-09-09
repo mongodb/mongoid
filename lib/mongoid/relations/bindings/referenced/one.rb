@@ -21,10 +21,10 @@ module Mongoid # :nodoc:
           def bind
             unless binding?
               binding do
-                target.send(metadata.foreign_key_setter, base.id)
+                target.you_must(metadata.foreign_key_setter, base.id)
                 target.send(metadata.inverse_setter, base)
                 if metadata.type
-                  target.send(metadata.type_setter, base.class.model_name)
+                  target.you_must(metadata.type_setter, base.class.model_name)
                 end
               end
             end
@@ -42,10 +42,10 @@ module Mongoid # :nodoc:
           def unbind
             unless binding?
               binding do
-                target.send(metadata.foreign_key_setter, nil)
+                target.you_must(metadata.foreign_key_setter, nil)
                 target.send(metadata.inverse_setter, nil)
                 if metadata.type
-                  target.send(metadata.type_setter, nil)
+                  target.you_must(metadata.type_setter, nil)
                 end
               end
             end
