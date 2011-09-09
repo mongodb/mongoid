@@ -2,6 +2,13 @@
 
 For instructions on upgrading to newer versions, visit [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.2.1
+
+* \#1210, \#517 Allow embedded document relation queries to use dot notation.
+  (Scott Ellard)
+
+### Resolved Issues
+
 ## 2.2.0
 
 ### New Features
