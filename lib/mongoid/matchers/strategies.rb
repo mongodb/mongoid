@@ -58,17 +58,29 @@ module Mongoid #:nodoc:
           end
         end
       end
-      
+
       private
-      
+
+      # Extract the attribute from the key, being smarter about dot notation.
+      #
+      # @example Extract the attribute.
+      #   strategy.extract_attribute(doc, "info.field")
+      #
+      # @param [ Document ] document The document.
+      # @param [ String ] key The key.
+      #
+      # @return [ Object ] The value of the attribute.
+      #
+      # @since 2.2.1
       def extract_attribute(document, key)
         if (key_string = key.to_s) =~ /.+\..+/
-          key_string.split('.').inject(document.attributes){|attribs, key| attribs.try(:[],key) }
+          key_string.split('.').inject(document.attributes) do |attribs, key|
+            attribs.try(:[], key)
+          end
         else
           document.attributes[key_string]
         end
       end
-      
     end
   end
 end
