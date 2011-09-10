@@ -131,17 +131,6 @@ describe Mongoid::Contexts::Mongo do
       Mongoid::Contexts::Mongo.new(crit)
     end
 
-    context "when criteria has not been executed" do
-
-      before do
-        context.instance_variable_set(:@count, 34)
-      end
-
-      it "returns a count from the cursor" do
-        context.count.should == 34
-      end
-    end
-
     context "when criteria has been executed" do
 
       let(:collection) do
