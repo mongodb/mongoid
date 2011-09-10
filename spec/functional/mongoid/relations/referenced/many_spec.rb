@@ -2307,7 +2307,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns 1" do
-          movie.ratings.send(method).should == 1
+          movie.ratings.send(method).should eq(1)
         end
       end
 
@@ -2319,7 +2319,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the total number of documents" do
-          movie.ratings.send(method).should == 2
+          movie.ratings.send(method).should eq(2)
         end
       end
     end

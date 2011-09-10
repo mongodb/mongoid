@@ -156,7 +156,7 @@ module Mongoid #:nodoc:
             end
           end
           added.each do |doc|
-            next unless doc.new?
+            next if doc.persisted? && (!loaded? && !loaded.empty?)
             yield(doc)
           end
           @executed = true
@@ -316,7 +316,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def size
-          (loaded? ? loaded.count : unloaded.count) + added.count{ |d| d.new? }
+          (unloaded ? unloaded.count : loaded.count) + added.count{ |d| d.new? }
         end
         alias :length :size
 

@@ -86,7 +86,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The count of documents.
       def count(extras = false)
-        @count ||= klass.collection.find(selector, process_options).count(extras)
+        klass.collection.find(selector, process_options).count(extras)
       end
       alias :size :count
       alias :length :count

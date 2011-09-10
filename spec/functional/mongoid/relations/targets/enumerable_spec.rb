@@ -79,6 +79,25 @@ describe Mongoid::Relations::Targets::Enumerable do
             enumerable.should eq([ post ])
           end
         end
+
+        context "when the enumerable is loaded" do
+
+          before do
+            enumerable.instance_variable_set(:@executed, true)
+          end
+
+          context "when the loaded has no docs and added is persisted" do
+
+            before do
+              post.save
+              enumerable.added << post
+            end
+
+            it "returns the equality check" do
+              enumerable.should eq([ post ])
+            end
+          end
+        end
       end
     end
 
