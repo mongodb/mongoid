@@ -195,9 +195,10 @@ module Mongoid #:nodoc:
       @options, @klass, @documents, @embedded = {}, klass, [], embedded
     end
 
-    # Merges another object into this +Criteria+. The other object may be a
-    # +Criteria+ or a +Hash+. This is used to combine multiple scopes together,
-    # where a chained scope situation may be desired.
+    # Merges another object with this +Criteria+ and returns a new criteria.
+    # The other object may be a +Criteria+ or a +Hash+. This is used to
+    # combine multiple scopes together, where a chained scope situation
+    # may be desired.
     #
     # @example Merge the criteria with a conditions hash.
     #   criteria.merge({ :conditions => { :title => "Sir" } })
