@@ -25,7 +25,6 @@ module Mongoid #:nodoc:
             object
           end
         end
-        alias :set :serialize
       end
     end
   end

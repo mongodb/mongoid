@@ -21,12 +21,11 @@ module Mongoid #:nodoc:
         def serialize(object)
           return nil if object.blank?
           begin
-            object.to_s =~ /\./ ? Float(object) : Integer(object)
+            ("%g" % object.to_s) =~ /\./ ? Float(object) : Integer(object)
           rescue
             object
           end
         end
-        alias :set :serialize
       end
     end
   end
