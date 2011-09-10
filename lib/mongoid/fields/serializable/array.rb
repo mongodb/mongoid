@@ -21,7 +21,6 @@ module Mongoid #:nodoc:
         def serialize(object)
           raise_or_return(object)
         end
-        alias :set :serialize
 
         protected
 

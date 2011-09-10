@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * \#1198 Enumerable target should use criteria count if loaded has no docs.
 
+* \#1193 Ensure all floats with n precision of zero get converted to integers
+  if the field is defined as an integer.
+
 ### Resolved Issues
 
 ## 2.2.0
