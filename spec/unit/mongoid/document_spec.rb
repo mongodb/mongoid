@@ -686,4 +686,15 @@ describe Mongoid::Document do
       person.send(:logger).should eq(Mongoid.logger)
     end
   end
+
+  context "after including the document module" do
+
+    let(:movie) do
+      Movie.new
+    end
+
+    it "resets to the global scope" do
+      movie.global_set.should be_a(::Set)
+    end
+  end
 end

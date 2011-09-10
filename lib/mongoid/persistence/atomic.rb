@@ -9,7 +9,7 @@ require "mongoid/persistence/atomic/pull_all"
 require "mongoid/persistence/atomic/push"
 require "mongoid/persistence/atomic/push_all"
 require "mongoid/persistence/atomic/rename"
-require "mongoid/persistence/atomic/set"
+require "mongoid/persistence/atomic/sets"
 require "mongoid/persistence/atomic/unset"
 
 module Mongoid #:nodoc:
@@ -201,7 +201,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def set(field, value = nil, options = {})
-        Set.new(self, field, value, options).persist
+        Sets.new(self, field, value, options).persist
       end
 
       # Performs the atomic $unset on the supplied field.

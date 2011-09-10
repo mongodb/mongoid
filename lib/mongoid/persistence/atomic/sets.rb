@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     module Atomic #:nodoc:
 
       # This class provides atomic $set behaviour.
-      class Set
+      class Sets
         include Operation
 
         # Sends the atomic $set operation to the database.
