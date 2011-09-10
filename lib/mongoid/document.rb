@@ -7,9 +7,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include Mongoid::Components
 
-    included do
-      attr_reader :new_record
-    end
+    attr_reader :new_record
 
     # Default comparison is via the string version of the id.
     #
