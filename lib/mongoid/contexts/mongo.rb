@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     class Mongo
       attr_accessor :criteria
 
-      delegate :klass, :options, :field_list, :selector, :to => :criteria
+      delegate :cached?, :klass, :options, :field_list, :selector, :to => :criteria
+      delegate :collection, :to => :klass
 
       # Perform an add to set on the matching documents.
       #
@@ -86,7 +87,11 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The count of documents.
       def count(extras = false)
-        klass.collection.find(selector, process_options).count(extras)
+        if cached?
+          @count ||= collection.find(selector, process_options).count(extras)
+        else
+          collection.find(selector, process_options).count(extras)
+        end
       end
       alias :size :count
       alias :length :count
@@ -202,7 +207,7 @@ module Mongoid #:nodoc:
       # @example Iterate over the results.
       #   context.iterate { |doc| p doc }
       def iterate(&block)
-        return caching(&block) if criteria.cached?
+        return caching(&block) if cached?
         if block_given?
           execute.each { |doc| yield doc }
         end
