@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#1210, \#517 Allow embedded document relation queries to use dot notation.
   (Scott Ellard)
 
+* \#1198 Enumerable target should use criteria count if loaded has no docs.
+
 ### Resolved Issues
 
 ## 2.2.0
