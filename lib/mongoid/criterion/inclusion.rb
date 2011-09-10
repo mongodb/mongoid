@@ -247,11 +247,26 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def execute_or_raise(args, criteria)
-        (args[0].is_a?(Array) ? criteria.entries : criteria.one).tap do |result|
+        (args[0].is_a?(Array) ? criteria.entries : from_map_or_db(criteria)).tap do |result|
           if Mongoid.raise_not_found_error && !args.flatten.blank?
             raise Errors::DocumentNotFound.new(klass, args) if result._vacant?
           end
         end
+      end
+
+      # Get the document from the identity map, and if not found hit the
+      # database.
+      #
+      # @example Get the document from the map or criteria.
+      #   criteria.from_map_or_db(criteria)
+      #
+      # @param [ Criteria ] The cloned criteria.
+      #
+      # @return [ Document ] The found document.
+      #
+      # @since 2.2.1
+      def from_map_or_db(criteria)
+        IdentityMap.get(klass, criteria.selector[:_id]) || criteria.one
       end
     end
   end
