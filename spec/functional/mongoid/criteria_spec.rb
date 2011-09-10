@@ -23,7 +23,7 @@ describe Mongoid::Criteria do
       Person.where(:title => "Sir").cache
     end
 
-    pending "iterates over the cursor only once" do
+    it "iterates over the cursor only once" do
       criteria.size.should == 5
       Person.create!(:title => "Sir")
       criteria.size.should == 5
