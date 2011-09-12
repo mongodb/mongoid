@@ -296,8 +296,6 @@ describe Mongoid::Relations::Synchronization do
     end
 
     before do
-      p one.person_ids
-      p two.person_ids
       person.destroy
     end
 
