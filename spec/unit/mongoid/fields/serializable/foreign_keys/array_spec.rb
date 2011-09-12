@@ -9,7 +9,7 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Array do
     end
 
     let(:field) do
-      described_class.new(
+      described_class.instantiate(
         :vals,
         :metadata => Person.relations["posts"],
         :type => Array,
@@ -40,7 +40,7 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Array do
       end
 
       let(:field) do
-        described_class.new(
+        described_class.instantiate(
           :vals,
           :type => Array,
           :default => [],

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::NilClass do
 
   let(:field) do
-    described_class.new(:test, :type => NilClass)
+    described_class.instantiate(:test, :type => NilClass)
   end
 
   describe "#deserialize" do

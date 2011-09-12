@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::BigDecimal do
 
   let(:field) do
-    described_class.new(:test, :type => BigDecimal)
+    described_class.instantiate(:test, :type => BigDecimal)
   end
 
   let(:number) do

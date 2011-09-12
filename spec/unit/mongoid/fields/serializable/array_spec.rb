@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::Array do
 
   let(:field) do
-    described_class.new(:test, :type => Array)
+    described_class.instantiate(:test, :type => Array)
   end
 
   describe "#cast_on_read?" do
@@ -18,7 +18,7 @@ describe Mongoid::Fields::Serializable::Array do
     context "when the default is a proc" do
 
       let(:field) do
-        described_class.new(
+        described_class.instantiate(
           :test,
           :type => Array,
           :default => lambda { [ "test" ] }
@@ -37,7 +37,7 @@ describe Mongoid::Fields::Serializable::Array do
       end
 
       let(:field) do
-        described_class.new(
+        described_class.instantiate(
           :test,
           :type => Array,
           :default => default
