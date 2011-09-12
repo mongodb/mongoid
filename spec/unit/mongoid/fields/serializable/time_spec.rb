@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::Time do
 
   let(:field) do
-    described_class.new(:test, :type => Time)
+    described_class.instantiate(:test, :type => Time)
   end
 
   let!(:time) do

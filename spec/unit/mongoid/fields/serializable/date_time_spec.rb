@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::DateTime do
 
   let(:field) do
-    described_class.new(:test, :type => DateTime)
+    described_class.instantiate(:test, :type => DateTime)
   end
 
   let!(:time) do

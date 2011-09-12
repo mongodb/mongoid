@@ -229,7 +229,7 @@ module Mongoid #:nodoc
         meth = options.delete(:as) || name
         Mappings.for(
           options[:type], options[:identity]
-        ).new(name, options).tap do |field|
+        ).instantiate(name, options).tap do |field|
           fields[name] = field
           defaults << name unless field.default.nil?
           create_accessors(name, meth, options)

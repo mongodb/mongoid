@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::Date do
 
   let(:field) do
-    described_class.new(:test, :type => Date)
+    described_class.instantiate(:test, :type => Date)
   end
 
   let!(:time) do
@@ -22,7 +22,7 @@ describe Mongoid::Fields::Serializable::Date do
     context "when provided a proc" do
 
       let(:field) do
-        described_class.new(
+        described_class.instantiate(
           :test,
           :type => Date,
           :default => lambda { 1.day.ago }

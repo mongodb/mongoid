@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::Range do
 
   let(:field) do
-    described_class.new(:test, :type => Range)
+    described_class.instantiate(:test, :type => Range)
   end
 
   describe "#cast_on_read?" do

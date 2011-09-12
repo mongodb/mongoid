@@ -5,7 +5,7 @@ describe Mongoid::Fields::Serializable::Object do
   describe "#cast_on_read?" do
 
     let(:field) do
-      described_class.new(:test)
+      described_class.instantiate(:test)
     end
 
     it "returns false" do
@@ -18,7 +18,7 @@ describe Mongoid::Fields::Serializable::Object do
     context "when the default value is a proc" do
 
       let(:field) do
-        described_class.new(:test, :default => lambda { 1 })
+        described_class.instantiate(:test, :default => lambda { 1 })
       end
 
       it "returns the called proc" do
@@ -29,7 +29,7 @@ describe Mongoid::Fields::Serializable::Object do
     context "when the default value is not a proc" do
 
       let(:field) do
-        described_class.new(:test, :default => "test")
+        described_class.instantiate(:test, :default => "test")
       end
 
       it "returns the default value" do
@@ -41,7 +41,7 @@ describe Mongoid::Fields::Serializable::Object do
   describe "#deserialize" do
 
     let(:field) do
-      described_class.new(:test)
+      described_class.instantiate(:test)
     end
 
     let(:value) do
@@ -56,7 +56,7 @@ describe Mongoid::Fields::Serializable::Object do
   describe "#initialize" do
 
     let(:field) do
-      described_class.new(:test, :type => Integer, :label => "test")
+      described_class.instantiate(:test, :type => Integer, :label => "test")
     end
 
     it "sets the name" do
@@ -103,7 +103,7 @@ describe Mongoid::Fields::Serializable::Object do
   describe "#serialize" do
 
     let(:field) do
-      described_class.new(:test)
+      described_class.instantiate(:test)
     end
 
     let(:value) do
