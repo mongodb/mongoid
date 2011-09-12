@@ -28,7 +28,7 @@ module Mongoid # :nodoc:
                 end
                 if inverse
                   inverse_metadata = metadata.inverse_metadata(target)
-                  if inverse_metadata != metadata
+                  if inverse_metadata != metadata && !inverse_metadata.nil?
                     base.metadata = inverse_metadata
                     if base.referenced_many?
                       target.send(inverse).push(base)

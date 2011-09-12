@@ -3,7 +3,8 @@ require "spec_helper"
 describe Mongoid::Relations::Embedded::Many do
 
   before do
-    [ Person, Account, Acolyte, League, Quiz, Role, Patient ].map(&:delete_all)
+    [ Person, Account, Acolyte, League,
+      Quiz, Role, Patient, Product, Purchase ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -1440,6 +1441,28 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "calls the passed block" do
         found.state.should == "CA"
+      end
+    end
+
+    context "when the child belongs to another document" do
+
+      let(:product) do
+        Product.create
+      end
+
+      let(:purchase) do
+        Purchase.create
+      end
+
+      let(:line_item) do
+        purchase.line_items.find_or_create_by(
+          :product_id => product.id,
+          :product_type => product.class.name
+        )
+      end
+
+      it "properly creates the document" do
+        line_item.product.should eq(product)
       end
     end
   end

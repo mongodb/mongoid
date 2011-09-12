@@ -291,11 +291,13 @@ describe Mongoid::Relations::Synchronization do
     let!(:person) do
       Person.create(
         :ssn => "342-12-2222",
-        :preference_ids => [ one.id, two.id ]
+        :preferences => [ one, two ]
       )
     end
 
     before do
+      p one.person_ids
+      p two.person_ids
       person.destroy
     end
 
