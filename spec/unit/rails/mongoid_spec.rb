@@ -8,33 +8,58 @@ describe "Rails::Mongoid" do
 
   describe ".create_indexes" do
 
-    let(:model_paths) do
-      Dir.glob("spec/models/**/*.rb")
-    end
+    context "with ordinary Rails models" do
 
-    let(:models) do
-      [].tap do |documents|
-        model_paths.each do |file|
-          model_path = file[0..-4].split('/')[2..-1]
-          begin
-            klass = model_path.map { |path| path.camelize }.join('::').constantize
-            if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
-              documents << klass
+      let(:model_paths) do
+        Dir.glob("spec/app/models/**/*.rb")
+      end
+
+      let(:models) do
+        [].tap do |documents|
+          model_paths.each do |file|
+            file_path = Pathname.new(file).realpath
+            spec_path = Pathname.new("spec/app/models").realpath
+            model_path = file_path.relative_path_from(spec_path).to_s.gsub('.rb', '').split('/')
+            begin
+              klass = model_path.map { |path| path.camelize }.join('::').constantize
+              if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
+                documents << klass
+              end
+            rescue => e
             end
-          rescue => e
           end
         end
       end
-    end
 
-    before do
-      models.each do |klass|
-        klass.expects(:create_indexes).once
+      before do
+        models.each do |klass|
+          klass.expects(:create_indexes).once
+        end
+      end
+
+      it "creates the indexes for each model" do
+        Rails::Mongoid.create_indexes("spec/app/models/**/*.rb")
       end
     end
 
-    it "creates the indexes for each model" do
-      Rails::Mongoid.create_indexes("spec/models/**/*.rb")
+    context "with models present in Rails engines" do
+
+      let(:files) do
+        ["/gem_path/engines/some_engine_gem/app/models/carrot.rb"]
+      end
+
+      before do
+        class Carrot
+          include Mongoid::Document
+        end
+
+        Dir.expects(:glob).with("/gem_path/engines/some_engine_gem/app/models/**/*.rb").returns(files)
+      end
+
+      it "requires the models by base name from the engine's app/models dir" do
+        Carrot.expects(:create_indexes).once
+        Rails::Mongoid.create_indexes("/gem_path/engines/some_engine_gem/app/models/**/*.rb")
+      end
     end
   end
 
