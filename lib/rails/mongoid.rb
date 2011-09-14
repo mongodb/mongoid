@@ -70,7 +70,7 @@ module Rails #:nodoc:
     #
     # @since 2.1.0
     def determine_model(file)
-      if file =~ /\/app\/models\/(.*).rb$/
+      if file =~ /app\/models\/(.*).rb$/
         model_path = $1.split('/')
         klass = model_path.map { |path| path.camelize }.join('::').constantize
         if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
