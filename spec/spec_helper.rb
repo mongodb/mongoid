@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
-MODELS = File.join(File.dirname(__FILE__), "models")
+MODELS = File.join(File.dirname(__FILE__), "app/models")
 SUPPORT = File.join(File.dirname(__FILE__), "support")
 $LOAD_PATH.unshift(MODELS)
 $LOAD_PATH.unshift(SUPPORT)
