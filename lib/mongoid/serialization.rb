@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.0
       def mongoize(object, klass = Object)
-        Fields::Mappings.for(klass).new(:mongoize).serialize(object)
+        Fields::Mappings.for(klass).instantiate(:mongoize).serialize(object)
       end
     end
 
