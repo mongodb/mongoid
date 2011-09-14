@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Inclusion do
 
   before do
-    [ Person, Post, Game ].each(&:delete_all)
+    [ Person, Post, Product, Game ].each(&:delete_all)
   end
 
   describe "#all_in" do
@@ -401,6 +401,35 @@ describe Mongoid::Criterion::Inclusion do
         :aliases => [ "D", "Durran" ],
         :things => [ { :phone => 'HTC Incredible' } ]
       )
+    end
+
+    context "when searching for localized fields" do
+
+      let!(:soda) do
+        Product.create(:description => "sweet")
+      end
+
+      let!(:beer) do
+        Product.create(:description => "hoppy")
+      end
+
+      before do
+        ::I18n.locale = :de
+        soda.update_attribute(:description, "suss")
+        beer.update_attribute(:description, "hopfig")
+      end
+
+      let(:results) do
+        Product.where(:description => "hopfig")
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "returns the results matching the correct locale" do
+        results.should eq([ beer ])
+      end
     end
 
     context "when providing 24 character strings" do

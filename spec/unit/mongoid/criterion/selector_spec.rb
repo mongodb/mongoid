@@ -4,7 +4,7 @@ require 'mongoid/criterion/selector'
 describe Mongoid::Criterion::Selector do
 
   let(:field) do
-    stub(:type => Integer)
+    stub(:type => Integer, :localized? => false)
   end
 
   describe "#initialize" do
@@ -50,6 +50,40 @@ describe Mongoid::Criterion::Selector do
       field.expects(:serialize).with("45").returns(45)
       selector["age"] = { "$gt" => "45" }
       selector["age"].should == { "$gt" => 45 }
+    end
+
+    context "when the field is localized" do
+
+      let(:selector) do
+        described_class.new(Product)
+      end
+
+      context "when no locale is defined" do
+
+        before do
+          selector["description"] = "testing"
+        end
+
+        it "converts to dot notation with the default locale" do
+          selector["description.en"].should eq("testing")
+        end
+      end
+
+      context "when a locale is defined" do
+
+        before do
+          ::I18n.locale = :de
+          selector["description"] = "testing"
+        end
+
+        after do
+          ::I18n.locale = :en
+        end
+
+        it "converts to dot notation with the set locale" do
+          selector["description.de"].should eq("testing")
+        end
+      end
     end
   end
 
