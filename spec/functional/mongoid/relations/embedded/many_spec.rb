@@ -1721,6 +1721,29 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#unscoped" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:unscoped) do
+      person.videos.unscoped
+    end
+
+    it "returns the relation criteria" do
+      unscoped.should be_a(Mongoid::Criteria)
+    end
+
+    it "returns with empty options" do
+      unscoped.options.should be_empty
+    end
+
+    it "returns with an empty selector" do
+      unscoped.selector.should be_empty
+    end
+  end
+
   context "when deeply embedding documents" do
 
     context "when building the tree through hashes" do
