@@ -439,6 +439,7 @@ describe Mongoid::IdentityMap do
         end
 
         it "gets the object from the identity map" do
+          pending "segfault on 1.9.2-p290 on Intel i7 OSX Lion"
           fiber.resume
         end
       end
