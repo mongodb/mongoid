@@ -31,10 +31,31 @@ describe "Rails::Mongoid" do
       models.each do |klass|
         klass.expects(:create_indexes).once
       end
+      Dir.expects(:glob).with("spec/models/**/*.rb").returns(model_paths)
     end
 
     it "creates the indexes for each model" do
       Rails::Mongoid.create_indexes("spec/models/**/*.rb")
+    end
+
+  end
+
+  context "when models are present in Rails engines" do
+    let(:files) do
+      ["/gem_path/engines/some_engine_gem/app/models/carrot.rb"]
+    end
+
+    before do
+      class Carrot
+        include Mongoid::Document
+      end
+
+      Dir.expects(:glob).with("/gem_path/engines/some_engine_gem/app/models/**/*.rb").returns(files)
+    end
+
+    it "requires the models by base name from the engine's app/models dir" do
+      Carrot.expects(:create_indexes).once
+      Rails::Mongoid.create_indexes("/gem_path/engines/some_engine_gem/app/models/**/*.rb")
     end
   end
 
