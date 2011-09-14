@@ -14,11 +14,13 @@ module Mongoid #:nodoc:
       # @example Proxy the driver save.
       #   collection.save({ :name => "Al" })
       Operations::ALL.each do |name|
-        define_method(name) do |*args|
-          retry_on_connection_failure do
-            collection.send(name, *args)
+        class_eval <<-EOS, __FILE__, __LINE__
+          def #{name}(*args)
+            retry_on_connection_failure do
+              collection.#{name}(*args)
+            end
           end
-        end
+        EOS
       end
 
       # Create the new database writer. Will create a collection from the
@@ -29,8 +31,14 @@ module Mongoid #:nodoc:
       #
       # @param [ Mongo::DB ] master The master database.
       # @param [ String ] name The name of the database.
-      def initialize(master, name)
-        @collection = master.collection(name)
+      # @param [ Hash ] options The collection options.
+      #
+      # @option options [ true, false ] :capped If the collection is capped.
+      # @option options [ Integer ] :size The capped collection size.
+      # @option options [ Integer ] :max The maximum number of docs in the
+      #   capped collection.
+      def initialize(master, name, options = {})
+        @collection = master.create_collection(name, options)
       end
     end
   end

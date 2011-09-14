@@ -13,8 +13,7 @@ require "rspec"
 LOGGER = Logger.new($stdout)
 
 Mongoid.configure do |config|
-  name = "mongoid_test"
-  config.master = Mongo::Connection.new.db(name)
+  config.master = Mongo::Connection.new.db("mongoid_test")
   config.logger = nil
 end
 
@@ -25,6 +24,7 @@ RSpec.configure do |config|
   config.mock_with(:mocha)
 
   config.after(:suite) { Mongoid.purge! }
+  config.before(:each) { Mongoid::IdentityMap.clear }
 
   # We filter out the specs that require authentication if the database has not
   # had the mongoid user set up properly.
@@ -40,8 +40,6 @@ RSpec.configure do |config|
     return true if value == :mongohq && !mongohq_configured
     return true if value == :user && !user_configured
   })
-
-  # config.filter_run :focus => true
 end
 
 ActiveSupport::Inflector.inflections do |inflect|

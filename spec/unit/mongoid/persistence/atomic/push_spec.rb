@@ -10,6 +10,10 @@ describe Mongoid::Persistence::Atomic::Push do
     person.stubs(:collection).returns(collection)
   end
 
+  after do
+    person.unstub(:collection)
+  end
+
   describe "#persist" do
 
     context "when the field exists" do
@@ -24,7 +28,7 @@ describe Mongoid::Persistence::Atomic::Push do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$push" => { :aliases => "Bond" } }, { :safe => false }
+          person.atomic_selector, { "$push" => { "aliases" => "Bond" } }, { :safe => false }
         )
       end
 
@@ -38,10 +42,6 @@ describe Mongoid::Persistence::Atomic::Push do
 
       it "removes the field from the dirty attributes" do
         person.changes["aliases"].should be_nil
-      end
-
-      it "resets the document dirty flag" do
-        person.should_not be_changed
       end
 
       it "returns the new array value" do
@@ -61,7 +61,7 @@ describe Mongoid::Persistence::Atomic::Push do
 
       before do
         collection.expects(:update).with(
-          person._selector, { "$push" => { :aliases => "Bond" } }, { :safe => false }
+          person.atomic_selector, { "$push" => { "aliases" => "Bond" } }, { :safe => false }
         )
       end
 
@@ -75,10 +75,6 @@ describe Mongoid::Persistence::Atomic::Push do
 
       it "removes the field from the dirty attributes" do
         person.changes["aliases"].should be_nil
-      end
-
-      it "resets the document dirty flag" do
-        person.should_not be_changed
       end
 
       it "returns the new array value" do

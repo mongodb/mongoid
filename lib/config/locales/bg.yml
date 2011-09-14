@@ -4,13 +4,21 @@ bg:
       messages:
         taken:
           е вече заето
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Не е намерен документ %{klass} с id(та) %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           Базата данни трябва да е от тип Mnogo:DB, а не  %{name}.
         invalid_type:
           Полето е дефинирано като a(n) %{klass}, но се присвоява %{other}
           със стойност %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} не се подържа, моля ползвайте версия след %{mongo_version}.
         validations:
@@ -39,3 +47,6 @@ bg:
         unsaved_document:
           You cannot call create or create! through a relational association
           relation (%{document}) who's parent (%{base}) is not already saved.
+        mixed_relations:
+          Referencing a(n) %{embedded} document from the %{root} document via a
+          relational association is not allowed since the %{embedded} is embedded.

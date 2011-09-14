@@ -23,8 +23,8 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind(options = {})
-            target.each { |doc| bind_one(doc, options) }
+          def bind
+            target.each { |doc| bind_one(doc) }
           end
 
           # Binds a single document with the inverse relation. Used
@@ -40,16 +40,14 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind_one(doc, options = {})
+          def bind_one(doc)
             doc.parentize(base)
-            if options[:continue]
-              name = metadata.inverse_setter(target)
-              doc.do_or_do_not(
-                name,
-                base,
-                :binding => true,
-                :continue => false
-              ) unless name == "versions="
+            unless binding?
+              binding do
+                unless metadata.versioned?
+                  doc.do_or_do_not(metadata.inverse_setter(target), base)
+                end
+              end
             end
           end
 
@@ -66,8 +64,8 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def unbind(options = {})
-            target.each { |doc| unbind_one(doc, options) }
+          def unbind
+            target.each { |doc| unbind_one(doc) }
           end
 
           # Unbind a single document.
@@ -81,14 +79,11 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def unbind_one(doc, options = {})
-            if options[:continue]
-              doc.do_or_do_not(
-                metadata.inverse_setter(target),
-                nil,
-                :binding => true,
-                :continue => false
-              )
+          def unbind_one(doc)
+            unless binding?
+              binding do
+                doc.do_or_do_not(metadata.inverse_setter(target), nil)
+              end
             end
           end
         end

@@ -57,15 +57,15 @@ describe Mongoid::Criteria do
 
       context "when updating an embedded document" do
 
-        let(:from_db) do
-          Person.first
-        end
-
         before do
           Person.where(:title => "Sir").send(
             method,
             "addresses.0.city" => "Berlin"
           )
+        end
+
+        let!(:from_db) do
+          Person.first
         end
 
         it "updates all the matching documents" do
@@ -120,10 +120,6 @@ describe Mongoid::Criteria do
 
         context "when the relation is a references many" do
 
-          let(:from_db) do
-            Person.first
-          end
-
           let!(:post_one) do
             person.posts.create(:title => "First")
           end
@@ -136,6 +132,10 @@ describe Mongoid::Criteria do
 
             before do
               person.posts.send(method, :title => "London")
+            end
+
+            let!(:from_db) do
+              Person.first
             end
 
             it "updates the first document" do
@@ -155,12 +155,16 @@ describe Mongoid::Criteria do
               )
             end
 
+            let!(:from_db) do
+              Person.first
+            end
+
             it "updates the matching documents" do
-              from_db.posts.first.title.should == "Berlin"
+              from_db.posts.where(:title => "Berlin").count.should eq(1)
             end
 
             it "does not update non matching documents" do
-              from_db.posts.last.title.should == "Second"
+              from_db.posts.where(:title => "Second").count.should eq(1)
             end
           end
         end

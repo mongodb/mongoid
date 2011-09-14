@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "mongoid/validations/associated"
-require "mongoid/validations/referenced"
 require "mongoid/validations/uniqueness"
 
 module Mongoid #:nodoc:
@@ -11,7 +10,25 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include ActiveModel::Validations
 
-    attr_accessor :validated
+    # Begin the associated validation.
+    #
+    # @example Begin validation.
+    #   document.begin_validate
+    #
+    # @since 2.1.9
+    def begin_validate
+      Threaded.begin_validate(self)
+    end
+
+    # Exit the associated validation.
+    #
+    # @example Exit validation.
+    #   document.exit_validate
+    #
+    # @since 2.1.9
+    def exit_validate
+      Threaded.exit_validate(self)
+    end
 
     # Overrides the default ActiveModel behaviour since we need to handle
     # validations of relations slightly different than just calling the
@@ -27,7 +44,8 @@ module Mongoid #:nodoc:
     # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
       if relations[attr.to_s]
-        send(attr, false, :eager => true)
+        relation = send(attr)
+        relation.do_or_do_not(:in_memory) || relation
       else
         send(attr)
       end
@@ -59,7 +77,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0.rc.2
     def validated?
-      !!@validated
+      Threaded.validated?(self)
     end
 
     module ClassMethods #:nodoc:
@@ -112,11 +130,7 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.1
       def validates_relation(metadata)
         if metadata.validate?
-          if metadata.embedded?
-            validates_associated(metadata.name)
-          else
-            validates_with(ReferencedValidator, _merge_attributes([metadata.name]))
-          end
+          validates_associated(metadata.name)
         end
       end
     end

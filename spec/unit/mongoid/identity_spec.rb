@@ -103,12 +103,7 @@ describe Mongoid::Identity do
         context "when using object ids" do
 
           before do
-            Person.identity(:type => BSON::ObjectId)
             Mongoid::Identity.new(person).create
-          end
-
-          after do
-            Person.identity(:type => String)
           end
 
           it "sets the id to a mongo object id" do
@@ -119,7 +114,12 @@ describe Mongoid::Identity do
         context "when not using object ids" do
 
           before do
+            Person.identity(:type => String)
             Mongoid::Identity.new(person).create
+          end
+
+          after do
+            Person.identity(:type => BSON::ObjectId)
           end
 
           it "sets the id to a mongo object id string" do
@@ -142,40 +142,6 @@ describe Mongoid::Identity do
         it "returns the existing id" do
           person.id.should == "5"
         end
-      end
-    end
-  end
-
-  describe "#identify" do
-    let(:person) { Person.new }
-    let(:service) { person.services.build }
-
-    context "with embedded_object_id set to true" do
-      before { Mongoid.embedded_object_id = true }
-
-      context "for a top level document" do
-        subject { person }
-        its(:id) { should_not be_nil }
-      end
-
-      context "for an embedded document" do
-        subject { service }
-        its(:id) { should_not be_nil }
-      end
-    end
-
-    context "with embedded_object_id set to false" do
-      before { Mongoid.embedded_object_id = false }
-      after { Mongoid.embedded_object_id = true }
-
-      context "for a top level document" do
-        subject { person }
-        its(:id) { should_not be_nil }
-      end
-
-      context "for an embedded document" do
-        subject { service }
-        its(:id) { should be_nil }
       end
     end
   end

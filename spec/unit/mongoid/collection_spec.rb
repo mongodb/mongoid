@@ -38,7 +38,11 @@ describe Mongoid::Collection do
   context "when secondary databases exist" do
 
     context "when the database is named" do
-      let(:secondary) { mock("secondary") }
+
+      let(:secondary) do
+        mock("secondary")
+      end
+
       let(:collection) do
         Mongoid::Collection.new(Business, "businesses")
       end
@@ -54,10 +58,9 @@ describe Mongoid::Collection do
       end
 
       it "should use the named database master" do
-        Mongoid::Collections::Master.expects(:new).with(secondary, "businesses")
+        Mongoid::Collections::Master.expects(:new).with(secondary, "businesses", {})
         collection.master
       end
-
     end
   end
 

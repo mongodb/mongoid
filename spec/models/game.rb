@@ -3,8 +3,10 @@ class Game
   field :high_score, :type => Integer, :default => 500
   field :score, :type => Integer, :default => 0
   field :name
-  referenced_in :person, :index => true
-  references_one :video, :validate => false
+  belongs_to :person, :index => true, :validate => true
+  belongs_to :parent, :class_name => "Game"
+  has_one :video, :validate => false
+  has_many :ratings, :as => :ratable, :dependent => :nullify
   accepts_nested_attributes_for :person
   cache
 

@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
       # @example Set the updated at time.
       #   person.set_updated_at
       def set_updated_at
-        self.updated_at = Time.now.utc
+        self.updated_at = Time.now.utc unless self.updated_at_changed?
       end
     end
   end

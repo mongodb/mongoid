@@ -42,8 +42,10 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The count of documents.
       def count
-        @count ||= filter.size
+        @count ||= execute.size
       end
+      alias :length :count
+      alias :size :count
 
       # Delete all the documents in the database matching the selector.
       #
@@ -56,7 +58,9 @@ module Mongoid #:nodoc:
       def delete_all
         atomically(:$pull) do
           set_collection
-          count.tap { filter.each(&:delete) }
+          count.tap do
+            filter.each { |doc| doc.delete }
+          end
         end
       end
       alias :delete :delete_all
@@ -72,7 +76,9 @@ module Mongoid #:nodoc:
       def destroy_all
         atomically(:$pull) do
           set_collection
-          count.tap { filter.each(&:destroy) }
+          count.tap do
+            filter.each { |doc| doc.destroy }
+          end
         end
       end
       alias :destroy :destroy_all
@@ -245,6 +251,14 @@ module Mongoid #:nodoc:
         documents
       end
 
+      def root
+        @root ||= documents.first.try(:_root)
+      end
+
+      def root_class
+        @root_class ||= root ? root.class : nil
+      end
+
       # Set the collection to the collection of the root document.
       #
       # @example Set the collection.
@@ -252,7 +266,6 @@ module Mongoid #:nodoc:
       #
       # @return [ Collection ] The root collection.
       def set_collection
-        root = documents.first._root
         @collection = root.collection if root && !root.embedded?
       end
 

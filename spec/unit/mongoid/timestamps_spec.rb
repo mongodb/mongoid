@@ -41,7 +41,7 @@ describe Mongoid::Timestamps do
   context "when the document has not changed" do
 
     let(:person) do
-      Person.new(:created_at => Time.now.utc)
+      Person.instantiate(:created_at => Time.now.utc)
     end
 
     before do
@@ -49,6 +49,23 @@ describe Mongoid::Timestamps do
     end
 
     it "does not run the update callbacks" do
+      person.expects(:updated_at=).never
+      person.save
+    end
+  end
+
+  context "when the document has changed with updated_at specified" do
+
+    let(:person) do
+      Person.new(:created_at => Time.now.utc)
+    end
+
+    before do
+      person.new_record = false
+    end
+
+    it "does not set updated at" do
+      person.updated_at = DateTime.parse("2001-06-12")
       person.expects(:updated_at=).never
       person.save
     end

@@ -25,14 +25,14 @@ module Mongoid #:nodoc:
           process_attribute(key, value)
         end
         yield self if block_given?
-        process_pending and setup_modifications
+        process_pending
       end
 
       protected
 
-      # If the key provided a relation or a nested attribute, where we have to
-      # hold off on the setting of the attribute until everything else has been
-      # set?
+      # If the key provided is the name of a relation or a nested attribute, we
+      # need to wait until all other attributes are set before processing
+      # these.
       #
       # @example Is the attribute pending?
       #   document.pending_attribute?(:name, "Durran")
@@ -135,7 +135,7 @@ module Mongoid #:nodoc:
           if value.is_a?(Hash)
             metadata.nested_builder(value, {}).build(self)
           else
-            send("#{name}=", value, :binding => true)
+            send("#{name}=", value)
           end
         end
       end

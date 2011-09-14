@@ -16,6 +16,25 @@ describe Mongoid::Persistence::Atomic::Inc do
       person.reload
     end
 
+    context "when incrementing a field on an embedded document" do
+
+      let(:address) do
+        person.addresses.create(:street => "Tauentzienstr", :number => 5)
+      end
+
+      let!(:inced) do
+        address.inc(:number, 5)
+      end
+
+      it "increments the provided value" do
+        inced.should == 10
+      end
+
+      it "persists the change" do
+        reloaded.addresses.first.number.should == 10
+      end
+    end
+
     context "when incrementing a field with a value" do
 
       let!(:inced) do

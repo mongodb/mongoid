@@ -140,6 +140,10 @@ describe Mongoid::Document do
     after do
       Firefox.delete_all
     end
+    
+    it 'should find object with String args' do
+      Firefox.find(@firefox.id.to_s).should == @firefox
+    end
 
     it "returns subclasses for querying parents" do
       firefox = Canvas.where(:name => "firefox").first
@@ -221,15 +225,28 @@ describe Mongoid::Document do
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
 
+    it "should respect the _type attribute" do
+      @container.vehicles.build({ "_type" => "Car" })
+      @container.vehicles.build({ "_type" => "Truck" })
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+
     it "should allow STI from the build call" do
       @container.vehicles.create({},Car)
       @container.vehicles.create({},Truck)
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
 
+    it "should respect the _type attribute" do
+      @container.vehicles.create({ "_type" => "Car" })
+      @container.vehicles.create({ "_type" => "Truck" })
+      @container.vehicles.map(&:class).should == [Car,Truck]
+    end
+
+
     it "should not bleed relations from one subclass to another" do
-      Truck.relations.keys.should =~ %w/ shipping_container bed /
-      Car.relations.keys.should =~ %w/ shipping_container /
+      Truck.relations.keys.should =~ %w/ shipping_container driver bed /
+      Car.relations.keys.should =~ %w/ shipping_container driver /
     end
   end
 end

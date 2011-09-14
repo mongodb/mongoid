@@ -4,7 +4,7 @@
 # development environment upon cd'ing into the directory
 
 # First we specify our desired <ruby>[@<gemset>], the @gemset name is optional.
-environment_id="ruby-1.9.2-p180@mongoid"
+environment_id="ruby-1.9.2@mongoid"
 
 #
 # First we attempt to load the desired environment directly from the environment

@@ -109,6 +109,13 @@ describe Mongoid::Persistence do
         account.should be_persisted
       end
     end
+
+    context "when a callback returns false" do
+
+      it "raises a callback error" do
+        expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)
+      end
+    end
   end
 
   [ :delete, :destroy ].each do |method|
@@ -282,7 +289,7 @@ describe Mongoid::Persistence do
         end
 
         it "persists with proper set and push modifiers" do
-          person._updates.should == {
+          person.atomic_updates.should == {
             "$set" => {
               "title" => "King",
               "name.first_name" => "Ryan"
@@ -412,12 +419,71 @@ describe Mongoid::Persistence do
         expect { subject.save! }.should raise_error
       end
     end
+
+    context "when a callback returns false" do
+
+      let(:oscar) do
+        Oscar.new
+      end
+
+      it "raises a callback error" do
+        expect { oscar.save! }.to raise_error(Mongoid::Errors::Callback)
+      end
+    end
   end
 
   describe "#update_attribute" do
 
     let(:post) do
       Post.new
+    end
+
+    context "when setting an array field" do
+
+      let(:person) do
+        Person.create(:ssn => "432-11-1123", :aliases => [])
+      end
+
+      before do
+        person.update_attribute(:aliases, person.aliases << "Bond")
+      end
+
+      it "sets the new value in the document" do
+        person.aliases.should eq([ "Bond" ])
+      end
+
+      it "persists the changes" do
+        person.reload.aliases.should eq([ "Bond" ])
+      end
+    end
+
+    context "when setting a boolean field" do
+
+      context "when the field is true" do
+
+        let(:person) do
+          Person.new(:ssn => "234-11-1232", :terms => true)
+        end
+
+        context "when setting to false" do
+
+          before do
+            person.update_attribute(:terms, false)
+          end
+
+          it "persists the document" do
+            person.should be_persisted
+          end
+
+          it "changes the attribute value" do
+            person.terms.should be_false
+          end
+
+          it "persists the changes" do
+            person.reload.terms.should be_false
+          end
+        end
+      end
     end
 
     context "when saving with a hash field with invalid keys" do
@@ -724,6 +790,22 @@ describe Mongoid::Persistence do
             reloaded.phone_numbers.first.number.should == "098-765-4321"
           end
         end
+      end
+    end
+  end
+
+  describe "#update_attributes!" do
+
+    context "when a callback returns false" do
+
+      let(:oscar) do
+        Oscar.new
+      end
+
+      it "raises a callback error" do
+        expect {
+          oscar.update_attributes!(:title => "The Grouch")
+        }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end

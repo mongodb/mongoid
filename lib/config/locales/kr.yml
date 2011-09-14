@@ -4,12 +4,20 @@ kr:
       messages:
         taken:
           이미 사용하고있습니다
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           클라스 %{klass}와 id를 %{identifiers} 위한 문서를 찾을수 없습니다.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           데이타베이스가 Mongo::DB이어야 합니다, %{name}이면 안됩니다.
         invalid_type:
           데이터 필드가 %{klass} 처럼 정의를 내립니다. 하지만 그것은  %{other}를 %{value} 으로 산출되어  받습니다
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} 를 사용할수 없습니다. %{mongo_version} 으로 업그레이드 시켜주세요.
         validations:
@@ -32,3 +40,6 @@ kr:
         unsaved_document:
           You cannot call create or create! through a relational association
           relation (%{document}) who's parent (%{base}) is not already saved.
+        mixed_relations:
+          Referencing a(n) %{embedded} document from the %{root} document via a
+          relational association is not allowed since the %{embedded} is embedded.

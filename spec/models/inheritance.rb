@@ -5,6 +5,9 @@ class Canvas
   embeds_one :writer
   embeds_one :palette
 
+  accepts_nested_attributes_for :shapes
+  accepts_nested_attributes_for :writer
+
   def render
     shapes.each { |shape| render }
   end
@@ -62,9 +65,14 @@ class Palette
   embeds_many :tools
 end
 
+class BigPalette < Palette
+end
+
 class Tool
   include Mongoid::Document
   embedded_in :palette
+
+  accepts_nested_attributes_for :palette
 end
 
 class Pencil < Tool; end
@@ -76,11 +84,17 @@ class Eraser < Tool; end
 ########################################
 class ShippingContainer
   include Mongoid::Document
-  references_many :vehicles
+  has_many :vehicles
+
+  accepts_nested_attributes_for :vehicles
 end
 class Vehicle
   include Mongoid::Document
-  referenced_in :shipping_container
+  belongs_to :shipping_container
+  belongs_to :driver
+
+  accepts_nested_attributes_for :driver
+  accepts_nested_attributes_for :shipping_containers
 end
 class Bed; end
 class Car < Vehicle; end
@@ -88,3 +102,12 @@ class Truck < Vehicle
   embeds_one :bed
 end
 
+class Driver
+  include Mongoid::Document
+
+  has_one :vehicle
+  accepts_nested_attributes_for :vehicle
+end
+
+class Learner < Driver
+end

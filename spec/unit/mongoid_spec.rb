@@ -30,4 +30,53 @@ describe Mongoid do
       end
     end
   end
+
+  describe ".unit_of_work" do
+
+    context "when an exception is raised" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        Mongoid::IdentityMap.set(person)
+
+        begin
+          Mongoid.unit_of_work do
+            raise RuntimeError
+          end
+        rescue
+        end
+      end
+
+      let(:identity_map) do
+        Mongoid::Threaded.identity_map
+      end
+
+      it "clears the identity map" do
+        identity_map.should be_empty
+      end
+    end
+
+    context "when no exception is raised" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        Mongoid::IdentityMap.set(person)
+        Mongoid.unit_of_work {}
+      end
+
+      let(:identity_map) do
+        Mongoid::Threaded.identity_map
+      end
+
+      it "clears the identity map" do
+        identity_map.should be_empty
+      end
+    end
+  end
 end

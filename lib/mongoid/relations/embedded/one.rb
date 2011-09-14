@@ -7,28 +7,6 @@ module Mongoid # :nodoc:
       # relations.
       class One < Relations::One
 
-        # Binds the base object to the inverse of the relation. This is so we
-        # are referenced to the actual objects themselves and dont hit the
-        # database twice when setting the relations up.
-        #
-        # This is called after first creating the relation, or if a new object
-        # is set on the relation.
-        #
-        # @example Bind the relation.
-        #   person.name.bind(:continue => false)
-        #
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
-        #
-        # @since 2.0.0.rc.1
-        def bind(options = {})
-          binding.bind(options)
-          target.save if base.persisted? && !options[:binding]
-        end
-
         # Instantiate a new embeds_one relation.
         #
         # @example Create the new proxy.
@@ -40,29 +18,34 @@ module Mongoid # :nodoc:
         def initialize(base, target, metadata)
           init(base, target, metadata) do
             characterize_one(target)
-            target.parentize(base)
+            bind_one
+            target.save if persistable?
           end
         end
 
-        # Unbinds the base object to the inverse of the relation. This occurs
-        # when setting a side of the relation to nil.
+        # Substitutes the supplied target documents for the existing document
+        # in the relation.
         #
-        # Will delete the object if necessary.
+        # @example Substitute the new document.
+        #   person.name.substitute(new_name)
         #
-        # @example Unbind the relation.
-        #   person.name.unbind(name, :continue => true)
+        # @param [ Document ] other A document to replace the target.
         #
-        # @param [ Document ] old_target The previous target of the relation.
-        # @param [ Hash ] options The options to bind with.
-        #
-        # @option options [ true, false ] :binding Are we in build mode?
-        # @option options [ true, false ] :continue Continue binding the
-        #   inverse?
+        # @return [ Document, nil ] The relation or nil.
         #
         # @since 2.0.0.rc.1
-        def unbind(old_target, options = {})
-          binding(old_target).unbind(options)
-          old_target.delete if base.persisted? && !old_target.destroyed?
+        def substitute(replacement)
+          tap do |proxy|
+            if assigning?
+              base.atomic_unsets.push(proxy.atomic_path)
+            else
+              proxy.delete if persistable?
+            end
+            proxy.unbind_one
+            return nil unless replacement
+            proxy.target = replacement
+            proxy.bind_one
+          end
         end
 
         private
@@ -77,8 +60,20 @@ module Mongoid # :nodoc:
         # @return [ Binding ] The relation's binding.
         #
         # @since 2.0.0.rc.1
-        def binding(new_target = nil)
-          Bindings::Embedded::One.new(base, new_target || target, metadata)
+        def binding
+          Bindings::Embedded::One.new(base, target, metadata)
+        end
+
+        # Are we able to persist this relation?
+        #
+        # @example Can we persist the relation?
+        #   relation.persistable?
+        #
+        # @return [ true, false ] If the relation is persistable.
+        #
+        # @since 2.1.0
+        def persistable?
+          base.persisted? && !binding? && !building? && !assigning?
         end
 
         class << self
@@ -95,8 +90,8 @@ module Mongoid # :nodoc:
           # @return [ Builder ] A newly instantiated builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object)
-            Builders::Embedded::One.new(meta, object)
+          def builder(meta, object, loading = false)
+            Builders::Embedded::One.new(meta, object, loading)
           end
 
           # Returns true if the relation is an embedded one. In this case
@@ -151,6 +146,21 @@ module Mongoid # :nodoc:
             Builders::NestedAttributes::One.new(metadata, attributes, options)
           end
 
+          # Get the path calculator for the supplied document.
+          #
+          # @example Get the path calculator.
+          #   Proxy.path(document)
+          #
+          # @param [ Document ] document The document to calculate on.
+          #
+          # @return [ Mongoid::Atomic::Paths::Embedded::One ]
+          #   The embedded one atomic path calculator.
+          #
+          # @since 2.1.0
+          def path(document)
+            Mongoid::Atomic::Paths::Embedded::One.new(document)
+          end
+
           # Tells the caller if this relation is one that stores the foreign
           # key on its own objects.
           #
@@ -162,6 +172,31 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def stores_foreign_key?
             false
+          end
+
+          # Get the valid options allowed with this relation.
+          #
+          # @example Get the valid options.
+          #   Relation.valid_options
+          #
+          # @return [ Array<Symbol> ] The valid options.
+          #
+          # @since 2.1.0
+          def valid_options
+            [ :as, :cyclic ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
           end
         end
       end

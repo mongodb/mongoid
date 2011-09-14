@@ -49,13 +49,36 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.7
       def matcher(document, key, value)
         if value.is_a?(Hash)
-          MATCHERS[value.keys.first].new(document.attributes[key.to_s])
+          MATCHERS[value.keys.first].new(extract_attribute(document, key))
         else
           if key == "$or"
             Matchers::Or.new(value, document)
           else
-            Default.new(document.attributes[key.to_s])
+            Default.new(extract_attribute(document, key))
           end
+        end
+      end
+
+      private
+
+      # Extract the attribute from the key, being smarter about dot notation.
+      #
+      # @example Extract the attribute.
+      #   strategy.extract_attribute(doc, "info.field")
+      #
+      # @param [ Document ] document The document.
+      # @param [ String ] key The key.
+      #
+      # @return [ Object ] The value of the attribute.
+      #
+      # @since 2.2.1
+      def extract_attribute(document, key)
+        if (key_string = key.to_s) =~ /.+\..+/
+          key_string.split('.').inject(document.attributes) do |attribs, key|
+            attribs.try(:[], key)
+          end
+        else
+          document.attributes[key_string]
         end
       end
     end

@@ -30,18 +30,19 @@ module Mongoid #:nodoc:
         #     person.posts << [ post_one, post_two, post_three ]
         #   end
         #
+        # @todo Durran: Move executions to thread local stack.
+        #
         # @param [ Proc ] block The block to execute.
         #
         # @return [ Object ] The result of the operation.
         #
         # @since 2.0.2, batch-relational-insert
         def batched(&block)
-          inserter = Thread.current[:mongoid_batch_insert] ||= Insert.new
+          inserter = Threaded.insert ||= Insert.new
           count_executions(&block)
         ensure
           if @executions.zero?
-            Thread.current[:mongoid_batch_insert] = nil
-            raise_mixed if embedded?
+            Threaded.insert = nil
             inserter.execute(collection)
           end
         end

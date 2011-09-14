@@ -62,12 +62,12 @@ describe Mongoid::Errors do
 
         before do
           @error = Mongoid::Errors::InvalidOptions.new(
-            "embedded_in_must_have_inverse_of", {}
+            :name, :invalid, [ :valid ]
           )
         end
 
         it "returns the class name" do
-          @error.message.should include("inverse_of")
+          @error.message.should include("Invalid option")
         end
       end
     end

@@ -6,11 +6,8 @@ module Mongoid #:nodoc:
   module Document
     extend ActiveSupport::Concern
     include Mongoid::Components
-    include Mongoid::MultiDatabase
 
-    included do
-      attr_reader :new_record
-    end
+    attr_reader :new_record
 
     # Default comparison is via the string version of the id.
     #
@@ -47,7 +44,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      self.class == other.class
+      other.is_a?(self.class)
     end
 
     # Delegates to ==. Used when needing checks in hashes.
@@ -125,13 +122,15 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil)
-      @new_record = true
-      @attributes = apply_default_attributes
-      process(attrs) do
-        yield self if block_given?
-        identify
+      building do
+        @new_record = true
+        @attributes = apply_default_attributes
+        process(attrs) do
+          yield self if block_given?
+          identify
+        end
+        run_callbacks(:initialize) { self }
       end
-      run_callbacks(:initialize) { self }
     end
 
     # Reloads the +Document+ attributes from the database. If the document has
@@ -150,32 +149,11 @@ module Mongoid #:nodoc:
         raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
       end
       @attributes = {}.merge(reloaded || {})
+      changed_attributes.clear
       apply_default_attributes
-      reset_modifications
       tap do
-        relations.keys.each do |name|
-          if instance_variable_defined?("@#{name}")
-            remove_instance_variable("@#{name}")
-          end
-        end
-      end
-    end
-
-    # Remove a child document from this parent. If an embeds one then set to
-    # nil, otherwise remove from the embeds many.
-    #
-    # This is called from the +RemoveEmbedded+ persistence command.
-    #
-    # @example Remove the child.
-    #   document.remove_child(child)
-    #
-    # @param [ Document ] child The child (embedded) document to remove.
-    def remove_child(child)
-      name = child.metadata.name
-      if child.embedded_one?
-        remove_instance_variable("@#{name}") if instance_variable_defined?("@#{name}")
-      else
-        send(name).delete(child)
+        reload_relations
+        run_callbacks(:initialize)
       end
     end
 
@@ -198,11 +176,12 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      attribs = attributes
-      attribs.tap do |attrs|
-        relations.select { |name, meta| meta.embedded? }.each do |name, meta|
-          relation = send(name, false, :continue => false)
-          attrs[name] = relation.as_document unless relation.blank?
+      attributes.tap do |attrs|
+        relations.each_pair do |name, meta|
+          if meta.embedded?
+            relation = send(name)
+            attrs[name] = relation.as_document unless relation.blank?
+          end
         end
       end
     end
@@ -228,6 +207,29 @@ module Mongoid #:nodoc:
         became.instance_variable_set('@new_record', new_record?)
         became.instance_variable_set('@destroyed', destroyed?)
       end
+    end
+
+    private
+
+    # Returns the logger
+    #
+    # @return [ Logger ] The configured logger or a default Logger instance.
+    #
+    # @since 2.2.0
+    def logger
+      Mongoid.logger
+    end
+
+    # Implement this for calls to flatten on array.
+    #
+    # @example Get the document as an array.
+    #   document.to_ary
+    #
+    # @return [ nil ] Always nil.
+    #
+    # @since 2.1.0
+    def to_ary
+      nil
     end
 
     module ClassMethods #:nodoc:
@@ -260,7 +262,7 @@ module Mongoid #:nodoc:
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
           doc.send(:apply_default_attributes)
-          doc.setup_modifications
+          IdentityMap.set(doc)
           doc.run_callbacks(:initialize) { doc }
         end
       end
@@ -272,12 +274,26 @@ module Mongoid #:nodoc:
       #
       # @return [ Array<Class> ] All subclasses of the current document.
       def _types
-        @_type ||= [descendants + [self]].flatten.uniq.map(&:to_s)
+        @_type ||= [descendants + [self]].flatten.uniq.map { |t| t.to_s }
       end
 
       # Set the i18n scope to overwrite ActiveModel.
+      #
+      # @return [ Symbol ] :mongoid
       def i18n_scope
         :mongoid
+      end
+
+      # Returns the logger
+      #
+      # @example Get the logger.
+      #   Person.logger
+      #
+      # @return [ Logger ] The configured logger or a default Logger instance.
+      #
+      # @since 2.2.0
+      def logger
+        Mongoid.logger
       end
     end
   end

@@ -4,7 +4,27 @@ module Mongoid #:nodoc:
     class Mongo
       attr_accessor :criteria
 
-      delegate :klass, :options, :field_list, :selector, :to => :criteria
+      delegate :cached?, :klass, :options, :field_list, :selector, :to => :criteria
+      delegate :collection, :to => :klass
+
+      # Perform an add to set on the matching documents.
+      #
+      # @example Add to set on all matching.
+      #   Person.where(:name => "Alex").add_to_set(:aliases, "value")
+      #
+      # @param [ String ] field The field to add to.
+      # @param [ Object ] value The value to add.
+      #
+      # @return [ Object ] The update value.
+      #
+      # @since 2.1.0
+      def add_to_set(field, value)
+        klass.collection.update(
+          selector,
+          { "$addToSet" => { field => value } },
+          :multi => true
+        )
+      end
 
       # Aggregate the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
@@ -67,8 +87,14 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The count of documents.
       def count(extras = false)
-        @count ||= klass.collection.find(selector, process_options).count(extras)
+        if cached?
+          @count ||= collection.find(selector, process_options).count(extras)
+        else
+          collection.find(selector, process_options).count(extras)
+        end
       end
+      alias :size :count
+      alias :length :count
 
       # Delete all the documents in the database matching the selector.
       #
@@ -119,6 +145,9 @@ module Mongoid #:nodoc:
       #
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
+        criteria.inclusions.reject! do |metadata|
+          metadata.eager_load(criteria)
+        end
         klass.collection.find(selector, process_options) || []
       end
 
@@ -178,7 +207,7 @@ module Mongoid #:nodoc:
       # @example Iterate over the results.
       #   context.iterate { |doc| p doc }
       def iterate(&block)
-        return caching(&block) if criteria.cached?
+        return caching(&block) if cached?
         if block_given?
           execute.each { |doc| yield doc }
         end
@@ -194,9 +223,9 @@ module Mongoid #:nodoc:
       # @return [ Document ] The last document in the collection.
       def last
         opts = process_options
-        sorting = opts[:sort]
-        sorting = [[:_id, :asc]] unless sorting
-        opts[:sort] = sorting.collect { |option| [ option[0], option[1].invert ] }
+        sorting = opts[:sort] ||= []
+        sorting << [:_id, :asc]
+        opts[:sort] = sorting.map{ |option| [ option[0], option[1].invert ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
@@ -233,6 +262,25 @@ module Mongoid #:nodoc:
       # @return [ Numeric ] A numeric minimum value.
       def min(field)
         grouped(:min, field.to_s, Javascript.min)
+      end
+
+      # Perform a pull on the matching documents.
+      #
+      # @example Pull on all matching.
+      #   Person.where(:name => "Alex").pull(:aliases, "value")
+      #
+      # @param [ String ] field The field to pull from.
+      # @param [ Object ] value The value to pull.
+      #
+      # @return [ Object ] The update value.
+      #
+      # @since 2.1.0
+      def pull(field, value)
+        klass.collection.update(
+          selector,
+          { "$pull" => { field => value } },
+          :multi => true
+        )
       end
 
       # Return the first result for the +Context+ and skip it
@@ -277,9 +325,10 @@ module Mongoid #:nodoc:
         klass.collection.update(
           selector,
           { "$set" => attributes },
-          :multi => true,
-          :safe => Mongoid.persist_in_safe_mode
-        )
+          Safety.merge_safety_options(:multi => true)
+        ).tap do
+          Threaded.clear_safety_options!
+        end
       end
       alias :update :update_all
 
@@ -318,7 +367,8 @@ module Mongoid #:nodoc:
           :initial => { start => "start" },
           :reduce => reduce.gsub("[field]", field)
         )
-        collection.empty? ? nil : collection.first[start.to_s]
+        value = collection.empty? ? nil : collection.first[start.to_s]
+        value ? (value.nan? ? nil : value) : value
       end
 
       # Filters the field list. If no fields have been supplied, then it will be

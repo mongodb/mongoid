@@ -3,5 +3,5 @@ class Ghost
 
   field :name, :type => String
 
-  referenced_in :movie, :autosave => true
+  belongs_to :movie, :autosave => true
 end

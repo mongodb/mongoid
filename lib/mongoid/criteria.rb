@@ -32,7 +32,6 @@ module Mongoid #:nodoc:
     include Criterion::Optional
 
     attr_accessor \
-      :collection,
       :documents,
       :embedded,
       :ids,
@@ -42,10 +41,13 @@ module Mongoid #:nodoc:
       :field_list
 
     delegate \
+      :add_to_set,
       :aggregate,
       :avg,
       :blank?,
       :count,
+      :size,
+      :length,
       :delete,
       :delete_all,
       :destroy,
@@ -59,6 +61,7 @@ module Mongoid #:nodoc:
       :max,
       :min,
       :one,
+      :pull,
       :shift,
       :sum,
       :update,
@@ -103,6 +106,18 @@ module Mongoid #:nodoc:
       else
         return false
       end
+    end
+
+    # Get the collection associated with the criteria.
+    #
+    # @example Get the collection.
+    #   criteria.collection
+    #
+    # @return [ Collection ] The collection.
+    #
+    # @since 2.2.0
+    def collection
+      klass.collection
     end
 
     # Return or create the context in which this criteria should be executed.
@@ -150,7 +165,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def freeze
-      context and super
+      context and inclusions and super
     end
 
     # Merges the supplied argument hash into a single criteria
@@ -180,9 +195,10 @@ module Mongoid #:nodoc:
       @options, @klass, @documents, @embedded = {}, klass, [], embedded
     end
 
-    # Merges another object into this +Criteria+. The other object may be a
-    # +Criteria+ or a +Hash+. This is used to combine multiple scopes together,
-    # where a chained scope situation may be desired.
+    # Merges another object with this +Criteria+ and returns a new criteria.
+    # The other object may be a +Criteria+ or a +Hash+. This is used to
+    # combine multiple scopes together, where a chained scope situation
+    # may be desired.
     #
     # @example Merge the criteria with a conditions hash.
     #   criteria.merge({ :conditions => { :title => "Sir" } })
@@ -294,7 +310,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def raise_invalid
-      raise Errors::InvalidOptions.new(:calling_document_find_with_nil_is_invalid, {})
+      raise Errors::InvalidFind.new
     end
 
     protected
@@ -312,6 +328,18 @@ module Mongoid #:nodoc:
       other.is_a?(Criteria) ? other.entries : other
     end
 
+    # Get the raw driver collection from the criteria.
+    #
+    # @example Get the raw driver collection.
+    #   criteria.driver
+    #
+    # @return [ Mongo::Collection ] The driver collection.
+    #
+    # @since 2.2.0
+    def driver
+      collection.driver
+    end
+
     # Clone or dup the current +Criteria+. This will return a new criteria with
     # the selector, options, klass, embedded options, etc intact.
     #
@@ -327,6 +355,7 @@ module Mongoid #:nodoc:
     def initialize_copy(other)
       @selector = other.selector.dup
       @options = other.options.dup
+      @includes = other.inclusions.dup
       @context = nil
     end
 
@@ -354,7 +383,7 @@ module Mongoid #:nodoc:
     def update_selector(attributes, operator, combine = :+)
       clone.tap do |crit|
         converted = BSON::ObjectId.convert(klass, attributes || {})
-        converted.each do |key, value|
+        converted.each_pair do |key, value|
           unless crit.selector[key]
             crit.selector[key] = { operator => value }
           else

@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
       module Inflections
 
         ActiveSupport::Inflector.inflections do |inflect|
-          inflect.singular("address", "address")
+          inflect.singular(/address$/, "address")
           inflect.singular("addresses", "address")
           inflect.irregular("canvas", "canvases")
         end
@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
           "*" => "-astx-",
           "+" => "-plus-",
           "," => "-comma-",
-          "-" => "-dash-",
+          "-" => "-",
           "." => "-period-",
           "/" => "-fwdslsh-",
           ":" => "-colon-",

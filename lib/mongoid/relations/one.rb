@@ -6,41 +6,30 @@ module Mongoid # :nodoc:
     # behaviour or those proxies.
     class One < Proxy
 
-      # Will load the target into an array if the target had not already been
-      # loaded.
+      # Get all the documents in the relation that are loaded into memory.
       #
-      # @example Load the relation into memory.
-      #   relation.load!
+      # @example Get the in memory documents.
+      #   relation.in_memory
       #
-      # @return [ One ] The relation.
+      # @return [ Array<Document> ] The documents in memory.
       #
-      # @since 2.0.0.rc.5
-      def load!(options = {})
-        tap do |relation|
-          unless relation.loaded?
-            relation.bind(options)
-            relation.loaded = true
-          end
-        end
+      # @since 2.1.0
+      def in_memory
+        [ target ]
       end
 
-      # Substitutes the supplied target documents for the existing document
-      # in the relation.
+      # Since method_missing is overridden we should override this as well.
       #
-      # @example Substitute the new document.
-      #   person.name.substitute(new_name)
+      # @example Does the proxy respond to the method?
+      #   relation.respond_to?(:name)
       #
-      # @param [ Document ] other A document to replace the target.
+      # @param [ Symbol ] name The method name.
       #
-      # @return [ Document, nil ] The relation or nil.
+      # @return [ true, false ] If the proxy responds to the method.
       #
-      # @since 2.0.0.rc.1
-      def substitute(new_target, options = {})
-        old_target = target
-        tap do |relation|
-          relation.target = new_target
-          new_target ? bind(options) : (unbind(old_target, options) and return nil)
-        end
+      # @since 2.1.8
+      def respond_to?(name, include_private = false)
+        target.respond_to?(name, include_private) || super
       end
     end
   end

@@ -4,13 +4,21 @@ nl:
       messages:
         taken:
           al in gebruik
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Document niet gevonden voor class %{klass} met de id(s) %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           Database moet een Mongo::DB zijn, niet een %{name}.
         invalid_type:
           Veld was gedefinieerd als een %{klass}, maar ontvangen als %{other} met
           de waarde %{value}.
+        invalid_options:
+          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
+          are: %{valid}."
         unsupported_version:
           MongoDB %{version} wordt niet ondersteund, upgrade naar versie %{mongo_version}.
         validations:
@@ -37,3 +45,6 @@ nl:
         unsaved_document:
           You cannot call create or create! through a relational association
           relation (%{document}) who's parent (%{base}) is not already saved.
+        mixed_relations:
+          Referencing a(n) %{embedded} document from the %{root} document via a
+          relational association is not allowed since the %{embedded} is embedded.

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::One do
 
   before do
-    [ Person, Game, Bar ].map(&:delete_all)
+    [ Person, Game, Bar, Book ].map(&:delete_all)
   end
 
   describe "#=" do
@@ -539,6 +539,87 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
+  describe ".eager_load" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let!(:person) do
+        Person.create(:ssn => "243-12-5243")
+      end
+
+      let!(:game) do
+        person.create_game(:name => "Tron")
+      end
+
+      let(:metadata) do
+        Person.relations["game"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Person.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Game, "person_id" => person.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq(game)
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let!(:book) do
+        Book.create(:name => "Game of Thrones")
+      end
+
+      let!(:movie) do
+        Movie.create(:name => "Bladerunner")
+      end
+
+      let!(:movie_rating) do
+        movie.ratings.create(:value => 10)
+      end
+
+      let!(:book_rating) do
+        book.create_rating(:value => 10)
+      end
+
+      let(:metadata) do
+        Book.relations["rating"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Book.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Rating, "ratable_id" => book.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "ratable_id" => { "$in" => [ book.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq(book_rating)
+      end
+    end
+  end
+
   describe "#nullify" do
 
     let(:person) do
@@ -549,20 +630,101 @@ describe Mongoid::Relations::Referenced::One do
       person.create_game(:name => "Starcraft II")
     end
 
+    context "when the instance has been set" do
+
+      before do
+        person.game.nullify
+      end
+
+      it "removes the foreign key from the target" do
+        game.person_id.should be_nil
+      end
+
+      it "removes the reference from the target" do
+        game.person.should be_nil
+      end
+    end
+
+    context "when the instance has been reloaded" do
+
+      let(:from_db) do
+        Person.find(person.id)
+      end
+
+      let(:game_reloaded) do
+        Game.find(game.id)
+      end
+
+      before do
+        from_db.game.nullify
+      end
+
+      it "removes the foreign key from the target" do
+        game_reloaded.person_id.should be_nil
+      end
+
+      it "removes the reference from the target" do
+        game_reloaded.person.should be_nil
+      end
+    end
+  end
+
+  context "when reloading the relation" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-41-9678", :title => "Mr.")
+    end
+
+    let!(:game_one) do
+      Game.create(:name => "Warcraft 3")
+    end
+
+    let!(:game_two) do
+      Game.create(:name => "Starcraft 2")
+    end
+
     before do
-      person.game.nullify
+      person.game = game_one
     end
 
-    it "removes the foreign key from the target" do
-      game.person_id.should be_nil
+    context "when the relation references the same document" do
+
+      before do
+        Game.collection.update(
+          { :_id => game_one.id }, { "$set" => { :name => "Diablo 2" }}
+        )
+      end
+
+      let(:reloaded) do
+        person.game(true)
+      end
+
+      it "reloads the document from the database" do
+        reloaded.name.should eq("Diablo 2")
+      end
+
+      it "sets a new document instance" do
+        reloaded.should_not equal(game_one)
+      end
     end
 
-    it "removes the reference from the target" do
-      game.person.should be_nil
-    end
+    context "when the relation references a different document" do
 
-    it "removes the reference from the base" do
-      person.game.should be_nil
+      before do
+        person.game = game_two
+      end
+
+      let(:reloaded) do
+        person.game(true)
+      end
+
+      it "reloads the new document from the database" do
+        reloaded.name.should eq("Starcraft 2")
+      end
+
+      it "sets a new document instance" do
+        reloaded.should_not equal(game_one)
+      end
     end
   end
 end

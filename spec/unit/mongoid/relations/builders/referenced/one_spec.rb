@@ -4,11 +4,16 @@ describe Mongoid::Relations::Builders::Referenced::One do
 
   describe "#build" do
 
+    let(:criteria) do
+      Post.where("person_id" => object)
+    end
+
     let(:metadata) do
       stub(
         :klass => Post,
         :name => :post,
-        :foreign_key => "person_id"
+        :foreign_key => "person_id",
+        :criteria => criteria
       )
     end
 
@@ -31,9 +36,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       before do
-        Post.expects(:first).with(
-          :conditions => { "person_id" => object }
-        ).returns(post)
+        criteria.expects(:first).returns(post)
         @documents = builder.build
       end
 

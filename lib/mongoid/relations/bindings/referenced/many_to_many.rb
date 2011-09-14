@@ -7,26 +7,6 @@ module Mongoid # :nodoc:
         # Binding class for all references_and_referenced_in_many relations.
         class ManyToMany < Binding
 
-          # Binds the base object to the inverse of the relation. This is so we
-          # are referenced to the actual objects themselves on both sides.
-          #
-          # This case sets the metadata on the inverse object as well as the
-          # document itself.
-          #
-          # @example Bind all the documents.
-          #   person.preferences.bind
-          #   person.preferences = [ Preference.new ]
-          #
-          # @param [ Hash ] options The binding options.
-          #
-          # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :binding Are we in build mode?
-          #
-          # @since 2.0.0.rc.1
-          def bind(options = {})
-            target.each { |doc| bind_one(doc, options) }
-          end
-
           # Binds a single document with the inverse relation. Used
           # specifically when appending to the proxy.
           #
@@ -34,40 +14,17 @@ module Mongoid # :nodoc:
           #   person.preferences.bind_one(preference)
           #
           # @param [ Document ] doc The single document to bind.
-          # @param [ Hash ] options The binding options.
-          #
-          # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind_one(doc, options = {})
-            if options[:continue]
-              inverse = metadata.inverse(target)
-              if inverse
-                doc.do_or_do_not(
-                  inverse,
-                  false,
-                  OPTIONS
-                ).push(base, :binding => true, :continue => false)
+          def bind_one(doc)
+            unless binding?
+              binding do
+                inverse_keys = doc.you_must(metadata.inverse_foreign_key)
+                inverse_keys.push(base.id) if inverse_keys
+                base.synced[metadata.foreign_key] = true
+                doc.synced[metadata.inverse_foreign_key] = true
               end
             end
-          end
-
-          # Unbinds the base object and the inverse, caused by setting the
-          # reference to nil.
-          #
-          # @example Unbind the documents.
-          #   person.preferences.unbind
-          #   person.preferences = nil
-          #
-          # @param [ Hash ] options The binding options.
-          #
-          # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :binding Are we in build mode?
-          #
-          # @since 2.0.0.rc.1
-          def unbind(options = {})
-            target.each { |doc| unbind_one(doc, options) }
           end
 
           # Unbind a single document.
@@ -75,25 +32,16 @@ module Mongoid # :nodoc:
           # @example Unbind the document.
           #   person.preferences.unbind_one(document)
           #
-          # @todo Durran: Get rid of persistence operation in this method.
-          #
-          # @param [ Hash ] options The binding options.
-          #
-          # @option options [ true, false ] :continue Continue binding the inverse.
-          # @option options [ true, false ] :binding Are we in build mode?
-          #
           # @since 2.0.0.rc.1
-          def unbind_one(doc, options = {})
-            base.do_or_do_not(metadata.foreign_key).delete(doc.id)
-            if options[:continue]
-              inverse = metadata.inverse(target)
-              if inverse
-                doc.do_or_do_not(
-                  inverse, false, OPTIONS
-                ).delete(base, :binding => true, :continue => false)
+          def unbind_one(doc)
+            unless binding?
+              binding do
+                base.send(metadata.foreign_key).delete_one(doc.id)
+                inverse_keys = doc.you_must(metadata.inverse_foreign_key)
+                inverse_keys.delete_one(base.id) if inverse_keys
+                base.synced[metadata.foreign_key] = true
+                doc.synced[metadata.inverse_foreign_key] = true
               end
-            else
-              base.save if base.persisted?
             end
           end
         end

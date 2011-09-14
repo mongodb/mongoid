@@ -49,34 +49,6 @@ describe Mongoid::Relations::Embedded::In do
     end
   end
 
-  describe "#bind" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    before do
-      binding_klass.expects(:new).returns(binding)
-      binding.expects(:bind).returns(true)
-    end
-
-    context "when building" do
-
-      it "does not save the document" do
-        target.expects(:save).never
-        relation.bind(:binding => true)
-      end
-    end
-
-    context "when not building" do
-
-      it "does not save the target" do
-        target.expects(:save).never
-        relation.bind
-      end
-    end
-  end
-
   describe ".builder" do
 
     it "returns the embedded one builder" do
@@ -100,6 +72,29 @@ describe Mongoid::Relations::Embedded::In do
     it "parentizes the child" do
       relation.base._parent.should == target
     end
+
+    context "when the base already has metadata" do
+
+      let(:base) do
+        Name.new
+      end
+
+      before do
+        base.metadata = Mongoid::Relations::Metadata.new(
+          :relation => described_class,
+          :inverse_class_name => "Name",
+          :name => :person
+        )
+      end
+
+      let(:relation) do
+        described_class.new(base, target, metadata)
+      end
+
+      it "does not set new metadata" do
+        base.metadata.should_not eq(metadata)
+      end
+    end
   end
 
   describe ".macro" do
@@ -121,91 +116,43 @@ describe Mongoid::Relations::Embedded::In do
     end
   end
 
-  describe "#substitute" do
+  describe "#respond_to?" do
 
-    let(:relation) do
-      described_class.new(base, target, metadata)
+    let(:person) do
+      Person.new
     end
 
-    context "when passing a document" do
-
-      let(:document) do
-        Name.new(:first_name => "Durran")
-      end
-
-      before do
-        binding_klass.expects(:new).returns(binding)
-        binding.expects(:bind).returns(true)
-        @substitute = relation.substitute(document)
-      end
-
-      it "sets a new target" do
-        relation.target.should == document
-      end
-
-      it "returns the relation" do
-        @substitute.should == relation
-      end
+    let!(:name) do
+      person.build_name(:first_name => "Tony")
     end
 
-    context "when passing nil" do
+    let(:document) do
+      name.namable
+    end
 
-      before do
-        binding_klass.expects(:new).returns(binding)
-        binding.expects(:unbind)
-        @substitute = relation.substitute(nil)
-      end
+    Mongoid::Document.public_instance_methods(true).each do |method|
 
-      it "sets a new target" do
-        relation.target.should == nil
-      end
+      context "when checking #{method}" do
 
-      it "returns the relation" do
-        @substitute.should be_nil
+        it "returns true" do
+          document.respond_to?(method).should be_true
+        end
       end
     end
   end
 
-  describe "#unbind" do
+  describe ".valid_options" do
 
-    let(:relation) do
-      described_class.new(base, target, metadata)
+    it "returns the valid options" do
+      described_class.valid_options.should ==
+        [ :cyclic, :polymorphic ]
     end
+  end
 
-    context "when the target is persisted" do
+  describe ".validation_default" do
 
-      context "when the base has not been destroyed" do
-
-        before do
-          target.expects(:persisted?).returns(true)
-        end
-
-        it "deletes the base" do
-          base.expects(:delete).returns(true)
-          relation.unbind(target)
-        end
-      end
-
-      context "when the base is already destroyed" do
-
-        before do
-          target.expects(:persisted?).returns(true)
-          base.expects(:destroyed?).returns(true)
-        end
-
-        it "does not delete the target" do
-          base.expects(:delete).never
-          relation.unbind(target)
-        end
-      end
-    end
-
-    context "when the target is not persisted" do
-
-      it "does not delete the base" do
-        base.expects(:delete).never
-        relation.unbind(target)
-      end
+    it "returns false" do
+      described_class.validation_default.should eq(false)
     end
   end
 end

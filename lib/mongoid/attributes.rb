@@ -25,6 +25,7 @@ module Mongoid #:nodoc:
       attribute = read_attribute(name)
       ! attribute.blank? || attribute == false
     end
+    alias :has_attribute? :attribute_present?
 
     # Read a value from the document attributes. If the value does not exist
     # it will return nil.
@@ -41,9 +42,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def read_attribute(name)
-      access = name.to_s
-      value = attributes[access]
-      accessed(access, value)
+      attributes[name.to_s]
     end
     alias :[] :read_attribute
 
@@ -57,8 +56,11 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def remove_attribute(name)
-      access = name.to_s
-      modify(access, attributes.delete(access), nil)
+      assigning do
+        access = name.to_s
+        attribute_will_change!(access)
+        attributes.delete(access)
+      end
     end
 
     # Override respond_to? so it responds properly for dynamic attributes.
@@ -92,9 +94,16 @@ module Mongoid #:nodoc:
     # @param [ Object ] value The value to set for the attribute.
     #
     # @since 1.0.0
-    def write_attribute(name, value)
-      access = name.to_s
-      modify(access, attributes[access], typed_value_for(access, value))
+    def write_attribute(name, value, localized = false)
+      assigning do
+        access = name.to_s
+        typed_value_for(access, value).tap do |value|
+          unless attributes[access] == value || attribute_changed?(access)
+            attribute_will_change!(access)
+          end
+          localized ? attributes[access].merge!(value) : attributes[access] = value
+        end
+      end
     end
     alias :[]= :write_attribute
 
@@ -113,28 +122,15 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attributes(attrs = nil, guard_protected_attributes = true)
-      process(attrs, guard_protected_attributes) do |document|
-        document.identify if new? && id.blank?
+      assigning do
+        process(attrs, guard_protected_attributes) do |document|
+          document.identify if new? && id.blank?
+        end
       end
     end
     alias :attributes= :write_attributes
 
     protected
-
-    # Get the default values for the attributes.
-    #
-    # @example Get the defaults.
-    #   person.default_attributes
-    #
-    # @return [ Hash ] The default values for each field.
-    #
-    # @since 1.0.0
-    #
-    # @raise [ RuntimeError ] Always
-    # @since 2.0.0.rc.8
-    def default_attributes
-      raise "default_attributes is no longer valid. Plase use: apply_default_attributes."
-    end
 
     # Set any missing default values in the attributes.
     #
@@ -145,12 +141,35 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0.rc.8
     def apply_default_attributes
-      (@attributes ||= {}).tap do |h|
-        defaults.each_pair do |key, val|
-          unless h.has_key?(key)
-            h[key] = val.respond_to?(:call) ? typed_value_for(key, val.call) : val
+      (@attributes ||= {}).tap do |attrs|
+        defaults.each do |name|
+          unless attrs.has_key?(name)
+            if field = fields[name]
+              attrs[name] = field.eval_default(self)
+            end
           end
         end
+      end
+    end
+
+    # Begin the assignment of attributes. While in this block embedded
+    # documents will not autosave themselves in order to allow the document to
+    # be in a valid state.
+    #
+    # @example Execute the assignment.
+    #   assigning do
+    #     person.attributes = { :addresses => [ address ] }
+    #   end
+    #
+    # @return [ Object ] The yielded value.
+    #
+    # @since 2.2.0
+    def assigning
+      begin
+        Threaded.begin_assign
+        yield
+      ensure
+        Threaded.exit_assign
       end
     end
 
@@ -180,7 +199,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].set(value) : value
+      fields.has_key?(key) ? fields[key].serialize(value) : value
     end
   end
 end

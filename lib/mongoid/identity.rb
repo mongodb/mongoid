@@ -48,10 +48,8 @@ module Mongoid #:nodoc:
     # @example Set the id.
     #   identity.identify
     def identify
-      if !document.embedded? || Mongoid.embedded_object_id
-        document.id = compose.join(" ").identify if document.primary_key
-        document.id = generate_id if document.id.blank?
-      end
+      document.id = compose.join(" ").identify if document.primary_key
+      document.id = generate_id if document.id.blank?
       document.id
     end
 

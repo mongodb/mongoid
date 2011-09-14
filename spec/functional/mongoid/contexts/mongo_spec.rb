@@ -17,19 +17,33 @@ describe Mongoid::Contexts::Mongo do
 
     context "when documents exist in the collection" do
 
-      before do
-        5.times do |n|
-          Person.create(
-            :title => "Sir",
-            :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"],
-            :ssn => "#{n}"
-          )
+      context "when values exist for the field" do
+
+        before do
+          5.times do |n|
+            Person.create(
+              :title => "Sir",
+              :age => ((n + 1) * 10),
+              :aliases => ["D", "Durran"],
+              :ssn => "#{n}"
+            )
+          end
+        end
+
+        it "returns the average for the field" do
+          Person.avg(:age).should == 30
         end
       end
 
-      it "returns the average for the field" do
-        Person.avg(:age).should == 30
+      context "when values do not exist" do
+
+        before do
+          Person.create(:ssn => "534-12-0923")
+        end
+
+        it "returns nil" do
+          Person.avg(:score).should be_nil
+        end
       end
     end
   end
@@ -170,25 +184,39 @@ describe Mongoid::Contexts::Mongo do
     context "when no documents are in the collection" do
 
       it "returns nil" do
-        Person.sum(:age).should == nil
+        Person.sum(:age).should be_nil
       end
     end
 
     context "when documents are in the collection" do
 
-      before do
-        5.times do |n|
-          Person.create(
-            :title => "Sir",
-            :age => 5,
-            :aliases => ["D", "Durran"],
-            :ssn => "#{n}"
-          )
+      context "when they contain the field" do
+
+        before do
+          2.times do |n|
+            Person.create(
+              :title => "Sir",
+              :age => 5,
+              :aliases => ["D", "Durran"],
+              :ssn => "#{n}"
+            )
+          end
+        end
+
+        it "returns the sum for the field" do
+          Person.where(:age.gt => 3).sum(:age).should eq(10)
         end
       end
 
-      it "returns the sum for the field" do
-        Person.where(:age.gt => 3).sum(:age).should == 25
+      context "when they do not contain the field" do
+
+        before do
+          Person.create(:ssn => "243-12-2143")
+        end
+
+        it "returns nil" do
+          Person.sum(:score).should be_nil
+        end
       end
     end
   end

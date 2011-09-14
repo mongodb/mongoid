@@ -26,8 +26,9 @@ class Address
 
   accepts_nested_attributes_for :locations
 
-  referenced_in :account
+  belongs_to :account
 
+  scope :without_postcode, where(:postcode => nil)
   named_scope :rodeo, where(:street => "Rodeo Dr") do
     def mansion?
       all? { |address| address.street == "Rodeo Dr" }

@@ -37,7 +37,7 @@ describe Mongoid::Timestamps::Updated do
   context "when the document has not changed" do
 
     let(:agent) do
-      Agent.new
+      Agent.instantiate
     end
 
     before do

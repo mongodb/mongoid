@@ -83,69 +83,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#bind" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    before do
-      binding_klass.expects(:new).returns(binding)
-      binding.expects(:bind)
-    end
-
-    context "when building" do
-
-      it "does not save the target docs" do
-        address.expects(:save).never
-        relation.bind(:continue => true)
-      end
-    end
-
-    context "when not building" do
-
-      context "when the base is persisted" do
-
-        before do
-          base.expects(:persisted?).returns(true)
-        end
-
-        it "saves all target docs" do
-          address.expects(:save).returns(true)
-          relation.bind
-        end
-      end
-
-      context "when the base is not persisted" do
-
-        it "does not save any docs" do
-          address.expects(:save).never
-          relation.bind
-        end
-      end
-    end
-  end
-
-  describe "#bind_one" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    let(:document) do
-      Address.new
-    end
-
-    before do
-      binding_klass.expects(:new).returns(binding)
-    end
-
-    it "binds the document" do
-      binding.expects(:bind_one).with(document, :continue => true)
-      relation.bind_one(document, :continue => true)
-    end
-  end
-
   describe "#build" do
 
     let(:relation) do
@@ -174,6 +111,31 @@ describe Mongoid::Relations::Embedded::Many do
 
     it "sets the metadata on the document" do
       document.metadata.should == metadata
+    end
+  end
+
+  describe "#blank?" do
+
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    context "when the relation contains elements" do
+
+      it "returns false" do
+        relation.should_not be_blank
+      end
+    end
+
+    context "when the relation contains no elements" do
+
+      before do
+        relation.target = []
+      end
+
+      it "returns true" do
+        relation.should be_blank
+      end
     end
   end
 
@@ -380,10 +342,6 @@ describe Mongoid::Relations::Embedded::Many do
             Mongoid.raise_not_found_error = true
           end
 
-          after do
-            Mongoid.raise_not_found_error = false
-          end
-
           it "raises an error" do
             expect {
               relation.find(BSON::ObjectId.new)
@@ -399,6 +357,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns nil" do
@@ -429,10 +391,6 @@ describe Mongoid::Relations::Embedded::Many do
             Mongoid.raise_not_found_error = true
           end
 
-          after do
-            Mongoid.raise_not_found_error = false
-          end
-
           it "raises an error" do
             expect {
               relation.find([ BSON::ObjectId.new ])
@@ -448,6 +406,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
           end
 
           it "returns an empty array" do
@@ -618,54 +580,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#substitute" do
-
-    let(:relation) do
-      described_class.new(base, target, metadata)
-    end
-
-    context "when passing documents" do
-
-      let(:document) do
-        Address.new(:street => "Broadway")
-      end
-
-      before do
-        relation.loaded = true
-        binding_klass.expects(:new).twice.returns(binding)
-        binding.expects(:unbind)
-        binding.expects(:bind).returns(true)
-        @substitute = relation.substitute([ document ])
-      end
-
-      it "sets a new target" do
-        relation.target.should == [ document ]
-      end
-
-      it "returns the relation" do
-        @substitute.should == relation
-      end
-    end
-
-    context "when passing nil" do
-
-      before do
-        relation.loaded = true
-        binding_klass.expects(:new).returns(binding)
-        binding.expects(:unbind)
-        @substitute = relation.substitute(nil)
-      end
-
-      it "sets a new target" do
-        relation.target.should == []
-      end
-
-      it "returns the relation" do
-        @substitute.should be_empty
-      end
-    end
-  end
-
   describe "#as_document" do
 
     it "returns an array of document hashes" do
@@ -673,50 +587,63 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#unbind" do
+  describe ".valid_options" do
 
-    let(:relation) do
-      described_class.new(base, [], metadata)
+    it "returns the valid options" do
+      described_class.valid_options.should ==
+        [ :as, :cyclic, :order, :versioned ]
+    end
+  end
+
+  describe "#respond_to?" do
+
+    let(:person) do
+      Person.new
     end
 
-    let!(:document) do
-      Address.new
+    let(:addresses) do
+      person.addresses
     end
 
-    context "when the base is persisted" do
+    Array.public_instance_methods.each do |method|
 
-      context "when the target has not been destroyed" do
+      context "when checking #{method}" do
 
-        before do
-          base.expects(:persisted?).returns(true)
-        end
-
-        it "deletes the target" do
-          document.expects(:delete).returns(true)
-          relation.unbind([ document ])
-        end
-      end
-
-      context "when the target is already destroyed" do
-
-        before do
-          base.expects(:persisted?).returns(true)
-          document.expects(:destroyed?).returns(true)
-        end
-
-        it "does not delete the target" do
-          target.expects(:delete).never
-          relation.unbind([ document ])
+        it "returns true" do
+          addresses.respond_to?(method).should be_true
         end
       end
     end
 
-    context "when the base is not persisted" do
+    Mongoid::Relations::Embedded::Many.public_instance_methods.each do |method|
 
-      it "does not delete the target" do
-        document.expects(:delete).never
-        relation.unbind([ document ])
+      context "when checking #{method}" do
+
+        it "returns true" do
+          addresses.respond_to?(method).should be_true
+        end
       end
+    end
+
+    Address.scopes.keys.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          addresses.respond_to?(method).should be_true
+        end
+      end
+    end
+
+    it "supports 'include_private = boolean'" do
+      expect { addresses.respond_to?(:Rational, true) }.not_to raise_error
+    end
+  end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
     end
   end
 end

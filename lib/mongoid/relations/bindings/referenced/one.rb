@@ -17,20 +17,16 @@ module Mongoid # :nodoc:
           #   person.game.bind(:continue => true)
           #   person.game = Game.new
           #
-          # @param [ Hash ] options The options to pass through.
-          #
-          # @option options [ true, false ] :continue Do we continue binding?
-          # @option options [ true, false ] :binding Are we in build mode?
-          #
           # @since 2.0.0.rc.1
-          def bind(options = {})
-            if options[:continue]
-              target.do_or_do_not(metadata.foreign_key_setter, base.id)
-              target.do_or_do_not(
-                metadata.inverse_setter,
-                base,
-                OPTIONS
-              )
+          def bind
+            unless binding?
+              binding do
+                target.you_must(metadata.foreign_key_setter, base.id)
+                target.send(metadata.inverse_setter, base)
+                if metadata.type
+                  target.you_must(metadata.type_setter, base.class.model_name)
+                end
+              end
             end
           end
           alias :bind_one :bind
@@ -42,20 +38,16 @@ module Mongoid # :nodoc:
           #   person.game.unbind(:continue => true)
           #   person.game = nil
           #
-          # @param [ Hash ] options The options to pass through.
-          #
-          # @option options [ true, false ] :continue Do we continue unbinding?
-          # @option options [ true, false ] :binding Are we in build mode?
-          #
           # @since 2.0.0.rc.1
-          def unbind(options = {})
-            if options[:continue]
-              target.do_or_do_not(metadata.foreign_key_setter, nil)
-              target.do_or_do_not(
-                metadata.inverse_setter,
-                nil,
-                OPTIONS
-              )
+          def unbind
+            unless binding?
+              binding do
+                target.you_must(metadata.foreign_key_setter, nil)
+                target.send(metadata.inverse_setter, nil)
+                if metadata.type
+                  target.you_must(metadata.type_setter, nil)
+                end
+              end
             end
           end
           alias :unbind_one :unbind

@@ -15,3 +15,7 @@ doc/*
 *.swp
 *.un~
 *~
+*.rbc
+*.profile
+*.profile.pdf
+*.symbols

@@ -2,40 +2,59 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Complex do
 
-  let(:complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "$gt") }
+  let(:complex) do
+    described_class.new(:key => :field, :operator => "$gt")
+  end
 
   describe "#initialize" do
 
     it "sets the key" do
-      complex.key.should == :field
+      complex.key.should eq(:field)
     end
 
     it "sets the operator" do
-      complex.operator.should == "$gt"
+      complex.operator.should eq("$gt")
+    end
+  end
+
+  describe "#to_s" do
+
+    let(:complex) do
+      described_class.new(:key => :field, :operator => "$gt")
+    end
+
+    it "returns the name of the key" do
+      complex.to_s.should eq("field")
     end
   end
 
   context "when comparing equivalent objects" do
-    let(:equivalent_complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "$gt") }
+
+    let(:equivalent_complex) do
+      described_class.new(:key => :field, :operator => "$gt")
+    end
 
     it "is identifiable as equal" do
-      complex.should == equivalent_complex
+      complex.should eq(equivalent_complex)
     end
 
     it "hashes to the same value" do
-      complex.hash.should == equivalent_complex.hash
+      complex.hash.should eq(equivalent_complex.hash)
     end
   end
 
   context "when comparing different objects" do
-    let(:different_complex) { Mongoid::Criterion::Complex.new(:key => :field, :operator => "$lt") }
+
+    let(:different_complex) do
+      described_class.new(:key => :field, :operator => "$lt")
+    end
 
     it "is identifiable as different" do
-      complex.should_not == different_complex
+      complex.should_not eq(different_complex)
     end
 
     it "hashes to a different value" do
-      complex.hash.should_not == different_complex.hash
+      complex.hash.should_not eq(different_complex.hash)
     end
   end
 end

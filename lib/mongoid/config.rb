@@ -13,8 +13,9 @@ module Mongoid #:nodoc
     extend self
     include ActiveModel::Observing
 
-    attr_accessor :master, :settings
+    attr_accessor :master, :settings, :defaults
     @settings = {}
+    @defaults = {}
 
     # Define a configuration option with a default.
     #
@@ -28,22 +29,31 @@ module Mongoid #:nodoc
     #
     # @since 2.0.0.rc.1
     def option(name, options = {})
-      define_method(name) do
-        settings.has_key?(name) ? settings[name] : options[:default]
-      end
-      define_method("#{name}=") { |value| settings[name] = value }
-      define_method("#{name}?") { send(name) }
+      defaults[name] = settings[name] = options[:default]
+
+      class_eval <<-RUBY
+        def #{name}
+          settings[#{name.inspect}]
+        end
+
+        def #{name}=(value)
+          settings[#{name.inspect}] = value
+        end
+
+        def #{name}?
+          #{name}
+        end
+      RUBY
     end
 
     option :allow_dynamic_fields, :default => true
     option :autocreate_indexes, :default => false
-    option :binding_defaults, :default => { :binding => false, :continue => true }
-    option :embedded_object_id, :default => true
+    option :identity_map_enabled, :default => false
     option :include_root_in_json, :default => false
     option :max_retries_on_connection_failure, :default => 0
     option :parameterize_keys, :default => true
     option :persist_in_safe_mode, :default => false
-    option :preload_models, :default => true
+    option :preload_models, :default => false
     option :raise_not_found_error, :default => true
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
@@ -92,12 +102,7 @@ module Mongoid #:nodoc
     #
     # @return [ Array<String> ] An array of bad field names.
     def destructive_fields
-      @destructive_fields ||= lambda {
-        klass = Class.new do
-          include Mongoid::Document
-        end
-        klass.instance_methods(true).collect { |method| method.to_s }
-      }.call
+      Components.prohibited_methods
     end
 
     # Configure mongoid from a hash. This is usually called after parsing a
@@ -125,7 +130,7 @@ module Mongoid #:nodoc
     #
     # @since 2.0.1
     def load!(path)
-      environment = defined?(Rails) ? Rails.env : ENV["RACK_ENV"]
+      environment = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV["RACK_ENV"]
       settings = YAML.load(ERB.new(File.new(path).read).result)[environment]
       if settings.present?
         from_hash(settings)
@@ -139,7 +144,7 @@ module Mongoid #:nodoc
     #
     # @return [ Logger ] The default Logger instance.
     def default_logger
-      defined?(Rails) ? Rails.logger : ::Logger.new($stdout)
+      defined?(Rails) && Rails.respond_to?(:logger) ? Rails.logger : ::Logger.new($stdout)
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.
@@ -160,7 +165,10 @@ module Mongoid #:nodoc
     #
     # @return [ Logger ] The newly set logger.
     def logger=(logger)
-      @logger = logger
+      case logger
+        when Logger then @logger = logger
+        when false, nil then @logger = nil
+      end
     end
 
     # Purge all data in all collections, including indexes.
@@ -196,7 +204,7 @@ module Mongoid #:nodoc
     # set is not a valid +Mongo::DB+, then an error will be raised.
     #
     # @example Set the master database.
-    #   config.master = Mongo::Connection.db("test")
+    #   config.master = Mongo::Connection.new.db("test")
     #
     # @param [ Mongo::DB ] db The master database.
     #
@@ -253,7 +261,7 @@ module Mongoid #:nodoc
     # @example Reset the configuration options.
     #   config.reset
     def reset
-      settings.clear
+      settings.replace(defaults)
     end
 
     # @deprecated User replica sets instead.

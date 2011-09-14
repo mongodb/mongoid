@@ -237,6 +237,28 @@ describe Mongoid::Criteria do
       end
     end
 
+    describe "#size" do
+
+      before do
+        context.expects(:size).returns(10)
+      end
+
+      it "delegates to the context" do
+        criteria.size.should == 10
+      end
+    end
+
+    describe "#length" do
+
+      before do
+        context.expects(:length).returns(10)
+      end
+
+      it "delegates to the context" do
+        criteria.length.should == 10
+      end
+    end
+
     describe "#exists?" do
 
       context "when there are documents in the db" do
@@ -377,7 +399,6 @@ describe Mongoid::Criteria do
       end
     end
   end
-
 
   describe "#clone" do
 
@@ -858,7 +879,6 @@ describe Mongoid::Criteria do
     end
   end
 
-
   describe "#respond_to?" do
 
     let(:criteria) do
@@ -874,7 +894,7 @@ describe Mongoid::Criteria do
     end
 
     it "is false when asking about a model's private class method even when including private methods" do
-      criteria.respond_to?(:include, true).should be_false
+      criteria.respond_to?(:alias_method, true).should be_false
     end
 
     it "is true when asking about a criteria's entries' instance method" do
@@ -894,11 +914,11 @@ describe Mongoid::Criteria do
     end
 
     it "is false when asking about a private criteria instance method without including private methods" do
-      criteria.respond_to?(:initialize).should be_false
+      criteria.respond_to?(:puts).should be_false
     end
 
     it "is true when asking about a private criteria instance method when including private methods" do
-      criteria.respond_to?(:initialize, true).should be_true
+      criteria.respond_to?(:puts, true).should be_true
     end
 
   end
@@ -924,6 +944,15 @@ describe Mongoid::Criteria do
     end
 
     context "with a single argument" do
+
+      context "when the arg is nil" do
+
+        it "adds the id selector" do
+          expect {
+            criteria.search(nil)
+          }.to raise_error(Mongoid::Errors::InvalidFind)
+        end
+      end
 
       context "when the arg is a string" do
 

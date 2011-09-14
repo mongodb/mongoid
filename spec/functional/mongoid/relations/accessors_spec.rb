@@ -298,17 +298,6 @@ describe Mongoid::Relations::Accessors do
         Person.new
       end
 
-      context "when setting the relation directly" do
-
-        before do
-          person.posts = [ "", "" ]
-        end
-
-        it "does not add them" do
-          person.posts.should be_empty
-        end
-      end
-
       context "when setting the foreign key" do
 
         let(:post) do
@@ -329,17 +318,6 @@ describe Mongoid::Relations::Accessors do
 
       let(:person) do
         Person.new
-      end
-
-      context "when setting the relation directly" do
-
-        before do
-          person.preferences = [ "", "" ]
-        end
-
-        it "does not add them" do
-          person.preferences.should be_empty
-        end
       end
 
       context "when setting the foreign key" do

@@ -139,19 +139,17 @@ module Mongoid #:nodoc:
       # @return [ Criteria ] The cloned criteria.
       def order_by(*args)
         clone.tap do |crit|
+          arguments = args.size == 1 ? args.first : args
           crit.options[:sort] = [] unless options[:sort] || args.first.nil?
-          arguments = args.first
-          case arguments
-          when Hash
-            arguments.each do |field, direction|
-              merge_options(crit.options[:sort], [ field, direction ])
+          if arguments.is_a?(Array)
+            #[:name, :asc]
+            if arguments.size == 2 && (arguments.first.is_a?(Symbol) || arguments.first.is_a?(String))
+              build_order_options(arguments, crit)
+            else
+              arguments.each { |argument| build_order_options(argument, crit) }
             end
-            when Array
-            merge_options(crit.options[:sort],arguments)
-          when Complex
-            args.flatten.each do |complex|
-              merge_options(crit.options[:sort], [ complex.key, complex.operator.to_sym ])
-            end
+          else
+            build_order_options(arguments, crit)
           end
         end
       end
@@ -189,6 +187,30 @@ module Mongoid #:nodoc:
 
       private
 
+      # Build ordering options from given arguments on given criteria
+      #
+      # @example build order options
+      #   criteria.build_order_options(:name.asc, criteria)
+      #
+      #
+      # @param [ <Hash>, <Array>, <Complex> ] argument to build criteria from
+      # @param [ Criterion ] criterion to change
+      def build_order_options(arguments, crit)
+        case arguments
+        when Hash
+          if arguments.size > 1
+            raise ArgumentError, "Please don't use hash to define multiple orders " +
+                "due to the fact that hash doesn't have order this may cause unpredictable results"
+          end
+          arguments.each_pair do |field, direction|
+            merge_options(crit.options[:sort], [ field, direction ])
+          end
+        when Array
+          merge_options(crit.options[:sort],arguments)
+        when Complex
+          merge_options(crit.options[:sort], [ arguments.key, arguments.operator.to_sym ])
+        end
+      end
 
       # Merge options for order_by criterion
       # Allow only one order direction for same field

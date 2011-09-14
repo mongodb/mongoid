@@ -8,8 +8,18 @@ module Mongoid #:nodoc:
     included do
       class_attribute :nested_attributes
       self.nested_attributes = []
+    end
 
-      delegate :nested_attributes, :to => "self.class"
+    # Get the nested attributes.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the nested attributes.
+    #   model.nested_attributes
+    #
+    # @return [ Array<String> ] The nested attributes methods.
+    def nested_attributes
+      self.class.nested_attributes
     end
 
     module ClassMethods #:nodoc:
@@ -35,7 +45,7 @@ module Mongoid #:nodoc:
       #   by a hash of options.
       #
       # @option *args [ true, false ] :allow_destroy Can deletion occur?
-      # @option *args [ Proc ] :reject_if Block to reject documents with.
+      # @option *args [ Proc, Symbol ] :reject_if Block or symbol pointing to a class method to reject documents with.
       # @option *args [ Integer ] :limit The max number to create.
       # @option *args [ true, false ] :update_only Only update existing docs.
       def accepts_nested_attributes_for(*args)
@@ -44,8 +54,10 @@ module Mongoid #:nodoc:
         args.each do |name|
           self.nested_attributes += [ "#{name}_attributes=" ]
           define_method("#{name}_attributes=") do |attrs|
-            relation = relations[name.to_s]
-            relation.nested_builder(attrs, options).build(self)
+            assigning do
+              relation = relations[name.to_s]
+              relation.nested_builder(attrs, options).build(self)
+            end
           end
         end
       end

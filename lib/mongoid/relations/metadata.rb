@@ -8,6 +8,54 @@ module Mongoid # :nodoc:
 
       delegate :foreign_key_default, :stores_foreign_key?, :to => :relation
 
+      # Returns the as option of the relation.
+      #
+      # @example Get the as option.
+      #   metadata.as
+      #
+      # @return [ true, false ] The as option.
+      #
+      # @since 2.1.0
+      def as
+        self[:as]
+      end
+
+      # Tells whether an as option exists.
+      #
+      # @example Is the as option set?
+      #   metadata.as?
+      #
+      # @return [ true, false ] True if an as exists, false if not.
+      #
+      # @since 2.0.0.rc.1
+      def as?
+        !!as
+      end
+
+      # Returns the autosave option of the relation.
+      #
+      # @example Get the autosave option.
+      #   metadata.autosave
+      #
+      # @return [ true, false ] The autosave option.
+      #
+      # @since 2.1.0
+      def autosave
+        self[:autosave]
+      end
+
+      # Does the metadata have a autosave option?
+      #
+      # @example Is the relation autosaving?
+      #   metadata.autosave?
+      #
+      # @return [ true, false ] If the relation autosaves.
+      #
+      # @since 2.1.0
+      def autosave?
+        !!autosave
+      end
+
       # Gets a relation builder associated with the relation this metadata is
       # for.
       #
@@ -19,8 +67,8 @@ module Mongoid # :nodoc:
       # @return [ Builder ] The builder for the relation.
       #
       # @since 2.0.0.rc.1
-      def builder(object)
-        relation.builder(self, object)
+      def builder(object, loading = false)
+        relation.builder(self, object, loading)
       end
 
       # Returns the name of the strategy used for handling dependent relations.
@@ -55,8 +103,96 @@ module Mongoid # :nodoc:
         @class_name ||= (self[:class_name] || classify)
       end
 
+      # Get the foreign key contraint for the metadata.
+      #
+      # @example Get the constaint.
+      #   metadata.constraint
+      #
+      # @return [ Constraint ] The constraint.
+      #
+      # @since 2.0.0.rc.1
       def constraint
         @constraint ||= Constraint.new(self)
+      end
+
+      # Get the criteria that is used to query for this metadata's relation.
+      #
+      # @example Get the criteria.
+      #   metadata.criteria([ id_one, id_two ])
+      #
+      # @param [ Object ] object The foreign key used for the query.
+      #
+      # @return [ Criteria ] The criteria.
+      #
+      # @since 2.1.0
+      def criteria(object, type = nil)
+        query = relation.criteria(self, object, type)
+        order ? query.order_by(order) : query
+      end
+
+      # Returns the cyclic option of the relation.
+      #
+      # @example Get the cyclic option.
+      #   metadata.cyclic
+      #
+      # @return [ true, false ] The cyclic option.
+      #
+      # @since 2.1.0
+      def cyclic
+        self[:cyclic]
+      end
+
+      # Does the metadata have a cyclic option?
+      #
+      # @example Is the metadata cyclic?
+      #   metadata.cyclic?
+      #
+      # @return [ true, false ] If the metadata is cyclic.
+      #
+      # @since 2.1.0
+      def cyclic?
+        !!cyclic
+      end
+
+      # Returns the dependent option of the relation.
+      #
+      # @example Get the dependent option.
+      #   metadata.dependent
+      #
+      # @return [ Symbol ] The dependent option.
+      #
+      # @since 2.1.0
+      def dependent
+        self[:dependent]
+      end
+
+      # Does the metadata have a dependent option?
+      #
+      # @example Is the metadata performing cascades?
+      #   metadata.dependent?
+      #
+      # @return [ true, false ] If the metadata cascades.
+      #
+      # @since 2.1.0
+      def dependent?
+        !!dependent
+      end
+
+      # Get the criteria needed to eager load this relation.
+      #
+      # @example Get the eager loading criteria.
+      #   metadata.eager_load(criteria)
+      #
+      # @param [ Criteria ] criteria The criteria to load from.
+      #
+      # @return [ Criteria ] The eager loading criteria.
+      #
+      # @since 2.2.0
+      def eager_load(criteria)
+        relation.eager_load(
+          self,
+          criteria.clone.tap { |crit| crit.inclusions.clear }
+        )
       end
 
       # Will determine if the relation is an embedded one or not. Currently
@@ -115,6 +251,18 @@ module Mongoid # :nodoc:
         @foreign_key ||= determine_foreign_key
       end
 
+      # Get the name of the method to check if the foreign key has changed.
+      #
+      # @example Get the foreign key check method.
+      #   metadata.foreign_key_check
+      #
+      # @return [ String ] The foreign key check.
+      #
+      # @since 2.1.0
+      def foreign_key_check
+        @foreign_key_check ||= "#{foreign_key}_changed?"
+      end
+
       # Returns the name of the method used to set the foreign key on a
       # document.
       #
@@ -128,6 +276,18 @@ module Mongoid # :nodoc:
         @foreign_key_setter ||= "#{foreign_key}="
       end
 
+      # Returns the index option of the relation.
+      #
+      # @example Get the index option.
+      #   metadata.index
+      #
+      # @return [ true, false ] The index option.
+      #
+      # @since 2.1.0
+      def index
+        self[:index]
+      end
+
       # Tells whether a foreign key index exists on the relation.
       #
       # @example Is the key indexed?
@@ -137,7 +297,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def indexed?
-        !!self[:index]
+        !!index
       end
 
       # Instantiate new metadata for a relation.
@@ -149,6 +309,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def initialize(properties = {})
+        Options.validate!(properties)
         merge!(properties)
       end
 
@@ -168,16 +329,14 @@ module Mongoid # :nodoc:
         "  cyclic:               #{cyclic || "No"},\n" <<
         "  dependent:            #{dependent || "None"},\n" <<
         "  inverse_of:           #{inverse_of || "N/A"},\n" <<
-        "  inverse_setter:       #{inverse_setter},\n" <<
-        "  inverse_type:         #{inverse_type || "N/A"},\n" <<
-        "  inverse_type_setter:  #{inverse_type_setter || "N/A"},\n" <<
         "  key:                  #{key},\n" <<
         "  macro:                #{macro},\n" <<
         "  name:                 #{name},\n" <<
         "  order:                #{order.inspect || "No"},\n" <<
-        "  polymorphic:          #{polymorphic? ? "Yes" : "No"},\n" <<
+        "  polymorphic:          #{polymorphic? || "No"},\n" <<
         "  relation:             #{relation},\n" <<
-        "  setter:               #{setter}>\n"
+        "  setter:               #{setter},\n" <<
+        "  versioned:            #{versioned? || "No"}>\n"
       end
 
       # Get the name of the inverse relation if it exists. If this is a
@@ -192,9 +351,33 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse(other = nil)
-        return self[:inverse_of] if inverse_of?
+        return self[:inverse_of] if has_key?(:inverse_of)
         return self[:as] || lookup_inverse(other) if polymorphic?
         @inverse ||= (cyclic? ? cyclic_inverse : inverse_relation)
+      end
+
+      # Returns the inverse_class_name option of the relation.
+      #
+      # @example Get the inverse_class_name option.
+      #   metadata.inverse_class_name
+      #
+      # @return [ true, false ] The inverse_class_name option.
+      #
+      # @since 2.1.0
+      def inverse_class_name
+        self[:inverse_class_name]
+      end
+
+      # Returns the if the inverse class name option exists.
+      #
+      # @example Is an inverse class name defined?
+      #   metadata.inverse_class_name?
+      #
+      # @return [ true, false ] If the inverse if defined.
+      #
+      # @since 2.1.0
+      def inverse_class_name?
+        !!inverse_class_name
       end
 
       # Used for relational many to many only. This determines the name of the
@@ -209,7 +392,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inverse_foreign_key
         @inverse_foreign_key ||=
-          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.underscore ) <<
+          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.demodulize.underscore ) <<
           relation.foreign_key_suffix
       end
 
@@ -225,6 +408,44 @@ module Mongoid # :nodoc:
         @inverse_klass ||= inverse_class_name.constantize
       end
 
+      # Get the metadata for the inverse relation.
+      #
+      # @example Get the inverse metadata.
+      #   metadata.inverse_metadata(doc)
+      #
+      # @param [ Document ] document The document to check.
+      #
+      # @return [ Metadata ] The inverse metadata.
+      #
+      # @since 2.1.0
+      def inverse_metadata(document)
+        document.reflect_on_association(inverse(document))
+      end
+
+      # Returns the inverse_of option of the relation.
+      #
+      # @example Get the inverse_of option.
+      #   metadata.inverse_of
+      #
+      # @return [ true, false ] The inverse_of option.
+      #
+      # @since 2.1.0
+      def inverse_of
+        self[:inverse_of]
+      end
+
+      # Does the metadata have a inverse_of option?
+      #
+      # @example Is an inverse_of defined?
+      #   metadata.inverse_of?
+      #
+      # @return [ true, false ] If the relation has an inverse_of defined.
+      #
+      # @since 2.1.0
+      def inverse_of?
+        !!inverse_of
+      end
+
       # Returns the setter for the inverse side of the relation.
       #
       # @example Get the inverse setter.
@@ -236,7 +457,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_setter(other = nil)
-        inverse(other).to_s << "="
+        "#{inverse(other)}="
       end
 
       # Returns the name of the field in which to store the name of the class
@@ -249,11 +470,8 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_type
-        if relation.stores_foreign_key? && polymorphic?
-          (polymorphic? ? name.to_s : class_name.underscore) << "_type"
-        else
-          return nil
-        end
+        @inverse_type ||=
+          relation.stores_foreign_key? && polymorphic? ? "#{name}_type" : nil
       end
 
       # Gets the setter for the field that sets the type of document on a
@@ -266,7 +484,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_type_setter
-        inverse_type ? inverse_type << "=" : nil
+        @inverse_type_setter ||= inverse_type ? "#{inverse_type}=" : nil
       end
 
       # This returns the key that is to be used to grab the attributes for the
@@ -295,6 +513,18 @@ module Mongoid # :nodoc:
         @klass ||= class_name.constantize
       end
 
+      # Is this metadata representing a one to many or many to many relation?
+      #
+      # @example Is the relation a many?
+      #   metadata.many?
+      #
+      # @return [ true, false ] If the relation is a many.
+      #
+      # @since 2.1.6
+      def many?
+        @many ||= (relation.macro.to_s =~ /many/)
+      end
+
       # Returns the macro for the relation of this metadata.
       #
       # @example Get the macro.
@@ -305,6 +535,43 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def macro
         relation.macro
+      end
+
+      # Get the name associated with this metadata.
+      #
+      # @example Get the name.
+      #   metadata.name
+      #
+      # @return [ Symbol ] The name.
+      #
+      # @since 2.1.0
+      def name
+        self[:name]
+      end
+
+      # Is the name defined?
+      #
+      # @example Is the name defined?
+      #   metadata.name?
+      #
+      # @return [ true, false ] If the name is defined.
+      #
+      # @since 2.1.0
+      def name?
+        !!name
+      end
+
+      # Does the relation have a destructive dependent option specified. This
+      # is true for :dependent => :delete and :dependent => :destroy.
+      #
+      # @example Is the relation destructive?
+      #   metadata.destructive?
+      #
+      # @return [ true, false ] If the relation is destructive.
+      #
+      # @since 2.1.0
+      def destructive?
+        @destructive ||= (dependent == :delete || dependent == :destroy)
       end
 
       # Gets a relation nested builder associated with the relation this metadata
@@ -323,6 +590,20 @@ module Mongoid # :nodoc:
         relation.nested_builder(self, attributes, options)
       end
 
+      # Get the path calculator for the supplied document.
+      #
+      # @example Get the path calculator.
+      #   metadata.path(document)
+      #
+      # @param [ Document ] document The document to calculate on.
+      #
+      # @return [ Object ] The atomic path calculator.
+      #
+      # @since 2.1.0
+      def path(document)
+        relation.path(document)
+      end
+
       # Returns true if the relation is polymorphic.
       #
       # @example Is the relation polymorphic?
@@ -333,6 +614,18 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def polymorphic?
         @polymorphic ||= (!!self[:as] || !!self[:polymorphic])
+      end
+
+      # Get the relation associated with this metadata.
+      #
+      # @example Get the relation.
+      #   metadata.relation
+      #
+      # @return [ Proxy ] The relation proxy class.
+      #
+      # @since 2.1.0
+      def relation
+        self[:relation]
       end
 
       # Gets the method name used to set this relation.
@@ -348,6 +641,32 @@ module Mongoid # :nodoc:
         @setter ||= "#{name.to_s}="
       end
 
+      # Returns the name of the field in which to store the name of the class
+      # for the polymorphic relation.
+      #
+      # @example Get the name of the field.
+      #   metadata.inverse_type
+      #
+      # @return [ String ] The name of the field for storing the type.
+      #
+      # @since 2.0.0.rc.1
+      def type
+        @type ||= polymorphic? ? "#{as.to_s}_type" : nil
+      end
+
+      # Gets the setter for the field that sets the type of document on a
+      # polymorphic relation.
+      #
+      # @example Get the inverse type setter.
+      #   metadata.inverse_type_setter
+      #
+      # @return [ String ] The name of the setter.
+      #
+      # @since 2.0.0.rc.1
+      def type_setter
+        @type_setter ||= type ? "#{type}=" : nil
+      end
+
       # Are we validating this relation automatically?
       #
       # @example Is automatic validation on?
@@ -357,20 +676,47 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def validate?
-        self[:validate] != false
+        unless self[:validate].nil?
+          self[:validate]
+        else
+          self[:validate] = relation.validation_default
+        end
       end
 
+      # Is this relation using Mongoid's internal versioning system?
+      #
+      # @example Is this relation versioned?
+      #   metadata.versioned?
+      #
+      # @return [ true, false ] If the relation uses Mongoid versioning.
+      #
+      # @since 2.1.0
+      def versioned?
+        !!self[:versioned]
+      end
 
       # Returns default order for this association.
       #
       # @example Get default order
-      #   metadata.order # => #<Mongoid::Criterion::Complex:0x00000102a8a450 @key=:rating, @operator="asc">
+      #   metadata.order
       #
-      # @return [Mongoid::Criterion::Complex, nil] nil if doesn't set
+      # @return [ Criterion::Complex, nil] nil if doesn't set
       #
       # @since 2.1.0
       def order
-        @order ||= self[:order]
+        self[:order]
+      end
+
+      # Is a default order set?
+      #
+      # @example Is the order set?
+      #   metadata.order?
+      #
+      # @return [ true, false ] If the order is set.
+      #
+      # @since 2.1.0
+      def order?
+        !!order
       end
 
       private
@@ -464,9 +810,10 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_inverse_relation
+        default = klass.relations[inverse_klass.name.underscore]
+        return default.name if default
         klass.relations.each_pair do |key, meta|
-          if key == inverse_klass.name.underscore ||
-            meta.class_name == inverse_class_name
+          if meta.class_name == inverse_class_name
             return key.to_sym
           end
         end
@@ -524,29 +871,9 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def lookup_inverse(other)
         return nil unless other
-        other.to_a.first.relations.each_pair do |key, meta|
+        other.class.relations.each_pair do |key, meta|
           return meta.name if meta.as == name
         end
-      end
-
-      # Handles two different cases - the first is a convenience for JSON like
-      # access to the hash instead of having to call []. The second is a
-      # delegation of the "*?" methods to has_key? as a convenience to check
-      # for existence of a value.
-      #
-      # @example Extras provided by this method.
-      #   metadata.name
-      #   metadata.name?
-      #
-      # @param [ Symbol ] name The name of the method.
-      # @param [ Array ] args The arguments passed to the method.
-      #
-      # @return [ Object ] Either the value or a boolen.
-      #
-      # @since 2.0.0.rc.1
-      def method_missing(name, *args)
-        method = name.to_s
-        method =~ /\?/ ? has_key?(method.sub('?', '').to_sym) : self[name]
       end
     end
   end
