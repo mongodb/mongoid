@@ -13,6 +13,7 @@ require "mongoid/fields/serializable/hash"
 require "mongoid/fields/serializable/integer"
 require "mongoid/fields/serializable/bignum"
 require "mongoid/fields/serializable/fixnum"
+require "mongoid/fields/serializable/localized"
 require "mongoid/fields/serializable/nil_class"
 require "mongoid/fields/serializable/object"
 require "mongoid/fields/serializable/object_id"
@@ -227,9 +228,8 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
         meth = options.delete(:as) || name
-        Mappings.for(
-          options[:type], options[:identity]
-        ).instantiate(name, options).tap do |field|
+        type = options[:localize] ? Fields::Serializable::Localized : options[:type]
+        Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field
           defaults << name unless field.default.nil?
           create_accessors(name, meth, options)
@@ -311,7 +311,7 @@ module Mongoid #:nodoc
             end
           end
           define_method("#{meth}=") do |value|
-            write_attribute(name, value)
+            write_attribute(name, value, field.localized?)
           end
           define_method("#{meth}?") do
             attr = read_attribute(name)

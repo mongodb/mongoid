@@ -30,6 +30,27 @@ describe Mongoid::Fields::Serializable::String do
     end
   end
 
+  describe "localized?" do
+
+    context "when the field is localized" do
+
+      let(:field) do
+        described_class.instantiate(:test, :type => String, :localize => true)
+      end
+
+      it "returns true" do
+        field.should be_localized
+      end
+    end
+
+    context "when the field is not localized" do
+
+      it "returns false" do
+        field.should_not be_localized
+      end
+    end
+  end
+
   describe "#versioned?" do
 
     context "when the field is versioned" do

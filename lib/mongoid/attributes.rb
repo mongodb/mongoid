@@ -94,14 +94,14 @@ module Mongoid #:nodoc:
     # @param [ Object ] value The value to set for the attribute.
     #
     # @since 1.0.0
-    def write_attribute(name, value)
+    def write_attribute(name, value, localized = false)
       assigning do
         access = name.to_s
         typed_value_for(access, value).tap do |value|
           unless attributes[access] == value || attribute_changed?(access)
             attribute_will_change!(access)
           end
-          attributes[access] = value
+          localized ? attributes[access].merge!(value) : attributes[access] = value
         end
       end
     end
