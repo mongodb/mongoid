@@ -102,5 +102,15 @@ describe Mongoid::Versioning do
         page.versions.map(&:title).should == expected
       end
     end
+
+    it "should not version versions attributes" do
+      3.times do |n|
+        page.title = "#{n + 2}"
+        page.save
+      end
+
+      page.versions[1].versions.should == []
+      page.versions[2].versions.should == []
+    end
   end
 end
