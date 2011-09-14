@@ -268,6 +268,19 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Get a criteria for the embedded documents without the default scoping
+        # applied.
+        #
+        # @example Get the unscoped criteria.
+        #   person.addresses.unscoped
+        #
+        # @return [ Criteria ] The unscoped criteria.
+        #
+        # @since 2.2.1
+        def unscoped
+          criteria(false)
+        end
+
         private
 
         # Appends the document to the target array, updating the index on the
@@ -306,8 +319,8 @@ module Mongoid # :nodoc:
         #   relation.criteria
         #
         # @return [ Criteria ] A new criteria.
-        def criteria
-          klass.criteria(true).tap do |criterion|
+        def criteria(scoped = true)
+          klass.criteria(true, scoped).tap do |criterion|
             criterion.documents = target
           end
         end
