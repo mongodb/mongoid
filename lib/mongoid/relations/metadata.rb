@@ -719,6 +719,18 @@ module Mongoid # :nodoc:
         !!order
       end
 
+      # Should embedded association cascade parent callbacks?
+      #
+      # @example Perform parent callbacks cascading?
+      #   metadata.cascade_callbacks
+      #
+      # @return [ true, false ] If the cascade_callbacks is set.
+      #
+      # @since 2.1.0
+      def cascade_callbacks
+        !!self[:cascade_callbacks]
+      end
+
       private
 
       # Returns the class name for the relation.
