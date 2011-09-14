@@ -79,7 +79,15 @@ namespace :db do
 
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
-      ::Rails::Mongoid.create_indexes("app/models/**/*.rb")
+      engines_models_paths = Rails.application.railties.engines.map do |engine|
+        engine.paths["app/models"].paths
+      end
+      root_models_paths = Rails.application.paths["app/models"]
+      models_paths = engines_models_paths.push(root_models_paths).flatten
+
+      models_paths.each do |path|
+        ::Rails::Mongoid.create_indexes("#{path}/**/*.rb")
+      end
     end
 
     def convert_ids(obj)
