@@ -53,6 +53,19 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Forces the creation of a new version of the +Document+, regardless of
+    # whether a change was actually made.
+    #
+    # @example Revise the document.
+    #   person.revise!
+    #
+    # @since 2.2.1
+    def revise!
+      new_version = versions.build((previous_revision || self).versioned_attributes)
+      versions.shift if version_max.present? && versions.length > version_max
+      self.version = (version || 1 ) + 1
+    end
+
     # Filters the results of +changes+ by removing any fields that should
     # not be versioned.
     #
