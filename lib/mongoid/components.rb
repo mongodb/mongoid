@@ -17,11 +17,11 @@ module Mongoid #:nodoc
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
     include Mongoid::Atomic
+    include Mongoid::Dirty
     include Mongoid::Attributes
     include Mongoid::Collections
     include Mongoid::Copyable
     include Mongoid::DefaultScope
-    include Mongoid::Dirty
     include Mongoid::Extras
     include Mongoid::Fields
     include Mongoid::Hierarchy

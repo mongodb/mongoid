@@ -930,30 +930,82 @@ describe Mongoid::Attributes do
     end
   end
 
-  pending "#alias_attribute" do
+  describe "#alias_attribute" do
 
-    let(:klass) do
-      class AliasAttributeTestClass
-        include Mongoid::Document
-        field :name, :type => String
-        alias_attribute :title, :name
+    let(:product) do
+      Product.new
+    end
+
+    context "when checking against the alias" do
+
+      before do
+        product.cost = 500
       end
-      AliasAttributeTestClass.new
+
+      it "aliases the getter" do
+        product.cost.should eq(500)
+      end
+
+      it "aliases the existance check" do
+        product.cost?.should be_true
+      end
+
+      it "aliases *_changed?" do
+        product.cost_changed?.should be_true
+      end
+
+      it "aliases *_change" do
+        product.cost_change.should eq([ nil, 500 ])
+      end
+
+      it "aliases *_will_change!" do
+        product.should respond_to(:cost_will_change!)
+      end
+
+      it "aliases *_was" do
+        product.cost_was.should be_nil
+      end
+
+      it "aliases reset_*!" do
+        product.reset_cost!
+        product.cost.should be_nil
+      end
     end
 
-    it "sets and accesses :name fine" do
-      klass.name = "baseline"
-      klass.name.should == "baseline"
-    end
+    context "when checking against the original" do
 
-    it "aliases :name value as :title" do
-      klass.name = "a value"
-      klass.title.should == "a value"
-    end
+      before do
+        product.price = 500
+      end
 
-    it "aliases :name= as :title=" do
-      klass.title = "a title value"
-      klass.name.should == "a title value"
+      it "aliases the getter" do
+        product.price.should eq(500)
+      end
+
+      it "aliases the existance check" do
+        product.price?.should be_true
+      end
+
+      it "aliases *_changed?" do
+        product.price_changed?.should be_true
+      end
+
+      it "aliases *_change" do
+        product.price_change.should eq([ nil, 500 ])
+      end
+
+      it "aliases *_will_change!" do
+        product.should respond_to(:price_will_change!)
+      end
+
+      it "aliases *_was" do
+        product.price_was.should be_nil
+      end
+
+      it "aliases reset_*!" do
+        product.reset_price!
+        product.price.should be_nil
+      end
     end
   end
 end
