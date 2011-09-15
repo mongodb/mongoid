@@ -35,8 +35,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def query?
-        return true unless object.respond_to?(:to_a)
-        obj = object.to_a.first
+        obj = Array(object).first
         !obj.is_a?(Mongoid::Document) && !obj.nil?
       end
     end
