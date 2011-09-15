@@ -6,6 +6,7 @@ module Mongoid #:nodoc:
   # This module contains the logic for handling the internal attributes hash,
   # and how to get and set values.
   module Attributes
+    extend ActiveSupport::Concern
     include Processing
 
     attr_reader :attributes
@@ -221,6 +222,33 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def typed_value_for(key, value)
       fields.has_key?(key) ? fields[key].serialize(value) : value
+    end
+
+    module ClassMethods #:nodoc:
+
+      # Alias the provided name to the original field. This will provide an
+      # aliased getter, setter, existance check, and all dirty attribute
+      # methods.
+      #
+      # @example Alias the attribute.
+      #   class Product
+      #     include Mongoid::Document
+      #     field :price, :type => Float
+      #     alias_attribute :cost, :price
+      #   end
+      #
+      # @param [ Symbol ] name The new name.
+      # @param [ Symbol ] original The original name.
+      #
+      # @since 2.3.0
+      def alias_attribute(name, original)
+        class_eval <<-RUBY
+          alias :#{name} :#{original}
+          alias :#{name}= :#{original}=
+          alias :#{name}? :#{original}?
+        RUBY
+        super
+      end
     end
   end
 end

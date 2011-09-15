@@ -234,13 +234,7 @@ module Mongoid #:nodoc
           defaults << name unless field.default.nil?
           create_accessors(name, meth, options)
           process_options(field)
-
-          # @todo Durran: Refactor this once we can depend on at least
-          #   ActiveModel greater than 3.0.9. They finally have the ability then
-          #   to add attribute methods one at a time. This code will make class
-          #   load times extremely slow.
-          undefine_attribute_methods
-          define_attribute_methods(fields.keys)
+          define_attribute_method(name)
         end
       end
 
