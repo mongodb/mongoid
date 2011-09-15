@@ -211,6 +211,7 @@ describe Mongoid::Versioning do
           WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
           criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
           match.expects(:first).returns(nil)
+          page.expects(:save)
           page.revise!
         end
 
@@ -229,6 +230,7 @@ describe Mongoid::Versioning do
           WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
           criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
           match.expects(:first).returns(page)
+          page.expects(:save)
           page.revise!
         end
 

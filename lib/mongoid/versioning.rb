@@ -64,6 +64,7 @@ module Mongoid #:nodoc:
       new_version = versions.build((previous_revision || self).versioned_attributes)
       versions.shift if version_max.present? && versions.length > version_max
       self.version = (version || 1 ) + 1
+      save
     end
 
     # Filters the results of +changes+ by removing any fields that should
