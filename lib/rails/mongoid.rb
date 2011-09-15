@@ -70,10 +70,12 @@ module Rails #:nodoc:
     #
     # @since 2.1.0
     def determine_model(file)
-      model_path = file[0..-4].split('/')[2..-1]
-      klass = model_path.map { |path| path.camelize }.join('::').constantize
-      if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
-        return klass
+      if file =~ /app\/models\/(.*).rb$/
+        model_path = $1.split('/')
+        klass = model_path.map { |path| path.camelize }.join('::').constantize
+        if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
+          return klass
+        end
       end
     end
   end
