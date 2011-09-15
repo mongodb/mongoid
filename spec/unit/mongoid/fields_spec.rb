@@ -234,7 +234,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the alias to write the attribute" do
-        person.expects(:write_attribute).with("aliased", true, false)
+        person.expects(:write_attribute).with("aliased", true)
         person.alias = true
       end
 

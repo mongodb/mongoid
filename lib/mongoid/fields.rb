@@ -311,7 +311,7 @@ module Mongoid #:nodoc
             end
           end
           define_method("#{meth}=") do |value|
-            write_attribute(name, value, field.localized?)
+            write_attribute(name, value)
           end
           define_method("#{meth}?") do
             attr = read_attribute(name)
