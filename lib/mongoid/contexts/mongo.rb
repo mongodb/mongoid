@@ -158,7 +158,10 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The first document in the collection.
       def first
-        attributes = klass.collection.find_one(selector, process_options)
+        opts = process_options
+        sorting = opts[:sort] ||= []
+        sorting << [:_id, :asc]
+        attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
       alias :one :first
