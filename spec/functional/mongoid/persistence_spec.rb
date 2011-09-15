@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
-    [ Person, Post, Game ].each(&:delete_all)
+    [ Person, Post, Product, Game ].each(&:delete_all)
   end
 
   before(:all) do
@@ -586,6 +586,34 @@ describe Mongoid::Persistence do
         it "saves the document" do
           post.should be_persisted
         end
+      end
+    end
+
+    context "when persisting a localized field" do
+
+      let!(:product) do
+        Product.create(:description => "The bomb")
+      end
+
+      before do
+        ::I18n.locale = :de
+        product.update_attribute(:description, "Die Bombe")
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      let(:attributes) do
+        product.attributes["description"]
+      end
+
+      it "persists the en locale" do
+        attributes["en"].should eq("The bomb")
+      end
+
+      it "persists the de locale" do
+        attributes["de"].should eq("Die Bombe")
       end
     end
   end
