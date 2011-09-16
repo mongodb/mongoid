@@ -19,7 +19,7 @@ task :install => :build do
 end
 
 task :release => :build do
-  system "git tag -a #{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
+  system "git tag -a v#{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
   system "git push --tags"
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
