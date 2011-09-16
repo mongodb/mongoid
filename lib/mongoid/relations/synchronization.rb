@@ -50,6 +50,20 @@ module Mongoid # :nodoc:
         !!synced[foreign_key]
       end
 
+      # Update the inverse keys on destroy.
+      #
+      # @example Update the inverse keys.
+      #   document.remove_inverse_keys(metadata)
+      #
+      # @param [ Metadata ] meta The document metadata.
+      #
+      # @return [ Object ] The updated values.
+      #
+      # @since 2.2.1
+      def remove_inverse_keys(meta)
+        meta.criteria(send(meta.foreign_key)).pull(meta.inverse_foreign_key, id)
+      end
+
       # Update the inverse keys for the relation.
       #
       # @example Update the inverse keys
@@ -79,6 +93,7 @@ module Mongoid # :nodoc:
         # @since 2.1.0
         def synced(metadata)
           synced_save(metadata)
+          synced_destroy(metadata)
         end
 
         private
@@ -105,6 +120,27 @@ module Mongoid # :nodoc:
               :if => lambda { |doc| doc.syncable?(metadata) }
             ) do |doc|
               doc.update_inverse_keys(metadata)
+            end
+          end
+        end
+
+        # Set up the sync of inverse keys that needs to happen on a destroy.
+        #
+        # @example Set up the destroy syncing.
+        #   Person.synced_destroy(metadata)
+        #
+        # @param [ Metadata ] metadata The relation metadata.
+        #
+        # @return [ Class ] The class getting set up.
+        #
+        # @since 2.2.1
+        def synced_destroy(metadata)
+          tap do
+            set_callback(
+              :destroy,
+              :after
+            ) do |doc|
+              doc.remove_inverse_keys(metadata)
             end
           end
         end

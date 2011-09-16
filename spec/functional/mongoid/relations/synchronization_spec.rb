@@ -278,7 +278,7 @@ describe Mongoid::Relations::Synchronization do
     end
   end
 
-  context "when destroying the document" do
+  context "when destroying" do
 
     let!(:one) do
       Preference.create(:name => "one")
@@ -295,16 +295,30 @@ describe Mongoid::Relations::Synchronization do
       )
     end
 
-    before do
-      person.destroy
+    context "when destroying the parent" do
+
+      before do
+        person.destroy
+      end
+
+      it "removes the first inverse key" do
+        one.reload.person_ids.should be_empty
+      end
+
+      it "removes the second inverse key" do
+        two.reload.person_ids.should be_empty
+      end
     end
 
-    it "removes the first inverse key" do
-      one.reload.person_ids.should be_empty
-    end
+    context "when destroying the child" do
 
-    it "removes the second inverse key" do
-      two.reload.person_ids.should be_empty
+      before do
+        one.destroy
+      end
+
+      it "removes the inverse key" do
+        person.reload.preference_ids.should eq([ two.id ])
+      end
     end
   end
 end
