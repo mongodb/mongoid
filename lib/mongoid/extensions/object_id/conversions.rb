@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
           case args
           when ::String
             return nil if args.blank?
-            if args.is_a?(Mongoid::Criterion::Unconvertable)
+            if args.unconvertable_to_bson?
               args
             else
               BSON::ObjectId.from_string(args)

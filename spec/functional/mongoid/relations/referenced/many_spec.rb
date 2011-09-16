@@ -2407,4 +2407,15 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
   end
+
+  context "when the parent is using integer ids" do
+
+    let(:jar) do
+      Jar.create(:_id => 1)
+    end
+
+    it "allows creation of the document" do
+      jar.id.should eq(1)
+    end
+  end
 end
