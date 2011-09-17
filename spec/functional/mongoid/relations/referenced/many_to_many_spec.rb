@@ -120,6 +120,45 @@ describe Mongoid::Relations::Referenced::ManyToMany do
               person.reload.preferences.should eq([ preference ])
             end
           end
+
+          context "when setting via the associated ids" do
+
+            let!(:persisted) do
+              Preference.create(:name => "testy")
+            end
+
+            let(:preference) do
+              Preference.first
+            end
+
+            let(:person) do
+              Person.new(:ssn => "345-12-9867", :preference_ids => [ preference.id ])
+            end
+
+            before do
+              person.save
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.reload.person_ids.should == [ person.id ]
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
+
+            it "persists the link" do
+              person.reload.preferences.should eq([ preference ])
+            end
+          end
         end
 
         context "when the parent is not a new record" do
