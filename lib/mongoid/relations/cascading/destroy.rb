@@ -11,7 +11,14 @@ module Mongoid # :nodoc:
         # @example Perform the cascading destroy.
         #   strategy.cascade
         def cascade
-          relation.to_a.each { |doc| doc.destroy } if relation
+          if relation
+            if relation.is_a?(Enumerable)
+              relation.entries
+              relation.each { |doc| doc.destroy }
+            else
+              relation.destroy
+            end
+          end
         end
       end
     end
