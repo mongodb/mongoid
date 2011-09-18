@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Synchronization do
 
   before do
-    [ Person, Preference ].each(&:delete_all)
+    [ Person, Preference, Article, Tag ].each(&:delete_all)
   end
 
   context "when first setting by the relation itself" do
@@ -319,6 +319,34 @@ describe Mongoid::Relations::Synchronization do
       it "removes the inverse key" do
         person.reload.preference_ids.should eq([ two.id ])
       end
+    end
+  end
+
+  context "when appending an existing document to a new one" do
+
+    let!(:peristed) do
+      Tag.create
+    end
+
+    let(:article) do
+      Article.new
+    end
+
+    before do
+      article.tags << Tag.first
+      article.save
+    end
+
+    let(:tag) do
+      Tag.first
+    end
+
+    it "persists the foreign key on the inverse" do
+      tag.article_ids.should eq([ article.id ])
+    end
+
+    it "persists the inverse relation" do
+      tag.articles.should eq([ article ])
     end
   end
 end
