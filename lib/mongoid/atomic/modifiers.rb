@@ -115,7 +115,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.2.0
       def push_conflict?(field)
-        set_fields.include?(field.split(".", 2)[0])
+        name = field.split(".", 2)[0]
+        set_fields.include?(name) || pull_fields.include?(name)
       end
 
       # Get the conflicting pull modifications.

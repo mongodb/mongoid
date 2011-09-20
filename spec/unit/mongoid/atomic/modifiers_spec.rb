@@ -141,30 +141,63 @@ describe Mongoid::Atomic::Modifiers do
 
     context "when a conflicting modification exists" do
 
-      let(:sets) do
-        { "addresses.0.street" => "Bond" }
-      end
+      context "when the conflicting modification is a set" do
 
-      let(:pushes) do
-        { "addresses" => { "street" => "Oxford St" } }
-      end
+        let(:sets) do
+          { "addresses.0.street" => "Bond" }
+        end
 
-      before do
-        modifiers.set(sets)
-        modifiers.push(pushes)
-      end
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
 
-      it "adds the push all modifiers to the conflicts hash" do
-        modifiers.should eq(
-          { "$set" => { "addresses.0.street" => "Bond" },
-            :conflicts => { "$pushAll" =>
-              { "addresses" => [
-                  { "street" => "Oxford St" }
-                ]
+        before do
+          modifiers.set(sets)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$set" => { "addresses.0.street" => "Bond" },
+              :conflicts => { "$pushAll" =>
+                { "addresses" => [
+                    { "street" => "Oxford St" }
+                  ]
+                }
               }
             }
-          }
-        )
+          )
+        end
+      end
+
+      context "when the conflicting modification is a pull" do
+
+        let(:pulls) do
+          { "addresses" => { "street" => "Bond St" } }
+        end
+
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
+
+        before do
+          modifiers.pull(pulls)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$pullAll" => {
+              "addresses" => { "street" => "Bond St" }},
+              :conflicts => { "$pushAll" =>
+                { "addresses" => [
+                    { "street" => "Oxford St" }
+                  ]
+                }
+              }
+            }
+          )
+        end
       end
     end
   end
