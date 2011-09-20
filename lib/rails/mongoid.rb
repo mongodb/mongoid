@@ -36,12 +36,19 @@ module Rails #:nodoc:
     #
     # @param [ Application ] app The rails application.
     def load_models(app)
-      return unless ::Mongoid.preload_models
       app.config.paths["app/models"].each do |path|
         Dir.glob("#{path}/**/*.rb").sort.each do |file|
           load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))
         end
       end
+    end
+
+    # Conditionally calls `Rails::Mongoid.load_models(app)` if the
+    # `::Mongoid.preload_models` is `true`.
+    #
+    # @param [ Application ] app The rails application.
+    def preload_models(app)
+      load_models(app) if ::Mongoid.preload_models
     end
 
     private
