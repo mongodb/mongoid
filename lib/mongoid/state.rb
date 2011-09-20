@@ -83,7 +83,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def settable?
-      new? && embedded_one?
+      new? && embedded_one? && _parent.persisted?
     end
 
     # Is the document updateable?
