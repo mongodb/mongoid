@@ -37,7 +37,9 @@ module Mongoid # :nodoc:
             if inverse.using_object_ids? || object.is_a?(BSON::ObjectId)
               object
             else
-              object.tap { |obj| obj.unconvertable_to_bson = true }
+              object.tap do |obj|
+                obj.unconvertable_to_bson = true if obj.is_a?(String)
+              end
             end
           end
         end
