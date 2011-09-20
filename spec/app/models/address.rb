@@ -14,6 +14,7 @@ class Address
   field :latlng, :type => Array
   key :street
   embeds_many :locations
+  embeds_one :code
 
   embedded_in :addressable, :polymorphic => true do
     def extension
@@ -24,7 +25,7 @@ class Address
     end
   end
 
-  accepts_nested_attributes_for :locations
+  accepts_nested_attributes_for :locations, :code
 
   belongs_to :account
 

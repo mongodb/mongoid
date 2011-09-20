@@ -136,7 +136,7 @@ describe Mongoid::NestedAttributes do
     end
   end
 
-  describe '##{name}_attributes=' do
+  describe "##{name}_attributes=" do
 
     context "when the parent document is new" do
 
@@ -3691,6 +3691,86 @@ describe Mongoid::NestedAttributes do
   end
 
   describe "#update_attributes" do
+
+    before(:all) do
+      Person.send(:undef_method, :addresses_attributes=)
+      Person.accepts_nested_attributes_for :addresses
+    end
+
+    context "when nesting multiple levels" do
+
+      let(:person) do
+        Person.create(:ssn => "678-23-2222")
+      end
+
+      context "when second level is a one to many" do
+
+        let(:attributes) do
+          { :addresses_attributes =>
+            { "0" =>
+              {
+                :street => "Alexanderstr",
+                :locations_attributes => { "0" => { :name => "Home" } }
+              }
+            }
+          }
+        end
+
+        before do
+          person.safely.update_attributes(attributes)
+        end
+
+        let(:address) do
+          person.addresses.first
+        end
+
+        let(:location) do
+          address.locations.first
+        end
+
+        it "adds the new first level embedded document" do
+          address.street.should eq("Alexanderstr")
+        end
+
+        it "adds the nested embedded document" do
+          location.name.should eq("Home")
+        end
+      end
+
+      context "when the second level is a one to one" do
+
+        let(:attributes) do
+          { :addresses_attributes =>
+            { "0" =>
+              {
+                :street => "Alexanderstr",
+                :code_attributes => { :name => "Home" }
+              }
+            }
+          }
+        end
+
+        before do
+          person.safely.update_attributes(attributes)
+        end
+
+        let(:address) do
+          person.addresses.first
+        end
+
+        let(:code) do
+          address.code
+        end
+
+        it "adds the new first level embedded document" do
+          address.street.should eq("Alexanderstr")
+        end
+
+        it "adds the nested embedded document" do
+          code.name.should eq("Home")
+        end
+      end
+    end
 
     context "when the relation is an embeds many" do
 
