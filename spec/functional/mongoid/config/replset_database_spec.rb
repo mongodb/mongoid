@@ -49,6 +49,12 @@ describe Mongoid::Config::ReplsetDatabase do
       it "sets up the default mongoid logger" do
         replica_set.logger.should eq(Mongoid::Config.logger)
       end
+
+      it "does not modify the options in place" do
+        options["test"]["hosts"].should eq(
+          [["localhost", 27017], ["localhost", 27017]]
+        )
+      end
     end
 
     context "with authentication details" do
