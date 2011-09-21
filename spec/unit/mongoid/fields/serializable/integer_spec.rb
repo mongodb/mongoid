@@ -19,8 +19,18 @@ describe Mongoid::Fields::Serializable::Integer do
 
       context "when the value is an integer" do
 
-        it "it returns the integer" do
-          field.serialize(3).should == 3
+        context "when the value is small" do
+
+          it "it returns the integer" do
+            field.serialize(3).should == 3
+          end
+        end
+
+        context "when the value is large" do
+
+          it "returns the integer" do
+            field.serialize(1024**2).to_s.should eq("1048576")
+          end
         end
       end
 
