@@ -188,6 +188,58 @@ describe Mongoid::Versioning do
     end
   end
 
+  describe "#revise!" do
+
+    let(:criteria) do
+      stub
+    end
+
+    let(:match) do
+      stub
+    end
+
+    context "when a last version does not exist" do
+
+      context "when versioning is new to the document" do
+
+        let!(:page) do
+          WikiPage.new(:title => "1")
+        end
+        subject { page }
+
+        before do
+          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
+          match.expects(:first).returns(nil)
+          page.expects(:save)
+          page.revise!
+        end
+
+        its('versions.size') { should == 1 }
+        its(:version) { should == 2 }
+      end
+
+      context "when versioning has been in effect" do
+
+        let!(:page) do
+          WikiPage.new(:title => "1")
+        end
+        subject { page }
+
+        before do
+          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
+          match.expects(:first).returns(page)
+          page.expects(:save)
+          page.revise!
+        end
+
+        its('versions.size') { should == 1 }
+        its(:version) { should == 2 }
+      end
+    end
+  end
+
   describe "#versionless" do
 
     let(:person) do

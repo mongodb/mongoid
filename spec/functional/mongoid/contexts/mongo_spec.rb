@@ -3,7 +3,45 @@ require "spec_helper"
 describe Mongoid::Contexts::Mongo do
 
   before do
-    Person.delete_all
+    [ Person, Product ].each(&:delete_all)
+  end
+
+  describe "#first" do
+
+    let!(:first) do
+      Product.create
+    end
+
+    let!(:last) do
+      Product.create
+    end
+
+    let(:from_db) do
+      Product.first
+    end
+
+    it "returns the first document in the collection by id" do
+      from_db.should eq(first)
+    end
+  end
+
+  describe "#last" do
+
+    let!(:first) do
+      Product.create
+    end
+
+    let!(:last) do
+      Product.create
+    end
+
+    let(:from_db) do
+      Product.last
+    end
+
+    it "returns the last document in the collection by id" do
+      from_db.should eq(last)
+    end
   end
 
   describe "#avg" do

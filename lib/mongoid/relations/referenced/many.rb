@@ -329,7 +329,7 @@ module Mongoid #:nodoc:
         # @example Get the value.
         #   relation.convertable
         #
-        # @return [ String, Unconvertable, BSON::ObjectId ] The string or object id.
+        # @return [ String, BSON::ObjectId ] The string or object id.
         #
         # @since 2.0.2
         def convertable
@@ -337,7 +337,9 @@ module Mongoid #:nodoc:
           if inverse.using_object_ids? || base.id.is_a?(BSON::ObjectId)
             base.id
           else
-            Criterion::Unconvertable.new(base.id)
+            base.id.tap do |id|
+              id.unconvertable_to_bson = true if id.is_a?(String)
+            end
           end
         end
 

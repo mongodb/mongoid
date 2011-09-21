@@ -35,6 +35,7 @@ module Mongoid # :nodoc:
                   doc.save
                 else
                   base.send(metadata.foreign_key).push(doc.id)
+                  base.synced[metadata.foreign_key] = false
                 end
               end
               if persistable? || creating?

@@ -14,14 +14,14 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.5
       def configure
-        # yes, construction is weird but the driver wants 
+        # yes, construction is weird but the driver wants
         # "A list of host-port pairs ending with a hash containing any options"
         # mongo likes symbols
         options = self.inject({ :logger => Mongoid::Logger.new }) do |memo, (k, v)|
           memo[k.to_sym] = v
           memo
         end
-        connection = Mongo::ReplSetConnection.new(*(hosts << options))
+        connection = Mongo::ReplSetConnection.new(*(hosts.clone << options))
 
         if authenticating?
           connection.add_auth(database, username, password)

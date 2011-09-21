@@ -20,6 +20,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       context "when the relations are not polymorphic" do
 
+
         context "when the inverse relation is not defined" do
 
           let(:person) do
@@ -46,35 +47,117 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the parent is a new record" do
 
           let(:person) do
-            Person.new
+            Person.new(:ssn => "423-12-0789")
           end
 
-          let(:preference) do
-            Preference.new
+          context "when the child is new" do
+
+            let(:preference) do
+              Preference.new
+            end
+
+            before do
+              person.preferences.send(method, preference)
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.person_ids.should == [ person.id ]
+            end
+
+            it "does not save the target" do
+              preference.should be_new
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
           end
 
-          before do
-            person.preferences.send(method, preference)
+          context "when the child is already persisted" do
+
+            let!(:persisted) do
+              Preference.create(:name => "testy")
+            end
+
+            let(:preference) do
+              Preference.first
+            end
+
+            before do
+              person.preferences.send(method, preference)
+              person.save
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.person_ids.should == [ person.id ]
+            end
+
+            it "saves the target" do
+              preference.should be_persisted
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
+
+            it "persists the link" do
+              person.reload.preferences.should eq([ preference ])
+            end
           end
 
-          it "adds the documents to the relation" do
-            person.preferences.should == [ preference ]
-          end
+          context "when setting via the associated ids" do
 
-          it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
-          end
+            let!(:persisted) do
+              Preference.create(:name => "testy")
+            end
 
-          it "sets the foreign key on the inverse relation" do
-            preference.person_ids.should == [ person.id ]
-          end
+            let(:preference) do
+              Preference.first
+            end
 
-          it "does not save the target" do
-            preference.should be_new
-          end
+            let(:person) do
+              Person.new(:ssn => "345-12-9867", :preference_ids => [ preference.id ])
+            end
 
-          it "adds the correct number of documents" do
-            person.preferences.size.should == 1
+            before do
+              person.save
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.reload.person_ids.should == [ person.id ]
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
+
+            it "persists the link" do
+              person.reload.preferences.should eq([ preference ])
+            end
           end
         end
 

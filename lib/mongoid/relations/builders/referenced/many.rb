@@ -29,7 +29,7 @@ module Mongoid # :nodoc:
           # @example Get the value.
           #   builder.convertable
           #
-          # @return [ String, Unconvertable, BSON::ObjectId ] The string or object id.
+          # @return [ String, BSON::ObjectId ] The string or object id.
           #
           # @since 2.0.2
           def convertable(metadata, object)
@@ -37,7 +37,9 @@ module Mongoid # :nodoc:
             if inverse.using_object_ids? || object.is_a?(BSON::ObjectId)
               object
             else
-              Criterion::Unconvertable.new(object)
+              object.tap do |obj|
+                obj.unconvertable_to_bson = true if obj.is_a?(String)
+              end
             end
           end
         end

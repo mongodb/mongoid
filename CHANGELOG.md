@@ -4,15 +4,57 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 ## 2.2.1
 
+### Resolved Issues
+
 * \#1210, \#517 Allow embedded document relation queries to use dot notation.
   (Scott Ellard)
 
 * \#1198 Enumerable target should use criteria count if loaded has no docs.
 
-* \#1193 Ensure all floats with n precision of zero get converted to integers
-  if the field is defined as an integer.
+* \#1164 Get rid of remaining no method in_memory errors.
 
-### Resolved Issues
+* \#1070 Allow custom field serializers to have their own constructors.
+
+* \#1176 Allow access to parent documents from embedded docs in after_destroy
+  callbacks.
+
+* \#1191 Context group methods (min, max, sum) no longer return NaN but instead
+  return nil if field doesn't exist or have values.
+
+* \#1193, \#1271 Always return Integers for integer fields with .000 precisions,
+  not floats.
+
+* \#1199 Fixed performance issues of hash and array field access when reading
+  multiple times.
+
+* \#1218 Fixed issues with relations referencing models with integer foreign keys.
+
+* \#1219 Fixed various conflicting modifications issues when pushing and pulling
+  from the same embedded document in a single call.
+
+* \#1220 Metadata should not get overwritten by nil on binding.
+
+* \#1231 Renamed Mongoid's atomic set class to Sets to avoid conflicts with Ruby's
+  native Set after document inclusion.
+
+* \#1232 Fix access to related models during before_destroy callbacks when
+  cascading.
+
+* \#1234 Fixed HABTM foreign key synchronization issues when destroying
+  documents.
+
+* \#1243 Polymorphic relations dont convert to object ids when querying if the
+  ids are defined as strings.
+
+* \#1247 Force Model.first to sort by ascending id to guarantee first document.
+
+* \#1248 Added #unscoped to embedded many relations.
+
+* \#1249 Destroy flags in nested attributes now actually destroy the document
+  for has_many instead of just breaking the relation.
+
+* \#1272 Don't modify configuration options in place when creating replica set
+  connections.
 
 ## 2.2.0
 
