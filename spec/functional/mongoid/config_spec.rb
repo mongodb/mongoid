@@ -158,21 +158,6 @@ describe Mongoid::Config do
         described_class.master.name.should == "mongoid"
       end
     end
-
-    context "when configured with replset", :config => :replset_config do
-
-      let(:settings) do
-        YAML.load(ERB.new(File.new(replset_config).read).result)
-      end
-
-      it "should create a regular Mongo::ReplSetConnection" do
-        described_class.master.connection.should be_a Mongo::ReplSetConnection
-      end
-
-      it "should create regular Mongo::ReplSetConnection(s) for multiple databases" do
-        described_class.databases["shard_replset"].connection.should be_a Mongo::ReplSetConnection
-      end
-    end
   end
 
   describe ".load!" do
