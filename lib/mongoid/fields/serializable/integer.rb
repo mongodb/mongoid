@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
         def serialize(object)
           return nil if object.blank?
           begin
-            ("%g" % object.to_s) =~ /\./ ? Float(object) : Integer(object)
+            object.to_s =~ /(^[-+]?[0-9]+$)|(\.0+)$/ ? Integer(object) : Float(object)
           rescue
             object
           end
