@@ -129,7 +129,7 @@ describe Mongoid::Safety do
     end
   end
 
-  context "when using #unsafely" do
+  describe ".unsafely" do
 
     context "when global safe mode is true" do
 
@@ -159,8 +159,41 @@ describe Mongoid::Safety do
             it "should fail silently" do
               Person.unsafely.create(:ssn => "432-97-1111").should be_true
             end
+
+            it "should still use defaults for subsequent requests" do
+              Person.unsafely.create(:ssn => "432-97-1111")
+              lambda {
+                Person.create(:ssn => "432-97-1111")
+              }.should raise_error(Mongo::OperationFailure)
+            end
           end
         end
+
+        describe ".save" do
+
+          before do
+            Person.safely.create(:ssn => "432-97-1113")
+          end
+
+          context "when a mongodb error occurs" do
+
+            let(:person) do
+              Person.new(:ssn => "432-97-1113")
+            end
+
+            it "should fail silently" do
+              person.unsafely.save(:ssn => "432-97-1113").should be_true
+            end
+
+            it "should still use defaults for subsequent requests" do
+              person.unsafely.save(:ssn => "432-97-1113")
+              lambda {
+                Person.create(:ssn => "432-97-1113")
+              }.should raise_error(Mongo::OperationFailure)
+            end
+          end
+        end
+
 
     end
   end
