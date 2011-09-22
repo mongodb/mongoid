@@ -128,4 +128,36 @@ describe Mongoid::Safety do
       end
     end
   end
+
+  context "when using #unsafely" do
+
+    context "when global safe mode is true" do
+
+        before do
+          Mongoid.persist_in_safe_mode = true
+        end
+
+        describe ".create" do
+
+          before do
+            Person.safely.create(:ssn => "432-97-1111")
+          end
+
+          context "when no error occurs" do
+
+            it "inserts the document" do
+              Person.count.should == 1
+            end
+          end
+
+          context "when a mongodb error occurs" do
+
+            it "should fail silently" do
+              Person.unsafely.create(:ssn => "432-97-1111").should be_true
+            end
+          end
+        end
+
+    end
+  end
 end
