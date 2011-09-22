@@ -63,7 +63,7 @@ describe "Rails::Mongoid" do
     end
   end
 
-  describe ".load_models" do
+  describe ".preload_models" do
 
     let(:app) do
       stub(:config => config)
@@ -77,7 +77,7 @@ describe "Rails::Mongoid" do
       { "app/models" => [ "/rails/root/app/models" ] }
     end
 
-    context "when load models config is false" do
+    context "when preload models config is false" do
 
       let(:files) do
         [
@@ -93,11 +93,11 @@ describe "Rails::Mongoid" do
 
       it "does not load any models" do
         Rails::Mongoid.expects(:load_model).never
-        Rails::Mongoid.load_models(app)
+        Rails::Mongoid.preload_models(app)
       end
     end
 
-    context "when load models config is true" do
+    context "when preload models config is true" do
 
       before(:all) do
         Mongoid.preload_models = true
@@ -119,7 +119,7 @@ describe "Rails::Mongoid" do
         it "requires the models by basename" do
           Rails::Mongoid.expects(:load_model).with("address")
           Rails::Mongoid.expects(:load_model).with("user")
-          Rails::Mongoid.load_models(app)
+          Rails::Mongoid.preload_models(app)
         end
       end
 
@@ -135,8 +135,44 @@ describe "Rails::Mongoid" do
 
         it "requires the models by subdirectory and basename" do
           Rails::Mongoid.expects(:load_model).with("mongoid/behaviour")
-          Rails::Mongoid.load_models(app)
+          Rails::Mongoid.preload_models(app)
         end
+      end
+    end
+  end
+
+  describe ".load_models" do
+
+    let(:app) do
+      stub(:config => config)
+    end
+
+    let(:config) do
+      stub(:paths => paths)
+    end
+
+    let(:paths) do
+      { "app/models" => [ "/rails/root/app/models" ] }
+    end
+
+    context "even when preload models config is false" do
+
+      let(:files) do
+        [
+          "/rails/root/app/models/user.rb",
+          "/rails/root/app/models/address.rb"
+        ]
+      end
+
+      before(:all) do
+        Mongoid.preload_models = false
+        Dir.stubs(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+      end
+
+      it "loads all models" do
+        Rails::Mongoid.expects(:load_model).with("address")
+        Rails::Mongoid.expects(:load_model).with("user")
+        Rails::Mongoid.load_models(app)
       end
     end
   end

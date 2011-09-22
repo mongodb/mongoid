@@ -93,7 +93,7 @@ module Rails #:nodoc:
       # environments.
       initializer "preload all application models" do |app|
         config.to_prepare do
-          ::Rails::Mongoid.load_models(app) unless $rails_rake_task
+          ::Rails::Mongoid.preload_models(app) unless $rails_rake_task
         end
       end
 
