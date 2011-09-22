@@ -27,6 +27,10 @@ module Mongoid #:nodoc:
       tap { Threaded.safety_options = safety }
     end
 
+    def unsafely
+      tap { Threaded.safety_options = false }
+    end
+
     class << self
 
       # Static class method of easily getting the desired safe mode options
