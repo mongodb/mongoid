@@ -43,8 +43,14 @@ module Mongoid #:nodoc:
       def merge_safety_options(options = {})
         options ||= {}
         return options if options[:safe]
+
+        unless Threaded.safety_options.nil?
+          safety = Threaded.safety_options
+        else
+          safety = Mongoid.persist_in_safe_mode
+        end
         options.merge!(
-          { :safe => Threaded.safety_options || Mongoid.persist_in_safe_mode }
+          { :safe => safety }
         )
       end
     end
@@ -69,6 +75,10 @@ module Mongoid #:nodoc:
       # @return [ Proxy ] The safety proxy.
       def safely(safety = true)
         tap { Threaded.safety_options = safety }
+      end
+
+      def unsafely
+        tap { Threaded.safety_options = false }
       end
     end
   end
