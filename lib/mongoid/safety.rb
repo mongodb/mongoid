@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
   module Safety
     extend ActiveSupport::Concern
 
-    # Execute the following class-level persistence operation in safe mode.
+    # Execute the following instance-level persistence operation in safe mode.
     #
     # @example Upsert in safe mode.
     #   person.safely.upsert
@@ -27,6 +27,14 @@ module Mongoid #:nodoc:
       tap { Threaded.safety_options = safety }
     end
 
+    # Execute the following instance-level persistence operation without safe mode.
+    # Allows per-request overriding of safe mode when the persist_in_safe_mode
+    # config option is turned on.
+    #
+    # @example Upsert in safe mode.
+    #   person.unsafely.upsert
+    #
+    # @return [ Proxy ] The safety proxy.
     def unsafely
       tap { Threaded.safety_options = false }
     end
@@ -81,6 +89,14 @@ module Mongoid #:nodoc:
         tap { Threaded.safety_options = safety }
       end
 
+      # Execute the following class-level persistence operation without safe mode.
+      # Allows per-request overriding of safe mode when the persist_in_safe_mode
+      # config option is turned on.
+      #
+      # @example Upsert in safe mode.
+      #   Person.unsafely.create(:name => "John")
+      #
+      # @return [ Proxy ] The safety proxy.
       def unsafely
         tap { Threaded.safety_options = false }
       end
