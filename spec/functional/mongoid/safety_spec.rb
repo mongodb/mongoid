@@ -43,6 +43,14 @@ describe Mongoid::Safety do
             }.should raise_error(Mongo::OperationFailure)
           end
         end
+
+        context "when using .safely(false)" do
+
+          it "should ignore mongodb error" do
+            Person.safely(false).create(:ssn => "432-97-1111").should be_true
+          end
+
+        end
       end
 
       describe ".create!" do
