@@ -137,6 +137,10 @@ describe Mongoid::Safety do
           Mongoid.persist_in_safe_mode = true
         end
 
+        after do
+          Mongoid.persist_in_safe_mode = false
+        end
+
         describe ".create" do
 
           before do
