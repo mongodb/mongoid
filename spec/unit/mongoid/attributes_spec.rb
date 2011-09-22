@@ -142,6 +142,53 @@ describe Mongoid::Attributes do
         account.balance.should == "ABBA"
       end
     end
+
+    context "when mass assignment role is indicated" do
+
+      context "when attributes assigned from default role" do
+
+        let(:article) do
+          Article.new(:title => "Some Title", :is_rss => true, :user_login => "SomeLogin")
+        end
+
+        it "only sets fields for default role" do
+          article.title.should == "Some Title"
+          article.user_login.should == "SomeLogin"
+          article.is_rss.should == false
+        end
+
+      end
+
+      context "when attributes assigned from parser role" do
+
+        let(:article) do
+          Article.new({:title => "Some Title", :is_rss => true, :user_login => "SomeLogin"}, :as => :parser)
+        end
+
+        it "only sets fields for parser role" do
+          article.title.should == "Some Title"
+          article.user_login.should be_nil
+          article.is_rss.should == true
+        end
+
+      end
+
+      context "when attributes assigned without protection" do
+
+        let(:article) do
+          Article.new({:title => "Some Title", :is_rss => true, :user_login => "SomeLogin"}, :without_protection => true)
+        end
+
+        it "sets all attributes when used without_protection" do
+          article.title.should == "Some Title"
+          article.user_login.should == "SomeLogin"
+          article.is_rss.should == true
+        end
+
+      end
+
+    end
+
   end
 
   describe ".attr_protected" do
@@ -188,6 +235,50 @@ describe Mongoid::Attributes do
         person.write_attributes({:security_code => "ABBA"}, false)
         person.security_code.should == "ABBA"
       end
+    end
+
+    context "when mass assignment role is indicated" do
+
+      let(:item) do
+        Item.new
+      end
+
+      context "when attributes assigned from default role" do
+
+        it "only sets fields for default role" do
+          item.assign_attributes(:title => "Some Title", :is_rss => true, :user_login => "SomeLogin")
+
+          item.title.should be_nil
+          item.user_login.should be_nil
+          item.is_rss.should == true
+        end
+
+      end
+
+      context "when attributes assigned from parser role" do
+
+        it "only sets fields for parser role" do
+          item.assign_attributes({:title => "Some Title", :is_rss => true, :user_login => "SomeLogin"}, :as => :parser)
+
+          item.title.should be_nil
+          item.user_login.should == "SomeLogin"
+          item.is_rss.should == false
+        end
+
+      end
+
+      context "when attributes assigned without protection" do
+
+        it "sets all attributes when used without_protection" do
+          item.assign_attributes({:title => "Some Title", :is_rss => true, :user_login => "SomeLogin"}, :without_protection => true)
+
+          item.title.should == "Some Title"
+          item.user_login.should == "SomeLogin"
+          item.is_rss.should == true
+        end
+
+      end
+
     end
   end
 
