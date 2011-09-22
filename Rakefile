@@ -24,10 +24,6 @@ task :release => :build do
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
 end
 
-RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = "spec/**/*_spec.rb"
-end
-
 RSpec::Core::RakeTask.new("spec:unit") do |spec|
   spec.pattern = "spec/unit/**/*_spec.rb"
 end
@@ -49,4 +45,5 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-task :default => [ "spec:functional", "spec:unit" ]
+task :spec => [ "spec:functional", "spec:unit" ]
+task :default => :spec
