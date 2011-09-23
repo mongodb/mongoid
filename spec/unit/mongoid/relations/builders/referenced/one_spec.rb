@@ -13,7 +13,8 @@ describe Mongoid::Relations::Builders::Referenced::One do
         :klass => Post,
         :name => :post,
         :foreign_key => "person_id",
-        :criteria => criteria
+        :criteria => criteria,
+        :inverse_klass => Person
       )
     end
 

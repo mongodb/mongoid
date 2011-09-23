@@ -16,7 +16,7 @@ module Mongoid # :nodoc:
           # @return [ Document ] A single document.
           def build(type = nil)
             return object unless query?
-            criteria = metadata.criteria(object)
+            criteria = metadata.criteria(Conversions.flag(object, metadata))
             IdentityMap.get(criteria.klass, criteria.selector) || criteria.first
           end
         end

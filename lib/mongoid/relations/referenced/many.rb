@@ -321,28 +321,6 @@ module Mongoid #:nodoc:
           klass.collection
         end
 
-        # Get the value for the foreign key in convertable or unconvertable
-        # form.
-        #
-        # @todo Durran: Find a common place for this.
-        #
-        # @example Get the value.
-        #   relation.convertable
-        #
-        # @return [ String, BSON::ObjectId ] The string or object id.
-        #
-        # @since 2.0.2
-        def convertable
-          inverse = metadata.inverse_klass
-          if inverse.using_object_ids? || base.id.is_a?(BSON::ObjectId)
-            base.id
-          else
-            base.id.tap do |id|
-              id.unconvertable_to_bson = true if id.is_a?(String)
-            end
-          end
-        end
-
         # Returns the criteria object for the target class with its documents set
         # to target.
         #
@@ -353,7 +331,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def criteria
-          Many.criteria(metadata, convertable)
+          Many.criteria(metadata, Conversions.flag(base.id, metadata))
         end
 
         # Perform the necessary cascade operations for documents that just got
