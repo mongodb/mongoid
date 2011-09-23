@@ -108,5 +108,22 @@ module Mongoid #:nodoc:
       return false unless changed_attributes.include?(attr)
       changed_attributes[attr] != attributes[attr]
     end
+
+    # Override Active Model's behaviour here in order to stay away from
+    # infinite loops on getter/setter overrides.
+    #
+    # @example Flag an attribute as changing.
+    #   document.attribute_will_change!(:name)
+    #
+    # @param [ Symbol ] attr The attribute.
+    #
+    # @return [ Object ] The value of the attribute.
+    #
+    # @since 2.3.0
+    def attribute_will_change!(attr)
+      value = read_attribute(attr)
+      value = value.duplicable? ? value.clone : value
+      changed_attributes[attr] = value unless changed_attributes.include?(attr)
+    end
   end
 end
