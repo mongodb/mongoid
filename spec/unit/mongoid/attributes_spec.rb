@@ -486,110 +486,129 @@ describe Mongoid::Attributes do
 
       context "when association is a has_one" do
 
-        before do
-          @name = Name.new(:first_name => "Testy")
-          @attributes = {
-            :name => @name
-          }
-          @person = Person.new(@attributes)
+        let(:name) do
+          Name.new(:first_name => "Testy")
+        end
+
+        let(:attributes) do
+          { :name => name }
+        end
+
+        let(:person) do
+          Person.new(attributes)
         end
 
         it "sets the associations" do
-          @person.name.should == @name
+          person.name.should eq(name)
         end
-
       end
 
       context "when association is a references_one" do
 
-        before do
-          @game = Game.new(:score => 100)
-          @attributes = {
-            :game => @game
-          }
-          @person = Person.new(@attributes)
+        let(:game) do
+          Game.new(:score => 100)
         end
 
-        it "sets the associations" do
-          @person.game.should == @game
-          @game.person.should == @person
+        let(:attributes) do
+          { :game => game }
         end
 
+        let!(:person) do
+          Person.new(attributes)
+        end
+
+        it "sets the parent association" do
+          person.game.should == game
+        end
+
+        it "sets the inverse association" do
+          game.person.should == person
+        end
       end
 
       context "when association is a embedded_in" do
 
-        before do
-          @person = Person.new
-          @name = Name.new(:first_name => "Tyler", :person => @person)
+        let(:person) do
+          Person.new
+        end
+
+        let(:name) do
+          Name.new(:first_name => "Tyler", :person => person)
         end
 
         it "sets the association" do
-          @name.person.should == @person
+          name.person.should == person
         end
-
       end
-
     end
 
     context "when non-associations provided in the attributes" do
 
-      before do
-        @employer = Employer.new
-        @attributes = { :employer_id => @employer.id, :title => "Sir" }
-        @person = Person.new(@attributes)
+      let(:employer) do
+        Employer.new
+      end
+
+      let(:attributes) do
+        { :employer_id => employer.id, :title => "Sir" }
+      end
+
+      let(:person) do
+        Person.new(attributes)
       end
 
       it "calls the setter for the association" do
-        @person.employer_id.should == "1"
+        person.employer_id.should == "1"
       end
-
     end
 
     context "when an empty array is provided in the attributes" do
 
-      before do
-        @attributes = {
-          :aliases => []
-        }
-        @person = Person.new(@attributes)
+      let(:attributes) do
+        { :aliases => [] }
+      end
+
+      let(:person) do
+        Person.new(attributes)
       end
 
       it "sets the empty array" do
-        @person.aliases.should == []
+        person.aliases.should == []
       end
-
     end
 
     context "when an empty hash is provided in the attributes" do
 
-      before do
-        @attributes = {
-          :map => {}
-        }
-        @person = Person.new(@attributes)
+      let(:attributes) do
+        { :map => {} }
+      end
+
+      let(:person) do
+        Person.new(attributes)
       end
 
       it "sets the empty hash" do
-        @person.map.should == {}
+        person.map.should == {}
       end
-
     end
-
   end
 
   context "updating when attributes already exist" do
 
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    let(:attributes) do
+      { :dob => "2000-01-01" }
+    end
+
     before do
-      @person = Person.new(:title => "Sir")
-      @attributes = { :dob => "2000-01-01" }
+      person.process(attributes)
     end
 
     it "only overwrites supplied attributes" do
-      @person.process(@attributes)
-      @person.title.should == "Sir"
+      person.title.should == "Sir"
     end
-
   end
 
   describe "#read_attribute" do
@@ -751,35 +770,38 @@ describe Mongoid::Attributes do
 
     context "when attribute does not exist" do
 
-      before do
-        @person = Person.new
+      let(:person) do
+        Person.new
       end
 
       it "returns the default value" do
-        @person.age.should == 100
+        person.age.should == 100
       end
     end
 
     context "when setting the attribute to nil" do
 
-      before do
-        @person = Person.new(:age => nil)
+      let(:person) do
+        Person.new(:age => nil)
       end
 
       it "does not use the default value" do
-        @person.age.should be_nil
+        person.age.should be_nil
       end
     end
 
     context "when field has a default value" do
 
+      let(:person) do
+        Person.new
+      end
+
       before do
-        @person = Person.new
+        person.terms = true
       end
 
       it "should allow overwriting of the default value" do
-        @person.terms = true
-        @person.terms.should be_true
+        person.terms.should be_true
       end
     end
   end
@@ -825,6 +847,7 @@ describe Mongoid::Attributes do
   end
 
   [:attributes=, :write_attributes].each do |method|
+
     describe "##{method}" do
 
       context "when nested" do
@@ -879,18 +902,27 @@ describe Mongoid::Attributes do
 
         context "when the parent has a has many through a has one" do
 
+          let(:owner) do
+            PetOwner.new(:title => "Mr")
+          end
+
+          let(:pet) do
+            Pet.new(:name => "Fido")
+          end
+
+          let(:vet_visit) do
+            VetVisit.new(:date => Date.today)
+          end
+
           before do
-            @owner = PetOwner.new(:title => "Mr")
-            @pet = Pet.new(:name => "Fido")
-            @owner.pet = @pet
-            @vet_visit = VetVisit.new(:date => Date.today)
-            @pet.vet_visits = [@vet_visit]
+            owner.pet = pet
+            pet.vet_visits = [ vet_visit ]
+            owner.send(method, { :pet => { :name => "Bingo" } })
           end
 
           it "does not overwrite child attributes if not in the hash" do
-            @owner.send(method, { :pet => { :name => "Bingo" } })
-            @owner.pet.name.should == "Bingo"
-            @owner.pet.vet_visits.size.should == 1
+            owner.pet.name.should == "Bingo"
+            owner.pet.vet_visits.size.should == 1
           end
         end
 
@@ -914,30 +946,42 @@ describe Mongoid::Attributes do
 
         context "when child is part of a has one" do
 
+          let(:person) do
+            Person.new(:title => "Sir", :age => 30)
+          end
+
+          let(:name) do
+            Name.new(:first_name => "Test", :last_name => "User")
+          end
+
           before do
-            @person = Person.new(:title => "Sir", :age => 30)
-            @name = Name.new(:first_name => "Test", :last_name => "User")
-            @person.name = @name
+            person.name = name
+            name.send(method, :first_name => "Test2", :last_name => "User2")
           end
 
           it "sets the child attributes on the parent" do
-            @name.send(method, :first_name => "Test2", :last_name => "User2")
-            @name.attributes.should ==
+            name.attributes.should ==
               { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2" }
           end
         end
 
         context "when child is part of a has many" do
 
+          let(:person) do
+            Person.new(:title => "Sir")
+          end
+
+          let(:address) do
+            Address.new(:street => "Test")
+          end
+
           before do
-            @person = Person.new(:title => "Sir")
-            @address = Address.new(:street => "Test")
-            @person.addresses << @address
+            person.addresses << address
+            address.send(method, "street" => "Test2")
           end
 
           it "updates the child attributes on the parent" do
-            @address.send(method, "street" => "Test2")
-            @address.attributes.should ==
+            address.attributes.should ==
               { "_id" => "test", "street" => "Test2" }
           end
         end
