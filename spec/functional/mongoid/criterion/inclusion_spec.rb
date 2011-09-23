@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Inclusion do
 
   before do
-    [ Person, Post, Product, Game ].each(&:delete_all)
+    [ Person, Post, Product, Game, Jar ].each(&:delete_all)
   end
 
   describe "#all_in" do
@@ -198,6 +198,32 @@ describe Mongoid::Criterion::Inclusion do
     end
 
     context "when finding by an array of ids" do
+
+      context "when ids are not object ids" do
+
+        let!(:jar_one) do
+          Jar.create(:_id => 114869287646134350)
+        end
+
+        let!(:jar_two) do
+          Jar.create(:_id => 114869287646134388)
+        end
+
+        let!(:jar_three) do
+          Jar.create(:_id => 114869287646134398)
+        end
+
+        context "when the documents are found" do
+
+          let(:jars) do
+            Jar.find([ jar_one.id, jar_two.id, jar_three.id ])
+          end
+
+          it "returns the documents from the database" do
+            jars.should eq([ jar_one, jar_two, jar_three ])
+          end
+        end
+      end
 
       context "when the id is found" do
 
