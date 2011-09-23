@@ -51,14 +51,12 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          tap do |proxy|
-            proxy.unbind_one
-            proxy.target.delete if persistable?
-            return nil unless replacement
-            proxy.target = replacement
-            proxy.bind_one
-            replacement.save if persistable?
+          unbind_one
+          if persistable?
+            metadata.destructive? ? send(metadata.dependent) : save
           end
+          return nil unless replacement
+          One.new(base, replacement, metadata)
         end
 
         private

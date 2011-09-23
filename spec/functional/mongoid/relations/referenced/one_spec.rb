@@ -169,6 +169,75 @@ describe Mongoid::Relations::Referenced::One do
           rating.should be_persisted
         end
       end
+
+      context "when replacing an existing relation with a new one" do
+
+        let!(:person) do
+          Person.create(:ssn => "122-11-1111")
+        end
+
+        context "when dependent is destroy" do
+
+          let!(:game) do
+            person.create_game(:name => "Starcraft")
+          end
+
+          let!(:new_game) do
+            Game.create(:name => "Starcraft 2")
+          end
+
+          before do
+            person.game = new_game
+          end
+
+          it "sets the new relation on the parent" do
+            person.game.should eq(new_game)
+          end
+
+          it "removes the old foreign key reference" do
+            game.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            game.person.should be_nil
+          end
+
+          it "destroys the old child" do
+            game.should be_destroyed
+          end
+        end
+
+        context "when dependent is not set" do
+
+          let!(:account) do
+            person.create_account(:name => "savings")
+          end
+
+          let!(:new_account) do
+            Account.create(:name => "checking")
+          end
+
+          before do
+            person.account = new_account
+          end
+
+          it "sets the new relation on the parent" do
+            person.account.should eq(new_account)
+          end
+
+          it "removes the old foreign key reference" do
+            account.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            account.person.should be_nil
+          end
+
+          it "nullifies the old child" do
+            account.should_not be_destroyed
+          end
+        end
+      end
     end
   end
 
@@ -294,8 +363,8 @@ describe Mongoid::Relations::Referenced::One do
           rating.ratable_id.should be_nil
         end
 
-        it "deletes the target from the database" do
-          rating.should be_destroyed
+        it "applies the appropriate dependent option" do
+          rating.should_not be_destroyed
         end
       end
     end
