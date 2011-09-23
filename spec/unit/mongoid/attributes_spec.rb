@@ -2,6 +2,20 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
+  describe "\#{attribute}" do
+
+    context "when setting the value in the getter" do
+
+      let(:account) do
+        Account.new
+      end
+
+      it "does not cause an infinite loop" do
+        account.overridden.should eq("not recommended")
+      end
+    end
+  end
+
   describe "#[]" do
 
     context "when the document is a new record" do
