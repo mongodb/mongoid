@@ -200,13 +200,13 @@ module Mongoid #:nodoc:
     # @return [ Document ] An instance of the specified class.
     def becomes(klass)
       unless klass.include?(Mongoid::Document)
-        raise ArgumentError, 'A class which includes Mongoid::Document is expected'
+        raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
-      klass.new.tap do |became|
-        became.instance_variable_set('@attributes', @attributes)
-        became.instance_variable_set('@errors', @errors)
-        became.instance_variable_set('@new_record', new_record?)
-        became.instance_variable_set('@destroyed', destroyed?)
+      klass.instantiate(frozen? ? attributes.dup : attributes).tap do |became|
+        became.instance_variable_set(:@errors, errors)
+        became.instance_variable_set(:@new_record, new_record?)
+        became.instance_variable_set(:@destroyed, destroyed?)
+        became._type = klass.to_s
       end
     end
 
