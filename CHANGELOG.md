@@ -14,6 +14,10 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#1196 Timestamps can now be turned off on a call-by-call basis via the use
   of #timeless: `person.timeless.save`, `Person.timeless.create(:title => "Sir")`.
 
+* \#1275 For applications that default safe mode to true, you can now tell a
+  single operation to persist without safe mode via #unsafely:
+  `person.unsafely.save`, `Person.unsafely.create`. (Matt Sanders)
+
 ### Major Changes
 
 * Mongoid now depends on Active Model 3.1 and higher.
