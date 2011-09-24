@@ -36,6 +36,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * \#939 Apply default attributes when upcasting via #becomes. (Christos Pappas)
 
+* \#932 Fixed casting of integer fields with leading zeros.
+
 ## 2.2.1
 
 ### Resolved Issues
