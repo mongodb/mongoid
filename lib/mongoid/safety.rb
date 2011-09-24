@@ -61,9 +61,7 @@ module Mongoid #:nodoc:
         else
           safety = Mongoid.persist_in_safe_mode
         end
-        options.merge!(
-          { :safe => safety }
-        )
+        options.merge!({ :safe => safety })
       end
     end
 
@@ -97,6 +95,8 @@ module Mongoid #:nodoc:
       #   Person.unsafely.create(:name => "John")
       #
       # @return [ Proxy ] The safety proxy.
+      #
+      # @since 2.3.0
       def unsafely
         tap { Threaded.safety_options = false }
       end
