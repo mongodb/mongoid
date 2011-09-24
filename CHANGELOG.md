@@ -18,6 +18,9 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
   single operation to persist without safe mode via #unsafely:
   `person.unsafely.save`, `Person.unsafely.create`. (Matt Sanders)
 
+* \#1228 Allow pre formatting of compsoite keys by passing a block to #key.
+  (Ben Hundley)
+
 ### Major Changes
 
 * Mongoid now depends on Active Model 3.1 and higher.
@@ -30,6 +33,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
   where Mongoid.load_models always loads everything. (Ryan McGeary)
 
 * \#1052 `alias_attribute` now works again as expected.
+
+* \#939 Apply default attributes when upcasting via #becomes. (Christos Pappas)
 
 ## 2.2.1
 
