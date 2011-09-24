@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/timestamps/created"
 require "mongoid/timestamps/updated"
+require "mongoid/timestamps/timeless"
 
 module Mongoid #:nodoc:
 
