@@ -69,9 +69,11 @@ module Mongoid #:nodoc:
     #
     # @return [ Array<Object> ] The array of keys.
     def compose
+      kf = document.key_formatter
       document.primary_key.collect do |key|
-        document.attributes[key.to_s]
-      end.reject { |val| val.nil? }
+        val = document.attributes[key.to_s]
+        val && kf ? kf.call(val) : val
+      end.compact
     end
 
     # Determines if the document stores the type information. This is if it is

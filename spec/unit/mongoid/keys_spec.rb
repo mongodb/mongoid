@@ -49,6 +49,22 @@ describe Mongoid::Keys do
         field.type.should == String
       end
     end
+    
+    context "when key is provided a formatter block" do
+
+      before do
+        Address.key(:street, :city) {|field| field.gsub('e', 'o') }
+        address.run_callbacks(:save)
+      end
+
+      let(:address) do
+        Address.new(:street => "Testing Street Name", :city => "Berlin")
+      end
+
+      it "combines all formatted fields" do
+        address.id.should == "tosting-stroot-namo-borlin"
+      end
+    end
 
     context "when key is composite" do
 
