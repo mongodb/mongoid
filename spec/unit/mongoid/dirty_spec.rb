@@ -381,6 +381,64 @@ describe Mongoid::Dirty do
     end
   end
 
+  describe "#attribute_will_change!" do
+
+    let(:aliases) do
+      [ "007" ]
+    end
+
+    let(:person) do
+      Person.new(:aliases => aliases)
+    end
+
+    before do
+      person.changed_attributes.clear
+    end
+
+    context "when the value is duplicable" do
+
+      context "when the attribute has not been cloned" do
+
+        before do
+          person.aliases_will_change!
+        end
+
+        let(:changed) do
+          person.changed_attributes
+        end
+
+        it "clones the value" do
+          changed["aliases"].should_not equal(aliases)
+        end
+
+        it "puts the old value in the changes" do
+          changed["aliases"].should eq(aliases)
+        end
+      end
+
+      context "when the attribute has been flagged" do
+
+        before do
+          person.changed_attributes["aliases"] = aliases
+          aliases.expects(:clone).never
+          person.aliases_will_change!
+        end
+
+        let(:changed) do
+          person.changed_attributes
+        end
+
+        it "does not clone the value" do
+          changed["aliases"].should equal(aliases)
+        end
+
+        it "retains the first value in the changes" do
+          changed["aliases"].should eq(aliases)
+        end
+      end
+    end
+  end
+
   describe "#changed" do
 
     context "when the document has changed" do
