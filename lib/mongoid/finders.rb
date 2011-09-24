@@ -25,6 +25,11 @@ module Mongoid #:nodoc:
       find(:all, *args)
     end
 
+    # Returns true if one or more +Documents+ ar in the result
+    def any?
+      count > 0
+    end
+
     # Returns a count of matching records in the database based on the
     # provided arguments.
     #

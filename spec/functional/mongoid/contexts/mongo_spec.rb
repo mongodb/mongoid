@@ -86,6 +86,34 @@ describe Mongoid::Contexts::Mongo do
     end
   end
 
+  describe "#any?" do
+
+    context "when no documents are in the collection" do
+
+      it "returns false" do
+        Person.any?.should == false
+      end
+    end
+
+    context "when some documents are in the collection" do
+
+      before do
+        2.times do |n|
+          Person.create(
+            :title => "Sir",
+            :age => ((n + 1) * 10),
+            :aliases => ["D", "Durran"],
+            :ssn => "#{n}"
+          )
+        end
+      end
+
+      it "returns true" do
+        Person.any?.should == true
+      end
+    end
+  end
+
   describe "#count" do
 
     context "when documents exist in the collection" do
