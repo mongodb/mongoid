@@ -401,4 +401,20 @@ describe Mongoid::Config do
       described_class.reset.should == described_class.defaults
     end
   end
+
+  describe ".databases=" do
+    before do
+      described_class.databases =  { "secondary" => {
+                                            "database" => "secondary_config_test",
+                                            "host" => "localhost",
+                                            "port" => 27017
+                                       }
+                                    }
+    end
+
+    it "sets the databases" do
+      described_class.databases['secondary'].should be_a(Mongo::DB)
+      described_class.databases['secondary'].name.should == "secondary_config_test"
+    end
+  end
 end
