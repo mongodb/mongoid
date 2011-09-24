@@ -116,11 +116,11 @@ describe Mongoid::Attributes do
     context "when the field is not _id" do
 
       let(:account) do
-        Account.new(:balance => 999999)
+        Account.new(:number => 999999)
       end
 
       it "prevents setting via mass assignment" do
-        account.balance.should be_nil
+        account.number.should be_nil
       end
     end
 

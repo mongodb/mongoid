@@ -52,12 +52,12 @@ describe Mongoid::Dirty do
         Person.new(:pets => true)
       end
 
-      it "returns an array of the default value and new value" do
-        person.send(:attribute_change, "pets").should eq([ false, true ])
+      it "returns an array of nil and new value" do
+        person.send(:attribute_change, "pets").should eq([ nil, true ])
       end
 
       it "allows access via (attribute)_change" do
-        person.pets_change.should eq([ false, true ])
+        person.pets_change.should eq([ nil, true ])
       end
     end
 

@@ -119,16 +119,18 @@ module Mongoid #:nodoc:
     #   Person.new(:title => "Sir")
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
-    # @param [ Hash ] options A mass-assignment protection options. Supports :as and :without_protection
+    # @param [ Hash ] options A mass-assignment protection options. Supports
+    #   :as and :without_protection
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, options = {})
       building do
         @new_record = true
-        @attributes = apply_default_attributes
+        @attributes = {}
         process(attrs, options[:as] || :default, !options[:without_protection]) do
           yield self if block_given?
           identify
+          apply_defaults
         end
         run_callbacks(:initialize) { self }
       end
@@ -151,7 +153,7 @@ module Mongoid #:nodoc:
       end
       @attributes = {}.merge(reloaded || {})
       changed_attributes.clear
-      apply_default_attributes
+      apply_defaults
       tap do
         reload_relations
         run_callbacks(:initialize)
@@ -262,7 +264,7 @@ module Mongoid #:nodoc:
         attributes = attrs || {}
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
-          doc.send(:apply_default_attributes)
+          doc.send(:apply_defaults)
           IdentityMap.set(doc)
           doc.run_callbacks(:initialize) { doc }
         end

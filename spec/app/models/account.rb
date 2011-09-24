@@ -4,6 +4,7 @@ class Account
   field :balance, :type => String
   field :nickname, :type => String
   field :name, :type => String
+  field :balanced, :type => Boolean, :default => lambda { balance? ? true : false }
 
   field :overridden, :type => String
   key :name
@@ -15,7 +16,7 @@ class Account
   has_and_belongs_to_many :agents
   has_one :comment, :validate => false
 
-  attr_accessible :nickname, :name
+  attr_accessible :nickname, :name, :balance
 
   validates_presence_of :name
   validates_length_of :name, :maximum => 10, :on => :create
