@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
     attr_reader :identifier
 
     included do
-      cattr_accessor :primary_key, :using_object_ids
+      cattr_accessor :primary_key, :using_object_ids, :key_formatter
       self.using_object_ids = true
     end
 
@@ -122,6 +122,7 @@ module Mongoid #:nodoc:
       # @since 1.0.0
       def key(*fields)
         self.primary_key = fields
+        self.key_formatter = block_given? ? Proc.new : nil
         identity(:type => String)
         set_callback(:save, :around, :set_composite_key)
       end
