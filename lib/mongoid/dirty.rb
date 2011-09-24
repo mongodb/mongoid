@@ -121,9 +121,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def attribute_will_change!(attr)
-      value = read_attribute(attr)
-      value = value.duplicable? ? value.clone : value
-      changed_attributes[attr] = value unless changed_attributes.include?(attr)
+      unless changed_attributes.include?(attr)
+        value = read_attribute(attr)
+        value = value.duplicable? ? value.clone : value
+        changed_attributes[attr] = value
+      end
     end
   end
 end
