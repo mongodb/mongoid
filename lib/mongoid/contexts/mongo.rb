@@ -330,7 +330,7 @@ module Mongoid #:nodoc:
           { "$set" => attributes },
           Safety.merge_safety_options(:multi => true)
         ).tap do
-          Threaded.clear_safety_options!
+          Threaded.clear_options!
         end
       end
       alias :update :update_all

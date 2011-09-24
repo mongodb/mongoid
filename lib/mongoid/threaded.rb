@@ -178,6 +178,17 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid]:safety-options"] = nil
     end
 
+    # Clear out all options set on a one-time basis.
+    #
+    # @example Clear out the options.
+    #   Threaded.clear_options!
+    #
+    # @since 2.3.0
+    def clear_options!
+      clear_safety_options!
+      self.timeless = false
+    end
+
     # Exit the assigning block.
     #
     # @example Exit the assigning block.
@@ -314,6 +325,30 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid]:scope-stack"] ||= {}
     end
 
+    # Get the value of the one-off timeless call.
+    #
+    # @example Get the timeless value.
+    #   Threaded.timeless
+    #
+    # @return [ true, false ] The timeless setting.
+    #
+    # @since 2.3.0
+    def timeless
+      !!Thread.current[:"[mongoid]:timeless"]
+    end
+
+    # Set the value of the one-off timeless call.
+    #
+    # @example Set the timeless value.
+    #   Threaded.timeless = true
+    #
+    # @param [ true, false ] value The value.
+    #
+    # @since 2.3.0
+    def timeless=(value)
+      Thread.current[:"[mongoid]:timeless"] = value
+    end
+
     # Get the update consumer from the current thread.
     #
     # @example Get the update consumer.
@@ -338,6 +373,18 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def set_update_consumer(klass, consumer)
       Thread.current[:"[mongoid][#{klass}]:update-consumer"] = consumer
+    end
+
+    # Is the current thread setting timestamps?
+    #
+    # @example Is the current thread timestamping?
+    #   Threaded.timestamping?
+    #
+    # @return [ true, false ] If timestamps can be applied.
+    #
+    # @since 2.3.0
+    def timestamping?
+      !timeless
     end
 
     # Is the document validated on the current thread?

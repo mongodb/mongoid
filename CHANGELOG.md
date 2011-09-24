@@ -11,6 +11,9 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * \#1256 Mongoid now can create indexes for models in Rails engines. (Caio Filipini)
 
+* \#1196 Timestamps can now be turned off on a call-by-call basis via the use
+  of #timeless: `person.timeless.save`, `Person.timeless.create(:title => "Sir")`.
+
 ### Major Changes
 
 * Mongoid now depends on Active Model 3.1 and higher.

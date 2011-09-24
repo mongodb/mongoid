@@ -523,6 +523,46 @@ describe Mongoid::Threaded do
     end
   end
 
+  describe "#timeless" do
+
+    before do
+      described_class.timeless = true
+    end
+
+    after do
+      described_class.timeless = false
+    end
+
+    it "returns the timeless value" do
+      described_class.timeless.should be_true
+    end
+  end
+
+  describe "#timestamping?" do
+
+    context "when timeless is not set" do
+
+      it "returns true" do
+        described_class.should be_timestamping
+      end
+    end
+
+    context "when timeless is true" do
+
+      before do
+        described_class.timeless = true
+      end
+
+      after do
+        described_class.timeless = false
+      end
+
+      it "returns false" do
+        described_class.should_not be_timestamping
+      end
+    end
+  end
+
   describe "#begin_validate" do
 
     let(:person) do
