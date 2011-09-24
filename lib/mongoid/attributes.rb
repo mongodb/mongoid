@@ -103,7 +103,11 @@ module Mongoid #:nodoc:
           unless attributes[access] == value || attribute_changed?(access)
             attribute_will_change!(access)
           end
-          localized ? attributes[access].merge!(value) : attributes[access] = value
+          if localized
+            (attributes[access] ||= {}).merge!(value)
+          else
+            attributes[access] = value
+          end
         end
       end
     end
@@ -137,18 +141,16 @@ module Mongoid #:nodoc:
     # Set any missing default values in the attributes.
     #
     # @example Get the raw attributes after defaults have been applied.
-    #   person.apply_default_attributes
+    #   person.apply_defaults
     #
     # @return [ Hash ] The raw attributes.
     #
     # @since 2.0.0.rc.8
-    def apply_default_attributes
-      (@attributes ||= {}).tap do |attrs|
-        defaults.each do |name|
-          unless attrs.has_key?(name)
-            if field = fields[name]
-              attrs[name] = field.eval_default(self)
-            end
+    def apply_defaults
+      defaults.each do |name|
+        unless attributes.has_key?(name)
+          if field = fields[name]
+            attributes[name] = field.eval_default(self)
           end
         end
       end

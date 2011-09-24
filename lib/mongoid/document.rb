@@ -124,10 +124,11 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil)
       building do
         @new_record = true
-        @attributes = apply_default_attributes
+        @attributes = {}
         process(attrs) do
           yield self if block_given?
           identify
+          apply_defaults
         end
         run_callbacks(:initialize) { self }
       end
@@ -150,7 +151,7 @@ module Mongoid #:nodoc:
       end
       @attributes = {}.merge(reloaded || {})
       changed_attributes.clear
-      apply_default_attributes
+      apply_defaults
       tap do
         reload_relations
         run_callbacks(:initialize)
@@ -261,7 +262,7 @@ module Mongoid #:nodoc:
         attributes = attrs || {}
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
-          doc.send(:apply_default_attributes)
+          doc.send(:apply_defaults)
           IdentityMap.set(doc)
           doc.run_callbacks(:initialize) { doc }
         end
