@@ -21,6 +21,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#1228 Allow pre formatting of compsoite keys by passing a block to #key.
   (Ben Hundley)
 
+* \#1103 Allow developers to create their own custom complex criteria. (Ryan Ong)
+
 ### Major Changes
 
 * Mongoid now depends on Active Model 3.1 and higher.
@@ -37,6 +39,13 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#939 Apply default attributes when upcasting via #becomes. (Christos Pappas)
 
 * \#932 Fixed casting of integer fields with leading zeros.
+
+* \#948 Reset version number on clone if versions existed.
+
+* \#763 Don't merge $in criteria arrays when chaining named scopes.
+
+* \#730 Existing models that have relations added post persistence of originals
+  can now have new relations added with no migrations.
 
 ## 2.2.1
 
