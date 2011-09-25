@@ -98,6 +98,23 @@ describe Mongoid::NamedScope do
       it "retains the second criteria" do
         selector[:frags].should == { "$gt" => 10 }
       end
+
+      context "when both scoped have in clauses" do
+
+        let!(:chained) do
+          Event.best.by_kind("party")
+        end
+
+        let(:initial) do
+          Event.best
+        end
+
+        it "does not modify the initial scope" do
+          initial.selector.should eq(
+            { :kind => { "$in" => [ "party", "concert" ]}}
+          )
+        end
+      end
     end
 
     context "when chaining named scoped with criteria class methods" do

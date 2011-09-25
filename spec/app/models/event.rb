@@ -17,4 +17,6 @@ class Event
     end
   end
 
+  scope :best, where(:kind.in => [ "party", "concert" ])
+  scope :by_kind, lambda { |kind| where(:kind.in => [kind]) }
 end
