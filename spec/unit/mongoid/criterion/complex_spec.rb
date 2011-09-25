@@ -20,7 +20,7 @@ describe Mongoid::Criterion::Complex do
   describe "#to_mongo_query" do
     it "creates a query" do
       complex.to_mongo_query(5).should == { "$gt" => 5}
-      complex.operator.should eq("$gt")
+      complex.operator.should eq("gt")
     end
   end
 
