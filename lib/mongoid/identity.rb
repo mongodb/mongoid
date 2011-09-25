@@ -48,7 +48,9 @@ module Mongoid #:nodoc:
     # @example Set the id.
     #   identity.identify
     def identify
-      document.id = compose.join(" ").identify if document.primary_key
+      document.id = document.generate_id if document.respond_to?(:generate_id)
+      document.id = document.class.generate_id if document.class.respond_to?(:generate_id)
+      document.id = compose.join(" ").identify if document.id.blank? && document.primary_key
       document.id = generate_id if document.id.blank?
       document.id
     end
