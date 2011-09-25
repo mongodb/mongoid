@@ -11,7 +11,7 @@ describe Mongoid::Copyable do
     describe "##{method}" do
 
       let(:person) do
-        Person.new(:title => "Sir", :ssn => "234-33-3123")
+        Person.new(:title => "Sir", :ssn => "234-33-3123", :version => 4)
       end
 
       let!(:address) do
@@ -56,6 +56,10 @@ describe Mongoid::Copyable do
 
           it "does not copy the versions" do
             copy[:versions].should be_nil
+          end
+
+          it "resets the document version" do
+            copy.version.should eq(1)
           end
 
           it "returns a new instance" do

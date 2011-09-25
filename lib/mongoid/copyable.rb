@@ -38,7 +38,9 @@ module Mongoid #:nodoc:
         instance_variable_set(name, value ? value.dup : nil)
       end
       attributes.delete("_id")
-      attributes.delete("versions")
+      if attributes.delete("versions")
+        attributes["version"] = 1
+      end
       @new_record = true
       identify
     end
