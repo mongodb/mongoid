@@ -144,5 +144,39 @@ describe Mongoid::Identity do
         end
       end
     end
+
+    context "when the document instance knows how to generate_ids" do
+
+      let(:person) do
+        Person.allocate
+      end
+
+      before do
+        def person.generate_id() 42 end
+        person.instance_variable_set(:@attributes, {})
+        Mongoid::Identity.new(person).create
+      end
+
+      it "sets the id to the instance generated id" do
+        person.id.should == 42
+      end
+    end
+
+    context "when the document *class* knows how to generate_ids" do
+
+      let(:person) do
+        Person.allocate
+      end
+
+      before do
+        def Person.generate_id() 42 end
+        person.instance_variable_set(:@attributes, {})
+        Mongoid::Identity.new(person).create
+      end
+
+      it "sets the id to the class generated id" do
+        person.id.should == 42
+      end
+    end
   end
 end
