@@ -43,6 +43,47 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#respond_to?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:posts) do
+      person.posts
+    end
+
+    Array.public_instance_methods.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          posts.respond_to?(method).should be_true
+        end
+      end
+    end
+
+    Mongoid::Relations::Referenced::Many.public_instance_methods.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          posts.respond_to?(method).should be_true
+        end
+      end
+    end
+
+    Post.scopes.keys.each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          posts.respond_to?(method).should be_true
+        end
+      end
+    end
+  end
+
   describe ".stores_foreign_key?" do
 
     it "returns false" do
@@ -55,6 +96,13 @@ describe Mongoid::Relations::Referenced::Many do
     it "returns the valid options" do
       described_class.valid_options.should ==
         [ :as, :autosave, :dependent, :foreign_key, :order ]
+    end
+  end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
     end
   end
 end

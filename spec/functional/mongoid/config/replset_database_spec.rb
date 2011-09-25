@@ -12,22 +12,6 @@ describe Mongoid::Config::ReplsetDatabase do
       YAML.load(ERB.new(File.new(replset_config).read).result)
     end
 
-    let(:replica_set) do
-      described_class.new(options['test']).configure
-    end
-
-    it "returns a replica set connection" do
-      replica_set[0].connection.should be_a(Mongo::ReplSetConnection)
-    end
-
-    it "sets slave ok to true" do
-      replica_set[0].connection.slave_ok?.should be_true
-    end
-
-    it "does not configure specific slaves" do
-      replica_set[1].should be_nil
-    end
-
     context "without authentication details" do
 
       let(:replica_set) do
@@ -48,6 +32,12 @@ describe Mongoid::Config::ReplsetDatabase do
 
       it "sets up the default mongoid logger" do
         replica_set.logger.should eq(Mongoid::Config.logger)
+      end
+
+      it "does not modify the options in place" do
+        options["test"]["hosts"].should eq(
+          [["localhost", 27017], ["localhost", 27017]]
+        )
       end
     end
 

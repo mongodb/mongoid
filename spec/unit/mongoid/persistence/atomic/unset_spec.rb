@@ -10,6 +10,10 @@ describe Mongoid::Persistence::Atomic::Unset do
     person.stubs(:collection).returns(collection)
   end
 
+  after do
+    person.unstub(:collection)
+  end
+
   describe "#persist" do
 
     context "when unsetting a field" do

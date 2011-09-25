@@ -145,38 +145,4 @@ describe Mongoid::Identity do
       end
     end
   end
-
-  describe "#identify" do
-    let(:person) { Person.new }
-    let(:service) { person.services.build }
-
-    context "with embedded_object_id set to true" do
-      before { Mongoid.embedded_object_id = true }
-
-      context "for a top level document" do
-        subject { person }
-        its(:id) { should_not be_nil }
-      end
-
-      context "for an embedded document" do
-        subject { service }
-        its(:id) { should_not be_nil }
-      end
-    end
-
-    context "with embedded_object_id set to false" do
-      before { Mongoid.embedded_object_id = false }
-      after { Mongoid.embedded_object_id = true }
-
-      context "for a top level document" do
-        subject { person }
-        its(:id) { should_not be_nil }
-      end
-
-      context "for an embedded document" do
-        subject { service }
-        its(:id) { should be_nil }
-      end
-    end
-  end
 end

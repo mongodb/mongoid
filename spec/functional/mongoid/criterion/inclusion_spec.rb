@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Inclusion do
 
   before do
-    Person.delete_all
+    [ Person, Post, Product, Game, Jar ].each(&:delete_all)
   end
 
   describe "#all_in" do
@@ -199,6 +199,32 @@ describe Mongoid::Criterion::Inclusion do
 
     context "when finding by an array of ids" do
 
+      context "when ids are not object ids" do
+
+        let!(:jar_one) do
+          Jar.create(:_id => 114869287646134350)
+        end
+
+        let!(:jar_two) do
+          Jar.create(:_id => 114869287646134388)
+        end
+
+        let!(:jar_three) do
+          Jar.create(:_id => 114869287646134398)
+        end
+
+        context "when the documents are found" do
+
+          let(:jars) do
+            Jar.find([ jar_one.id, jar_two.id, jar_three.id ])
+          end
+
+          it "returns the documents from the database" do
+            jars.should eq([ jar_one, jar_two, jar_three ])
+          end
+        end
+      end
+
       context "when the id is found" do
 
         let!(:from_db) do
@@ -239,6 +265,118 @@ describe Mongoid::Criterion::Inclusion do
             from_db.should be_empty
           end
         end
+      end
+    end
+  end
+
+  describe "#includes" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    let!(:person) do
+      Person.create(:ssn => "123-12-1211")
+    end
+
+    context "when including a has many" do
+
+      let!(:post_one) do
+        person.posts.create(:title => "one")
+      end
+
+      let!(:post_two) do
+        person.posts.create(:title => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Person.includes(:posts).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Post][post_one.id].should eq(post_one)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Post][post_two.id].should eq(post_two)
+      end
+    end
+
+    context "when including a has one" do
+
+      let!(:game_one) do
+        person.create_game(:name => "one")
+      end
+
+      let!(:game_two) do
+        person.create_game(:name => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Person.includes(:game).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Game][game_one.id].should eq(game_one)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Game][game_two.id].should eq(game_two)
+      end
+    end
+
+    context "when including a belongs to" do
+
+      let(:person_two) do
+        Person.create(:ssn => "243-11-0978")
+      end
+
+      let!(:game_one) do
+        person.create_game(:name => "one")
+      end
+
+      let!(:game_two) do
+        person_two.create_game(:name => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Game.includes(:person).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ game_one, game_two ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Person][person.id].should eq(person)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Person][person_two.id].should eq(person_two)
       end
     end
   end
@@ -289,6 +427,35 @@ describe Mongoid::Criterion::Inclusion do
         :aliases => [ "D", "Durran" ],
         :things => [ { :phone => 'HTC Incredible' } ]
       )
+    end
+
+    context "when searching for localized fields" do
+
+      let!(:soda) do
+        Product.create(:description => "sweet")
+      end
+
+      let!(:beer) do
+        Product.create(:description => "hoppy")
+      end
+
+      before do
+        ::I18n.locale = :de
+        soda.update_attribute(:description, "suss")
+        beer.update_attribute(:description, "hopfig")
+      end
+
+      let(:results) do
+        Product.where(:description => "hopfig")
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "returns the results matching the correct locale" do
+        results.should eq([ beer ])
+      end
     end
 
     context "when providing 24 character strings" do

@@ -8,8 +8,18 @@ module Mongoid #:nodoc
     included do
       cattr_accessor :shard_key_fields
       self.shard_key_fields = []
+    end
 
-      delegate :shard_key_fields, :to => "self.class"
+    # Get the shard key fields.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the shard key fields.
+    #   model.shard_key_fields
+    #
+    # @return [ Array<String> ] The shard key field names.
+    def shard_key_fields
+      self.class.shard_key_fields
     end
 
     # Get the document selector with the defined shard keys.

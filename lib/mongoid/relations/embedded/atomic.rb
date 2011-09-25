@@ -46,6 +46,8 @@ module Mongoid #:nodoc:
         #     person.addresses.push([ address_one, address_two ])
         #   end
         #
+        # @todo Durran: Move executions to thread local stack.
+        #
         # @param [ Symbol ] modifier The atomic modifier to perform.
         # @param [ Proc ] block The block to execute.
         #
@@ -53,12 +55,13 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def atomically(modifier, &block)
-          updater = Threaded.update ||= MODIFIERS[modifier].new
+          updater = Threaded.update_consumer(root_class) ||
+            Threaded.set_update_consumer(root_class, MODIFIERS[modifier].new)
           count_executions do
             block.call if block
           end.tap do
             if @executions.zero?
-              Threaded.update = nil
+              Threaded.set_update_consumer(root_class, nil)
               updater.execute(collection)
             end
           end

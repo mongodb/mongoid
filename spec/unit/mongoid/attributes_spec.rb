@@ -2,6 +2,20 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
+  describe "\#{attribute}" do
+
+    context "when setting the value in the getter" do
+
+      let(:account) do
+        Account.new
+      end
+
+      it "does not cause an infinite loop" do
+        account.overridden.should eq("not recommended")
+      end
+    end
+  end
+
   describe "#[]" do
 
     context "when the document is a new record" do
@@ -102,11 +116,11 @@ describe Mongoid::Attributes do
     context "when the field is not _id" do
 
       let(:account) do
-        Account.new(:balance => 999999)
+        Account.new(:number => 999999)
       end
 
       it "prevents setting via mass assignment" do
-        account.balance.should be_nil
+        account.number.should be_nil
       end
     end
 
@@ -486,110 +500,129 @@ describe Mongoid::Attributes do
 
       context "when association is a has_one" do
 
-        before do
-          @name = Name.new(:first_name => "Testy")
-          @attributes = {
-            :name => @name
-          }
-          @person = Person.new(@attributes)
+        let(:name) do
+          Name.new(:first_name => "Testy")
+        end
+
+        let(:attributes) do
+          { :name => name }
+        end
+
+        let(:person) do
+          Person.new(attributes)
         end
 
         it "sets the associations" do
-          @person.name.should == @name
+          person.name.should eq(name)
         end
-
       end
 
       context "when association is a references_one" do
 
-        before do
-          @game = Game.new(:score => 100)
-          @attributes = {
-            :game => @game
-          }
-          @person = Person.new(@attributes)
+        let(:game) do
+          Game.new(:score => 100)
         end
 
-        it "sets the associations" do
-          @person.game.should == @game
-          @game.person.should == @person
+        let(:attributes) do
+          { :game => game }
         end
 
+        let!(:person) do
+          Person.new(attributes)
+        end
+
+        it "sets the parent association" do
+          person.game.should == game
+        end
+
+        it "sets the inverse association" do
+          game.person.should == person
+        end
       end
 
       context "when association is a embedded_in" do
 
-        before do
-          @person = Person.new
-          @name = Name.new(:first_name => "Tyler", :person => @person)
+        let(:person) do
+          Person.new
+        end
+
+        let(:name) do
+          Name.new(:first_name => "Tyler", :person => person)
         end
 
         it "sets the association" do
-          @name.person.should == @person
+          name.person.should == person
         end
-
       end
-
     end
 
     context "when non-associations provided in the attributes" do
 
-      before do
-        @employer = Employer.new
-        @attributes = { :employer_id => @employer.id, :title => "Sir" }
-        @person = Person.new(@attributes)
+      let(:employer) do
+        Employer.new
+      end
+
+      let(:attributes) do
+        { :employer_id => employer.id, :title => "Sir" }
+      end
+
+      let(:person) do
+        Person.new(attributes)
       end
 
       it "calls the setter for the association" do
-        @person.employer_id.should == "1"
+        person.employer_id.should == "1"
       end
-
     end
 
     context "when an empty array is provided in the attributes" do
 
-      before do
-        @attributes = {
-          :aliases => []
-        }
-        @person = Person.new(@attributes)
+      let(:attributes) do
+        { :aliases => [] }
+      end
+
+      let(:person) do
+        Person.new(attributes)
       end
 
       it "sets the empty array" do
-        @person.aliases.should == []
+        person.aliases.should == []
       end
-
     end
 
     context "when an empty hash is provided in the attributes" do
 
-      before do
-        @attributes = {
-          :map => {}
-        }
-        @person = Person.new(@attributes)
+      let(:attributes) do
+        { :map => {} }
+      end
+
+      let(:person) do
+        Person.new(attributes)
       end
 
       it "sets the empty hash" do
-        @person.map.should == {}
+        person.map.should == {}
       end
-
     end
-
   end
 
   context "updating when attributes already exist" do
 
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    let(:attributes) do
+      { :dob => "2000-01-01" }
+    end
+
     before do
-      @person = Person.new(:title => "Sir")
-      @attributes = { :dob => "2000-01-01" }
+      person.process(attributes)
     end
 
     it "only overwrites supplied attributes" do
-      @person.process(@attributes)
-      @person.title.should == "Sir"
+      person.title.should == "Sir"
     end
-
   end
 
   describe "#read_attribute" do
@@ -643,84 +676,86 @@ describe Mongoid::Attributes do
     end
   end
 
-  describe "#attribute_present?" do
+  [ :attribute_present?, :has_attribute? ].each do |method|
 
-    context "when document is a new record" do
+    describe "##{method}" do
 
-      let(:person) do
-        Person.new
-      end
+      context "when document is a new record" do
 
-      context "when attribute does not exist" do
-        it "returns false" do
-          person.attribute_present?(:owner_id).should be_false
-        end
-      end
-
-      context "when attribute does exist" do
-        before do
-          person.owner_id = 5
+        let(:person) do
+          Person.new
         end
 
-        it "returns true" do
-          person.attribute_present?(:owner_id).should be_true
-        end
-      end
-    end
-
-    context "when the document is an existing record" do
-
-      let(:person) do
-        Person.create
-      end
-
-      context "when the attribute does not exist" do
-
-        before do
-          person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
-          Mongoid.raise_not_found_error = false
-          person.reload
-          Mongoid.raise_not_found_error = true
-        end
-
-        it "returns true" do
-          person.attribute_present?(:age).should be_true
-        end
-      end
-    end
-
-    context "when the value is boolean" do
-      let(:person) do
-        Person.new
-      end
-
-      context "when attribute does not exist" do
-        context "when the value is true" do
-
-          it "return true"  do
-            person.terms = false
-            person.attribute_present?(:terms).should be_true
+        context "when attribute does not exist" do
+          it "returns false" do
+            person.send(method, :owner_id).should be_false
           end
         end
 
-        context "when the value is false" do
-          it "return true"  do
-            person.terms = false
-            person.attribute_present?(:terms).should be_true
+        context "when attribute does exist" do
+          before do
+            person.owner_id = 5
+          end
+
+          it "returns true" do
+            person.send(method, :owner_id).should be_true
           end
         end
       end
-    end
 
-    context "when the value is blank string" do
-      let(:person) do
-        Person.new(:title => '')
+      context "when the document is an existing record" do
+
+        let(:person) do
+          Person.create
+        end
+
+        context "when the attribute does not exist" do
+
+          before do
+            person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+            Mongoid.raise_not_found_error = false
+            person.reload
+            Mongoid.raise_not_found_error = true
+          end
+
+          it "returns true" do
+            person.send(method, :age).should be_true
+          end
+        end
       end
 
-      it "return false" do
-        person.attribute_present?(:title).should be_false
+      context "when the value is boolean" do
+        let(:person) do
+          Person.new
+        end
+
+        context "when attribute does not exist" do
+          context "when the value is true" do
+
+            it "return true"  do
+              person.terms = false
+              person.send(method, :terms).should be_true
+            end
+          end
+
+          context "when the value is false" do
+            it "return true"  do
+              person.terms = false
+              person.send(method, :terms).should be_true
+            end
+          end
+        end
       end
 
+      context "when the value is blank string" do
+        let(:person) do
+          Person.new(:title => '')
+        end
+
+        it "return false" do
+          person.send(method, :title).should be_false
+        end
+      end
     end
   end
 
@@ -749,35 +784,38 @@ describe Mongoid::Attributes do
 
     context "when attribute does not exist" do
 
-      before do
-        @person = Person.new
+      let(:person) do
+        Person.new
       end
 
       it "returns the default value" do
-        @person.age.should == 100
+        person.age.should == 100
       end
     end
 
     context "when setting the attribute to nil" do
 
-      before do
-        @person = Person.new(:age => nil)
+      let(:person) do
+        Person.new(:age => nil)
       end
 
       it "does not use the default value" do
-        @person.age.should be_nil
+        person.age.should be_nil
       end
     end
 
     context "when field has a default value" do
 
+      let(:person) do
+        Person.new
+      end
+
       before do
-        @person = Person.new
+        person.terms = true
       end
 
       it "should allow overwriting of the default value" do
-        @person.terms = true
-        @person.terms.should be_true
+        person.terms.should be_true
       end
     end
   end
@@ -790,7 +828,7 @@ describe Mongoid::Attributes do
 
       before do
         person.stubs(:fields).returns(
-          { "age" => Mongoid::Fields::Serializable::Integer.new(:age) }
+          { "age" => Mongoid::Fields::Serializable::Integer.instantiate(:age) }
         )
       end
 
@@ -818,52 +856,102 @@ describe Mongoid::Attributes do
     let(:person) { Person.new }
 
     it "typecasts proc values" do
-      person.stubs(:defaults).returns("age" => lambda { "51" })
-      person.expects(:typed_value_for).with("age", "51")
-      person.instance_variable_set(:@attributes, {})
-      person.send(:apply_default_attributes)
+      person.age.should eq(100)
     end
-
   end
 
   [:attributes=, :write_attributes].each do |method|
+
     describe "##{method}" do
+
+      context "when nested" do
+
+        let(:person) do
+          Person.new
+        end
+
+        before do
+          person.send(method, { :videos => [{:title => "Fight Club"}] })
+        end
+
+        it "should set nested documents" do
+          person.videos.first.title.should eq("Fight Club")
+        end
+      end
 
       context "typecasting" do
 
-        before do
-          @person = Person.new
-          @attributes = { :age => "50" }
+        let(:person) do
+          Person.new
         end
 
-        it "properly casts values" do
-          @person.send(method, @attributes)
-          @person.age.should == 50
+        let(:attributes) do
+          { :age => "50" }
         end
 
-        it "allows passing of nil" do
-          @person.send(method, nil)
-          @person.age.should == 100
+        context "when passing a hash" do
+
+          before do
+            person.send(method, attributes)
+          end
+
+          it "properly casts values" do
+            person.age.should eq(50)
+          end
         end
 
+        context "when passing nil" do
+
+          before do
+            person.send(method, nil)
+          end
+
+          it "does not set anything" do
+            person.age.should eq(100)
+          end
+        end
       end
 
       context "on a parent document" do
 
         context "when the parent has a has many through a has one" do
 
+          let(:owner) do
+            PetOwner.new(:title => "Mr")
+          end
+
+          let(:pet) do
+            Pet.new(:name => "Fido")
+          end
+
+          let(:vet_visit) do
+            VetVisit.new(:date => Date.today)
+          end
+
           before do
-            @owner = PetOwner.new(:title => "Mr")
-            @pet = Pet.new(:name => "Fido")
-            @owner.pet = @pet
-            @vet_visit = VetVisit.new(:date => Date.today)
-            @pet.vet_visits = [@vet_visit]
+            owner.pet = pet
+            pet.vet_visits = [ vet_visit ]
+            owner.send(method, { :pet => { :name => "Bingo" } })
           end
 
           it "does not overwrite child attributes if not in the hash" do
-            @owner.send(method, { :pet => { :name => "Bingo" } })
-            @owner.pet.name.should == "Bingo"
-            @owner.pet.vet_visits.size.should == 1
+            owner.pet.name.should == "Bingo"
+            owner.pet.vet_visits.size.should == 1
+          end
+        end
+
+        context "when the parent has an empty embeds_many" do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:attributes) do
+            { :services => [] }
+          end
+
+          it "does not raise an error" do
+            person.send(method, attributes)
           end
         end
       end
@@ -872,33 +960,124 @@ describe Mongoid::Attributes do
 
         context "when child is part of a has one" do
 
+          let(:person) do
+            Person.new(:title => "Sir", :age => 30)
+          end
+
+          let(:name) do
+            Name.new(:first_name => "Test", :last_name => "User")
+          end
+
           before do
-            @person = Person.new(:title => "Sir", :age => 30)
-            @name = Name.new(:first_name => "Test", :last_name => "User")
-            @person.name = @name
+            person.name = name
+            name.send(method, :first_name => "Test2", :last_name => "User2")
           end
 
           it "sets the child attributes on the parent" do
-            @name.send(method, :first_name => "Test2", :last_name => "User2")
-            @name.attributes.should ==
+            name.attributes.should ==
               { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2" }
           end
         end
 
         context "when child is part of a has many" do
 
+          let(:person) do
+            Person.new(:title => "Sir")
+          end
+
+          let(:address) do
+            Address.new(:street => "Test")
+          end
+
           before do
-            @person = Person.new(:title => "Sir")
-            @address = Address.new(:street => "Test")
-            @person.addresses << @address
+            person.addresses << address
+            address.send(method, "street" => "Test2")
           end
 
           it "updates the child attributes on the parent" do
-            @address.send(method, "street" => "Test2")
-            @address.attributes.should ==
+            address.attributes.should ==
               { "_id" => "test", "street" => "Test2" }
           end
         end
+      end
+    end
+  end
+
+  describe "#alias_attribute" do
+
+    let(:product) do
+      Product.new
+    end
+
+    context "when checking against the alias" do
+
+      before do
+        product.cost = 500
+      end
+
+      it "aliases the getter" do
+        product.cost.should eq(500)
+      end
+
+      it "aliases the existance check" do
+        product.cost?.should be_true
+      end
+
+      it "aliases *_changed?" do
+        product.cost_changed?.should be_true
+      end
+
+      it "aliases *_change" do
+        product.cost_change.should eq([ nil, 500 ])
+      end
+
+      it "aliases *_will_change!" do
+        product.should respond_to(:cost_will_change!)
+      end
+
+      it "aliases *_was" do
+        product.cost_was.should be_nil
+      end
+
+      it "aliases reset_*!" do
+        product.reset_cost!
+        product.cost.should be_nil
+      end
+    end
+
+    context "when checking against the original" do
+
+      before do
+        product.price = 500
+      end
+
+      it "aliases the getter" do
+        product.price.should eq(500)
+      end
+
+      it "aliases the existance check" do
+        product.price?.should be_true
+      end
+
+      it "aliases *_changed?" do
+        product.price_changed?.should be_true
+      end
+
+      it "aliases *_change" do
+        product.price_change.should eq([ nil, 500 ])
+      end
+
+      it "aliases *_will_change!" do
+        product.should respond_to(:price_will_change!)
+      end
+
+      it "aliases *_was" do
+        product.price_was.should be_nil
+      end
+
+      it "aliases reset_*!" do
+        product.reset_price!
+        product.price.should be_nil
       end
     end
   end

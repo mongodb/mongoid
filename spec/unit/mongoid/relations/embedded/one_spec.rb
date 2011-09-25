@@ -93,11 +93,47 @@ describe Mongoid::Relations::Embedded::One do
     end
   end
 
+  describe "#respond_to?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let!(:name) do
+      person.build_name(:first_name => "Tony")
+    end
+
+    let(:document) do
+      person.name
+    end
+
+    Mongoid::Document.public_instance_methods(true).each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          document.respond_to?(method).should be_true
+        end
+      end
+    end
+
+    it "responds to persisted?" do
+      document.should respond_to(:persisted?)
+    end
+  end
+
   describe ".valid_options" do
 
     it "returns the valid options" do
       described_class.valid_options.should ==
         [ :as, :cyclic ]
+    end
+  end
+
+  describe ".validation_default" do
+
+    it "returns true" do
+      described_class.validation_default.should eq(true)
     end
   end
 end

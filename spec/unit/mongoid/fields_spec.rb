@@ -5,7 +5,7 @@ describe Mongoid::Fields do
   describe ".defaults" do
 
     it "returns a hash of all the default values" do
-      Game.defaults.should == { "high_score" => 500, "score" => 0 }
+      Game.defaults.should eq([ "high_score", "score" ])
     end
   end
 
@@ -29,6 +29,7 @@ describe Mongoid::Fields do
 
         after do
           Person.fields.delete("array_testing")
+          Person.defaults.delete_one("array_testing")
         end
 
         it "returns an equal object of a different instance" do
@@ -52,6 +53,51 @@ describe Mongoid::Fields do
             person_two.hash_testing.object_id
         end
       end
+
+      context "when provided a default proc" do
+
+        context "when the proc has no argument" do
+
+          before do
+            Person.field(
+              :generated_testing,
+              :type => Float,
+              :default => lambda { Time.now.to_f }
+            )
+          end
+
+          after do
+            Person.fields.delete("generated_testing")
+            Person.defaults.delete_one("generated_testing")
+          end
+
+          it "returns an equal object of a different instance" do
+            person_one.generated_testing.object_id.should_not eq(
+              person_two.generated_testing.object_id
+            )
+          end
+        end
+
+        context "when the proc has to be evaluated on the document" do
+
+          before do
+            Person.field(
+              :rank,
+              :type => Integer,
+              :default => lambda { title? ? 1 : 2 }
+            )
+          end
+
+          after do
+            Person.fields.delete("rank")
+            Person.defaults.delete_one("rank")
+          end
+
+          it "yields the document to the proc" do
+            Person.new.rank.should eq(2)
+          end
+        end
+      end
     end
 
     context "on parent classes" do
@@ -61,7 +107,7 @@ describe Mongoid::Fields do
       end
 
       it "does not return subclass defaults" do
-        shape.defaults.should == { "x" => 0, "y" => 0 }
+        shape.defaults.should eq([ "x", "y" ])
       end
     end
 
@@ -72,7 +118,7 @@ describe Mongoid::Fields do
       end
 
       it "has the parent and child defaults" do
-        circle.defaults.should == { "x" => 0, "y" => 0, "radius" => 0 }
+        circle.defaults.should eq([ "x", "y", "radius" ])
       end
     end
   end
@@ -81,6 +127,15 @@ describe Mongoid::Fields do
 
     it "returns the generated field" do
       Person.field(:testing).should equal Person.fields["testing"]
+    end
+
+    context "when the field name conflicts with mongoid's internals" do
+
+      it "raises an error" do
+        expect {
+          Person.field(:identifier)
+        }.to raise_error(Mongoid::Errors::InvalidField)
+      end
     end
 
     context "when the field is a time" do
@@ -280,6 +335,91 @@ describe Mongoid::Fields do
 
       it "includes the child fields" do
         circle.fields.keys.should include("radius")
+      end
+    end
+  end
+
+  describe ".object_id_field?" do
+
+    context "when the field exists" do
+
+      context "when the field is of type BSON::ObjectId" do
+
+        context "when the field is the _id" do
+
+          it "returns true" do
+            Person.object_id_field?(:_id).should be_true
+          end
+        end
+
+        context "when the field is a single foreign key" do
+
+          context "when the relation is not polymorphic" do
+
+            it "returns true" do
+              Post.object_id_field?(:person_id).should be_true
+            end
+          end
+
+          context "when the relation is polymorphic" do
+
+            it "returns true" do
+              Rating.object_id_field?(:ratable_id).should be_true
+            end
+          end
+        end
+
+        context "when the field is a multi foreign key" do
+
+          it "returns true" do
+            Person.object_id_field?(:preference_ids).should be_true
+          end
+        end
+
+        context "when the field is not a foreign key" do
+
+          it "returns true" do
+            Person.object_id_field?(:bson_id).should be_true
+          end
+        end
+      end
+
+      context "when the field is not an object id" do
+
+        context "when the field is an id" do
+
+          it "returns false" do
+            Address.object_id_field?(:_id).should be_false
+          end
+        end
+
+        context "when the field is a normal field" do
+
+          it "returns false" do
+            Person.object_id_field?(:title).should be_false
+          end
+        end
+
+        context "when the field is a single foreign key" do
+
+          it "returns true" do
+            Alert.object_id_field?(:account_id).should be_false
+          end
+        end
+
+        context "when the field is a multi foreign key" do
+
+          it "returns false" do
+            Agent.object_id_field?(:account_ids).should be_false
+          end
+        end
+      end
+    end
+
+    context "when the field does not exist" do
+
+      it "returns false" do
+        Person.object_id_field?(:some_random_name).should be_false
       end
     end
   end

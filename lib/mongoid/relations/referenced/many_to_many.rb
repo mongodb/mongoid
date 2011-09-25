@@ -30,14 +30,15 @@ module Mongoid # :nodoc:
               args.flatten.each do |doc|
                 next unless doc
                 append(doc)
-                if persistable?
+                if persistable? || creating?
                   ids.push(doc.id)
                   doc.save
                 else
                   base.send(metadata.foreign_key).push(doc.id)
+                  base.synced[metadata.foreign_key] = false
                 end
               end
-              if persistable?
+              if persistable? || creating?
                 base.push_all(metadata.foreign_key, ids)
                 base.synced[metadata.foreign_key] = false
               end
@@ -132,36 +133,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Instantiate a new references_many relation. Will set the foreign key
-        # and the base on the inverse object.
-        #
-        # @example Create the new relation.
-        #   Referenced::Many.new(base, target, metadata)
-        #
-        # @param [ Document ] base The document this relation hangs off of.
-        # @param [ Array<Document> ] target The target of the relation.
-        # @param [ Metadata ] metadata The relation's metadata.
-        #
-        # @since 2.0.0.beta.1
-        def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
-            raise_mixed if klass.embedded?
-            batched do
-              proxy.in_memory do |doc|
-                characterize_one(doc)
-                bind_one(doc)
-                if persistable?
-                  base.push(metadata.foreign_key, doc.id)
-                  base.synced[metadata.foreign_key] = false
-                  doc.save
-                else
-                  base.send(metadata.foreign_key).push(doc.id)
-                end
-              end
-            end
-          end
-        end
-
         # Removes all associations between the base document and the target
         # documents by deleting the foreign keys and the references, orphaning
         # the target documents in the process.
@@ -171,14 +142,20 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def nullify
-          # @todo: Durran: This is wrong.
-          criteria.update(metadata.inverse_foreign_key => [])
-          # We need to update the inverse as well.
+          criteria.pull(metadata.inverse_foreign_key, base.id)
+          if persistable?
+            base.set(
+              metadata.foreign_key,
+              base.send(metadata.foreign_key).clear
+            )
+          end
           target.clear do |doc|
             unbind_one(doc)
           end
         end
         alias :nullify_all :nullify
+        alias :clear :nullify
+        alias :purge :nullify
 
         private
 
@@ -239,8 +216,37 @@ module Mongoid # :nodoc:
             Builders::Referenced::ManyToMany.new(meta, object, loading)
           end
 
+          # Create the standard criteria for this relation given the supplied
+          # metadata and object.
+          #
+          # @example Get the criteria.
+          #   Proxy.criteria(meta, object)
+          #
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Object ] object The object for the criteria.
+          # @param [ Class ] type The criteria class.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 2.1.0
           def criteria(metadata, object, type = nil)
             metadata.klass.any_in(:_id => object)
+          end
+
+          # Get the criteria that is used to eager load a relation of this
+          # type.
+          #
+          # @example Get the eager load criteria.
+          #   Proxy.eager_load(metadata, criteria)
+          #
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Criteria ] criteria The criteria being used.
+          #
+          # @return [ Criteria ] The criteria to eager load the relation.
+          #
+          # @since 2.2.0
+          def eager_load(metadata, criteria)
+            raise Errors::EagerLoad.new(metadata.name)
           end
 
           # Returns true if the relation is an embedded one. In this case
@@ -354,6 +360,19 @@ module Mongoid # :nodoc:
           # @since 2.1.0
           def valid_options
             [ :autosave, :dependent, :foreign_key, :index, :order ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
           end
         end
       end

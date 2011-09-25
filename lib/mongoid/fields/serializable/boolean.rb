@@ -37,7 +37,6 @@ module Mongoid #:nodoc:
           object = MAPPINGS[object]
           object.nil? ? nil : object
         end
-        alias :set :serialize
       end
     end
   end

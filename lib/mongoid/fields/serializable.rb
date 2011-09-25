@@ -23,9 +23,10 @@ module Mongoid #:nodoc:
     #     end
     #   end
     module Serializable
+      extend ActiveSupport::Concern
 
       # Set readers for the instance variables.
-      attr_reader :default_value, :label, :name, :options
+      attr_accessor :default, :label, :localize, :name, :options
 
       # When reading the field do we need to cast the value? This holds true when
       # times are stored or for big decimals which are stored as strings.
@@ -44,20 +45,16 @@ module Mongoid #:nodoc:
           end.include?(:deserialize)
       end
 
-      # Get the default value for the field.
+      # Get the constraint from the metadata once.
       #
-      # @example Get the default.
-      #   field.default
+      # @example Get the constraint.
+      #   field.constraint
       #
-      # @return [ Object ] The default value.
+      # @return [ Constraint ] The relation's contraint.
       #
       # @since 2.1.0
-      def default
-        if default_value.respond_to?(:call)
-          serialize(default_value.call)
-        else
-          serialize(default_value)
-        end
+      def constraint
+        @constraint ||= metadata.constraint
       end
 
       # Deserialize this field from the type stored in MongoDB to the type
@@ -73,21 +70,59 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def deserialize(object); object; end
 
-      # Create the new field with a name and optional additional options.
+      # Evaluate the default value and return it. Will handle the
+      # serialization, proc calls, and duplication if necessary.
       #
-      # @example Create the new field.
-      #   Field.new(:name, :type => String)
+      # @example Evaluate the default value.
+      #   field.eval_default(document)
       #
-      # @param [ Hash ] options The field options.
+      # @param [ Document ] doc The document the field belongs to.
       #
-      # @option options [ Class ] :type The class of the field.
-      # @option options [ Object ] :default The default value for the field.
-      # @option options [ String ] :label The field's label.
+      # @return [ Object ] The serialized default value.
       #
-      # @since 2.1.0
-      def initialize(name, options = {})
-        @name, @options = name, options
-        @default_value, @label = options[:default], options[:label]
+      # @since 2.1.8
+      def eval_default(doc)
+        if default.respond_to?(:call)
+          serialize(doc.instance_exec(&default))
+        else
+          serialize(default.duplicable? ? default.dup : default)
+        end
+      end
+
+      # Is the field localized or not?
+      #
+      # @example Is the field localized?
+      #   field.localized?
+      #
+      # @return [ true, false ] If the field is localized.
+      #
+      # @since 2.3.0
+      def localized?
+        !!@localize
+      end
+
+      # Get the metadata for the field if its a foreign key.
+      #
+      # @example Get the metadata.
+      #   field.metadata
+      #
+      # @return [ Metadata ] The relation metadata.
+      #
+      # @since 2.2.0
+      def metadata
+        @metadata ||= options[:metadata]
+      end
+
+      # Is the field a BSON::ObjectId?
+      #
+      # @example Is the field a BSON::ObjectId?
+      #   field.object_id_field?
+      #
+      # @return [ true, false ] If the field is a BSON::ObjectId.
+      #
+      # @since 2.2.0
+      def object_id_field?
+        @object_id_field ||= (type == BSON::ObjectId)
       end
 
       # Serialize the object from the type defined in the model to a MongoDB
@@ -125,6 +160,34 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def versioned?
         @versioned ||= (options[:versioned].nil? ? true : options[:versioned])
+      end
+
+      module ClassMethods #:nodoc:
+
+        # Create the new field with a name and optional additional options.
+        #
+        # @example Create the new field.
+        #   Field.new(:name, :type => String)
+        #
+        # @param [ Hash ] options The field options.
+        #
+        # @option options [ Class ] :type The class of the field.
+        # @option options [ Object ] :default The default value for the field.
+        # @option options [ String ] :label The field's label.
+        #
+        # @since 2.1.0
+        def instantiate(name, options = {})
+          allocate.tap do |field|
+            field.name = name
+            field.options = options
+            field.label = options[:label]
+            field.localize = options[:localize]
+            field.default = options[:default]
+            unless field.default
+              field.default = {} if field.localized?
+            end
+          end
+        end
       end
     end
   end

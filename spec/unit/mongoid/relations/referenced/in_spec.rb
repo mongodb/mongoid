@@ -43,6 +43,31 @@ describe Mongoid::Relations::Referenced::In do
     end
   end
 
+  describe "#respond_to?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:game) do
+      person.build_game(:name => "Tron")
+    end
+
+    let(:document) do
+      game.person
+    end
+
+    Mongoid::Document.public_instance_methods(true).each do |method|
+
+      context "when checking #{method}" do
+
+        it "returns true" do
+          document.respond_to?(method).should be_true
+        end
+      end
+    end
+  end
+
   describe ".stores_foreign_key?" do
 
     it "returns true" do
@@ -55,6 +80,13 @@ describe Mongoid::Relations::Referenced::In do
     it "returns the valid options" do
       described_class.valid_options.should ==
         [ :autosave, :foreign_key, :index, :polymorphic ]
+    end
+  end
+
+  describe ".validation_default" do
+
+    it "returns false" do
+      described_class.validation_default.should eq(false)
     end
   end
 end

@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
   module Safety
     extend ActiveSupport::Concern
 
-    # Execute the following class-level persistence operation in safe mode.
+    # Execute the following instance-level persistence operation in safe mode.
     #
     # @example Upsert in safe mode.
     #   person.safely.upsert
@@ -27,6 +27,18 @@ module Mongoid #:nodoc:
       tap { Threaded.safety_options = safety }
     end
 
+    # Execute the following instance-level persistence operation without safe mode.
+    # Allows per-request overriding of safe mode when the persist_in_safe_mode
+    # config option is turned on.
+    #
+    # @example Upsert in safe mode.
+    #   person.unsafely.upsert
+    #
+    # @return [ Proxy ] The safety proxy.
+    def unsafely
+      tap { Threaded.safety_options = false }
+    end
+
     class << self
 
       # Static class method of easily getting the desired safe mode options
@@ -43,9 +55,13 @@ module Mongoid #:nodoc:
       def merge_safety_options(options = {})
         options ||= {}
         return options if options[:safe]
-        options.merge!(
-          { :safe => Threaded.safety_options || Mongoid.persist_in_safe_mode }
-        )
+
+        unless Threaded.safety_options.nil?
+          safety = Threaded.safety_options
+        else
+          safety = Mongoid.persist_in_safe_mode
+        end
+        options.merge!({ :safe => safety })
       end
     end
 
@@ -69,6 +85,20 @@ module Mongoid #:nodoc:
       # @return [ Proxy ] The safety proxy.
       def safely(safety = true)
         tap { Threaded.safety_options = safety }
+      end
+
+      # Execute the following class-level persistence operation without safe mode.
+      # Allows per-request overriding of safe mode when the persist_in_safe_mode
+      # config option is turned on.
+      #
+      # @example Upsert in safe mode.
+      #   Person.unsafely.create(:name => "John")
+      #
+      # @return [ Proxy ] The safety proxy.
+      #
+      # @since 2.3.0
+      def unsafely
+        tap { Threaded.safety_options = false }
       end
     end
   end

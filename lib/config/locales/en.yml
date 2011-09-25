@@ -4,8 +4,13 @@ en:
       messages:
         taken:
           is already taken
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Document not found for class %{klass} with id(s) %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           "Database should be a Mongo::DB, not %{name}."
         invalid_options:
@@ -26,7 +31,7 @@ en:
         invalid_field:
           Defining a field named %{name} is not allowed. Do not define
           fields that conflict with Mongoid internal attributes or method
-          names. Use Document#instance_methods to see what names this includes.
+          names. Use Mongoid.destructive_fields to see what names this includes.
         too_many_nested_attribute_records:
           Accepting nested attributes for %{association} is limited
           to %{limit} records.

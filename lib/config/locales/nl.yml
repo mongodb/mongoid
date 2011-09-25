@@ -4,8 +4,13 @@ nl:
       messages:
         taken:
           al in gebruik
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Document niet gevonden voor class %{klass} met de id(s) %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           Database moet een Mongo::DB zijn, niet een %{name}.
         invalid_type:

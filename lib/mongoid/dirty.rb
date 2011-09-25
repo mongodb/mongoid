@@ -21,7 +21,9 @@ module Mongoid #:nodoc:
       {}.tap do |hash|
         changed.each do |name|
           change = attribute_change(name)
-          hash[name] = change if change[0] != change[1]
+          if change
+            hash[name] = change if change[0] != change[1]
+          end
         end
       end
     end
@@ -39,6 +41,8 @@ module Mongoid #:nodoc:
       @_children = nil
       @previously_changed = changes
       @validated = false
+      atomic_pulls.clear
+      atomic_unsets.clear
       changed_attributes.clear
     end
 
@@ -88,6 +92,40 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def attribute_change(attr)
       [changed_attributes[attr], attributes[attr]] if attribute_changed?(attr)
+    end
+
+    # Determine if a specific attribute has changed.
+    #
+    # @note Overriding AM::Dirty once again since their implementation is not
+    #   friendly to fields that can be changed in place.
+    #
+    # @param [ String ] attr The name of the attribute.
+    #
+    # @return [ true, false ] Whether the attribute has changed.
+    #
+    # @since 2.1.6
+    def attribute_changed?(attr)
+      return false unless changed_attributes.include?(attr)
+      changed_attributes[attr] != attributes[attr]
+    end
+
+    # Override Active Model's behaviour here in order to stay away from
+    # infinite loops on getter/setter overrides.
+    #
+    # @example Flag an attribute as changing.
+    #   document.attribute_will_change!(:name)
+    #
+    # @param [ Symbol ] attr The attribute.
+    #
+    # @return [ Object ] The value of the attribute.
+    #
+    # @since 2.3.0
+    def attribute_will_change!(attr)
+      unless changed_attributes.include?(attr)
+        value = read_attribute(attr)
+        value = value.duplicable? ? value.clone : value
+        changed_attributes[attr] = value
+      end
     end
   end
 end

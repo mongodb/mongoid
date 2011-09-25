@@ -15,7 +15,7 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Object do
       end
 
       let(:field) do
-        described_class.new(
+        described_class.instantiate(
           :vals,
           :type => Object,
           :default => nil,

@@ -60,23 +60,6 @@ module Mongoid #:nodoc:
         end
         alias :new :build
 
-        # Clear the relation. Will delete the documents from the db if they are
-        # already persisted.
-        #
-        # @example Clear the relation.
-        #   person.posts.clear
-        #
-        # @return [ Many ] The relation emptied.
-        #
-        # @since 2.0.0.beta.1
-        def clear
-          criteria.delete_all
-          target.clear do |doc|
-            unbind_one(doc)
-            doc.destroyed = true
-          end
-        end
-
         # Creates a new document on the references many relation. This will
         # save the document if the parent has been persisted.
         #
@@ -231,15 +214,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do |proxy|
+          init(base, Targets::Enumerable.new(target), metadata) do
             raise_mixed if klass.embedded?
-            batched do
-              proxy.in_memory do |doc|
-                characterize_one(doc)
-                bind_one(doc)
-                doc.save if persistable?
-              end
-            end
           end
         end
 
@@ -259,6 +235,28 @@ module Mongoid #:nodoc:
         end
         alias :nullify_all :nullify
 
+        # Clear the relation. Will delete the documents from the db if they are
+        # already persisted.
+        #
+        # @example Clear the relation.
+        #   person.posts.clear
+        #
+        # @return [ Many ] The relation emptied.
+        #
+        # @since 2.0.0.beta.1
+        def purge
+          unless metadata.destructive?
+            nullify
+          else
+            criteria.delete_all
+            target.clear do |doc|
+              unbind_one(doc)
+              doc.destroyed = true
+            end
+          end
+        end
+        alias :clear :purge
+
         # Substitutes the supplied target documents for the existing documents
         # in the relation. If the new target is nil, perform the necessary
         # deletion.
@@ -273,8 +271,10 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            proxy.clear
-            proxy.push(replacement) if replacement
+            if replacement != proxy.in_memory
+              proxy.purge
+              proxy.push(replacement.compact) if replacement
+            end
           end
         end
 
@@ -321,26 +321,6 @@ module Mongoid #:nodoc:
           klass.collection
         end
 
-        # Get the value for the foreign key in convertable or unconvertable
-        # form.
-        #
-        # @todo Durran: Find a common place for this.
-        #
-        # @example Get the value.
-        #   relation.convertable
-        #
-        # @return [ String, Unconvertable, BSON::ObjectId ] The string or object id.
-        #
-        # @since 2.0.2
-        def convertable
-          inverse = metadata.inverse_klass
-          if inverse.using_object_ids? || base.id.is_a?(BSON::ObjectId)
-            base.id
-          else
-            Criterion::Unconvertable.new(base.id)
-          end
-        end
-
         # Returns the criteria object for the target class with its documents set
         # to target.
         #
@@ -351,7 +331,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def criteria
-          Many.criteria(metadata, convertable)
+          Many.criteria(metadata, Conversions.flag(base.id, metadata))
         end
 
         # Perform the necessary cascade operations for documents that just got
@@ -406,7 +386,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding?
+          base.persisted? && !binding? && !building?
         end
 
         # Deletes all related documents from the database given the supplied
@@ -468,6 +448,24 @@ module Mongoid #:nodoc:
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
             metadata.klass.where(metadata.foreign_key => object)
+          end
+
+          # Eager load the relation based on the criteria.
+          #
+          # @example Eager load the criteria.
+          #   Proxy.eager_load(metadata, criteria)
+          #
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Criteria ] criteria The criteria being used.
+          #
+          # @return [ Criteria ] The criteria to eager load the relation.
+          #
+          # @since 2.2.0
+          def eager_load(metadata, criteria)
+            klass, foreign_key = metadata.klass, metadata.foreign_key
+            klass.any_in(foreign_key => criteria.load_ids("_id").uniq).each do |doc|
+              IdentityMap.set_many(doc, foreign_key => doc.send(foreign_key))
+            end
           end
 
           # Returns true if the relation is an embedded one. In this case
@@ -581,6 +579,19 @@ module Mongoid #:nodoc:
           # @since 2.1.0
           def valid_options
             [ :as, :autosave, :dependent, :foreign_key, :order ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
           end
         end
       end

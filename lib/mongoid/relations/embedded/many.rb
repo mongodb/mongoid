@@ -26,7 +26,7 @@ module Mongoid # :nodoc:
             args.flatten.each do |doc|
               next unless doc
               append(doc)
-              doc.save if persistable?
+              doc.save if persistable? && !assigning?
             end
           end
         end
@@ -123,7 +123,14 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document)
           target.delete_one(document).tap do |doc|
-            unbind_one(doc) if doc && !binding?
+            if doc && !binding?
+              if assigning?
+                base.add_atomic_pull(doc)
+              else
+                doc.delete(:suppress => true)
+              end
+              unbind_one(doc)
+            end
             reindex
           end
         end
@@ -225,14 +232,20 @@ module Mongoid # :nodoc:
         def substitute(replacement)
           tap do |proxy|
             if replacement.blank?
+              if assigning? && !proxy.empty?
+                base.atomic_unsets.push(proxy.first.atomic_path)
+              end
               proxy.clear
             else
               atomically(:$set) do
+                if replacement.first.is_a?(Hash)
+                  replacement = Many.builder(metadata, replacement).build
+                end
                 proxy.target = replacement.compact
                 proxy.target.each_with_index do |doc, index|
                   integrate(doc)
                   doc._index = index
-                  doc.save if base.persisted?
+                  doc.save if base.persisted? && !assigning?
                 end
               end
             end
@@ -253,6 +266,19 @@ module Mongoid # :nodoc:
               attributes << doc.as_document
             end
           end
+        end
+
+        # Get a criteria for the embedded documents without the default scoping
+        # applied.
+        #
+        # @example Get the unscoped criteria.
+        #   person.addresses.unscoped
+        #
+        # @return [ Criteria ] The unscoped criteria.
+        #
+        # @since 2.2.1
+        def unscoped
+          criteria(false)
         end
 
         private
@@ -293,8 +319,8 @@ module Mongoid # :nodoc:
         #   relation.criteria
         #
         # @return [ Criteria ] A new criteria.
-        def criteria
-          klass.criteria(true).tap do |criterion|
+        def criteria(scoped = true)
+          klass.criteria(true, scoped).tap do |criterion|
             criterion.documents = target
           end
         end
@@ -371,8 +397,8 @@ module Mongoid # :nodoc:
           criteria.size.tap do
             criteria.each do |doc|
               target.delete_one(doc)
+              doc.send(method, :suppress => true) unless assigning?
               unbind_one(doc)
-              doc.send(method, :suppress => true)
             end
             reindex
           end
@@ -487,6 +513,19 @@ module Mongoid # :nodoc:
           # @since 2.1.0
           def valid_options
             [ :as, :cyclic, :order, :versioned ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
           end
         end
       end

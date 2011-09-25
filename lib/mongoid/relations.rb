@@ -3,6 +3,7 @@ require "mongoid/relations/accessors"
 require "mongoid/relations/auto_save"
 require "mongoid/relations/cascading"
 require "mongoid/relations/constraint"
+require "mongoid/relations/conversions"
 require "mongoid/relations/cyclic"
 require "mongoid/relations/proxy"
 require "mongoid/relations/bindings"
@@ -69,7 +70,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def embedded_many?
-      @embedded_many ||= (metadata && metadata.macro == :embeds_many)
+      metadata && metadata.macro == :embeds_many
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -81,7 +82,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def embedded_one?
-      @embedded_one ||= (metadata && metadata.macro == :embeds_one)
+      metadata && metadata.macro == :embeds_one
     end
 
     # Determine if the document is part of an references_many relation.
@@ -93,7 +94,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      @referenced_many ||= (metadata && metadata.macro == :references_many)
+      metadata && metadata.macro == :references_many
     end
 
     # Determine if the document is part of an references_one relation.
@@ -105,7 +106,24 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      @referenced_one ||= (metadata && metadata.macro == :references_one)
+      metadata && metadata.macro == :references_one
+    end
+
+    # Convenience method for iterating through the loaded relations and
+    # reloading them.
+    #
+    # @example Reload the relations.
+    #   document.reload_relations
+    #
+    # @return [ Hash ] The relations metadata.
+    #
+    # @since 2.1.6
+    def reload_relations
+      relations.each_pair do |name, meta|
+        if instance_variable_defined?("@#{name}")
+          remove_instance_variable("@#{name}")
+        end
+      end
     end
   end
 end

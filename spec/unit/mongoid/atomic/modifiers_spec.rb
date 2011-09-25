@@ -6,36 +6,68 @@ describe Mongoid::Atomic::Modifiers do
     described_class.new
   end
 
-  describe "#conflicting?" do
+  describe "#pull" do
 
-    context "when the sets contain a conflicting field" do
+    context "when the pulls are empty" do
 
       before do
-        modifiers.set({ "addresses.0.street" => "Tauentzienstr." })
+        modifiers.pull({})
       end
 
-      it "returns true" do
-        modifiers.should be_conflicting("addresses")
+      it "does not contain any pull operations" do
+        modifiers.should eq({})
       end
     end
 
-    context "when the sets do not contain a conflicting field" do
+    context "when no conflicting modifications are present" do
 
-      before do
-        modifiers.set({ "addresses.0.street" => "Tauentzienstr." })
-      end
+      context "when adding a single pull" do
 
-      context "when the field name is not similar" do
+        let(:pulls) do
+          { "addresses" => [{ "_id" => "one" }] }
+        end
 
-        it "returns false" do
-          modifiers.should_not be_conflicting("title")
+        before do
+          modifiers.pull(pulls)
+        end
+
+        it "adds the push all modifiers" do
+          modifiers.should eq(
+            { "$pullAll" =>
+              { "addresses" => [
+                  { "_id" => "one" }
+                ]
+              }
+            }
+          )
         end
       end
 
-      context "when the field name is similar" do
+      context "when adding to an existing pull" do
 
-        it "returns false" do
-          modifiers.should_not be_conflicting("address")
+        let(:pull_one) do
+          { "addresses" => [{ "street" => "Hobrechtstr." }] }
+        end
+
+        let(:pull_two) do
+          { "addresses" => [{ "street" => "Pflugerstr." }] }
+        end
+
+        before do
+          modifiers.pull(pull_one)
+          modifiers.pull(pull_two)
+        end
+
+        it "adds the pull all modifiers" do
+          modifiers.should eq(
+            { "$pullAll" =>
+              { "addresses" => [
+                  { "street" => "Hobrechtstr." },
+                  { "street" => "Pflugerstr." }
+                ]
+              }
+            }
+          )
         end
       end
     end
@@ -50,7 +82,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "does not contain any push operations" do
-        modifiers.should == {}
+        modifiers.should eq({})
       end
     end
 
@@ -67,13 +99,14 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should ==
+          modifiers.should eq(
             { "$pushAll" =>
               { "addresses" => [
                   { "street" => "Oxford St" }
                 ]
               }
             }
+          )
         end
       end
 
@@ -93,7 +126,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should ==
+          modifiers.should eq(
             { "$pushAll" =>
               { "addresses" => [
                   { "street" => "Hobrechtstr." },
@@ -101,34 +134,70 @@ describe Mongoid::Atomic::Modifiers do
                 ]
               }
             }
+          )
         end
       end
     end
 
     context "when a conflicting modification exists" do
 
-      let(:sets) do
-        { "addresses.0.street" => "Bond" }
-      end
+      context "when the conflicting modification is a set" do
 
-      let(:pushes) do
-        { "addresses" => { "street" => "Oxford St" } }
-      end
+        let(:sets) do
+          { "addresses.0.street" => "Bond" }
+        end
 
-      before do
-        modifiers.set(sets)
-        modifiers.push(pushes)
-      end
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
 
-      it "adds the push all modifiers to the conflicts hash" do
-        modifiers.should ==
-          { "$set" => { "addresses.0.street" => "Bond" },
-            :other =>
-            { "addresses" => [
-                { "street" => "Oxford St" }
-              ]
+        before do
+          modifiers.set(sets)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$set" => { "addresses.0.street" => "Bond" },
+              :conflicts => { "$pushAll" =>
+                { "addresses" => [
+                    { "street" => "Oxford St" }
+                  ]
+                }
+              }
             }
-          }
+          )
+        end
+      end
+
+      context "when the conflicting modification is a pull" do
+
+        let(:pulls) do
+          { "addresses" => { "street" => "Bond St" } }
+        end
+
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
+
+        before do
+          modifiers.pull(pulls)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$pullAll" => {
+              "addresses" => { "street" => "Bond St" }},
+              :conflicts => { "$pushAll" =>
+                { "addresses" => [
+                    { "street" => "Oxford St" }
+                  ]
+                }
+              }
+            }
+          )
+        end
       end
     end
   end
@@ -137,29 +206,108 @@ describe Mongoid::Atomic::Modifiers do
 
     describe "when adding to the root level" do
 
-      context "when the sets have values" do
+      context "when no conflicting mods exist" do
 
-        let(:sets) do
-          { "title" => "Sir" }
+        context "when the sets have values" do
+
+          let(:sets) do
+            { "title" => "Sir" }
+          end
+
+          before do
+            modifiers.set(sets)
+          end
+
+          it "adds the sets to the modifiers" do
+            modifiers.should eq({ "$set" => { "title" => "Sir" } })
+          end
         end
 
-        before do
-          modifiers.set(sets)
+        context "when the sets contain an id" do
+
+          let(:sets) do
+            { "_id" => BSON::ObjectId.new }
+          end
+
+          before do
+            modifiers.set(sets)
+          end
+
+          it "does not include the id sets" do
+            modifiers.should eq({})
+          end
         end
 
-        it "adds the sets to the modifiers" do
-          modifiers.should == { "$set" => { "title" => "Sir" } }
+        context "when the sets are empty" do
+
+          before do
+            modifiers.set({})
+          end
+
+          it "does not contain set operations" do
+            modifiers.should eq({})
+          end
         end
       end
 
-      context "when the sets are empty" do
+      context "when a conflicting modification exists" do
 
-        before do
-          modifiers.set({})
+        let(:pulls) do
+          { "addresses" => [{ "_id" => "one" }] }
         end
 
-        it "does not contain set operations" do
-          modifiers.should == {}
+        let(:sets) do
+          { "addresses.0.title" => "Sir" }
+        end
+
+        before do
+          modifiers.pull(pulls)
+          modifiers.set(sets)
+        end
+
+        it "adds the set modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$pullAll" =>
+              { "addresses" => [
+                  { "_id" => "one" }
+                ]
+              },
+              :conflicts =>
+                { "$set" => { "addresses.0.title" => "Sir" }}
+            }
+          )
+        end
+      end
+    end
+  end
+
+  describe "#unset" do
+
+    describe "when adding to the root level" do
+
+      context "when the unsets have values" do
+
+        let(:unsets) do
+          [ "addresses" ]
+        end
+
+        before do
+          modifiers.unset(unsets)
+        end
+
+        it "adds the unsets to the modifiers" do
+          modifiers.should eq({ "$unset" => { "addresses" => true } })
+        end
+      end
+
+      context "when the unsets are empty" do
+
+        before do
+          modifiers.unset([])
+        end
+
+        it "does not contain unset operations" do
+          modifiers.should eq({})
         end
       end
     end

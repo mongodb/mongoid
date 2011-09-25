@@ -109,6 +109,13 @@ describe Mongoid::Document do
         (klass === Person).should be_true
       end
     end
+
+    context "when the comparable is a subclass" do
+
+      it "returns false" do
+        (Person === Doctor).should be_false
+      end
+    end
   end
 
   describe "#===" do
@@ -117,6 +124,13 @@ describe Mongoid::Document do
 
       it "returns true" do
         (person === Person.new).should be_true
+      end
+    end
+
+    context "when the comparable is a subclass" do
+
+      it "returns true" do
+        (person === Doctor.new).should be_true
       end
     end
   end
@@ -635,6 +649,7 @@ describe Mongoid::Document do
     end
 
     context "when not frozen" do
+
       it "freezes attributes" do
         person.freeze.should == person
         lambda { person.title = "something" }.should raise_error
@@ -642,13 +657,44 @@ describe Mongoid::Document do
     end
 
     context "when frozen" do
+
       before do
         person.raw_attributes.freeze
       end
+
       it "keeps things frozen" do
         person.freeze
         lambda { person.title = "something" }.should raise_error
       end
+    end
+  end
+
+  describe ".logger" do
+
+    it "returns the mongoid logger" do
+      Person.logger.should eq(Mongoid.logger)
+    end
+  end
+
+  describe "#logger" do
+
+    let(:person) do
+      Person.new
+    end
+
+    it "returns the mongoid logger" do
+      person.send(:logger).should eq(Mongoid.logger)
+    end
+  end
+
+  context "after including the document module" do
+
+    let(:movie) do
+      Movie.new
+    end
+
+    it "resets to the global scope" do
+      movie.global_set.should be_a(::Set)
     end
   end
 end

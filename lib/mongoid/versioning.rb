@@ -20,8 +20,19 @@ module Mongoid #:nodoc:
       set_callback :save, :before, :revise, :if => :revisable?
 
       class_attribute :version_max
-      delegate :version_max, :to => "self.class"
       self.cyclic = true
+    end
+
+    # Get the maximum number of versions to store.
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Get the max versions.
+    #   model.version_max
+    #
+    # @return [ Integer ] The max number of versions.
+    def version_max
+      self.class.version_max
     end
 
     # Create a new version of the +Document+. This will load the previous
@@ -40,6 +51,20 @@ module Mongoid #:nodoc:
         versions.shift if version_max.present? && versions.length > version_max
         self.version = (version || 1 ) + 1
       end
+    end
+
+    # Forces the creation of a new version of the +Document+, regardless of
+    # whether a change was actually made.
+    #
+    # @example Revise the document.
+    #   person.revise!
+    #
+    # @since 2.2.1
+    def revise!
+      new_version = versions.build((previous_revision || self).versioned_attributes)
+      versions.shift if version_max.present? && versions.length > version_max
+      self.version = (version || 1 ) + 1
+      save
     end
 
     # Filters the results of +changes+ by removing any fields that should
@@ -142,7 +167,7 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def only_versioned_attributes(hash)
       {}.tap do |versioned|
-        hash.each_pair do |name, value|
+        hash.except("versions").each_pair do |name, value|
           field = fields[name]
           versioned[name] = value if !field || field.versioned?
         end

@@ -4,8 +4,13 @@ en-GB:
       messages:
         taken:
           is already taken
+        callbacks:
+          "Calling %{method} on %{klass} resulted in a false return from a callback."
         document_not_found:
           Document not found for class %{klass} with id(s) %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           "Database should be a Mongo::DB, not %{name}."
         invalid_options:

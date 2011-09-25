@@ -8,7 +8,18 @@ module Mongoid #:nodoc:
     included do
       class_attribute :cached
       self.cached = false
-      delegate :cached?, :to => "self.class"
+    end
+
+    # Is the class cached?
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Is the class cached?
+    #   person.cached?
+    #
+    # @return [ true, false ] If the class is cached.
+    def cached?
+      self.class.cached?
     end
 
     module ClassMethods #:nodoc

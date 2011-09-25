@@ -19,13 +19,9 @@ task :install => :build do
 end
 
 task :release => :build do
-  system "git tag -a #{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
+  system "git tag -a v#{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
   system "git push --tags"
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
-end
-
-RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = "spec/**/*_spec.rb"
 end
 
 RSpec::Core::RakeTask.new("spec:unit") do |spec|
@@ -49,4 +45,5 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
+task :spec => [ "spec:functional", "spec:unit" ]
 task :default => :spec

@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
     class Database < Hash
 
       # keys to remove from self to not pass through to Mongo::Connection
-      PRIVATE_OPTIONS = %w(uri database username password)
+      PRIVATE_OPTIONS = %w(uri database username password logger)
 
       # Configure the database connections. This will return an array
       # containing the master and an array of slaves.
@@ -108,6 +108,19 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Should we use a logger?
+      #
+      # @example Should we use a logger?
+      #   database.logger?
+      #
+      # @return [ true, false ] Defaults to true, false if specifically
+      #   defined.
+      #
+      # @since 2.2.0
+      def logger?
+        self[:logger].nil? || self[:logger] ? true : false
+      end
+
       # Convenience for accessing the hash via dot notation.
       #
       # @example Access a value in alternate syntax.
@@ -147,7 +160,7 @@ module Mongoid #:nodoc:
       def optional(slave = false)
         ({
           :pool_size => pool_size,
-          :logger => Mongoid::Logger.new,
+          :logger => logger? ? Mongoid::Logger.new : nil,
           :slave_ok => slave
         }).merge(self).reject { |k,v| PRIVATE_OPTIONS.include? k }.
           inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo} # mongo likes symbols

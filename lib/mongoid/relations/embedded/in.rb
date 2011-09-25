@@ -41,9 +41,10 @@ module Mongoid # :nodoc:
           tap do |proxy|
             proxy.unbind_one
             unless replacement
-              base.delete unless binding?
+              base.delete if persistable?
               return nil
             end
+            base.new_record = true
             proxy.target = replacement
             proxy.bind_one
           end
@@ -74,7 +75,9 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def characterize_one(document)
-          base.metadata = metadata.inverse_metadata(document)
+          unless base.metadata
+            base.metadata = metadata.inverse_metadata(document)
+          end
         end
 
         # Are we able to persist this relation?
@@ -196,6 +199,19 @@ module Mongoid # :nodoc:
           # @since 2.1.0
           def valid_options
             [ :cyclic, :polymorphic ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            false
           end
         end
       end

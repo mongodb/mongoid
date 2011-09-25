@@ -155,10 +155,7 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def init_updates
         document.atomic_updates.tap do |updates|
-          conflicts = updates.delete(:other)
-          if conflicts
-            @conflicts = { "$pushAll" => conflicts }
-          end
+          @conflicts = updates.delete(:conflicts) || {}
         end
       end
 

@@ -34,13 +34,15 @@ describe Mongoid::Dirty do
       end
 
       it "returns an array of the old value and new value" do
-        person.send(:attribute_change, "title").should ==
+        person.send(:attribute_change, "title").should eq(
           [ "Grand Poobah", "Captain Obvious" ]
+        )
       end
 
       it "allows access via (attribute)_change" do
-        person.title_change.should ==
+        person.title_change.should eq(
           [ "Grand Poobah", "Captain Obvious" ]
+        )
       end
     end
 
@@ -50,12 +52,12 @@ describe Mongoid::Dirty do
         Person.new(:pets => true)
       end
 
-      it "returns an array of the default value and new value" do
-        person.send(:attribute_change, "pets").should == [ false, true ]
+      it "returns an array of nil and new value" do
+        person.send(:attribute_change, "pets").should eq([ nil, true ])
       end
 
       it "allows access via (attribute)_change" do
-        person.pets_change.should == [ false, true ]
+        person.pets_change.should eq([ nil, true ])
       end
     end
 
@@ -71,13 +73,15 @@ describe Mongoid::Dirty do
       end
 
       it "returns an array of the original value and new value" do
-        person.send(:attribute_change, "title").should ==
+        person.send(:attribute_change, "title").should eq(
           [ "Grand Poobah", "Dark Helmet" ]
+        )
       end
 
       it "allows access via (attribute)_change" do
-        person.title_change.should ==
+        person.title_change.should eq(
           [ "Grand Poobah", "Dark Helmet" ]
+        )
       end
     end
 
@@ -94,13 +98,15 @@ describe Mongoid::Dirty do
         end
 
         it "returns an array of the original value and new value" do
-          person.send(:attribute_change, "aliases").should ==
-            [ [ "Grand Poobah" ],  [ "Dark Helmet" ] ]
+          person.send(:attribute_change, "aliases").should eq(
+            [[ "Grand Poobah" ],  [ "Dark Helmet" ]]
+          )
         end
 
         it "allows access via (attribute)_change" do
-          person.aliases_change.should ==
-            [ [ "Grand Poobah" ],  [ "Dark Helmet" ] ]
+          person.aliases_change.should eq(
+            [[ "Grand Poobah" ],  [ "Dark Helmet" ]]
+          )
         end
 
         context "when the attribute changes multiple times" do
@@ -110,8 +116,9 @@ describe Mongoid::Dirty do
           end
 
           it "returns an array of the original value and new value" do
-            person.send(:attribute_change, "aliases").should ==
-              [ [ "Grand Poobah" ],  [ "Dark Helmet", "Colonel Sanders" ] ]
+            person.send(:attribute_change, "aliases").should eq(
+              [[ "Grand Poobah" ], [ "Dark Helmet", "Colonel Sanders" ]]
+            )
           end
         end
       end
@@ -127,13 +134,15 @@ describe Mongoid::Dirty do
         end
 
         it "returns an array of the original value and new value" do
-          person.send(:attribute_change, "map").should ==
-            [ { :location => "Home" }, { :location => "Work" } ]
+          person.send(:attribute_change, "map").should eq(
+            [{ :location => "Home" }, { :location => "Work" }]
+          )
         end
 
         it "allows access via (attribute)_change" do
-          person.map_change.should ==
-            [ { :location => "Home" }, { :location => "Work" } ]
+          person.map_change.should eq(
+            [{ :location => "Home" }, { :location => "Work" }]
+          )
         end
 
         context "when the attribute changes multiple times" do
@@ -143,8 +152,9 @@ describe Mongoid::Dirty do
           end
 
           it "returns an array of the original value and new value" do
-            person.send(:attribute_change, "map").should ==
-              [ { :location => "Home" }, { :location => "Work", :lat => 20.0 } ]
+            person.send(:attribute_change, "map").should eq(
+              [{ :location => "Home" }, { :location => "Work", :lat => 20.0 }]
+            )
           end
         end
       end
@@ -197,8 +207,9 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty array" do
-        person.send(:attribute_change, "title").should ==
+        person.send(:attribute_change, "title").should eq(
           [ "Grand Poobah", nil ]
+        )
       end
     end
   end
@@ -216,11 +227,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns true" do
-        person.send(:attribute_changed?, "title").should == true
+        person.send(:attribute_changed?, "title").should be_true
       end
 
       it "allows access via (attribute)_changed?" do
-        person.title_changed?.should == true
+        person.title_changed?.should be_true
       end
     end
 
@@ -235,11 +246,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns true" do
-        person.send(:attribute_changed?, "pets").should == true
+        person.send(:attribute_changed?, "pets").should be_true
       end
 
       it "allows access via (attribute)_changed?" do
-        person.pets_changed?.should == true
+        person.pets_changed?.should be_true
       end
     end
 
@@ -250,18 +261,59 @@ describe Mongoid::Dirty do
       end
 
       it "returns false" do
-        person.send(:attribute_changed?, "title").should == false
+        person.send(:attribute_changed?, "title").should be_false
       end
     end
 
     context "when the attribute has not changed from the default value" do
 
-      let!(:person) do
-        Person.new
+      context "when the attribute is not enumerable" do
+
+        let!(:person) do
+          Person.new
+        end
+
+        it "returns false" do
+          person.send(:attribute_changed?, "pets").should be_false
+        end
       end
 
-      it "returns false" do
-        person.send(:attribute_changed?, "pets").should == false
+      context "when the attribute is an array" do
+
+        let!(:person) do
+          Person.new(:aliases => [ "Bond" ])
+        end
+
+        context "when the array is only accessed" do
+
+          before do
+            person.move_changes
+            person.aliases
+          end
+
+          it "returns false" do
+            person.should_not be_aliases_changed
+          end
+        end
+      end
+
+      context "when the attribute is a hash" do
+
+        let!(:person) do
+          Person.new(:map => { :key => "value" })
+        end
+
+        context "when the hash is only accessed" do
+
+          before do
+            person.move_changes
+            person.map
+          end
+
+          it "returns false" do
+            person.should_not be_map_changed
+          end
+        end
       end
     end
   end
@@ -279,11 +331,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns the old value" do
-        person.send(:attribute_was, "title").should == "Grand Poobah"
+        person.send(:attribute_was, "title").should eq("Grand Poobah")
       end
 
       it "allows access via (attribute)_was" do
-        person.title_was.should == "Grand Poobah"
+        person.title_was.should eq("Grand Poobah")
       end
     end
 
@@ -298,11 +350,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should == false
+        person.send(:attribute_was, "pets").should be_false
       end
 
       it "allows access via (attribute)_was" do
-        person.pets_was.should == false
+        person.pets_was.should be_false
       end
     end
 
@@ -313,7 +365,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns the original value" do
-        person.send(:attribute_was, "title").should == "Grand Poobah"
+        person.send(:attribute_was, "title").should eq("Grand Poobah")
       end
     end
 
@@ -324,7 +376,65 @@ describe Mongoid::Dirty do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should == false
+        person.send(:attribute_was, "pets").should be_false
+      end
+    end
+  end
+
+  describe "#attribute_will_change!" do
+
+    let(:aliases) do
+      [ "007" ]
+    end
+
+    let(:person) do
+      Person.new(:aliases => aliases)
+    end
+
+    before do
+      person.changed_attributes.clear
+    end
+
+    context "when the value is duplicable" do
+
+      context "when the attribute has not been cloned" do
+
+        before do
+          person.aliases_will_change!
+        end
+
+        let(:changed) do
+          person.changed_attributes
+        end
+
+        it "clones the value" do
+          changed["aliases"].should_not equal(aliases)
+        end
+
+        it "puts the old value in the changes" do
+          changed["aliases"].should eq(aliases)
+        end
+      end
+
+      context "when the attribute has been flagged" do
+
+        before do
+          person.changed_attributes["aliases"] = aliases
+          aliases.expects(:clone).never
+          person.aliases_will_change!
+        end
+
+        let(:changed) do
+          person.changed_attributes
+        end
+
+        it "does not clone the value" do
+          changed["aliases"].should equal(aliases)
+        end
+
+        it "retains the first value in the changes" do
+          changed["aliases"].should eq(aliases)
+        end
       end
     end
   end
@@ -342,7 +452,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an array of changed field names" do
-        person.changed.should == [ "title" ]
+        person.changed.should eq([ "title" ])
       end
     end
 
@@ -353,7 +463,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty array" do
-        person.changed.should == []
+        person.changed.should eq([])
       end
     end
   end
@@ -400,8 +510,9 @@ describe Mongoid::Dirty do
       end
 
       it "returns a hash of changes" do
-        person.changes.should ==
+        person.changes.should eq(
           { "title" => [ nil, "Captain Obvious" ] }
+        )
       end
     end
 
@@ -412,7 +523,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty hash" do
-        person.changes.should == {}
+        person.changes.should be_empty
       end
     end
   end
@@ -432,8 +543,9 @@ describe Mongoid::Dirty do
         end
 
         it "returns a hash of field names and new values" do
-          person.setters.should ==
+          person.setters.should eq(
             { "title" => "Captain Obvious" }
+          )
         end
       end
 
@@ -455,8 +567,9 @@ describe Mongoid::Dirty do
         end
 
         it "returns a hash of field names and new values" do
-          address.setters.should ==
+          address.setters.should eq(
             { "addresses.0.street" => "Bond St" }
+          )
         end
 
         context "when the document is embedded multiple levels" do
@@ -472,8 +585,9 @@ describe Mongoid::Dirty do
           end
 
           it "returns the proper hash with locations" do
-            location.setters.should ==
+            location.setters.should eq(
               { "addresses.0.locations.0.name" => "Work" }
+            )
           end
         end
       end
@@ -486,7 +600,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns an empty hash" do
-        person.setters.should == {}
+        person.setters.should be_empty
       end
     end
   end
@@ -509,8 +623,9 @@ describe Mongoid::Dirty do
       end
 
       it "returns the changes before the save" do
-        person.previous_changes["title"].should ==
+        person.previous_changes["title"].should eq(
           [ nil, "Captain Obvious" ]
+        )
       end
     end
 
@@ -532,21 +647,19 @@ describe Mongoid::Dirty do
 
       before do
         person.title = "Captain Obvious"
+        person.send(:reset_attribute!, "title")
       end
 
       it "resets the value to the original" do
-        person.send(:reset_attribute!, "title")
         person.title.should be_nil
       end
 
       it "allows access via reset_(attribute)!" do
-        person.reset_title!
         person.title.should be_nil
       end
 
       it "removes the field from the changes" do
-        person.reset_title!
-        person.changed.should == [ "title" ]
+        person.changed.should eq([ "title" ])
       end
     end
 
@@ -556,8 +669,11 @@ describe Mongoid::Dirty do
         Person.instantiate(:title => "Grand Poobah")
       end
 
-      it "does nothing" do
+      before do
         person.send(:reset_attribute!, "title")
+      end
+
+      it "does nothing" do
         person.title.should be_nil
       end
     end

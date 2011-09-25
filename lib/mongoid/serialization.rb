@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.0
       def mongoize(object, klass = Object)
-        Fields::Mappings.for(klass).new(:mongoize).serialize(object)
+        Fields::Mappings.for(klass).instantiate(:mongoize).serialize(object)
       end
     end
 
@@ -74,7 +74,7 @@ module Mongoid # :nodoc:
       inclusions = options[:include]
       relation_names(inclusions).each do |name|
         metadata = relations[name.to_s]
-        relation = send(metadata.name, false, :eager => true)
+        relation = send(metadata.name)
         if relation
           attributes[metadata.name.to_s] =
             relation.serializable_hash(relation_options(inclusions, options, name))

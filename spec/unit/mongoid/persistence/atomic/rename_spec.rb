@@ -10,6 +10,10 @@ describe Mongoid::Persistence::Atomic::Rename do
     person.stubs(:collection).returns(collection)
   end
 
+  after do
+    person.unstub(:collection)
+  end
+
   describe "#rename" do
 
     context "when incrementing a field with a value" do

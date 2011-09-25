@@ -80,7 +80,20 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def respond_to?(name, include_private = false)
-        [].respond_to?(name, include_private) || super
+        [].respond_to?(name, include_private) ||
+          klass.respond_to?(name, include_private) || super
+      end
+
+      # This is public access to the relation's criteria.
+      #
+      # @example Get the scoped relation.
+      #   relation.scoped
+      #
+      # @return [ Criteria ] The scoped criteria.
+      #
+      # @since 2.1.0
+      def scoped
+        criteria
       end
 
       # Gets the document as a serializable hash, used by ActiveModel's JSON and

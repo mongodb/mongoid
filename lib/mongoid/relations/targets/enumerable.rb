@@ -16,6 +16,8 @@ module Mongoid #:nodoc:
         # @attribute [rw] unloaded A criteria representing persisted docs.
         attr_accessor :added, :loaded, :unloaded
 
+        delegate :===, :is_a?, :kind_of?, :to => :added
+
         # Check if the enumerable is equal to the other object.
         #
         # @example Check equality.
@@ -65,6 +67,20 @@ module Mongoid #:nodoc:
             in_memory { |doc| yield(doc) }
           end
           loaded.clear and added.clear
+        end
+
+        # Clones each document in the enumerable.
+        #
+        # @note This loads all documents into memory.
+        #
+        # @example Clone the enumerable.
+        #   enumerable.clone
+        #
+        # @return [ Array<Document> ] An array clone of the enumerable.
+        #
+        # @since 2.1.6
+        def clone
+          collect { |doc| doc.clone }
         end
 
         # Delete the supplied document from the enumerable.
@@ -140,7 +156,7 @@ module Mongoid #:nodoc:
             end
           end
           added.each do |doc|
-            next unless doc.new?
+            next if doc.persisted? && (!loaded? && !loaded.empty?)
             yield(doc)
           end
           @executed = true
@@ -173,7 +189,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def first
-          (loaded? ? loaded.first : unloaded.first) || added.first
+          added.first || (loaded? ? loaded.first : unloaded.first)
         end
 
         # Initialize the new enumerable either with a criteria or an array.
@@ -300,9 +316,37 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def size
-          (loaded? ? loaded.count : unloaded.count) + added.count{ |d| d.new? }
+          (unloaded ? unloaded.count : loaded.count) + added.count{ |d| d.new? }
         end
         alias :length :size
+
+        # Send #to_json to the entries.
+        #
+        # @example Get the enumerable as json.
+        #   enumerable.to_json
+        #
+        # @param [ Hash ] options Optional parameters.
+        #
+        # @return [ String ] The entries all loaded as a string.
+        #
+        # @since 2.2.0
+        def to_json(options = {})
+          entries.to_json(options)
+        end
+
+        # Send #as_json to the entries, without encoding.
+        #
+        # @example Get the enumerable as json.
+        #   enumerable.as_json
+        #
+        # @param [ Hash ] options Optional parameters.
+        #
+        # @return [ Hash ] The entries all loaded as a hash.
+        #
+        # @since 2.2.0
+        def as_json(options = {})
+          entries.as_json(options)
+        end
 
         # Return all the unique documents in the enumerable.
         #

@@ -3,23 +3,27 @@ module Rails #:nodoc:
   module Mongoid #:nodoc:
     extend self
 
-    # Recursive function to create all the indexes for the model, then
-    # potentially and subclass of the model since both are still root
-    # documents in the hierarchy.
+    # Create indexes for each model given the provided pattern and the class is
+    # not embedded.
     #
-    # Note there is a tricky naming scheme going on here that needs to be
-    # revisisted. Module.descendants vs Class.descendents is way too
-    # confusing.
+    # @example Create all the indexes.
+    #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
     #
-    # @example Index the children.
-    #   Rails::Mongoid.index_children(classes)
+    # @param [ String ] pattern The file matching pattern.
     #
-    # @param [ Array<Class> ] children The child model classes.
-    def index_children(children)
-      children.each do |model|
-        Logger.new($stdout).info("Generating indexes for #{model}")
-        model.create_indexes
-        index_children(model.descendants)
+    # @return [ Array<String> ] The file names.
+    #
+    # @since 2.1.0
+    def create_indexes(pattern)
+      Dir.glob(pattern).each do |file|
+        begin
+          model = determine_model(file)
+          if model
+            model.create_indexes
+            Logger.new($stdout).info("Generated indexes for #{model}")
+          end
+        rescue => e
+        end
       end
     end
 
@@ -32,12 +36,19 @@ module Rails #:nodoc:
     #
     # @param [ Application ] app The rails application.
     def load_models(app)
-      return unless ::Mongoid.preload_models
       app.config.paths["app/models"].each do |path|
         Dir.glob("#{path}/**/*.rb").sort.each do |file|
           load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))
         end
       end
+    end
+
+    # Conditionally calls `Rails::Mongoid.load_models(app)` if the
+    # `::Mongoid.preload_models` is `true`.
+    #
+    # @param [ Application ] app The rails application.
+    def preload_models(app)
+      load_models(app) if ::Mongoid.preload_models
     end
 
     private
@@ -53,6 +64,26 @@ module Rails #:nodoc:
     # @since 2.0.0.rc.3
     def load_model(file)
       require_dependency(file)
+    end
+
+    # Given the provided file name, determine the model and return the class.
+    #
+    # @example Determine the model from the file.
+    #   Rails::Mongoid.determine_model("app/models/person.rb")
+    #
+    # @param [ String ] file The filename.
+    #
+    # @return [ Class ] The model.
+    #
+    # @since 2.1.0
+    def determine_model(file)
+      if file =~ /app\/models\/(.*).rb$/
+        model_path = $1.split('/')
+        klass = model_path.map { |path| path.camelize }.join('::').constantize
+        if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
+          return klass
+        end
+      end
     end
   end
 end

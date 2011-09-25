@@ -4,7 +4,8 @@ module Mongoid #:nodoc:
     class Mongo
       attr_accessor :criteria
 
-      delegate :klass, :options, :field_list, :selector, :to => :criteria
+      delegate :cached?, :klass, :options, :field_list, :selector, :to => :criteria
+      delegate :collection, :to => :klass
 
       # Perform an add to set on the matching documents.
       #
@@ -86,7 +87,11 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The count of documents.
       def count(extras = false)
-        @count ||= klass.collection.find(selector, process_options).count(extras)
+        if cached?
+          @count ||= collection.find(selector, process_options).count(extras)
+        else
+          collection.find(selector, process_options).count(extras)
+        end
       end
       alias :size :count
       alias :length :count
@@ -140,6 +145,9 @@ module Mongoid #:nodoc:
       #
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
+        criteria.inclusions.reject! do |metadata|
+          metadata.eager_load(criteria)
+        end
         klass.collection.find(selector, process_options) || []
       end
 
@@ -150,7 +158,10 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The first document in the collection.
       def first
-        attributes = klass.collection.find_one(selector, process_options)
+        opts = process_options
+        sorting = opts[:sort] ||= []
+        sorting << [:_id, :asc]
+        attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
       alias :one :first
@@ -199,7 +210,7 @@ module Mongoid #:nodoc:
       # @example Iterate over the results.
       #   context.iterate { |doc| p doc }
       def iterate(&block)
-        return caching(&block) if criteria.cached?
+        return caching(&block) if cached?
         if block_given?
           execute.each { |doc| yield doc }
         end
@@ -319,7 +330,7 @@ module Mongoid #:nodoc:
           { "$set" => attributes },
           Safety.merge_safety_options(:multi => true)
         ).tap do
-          Threaded.clear_safety_options!
+          Threaded.clear_options!
         end
       end
       alias :update :update_all
@@ -359,7 +370,8 @@ module Mongoid #:nodoc:
           :initial => { start => "start" },
           :reduce => reduce.gsub("[field]", field)
         )
-        collection.empty? ? nil : collection.first[start.to_s]
+        value = collection.empty? ? nil : collection.first[start.to_s]
+        value ? (value.nan? ? nil : value) : value
       end
 
       # Filters the field list. If no fields have been supplied, then it will be

@@ -17,27 +17,8 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             return [] if object.is_a?(Array)
-            metadata.criteria(convertable(metadata, object))
-          end
-
-          private
-
-          # Get the value for the foreign key in convertable or unconvertable
-          # form.
-          #
-          # @example Get the value.
-          #   builder.convertable
-          #
-          # @return [ String, Unconvertable, BSON::ObjectId ] The string or object id.
-          #
-          # @since 2.0.2
-          def convertable(metadata, object)
-            inverse = metadata.inverse_klass
-            if inverse.using_object_ids? || object.is_a?(BSON::ObjectId)
-              object
-            else
-              Criterion::Unconvertable.new(object)
-            end
+            crit = metadata.criteria(Conversions.flag(object, metadata))
+            IdentityMap.get(crit.klass, crit.selector) || crit
           end
         end
       end

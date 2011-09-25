@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
 
             unless result == false
               doc.move_changes
-              Threaded.clear_safety_options!
+              Threaded.clear_options!
             end
           end
         end

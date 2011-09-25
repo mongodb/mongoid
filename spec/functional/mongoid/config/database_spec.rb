@@ -78,7 +78,8 @@ describe Mongoid::Config::Database do
           let(:options) do
             {
               "uri" => "mongodb://mongoid:test@localhost:27017/mongoid_test",
-              "pool_size" => 2
+              "pool_size" => 2,
+              "logger" => true
             }
           end
 

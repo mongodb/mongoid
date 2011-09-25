@@ -16,3 +16,4 @@ test:
   persist_types: false
   option_no_exist: false
   skip_version_check: false
+  logger: false

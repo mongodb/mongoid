@@ -6,69 +6,6 @@ describe Mongoid::Relations::Embedded::In do
     Person.delete_all
   end
 
-  context "when creating the tree through initialization" do
-
-    let!(:person) do
-      Person.create(:ssn => "666-66-6666")
-    end
-
-    let!(:address) do
-      Address.create(:addressable => person)
-    end
-
-    let!(:first_location) do
-      Location.create(:address => address)
-    end
-
-    let!(:second_location) do
-      Location.create(:address => address)
-    end
-
-    it "saves the child" do
-      Person.last.addresses.last.should == address
-    end
-
-    it "indexes the child" do
-      address._index.should == 0
-    end
-
-    it "saves the first location with the correct index" do
-      first_location._index.should == 0
-    end
-
-    it "saves the second location with the correct index" do
-      second_location._index.should == 1
-    end
-
-    it "has the locations in the association array" do
-      Person.last.addresses.last.locations.should ==
-        [first_location, second_location]
-    end
-  end
-
-  context "when instantiating a new child with a persisted parent" do
-
-    let!(:person) do
-      Person.create(:ssn => "666-66-6666")
-    end
-
-    let!(:address) do
-      Address.new(:addressable => person)
-    end
-
-    let!(:location) do
-      Location.new(:address => address)
-    end
-
-    it "does not save the child" do
-      address.should_not be_persisted
-    end
-
-    it "does not save the deeply embedded children" do
-      address.locations.first.should_not be_persisted
-    end
-  end
-
   describe "#=" do
 
     context "when the inverse of an embeds one" do
@@ -381,6 +318,124 @@ describe Mongoid::Relations::Embedded::In do
         it "reindexes the children" do
           address_two._index.should == 0
         end
+      end
+    end
+  end
+
+  context "when creating the tree through initialization" do
+
+    let!(:person) do
+      Person.create(:ssn => "666-66-6666")
+    end
+
+    let!(:address) do
+      Address.create(:addressable => person)
+    end
+
+    let!(:first_location) do
+      Location.create(:address => address)
+    end
+
+    let!(:second_location) do
+      Location.create(:address => address)
+    end
+
+    it "saves the child" do
+      Person.last.addresses.last.should == address
+    end
+
+    it "indexes the child" do
+      address._index.should == 0
+    end
+
+    it "saves the first location with the correct index" do
+      first_location._index.should == 0
+    end
+
+    it "saves the second location with the correct index" do
+      second_location._index.should == 1
+    end
+
+    it "has the locations in the association array" do
+      Person.last.addresses.last.locations.should ==
+        [first_location, second_location]
+    end
+  end
+
+  context "when instantiating a new child with a persisted parent" do
+
+    let!(:person) do
+      Person.create(:ssn => "666-66-6666")
+    end
+
+    let!(:address) do
+      Address.new(:addressable => person)
+    end
+
+    let!(:location) do
+      Location.new(:address => address)
+    end
+
+    it "does not save the child" do
+      address.should_not be_persisted
+    end
+
+    it "does not save the deeply embedded children" do
+      address.locations.first.should_not be_persisted
+    end
+  end
+
+  context "when replacing the relation with another" do
+
+    let!(:person) do
+      Person.create(:ssn => "321-99-8888")
+    end
+
+    let!(:person_two) do
+      Person.create(:ssn => "321-99-8889")
+    end
+
+    let!(:address) do
+      person.addresses.create(:street => "Kotbusser Damm")
+    end
+
+    let!(:name) do
+      person_two.create_name(:first_name => "Syd")
+    end
+
+    before do
+      name.namable = address.addressable
+      name.namable.save
+    end
+
+    it "sets the new parent" do
+      name.namable.should eq(person)
+    end
+
+    it "removes the previous parent relation" do
+      person_two.name.should be_nil
+    end
+
+    it "sets the new child relation" do
+      person.name.should eq(name)
+    end
+
+    context "when reloading" do
+
+      before do
+        person.reload
+      end
+
+      it "sets the new parent" do
+        name.namable.should eq(person)
+      end
+
+      it "removes the previous parent relation" do
+        person_two.name.should be_nil
+      end
+
+      it "sets the new child relation" do
+        person.name.should eq(name)
       end
     end
   end

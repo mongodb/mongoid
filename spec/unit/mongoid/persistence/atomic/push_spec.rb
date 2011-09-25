@@ -10,6 +10,10 @@ describe Mongoid::Persistence::Atomic::Push do
     person.stubs(:collection).returns(collection)
   end
 
+  after do
+    person.unstub(:collection)
+  end
+
   describe "#persist" do
 
     context "when the field exists" do

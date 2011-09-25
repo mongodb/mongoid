@@ -11,6 +11,11 @@ describe Mongoid::Safety do
     Acolyte.stubs(:collection).returns(collection)
   end
 
+  after do
+    Person.unstub(:collection)
+    Acolyte.unstub(:collection)
+  end
+
   describe "#add_to_set" do
 
     let(:person) do

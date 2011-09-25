@@ -40,31 +40,48 @@ describe Mongoid::Persistence do
       stub.quacks_like(Patient.allocate)
     end
 
-    before do
-      Patient.expects(:new).returns(patient)
-      patient.expects(:insert).returns(patient)
-    end
-
     context "when validation passes" do
 
       before do
+        Patient.expects(:new).returns(patient)
+        patient.expects(:insert).returns(patient)
         patient.expects(:errors).returns([])
+        patient.expects(:new?).returns(false)
       end
 
       it "returns the new document" do
-        Patient.create!.should == patient
+        Patient.create!.should eq(patient)
       end
     end
 
     context "when validation fails" do
 
+      let(:errors) do
+        stub(:any? => true, :full_messages => [ "Message" ])
+      end
+
       before do
-        errors = stub(:any? => true, :full_messages => [ "Message" ])
+        Patient.expects(:new).returns(patient)
+        patient.expects(:insert).returns(patient)
         patient.expects(:errors).at_least_once.returns(errors)
       end
 
       it "raises an error" do
-        lambda { Patient.create! }.should raise_error(Mongoid::Errors::Validations)
+        expect { Patient.create! }.to raise_error(Mongoid::Errors::Validations)
+      end
+    end
+
+    context "when a callback returns false" do
+
+      before do
+        Patient.expects(:new).returns(patient)
+        patient.expects(:insert).returns(patient)
+        patient.expects(:errors).at_least_once.returns([])
+        patient.expects(:new?).returns(true)
+      end
+
+      it "raises an error" do
+        expect { Patient.create! }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end
@@ -307,14 +324,37 @@ describe Mongoid::Persistence do
         stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
       end
 
+      let(:errors) do
+        stub(:any? => true, :full_messages => [ "error" ])
+      end
+
       before do
         person.instance_variable_set(:@new_record, false)
         Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
         update.expects(:persist).returns(false)
+        person.expects(:errors).at_least_once.returns(errors)
       end
 
       it "raises an error" do
         lambda { person.save! }.should raise_error(Mongoid::Errors::Validations)
+      end
+    end
+
+    context "when a callback fails" do
+
+      let(:update) do
+        stub.quacks_like(Mongoid::Persistence::Operations::Update.allocate)
+      end
+
+      before do
+        person.instance_variable_set(:@new_record, false)
+        Mongoid::Persistence::Operations::Update.expects(:new).with(person, {}).returns(update)
+        update.expects(:persist).returns(false)
+        person.expects(:errors).at_least_once.returns([])
+      end
+
+      it "raises an error" do
+        expect { person.save! }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end
@@ -375,11 +415,33 @@ describe Mongoid::Persistence do
 
     context "when validation fails" do
 
-      it "raises an error" do
+      let(:errors) do
+        stub(:any? => true, :full_messages => [ "error" ])
+      end
+
+      before do
         update.expects(:persist).returns(false)
-        lambda {
+        person.expects(:errors).at_least_once.returns(errors)
+      end
+
+      it "raises an error" do
+        expect {
           person.update_attributes!(:title => "Mam")
-        }.should raise_error(Mongoid::Errors::Validations)
+        }.to raise_error(Mongoid::Errors::Validations)
+      end
+    end
+
+    context "when a callback fails" do
+
+      before do
+        update.expects(:persist).returns(false)
+        person.expects(:errors).at_least_once.returns([])
+      end
+
+      it "raises an error" do
+        expect {
+          person.update_attributes!(:title => "Mam")
+        }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end

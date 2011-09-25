@@ -21,7 +21,6 @@ module Mongoid #:nodoc:
         def serialize(object)
           object.try(:to_s)
         end
-        alias :set :serialize
       end
     end
   end

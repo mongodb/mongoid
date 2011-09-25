@@ -41,10 +41,9 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def atomic_updates
       Modifiers.new.tap do |mods|
-        mods.set(atomic_sets)
+        generate_atomic_updates(mods, self)
         _children.each do |child|
-          mods.set(child.atomic_sets)
-          mods.push(child.atomic_pushes)
+          generate_atomic_updates(mods, child)
         end
       end
     end
@@ -54,7 +53,7 @@ module Mongoid #:nodoc:
     # documents, $unset on embeds_one, $set on embeds_many.
     #
     # @example Get the removal operator.
-    #   name.remover
+    #   name.atomic_delete_modifier
     #
     # @return [ String ] The pull or unset operation.
     def atomic_delete_modifier
@@ -65,7 +64,7 @@ module Mongoid #:nodoc:
     # documents, $set on embeds_one, $push on embeds_many.
     #
     # @example Get the insert operation.
-    #   name.inserter
+    #   name.atomic_insert_modifier
     #
     # @return [ String ] The pull or set operator.
     def atomic_insert_modifier
@@ -76,7 +75,7 @@ module Mongoid #:nodoc:
     # updates via $set in MongoDB.
     #
     # @example Get the path to this document.
-    #   address.path
+    #   address.atomic_path
     #
     # @return [ String ] The path to the document in the database.
     def atomic_path
@@ -86,17 +85,41 @@ module Mongoid #:nodoc:
     # Returns the positional operator of this document for modification.
     #
     # @example Get the positional operator.
-    #   address.position
+    #   address.atomic_position
     #
     # @return [ String ] The positional operator with indexes.
     def atomic_position
       atomic_paths.position
     end
 
+    # Get all the attributes that need to be pulled.
+    #
+    # @example Get the pulls.
+    #   person.atomic_pulls
+    #
+    # @return [ Array<Hash> ] The $pullAll operations.
+    #
+    # @since 2.2.0
+    def atomic_pulls
+      @atomic_pulls ||= {}
+    end
+
+    # Add the document as an atomic pull.
+    #
+    # @example Add the atomic pull.
+    #   person.add_atomic_pull(address)
+    #
+    # @param [ Document ] The embedded document to pull.
+    #
+    # @since 2.2.0
+    def add_atomic_pull(document)
+      (atomic_pulls[document.atomic_path] ||= []).push(document.as_document)
+    end
+
     # Get all the push attributes that need to occur.
     #
     # @example Get the pushes.
-    #   person._pushes
+    #   person.atomic_pushes
     #
     # @return [ Hash ] The $pushAll operations.
     #
@@ -109,7 +132,7 @@ module Mongoid #:nodoc:
     # with MongoDB's $ operator.
     #
     # @example Get the selector.
-    #   address.selector
+    #   address.atomic_selector
     #
     # @return [ String ] The exact selector for this document.
     def atomic_selector
@@ -119,13 +142,25 @@ module Mongoid #:nodoc:
     # Get all the attributes that need to be set.
     #
     # @example Get the sets.
-    #   person._sets
+    #   person.atomic_sets
     #
     # @return [ Hash ] The $set operations.
     #
     # @since 2.1.0
     def atomic_sets
       updateable? ? setters : settable? ? { atomic_path => as_document } : {}
+    end
+
+    # Get all the attributes that need to be unset.
+    #
+    # @example Get the unsets.
+    #   person.atomic_unsets
+    #
+    # @return [ Array<Hash> ] The $unset operations.
+    #
+    # @since 2.2.0
+    def atomic_unsets
+      @atomic_unsets ||= []
     end
 
     private
@@ -140,6 +175,22 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def atomic_paths
       @atomic_paths ||= metadata ? metadata.path(self) : Atomic::Paths::Root.new(self)
+    end
+
+    # Generates the atomic updates in the correct order.
+    #
+    # @example Generate the updates.
+    #   model.generate_atomic_updates(mods, doc)
+    #
+    # @param [ Modifiers ] mods The atomic modifications.
+    # @param [ Document ] doc The document to update for.
+    #
+    # @since 2.2.0
+    def generate_atomic_updates(mods, doc)
+      mods.unset(doc.atomic_unsets)
+      mods.pull(doc.atomic_pulls)
+      mods.set(doc.atomic_sets)
+      mods.push(doc.atomic_pushes)
     end
   end
 end

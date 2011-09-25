@@ -1,7 +1,14 @@
 require 'spec_helper'
 
 describe "when initialize a model with an embedded model" do
-  let(:person){Person.new :pet => Pet.new}
+
+  before do
+    Person.delete_all
+  end
+
+  let(:person) do
+    Person.new(:ssn => "444-44-1234", :pet => Pet.new)
+  end
 
   it "should have changes in the embedded model" do
     person.pet.changes.should_not be_empty
@@ -13,7 +20,10 @@ describe "when initialize a model with an embedded model" do
 end
 
 describe "when creating a model with an embedded model" do
-  let (:person){Person.create :pet => Pet.new}
+
+  let(:person) do
+    Person.create(:ssn => "123-22-2222", :pet => Pet.new)
+  end
 
   it "should not have changes in the embedded model" do
     person.pet.changes.should be_empty
@@ -25,7 +35,11 @@ describe "when creating a model with an embedded model" do
 end
 
 describe "when embedding a model on an already saved model" do
-  let (:person) { Person.create }
+
+  let(:person) do
+    Person.create(:ssn => "654-33-2222")
+  end
+
   before do
     person.pet = Pet.new
   end
@@ -39,6 +53,7 @@ describe "when embedding a model on an already saved model" do
   end
 
   describe "and saving the model" do
+
     before do
       person.save!
     end
@@ -52,4 +67,3 @@ describe "when embedding a model on an already saved model" do
     end
   end
 end
-

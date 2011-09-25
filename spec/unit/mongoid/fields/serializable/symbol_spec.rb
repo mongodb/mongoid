@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Serializable::Symbol do
 
   let(:field) do
-    described_class.new(:test, :type => Symbol)
+    described_class.instantiate(:test, :type => Symbol)
   end
 
   describe ".deserialize" do

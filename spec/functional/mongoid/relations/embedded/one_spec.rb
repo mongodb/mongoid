@@ -51,24 +51,42 @@ describe Mongoid::Relations::Embedded::One do
           Name.new
         end
 
-        before do
-          person.name = name
+        context "when setting directly" do
+
+          before do
+            person.name = name
+          end
+
+          it "sets the target of the relation" do
+            person.name.should == name
+          end
+
+          it "sets the base on the inverse relation" do
+            name.namable.should == person
+          end
+
+          it "sets the same instance on the inverse relation" do
+            name.namable.should eql(person)
+          end
+
+          it "saves the target" do
+            name.should be_persisted
+          end
         end
 
-        it "sets the target of the relation" do
-          person.name.should == name
-        end
+        context "when setting via the parent attributes" do
 
-        it "sets the base on the inverse relation" do
-          name.namable.should == person
-        end
+          before do
+            person.attributes = { :name => name }
+          end
 
-        it "sets the same instance on the inverse relation" do
-          name.namable.should eql(person)
-        end
+          it "sets the target of the relation" do
+            person.name.should eq(name)
+          end
 
-        it "saves the target" do
-          name.should be_persisted
+          it "does not save the target" do
+            name.should_not be_persisted
+          end
         end
       end
     end
@@ -182,7 +200,7 @@ describe Mongoid::Relations::Embedded::One do
         end
       end
 
-      context "when the documents are not new records" do
+      context "when the parent is persisted" do
 
         let(:person) do
           Person.create(:ssn => "437-11-1112")
@@ -192,21 +210,40 @@ describe Mongoid::Relations::Embedded::One do
           Name.new
         end
 
-        before do
-          person.name = name
-          person.name = nil
+        context "when setting directly" do
+
+          before do
+            person.name = name
+            person.name = nil
+          end
+
+          it "sets the relation to nil" do
+            person.name.should be_nil
+          end
+
+          it "removed the inverse relation" do
+            name.namable.should be_nil
+          end
+
+          it "deletes the child document" do
+            name.should be_destroyed
+          end
         end
 
-        it "sets the relation to nil" do
-          person.name.should be_nil
-        end
+        context "when setting via parent attributes" do
 
-        it "removed the inverse relation" do
-          name.namable.should be_nil
-        end
+          before do
+            person.name = name
+            person.attributes = { :name => nil }
+          end
 
-        it "deletes the child document" do
-          name.should be_destroyed
+          it "sets the relation to nil" do
+            person.name.should be_nil
+          end
+
+          it "does not delete the child document" do
+            name.should_not be_destroyed
+          end
         end
       end
     end

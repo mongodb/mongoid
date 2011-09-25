@@ -36,7 +36,11 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            proxy.delete
+            if assigning?
+              base.atomic_unsets.push(proxy.atomic_path)
+            else
+              proxy.delete if persistable?
+            end
             proxy.unbind_one
             return nil unless replacement
             proxy.target = replacement
@@ -69,7 +73,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding? && !building?
+          base.persisted? && !binding? && !building? && !assigning?
         end
 
         class << self
@@ -180,6 +184,19 @@ module Mongoid # :nodoc:
           # @since 2.1.0
           def valid_options
             [ :as, :cyclic ]
+          end
+
+          # Get the default validation setting for the relation. Determines if
+          # by default a validates associated will occur.
+          #
+          # @example Get the validation default.
+          #   Proxy.validation_default
+          #
+          # @return [ true, false ] The validation default.
+          #
+          # @since 2.1.9
+          def validation_default
+            true
           end
         end
       end

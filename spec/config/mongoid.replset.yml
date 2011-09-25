@@ -1,6 +1,6 @@
 test:
   hosts: [[localhost, 27017], [localhost, 27017]]
-  read_secondary: true
+  read: :secondary
   allow_dynamic_fields: false
   parameterize_keys: false
   persist_in_safe_mode: false
@@ -18,7 +18,7 @@ test:
 
 authenticated:
   hosts: [[localhost, 27017], [localhost, 27017]]
-  read_secondary: true
+  read: :secondary
   allow_dynamic_fields: false
   parameterize_keys: false
   persist_in_safe_mode: false

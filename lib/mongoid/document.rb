@@ -7,9 +7,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include Mongoid::Components
 
-    included do
-      attr_reader :new_record
-    end
+    attr_reader :new_record
 
     # Default comparison is via the string version of the id.
     #
@@ -46,7 +44,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      self.class == other.class
+      other.is_a?(self.class)
     end
 
     # Delegates to ==. Used when needing checks in hashes.
@@ -126,10 +124,11 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil)
       building do
         @new_record = true
-        @attributes = apply_default_attributes
+        @attributes = {}
         process(attrs) do
           yield self if block_given?
           identify
+          apply_defaults
         end
         run_callbacks(:initialize) { self }
       end
@@ -152,13 +151,10 @@ module Mongoid #:nodoc:
       end
       @attributes = {}.merge(reloaded || {})
       changed_attributes.clear
-      apply_default_attributes
+      apply_defaults
       tap do
-        relations.keys.each do |name|
-          if instance_variable_defined?("@#{name}")
-            remove_instance_variable("@#{name}")
-          end
-        end
+        reload_relations
+        run_callbacks(:initialize)
       end
     end
 
@@ -184,7 +180,7 @@ module Mongoid #:nodoc:
       attributes.tap do |attrs|
         relations.each_pair do |name, meta|
           if meta.embedded?
-            relation = send(name, false, :continue => false)
+            relation = send(name)
             attrs[name] = relation.as_document unless relation.blank?
           end
         end
@@ -204,17 +200,26 @@ module Mongoid #:nodoc:
     # @return [ Document ] An instance of the specified class.
     def becomes(klass)
       unless klass.include?(Mongoid::Document)
-        raise ArgumentError, 'A class which includes Mongoid::Document is expected'
+        raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
-      klass.new.tap do |became|
-        became.instance_variable_set('@attributes', @attributes)
-        became.instance_variable_set('@errors', @errors)
-        became.instance_variable_set('@new_record', new_record?)
-        became.instance_variable_set('@destroyed', destroyed?)
+      klass.instantiate(frozen? ? attributes.dup : attributes).tap do |became|
+        became.instance_variable_set(:@errors, errors)
+        became.instance_variable_set(:@new_record, new_record?)
+        became.instance_variable_set(:@destroyed, destroyed?)
+        became._type = klass.to_s
       end
     end
 
     private
+
+    # Returns the logger
+    #
+    # @return [ Logger ] The configured logger or a default Logger instance.
+    #
+    # @since 2.2.0
+    def logger
+      Mongoid.logger
+    end
 
     # Implement this for calls to flatten on array.
     #
@@ -257,7 +262,7 @@ module Mongoid #:nodoc:
         attributes = attrs || {}
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
-          doc.send(:apply_default_attributes)
+          doc.send(:apply_defaults)
           IdentityMap.set(doc)
           doc.run_callbacks(:initialize) { doc }
         end
@@ -274,8 +279,22 @@ module Mongoid #:nodoc:
       end
 
       # Set the i18n scope to overwrite ActiveModel.
+      #
+      # @return [ Symbol ] :mongoid
       def i18n_scope
         :mongoid
+      end
+
+      # Returns the logger
+      #
+      # @example Get the logger.
+      #   Person.logger
+      #
+      # @return [ Logger ] The configured logger or a default Logger instance.
+      #
+      # @since 2.2.0
+      def logger
+        Mongoid.logger
       end
     end
   end

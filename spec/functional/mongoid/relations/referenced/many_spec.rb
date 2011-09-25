@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   before do
-    [ Person, Post, Movie, Rating ].map(&:delete_all)
+    [ Person, Post, Movie, Rating, Game ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -380,29 +380,60 @@ describe Mongoid::Relations::Referenced::Many do
           Person.create(:ssn => "437-11-1112")
         end
 
-        let(:post) do
-          Post.new
+        context "when dependent is destructive" do
+
+          let(:post) do
+            Post.new
+          end
+
+          before do
+            person.posts = [ post ]
+            person.posts = nil
+          end
+
+          it "sets the relation to empty" do
+            person.posts.should be_empty
+          end
+
+          it "removed the inverse relation" do
+            post.person.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            post.person_id.should be_nil
+          end
+
+          it "deletes the target from the database" do
+            post.should be_destroyed
+          end
         end
 
-        before do
-          person.posts = [ post ]
-          person.posts = nil
-        end
+        context "when dependent is not destructive" do
 
-        it "sets the relation to empty" do
-          person.posts.should be_empty
-        end
+          let(:drug) do
+            Drug.new(:name => "Oxycodone")
+          end
 
-        it "removed the inverse relation" do
-          post.person.should be_nil
-        end
+          before do
+            person.drugs = [ drug ]
+            person.drugs = nil
+          end
 
-        it "removes the foreign key value" do
-          post.person_id.should be_nil
-        end
+          it "sets the relation to empty" do
+            person.drugs.should be_empty
+          end
 
-        it "deletes the target from the database" do
-          post.should be_destroyed
+          it "removed the inverse relation" do
+            drug.person.should be_nil
+          end
+
+          it "removes the foreign key value" do
+            drug.person_id.should be_nil
+          end
+
+          it "nullifies the relation" do
+            drug.should_not be_destroyed
+          end
         end
       end
     end
@@ -464,8 +495,11 @@ describe Mongoid::Relations::Referenced::Many do
           rating.ratable_id.should be_nil
         end
 
-        it "deletes the target from the database" do
-          rating.should be_destroyed
+        context "when dependent is nullify" do
+
+          it "does not delete the target from the database" do
+            rating.should_not be_destroyed
+          end
         end
       end
     end
@@ -737,8 +771,8 @@ describe Mongoid::Relations::Referenced::Many do
             movie.ratings.should be_empty
           end
 
-          it "marks the documents as deleted" do
-            rating.should be_destroyed
+          it "handles the proper dependent strategy" do
+            rating.should_not be_destroyed
           end
 
           it "deletes the documents from the db" do
@@ -1306,6 +1340,87 @@ describe Mongoid::Relations::Referenced::Many do
             movie.ratings.send(method).should == 2
           end
         end
+      end
+    end
+  end
+
+  describe ".eager_load" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let!(:person) do
+        Person.create(:ssn => "243-12-5243")
+      end
+
+      let!(:post) do
+        person.posts.create(:title => "testing")
+      end
+
+      let(:metadata) do
+        Person.relations["posts"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Person.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Post, "person_id" => person.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq([ post ])
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let!(:movie) do
+        Movie.create(:name => "Bladerunner")
+      end
+
+      let!(:book) do
+        Book.create(:name => "Game of Thrones")
+      end
+
+      let!(:movie_rating) do
+        movie.ratings.create(:value => 10)
+      end
+
+      let!(:book_rating) do
+        book.create_rating(:value => 10)
+      end
+
+      let(:metadata) do
+        Movie.relations["ratings"]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, Movie.all)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Rating, "ratable_id" => movie.id)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ "ratable_id" => { "$in" => [ movie.id ] }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq([ movie_rating ])
       end
     end
   end
@@ -2158,6 +2273,25 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#scoped" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:scoped) do
+      person.posts.scoped
+    end
+
+    it "returns the relation criteria" do
+      scoped.should be_a(Mongoid::Criteria)
+    end
+
+    it "returns with an empty selector" do
+      scoped.selector.should eq({ "person_id" => person.id })
+    end
+  end
+
   [ :size, :length ].each do |method|
 
     describe "##{method}" do
@@ -2173,7 +2307,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns 1" do
-          movie.ratings.send(method).should == 1
+          movie.ratings.send(method).should eq(1)
         end
       end
 
@@ -2185,13 +2319,14 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the total number of documents" do
-          movie.ratings.send(method).should == 2
+          movie.ratings.send(method).should eq(2)
         end
       end
     end
   end
 
-  context "then association has order" do
+  context "when the association has an order defined" do
+
     let(:person) do
       Person.create(:ssn => "999-99-9999")
     end
@@ -2208,7 +2343,6 @@ describe Mongoid::Relations::Referenced::Many do
       Post.create(:rating => 20, :title => '3')
     end
 
-
     before do
       person.posts.nullify_all
       person.posts.push(post_one, post_two, post_three)
@@ -2220,6 +2354,68 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "chaining order criterias" do
       person.posts.order_by(:title.desc).to_a.should == [post_three, post_two, post_one]
+    end
+  end
+
+  context "when reloading the relation" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-41-9678")
+    end
+
+    let!(:post_one) do
+      Post.create(:title => "one")
+    end
+
+    let!(:post_two) do
+      Post.create(:title => "two")
+    end
+
+    before do
+      person.posts << post_one
+    end
+
+    context "when the relation references the same documents" do
+
+      before do
+        Post.collection.update(
+          { :_id => post_one.id }, { "$set" => { :title => "reloaded" }}
+        )
+      end
+
+      let(:reloaded) do
+        person.posts(true)
+      end
+
+      it "reloads the document from the database" do
+        reloaded.first.title.should eq("reloaded")
+      end
+    end
+
+    context "when the relation references different documents" do
+
+      before do
+        person.posts << post_two
+      end
+
+      let(:reloaded) do
+        person.posts(true)
+      end
+
+      it "reloads the new document from the database" do
+        reloaded.should eq([ post_one, post_two ])
+      end
+    end
+  end
+
+  context "when the parent is using integer ids" do
+
+    let(:jar) do
+      Jar.create(:_id => 1)
+    end
+
+    it "allows creation of the document" do
+      jar.id.should eq(1)
     end
   end
 end

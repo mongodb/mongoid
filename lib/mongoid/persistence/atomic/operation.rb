@@ -76,7 +76,7 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def prepare
           yield(document).tap do
-            Threaded.clear_safety_options!
+            Threaded.clear_options!
           end
         end
       end

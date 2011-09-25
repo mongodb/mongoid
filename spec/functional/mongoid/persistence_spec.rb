@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
-    [ Person, Post, Game ].each(&:delete_all)
+    [ Person, Post, Product, Game ].each(&:delete_all)
   end
 
   before(:all) do
@@ -51,7 +51,7 @@ describe Mongoid::Persistence do
       end
 
       it "sets the attributes" do
-        person.ssn.should == "666-66-6666"
+        person.ssn.should eq("666-66-6666")
       end
 
       it "persists the document" do
@@ -91,7 +91,7 @@ describe Mongoid::Persistence do
       end
 
       it "sets the attributes" do
-        person.ssn.should == "666-66-6666"
+        person.ssn.should eq("666-66-6666")
       end
 
       it "persists the document" do
@@ -107,6 +107,13 @@ describe Mongoid::Persistence do
 
       it "saves the document" do
         account.should be_persisted
+      end
+    end
+
+    context "when a callback returns false" do
+
+      it "raises a callback error" do
+        expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end
@@ -237,7 +244,7 @@ describe Mongoid::Persistence do
       end
 
       it "has the appropriate errors" do
-        address.errors[:street].should == ["can't be blank"]
+        address.errors[:street].should eq(["can't be blank"])
       end
     end
 
@@ -268,21 +275,21 @@ describe Mongoid::Persistence do
 
         it "saves the root document" do
           person.save
-          person.title.should == "King"
+          person.title.should eq("King")
         end
 
         it "saves embedded many relations" do
           person.save
-          person.addresses.first.street.should == "Bond St"
+          person.addresses.first.street.should eq("Bond St")
         end
 
         it "saves embedded one relations" do
           person.save
-          person.name.first_name.should == "Ryan"
+          person.name.first_name.should eq("Ryan")
         end
 
         it "persists with proper set and push modifiers" do
-          person.atomic_updates.should == {
+          person.atomic_updates.should eq({
             "$set" => {
               "title" => "King",
               "name.first_name" => "Ryan"
@@ -290,7 +297,7 @@ describe Mongoid::Persistence do
             "$pushAll"=> {
               "addresses" => [ { "_id" => address.id, "street" => "Bond St" } ]
             }
-          }
+          })
         end
       end
 
@@ -327,15 +334,15 @@ describe Mongoid::Persistence do
         end
 
         it "saves modifications to existing embedded docs" do
-          from_db.addresses[0].number.should == 102
+          from_db.addresses[0].number.should eq(102)
         end
 
         it "saves modifications to new embedded docs" do
-          from_db.addresses[1].street.should == 'North Ave'
+          from_db.addresses[1].street.should eq('North Ave')
         end
 
         it "saves modifications to deeply embedded docs" do
-          from_db.addresses[0].locations.first.name.should == 'Work'
+          from_db.addresses[0].locations.first.name.should eq('Work')
         end
       end
 
@@ -412,12 +419,42 @@ describe Mongoid::Persistence do
         expect { subject.save! }.should raise_error
       end
     end
+
+    context "when a callback returns false" do
+
+      let(:oscar) do
+        Oscar.new
+      end
+
+      it "raises a callback error" do
+        expect { oscar.save! }.to raise_error(Mongoid::Errors::Callback)
+      end
+    end
   end
 
   describe "#update_attribute" do
 
     let(:post) do
       Post.new
+    end
+
+    context "when setting an array field" do
+
+      let(:person) do
+        Person.create(:ssn => "432-11-1123", :aliases => [])
+      end
+
+      before do
+        person.update_attribute(:aliases, person.aliases << "Bond")
+      end
+
+      it "sets the new value in the document" do
+        person.aliases.should eq([ "Bond" ])
+      end
+
+      it "persists the changes" do
+        person.reload.aliases.should eq([ "Bond" ])
+      end
     end
 
     context "when setting a boolean field" do
@@ -471,7 +508,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should == "Testing"
+          post.title.should eq("Testing")
         end
 
         it "saves the document" do
@@ -497,7 +534,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should == "$invalid"
+          post.title.should eq("$invalid")
         end
 
         it "saves the document" do
@@ -528,7 +565,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should == "Testing"
+          post.title.should eq("Testing")
         end
 
         it "saves the document" do
@@ -543,12 +580,40 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should == "$invalid"
+          post.title.should eq("$invalid")
         end
 
         it "saves the document" do
           post.should be_persisted
         end
+      end
+    end
+
+    context "when persisting a localized field" do
+
+      let!(:product) do
+        Product.create(:description => "The bomb")
+      end
+
+      before do
+        ::I18n.locale = :de
+        product.update_attribute(:description, "Die Bombe")
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      let(:attributes) do
+        product.attributes["description"]
+      end
+
+      it "persists the en locale" do
+        attributes["en"].should eq("The bomb")
+      end
+
+      it "persists the de locale" do
+        attributes["de"].should eq("Die Bombe")
       end
     end
   end
@@ -628,7 +693,7 @@ describe Mongoid::Persistence do
       end
 
       it "saves the attributes" do
-        person.ssn.should == "555-66-7777"
+        person.ssn.should eq("555-66-7777")
       end
     end
 
@@ -666,15 +731,15 @@ describe Mongoid::Persistence do
           end
 
           it "sets the instance of the relation" do
-            person.posts.should == [ post ]
+            person.posts.should eq([ post ])
           end
 
           it "sets properly through method_missing" do
-            person.posts.to_a.should == [ post ]
+            person.posts.to_a.should eq([ post ])
           end
 
           it "persists the reference" do
-            person.posts(true).should == [ post ]
+            person.posts(true).should eq([ post ])
           end
         end
 
@@ -686,15 +751,15 @@ describe Mongoid::Persistence do
           end
 
           it "sets the instance of the relation" do
-            person.posts.should == [ post ]
+            person.posts.should eq([ post ])
           end
 
           it "sets properly through method_missing" do
-            person.posts.to_a.should == [ post ]
+            person.posts.to_a.should eq([ post ])
           end
 
           it "persists the reference" do
-            person.posts(true).should == [ post ]
+            person.posts(true).should eq([ post ])
           end
         end
       end
@@ -721,11 +786,11 @@ describe Mongoid::Persistence do
       end
 
       it "sets the first level document" do
-        person.phone_numbers.first.should == phone_number
+        person.phone_numbers.first.should eq(phone_number)
       end
 
       it "sets the second level document" do
-        person.phone_numbers.first.country_code.should == country_code
+        person.phone_numbers.first.country_code.should eq(country_code)
       end
 
       context "when updating the first level document" do
@@ -740,7 +805,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the new attributes" do
-          phone.number.should == "098-765-4321"
+          phone.number.should eq("098-765-4321")
         end
 
         context "when reloading the root" do
@@ -750,9 +815,25 @@ describe Mongoid::Persistence do
           end
 
           it "saves the new attributes" do
-            reloaded.phone_numbers.first.number.should == "098-765-4321"
+            reloaded.phone_numbers.first.number.should eq("098-765-4321")
           end
         end
+      end
+    end
+  end
+
+  describe "#update_attributes!" do
+
+    context "when a callback returns false" do
+
+      let(:oscar) do
+        Oscar.new
+      end
+
+      it "raises a callback error" do
+        expect {
+          oscar.update_attributes!(:title => "The Grouch")
+        }.to raise_error(Mongoid::Errors::Callback)
       end
     end
   end
@@ -770,11 +851,11 @@ describe Mongoid::Persistence do
       end
 
       it "removes all the documents" do
-        Person.count.should == 0
+        Person.count.should eq(0)
       end
 
       it "returns the number of documents removed" do
-        removed.should == 1
+        removed.should eq(1)
       end
     end
   end

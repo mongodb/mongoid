@@ -2,15 +2,14 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
+  before do
+    [ Person, Agent, Account ].each(&:delete_all)
+  end
+
   context "when persisting nil attributes" do
 
     let!(:person) do
       Person.create(:score => nil, :ssn => "555-66-7777")
-    end
-
-    after do
-      Person.delete_all
-      Agent.delete_all
     end
 
     it "has an entry in the attributes" do
@@ -30,16 +29,63 @@ describe Mongoid::Attributes do
 
   context "when default values are defined" do
 
-    let(:person) do
-      Person.create
+    context "when no value exists in the database" do
+
+      let(:person) do
+        Person.create(:ssn => "123-77-7763")
+      end
+
+      it "applies the default value" do
+        person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
+      end
     end
 
-    after do
-      Person.delete_all
-    end
+    context "when a value exists in the database" do
 
-    it "does not override the default" do
-      person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
+      context "when the value is not nil" do
+
+        let!(:person) do
+          Person.create(:ssn => "789-67-7861", :age => 50)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not set the default" do
+          from_db.age.should eq(50)
+        end
+      end
+
+      context "when the value is explicitly nil" do
+
+        let!(:person) do
+          Person.create(:ssn => "789-67-7861", :age => nil)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not set the default" do
+          from_db.age.should be_nil
+        end
+      end
+
+      context "when the default is a proc" do
+
+        let!(:account) do
+          Account.create(:name => "savings", :balance => "100")
+        end
+
+        let(:from_db) do
+          Account.find(account.id)
+        end
+
+        it "applies the defaults after all attributes are set" do
+          from_db.should be_balanced
+        end
+      end
     end
   end
 
@@ -57,10 +103,6 @@ describe Mongoid::Attributes do
 
       before do
         Person.collection.insert 'pet' => { 'unrecognized_field' => true }
-      end
-
-      after do
-        Person.delete_all
       end
 
       it "allows access to the legacy data" do

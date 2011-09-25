@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
-MODELS = File.join(File.dirname(__FILE__), "models")
+MODELS = File.join(File.dirname(__FILE__), "app/models")
 SUPPORT = File.join(File.dirname(__FILE__), "support")
 $LOAD_PATH.unshift(MODELS)
 $LOAD_PATH.unshift(SUPPORT)
@@ -13,9 +13,7 @@ require "rspec"
 LOGGER = Logger.new($stdout)
 
 Mongoid.configure do |config|
-  name = "mongoid_test"
-  # config.master = Mongo::Connection.new("localhost", 27017, :logger => LOGGER).db(name)
-  config.master = Mongo::Connection.new.db(name)
+  config.master = Mongo::Connection.new.db("mongoid_test")
   config.logger = nil
 end
 
@@ -42,8 +40,6 @@ RSpec.configure do |config|
     return true if value == :mongohq && !mongohq_configured
     return true if value == :user && !user_configured
   })
-
-  # config.filter_run :focus => true
 end
 
 ActiveSupport::Inflector.inflections do |inflect|

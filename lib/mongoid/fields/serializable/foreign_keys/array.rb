@@ -8,17 +8,17 @@ module Mongoid #:nodoc:
         class Array
           include Serializable
 
-          # Get the default value for the field. If the default is a proc call
-          # it, otherwise clone the array.
+          # Is the field a BSON::ObjectId?
           #
-          # @example Get the default.
-          #   field.default
+          # @example Is the field a BSON::ObjectId?
+          #   field.object_id_field?
           #
-          # @return [ Object ] The default value cloned.
+          # @return [ true, false ] If the field is a BSON::ObjectId.
           #
-          # @since 2.1.0
-          def default
-            default_value.dup
+          # @since 2.2.0
+          def object_id_field?
+            @object_id_field ||=
+              metadata.polymorphic? ? true : metadata.klass.using_object_ids?
           end
 
           # Serialize the object from the type defined in the model to a MongoDB
@@ -33,21 +33,7 @@ module Mongoid #:nodoc:
           #
           # @since 2.1.0
           def serialize(object)
-            object.blank? ? [] : constraint.convert(object)
-          end
-
-          protected
-
-          # Get the constraint from the metadata once.
-          #
-          # @example Get the constraint.
-          #   field.constraint
-          #
-          # @return [ Constraint ] The relation's contraint.
-          #
-          # @since 2.1.0
-          def constraint
-            @constraint ||= options[:metadata].constraint
+            object ? constraint.convert(object) : []
           end
         end
       end

@@ -6,6 +6,9 @@ es:
           ya está en uso
         document_not_found:
           No se encontró ningún documento para la clase %{klass} con los id(s) %{identifiers}.
+        eager_load:
+          "Eager loading :%{name} is not supported due to it being a many-to-many
+          or polymorphic belongs_to relation."
         invalid_database:
           La base de datos debería ser una instancia de Mongo::DB, en lugar de %{name}.
         invalid_type:

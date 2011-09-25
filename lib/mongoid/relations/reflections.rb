@@ -7,11 +7,28 @@ module Mongoid # :nodoc:
     module Reflections
       extend ActiveSupport::Concern
 
-      included do
+      # Returns the relation metadata for the supplied name.
+      #
+      # @example Find relation metadata by name.
+      #   person.reflect_on_association(:addresses)
+      #
+      # @param [ String, Symbol ] name The name of the relation to find.
+      #
+      # @return [ Metadata ] The matching relation metadata.
+      def reflect_on_association(name)
+        self.class.reflect_on_association(name)
+      end
 
-        delegate \
-          :reflect_on_association,
-          :reflect_on_all_associations, :to => "self.class"
+      # Returns all relation metadata for the supplied macros.
+      #
+      # @example Find multiple relation metadata by macro.
+      #   person.reflect_on_all_associations(:embeds_many)
+      #
+      # @param [ Array<String, Symbol> ] *macros The relation macros.
+      #
+      # @return [ Array<Metadata> ] The matching relation metadata.
+      def reflect_on_all_associations(*macros)
+        self.class.reflect_on_all_associations(*macros)
       end
 
       module ClassMethods #:nodoc

@@ -45,6 +45,51 @@ describe Mongoid::Finders do
             }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
+
+        context "when the identity map is enabled" do
+
+          before do
+            Mongoid.identity_map_enabled = true
+          end
+
+          after do
+            Mongoid.identity_map_enabled = false
+          end
+
+          context "when the document is found in the map" do
+
+            before do
+              Mongoid::IdentityMap.set(person)
+            end
+
+            let(:from_map) do
+              Person.find(person.id)
+            end
+
+            it "returns the document" do
+              from_map.should eq(person)
+            end
+
+            it "returns the same instance" do
+              from_map.should equal(person)
+            end
+          end
+
+          context "when the document is not found in the map" do
+
+            let(:from_db) do
+              Person.find(person.id)
+            end
+
+            it "returns the document from the database" do
+              from_db.should eq(person)
+            end
+
+            it "returns a different instance" do
+              from_db.should_not equal(person)
+            end
+          end
+        end
       end
 
       context "when passed an array of ids" do

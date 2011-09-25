@@ -7,7 +7,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   before do
-    [ Person, Preference, Event, Tag ].map(&:delete_all)
+    [
+      Person, Preference, Event, Tag,
+      UserAccount, Agent, Account, Business, User,
+      Artwork, Exhibition, Exhibitor
+    ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -15,6 +19,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     describe "##{method}" do
 
       context "when the relations are not polymorphic" do
+
 
         context "when the inverse relation is not defined" do
 
@@ -42,35 +47,117 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the parent is a new record" do
 
           let(:person) do
-            Person.new
+            Person.new(:ssn => "423-12-0789")
           end
 
-          let(:preference) do
-            Preference.new
+          context "when the child is new" do
+
+            let(:preference) do
+              Preference.new
+            end
+
+            before do
+              person.preferences.send(method, preference)
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.person_ids.should == [ person.id ]
+            end
+
+            it "does not save the target" do
+              preference.should be_new
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
           end
 
-          before do
-            person.preferences.send(method, preference)
+          context "when the child is already persisted" do
+
+            let!(:persisted) do
+              Preference.create(:name => "testy")
+            end
+
+            let(:preference) do
+              Preference.first
+            end
+
+            before do
+              person.preferences.send(method, preference)
+              person.save
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.person_ids.should == [ person.id ]
+            end
+
+            it "saves the target" do
+              preference.should be_persisted
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
+
+            it "persists the link" do
+              person.reload.preferences.should eq([ preference ])
+            end
           end
 
-          it "adds the documents to the relation" do
-            person.preferences.should == [ preference ]
-          end
+          context "when setting via the associated ids" do
 
-          it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
-          end
+            let!(:persisted) do
+              Preference.create(:name => "testy")
+            end
 
-          it "sets the foreign key on the inverse relation" do
-            preference.person_ids.should == [ person.id ]
-          end
+            let(:preference) do
+              Preference.first
+            end
 
-          it "does not save the target" do
-            preference.should be_new
-          end
+            let(:person) do
+              Person.new(:ssn => "345-12-9867", :preference_ids => [ preference.id ])
+            end
 
-          it "adds the correct number of documents" do
-            person.preferences.size.should == 1
+            before do
+              person.save
+            end
+
+            it "adds the documents to the relation" do
+              person.preferences.should == [ preference ]
+            end
+
+            it "sets the foreign key on the relation" do
+              person.preference_ids.should == [ preference.id ]
+            end
+
+            it "sets the foreign key on the inverse relation" do
+              preference.reload.person_ids.should == [ person.id ]
+            end
+
+            it "adds the correct number of documents" do
+              person.preferences.size.should == 1
+            end
+
+            it "persists the link" do
+              person.reload.preferences.should eq([ preference ])
+            end
           end
         end
 
@@ -206,6 +293,29 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             it "sets the inverse side of the relation" do
               loaded_event.administrators.should == [ person ]
             end
+          end
+        end
+
+        context "when the relation also includes a has_many relation" do
+
+          let(:artwork) do
+            Artwork.create
+          end
+
+          let(:exhibition) do
+            Exhibition.create
+          end
+
+          let(:exhibitor) do
+            Exhibitor.create(:exhibition => exhibition)
+          end
+
+          before do
+            artwork.exhibitors << exhibitor
+          end
+
+          it "creates a single artwork object" do
+            Artwork.count.should == 1
           end
         end
 
@@ -523,37 +633,69 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       context "when the parent is not a new record" do
 
-        let(:person) do
-          Person.create(:ssn => "437-11-1112")
+        context "when the relation has been loaded" do
+
+          let(:person) do
+            Person.create(:ssn => "437-11-1112")
+          end
+
+          let(:preference) do
+            Preference.new
+          end
+
+          before do
+            person.preferences = [ preference ]
+            person.preferences = nil
+          end
+
+          it "sets the relation to an empty array" do
+            person.preferences.should be_empty
+          end
+
+          it "removed the inverse relation" do
+            preference.people.should be_empty
+          end
+
+          it "removes the foreign key values" do
+            person.preference_ids.should be_empty
+          end
+
+          it "removes the inverse foreign key values" do
+            preference.person_ids.should be_empty
+          end
+
+          it "does not delete the target from the database" do
+            preference.should_not be_destroyed
+          end
         end
 
-        let(:preference) do
-          Preference.new
-        end
+        context "when the relation has not been loaded" do
 
-        before do
-          person.preferences = [ preference ]
-          person.preferences = nil
-        end
+          let(:preference) do
+            Preference.new
+          end
 
-        it "sets the relation to an empty array" do
-          person.preferences.should be_empty
-        end
+          let(:person) do
+            Person.create(:ssn => "437-11-1112").tap do |p|
+              p.preferences = [ preference ]
+            end
+          end
 
-        it "removed the inverse relation" do
-          preference.people.should be_empty
-        end
+          let(:from_db) do
+            Person.find(person.id)
+          end
 
-        it "removes the foreign key values" do
-          person.preference_ids.should be_empty
-        end
+          before do
+            from_db.preferences = nil
+          end
 
-        it "removes the inverse foreign key values" do
-          preference.person_ids.should be_empty
-        end
+          it "sets the relation to an empty array" do
+            from_db.preferences.should be_empty
+          end
 
-        it "deletes the target from the database" do
-          preference.should be_destroyed
+          it "removes the foreign key values" do
+            from_db.preference_ids.should be_empty
+          end
         end
       end
     end
@@ -705,11 +847,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             preference.person_ids.should_not include(person.id)
           end
 
-          it "marks the documents as deleted" do
-            preference.should be_destroyed
+          it "does not delete the documents" do
+            preference.should_not be_destroyed
           end
 
-          it "deletes the documents from the db" do
+          it "persists the nullification" do
             person.reload.preferences.should be_empty
           end
 
@@ -769,6 +911,22 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       it "returns the number of persisted documents" do
         person.preferences.count.should == 1
+      end
+    end
+
+    context "when appending to a loaded relation" do
+
+      let!(:preference) do
+        person.preferences.create(:name => "setting")
+      end
+
+      before do
+        person.preferences.count
+        person.preferences << Preference.create(:name => "two")
+      end
+
+      it "returns the number of persisted documents" do
+        person.preferences.count.should eq(2)
       end
     end
 
@@ -847,11 +1005,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           before do
-            agent.accounts.create(:name => "test")
+            agent.accounts.create(:name => "testing again")
           end
 
           it "does not convert the string key to an object id" do
-            agent.account_ids.should == [ "test" ]
+            agent.account_ids.should == [ "testing-again" ]
           end
         end
 
@@ -1078,7 +1236,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "deletes the document from the relation" do
-            # @todo: Durran: 
+            # @todo: Durran:
             reloaded.related.should be_empty
           end
 
@@ -1191,6 +1349,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
         end
       end
+    end
+  end
+
+  describe ".eager_load" do
+
+    let(:metadata) do
+      Person.relations["preferences"]
+    end
+
+    it "raises an error" do
+      expect {
+        described_class.eager_load(metadata, Person.all)
+      }.to raise_error(Mongoid::Errors::EagerLoad)
     end
   end
 
@@ -1672,27 +1843,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  describe "#respond_to?" do
-
-    let(:person) do
-      Person.new
-    end
-
-    let(:preferences) do
-      person.preferences
-    end
-
-    context "when checking against array methods" do
-
-      [].methods.each do |method|
-
-        it "returns true for #{method}" do
-          preferences.should respond_to(method)
-        end
-      end
-    end
-  end
-
   describe "#sum" do
 
     let(:person) do
@@ -1717,6 +1867,25 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     it "returns the sum value of the supplied field" do
       sum.should == 15
+    end
+  end
+
+  describe "#scoped" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:scoped) do
+      person.preferences.scoped
+    end
+
+    it "returns the relation criteria" do
+      scoped.should be_a(Mongoid::Criteria)
+    end
+
+    it "returns with an empty selector" do
+      scoped.selector.should eq({ :_id => { "$in" => [] }})
     end
   end
 
@@ -1748,6 +1917,163 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "returns the total number of documents" do
           person.preferences.send(method).should == 2
+        end
+      end
+    end
+  end
+
+  context "when setting the ids directly after the documents" do
+
+    let!(:person) do
+      Person.create!(:ssn => "132-11-1433", :title => "The Boss")
+    end
+
+    let!(:girlfriend_house) do
+      House.create!(:name => "Girlfriend")
+    end
+
+    let!(:wife_house) do
+      House.create!(:name => "Wife")
+    end
+
+    let!(:exwife_house) do
+      House.create!(:name => "Ex-Wife")
+    end
+
+    before do
+      person.update_attributes(
+        :houses => [ wife_house, exwife_house, girlfriend_house ]
+      )
+      person.update_attributes(:house_ids => [ girlfriend_house.id ])
+    end
+
+    context "when reloading" do
+
+      it "properly sets the references" do
+        person.houses(true).should eq([ girlfriend_house ])
+      end
+    end
+  end
+
+  context "when setting both sides in a single call" do
+
+    context "when the documents are new" do
+
+      let(:user) do
+        User.new(:name => "testing")
+      end
+
+      let(:business) do
+        Business.new(:name => "serious", :owners => [ user ])
+      end
+
+      before do
+        user.businesses = [ business ]
+      end
+
+      it "sets the businesses" do
+        user.businesses.should eq([ business ])
+      end
+
+      it "sets the inverse users" do
+        user.businesses.first.owners.first.should eq(user)
+      end
+
+      it "sets the inverse businesses" do
+        business.owners.should eq([ user ])
+      end
+    end
+
+    context "when one side is persisted" do
+
+      let!(:user) do
+        User.new(:name => "testing")
+      end
+
+      let!(:business) do
+        Business.create(:name => "serious", :owners => [ user ])
+      end
+
+      before do
+        user.businesses = [ business ]
+      end
+
+      it "sets the businesses" do
+        user.businesses.should eq([ business ])
+      end
+
+      it "sets the inverse users" do
+        user.businesses.first.owners.first.should eq(user)
+      end
+
+      it "sets the inverse businesses" do
+        business.owners.should eq([ user ])
+      end
+
+      context "when reloading" do
+
+        before do
+          user.reload
+          business.reload
+        end
+
+        it "persists the businesses" do
+          user.businesses.should eq([ business ])
+        end
+
+        it "persists the inverse users" do
+          user.businesses.first.owners.first.should eq(user)
+        end
+
+        it "persists the inverse businesses" do
+          business.owners.should eq([ user ])
+        end
+      end
+    end
+
+    context "when the documents are persisted" do
+
+      let(:user) do
+        User.create(:name => "tst")
+      end
+
+      let(:business) do
+        Business.create(:name => "srs", :owners => [ user ])
+      end
+
+      before do
+        user.businesses = [ business ]
+      end
+
+      it "sets the businesses" do
+        user.businesses.should eq([ business ])
+      end
+
+      it "sets the inverse users" do
+        user.businesses.first.owners.first.should eq(user)
+      end
+
+      it "sets the inverse businesses" do
+        business.owners.should eq([ user ])
+      end
+
+      context "when reloading" do
+
+        before do
+          user.reload
+          business.reload
+        end
+
+        it "persists the businesses" do
+          user.businesses.should eq([ business ])
+        end
+
+        it "persists the inverse users" do
+          user.businesses.first.owners.first.should eq(user)
+        end
+
+        it "persists the inverse businesses" do
+          business.owners.should eq([ user ])
         end
       end
     end
@@ -1807,6 +2133,89 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       person.preferences.order_by(:name.desc).to_a.should eq(
         [preference_three, preference_two, preference_one]
       )
+    end
+  end
+
+  context "when the parent is not a new record and freshly loaded" do
+
+    let(:person) do
+      Person.create(:ssn => "437-11-1110")
+    end
+
+    let(:preference) do
+      Preference.new
+    end
+
+    before do
+      person.preferences = [ preference ]
+      person.save
+      person.reload
+      person.preferences = nil
+    end
+
+    it "sets the relation to an empty array" do
+      person.preferences.should be_empty
+    end
+
+    it "removes the foreign key values" do
+      person.preference_ids.should be_empty
+    end
+
+    it "does not delete the target from the database" do
+      expect {
+        preference.reload
+      }.not_to raise_error(Mongoid::Errors::DocumentNotFound)
+    end
+  end
+
+  context "when reloading the relation" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-41-9678")
+    end
+
+    let!(:preference_one) do
+      Preference.create(:name => "one")
+    end
+
+    let!(:preference_two) do
+      Preference.create(:name => "two")
+    end
+
+    before do
+      person.preferences << preference_one
+    end
+
+    context "when the relation references the same documents" do
+
+      before do
+        Preference.collection.update(
+          { :_id => preference_one.id }, { "$set" => { :name => "reloaded" }}
+        )
+      end
+
+      let(:reloaded) do
+        person.preferences(true)
+      end
+
+      it "reloads the document from the database" do
+        reloaded.first.name.should eq("reloaded")
+      end
+    end
+
+    context "when the relation references different documents" do
+
+      before do
+        person.preferences << preference_two
+      end
+
+      let(:reloaded) do
+        person.preferences(true)
+      end
+
+      it "reloads the new document from the database" do
+        reloaded.should eq([ preference_one, preference_two ])
+      end
     end
   end
 end

@@ -61,7 +61,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
     end
 
-    context "when rejectable" do
+    context "when rejectable using a proc" do
 
       let(:builder) do
         described_class.new(
@@ -78,6 +78,27 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       it "rejects the matching attributes" do
         person.addresses.should be_empty
       end
+
+    end
+
+    context "when rejectable using a symbol" do
+
+      let(:builder) do
+        described_class.new(
+          metadata,
+          attributes,
+          :reject_if => :reject_if_city_is_empty
+        )
+      end
+
+      before do
+        builder.build(person)
+      end
+
+      it "rejects the matching attributes" do
+        person.addresses.should be_empty
+      end
+
     end
 
     context "when ids are present" do
@@ -157,7 +178,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         end
 
         it "returns true" do
-          builder.reject?({ :last_name => "Lang" }).should be_true
+          builder.reject?(builder, { :last_name => "Lang" }).should be_true
         end
       end
 
@@ -168,7 +189,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         end
 
         it "returns false" do
-          builder.reject?({ :first_name => "Lang" }).should be_false
+          builder.reject?(builder, { :first_name => "Lang" }).should be_false
         end
       end
     end
@@ -180,7 +201,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns false" do
-        builder.reject?({ :first_name => "Lang" }).should be_false
+        builder.reject?(builder,{ :first_name => "Lang" }).should be_false
       end
     end
   end

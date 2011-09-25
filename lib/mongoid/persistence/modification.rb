@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
           unless result == false
             document.reset_persisted_children
             document.move_changes
-            Threaded.clear_safety_options!
+            Threaded.clear_options!
           end
         end
       end

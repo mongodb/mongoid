@@ -20,13 +20,24 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def serialize(object)
           return nil if object.blank?
-          begin
-            object.to_s =~ /\./ ? Float(object) : Integer(object)
-          rescue
-            object
-          end
+          numeric(object) rescue object
         end
-        alias :set :serialize
+
+        private
+
+        # Get the numeric value for the provided object.
+        #
+        # @example Get the numeric value.
+        #   field.numeric("1120")
+        #
+        # @param [ Object ] object The object to convert.
+        #
+        # @return [ Integer, Float ] The number.
+        #
+        # @since 2.3.0
+        def numeric(object)
+          object.to_s =~ /(^[-+]?[0-9]+$)|(\.0+)$/ ? object.to_i : Float(object)
+        end
       end
     end
   end

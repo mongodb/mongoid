@@ -10,6 +10,10 @@ describe Mongoid::Persistence::Atomic::Inc do
     person.stubs(:collection).returns(collection)
   end
 
+  after do
+    person.unstub(:collection)
+  end
+
   describe "#inc" do
 
     let(:reloaded) do

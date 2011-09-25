@@ -9,14 +9,13 @@ module Mongoid # :nodoc:
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-          method =~ /(^__|^send$|^object_id$|^extend$|^tap$)/
+          method =~ /(^__|^send$|^object_id$|^extend$|^respond_to\?$|^tap$)/
       end
 
       attr_accessor :base, :loaded, :metadata, :target
 
       # Backwards compatibility with Mongoid beta releases.
       delegate :klass, :to => :metadata
-
       delegate :bind_one, :unbind_one, :to => :binding
 
       # Convenience for setting the target and the metadata properties since
@@ -36,7 +35,32 @@ module Mongoid # :nodoc:
         extend metadata.extension if metadata.extension?
       end
 
+      # The default substitutable object for a relation proxy is the clone of
+      # the target.
+      #
+      # @example Get the substitutable.
+      #   proxy.substitutable
+      #
+      # @return [ Object ] A clone of the target.
+      #
+      # @since 2.1.6
+      def substitutable
+        target
+      end
+
       protected
+
+      # Is the current thread in assigning mode?
+      #
+      # @example Is the current thread in assigning mode?
+      #   proxy.assigning?
+      #
+      # @return [ true, false ] If the thread is assigning.
+      #
+      # @since 2.1.0
+      def assigning?
+        Threaded.assigning?
+      end
 
       # Is the current thread in binding mode?
       #
@@ -60,6 +84,18 @@ module Mongoid # :nodoc:
       # @since 2.1.0
       def building?
         Threaded.building?
+      end
+
+      # Is the current thread in creating mode?
+      #
+      # @example Is the current thread in creating mode?
+      #   proxy.creating?
+      #
+      # @return [ true, false ] If the thread is creating.
+      #
+      # @since 2.1.0
+      def creating?
+        Threaded.creating?
       end
 
       # Get the collection from the root of the hierarchy.
@@ -138,6 +174,18 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.6
       def raise_unsaved(doc)
         raise Errors::UnsavedDocument.new(base, doc)
+      end
+
+      # Get the class of the root document in the hierarchy.
+      #
+      # @example Get the root's class.
+      #   proxy.root_class
+      #
+      # @return [ Class ] The root class.
+      #
+      # @since 2.1.8
+      def root_class
+        @root_class ||= base._root.class
       end
     end
   end

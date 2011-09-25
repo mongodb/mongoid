@@ -28,11 +28,6 @@ describe Mongoid::Timestamps::Created do
     it "forces the created_at timestamps to UTC" do
       quiz.created_at.should be_within(10).of(Time.now.utc)
     end
-
-    it "includes a record_timestamps class_accessor to ease AR compatibility" do
-      Quiz.should.respond_to? :record_timestamps
-      Quiz.record_timestamps.should be_true
-    end
   end
 
   context "when the document is created" do

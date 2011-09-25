@@ -421,10 +421,43 @@ describe Mongoid::Serialization do
         person.to_json.should_not include("person")
       end
     end
+
+    context "when serializing a relation directly" do
+
+      context "when serializing an embeds many" do
+
+        let!(:address) do
+          person.addresses.build(:street => "Kudamm")
+        end
+
+        let(:json) do
+          person.addresses.to_json
+        end
+
+        it "serializes only the relation" do
+          json.should include(address.street)
+        end
+      end
+
+      context "when serializing a references many" do
+
+        let!(:post) do
+          person.posts.build(:title => "testing")
+        end
+
+        let(:json) do
+          person.posts.to_json
+        end
+
+        it "serializes only the relation" do
+          json.should include(post.title)
+        end
+      end
+    end
   end
 
   describe "#to_xml" do
-    
+
     context "BSON::ObjectId" do
       let(:person) { Person.new }
 

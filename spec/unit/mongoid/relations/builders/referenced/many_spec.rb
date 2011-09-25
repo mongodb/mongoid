@@ -4,13 +4,17 @@ describe Mongoid::Relations::Builders::Referenced::Many do
 
   describe "#build" do
 
+    let(:criteria) do
+      stub(:klass => Post, :selector => { "person_id" => "" })
+    end
+
     let(:metadata) do
       stub_everything(
         :klass => Post,
         :name => :posts,
         :foreign_key => "person_id",
         :inverse_klass => Person,
-        :criteria => [ post ]
+        :criteria => criteria
       )
     end
 
@@ -37,7 +41,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       it "sets the documents" do
-        @documents.should == [ post ]
+        @documents.should eq(criteria)
       end
     end
 
@@ -50,7 +54,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
           :foreign_key => "person_id",
           :inverse_klass => Person,
           :order => :rating.asc,
-          :criteria => [ post ]
+          :criteria => criteria
         )
       end
 
@@ -71,7 +75,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       it "ordered by specified filed" do
-        @documents.should == [ post ]
+        @documents.should eq(criteria)
       end
     end
 

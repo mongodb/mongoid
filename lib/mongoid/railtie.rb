@@ -93,21 +93,7 @@ module Rails #:nodoc:
       # environments.
       initializer "preload all application models" do |app|
         config.to_prepare do
-          ::Rails::Mongoid.load_models(app) unless $rails_rake_task
-        end
-      end
-
-      # This initializer warns the user that preloading models is set to false,
-      # and queries will be inconsistent in dev mode if models are using
-      # inheritance.
-      initializer "warn of preload models configuration" do |app|
-        config.after_initialize do
-          if !::Mongoid.preload_models && !Rails.configuration.cache_classes
-            puts "\nMongoid preload_models is set to false. If you are using"
-            puts "inheritance in your application model please set this to true or "
-            puts "you will experience querying inconsistencies in dev mode. Note that"
-            puts "this will severely decrease performance in dev mode only.\n\n"
-          end
+          ::Rails::Mongoid.preload_models(app) unless $rails_rake_task
         end
       end
 

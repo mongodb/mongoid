@@ -6,7 +6,7 @@ Mongoid.configure do |config|
   config.master = Mongo::Connection.new.db("mongoid_perf_test")
 end
 
-Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:remove)
 
 puts "Creating indexes..."
 
@@ -297,6 +297,60 @@ Benchmark.bm do |bm|
 
       person.preferences.clear
       GC.start
+    end
+  end
+
+  [ 1000, 10000].each do |i|
+
+    GC.start
+
+    i.times do |n|
+
+      Person.create(:title => "#{n}").tap do |person|
+        person.posts.create(:title => "#{n}")
+      end
+    end
+
+    puts "\n[ Iterate with association load 1-1 ]"
+
+    Mongoid.unit_of_work do
+
+      bm.report("#each [ normal ] ") do
+        Post.all.each do |post|
+          post.person.title
+        end
+      end
+
+      Mongoid.identity_map_enabled = true
+
+      bm.report("#each [ eager ]  ") do
+        Post.includes(:person).each do |post|
+          post.person.title
+        end
+      end
+
+      Mongoid.identity_map_enabled = false
+    end
+
+    puts "\n[ Iterate with association load 1-n ]"
+
+    Mongoid.unit_of_work do
+
+      bm.report("#each [ normal ] ") do
+        Person.all.each do |person|
+          person.posts.each { |post| post.title }
+        end
+      end
+
+      Mongoid.identity_map_enabled = true
+
+      bm.report("#each [ eager ]  ") do
+        Person.includes(:posts).each do |person|
+          person.posts.each { |post| post.title }
+        end
+      end
+
+      Mongoid.identity_map_enabled = false
     end
   end
 end

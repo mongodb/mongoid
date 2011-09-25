@@ -115,7 +115,7 @@ describe Mongoid::Persistence::Operations::Embedded::Remove do
       context "when the parent is not new" do
 
         let(:remove) do
-          described_class.new(address)
+          described_class.new(address, :suppress => true)
         end
 
         before do
@@ -131,7 +131,7 @@ describe Mongoid::Persistence::Operations::Embedded::Remove do
       context "when embedded multiple levels" do
 
         let(:remove) do
-          described_class.new(location)
+          described_class.new(location, :suppress => true)
         end
 
         before do
