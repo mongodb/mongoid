@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
               case k
               when Mongoid::Criterion::Complex
                 hsh[k.key] ||= {}
-                hsh[k.key].merge!({"$#{k.operator}" => v})
+                hsh[k.key].merge!(k.to_mongo_query(v))
               else
                 hsh[k] = v
               end
