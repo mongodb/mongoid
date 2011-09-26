@@ -1,11 +1,6 @@
 test:
   database: mongoid_config_test
   host: localhost
-  slaves:
-    # - host: localhost
-      # port: 27018
-    # - host: localhost
-      # port: 27019
   allow_dynamic_fields: false
   include_root_in_json: true
   parameterize_keys: false

@@ -441,6 +441,23 @@ describe Mongoid::Threaded do
     end
   end
 
+  describe "#connection" do
+
+    context "when the connection is present" do
+
+      it "returns the current thread's connection" do
+        pending
+      end
+    end
+
+    context "when the connection is not present" do
+
+      it "creates a new connection" do
+        pending
+      end
+    end
+  end
+
   describe "#creating?" do
 
     context "when creating is not set" do

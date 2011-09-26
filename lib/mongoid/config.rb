@@ -1,7 +1,9 @@
 # encoding: utf-8
 require "uri"
 require "mongoid/config/database"
+require "mongoid/config/environment"
 require "mongoid/config/replset_database"
+require "mongoid/config/options"
 
 module Mongoid #:nodoc
 
@@ -11,40 +13,11 @@ module Mongoid #:nodoc
   # @todo Durran: This module needs an overhaul, remove singleton, etc.
   module Config
     extend self
+    extend Options
     include ActiveModel::Observing
 
-    attr_accessor :master, :settings, :defaults
-    @settings = {}
-    @defaults = {}
-
-    # Define a configuration option with a default.
-    #
-    # @example Define the option.
-    #   Config.option(:persist_in_safe_mode, :default => false)
-    #
-    # @param [ Symbol ] name The name of the configuration option.
-    # @param [ Hash ] options Extras for the option.
-    #
-    # @option options [ Object ] :default The default value.
-    #
-    # @since 2.0.0.rc.1
-    def option(name, options = {})
-      defaults[name] = settings[name] = options[:default]
-
-      class_eval <<-RUBY
-        def #{name}
-          settings[#{name.inspect}]
-        end
-
-        def #{name}=(value)
-          settings[#{name.inspect}] = value
-        end
-
-        def #{name}?
-          #{name}
-        end
-      RUBY
-    end
+    # @attribute [rw] master The master database.
+    attr_accessor :master
 
     option :allow_dynamic_fields, :default => true
     option :autocreate_indexes, :default => false
@@ -130,10 +103,8 @@ module Mongoid #:nodoc
     #
     # @since 2.0.1
     def load!(path)
-      environment = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV["RACK_ENV"]
-      settings = YAML.load(ERB.new(File.new(path).read).result)[environment]
-      if settings.present?
-        from_hash(settings)
+      Environment.load_yaml(path).tap do |settings|
+        from_hash(settings) if settings.present?
       end
     end
 
@@ -258,24 +229,6 @@ module Mongoid #:nodoc
       end
     end
 
-    # Reset the configuration options to the defaults.
-    #
-    # @example Reset the configuration options.
-    #   config.reset
-    def reset
-      settings.replace(defaults)
-    end
-
-    # @deprecated User replica sets instead.
-    def slaves
-      slave_warning!
-    end
-
-    # @deprecated User replica sets instead.
-    def slaves=(dbs)
-      slave_warning!
-    end
-
     protected
 
     # Check if the database is valid and the correct version.
@@ -333,15 +286,6 @@ module Mongoid #:nodoc
         dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
         end
       end
-    end
-
-    # Temporarily here so people can move to replica sets.
-    def slave_warning!
-      warn(
-        "Using Mongoid for traditional slave databases will be removed in the " +
-        "next release in preference of replica sets. Please change your setup " +
-        "accordingly."
-      )
     end
   end
 end
