@@ -215,6 +215,21 @@ describe Mongoid::Contexts::Mongo do
         Person.min(:age).should == 10.0
       end
     end
+
+    context "when the returned value is not a number" do
+
+      let(:time) do
+        Time.now.utc
+      end
+
+      before do
+        Person.create(:ssn => "444-44-4444", :lunch_time => time)
+      end
+
+      it "returns the value" do
+        Person.min(:lunch_time).should be_within(1).of(time)
+      end
+    end
   end
 
   describe "#sum" do
