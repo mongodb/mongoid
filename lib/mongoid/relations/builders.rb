@@ -35,14 +35,14 @@ module Mongoid # :nodoc:
       # Execute a block in building mode.
       #
       # @example Execute in building mode.
-      #   building do
+      #   _building do
       #     relation.push(doc)
       #   end
       #
       # @return [ Object ] The return value of the block.
       #
       # @since 2.1.0
-      def building
+      def _building
         Threaded.begin_build
         yield
       ensure
@@ -66,7 +66,7 @@ module Mongoid # :nodoc:
           tap do
             define_method("build_#{name}") do |*args|
               document = Factory.build(metadata.klass, args.first || {})
-              building do
+              _building do
                 send("#{name}=", document)
               end
             end

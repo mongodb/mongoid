@@ -36,7 +36,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            if assigning?
+            if _assigning?
               base.atomic_unsets.push(proxy.atomic_path)
             else
               proxy.delete if persistable?
@@ -73,7 +73,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding? && !building? && !assigning?
+          base.persisted? && !binding? && !_building? && !_assigning?
         end
 
         class << self

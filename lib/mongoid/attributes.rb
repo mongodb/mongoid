@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def remove_attribute(name)
-      assigning do
+      _assigning do
         access = name.to_s
         attribute_will_change!(access)
         attributes.delete(access)
@@ -96,7 +96,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      assigning do
+      _assigning do
         access = name.to_s
         localized = fields[access].try(:localized?)
         typed_value_for(access, value).tap do |value|
@@ -113,8 +113,7 @@ module Mongoid #:nodoc:
     end
     alias :[]= :write_attribute
 
-    
-    # Allows you to set all the attributes for a particular mass-assignment security role 
+    # Allows you to set all the attributes for a particular mass-assignment security role
     # by passing in a hash of attributes with keys matching the attribute names
     # (which again matches the column names)  and the role name using the :as option.
     # To bypass mass-assignment security you can use the :without_protection => true option.
@@ -130,12 +129,12 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.1
     def assign_attributes(attrs = nil, options = {})
-      assigning do
+      _assigning do
         process(attrs, options[:as] || :default, !options[:without_protection]) do |document|
           document.identify if new? && id.blank?
         end
       end
-    end    
+    end
 
     # Writes the supplied attributes hash to the document. This will only
     # overwrite existing attributes if they are present in the new +Hash+, all
@@ -181,14 +180,14 @@ module Mongoid #:nodoc:
     # be in a valid state.
     #
     # @example Execute the assignment.
-    #   assigning do
+    #   _assigning do
     #     person.attributes = { :addresses => [ address ] }
     #   end
     #
     # @return [ Object ] The yielded value.
     #
     # @since 2.2.0
-    def assigning
+    def _assigning
       begin
         Threaded.begin_assign
         yield
