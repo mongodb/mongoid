@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def remove_attribute(name)
-      assigning do
+      _assigning do
         access = name.to_s
         attribute_will_change!(access)
         attributes.delete(access)
@@ -96,7 +96,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      assigning do
+      _assigning do
         access = name.to_s
         localized = fields[access].try(:localized?)
         typed_value_for(access, value).tap do |value|
@@ -128,7 +128,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attributes(attrs = nil, guard_protected_attributes = true)
-      assigning do
+      _assigning do
         process(attrs, guard_protected_attributes) do |document|
           document.identify if new? && id.blank?
         end
@@ -161,14 +161,14 @@ module Mongoid #:nodoc:
     # be in a valid state.
     #
     # @example Execute the assignment.
-    #   assigning do
+    #   _assigning do
     #     person.attributes = { :addresses => [ address ] }
     #   end
     #
     # @return [ Object ] The yielded value.
     #
     # @since 2.2.0
-    def assigning
+    def _assigning
       begin
         Threaded.begin_assign
         yield

@@ -53,12 +53,12 @@ module Mongoid # :nodoc:
       # Is the current thread in assigning mode?
       #
       # @example Is the current thread in assigning mode?
-      #   proxy.assigning?
+      #   proxy._assigning?
       #
       # @return [ true, false ] If the thread is assigning.
       #
       # @since 2.1.0
-      def assigning?
+      def _assigning?
         Threaded.assigning?
       end
 
@@ -77,12 +77,12 @@ module Mongoid # :nodoc:
       # Is the current thread in building mode?
       #
       # @example Is the current thread in building mode?
-      #   proxy.building?
+      #   proxy._building?
       #
       # @return [ true, false ] If the thread is building.
       #
       # @since 2.1.0
-      def building?
+      def _building?
         Threaded.building?
       end
 

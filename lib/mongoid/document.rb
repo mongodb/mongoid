@@ -122,7 +122,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil)
-      building do
+      _building do
         @new_record = true
         @attributes ||= {}
         process(attrs) do

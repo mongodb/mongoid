@@ -386,7 +386,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding? && !building?
+          base.persisted? && !binding? && !_building?
         end
 
         # Deletes all related documents from the database given the supplied

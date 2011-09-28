@@ -96,7 +96,7 @@ module Mongoid # :nodoc:
               if instance_variable_defined?(variable) && !reload
                 instance_variable_get(variable)
               else
-                building do
+                _building do
                   build(name, attributes[metadata.key], metadata, :loading => true)
                 end
               end
