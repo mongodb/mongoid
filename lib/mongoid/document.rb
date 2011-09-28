@@ -126,7 +126,7 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil, options = {})
       building do
         @new_record = true
-        @attributes = {}
+        @attributes ||= {}
         process(attrs, options[:as] || :default, !options[:without_protection]) do
           yield self if block_given?
           identify
