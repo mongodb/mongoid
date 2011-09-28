@@ -124,7 +124,7 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil)
       building do
         @new_record = true
-        @attributes = {}
+        @attributes ||= {}
         process(attrs) do
           yield self if block_given?
           identify
