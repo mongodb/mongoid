@@ -23,6 +23,10 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * \#1103 Allow developers to create their own custom complex criteria. (Ryan Ong)
 
+* Mongoid now includes all defined fields in `serializable_hash` and `to_json`
+  results even if the fields have no values to make serialized documents easier
+  to use by ActiveResource clients.
+
 ### Major Changes
 
 * Mongoid now depends on Active Model 3.1 and higher.

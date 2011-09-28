@@ -12,6 +12,90 @@ describe Mongoid::Serialization do
       Person.new
     end
 
+    context "when a model has defined fields" do
+
+      let(:attributes) do
+        { 'title' => "President", 'security_code' => '1234' }
+      end
+
+      before do
+        person.write_attributes attributes, false
+      end
+
+      it "serializes assigned attributes" do
+        person.serializable_hash.should include attributes
+      end
+
+      it "includes all defined fields except _type" do
+        field_names = person.fields.keys.map(&:to_s) - ['_type']
+        person.serializable_hash.keys.should include(*field_names)
+      end
+
+      it "does not include _type" do
+        person.serializable_hash.keys.should_not include '_type'
+      end
+
+      it "does not modify the options in the argument" do
+        options = { :only => :name }
+        person.serializable_hash(options)
+        options[:except].should be_nil
+      end
+
+      context "when specifying which fields to only include" do
+
+        it "only includes the specified fields" do
+          person.serializable_hash(:only => [:title]).should == { 'title' => attributes['title'] }
+        end
+      end
+
+      context "when specifying which fields to exclude" do
+
+        it "excludes the specified fields" do
+          person.serializable_hash(:except => [:title]).should_not include('title' => attributes['title'])
+        end
+      end
+    end
+
+    context "when a model has dynamic fields" do
+
+      let(:dynamic_field_name) do
+        "dynamic_field_name"
+      end
+
+      let(:dynamic_value) do
+        "dynamic_value"
+      end
+
+      before do
+        person.write_attribute dynamic_field_name, dynamic_value
+      end
+
+      it "includes dynamic fields" do
+        person.serializable_hash[dynamic_field_name].should == dynamic_value
+      end
+
+      context "when specifying which dynamic fields to only include" do
+
+        it "only includes the specified dynamic fields" do
+          person.serializable_hash(:only => [dynamic_field_name]).should == { dynamic_field_name => dynamic_value }
+        end
+      end
+
+      context "when specified which dynamic fields to exclude" do
+
+        it "excludes the specified fields" do
+          person.serializable_hash(:except => [dynamic_field_name]).should_not include(dynamic_field_name => dynamic_value)
+        end
+      end
+    end
+
+    context "when including methods" do
+
+      it "includes the method result" do
+        person.serializable_hash(:methods => [:foo]).should include('foo' => person.foo)
+      end
+    end
+
     context "when including relations" do
 
       context "when including a single relation" do
@@ -56,12 +140,12 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first relation" do
-              relation_hash[0].should ==
+              relation_hash[0].should include
                 { "_id" => "kudamm", "street" => "Kudamm" }
             end
 
             it "includes the second relation" do
-              relation_hash[1].should ==
+              relation_hash[1].should include
                 { "_id" => "tauentzienstr", "street" => "Tauentzienstr" }
             end
           end
@@ -73,12 +157,12 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first relation" do
-              relation_hash[0].should ==
+              relation_hash[0].should include
                 { "_id" => "kudamm", "street" => "Kudamm" }
             end
 
             it "includes the second relation" do
-              relation_hash[1].should ==
+              relation_hash[1].should include
                 { "_id" => "tauentzienstr", "street" => "Tauentzienstr" }
             end
           end
@@ -92,11 +176,11 @@ describe Mongoid::Serialization do
               end
 
               it "includes the first relation sans exceptions" do
-                relation_hash[0].should == { "street" => "Kudamm" }
+                relation_hash[0].should include({ "street" => "Kudamm" })
               end
 
               it "includes the second relation sans exceptions" do
-                relation_hash[1].should == { "street" => "Tauentzienstr" }
+                relation_hash[1].should include({ "street" => "Tauentzienstr" })
               end
             end
 
@@ -115,7 +199,7 @@ describe Mongoid::Serialization do
               end
 
               it "includes the first relation" do
-                relation_hash[0]["locations"].should == [{ "name" => "Home" }]
+                relation_hash[0]["locations"].any? { |location| location['name'] == "Home" }.should be_true
               end
 
               context "after retrieved from database" do
@@ -139,8 +223,8 @@ describe Mongoid::Serialization do
                 end
 
                 it "includes the specific ralations" do
-                  relation_hash[0]["locations"].should == [{ "name" => "Home" }]
-                  relation_hash[1]["locations"].should == [{ "name" => "Hotel" }]
+                  relation_hash[0]["locations"].map { |location| location['name'] }.should include "Home"
+                  relation_hash[1]["locations"].map { |location| location['name'] }.should include "Hotel"
                 end
               end
             end
@@ -190,7 +274,7 @@ describe Mongoid::Serialization do
             end
 
             it "includes the specified relation" do
-              relation_hash.should ==
+              relation_hash.should include
                 { "_id" => "leo-marvin", "first_name" => "Leo", "last_name" => "Marvin" }
             end
           end
@@ -202,7 +286,7 @@ describe Mongoid::Serialization do
             end
 
             it "includes the specified relation" do
-              relation_hash.should ==
+              relation_hash.should include
                 { "_id" => "leo-marvin", "first_name" => "Leo", "last_name" => "Marvin" }
             end
           end
@@ -214,7 +298,7 @@ describe Mongoid::Serialization do
             end
 
             it "includes the specified relation sans exceptions" do
-              relation_hash.should ==
+              relation_hash.should include
                 { "first_name" => "Leo", "last_name" => "Marvin" }
             end
           end
