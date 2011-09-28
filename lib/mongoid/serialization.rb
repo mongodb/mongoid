@@ -5,11 +5,9 @@ module Mongoid # :nodoc:
   # and XML serialization.
   module Serialization
     extend ActiveSupport::Concern
-    include ActiveModel::Serialization
 
-    # Gets the document as a serializable hash, used by ActiveModel's JSON and
-    # XML serializers. This override is just to be able to pass the :include
-    # and :except options to get associations in the hash.
+    # Gets the document as a serializable hash, used by ActiveModel's JSON
+    # serializer.
     #
     # @example Get the serializable hash.
     #   document.serializable_hash
@@ -19,16 +17,32 @@ module Mongoid # :nodoc:
     #
     # @param [ Hash ] options The options to pass.
     #
-    # @option options [ Symbol ] :include What relations to include
+    # @option options [ Symbol ] :include What relations to include.
     # @option options [ Symbol ] :only Limit the fields to only these.
     # @option options [ Symbol ] :except Dont include these fields.
+    # @option options [ Symbol ] :methods What methods to include.
     #
     # @return [ Hash ] The document, ready to be serialized.
     #
     # @since 2.0.0.rc.6
     def serializable_hash(options = nil)
       options ||= {}
-      super(options).tap do |attrs|
+
+      only   = Array.wrap(options[:only]).map(&:to_s)
+      except = Array.wrap(options[:except]).map(&:to_s)
+
+      except |= ['_type']
+
+      field_names = fields.keys.map { |field| field.to_s }
+      attribute_names = (attributes.keys + field_names).sort
+      if only.any?
+        attribute_names &= only
+      elsif except.any?
+        attribute_names -= except
+      end
+
+      method_names = Array.wrap(options[:methods]).map { |n| n.to_s if respond_to?(n.to_s) }.compact
+      Hash[(attribute_names + method_names).map { |n| [n, send(n)] }].tap do |attrs|
         serialize_relations(attrs, options) if options[:include]
       end
     end

@@ -154,6 +154,10 @@ class Person
   def reject_if_name_is_blank(attrs)
     attrs[:first_name].blank?
   end
+
+  def foo
+    'i_am_foo'
+  end
 end
 
 class Doctor < Person
