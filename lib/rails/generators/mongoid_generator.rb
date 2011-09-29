@@ -63,7 +63,7 @@ module Rails
       def type_class
         return "Time" if type.to_s == "datetime"
         return "String" if type.to_s == "text"
-        return type.to_s.camelcase
+        type.to_s.camelcase
       end
     end
   end
