@@ -39,8 +39,7 @@ module Mongoid #:nodoc:
         ensure
           document.exit_validate
         end
-        return if valid
-        document.errors.add(attribute, :invalid, options.merge(:value => value))
+        document.errors.add(attribute, :invalid) unless valid
       end
     end
   end

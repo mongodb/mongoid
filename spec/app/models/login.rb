@@ -1,6 +1,6 @@
 class Login
   include Mongoid::Document
-  field :username
+  field :username, :type => String
+  field :application_id, :type => Integer
   key :username
-  validates_uniqueness_of :username
 end
