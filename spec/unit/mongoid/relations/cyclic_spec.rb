@@ -34,6 +34,21 @@ describe Mongoid::Relations::Cyclic do
       end
     end
 
+    context "when the document is namespaced" do
+
+      let(:document) do
+        Trees::Node.new
+      end
+
+      it "creates the parent relation" do
+        document.should respond_to(:parent_node)
+      end
+
+      it "creates the child relation" do
+        document.should respond_to(:child_nodes)
+      end
+    end
+
     context "when the classes are namespaced" do
 
       let(:document) do
