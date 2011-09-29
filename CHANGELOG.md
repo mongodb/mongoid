@@ -38,6 +38,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#1273 Mongoid.preload_models now checks if preload configuration option is set,
   where Mongoid.load_models always loads everything. (Ryan McGeary)
 
+* \#1166 Don't load config in Railtie if no env variables defined. (Terence Lee)
+
 * \#1052 `alias_attribute` now works again as expected.
 
 * \#939 Apply default attributes when upcasting via #becomes. (Christos Pappas)
