@@ -51,6 +51,12 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#730 Existing models that have relations added post persistence of originals
   can now have new relations added with no migrations.
 
+* \#726 Embedded documents with compound keys not validate uniqueness correctly.
+
+* \#582 Cyclic non embedded relations now validate uniqueness correctly.
+
+* \#484 Validates uniqueness with multiple scopes of all types now work properly.
+
 ## 2.2.1
 
 ### Resolved Issues
