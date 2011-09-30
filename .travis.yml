@@ -17,4 +17,5 @@ notifications:
     - gregory@kaddabra.co.il
     - nick@deadorange.com
     - paul@codingfrontier.com
+    - bj.schaefer@gmail.com
   irc: "irc.freenode.org#mongoid"
