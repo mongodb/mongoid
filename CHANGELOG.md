@@ -67,6 +67,11 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
 
+## 2.2.2
+
+* This release removes the restriction of a dependency on 1.3.x of the mongo
+  ruby driver. Users may now use 1.3.x through 1.4.x.
+
 ## 2.2.1
 
 ### Resolved Issues
