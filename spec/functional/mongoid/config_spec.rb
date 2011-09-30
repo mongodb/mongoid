@@ -298,7 +298,6 @@ describe Mongoid::Config do
   describe ".purge!" do
 
     before do
-      Person.create(:ssn => "123-44-1200")
       Post.create(:title => "testing")
     end
 
@@ -308,12 +307,8 @@ describe Mongoid::Config do
         Mongoid.purge!
       end
 
-      it "purges the person collection" do
-        Person.count.should == 0
-      end
-
       it "purges the post collection" do
-        Post.count.should == 0
+        Post.collection.count.should eq(0)
       end
     end
   end

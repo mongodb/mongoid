@@ -50,7 +50,7 @@ describe Mongoid::Config::Database do
           end
         end
 
-        context "when no pool size provided", :config => :user do
+        context "when no pool size provided" do
 
           let(:options) do
             { "uri" => "mongodb://mongoid:test@localhost:27017/mongoid_test" }
@@ -73,7 +73,7 @@ describe Mongoid::Config::Database do
           end
         end
 
-        context "when a pool size is provided", :config => :user do
+        context "when a pool size is provided" do
 
           let(:options) do
             {
@@ -179,7 +179,7 @@ describe Mongoid::Config::Database do
           end
         end
 
-        context "when a username and password are provided", :config => :user do
+        context "when a username and password are provided" do
 
           let(:options) do
             {
@@ -199,7 +199,7 @@ describe Mongoid::Config::Database do
         end
       end
 
-      context "when arbitrary options are specified", :config => :user  do
+      context "when arbitrary options are specified" do
 
         let(:options) do
           {
