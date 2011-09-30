@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
       extend ActiveSupport::Concern
 
       included do
-        field :updated_at, :type => Time
+        field :updated_at, :type => Time, :versioned => false
         set_callback :save, :before, :set_updated_at, :if => Proc.new { |doc|
           doc.timestamping? && (doc.new_record? || doc.changed?)
         }

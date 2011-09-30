@@ -2,53 +2,77 @@ require "spec_helper"
 
 describe Mongoid::Versioning do
 
-  before(:all) do
+  before do
     WikiPage.delete_all
   end
 
   describe "#version" do
 
-    let(:page) do
-      WikiPage.new(:title => "1")
-    end
-
     context "when the document is new" do
 
-      it "defaults to 1" do
-        page.version.should == 1
+      it "returns 1" do
+        WikiPage.new.version.should eq(1)
       end
     end
 
-    context "after the document's first save" do
+    context "when the document is persisted once" do
 
-      before do
-        page.save
+      let(:page) do
+        WikiPage.create(:title => "1")
       end
 
       it "returns 1" do
-        page.version.should == 1
+        page.version.should eq(1)
       end
     end
 
-    context "when saving multiple times" do
+    context "when the document is persisted more than once" do
 
-      it "increments the version by 1" do
-        3.times do |n|
-          page.update_attribute(:title, "#{n}")
-          page.version.should == n + 1
+      let(:page) do
+        WikiPage.create(:title => "1")
+      end
+
+      before do
+        3.times { |n| page.update_attribute(:title, "#{n}") }
+      end
+
+      it "returns the number of versions" do
+        page.version.should eq(4)
+      end
+    end
+
+    context "when maximum versions is defined" do
+
+      let(:page) do
+        WikiPage.create(:title => "1")
+      end
+
+      context "when saving over the max versions limit" do
+
+        before do
+          10.times { |n| page.update_attribute(:title, "#{n}") }
+        end
+
+        it "returns the number of versions" do
+          page.version.should eq(11)
         end
       end
     end
 
-    context "when skipping versioning" do
+    context "when performing versionless saves" do
 
-      it "does not version" do
-        3.times do |n|
-          page.versionless do |doc|
-            doc.update_attribute(:title, "#{n}")
-          end
+      let(:page) do
+        WikiPage.create(:title => "1")
+      end
+
+      before do
+        10.times do |n|
+          page.versionless { |doc| doc.update_attribute(:title, "#{n}") }
         end
-        page.version.should == 1
+      end
+
+      it "does not increment the version number" do
+        page.version.should eq(1)
       end
     end
   end
@@ -59,58 +83,85 @@ describe Mongoid::Versioning do
       WikiPage.create(:title => "1")
     end
 
-    context "when version is less than the maximum" do
+    context "when saving the document " do
 
-      before do
-        4.times do |n|
-          page.title = "#{n + 2}"
-          page.save
+      context "when the document has changed" do
+
+        before do
+          page.update_attribute(:title, "2")
+        end
+
+        let(:version) do
+          page.versions.first
+        end
+
+        it "creates a new version" do
+          version.title.should eq("1")
+        end
+
+        it "only creates 1 new version" do
+          page.versions.count.should eq(1)
+        end
+
+        it "does not version the _id" do
+          version._id.should be_nil
+        end
+
+        it "does not version the updated_at timestamp" do
+          version.updated_at.should be_nil
         end
       end
 
-      let(:expected) do
-        [ "1", "2", "3", "4" ]
-      end
+      context "when the document has not changed" do
 
-      it "retains all versions" do
-        page.versions.size.should == 4
-      end
-
-      it "retains the correct values" do
-        page.versions.map(&:title).should == expected
-      end
-    end
-
-    context "when version is over the maximum" do
-
-      before do
-        7.times do |n|
-          page.title = "#{n + 2}"
+        before do
           page.save
+        end
+
+        let(:version) do
+          page.versions.first
+        end
+
+        it "does not create a new version" do
+          version.should be_nil
         end
       end
 
-      let(:expected) do
-        [ "3", "4", "5", "6", "7" ]
+      context "when saving over the number of maximum versions" do
+
+        before do
+          10.times do |n|
+            page.update_attribute(:title, "#{n}")
+          end
+        end
+
+        let(:versions) do
+          page.versions
+        end
+
+        it "only versions the maximum amount" do
+          versions.count.should eq(5)
+        end
+
+        it "shifts the versions in order" do
+          versions.last.title.should eq("8")
+        end
+
+        it "persists the version shifts" do
+          page.reload.versions.last.title.should eq("8")
+        end
       end
 
-      it "retains the set number of most recent versions" do
-        page.versions.size.should == 5
-      end
+      context "when persisting versionless" do
 
-      it "retains the most recent values" do
-        page.versions.map(&:title).should == expected
-      end
-    end
+        before do
+          page.versionless { |doc| doc.update_attribute(:title, "2") }
+        end
 
-    it "should not version versions attributes" do
-      3.times do |n|
-        page.title = "#{n + 2}"
-        page.save
+        it "does not version the document" do
+          page.versions.count.should eq(0)
+        end
       end
-
-      page.versions[1].versions.should == []
-      page.versions[2].versions.should == []
     end
   end
 end
