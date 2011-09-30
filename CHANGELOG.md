@@ -61,6 +61,9 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * \#484 Validates uniqueness with multiple scopes of all types now work properly.
 
+* Deleting versions created with `Mongoid::Versioning` no longer fires off
+  dependent cascading on relations.
+
 ## 2.2.1
 
 ### Resolved Issues

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Versioning do
 
   before do
-    WikiPage.delete_all
+    [ WikiPage, Comment ].each(&:delete_all)
   end
 
   describe "#version" do
@@ -160,6 +160,53 @@ describe Mongoid::Versioning do
 
         it "does not version the document" do
           page.versions.count.should eq(0)
+        end
+      end
+
+      context "when deleting versions" do
+
+        let(:comment) do
+          Comment.new(:title => "Don't delete me!")
+        end
+
+        let!(:orphaned) do
+          Comment.create(:title => "Annie")
+        end
+
+        before do
+          page.comments << comment
+          page.update_attribute(:title, "5")
+        end
+
+        context "when the version had a dependent relation" do
+
+          before do
+            page.versions.delete_all
+          end
+
+          let(:from_db) do
+            Comment.find(comment.id)
+          end
+
+          it "does not perform dependent cascading" do
+            from_db.should eq(comment)
+          end
+
+          it "does not delete related orphans" do
+            Comment.find(orphaned.id).should eq(orphaned)
+          end
+
+          it "deletes the version" do
+            page.versions.should be_empty
+          end
+
+          it "persists the deletion" do
+            page.reload.versions.should be_empty
+          end
+
+          it "retains the root relation" do
+            page.reload.comments.should eq([ comment ])
+          end
         end
       end
     end
