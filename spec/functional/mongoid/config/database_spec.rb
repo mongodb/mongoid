@@ -53,7 +53,7 @@ describe Mongoid::Config::Database do
         context "when no pool size provided" do
 
           let(:options) do
-            { "uri" => "mongodb://mongoid:test@localhost:27017/mongoid_test" }
+            { "uri" => "mongodb://mongoid:test@localhost:27017/mongoid_#{DATABASE_ID}" }
           end
 
           it "sets the node host to the uri host" do
@@ -65,7 +65,7 @@ describe Mongoid::Config::Database do
           end
 
           it "sets the database name to the uri database name" do
-            master.name.should == "mongoid_test"
+            master.name.should == "mongoid_#{DATABASE_ID}"
           end
 
           it "defaults the pool size to 1" do
@@ -77,7 +77,7 @@ describe Mongoid::Config::Database do
 
           let(:options) do
             {
-              "uri" => "mongodb://mongoid:test@localhost:27017/mongoid_test",
+              "uri" => "mongodb://mongoid:test@localhost:27017/mongoid_#{DATABASE_ID}",
               "pool_size" => 2,
               "logger" => true
             }
@@ -92,7 +92,7 @@ describe Mongoid::Config::Database do
           end
 
           it "sets the database name to the uri database name" do
-            master.name.should == "mongoid_test"
+            master.name.should == "mongoid_#{DATABASE_ID}"
           end
 
           it "sets the pool size" do
@@ -110,7 +110,7 @@ describe Mongoid::Config::Database do
         context "when a host is provided" do
 
           let(:options) do
-            { "host" => "localhost", "database" => "mongoid_test" }
+            { "host" => "localhost", "database" => "mongoid_#{DATABASE_ID}" }
           end
 
           it "sets the node host to the uri host" do
@@ -122,7 +122,7 @@ describe Mongoid::Config::Database do
           end
 
           it "sets the database name to the uri database name" do
-            master.name.should == "mongoid_test"
+            master.name.should == "mongoid_#{DATABASE_ID}"
           end
 
           it "sets the pool size to 1" do
@@ -133,7 +133,7 @@ describe Mongoid::Config::Database do
         context "when no host is provided" do
 
           let(:options) do
-            { "database" => "mongoid_test", "port" => 27017 }
+            { "database" => "mongoid_#{DATABASE_ID}", "port" => 27017 }
           end
 
           it "sets the node host to localhost" do
@@ -145,14 +145,14 @@ describe Mongoid::Config::Database do
           end
 
           it "sets the database name to the uri database name" do
-            master.name.should == "mongoid_test"
+            master.name.should == "mongoid_#{DATABASE_ID}"
           end
         end
 
         context "when a port is provided" do
 
           let(:options) do
-            { "database" => "mongoid_test", "port" => 27017 }
+            { "database" => "mongoid_#{DATABASE_ID}", "port" => 27017 }
           end
 
           it "sets the node host to localhost" do
@@ -167,7 +167,7 @@ describe Mongoid::Config::Database do
         context "when no port is provided" do
 
           let(:options) do
-            { "database" => "mongoid_test" }
+            { "database" => "mongoid_#{DATABASE_ID}" }
           end
 
           it "sets the node host to localhost" do
@@ -183,7 +183,7 @@ describe Mongoid::Config::Database do
 
           let(:options) do
             {
-              "database" => "mongoid_test",
+              "database" => "mongoid_#{DATABASE_ID}",
               "username" => "mongoid",
               "password" => "test"
             }
