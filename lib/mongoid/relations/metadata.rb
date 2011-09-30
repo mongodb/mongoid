@@ -813,6 +813,7 @@ module Mongoid # :nodoc:
         default = klass.relations[inverse_klass.name.underscore]
         return default.name if default
         klass.relations.each_pair do |key, meta|
+          next if meta.versioned? || meta.name == name
           if meta.class_name == inverse_class_name
             return key.to_sym
           end
