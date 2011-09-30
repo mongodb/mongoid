@@ -69,7 +69,7 @@ describe Mongoid::Config::Database do
           end
 
           it "defaults the pool size to 1" do
-            connection.instance_variable_get(:@pool_size).should == 1
+            connection.pool_size.should == 1
           end
         end
 
@@ -96,7 +96,7 @@ describe Mongoid::Config::Database do
           end
 
           it "sets the pool size" do
-            connection.instance_variable_get(:@pool_size).should == 2
+            connection.pool_size.should == 2
           end
 
           it "sets the logger to the mongoid logger" do
@@ -126,7 +126,7 @@ describe Mongoid::Config::Database do
           end
 
           it "sets the pool size to 1" do
-            connection.instance_variable_get(:@pool_size).should == 1
+            connection.pool_size.should == 1
           end
         end
 
