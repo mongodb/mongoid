@@ -15,6 +15,7 @@ module Mongoid #:nodoc:
         :class_name => self.name,
         :validate => false,
         :cyclic => true,
+        :inverse_of => nil,
         :versioned => true
 
       set_callback :save, :before, :revise, :if => :revisable?

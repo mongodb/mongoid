@@ -35,6 +35,9 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 ### Resolved Issues
 
+* \#1299 Self referenced documents with versioning no longer fail when inverse_of
+  is not defined on all relations.
+
 * \#1288, \#1289 _id and updated_at should not be part of versioned attributes.
 
 * \#1273 Mongoid.preload_models now checks if preload configuration option is set,

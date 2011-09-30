@@ -211,4 +211,23 @@ describe Mongoid::Versioning do
       end
     end
   end
+
+  context "when appending a self referencing document with versions" do
+
+    let(:page) do
+      WikiPage.create(:title => "1")
+    end
+
+    let(:child) do
+      WikiPage.new
+    end
+
+    before do
+      page.child_pages << child
+    end
+
+    it "allows the document to be added" do
+      page.child_pages.should eq([ child ])
+    end
+  end
 end
