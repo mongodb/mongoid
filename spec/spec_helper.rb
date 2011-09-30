@@ -11,9 +11,12 @@ require "mocha"
 require "rspec"
 
 LOGGER = Logger.new($stdout)
+DATABASE_ID = Process.pid
 
 Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db("mongoid_test")
+  database = Mongo::Connection.new.db("mongoid_#{DATABASE_ID}")
+  database.add_user("mongoid", "test")
+  config.master = database
   config.logger = nil
 end
 
@@ -23,13 +26,13 @@ Dir[ File.join(SUPPORT, "*.rb") ].each { |file| require File.basename(file) }
 RSpec.configure do |config|
   config.mock_with(:mocha)
 
-  config.after(:suite) { Mongoid.purge! }
-  config.before(:each) { Mongoid::IdentityMap.clear }
+  config.before(:each) do
+    Mongoid::IdentityMap.clear
+  end
 
-  # We filter out the specs that require authentication if the database has not
-  # had the mongoid user set up properly.
-  user_configured = Support::Authentication.configured?
-  warn(Support::Authentication.message) unless user_configured
+  config.after(:suite) do
+    Mongoid.master.connection.drop_database("mongoid_#{DATABASE_ID}")
+  end
 
   # We filter out specs that require authentication to MongoHQ if the
   # environment variables have not been set up locally.
@@ -38,7 +41,6 @@ RSpec.configure do |config|
 
   config.filter_run_excluding(:config => lambda { |value|
     return true if value == :mongohq && !mongohq_configured
-    return true if value == :user && !user_configured
   })
 end
 

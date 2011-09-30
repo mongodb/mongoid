@@ -7,5 +7,3 @@ rvm:
   - 1.9.2
   - ree
   - rbx-2.0.0pre
-before_script:
-  - mongo mongoid_test --eval 'db.addUser("mongoid", "test");'
