@@ -1,9 +1,20 @@
 rvm:
+  - 1.8.7
+  - 1.9.2
+  - 1.9.3
   - ruby-head
   - jruby
   - rbx
-  - 1.9.3
-  - 1.8.7
-  - 1.9.2
-  - ree
   - rbx-2.0.0pre
+  - ree
+notifications:
+  email:
+    - durran@gmail.com
+    - arunagw@gmail.com
+    - cgriego@gmail.com
+    - mail@etehtsea.me
+    - ethan@ethangunderson.com
+    - gregory@kaddabra.co.il
+    - nick@deadorange.com
+    - paul@codingfrontier.com
+  irc: "irc.freenode.org#mongoid"
