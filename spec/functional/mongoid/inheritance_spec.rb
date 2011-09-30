@@ -19,7 +19,7 @@ describe Mongoid::Document do
     end
 
     let(:attributes) do
-      collection.find({ :name => "Test"}, {}).next_document
+      collection.find({ :name => "Test"}, {}).first
     end
 
     it "persists the versions" do
@@ -46,7 +46,7 @@ describe Mongoid::Document do
     end
 
     let(:attributes) do
-      collection.find({ :name => "Testy"}, {}).next_document
+      collection.find({ :name => "Testy"}, {}).first
     end
 
     before do
