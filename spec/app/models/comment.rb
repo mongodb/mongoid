@@ -9,6 +9,7 @@ class Comment
   belongs_to :account
   belongs_to :movie
   belongs_to :rating
+  belongs_to :wiki_page
   validates :title, :presence => true
   validates :movie, :rating, :associated => true
 end
