@@ -132,6 +132,45 @@ describe Mongoid::Criterion::Inclusion do
     end
   end
 
+  describe "#all_of" do
+
+    let!(:person_one) do
+      Person.create(:ssn => "354-12-1221")
+    end
+
+    let!(:person_two) do
+      Person.create(:ssn => "354-12-1222")
+    end
+
+    context "when providing object ids" do
+
+      let(:from_db) do
+        Person.all_of(
+          { :_id.in => [ person_one.id, person_two.id ] },
+          { :_id => person_two.id }
+        )
+      end
+
+      it "returns the matching documents" do
+        from_db.should eq([ person_two ])
+      end
+    end
+
+    context "when providing string ids" do
+
+      let(:from_db) do
+        Person.all_of(
+          { :_id.in => [ person_one.id.to_s, person_two.id.to_s ] },
+          { :_id => person_two.id.to_s }
+        )
+      end
+
+      it "returns the matching documents" do
+        from_db.should eq([ person_two ])
+      end
+    end
+  end
+
   describe "#find" do
 
     let!(:person) do
