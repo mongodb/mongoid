@@ -27,11 +27,16 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
   results even if the fields have no values to make serialized documents easier
   to use by ActiveResource clients.
 
+* Support for MongoDB's $and operator is now available in the form of:
+  `Criteria#all_of(*args)` where args is multiple hash expressions.
+
 ### Major Changes
 
 * Mongoid now depends on Active Model 3.1 and higher.
 
 * Mongoid now depends on the Mongo Ruby Driver 1.4 and higher.
+
+* Mongoid requires MongoDB 2.0.0 and higher.
 
 ### Resolved Issues
 
