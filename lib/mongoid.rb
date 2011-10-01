@@ -94,7 +94,7 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 module Mongoid #:nodoc
   extend self
 
-  MONGODB_VERSION = "1.8.0"
+  MONGODB_VERSION = "2.0.0"
 
   # Sets the Mongoid configuration options. Best used by passing a block.
   #
