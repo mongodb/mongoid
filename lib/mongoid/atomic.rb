@@ -163,6 +163,18 @@ module Mongoid #:nodoc:
       @atomic_unsets ||= []
     end
 
+    # Get all the atomic sets that have had their saves delayed.
+    #
+    # @example Get the delayed atomic sets.
+    #   person.delayed_atomic_sets
+    #
+    # @return [ Hash ] The delayed $sets.
+    #
+    # @since 2.3.0
+    def delayed_atomic_sets
+      @delayed_atomic_sets ||= {}
+    end
+
     private
 
     # Get the atomic paths utility for this document.
@@ -190,6 +202,7 @@ module Mongoid #:nodoc:
       mods.unset(doc.atomic_unsets)
       mods.pull(doc.atomic_pulls)
       mods.set(doc.atomic_sets)
+      mods.set(doc.delayed_atomic_sets)
       mods.push(doc.atomic_pushes)
     end
   end

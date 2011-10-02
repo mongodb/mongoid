@@ -129,6 +129,10 @@ class Person
     self.employer_id = emp.id
   end
 
+  def set_addresses=(addresses)
+    self.addresses = addresses
+  end
+
   before_save :savable?
 
   def savable?
