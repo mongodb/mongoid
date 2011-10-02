@@ -961,7 +961,9 @@ describe Mongoid::Criteria do
         end
 
         it "adds the id selector" do
-          criteria.search(id)[1].selector.should == { :_id => BSON::ObjectId.from_string(id) }
+          criteria.search(id)[1].selector.should eq(
+            { "$and" => [{ :_id => BSON::ObjectId.from_string(id) }] }
+          )
         end
       end
 
@@ -972,7 +974,9 @@ describe Mongoid::Criteria do
         end
 
         it "adds the id selector" do
-          criteria.search(id)[1].selector.should == { :_id => id }
+          criteria.search(id)[1].selector.should eq(
+            { "$and" => [{ :_id => id }] }
+          )
         end
       end
     end

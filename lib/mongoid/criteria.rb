@@ -153,6 +153,20 @@ module Mongoid #:nodoc:
       context.count > 0
     end
 
+    # Extract a single id from the provided criteria. Could be in an $and
+    # query or a straight _id query.
+    #
+    # @example Extract the id.
+    #   criteria.extract_id
+    #
+    # @return [ Object ] The id.
+    #
+    # @since 2.3.0
+    def extract_id
+      query = selector["$and"]
+      query && query.first ? query.first[:_id] : selector[:_id]
+    end
+
     # When freezing a criteria we need to initialize the context first
     # otherwise the setting of the context on attempted iteration will raise a
     # runtime error.

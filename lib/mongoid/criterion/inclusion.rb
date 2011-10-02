@@ -287,7 +287,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.2.1
       def from_map_or_db(criteria)
-        IdentityMap.get(klass, criteria.selector[:_id]) || criteria.one
+        IdentityMap.get(klass, criteria.extract_id) || criteria.one
       end
     end
   end
