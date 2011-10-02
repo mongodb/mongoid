@@ -163,11 +163,13 @@ module Mongoid #:nodoc:
       #   Person.create(:title => "Mr")
       #
       # @param [ Hash ] attributes The attributes to create with.
+      # @param [ Hash ] options A mass-assignment protection options. Supports
+      #   :as and :without_protection
       #
       # @return [ Document ] The newly created document.
-      def create(attributes = {}, &block)
+      def create(attributes = {}, options = {}, &block)
         creating do
-          new(attributes, &block).tap { |doc| doc.save }
+          new(attributes, options, &block).tap { |doc| doc.save }
         end
       end
 
@@ -180,11 +182,13 @@ module Mongoid #:nodoc:
       #   Person.create!(:title => "Mr")
       #
       # @param [ Hash ] attributes The attributes to create with.
+      # @param [ Hash ] options A mass-assignment protection options. Supports
+      #   :as and :without_protection
       #
       # @return [ Document ] The newly created document.
-      def create!(attributes = {}, &block)
+      def create!(attributes = {}, options = {}, &block)
         creating do
-          new(attributes, &block).tap do |doc|
+          new(attributes, options, &block).tap do |doc|
             fail_validate!(doc) if doc.insert.errors.any?
             fail_callback!(doc, :create!) if doc.new?
           end

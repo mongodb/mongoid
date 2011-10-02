@@ -58,6 +58,79 @@ describe Mongoid::Persistence do
         person.should be_persisted
       end
     end
+
+    context "when mass assignment role is indicated" do
+
+      context "when attributes assigned from default role" do
+
+        let(:item) do
+          Item.create(
+            :title => "Some Title",
+            :is_rss => true,
+            :user_login => "SomeLogin"
+          )
+        end
+
+        it "sets the field for the default role" do
+          item.is_rss.should be_true
+        end
+
+        it "does not set the field for non default role title" do
+          item.title.should be_nil
+        end
+
+        it "does not set the field for non default role user login" do
+          item.user_login.should be_nil
+        end
+      end
+
+      context "when attributes assigned from parser role" do
+
+        let(:item) do
+          Item.create(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin" }, :as => :parser
+          )
+        end
+
+        it "sets the user login field for parser role" do
+          item.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the is rss field for parse role" do
+          item.is_rss.should eq(false)
+        end
+
+        it "does not set the title field" do
+          item.title.should be_nil
+        end
+      end
+
+      context "when attributes assigned without protection" do
+
+        let(:item) do
+          Item.create(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin"
+            }, :without_protection => true
+          )
+        end
+
+        it "sets the title attribute" do
+          item.title.should eq("Some Title")
+        end
+
+        it "sets the user login attribute" do
+          item.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the rss attribute" do
+          item.is_rss.should be_true
+        end
+      end
+    end
   end
 
   describe ".create!" do
@@ -114,6 +187,79 @@ describe Mongoid::Persistence do
 
       it "raises a callback error" do
         expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)
+      end
+    end
+
+    context "when mass assignment role is indicated" do
+
+      context "when attributes assigned from default role" do
+
+        let(:item) do
+          Item.create!(
+            :title => "Some Title",
+            :is_rss => true,
+            :user_login => "SomeLogin"
+          )
+        end
+
+        it "sets the field for the default role" do
+          item.is_rss.should be_true
+        end
+
+        it "does not set the field for non default role title" do
+          item.title.should be_nil
+        end
+
+        it "does not set the field for non default role user login" do
+          item.user_login.should be_nil
+        end
+      end
+
+      context "when attributes assigned from parser role" do
+
+        let(:item) do
+          Item.create!(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin" }, :as => :parser
+          )
+        end
+
+        it "sets the user login field for parser role" do
+          item.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the is rss field for parse role" do
+          item.is_rss.should eq(false)
+        end
+
+        it "does not set the title field" do
+          item.title.should be_nil
+        end
+      end
+
+      context "when attributes assigned without protection" do
+
+        let(:item) do
+          Item.create!(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin"
+            }, :without_protection => true
+          )
+        end
+
+        it "sets the title attribute" do
+          item.title.should eq("Some Title")
+        end
+
+        it "sets the user login attribute" do
+          item.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the rss attribute" do
+          item.is_rss.should be_true
+        end
       end
     end
   end
