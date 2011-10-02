@@ -237,14 +237,24 @@ module Mongoid #:nodoc:
               BSON::ObjectId.convert(klass, selector || {}, false).expand_complex_criteria
           end
 
+          # @todo: Durran: 3.0.0: refactor the merging into separate strategies
+          # to clean this funkiness up.
           selector.each_pair do |key, value|
-            if crit.selector.has_key?(key) &&
-              crit.selector[key].respond_to?(:merge) &&
-              value.respond_to?(:merge)
-              crit.selector[key] =
-                crit.selector[key].merge(value) do |key, old, new|
-                  key == '$in' ? old & new : new
+            if crit.selector.has_key?(key)
+              if key.to_s =~ /^(|_)id$/
+                if crit.selector.has_key?("$and")
+                  crit.selector["$and"] << { key => value }
+                else
+                  crit.selector["$and"] = [{ key => crit.selector.delete(key) }, { key => value }]
                 end
+              elsif crit.selector[key].respond_to?(:merge) && value.respond_to?(:merge)
+                crit.selector[key] =
+                  crit.selector[key].merge(value) do |key, old, new|
+                    key == '$in' ? old & new : new
+                  end
+              else
+                crit.selector[key] = value
+              end
             else
               crit.selector[key] = value
             end

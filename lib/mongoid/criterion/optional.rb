@@ -91,9 +91,9 @@ module Mongoid #:nodoc:
       def for_ids(*ids)
         ids.flatten!
         if ids.size > 1
-          any_in(:_id => ::BSON::ObjectId.convert(klass, ids))
+          where(:_id.in => ::BSON::ObjectId.convert(klass, ids))
         else
-          all_of(:_id => ids.first)
+          where(:_id => ids.first)
         end
       end
 

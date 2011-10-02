@@ -1742,6 +1742,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       person.preferences.create(:name => "Second", :value => "Testing")
     end
 
+    let!(:unrelated) do
+      Preference.create(:name => "Third")
+    end
+
     context "when providing a single criteria" do
 
       let(:preferences) do
@@ -1750,6 +1754,17 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       it "applies the criteria to the documents" do
         preferences.should == [ preference_one ]
+      end
+    end
+
+    context "when providing a criteria on id" do
+
+      let(:preferences) do
+        person.preferences.where(:_id => unrelated.id)
+      end
+
+      it "does not return unrelated documents" do
+        preferences.should be_empty
       end
     end
 
