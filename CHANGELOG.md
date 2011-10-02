@@ -18,6 +18,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#1228 Allow pre formatting of compsoite keys by passing a block to #key.
   (Ben Hundley)
 
+* \#1222 Scoped mass assignment is now supported. (Andrew Shaydurov)
+
 * \#1196 Timestamps can now be turned off on a call-by-call basis via the use
   of #timeless: `person.timeless.save`, `Person.timeless.create(:title => "Sir")`.
 
