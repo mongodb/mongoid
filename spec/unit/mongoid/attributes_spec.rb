@@ -156,6 +156,80 @@ describe Mongoid::Attributes do
         account.balance.should == "ABBA"
       end
     end
+
+    context "when mass assignment role is indicated" do
+
+      context "when attributes assigned from default role" do
+
+        let(:article) do
+          Article.new(
+            :title => "Some Title",
+            :is_rss => true,
+            :user_login => "SomeLogin"
+          )
+        end
+
+        it "sets the title field for default role" do
+          article.title.should eq("Some Title")
+        end
+
+        it "sets the user login field for the default role" do
+          article.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the rss field for the default role" do
+          article.is_rss.should eq(false)
+        end
+      end
+
+      context "when attributes assigned from parser role" do
+
+        let(:article) do
+          Article.new({
+            :title => "Some Title",
+            :is_rss => true,
+            :user_login => "SomeLogin"
+            }, :as => :parser
+          )
+        end
+
+        it "sets the title field" do
+          article.title.should eq("Some Title")
+        end
+
+        it "sets the rss field" do
+          article.is_rss.should be_true
+        end
+
+        it "does not set the user login field" do
+          article.user_login.should be_nil
+        end
+      end
+
+      context "when attributes assigned without protection" do
+
+        let(:article) do
+          Article.new(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin"
+            }, :without_protection => true
+          )
+        end
+
+        it "sets the title field" do
+          article.title.should eq("Some Title")
+        end
+
+        it "sets the user login field" do
+          article.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the rss field" do
+          article.is_rss.should be_true
+        end
+      end
+    end
   end
 
   describe ".attr_protected" do
@@ -194,6 +268,7 @@ describe Mongoid::Attributes do
     end
 
     context "when using override" do
+
       let(:person) do
         Person.new
       end
@@ -201,6 +276,83 @@ describe Mongoid::Attributes do
       it "ignores any protected attribute" do
         person.write_attributes({:security_code => "ABBA"}, false)
         person.security_code.should == "ABBA"
+      end
+    end
+
+    context "when mass assignment role is indicated" do
+
+      let(:item) do
+        Item.new
+      end
+
+      context "when attributes assigned from default role" do
+
+        before do
+          item.assign_attributes(
+            :title => "Some Title",
+            :is_rss => true,
+            :user_login => "SomeLogin"
+          )
+        end
+
+        it "sets the field for the default role" do
+          item.is_rss.should be_true
+        end
+
+        it "does not set the field for non default role title" do
+          item.title.should be_nil
+        end
+
+        it "does not set the field for non default role user login" do
+          item.user_login.should be_nil
+        end
+      end
+
+      context "when attributes assigned from parser role" do
+
+        before do
+          item.assign_attributes(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin" }, :as => :parser
+          )
+        end
+
+        it "sets the user login field for parser role" do
+          item.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the is rss field for parse role" do
+          item.is_rss.should eq(false)
+        end
+
+        it "does not set the title field" do
+          item.title.should be_nil
+        end
+      end
+
+      context "when attributes assigned without protection" do
+
+        before do
+          item.assign_attributes(
+            { :title => "Some Title",
+              :is_rss => true,
+              :user_login => "SomeLogin"
+            }, :without_protection => true
+          )
+        end
+
+        it "sets the title attribute" do
+          item.title.should eq("Some Title")
+        end
+
+        it "sets the user login attribute" do
+          item.user_login.should eq("SomeLogin")
+        end
+
+        it "sets the rss attribute" do
+          item.is_rss.should be_true
+        end
       end
     end
   end

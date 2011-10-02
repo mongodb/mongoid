@@ -44,10 +44,11 @@ module Mongoid #:nodoc:
     #   person.process(:title => "sir", :age => 40)
     #
     # @param [ Hash ] attrs The attributes to set.
+    # @param [ Symbol ] role A role for scoped mass assignment.
     # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 2.0.0.rc.7
-    def process(attrs = nil, guard_protected_attributes = true)
+    def process(attrs = nil, role = :default, guard_protected_attributes = true)
       if attrs
         errors = []
         attributes = {}
@@ -81,7 +82,7 @@ module Mongoid #:nodoc:
           )
         end
 
-        super attributes, guard_protected_attributes
+        super attributes, role, guard_protected_attributes
       else
         super
       end
