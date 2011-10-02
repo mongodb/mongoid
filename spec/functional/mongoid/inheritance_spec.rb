@@ -216,10 +216,10 @@ describe Mongoid::Document do
     end
 
     it "should allow STI from the build call" do
-      car = @container.vehicles.build({},Car)
+      car = @container.vehicles.build({}, {}, Car)
       car.save
 
-      truck = @container.vehicles.build({},Truck)
+      truck = @container.vehicles.build({}, {}, Truck)
       truck.save
 
       @container.vehicles.map(&:class).should == [Car,Truck]
@@ -232,8 +232,8 @@ describe Mongoid::Document do
     end
 
     it "should allow STI from the build call" do
-      @container.vehicles.create({},Car)
-      @container.vehicles.create({},Truck)
+      @container.vehicles.create({}, {}, Car)
+      @container.vehicles.create({}, {}, Truck)
       @container.vehicles.map(&:class).should == [Car,Truck]
     end
 

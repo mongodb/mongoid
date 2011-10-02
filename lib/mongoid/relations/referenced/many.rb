@@ -47,13 +47,14 @@ module Mongoid #:nodoc:
         #   person.posts.build(:title => "A new post")
         #
         # @param [ Hash ] attributes The attributes of the new document.
+        # @param [ Hash ] options The scoped assignment options.
         # @param [ Class ] type The optional subclass to build.
         #
         # @return [ Document ] The new document.
         #
         # @since 2.0.0.beta.1
-        def build(attributes = {}, type = nil)
-          Factory.build(type || klass, attributes).tap do |doc|
+        def build(attributes = {}, options = {}, type = nil)
+          Factory.build(type || klass, attributes, options).tap do |doc|
             append(doc)
             yield(doc) if block_given?
           end
@@ -67,13 +68,14 @@ module Mongoid #:nodoc:
         #   person.posts.create(:text => "Testing")
         #
         # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Hash ] options The scoped assignment options.
         # @param [ Class ] type The optional type of document to create.
         #
         # @return [ Document ] The newly created document.
         #
         # @since 2.0.0.beta.1
-        def create(attributes = nil, type = nil, &block)
-          build(attributes, type, &block).tap do |doc|
+        def create(attributes = nil, options = {}, type = nil, &block)
+          build(attributes, options, type, &block).tap do |doc|
             base.persisted? ? doc.save : raise_unsaved(doc)
           end
         end
@@ -86,6 +88,7 @@ module Mongoid #:nodoc:
         #   person.posts.create!(:text => "Testing")
         #
         # @param [ Hash ] attributes The attributes to create with.
+        # @param [ Hash ] options The scoped assignment options.
         # @param [ Class ] type The optional type of document to create.
         #
         # @raise [ Errors::Validations ] If validation failed.
@@ -93,8 +96,8 @@ module Mongoid #:nodoc:
         # @return [ Document ] The newly created document.
         #
         # @since 2.0.0.beta.1
-        def create!(attributes = nil, type = nil, &block)
-          build(attributes, type, &block).tap do |doc|
+        def create!(attributes = nil, options = {}, type = nil, &block)
+          build(attributes, options, type, &block).tap do |doc|
             base.persisted? ? doc.save! : raise_unsaved(doc)
           end
         end

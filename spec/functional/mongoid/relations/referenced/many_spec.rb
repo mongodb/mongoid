@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   before do
-    [ Person, Post, Movie, Rating, Game ].map(&:delete_all)
+    [ Person, Post, Movie, Rating, Game, Drug ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -536,6 +536,28 @@ describe Mongoid::Relations::Referenced::Many do
 
     describe "##{method}" do
 
+      context "when providing scoped mass assignment" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:drug) do
+          person.drugs.send(
+            method,
+            { :name => "Oxycontin", :generic => false }, :as => :admin
+          )
+        end
+
+        it "sets the attributes for the provided role" do
+          drug.name.should eq("Oxycontin")
+        end
+
+        it "does not set the attributes for other roles" do
+          drug.generic.should be_nil
+        end
+      end
+
       context "when the relation is not polymorphic" do
 
         context "when the parent is a new record" do
@@ -877,6 +899,27 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#create" do
 
+    context "when providing scoped mass assignment" do
+
+      let(:person) do
+        Person.create(:ssn => "213-12-2121")
+      end
+
+      let(:drug) do
+        person.drugs.create(
+          { :name => "Oxycontin", :generic => false }, :as => :admin
+        )
+      end
+
+      it "sets the attributes for the provided role" do
+        drug.name.should eq("Oxycontin")
+      end
+
+      it "does not set the attributes for other roles" do
+        drug.generic.should be_nil
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       context "when the parent is a new record" do
@@ -983,6 +1026,27 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#create!" do
+
+    context "when providing mass scoping options" do
+
+      let(:person) do
+        Person.create(:ssn => "213-12-2121")
+      end
+
+      let(:drug) do
+        person.drugs.create!(
+          { :name => "Oxycontin", :generic => false }, :as => :admin
+        )
+      end
+
+      it "sets the attributes for the provided role" do
+        drug.name.should eq("Oxycontin")
+      end
+
+      it "does not set the attributes for other roles" do
+        drug.generic.should be_nil
+      end
+    end
 
     context "when the relation is not polymorphic" do
 
