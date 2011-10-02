@@ -1410,6 +1410,14 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         person.preferences.create(:name => "OMG I has relations")
       end
 
+      let!(:unrelated_pref) do
+        Preference.create(:name => "orphan annie")
+      end
+
+      let!(:unrelated_pref_two) do
+        Preference.create(:name => "orphan two")
+      end
+
       context "when providing an id" do
 
         context "when the id matches" do
@@ -1420,6 +1428,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "returns the matching document" do
             preference.should == preference_one
+          end
+        end
+
+        context "when the id matches an unreferenced document" do
+
+          let(:preference) do
+            person.preferences.find(unrelated_pref.id)
+          end
+
+          it "raises an error" do
+            expect {
+              preference
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
 
@@ -1469,6 +1490,21 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "returns the matching documents" do
             preferences.should == [ preference_one, preference_two ]
+          end
+        end
+
+        context "when the ids matche unreferenced documents" do
+
+          let(:preferences) do
+            person.preferences.find(
+              [ unrelated_pref.id, unrelated_pref_two.id ]
+            )
+          end
+
+          it "raises an error" do
+            expect {
+              preferences
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
 

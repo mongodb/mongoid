@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/matchers/default"
 require "mongoid/matchers/all"
+require "mongoid/matchers/and"
 require "mongoid/matchers/exists"
 require "mongoid/matchers/gt"
 require "mongoid/matchers/gte"
@@ -22,6 +23,7 @@ module Mongoid #:nodoc:
 
       MATCHERS = {
         "$all" => Matchers::All,
+        "$and" => Matchers::And,
         "$exists" => Matchers::Exists,
         "$gt" => Matchers::Gt,
         "$gte" => Matchers::Gte,
@@ -51,10 +53,10 @@ module Mongoid #:nodoc:
         if value.is_a?(Hash)
           MATCHERS[value.keys.first].new(extract_attribute(document, key))
         else
-          if key == "$or"
-            Matchers::Or.new(value, document)
-          else
-            Default.new(extract_attribute(document, key))
+          case key
+            when "$or" then Matchers::Or.new(value, document)
+            when "$and" then Matchers::And.new(value, document)
+            else Default.new(extract_attribute(document, key))
           end
         end
       end
