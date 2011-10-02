@@ -79,15 +79,32 @@ describe Mongoid::Criterion::Inclusion do
 
   describe "#any_in" do
 
-    let(:criteria) do
-      base.any_in(:title => ["title1", "title2"], :text => ["test"])
+    context "when providing multiple fields" do
+
+      let(:criteria) do
+        base.any_in(:title => ["title1", "title2"], :text => ["test"])
+      end
+
+      it "aliases to #in" do
+        criteria.selector.should eq({
+          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
+        })
+      end
     end
 
-    it "aliases to #in" do
-      criteria.selector.should ==
-        {
-          :title => { "$in" => ["title1", "title2"] }, :text => { "$in" => ["test"] }
-        }
+    context "when chaining on the same field" do
+
+      let(:criteria) do
+        base.
+          any_in(:title => [ "test", "test2" ]).
+          any_in(:title => [ "test2", "test3" ])
+      end
+
+      it "intersects the selector" do
+        criteria.selector.should eq({
+          :title => { "$in" => [ "test2" ] }
+        })
+      end
     end
   end
 
