@@ -637,6 +637,36 @@ describe Mongoid::Dirty do
     end
   end
 
+  describe "#move_changes" do
+
+    let(:person) do
+      Person.new(:title => "Sir")
+    end
+
+    before do
+      person.atomic_pulls["addresses"] = Address.new
+      person.atomic_unsets << Address.new
+      person.delayed_atomic_sets["addresses"] = Address.new
+      person.move_changes
+    end
+
+    it "clears the atomic pulls" do
+      person.atomic_pulls.should be_empty
+    end
+
+    it "clears the atomic unsets" do
+      person.atomic_unsets.should be_empty
+    end
+
+    it "clears the delayed atomic sets" do
+      person.delayed_atomic_sets.should be_empty
+    end
+
+    it "clears the changed attributes" do
+      person.changed_attributes.should be_empty
+    end
+  end
+
   describe "#reset_attribute!" do
 
     context "when the attribute has changed" do

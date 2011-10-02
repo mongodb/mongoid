@@ -242,6 +242,9 @@ module Mongoid # :nodoc:
                   replacement = Many.builder(metadata, replacement).build
                 end
                 proxy.target = replacement.compact
+                if _assigning?
+                  base.delayed_atomic_sets[metadata.name.to_s] = proxy.as_document
+                end
                 proxy.target.each_with_index do |doc, index|
                   integrate(doc)
                   doc._index = index

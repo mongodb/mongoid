@@ -71,7 +71,10 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] Is the document new and embedded?
     def pushable?
-      new? && embedded_many? && _parent.persisted?
+      new? &&
+        embedded_many? &&
+        _parent.persisted? &&
+        !_parent.delayed_atomic_sets[atomic_path]
     end
 
     # Determine if the document can be set.
