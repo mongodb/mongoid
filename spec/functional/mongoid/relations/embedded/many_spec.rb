@@ -643,6 +643,28 @@ describe Mongoid::Relations::Embedded::Many do
 
     describe "#build" do
 
+      context "when providing scoped mass assignment" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:video) do
+          person.videos.send(
+            method,
+            { :title => "Inception", :year => 1999 }, :as => :admin
+          )
+        end
+
+        it "sets the attributes for the provided role" do
+          video.title.should eq("Inception")
+        end
+
+        it "does not set the attributes for other roles" do
+          video.year.should be_nil
+        end
+      end
+
       context "when the relation is not cyclic" do
 
         let(:person) do
@@ -848,6 +870,27 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#create" do
 
+    context "when providing scoped mass assignment" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:video) do
+        person.videos.create(
+          { :title => "Inception", :year => 1999 }, :as => :admin
+        )
+      end
+
+      it "sets the attributes for the provided role" do
+        video.title.should eq("Inception")
+      end
+
+      it "does not set the attributes for other roles" do
+        video.year.should be_nil
+      end
+    end
+
     context "when the relation is not cyclic" do
 
       let(:person) do
@@ -924,6 +967,23 @@ describe Mongoid::Relations::Embedded::Many do
 
     let(:person) do
       Person.new
+    end
+
+    context "when providing scoped mass assignment" do
+
+      let(:video) do
+        person.videos.create!(
+          { :title => "Inception", :year => 1999 }, :as => :admin
+        )
+      end
+
+      it "sets the attributes for the provided role" do
+        video.title.should eq("Inception")
+      end
+
+      it "does not set the attributes for other roles" do
+        video.year.should be_nil
+      end
     end
 
     context "when validation passes" do

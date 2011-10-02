@@ -123,10 +123,11 @@ module Mongoid #:nodoc:
     #   :as and :without_protection
     #
     # @return [ Document ] A new document.
-    def initialize(attrs = nil, options = {})
+    def initialize(attrs = nil, options = nil)
       _building do
         @new_record = true
         @attributes ||= {}
+        options ||= {}
         process(attrs, options[:as] || :default, !options[:without_protection]) do
           yield self if block_given?
           identify
