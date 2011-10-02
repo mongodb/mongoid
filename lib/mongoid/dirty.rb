@@ -40,9 +40,9 @@ module Mongoid #:nodoc:
     def move_changes
       @_children = nil
       @previously_changed = changes
-      @validated = false
       atomic_pulls.clear
       atomic_unsets.clear
+      delayed_atomic_sets.clear
       changed_attributes.clear
     end
 
