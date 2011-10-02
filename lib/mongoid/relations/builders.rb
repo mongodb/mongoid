@@ -65,7 +65,9 @@ module Mongoid # :nodoc:
         def builder(name, metadata)
           tap do
             define_method("build_#{name}") do |*args|
-              document = Factory.build(metadata.klass, args.first || {})
+              attributes = args.first || {}
+              options = args.size > 1 ? args[1] : {}
+              document = Factory.build(metadata.klass, attributes, options)
               _building do
                 send("#{name}=", document)
               end
