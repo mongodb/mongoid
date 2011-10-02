@@ -163,8 +163,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def extract_id
-      query = selector["$and"]
-      query && query.first ? query.first[:_id] : selector[:_id]
+      selector[:_id]
     end
 
     # When freezing a criteria we need to initialize the context first
