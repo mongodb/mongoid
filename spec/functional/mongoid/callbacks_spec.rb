@@ -574,6 +574,357 @@ describe Mongoid::Callbacks do
         end
       end
     end
+
+    context "when the document is embedded multiple levels" do
+
+      describe "#before_create" do
+
+        context "when the child is new" do
+
+          context "when the root is new" do
+
+            let(:band) do
+              Band.new(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            it "executes the callback" do
+              track.before_create_called.should be_true
+            end
+          end
+
+          context "when the root is persisted" do
+
+            let(:band) do
+              Band.create(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            it "executes the callback" do
+              track.before_create_called.should be_true
+            end
+          end
+        end
+
+        context "when the child is persisted" do
+
+          let(:band) do
+            Band.create(:name => "Moderat")
+          end
+
+          let!(:record) do
+            band.records.create(:name => "Moderat")
+          end
+
+          let!(:track) do
+            record.tracks.create(:name => "Berlin")
+          end
+
+          before do
+            track.before_create_called = false
+            band.save
+          end
+
+          it "does not execute the callback" do
+            track.before_create_called.should be_false
+          end
+        end
+      end
+
+      describe "#before_save" do
+
+        context "when the child is new" do
+
+          context "when the root is new" do
+
+            let(:band) do
+              Band.new(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            let(:reloaded) do
+              band.reload.records.first
+            end
+
+            it "executes the callback" do
+              track.before_save_called.should be_true
+            end
+
+            it "persists the change" do
+              reloaded.tracks.first.before_save_called.should be_true
+            end
+          end
+
+          context "when the parent is persisted" do
+
+            let(:band) do
+              Band.create(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            let(:reloaded) do
+              band.reload.records.first
+            end
+
+            it "executes the callback" do
+              track.before_save_called.should be_true
+            end
+
+            it "persists the change" do
+              reloaded.tracks.first.before_save_called.should be_true
+            end
+          end
+        end
+
+        context "when the child is persisted" do
+
+          let(:band) do
+            Band.create(:name => "Moderat")
+          end
+
+          let!(:record) do
+            band.records.create(:name => "Moderat")
+          end
+
+          let!(:track) do
+            record.tracks.create(:name => "Berlin")
+          end
+
+          before do
+            band.save
+          end
+
+          let(:reloaded) do
+            band.reload.records.first
+          end
+
+          it "executes the callback" do
+            track.before_save_called.should be_true
+          end
+
+          it "persists the change" do
+            reloaded.tracks.first.before_save_called.should be_true
+          end
+        end
+      end
+
+      describe "#before_update" do
+
+        context "when the child is new" do
+
+          context "when the parent is new" do
+
+            let(:band) do
+              Band.new(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            it "does not execute the callback" do
+              track.before_update_called.should be_false
+            end
+          end
+
+          context "when the parent is persisted" do
+
+            let(:band) do
+              Band.create(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            it "does not execute the callback" do
+              track.before_update_called.should be_false
+            end
+          end
+        end
+
+        context "when the child is persisted" do
+
+          let(:band) do
+            Band.create(:name => "Moderat")
+          end
+
+          let!(:record) do
+            band.records.create(:name => "Moderat")
+          end
+
+          let!(:track) do
+            record.tracks.create(:name => "Berlin")
+          end
+
+          context "when the child is dirty" do
+
+            before do
+              track.name = "Rusty Nails"
+              band.save
+            end
+
+            let(:reloaded) do
+              band.reload.records.first
+            end
+
+            it "executes the callback" do
+              track.before_update_called.should be_true
+            end
+
+            it "persists the change" do
+              reloaded.tracks.first.before_update_called.should be_true
+            end
+          end
+
+          context "when the child is not dirty" do
+
+            before do
+              band.save
+            end
+
+            it "does not execute the callback" do
+              track.before_update_called.should be_false
+            end
+          end
+        end
+      end
+
+      describe "#before_validation" do
+
+        context "when the child is new" do
+
+          context "when the parent is new" do
+
+            let(:band) do
+              Band.new(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            it "executes the callback" do
+              track.before_validation_called.should be_true
+            end
+          end
+
+          context "when the parent is persisted" do
+
+            let(:band) do
+              Band.create(:name => "Moderat")
+            end
+
+            let!(:record) do
+              band.records.build(:name => "Moderat")
+            end
+
+            let!(:track) do
+              record.tracks.build(:name => "Berlin")
+            end
+
+            before do
+              band.save
+            end
+
+            it "executes the callback" do
+              track.before_validation_called.should be_true
+            end
+          end
+        end
+
+        context "when the child is persisted" do
+
+          let(:band) do
+            Band.create(:name => "Moderat")
+          end
+
+          let!(:record) do
+            band.records.create(:name => "Moderat")
+          end
+
+          let!(:track) do
+            record.tracks.create(:name => "Berlin")
+          end
+
+          before do
+            band.save
+          end
+
+          it "executes the callback" do
+            track.before_validation_called.should be_true
+          end
+        end
+      end
+    end
   end
 
   context "callback on valid?" do

@@ -85,6 +85,7 @@ module Mongoid #:nodoc:
           child = send(name)
           Array.wrap(child).each do |doc|
             children.push(doc) if cascadable_child?(kind, doc)
+            children.concat(doc.send(:cascadable_children, kind))
           end
         end
       end
