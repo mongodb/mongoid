@@ -233,6 +233,29 @@ describe Mongoid::Relations::Embedded::Many do
         end
       end
 
+      context "when setting via an overridden method from the parent" do
+
+        let!(:person) do
+          Person.create(:ssn => "231-12-1111")
+        end
+
+        let!(:address) do
+          person.addresses.create(:street => "Alt Treptow")
+        end
+
+        let!(:new_address) do
+          Address.new(:street => "Tempelhofer Damm")
+        end
+
+        before do
+          person.update_attributes(:set_addresses => [ new_address ])
+        end
+
+        it "overwrites the existing addresses" do
+          person.reload.addresses.should eq([ new_address ])
+        end
+      end
+
       context "when setting via the parent attributes" do
 
         before do
