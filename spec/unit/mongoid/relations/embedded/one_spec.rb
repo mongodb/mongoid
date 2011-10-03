@@ -126,7 +126,7 @@ describe Mongoid::Relations::Embedded::One do
 
     it "returns the valid options" do
       described_class.valid_options.should ==
-        [ :as, :cyclic ]
+        [ :as, :cascade_callbacks, :cyclic ]
     end
   end
 

@@ -591,7 +591,7 @@ describe Mongoid::Relations::Embedded::Many do
 
     it "returns the valid options" do
       described_class.valid_options.should ==
-        [ :as, :cyclic, :order, :versioned ]
+        [ :as, :cascade_callbacks, :cyclic, :order, :versioned ]
     end
   end
 

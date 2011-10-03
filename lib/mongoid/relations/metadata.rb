@@ -89,6 +89,19 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Is this an embedded relations that allows callbacks to cascade down to
+      # it?
+      #
+      # @example Does the relation have cascading callbacks?
+      #   metadata.cascading_callbacks?
+      #
+      # @return [ true, false ] If the relation cascades callbacks.
+      #
+      # @since 2.3.0
+      def cascading_callbacks?
+        !!self[:cascade_callbacks]
+      end
+
       # Returns the name of the class that this relation contains. If the
       # class_name was provided as an option this will return that, otherwise
       # it will determine the name from the name property.

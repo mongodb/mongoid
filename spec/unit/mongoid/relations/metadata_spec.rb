@@ -18,6 +18,50 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#cascading_callbacks?" do
+
+    context "when the option is true" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Embedded::Many,
+          :cascade_callbacks => true
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_cascading_callbacks
+      end
+    end
+
+    context "when the option is false" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Embedded::Many,
+          :cascade_callbacks => false
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_cascading_callbacks
+      end
+    end
+
+    context "when the option is nil" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_cascading_callbacks
+      end
+    end
+  end
+
   describe "#cascade_strategy" do
 
     context "when no dependent option is set" do
