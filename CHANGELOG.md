@@ -2,7 +2,7 @@
 
 For instructions on upgrading to newer versions, visit [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.3.0 (master - in development)
+## 2.3.0
 
 ### New Features
 
@@ -31,6 +31,10 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * Support for MongoDB's $and operator is now available in the form of:
   `Criteria#all_of(*args)` where args is multiple hash expressions.
+
+* \#1250, \#1058 Embedded documents now can have their callbacks fired on a parent
+  save by setting `:cascade_callbacks => true` on the relation.
+  (pyromanic, Paul Rosania, Jak Charlton)
 
 ### Major Changes
 
