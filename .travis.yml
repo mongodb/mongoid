@@ -5,7 +5,7 @@ rvm:
   - ruby-head
   - jruby
   - rbx
-  - rbx-2.0.0pre
+  - rbx-2.0
   - ree
 notifications:
   email:
@@ -17,4 +17,3 @@ notifications:
     - nick@deadorange.com
     - paul@codingfrontier.com
     - bj.schaefer@gmail.com
-  irc: "irc.freenode.org#mongoid"
