@@ -89,7 +89,7 @@ module Mongoid #:nodoc:
     def restore
       paranoid_collection.update(
         atomic_selector,
-        { "$unset" => { paranoid_field => true }},
+        { "$unset" => { paranoid_field => true }}
       )
       attributes.delete("deleted_at")
     end
