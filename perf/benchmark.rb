@@ -185,7 +185,7 @@ Benchmark.bm do |bm|
         person.posts.delete_all
       end
 
-      person.posts.clear
+      Post.delete_all
       GC.start
 
       bm.report("#push (batch)     ") do
@@ -213,7 +213,7 @@ Benchmark.bm do |bm|
         person.posts.delete(post)
       end
 
-      person.posts.clear
+      Post.delete_all
       GC.start
     end
   end
@@ -267,7 +267,7 @@ Benchmark.bm do |bm|
         person.preferences.delete_all
       end
 
-      person.preferences.clear
+      Preference.delete_all
       GC.start
 
       bm.report("#push (batch)     ") do
@@ -295,7 +295,7 @@ Benchmark.bm do |bm|
         person.preferences.delete(preference)
       end
 
-      person.preferences.clear
+      Preference.delete_all
       GC.start
     end
   end
