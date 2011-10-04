@@ -47,8 +47,10 @@ module Mongoid #:nodoc:
     def revise
       previous = previous_revision
       if previous && versioned_attributes_changed?
-        new_version = versions.build(previous.versioned_attributes)
-        versions.shift if version_max.present? && versions.length > version_max
+        versions.build(previous.versioned_attributes)
+        if version_max.present? && versions.length > version_max
+          versions.delete(versions.first)
+        end
         self.version = (version || 1 ) + 1
       end
     end
@@ -167,7 +169,7 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def only_versioned_attributes(hash)
       {}.tap do |versioned|
-        hash.except("versions").each_pair do |name, value|
+        hash.except("versions", "_id").each_pair do |name, value|
           field = fields[name]
           versioned[name] = value if !field || field.versioned?
         end
