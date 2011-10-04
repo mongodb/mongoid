@@ -231,7 +231,7 @@ module Mongoid #:nodoc
         type = options[:localize] ? Fields::Serializable::Localized : options[:type]
         Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field
-          defaults << name unless field.default.nil?
+          defaults << name unless field.default_val.nil?
           create_accessors(name, meth, options)
           process_options(field)
           define_attribute_method(name)

@@ -25,8 +25,15 @@ module Mongoid #:nodoc:
     module Serializable
       extend ActiveSupport::Concern
 
+      included do
+        # @todo: Durran: Pull out in 3.0.0
+        unless method_defined?(:default)
+          alias :default :default_val
+        end
+      end
+
       # Set readers for the instance variables.
-      attr_accessor :default, :label, :localize, :name, :options
+      attr_accessor :default_val, :label, :localize, :name, :options
 
       # When reading the field do we need to cast the value? This holds true when
       # times are stored or for big decimals which are stored as strings.
@@ -82,10 +89,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.8
       def eval_default(doc)
-        if default.respond_to?(:call)
-          serialize(doc.instance_exec(&default))
+        if default_val.respond_to?(:call)
+          serialize(doc.instance_exec(&default_val))
         else
-          serialize(default.duplicable? ? default.dup : default)
+          serialize(default_val.duplicable? ? default_val.dup : default_val)
         end
       end
 
@@ -182,9 +189,9 @@ module Mongoid #:nodoc:
             field.options = options
             field.label = options[:label]
             field.localize = options[:localize]
-            field.default = options[:default]
-            unless field.default
-              field.default = {} if field.localized?
+            field.default_val = options[:default]
+            unless field.default_val
+              field.default_val = {} if field.localized?
             end
           end
         end
