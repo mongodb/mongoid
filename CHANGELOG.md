@@ -48,6 +48,8 @@ For instructions on upgrading to newer versions, visit
 * \#1316 Added a separate Rake task "db:mongoid:drop" so Mongoid and AR can coexist.
   (Daniel Vartanov)
 
+* \#408 Embedded documents can now be soft deleted via `Mongoid::Paranoia`.
+
 ## 2.3.0
 
 ### New Features
