@@ -129,26 +129,52 @@ describe Mongoid::Versioning do
 
       context "when saving over the number of maximum versions" do
 
-        before do
-          10.times do |n|
-            page.update_attribute(:title, "#{n}")
+        context "when saving in succession" do
+
+          before do
+            10.times do |n|
+              page.update_attribute(:title, "#{n}")
+            end
+          end
+
+          let(:versions) do
+            page.versions
+          end
+
+          it "only versions the maximum amount" do
+            versions.count.should eq(5)
+          end
+
+          it "shifts the versions in order" do
+            versions.last.title.should eq("8")
+          end
+
+          it "persists the version shifts" do
+            page.reload.versions.last.title.should eq("8")
           end
         end
 
-        let(:versions) do
-          page.versions
-        end
+        context "when saving in batches" do
 
-        it "only versions the maximum amount" do
-          versions.count.should eq(5)
-        end
+          before do
+            2.times do
+              5.times do |n|
+                WikiPage.find(page.id).update_attributes(:title => "#{n}")
+              end
+            end
+          end
 
-        it "shifts the versions in order" do
-          versions.last.title.should eq("8")
-        end
+          let(:from_db) do
+            WikiPage.find(page.id)
+          end
 
-        it "persists the version shifts" do
-          page.reload.versions.last.title.should eq("8")
+          let(:versions) do
+            from_db.versions
+          end
+
+          it "only versions the maximum amount" do
+            versions.count.should eq(5)
+          end
         end
       end
 

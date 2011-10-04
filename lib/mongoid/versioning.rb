@@ -50,7 +50,7 @@ module Mongoid #:nodoc:
       if previous && versioned_attributes_changed?
         versions.build(previous.versioned_attributes).attributes.delete("_id")
         if version_max.present? && versions.length > version_max
-          versions.shift
+          versions.delete(versions.first)
         end
         self.version = (version || 1 ) + 1
       end
