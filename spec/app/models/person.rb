@@ -52,6 +52,7 @@ class Person
     end
   end
   embeds_many :address_components, :validate => false
+  embeds_many :paranoid_phones, :validate => false
   embeds_many :services
 
   embeds_one :pet, :class_name => "Animal"
