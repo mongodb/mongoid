@@ -1,5 +1,4 @@
 require "spec_helper"
-require 'mongoid/criterion/selector'
 
 describe Mongoid::Criterion::Selector do
 
@@ -153,6 +152,33 @@ describe Mongoid::Criterion::Selector do
   describe "#typecast_value_for" do
     let(:field) { stub(:type => Integer) }
     let(:selector) { Mongoid::Criterion::Selector.allocate }
+
+    context "when the value is a range" do
+
+      let(:field) do
+        Mongoid::Fields::Serializable::Date.instantiate(:dob)
+      end
+
+      let(:first) do
+        Date.new(2000, 1, 1)
+      end
+
+      let(:last) do
+        Date.new(2010, 1, 1)
+      end
+
+      let(:range) do
+        first..last
+      end
+
+      let(:converted) do
+        selector.send(:typecast_value_for, field, range)
+      end
+
+      it "returns a hash with gte and lte criteria" do
+        converted.should eq({ "$gte" => first, "$lte" => last })
+      end
+    end
 
     context "when the value is simple" do
       it "should delegate to the field to typecast" do

@@ -468,6 +468,51 @@ describe Mongoid::Criterion::Inclusion do
       )
     end
 
+    context "when passing in a range" do
+
+      let!(:baby) do
+        Person.create(:ssn => "123-12-1212", :dob => Date.new(2011, 1, 1))
+      end
+
+      let!(:adult) do
+        Person.create(:ssn => "124-12-1212", :dob => Date.new(1980, 1, 1))
+      end
+
+      context "when the range matches documents" do
+
+        let(:range) do
+          Date.new(1970, 1, 1)..Date.new(2012, 1, 1)
+        end
+
+        let(:criteria) do
+          Person.where(:dob => range)
+        end
+
+        it "includes the lower range value" do
+          criteria.should include(baby)
+        end
+
+        it "includes the higher range value" do
+          criteria.should include(adult)
+        end
+      end
+
+      context "when the range does not match documents" do
+
+        let(:range) do
+          Date.new(2012, 1, 1)..Date.new(2014, 1, 1)
+        end
+
+        let(:criteria) do
+          Person.where(:dob => range)
+        end
+
+        it "returns an empty result" do
+          criteria.should be_empty
+        end
+      end
+    end
+
     context "when searching for localized fields" do
 
       let!(:soda) do

@@ -112,6 +112,11 @@ module Mongoid #:nodoc:
           value.map { |v| typecast_value_for(field, v) }
         when Regexp
           value
+        when Range
+          {
+            "$gte" => typecast_value_for(field, value.first),
+            "$lte" => typecast_value_for(field, value.last)
+          }
         else
           if field.type == Array
             Serialization.mongoize(value, value.class)

@@ -2,6 +2,11 @@
 
 For instructions on upgrading to newer versions, visit [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.4.0
+
+* Ranges can now be passed to #where criteria to create a $gte/$lte query under the
+  covers. `Person.where(dob: start_date...end_date)`
+
 ## 2.3.0
 
 ### New Features
