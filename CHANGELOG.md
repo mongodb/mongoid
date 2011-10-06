@@ -2,10 +2,12 @@
 
 For instructions on upgrading to newer versions, visit [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.0
+## 2.4.0 \[ In Development \] \[ Branch: master \]
 
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
+
+## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
 ## 2.3.0
 
@@ -92,6 +94,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
+
+## 2.2.3 \[ In Development \] \[ Branch: 2.2.0-stable \]
 
 ## 2.2.2
 
