@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    [ Person, Game, Post, Bar, Agent, Comment, Movie, Account ].map(&:delete_all)
+    [ Person, Game, Post, Bar, Agent, Comment, Movie, Account, User ].map(&:delete_all)
   end
 
   let(:person) do
@@ -11,6 +11,27 @@ describe Mongoid::Relations::Referenced::In do
   end
 
   describe "#=" do
+
+    context "when the relation is named target" do
+
+      let(:target) do
+        User.new
+      end
+
+      context "when the relation is referenced from an embeds many" do
+
+        context "when setting via create" do
+
+          let(:service) do
+            person.services.create(:target => target)
+          end
+
+          it "sets the target relation" do
+            service.target.should eq(target)
+          end
+        end
+      end
+    end
 
     context "when the inverse relation has no reference defined" do
 
