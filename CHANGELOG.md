@@ -39,38 +39,6 @@ For instructions on upgrading to newer versions, visit
 
 * \#408 Embedded documents can now be soft deleted via `Mongoid::Paranoia`.
 
-## 2.4.0 \[ In Development \] \[ Branch: master \]
-
-* Ranges can now be passed to #where criteria to create a $gte/$lte query under the
-  covers. `Person.where(dob: start_date...end_date)`
-
-## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
-
-### Resolved Issues
-
-* \#1321 HABTM no longer allows duplicate entries or keys, instead of the previous
-  inconsistencies.
-
-* \#1320 Fixed errors in perf benchmark.
-
-* \#1316 Added a separate Rake task "db:mongoid:drop" so Mongoid and AR can coexist.
-  (Daniel Vartanov)
-
-* \#1311 Fix issue with custom field serialization inheriting from hash.
-
-* \#1287 Fixed max versions limitation with versioning.
-
-* \#1277 attribute_will_change! properly flags the attribute even if no change occured.
-
-* \#920 Allow relations to be named target.
-
-* \#861 accepts_nested_attributes_for is no longer needed to set embedded documents
-  via a hash or array of hashes directly.
-
-* \#768 Fixed class_attribute definitions module wide.
-
-* \#408 Embedded documents can now be soft deleted via `Mongoid::Paranoia`.
-
 ## 2.3.0
 
 ### New Features
