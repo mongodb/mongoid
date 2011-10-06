@@ -202,10 +202,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.2.0
       def eager_load(criteria)
-        relation.eager_load(
-          self,
-          criteria.clone.tap { |crit| crit.inclusions.clear }
-        )
+        relation.eager_load(self, criteria.clone)
       end
 
       # Will determine if the relation is an embedded one or not. Currently

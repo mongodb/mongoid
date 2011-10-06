@@ -418,6 +418,53 @@ describe Mongoid::Criterion::Inclusion do
         Mongoid::IdentityMap[Person][person_two.id].should eq(person_two)
       end
     end
+
+    context "when including multiples in the same criteria" do
+
+      let!(:post_one) do
+        person.posts.create(:title => "one")
+      end
+
+      let!(:post_two) do
+        person.posts.create(:title => "two")
+      end
+
+      let!(:game_one) do
+        person.create_game(:name => "one")
+      end
+
+      let!(:game_two) do
+        person.create_game(:name => "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Person.includes(:posts, :game).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first has many document into the identity map" do
+        Mongoid::IdentityMap[Post][post_one.id].should eq(post_one)
+      end
+
+      it "inserts the second has many document into the identity map" do
+        Mongoid::IdentityMap[Post][post_two.id].should eq(post_two)
+      end
+
+      it "inserts the first has one document into the identity map" do
+        Mongoid::IdentityMap[Game][game_one.id].should eq(game_one)
+      end
+
+      it "inserts the second has one document into the identity map" do
+        Mongoid::IdentityMap[Game][game_two.id].should eq(game_two)
+      end
+    end
   end
 
   describe "#near" do

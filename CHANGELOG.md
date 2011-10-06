@@ -1,6 +1,7 @@
 # Overview
 
-For instructions on upgrading to newer versions, visit [mongoid.org](http://mongoid.org/docs/upgrading.html).
+For instructions on upgrading to newer versions, visit
+[mongoid.org](http://mongoid.org/docs/upgrading.html).
 
 ## 2.4.0 \[ In Development \] \[ Branch: master \]
 
@@ -20,6 +21,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
   (Daniel Vartanov)
 
 * \#1311 Fix issue with custom field serialization inheriting from hash.
+
+* \#1295 Fixed having multiple includes only execute the eager loading of the first.
 
 * \#1287 Fixed max versions limitation with versioning.
 
