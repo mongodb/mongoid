@@ -41,6 +41,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.4.0 \[ In Development \] \[ Branch: master \]
 
+* Ranges can now be passed to #where criteria to create a $gte/$lte query under the
+  covers. `Person.where(dob: start_date...end_date)`
+
 ## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
 ### Resolved Issues
