@@ -395,6 +395,41 @@ describe Mongoid::Dirty do
       person.changed_attributes.clear
     end
 
+    context "when the value has not changed" do
+
+      before do
+        person.aliases_will_change!
+      end
+
+      let(:changes) do
+        person.changes
+      end
+
+      it "returns the value in the changes" do
+        changes.should eq({ "aliases" => nil })
+      end
+
+      it "is flagged as changed" do
+        person.should be_changed
+      end
+    end
+
+    context "when the value has changed" do
+
+      before do
+        person.aliases_will_change!
+        person.aliases << "008"
+      end
+
+      let(:changes) do
+        person.changes
+      end
+
+      it "returns the value in the changes" do
+        changes.should eq({ "aliases" => [[ "007" ], [ "007", "008" ]] })
+      end
+    end
+
     context "when the value is duplicable" do
 
       context "when the attribute has not been cloned" do
