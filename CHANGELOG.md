@@ -30,6 +30,8 @@ For instructions on upgrading to newer versions, visit [mongoid.org](http://mong
 * \#861 accepts_nested_attributes_for is no longer needed to set embedded documents
   via a hash or array of hashes directly.
 
+* \#857 Fixed cascading of dependent relations when base document is paranoid.
+
 * \#768 Fixed class_attribute definitions module wide.
 
 * \#408 Embedded documents can now be soft deleted via `Mongoid::Paranoia`.
