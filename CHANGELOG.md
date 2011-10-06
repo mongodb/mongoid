@@ -2,6 +2,131 @@
 
 For instructions on upgrading to newer versions, visit [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.4.0 \[ In Development \] \[ Branch: master \]
+
+* Ranges can now be passed to #where criteria to create a $gte/$lte query under the
+  covers. `Person.where(dob: start_date...end_date)`
+
+## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+### Resolved Issues
+
+* \#1321 HABTM no longer allows duplicate entries or keys, instead of the previous
+  inconsistencies.
+
+* \#1320 Fixed errors in perf benchmark.
+
+* \#1316 Added a separate Rake task "db:mongoid:drop" so Mongoid and AR can coexist.
+  (Daniel Vartanov)
+
+* \#1311 Fix issue with custom field serialization inheriting from hash.
+
+* \#1287 Fixed max versions limitation with versioning.
+
+* \#1277 attribute_will_change! properly flags the attribute even if no change occured.
+
+* \#920 Allow relations to be named target.
+
+* \#861 accepts_nested_attributes_for is no longer needed to set embedded documents
+  via a hash or array of hashes directly.
+
+* \#768 Fixed class_attribute definitions module wide.
+
+* \#408 Embedded documents can now be soft deleted via `Mongoid::Paranoia`.
+
+## 2.3.0
+
+### New Features
+
+* Mongoid now supports basic localized fields, storing them under the covers as a
+  hash of locale => value pairs. `field :name, localize: true`
+
+* \#1275 For applications that default safe mode to true, you can now tell a
+  single operation to persist without safe mode via #unsafely:
+  `person.unsafely.save`, `Person.unsafely.create`. (Matt Sanders)
+
+* \#1256 Mongoid now can create indexes for models in Rails engines. (Caio Filipini)
+
+* \#1228 Allow pre formatting of compsoite keys by passing a block to #key.
+  (Ben Hundley)
+
+* \#1222 Scoped mass assignment is now supported. (Andrew Shaydurov)
+
+* \#1196 Timestamps can now be turned off on a call-by-call basis via the use
+  of #timeless: `person.timeless.save`, `Person.timeless.create(:title => "Sir")`.
+
+* \#1103 Allow developers to create their own custom complex criteria. (Ryan Ong)
+
+* Mongoid now includes all defined fields in `serializable_hash` and `to_json`
+  results even if the fields have no values to make serialized documents easier
+  to use by ActiveResource clients.
+
+* Support for MongoDB's $and operator is now available in the form of:
+  `Criteria#all_of(*args)` where args is multiple hash expressions.
+
+* \#1250, \#1058 Embedded documents now can have their callbacks fired on a parent
+  save by setting `:cascade_callbacks => true` on the relation.
+  (pyromanic, Paul Rosania, Jak Charlton)
+
+### Major Changes
+
+* Mongoid now depends on Active Model 3.1 and higher.
+
+* Mongoid now depends on the Mongo Ruby Driver 1.4 and higher.
+
+* Mongoid requires MongoDB 2.0.0 and higher.
+
+### Resolved Issues
+
+* \#1308 Fixed scoping of HABTM finds.
+
+* \#1300 Namespaced models should handle recursive embedding properly.
+
+* \#1299 Self referenced documents with versioning no longer fail when inverse_of
+  is not defined on all relations.
+
+* \#1296 Renamed internal building method to _building.
+
+* \#1288, \#1289 _id and updated_at should not be part of versioned attributes.
+
+* \#1273 Mongoid.preload_models now checks if preload configuration option is set,
+  where Mongoid.load_models always loads everything. (Ryan McGeary)
+
+* \#1244 Has one relations now adhere to default dependant behaviour.
+
+* \#1225 Fixed delayed persistence of embedded documents via $set.
+
+* \#1166 Don't load config in Railtie if no env variables defined. (Terence Lee)
+
+* \#1052 `alias_attribute` now works again as expected.
+
+* \#939 Apply default attributes when upcasting via #becomes. (Christos Pappas)
+
+* \#932 Fixed casting of integer fields with leading zeros.
+
+* \#948 Reset version number on clone if versions existed.
+
+* \#763 Don't merge $in criteria arrays when chaining named scopes.
+
+* \#730 Existing models that have relations added post persistence of originals
+  can now have new relations added with no migrations.
+
+* \#726 Embedded documents with compound keys not validate uniqueness correctly.
+
+* \#582 Cyclic non embedded relations now validate uniqueness correctly.
+
+* \#484 Validates uniqueness with multiple scopes of all types now work properly.
+
+* Deleting versions created with `Mongoid::Versioning` no longer fires off
+  dependent cascading on relations.
+
+## 2.2.3 \[ In Development \] \[ Branch: 2.2.0-stable \]
+
+## 2.2.2
+
+* This release removes the restriction of a dependency on 1.3.x of the mongo
+  ruby driver. Users may now use 1.3.x through 1.4.x.
+
 ## 2.2.1
 
 ### Resolved Issues
