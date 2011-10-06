@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Paranoia do
 
   before do
-    Person.delete_all
+    [ Author, Person ].each(&:delete_all)
     ParanoidPost.all.each(&:delete!)
   end
 
@@ -64,6 +64,27 @@ describe Mongoid::Paranoia do
 
       it "executes the after destroy callbacks" do
         phone.after_destroy_called.should be_true
+      end
+    end
+
+    context "when the document has a dependent relation" do
+
+      let(:post) do
+        ParanoidPost.create(:title => "test")
+      end
+
+      let!(:author) do
+        post.authors.create(:name => "poe")
+      end
+
+      before do
+        post.destroy!
+      end
+
+      it "cascades the dependent option" do
+        expect {
+          author.reload
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
   end
@@ -141,6 +162,27 @@ describe Mongoid::Paranoia do
 
       it "executes the after destroy callbacks" do
         phone.after_destroy_called.should be_true
+      end
+    end
+
+    context "when the document has a dependent relation" do
+
+      let(:post) do
+        ParanoidPost.create(:title => "test")
+      end
+
+      let!(:author) do
+        post.authors.create(:name => "poe")
+      end
+
+      before do
+        post.destroy
+      end
+
+      it "cascades the dependent option" do
+        expect {
+          author.reload
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
   end
@@ -253,6 +295,27 @@ describe Mongoid::Paranoia do
         raw["paranoid_phones"].should be_empty
       end
     end
+
+    context "when the document has a dependent relation" do
+
+      let(:post) do
+        ParanoidPost.create(:title => "test")
+      end
+
+      let!(:author) do
+        post.authors.create(:name => "poe")
+      end
+
+      before do
+        post.delete!
+      end
+
+      it "cascades the dependent option" do
+        expect {
+          author.reload
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
   end
 
   describe "#delete" do
@@ -279,6 +342,14 @@ describe Mongoid::Paranoia do
         expect {
           ParanoidPost.find(post.id)
         }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+
+      it "clears out the safety options" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+
+      it "clears out the identity map" do
+        Mongoid::IdentityMap.should be_empty
       end
     end
 
@@ -312,6 +383,27 @@ describe Mongoid::Paranoia do
 
       it "does not include the document in the relation" do
         person.paranoid_phones.scoped.should be_empty
+      end
+    end
+
+    context "when the document has a dependent relation" do
+
+      let(:post) do
+        ParanoidPost.create(:title => "test")
+      end
+
+      let!(:author) do
+        post.authors.create(:name => "poe")
+      end
+
+      before do
+        post.delete
+      end
+
+      it "cascades the dependent option" do
+        expect {
+          author.reload
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
   end

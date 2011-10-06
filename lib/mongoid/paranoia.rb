@@ -39,7 +39,6 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def delete!
-      @destroyed = true
       Persistence::Operations.remove(self).persist
     end
 
@@ -59,8 +58,12 @@ module Mongoid #:nodoc:
       paranoid_collection.update(
         atomic_selector,
         { "$set" => { paranoid_field => time }},
-        options
+        Safety.merge_safety_options(options)
       )
+      cascade!
+      @destroyed = true
+      IdentityMap.remove(self)
+      Threaded.clear_options!
       true
     end
     alias :delete :remove
