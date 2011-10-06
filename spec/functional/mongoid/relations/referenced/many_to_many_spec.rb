@@ -377,6 +377,55 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
   describe "#=" do
 
+    context "when trying to add duplicate entries" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:preference) do
+        Preference.create(:name => "one")
+      end
+
+      before do
+        person.preferences = [ preference, preference ]
+      end
+
+      context "when the document is new" do
+
+        it "does not add the duplicates" do
+          person.preferences.should eq([ preference ])
+        end
+
+        it "does not create duplicate keys" do
+          person.preference_ids.should eq([ preference.id ])
+        end
+      end
+
+      context "when the document is persisted" do
+
+        before do
+          person.save
+        end
+
+        it "does not add the duplicates" do
+          person.preferences.should eq([ preference ])
+        end
+
+        it "does not create duplicate keys" do
+          person.preference_ids.should eq([ preference.id ])
+        end
+
+        it "does not add duplicates on the inverse" do
+          preference.people.should eq([ person ])
+        end
+
+        it "does not add duplicate inverse keys" do
+          preference.person_ids.should eq([ person.id ])
+        end
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       context "when the parent and relation are new records" do
