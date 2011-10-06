@@ -7,7 +7,6 @@ class ParentDoc
   field :children_order, :type => Array, :default => [] # hold all the children's id
 end
 
-
 class ChildDoc
   include Mongoid::Document
 

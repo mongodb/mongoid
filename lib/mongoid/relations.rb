@@ -125,5 +125,20 @@ module Mongoid # :nodoc:
         end
       end
     end
+
+    module ClassMethods #:nodoc:
+
+      # This is convenience for librarys still on the old API.
+      #
+      # @example Get the associations.
+      #   Person.associations
+      #
+      # @return [ Hash ] The relations.
+      #
+      # @since 2.3.1
+      def associations
+        self.relations
+      end
+    end
   end
 end

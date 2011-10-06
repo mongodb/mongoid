@@ -43,6 +43,26 @@ describe Mongoid::Relations do
         end
       end
     end
+
+    context "when the document is subclassed" do
+
+      context "when the document has no parent" do
+
+        it "returns false" do
+          Item.should_not be_embedded
+        end
+      end
+    end
+
+    context "when the document is a subclass" do
+
+      context "when the document has a parent" do
+
+        it "returns true" do
+          SubItem.should be_embedded
+        end
+      end
+    end
   end
 
   describe "#embedded_many?" do

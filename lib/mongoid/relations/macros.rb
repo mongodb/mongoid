@@ -8,33 +8,23 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
-        cattr_accessor :embedded
+        class_attribute :embedded, :instance_reader => false
         class_attribute :relations
         self.embedded = false
         self.relations = {}
-
-        # For backwards compatibility, alias the class method for associations
-        # and embedding as well. Fix in related gems.
-        #
-        # @todo Affected libraries: Machinist
-        class << self
-          alias :associations :relations
-          alias :embedded? :embedded
-        end
       end
 
-      # Get the metadata for all the defined relations.
+      # This is convenience for librarys still on the old API.
       #
-      # @note Refactored from using delegate for class load performance.
+      # @example Get the associations.
+      #   person.associations
       #
-      # @example Get the relations.
-      #   model.relations
+      # @return [ Hash ] The relations.
       #
-      # @return [ Hash<String, Metadata> ] The relation metadata.
-      def relations
-        self.class.relations
+      # @since 2.3.1
+      def associations
+        self.relations
       end
-      alias :associations :relations
 
       module ClassMethods #:nodoc:
 

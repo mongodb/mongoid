@@ -10,18 +10,6 @@ module Mongoid #:nodoc:
       self.nested_attributes = []
     end
 
-    # Get the nested attributes.
-    #
-    # @note Refactored from using delegate for class load performance.
-    #
-    # @example Get the nested attributes.
-    #   model.nested_attributes
-    #
-    # @return [ Array<String> ] The nested attributes methods.
-    def nested_attributes
-      self.class.nested_attributes
-    end
-
     module ClassMethods #:nodoc:
 
       REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |_, value| value.blank? } }

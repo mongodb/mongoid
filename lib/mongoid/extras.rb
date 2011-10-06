@@ -10,18 +10,6 @@ module Mongoid #:nodoc:
       self.cached = false
     end
 
-    # Is the class cached?
-    #
-    # @note Refactored from using delegate for class load performance.
-    #
-    # @example Is the class cached?
-    #   person.cached?
-    #
-    # @return [ true, false ] If the class is cached.
-    def cached?
-      self.class.cached?
-    end
-
     module ClassMethods #:nodoc
 
       # Sets caching on for this class. This class level configuration will
@@ -37,16 +25,6 @@ module Mongoid #:nodoc:
       #   end
       def cache
         self.cached = true
-      end
-
-      # Determines if the class is cached or not.
-      #
-      # @example Are class reads cached?
-      #   Document.cached?
-      #
-      # @return [ true, false ] If the reads are cached.
-      def cached?
-        !!self.cached
       end
     end
   end
