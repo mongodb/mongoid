@@ -13,6 +13,7 @@ require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/checks"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
+require "mongoid/extensions/symbol/checks"
 require "mongoid/extensions/symbol/inflections"
 require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/object_id/conversions"
@@ -62,6 +63,7 @@ end
 
 class Symbol #:nodoc
   remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
+  include Mongoid::Extensions::Symbol::Checks
   include Mongoid::Extensions::Symbol::Inflections
 end
 

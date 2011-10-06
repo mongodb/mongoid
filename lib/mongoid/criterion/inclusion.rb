@@ -241,7 +241,7 @@ module Mongoid #:nodoc:
           # to clean this funkiness up.
           selector.each_pair do |key, value|
             if crit.selector.has_key?(key)
-              if key.to_s =~ /^(|_)id$/
+              if key.mongoid_id?
                 if crit.selector.has_key?("$and")
                   crit.selector["$and"] << { key => value }
                 else
