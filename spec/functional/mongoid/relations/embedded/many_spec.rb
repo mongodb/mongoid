@@ -340,6 +340,41 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
 
+    context "when setting the entire tree via a hash" do
+
+      let(:person) do
+        Person.create(:ssn => "456-11-1111")
+      end
+
+      let!(:address_one) do
+        person.addresses.create(:street => "Tauentzienstr")
+      end
+
+      let!(:address_two) do
+        person.addresses.create(:street => "Kudamm")
+      end
+
+      let(:attributes) do
+        person.as_document.dup
+      end
+
+      context "when the attributes have changed" do
+
+        before do
+          attributes["addresses"][0]["city"] = "Berlin"
+          person.update_attributes(attributes)
+        end
+
+        it "sets the new attributes" do
+          person.addresses.first.city.should eq("Berlin")
+        end
+
+        it "persists the changes" do
+          person.reload.addresses.first.city.should eq("Berlin")
+        end
+      end
+    end
+
     context "when the parent and child have a cyclic relation" do
 
       context "when the parent is a new record" do
