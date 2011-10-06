@@ -39,7 +39,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#408 Embedded documents can now be soft deleted via `Mongoid::Paranoia`.
 
-## 2.3.1
+## 2.4.0 \[ In Development \] \[ Branch: master \]
+
+## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
 ### Resolved Issues
 
