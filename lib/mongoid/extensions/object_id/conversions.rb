@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
             if args.unconvertable_to_bson?
               args
             else
-              BSON::ObjectId.from_string(args)
+              BSON::ObjectId.legal?(args) ? BSON::ObjectId.from_string(args) : args
             end
           when ::Array
             args.delete_if { |arg| arg.blank? } if reject_blank
@@ -47,9 +47,7 @@ module Mongoid #:nodoc:
             args.tap do |hash|
               hash.each_pair do |key, value|
                 next unless klass.object_id_field?(key)
-                begin
-                  hash[key] = convert(klass, value, reject_blank)
-                rescue BSON::InvalidObjectId; end
+                hash[key] = convert(klass, value, reject_blank)
               end
             end
           else
