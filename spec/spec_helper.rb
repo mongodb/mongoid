@@ -9,6 +9,7 @@ $LOAD_PATH.unshift(SUPPORT)
 require "mongoid"
 require "mocha"
 require "rspec"
+require "ammeter/init"
 
 LOGGER = Logger.new($stdout)
 DATABASE_ID = Process.pid
