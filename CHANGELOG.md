@@ -28,6 +28,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1277 attribute_will_change! properly flags the attribute even if no change occured.
 
+* \#1061 Raise `Mongoid::Errors::InvalidTime` when time serialization fails.
+
 * \#920 Allow relations to be named target.
 
 * \#861 accepts_nested_attributes_for is no longer needed to set embedded documents

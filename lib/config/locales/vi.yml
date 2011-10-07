@@ -13,6 +13,8 @@ vi:
           or polymorphic belongs_to relation."
         invalid_database:
           Cơ sở dữ liệu nên là Mongo::DB, không phải %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Trường được định nghĩa là một %{klass}, nhưng nhận được %{other} với 
           giá trị %{value}.

@@ -51,8 +51,12 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def serialize(object)
           return nil if object.blank?
-          time = convert_to_time(object)
-          strip_milliseconds(time).utc
+          begin
+            time = convert_to_time(object)
+            strip_milliseconds(time).utc
+          rescue ArgumentError
+            raise Errors::InvalidTime.new(object)
+          end
         end
 
         # Convert the provided object to a UTC time to store in the database.

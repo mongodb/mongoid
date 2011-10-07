@@ -13,6 +13,8 @@ en:
           or polymorphic belongs_to relation."
         invalid_database:
           "Database should be a Mongo::DB, not %{name}."
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_options:
           "Invalid option :%{invalid} provided to relation :%{name}. Valid options
           are: %{valid}."

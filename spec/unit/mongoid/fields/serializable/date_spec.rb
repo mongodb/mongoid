@@ -103,6 +103,15 @@ describe Mongoid::Fields::Serializable::Date do
       end
     end
 
+    context "when the string is an invalid time" do
+
+      it "raises an error" do
+        expect {
+          field.serialize("shitty time")
+        }.to raise_error(Mongoid::Errors::InvalidTime)
+      end
+    end
+
     context "when given a string" do
 
       it "converts to a utc time" do

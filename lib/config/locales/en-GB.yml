@@ -16,6 +16,8 @@ en-GB:
         invalid_options:
           "Invalid option :%{invalid} provided to relation :%{name}. Valid options
           are: %{valid}."
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Field was defined as a(n) %{klass}, but received a %{other} with
           the value %{value}.

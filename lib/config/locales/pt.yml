@@ -13,6 +13,8 @@ pt:
           or polymorphic belongs_to relation."
         invalid_database:
           A base de dados deverá ser uma Mongo::DB, em vez de %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           O campo foi definido como %{klass}, mas recebeu uma instância de %{other} com
           o valor %{value}.

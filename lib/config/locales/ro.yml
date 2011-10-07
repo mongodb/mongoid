@@ -13,6 +13,8 @@ ro:
           or polymorphic belongs_to relation."
         invalid_database:
           Baza de date ar trebui să fie de tipul Mongo::DB, nu %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Câmpul a fost definit ca şi un(o) %{klass}, dar valoarea
           recepţionată %{value} este de clasa %{other}.

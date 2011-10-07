@@ -13,6 +13,8 @@ bg:
           or polymorphic belongs_to relation."
         invalid_database:
           Базата данни трябва да е от тип Mnogo:DB, а не  %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Полето е дефинирано като a(n) %{klass}, но се присвоява %{other}
           със стойност %{value}.

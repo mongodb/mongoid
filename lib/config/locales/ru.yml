@@ -13,6 +13,8 @@ ru:
           or polymorphic belongs_to relation."
         invalid_database:
           База данных должна быть Mongo::DB, а не %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Поле уже было определено в классе %{klass}, но получено как %{other}
           со значением %{value}.

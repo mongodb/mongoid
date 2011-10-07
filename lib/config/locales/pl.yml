@@ -13,6 +13,8 @@ pl:
           or polymorphic belongs_to relation."
         invalid_database:
           Baza danych powinna być typu Mongo::DB, a nie %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Pole zostało zdefiniowane jako %{klass}, ale otrzymano %{other}
           z wartością %{value}.
