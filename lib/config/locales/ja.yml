@@ -13,6 +13,8 @@ ja:
           or polymorphic belongs_to relation."
         invalid_database:
           次のDatabaseは利用できませんでした。%{name}
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           このフィールドは %{klass} で定義されていますが、%{other}に対し %{value} という値が送信されました。
         invalid_options:

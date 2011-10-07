@@ -23,4 +23,16 @@ describe Mongoid::Fields::Serializable::DateTime do
       field.deserialize(time).should be_kind_of(DateTime)
     end
   end
+
+  describe "#serialize" do
+
+    context "when the string is an invalid time" do
+
+      it "raises an error" do
+        expect {
+          field.serialize("shitty time")
+        }.to raise_error(Mongoid::Errors::InvalidTime)
+      end
+    end
+  end
 end

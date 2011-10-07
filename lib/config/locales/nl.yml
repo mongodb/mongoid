@@ -13,6 +13,8 @@ nl:
           or polymorphic belongs_to relation."
         invalid_database:
           Database moet een Mongo::DB zijn, niet een %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Veld was gedefinieerd als een %{klass}, maar ontvangen als %{other} met
           de waarde %{value}.

@@ -13,6 +13,8 @@ sv:
           or polymorphic belongs_to relation."
         invalid_database:
           Databasen bör vara Mongo::DB, inte %{name}.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           Fältet var definerat som %{klass}, men fick %{other} med
           värdet %{value}.

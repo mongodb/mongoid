@@ -13,6 +13,8 @@ kr:
           or polymorphic belongs_to relation."
         invalid_database:
           데이타베이스가 Mongo::DB이어야 합니다, %{name}이면 안됩니다.
+        invalid_time:
+          "'%{value}' is not a valid Time."
         invalid_type:
           데이터 필드가 %{klass} 처럼 정의를 내립니다. 하지만 그것은  %{other}를 %{value} 으로 산출되어  받습니다
         invalid_options:

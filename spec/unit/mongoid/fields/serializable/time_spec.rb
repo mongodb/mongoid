@@ -10,198 +10,272 @@ describe Mongoid::Fields::Serializable::Time do
     Time.local(2010, 11, 19)
   end
 
-  describe ".set" do
+  describe "#serialize" do
+
     context "when given nil" do
+
       it "returns nil" do
         field.serialize(nil).should be_nil
       end
     end
 
     context "when string is empty" do
+
       it "returns nil" do
         field.serialize("").should be_nil
       end
     end
 
     context "when given a string" do
-      it "converts to a utc time" do
-        field.serialize(time.to_s).utc_offset.should == 0
+
+      context "when the string is a valid time" do
+
+        it "converts to a utc time" do
+          field.serialize(time.to_s).utc_offset.should == 0
+        end
+
+        it "serializes with time parsing" do
+          field.serialize(time.to_s).should eq(Time.parse(time.to_s).utc)
+        end
+
+        it "returns a local date from the string" do
+          field.serialize(time.to_s).should eq(
+            Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
+          )
+        end
       end
 
-      it "uses Time.parse - note that this returns the wrong day due sometimes since it ignores the time zone" do
-        field.serialize(time.to_s).should == Time.parse(time.to_s).utc
-      end
+      context "when the string is an invalid time" do
 
-      it "returns a local date from the string due to a limitation in Time.parse" do
-        field.serialize(time.to_s).should == Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
+        it "raises an error" do
+          expect {
+            field.serialize("shitty time")
+          }.to raise_error(Mongoid::Errors::InvalidTime)
+        end
       end
 
       context "when using the ActiveSupport time zone" do
+
         before do
           Mongoid::Config.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
         end
+
         after do
           Time.zone = nil
           Mongoid::Config.use_activesupport_time_zone = false
         end
 
         context "when the local time is not observing daylight saving" do
+
           it "returns the local time" do
-            field.serialize('2010-11-19 5:00:00').should == Time.utc(2010, 11, 19, 4)
+            field.serialize('2010-11-19 5:00:00').should eq(
+              Time.utc(2010, 11, 19, 4)
+            )
           end
         end
 
         context "when the local time is observing daylight saving" do
+
           it "returns the local time" do
-            field.serialize('2010-9-19 5:00:00').should == Time.utc(2010, 9, 19, 3)
+            field.serialize('2010-9-19 5:00:00').should eq(
+              Time.utc(2010, 9, 19, 3)
+            )
           end
         end
       end
     end
 
     context "when given a DateTime" do
+
       it "returns a time" do
-        field.serialize(time.to_datetime).should == Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
+        field.serialize(time.to_datetime).should eq(
+          Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
+        )
       end
 
       context "when using the ActiveSupport time zone" do
+
+        let(:datetime) do
+          DateTime.new(2010, 11, 19)
+        end
+
         before do
           Mongoid::Config.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
-          @datetime = DateTime.new(2010, 11, 19)
         end
+
         after do
           Time.zone = nil
           Mongoid::Config.use_activesupport_time_zone = false
         end
 
         it "assumes the given time is local" do
-          field.serialize(@datetime).should == Time.utc(2010, 11, 18, 23)
+          field.serialize(datetime).should eq(
+            Time.utc(2010, 11, 18, 23)
+          )
         end
       end
     end
 
     context "when given a Time" do
+
       it "converts to a utc time" do
-        field.serialize(time).utc_offset.should == 0
+        field.serialize(time).utc_offset.should eq(0)
       end
 
       it "strips miliseconds" do
-        field.serialize(Time.now).usec.should == 0
+        field.serialize(Time.now).usec.should eq(0)
       end
 
       it "returns utc times unchanged" do
-        field.serialize(time.utc).should == time.utc
+        field.serialize(time.utc).should eq(time.utc)
       end
 
       it "returns the time as utc" do
-        field.serialize(time).should == time.utc
+        field.serialize(time).should eq(time.utc)
       end
     end
 
     context "when given an ActiveSupport::TimeWithZone" do
+
       before { time = 1.hour.ago }
 
       it "converts it to utc" do
-        field.serialize(time.in_time_zone("Alaska")).should == Time.at(time.to_i).utc
+        field.serialize(time.in_time_zone("Alaska")).should eq(
+          Time.at(time.to_i).utc
+        )
       end
     end
 
     context "when given a Date" do
-      before { @date = Date.today }
+
+      let(:date) do
+        Date.today
+      end
 
       it "converts to a utc time" do
-        field.serialize(@date).should == Time.local(@date.year, @date.month, @date.day)
-        field.serialize(@date).utc_offset.should == 0
+        field.serialize(date).should == Time.local(date.year, date.month, date.day)
+      end
+
+      it "has a zero utc offset" do
+        field.serialize(date).utc_offset.should == 0
       end
 
       context "when using the ActiveSupport time zone" do
+
+        let(:date) do
+          Date.new(2010, 11, 19)
+        end
+
         before do
           Mongoid::Config.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
-          @date = Date.new(2010, 11, 19)
         end
+
         after do
           Time.zone = nil
           Mongoid::Config.use_activesupport_time_zone = false
         end
 
         it "assumes the given time is local" do
-          field.serialize(@date).should == Time.utc(2010, 11, 18, 23)
+          field.serialize(date).should == Time.utc(2010, 11, 18, 23)
         end
       end
     end
 
     context "when given an array" do
-      before { @array = [2010, 11, 19, 00, 24, 49] }
+
+      let(:array) do
+        [2010, 11, 19, 00, 24, 49]
+      end
 
       it "returns a time" do
-        field.serialize(@array).should == Time.local(*@array)
+        field.serialize(array).should == Time.local(*array)
       end
 
       context "when using the ActiveSupport time zone" do
+
         before do
           Mongoid::Config.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
         end
+
         after do
           Time.zone = nil
           Mongoid::Config.use_activesupport_time_zone = false
         end
 
         it "assumes the given time is local" do
-          field.serialize(@array).should == Time.utc(2010, 11, 18, 23, 24, 49)
+          field.serialize(array).should eq(
+            Time.utc(2010, 11, 18, 23, 24, 49)
+          )
         end
       end
     end
   end
 
-  describe ".get" do
+  describe "#deserialize" do
 
     context "when the time zone is not defined" do
-      before { Mongoid::Config.use_utc = false }
+
+      before do
+        Mongoid::Config.use_utc = false
+      end
 
       context "when the local time is not observing daylight saving" do
-        before { time = Time.utc(2010, 11, 19) }
+
+        let(:time) do
+          Time.utc(2010, 11, 19)
+        end
 
         it "returns the local time" do
-          field.deserialize(time).utc_offset.should == Time.local(2010, 11, 19).utc_offset
+          field.deserialize(time).utc_offset.should eq(
+            Time.local(2010, 11, 19).utc_offset
+          )
         end
       end
 
       context "when the local time is observing daylight saving" do
-        before { time = Time.utc(2010, 9, 19) }
+
+        let(:time) do
+          Time.utc(2010, 9, 19)
+        end
 
         it "returns the local time" do
-          field.deserialize(time).should == time.getlocal
+          field.deserialize(time).should eq(time.getlocal)
         end
       end
 
       context "when we have a time close to midnight" do
-        before { time = Time.local(2010, 11, 19, 0, 30).utc }
 
-        it "change it back to the equivalent local time" do
-          field.deserialize(time).should == time
+        let(:time) do
+          Time.local(2010, 11, 19, 0, 30).utc
+        end
+
+        it "changes it back to the equivalent local time" do
+          field.deserialize(time).should eq(time)
         end
       end
 
       context "when using the ActiveSupport time zone" do
+
         before do
           Mongoid::Config.use_activesupport_time_zone = true
           Time.zone = "Stockholm"
         end
+
         after do
           Time.zone = nil
           Mongoid::Config.use_activesupport_time_zone = false
         end
 
         it "returns an ActiveSupport::TimeWithZone" do
-          field.deserialize(time).class.should == ActiveSupport::TimeWithZone
+          field.deserialize(time).class.should eq(ActiveSupport::TimeWithZone)
         end
 
         context "when the local time is not observing daylight saving" do
@@ -211,7 +285,9 @@ describe Mongoid::Fields::Serializable::Time do
           end
 
           it "returns the local time" do
-            field.deserialize(new_time).should == Time.zone.local(2010, 11, 19, 13)
+            field.deserialize(new_time).should eq(
+              Time.zone.local(2010, 11, 19, 13)
+            )
           end
         end
 
@@ -222,7 +298,9 @@ describe Mongoid::Fields::Serializable::Time do
           end
 
           it "returns the local time" do
-            field.deserialize(new_time).should == Time.zone.local(2010, 9, 19, 14)
+            field.deserialize(new_time).should eq(
+              Time.zone.local(2010, 9, 19, 14)
+            )
           end
         end
 
@@ -233,18 +311,26 @@ describe Mongoid::Fields::Serializable::Time do
           end
 
           it "change it back to the equivalent local time" do
-            field.deserialize(new_time).should == Time.zone.local(2010, 11, 19, 1, 30)
+            field.deserialize(new_time).should eq(
+              Time.zone.local(2010, 11, 19, 1, 30)
+            )
           end
         end
       end
     end
 
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.use_utc = true }
-      after { Mongoid::Config.use_utc = false }
+
+      before do
+        Mongoid::Config.use_utc = true
+      end
+
+      after do
+        Mongoid::Config.use_utc = false
+      end
 
       it "returns utc" do
-        field.deserialize(time.dup.utc).utc_offset.should == 0
+        field.deserialize(time.dup.utc).utc_offset.should eq(0)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -264,61 +350,86 @@ describe Mongoid::Fields::Serializable::Time do
         end
 
         it "returns utc" do
-          field.deserialize(time).should ==
+          field.deserialize(time).should eq(
             ActiveSupport::TimeZone['UTC'].local(2010, 11, 19, 0, 30)
+          )
         end
 
         it "returns an ActiveSupport::TimeWithZone" do
-          field.deserialize(time).class.should == ActiveSupport::TimeWithZone
+          field.deserialize(time).class.should eq(
+            ActiveSupport::TimeWithZone
+          )
         end
       end
     end
 
     context "when time is nil" do
+
       it "returns nil" do
         field.deserialize(nil).should be_nil
       end
     end
-
   end
 
   describe "round trip - set then get" do
+
     context "when the time zone is not defined" do
-      before { Mongoid::Config.use_utc = false }
+
+      before do
+        Mongoid::Config.use_utc = false
+      end
 
       context "when the local time is not observing daylight saving" do
-        before { time = field.serialize(Time.local(2010, 11, 19)) }
+
+        let(:time) do
+          field.serialize(Time.local(2010, 11, 19))
+        end
 
         it "returns the local time" do
-          field.deserialize(time).utc_offset.should == Time.local(2010, 11, 19).utc_offset
+          field.deserialize(time).utc_offset.should eq(
+            Time.local(2010, 11, 19).utc_offset
+          )
         end
       end
 
       context "when the local time is observing daylight saving" do
+
         let(:time) do
           field.serialize(Time.local(2010, 9, 19))
         end
 
         it "returns the local time" do
-          field.deserialize(time).utc_offset.should == Time.local(2010, 9, 19).utc_offset
+          field.deserialize(time).utc_offset.should eq(
+            Time.local(2010, 9, 19).utc_offset
+          )
         end
       end
 
       context "when we have a time close to midnight" do
-        before do
-          @original_time = Time.local(2010, 11, 19, 0, 30)
-          @stored_time = field.serialize(@original_time)
+
+        let(:original_time) do
+          Time.local(2010, 11, 19, 0, 30)
+        end
+
+        let(:restored_time) do
+          field.serialize(original_time)
         end
 
         it "does not change a local time" do
-          field.deserialize(@stored_time).should == @original_time
+          field.deserialize(restored_time).should eq(original_time)
         end
       end
     end
 
     context "when the time zone is defined as UTC" do
-      before { Mongoid::Config.use_utc = true }
-      after { Mongoid::Config.use_utc = false }
+
+      before do
+        Mongoid::Config.use_utc = true
+      end
+
+      after do
+        Mongoid::Config.use_utc = false
+      end
 
       context "when the local time is not observing daylight saving" do
 
@@ -327,7 +438,7 @@ describe Mongoid::Fields::Serializable::Time do
         end
 
         it "returns UTC" do
-          field.deserialize(time).utc_offset.should == 0
+          field.deserialize(time).utc_offset.should eq(0)
         end
       end
 
@@ -338,21 +449,26 @@ describe Mongoid::Fields::Serializable::Time do
         end
 
         it "returns UTC" do
-          field.deserialize(time).utc_offset.should == 0
+          field.deserialize(time).utc_offset.should eq(0)
         end
       end
 
       context "when we have a time close to midnight" do
 
-        before do
-          Time.zone = "Stockholm"
-          @new_time = field.serialize(Time.zone.local(2010, 11, 19, 0, 30))
+        let(:new_time) do
+          field.serialize(Time.zone.local(2010, 11, 19, 0, 30))
         end
 
-        after { Time.zone = nil }
+        before do
+          Time.zone = "Stockholm"
+        end
+
+        after do
+          Time.zone = nil
+        end
 
         it "changes the day since UTC is behind Stockholm" do
-          field.deserialize(@new_time).day.should == 18
+          field.deserialize(new_time).day.should == 18
         end
       end
     end
