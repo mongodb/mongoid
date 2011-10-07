@@ -77,10 +77,10 @@ describe Mongoid::Extensions::ObjectId::Conversions do
 
         context "when the string is not a valid object id" do
 
-          it "raises an error" do
-            expect {
-              BSON::ObjectId.convert(Person, composite_key)
-            }.to raise_error(BSON::InvalidObjectId)
+          it "returns the key" do
+            BSON::ObjectId.convert(Person, composite_key).should eq(
+              composite_key
+            )
           end
         end
 
@@ -123,10 +123,10 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             BSON::ObjectId.convert(Person, [ composite_key, other_key ])
           end
 
-          it "converts to an array of object ids" do
-            expect {
-              BSON::ObjectId.convert(Person, composite_key)
-            }.to raise_error(BSON::InvalidObjectId)
+          it "returns the key" do
+            BSON::ObjectId.convert(Person, composite_key).should eq(
+              composite_key
+            )
           end
         end
       end
