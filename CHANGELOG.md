@@ -34,6 +34,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#920 Allow relations to be named target.
 
+* \#905 Return normalized class name in metadata if string was defined with a
+  prefixed ::.
+
 * \#861 accepts_nested_attributes_for is no longer needed to set embedded documents
   via a hash or array of hashes directly.
 
