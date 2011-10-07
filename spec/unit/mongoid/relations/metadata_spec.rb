@@ -145,15 +145,32 @@ describe Mongoid::Relations::Metadata do
 
     context "when class_name provided" do
 
-      let(:metadata) do
-        described_class.new(
-          :relation => Mongoid::Relations::Referenced::Many,
-          :class_name => "Person"
-        )
+      context "when the class name contains leading ::" do
+
+        let(:metadata) do
+          described_class.new(
+            :relation => Mongoid::Relations::Referenced::Many,
+            :class_name => "::Person"
+          )
+        end
+
+        it "returns the stripped class name" do
+          metadata.class_name.should eq("Person")
+        end
       end
 
-      it "constantizes the class name" do
-        metadata.class_name.should == "Person"
+      context "when the class name has no prefix" do
+
+        let(:metadata) do
+          described_class.new(
+            :relation => Mongoid::Relations::Referenced::Many,
+            :class_name => "Person"
+          )
+        end
+
+        it "constantizes the class name" do
+          metadata.class_name.should == "Person"
+        end
       end
     end
 
@@ -1014,15 +1031,32 @@ describe Mongoid::Relations::Metadata do
 
   describe "#klass" do
 
-    let(:metadata) do
-      described_class.new(
-        :class_name => "Address",
-        :relation => Mongoid::Relations::Embedded::Many
-      )
+    context "when the class name is not namespaced" do
+
+      let(:metadata) do
+        described_class.new(
+          :class_name => "Address",
+          :relation => Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "constantizes the class_name" do
+        metadata.klass.should eq(Address)
+      end
     end
 
-    it "constantizes the class_name" do
-      metadata.klass.should == Address
+    context "when the class name is prepended with ::" do
+
+      let(:metadata) do
+        described_class.new(
+          :class_name => "::Address",
+          :relation => Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "returns the class" do
+        metadata.klass.should eq(Address)
+      end
     end
   end
 
