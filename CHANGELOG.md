@@ -8,6 +8,8 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
+* \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
+
 ## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
 ### Resolved Issues

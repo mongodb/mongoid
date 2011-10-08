@@ -224,7 +224,6 @@ describe Mongoid::Fields::Mappings do
         it "returns the class of the custom type" do
           definable.should eq(Person)
         end
-
       end
 
       context "with a module" do
@@ -238,7 +237,6 @@ describe Mongoid::Fields::Mappings do
           it "returns the module and class of the custom type" do
             definable.should eq(Custom::Type)
           end
-
         end
 
         context "and a class matching a defined serializable" do
@@ -250,7 +248,6 @@ describe Mongoid::Fields::Mappings do
           it "returns the module and class of the custom type" do
             definable.should eq(Custom::String)
           end
-
         end
 
         context "inside the Mongoid namespace" do
@@ -262,11 +259,8 @@ describe Mongoid::Fields::Mappings do
           it "returns the module and class of the custom type" do
             definable.should eq(Mongoid::MyExtension::Object)
           end
-
         end
-
       end
-
     end
 
     context "when given nil" do
