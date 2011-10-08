@@ -26,7 +26,12 @@ module Mongoid #:nodoc
           return "#{MODULE}::ForeignKeys::#{klass.to_s.demodulize}".constantize
         end
         begin
-          "#{MODULE}::#{klass.to_s.demodulize}".constantize
+          modules = "#{ MODULE }::|BSON::|ActiveSupport::"
+          if match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
+            "#{MODULE}::#{ match[2] }".constantize
+          else
+            klass.to_s.constantize
+          end
         rescue NameError
           klass
         end

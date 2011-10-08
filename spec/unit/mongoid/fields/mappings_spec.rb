@@ -215,13 +215,58 @@ describe Mongoid::Fields::Mappings do
 
     context "when given a custom type" do
 
-      let(:klass) do
-        Person
+      context "without a module" do
+
+        let(:klass) do
+          Person
+        end
+
+        it "returns the class of the custom type" do
+          definable.should eq(Person)
+        end
+
       end
 
-      it "returns the class of the custom type" do
-        definable.should eq(Person)
+      context "with a module" do
+
+        context "and a class not matching a defined serializable" do
+
+          let(:klass) do
+            Custom::Type
+          end
+
+          it "returns the module and class of the custom type" do
+            definable.should eq(Custom::Type)
+          end
+
+        end
+
+        context "and a class matching a defined serializable" do
+
+          let(:klass) do
+            Custom::String
+          end
+
+          it "returns the module and class of the custom type" do
+            definable.should eq(Custom::String)
+          end
+
+        end
+
+        context "inside the Mongoid namespace" do
+
+          let(:klass) do
+            Mongoid::MyExtension::Object
+          end
+
+          it "returns the module and class of the custom type" do
+            definable.should eq(Mongoid::MyExtension::Object)
+          end
+
+        end
+
       end
+
     end
 
     context "when given nil" do
