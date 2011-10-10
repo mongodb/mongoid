@@ -54,14 +54,24 @@ module Mongoid # :nodoc:
         # @example Build a new document on the relation.
         #   person.posts.build(:title => "A new post")
         #
-        # @param [ Hash ] attributes The attributes of the new document.
-        # @param [ Hash ] options The scoped assignment options.
-        # @param [ Class ] type The optional subclass to build.
+        # @overload build(attributes = {}, options = {}, type = nil)
+        #   @param [ Hash ] attributes The attributes of the new document.
+        #   @param [ Hash ] options The scoped assignment options.
+        #   @param [ Class ] type The optional subclass to build.
+        #
+        # @overload build(attributes = {}, type = nil)
+        #   @param [ Hash ] attributes The attributes of the new document.
+        #   @param [ Hash ] options The scoped assignment options.
+        #   @param [ Class ] type The optional subclass to build.
         #
         # @return [ Document ] The new document.
         #
         # @since 2.0.0.beta.1
         def build(attributes = {}, options = {}, type = nil)
+          if options.is_a? Class
+            options, type = {}, options
+          end
+
           Factory.build(type || klass, attributes, options).tap do |doc|
             base.send(metadata.foreign_key).push(doc.id)
             append(doc)
