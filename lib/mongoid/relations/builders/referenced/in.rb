@@ -17,7 +17,9 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object unless query?
             model = type ? type.constantize : metadata.klass
-            IdentityMap.get(model, object) || metadata.criteria(object, model).first
+            from_map = IdentityMap.get(model, object)
+            from_db = metadata.criteria(object, model).first
+            from_map || from_db
           end
         end
       end
