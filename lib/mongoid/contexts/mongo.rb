@@ -371,7 +371,7 @@ module Mongoid #:nodoc:
           :reduce => reduce.gsub("[field]", field)
         )
         value = collection.empty? ? nil : collection.first[start.to_s]
-        value && value.try(:nan?) ? nil : value
+        value && value.do_or_do_not(:nan?) ? nil : value
       end
 
       # Filters the field list. If no fields have been supplied, then it will be
