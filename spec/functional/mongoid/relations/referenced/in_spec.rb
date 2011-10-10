@@ -850,4 +850,38 @@ describe Mongoid::Relations::Referenced::In do
       end
     end
   end
+
+  context "when the parent and child are persisted" do
+
+    context "when the identity map is enabled" do
+
+      before do
+        Mongoid.identity_map_enabled = true
+      end
+
+      after do
+        Mongoid.identity_map_enabled = false
+      end
+
+      let(:series) do
+        Series.create
+      end
+
+      let!(:book_one) do
+        series.books.create
+      end
+
+      let!(:book_two) do
+        series.books.create
+      end
+
+      context "when asking for the inverse multiple times" do
+
+        it "does not append and save duplicate docs" do
+          Book.find(Book.first.id).series.books.to_a.length.should eq(2)
+          Book.find(Book.first.id).series.books.to_a.length.should eq(2)
+        end
+      end
+    end
+  end
 end
