@@ -46,14 +46,23 @@ module Mongoid #:nodoc:
         # @example Build a new document on the relation.
         #   person.posts.build(:title => "A new post")
         #
-        # @param [ Hash ] attributes The attributes of the new document.
-        # @param [ Hash ] options The scoped assignment options.
-        # @param [ Class ] type The optional subclass to build.
+        # @overload build(attributes = {}, options = {}, type = nil)
+        #   @param [ Hash ] attributes The attributes of the new document.
+        #   @param [ Hash ] options The scoped assignment options.
+        #   @param [ Class ] type The optional subclass to build.
+        #
+        # @overload build(attributes = {}, type = nil)
+        #   @param [ Hash ] attributes The attributes of the new document.
+        #   @param [ Class ] type The optional subclass to build.
         #
         # @return [ Document ] The new document.
         #
         # @since 2.0.0.beta.1
         def build(attributes = {}, options = {}, type = nil)
+          if options.is_a? Class
+            options, type = {}, options
+          end
+
           Factory.build(type || klass, attributes, options).tap do |doc|
             append(doc)
             yield(doc) if block_given?
@@ -67,9 +76,14 @@ module Mongoid #:nodoc:
         # @example Create and save the new document.
         #   person.posts.create(:text => "Testing")
         #
-        # @param [ Hash ] attributes The attributes to create with.
-        # @param [ Hash ] options The scoped assignment options.
-        # @param [ Class ] type The optional type of document to create.
+        # @overload create(attributes = nil, options = {}, type = nil)
+        #   @param [ Hash ] attributes The attributes to create with.
+        #   @param [ Hash ] options The scoped assignment options.
+        #   @param [ Class ] type The optional type of document to create.
+        #
+        # @overload create(attributes = nil, type = nil)
+        #   @param [ Hash ] attributes The attributes to create with.
+        #   @param [ Class ] type The optional type of document to create.
         #
         # @return [ Document ] The newly created document.
         #
@@ -87,9 +101,14 @@ module Mongoid #:nodoc:
         # @example Create and save the new document.
         #   person.posts.create!(:text => "Testing")
         #
-        # @param [ Hash ] attributes The attributes to create with.
-        # @param [ Hash ] options The scoped assignment options.
-        # @param [ Class ] type The optional type of document to create.
+        # @overload create!(attributes = nil, options = {}, type = nil)
+        #   @param [ Hash ] attributes The attributes to create with.
+        #   @param [ Hash ] options The scoped assignment options.
+        #   @param [ Class ] type The optional type of document to create.
+        #
+        # @overload create!(attributes = nil, type = nil)
+        #   @param [ Hash ] attributes The attributes to create with.
+        #   @param [ Class ] type The optional type of document to create.
         #
         # @raise [ Errors::Validations ] If validation failed.
         #
