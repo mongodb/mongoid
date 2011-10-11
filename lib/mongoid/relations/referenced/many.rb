@@ -295,7 +295,7 @@ module Mongoid #:nodoc:
           tap do |proxy|
             if replacement != proxy.in_memory
               proxy.purge
-              proxy.push(replacement.compact) if replacement
+              proxy.push(replacement.compact.uniq) if replacement
             end
           end
         end
