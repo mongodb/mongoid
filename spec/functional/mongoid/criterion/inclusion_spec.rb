@@ -169,6 +169,17 @@ describe Mongoid::Criterion::Inclusion do
         from_db.should eq([ person_two ])
       end
     end
+
+    context "when providing no expressions" do
+
+      let(:from_db) do
+        Person.all_of()
+      end
+
+      it "returns all documents" do
+        from_db.should eq([ person_one, person_two ])
+      end
+    end
   end
 
   describe "#find" do
