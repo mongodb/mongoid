@@ -123,7 +123,7 @@ For instructions on upgrading to newer versions, visit
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
 
-## 2.2.3 \[ In Development \] \[ Branch: 2.2.0-stable \]
+## 2.2.3
 
 * \#1295 Fixed having multiple includes only execute the eager loading of the first.
 
