@@ -127,16 +127,49 @@ describe Mongoid::Relations::Targets::Enumerable do
       described_class.new([])
     end
 
-    let!(:added) do
-      enumerable << post
+    context "when the relation is empty" do
+
+      let!(:added) do
+        enumerable << post
+      end
+
+      it "adds the document to the added target" do
+        enumerable.added.should eq([ post ])
+      end
+
+      it "returns the added documents" do
+        added.should eq([ post ])
+      end
     end
 
-    it "adds the document to the added target" do
-      enumerable.added.should eq([ post ])
+    context "when adding a document that is already added" do
+
+      let!(:added) do
+        enumerable.added.push(post)
+      end
+
+      before do
+        enumerable << post
+      end
+
+      it "does not add the duplicate" do
+        enumerable.added.should eq([ post ])
+      end
     end
 
-    it "returns the added documents" do
-      added.should eq([ post ])
+    context "when adding a document that is already loaded" do
+
+      let!(:added) do
+        enumerable.loaded.push(post)
+      end
+
+      before do
+        enumerable << post
+      end
+
+      it "does not add the duplicate" do
+        enumerable.loaded.should eq([ post ])
+      end
     end
   end
 
