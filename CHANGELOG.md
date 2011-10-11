@@ -10,7 +10,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
-## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
+## 2.3.1
 
 ### Resolved Issues
 
@@ -142,7 +142,13 @@ For instructions on upgrading to newer versions, visit
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
 
-## 2.2.3 \[ In Development \] \[ Branch: 2.2.0-stable \]
+## 2.2.3
+
+* \#1295 Fixed having multiple includes only execute the eager loading of the first.
+
+* \#1225 Fixed delayed persistence of embedded documents via $set.
+
+* \#1002 Fix BSON object id conversion to check if legal first.
 
 ## 2.2.2
 
