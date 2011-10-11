@@ -125,6 +125,12 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.2.3 \[ In Development \] \[ Branch: 2.2.0-stable \]
 
+* \#1295 Fixed having multiple includes only execute the eager loading of the first.
+
+* \#1225 Fixed delayed persistence of embedded documents via $set.
+
+* \#1002 Fix BSON object id conversion to check if legal first.
+
 ## 2.2.2
 
 * This release removes the restriction of a dependency on 1.3.x of the mongo
