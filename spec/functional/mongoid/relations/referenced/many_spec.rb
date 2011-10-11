@@ -1520,6 +1520,41 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find" do
 
+    context "when the identity map is enabled" do
+
+      before do
+        Mongoid.identity_map_enabled = true
+      end
+
+      after do
+        Mongoid.identity_map_enabled = false
+      end
+
+      context "when the document is in the map" do
+
+        let(:person) do
+          Person.create(:ssn => "123-11-1111")
+        end
+
+        before do
+          person.posts.create(:title => "Test")
+        end
+
+        context "when the document does not belong to the relation" do
+
+          let!(:post) do
+            Post.create(:title => "testing")
+          end
+
+          it "raises an error" do
+            expect {
+              person.posts.find(post.id)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       let(:person) do
