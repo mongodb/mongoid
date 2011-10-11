@@ -87,6 +87,7 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.1
       def master
         Mongo::Connection.from_uri(uri(self), optional).tap do |conn|
+          conn.extend(Mongoid::DurationLogging)
           conn.apply_saved_authentication
         end
       end
@@ -103,6 +104,7 @@ module Mongoid #:nodoc:
       def slaves
         (self["slaves"] || []).map do |options|
           Mongo::Connection.from_uri(uri(options), optional(true)).tap do |conn|
+            conn.extend(Mongoid::DurationLogging)
             conn.apply_saved_authentication
           end
         end
