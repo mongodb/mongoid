@@ -12,6 +12,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1338 Calling #find on a scope or relation checks that the document in the
+  identity map actually matches other scope parameters.
+
 * \#1321 HABTM no longer allows duplicate entries or keys, instead of the previous
   inconsistencies.
 
@@ -22,11 +25,16 @@ For instructions on upgrading to newer versions, visit
 
 * \#1311 Fix issue with custom field serialization inheriting from hash.
 
+* \#1310 The referenced many enumerable target no longer duplicates loaded and
+  added documents when the identity map is enabled.
+
 * \#1295 Fixed having multiple includes only execute the eager loading of the first.
 
 * \#1287 Fixed max versions limitation with versioning.
 
 * \#1277 attribute_will_change! properly flags the attribute even if no change occured.
+
+* \#1063 Paranoid documents properly run destroy callbacks on soft destroy.
 
 * \#1061 Raise `Mongoid::Errors::InvalidTime` when time serialization fails.
 
