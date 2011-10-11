@@ -3,7 +3,8 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   before do
-    [ Person, Game, Post, Bar, Agent, Comment, Movie, Account, User ].map(&:delete_all)
+    [ Person, Game, Post, Bar, Agent,
+      Comment, Movie, Account, User, Book, Series ].map(&:delete_all)
   end
 
   let(:person) do
