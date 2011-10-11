@@ -124,10 +124,47 @@ module Mongoid #:nodoc:
         case type
         when :first then crit.one
         when :last then crit.last
-        when :ids then execute_or_raise(args, crit)
+        when :ids then crit.execute_or_raise(args)
         else
           crit
         end
+      end
+
+      # Execute the criteria or raise an error if no documents found.
+      #
+      # @example Execute or raise
+      #   criteria.execute_or_raise(id, criteria)
+      #
+      # @param [ Object ] args The arguments passed.
+      # @param [ Criteria ] criteria The criteria to execute.
+      #
+      # @raise [ Errors::DocumentNotFound ] If nothing returned.
+      #
+      # @return [ Document, Array<Document> ] The document(s).
+      #
+      # @since 2.0.0
+      def execute_or_raise(args)
+        (args[0].is_a?(Array) ? entries : from_map_or_db).tap do |result|
+          if Mongoid.raise_not_found_error && !args.flatten.blank?
+            raise Errors::DocumentNotFound.new(klass, args) if result._vacant?
+          end
+        end
+      end
+
+      # Get the document from the identity map, and if not found hit the
+      # database.
+      #
+      # @example Get the document from the map or criteria.
+      #   criteria.from_map_or_db(criteria)
+      #
+      # @param [ Criteria ] The cloned criteria.
+      #
+      # @return [ Document ] The found document.
+      #
+      # @since 2.2.1
+      def from_map_or_db
+        doc = IdentityMap.get(klass, extract_id)
+        doc && doc.matches?(selector) ? doc : first
       end
 
       # Adds a criterion to the +Criteria+ that specifies values where any can
@@ -260,44 +297,6 @@ module Mongoid #:nodoc:
             end
           end
         end
-      end
-
-      private
-
-      # Execute the criteria or raise an error if no documents found.
-      #
-      # @example Execute or raise
-      #   criteria.execute_or_raise(id, criteria)
-      #
-      # @param [ Object ] args The arguments passed.
-      # @param [ Criteria ] criteria The criteria to execute.
-      #
-      # @raise [ Errors::DocumentNotFound ] If nothing returned.
-      #
-      # @return [ Document, Array<Document> ] The document(s).
-      #
-      # @since 2.0.0
-      def execute_or_raise(args, criteria)
-        (args[0].is_a?(Array) ? criteria.entries : from_map_or_db(criteria)).tap do |result|
-          if Mongoid.raise_not_found_error && !args.flatten.blank?
-            raise Errors::DocumentNotFound.new(klass, args) if result._vacant?
-          end
-        end
-      end
-
-      # Get the document from the identity map, and if not found hit the
-      # database.
-      #
-      # @example Get the document from the map or criteria.
-      #   criteria.from_map_or_db(criteria)
-      #
-      # @param [ Criteria ] The cloned criteria.
-      #
-      # @return [ Document ] The found document.
-      #
-      # @since 2.2.1
-      def from_map_or_db(criteria)
-        IdentityMap.get(klass, criteria.extract_id) || criteria.one
       end
     end
   end

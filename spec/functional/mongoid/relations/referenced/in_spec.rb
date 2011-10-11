@@ -875,11 +875,19 @@ describe Mongoid::Relations::Referenced::In do
         series.books.create
       end
 
+      let(:id) do
+        Book.first.id
+      end
+
       context "when asking for the inverse multiple times" do
 
-        it "does not append and save duplicate docs" do
-          Book.find(Book.first.id).series.books.to_a.length.should eq(2)
-          Book.find(Book.first.id).series.books.to_a.length.should eq(2)
+        pending "does not append and save duplicate docs" do
+          Book.find(id).series.books.to_a.length.should eq(2)
+          Book.find(id).series.books.to_a.length.should eq(2)
+        end
+
+        pending "returns the same documents from the map" do
+          Book.find(id).should equal(Book.find(id))
         end
       end
     end
