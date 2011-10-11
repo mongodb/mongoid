@@ -34,8 +34,8 @@ module Mongoid #:nodoc:
       # @since 2.3.0
       def all_of(*args)
         clone.tap do |crit|
-          criterion = @selector["$and"] || []
           unless args.empty?
+            criterion = @selector["$and"] || []
             converted = BSON::ObjectId.convert(klass, args.flatten)
             expanded = converted.collect { |hash| hash.expand_complex_criteria }
             crit.selector["$and"] = criterion.concat(expanded)
