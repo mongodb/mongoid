@@ -44,7 +44,9 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def <<(document)
-          added << document
+          unless added.include?(document) || loaded.include?(document)
+            added.push(document)
+          end
         end
         alias :push :<<
 
@@ -151,12 +153,11 @@ module Mongoid #:nodoc:
             end
           else
             unloaded.each do |doc|
-              loaded.push(doc)
+              loaded.push(added.delete_one(doc) || doc)
               yield(doc)
             end
           end
           added.each do |doc|
-            next if doc.persisted? && (!loaded? && !loaded.empty?)
             yield(doc)
           end
           @executed = true
