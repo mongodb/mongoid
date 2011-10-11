@@ -31,7 +31,7 @@ module Mongoid # :nodoc:
                   if inverse_metadata != metadata && !inverse_metadata.nil?
                     base.metadata = inverse_metadata
                     if base.referenced_many?
-                      target.send(inverse).push(base)
+                      target.send(inverse).push(base) unless Mongoid.identity_map_enabled?
                     else
                       target.do_or_do_not(metadata.inverse_setter(target), base)
                     end

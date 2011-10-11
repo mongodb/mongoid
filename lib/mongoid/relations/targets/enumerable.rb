@@ -44,9 +44,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def <<(document)
-          unless added.include?(document) || loaded.include?(document)
-            added.push(document)
-          end
+          added.push(document)
         end
         alias :push :<<
 

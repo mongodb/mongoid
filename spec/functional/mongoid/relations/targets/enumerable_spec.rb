@@ -141,36 +141,6 @@ describe Mongoid::Relations::Targets::Enumerable do
         added.should eq([ post ])
       end
     end
-
-    context "when adding a document that is already added" do
-
-      let!(:added) do
-        enumerable.added.push(post)
-      end
-
-      before do
-        enumerable << post
-      end
-
-      it "does not add the duplicate" do
-        enumerable.added.should eq([ post ])
-      end
-    end
-
-    context "when adding a document that is already loaded" do
-
-      let!(:added) do
-        enumerable.loaded.push(post)
-      end
-
-      before do
-        enumerable << post
-      end
-
-      it "does not add the duplicate" do
-        enumerable.loaded.should eq([ post ])
-      end
-    end
   end
 
   describe "#clear" do
