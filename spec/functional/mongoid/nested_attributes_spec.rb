@@ -1049,29 +1049,51 @@ describe Mongoid::NestedAttributes do
                   person.addresses.size.should == 2
                 end
               end
-            end
 
-            context "when the ids match in an array of attributes and start with '_'" do
+              context "when passing in id as symbol" do
 
-              before do
-                person.addresses_attributes =
-                  [
-                    { "_id" => address_one.id, "street" => "Maybachufer" },
-                    { "_id" => address_two.id, "street" => "Alexander Platz" }
-                  ]
+                before do
+                  person.addresses_attributes =
+                    [
+                      { :id => address_one.id, :street => "Water Street" }
+                    ]
+                end
+
+                it "updates the first existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?('Water Street')
+                end
+
+                it "does not update the second existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?(address_two.street)
+                end
+
+                it "does not add new documents" do
+                  person.addresses.size.should == 2
+                end
               end
 
-              it "updates the first existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+              context "when passing in _id as symbol" do
+
+                before do
+                  person.addresses_attributes =
+                    [
+                      { :_id => address_one.id, :street => "Water Street" }
+                    ]
+                end
+
+                it "updates the first existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?('Water Street')
+                end
+
+                it "does not update the second existing document" do
+                  person.addresses.collect { |a| a['street'] }.include?(address_two.street)
+                end
+
+                it "does not add new documents" do
+                  person.addresses.size.should == 2
+                end
               end
 
-              it "updates the second existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
-              end
-
-              it "does not add new documents" do
-                person.addresses.size.should == 2
-              end
             end
 
             context "when the ids do not match" do
