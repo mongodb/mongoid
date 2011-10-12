@@ -6,6 +6,18 @@ describe Mongoid::Document do
     Person.delete_all
   end
 
+  describe "#initialize" do
+
+    context "when providing a block" do
+
+      it "sets the defaults before yielding" do
+        Person.new do |person|
+          person.age.should eq(100)
+        end
+      end
+    end
+  end
+
   context "defining a BSON::ObjectId as a field" do
 
     let(:bson_id) do

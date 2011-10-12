@@ -129,9 +129,9 @@ module Mongoid #:nodoc:
         @attributes ||= {}
         options ||= {}
         process(attrs, options[:as] || :default, !options[:without_protection]) do
-          yield self if block_given?
           identify
           apply_defaults
+          yield(self) if block_given?
         end
         run_callbacks(:initialize) { self }
       end
