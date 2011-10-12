@@ -137,30 +137,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Reloads the +Document+ attributes from the database. If the document has
-    # not been saved then an error will get raised if the configuration option
-    # was set.
-    #
-    # @example Reload the document.
-    #   person.reload
-    #
-    # @raise [ Errors::DocumentNotFound ] If the document was deleted.
-    #
-    # @return [ Document ] The document, reloaded.
-    def reload
-      reloaded = collection.find_one(:_id => id)
-      if Mongoid.raise_not_found_error
-        raise Errors::DocumentNotFound.new(self.class, id) if reloaded.nil?
-      end
-      @attributes = {}.merge(reloaded || {})
-      changed_attributes.clear
-      apply_defaults
-      tap do
-        reload_relations
-        run_callbacks(:initialize)
-      end
-    end
-
     # Return an array with this +Document+ only in it.
     #
     # @example Return the document in an array.

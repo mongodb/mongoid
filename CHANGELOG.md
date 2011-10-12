@@ -8,7 +8,16 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
-## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
+## 2.3.2 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+* \#1343 When passing no arguments to `Criteria#all_of` return all documents.
+  (Chris Leishman)
+
+* \#736 Calling #reload on embedded documents now works properly.
+
+### Resolved Issues
+
+## 2.3.1
 
 ### Resolved Issues
 
