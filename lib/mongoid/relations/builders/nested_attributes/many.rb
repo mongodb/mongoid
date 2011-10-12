@@ -91,7 +91,7 @@ module Mongoid # :nodoc:
           # @param [ Hash ] attrs The single document attributes to process.
           def process(parent, attrs)
             return if reject?(parent, attrs)
-            if id = attrs["id"] || attrs["_id"]
+            if id = attrs.extract_id
               doc = existing.find(convert_id(id))
               if destroyable?(attrs)
                 existing.delete(doc)

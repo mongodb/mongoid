@@ -1015,11 +1015,11 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the first existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                  person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
                 end
 
                 it "updates the second existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                  person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
                 end
 
                 it "does not add new documents" do
@@ -1038,11 +1038,11 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the first existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                  person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
                 end
 
                 it "updates the second existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                  person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
                 end
 
                 it "does not add new documents" do
@@ -1062,15 +1062,61 @@ describe Mongoid::NestedAttributes do
               end
 
               it "updates the first existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
               end
 
               it "updates the second existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
               end
 
               it "does not add new documents" do
                 person.addresses.size.should == 2
+              end
+            end
+
+            context "when the ids are _id symbols" do
+
+              before do
+                person.addresses_attributes =
+                  [
+                    { :_id => address_one.id, "street" => "Maybachufer" },
+                    { :_id => address_two.id, "street" => "Alexander Platz" }
+                  ]
+              end
+
+              it "updates the first existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
+              end
+
+              it "updates the second existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
+              end
+
+              it "does not add new documents" do
+                person.addresses.size.should eq(2)
+              end
+            end
+
+            context "when the ids are id symbols" do
+
+              before do
+                person.addresses_attributes =
+                  [
+                    { :id => address_one.id, "street" => "Maybachufer" },
+                    { :id => address_two.id, "street" => "Alexander Platz" }
+                  ]
+              end
+
+              it "updates the first existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
+              end
+
+              it "updates the second existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
+              end
+
+              it "does not add new documents" do
+                person.addresses.size.should eq(2)
               end
             end
 
