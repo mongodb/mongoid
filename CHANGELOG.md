@@ -13,6 +13,12 @@ For instructions on upgrading to newer versions, visit
 * \#1343 When passing no arguments to `Criteria#all_of` return all documents.
   (Chris Leishman)
 
+* \#1323 Allow both strings and symbols as ids in the attributes array for
+  nested attributes. (Michael Wood)
+
+* \#1236 Ensure all models are loaded in rake tasks, so even in threadsafe mode
+  all indexes can be created.
+
 * \#736 Calling #reload on embedded documents now works properly.
 
 ### Resolved Issues
