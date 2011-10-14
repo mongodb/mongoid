@@ -13,6 +13,9 @@ For instructions on upgrading to newer versions, visit
 * \#1343 When passing no arguments to `Criteria#all_of` return all documents.
   (Chris Leishman)
 
+* \#1339 Ensure destroy callbacks are run on cascadable children when deleting via
+  nested attributes.
+
 * \#1323 Allow both strings and symbols as ids in the attributes array for
   nested attributes. (Michael Wood)
 
