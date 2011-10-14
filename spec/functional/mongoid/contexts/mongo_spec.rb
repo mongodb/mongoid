@@ -23,6 +23,21 @@ describe Mongoid::Contexts::Mongo do
     it "returns the first document in the collection by id" do
       from_db.should eq(first)
     end
+
+    context "when chained on another criteria" do
+
+      let(:criteria) do
+        Product.desc(:description)
+      end
+
+      before do
+        criteria.first
+      end
+
+      it "does not modify the previous criteria's sorting" do
+        criteria.options.should eq({ :sort => [[ :description, :desc ]] })
+      end
+    end
   end
 
   describe "#last" do
@@ -41,6 +56,21 @@ describe Mongoid::Contexts::Mongo do
 
     it "returns the last document in the collection by id" do
       from_db.should eq(last)
+    end
+
+    context "when chained on another criteria" do
+
+      let(:criteria) do
+        Product.desc(:description)
+      end
+
+      before do
+        criteria.last
+      end
+
+      it "does not modify the previous criteria's sorting" do
+        criteria.options.should eq({ :sort => [[ :description, :desc ]] })
+      end
     end
   end
 
