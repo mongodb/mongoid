@@ -53,7 +53,7 @@ class Person
   end
   embeds_many :address_components, :validate => false
   embeds_many :paranoid_phones, :validate => false
-  embeds_many :services
+  embeds_many :services, :cascade_callbacks => true
 
   embeds_one :pet, :class_name => "Animal"
   embeds_one :name, :as => :namable, :validate => false do
@@ -74,6 +74,7 @@ class Person
   accepts_nested_attributes_for :posts
   accepts_nested_attributes_for :preferences
   accepts_nested_attributes_for :quiz
+  accepts_nested_attributes_for :services, :allow_destroy => true
 
   has_one :game, :dependent => :destroy do
     def extension
