@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.2 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1347 Fix embedded matchers when provided a hash value that does not have a
+  modifier as a key.
+
 * \#1346 Dup default sorting criteria when calling first/last on a criteria.
 
 * \#1343 When passing no arguments to `Criteria#all_of` return all documents.
