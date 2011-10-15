@@ -807,6 +807,14 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Determine the inverse foreign key of the relation.
+      #
+      # @example Determine the inverse foreign key.
+      #   metadata.determine_inverse_foreign_key
+      #
+      # @return [ String ] The inverse.
+      #
+      # @since 2.3.2
       def determine_inverse_foreign_key
         if has_key?(:inverse_of)
           inverse_of ? "#{inverse_of.to_s.singularize}#{relation.foreign_key_suffix}" : nil
