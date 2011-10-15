@@ -401,9 +401,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_foreign_key
-        @inverse_foreign_key ||=
-          ( inverse_of ? inverse_of.to_s.singularize : inverse_class_name.demodulize.underscore ) <<
-          relation.foreign_key_suffix
+        @inverse_foreign_key ||= determine_inverse_foreign_key
       end
 
       # Returns the inverse class of the proxied relation.
@@ -806,6 +804,14 @@ module Mongoid # :nodoc:
           else
             inverse_of ? "#{inverse_of}#{suffix}" : inverse_class_name.foreign_key
           end
+        end
+      end
+
+      def determine_inverse_foreign_key
+        if has_key?(:inverse_of)
+          inverse_of ? "#{inverse_of.to_s.singularize}#{relation.foreign_key_suffix}" : nil
+        else
+          "#{inverse_class_name.demodulize.underscore}#{relation.foreign_key_suffix}"
         end
       end
 

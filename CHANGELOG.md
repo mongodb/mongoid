@@ -21,6 +21,9 @@ For instructions on upgrading to newer versions, visit
 * \#1339 Ensure destroy callbacks are run on cascadable children when deleting via
   nested attributes.
 
+* \#1324 Setting `inverse_of: nil` on a many-to-many referencing the same class
+  returns nil for the inverse foreign key.
+
 * \#1323 Allow both strings and symbols as ids in the attributes array for
   nested attributes. (Michael Wood)
 

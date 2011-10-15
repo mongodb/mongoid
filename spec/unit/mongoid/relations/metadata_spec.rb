@@ -422,7 +422,6 @@ describe Mongoid::Relations::Metadata do
             it "returns the inverse_foreign_key without the module name" do
               metadata.inverse_foreign_key.should == "apple_ids"
             end
-
           end
         end
       end
@@ -872,6 +871,22 @@ describe Mongoid::Relations::Metadata do
 
       it "returns the inverse class name plus suffix" do
         metadata.inverse_foreign_key.should == "person_ids"
+      end
+    end
+
+    context "when the inverse_of is nil" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :blogs,
+          :class_name => "Blog",
+          :relation => Mongoid::Relations::Referenced::ManyToMany,
+          :inverse_of => nil
+        )
+      end
+
+      it "returns nil" do
+        metadata.inverse_foreign_key.should be_nil
       end
     end
   end
