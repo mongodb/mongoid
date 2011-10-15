@@ -97,7 +97,9 @@ module Mongoid # :nodoc:
                 instance_variable_get(variable)
               else
                 _building do
-                  build(name, attributes[metadata.key], metadata, :loading => true)
+                  _loading do
+                    build(name, attributes[metadata.key], metadata, :loading => true)
+                  end
                 end
               end
             end

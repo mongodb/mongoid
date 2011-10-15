@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 require "mongoid/relations/embedded/sort"
 
 module Mongoid # :nodoc:
@@ -8,6 +7,7 @@ module Mongoid # :nodoc:
       module Embedded #:nodoc:
         class Many < Builder #:nodoc:
           include Relations::Embedded::Sort
+
           # Builds the document out of the attributes using the provided
           # metadata on the relation. Instantiates through the factory in order
           # to make sure subclasses and allocation are used if fitting. This
@@ -24,10 +24,10 @@ module Mongoid # :nodoc:
             return object if object.first.is_a?(Document)
             [].tap do |docs|
               object.each do |attrs|
-                if loading
-                  docs << Mongoid::Factory.from_db(metadata.klass, attrs)
+                if _loading?
+                  docs << Factory.from_db(klass, attrs)
                 else
-                  docs << Mongoid::Factory.build(metadata.klass, attrs)
+                  docs << Factory.build(klass, attrs)
                 end
               end
               sort_documents!(docs, metadata) if metadata.order

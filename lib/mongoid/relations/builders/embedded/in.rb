@@ -16,10 +16,10 @@ module Mongoid # :nodoc:
           # @return [ Document ] A single document.
           def build(type = nil)
             return object unless object.is_a?(Hash)
-            if loading
-              Mongoid::Factory.from_db(metadata.klass, object)
+            if _loading?
+              Factory.from_db(klass, object)
             else
-              Mongoid::Factory.build(metadata.klass, object)
+              Factory.build(klass, object)
             end
           end
         end

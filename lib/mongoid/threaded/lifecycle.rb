@@ -121,10 +121,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.2
       def _loading
-        Threaded.begin_build
+        Threaded.begin_load
         yield
       ensure
-        Threaded.exit_build
+        Threaded.exit_load
       end
 
       # Is the current thread in loading mode?
