@@ -90,8 +90,8 @@ module Mongoid # :nodoc:
           # @return [ Builder ] A newly instantiated builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object, loading = false)
-            Builders::Embedded::One.new(meta, object, loading)
+          def builder(meta, object)
+            Builders::Embedded::One.new(meta, object)
           end
 
           # Returns true if the relation is an embedded one. In this case

@@ -20,7 +20,7 @@ module Mongoid # :nodoc:
       #   id to query with.
       #
       # @since 2.0.0.rc.1
-      def initialize(metadata, object, loading = false)
+      def initialize(metadata, object)
         @metadata, @object = metadata, object
       end
 

@@ -452,8 +452,8 @@ module Mongoid #:nodoc:
           # @return [ Builder ] A new builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object, loading = false)
-            Builders::Referenced::Many.new(meta, object || [], loading)
+          def builder(meta, object)
+            Builders::Referenced::Many.new(meta, object || [])
           end
 
           # Get the standard criteria used for querying this relation.
