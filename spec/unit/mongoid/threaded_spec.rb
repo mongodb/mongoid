@@ -6,6 +6,90 @@ describe Mongoid::Threaded do
     stub
   end
 
+  describe "#begin_load" do
+
+    before do
+      described_class.begin_load
+    end
+
+    after do
+      described_class.load_stack.clear
+    end
+
+    it "adds a boolen to the load stack" do
+      described_class.load_stack.should eq([ true ])
+    end
+  end
+
+  describe "#loading?" do
+
+    context "when loading is not set" do
+
+      it "returns false" do
+        described_class.should_not be_loading
+      end
+    end
+
+    context "when loading has elements" do
+
+      before do
+        Thread.current[:"[mongoid]:load-stack"] = [ true ]
+      end
+
+      after do
+        Thread.current[:"[mongoid]:load-stack"] = []
+      end
+
+      it "returns true" do
+        described_class.should be_loading
+      end
+    end
+
+    context "when loading has no elements" do
+
+      before do
+        Thread.current[:"[mongoid]:load-stack"] = []
+      end
+
+      it "returns false" do
+        described_class.should_not be_loading
+      end
+    end
+  end
+
+  describe "#load_stack" do
+
+    context "when no load stack has been initialized" do
+
+      let(:loading) do
+        described_class.load_stack
+      end
+
+      it "returns an empty stack" do
+        loading.should eq([])
+      end
+    end
+
+    context "when a load stack has been initialized" do
+
+      before do
+        Thread.current[:"[mongoid]:load-stack"] = [ true ]
+      end
+
+      let(:loading) do
+        described_class.load_stack
+      end
+
+      after do
+        Thread.current[:"[mongoid]:load-stack"] = []
+      end
+
+      it "returns the stack" do
+        loading.should eq([ true ])
+      end
+    end
+  end
+
   describe "#begin_assign" do
 
     before do
@@ -367,6 +451,22 @@ describe Mongoid::Threaded do
 
     it "adds a boolen to the assign stack" do
       described_class.assign_stack.should be_empty
+    end
+  end
+
+  describe "#exit_load" do
+
+    before do
+      described_class.begin_load
+      described_class.exit_load
+    end
+
+    after do
+      described_class.load_stack.clear
+    end
+
+    it "adds a boolen to the load stack" do
+      described_class.load_stack.should be_empty
     end
   end
 

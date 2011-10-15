@@ -110,6 +110,35 @@ module Mongoid #:nodoc:
         Threaded.creating?
       end
 
+      # Execute a block in loading mode.
+      #
+      # @example Execute in loading mode.
+      #   _loading do
+      #     relation.push(doc)
+      #   end
+      #
+      # @return [ Object ] The return value of the block.
+      #
+      # @since 2.3.2
+      def _loading
+        Threaded.begin_build
+        yield
+      ensure
+        Threaded.exit_build
+      end
+
+      # Is the current thread in loading mode?
+      #
+      # @example Is the current thread in loading mode?
+      #   proxy._loading?
+      #
+      # @return [ true, false ] If the thread is loading.
+      #
+      # @since 2.3.2
+      def _loading?
+        Threaded.loading?
+      end
+
       module ClassMethods #:nodoc:
 
         # Execute a block in creating mode.
