@@ -25,8 +25,8 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind
             target.parentize(base)
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 target.do_or_do_not(metadata.inverse_setter(target), base)
               end
             end
@@ -47,8 +47,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 target.do_or_do_not(metadata.inverse_setter(target), nil)
               end
             end

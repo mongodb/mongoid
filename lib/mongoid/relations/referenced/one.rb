@@ -82,7 +82,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding? && !_building?
+          base.persisted? && !_binding? && !_building?
         end
 
         class << self

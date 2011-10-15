@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/threaded/lifecycle"
+
 module Mongoid #:nodoc:
 
   # This module contains logic for easy access to objects that have a lifecycle

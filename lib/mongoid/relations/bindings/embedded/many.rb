@@ -42,8 +42,8 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind_one(doc)
             doc.parentize(base)
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 unless metadata.versioned?
                   doc.do_or_do_not(metadata.inverse_setter(target), base)
                 end
@@ -80,8 +80,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind_one(doc)
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 doc.do_or_do_not(metadata.inverse_setter(target), nil)
               end
             end

@@ -145,7 +145,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document)
           target.delete_one(document).tap do |doc|
-            if doc && !binding?
+            if doc && !_binding?
               if _assigning?
                 base.add_atomic_pull(doc)
               else
@@ -390,7 +390,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding?
+          base.persisted? && !_binding?
         end
 
         # Reindex all the target elements. This is useful when performing
