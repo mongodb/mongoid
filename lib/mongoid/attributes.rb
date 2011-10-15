@@ -175,27 +175,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Begin the assignment of attributes. While in this block embedded
-    # documents will not autosave themselves in order to allow the document to
-    # be in a valid state.
-    #
-    # @example Execute the assignment.
-    #   _assigning do
-    #     person.attributes = { :addresses => [ address ] }
-    #   end
-    #
-    # @return [ Object ] The yielded value.
-    #
-    # @since 2.2.0
-    def _assigning
-      begin
-        Threaded.begin_assign
-        yield
-      ensure
-        Threaded.exit_assign
-      end
-    end
-
     # Used for allowing accessor methods for dynamic attributes.
     #
     # @param [ String, Symbol ] name The name of the method.

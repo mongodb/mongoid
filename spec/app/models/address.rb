@@ -12,6 +12,7 @@ class Address
   field :parent_title
   field :services, :type => Array
   field :latlng, :type => Array
+  field :map, :type => Hash
   key :street
   embeds_many :locations
   embeds_one :code

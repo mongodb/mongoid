@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/threaded/lifecycle"
+
 module Mongoid #:nodoc:
 
   # This module contains logic for easy access to objects that have a lifecycle
@@ -52,6 +54,18 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def begin_create
       create_stack.push(true)
+    end
+
+    # Begins a creating block.
+    #
+    # @example Begin the load.
+    #   Threaded.begin_load
+    #
+    # @return [ true ] Always true.
+    #
+    # @since 2.3.2
+    def begin_load
+      load_stack.push(true)
     end
 
     # Begin validating a document on the current thread.
@@ -114,6 +128,18 @@ module Mongoid #:nodoc:
       !create_stack.empty?
     end
 
+    # Is the current thread in creating mode?
+    #
+    # @example Is the thread in creating mode?
+    #   Threaded.creating?
+    #
+    # @return [ true, false ] If the thread is in creating mode?
+    #
+    # @since 2.3.2
+    def loading?
+      !load_stack.empty?
+    end
+
     # Get the assign stack for the current thread. Is simply an array of calls
     # to Mongoid's assigning method.
     #
@@ -164,6 +190,19 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def create_stack
       Thread.current[:"[mongoid]:create-stack"] ||= []
+    end
+
+    # Get the load stack for the current thread. Is simply an array of calls
+    # to Mongoid's loading method.
+    #
+    # @example Get the load stack.
+    #   Threaded.load_stack
+    #
+    # @return [ Array ] The array of load calls.
+    #
+    # @since 2.3.2
+    def load_stack
+      Thread.current[:"[mongoid]:load-stack"] ||= []
     end
 
     # Clear out all the safety options set using the safely proxy.
@@ -235,6 +274,18 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def exit_create
       create_stack.pop
+    end
+
+    # Exit the loading block.
+    #
+    # @example Exit the loading block.
+    #   Threaded.exit_load
+    #
+    # @return [ true ] The last element in the stack.
+    #
+    # @since 2.1.9
+    def exit_load
+      load_stack.pop
     end
 
     # Exit validating a document on the current thread.

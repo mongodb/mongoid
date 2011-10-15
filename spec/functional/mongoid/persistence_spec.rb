@@ -762,6 +762,37 @@ describe Mongoid::Persistence do
         attributes["de"].should eq("Die Bombe")
       end
     end
+
+    context "when updating a deeply embedded document" do
+
+      let!(:person) do
+        Person.create(:ssn => "345-12-1212")
+      end
+
+      let!(:address) do
+        person.addresses.create(:street => "Winterfeldtstr")
+      end
+
+      let!(:location) do
+        address.locations.create(:name => "work")
+      end
+
+      let(:from_db) do
+        Person.last.addresses.last.locations.last
+      end
+
+      before do
+        from_db.update_attribute(:name, "home")
+      end
+
+      it "updates the attribute" do
+        from_db.name.should eq("home")
+      end
+
+      it "persists the changes" do
+        from_db.reload.name.should eq("home")
+      end
+    end
   end
 
   describe "#update_attributes" do

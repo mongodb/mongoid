@@ -89,7 +89,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def persistable?
-          target.persisted? && !binding? && !_building?
+          target.persisted? && !_binding? && !_building?
         end
 
         class << self
@@ -100,14 +100,15 @@ module Mongoid # :nodoc:
           # @example Get the builder.
           #   Embedded::In.builder(meta, object, person)
           #
+          # @param [ Document ] base The base document.
           # @param [ Metadata ] meta The metadata of the relation.
           # @param [ Document, Hash ] object A document or attributes to build with.
           #
           # @return [ Builder ] A newly instantiated builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object, loading = false)
-            Builders::Embedded::In.new(meta, object, loading)
+          def builder(base, meta, object)
+            Builders::Embedded::In.new(base, meta, object)
           end
 
           # Returns true if the relation is an embedded one. In this case

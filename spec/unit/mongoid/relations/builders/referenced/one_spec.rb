@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::One do
 
+  let(:base) do
+    stub(:new_record? => false)
+  end
+
   describe "#build" do
 
     let(:criteria) do
@@ -19,7 +23,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
     end
 
     let(:builder) do
-      described_class.new(metadata, object)
+      described_class.new(base, metadata, object)
     end
 
     context "when provided an id" do

@@ -19,6 +19,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def do_or_do_not(name, *args)
+          return nil unless name
           respond_to?(name) ? send(name, *args) : nil
         end
 

@@ -101,7 +101,15 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def atomic_pulls
-      @atomic_pulls ||= {}
+      delayed_atomic_pulls.inject({}) do |pulls, (name, docs)|
+        pulls.tap do |pull|
+          docs.each do |doc|
+            (pull[doc.atomic_path] ||= []).push(doc.as_document)
+            doc.destroyed = true
+            doc.flagged_for_destroy = false
+          end
+        end
+      end
     end
 
     # Add the document as an atomic pull.
@@ -113,7 +121,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def add_atomic_pull(document)
-      (atomic_pulls[document.atomic_path] ||= []).push(document.as_document)
+      document.flagged_for_destroy = true
+      (delayed_atomic_pulls[document.metadata.name.to_s] ||= []).push(document)
     end
 
     # Get all the push attributes that need to occur.
@@ -173,6 +182,18 @@ module Mongoid #:nodoc:
     # @since 2.3.0
     def delayed_atomic_sets
       @delayed_atomic_sets ||= {}
+    end
+
+    # Get a hash of atomic pulls that are pending.
+    #
+    # @example Get the atomic pulls.
+    #   document.delayed_atomic_pulls
+    #
+    # @return [ Hash ] name/document pairs.
+    #
+    # @since 2.3.2
+    def delayed_atomic_pulls
+      @delayed_atomic_pulls ||= {}
     end
 
     private

@@ -5,6 +5,7 @@ module Mongoid # :nodoc:
     # This class is the superclass for all relation proxy objects, and contains
     # common behaviour for all of them.
     class Proxy
+      include Threaded::Lifecycle
 
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
@@ -49,54 +50,6 @@ module Mongoid # :nodoc:
       end
 
       protected
-
-      # Is the current thread in assigning mode?
-      #
-      # @example Is the current thread in assigning mode?
-      #   proxy._assigning?
-      #
-      # @return [ true, false ] If the thread is assigning.
-      #
-      # @since 2.1.0
-      def _assigning?
-        Threaded.assigning?
-      end
-
-      # Is the current thread in binding mode?
-      #
-      # @example Is the current thread in binding mode?
-      #   proxy.binding?
-      #
-      # @return [ true, false ] If the thread is binding.
-      #
-      # @since 2.1.0
-      def binding?
-        Threaded.binding?
-      end
-
-      # Is the current thread in building mode?
-      #
-      # @example Is the current thread in building mode?
-      #   proxy._building?
-      #
-      # @return [ true, false ] If the thread is building.
-      #
-      # @since 2.1.0
-      def _building?
-        Threaded.building?
-      end
-
-      # Is the current thread in creating mode?
-      #
-      # @example Is the current thread in creating mode?
-      #   proxy.creating?
-      #
-      # @return [ true, false ] If the thread is creating.
-      #
-      # @since 2.1.0
-      def creating?
-        Threaded.creating?
-      end
 
       # Get the collection from the root of the hierarchy.
       #

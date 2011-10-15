@@ -10,6 +10,36 @@ For instructions on upgrading to newer versions, visit
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
+## 2.3.2 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+### Resolved Issues
+
+* \#1347 Fix embedded matchers when provided a hash value that does not have a
+  modifier as a key.
+
+* \#1346 Dup default sorting criteria when calling first/last on a criteria.
+
+* \#1343 When passing no arguments to `Criteria#all_of` return all documents.
+  (Chris Leishman)
+
+* \#1339 Ensure destroy callbacks are run on cascadable children when deleting via
+  nested attributes.
+
+* \#1324 Setting `inverse_of: nil` on a many-to-many referencing the same class
+  returns nil for the inverse foreign key.
+
+* \#1323 Allow both strings and symbols as ids in the attributes array for
+  nested attributes. (Michael Wood)
+
+* \#1297 Don't hit the database when accessing relations if the base is new.
+
+* \#1239 Allow appending of referenced relations in create blocks, post default set.
+
+* \#1236 Ensure all models are loaded in rake tasks, so even in threadsafe mode
+  all indexes can be created.
+
+* \#736 Calling #reload on embedded documents now works properly.
+
 ## 2.3.1
 
 ### Resolved Issues

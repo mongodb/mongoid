@@ -158,10 +158,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The first document in the collection.
       def first
-        opts = process_options
-        sorting = opts[:sort] ||= []
-        sorting << [:_id, :asc]
-        attributes = klass.collection.find_one(selector, opts)
+        attributes = klass.collection.find_one(selector, options_with_default_sorting)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
       alias :one :first
@@ -225,10 +222,8 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The last document in the collection.
       def last
-        opts = process_options
-        sorting = opts[:sort] ||= []
-        sorting << [:_id, :asc]
-        opts[:sort] = sorting.map{ |option| [ option[0], option[1].invert ] }.uniq
+        opts = options_with_default_sorting
+        opts[:sort] = opts[:sort].map{ |option| [ option[0], option[1].invert ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
@@ -372,6 +367,22 @@ module Mongoid #:nodoc:
         )
         value = collection.empty? ? nil : collection.first[start.to_s]
         value && value.do_or_do_not(:nan?) ? nil : value
+      end
+
+      # Get the options hash with the default sorting options provided.
+      #
+      # @example Get the options.
+      #   criteria.options_with_default_sorting
+      #
+      # @return [ Hash ] The options.
+      #
+      # @since 2.3.2
+      def options_with_default_sorting
+        process_options.tap do |opts|
+          sorting = opts[:sort] ? opts[:sort].dup : []
+          sorting << [:_id, :asc]
+          opts[:sort] = sorting
+        end
       end
 
       # Filters the field list. If no fields have been supplied, then it will be

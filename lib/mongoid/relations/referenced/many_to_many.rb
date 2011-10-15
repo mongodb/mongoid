@@ -30,7 +30,7 @@ module Mongoid # :nodoc:
               args.flatten.each do |doc|
                 next unless doc
                 append(doc)
-                if persistable? || creating?
+                if persistable? || _creating?
                   ids.push(doc.id)
                   doc.save
                 else
@@ -38,7 +38,7 @@ module Mongoid # :nodoc:
                   base.synced[metadata.foreign_key] = false
                 end
               end
-              if persistable? || creating?
+              if persistable? || _creating?
                 base.push_all(metadata.foreign_key, ids)
                 base.synced[metadata.foreign_key] = false
               end
@@ -216,6 +216,7 @@ module Mongoid # :nodoc:
           # @example Get the builder.
           #   Referenced::ManyToMany.builder(meta, object)
           #
+          # @param [ Document ] base The base document.
           # @param [ Metadata ] meta The metadata of the relation.
           # @param [ Document, Hash ] object A document or attributes to build
           #   with.
@@ -223,8 +224,8 @@ module Mongoid # :nodoc:
           # @return [ Builder ] A new builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object, loading = false)
-            Builders::Referenced::ManyToMany.new(meta, object, loading)
+          def builder(base, meta, object)
+            Builders::Referenced::ManyToMany.new(base, meta, object)
           end
 
           # Create the standard criteria for this relation given the supplied

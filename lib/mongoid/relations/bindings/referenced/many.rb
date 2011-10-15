@@ -17,8 +17,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind_one(doc)
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 doc.you_must(metadata.foreign_key_setter, base.id)
                 if metadata.type
                   doc.you_must(metadata.type_setter, base.class.model_name)
@@ -37,8 +37,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind_one(doc)
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 doc.you_must(metadata.foreign_key_setter, nil)
                 if metadata.type
                   doc.you_must(metadata.type_setter, nil)

@@ -22,8 +22,8 @@ module Mongoid # :nodoc:
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def build(name, object, metadata, options = {})
-        relation = create_relation(object, metadata, options[:loading])
+      def build(name, object, metadata)
+        relation = create_relation(object, metadata)
         set_relation(name, relation)
       end
 
@@ -38,9 +38,9 @@ module Mongoid # :nodoc:
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def create_relation(object, metadata, loading = false)
+      def create_relation(object, metadata)
         type = @attributes[metadata.inverse_type]
-        target = metadata.builder(object, loading).build(type)
+        target = metadata.builder(self, object).build(type)
         target ? metadata.relation.new(self, target, metadata) : nil
       end
 
@@ -97,7 +97,9 @@ module Mongoid # :nodoc:
                 instance_variable_get(variable)
               else
                 _building do
-                  build(name, attributes[metadata.key], metadata, :loading => true)
+                  _loading do
+                    build(name, attributes[metadata.key], metadata)
+                  end
                 end
               end
             end

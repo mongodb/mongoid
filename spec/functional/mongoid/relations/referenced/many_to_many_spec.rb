@@ -20,7 +20,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       context "when the relations are not polymorphic" do
 
-
         context "when the inverse relation is not defined" do
 
           let(:person) do
@@ -41,6 +40,43 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "sets the foreign key on the relation" do
             person.house_ids.should == [ house.id ]
+          end
+        end
+
+        context "when appending in a parent create block" do
+
+          let!(:preference) do
+            Preference.create(:name => "testing")
+          end
+
+          let!(:person) do
+            Person.create(:ssn => "345-11-1123") do |doc|
+              doc.preferences << preference
+            end
+          end
+
+          it "adds the documents to the relation" do
+            person.preferences.should eq([ preference ])
+          end
+
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should eq([ preference.id ])
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            preference.person_ids.should eq([ person.id ])
+          end
+
+          it "saves the target" do
+            preference.should be_persisted
+          end
+
+          it "adds the correct number of documents" do
+            person.preferences.size.should eq(1)
+          end
+
+          it "persists the link" do
+            person.reload.preferences.should eq([ preference ])
           end
         end
 

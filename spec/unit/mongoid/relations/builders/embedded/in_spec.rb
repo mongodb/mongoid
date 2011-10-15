@@ -8,6 +8,10 @@ describe Mongoid::Relations::Builders::Embedded::In do
       stub
     end
 
+    let(:base) do
+      stub
+    end
+
     let(:metadata) do
       stub(:klass => Person, :name => :person)
     end
@@ -15,7 +19,7 @@ describe Mongoid::Relations::Builders::Embedded::In do
     context "when a document is provided" do
 
       let(:builder) do
-        described_class.new(metadata, object)
+        described_class.new(base, metadata, object)
       end
 
       let(:document) do

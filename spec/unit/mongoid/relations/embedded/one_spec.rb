@@ -52,7 +52,7 @@ describe Mongoid::Relations::Embedded::One do
   describe ".builder" do
 
     it "returns the embedded one builder" do
-      described_class.builder(metadata, target).should be_a(builder_klass)
+      described_class.builder(base, metadata, target).should be_a(builder_klass)
     end
   end
 

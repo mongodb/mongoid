@@ -16,6 +16,7 @@ module Mongoid # :nodoc:
           # @return [ Document ] A single document.
           def build(type = nil)
             return object unless query?
+            return nil if base.new_record?
             metadata.criteria(Conversions.flag(object, metadata)).from_map_or_db
           end
         end

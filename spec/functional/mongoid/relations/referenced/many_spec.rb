@@ -51,6 +51,39 @@ describe Mongoid::Relations::Referenced::Many do
           end
         end
 
+        context "when appending in a parent create block" do
+
+          let!(:post) do
+            Post.create(:title => "testing")
+          end
+
+          let!(:person) do
+            Person.create(:ssn => "345-11-1124") do |doc|
+              doc.posts << post
+            end
+          end
+
+          it "adds the documents to the relation" do
+            person.posts.should eq([ post ])
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            post.person_id.should eq(person.id)
+          end
+
+          it "saves the target" do
+            post.should be_persisted
+          end
+
+          it "adds the correct number of documents" do
+            person.posts.size.should eq(1)
+          end
+
+          it "persists the link" do
+            person.reload.posts.should eq([ post ])
+          end
+        end
+
         context "when the parent is not a new record" do
 
           let(:person) do

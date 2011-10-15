@@ -19,6 +19,7 @@ module Mongoid #:nodoc:
       atomic_pulls.clear
       atomic_unsets.clear
       delayed_atomic_sets.clear
+      delayed_atomic_pulls.clear
       changed_attributes.clear
     end
 

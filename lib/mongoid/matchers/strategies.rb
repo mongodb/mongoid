@@ -51,7 +51,12 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.7
       def matcher(document, key, value)
         if value.is_a?(Hash)
-          MATCHERS[value.keys.first].new(extract_attribute(document, key))
+          matcher = MATCHERS[value.keys.first]
+          if matcher
+            matcher.new(extract_attribute(document, key))
+          else
+            Default.new(extract_attribute(document, key))
+          end
         else
           case key
             when "$or" then Matchers::Or.new(value, document)

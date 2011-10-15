@@ -34,10 +34,12 @@ module Mongoid #:nodoc
     include Mongoid::NestedAttributes
     include Mongoid::Persistence
     include Mongoid::Relations
+    include Mongoid::Reloading
     include Mongoid::Safety
     include Mongoid::Serialization
     include Mongoid::Sharding
     include Mongoid::State
+    include Mongoid::Threaded::Lifecycle
     include Mongoid::Timestamps::Timeless
     include Mongoid::Validations
     include Mongoid::Callbacks

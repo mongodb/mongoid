@@ -26,8 +26,8 @@ module Mongoid # :nodoc:
           def bind
             base.metadata = metadata.inverse_metadata(target)
             base.parentize(target)
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 if base.embedded_many?
                   target.do_or_do_not(metadata.inverse(target)).push(base)
                 else
@@ -51,8 +51,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 if base.embedded_many?
                   target.do_or_do_not(metadata.inverse(target)).delete(base)
                 else

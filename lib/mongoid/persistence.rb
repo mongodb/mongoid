@@ -168,7 +168,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The newly created document.
       def create(attributes = {}, options = {}, &block)
-        creating do
+        _creating do
           new(attributes, options, &block).tap { |doc| doc.save }
         end
       end
@@ -187,7 +187,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The newly created document.
       def create!(attributes = {}, options = {}, &block)
-        creating do
+        _creating do
           new(attributes, options, &block).tap do |doc|
             fail_validate!(doc) if doc.insert.errors.any?
             fail_callback!(doc, :create!) if doc.new?
@@ -258,25 +258,6 @@ module Mongoid #:nodoc:
       # @since 2.2.0
       def fail_callback!(document, method)
         raise Errors::Callback.new(document.class, method)
-      end
-
-      private
-
-      # Execute a block in creating mode.
-      #
-      # @example Execute in creating mode.
-      #   creating do
-      #     relation.push(doc)
-      #   end
-      #
-      # @return [ Object ] The return value of the block.
-      #
-      # @since 2.1.0
-      def creating
-        Threaded.begin_create
-        yield
-      ensure
-        Threaded.exit_create
       end
     end
   end

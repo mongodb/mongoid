@@ -32,23 +32,6 @@ module Mongoid # :nodoc:
     module Builders
       extend ActiveSupport::Concern
 
-      # Execute a block in building mode.
-      #
-      # @example Execute in building mode.
-      #   _building do
-      #     relation.push(doc)
-      #   end
-      #
-      # @return [ Object ] The return value of the block.
-      #
-      # @since 2.1.0
-      def _building
-        Threaded.begin_build
-        yield
-      ensure
-        Threaded.exit_build
-      end
-
       module ClassMethods #:nodoc:
 
         # Defines a builder method for an embeds_one relation. This is

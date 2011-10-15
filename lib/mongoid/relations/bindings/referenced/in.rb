@@ -19,8 +19,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 inverse = metadata.inverse(target)
                 base.you_must(metadata.foreign_key_setter, target.id)
                 if metadata.inverse_type
@@ -51,8 +51,8 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind
-            unless binding?
-              binding do
+            unless _binding?
+              _binding do
                 inverse = metadata.inverse(target)
                 base.you_must(metadata.foreign_key_setter, nil)
                 if metadata.inverse_type

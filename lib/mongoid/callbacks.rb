@@ -82,6 +82,8 @@ module Mongoid #:nodoc:
       [].tap do |children|
         relations.each_pair do |name, metadata|
           next unless metadata.cascading_callbacks?
+          delayed_pulls = delayed_atomic_pulls[name]
+          children.concat(delayed_pulls) if delayed_pulls
           child = send(name)
           Array.wrap(child).each do |doc|
             children.push(doc) if cascadable_child?(kind, doc)
@@ -121,7 +123,13 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def child_callback_type(kind, child)
-      kind == :update && child.new_record? ? :create : kind
+      if kind == :update
+        return :create if child.new_record?
+        return :destroy if child.flagged_for_destroy?
+        kind
+      else
+        kind
+      end
     end
   end
 end

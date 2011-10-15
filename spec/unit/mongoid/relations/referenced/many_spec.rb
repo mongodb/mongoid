@@ -17,7 +17,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     it "returns the embedded in builder" do
-      described_class.builder(metadata, document).should
+      described_class.builder(nil, metadata, document).should
         be_a_kind_of(builder_klass)
     end
   end

@@ -408,7 +408,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persistable?
-          base.persisted? && !binding? && !_building?
+          _creating? || base.persisted? && !_binding? && !_building?
         end
 
         # Deletes all related documents from the database given the supplied
@@ -445,6 +445,7 @@ module Mongoid #:nodoc:
           # @example Get the builder.
           #   Referenced::Many.builder(meta, object)
           #
+          # @param [ Document ] base The base document.
           # @param [ Metadata ] meta The metadata of the relation.
           # @param [ Document, Hash ] object A document or attributes to build
           #   with.
@@ -452,8 +453,8 @@ module Mongoid #:nodoc:
           # @return [ Builder ] A new builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object, loading = false)
-            Builders::Referenced::Many.new(meta, object || [], loading)
+          def builder(base, meta, object)
+            Builders::Referenced::Many.new(base, meta, object || [])
           end
 
           # Get the standard criteria used for querying this relation.

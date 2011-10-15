@@ -71,7 +71,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def persistable?
-          target.persisted? && !binding? && !_building?
+          target.persisted? && !_binding? && !_building?
         end
 
         class << self
@@ -82,6 +82,7 @@ module Mongoid # :nodoc:
           # @example Get the builder.
           #   Referenced::In.builder(meta, object)
           #
+          # @param [ Document ] base The base document.
           # @param [ Metadata ] meta The metadata of the relation.
           # @param [ Document, Hash ] object A document or attributes to build
           #   with.
@@ -89,8 +90,8 @@ module Mongoid # :nodoc:
           # @return [ Builder ] A new builder object.
           #
           # @since 2.0.0.rc.1
-          def builder(meta, object, loading = false)
-            Builders::Referenced::In.new(meta, object, loading)
+          def builder(base, meta, object)
+            Builders::Referenced::In.new(base, meta, object)
           end
 
           # Get the standard criteria used for querying this relation.

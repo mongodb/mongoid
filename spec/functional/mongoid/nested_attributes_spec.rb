@@ -1015,11 +1015,11 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the first existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                  person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
                 end
 
                 it "updates the second existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                  person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
                 end
 
                 it "does not add new documents" do
@@ -1038,11 +1038,11 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the first existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                  person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
                 end
 
                 it "updates the second existing document" do
-                  person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                  person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
                 end
 
                 it "does not add new documents" do
@@ -1062,15 +1062,61 @@ describe Mongoid::NestedAttributes do
               end
 
               it "updates the first existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Maybachufer')
+                person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
               end
 
               it "updates the second existing document" do
-                person.addresses.collect { |a| a['street'] }.include?('Alexander Platz')
+                person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
               end
 
               it "does not add new documents" do
                 person.addresses.size.should == 2
+              end
+            end
+
+            context "when the ids are _id symbols" do
+
+              before do
+                person.addresses_attributes =
+                  [
+                    { :_id => address_one.id, "street" => "Maybachufer" },
+                    { :_id => address_two.id, "street" => "Alexander Platz" }
+                  ]
+              end
+
+              it "updates the first existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
+              end
+
+              it "updates the second existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
+              end
+
+              it "does not add new documents" do
+                person.addresses.size.should eq(2)
+              end
+            end
+
+            context "when the ids are id symbols" do
+
+              before do
+                person.addresses_attributes =
+                  [
+                    { :id => address_one.id, "street" => "Maybachufer" },
+                    { :id => address_two.id, "street" => "Alexander Platz" }
+                  ]
+              end
+
+              it "updates the first existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Maybachufer')
+              end
+
+              it "updates the second existing document" do
+                person.addresses.collect { |a| a['street'] }.should include('Alexander Platz')
+              end
+
+              it "does not add new documents" do
+                person.addresses.size.should eq(2)
               end
             end
 
@@ -3695,6 +3741,49 @@ describe Mongoid::NestedAttributes do
     before(:all) do
       Person.send(:undef_method, :addresses_attributes=)
       Person.accepts_nested_attributes_for :addresses
+    end
+
+    context "when deleting the child document" do
+
+      let(:person) do
+        Person.create(:ssn => "678-23-2223")
+      end
+
+      let!(:service) do
+        person.services.create(:sid => "123")
+      end
+
+      let(:attributes) do
+        { :services_attributes =>
+          { "0" =>
+            { :_id => service.id, :sid => service.sid, :_destroy => 1 }
+          }
+        }
+      end
+
+      before do
+        person.update_attributes(attributes)
+      end
+
+      it "removes the document from the parent" do
+        person.services.should be_empty
+      end
+
+      it "deletes the document" do
+        service.should be_destroyed
+      end
+
+      it "runs the before destroy callbacks" do
+        service.before_destroy_called.should be_true
+      end
+
+      it "runs the after destroy callbacks" do
+        service.after_destroy_called.should be_true
+      end
+
+      it "clears the delayed atomic pulls from the parent" do
+        person.delayed_atomic_pulls.should be_empty
+      end
     end
 
     context "when nesting multiple levels" do
