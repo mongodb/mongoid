@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Builders::Referenced::One do
 
   let(:base) do
-    stub
+    stub(:new_record? => false)
   end
 
   describe "#build" do
