@@ -10,6 +10,8 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.2 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1346 Dup default sorting criteria when calling first/last on a criteria.
+
 * \#1343 When passing no arguments to `Criteria#all_of` return all documents.
   (Chris Leishman)
 
