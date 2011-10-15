@@ -27,6 +27,8 @@ For instructions on upgrading to newer versions, visit
 * \#1323 Allow both strings and symbols as ids in the attributes array for
   nested attributes. (Michael Wood)
 
+* \#1297 Don't hit the database when accessing relations if the base is new.
+
 * \#1239 Allow appending of referenced relations in create blocks, post default set.
 
 * \#1236 Ensure all models are loaded in rake tasks, so even in threadsafe mode
