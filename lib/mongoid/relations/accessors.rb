@@ -40,7 +40,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def create_relation(object, metadata)
         type = @attributes[metadata.inverse_type]
-        target = metadata.builder(object).build(type)
+        target = metadata.builder(self, object).build(type)
         target ? metadata.relation.new(self, target, metadata) : nil
       end
 

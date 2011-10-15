@@ -12,8 +12,12 @@ describe Mongoid::Relations::Metadata do
       stub
     end
 
+    let(:base) do
+      stub
+    end
+
     it "returns the builder from the relation" do
-      metadata.builder(object).should
+      metadata.builder(base, object).should
         be_a_kind_of(Mongoid::Relations::Builders::Embedded::One)
     end
   end

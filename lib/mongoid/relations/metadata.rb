@@ -62,13 +62,14 @@ module Mongoid # :nodoc:
       # @example Get the builder.
       #   metadata.builder(document)
       #
+      # @param [ Document ] base The base document.
       # @param [ Object ] object A document or attributes to give the builder.
       #
       # @return [ Builder ] The builder for the relation.
       #
       # @since 2.0.0.rc.1
-      def builder(object)
-        relation.builder(self, object)
+      def builder(base, object)
+        relation.builder(base, self, object)
       end
 
       # Returns the name of the strategy used for handling dependent relations.

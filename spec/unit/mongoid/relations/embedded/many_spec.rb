@@ -150,7 +150,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the many builder" do
-      described_class.builder(metadata, document).should
+      described_class.builder(base, metadata, document).should
         be_a(Mongoid::Relations::Builders::Embedded::Many)
     end
   end

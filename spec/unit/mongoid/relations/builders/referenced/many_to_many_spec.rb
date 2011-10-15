@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::ManyToMany do
 
+  let(:base) do
+    stub
+  end
+
   describe "#build" do
 
     let(:metadata) do
@@ -14,7 +18,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     end
 
     let(:builder) do
-      described_class.new(metadata, object)
+      described_class.new(base, metadata, object)
     end
 
     context "when provided ids" do
