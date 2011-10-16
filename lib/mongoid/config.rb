@@ -166,8 +166,10 @@ module Mongoid #:nodoc
     # @return [ Logger ] The newly set logger.
     def logger=(logger)
       case logger
-        when Logger then @logger = logger
-        when false, nil then @logger = nil
+      when false, nil then @logger = nil
+      when true then @logger = default_logger
+      else
+        @logger = logger if logger.respond_to?(:info)
       end
     end
 

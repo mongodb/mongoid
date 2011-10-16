@@ -31,6 +31,9 @@ For instructions on upgrading to newer versions, visit
 * \#1323 Allow both strings and symbols as ids in the attributes array for
   nested attributes. (Michael Wood)
 
+* \#1312 Setting a logger on the config now accepts anything that quacks like a
+  logger.
+
 * \#1297 Don't hit the database when accessing relations if the base is new.
 
 * \#1239 Allow appending of referenced relations in create blocks, post default set.
