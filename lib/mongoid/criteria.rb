@@ -396,14 +396,19 @@ module Mongoid #:nodoc:
       clone.tap do |crit|
         converted = BSON::ObjectId.convert(klass, attributes || {})
         converted.each_pair do |key, value|
-          unless crit.selector[key]
+          existing = crit.selector[key]
+          unless existing
             crit.selector[key] = { operator => value }
           else
-            if crit.selector[key].has_key?(operator)
-              new_value = crit.selector[key].values.first.send(combine, value)
-              crit.selector[key] = { operator => new_value }
+            if existing.respond_to?(:merge)
+              if existing.has_key?(operator)
+                new_value = existing.values.first.send(combine, value)
+                crit.selector[key] = { operator => new_value }
+              else
+                crit.selector[key][operator] = value
+              end
             else
-              crit.selector[key][operator] = value
+              crit.selector[key] = { operator => value }
             end
           end
         end
