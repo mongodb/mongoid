@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
         CHAR_CONV = {
           " " => "-",
           "!" => "-excl-",
-          "\"" => "-bckslsh-",
+          "\"" => "-dblquo-",
           "#" => "-hash-",
           "$" => "-dol-",
           "%" => "-perc-",
@@ -48,7 +48,7 @@ module Mongoid #:nodoc:
           "{" => "-ocurly-",
           "|" => "-pipe-",
           "}" => "-clcurly-",
-          "~" => "-tilda-"
+          "~" => "-tilde-"
         }
 
         REVERSALS = {
