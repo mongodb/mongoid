@@ -93,8 +93,10 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def synced(metadata)
-          synced_save(metadata)
-          synced_destroy(metadata)
+          unless metadata.forced_nil_inverse?
+            synced_save(metadata)
+            synced_destroy(metadata)
+          end
         end
 
         private
