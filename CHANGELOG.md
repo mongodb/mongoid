@@ -15,6 +15,9 @@ For instructions on upgrading to newer versions, visit
 * \#1358 Fixed type error on many to many synchronization when inverse_of is
   set to nil.
 
+* \#1356 $in criteria can now be chained to non-complex criteria on the same
+  key without error.
+
 * \#1350, \#1351 Fixed errors in the string conversions of double quotes and
   tilde when paramterizing keys.
 
