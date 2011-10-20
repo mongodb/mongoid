@@ -243,6 +243,19 @@ module Mongoid # :nodoc:
         !!extension
       end
 
+      # Does this metadata have a forced nil inverse_of defined. (Used in many
+      # to manies)
+      #
+      # @example Is this a forced nil inverse?
+      #   metadata.forced_nil_inverse?
+      #
+      # @return [ true, false ] If inverse_of has been explicitly set to nil.
+      #
+      # @since 2.3.3
+      def forced_nil_inverse?
+        has_key?(:inverse_of) && inverse_of.nil?
+      end
+
       # Handles all the logic for figuring out what the foreign_key is for each
       # relations query. The logic is as follows:
       #

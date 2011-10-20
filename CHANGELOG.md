@@ -8,7 +8,16 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
-## 2.3.2 \[ In Development \] \[ Branch: 2.3.0-stable \]
+## 2.3.3 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+### Resolved Issues
+
+* \#1358 Fixed type error on many to many synchronization when inverse_of is
+  set to nil.
+
+## 2.3.2
+
+### Resolved Issues
 
 * \#1347 Fix embedded matchers when provided a hash value that does not have a
   modifier as a key.
@@ -38,8 +47,6 @@ For instructions on upgrading to newer versions, visit
   all indexes can be created.
 
 * \#736 Calling #reload on embedded documents now works properly.
-
-### Resolved Issues
 
 ## 2.3.1
 

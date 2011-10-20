@@ -6,6 +6,29 @@ describe Mongoid::Relations::Synchronization do
     [ Person, Preference, Article, Tag ].each(&:delete_all)
   end
 
+  context "when the inverse of is nil" do
+
+    let(:preference) do
+      Preference.new(:name => "test")
+    end
+
+    let(:article) do
+      Article.new
+    end
+
+    before do
+      article.preferences << preference
+    end
+
+    it "does not attempt synchronization" do
+      expect { article.save }.to_not raise_error(TypeError)
+    end
+
+    it "sets the one side of the relation" do
+      article.preferences.should eq([ preference ])
+    end
+  end
+
   context "when first setting by the relation itself" do
 
     let!(:person) do
