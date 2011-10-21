@@ -147,8 +147,7 @@ module Mongoid #:nodoc
     { :to => Config })
 end
 
-# After loading Mongoid, if Rails is defined we will get the load hooks cranked
-# up here. This optimizes the number of calls to instantiate_observers.
-if defined?(Rails)
-  ActiveSupport.run_load_hooks(:mongoid, Mongoid)
-end
+# After loading Mongoid, we will get the load hooks cranked
+# up here. This optimizes the number of calls to instantiate_observers when in
+# Rails.
+ActiveSupport.run_load_hooks(:mongoid, Mongoid)
