@@ -139,6 +139,18 @@ describe Mongoid::Relations::AutoSave do
           end
         end
       end
+
+      context "when the relation is auto built" do
+
+        let(:person) do
+          Person.new
+        end
+
+        it "does not build the unaccessed relation" do
+          person.expects(:build_book).never
+          person.save
+        end
+      end
     end
   end
 end

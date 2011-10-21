@@ -43,6 +43,14 @@ describe Mongoid::Validations do
         value.should == [ address ]
       end
     end
+
+    context "when reading an auto built relation" do
+
+      it "should not build the unaccessed relation" do
+        person.expects(:build_passport).never
+        person.read_attribute_for_validation(:passport)
+      end
+    end
   end
 
   describe ".validates_associated" do

@@ -471,6 +471,11 @@ describe Mongoid::Document do
     it "includes second level embeds many attributes" do
       person.as_document["addresses"].first.should have_key("locations")
     end
+
+    it "does not build autobuild relations" do
+      person.expects(:build_passport).never
+      person.as_document
+    end
   end
 
   describe "#to_key" do

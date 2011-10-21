@@ -38,7 +38,7 @@ module Mongoid #:nodoc
           [].tap do |children|
             relations.each_pair do |name, metadata|
               if metadata.embedded?
-                child = send(name)
+                child = send(name, :autobuild => false)
                 child.to_a.each do |doc|
                   children.push(doc)
                   children.concat(doc._children) unless metadata.versioned?

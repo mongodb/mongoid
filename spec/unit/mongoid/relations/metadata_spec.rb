@@ -2,6 +2,34 @@ require "spec_helper"
 
 describe Mongoid::Relations::Metadata do
 
+  describe "#autobuild" do
+
+    context "when explicitly set" do
+
+      let(:metadata) do
+        described_class.new(
+          :autobuild => true,
+          :relation => Mongoid::Relations::Embedded::One
+        )
+      end
+
+      it "returns the autobuild option" do
+        metadata.autobuild.should == true
+      end
+    end
+
+    context "when not explicitly set" do
+
+      let (:metadata) do
+        described_class.new(:relation => Mongoid::Relations::Embedded::One)
+      end
+
+      it "is not true by default" do
+        metadata.autobuild.should_not == true
+      end
+    end
+  end
+
   describe "#builder" do
 
     let(:metadata) do
@@ -595,6 +623,7 @@ describe Mongoid::Relations::Metadata do
     it "contains all relevant information" do
       metadata.inspect.should ==
         "#<Mongoid::Relations::Metadata\n" <<
+        "  autobuild:            #{metadata.autobuild},\n" <<
         "  class_name:           #{metadata.class_name},\n" <<
         "  cyclic:               #{metadata.cyclic || "No"},\n" <<
         "  dependent:            #{metadata.dependent || "None"},\n" <<

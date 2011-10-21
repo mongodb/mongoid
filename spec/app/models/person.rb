@@ -65,6 +65,8 @@ class Person
     end
   end
   embeds_one :quiz, :validate => false
+  embeds_one :passport, :autobuild => true
+  has_one :book, :autobuild => true, :autosave => true
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, :update_only => true

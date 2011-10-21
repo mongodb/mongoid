@@ -32,6 +32,16 @@ module Mongoid # :nodoc:
         !!as
       end
 
+      # Returns the autobuild option of the relation.
+      #
+      # @example Get the autobuild option.
+      #   metadata.autobuild
+      #
+      # @return [ true, false ] The autobuild option.
+      def autobuild
+        self[:autobuild]
+      end
+
       # Returns the autosave option of the relation.
       #
       # @example Get the autosave option.
@@ -349,6 +359,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inspect
         "#<Mongoid::Relations::Metadata\n" <<
+        "  autobuild:            #{autobuild},\n" <<
         "  class_name:           #{class_name},\n" <<
         "  cyclic:               #{cyclic || "No"},\n" <<
         "  dependent:            #{dependent || "None"},\n" <<
