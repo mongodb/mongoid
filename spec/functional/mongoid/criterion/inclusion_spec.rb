@@ -26,6 +26,29 @@ describe Mongoid::Criterion::Inclusion do
 
   describe "#any_in" do
 
+    context "when chaining after a where" do
+
+      let!(:person) do
+        Person.create(:ssn => "423-11-1111", :title => "sir")
+      end
+
+      let(:criteria) do
+        Person.where(:title => "sir")
+      end
+
+      let(:from_db) do
+        criteria.any_in(:title => [ "sir", "madam" ])
+      end
+
+      it "returns the correct documents" do
+        from_db.should eq([ person ])
+      end
+
+      it "contains the overridden selector" do
+        from_db.selector.should eq({ :title => { "$in" => [ "sir", "madam" ] } })
+      end
+    end
+
     context "when the field value is nil" do
 
       let!(:person) do

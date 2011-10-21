@@ -3,29 +3,55 @@ require "spec_helper"
 describe Mongoid::Reloading do
 
   before do
-    [ Person, Game ].each(&:delete_all)
+    [ Account, Person, Game ].each(&:delete_all)
   end
 
   describe "#reload" do
 
-    let(:person) do
-      Person.create(:ssn => "112-11-1121", :title => "Sir")
-    end
+    context "when using bson ids" do
 
-    let!(:from_db) do
-      Person.find(person.id).tap do |peep|
-        peep.age = 35
-        peep.save
+      let(:person) do
+        Person.create(:ssn => "112-11-1121", :title => "Sir")
+      end
+
+      let!(:from_db) do
+        Person.find(person.id).tap do |peep|
+          peep.age = 35
+          peep.save
+        end
+      end
+
+      it "reloads the object attributes from the db" do
+        person.reload
+        person.age.should eq(35)
+      end
+
+      it "reload should return self" do
+        person.reload.should eq(from_db)
       end
     end
 
-    it "reloads the object attributes from the db" do
-      person.reload
-      person.age.should eq(35)
-    end
+    context "when using string ids" do
 
-    it "reload should return self" do
-      person.reload.should eq(from_db)
+      let(:account) do
+        Account.create(:name => "bank", :number => "1000")
+      end
+
+      let!(:from_db) do
+        Account.find(account.id).tap do |acc|
+          acc.number = "1001"
+          acc.save
+        end
+      end
+
+      it "reloads the object attributes from the db" do
+        account.reload
+        account.number.should eq("1001")
+      end
+
+      it "reload should return self" do
+        account.reload.should eq(from_db)
+      end
     end
 
     context "when an after initialize callback is defined" do
@@ -71,6 +97,10 @@ describe Mongoid::Reloading do
     end
 
     context "when the document is embedded" do
+
+      let(:person) do
+        Person.create(:ssn => "112-11-1122", :title => "Sir")
+      end
 
       context "when embedded a single level" do
 
@@ -162,6 +192,10 @@ describe Mongoid::Reloading do
 
     context "when embedded documents change" do
 
+      let(:person) do
+        Person.create(:ssn => "112-11-1123", :title => "Sir")
+      end
+
       let!(:address) do
         person.addresses.create(:number => 27, :street => "Maiden Lane")
       end
@@ -179,6 +213,10 @@ describe Mongoid::Reloading do
     end
 
     context "with relational associations" do
+
+      let(:person) do
+        Person.create(:ssn => "112-11-1124", :title => "Sir")
+      end
 
       context "for a references_one" do
 

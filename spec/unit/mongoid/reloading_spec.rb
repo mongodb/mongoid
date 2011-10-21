@@ -31,7 +31,7 @@ describe Mongoid::Reloading do
 
       before do
         person.expects(:collection).returns(collection)
-        collection.expects(:find_one).with(person.id).returns(attributes)
+        collection.expects(:find_one).with(:_id => person.id).returns(attributes)
       end
 
       it "reloads the attributes" do
@@ -47,7 +47,7 @@ describe Mongoid::Reloading do
 
       before do
         person.expects(:collection).returns(collection)
-        collection.expects(:find_one).with(person.id).returns(nil)
+        collection.expects(:find_one).with(:_id => person.id).returns(nil)
       end
 
       context "when raising a not found error" do
@@ -84,7 +84,9 @@ describe Mongoid::Reloading do
       before do
         person.instance_variable_set(:@name, nil)
         person.expects(:collection).returns(collection)
-        collection.expects(:find_one).with(person.id).returns({ "title" => "Sir" })
+        collection.expects(:find_one).with(
+          :_id => person.id
+        ).returns({ "title" => "Sir" })
       end
 
       let(:reloaded) do
