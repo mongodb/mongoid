@@ -146,8 +146,3 @@ module Mongoid #:nodoc
     ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
     { :to => Config })
 end
-
-# After loading Mongoid, we will get the load hooks cranked
-# up here. This optimizes the number of calls to instantiate_observers when in
-# Rails.
-ActiveSupport.run_load_hooks(:mongoid, Mongoid)
