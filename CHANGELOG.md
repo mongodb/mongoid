@@ -14,6 +14,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1364 Fixed reloading of documents with non bson object id ids.
 
+* \#1360 Fixed performance of Mongoid's observer instantiation by hooking into
+  Active Support's load hooks, a la AR.
+
 * \#1358 Fixed type error on many to many synchronization when inverse_of is
   set to nil.
 
