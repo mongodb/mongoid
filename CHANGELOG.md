@@ -12,6 +12,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1364 Fixed reloading of documents with non bson object id ids.
+
 * \#1358 Fixed type error on many to many synchronization when inverse_of is
   set to nil.
 
