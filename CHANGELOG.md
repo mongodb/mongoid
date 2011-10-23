@@ -14,6 +14,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1373 Warn if a scope overrides another scope.
 
+* \#1372 Never persist when binding inside of a read attribute for validation.
+
 * \#1364 Fixed reloading of documents with non bson object id ids.
 
 * \#1360 Fixed performance of Mongoid's observer instantiation by hooking into
