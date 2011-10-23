@@ -12,6 +12,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1373 Warn if a scope overrides another scope.
+
 * \#1364 Fixed reloading of documents with non bson object id ids.
 
 * \#1360 Fixed performance of Mongoid's observer instantiation by hooking into
