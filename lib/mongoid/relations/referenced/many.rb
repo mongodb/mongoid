@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
             args.flatten.each do |doc|
               next unless doc
               append(doc)
-              doc.save if persistable?
+              doc.save if persistable? && !doc.validated?
             end
           end
         end

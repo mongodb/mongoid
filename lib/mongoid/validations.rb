@@ -44,7 +44,9 @@ module Mongoid #:nodoc:
     # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
       if relations[attr.to_s]
+        begin_validate
         relation = send(attr)
+        exit_validate
         relation.do_or_do_not(:in_memory) || relation
       else
         send(attr)
