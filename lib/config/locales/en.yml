@@ -53,3 +53,5 @@ en:
         mixed_relations:
           Referencing a(n) %{embedded} document from the %{root} document via a
           relational association is not allowed since the %{embedded} is embedded.
+        scope_overwrite:
+          "Cannot create scope :%{scope_name}, because of existing method %{model_name}.%{scope_name}."
