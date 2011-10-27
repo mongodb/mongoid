@@ -12,6 +12,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+  (Maxime Garcia)
+
 * \#1373 Warn if a scope overrides another scope.
 
 * \#1372 Never persist when binding inside of a read attribute for validation.
