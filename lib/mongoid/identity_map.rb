@@ -93,7 +93,12 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def documents_for(klass)
-      self[klass] ||= {}
+      if index = klass.try(:collection_name)
+        index += "." + klass.name if klass.embedded?
+        self[index] ||= {}
+      else
+        {}
+      end
     end
 
     class << self
