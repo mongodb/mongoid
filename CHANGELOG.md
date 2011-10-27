@@ -33,6 +33,9 @@ For instructions on upgrading to newer versions, visit
 * \#1350, \#1351 Fixed errors in the string conversions of double quotes and
   tilde when paramterizing keys.
 
+* \#1349 Mongoid documents should not blow up when including Enumerable.
+  (Jonas Nicklas)
+
 ## 2.3.2
 
 ### Resolved Issues

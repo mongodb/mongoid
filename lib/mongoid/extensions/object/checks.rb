@@ -14,9 +14,6 @@ module Mongoid #:nodoc:
         # @example Is the array vacant?
         #   [].vacant?
         #
-        # @example Is the hash vacant?
-        #   {}.vacant?
-        #
         # @example Is the object vacant?
         #   nil.vacant?
         #
@@ -24,7 +21,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.2
         def _vacant?
-          is_a?(::Enumerable) || is_a?(::String) ? empty? : !self
+          is_a?(::Array) || is_a?(::String) ? empty? : !self
         end
       end
     end
