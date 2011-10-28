@@ -15,14 +15,21 @@ module Rails #:nodoc:
     #
     # @since 2.1.0
     def create_indexes(pattern)
+      logger = Logger.new($stdout)
       Dir.glob(pattern).each do |file|
         begin
           model = determine_model(file)
           if model
             model.create_indexes
-            Logger.new($stdout).info("Generated indexes for #{model}")
+            logger.info("Generated indexes for #{model}")
+          else
+            logger.info("Not a Mongoid parent model: #{file}")
           end
         rescue => e
+          logger.error %Q{Failed to create indexes for #{model}:
+            #{e.class}:#{e.message}
+            #{e.backtrace.join("\n")}
+          }
         end
       end
     end
