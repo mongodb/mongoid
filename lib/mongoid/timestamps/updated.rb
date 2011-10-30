@@ -21,6 +21,19 @@ module Mongoid #:nodoc:
       def set_updated_at
         self.updated_at = Time.now.utc unless self.updated_at_changed?
       end
+      
+      def cache_key
+        case
+        when new_record?
+          "#{self.class.model_name.cache_key}/new"
+        when timestamp = self[:updated_at]
+          timestamp = timestamp.utc.to_s(:number)
+          "#{self.class.model_name.cache_key}/#{id}-#{timestamp}"
+        else
+          "#{self.class.model_name.cache_key}/#{id}"
+        end
+      end
+      
     end
   end
 end
