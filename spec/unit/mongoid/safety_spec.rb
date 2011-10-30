@@ -54,6 +54,45 @@ describe Mongoid::Safety do
       end
     end
   end
+  
+  describe "#add_all_to_set" do
+  
+    let(:person) do
+      Person.new.tap { |p| p.new_record = false }
+    end
+  
+    context "when providing options" do
+  
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$addToSet" => { "aliases" => {'$each' => [ "Bond", "James" ] } } },
+          :safe => { :w => 2 }
+        )
+        person.safely(:w => 2).add_all_to_set(:aliases, [ "Bond", "James" ])
+      end
+  
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  
+    context "when not providing options" do
+  
+      before do
+        collection.expects(:update).with(
+          { "_id" => person.id },
+          { "$addToSet" => { "aliases" => {'$each' => [ "Bond", "James" ] } } },
+          :safe => true
+        )
+        person.safely.add_all_to_set(:aliases, [ "Bond", "James" ])
+      end
+  
+      it "clears the safety options post persist" do
+        Mongoid::Threaded.safety_options.should be_nil
+      end
+    end
+  end
 
   describe "#bit" do
 
