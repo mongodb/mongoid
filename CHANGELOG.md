@@ -12,6 +12,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1386 Lowered mongo/bson dependency to 1.3
+
 * \#1377 Fix aggregation functions to properly handle nil or indefined values.
   (Maxime Garcia)
 
