@@ -14,7 +14,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
-## 2.3.3 \[ In Development \] \[ Branch: 2.3.0-stable \]
+## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+## 2.3.3
 
 ### Resolved Issues
 
