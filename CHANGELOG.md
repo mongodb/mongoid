@@ -211,6 +211,27 @@ For instructions on upgrading to newer versions, visit
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
 
+## 2.2.4
+
+* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+  (Maxime Garcia)
+
+* \#1373 Warn if a scope overrides another scope.
+
+* \#1372 Never persist when binding inside of a read attribute for validation.
+
+* \#1358 Fixed type error on many to many synchronization when inverse_of is
+  set to nil.
+
+* \#1356 $in criteria can now be chained to non-complex criteria on the same
+  key without error.
+
+* \#1350, \#1351 Fixed errors in the string conversions of double quotes and
+  tilde when paramterizing keys.
+
+* \#1349 Mongoid documents should not blow up when including Enumerable.
+  (Jonas Nicklas)
+
 ## 2.2.3
 
 * \#1295 Fixed having multiple includes only execute the eager loading of the first.
