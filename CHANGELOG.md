@@ -18,6 +18,15 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1386 Lowered mongo/bson dependency to 1.3
+
+* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+  (Maxime Garcia)
+
+* \#1373 Warn if a scope overrides another scope.
+
+* \#1372 Never persist when binding inside of a read attribute for validation.
+
 * \#1364 Fixed reloading of documents with non bson object id ids.
 
 * \#1360 Fixed performance of Mongoid's observer instantiation by hooking into
@@ -31,6 +40,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1350, \#1351 Fixed errors in the string conversions of double quotes and
   tilde when paramterizing keys.
+
+* \#1349 Mongoid documents should not blow up when including Enumerable.
+  (Jonas Nicklas)
 
 ## 2.3.2
 

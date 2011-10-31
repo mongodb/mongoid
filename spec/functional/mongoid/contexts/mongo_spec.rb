@@ -110,7 +110,7 @@ describe Mongoid::Contexts::Mongo do
         end
 
         it "returns nil" do
-          Person.avg(:score).should be_nil
+          Person.avg(:score).should eq(0)
         end
       end
     end
@@ -216,6 +216,18 @@ describe Mongoid::Contexts::Mongo do
       it "returns the maximum for the field" do
         Person.max(:age).should == 40
       end
+
+      context "when the field is not defined" do
+
+        before do
+          Person.create(:ssn => "123-22-1111")
+          Person.create(:ssn => "123-22-1112", :no_definition => 5)
+        end
+
+        it "returns the sum" do
+          Person.max(:no_definition).should eq(5)
+        end
+      end
     end
   end
 
@@ -243,6 +255,18 @@ describe Mongoid::Contexts::Mongo do
 
       it "returns the minimum for the field" do
         Person.min(:age).should == 10.0
+      end
+
+      context "when the field is not defined" do
+
+        before do
+          Person.create(:ssn => "123-22-1111")
+          Person.create(:ssn => "123-22-1112", :no_definition => 5)
+        end
+
+        it "returns the sum" do
+          Person.min(:no_definition).should eq(5)
+        end
       end
     end
 
@@ -298,7 +322,19 @@ describe Mongoid::Contexts::Mongo do
         end
 
         it "returns nil" do
-          Person.sum(:score).should be_nil
+          Person.sum(:score).should eq(0)
+        end
+      end
+
+      context "when the field is not defined" do
+
+        before do
+          Person.create(:ssn => "123-22-1111")
+          Person.create(:ssn => "123-22-1112", :no_definition => 5)
+        end
+
+        it "returns the sum" do
+          Person.sum(:no_definition).should eq(5)
         end
       end
     end
