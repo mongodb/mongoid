@@ -229,6 +229,9 @@ For instructions on upgrading to newer versions, visit
 * \#1350, \#1351 Fixed errors in the string conversions of double quotes and
   tilde when paramterizing keys.
 
+* \#1349 Mongoid documents should not blow up when including Enumerable.
+  (Jonas Nicklas)
+
 ## 2.2.3
 
 * \#1295 Fixed having multiple includes only execute the eager loading of the first.
