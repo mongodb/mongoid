@@ -213,7 +213,12 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.2.4
 
+* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+  (Maxime Garcia)
+
 * \#1373 Warn if a scope overrides another scope.
+
+* \#1372 Never persist when binding inside of a read attribute for validation.
 
 * \#1358 Fixed type error on many to many synchronization when inverse_of is
   set to nil.
