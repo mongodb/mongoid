@@ -5,12 +5,86 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.4.0 \[ In Development \] \[ Branch: master \]
 
+### New Features
+
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
-## 2.3.1 \[ In Development \] \[ Branch: 2.3.0-stable \]
+### Resolved Issues
+
+* \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
+
+## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+## 2.3.3
 
 ### Resolved Issues
+
+* \#1386 Lowered mongo/bson dependency to 1.3
+
+* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+  (Maxime Garcia)
+
+* \#1373 Warn if a scope overrides another scope.
+
+* \#1372 Never persist when binding inside of a read attribute for validation.
+
+* \#1364 Fixed reloading of documents with non bson object id ids.
+
+* \#1360 Fixed performance of Mongoid's observer instantiation by hooking into
+  Active Support's load hooks, a la AR.
+
+* \#1358 Fixed type error on many to many synchronization when inverse_of is
+  set to nil.
+
+* \#1356 $in criteria can now be chained to non-complex criteria on the same
+  key without error.
+
+* \#1350, \#1351 Fixed errors in the string conversions of double quotes and
+  tilde when paramterizing keys.
+
+* \#1349 Mongoid documents should not blow up when including Enumerable.
+  (Jonas Nicklas)
+
+## 2.3.2
+
+### Resolved Issues
+
+* \#1347 Fix embedded matchers when provided a hash value that does not have a
+  modifier as a key.
+
+* \#1346 Dup default sorting criteria when calling first/last on a criteria.
+
+* \#1343 When passing no arguments to `Criteria#all_of` return all documents.
+  (Chris Leishman)
+
+* \#1339 Ensure destroy callbacks are run on cascadable children when deleting via
+  nested attributes.
+
+* \#1324 Setting `inverse_of: nil` on a many-to-many referencing the same class
+  returns nil for the inverse foreign key.
+
+* \#1323 Allow both strings and symbols as ids in the attributes array for
+  nested attributes. (Michael Wood)
+
+* \#1312 Setting a logger on the config now accepts anything that quacks like a
+  logger.
+
+* \#1297 Don't hit the database when accessing relations if the base is new.
+
+* \#1239 Allow appending of referenced relations in create blocks, post default set.
+
+* \#1236 Ensure all models are loaded in rake tasks, so even in threadsafe mode
+  all indexes can be created.
+
+* \#736 Calling #reload on embedded documents now works properly.
+
+## 2.3.1
+
+### Resolved Issues
+
+* \#1338 Calling #find on a scope or relation checks that the document in the
+  identity map actually matches other scope parameters.
 
 * \#1321 HABTM no longer allows duplicate entries or keys, instead of the previous
   inconsistencies.
@@ -22,16 +96,30 @@ For instructions on upgrading to newer versions, visit
 
 * \#1311 Fix issue with custom field serialization inheriting from hash.
 
+* \#1310 The referenced many enumerable target no longer duplicates loaded and
+  added documents when the identity map is enabled.
+
 * \#1295 Fixed having multiple includes only execute the eager loading of the first.
 
 * \#1287 Fixed max versions limitation with versioning.
 
 * \#1277 attribute_will_change! properly flags the attribute even if no change occured.
 
+* \#1063 Paranoid documents properly run destroy callbacks on soft destroy.
+
+* \#1061 Raise `Mongoid::Errors::InvalidTime` when time serialization fails.
+
+* \#1002 Check for legal bson ids when attempting conversion.
+
 * \#920 Allow relations to be named target.
+
+* \#905 Return normalized class name in metadata if string was defined with a
+  prefixed ::.
 
 * \#861 accepts_nested_attributes_for is no longer needed to set embedded documents
   via a hash or array of hashes directly.
+
+* \#857 Fixed cascading of dependent relations when base document is paranoid.
 
 * \#768 Fixed class_attribute definitions module wide.
 
@@ -122,6 +210,11 @@ For instructions on upgrading to newer versions, visit
 
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
+
+## 2.2.4
+
+* \#1358 Fixed type error on many to many synchronization when inverse_of is
+  set to nil.
 
 ## 2.2.3
 
