@@ -45,6 +45,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true ] True.
     def remove(options = {})
+      return super if embedded? && respond_to?(:version_max) && version_max
       now = Time.now
       collection.update({ :_id => id }, { '$set' => { :deleted_at => now } })
       @attributes["deleted_at"] = now

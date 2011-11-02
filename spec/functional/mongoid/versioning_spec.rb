@@ -94,12 +94,141 @@ describe Mongoid::Versioning do
         [ "3", "4", "5", "6", "7" ]
       end
 
+      context "when saving over the number of maximum versions" do
+
+        context "when saving in succession" do
+
+          before do
+            10.times do |n|
+              page.update_attribute(:title, "#{n}")
+            end
+          end
+
+          let(:versions) do
+            page.versions
+          end
+
+          it "only versions the maximum amount" do
+            versions.count.should eq(5)
+          end
+
+          it "shifts the versions in order" do
+            versions.last.title.should eq("8")
+          end
+
+          it "persists the version shifts" do
+            page.reload.versions.last.title.should eq("8")
+          end
+        end
+
+        context "when saving in batches" do
+
+          before do
+            2.times do
+              5.times do |n|
+                WikiPage.find(page.id).update_attributes(:title => "#{n}")
+              end
+            end
+          end
+
+          let(:from_db) do
+            WikiPage.find(page.id)
+          end
+
+          let(:versions) do
+            from_db.versions
+          end
+
+          it "only versions the maximum amount" do
+            versions.count.should eq(5)
+          end
+        end
+      end
+
       it "retains the set number of most recent versions" do
         page.versions.size.should == 5
       end
 
       it "retains the most recent values" do
         page.versions.map(&:title).should == expected
+      end
+    end
+
+    context "when document is also paranoid" do
+      let(:post) do
+        ParanoidPost.create(:title => "1")
+      end
+
+      context "when version is over the maximum" do
+        before do
+          7.times do |n|
+            post.title = "#{n + 2}"
+            post.save
+          end
+        end
+
+        let(:expected) do
+          [ "3", "4", "5", "6", "7" ]
+        end
+
+        context "when saving over the number of maximum versions" do
+
+          context "when saving in succession" do
+
+            before do
+              10.times do |n|
+                post.update_attribute(:title, "#{n}")
+              end
+            end
+
+            let(:versions) do
+              post.versions
+            end
+
+            it "only versions the maximum amount" do
+              versions.count.should eq(5)
+            end
+
+            it "shifts the versions in order" do
+              versions.last.title.should eq("8")
+            end
+
+            it "persists the version shifts" do
+              post.reload.versions.last.title.should eq("8")
+            end
+          end
+
+          context "when saving in batches" do
+
+            before do
+              2.times do
+                5.times do |n|
+                  ParanoidPost.find(post.id).update_attributes(:title => "#{n}")
+                end
+              end
+            end
+
+            let(:from_db) do
+              ParanoidPost.find(post.id)
+            end
+
+            let(:versions) do
+              from_db.versions
+            end
+
+            it "only versions the maximum amount" do
+              versions.count.should eq(5)
+            end
+          end
+        end
+
+        it "retains the set number of most recent versions" do
+          post.versions.size.should == 5
+        end
+
+        it "retains the most recent values" do
+          post.versions.map(&:title).should == expected
+        end
       end
     end
 
