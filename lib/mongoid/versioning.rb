@@ -64,7 +64,9 @@ module Mongoid #:nodoc:
     # @since 2.2.1
     def revise!
       new_version = versions.build((previous_revision || self).versioned_attributes)
-      versions.shift if version_max.present? && versions.length > version_max
+      if version_max.present? && versions.length > version_max
+        versions.delete(versions.first)
+      end
       self.version = (version || 1 ) + 1
       save
     end
