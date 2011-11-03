@@ -123,7 +123,6 @@ describe Mongoid::Finders do
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
         criteria.expects(:find).with(:all, conditions).returns(criteria)
-        criteria.expects(:limit).with(1).returns(criteria)
       end
 
       context "when count is greater than zero" do
@@ -154,7 +153,6 @@ describe Mongoid::Finders do
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
         criteria.expects(:find).with(:all, nil).returns(criteria)
-        criteria.expects(:limit).with(1).returns(criteria)
       end
 
       context "when count is greater than zero" do

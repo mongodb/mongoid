@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Array ] args The conditions.
     def exists?(*args)
-       find(:all, *args).limit(1).count == 1
+       find(:all, *args).count > 0
     end
 
     # Find a +Document+ in several different ways.
