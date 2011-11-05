@@ -72,6 +72,7 @@ module Mongoid #:nodoc
     def next_document
       Mongoid::Factory.from_db(klass, cursor.next_document)
     end
+    alias :next :next_document
 
     # Returns an array of all the documents in the cursor.
     #

@@ -35,6 +35,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = {})
+      return unless attributes
       type = attributes["_type"]
       if type.blank?
         klass.instantiate(attributes)

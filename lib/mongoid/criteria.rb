@@ -140,6 +140,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Criteria ] The criteria itself.
     def each(&block)
+      return collection.cursor unless block_given?
       tap { context.iterate(&block) }
     end
 

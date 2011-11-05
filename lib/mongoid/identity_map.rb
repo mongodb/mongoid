@@ -77,7 +77,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def set_one(document, selector)
-     documents_for(document.class)[selector] = document
+      documents_for(document.class)[selector] = document
     end
 
     private

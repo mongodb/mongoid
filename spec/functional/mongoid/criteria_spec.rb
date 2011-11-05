@@ -30,6 +30,28 @@ describe Mongoid::Criteria do
     end
   end
 
+  context "when the block is omitted" do
+
+    before do
+      3.times do |n|
+        Person.create!(:title => "Sir", :ssn => "#{n}")
+      end
+    end
+
+    let(:cursor) do
+      Person.where(:title => "Sir").asc(:ssn).each
+    end
+
+    it "emits the next document on .next" do
+      cursor.next.ssn.should == "0"
+      cursor.next.ssn.should == "1"
+      cursor.next.ssn.should == "2"
+      cursor.next.should     == nil
+      cursor.next.should     == nil
+    end
+
+  end
+
   describe "#find" do
 
     context "when using object ids" do
