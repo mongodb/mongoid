@@ -577,9 +577,10 @@ describe Mongoid::Criteria do
 
     context "when no block is passed" do
 
-      it "returns self" do
-        new_criteria.each.should == new_criteria
+      it "returns the collection's cursor" do
+        new_criteria.each.should == new_criteria.collection.cursor
       end
+
     end
 
     context "when caching" do

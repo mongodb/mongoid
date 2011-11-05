@@ -8,7 +8,7 @@ module Mongoid #:nodoc
   # This class is the Mongoid wrapper to the Mongo Ruby driver's collection
   # object.
   class Collection
-    attr_reader :counter, :klass, :name
+    attr_reader :counter, :klass, :name, :cursor
 
     # All write operations should delegate to the master connection. These
     # operations mimic the methods on a Mongo:Collection.
@@ -39,11 +39,11 @@ module Mongoid #:nodoc
     #
     # @return [ Cursor ] The results.
     def find(selector = {}, options = {})
-      cursor = Mongoid::Cursor.new(klass, self, master(options).find(selector, options))
+      @cursor = Mongoid::Cursor.new(klass, self, master(options).find(selector, options))
       if block_given?
-        yield cursor; cursor.close
+        yield @cursor; @cursor.close
       else
-        cursor
+        @cursor
       end
     end
 
