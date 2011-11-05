@@ -54,7 +54,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.2
     def reload_root_document
-      {}.merge(collection.find_one(:_id => id) || {})
+      {}.merge(collection.find_one({:_id => id}, default_scoped_fields) || {})
+    end
+
+    def default_scoped_fields
+      (self.class.default_scoping || {}).select{|key, _| key == :fields }
     end
 
     # Reload the embedded document.
