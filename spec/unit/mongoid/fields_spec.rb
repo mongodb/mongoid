@@ -188,6 +188,10 @@ describe Mongoid::Fields do
         Person.new.testing?.should be_false
       end
 
+      it "adds a before_type_cast method for the fields defined" do
+        person.should respond_to :testing_before_type_cast
+      end
+
       it "adds field methods in a module to allow overriding and preserve inheritance" do
         Person.class_eval do
           attr_reader :testing_override_called

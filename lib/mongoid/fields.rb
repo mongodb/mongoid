@@ -313,6 +313,9 @@ module Mongoid #:nodoc
             attr = read_attribute(name)
             (options[:type] == Boolean) ? attr == true : attr.present?
           end
+          define_method("#{meth}_before_type_cast") do
+            instance_variable_get :"@#{meth}_before_type_cast"
+          end
         end
       end
 

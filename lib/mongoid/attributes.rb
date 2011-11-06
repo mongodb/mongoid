@@ -98,6 +98,7 @@ module Mongoid #:nodoc:
     def write_attribute(name, value)
       _assigning do
         access = name.to_s
+        instance_variable_set :"@#{access}_before_type_cast", value
         localized = fields[access].try(:localized?)
         typed_value_for(access, value).tap do |value|
           unless attributes[access] == value || attribute_changed?(access)
@@ -201,7 +202,11 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].serialize(value) : value
+      begin
+        fields.has_key?(key) ? fields[key].serialize(value) : value
+      rescue
+        nil
+      end
     end
 
     module ClassMethods #:nodoc:
