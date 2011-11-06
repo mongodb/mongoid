@@ -53,7 +53,7 @@ describe Mongoid::Extensions::Symbol::Inflections do
   
   describe "#not" do
 
-    it 'returns :"foo not"' do
+    it 'returns :"foo $not"' do
       ret = :foo.not
       ret.key.should == :foo
       ret.operator.should == "not"
