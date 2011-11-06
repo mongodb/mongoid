@@ -48,6 +48,7 @@ module Mongoid #:nodoc:
           "mod",
           "ne",
           "near",
+          "not",
           "nin",
           "size",
           "within",
