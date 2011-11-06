@@ -13,6 +13,8 @@ For instructions on upgrading to newer versions, visit
 * \#1399 Allow conversion of strings to integers in foreign keys where the
   id is defined as an int.
 
+* \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
+
 ## 2.3.3
 
 ### Resolved Issues
