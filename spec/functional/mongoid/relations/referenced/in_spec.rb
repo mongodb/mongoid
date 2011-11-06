@@ -4,7 +4,8 @@ describe Mongoid::Relations::Referenced::In do
 
   before do
     [ Person, Game, Post, Bar, Agent,
-      Comment, Movie, Account, User, Book, Series ].map(&:delete_all)
+      Comment, Movie, Account, User, Book,
+      Series, Cookie, Jar ].map(&:delete_all)
   end
 
   let(:person) do
@@ -894,6 +895,25 @@ describe Mongoid::Relations::Referenced::In do
           Book.find(id).should equal(Book.find(id))
         end
       end
+    end
+  end
+
+  context "when creating with a reference to an integer id parent" do
+
+    let!(:jar) do
+      Jar.create(:_id => 1)
+    end
+
+    let(:cookie) do
+      Cookie.create(:jar_id => "1")
+    end
+
+    it "allows strings to be passed as the id" do
+      cookie.jar.should eq(jar)
+    end
+
+    it "persists the relation" do
+      cookie.reload.jar.should eq(jar)
     end
   end
 end

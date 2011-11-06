@@ -8,7 +8,12 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
-## 2.3.3 \[ In Development \] \[ Branch: 2.3.0-stable \]
+## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
+
+* \#1399 Allow conversion of strings to integers in foreign keys where the
+  id is defined as an int.
+
+## 2.3.3
 
 ### Resolved Issues
 
