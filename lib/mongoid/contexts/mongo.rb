@@ -379,9 +379,9 @@ module Mongoid #:nodoc:
       # @since 2.3.2
       def options_with_default_sorting
         process_options.tap do |opts|
-          sorting = opts[:sort] ? opts[:sort].dup : []
-          sorting << [:_id, :asc]
-          opts[:sort] = sorting
+          if opts[:sort].blank?
+            opts[:sort] = [[ :_id, :asc ]]
+          end
         end
       end
 

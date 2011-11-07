@@ -7,7 +7,7 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   before do
-    [ Person, Post, Movie, Rating, Game, Drug ].map(&:delete_all)
+    [ Person, Post, OrderedPost, Movie, Rating, Game, Drug ].map(&:delete_all)
   end
 
   [ :<<, :push, :concat ].each do |method|
@@ -2464,28 +2464,32 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     let(:post_one) do
-      Post.create(:rating => 10, :title => '1')
+      OrderedPost.create(:rating => 10, :title => '1')
     end
 
     let(:post_two) do
-      Post.create(:rating => 20, :title => '2')
+      OrderedPost.create(:rating => 20, :title => '2')
     end
 
     let(:post_three) do
-      Post.create(:rating => 20, :title => '3')
+      OrderedPost.create(:rating => 20, :title => '3')
     end
 
     before do
-      person.posts.nullify_all
-      person.posts.push(post_one, post_two, post_three)
+      person.ordered_posts.nullify_all
+      person.ordered_posts.push(post_one, post_two, post_three)
     end
 
     it "order documents" do
-      person.posts(true).should == [post_two, post_three, post_one]
+      person.ordered_posts(true).should eq(
+        [post_two, post_three, post_one]
+      )
     end
 
     it "chaining order criterias" do
-      person.posts.order_by(:title.desc).to_a.should == [post_three, post_two, post_one]
+      person.ordered_posts.order_by(:title.desc).to_a.should eq(
+        [post_three, post_two, post_one]
+      )
     end
   end
 
@@ -2534,8 +2538,12 @@ describe Mongoid::Relations::Referenced::Many do
         person.posts(true)
       end
 
+      it "reloads the first document from the database" do
+        reloaded.should include(post_one)
+      end
+
       it "reloads the new document from the database" do
-        reloaded.should eq([ post_one, post_two ])
+        reloaded.should include(post_two)
       end
     end
   end
