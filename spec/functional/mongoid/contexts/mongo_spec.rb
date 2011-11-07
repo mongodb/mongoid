@@ -113,6 +113,17 @@ describe Mongoid::Contexts::Mongo do
           Person.avg(:score).should eq(0)
         end
       end
+
+      context "when no document has the field" do
+
+        before do
+          Person.create(:ssn => "121-11-1234")
+        end
+
+        it "returns 0" do
+          Person.avg(:no_definition).should eq(0)
+        end
+      end
     end
   end
 
@@ -228,6 +239,17 @@ describe Mongoid::Contexts::Mongo do
           Person.max(:no_definition).should eq(5)
         end
       end
+
+      context "when no document has the field" do
+
+        before do
+          Person.create(:ssn => "121-11-1234")
+        end
+
+        it "returns 0" do
+          Person.max(:no_definition).should eq(0)
+        end
+      end
     end
   end
 
@@ -266,6 +288,17 @@ describe Mongoid::Contexts::Mongo do
 
         it "returns the sum" do
           Person.min(:no_definition).should eq(5)
+        end
+      end
+
+      context "when no document has the field" do
+
+        before do
+          Person.create(:ssn => "121-11-1234")
+        end
+
+        it "returns 0" do
+          Person.min(:no_definition).should eq(0)
         end
       end
     end
@@ -335,6 +368,17 @@ describe Mongoid::Contexts::Mongo do
 
         it "returns the sum" do
           Person.sum(:no_definition).should eq(5)
+        end
+      end
+
+      context "when no document has the field" do
+
+        before do
+          Person.create(:ssn => "121-11-1234")
+        end
+
+        it "returns 0" do
+          Person.sum(:no_definition).should eq(0)
         end
       end
     end

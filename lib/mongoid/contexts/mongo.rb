@@ -242,7 +242,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Numeric ] A numeric max value.
       def max(field)
-        grouped(:max, field.to_s, Javascript.max)
+        grouped(:max, field.to_s, Javascript.max, Javascript.max_finalize)
       end
 
       # Return the min value for a field.
@@ -259,7 +259,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Numeric ] A numeric minimum value.
       def min(field)
-        grouped(:min, field.to_s, Javascript.min)
+        grouped(:min, field.to_s, Javascript.min, Javascript.min_finalize)
       end
 
       # Perform a pull on the matching documents.
@@ -306,7 +306,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Numeric ] A numeric value that is the sum.
       def sum(field)
-        grouped(:sum, field.to_s, Javascript.sum)
+        grouped(:sum, field.to_s, Javascript.sum, Javascript.sum_finalize)
       end
 
       # Very basic update that will perform a simple atomic $set of the
@@ -359,14 +359,14 @@ module Mongoid #:nodoc:
       # @param [ String ] reduce The reduce JS function.
       #
       # @return [ Numeric ] A numeric result.
-      def grouped(start, field, reduce)
+      def grouped(start, field, reduce, finalize)
         collection = klass.collection.group(
           :cond => selector,
           :initial => { start => "start" },
+          :finalize => finalize,
           :reduce => reduce.gsub("[field]", field)
         )
-        value = collection.empty? ? nil : collection.first[start.to_s]
-        value && value.do_or_do_not(:nan?) ? nil : value
+        collection.empty? ? nil : collection.first[start.to_s]
       end
 
       # Get the options hash with the default sorting options provided.
@@ -379,9 +379,9 @@ module Mongoid #:nodoc:
       # @since 2.3.2
       def options_with_default_sorting
         process_options.tap do |opts|
-          sorting = opts[:sort] ? opts[:sort].dup : []
-          sorting << [:_id, :asc]
-          opts[:sort] = sorting
+          if opts[:sort].blank?
+            opts[:sort] = [[ :_id, :asc ]]
+          end
         end
       end
 

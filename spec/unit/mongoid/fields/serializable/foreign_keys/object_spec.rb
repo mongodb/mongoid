@@ -37,20 +37,41 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Object do
 
       context "when not using object ids" do
 
-        let(:object_id) do
-          BSON::ObjectId.new
+        context "when using strings" do
+
+          let(:object_id) do
+            BSON::ObjectId.new
+          end
+
+          before do
+            Person.identity :type => String
+          end
+
+          after do
+            Person.identity :type => BSON::ObjectId
+          end
+
+          it "does not convert" do
+            field.serialize(object_id.to_s).should == object_id.to_s
+          end
         end
 
-        before do
-          Person.identity :type => String
-        end
+        context "when using integers" do
 
-        after do
-          Person.identity :type => BSON::ObjectId
-        end
+          context "when provided a string" do
 
-        it "does not convert" do
-          field.serialize(object_id.to_s).should == object_id.to_s
+            before do
+              Person.identity :type => Integer
+            end
+
+            after do
+              Person.identity :type => BSON::ObjectId
+            end
+
+            it "does not convert" do
+              field.serialize("1").should eq(1)
+            end
+          end
         end
       end
     end

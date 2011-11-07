@@ -18,6 +18,14 @@ max:
      }
    }"
 
+max_finalize:
+  "function(obj) {
+     if (obj.max == 'start' || isNaN(obj.max)) {
+       obj.max = 0;
+     }
+     return obj;
+   }"
+
 min:
   "function(obj, prev) {
      if (obj.[field] && prev.min == 'start') {
@@ -26,6 +34,14 @@ min:
      if (obj.[field] && prev.min > obj.[field]) {
        prev.min = obj.[field];
      }
+   }"
+
+min_finalize:
+  "function(obj) {
+     if (obj.min == 'start' || isNaN(obj.min)) {
+       obj.min = 0;
+     }
+     return obj;
    }"
 
 sum:
@@ -37,3 +53,11 @@ sum:
        prev.sum += obj.[field];
      }
   }"
+
+sum_finalize:
+  "function(obj) {
+     if (obj.sum == 'start' || isNaN(obj.sum)) {
+       obj.sum = 0;
+     }
+     return obj;
+   }"

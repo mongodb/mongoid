@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
         #   BSON::ObjectId.convert(Person, { :_id => "4c52c439931a90ab29000003" })
         #
         # @param [ Class ] klass The class to convert the ids for.
-        # @param [ Object, Array, Hash ] args The object to convert.
+        # @param [ Object, Array, Hash ] object The object to convert.
         #
         # @raise BSON::InvalidObjectId If using object ids and passed bad
         #   strings.
@@ -30,28 +30,28 @@ module Mongoid #:nodoc:
         # @return [ BSON::ObjectId, Array, Hash ] The converted object ids.
         #
         # @since 2.0.0.rc.7
-        def convert(klass, args, reject_blank = true)
-          return args if args.is_a?(BSON::ObjectId) || !klass.using_object_ids?
-          case args
+        def convert(klass, object, reject_blank = true)
+          return object if object.is_a?(BSON::ObjectId) || !klass.using_object_ids?
+          case object
           when ::String
-            return nil if args.blank?
-            if args.unconvertable_to_bson?
-              args
+            return nil if object.blank?
+            if object.unconvertable_to_bson?
+              object
             else
-              BSON::ObjectId.legal?(args) ? BSON::ObjectId.from_string(args) : args
+              BSON::ObjectId.legal?(object) ? BSON::ObjectId.from_string(object) : object
             end
           when ::Array
-            args.delete_if { |arg| arg.blank? } if reject_blank
-            args.replace(args.map { |arg| convert(klass, arg, reject_blank) })
+            object.delete_if { |arg| arg.blank? } if reject_blank
+            object.replace(object.map { |arg| convert(klass, arg, reject_blank) })
           when ::Hash
-            args.tap do |hash|
+            object.tap do |hash|
               hash.each_pair do |key, value|
                 next unless klass.object_id_field?(key)
                 hash[key] = convert(klass, value, reject_blank)
               end
             end
           else
-            args
+            object
           end
         end
       end

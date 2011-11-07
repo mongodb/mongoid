@@ -16,6 +16,16 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1399 Allow conversion of strings to integers in foreign keys where the
+  id is defined as an int.
+
+* \#1397 Don't add default sorting criteria on first if they sort criteria
+  already exists.
+
+* \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
+
+* \#1392 Return 0 on aggregation functions where field is nonexistant.
+
 ## 2.3.3
 
 ### Resolved Issues

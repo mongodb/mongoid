@@ -8,7 +8,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
   before do
     [
-      Person, Preference, Event, Tag, House,
+      Person, Preference, OrderedPreference, Event, Tag, House,
       UserAccount, Agent, Account, Business, User,
       Artwork, Exhibition, Exhibitor
     ].map(&:delete_all)
@@ -2289,28 +2289,30 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:name => 'preference-1', :value => 10)
+      OrderedPreference.create(:name => 'preference-1', :value => 10)
     end
 
     let(:preference_two) do
-      Preference.create(:name => 'preference-2', :value => 20)
+      OrderedPreference.create(:name => 'preference-2', :value => 20)
     end
 
     let(:preference_three) do
-      Preference.create(:name => 'preference-3', :value => 20)
+      OrderedPreference.create(:name => 'preference-3', :value => 20)
     end
 
     before do
-      person.preferences.nullify_all
-      person.preferences.push(preference_one, preference_two, preference_three)
+      person.ordered_preferences.nullify_all
+      person.ordered_preferences.push(preference_one, preference_two, preference_three)
     end
 
     it "orders the documents" do
-      person.preferences(true).should == [preference_two, preference_three, preference_one]
+      person.ordered_preferences(true).should eq(
+        [preference_two, preference_three, preference_one]
+      )
     end
 
     it "chains default criteria with additional" do
-      person.preferences.order_by(:name.desc).to_a.should eq(
+      person.ordered_preferences.order_by(:name.desc).to_a.should eq(
         [preference_three, preference_two, preference_one]
       )
     end

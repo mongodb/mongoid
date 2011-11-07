@@ -33,7 +33,12 @@ module Mongoid #:nodoc:
           #
           # @since 2.1.0
           def serialize(object)
-            object.blank? ? nil : constraint.convert(object)
+            return nil if object.blank?
+            if object_id_field?
+              constraint.convert(object)
+            else
+              metadata.klass.fields["_id"].serialize(object)
+            end
           end
         end
       end

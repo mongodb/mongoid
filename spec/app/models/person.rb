@@ -84,21 +84,21 @@ class Person
 
   has_many \
     :posts,
-    :dependent => :delete,
-    :order => :rating.desc do
+    :dependent => :delete do
     def extension
       "Testing"
     end
   end
+  has_many :ordered_posts, :order => :rating.desc, :validate => false
   has_many :paranoid_posts, :validate => false
   has_and_belongs_to_many \
     :preferences,
     :index => true,
     :dependent => :nullify,
-    :autosave => true,
-    :order => :value.desc
+    :autosave => true
   has_and_belongs_to_many :user_accounts, :validate => false
   has_and_belongs_to_many :houses, :validate => false
+  has_and_belongs_to_many :ordered_preferences, :order => :value.desc, :validate => false
 
   has_many :drugs, :autosave => true, :validate => false
   has_one :account, :autosave => true, :validate => false
