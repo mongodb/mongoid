@@ -18,6 +18,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
 
+* \#1392 Return 0 on aggregation functions where field is nonexistant.
+
 ## 2.3.3
 
 ### Resolved Issues

@@ -62,11 +62,7 @@ describe Mongoid::Contexts::Mongo do
 
     before do
       Person.expects(:collection).twice.returns(collection)
-      collection.expects(:group).with(
-        :cond => {},
-        :initial => {:sum => "start"},
-        :reduce => reduce
-      ).returns([{"sum" => 100.0}])
+      collection.expects(:group).returns([{"sum" => 100.0}])
       cursor = mock(:count => 10)
       collection.expects(:find).returns(cursor)
     end
@@ -521,11 +517,7 @@ describe Mongoid::Contexts::Mongo do
     end
 
     it "calls group on the collection with the aggregate js" do
-      collection.expects(:group).with(
-        :cond => {},
-        :initial => {:max => "start"},
-        :reduce => reduce
-      ).returns([{"max" => 200.0}])
+      collection.expects(:group).returns([{"max" => 200.0}])
       context.max(:age).should eq(200.0)
     end
   end
@@ -553,11 +545,7 @@ describe Mongoid::Contexts::Mongo do
     end
 
     it "calls group on the collection with the aggregate js" do
-      collection.expects(:group).with(
-        :cond => {},
-        :initial => {:min => "start"},
-        :reduce => reduce
-      ).returns([{"min" => 4.0}])
+      collection.expects(:group).returns([{"min" => 4.0}])
       context.min(:age).should eq(4.0)
     end
   end
@@ -673,11 +661,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "calls group on the collection with the aggregate js" do
-        collection.expects(:group).with(
-          :cond => {},
-          :initial => {:sum => "start"},
-          :reduce => reduce
-        ).returns([{"sum" => 50.0}])
+        collection.expects(:group).returns([{"sum" => 50.0}])
         context.sum(:age).should eq(50.0)
       end
     end
