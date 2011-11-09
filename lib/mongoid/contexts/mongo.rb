@@ -188,6 +188,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The first document in the collection.
       def first
+        call_inclusions
         attributes = klass.collection.find_one(selector, options_with_default_sorting)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
@@ -254,6 +255,7 @@ module Mongoid #:nodoc:
       def last
         opts = options_with_default_sorting
         opts[:sort] = opts[:sort].map{ |option| [ option[0], option[1].invert ] }.uniq
+        call_inclusions
         attributes = klass.collection.find_one(selector, opts)
         attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
       end
@@ -433,6 +435,12 @@ module Mongoid #:nodoc:
           options[:fields] = fields
         end
         options.dup
+      end
+
+      def call_inclusions
+        criteria.inclusions.reject! do |metadata|
+          metadata.eager_load(criteria)
+        end
       end
     end
   end
