@@ -95,4 +95,14 @@ describe Mongoid::Config do
       end
     end
   end
+  
+  describe "#load!" do
+    context "when RACK_ENV is nil" do
+      ENV["RACK_ENV"] = nil
+    end
+
+    it "raises a NoEnvironment error" do
+      lambda { subject.load!("foo") }.should raise_error(Mongoid::Errors::NoEnvironment)
+    end
+  end
 end
