@@ -256,4 +256,38 @@ describe Mongoid::Versioning do
       page.child_pages.should eq([ child ])
     end
   end
+
+  context "when the identity map is enabled" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when updating a loaded attribute" do
+
+      let!(:page) do
+        WikiPage.create(:title => "first")
+      end
+
+      let!(:loaded) do
+        WikiPage.find(page.id)
+      end
+
+      before do
+        loaded.update_attribute(:title, "revised")
+      end
+
+      let(:reloaded) do
+        WikiPage.find(page.id)
+      end
+
+      it "returns the revised im memory document" do
+        reloaded.title.should eq("revised")
+      end
+    end
+  end
 end

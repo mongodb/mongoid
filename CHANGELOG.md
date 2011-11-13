@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1418 Documents being loaded from the database for revision purposes
+  no longer get placed in the identity map.
+
 * \#1399 Allow conversion of strings to integers in foreign keys where the
   id is defined as an int.
 
