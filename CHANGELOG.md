@@ -23,6 +23,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1392 Return 0 on aggregation functions where field is nonexistant.
 
+* \#1390 When _type field is lower case class camelize before constantizing.
+
 ## 2.3.3
 
 ### Resolved Issues

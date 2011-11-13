@@ -4,49 +4,88 @@ describe Mongoid::Factory do
 
   describe ".build" do
 
-    context "when the _type attribute is present" do
+    context "when the type attribute is present" do
 
-      before do
-        @attributes = { "_type" => "Person", "title" => "Sir" }
+      let(:attributes) do
+        { "_type" => "Person", "title" => "Sir" }
       end
 
-      it "instantiates based on the type" do
-        person = Mongoid::Factory.build(Person, @attributes)
-        person.title.should == "Sir"
+      context "when the type is a class" do
+
+        let(:person) do
+          described_class.build(Person, attributes)
+        end
+
+        it "instantiates based on the type" do
+          person.title.should eq("Sir")
+        end
       end
 
-      it "does not instantiate classes other than the given or its subclasses" do
-        person = Mongoid::Factory.build(Person, { "_type" => "Canvas" })
-        person.class.should == Person
+      context "when the type is a not a subclass" do
+
+        let(:person) do
+          described_class.build(Person, { "_type" => "Canvas" })
+        end
+
+        it "instantiates the provided class" do
+          person.class.should eq(Person)
+        end
       end
 
-      it "does instantiate subclasses of the given class" do
-        person = Mongoid::Factory.build(Person, { "_type" => "Doctor" })
-        person.class.should == Doctor
+      context "when the type is a subclass of the provided" do
+
+        let(:person) do
+          described_class.build(Person, { "_type" => "Doctor" })
+        end
+
+        it "instantiates the subclass" do
+          person.class.should eq(Doctor)
+        end
+      end
+
+      context "when type is an empty string" do
+
+        let(:attributes) do
+          { "title" => "Sir", "_type" => "" }
+        end
+
+        let(:person) do
+          described_class.build(Person, attributes)
+        end
+
+        it "instantiates based on the type" do
+          person.title.should eq("Sir")
+        end
+      end
+
+      context "when type is the lower case class name" do
+
+        let(:attributes) do
+          { "title" => "Sir", "_type" => "person" }
+        end
+
+        let(:person) do
+          described_class.build(Person, attributes)
+        end
+
+        it "instantiates based on the type" do
+          person.title.should eq("Sir")
+        end
       end
     end
 
-    context "when _type is not preset" do
+    context "when type is not preset" do
 
-      before do
-        @attributes = { "title" => "Sir" }
+      let(:attributes) do
+        { "title" => "Sir" }
       end
 
-      it "instantiates based on the type" do
-        person = Mongoid::Factory.build(Person, @attributes)
-        person.title.should == "Sir"
-      end
-    end
-
-    context "when _type is an empty string" do
-
-      before do
-        @attributes = { "title" => "Sir", "_type" => "" }
+      let(:person) do
+        described_class.build(Person, attributes)
       end
 
-      it "instantiates based on the type" do
-        person = Mongoid::Factory.build(Person, @attributes)
-        person.title.should == "Sir"
+      it "instantiates based on the provided class" do
+        person.title.should eq("Sir")
       end
     end
   end
@@ -90,6 +129,21 @@ describe Mongoid::Factory do
 
         it "sets the attributes" do
           document.title.should == "Sir"
+        end
+      end
+
+      context "when type is the lower case class name" do
+
+        let(:attributes) do
+          { "title" => "Sir", "_type" => "person" }
+        end
+
+        let(:person) do
+          described_class.from_db(Person, attributes)
+        end
+
+        it "instantiates based on the type" do
+          person.title.should eq("Sir")
         end
       end
     end
