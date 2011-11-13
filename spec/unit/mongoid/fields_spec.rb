@@ -4,7 +4,7 @@ describe Mongoid::Fields do
 
   describe ".defaults" do
 
-    it "returns a hash of all the default values" do
+    it "returns an array of all the default values" do
       Game.defaults.should eq([ "high_score", "score" ])
     end
   end
