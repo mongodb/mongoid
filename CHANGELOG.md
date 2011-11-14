@@ -28,6 +28,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1390 When _type field is lower case class camelize before constantizing.
 
+* \#1383 Fix cast on read for serializable fields that are subclassed.
+
 ## 2.3.3
 
 ### Resolved Issues

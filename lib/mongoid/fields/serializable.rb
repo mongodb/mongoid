@@ -30,27 +30,12 @@ module Mongoid #:nodoc:
         unless method_defined?(:default)
           alias :default :default_val
         end
+
+        class_attribute :cast_on_read
       end
 
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :localize, :name, :options
-
-      # When reading the field do we need to cast the value? This holds true when
-      # times are stored or for big decimals which are stored as strings.
-      #
-      # @example Typecast on a read?
-      #   field.cast_on_read?
-      #
-      # @return [ true, false ] If the field should be cast.
-      #
-      # @since 2.1.0
-      def cast_on_read?
-        return @cast_on_read if defined?(@cast_on_read)
-        @cast_on_read =
-          self.class.public_instance_methods(false).map do |m|
-            m.to_sym
-          end.include?(:deserialize)
-      end
 
       # Get the constraint from the metadata once.
       #
@@ -194,6 +179,21 @@ module Mongoid #:nodoc:
               field.default_val = {} if field.localized?
             end
           end
+        end
+
+        private
+
+        # If we define a method called deserialize then we need to cast on
+        # read.
+        #
+        # @example Hook into method added.
+        #   method_added(:deserialize)
+        #
+        # @param [ Symbol ] method The method name.
+        #
+        # @since 2.3.4
+        def method_added(method)
+          self.cast_on_read = true if method == :deserialize
         end
       end
     end
