@@ -23,6 +23,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1392 Return 0 on aggregation functions where field is nonexistant.
 
+* \#1391 Uniqueness validation now works properly on embedded documents that are
+  using primary key definitions.
+
 * \#1390 When _type field is lower case class camelize before constantizing.
 
 ## 2.3.3

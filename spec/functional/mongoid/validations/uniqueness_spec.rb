@@ -19,8 +19,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -80,8 +79,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -214,8 +212,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -348,8 +345,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -409,8 +405,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -488,8 +483,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is nil" do
@@ -515,8 +509,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary._validators.clear
-            Dictionary._validate_callbacks.clear
+            Dictionary.reset_callbacks(:validate)
           end
 
           context "when the attribute is blank" do
@@ -545,8 +538,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Login._validators.clear
-            Login._validate_callbacks.clear
+            Login.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -606,8 +598,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Login._validators.clear
-            Login._validate_callbacks.clear
+            Login.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -722,8 +713,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Login._validators.clear
-            Login._validate_callbacks.clear
+            Login.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -783,8 +773,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Login._validators.clear
-            Login._validate_callbacks.clear
+            Login.reset_callbacks(:validate)
           end
 
           context "when the attribute is unique" do
@@ -862,8 +851,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Login._validators.clear
-            Login._validate_callbacks.clear
+            Login.reset_callbacks(:validate)
           end
 
           context "when the attribute is nil" do
@@ -889,8 +877,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Login._validators.clear
-            Login._validate_callbacks.clear
+            Login.reset_callbacks(:validate)
           end
 
           context "when the attribute is blank" do
@@ -920,414 +907,19 @@ describe Mongoid::Validations::UniquenessValidator do
 
     context "when in an embeds_many" do
 
-      context "when no scope is provided" do
+      context "when the document does not use composite keys" do
 
-        before do
-          Definition.validates_uniqueness_of :description
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is unique" do
+        context "when no scope is provided" do
 
           before do
-            word.definitions.build(:description => "Malicious joy")
+            Definition.validates_uniqueness_of :description
           end
 
-          let(:definition) do
-            word.definitions.build(:description => "Gloating")
+          after do
+            Definition.reset_callbacks(:validate)
           end
 
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique" do
-
-          context "when the document is not the match" do
-
-            before do
-              word.definitions.build(:description => "Malicious joy")
-            end
-
-            let(:definition) do
-              word.definitions.build(:description => "Malicious joy")
-            end
-
-            it "returns false" do
-              definition.should_not be_valid
-            end
-
-            it "adds the uniqueness error" do
-              definition.valid?
-              definition.errors[:description].should eq([ "is already taken" ])
-            end
-          end
-
-          context "when the document is the match in the database" do
-
-            let!(:definition) do
-              word.definitions.build(:description => "Malicious joy")
-            end
-
-            it "returns true" do
-              definition.should be_valid
-            end
-          end
-        end
-      end
-
-      context "when a single scope is provided" do
-
-        before do
-          Definition.validates_uniqueness_of :description, :scope => :part
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is unique" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy", :part => "Noun"
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(:description => "Gloating")
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is unique in the scope" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun"
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(
-              :description => "Gloating",
-              :part => "Noun"
-            )
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique with no scope" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun"
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(:description => "Malicious joy")
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique in another scope" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun"
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Adj"
-            )
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique in the same scope" do
-
-          context "when the document is not the match" do
-
-            before do
-              word.definitions.build(
-                :description => "Malicious joy",
-                :part => "Noun"
-              )
-            end
-
-            let(:definition) do
-              word.definitions.build(
-                :description => "Malicious joy",
-                :part => "Noun"
-              )
-            end
-
-            it "returns false" do
-              definition.should_not be_valid
-            end
-
-            it "adds the uniqueness errors" do
-              definition.valid?
-              definition.errors[:description].should eq([ "is already taken" ])
-            end
-          end
-
-          context "when the document is the match in the database" do
-
-            let!(:definition) do
-              word.definitions.build(
-                :description => "Malicious joy",
-                :part => "Noun"
-              )
-            end
-
-            it "returns true" do
-              definition.should be_valid
-            end
-          end
-        end
-      end
-
-      context "when multiple scopes are provided" do
-
-        before do
-          Definition.validates_uniqueness_of :description, :scope => [ :part, :regular ]
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is unique" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun"
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(:description => "Gloating")
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is unique in the scope" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun",
-              :regular => true
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(
-              :description => "Gloating",
-              :part => "Noun",
-              :regular => true
-            )
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique with no scope" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun"
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(:description => "Malicious scope")
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique in another scope" do
-
-          before do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Noun",
-              :regular => true
-            )
-          end
-
-          let(:definition) do
-            word.definitions.build(
-              :description => "Malicious joy",
-              :part => "Adj",
-              :regular => true
-            )
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique in the same scope" do
-
-          context "when the document is not the match" do
-
-            before do
-              word.definitions.build(
-                :description => "Malicious joy",
-                :part => "Noun",
-                :regular => true
-              )
-            end
-
-            let(:definition) do
-              word.definitions.build(
-                :description => "Malicious joy",
-                :part => "Noun",
-                :regular => true
-              )
-            end
-
-            it "returns false" do
-              definition.should_not be_valid
-            end
-
-            it "adds the uniqueness errors" do
-              definition.valid?
-              definition.errors[:description].should eq([ "is already taken" ])
-            end
-          end
-
-          context "when the document is the match in the database" do
-
-            let!(:definition) do
-              word.definitions.build(
-                :description => "Malicious joy",
-                :part => "Noun",
-                :regular => false
-              )
-            end
-
-            it "returns true" do
-              definition.should be_valid
-            end
-          end
-        end
-      end
-
-      context "when case sensitive is true" do
-
-        before do
-          Definition.validates_uniqueness_of :description
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is unique" do
-
-          before do
-            word.definitions.build(:description => "Malicious jo")
-          end
-
-          let(:definition) do
-            word.definitions.build(:description => "Gloating")
-          end
-
-          it "returns true" do
-            definition.should be_valid
-          end
-        end
-
-        context "when the attribute is not unique" do
-
-          context "when the document is not the match" do
-
-            before do
-              word.definitions.build(:description => "Malicious joy")
-            end
-
-            let(:definition) do
-              word.definitions.build(:description => "Malicious joy")
-            end
-
-            it "returns false" do
-              definition.should_not be_valid
-            end
-
-            it "adds the uniqueness error" do
-              definition.valid?
-              definition.errors[:description].should eq([ "is already taken" ])
-            end
-          end
-
-          context "when the document is the match in the database" do
-
-            let!(:definition) do
-              word.definitions.build(:description => "Malicious joy")
-            end
-
-            it "returns true" do
-              definition.should be_valid
-            end
-          end
-        end
-      end
-
-      context "when case sensitive is false" do
-
-        before do
-          Definition.validates_uniqueness_of :description, :case_sensitive => false
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is unique" do
-
-          context "when there are no special characters" do
+          context "when the attribute is unique" do
 
             before do
               word.definitions.build(:description => "Malicious joy")
@@ -1342,14 +934,467 @@ describe Mongoid::Validations::UniquenessValidator do
             end
           end
 
-          context "when special characters exist" do
+          context "when the attribute is not unique" do
+
+            context "when the document is not the match" do
+
+              before do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              let(:definition) do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              it "returns false" do
+                definition.should_not be_valid
+              end
+
+              it "adds the uniqueness error" do
+                definition.valid?
+                definition.errors[:description].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:definition) do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+          end
+        end
+
+        context "when a single scope is provided" do
+
+          before do
+            Definition.validates_uniqueness_of :description, :scope => :part
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is unique" do
 
             before do
-              word.definitions.build(:description => "Malicious joy")
+              word.definitions.build(
+                :description => "Malicious joy", :part => "Noun"
+              )
             end
 
             let(:definition) do
-              word.definitions.build(:description => "M@licious.joy")
+              word.definitions.build(:description => "Gloating")
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is unique in the scope" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun"
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(
+                :description => "Gloating",
+                :part => "Noun"
+              )
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique with no scope" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun"
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(:description => "Malicious joy")
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique in another scope" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun"
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Adj"
+              )
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique in the same scope" do
+
+            context "when the document is not the match" do
+
+              before do
+                word.definitions.build(
+                  :description => "Malicious joy",
+                  :part => "Noun"
+                )
+              end
+
+              let(:definition) do
+                word.definitions.build(
+                  :description => "Malicious joy",
+                  :part => "Noun"
+                )
+              end
+
+              it "returns false" do
+                definition.should_not be_valid
+              end
+
+              it "adds the uniqueness errors" do
+                definition.valid?
+                definition.errors[:description].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:definition) do
+                word.definitions.build(
+                  :description => "Malicious joy",
+                  :part => "Noun"
+                )
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+          end
+        end
+
+        context "when multiple scopes are provided" do
+
+          before do
+            Definition.validates_uniqueness_of :description, :scope => [ :part, :regular ]
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is unique" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun"
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(:description => "Gloating")
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is unique in the scope" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun",
+                :regular => true
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(
+                :description => "Gloating",
+                :part => "Noun",
+                :regular => true
+              )
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique with no scope" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun"
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(:description => "Malicious scope")
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique in another scope" do
+
+            before do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Noun",
+                :regular => true
+              )
+            end
+
+            let(:definition) do
+              word.definitions.build(
+                :description => "Malicious joy",
+                :part => "Adj",
+                :regular => true
+              )
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique in the same scope" do
+
+            context "when the document is not the match" do
+
+              before do
+                word.definitions.build(
+                  :description => "Malicious joy",
+                  :part => "Noun",
+                  :regular => true
+                )
+              end
+
+              let(:definition) do
+                word.definitions.build(
+                  :description => "Malicious joy",
+                  :part => "Noun",
+                  :regular => true
+                )
+              end
+
+              it "returns false" do
+                definition.should_not be_valid
+              end
+
+              it "adds the uniqueness errors" do
+                definition.valid?
+                definition.errors[:description].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:definition) do
+                word.definitions.build(
+                  :description => "Malicious joy",
+                  :part => "Noun",
+                  :regular => false
+                )
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+          end
+        end
+
+        context "when case sensitive is true" do
+
+          before do
+            Definition.validates_uniqueness_of :description
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is unique" do
+
+            before do
+              word.definitions.build(:description => "Malicious jo")
+            end
+
+            let(:definition) do
+              word.definitions.build(:description => "Gloating")
+            end
+
+            it "returns true" do
+              definition.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique" do
+
+            context "when the document is not the match" do
+
+              before do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              let(:definition) do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              it "returns false" do
+                definition.should_not be_valid
+              end
+
+              it "adds the uniqueness error" do
+                definition.valid?
+                definition.errors[:description].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:definition) do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+          end
+        end
+
+        context "when case sensitive is false" do
+
+          before do
+            Definition.validates_uniqueness_of :description, :case_sensitive => false
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is unique" do
+
+            context "when there are no special characters" do
+
+              before do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              let(:definition) do
+                word.definitions.build(:description => "Gloating")
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+
+            context "when special characters exist" do
+
+              before do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              let(:definition) do
+                word.definitions.build(:description => "M@licious.joy")
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+          end
+
+          context "when the attribute is not unique" do
+
+            context "when the document is not the match" do
+
+              before do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              let(:definition) do
+                word.definitions.build(:description => "Malicious JOY")
+              end
+
+              it "returns false" do
+                definition.should_not be_valid
+              end
+
+              it "adds the uniqueness error" do
+                definition.valid?
+                definition.errors[:description].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:definition) do
+                word.definitions.build(:description => "Malicious joy")
+              end
+
+              it "returns true" do
+                definition.should be_valid
+              end
+            end
+          end
+        end
+
+        context "when allowing nil" do
+
+          before do
+            Definition.validates_uniqueness_of :description, :allow_nil => true
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is nil" do
+
+            before do
+              word.definitions.build
+            end
+
+            let(:definition) do
+              word.definitions.build
             end
 
             it "returns true" do
@@ -1358,32 +1403,24 @@ describe Mongoid::Validations::UniquenessValidator do
           end
         end
 
-        context "when the attribute is not unique" do
+        context "when allowing blank" do
 
-          context "when the document is not the match" do
+          before do
+            Definition.validates_uniqueness_of :description, :allow_blank => true
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is blank" do
 
             before do
-              word.definitions.build(:description => "Malicious joy")
+              word.definitions.build(:description => "")
             end
 
             let(:definition) do
-              word.definitions.build(:description => "Malicious JOY")
-            end
-
-            it "returns false" do
-              definition.should_not be_valid
-            end
-
-            it "adds the uniqueness error" do
-              definition.valid?
-              definition.errors[:description].should eq([ "is already taken" ])
-            end
-          end
-
-          context "when the document is the match in the database" do
-
-            let!(:definition) do
-              word.definitions.build(:description => "Malicious joy")
+              word.definitions.build(:description => "")
             end
 
             it "returns true" do
@@ -1393,56 +1430,117 @@ describe Mongoid::Validations::UniquenessValidator do
         end
       end
 
-      context "when allowing nil" do
+      context "when the document uses composite keys" do
 
-        before do
-          Definition.validates_uniqueness_of :description, :allow_nil => true
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is nil" do
+        context "when no scope is provided" do
 
           before do
-            word.definitions.build
+            WordOrigin.validates_uniqueness_of :origin_id
           end
 
-          let(:definition) do
-            word.definitions.build
+          after do
+            WordOrigin.reset_callbacks(:validate)
           end
 
-          it "returns true" do
-            definition.should be_valid
+          context "when the attribute is unique" do
+
+            before do
+              word.word_origins.build(:origin_id => 1)
+            end
+
+            let(:word_origin) do
+              word.word_origins.build(:origin_id => 2)
+            end
+
+            it "returns true" do
+              word_origin.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique" do
+
+            context "when the document is not the match" do
+
+              before do
+                word.word_origins.build(:origin_id => 1)
+              end
+
+              let(:word_origin) do
+                word.word_origins.build(:origin_id => 1)
+              end
+
+              it "returns false" do
+                word_origin.should_not be_valid
+              end
+
+              it "adds the uniqueness error" do
+                word_origin.valid?
+                word_origin.errors[:origin_id].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:word_origin) do
+                word.word_origins.build(:origin_id => 1)
+              end
+
+              it "returns true" do
+                word_origin.should be_valid
+              end
+            end
           end
         end
-      end
 
-      context "when allowing blank" do
-
-        before do
-          Definition.validates_uniqueness_of :description, :allow_blank => true
-        end
-
-        after do
-          Definition._validators.clear
-          Definition._validate_callbacks.clear
-        end
-
-        context "when the attribute is blank" do
+        context "when allowing nil" do
 
           before do
-            word.definitions.build(:description => "")
+            WordOrigin.validates_uniqueness_of :origin_id, :allow_nil => true
           end
 
-          let(:definition) do
-            word.definitions.build(:description => "")
+          after do
+            WordOrigin.reset_callbacks(:validate)
           end
 
-          it "returns true" do
-            definition.should be_valid
+          context "when the attribute is nil" do
+
+            before do
+              word.word_origins.build
+            end
+
+            let(:word_origin) do
+              word.word_origins.build
+            end
+
+            it "returns true" do
+              word_origin.should be_valid
+            end
+          end
+        end
+
+        context "when allowing blank" do
+
+          before do
+            WordOrigin.validates_uniqueness_of :origin_id, :allow_blank => true
+          end
+
+          after do
+            WordOrigin.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is blank" do
+
+            before do
+              word.word_origins.build(:origin_id => "")
+            end
+
+            let(:word_origin) do
+              word.word_origins.build(:origin_id => "")
+            end
+
+            it "returns true" do
+              word_origin.should be_valid
+            end
           end
         end
       end
@@ -1455,8 +1553,7 @@ describe Mongoid::Validations::UniquenessValidator do
       end
 
       after do
-        Pronunciation._validators.clear
-        Pronunciation._validate_callbacks.clear
+        Pronunciation.reset_callbacks(:validate)
       end
 
       let(:pronunciation) do
