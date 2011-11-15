@@ -26,4 +26,37 @@ describe Mongoid::Fields::Serializable do
       end
     end
   end
+
+  context "when subclassing a serializable field" do
+
+    let(:thumbnail) do
+      Thumbnail.new("test")
+    end
+
+    it "inherits the parents deserialize method" do
+      thumbnail.deserialize("testy").name.should eq("testy")
+    end
+
+    it "inherits the parents serialize method" do
+      thumbnail.serialize(thumbnail).should eq("test")
+    end
+
+    context "when instantiating the class" do
+
+      let(:movie) do
+        Movie.new(
+          :poster => Image.new("poster"),
+          :poster_thumb => Thumbnail.new("thumb")
+        )
+      end
+
+      it "deserializes the parent type" do
+        movie.poster.name.should eq("poster")
+      end
+
+      it "deserializes the child type" do
+        movie.poster_thumb.name.should eq("thumb")
+      end
+    end
+  end
 end

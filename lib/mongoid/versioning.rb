@@ -117,9 +117,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def previous_revision
-      self.class.
-        where(:_id => id).
-        any_of({ :version => version }, { :version => nil }).first
+      _loading_revision do
+        self.class.
+          where(:_id => id).
+          any_of({ :version => version }, { :version => nil }).first
+      end
     end
 
     # Is the document able to be revised? This is true if the document has

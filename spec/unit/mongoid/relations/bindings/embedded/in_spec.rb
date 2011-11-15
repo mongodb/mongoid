@@ -22,6 +22,10 @@ describe Mongoid::Relations::Bindings::Embedded::In do
     Address.relations["addressable"]
   end
 
+  let(:person_metadata) do
+    Person.relations["addresses"]
+  end
+
   describe "#bind" do
 
     context "when the child of an embeds one" do
@@ -66,16 +70,31 @@ describe Mongoid::Relations::Bindings::Embedded::In do
 
       context "when the document is bindable" do
 
-        before do
-          binding.bind
+        context "when the base has no metadata" do
+
+          before do
+            binding.bind
+          end
+
+          it "parentizes the documents" do
+            address._parent.should == person
+          end
+
+          it "sets the inverse relation" do
+            person.addresses.should include(address)
+          end
         end
 
-        it "parentizes the documents" do
-          address._parent.should == person
-        end
+        context "when the base has metadata" do
 
-        it "sets the inverse relation" do
-          person.addresses.should include(address)
+          before do
+            address.metadata = person_metadata
+          end
+
+          it "does not overwrite the existing metadata" do
+            address.expects(:metadata=).never
+            binding.bind
+          end
         end
       end
 

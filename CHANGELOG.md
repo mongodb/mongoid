@@ -16,6 +16,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1418 Documents being loaded from the database for revision purposes
+  no longer get placed in the identity map.
+
 * \#1399 Allow conversion of strings to integers in foreign keys where the
   id is defined as an int.
 
@@ -25,6 +28,18 @@ For instructions on upgrading to newer versions, visit
 * \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
 
 * \#1392 Return 0 on aggregation functions where field is nonexistant.
+
+* \#1391 Uniqueness validation now works properly on embedded documents that are
+  using primary key definitions.
+
+* \#1390 When _type field is lower case class camelize before constantizing.
+
+* \#1383 Fix cast on read for serializable fields that are subclassed.
+
+* \#1301 Don't overwrite base metadata on embedded in relations if already set.
+
+* \#1208 Don't auto-persist child documents via the setter when setting from
+  an embedded_in.
 
 ## 2.3.3
 

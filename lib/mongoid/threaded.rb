@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
       create_stack.push(true)
     end
 
-    # Begins a creating block.
+    # Begins a loading block.
     #
     # @example Begin the load.
     #   Threaded.begin_load
@@ -66,6 +66,18 @@ module Mongoid #:nodoc:
     # @since 2.3.2
     def begin_load
       load_stack.push(true)
+    end
+
+    # Begins a loading revision block.
+    #
+    # @example Begin the revision load.
+    #   Threaded.begin_load_revision
+    #
+    # @return [ true ] Always true.
+    #
+    # @since 2.3.4
+    def begin_load_revision
+      load_revision_stack.push(true)
     end
 
     # Begin validating a document on the current thread.
@@ -128,16 +140,28 @@ module Mongoid #:nodoc:
       !create_stack.empty?
     end
 
-    # Is the current thread in creating mode?
+    # Is the current thread in loading mode?
     #
-    # @example Is the thread in creating mode?
-    #   Threaded.creating?
+    # @example Is the thread in loading mode?
+    #   Threaded.loading?
     #
-    # @return [ true, false ] If the thread is in creating mode?
+    # @return [ true, false ] If the thread is in loading mode?
     #
     # @since 2.3.2
     def loading?
       !load_stack.empty?
+    end
+
+    # Is the current thread in revision load mode?
+    #
+    # @example Is the thread in revision load mode?
+    #   Threaded.loading_revision?
+    #
+    # @return [ true, false ] If the thread is in revision load mode?
+    #
+    # @since 2.3.4
+    def loading_revision?
+      !load_revision_stack.empty?
     end
 
     # Get the assign stack for the current thread. Is simply an array of calls
@@ -203,6 +227,19 @@ module Mongoid #:nodoc:
     # @since 2.3.2
     def load_stack
       Thread.current[:"[mongoid]:load-stack"] ||= []
+    end
+
+    # Get the revision load stack for the current thread. Is simply an array
+    # of calls to Mongoid's loading_revision method.
+    #
+    # @example Get the revision load stack.
+    #   Threaded.load_revision_stack
+    #
+    # @return [ Array ] The array of load revision calls.
+    #
+    # @since 2.3.4
+    def load_revision_stack
+      Thread.current[:"[mongoid]:load-revision-stack"] ||= []
     end
 
     # Clear out all the safety options set using the safely proxy.
@@ -286,6 +323,18 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def exit_load
       load_stack.pop
+    end
+
+    # Exit the revision loading block.
+    #
+    # @example Exit the revision loading block.
+    #   Threaded.exit_load_revision
+    #
+    # @return [ true ] The last element in the stack.
+    #
+    # @since 2.3.4
+    def exit_load_revision
+      load_revision_stack.pop
     end
 
     # Exit validating a document on the current thread.

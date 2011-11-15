@@ -6,6 +6,90 @@ describe Mongoid::Threaded do
     stub
   end
 
+  describe "#begin_load_revision" do
+
+    before do
+      described_class.begin_load_revision
+    end
+
+    after do
+      described_class.load_revision_stack.clear
+    end
+
+    it "adds a boolen to the revision load stack" do
+      described_class.load_revision_stack.should eq([ true ])
+    end
+  end
+
+  describe "#loading_revision?" do
+
+    context "when loading revision is not set" do
+
+      it "returns false" do
+        described_class.should_not be_loading_revision
+      end
+    end
+
+    context "when loading revision has elements" do
+
+      before do
+        Thread.current[:"[mongoid]:load-revision-stack"] = [ true ]
+      end
+
+      after do
+        Thread.current[:"[mongoid]:load-revision-stack"] = []
+      end
+
+      it "returns true" do
+        described_class.should be_loading_revision
+      end
+    end
+
+    context "when loading revision has no elements" do
+
+      before do
+        Thread.current[:"[mongoid]:load-revision-stack"] = []
+      end
+
+      it "returns false" do
+        described_class.should_not be_loading_revision
+      end
+    end
+  end
+
+  describe "#load_revision_stack" do
+
+    context "when no load revision stack has been initialized" do
+
+      let(:loading) do
+        described_class.load_revision_stack
+      end
+
+      it "returns an empty stack" do
+        loading.should eq([])
+      end
+    end
+
+    context "when a load revision stack has been initialized" do
+
+      before do
+        Thread.current[:"[mongoid]:load-revision-stack"] = [ true ]
+      end
+
+      let(:loading) do
+        described_class.load_revision_stack
+      end
+
+      after do
+        Thread.current[:"[mongoid]:load-revision-stack"] = []
+      end
+
+      it "returns the stack" do
+        loading.should eq([ true ])
+      end
+    end
+  end
+
   describe "#begin_load" do
 
     before do
@@ -467,6 +551,22 @@ describe Mongoid::Threaded do
 
     it "adds a boolen to the load stack" do
       described_class.load_stack.should be_empty
+    end
+  end
+
+  describe "#exit_load_revision" do
+
+    before do
+      described_class.begin_load_revision
+      described_class.exit_load_revision
+    end
+
+    after do
+      described_class.load_revision_stack.clear
+    end
+
+    it "adds a boolen to the load revision stack" do
+      described_class.load_revision_stack.should be_empty
     end
   end
 

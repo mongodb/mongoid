@@ -45,11 +45,17 @@ module Mongoid #:nodoc:
           return if skip_validation?(document)
           relation = document._parent.send(document.metadata.name)
           criteria = relation.where(criterion(document, attribute, value))
+          criteria = scope(criteria, document, attribute)
+          if document.primary_key == Array.wrap(attribute)
+            document.errors.add(attribute, :taken) if criteria.count > 1
+          else
+            document.errors.add(attribute, :taken) if criteria.exists?
+          end
         else
           criteria = klass.where(criterion(document, attribute, value))
+          criteria = scope(criteria, document, attribute)
+          document.errors.add(attribute, :taken) if criteria.exists?
         end
-        criteria = scope(criteria, document, attribute)
-        document.errors.add(attribute, :taken) if criteria.exists?
       end
 
       protected
@@ -80,7 +86,8 @@ module Mongoid #:nodoc:
       # @since 2.3.0
       def criterion(document, attribute, value)
         { attribute => filter(value) }.tap do |selector|
-          if document.persisted? || document.embedded?
+          if document.persisted? ||
+            (document.embedded? && (document.primary_key != Array.wrap(attribute)))
             selector.merge!(:_id => { "$ne" => document.id })
           end
         end
