@@ -30,6 +30,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1383 Fix cast on read for serializable fields that are subclassed.
 
+* \#1301 Don't overwrite base metadata on embedded in relations if already set.
+
 ## 2.3.3
 
 ### Resolved Issues

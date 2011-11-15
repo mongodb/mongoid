@@ -24,7 +24,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind
-            base.metadata = metadata.inverse_metadata(target)
+            base.metadata = metadata.inverse_metadata(target) unless base.metadata
             base.parentize(target)
             unless _binding?
               _binding do
