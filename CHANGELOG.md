@@ -32,6 +32,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1301 Don't overwrite base metadata on embedded in relations if already set.
 
+* \#1208 Don't auto-persist child documents via the setter when setting from
+  an embedded_in.
+
 ## 2.3.3
 
 ### Resolved Issues

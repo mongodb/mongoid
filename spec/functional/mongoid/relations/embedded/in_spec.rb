@@ -67,8 +67,8 @@ describe Mongoid::Relations::Embedded::In do
           person.name.should eql(name)
         end
 
-        it "saves the base" do
-          name.should be_persisted
+        it "does not save the base" do
+          name.should_not be_persisted
         end
       end
     end

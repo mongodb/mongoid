@@ -22,7 +22,6 @@ module Mongoid # :nodoc:
           init(base, target, metadata) do
             characterize_one(target)
             bind_one
-            base.save if persistable?
           end
         end
 
