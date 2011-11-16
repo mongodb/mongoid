@@ -10,13 +10,15 @@ module Mongoid #:nodoc:
     # @example Reload the document.
     #   person.reload
     #
+    # @param [ Boolean ] scoped Will take field selections from default scopes into account (default true)
+    #
     # @raise [ Errors::DocumentNotFound ] If the document was deleted.
     #
     # @return [ Document ] The document, reloaded.
     #
     # @since 1.0.0
-    def reload
-      _reload.tap do |reloaded|
+    def reload(scoped = true)
+      _reload(scoped).tap do |reloaded|
         if Mongoid.raise_not_found_error && reloaded.empty?
           raise Errors::DocumentNotFound.new(self.class, id)
         end
@@ -30,6 +32,19 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Reloads the +Document+ attributes from the database. Alias for reload(false).
+    # Will not take field selections from default scopes into account, but load all fields.
+    #
+    # @example Reload the document with all fields.
+    #   person.reload_unscoped
+    #
+    # @return [ Document ] The document, reloaded.
+    #
+    # @since 2.?.?
+    def reload_unscoped
+      reload(false)
+    end
+
     private
 
     # Reload the document, determining if it's embedded or not and what
@@ -41,8 +56,8 @@ module Mongoid #:nodoc:
     # @return [ Hash ] The reloaded attributes.
     #
     # @since 2.3.2
-    def _reload
-      embedded? ? reload_embedded_document : reload_root_document
+    def _reload(scoped = true)
+      embedded? ? reload_embedded_document : reload_root_document(scoped)
     end
 
     # Reload the root document.
@@ -53,11 +68,11 @@ module Mongoid #:nodoc:
     # @return [ Hash ] The reloaded attributes.
     #
     # @since 2.3.2
-    def reload_root_document
-      {}.merge(collection.find_one({:_id => id}, default_scoped_fields) || {})
+    def reload_root_document(scoped = true)
+      {}.merge(collection.find_one({:_id => id}, scoped ? default_scoped_fields : {}) || {})
     end
 
-    def default_scoped_fields
+    def default_scoped_fields #:nodoc:
       (self.class.default_scoping || {}).select{|key, _| key == :fields }
     end
 
