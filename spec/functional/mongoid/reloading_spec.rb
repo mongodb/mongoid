@@ -136,6 +136,13 @@ describe Mongoid::Reloading do
             person_ds.reload.addresses.should  == []
           end
 
+          it "reloads all fields when called via reload_unscoped" do
+            person_ds = PersonDs.create
+            person_ds.addresses.create(:street => "Main St", :number => 1)
+
+            person_ds.reload_unscoped.addresses.should_not == []
+          end
+
         end
 
         context "when the relation is an embeds one" do
