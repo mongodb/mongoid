@@ -39,7 +39,7 @@ describe Mongoid::Criteria do
     end
 
     let(:cursor) do
-      Person.where(:title => "Sir").asc(:ssn).each
+      Person.where(:title => "Sir").asc(:ssn).cursor
     end
 
     it "emits the next document on .next" do
