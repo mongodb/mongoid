@@ -10,6 +10,31 @@ describe Mongoid::IdentityMap do
     Mongoid.identity_map_enabled = false
   end
 
+  context "prove that eager loading is beeing used" do
+
+    let(:person)  { Person.create(:title => 'Mr.', :ssn => '1') }
+    let(:post)    { person.posts.create(:title => 'A Post') }
+    let(:account) { person.user_accounts.create(:email => 'e@mail.com') }
+
+      it "should call set_many with .to_a.first (many)" do
+        Mongoid::Relations::Referenced::Many.expects(:eager_load)
+        Person.includes(:posts).to_a.first
+      end
+
+      it "should call set_many with .first (many)" do
+        Mongoid::Relations::Referenced::Many.expects(:eager_load)
+        Person.includes(:posts).first
+      end
+
+      it "should call set_many with .find() (many)" do
+        pid = person.id
+        Mongoid::IdentityMap.clear
+        Mongoid::Relations::Referenced::Many.expects(:eager_load)
+        Person.includes(:posts).find(pid)
+      end
+
+  end
+
   context "ensure object identity with eager loading (many)" do
 
     let(:person_0) { Person.create(:title => 'Mr.', :ssn => '1') }
@@ -106,34 +131,5 @@ describe Mongoid::IdentityMap do
     end
 
   end
-
-  # FIXME the mocha expectations are not cleared after this
-  #       context (why?), so these specs are NOT independent.
-  #       Even ...::Many.unstub(:eager_load) doesn't help.
-
-  # context "prove that eager loading is beeing used" do
-
-  #   let(:person)  { Person.create(:title => 'Mr.', :ssn => '1') }
-  #   let(:post)    { person.posts.create(:title => 'A Post') }
-  #   let(:account) { person.user_accounts.create(:email => 'e@mail.com') }
-
-  #     it "should call set_many with .to_a.first (many)" do
-  #       Mongoid::Relations::Referenced::Many.expects(:eager_load)
-  #       Person.includes(:posts).to_a.first
-  #     end
-
-  #     it "should call set_many with .first (many)" do
-  #       Mongoid::Relations::Referenced::Many.expects(:eager_load)
-  #       Person.includes(:posts).first
-  #     end
-
-  #     it "should call set_many with .find() (many)" do
-  #       pid = person.id
-  #       Mongoid::IdentityMap.clear
-  #       Mongoid::Relations::Referenced::Many.expects(:eager_load)
-  #       Person.includes(:posts).find(pid)
-  #     end
-
-  # end
 
 end
