@@ -346,8 +346,8 @@ describe Mongoid::IdentityMap do
         identity_map[Post][{ :person_id => person.id }]
       end
 
-      it "puts the documents in the map" do
-        documents.should eq([ post_one, post_two ])
+      it "puts the document ids in the map" do
+        documents.should eq([ post_one.id, post_two.id ])
       end
     end
   end
@@ -368,8 +368,12 @@ describe Mongoid::IdentityMap do
         identity_map.set_one(post_one, { :person_id => person.id })
       end
 
-      let(:document) do
+      let(:doc_id) do
         identity_map[Post][{ :person_id => person.id }]
+      end
+
+      let(:document) do
+        identity_map[Post][doc_id]
       end
 
       it "puts the documents in the map" do
