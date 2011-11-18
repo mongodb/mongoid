@@ -5,22 +5,21 @@ id:
         taken:
           telah digunakan
         callbacks:
-          "Calling %{method} on %{klass} resulted in a false return from a callback."
+          "Memanggil %{method} dalam %{klass} me-return false return dari salah satu callback."
         document_not_found:
           Dokumen tidak ditemukan untuk kelas %{klass} dengan id %{identifiers}.
         eager_load:
-          "Eager loading :%{name} is not supported due to it being a many-to-many
-          or polymorphic belongs_to relation."
+          "Eager loading : %{name} is tidak di-support karena merupakan relasi many-to-many
+          atau polymorphic belongs_to."
         invalid_time:
-          "'%{value}' is not a valid Time."
+          "'%{value}' bukan merupakan Time yang valid."
         invalid_database:
           Database harus Mongo::DB, bukan %{name}.
         invalid_type:
           Field didefinisikan sebagai %{klass}, tetapi menerima %{other} dengan
           value %{value}.
         invalid_options:
-          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
-          are: %{valid}."
+          "Opsi invalid : %{invalid} untuk relasi : %{name}. Opsi yang valid adalah : %{valid}."
         unsupported_version:
           MongoDB %{version} tidak di support, silakan upgrade
           ke %{mongo_version}.
