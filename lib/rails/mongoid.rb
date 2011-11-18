@@ -16,13 +16,15 @@ module Rails #:nodoc:
     # @since 2.1.0
     def create_indexes(pattern)
       Dir.glob(pattern).each do |file|
+        logger = Logger.new($stdout)
         begin
           model = determine_model(file)
           if model
             model.create_indexes
-            Logger.new($stdout).info("Generated indexes for #{model}")
+            logger.info("Generated indexes for #{model}")
           end
         rescue => e
+          logger.error("ERROR: #{e.message}")
         end
       end
     end
