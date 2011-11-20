@@ -36,6 +36,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1301 Don't overwrite base metadata on embedded in relations if already set.
 
+* \#1221 HABTM with inverse nil is allowed again on embedded documents.
+
 * \#1208 Don't auto-persist child documents via the setter when setting from
   an embedded_in.
 
