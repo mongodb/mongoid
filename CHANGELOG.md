@@ -34,6 +34,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1383 Fix cast on read for serializable fields that are subclassed.
 
+* \#1326 Ensure base document on HABTM gets its keys saved after saving a newly
+  build child document.
+
 * \#1301 Don't overwrite base metadata on embedded in relations if already set.
 
 * \#1221 HABTM with inverse nil is allowed again on embedded documents.
