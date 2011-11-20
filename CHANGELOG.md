@@ -39,6 +39,9 @@ For instructions on upgrading to newer versions, visit
 * \#1208 Don't auto-persist child documents via the setter when setting from
   an embedded_in.
 
+* \#791 Root document updates its timestamps when only embedded documents have
+  changed.
+
 ## 2.3.3
 
 ### Resolved Issues
