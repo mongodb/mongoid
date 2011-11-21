@@ -143,6 +143,63 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#any?" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1234")
+    end
+
+    let!(:post_one) do
+      Post.create(:person_id => person.id)
+    end
+
+    let!(:post_two) do
+      Post.create(:person_id => person.id)
+    end
+
+    context "when only a criteria target exists" do
+
+      let(:criteria) do
+        Post.where(:person_id => person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:any) do
+        enumerable.any?
+      end
+
+      it "returns true" do
+        any.should be_true
+      end
+
+      it "retains the correct length" do
+        enumerable.length.should eq(2)
+      end
+
+      it "retains the correct length when calling to_a" do
+        enumerable.to_a.length.should eq(2)
+      end
+
+      context "when iterating over the relation a second time" do
+
+        before do
+          enumerable.each { |post| post }
+        end
+
+        it "retains the correct length" do
+          enumerable.length.should eq(2)
+        end
+
+        it "retains the correct length when calling to_a" do
+          enumerable.to_a.length.should eq(2)
+        end
+      end
+    end
+  end
+
   describe "#clear" do
 
     let(:person) do
@@ -1169,6 +1226,10 @@ describe Mongoid::Relations::Targets::Enumerable do
 
       it "returns the loaded size plus added size" do
         size.should eq(2)
+      end
+
+      it "matches the size of the loaded enumerable" do
+        size.should eq(enumerable.to_a.size)
       end
     end
 

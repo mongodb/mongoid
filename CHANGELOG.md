@@ -16,6 +16,10 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1431 Enumerable context should add to the loaded array post yield, so
+  that methods like #any? that short circuit based on the value of the block
+  dont falsely have extra documents.
+
 * \#1418 Documents being loaded from the database for revision purposes
   no longer get placed in the identity map.
 
@@ -36,10 +40,18 @@ For instructions on upgrading to newer versions, visit
 
 * \#1383 Fix cast on read for serializable fields that are subclassed.
 
+* \#1326 Ensure base document on HABTM gets its keys saved after saving a newly
+  build child document.
+
 * \#1301 Don't overwrite base metadata on embedded in relations if already set.
+
+* \#1221 HABTM with inverse nil is allowed again on embedded documents.
 
 * \#1208 Don't auto-persist child documents via the setter when setting from
   an embedded_in.
+
+* \#791 Root document updates its timestamps when only embedded documents have
+  changed.
 
 ## 2.3.3
 
