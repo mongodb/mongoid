@@ -10,6 +10,12 @@ describe Mongoid::IdentityMap do
     Mongoid.identity_map_enabled = false
   end
 
+  before do
+    Post.delete_all
+    Person.delete_all
+    UserAccount.delete_all
+  end
+
   context "prove that eager loading is beeing used" do
 
     let(:person)  { Person.create(:title => 'Mr.', :ssn => '1') }
@@ -104,11 +110,6 @@ describe Mongoid::IdentityMap do
     let(:account_0) { person_0.user_accounts.create }
     let(:account_1) { person_1.user_accounts.first }
     let(:account_2) { UserAccount.find(account_0.id) }
-
-    before do
-      Person.delete_all
-      UserAccount.delete_all
-    end
 
     it "should return the same object for create- and find-results" do
       person_0.should == person_1
