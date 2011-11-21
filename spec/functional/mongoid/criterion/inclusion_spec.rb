@@ -379,11 +379,11 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "inserts the first document into the identity map" do
-        Mongoid::IdentityMap[Post][post_one.id].should eq(post_one)
+        Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
       end
 
       it "inserts the second document into the identity map" do
-        Mongoid::IdentityMap[Post][post_two.id].should eq(post_two)
+        Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
       end
     end
 
@@ -410,11 +410,11 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "inserts the first document into the identity map" do
-        Mongoid::IdentityMap[Game][game_one.id].should eq(game_one)
+        Mongoid::IdentityMap[Game.collection_name][game_one.id].should eq(game_one)
       end
 
       it "inserts the second document into the identity map" do
-        Mongoid::IdentityMap[Game][game_two.id].should eq(game_two)
+        Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
       end
     end
 
@@ -445,11 +445,11 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "inserts the first document into the identity map" do
-        Mongoid::IdentityMap[Person][person.id].should eq(person)
+        Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
       end
 
       it "inserts the second document into the identity map" do
-        Mongoid::IdentityMap[Person][person_two.id].should eq(person_two)
+        Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
       end
     end
 
@@ -484,19 +484,19 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "inserts the first has many document into the identity map" do
-        Mongoid::IdentityMap[Post][post_one.id].should eq(post_one)
+        Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
       end
 
       it "inserts the second has many document into the identity map" do
-        Mongoid::IdentityMap[Post][post_two.id].should eq(post_two)
+        Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
       end
 
       it "inserts the first has one document into the identity map" do
-        Mongoid::IdentityMap[Game][game_one.id].should eq(game_one)
+        Mongoid::IdentityMap[Game.collection_name][game_one.id].should eq(game_one)
       end
 
       it "inserts the second has one document into the identity map" do
-        Mongoid::IdentityMap[Game][game_two.id].should eq(game_two)
+        Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
       end
     end
   end
