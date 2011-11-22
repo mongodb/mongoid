@@ -420,12 +420,28 @@ describe Mongoid::IdentityMap do
         identity_map.set_many(post_two, { :person_id => person.id })
       end
 
-      let(:documents) do
+      let(:document_ids) do
         identity_map[Post.collection_name][{ :person_id => person.id }]
       end
 
+      let(:doc_one) do
+        identity_map[Post.collection_name][post_one.id]
+      end
+
+      let(:doc_two) do
+        identity_map[Post.collection_name][post_two.id]
+      end
+
       it "puts the document ids in the map" do
-        documents.should eq([ post_one.id, post_two.id ])
+        document_ids.should eq([ post_one.id, post_two.id ])
+      end
+
+      it "puts doc_one in the map" do
+        doc_one.should eq(post_one)
+      end
+
+      it "puts doc_two in the map" do
+        doc_two.should eq(post_two)
       end
     end
   end
