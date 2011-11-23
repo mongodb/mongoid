@@ -34,6 +34,8 @@ describe Mongoid::Dirty do
     end
 
     before do
+      @time_now = Time.now
+      Time.stubs(:now).returns(@time_now)
       person.update_attributes(:preference_ids => [ preference.id ])
     end
 
