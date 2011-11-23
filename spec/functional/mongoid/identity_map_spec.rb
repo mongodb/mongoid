@@ -133,21 +133,36 @@ describe Mongoid::IdentityMap do
 
   end
 
-  context "ensure object identity for inverse relational proxies" do
+  context "ensure object identity for inverse relational proxies (many)" do
 
     let!(:person) { Person.create(:title => 'Mr.', :ssn => '1') }
     let!(:post)   { person.posts.create(:title => 'A Post') }
 
     it "should return an identical object as parent" do
       Person.first.should == Post.first.person
-      person.should       == Post.first.person
       Person.first.should == person
     end
 
     it "should return the same ruby object as parent" do
       Person.first.object_id.should == Post.first.person.object_id
-      person.object_id.should       == Post.first.person.object_id
       Person.first.object_id.should == person.object_id
+    end
+
+  end
+
+  context "ensure object identity for inverse relational proxies (many2many)" do
+
+    let!(:person)  { Person.create(:title => 'Mr.', :ssn => '1') }
+    let!(:account) { person.user_accounts.create }
+
+    it "should return an identical object as related object" do
+      UserAccount.first.should == Person.first.user_accounts.first
+      UserAccount.first.should == account
+    end
+
+    it "should return the same ruby object as related object" do
+      UserAccount.first.object_id.should == Person.first.user_accounts.first.object_id
+      UserAccount.first.object_id.should == account.object_id
     end
 
   end
