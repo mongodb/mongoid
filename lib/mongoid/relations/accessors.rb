@@ -71,7 +71,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def set_relation(name, relation)
-        reset_id_mapping_for(relation)
+        relation = reset_id_mapping_for(relation)
         instance_variable_set("@#{name}", relation)
       end
 
@@ -82,10 +82,11 @@ module Mongoid # :nodoc:
       #
       # @since 2.?.?
       def reset_id_mapping_for(relation)
-        if relation && !relation.is_a?(Array)
-          IdentityMap.remove(relation)
-          IdentityMap.set(relation)
+        if Mongoid.identity_map_enabled && relation && !relation.is_a?(Array)
+          IdentityMap.set(relation) unless IdentityMap.get(relation.class, relation.id)
+          relation = IdentityMap.get(relation.class, relation.id)
         end
+        relation
       end
 
       module ClassMethods #:nodoc:
@@ -139,7 +140,10 @@ module Mongoid # :nodoc:
             define_method("#{name}=") do |object|
               if relation_exists?(name) || metadata.many? ||
                 (object.blank? && send(name))
-                set_relation(name, send(name).substitute(object.substitutable))
+                set_relation(name, send(name).respond_to?(:substitute) ?
+                                     send(name).substitute(object.substitutable) :
+                                     send(name)
+                )
               else
                 build(name, object.substitutable, metadata)
               end
