@@ -71,7 +71,21 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def set_relation(name, relation)
+        reset_id_mapping_for(relation)
         instance_variable_set("@#{name}", relation)
+      end
+
+      # Reset the id mapping for the given relation.
+      # Helper for #set_relation.
+      #
+      # @param [ Proxy ] relation The relation to store with the map
+      #
+      # @since 2.?.?
+      def reset_id_mapping_for(relation)
+        if relation && !relation.is_a?(Array)
+          IdentityMap.remove(relation)
+          IdentityMap.set(relation)
+        end
       end
 
       module ClassMethods #:nodoc:

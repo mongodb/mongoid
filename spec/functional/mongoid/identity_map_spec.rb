@@ -16,6 +16,26 @@ describe Mongoid::IdentityMap do
     UserAccount.delete_all
   end
 
+  context "ensure object identity for inverse relational proxies" do
+
+    let!(:person) { Person.create(:title => 'Mr.', :ssn => '1') }
+    let!(:post)   { person.posts.create(:title => 'A Post') }
+
+    it "should return an identical object as parent" do
+      Person.first.should == Post.first.person
+    end
+
+    it "should return the same ruby object as parent" do
+      Person.first.object_id.should == Post.first.person.object_id
+    end
+
+    it "debugs" do
+      Post.first.person.object_id
+    end
+
+
+  end
+
   context "prove that eager loading is beeing used" do
 
     let(:person)  { Person.create(:title => 'Mr.', :ssn => '1') }
