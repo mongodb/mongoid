@@ -53,8 +53,26 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def set(document)
       return nil unless Mongoid.identity_map_enabled? && document && document.id
-      return if documents_for(document.class)[document.id]
+      if (old_doc = documents_for(document.class)[document.id])
+        log_reset_warning(old_doc, document)
+      end
       documents_for(document.class)[document.id] = document
+    end
+
+    # Logs a warning if an instance is set where it already existed.
+    #
+    # @example Log a warning.
+    #   identity_map.log_reset_warning(old_doc, new_doc)
+    #
+    # @param [ Document ] document The old document.
+    # @param [ Document ] document The new document.
+    #
+    # @since 2.?.?
+    def log_reset_warning(old_doc, document)
+      return unless Mongoid.logger
+      warning = "MONGOID The #{document.class.name} instance #{old_doc.id} has been reset in the IdentityMap. " +
+                "Object_id was: #{old_doc.object_id}, is now: #{document.object_id}."
+      Mongoid.logger.warn(warning)
     end
 
     # Set a document in the identity map for the provided selector.
