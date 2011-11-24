@@ -55,6 +55,7 @@ module Mongoid #:nodoc:
       return nil unless Mongoid.identity_map_enabled? && document && document.id
       if (old_doc = documents_for(document.class)[document.id])
         log_reset_warning(old_doc, document)
+        return old_doc
       end
       documents_for(document.class)[document.id] = document
     end
@@ -70,8 +71,8 @@ module Mongoid #:nodoc:
     # @since 2.?.?
     def log_reset_warning(old_doc, document)
       return unless Mongoid.logger
-      warning = "MONGOID The #{document.class.name} instance #{old_doc.id} has been reset in the IdentityMap. " +
-                "Object_id was: #{old_doc.object_id}, is now: #{document.object_id}."
+      warning = "MONGOID An attempt to reset the #{old_doc.class.name} instance #{old_doc.id} in the IdentityMap has been canceled. " +
+                "Object_id new: #{document.object_id}, old: #{old_doc.object_id}."
       Mongoid.logger.warn(warning)
     end
 
