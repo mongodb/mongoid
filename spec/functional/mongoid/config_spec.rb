@@ -162,6 +162,10 @@ describe Mongoid::Config do
 
   describe ".load!" do
 
+    before(:all) do
+      Object.send(:remove_const, :Rails) if defined?(Rails)
+    end
+
     before do
       ENV["RACK_ENV"] = "test"
       described_class.load!(standard_config)
