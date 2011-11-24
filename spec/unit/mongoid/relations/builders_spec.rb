@@ -66,13 +66,21 @@ describe Mongoid::Relations::Builders do
 
   describe ".creator" do
 
+    let(:metadata) do
+      Mongoid::Relations::Metadata.new(
+        :name => :name,
+        :relation => relation,
+        :inverse_class_name => "Person"
+      )
+    end
+
     let(:document) do
       klass.new
     end
 
     before do
       document.instance_variable_set(:@attributes, {})
-      klass.creator("name")
+      klass.creator("name", metadata)
     end
 
     it "defines a create_* method" do
@@ -80,7 +88,7 @@ describe Mongoid::Relations::Builders do
     end
 
     it "returns self" do
-      klass.creator("name").should == klass
+      klass.creator("name", metadata).should == klass
     end
 
     context "defined methods" do

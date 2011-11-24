@@ -16,6 +16,12 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1445 Prevent duplicate documents in the loaded array on the target
+  enumerable for relational associations.
+
+* \#1442 When using create_ methods for has one relations, the appropriate
+  destructive methods now get called when replacing an existing document.
+
 * \#1431 Enumerable context should add to the loaded array post yield, so
   that methods like #any? that short circuit based on the value of the block
   dont falsely have extra documents.
@@ -39,6 +45,9 @@ For instructions on upgrading to newer versions, visit
 * \#1390 When _type field is lower case class camelize before constantizing.
 
 * \#1383 Fix cast on read for serializable fields that are subclassed.
+
+* \#1357 Delayed atomic sets from update_attributes on embedded documents
+  multiple levels deep now properly persist.
 
 * \#1326 Ensure base document on HABTM gets its keys saved after saving a newly
   build child document.

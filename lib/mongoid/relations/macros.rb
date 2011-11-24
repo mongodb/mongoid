@@ -103,7 +103,7 @@ module Mongoid # :nodoc:
         def embeds_one(name, options = {}, &block)
           characterize(name, Embedded::One, options, &block).tap do |meta|
             relate(name, meta)
-            builder(name, meta).creator(name)
+            builder(name, meta).creator(name, meta)
             validates_relation(meta)
           end
         end
@@ -219,7 +219,7 @@ module Mongoid # :nodoc:
           characterize(name, Referenced::One, options, &block).tap do |meta|
             relate(name, meta)
             reference(meta)
-            builder(name, meta).creator(name).autosave(meta)
+            builder(name, meta).creator(name, meta).autosave(meta)
             validates_relation(meta)
           end
         end
