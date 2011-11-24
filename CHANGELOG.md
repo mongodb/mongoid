@@ -14,7 +14,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
-## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
+## 2.3.4
 
 * \#1445 Prevent duplicate documents in the loaded array on the target
   enumerable for relational associations.
