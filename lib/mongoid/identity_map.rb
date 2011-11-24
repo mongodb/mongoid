@@ -53,13 +53,8 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def set(document)
       return nil unless Mongoid.identity_map_enabled? && document && document.id
-
-      if (mapped_doc = documents_for(document.class)[document.id])
-        document = mapped_doc
-      else
-      documents_for(document.class)[document.id] = document
-    end
-    end
+        documents_for(document.class)[document.id] = document
+      end
 
     # Set a document in the identity map for the provided selector.
     #
