@@ -152,7 +152,7 @@ module Mongoid #:nodoc:
           else
             unloaded.each do |doc|
               yield(doc)
-              loaded.push(added.delete_one(doc) || doc)
+              loaded.push(added.delete_one(doc) || loaded.delete_one(doc) || doc)
             end
           end
           added.each do |doc|

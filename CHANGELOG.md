@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
 
+* \#1445 Prevent duplicate documents in the loaded array on the target
+  enumerable for relational associations.
+
 * \#1431 Enumerable context should add to the loaded array post yield, so
   that methods like #any? that short circuit based on the value of the block
   dont falsely have extra documents.
