@@ -40,6 +40,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1383 Fix cast on read for serializable fields that are subclassed.
 
+* \#1357 Delayed atomic sets from update_attributes on embedded documents
+  multiple levels deep now properly persist.
+
 * \#1326 Ensure base document on HABTM gets its keys saved after saving a newly
   build child document.
 
