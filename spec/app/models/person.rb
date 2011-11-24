@@ -102,6 +102,7 @@ class Person
 
   has_many :drugs, :autosave => true, :validate => false
   has_one :account, :autosave => true, :validate => false
+  has_one :cat, :dependent => :nullify
 
   has_and_belongs_to_many \
     :administrated_events,

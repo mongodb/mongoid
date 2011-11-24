@@ -170,6 +170,306 @@ describe Mongoid::Relations::Referenced::One do
         end
       end
 
+      context "when replacing an existing persisted (dependent: :destroy) relation" do
+
+        let!(:person) do
+          Person.create(:ssn => "122-11-1111")
+        end
+
+        let!(:game) do
+          person.create_game(:name => "Starcraft")
+        end
+
+        context "with a new one created via the parent" do
+
+          let!(:new_game) do
+            person.create_game(:name => "Starcraft 2")
+          end
+
+          it "sets the new relation on the parent" do
+            person.game.should eq(new_game)
+          end
+
+          it "removes the old foreign key reference" do
+            game.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            game.person.should be_nil
+          end
+
+          it "destroys the old child" do
+            game.should be_destroyed
+          end
+
+          it "leaves the old child unpersisted" do
+            game.persisted?.should be_false
+          end
+
+          it "leaves the new child persisted" do
+            new_game.persisted?.should be_true
+          end
+
+        end
+
+        context "with a new one built via the parent" do
+
+          let!(:new_game) do
+            person.build_game(:name => "Starcraft 2")
+          end
+
+          it "sets the new relation on the parent" do
+            person.game.should eq(new_game)
+          end
+
+          it "removes the old foreign key reference" do
+            game.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            game.person.should be_nil
+          end
+
+          it "does not destroy the old child" do
+            game.should_not be_destroyed
+          end
+
+          it "leaves the old child persisted" do
+            game.persisted?.should be_true
+          end
+
+          it "leaves the new child unpersisted" do
+            new_game.persisted?.should be_false
+          end
+
+        end
+      end
+
+      context "when replacing an existing unpersisted (dependent: :destroy) relation" do
+
+        let!(:person) do
+          Person.create(:ssn => "122-11-1111")
+        end
+
+        let!(:game) do
+          person.build_game(:name => "Starcraft")
+        end
+
+        context "with a new one created via the parent" do
+
+          let!(:new_game) do
+            person.create_game(:name => "Starcraft 2")
+          end
+
+          it "sets the new relation on the parent" do
+            person.game.should eq(new_game)
+          end
+
+          it "removes the old foreign key reference" do
+            game.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            game.person.should be_nil
+          end
+
+          it "destroys the old child" do
+            game.should be_destroyed
+          end
+
+          it "leaves the old child unpersisted" do
+            game.persisted?.should be_false
+          end
+
+          it "leaves the new child persisted" do
+            new_game.persisted?.should be_true
+          end
+
+        end
+
+        context "with a new one built via the parent" do
+
+          let!(:new_game) do
+            person.build_game(:name => "Starcraft 2")
+          end
+
+          it "sets the new relation on the parent" do
+            person.game.should eq(new_game)
+          end
+
+          it "removes the old foreign key reference" do
+            game.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            game.person.should be_nil
+          end
+
+          it "does not destroy the old child" do
+            game.should_not be_destroyed
+          end
+
+          it "leaves the old child unpersisted" do
+            game.persisted?.should be_false
+          end
+
+          it "leaves the new child unpersisted" do
+            new_game.persisted?.should be_false
+          end
+
+        end
+      end
+
+      context "when replacing an existing persisted (dependent: :nullify) relation" do
+
+        let!(:person) do
+          Person.create(:ssn => "122-11-1111")
+        end
+
+        let!(:cat) do
+          person.create_cat(:name => "Cuddles")
+        end
+
+        context "with a new one created via the parent" do
+
+          let!(:new_cat) do
+            person.create_cat(:name => "Brutus")
+          end
+
+          it "sets the new relation on the parent" do
+            person.cat.should eq(new_cat)
+          end
+
+          it "removes the old foreign key reference" do
+            cat.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            cat.person.should be_nil
+          end
+
+          it "does not destroy the old child" do
+            cat.should_not be_destroyed
+          end
+
+          it "leaves the old child persisted" do
+            cat.persisted?.should be_true
+          end
+
+          it "leaves the new child persisted" do
+            new_cat.persisted?.should be_true
+          end
+
+        end
+
+        context "with a new one built via the parent" do
+
+          let!(:new_cat) do
+            person.build_cat(:name => "Brutus")
+          end
+
+          it "sets the new relation on the parent" do
+            person.cat.should eq(new_cat)
+          end
+
+          it "removes the old foreign key reference" do
+            cat.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            cat.person.should be_nil
+          end
+
+          it "does not destroy the old child" do
+            cat.should_not be_destroyed
+          end
+
+          it "leaves the old child persisted" do
+            cat.persisted?.should be_true
+          end
+
+          it "leaves the new child unpersisted" do
+            new_cat.persisted?.should be_false
+          end
+          
+        end
+      end
+      
+      context "when replacing an existing unpersisted (dependent: :nullify) relation" do
+
+        let!(:person) do
+          Person.create(:ssn => "122-11-1111")
+        end
+
+        let!(:cat) do
+          person.build_cat(:name => "Cuddles")
+        end
+
+        context "with a new one created via the parent" do
+
+          let!(:new_cat) do
+            person.create_cat(:name => "Brutus")
+          end
+
+          it "sets the new relation on the parent" do
+            person.cat.should eq(new_cat)
+          end
+
+          it "removes the old foreign key reference" do
+            cat.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            cat.person.should be_nil
+          end
+
+          it "does not destroy the old child" do
+            cat.should_not be_destroyed
+          end
+
+          it "leaves the old child unpersisted" do
+            cat.persisted?.should be_false
+          end
+
+          it "leaves the new child persisted" do
+            new_cat.persisted?.should be_true
+          end
+
+        end
+
+        context "with a new one built via the parent" do
+
+          let!(:new_cat) do
+            person.build_cat(:name => "Brutus")
+          end
+
+          it "sets the new relation on the parent" do
+            person.cat.should eq(new_cat)
+          end
+
+          it "removes the old foreign key reference" do
+            cat.person_id.should be_nil
+          end
+
+          it "removes the reference to the parent" do
+            cat.person.should be_nil
+          end
+
+          it "does not destroy the old child" do
+            cat.should_not be_destroyed
+          end
+
+          it "leaves the old child unpersisted" do
+            cat.persisted?.should be_false
+          end
+
+          it "leaves the new child unpersisted" do
+            new_cat.persisted?.should be_false
+          end
+          
+        end
+      end
+
       context "when replacing an existing relation with a new one" do
 
         let!(:person) do
