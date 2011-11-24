@@ -186,11 +186,11 @@ describe Mongoid::Callbacks do
             Band.create(:name => "Moderat")
           end
 
-          let!(:label) do
-            band.create_label(:name => "Mute")
-          end
-
           context "when the child is dirty" do
+
+            let!(:label) do
+              band.create_label(:name => "Mute")
+            end
 
             before do
               label.name = "Nothing"
@@ -203,6 +203,10 @@ describe Mongoid::Callbacks do
           end
 
           context "when the child is not dirty" do
+
+            let!(:label) do
+              band.build_label(:name => "Mute")
+            end
 
             before do
               band.save

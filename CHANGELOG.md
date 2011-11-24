@@ -13,6 +13,9 @@ For instructions on upgrading to newer versions, visit
 * \#1445 Prevent duplicate documents in the loaded array on the target
   enumerable for relational associations.
 
+* \#1442 When using create_ methods for has one relations, the appropriate
+  destructive methods now get called when replacing an existing document.
+
 * \#1431 Enumerable context should add to the loaded array post yield, so
   that methods like #any? that short circuit based on the value of the block
   dont falsely have extra documents.
