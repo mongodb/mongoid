@@ -34,7 +34,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def serialize(object)
-          object.nil? ? nil : { "min" => object.min, "max" => object.max }
+          object.nil? ? nil : { "min" => object.first, "max" => object.last }
         end
       end
     end
