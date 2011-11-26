@@ -14,7 +14,12 @@ For instructions on upgrading to newer versions, visit
 
 * \#1448 Localization is now used when sorting. (Hans Hasselberg)
 
+* \#1413 $not support added to criteria symbol methods. (Marc Weil)
+
 ### Resolved Issues
+
+* \#1382 Raise proper error when creating indexes via rake task if index
+  definition is incorrect. (Mathieu Ravaux)
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
