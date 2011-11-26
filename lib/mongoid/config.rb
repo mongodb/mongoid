@@ -131,6 +131,7 @@ module Mongoid #:nodoc
     # @since 2.0.1
     def load!(path)
       environment = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV["RACK_ENV"]
+      raise Errors::NoEnvironment.new if environment.nil?
       settings = YAML.load(ERB.new(File.new(path).read).result)[environment]
       if settings.present?
         from_hash(settings)
