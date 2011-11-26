@@ -35,7 +35,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ :sort => [[ :description, :desc ]] })
+        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
       end
     end
   end
@@ -69,7 +69,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ :sort => [[ :description, :desc ]] })
+        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
       end
     end
   end
