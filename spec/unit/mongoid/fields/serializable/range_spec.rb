@@ -15,8 +15,16 @@ describe Mongoid::Fields::Serializable::Range do
 
   describe "#deserialize" do
 
-    it "returns the range" do
+    it "returns a range" do
       field.deserialize({"min" => 1, "max" => 3}).should == (1..3)
+    end
+    
+    it "returns an inverse range" do
+      field.deserialize({"min" => 5, "max" => 1}).should == (5..1)
+    end
+    
+    it "returns a letter range" do
+      field.deserialize({"min" => 'a', "max" => 'z'}).should == ('a'..'z')
     end
   end
 
@@ -24,8 +32,16 @@ describe Mongoid::Fields::Serializable::Range do
 
     context "when the value is not nil" do
 
-      it "returns the object to_hash" do
+      it "returns the object hash" do
         field.serialize(1..3).should == {"min" => 1, "max" => 3}
+      end
+
+      it "returns the object hash when passed an inverse range" do
+        field.serialize(5..1).should == {"min" => 5, "max" => 1}
+      end
+
+      it "returns the object hash when passed a letter range" do
+        field.serialize('a'..'z').should == {"min" => 'a', "max" => 'z'}
       end
     end
 
