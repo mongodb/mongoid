@@ -76,6 +76,7 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
           characterize(name, Embedded::Many, options, &block).tap do |meta|
+            self.cyclic = true if options[:cyclic]
             relate(name, meta)
             validates_relation(meta)
           end
@@ -102,6 +103,7 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
           characterize(name, Embedded::One, options, &block).tap do |meta|
+            self.cyclic = true if options[:cyclic]
             relate(name, meta)
             builder(name, meta).creator(name, meta)
             validates_relation(meta)

@@ -18,6 +18,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1439 embedded? should return true when relation defined as cyclic.
+
 * \#1382 Raise proper error when creating indexes via rake task if index
   definition is incorrect. (Mathieu Ravaux)
 

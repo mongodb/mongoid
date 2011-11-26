@@ -17,6 +17,10 @@ describe Mongoid::Relations::Cyclic do
       it "creates the child relation" do
         document.should respond_to(:child_roles)
       end
+
+      it "sets cyclic to true" do
+        document.cyclic.should be_true
+      end
     end
 
     context "when the name is not inflected easily" do
@@ -31,6 +35,10 @@ describe Mongoid::Relations::Cyclic do
 
       it "creates the child relation" do
         document.should respond_to(:child_entries)
+      end
+
+      it "sets cyclic to true" do
+        document.cyclic.should be_true
       end
     end
 
@@ -47,6 +55,10 @@ describe Mongoid::Relations::Cyclic do
       it "creates the child relation" do
         document.should respond_to(:child_nodes)
       end
+
+      it "sets cyclic to true" do
+        document.cyclic.should be_true
+      end
     end
 
     context "when the classes are namespaced" do
@@ -61,6 +73,10 @@ describe Mongoid::Relations::Cyclic do
 
       it "creates the child relation" do
         document.should respond_to(:child_apples)
+      end
+
+      it "sets cyclic to true" do
+        document.cyclic.should be_true
       end
     end
   end
@@ -77,6 +93,10 @@ describe Mongoid::Relations::Cyclic do
 
     it "creates the child relation" do
       document.should respond_to(:child_shelf)
+    end
+
+    it "sets cyclic to true" do
+      document.cyclic.should be_true
     end
   end
 end
