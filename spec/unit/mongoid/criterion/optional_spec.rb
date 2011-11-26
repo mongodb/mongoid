@@ -8,6 +8,46 @@ describe Mongoid::Criterion::Optional do
 
   describe "#ascending" do
 
+    context "when a field is localized" do
+
+      let(:base) do
+        Mongoid::Criteria.new(Product)
+      end
+
+      context "when no locale is defined" do
+
+        let(:criteria) do
+          base.ascending(:description)
+        end
+
+        it "converts to dot notation with the default locale" do
+          criteria.options[:sort].should == [[:"description.en", :asc]]
+        end
+
+      end
+
+      context "when a locale is defined" do
+
+        before do
+          ::I18n.locale = :de
+        end
+
+        after do
+          ::I18n.locale = :en
+        end
+
+        let(:criteria) do
+          base.ascending(:description)
+        end
+
+        it "converts to dot notation with the default locale" do
+          criteria.options[:sort].should == [[:"description.de", :asc]]
+        end
+
+      end
+
+    end
+
     context "when providing a field" do
 
       let(:criteria) do
@@ -128,6 +168,46 @@ describe Mongoid::Criterion::Optional do
   end
 
   describe "#descending" do
+
+    context "when a field is localized" do
+
+      let(:base) do
+        Mongoid::Criteria.new(Product)
+      end
+
+      context "when no locale is defined" do
+
+        let(:criteria) do
+          base.descending(:description)
+        end
+
+        it "converts to dot notation with the default locale" do
+          criteria.options[:sort].should == [[:"description.en", :desc]]
+        end
+
+      end
+
+      context "when a locale is defined" do
+
+        before do
+          ::I18n.locale = :de
+        end
+
+        after do
+          ::I18n.locale = :en
+        end
+
+        let(:criteria) do
+          base.descending(:description)
+        end
+
+        it "converts to dot notation with the default locale" do
+          criteria.options[:sort].should == [[:"description.de", :desc]]
+        end
+
+      end
+
+    end
 
     context "when providing a field" do
 
@@ -427,6 +507,46 @@ describe Mongoid::Criterion::Optional do
   end
 
   describe "#order_by" do
+
+    context "when a field is localized" do
+
+      let(:base) do
+        Mongoid::Criteria.new(Product)
+      end
+
+      context "when no locale is defined" do
+
+        let(:criteria) do
+          base.order_by([[:description, :desc]])
+        end
+
+        it "converts to dot notation with the default locale" do
+          criteria.options[:sort].should == [[:"description.en", :desc]]
+        end
+
+      end
+
+      context "when a locale is defined" do
+
+        before do
+          ::I18n.locale = :de
+        end
+
+        after do
+          ::I18n.locale = :en
+        end
+
+        let(:criteria) do
+          base.order_by([[:description, :desc]])
+        end
+
+        it "converts to dot notation with the default locale" do
+          criteria.options[:sort].should == [[:"description.de", :desc]]
+        end
+
+      end
+
+    end
 
     context "when field names and direction specified" do
 
