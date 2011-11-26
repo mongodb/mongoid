@@ -53,3 +53,6 @@ vi:
         mixed_relations:
           Không được phép tham chiếu một văn bản %{embedded} từ văn bản %{root} thông qua một 
           quan hệ kết hợp vì %{embedded} là kiểu nhúng.
+        no_environment:
+          "Mongoid attempted to find the appropriate environment but no Rails.env,
+          Sinatra::Base.environment, or RACK_ENV could be found."

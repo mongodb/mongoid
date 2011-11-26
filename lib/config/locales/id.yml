@@ -53,3 +53,6 @@ id:
           Mereferensi sebuah %{embedded} document dari %{root} dokumen melalui
           asosiasi relasional tidak diperbolehkan karena %{embedded}
           adalah dokumen embedded.
+        no_environment:
+          "Mongoid attempted to find the appropriate environment but no Rails.env,
+          Sinatra::Base.environment, or RACK_ENV could be found."

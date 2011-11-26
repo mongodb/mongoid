@@ -55,3 +55,6 @@ hu:
         mixed_relations:
           Referencing a(n) %{embedded} document from the %{root} document via a
           relational association is not allowed since the %{embedded} is embedded.
+        no_environment:
+          "Mongoid attempted to find the appropriate environment but no Rails.env,
+          Sinatra::Base.environment, or RACK_ENV could be found."

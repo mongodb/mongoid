@@ -48,3 +48,6 @@ ja:
           %{document} の 親ドキュメント (%{base}) は保存されていません。
         mixed_relations:
           "%{embedded} ドキュメント に対して %{root} ドキュメントからリレーション関係を用いて、参照することはできません。"
+        no_environment:
+          "Mongoid attempted to find the appropriate environment but no Rails.env,
+          Sinatra::Base.environment, or RACK_ENV could be found."
