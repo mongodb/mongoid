@@ -50,6 +50,15 @@ describe Mongoid::Extensions::Symbol::Inflections do
       ret.operator.should == "near"
     end
   end
+  
+  describe "#not" do
+
+    it 'returns :"foo $not"' do
+      ret = :foo.not
+      ret.key.should == :foo
+      ret.operator.should == "not"
+    end
+  end
 
   describe "#within" do
 
