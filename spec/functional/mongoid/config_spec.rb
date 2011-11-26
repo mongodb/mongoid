@@ -95,6 +95,10 @@ describe Mongoid::Config do
         described_class.parameterize_keys.should == false
       end
 
+      it "sets scope_overwrite_exception" do
+        described_class.scope_overwrite_exception.should == false
+      end
+
       it "sets persist_in_safe_mode" do
         described_class.persist_in_safe_mode.should == false
       end
@@ -189,6 +193,10 @@ describe Mongoid::Config do
 
     it "sets parameterize keys" do
       described_class.parameterize_keys.should == false
+    end
+
+    it "sets scope_overwrite_exception" do
+      described_class.scope_overwrite_exception.should == false
     end
 
     it "sets persist_in_safe_mode" do
@@ -348,6 +356,13 @@ describe Mongoid::Config do
 
       it "defaults to true" do
         described_class.parameterize_keys.should be_true
+      end
+    end
+
+    describe ".scope_overwrite_exception" do
+
+      it "defaults to false" do
+        described_class.scope_overwrite_exception.should be_false
       end
     end
 

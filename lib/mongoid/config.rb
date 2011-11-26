@@ -25,6 +25,7 @@ module Mongoid #:nodoc
     option :include_root_in_json, :default => false
     option :max_retries_on_connection_failure, :default => 0
     option :parameterize_keys, :default => true
+    option :scope_overwrite_exception, :default => false
     option :persist_in_safe_mode, :default => false
     option :preload_models, :default => false
     option :raise_not_found_error, :default => true

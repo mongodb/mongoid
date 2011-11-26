@@ -125,19 +125,23 @@ module Mongoid #:nodoc:
 
       protected
 
-      # Warns if overriding another scope or method.
+      # Warns or raises exception if overriding another scope or method.
       #
-      # @example Warn if name exists.
+      # @example Warn or raise error if name exists.
       #   Model.valid_scope_name?("test")
       #
       # @param [ String, Symbol ] name The name of the scope.
       def valid_scope_name?(name)
         if scopes[name] || respond_to?(name, true)
-          if Mongoid.logger
-            Mongoid.logger.warn(
-              "Creating scope :#{name}. " +
-              "Overwriting existing method #{self.name}.#{name}."
-            )
+          if Mongoid.scope_overwrite_exception
+            raise Errors::ScopeOverwrite.new(self.name,name)
+          else
+            if Mongoid.logger
+              Mongoid.logger.warn(
+                "Creating scope :#{name}. " +
+                "Overwriting existing method #{self.name}.#{name}."
+              )
+            end
           end
         end
       end
