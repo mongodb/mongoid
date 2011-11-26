@@ -28,18 +28,30 @@ module Mongoid #:nodoc:
         begin
           yield
         rescue Mongo::ConnectionFailure => ex
-          retries += 1
-          raise ex if retries > Mongoid.max_retries_on_connection_failure
-          Kernel.sleep(0.5)
-          log_retry retries
+          retries = increase_retry_attempts(retries, ex)
           retry
+        rescue Mongo::OperationFailure => ex
+          if ex.message =~ /not master/
+            retries = increase_retry_attempts(retries, ex)
+            retry
+          else
+            raise ex
+          end
         end
       end
 
       private
 
-      def log_retry(retry_number)
-        Mongoid.logger.warn "A Mongo::ConnectionFailure was raised. Retry attempt ##{retry_number}."
+      def increase_retry_attempts(retries, ex)
+        retries += 1
+        raise ex if retries > Mongoid.max_retries_on_connection_failure
+        Kernel.sleep(0.5)
+        log_retry retries, ex
+        retries
+      end
+
+      def log_retry(retry_number, ex)
+        Mongoid.logger.warn "A #{ex.class.name} was raised. Retry attempt ##{retry_number}."
       end
     end
   end
