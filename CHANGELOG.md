@@ -10,6 +10,10 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
+* \#1451 Ranges can now be any range value, not just numbers. (aupajo)
+
+* \#1448 Localization is now used when sorting. (Hans Hasselberg)
+
 ### Resolved Issues
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
