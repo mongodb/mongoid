@@ -95,4 +95,14 @@ describe Mongoid::Config do
       end
     end
   end
+
+  describe "#load!" do
+
+    context "when passed a bad filename" do
+
+      it "raises an error" do
+        lambda { subject.load!("foo") }.should raise_error
+      end
+    end
+  end
 end

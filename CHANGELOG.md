@@ -14,6 +14,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1448 Localization is now used when sorting. (Hans Hasselberg)
 
+* \#1422 Mongoid raises an error at yaml load if no environment is found.
+  (Tom Stuart)
+
 * \#1413 $not support added to criteria symbol methods. (Marc Weil)
 
 ### Resolved Issues
