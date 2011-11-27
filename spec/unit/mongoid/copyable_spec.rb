@@ -262,6 +262,10 @@ describe Mongoid::Copyable do
           copy.game.should be_nil
         end
 
+        it "keeps the original attributes frozen" do
+          person.attributes.should be_frozen
+        end
+
         Mongoid::Copyable::COPYABLES.each do |name|
 
           it "dups #{name}" do

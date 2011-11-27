@@ -68,8 +68,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def freeze
-      as_document.freeze
-      self
+      tap { |doc| doc.as_document.freeze }
     end
 
     # Checks if the document is frozen
@@ -81,7 +80,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def frozen?
-      raw_attributes.frozen?
+      attributes.frozen?
     end
 
     # Delegates to id in order to allow two records of the same type and id to
@@ -95,7 +94,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Integer ] The hash of the document's id.
     def hash
-      raw_attributes["_id"].hash
+      attributes["_id"].hash
     end
 
     # Generate an id for this +Document+.
