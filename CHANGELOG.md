@@ -23,6 +23,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1439 embedded? should return true when relation defined as cyclic.
 
+* \#1426 Frozen documents can now be cloned. (aagrawal2001)
+
 * \#1382 Raise proper error when creating indexes via rake task if index
   definition is incorrect. (Mathieu Ravaux)
 
