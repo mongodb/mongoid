@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def get(klass, identifier)
-      return nil unless Mongoid.identity_map_enabled?
+      return nil unless Mongoid.identity_map_enabled? && klass
       documents_for(klass)[identifier]
     end
 
@@ -93,7 +93,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def documents_for(klass)
-      self[klass] ||= {}
+      return nil unless klass
+      self[klass.collection_name] ||= {}
     end
 
     class << self

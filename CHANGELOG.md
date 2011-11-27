@@ -38,6 +38,9 @@ For instructions on upgrading to newer versions, visit
 * \#1382 Raise proper error when creating indexes via rake task if index
   definition is incorrect. (Mathieu Ravaux)
 
+* \#1381, \#1371 The identity map now functions properly with inherited
+  documents. (Paul Canavese)
+
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
 ## 2.3.4
