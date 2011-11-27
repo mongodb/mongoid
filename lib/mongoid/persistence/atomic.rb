@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic/operation"
 require "mongoid/persistence/atomic/add_to_set"
+require "mongoid/persistence/atomic/add_all_to_set"
 require "mongoid/persistence/atomic/bit"
 require "mongoid/persistence/atomic/inc"
 require "mongoid/persistence/atomic/pop"
@@ -36,6 +37,23 @@ module Mongoid #:nodoc:
       # @since 2.0.0
       def add_to_set(field, value, options = {})
         AddToSet.new(self, field, value, options).persist
+      end
+      
+      # Performs an atomic $addToSet of the provided array on the supplied field.      
+      # If the field does not exist it will be initialized as an empty array.      
+      #      
+      # If a value in the array already exists it will not be added.      
+      #      
+      # @example Add only a unique value on the field.      
+      #   person.add_all_to_set(:aliases, ["Bond", "007"])      
+      #      
+      # @param [ Symbol ] field The name of the field.      
+      # @param [ Array ] value The array to add.      
+      # @param [ Hash ] options The mongo persistence options.      
+      #      
+      # @return [ Array<Object> ] The new value of the field.
+      def add_all_to_set(field, value, options = {})  
+        AddAllToSet.new(self, field, value, options).persist      
       end
 
       # Performs an atomic $bit operation on the field with the provided hash
