@@ -143,11 +143,10 @@ describe Mongoid::Config do
     end
   end
 
-  describe ".load!", :pending => true do
+  describe ".load!" do
 
-    before(:all) do
-      # FIXME this kills the Rails dependency for ammeter if run via 'rspec ./spec'
-      # Object.send(:remove_const, :Rails) if defined?(Rails)
+    before(:each) do
+      Rails.stubs(:env).returns('test')
     end
 
     before do
