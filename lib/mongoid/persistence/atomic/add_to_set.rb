@@ -20,7 +20,9 @@ module Mongoid #:nodoc:
           prepare do
             document[field] = [] unless document[field]
             values = document.send(field)
-            values.push(value) unless values.include?(value)
+            Array.wrap(value).each do |val|
+              values.push(val) unless values.include?(val)
+            end
             values.tap do
               if document.persisted?
                 collection.update(document.atomic_selector, operation("$addToSet"), options)
@@ -28,6 +30,20 @@ module Mongoid #:nodoc:
               end
             end
           end
+        end
+
+        # Get the atomic operation to perform.
+        #
+        # @example Get the operation.
+        #   add_to_set.operation("$addToSet")
+        #
+        # @param [ String ] modifier The modifier to use.
+        #
+        # @return [ Hash ] The atomic operation for the field and addition.
+        #
+        # @since 2.0.0
+        def operation(modifier)
+          { modifier => { path => value.is_a?(Array) ? { "$each" => value } : value}}
         end
       end
     end

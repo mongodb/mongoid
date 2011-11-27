@@ -19,6 +19,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1413 $not support added to criteria symbol methods. (Marc Weil)
 
+* \#1388 `model.add_to_set` now supports adding multiple values and performs an
+  $addToSet with $each under the covers. (Christian Felder)
+
 ### Resolved Issues
 
 * \#1439 embedded? should return true when relation defined as cyclic.

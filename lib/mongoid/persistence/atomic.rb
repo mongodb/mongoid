@@ -27,8 +27,11 @@ module Mongoid #:nodoc:
       # @example Add only a unique value on the field.
       #   person.add_to_set(:aliases, "Bond")
       #
+      # @example Add only the unique values to the field.
+      #   person.add_to_set(:aliases, [ "Bond", "James" ])
+      #
       # @param [ Symbol ] field The name of the field.
-      # @param [ Object ] value The value to add.
+      # @param [ Object, Array<Object> ] value The value or values to add.
       # @param [ Hash ] options The mongo persistence options.
       #
       # @return [ Array<Object> ] The new value of the field.
