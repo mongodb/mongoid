@@ -54,3 +54,6 @@ sv:
         no_environment:
           "Mongoid attempted to find the appropriate environment but no Rails.env,
           Sinatra::Base.environment, or RACK_ENV could be found."
+        scope_overwrite:
+          "Cannot create scope :%{scope_name}, because of existing method
+          %{model_name}.%{scope_name}."

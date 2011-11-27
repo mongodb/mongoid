@@ -19,6 +19,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#1413 $not support added to criteria symbol methods. (Marc Weil)
 
+* \#1403 Added configuration option `scope_overwrite_exception` which defaults to
+  false for raising an error when defining a named scope with the same name of
+  an existing method. (Christoph Grabo)
+
 * \#1388 `model.add_to_set` now supports adding multiple values and performs an
   $addToSet with $each under the covers. (Christian Felder)
 
