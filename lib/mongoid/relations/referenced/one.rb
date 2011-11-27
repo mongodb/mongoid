@@ -53,7 +53,11 @@ module Mongoid # :nodoc:
         def substitute(replacement)
           unbind_one
           if persistable?
-            metadata.destructive? ? send(metadata.dependent) : save
+            if metadata.destructive?
+              send(metadata.dependent)
+            else
+              save if persisted?
+            end
           end
           return nil unless replacement
           One.new(base, replacement, metadata)

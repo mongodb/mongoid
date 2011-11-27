@@ -24,6 +24,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1449 New documents no longer get persisted when replaced on a has one as
+  a side effect. (jasonsydes)
+
 * \#1439 embedded? should return true when relation defined as cyclic.
 
 * \#1426 Frozen documents can now be cloned. (aagrawal2001)

@@ -209,7 +209,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child persisted" do
             new_game.persisted?.should be_true
           end
-
         end
 
         context "with a new one built via the parent" do
@@ -241,7 +240,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child unpersisted" do
             new_game.persisted?.should be_false
           end
-
         end
       end
 
@@ -284,7 +282,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child persisted" do
             new_game.persisted?.should be_true
           end
-
         end
 
         context "with a new one built via the parent" do
@@ -316,7 +313,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child unpersisted" do
             new_game.persisted?.should be_false
           end
-
         end
       end
 
@@ -359,7 +355,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child persisted" do
             new_cat.persisted?.should be_true
           end
-
         end
 
         context "with a new one built via the parent" do
@@ -391,10 +386,9 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child unpersisted" do
             new_cat.persisted?.should be_false
           end
-          
         end
       end
-      
+
       context "when replacing an existing unpersisted (dependent: :nullify) relation" do
 
         let!(:person) do
@@ -434,7 +428,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child persisted" do
             new_cat.persisted?.should be_true
           end
-
         end
 
         context "with a new one built via the parent" do
@@ -466,7 +459,6 @@ describe Mongoid::Relations::Referenced::One do
           it "leaves the new child unpersisted" do
             new_cat.persisted?.should be_false
           end
-          
         end
       end
 
