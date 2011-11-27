@@ -100,7 +100,7 @@ describe Mongoid::NamedScope do
         Mongoid.scope_overwrite_exception = false
 
         Person.class_eval do
-          scope :old, criteria.where(:age.gt => 67)
+          scope :old, criteria.where(:age.gt => 50)
         end
 
         log_io.rewind
@@ -112,7 +112,7 @@ describe Mongoid::NamedScope do
         Mongoid.scope_overwrite_exception = true
         lambda {
           Person.class_eval do
-            scope :old, criteria.where(:age.gt => 67)
+            scope :old, criteria.where(:age.gt => 50)
           end
         }.should raise_error(
           Mongoid::Errors::ScopeOverwrite,
