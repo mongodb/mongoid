@@ -16,10 +16,6 @@ class Player
   scope :deaths_over, lambda { |count| criteria.where(:deaths.gt => count) }
 
   references_many :weapons
-  references_one :powerup
-
-  embeds_many :implants
-  embeds_one :augmentation
 
   class << self
     def alive
@@ -39,40 +35,3 @@ class Weapon
     self.name = "Holy Hand Grenade (#{player.frags})"
   end
 end
-
-class Powerup
-  include Mongoid::Document
-
-  field :name
-
-  referenced_in :player, :inverse_of => :powerup
-
-  after_build do
-    self.name = "Quad Damage (#{player.frags})"
-  end
-end
-
-class Implant
-  include Mongoid::Document
-
-  field :name
-
-  embedded_in :player, :inverse_of => :Implants
-
-  after_build do
-    self.name = "Cochlear Implant (#{player.frags})"
-  end
-end
-
-class Augmentation
-  include Mongoid::Document
-
-  field :name
-
-  embedded_in :player, :inverse_of => :augmentation
-
-  after_build do
-    self.name = "Infolink (#{player.frags})"
-  end
-end
-
