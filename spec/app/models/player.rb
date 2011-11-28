@@ -75,4 +75,3 @@ class Augmentation
     self.name = "Infolink (#{player.frags})"
   end
 end
-
