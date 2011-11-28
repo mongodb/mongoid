@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
 
     CALLBACKS = [
       :before_validation, :after_validation,
-      :after_initialize,
+      :after_initialize, :after_build,
       :before_create, :around_create, :after_create,
       :before_destroy, :around_destroy, :after_destroy,
       :before_save, :around_save, :after_save,
@@ -19,6 +19,7 @@ module Mongoid #:nodoc:
       include ActiveModel::Validations::Callbacks
 
       define_model_callbacks :initialize, :only => :after
+      define_model_callbacks :build, :only => :after
       define_model_callbacks :create, :destroy, :save, :update
     end
 
