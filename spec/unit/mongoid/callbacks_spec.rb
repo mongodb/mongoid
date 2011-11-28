@@ -71,6 +71,10 @@ describe Mongoid::Callbacks do
     it "includes the after_initialize callback" do
       @class.should respond_to(:after_initialize)
     end
+    
+    it "includes the after_build callback" do
+      @class.should respond_to(:after_build)
+    end
   end
 
   describe ".after_initialize" do
@@ -81,6 +85,41 @@ describe Mongoid::Callbacks do
 
     it "runs after document instantiation" do
       game.name.should == "Testing"
+    end
+  end
+  
+  describe ".after_build" do
+
+    let(:weapon) do
+      Player.new(:frags => 5).weapons.build
+    end
+
+    it "runs after document build (references_many)" do
+      weapon.name.should == "Holy Hand Grenade (5)"
+    end
+
+    let(:implant) do
+      Player.new(:frags => 5).implants.build
+    end
+
+    it "runs after document build (embeds_many)" do
+      implant.name.should == 'Cochlear Implant (5)'
+    end
+
+    let(:powerup) do
+      Player.new(:frags => 5).build_powerup
+    end
+
+    it "runs after document build (references_one)" do
+      powerup.name.should == "Quad Damage (5)"
+    end
+
+    let(:augmentation) do
+      Player.new(:frags => 5).build_augmentation
+    end
+
+    it "runs after document build (embeds_one)" do
+      augmentation.name.should == "Infolink (5)"
     end
   end
 
