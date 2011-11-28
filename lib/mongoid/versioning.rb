@@ -36,6 +36,7 @@ module Mongoid #:nodoc:
     def revise
       previous = previous_revision
       if previous && versioned_attributes_changed?
+	previous.attributes.delete("versions") # remove unnesessary versioning hierarchy 
         versions.build(previous.versioned_attributes).attributes.delete("_id")
         if version_max.present? && versions.length > version_max
           versions.delete(versions.first)
