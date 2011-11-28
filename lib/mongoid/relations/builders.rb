@@ -68,7 +68,7 @@ module Mongoid # :nodoc:
               attributes, options = parse_args(*args)
               document = Factory.build(metadata.klass, attributes, options)
               _building do
-                send("#{name}=", document)
+                send("#{name}=", document).tap {|child| child.run_callbacks(:build) }
               end
             end
           end

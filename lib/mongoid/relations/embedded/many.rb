@@ -57,6 +57,7 @@ module Mongoid # :nodoc:
           Factory.build(type || metadata.klass, attributes, options).tap do |doc|
             doc.identify
             append(doc)
+            doc.run_callbacks(:build) { doc }
             yield(doc) if block_given?
           end
         end

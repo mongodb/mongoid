@@ -7,18 +7,9 @@ describe Mongoid::Callbacks do
   end
 
   it "CALLBACKS includes all callbacks" do
-    Mongoid::Callbacks::CALLBACKS.should =~
-      TestClass.methods.map(&:to_s).
-        grep(/^(before|after|around)_/).
-        map(&:to_sym).
-        reject do |method|
-          # deprecated callbacks
-          [
-            :after_validation_on_create,
-            :after_validation_on_update,
-            :before_validation_on_create,
-            :before_validation_on_update
-          ].include?(method)
+    Mongoid::Callbacks::CALLBACKS.should =~ TestClass.methods.map(&:to_s).grep(/^(before|after|around)_/).map(&:to_sym).reject do |method|
+      # deprecated callbacks
+      [:after_validation_on_create, :after_validation_on_update, :before_validation_on_create, :before_validation_on_update].include? method
     end
   end
 
@@ -94,9 +85,34 @@ describe Mongoid::Callbacks do
       Player.new(:frags => 5).weapons.build
     end
 
-    it "runs after document build" do
+    it "runs after document build (references_many)" do
       weapon.name.should == "Holy Hand Grenade (5)"
     end
+
+    let(:implant) do
+      Player.new(:frags => 5).implants.build
+    end
+
+    it "runs after document build (embeds_many)" do
+      implant.name.should == 'Cochlear Implant (5)'
+    end
+      
+    let(:powerup) do
+      Player.new(:frags => 5).build_powerup
+    end
+
+    it "runs after document build (references_one)" do
+      powerup.name.should == "Quad Damage (5)"
+    end
+
+    let(:augmentation) do
+      Player.new(:frags => 5).build_augmentation
+    end
+
+    it "runs after document build (embeds_one)" do
+      augmentation.name.should == "Infolink (5)"
+    end
+
   end
 
   describe ".before_create" do
@@ -130,67 +146,32 @@ describe Mongoid::Callbacks do
 
   describe ".before_save" do
 
-    context "when creating" do
+    before do
+      @artist = Artist.create(:name => "Depeche Mode")
+      @artist.name = "The Mountain Goats"
+    end
 
-      let(:artist) do
-        Artist.new(:name => "Depeche Mode")
+    after do
+      @artist.delete
+    end
+
+    context "callback returns true" do
+      before do
+        @artist.expects(:before_save_stub).returns(true)
       end
 
-      after do
-        artist.delete
-      end
-
-      context "callback returns true" do
-        before do
-          artist.expects(:before_save_stub).returns(true)
-        end
-
-        it "should return true" do
-          artist.save.should == true
-        end
-      end
-
-      context "callback returns false" do
-        before do
-          artist.expects(:before_save_stub).returns(false)
-        end
-
-        it "should return false" do
-          artist.save.should == false
-        end
+      it "should return true" do
+        @artist.save.should == true
       end
     end
 
-    context "when updating" do
-
-      let(:artist) do
-        Artist.create(:name => "Depeche Mode").tap do |artist|
-          artist.name = "The Mountain Goats"
-        end
+    context "callback returns false" do
+      before do
+        @artist.expects(:before_save_stub).returns(false)
       end
 
-      after do
-        artist.delete
-      end
-
-      context "callback returns true" do
-        before do
-          artist.expects(:before_save_stub).returns(true)
-        end
-
-        it "should return true" do
-          artist.save.should == true
-        end
-      end
-
-      context "callback returns false" do
-        before do
-          artist.expects(:before_save_stub).returns(false)
-        end
-
-        it "should return false" do
-          artist.save.should == false
-        end
+      it "should return false" do
+        @artist.save.should == false
       end
     end
   end
