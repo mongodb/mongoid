@@ -169,7 +169,7 @@ describe Mongoid::IdentityMap do
     context "embedded class" do
 
       let!(:animal) do
-        circus = Circus.new(animals: [Animal.new])
+        circus = Circus.new(:animals => [Animal.new])
         circus.animals.first
       end
 
@@ -254,10 +254,6 @@ describe Mongoid::IdentityMap do
         get.should be_nil
       end
     end
-  end
-
-  describe "#get_selector" do
-
   end
 
   describe "#remove" do
