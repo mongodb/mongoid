@@ -287,6 +287,10 @@ describe Mongoid::Persistence do
         it "returns true" do
           deleted.should be_true
         end
+
+        it "resets the flagged for destroy flag" do
+          person.should_not be_flagged_for_destroy
+        end
       end
 
       context "when removing an embedded document" do
@@ -307,6 +311,10 @@ describe Mongoid::Persistence do
 
           it "removes the attributes from the parent" do
             person.raw_attributes["addresses"].should be_nil
+          end
+
+          it "resets the flagged for destroy flag" do
+            address.should_not be_flagged_for_destroy
           end
         end
 
@@ -349,6 +357,10 @@ describe Mongoid::Persistence do
 
           it "removes the object from the parent and database" do
             from_db.addresses.first.locations.should be_empty
+          end
+
+          it "resets the flagged for destroy flag" do
+            location.should_not be_flagged_for_destroy
           end
         end
       end
