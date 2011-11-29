@@ -28,6 +28,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if successful, false if not.
     def destroy(options = {})
+      self.flagged_for_destroy = true
       run_callbacks(:destroy) { remove(options) }
     end
 
