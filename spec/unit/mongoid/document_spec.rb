@@ -539,6 +539,19 @@ describe Mongoid::Document do
         person.to_key.should == [ person.id ]
       end
     end
+
+    context "when the document is destroyed" do
+
+      let(:person) do
+        Person.instantiate("_id" => BSON::ObjectId.new).tap do |peep|
+          peep.destroyed = true
+        end
+      end
+
+      it "returns the id in an array" do
+        person.to_key.should == [ person.id ]
+      end
+    end
   end
 
   describe "#to_param" do

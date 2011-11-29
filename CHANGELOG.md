@@ -37,6 +37,8 @@ For instructions on upgrading to newer versions, visit
 * \#1455, \#1456 Calling destroy on any document now temporarily marks it as
   flagged for destroy until the operation is complete. (Nader Akhnoukh)
 
+* \#1453 `Model#to_key` should return a value is the document is destroyed.
+
 * \#1449 New documents no longer get persisted when replaced on a has one as
   a side effect. (jasonsydes)
 

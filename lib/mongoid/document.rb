@@ -136,6 +136,18 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Return the key value for the document.
+    #
+    # @example Return the key.
+    #   document.to_key
+    #
+    # @return [ Object ] The id of the document or nil if new.
+    #
+    # @since 2.4.0
+    def to_key
+      new_record? ? nil : [ id ]
+    end
+
     # Return an array with this +Document+ only in it.
     #
     # @example Return the document in an array.
