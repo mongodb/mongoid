@@ -315,12 +315,12 @@ describe Mongoid::Config do
 
     context "when no collection name is provided" do
 
-      let!(:collections) do
+      before do
         Mongoid.purge!
       end
 
       it "purges the post collection" do
-        Post.collection.count.should eq(0)
+        Mongoid.master.collection("posts").count.should eq(0)
       end
     end
   end
