@@ -80,7 +80,9 @@ describe Mongoid::Versioning do
   describe "#versions" do
 
     let(:page) do
-      WikiPage.create(:title => "1")
+      WikiPage.create(:title => "1") do |wiki|
+        wiki.author = "woodchuck"
+      end
     end
 
     context "when saving the document " do
@@ -113,6 +115,10 @@ describe Mongoid::Versioning do
 
         it "does not embed versions within versions" do
           version.versions.should be_empty
+        end
+
+        it "versions protected fields" do
+          version.author.should eq("woodchuck")
         end
 
         context "when saving multiple times" do

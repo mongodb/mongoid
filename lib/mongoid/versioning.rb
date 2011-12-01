@@ -36,7 +36,9 @@ module Mongoid #:nodoc:
     def revise
       previous = previous_revision
       if previous && versioned_attributes_changed?
-        versions.build(previous.versioned_attributes).attributes.delete("_id")
+        versions.build(
+          previous.versioned_attributes, :without_protection => true
+        ).attributes.delete("_id")
         if version_max.present? && versions.length > version_max
           versions.delete(versions.first)
         end
@@ -52,7 +54,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.1
     def revise!
-      new_version = versions.build((previous_revision || self).versioned_attributes)
+      new_version = versions.build(
+        (previous_revision || self).versioned_attributes, :without_protection => true
+      )
       versions.shift if version_max.present? && versions.length > version_max
       self.version = (version || 1 ) + 1
       save

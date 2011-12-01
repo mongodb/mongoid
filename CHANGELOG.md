@@ -37,6 +37,9 @@ For instructions on upgrading to newer versions, visit
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
 
+* \#1458 Versioning no longer skips fields that have been protected from mass
+  assignment.
+
 * \#1455, \#1456 Calling destroy on any document now temporarily marks it as
   flagged for destroy until the operation is complete. (Nader Akhnoukh)
 
