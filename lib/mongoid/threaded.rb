@@ -8,76 +8,60 @@ module Mongoid #:nodoc:
   module Threaded
     extend self
 
-    # Begins a assigning block.
+    # Begin entry into a named thread local stack.
     #
-    # @example Begin the assign.
-    #   Threaded.begin_assign
+    # @example Begin entry into the stack.
+    #   Threaded.begin(:create)
     #
-    # @return [ true ] Always true.
+    # @param [ Symbol ] name The name of the stack
     #
-    # @since 2.1.9
-    def begin_assign
-      assign_stack.push(true)
+    # @return [ true ] True.
+    #
+    # @since 2.4.0
+    def begin(name)
+      stack(name).push(true)
     end
 
-    # Begins a binding block.
+    # Are in the middle of executing the named stack
     #
-    # @example Begin the bind.
-    #   Threaded.begin_bind
+    # @example Are we in the stack execution?
+    #   Threaded.executing?(:create)
     #
-    # @return [ true ] Always true.
+    # @param [ Symbol ] name The name of the stack
     #
-    # @since 2.1.9
-    def begin_bind
-      bind_stack.push(true)
+    # @return [ true ] If the stack is being executed.
+    #
+    # @since 2.4.0
+    def executing?(name)
+      !stack(name).empty?
     end
 
-    # Begins a building block.
+    # Exit from a named thread local stack.
     #
-    # @example Begin the build.
-    #   Threaded.begin_build
+    # @example Exit from the stack.
+    #   Threaded.exit(:create)
     #
-    # @return [ true ] Always true.
+    # @param [ Symbol ] name The name of the stack
     #
-    # @since 2.1.9
-    def begin_build
-      build_stack.push(true)
+    # @return [ true ] True.
+    #
+    # @since 2.4.0
+    def exit(name)
+      stack(name).pop
     end
 
-    # Begins a creating block.
+    # Get the named stack.
     #
-    # @example Begin the create.
-    #   Threaded.begin_create
+    # @example Get a stack by name
+    #   Threaded.stack(:create)
     #
-    # @return [ true ] Always true.
+    # @param [ Symbol ] name The name of the stack
     #
-    # @since 2.1.9
-    def begin_create
-      create_stack.push(true)
-    end
-
-    # Begins a loading block.
+    # @return [ Array ] The stack.
     #
-    # @example Begin the load.
-    #   Threaded.begin_load
-    #
-    # @return [ true ] Always true.
-    #
-    # @since 2.3.2
-    def begin_load
-      load_stack.push(true)
-    end
-
-    # Begins a loading revision block.
-    #
-    # @example Begin the revision load.
-    #   Threaded.begin_load_revision
-    #
-    # @return [ true ] Always true.
-    #
-    # @since 2.3.4
-    def begin_load_revision
-      load_revision_stack.push(true)
+    # @since 2.4.0
+    def stack(name)
+      Thread.current[:"[mongoid]:#{name}-stack"] ||= []
     end
 
     # Begin validating a document on the current thread.
@@ -90,156 +74,6 @@ module Mongoid #:nodoc:
     # @since 2.1.9
     def begin_validate(document)
       validations_for(document.class).push(document.id)
-    end
-
-    # Is the current thread in assigning mode?
-    #
-    # @example Is the thread in assigning mode?
-    #   Threaded.assigning?
-    #
-    # @return [ true, false ] If the thread is in assigning mode?
-    #
-    # @since 2.1.0
-    def assigning?
-      !assign_stack.empty?
-    end
-
-    # Is the current thread in binding mode?
-    #
-    # @example Is the thread in binding mode?
-    #   Threaded.binding?
-    #
-    # @return [ true, false ] If the thread is in binding mode?
-    #
-    # @since 2.1.0
-    def binding?
-      !bind_stack.empty?
-    end
-
-    # Is the current thread in building mode?
-    #
-    # @example Is the thread in building mode?
-    #   Threaded.building?
-    #
-    # @return [ true, false ] If the thread is in building mode?
-    #
-    # @since 2.1.0
-    def building?
-      !build_stack.empty?
-    end
-
-    # Is the current thread in creating mode?
-    #
-    # @example Is the thread in creating mode?
-    #   Threaded.creating?
-    #
-    # @return [ true, false ] If the thread is in creating mode?
-    #
-    # @since 2.1.0
-    def creating?
-      !create_stack.empty?
-    end
-
-    # Is the current thread in loading mode?
-    #
-    # @example Is the thread in loading mode?
-    #   Threaded.loading?
-    #
-    # @return [ true, false ] If the thread is in loading mode?
-    #
-    # @since 2.3.2
-    def loading?
-      !load_stack.empty?
-    end
-
-    # Is the current thread in revision load mode?
-    #
-    # @example Is the thread in revision load mode?
-    #   Threaded.loading_revision?
-    #
-    # @return [ true, false ] If the thread is in revision load mode?
-    #
-    # @since 2.3.4
-    def loading_revision?
-      !load_revision_stack.empty?
-    end
-
-    # Get the assign stack for the current thread. Is simply an array of calls
-    # to Mongoid's assigning method.
-    #
-    # @example Get the assign stack.
-    #   Threaded.assign_stack
-    #
-    # @return [ Array ] The array of assign calls.
-    #
-    # @since 2.1.9
-    def assign_stack
-      Thread.current[:"[mongoid]:assign-stack"] ||= []
-    end
-
-    # Get the bind stack for the current thread. Is simply an array of calls
-    # to Mongoid's binding method.
-    #
-    # @example Get the bind stack.
-    #   Threaded.bind_stack
-    #
-    # @return [ Array ] The array of bind calls.
-    #
-    # @since 2.1.9
-    def bind_stack
-      Thread.current[:"[mongoid]:bind-stack"] ||= []
-    end
-
-    # Get the build stack for the current thread. Is simply an array of calls
-    # to Mongoid's building method.
-    #
-    # @example Get the build stack.
-    #   Threaded.build_stack
-    #
-    # @return [ Array ] The array of build calls.
-    #
-    # @since 2.1.9
-    def build_stack
-      Thread.current[:"[mongoid]:build-stack"] ||= []
-    end
-
-    # Get the create stack for the current thread. Is simply an array of calls
-    # to Mongoid's creating method.
-    #
-    # @example Get the create stack.
-    #   Threaded.create_stack
-    #
-    # @return [ Array ] The array of create calls.
-    #
-    # @since 2.1.9
-    def create_stack
-      Thread.current[:"[mongoid]:create-stack"] ||= []
-    end
-
-    # Get the load stack for the current thread. Is simply an array of calls
-    # to Mongoid's loading method.
-    #
-    # @example Get the load stack.
-    #   Threaded.load_stack
-    #
-    # @return [ Array ] The array of load calls.
-    #
-    # @since 2.3.2
-    def load_stack
-      Thread.current[:"[mongoid]:load-stack"] ||= []
-    end
-
-    # Get the revision load stack for the current thread. Is simply an array
-    # of calls to Mongoid's loading_revision method.
-    #
-    # @example Get the revision load stack.
-    #   Threaded.load_revision_stack
-    #
-    # @return [ Array ] The array of load revision calls.
-    #
-    # @since 2.3.4
-    def load_revision_stack
-      Thread.current[:"[mongoid]:load-revision-stack"] ||= []
     end
 
     # Clear out all the safety options set using the safely proxy.
@@ -263,78 +97,6 @@ module Mongoid #:nodoc:
     def clear_options!
       clear_safety_options!
       self.timeless = false
-    end
-
-    # Exit the assigning block.
-    #
-    # @example Exit the assigning block.
-    #   Threaded.exit_assign
-    #
-    # @return [ true ] The last element in the stack.
-    #
-    # @since 2.1.9
-    def exit_assign
-      assign_stack.pop
-    end
-
-    # Exit the binding block.
-    #
-    # @example Exit the binding block.
-    #   Threaded.exit_bind
-    #
-    # @return [ true ] The last element in the stack.
-    #
-    # @since 2.1.9
-    def exit_bind
-      bind_stack.pop
-    end
-
-    # Exit the building block.
-    #
-    # @example Exit the building block.
-    #   Threaded.exit_build
-    #
-    # @return [ true ] The last element in the stack.
-    #
-    # @since 2.1.9
-    def exit_build
-      build_stack.pop
-    end
-
-    # Exit the creating block.
-    #
-    # @example Exit the creating block.
-    #   Threaded.exit_create
-    #
-    # @return [ true ] The last element in the stack.
-    #
-    # @since 2.1.9
-    def exit_create
-      create_stack.pop
-    end
-
-    # Exit the loading block.
-    #
-    # @example Exit the loading block.
-    #   Threaded.exit_load
-    #
-    # @return [ true ] The last element in the stack.
-    #
-    # @since 2.1.9
-    def exit_load
-      load_stack.pop
-    end
-
-    # Exit the revision loading block.
-    #
-    # @example Exit the revision loading block.
-    #   Threaded.exit_load_revision
-    #
-    # @return [ true ] The last element in the stack.
-    #
-    # @since 2.3.4
-    def exit_load_revision
-      load_revision_stack.pop
     end
 
     # Exit validating a document on the current thread.

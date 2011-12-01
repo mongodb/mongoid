@@ -6,115 +6,31 @@ describe Mongoid::Threaded do
     stub
   end
 
-  describe "#begin_load_revision" do
+  describe "#begin" do
 
     before do
-      described_class.begin_load_revision
+      described_class.begin(:load)
     end
 
     after do
-      described_class.load_revision_stack.clear
-    end
-
-    it "adds a boolen to the revision load stack" do
-      described_class.load_revision_stack.should eq([ true ])
-    end
-  end
-
-  describe "#loading_revision?" do
-
-    context "when loading revision is not set" do
-
-      it "returns false" do
-        described_class.should_not be_loading_revision
-      end
-    end
-
-    context "when loading revision has elements" do
-
-      before do
-        Thread.current[:"[mongoid]:load-revision-stack"] = [ true ]
-      end
-
-      after do
-        Thread.current[:"[mongoid]:load-revision-stack"] = []
-      end
-
-      it "returns true" do
-        described_class.should be_loading_revision
-      end
-    end
-
-    context "when loading revision has no elements" do
-
-      before do
-        Thread.current[:"[mongoid]:load-revision-stack"] = []
-      end
-
-      it "returns false" do
-        described_class.should_not be_loading_revision
-      end
-    end
-  end
-
-  describe "#load_revision_stack" do
-
-    context "when no load revision stack has been initialized" do
-
-      let(:loading) do
-        described_class.load_revision_stack
-      end
-
-      it "returns an empty stack" do
-        loading.should eq([])
-      end
-    end
-
-    context "when a load revision stack has been initialized" do
-
-      before do
-        Thread.current[:"[mongoid]:load-revision-stack"] = [ true ]
-      end
-
-      let(:loading) do
-        described_class.load_revision_stack
-      end
-
-      after do
-        Thread.current[:"[mongoid]:load-revision-stack"] = []
-      end
-
-      it "returns the stack" do
-        loading.should eq([ true ])
-      end
-    end
-  end
-
-  describe "#begin_load" do
-
-    before do
-      described_class.begin_load
-    end
-
-    after do
-      described_class.load_stack.clear
+      described_class.stack(:load).clear
     end
 
     it "adds a boolen to the load stack" do
-      described_class.load_stack.should eq([ true ])
+      described_class.stack(:load).should eq([ true ])
     end
   end
 
-  describe "#loading?" do
+  describe "#executing?" do
 
     context "when loading is not set" do
 
       it "returns false" do
-        described_class.should_not be_loading
+        described_class.should_not be_executing(:load)
       end
     end
 
-    context "when loading has elements" do
+    context "when the stack has elements" do
 
       before do
         Thread.current[:"[mongoid]:load-stack"] = [ true ]
@@ -125,28 +41,28 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        described_class.should be_loading
+        described_class.should be_executing(:load)
       end
     end
 
-    context "when loading has no elements" do
+    context "when the stack has no elements" do
 
       before do
         Thread.current[:"[mongoid]:load-stack"] = []
       end
 
       it "returns false" do
-        described_class.should_not be_loading
+        described_class.should_not be_executing(:load)
       end
     end
   end
 
-  describe "#load_stack" do
+  describe "#stack" do
 
-    context "when no load stack has been initialized" do
+    context "when no stack has been initialized" do
 
       let(:loading) do
-        described_class.load_stack
+        described_class.stack(:load)
       end
 
       it "returns an empty stack" do
@@ -154,14 +70,14 @@ describe Mongoid::Threaded do
       end
     end
 
-    context "when a load stack has been initialized" do
+    context "when a stack has been initialized" do
 
       before do
         Thread.current[:"[mongoid]:load-stack"] = [ true ]
       end
 
       let(:loading) do
-        described_class.load_stack
+        described_class.stack(:load)
       end
 
       after do
@@ -174,339 +90,19 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#begin_assign" do
+  describe "#exit" do
 
     before do
-      described_class.begin_assign
+      described_class.begin(:load)
+      described_class.exit(:load)
     end
 
     after do
-      described_class.assign_stack.clear
+      described_class.stack(:load).clear
     end
 
-    it "adds a boolen to the assign stack" do
-      described_class.assign_stack.should eq([ true ])
-    end
-  end
-
-  describe "#assigning?" do
-
-    context "when assigning is not set" do
-
-      it "returns false" do
-        described_class.should_not be_assigning
-      end
-    end
-
-    context "when assigning has elements" do
-
-      before do
-        Thread.current[:"[mongoid]:assign-stack"] = [ true ]
-      end
-
-      after do
-        Thread.current[:"[mongoid]:assign-stack"] = []
-      end
-
-      it "returns true" do
-        described_class.should be_assigning
-      end
-    end
-
-    context "when assigning has no elements" do
-
-      before do
-        Thread.current[:"[mongoid]:assign-stack"] = []
-      end
-
-      it "returns false" do
-        described_class.should_not be_assigning
-      end
-    end
-  end
-
-  describe "#assign_stack" do
-
-    context "when no assign stack has been initialized" do
-
-      let(:assigning) do
-        described_class.assign_stack
-      end
-
-      it "returns an empty stack" do
-        assigning.should eq([])
-      end
-    end
-
-    context "when a assign stack has been initialized" do
-
-      before do
-        Thread.current[:"[mongoid]:assign-stack"] = [ true ]
-      end
-
-      let(:assigning) do
-        described_class.assign_stack
-      end
-
-      after do
-        Thread.current[:"[mongoid]:assign-stack"] = []
-      end
-
-      it "returns the stack" do
-        assigning.should eq([ true ])
-      end
-    end
-  end
-
-  describe "#begin_bind" do
-
-    before do
-      described_class.begin_bind
-    end
-
-    after do
-      described_class.bind_stack.clear
-    end
-
-    it "adds a boolen to the bind stack" do
-      described_class.bind_stack.should eq([ true ])
-    end
-  end
-
-  describe "#binding?" do
-
-    context "when binding is not set" do
-
-      it "returns false" do
-        described_class.should_not be_binding
-      end
-    end
-
-    context "when binding has elements" do
-
-      before do
-        Thread.current[:"[mongoid]:bind-stack"] = [ true ]
-      end
-
-      after do
-        Thread.current[:"[mongoid]:bind-stack"] = []
-      end
-
-      it "returns true" do
-        described_class.should be_binding
-      end
-    end
-
-    context "when binding has no elements" do
-
-      before do
-        Thread.current[:"[mongoid]:bind-stack"] = []
-      end
-
-      it "returns false" do
-        described_class.should_not be_binding
-      end
-    end
-  end
-
-  describe "#bind_stack" do
-
-    context "when no bind stack has been initialized" do
-
-      let(:binding) do
-        described_class.bind_stack
-      end
-
-      it "returns an empty stack" do
-        binding.should eq([])
-      end
-    end
-
-    context "when a bind stack has been initialized" do
-
-      before do
-        Thread.current[:"[mongoid]:bind-stack"] = [ true ]
-      end
-
-      let(:binding) do
-        described_class.bind_stack
-      end
-
-      after do
-        Thread.current[:"[mongoid]:bind-stack"] = []
-      end
-
-      it "returns the stack" do
-        binding.should eq([ true ])
-      end
-    end
-  end
-
-  describe "#begin_build" do
-
-    before do
-      described_class.begin_build
-    end
-
-    after do
-      described_class.build_stack.clear
-    end
-
-    it "adds a boolen to the build stack" do
-      described_class.build_stack.should eq([ true ])
-    end
-  end
-
-  describe "#building?" do
-
-    context "when building is not set" do
-
-      it "returns false" do
-        described_class.should_not be_building
-      end
-    end
-
-    context "when building has elements" do
-
-      before do
-        Thread.current[:"[mongoid]:build-stack"] = [ true ]
-      end
-
-      after do
-        Thread.current[:"[mongoid]:build-stack"] = []
-      end
-
-      it "returns true" do
-        described_class.should be_building
-      end
-    end
-
-    context "when building has no elements" do
-
-      before do
-        Thread.current[:"[mongoid]:build-stack"] = []
-      end
-
-      it "returns false" do
-        described_class.should_not be_building
-      end
-    end
-  end
-
-  describe "#build_stack" do
-
-    context "when no build stack has been initialized" do
-
-      let(:building) do
-        described_class.build_stack
-      end
-
-      it "returns an empty stack" do
-        building.should eq([])
-      end
-    end
-
-    context "when a build stack has been initialized" do
-
-      before do
-        Thread.current[:"[mongoid]:build-stack"] = [ true ]
-      end
-
-      let(:building) do
-        described_class.build_stack
-      end
-
-      after do
-        Thread.current[:"[mongoid]:build-stack"] = []
-      end
-
-      it "returns the stack" do
-        building.should eq([ true ])
-      end
-    end
-  end
-
-  describe "#begin_create" do
-
-    before do
-      described_class.begin_create
-    end
-
-    after do
-      described_class.create_stack.clear
-    end
-
-    it "adds a boolen to the create stack" do
-      described_class.create_stack.should eq([ true ])
-    end
-  end
-
-  describe "#creating?" do
-
-    context "when creating is not set" do
-
-      it "returns false" do
-        described_class.should_not be_creating
-      end
-    end
-
-    context "when creating has elements" do
-
-      before do
-        Thread.current[:"[mongoid]:create-stack"] = [ true ]
-      end
-
-      after do
-        Thread.current[:"[mongoid]:create-stack"] = []
-      end
-
-      it "returns true" do
-        described_class.should be_creating
-      end
-    end
-
-    context "when creating has no elements" do
-
-      before do
-        Thread.current[:"[mongoid]:create-stack"] = []
-      end
-
-      it "returns false" do
-        described_class.should_not be_creating
-      end
-    end
-  end
-
-  describe "#create_stack" do
-
-    context "when no create stack has been initialized" do
-
-      let(:creating) do
-        described_class.create_stack
-      end
-
-      it "returns an empty stack" do
-        creating.should eq([])
-      end
-    end
-
-    context "when a create stack has been initialized" do
-
-      before do
-        Thread.current[:"[mongoid]:create-stack"] = [ true ]
-      end
-
-      let(:creating) do
-        described_class.create_stack
-      end
-
-      after do
-        Thread.current[:"[mongoid]:create-stack"] = []
-      end
-
-      it "returns the stack" do
-        creating.should eq([ true ])
-      end
+    it "removes a boolen from the stack" do
+      described_class.stack(:load).should be_empty
     end
   end
 
@@ -519,102 +115,6 @@ describe Mongoid::Threaded do
 
     it "removes all safety options" do
       described_class.safety_options.should be_nil
-    end
-  end
-
-  describe "#exit_assign" do
-
-    before do
-      described_class.begin_assign
-      described_class.exit_assign
-    end
-
-    after do
-      described_class.assign_stack.clear
-    end
-
-    it "adds a boolen to the assign stack" do
-      described_class.assign_stack.should be_empty
-    end
-  end
-
-  describe "#exit_load" do
-
-    before do
-      described_class.begin_load
-      described_class.exit_load
-    end
-
-    after do
-      described_class.load_stack.clear
-    end
-
-    it "adds a boolen to the load stack" do
-      described_class.load_stack.should be_empty
-    end
-  end
-
-  describe "#exit_load_revision" do
-
-    before do
-      described_class.begin_load_revision
-      described_class.exit_load_revision
-    end
-
-    after do
-      described_class.load_revision_stack.clear
-    end
-
-    it "adds a boolen to the load revision stack" do
-      described_class.load_revision_stack.should be_empty
-    end
-  end
-
-  describe "#exit_bind" do
-
-    before do
-      described_class.begin_bind
-      described_class.exit_bind
-    end
-
-    after do
-      described_class.bind_stack.clear
-    end
-
-    it "adds a boolen to the bind stack" do
-      described_class.bind_stack.should be_empty
-    end
-  end
-
-  describe "#exit_build" do
-
-    before do
-      described_class.begin_build
-      described_class.exit_build
-    end
-
-    after do
-      described_class.build_stack.clear
-    end
-
-    it "adds a boolen to the build stack" do
-      described_class.build_stack.should be_empty
-    end
-  end
-
-  describe "#exit_create" do
-
-    before do
-      described_class.begin_create
-      described_class.exit_create
-    end
-
-    after do
-      described_class.create_stack.clear
-    end
-
-    it "adds a boolen to the create stack" do
-      described_class.create_stack.should be_empty
     end
   end
 

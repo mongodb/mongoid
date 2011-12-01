@@ -30,9 +30,9 @@ For instructions on upgrading to newer versions, visit
 * \#1388 `model.add_to_set` now supports adding multiple values and performs an
   $addToSet with $each under the covers. (Christian Felder)
 
-* \#1387 Added `Model#cacheKey` for use in Rails caching. (Seivan Heidari)
+* \#1387 Added `Model#cache_key` for use in Rails caching. (Seivan Heidari)
 
-### Resolved Issue
+### Resolved Issues
 
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
