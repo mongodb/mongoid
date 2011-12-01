@@ -91,7 +91,7 @@ module Mongoid #:nodoc
     #
     # @since 2.0.2, batch-relational-insert
     def insert(documents, options = {})
-      consumer = Threaded.insert
+      consumer = Threaded.insert(name)
       if consumer
         consumer.consume(documents, options)
       else

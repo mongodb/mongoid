@@ -38,11 +38,12 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.2, batch-relational-insert
         def batched(&block)
-          inserter = Threaded.insert ||= Insert.new
+          name = collection.name
+          inserter = Threaded.insert(name) || Threaded.set_insert(name, Insert.new)
           count_executions(&block)
         ensure
           if @executions.zero?
-            Threaded.insert = nil
+            Threaded.set_insert(name, nil)
             inserter.execute(collection)
           end
         end

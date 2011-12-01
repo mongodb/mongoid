@@ -369,8 +369,8 @@ module Mongoid #:nodoc:
     # @return [ Object ] The batch insert consumer.
     #
     # @since 2.1.0
-    def insert
-      Thread.current[:"[mongoid]:insert-consumer"]
+    def insert(name)
+      Thread.current[:"[mongoid][#{name}]:insert-consumer"]
     end
 
     # Set the insert consumer on the current thread.
@@ -383,8 +383,8 @@ module Mongoid #:nodoc:
     # @return [ Object ] The insert consumer.
     #
     # @since 2.1.0
-    def insert=(consumer)
-      Thread.current[:"[mongoid]:insert-consumer"] = consumer
+    def set_insert(name, consumer)
+      Thread.current[:"[mongoid][#{name}]:insert-consumer"] = consumer
     end
 
     # Get the safety options for the current thread.
