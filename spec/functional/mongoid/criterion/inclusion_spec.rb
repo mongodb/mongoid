@@ -26,6 +26,36 @@ describe Mongoid::Criterion::Inclusion do
 
   describe "#any_in" do
 
+    context "when querying on foreign keys" do
+
+      context "when not using object ids" do
+
+        before(:all) do
+          Person.identity :type => String
+        end
+
+        after(:all) do
+          Person.identity :type => BSON::ObjectId
+        end
+
+        let!(:person) do
+          Person.create(:ssn => "123-11-1111")
+        end
+
+        let!(:account) do
+          person.create_account(:name => "test")
+        end
+
+        let(:from_db) do
+          Account.any_in(:person_id => [ person.id ])
+        end
+
+        it "returns the correct results" do
+          from_db.should eq([ account ])
+        end
+      end
+    end
+
     context "when chaining after a where" do
 
       let!(:person) do
