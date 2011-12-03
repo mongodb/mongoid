@@ -39,20 +39,48 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Object do
 
         context "when using strings" do
 
-          let(:object_id) do
-            BSON::ObjectId.new
+          context "when provided a string" do
+
+            let(:object_id) do
+              BSON::ObjectId.new
+            end
+
+            before do
+              Person.identity :type => String
+            end
+
+            after do
+              Person.identity :type => BSON::ObjectId
+            end
+
+            it "does not convert" do
+              field.serialize(object_id.to_s).should == object_id.to_s
+            end
           end
 
-          before do
-            Person.identity :type => String
-          end
+          context "when provided a hash" do
 
-          after do
-            Person.identity :type => BSON::ObjectId
-          end
+            let(:object_id) do
+              BSON::ObjectId.new
+            end
 
-          it "does not convert" do
-            field.serialize(object_id.to_s).should == object_id.to_s
+            before do
+              Person.identity :type => String
+            end
+
+            after do
+              Person.identity :type => BSON::ObjectId
+            end
+
+            let(:criterion) do
+              { "$in" => [ object_id.to_s ] }
+            end
+
+            it "does not convert" do
+              field.serialize(criterion).should eq(
+                criterion
+              )
+            end
           end
         end
 
@@ -70,6 +98,48 @@ describe Mongoid::Fields::Serializable::ForeignKeys::Object do
 
             it "does not convert" do
               field.serialize("1").should eq(1)
+            end
+          end
+
+          context "when provided a hash with a string value" do
+
+            before do
+              Person.identity :type => Integer
+            end
+
+            after do
+              Person.identity :type => BSON::ObjectId
+            end
+
+            let(:criterion) do
+              { "$eq" => "1" }
+            end
+
+            it "does not convert" do
+              field.serialize(criterion).should eq(
+                { "$eq" => 1 }
+              )
+            end
+          end
+
+          context "when provided a hash with an array of string values" do
+
+            before do
+              Person.identity :type => Integer
+            end
+
+            after do
+              Person.identity :type => BSON::ObjectId
+            end
+
+            let(:criterion) do
+              { "$in" => [ "1" ] }
+            end
+
+            it "does not convert" do
+              field.serialize(criterion).should eq(
+                { "$in" => [ 1 ] }
+              )
             end
           end
         end

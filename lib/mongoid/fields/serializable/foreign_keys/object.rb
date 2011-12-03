@@ -37,7 +37,16 @@ module Mongoid #:nodoc:
             if object_id_field?
               constraint.convert(object)
             else
-              metadata.klass.fields["_id"].serialize(object)
+              case object
+              when ::Array
+                object.replace(object.map { |arg| serialize(arg) })
+              when ::Hash
+                object.each_pair do |key, value|
+                  object[key] = serialize(value)
+                end
+              else
+                metadata.klass.fields["_id"].serialize(object)
+              end
             end
           end
         end

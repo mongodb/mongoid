@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Inclusion do
 
   before do
-    [ Person, Post, Product, Game, Jar ].each(&:delete_all)
+    [ Account, Person, Post, Product, Game, Jar ].each(&:delete_all)
   end
 
   describe "#all_in" do
@@ -39,11 +39,11 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let!(:person) do
-          Person.create(:ssn => "123-11-1111")
+          Person.safely.create!(:ssn => "123-11-1111")
         end
 
         let!(:account) do
-          person.create_account(:name => "test")
+          person.safely.create_account(:name => "test")
         end
 
         let(:from_db) do
