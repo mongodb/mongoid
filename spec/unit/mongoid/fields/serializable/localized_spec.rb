@@ -8,8 +8,8 @@ describe Mongoid::Fields::Serializable::Localized do
 
   context "when no default is provided" do
 
-    it "defaults to an empty hash" do
-      field.default.should eq({})
+    it "defaults to nil" do
+      field.default.should be_nil
     end
   end
 

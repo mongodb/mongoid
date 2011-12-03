@@ -175,9 +175,6 @@ module Mongoid #:nodoc:
             field.label = options[:label]
             field.localize = options[:localize]
             field.default_val = options[:default]
-            unless field.default_val
-              field.default_val = {} if field.localized?
-            end
           end
         end
 

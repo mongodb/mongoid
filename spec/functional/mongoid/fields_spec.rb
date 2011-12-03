@@ -2,6 +2,111 @@ require "spec_helper"
 
 describe Mongoid::Fields do
 
+  before do
+    Product.delete_all
+  end
+
+  describe "#\{field}_translations" do
+
+    let(:product) do
+      Product.new
+    end
+
+    context "when the field is localized" do
+
+      context "when translations exist" do
+
+        before do
+          product.description = "test"
+          ::I18n.locale = :de
+          product.description = "The best"
+        end
+
+        after do
+          ::I18n.locale = :en
+        end
+
+        let(:translations) do
+          product.description_translations
+        end
+
+        it "returns all the translations" do
+          translations.should eq(
+            { "en" => "test", "de" => "The best" }
+          )
+        end
+      end
+
+      context "when translations do not exist" do
+
+        it "returns nil" do
+          product.description_translations.should be_nil
+        end
+      end
+    end
+
+    context "when the field is not localized" do
+
+      it "does not respond to the method" do
+        product.should_not respond_to(:price_translations)
+      end
+    end
+  end
+
+  describe "#\{field}_translations=" do
+
+    let(:product) do
+      Product.new
+    end
+
+    context "when the field is localized" do
+
+      let(:translations) do
+        { "en" => "test", "de" => "testing" }
+      end
+
+      before do
+        product.description_translations = translations
+      end
+
+      it "sets the raw values of the translations" do
+        product.description_translations.should eq(translations)
+      end
+
+      context "when saving the new translations" do
+
+        before do
+          product.save
+        end
+
+        it "persists the changes" do
+          product.reload.description_translations.should eq(translations)
+        end
+
+        context "when updating the translations" do
+
+          before do
+            product.description_translations = { "en" => "overwritten" }
+            product.save
+          end
+
+          it "persists the changes" do
+            product.reload.description_translations.should eq(
+              { "en" => "overwritten" }
+            )
+          end
+        end
+      end
+    end
+
+    context "when the field is not localized" do
+
+      it "does not respond to the method" do
+        product.should_not respond_to(:price_translations=)
+      end
+    end
+  end
+
   describe "#getter" do
 
     context "when a field is localized" do

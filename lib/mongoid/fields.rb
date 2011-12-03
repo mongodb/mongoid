@@ -313,6 +313,16 @@ module Mongoid #:nodoc
             attr = read_attribute(name)
             (options[:type] == Boolean) ? attr == true : attr.present?
           end
+
+          if options[:localize]
+            define_method("#{meth}_translations") do
+              attributes[name]
+            end
+            define_method("#{meth}_translations=") do |value|
+              attribute_will_change!(name)
+              attributes[name] = value
+            end
+          end
         end
       end
 
