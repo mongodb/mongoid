@@ -1,7 +1,4 @@
 # encoding: utf-8
-require "i18n/backend/fallbacks"
-I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-
 module Mongoid #:nodoc:
   module Fields #:nodoc:
     module Serializable #:nodoc:
@@ -23,8 +20,11 @@ module Mongoid #:nodoc:
         # @since 2.3.0
         def deserialize(object)
           locale = ::I18n.locale
-          lookups = ::I18n.fallbacks[locale].map(&:to_s)
-          object[ lookups.find{ |loc| object[loc] } ]
+          if ::I18n.respond_to?(:fallbacks)
+            object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| object[loc] }]
+          else
+            object[locale.to_s]
+          end
         end
 
         # Convert the provided string into a hash for the locale.

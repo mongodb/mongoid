@@ -49,58 +49,77 @@ describe Mongoid::Fields::Serializable::Localized do
 
       context "when the value does not exist" do
 
-        context "when fallbacks are defined" do
+        context "when not using fallbacks" do
 
-          before do
-            ::I18n.fallbacks[:de] = [ :de, :en, :es ]
+          let(:value) do
+            field.deserialize({ "en" => "testing" })
           end
 
-          context "when the first fallback translation exists" do
+          it "returns nil" do
+            value.should be_nil
+          end
+        end
 
-            let(:value) do
-              field.deserialize({ "en" => "testing" })
+        context "when using fallbacks" do
+
+          before(:all) do
+            require "i18n/backend/fallbacks"
+            I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+          end
+
+          context "when fallbacks are defined" do
+
+            before do
+              ::I18n.fallbacks[:de] = [ :de, :en, :es ]
             end
 
-            it "returns the fallback translation" do
-              value.should eq("testing")
+            context "when the first fallback translation exists" do
+
+              let(:value) do
+                field.deserialize({ "en" => "testing" })
+              end
+
+              it "returns the fallback translation" do
+                value.should eq("testing")
+              end
+            end
+
+            context "when another fallback translation exists" do
+
+              let(:value) do
+                field.deserialize({ "es" => "pruebas" })
+              end
+
+              it "returns the fallback translation" do
+                value.should eq("pruebas")
+              end
+            end
+
+            context "when the fallback translation does not exist" do
+
+              let(:value) do
+                field.deserialize({ "fr" => "oui" })
+              end
+
+              it "returns nil" do
+                value.should be_nil
+              end
             end
           end
 
-          context "when another fallback translation exists" do
+          context "when no fallbacks are defined" do
+
+            before do
+              ::I18n.fallbacks[:de] = [ :de ]
+            end
 
             let(:value) do
               field.deserialize({ "es" => "pruebas" })
             end
 
-            it "returns the fallback translation" do
-              value.should eq("pruebas")
-            end
-          end
-
-          context "when the fallback translation does not exist" do
-
-            let(:value) do
-              field.deserialize({ "fr" => "oui" })
-            end
-
             it "returns nil" do
               value.should be_nil
             end
-          end
-        end
-
-        context "when no fallbacks are defined" do
-
-          before do
-            ::I18n.fallbacks[:de] = [ :de ]
-          end
-
-          let(:value) do
-            field.deserialize({ "es" => "pruebas" })
-          end
-
-          it "returns nil" do
-            value.should be_nil
           end
         end
       end
