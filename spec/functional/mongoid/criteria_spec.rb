@@ -80,9 +80,7 @@ describe Mongoid::Criteria do
       end
 
       it 'should find the object with a matching BSON::ObjectId argument' do
-        expect {
-          Person.find(BSON::ObjectId(person.id))
-        }.to raise_error
+        Person.find(BSON::ObjectId(person.id)).should eq(person)
       end
     end
   end

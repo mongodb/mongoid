@@ -89,11 +89,12 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def for_ids(*ids)
+        field = klass.fields["_id"]
         ids.flatten!
         if ids.size > 1
-          where(:_id.in => ::BSON::ObjectId.convert(klass, ids))
+          any_in(:_id => ids.map{ |id| field.serialize(id) })
         else
-          where(:_id => ids.first)
+          where(:_id => field.serialize(ids.first))
         end
       end
 

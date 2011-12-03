@@ -342,8 +342,8 @@ describe Mongoid::Criterion::Optional do
             base.for_ids(id)
           end
 
-          it "adds the _id query to the selector" do
-            criteria.selector.should eq({ :_id => id })
+          it "adds the string _id query to the selector" do
+            criteria.selector.should eq({ :_id => id.to_s })
           end
 
           it "returns a copy" do
@@ -375,7 +375,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the _id query to the selector" do
-          base.for_ids(ids).selector.should eq({ :_id => ids.first })
+          base.for_ids(ids).selector.should eq({ :_id => ids.first.to_s })
         end
       end
     end

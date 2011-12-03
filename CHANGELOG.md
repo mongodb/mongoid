@@ -32,6 +32,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1387 Added `Model#cache_key` for use in Rails caching. (Seivan Heidari)
 
+* \#1380 Calling Model.find(id) will now properly convert to and from any type
+  based on the type of the _id field.
+
 ### Resolved Issues
 
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence

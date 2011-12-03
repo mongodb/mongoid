@@ -8,6 +8,47 @@ describe Mongoid::Finders do
 
   describe "#find" do
 
+    context "when using integer ids" do
+
+      before(:all) do
+        Person.identity :type => Integer
+      end
+
+      after(:all) do
+        Person.identity :type => BSON::ObjectId
+      end
+
+      context "when passed a string" do
+
+        let!(:person) do
+          Person.create(:_id => 1, :ssn => "123-44-4321")
+        end
+
+        let(:from_db) do
+          Person.find("1")
+        end
+
+        it "returns the matching document" do
+          from_db.should eq(person)
+        end
+      end
+
+      context "when passed an array of strings" do
+
+        let!(:person) do
+          Person.create(:_id => 2, :ssn => "123-44-4321")
+        end
+
+        let(:from_db) do
+          Person.find([ "2" ])
+        end
+
+        it "returns the matching documents" do
+          from_db.should eq([ person ])
+        end
+      end
+    end
+
     context "when using string ids" do
 
       let!(:person) do
