@@ -35,6 +35,9 @@ For instructions on upgrading to newer versions, visit
 * \#1380 Calling Model.find(id) will now properly convert to and from any type
   based on the type of the _id field.
 
+* \#1363 Added fallbacks and default support to localized fields, and added
+  ability to get and set all translations at once.
+
 ### Resolved Issues
 
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence

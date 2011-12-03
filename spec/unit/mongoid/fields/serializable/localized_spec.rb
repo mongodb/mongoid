@@ -13,6 +13,21 @@ describe Mongoid::Fields::Serializable::Localized do
     end
   end
 
+  context "when a default is provided" do
+
+    let(:field) do
+      described_class.instantiate(
+        :description,
+        :localize => true,
+        :default => "No translation"
+      )
+    end
+
+    it "defaults to the value" do
+      field.default.should eq("No translation")
+    end
+  end
+
   describe "#deserialize" do
 
     context "when no locale is defined" do

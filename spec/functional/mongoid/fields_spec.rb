@@ -39,8 +39,20 @@ describe Mongoid::Fields do
 
       context "when translations do not exist" do
 
-        it "returns nil" do
-          product.description_translations.should be_nil
+        context "when no default is provided" do
+
+          it "returns nil" do
+            product.description_translations.should be_nil
+          end
+        end
+
+        context "when a default is provided" do
+
+          it "returns the translations with the default" do
+            product.name_translations.should eq(
+              { "en" => "no translation" }
+            )
+          end
         end
       end
     end
