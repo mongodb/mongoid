@@ -1,5 +1,14 @@
 aggregate:
-  "prev.count++;"
+  "if (prev.aggregate == 'start') {
+     prev.aggregate = 0;
+   }
+   prev.aggregate++;"
+
+aggregate_finalize:
+  "if (obj.aggregate == 'start' || isNaN(obj.aggregate)) {
+     obj.aggregate = 0;
+   }
+   return obj;"
 
 group:
   "prev.group.push(obj);"

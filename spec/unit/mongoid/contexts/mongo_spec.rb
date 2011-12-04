@@ -23,7 +23,7 @@ describe Mongoid::Contexts::Mongo do
     context "when klass not provided" do
 
       let(:reduce) do
-        "function(obj, prev) { prev.count++; }"
+        Mongoid::Javascript.aggregate
       end
 
       let(:collection) do

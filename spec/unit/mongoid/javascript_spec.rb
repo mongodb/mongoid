@@ -9,7 +9,8 @@ describe Mongoid::Javascript do
   describe ".aggregate" do
 
     it "returns the aggregate function" do
-      js.aggregate.should == "function(obj, prev) { prev.count++; }"
+      js.aggregate.should == "function(obj, prev) { if (prev.aggregate == 'start') { " +
+         "prev.aggregate = 0; } prev.aggregate++; }"
     end
   end
 
