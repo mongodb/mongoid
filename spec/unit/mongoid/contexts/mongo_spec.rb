@@ -276,6 +276,60 @@ describe Mongoid::Contexts::Mongo do
         context.group
       end
     end
+    
+  end
+
+  
+  describe "#reduce" do
+    let(:grouped) do
+      criteria.only(:field1)
+    end
+    
+    let(:grouping) do
+      [{ "title" => "Sir", "age_min" => 16, "age_max" => 82, "age_sum" => 98}]
+    end
+    
+    let(:context) do
+      Mongoid::Contexts::Mongo.new(grouped)
+    end
+    
+    context "when klass provided" do
+      
+      let(:collection) do
+        stub
+      end
+      
+      let(:fields) do
+        { :age => [:min, :max, :sum] }
+      end
+      
+      let(:initial) do
+        context.send(:initial, fields)
+      end
+      
+      let(:reduce) do
+        Mongoid::Javascript.compound(fields)
+      end
+      
+      let(:finalize) do
+        Mongoid::Javascript.compound_finalize(fields)
+      end
+      
+      before do
+        Person.expects(:collection).returns(collection)
+      end
+      
+      it "calls group on the collection with our compound js" do
+        collection.expects(:group).with(
+          :key => [:field1],
+          :cond => {},
+          :initial => initial,
+          :reduce => reduce,
+          :finalize => finalize
+        )
+        context.reduce fields
+      end
+    end
   end
 
   describe ".initialize" do

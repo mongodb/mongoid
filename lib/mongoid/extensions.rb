@@ -2,6 +2,7 @@
 require "mongoid/extensions/array/deletion"
 require "mongoid/extensions/false_class/equality"
 require "mongoid/extensions/hash/criteria_helpers"
+require "mongoid/extensions/hash/reduction_helpers"
 require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/integer/checks"
 require "mongoid/extensions/nil/collectionization"
@@ -33,6 +34,7 @@ end
 
 class Hash #:nodoc
   include Mongoid::Extensions::Hash::CriteriaHelpers
+  include Mongoid::Extensions::Hash::ReductionHelpers
   include Mongoid::Extensions::Hash::Scoping
 end
 
