@@ -67,6 +67,9 @@ For instructions on upgrading to newer versions, visit
 * \#1381, \#1371 The identity map now functions properly with inherited
   documents. (Paul Canavese)
 
+* \#1359 Provide ability to not have default scope applied to all named
+  scopes via using lambdas.
+
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
 ## 2.3.4

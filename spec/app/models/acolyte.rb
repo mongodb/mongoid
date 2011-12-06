@@ -5,9 +5,9 @@ class Acolyte
 
   embeds_many :versions, :as => :memorable
 
-  scope :active, where(:status => "active")
-
   default_scope asc(:name)
+  scope :active, lambda { where(:status => "active") }
+  scope :named, lambda { where(:name.exists => true) }
 
   def callback_test?
     name == "callback-test"

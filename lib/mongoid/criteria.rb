@@ -6,6 +6,7 @@ require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/inspection"
 require "mongoid/criterion/optional"
+require "mongoid/criterion/scoping"
 require "mongoid/criterion/selector"
 
 module Mongoid #:nodoc:
@@ -29,6 +30,7 @@ module Mongoid #:nodoc:
     include Criterion::Inclusion
     include Criterion::Inspection
     include Criterion::Optional
+    include Criterion::Scoping
 
     attr_accessor \
       :documents,

@@ -25,7 +25,15 @@ module Mongoid #:nodoc:
       # @since 2.0.0
       def criteria(embedded = false, scoped = true)
         scope_stack.last || Criteria.new(self, embedded).tap do |crit|
-          return crit.fuse(default_scoping) if default_scoping && scoped
+          # @todo: Durran, Need to rewrite all the scoping code for 3.0.0 to
+          # avoid the lambda workaround.
+          if scoped
+            if default_scoping && !crit.unscopable?
+              return crit.fuse(default_scoping)
+            end
+          else
+            crit.unscopable = true
+          end
         end
       end
 
