@@ -90,7 +90,7 @@ describe Mongoid::NamedScope do
       end
 
     end
-    
+
     context "when overwriting an existing scope" do
 
       it "logs warnings per default" do
@@ -98,16 +98,16 @@ describe Mongoid::NamedScope do
         log_io = StringIO.new
         Mongoid.logger = ::Logger.new(log_io)
         Mongoid.scope_overwrite_exception = false
-        
+
         Person.class_eval do
           scope :old, criteria.where(:age.gt => 67)
         end
-        
+
         log_io.rewind
         log_io.readlines.join.should =~
           /Creating scope :old. Overwriting existing method Person.old/
       end
-      
+
       it "throws exception if configured with scope_overwrite_exception = true" do
         Mongoid.scope_overwrite_exception = true
         lambda {

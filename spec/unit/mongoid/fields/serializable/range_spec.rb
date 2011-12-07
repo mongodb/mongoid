@@ -18,11 +18,11 @@ describe Mongoid::Fields::Serializable::Range do
     it "returns a range" do
       field.deserialize({"min" => 1, "max" => 3}).should == (1..3)
     end
-    
+
     it "returns an inverse range" do
       field.deserialize({"min" => 5, "max" => 1}).should == (5..1)
     end
-    
+
     it "returns a letter range" do
       field.deserialize({"min" => 'a', "max" => 'z'}).should == ('a'..'z')
     end

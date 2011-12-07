@@ -95,7 +95,7 @@ describe Mongoid::Matchers::Default do
         end
       end
     end
-    
+
     context "when comparing an array to an array" do
 
       let(:matcher) do

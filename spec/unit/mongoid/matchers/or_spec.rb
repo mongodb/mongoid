@@ -80,7 +80,7 @@ describe Mongoid::Matchers::Or do
           matches.should be_false
         end
       end
-     
+
       context "when expression contain multiple fields" do
 
         let(:matches) do

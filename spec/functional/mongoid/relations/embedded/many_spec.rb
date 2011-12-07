@@ -2135,9 +2135,9 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         before do
-          person.phone_numbers << nil 
+          person.phone_numbers << nil
           person.phone_numbers << home_phone
-          person.phone_numbers << office_phone 
+          person.phone_numbers << office_phone
           person.save!
         end
 
@@ -2155,8 +2155,8 @@ describe Mongoid::Relations::Embedded::Many do
 
         before do
           person.phone_numbers << home_phone
-          person.phone_numbers << nil 
-          person.phone_numbers << office_phone 
+          person.phone_numbers << nil
+          person.phone_numbers << office_phone
           person.save!
         end
 
@@ -2174,8 +2174,8 @@ describe Mongoid::Relations::Embedded::Many do
 
         before do
           person.phone_numbers << home_phone
-          person.phone_numbers << office_phone 
-          person.phone_numbers << nil 
+          person.phone_numbers << office_phone
+          person.phone_numbers << nil
           person.save!
         end
 

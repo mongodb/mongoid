@@ -30,11 +30,11 @@ end
 
 class Weapon
   include Mongoid::Document
-  
+
   field :name
-  
+
   referenced_in :player, :inverse_of => :weapons
-  
+
   after_build do
     self.name = "Holy Hand Grenade (#{player.frags})"
   end

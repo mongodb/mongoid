@@ -22,7 +22,7 @@ pt:
           "Invalid option :%{invalid} provided to relation :%{name}. Valid options
           are: %{valid}."
         unsupported_version:
-          MongoDB %{version} não é suportada, por favor actualize para a 
+          MongoDB %{version} não é suportada, por favor actualize para a
           versão %{mongo_version}.
         validations:
           A validação falhou - %{errors}.
@@ -32,7 +32,7 @@ pt:
           do documento raiz.
         invalid_field:
           Não é permitido definir um campo com o nome %{name}. Não defina
-          campos que entrem em conflito com os nomes dos atributos internos e métodos 
+          campos que entrem em conflito com os nomes dos atributos internos e métodos
           do Mongoid. Use Document#instance_methods para consultar esses nomes.
         too_many_nested_attribute_records:
           A aceitação de atributos encadeados para %{association} encontra-se limitada

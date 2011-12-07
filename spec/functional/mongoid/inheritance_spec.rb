@@ -140,7 +140,7 @@ describe Mongoid::Document do
     after do
       Firefox.delete_all
     end
-    
+
     it 'should find object with String args' do
       Firefox.find(@firefox.id.to_s).should == @firefox
     end

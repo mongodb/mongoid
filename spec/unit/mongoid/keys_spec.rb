@@ -49,7 +49,7 @@ describe Mongoid::Keys do
         field.type.should == String
       end
     end
-    
+
     context "when key is provided a formatter block" do
 
       before do

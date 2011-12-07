@@ -71,7 +71,7 @@ describe Mongoid::Callbacks do
     it "includes the after_initialize callback" do
       @class.should respond_to(:after_initialize)
     end
-    
+
     it "includes the after_build callback" do
       @class.should respond_to(:after_build)
     end
@@ -87,7 +87,7 @@ describe Mongoid::Callbacks do
       game.name.should == "Testing"
     end
   end
-  
+
   describe ".after_build" do
 
     let(:weapon) do
