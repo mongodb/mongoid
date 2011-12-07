@@ -403,7 +403,7 @@ describe Mongoid::Criteria do
   describe "#clone" do
 
     let(:criteria) do
-      Person.only(:title).where(:age.gt => 30).skip(10)
+      Person.only(:title).where(:age.gt => 30).skip(10).asc(:age)
     end
 
     let(:copy) do
@@ -416,6 +416,11 @@ describe Mongoid::Criteria do
 
     it "copies the options" do
       copy.options.should == criteria.options
+    end
+
+    it 'copies the sort' do
+      copy.options[:sort].should == criteria.options[:sort]
+      copy.options[:sort].should_not be criteria.options[:sort]
     end
 
     it "copies the embedded flag" do
