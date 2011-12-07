@@ -33,35 +33,17 @@ module Mongoid #:nodoc
     extend ActiveSupport::Concern
 
     included do
+      class_attribute :defaults
+      class_attribute :fields
+
+      self.defaults = []
+      self.fields = {}
+
       field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
 
       alias :id :_id
       alias :id= :_id=
-    end
-
-    # Get the default fields.
-    #
-    # @note Refactored from using delegate for class load performance.
-    #
-    # @example Get the defaults.
-    #   model.defaults
-    #
-    # @return [ Array<String> ] The default field names.
-    def defaults
-      self.class.defaults
-    end
-
-    # Get the document's fields.
-    #
-    # @note Refactored from using delegate for class load performance.
-    #
-    # @example Get the fields.
-    #   model.fields
-    #
-    # @return [ Hash ] The fields.
-    def fields
-      self.class.fields
     end
 
     class << self
@@ -103,28 +85,6 @@ module Mongoid #:nodoc
 
     module ClassMethods #:nodoc
 
-      # Returns the default values for the fields on the document.
-      #
-      # @example Get the defaults.
-      #   Person.defaults
-      #
-      # @return [ Hash ] The field defaults.
-      def defaults
-        @defaults ||= []
-      end
-
-      # Set the defaults for the class.
-      #
-      # @example Set the defaults.
-      #   Person.defaults = defaults
-      #
-      # @param [ Array ] defaults The array of defaults to set.
-      #
-      # @since 2.0.0.rc.6
-      def defaults=(defaults)
-        @defaults = defaults
-      end
-
       # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
@@ -143,30 +103,6 @@ module Mongoid #:nodoc
       def field(name, options = {})
         check_field_name!(name)
         add_field(name.to_s, options)
-      end
-
-      # Return the fields for this class.
-      #
-      # @example Get the fields.
-      #   Person.fields
-      #
-      # @return [ Hash ] The fields for this document.
-      #
-      # @since 2.0.0.rc.6
-      def fields
-        @fields ||= {}
-      end
-
-      # Set the fields for the class.
-      #
-      # @example Set the fields.
-      #   Person.fields = fields
-      #
-      # @param [ Hash ] fields The hash of fields to set.
-      #
-      # @since 2.0.0.rc.6
-      def fields=(fields)
-        @fields = fields
       end
 
       # When inheriting, we want to copy the fields from the parent class and
