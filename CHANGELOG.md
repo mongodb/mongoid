@@ -40,6 +40,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1483 Sending module includes at runtime which add new fields to a parent
+  document, also have the fields added to subclasses.
+
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
 

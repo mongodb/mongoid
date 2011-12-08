@@ -101,8 +101,13 @@ module Mongoid #:nodoc
       #
       # @return [ Field ] The generated field
       def field(name, options = {})
+        named = name.to_s
         check_field_name!(name)
-        add_field(name.to_s, options)
+        add_field(named, options).tap do
+          descendants.each do |subclass|
+            subclass.add_field(named, options)
+          end
+        end
       end
 
       # When inheriting, we want to copy the fields from the parent class and
