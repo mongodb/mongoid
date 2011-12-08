@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::ManyToMany do
 
+  let(:person) do
+    Person.new
+  end
+
   describe "#build" do
 
     let(:person) do
@@ -27,6 +31,21 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
           person.preferences.should be_empty
         end
       end
+    end
+  end
+
+  context "when the foreign key is nil" do
+
+    let(:builder) do
+      described_class.new(person, Person.relations["preferences"], nil)
+    end
+
+    let(:criteria) do
+      builder.build
+    end
+
+    it "returns the criteria" do
+      criteria.should eq([])
     end
   end
 end

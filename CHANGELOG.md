@@ -43,6 +43,9 @@ For instructions on upgrading to newer versions, visit
 * \#1483 Sending module includes at runtime which add new fields to a parent
   document, also have the fields added to subclasses.
 
+* \#1481 Fix invalid query when accessing many-to-many relations before
+  defaults are set.
+
 * \#1482 Applying new sorting options does not merge into previously
   chained criteria. (Gerad Suyderhoud)
 
