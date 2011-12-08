@@ -369,7 +369,6 @@ module Mongoid #:nodoc:
     def initialize_copy(other)
       @selector = other.selector.dup
       @options = other.options.dup
-      @options[:sort] = @options[:sort].dup if @options.key?(:sort)
       @includes = other.inclusions.dup
       @context = nil
     end

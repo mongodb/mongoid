@@ -418,11 +418,6 @@ describe Mongoid::Criteria do
       copy.options.should == criteria.options
     end
 
-    it 'copies the sort' do
-      copy.options[:sort].should == criteria.options[:sort]
-      copy.options[:sort].should_not be criteria.options[:sort]
-    end
-
     it "copies the embedded flag" do
       copy.embedded.should == criteria.embedded
     end
