@@ -156,14 +156,23 @@ describe Mongoid::Criterion::Optional do
   end
 
   context "when chaining sort criteria" do
+    let(:original) do
+      base.desc(:title)
+    end
 
     let(:criteria) do
-      base.asc(:title).desc(:dob, :name).order_by(:score.asc)
+      original.asc(:title).desc(:dob, :name).order_by(:score.asc)
     end
 
     it "does not overwrite any previous criteria" do
       criteria.options[:sort].should ==
         [[ :title, :asc ], [ :dob, :desc ], [ :name, :desc ], [ :score, :asc ]]
+    end
+
+    it 'does not alter the original criteria' do
+      expect {
+        criteria
+      }.not_to change { original.options[:sort] }
     end
   end
 

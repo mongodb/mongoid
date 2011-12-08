@@ -403,7 +403,7 @@ describe Mongoid::Criteria do
   describe "#clone" do
 
     let(:criteria) do
-      Person.only(:title).where(:age.gt => 30).skip(10)
+      Person.only(:title).where(:age.gt => 30).skip(10).asc(:age)
     end
 
     let(:copy) do
