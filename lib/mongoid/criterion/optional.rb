@@ -237,7 +237,7 @@ module Mongoid #:nodoc:
       #
       # @param [ Array<Array> ] Existing options
       #
-      # @since 2.3.4
+      # @since 2.4.0
       def setup_sort_options(options)
         options[:sort] = options[:sort] ? options[:sort].dup : []
       end

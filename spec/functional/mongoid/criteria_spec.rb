@@ -99,29 +99,4 @@ describe Mongoid::Criteria do
       criteria.to_json.should include("\"ssn\":\"555-55-1212\"")
     end
   end
-
-  describe 'chaining' do
-    let(:asc) do
-      Book.all.asc(:title)
-    end
-
-    let(:desc) do
-      asc.desc(:title)
-    end
-
-    let(:titles) do
-      %w/ a b c d /
-    end
-
-    before do
-      titles.each do |name|
-        Book.create :title => name
-      end
-    end
-
-    it 'should not overwrite the criteria options' do
-      desc.map(&:title).should eq titles.reverse
-      asc.map(&:title).should eq titles
-    end
-  end
 end

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Optional do
 
   before do
-    Person.delete_all
+    [ Person, Book ].each(&:delete_all)
   end
 
   describe "#descending" do
@@ -39,6 +39,35 @@ describe Mongoid::Criterion::Optional do
           sorted.should eq(second)
         end
       end
+    end
+  end
+
+  context "when chaining multiple sort criterion" do
+
+    let(:asc) do
+      Book.all.asc(:title)
+    end
+
+    let(:desc) do
+      asc.desc(:title)
+    end
+
+    let(:titles) do
+      %w/ a b c d /
+    end
+
+    before do
+      titles.each do |name|
+        Book.create(:title => name)
+      end
+    end
+
+    it "does not overwrite the original sort options" do
+      asc.map(&:title).should eq(titles)
+    end
+
+    it "applies the new sort options" do
+      desc.map(&:title).should eq(titles.reverse)
     end
   end
 end
