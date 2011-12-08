@@ -2,6 +2,17 @@ require "spec_helper"
 
 describe Mongoid::Fields::Serializable do
 
+  context "when checking hash values in a custom serializer" do
+
+    let(:image) do
+      Image.new("test")
+    end
+
+    it "does not conflict with the ruby core hash" do
+      image.hash_is_hash.should be_true
+    end
+  end
+
   context "when included in a hash" do
 
     let(:hash) do

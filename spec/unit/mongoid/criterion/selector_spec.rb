@@ -156,7 +156,7 @@ describe Mongoid::Criterion::Selector do
     context "when the value is a range" do
 
       let(:field) do
-        Mongoid::Fields::Serializable::Date.instantiate(:dob)
+        Mongoid::Fields::Internal::Date.instantiate(:dob, :type => Date)
       end
 
       let(:first) do

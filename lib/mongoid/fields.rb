@@ -1,30 +1,30 @@
 # encoding: utf-8
 require "mongoid/fields/mappings"
 require "mongoid/fields/serializable"
-require "mongoid/fields/serializable/timekeeping"
-require "mongoid/fields/serializable/array"
-require "mongoid/fields/serializable/big_decimal"
-require "mongoid/fields/serializable/binary"
-require "mongoid/fields/serializable/boolean"
-require "mongoid/fields/serializable/date"
-require "mongoid/fields/serializable/date_time"
-require "mongoid/fields/serializable/float"
-require "mongoid/fields/serializable/hash"
-require "mongoid/fields/serializable/integer"
-require "mongoid/fields/serializable/bignum"
-require "mongoid/fields/serializable/fixnum"
-require "mongoid/fields/serializable/localized"
-require "mongoid/fields/serializable/nil_class"
-require "mongoid/fields/serializable/object"
-require "mongoid/fields/serializable/object_id"
-require "mongoid/fields/serializable/range"
-require "mongoid/fields/serializable/set"
-require "mongoid/fields/serializable/string"
-require "mongoid/fields/serializable/symbol"
-require "mongoid/fields/serializable/time"
-require "mongoid/fields/serializable/time_with_zone"
-require "mongoid/fields/serializable/foreign_keys/array"
-require "mongoid/fields/serializable/foreign_keys/object"
+require "mongoid/fields/internal/timekeeping"
+require "mongoid/fields/internal/array"
+require "mongoid/fields/internal/big_decimal"
+require "mongoid/fields/internal/binary"
+require "mongoid/fields/internal/boolean"
+require "mongoid/fields/internal/date"
+require "mongoid/fields/internal/date_time"
+require "mongoid/fields/internal/float"
+require "mongoid/fields/internal/hash"
+require "mongoid/fields/internal/integer"
+require "mongoid/fields/internal/bignum"
+require "mongoid/fields/internal/fixnum"
+require "mongoid/fields/internal/localized"
+require "mongoid/fields/internal/nil_class"
+require "mongoid/fields/internal/object"
+require "mongoid/fields/internal/object_id"
+require "mongoid/fields/internal/range"
+require "mongoid/fields/internal/set"
+require "mongoid/fields/internal/string"
+require "mongoid/fields/internal/symbol"
+require "mongoid/fields/internal/time"
+require "mongoid/fields/internal/time_with_zone"
+require "mongoid/fields/internal/foreign_keys/array"
+require "mongoid/fields/internal/foreign_keys/object"
 
 module Mongoid #:nodoc
 
@@ -169,7 +169,7 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
         meth = options.delete(:as) || name
-        type = options[:localize] ? Fields::Serializable::Localized : options[:type]
+        type = options[:localize] ? Fields::Internal::Localized : options[:type]
         Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field
           defaults << name unless field.default_val.nil?

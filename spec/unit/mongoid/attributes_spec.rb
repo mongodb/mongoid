@@ -980,7 +980,7 @@ describe Mongoid::Attributes do
 
       before do
         person.stubs(:fields).returns(
-          { "age" => Mongoid::Fields::Serializable::Integer.instantiate(:age) }
+          { "age" => Mongoid::Fields::Internal::Integer.instantiate(:age) }
         )
       end
 

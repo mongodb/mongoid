@@ -14,6 +14,10 @@ class Image
   def serialize(value)
     value.name.to_s
   end
+
+  def hash_is_hash
+    {}.is_a?(Hash)
+  end
 end
 
 class Thumbnail < Image

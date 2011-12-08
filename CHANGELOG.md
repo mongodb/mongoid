@@ -46,6 +46,9 @@ For instructions on upgrading to newer versions, visit
 * \#1482 Applying new sorting options does not merge into previously
   chained criteria. (Gerad Suyderhoud)
 
+* \#1480 Mongoid's internal serialized field types renamespaced to Internal in order
+  to not conflict with ruby core classes in custom serializable types.
+
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
 
