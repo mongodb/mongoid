@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
       # @return [ Criteria ] The cloned criteria.
       def ascending(*fields)
         clone.tap do |crit|
-          crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
+          setup_sort_options(crit.options) unless fields.first.nil?
           fields.flatten.each { |field| merge_options(crit.options[:sort], [ localize(field), :asc ]) }
         end
       end
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
       # @return [ Criteria ] The cloned criteria.
       def descending(*fields)
         clone.tap do |crit|
-          crit.options[:sort] = [] unless options[:sort] || fields.first.nil?
+          setup_sort_options(crit.options) unless fields.first.nil?
           fields.flatten.each { |field| merge_options(crit.options[:sort], [ localize(field), :desc ]) }
         end
       end
@@ -136,7 +136,7 @@ module Mongoid #:nodoc:
       def order_by(*args)
         clone.tap do |crit|
           arguments = args.size == 1 ? args.first : args
-          crit.options[:sort] = [] unless options[:sort] || args.first.nil?
+          setup_sort_options(crit.options) unless args.first.nil?
           if arguments.is_a?(Array)
             #[:name, :asc]
             if arguments.size == 2 && (arguments.first.is_a?(Symbol) || arguments.first.is_a?(String))
@@ -227,6 +227,19 @@ module Mongoid #:nodoc:
         else
           options << new_option.flatten
         end
+      end
+
+      # Initialize the sort options
+      # Set options[:sort] to an empty array if it does not exist, or dup it if
+      # it already has been defined
+      #
+      # @example criteria.setup_sort_options(crit.options)
+      #
+      # @param [ Array<Array> ] Existing options
+      #
+      # @since 2.3.4
+      def setup_sort_options(options)
+        options[:sort] = options[:sort] ? options[:sort].dup : []
       end
 
       # Check if field is localized and return localized version if it is.
