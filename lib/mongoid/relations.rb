@@ -44,9 +44,7 @@ module Mongoid # :nodoc:
     include Reflections
     include Synchronization
 
-    included do
-      attr_accessor :metadata
-    end
+    attr_accessor :metadata
 
     # Determine if the document itself is embedded in another document via the
     # proper channels. (If it has a parent document.)

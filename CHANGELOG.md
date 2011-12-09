@@ -54,6 +54,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1479 Don't duplicate ids on many-to-many when using create or create!
 
+* \#1467 Defining a field named metadata now properly raises an invalid field
+  error.
+
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
 
