@@ -165,7 +165,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.2.1
       def from_map_or_db
-        doc = IdentityMap.get(klass, extract_id)
+        doc = IdentityMap.get(klass, extract_id || selector)
         doc && doc.matches?(selector) ? doc : first
       end
 

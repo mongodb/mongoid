@@ -446,6 +446,21 @@ describe Mongoid::Criterion::Inclusion do
       it "inserts the second document into the identity map" do
         Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
       end
+
+      context "when asking from map or db" do
+
+        let(:in_map) do
+          Mongoid::IdentityMap[Game.collection_name][game_two.id]
+        end
+
+        let(:game) do
+          Game.where("person_id" => person.id).from_map_or_db
+        end
+
+        it "returns the document from the map" do
+          game.should equal(in_map)
+        end
+      end
     end
 
     context "when including a belongs to" do

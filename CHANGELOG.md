@@ -54,6 +54,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1479 Don't duplicate ids on many-to-many when using create or create!
 
+* \#1469 When extract_id returns nil, get the document out of the identity map
+  by the criteria selector.
+
 * \#1467 Defining a field named metadata now properly raises an invalid field
   error.
 
