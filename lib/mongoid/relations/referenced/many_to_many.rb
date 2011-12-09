@@ -81,49 +81,6 @@ module Mongoid # :nodoc:
         end
         alias :new :build
 
-        # Creates a new document on the references many relation. This will
-        # save the document if the parent has been persisted.
-        #
-        # @example Create and save the new document.
-        #   person.posts.create(:text => "Testing")
-        #
-        # @param [ Hash ] attributes The attributes to create with.
-        # @param [ Class ] type The optional type of document to create.
-        #
-        # @return [ Document ] The newly created document.
-        #
-        # @since 2.0.0.beta.1
-        def create(attributes = nil, type = nil, &block)
-          super.tap do |doc|
-            base.send(metadata.foreign_key).delete_one(doc.id)
-            base.push(metadata.foreign_key, doc.id)
-            base.synced[metadata.foreign_key] = false
-          end
-        end
-
-        # Creates a new document on the references many relation. This will
-        # save the document if the parent has been persisted and will raise an
-        # error if validation fails.
-        #
-        # @example Create and save the new document.
-        #   person.posts.create!(:text => "Testing")
-        #
-        # @param [ Hash ] attributes The attributes to create with.
-        # @param [ Class ] type The optional type of document to create.
-        #
-        # @raise [ Errors::Validations ] If validation failed.
-        #
-        # @return [ Document ] The newly created document.
-        #
-        # @since 2.0.0.beta.1
-        def create!(attributes = nil, type = nil, &block)
-          super.tap do |doc|
-            base.send(metadata.foreign_key).delete_one(doc.id)
-            base.push(metadata.foreign_key, doc.id)
-            base.synced[metadata.foreign_key] = false
-          end
-        end
-
         # Delete the document from the relation. This will set the foreign key
         # on the document to nil. If the dependent options on the relation are
         # :delete or :destroy the appropriate removal will occur.

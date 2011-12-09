@@ -43,14 +43,16 @@ For instructions on upgrading to newer versions, visit
 * \#1483 Sending module includes at runtime which add new fields to a parent
   document, also have the fields added to subclasses.
 
-* \#1481 Fix invalid query when accessing many-to-many relations before
-  defaults are set.
-
 * \#1482 Applying new sorting options does not merge into previously
   chained criteria. (Gerad Suyderhoud)
 
+* \#1481 Fix invalid query when accessing many-to-many relations before
+  defaults are set.
+
 * \#1480 Mongoid's internal serialized field types renamespaced to Internal in order
   to not conflict with ruby core classes in custom serializable types.
+
+* \#1479 Don't duplicate ids on many-to-many when using create or create!
 
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
