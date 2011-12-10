@@ -33,9 +33,11 @@ module Mongoid #:nodoc
     extend ActiveSupport::Concern
 
     included do
+      class_attribute :aliased_fields
       class_attribute :defaults
       class_attribute :fields
 
+      self.aliased_fields = {}
       self.defaults = []
       self.fields = {}
 
@@ -168,7 +170,9 @@ module Mongoid #:nodoc
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The hash of options.
       def add_field(name, options = {})
-        meth = options.delete(:as) || name
+        aliased = options[:as]
+        aliased_fields[aliased.to_s] = name if aliased
+        meth = aliased || name
         type = options[:localize] ? Fields::Internal::Localized : options[:type]
         Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field

@@ -14,6 +14,7 @@ describe Mongoid::Criterion::Selector do
 
     before do
       klass.stubs(:fields).returns({})
+      klass.stubs(:aliased_fields).returns({})
     end
 
     it "stores the class" do
@@ -33,12 +34,14 @@ describe Mongoid::Criterion::Selector do
 
     it "should store the values provided" do
       klass.stubs(:fields).returns({})
+      klass.stubs(:aliased_fields).returns({})
       selector["age"] = 45
       selector["age"].should == 45
     end
 
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
+      klass.stubs(:aliased_fields).returns({})
       field.expects(:serialize).with("45").returns(45)
       selector["age"] = "45"
       selector["age"].should == 45
@@ -46,6 +49,7 @@ describe Mongoid::Criterion::Selector do
 
     it "should typecast complex conditions" do
       klass.stubs(:fields).returns({"age" => field})
+      klass.stubs(:aliased_fields).returns({})
       field.expects(:serialize).with("45").returns(45)
       selector["age"] = { "$gt" => "45" }
       selector["age"].should == { "$gt" => 45 }
@@ -98,6 +102,7 @@ describe Mongoid::Criterion::Selector do
 
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
+      klass.stubs(:aliased_fields).returns({})
       field.expects(:serialize).with("45").returns(45)
       selector.update({"age" => "45"})
       selector["age"].should == 45
@@ -116,6 +121,7 @@ describe Mongoid::Criterion::Selector do
 
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
+      klass.stubs(:aliased_fields).returns({})
       field.expects(:serialize).with("45").returns(45)
       selector.merge!({"age" => "45"})
       selector["age"].should == 45
@@ -135,6 +141,7 @@ describe Mongoid::Criterion::Selector do
     context "when the key is not a declared field" do
       it "returns the value" do
         klass.stubs(:fields).returns({})
+        klass.stubs(:aliased_fields).returns({})
         selector.send(:try_to_typecast, "age", "45").should == "45"
       end
     end
@@ -143,6 +150,7 @@ describe Mongoid::Criterion::Selector do
       it "returns the typecast value" do
         field = stub_everything
         klass.stubs(:fields).returns({"age" => field})
+        klass.stubs(:aliased_fields).returns({})
         selector.expects(:typecast_value_for).with(field, "45")
         selector.send(:try_to_typecast, "age", "45")
       end

@@ -259,6 +259,17 @@ describe Mongoid::Fields do
         person.expects(:read_attribute).with("aliased")
         person.alias?
       end
+
+      context "when defining a criteria" do
+
+        let(:criteria) do
+          Person.where(:alias => "true")
+        end
+
+        it "properly serializes the aliased field" do
+          criteria.selector.should eq({ :alias => true })
+        end
+      end
     end
 
     context "custom options" do

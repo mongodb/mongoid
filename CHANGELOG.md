@@ -38,6 +38,8 @@ For instructions on upgrading to newer versions, visit
 * \#1363 Added fallbacks and default support to localized fields, and added
   ability to get and set all translations at once.
 
+* \#1362 Aliased fields now properly typecast in criteria.
+
 ### Resolved Issues
 
 * \#1483 Sending module includes at runtime which add new fields to a parent

@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
     # mongoid criteria selectors.
     class Selector < Hash
 
-      attr_reader :fields, :klass
+      attr_reader :aliased_fields, :fields, :klass
 
       # Create the new selector.
       #
@@ -17,7 +17,8 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def initialize(klass)
-        @fields, @klass = klass.fields.except("_id", "_type"), klass
+        @aliased_fields, @fields, @klass =
+          klass.aliased_fields, klass.fields.except("_id", "_type"), klass
       end
 
       # Set the value for the supplied key, attempting to typecast the value.
@@ -84,8 +85,10 @@ module Mongoid #:nodoc:
       # @since 1.0.0
       def try_to_typecast(key, value)
         access = key.to_s
-        return value unless fields.has_key?(access)
-        field = fields[access]
+        if !fields.has_key?(access) && !aliased_fields.has_key?(access)
+          return value
+        end
+        field = fields[access] || fields[aliased_fields[access]]
         typecast_value_for(field, value)
       end
 
