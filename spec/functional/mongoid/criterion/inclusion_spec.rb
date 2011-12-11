@@ -197,7 +197,7 @@ describe Mongoid::Criterion::Inclusion do
 
     context "when providing object ids" do
 
-      let(:from_db) do
+      let!(:from_db) do
         Person.all_of(
           { :_id.in => [ person_one.id, person_two.id ] },
           { :_id => person_two.id }
@@ -211,7 +211,7 @@ describe Mongoid::Criterion::Inclusion do
 
     context "when providing string ids" do
 
-      let(:from_db) do
+      let!(:from_db) do
         Person.all_of(
           { :_id.in => [ person_one.id.to_s, person_two.id.to_s ] },
           { :_id => person_two.id.to_s }
@@ -225,8 +225,8 @@ describe Mongoid::Criterion::Inclusion do
 
     context "when providing no expressions" do
 
-      let(:from_db) do
-        Person.all_of()
+      let!(:from_db) do
+        Person.all_of
       end
 
       it "returns all documents" do
