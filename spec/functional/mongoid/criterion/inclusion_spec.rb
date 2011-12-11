@@ -226,13 +226,19 @@ describe Mongoid::Criterion::Inclusion do
     context "when providing no expressions" do
 
       let!(:from_db) do
-        p DATABASE_ID
-        p Person.collection.find.to_a
         Person.all_of
       end
 
-      it "returns all documents" do
-        from_db.should eq([ person_one, person_two ])
+      it "returns the first document" do
+        from_db.should include(person_one)
+      end
+
+      it "returns the second document" do
+        from_db.should include(person_two)
+      end
+
+      it "returns only the matching documents" do
+        from_db.count.should eq(2)
       end
     end
   end
