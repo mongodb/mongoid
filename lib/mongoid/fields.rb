@@ -237,36 +237,44 @@ module Mongoid #:nodoc
         field = fields[name]
         generated_field_methods.module_eval do
           if field.cast_on_read?
-            define_method(meth) do
-              field.deserialize(read_attribute(name))
-            end
+            class_eval <<-EOM
+              def #{meth}
+                fields[#{name.inspect}].deserialize(read_attribute(#{name.inspect}))
+              end
+            EOM
           else
-            define_method(meth) do
-              read_attribute(name).tap do |value|
-                if value.is_a?(Array) || value.is_a?(Hash)
-                  unless changed_attributes.include?(name)
-                    changed_attributes[name] = value.clone
+            class_eval <<-EOM
+              def #{meth}
+                read_attribute(#{name.inspect}).tap do |value|
+                  if value.is_a?(Array) || value.is_a?(Hash)
+                    unless changed_attributes.include?(#{name.inspect})
+                      changed_attributes[#{name.inspect}] = value.clone
+                    end
                   end
                 end
               end
+            EOM
+          end
+          class_eval <<-EOM
+            def #{meth}=(value)
+              write_attribute(#{name.inspect}, value)
             end
-          end
-          define_method("#{meth}=") do |value|
-            write_attribute(name, value)
-          end
-          define_method("#{meth}?") do
-            attr = read_attribute(name)
-            (options[:type] == Boolean) ? attr == true : attr.present?
-          end
+            def #{meth}?
+              attr = read_attribute(#{name.inspect})
+              attr == true || attr.present?
+            end
+          EOM
 
           if options[:localize]
-            define_method("#{meth}_translations") do
-              attributes[name]
-            end
-            define_method("#{meth}_translations=") do |value|
-              attribute_will_change!(name)
-              attributes[name] = value
-            end
+            class_eval <<-EOM
+              def #{meth}_translations
+                attributes[#{name.inspect}]
+              end
+              def #{meth}_translations=(value)
+                attribute_will_change!(#{name.inspect})
+                attributes[#{name.inspect}] = value
+              end
+            EOM
           end
         end
       end
