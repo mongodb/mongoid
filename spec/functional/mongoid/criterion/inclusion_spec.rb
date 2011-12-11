@@ -226,6 +226,8 @@ describe Mongoid::Criterion::Inclusion do
     context "when providing no expressions" do
 
       let!(:from_db) do
+        p DATABASE_ID
+        p Person.collection.find.to_a
         Person.all_of
       end
 
