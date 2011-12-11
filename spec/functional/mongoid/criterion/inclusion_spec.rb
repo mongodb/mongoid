@@ -188,11 +188,11 @@ describe Mongoid::Criterion::Inclusion do
   describe "#all_of" do
 
     let!(:person_one) do
-      Person.create(:ssn => "354-12-1221")
+      Person.safely.create!(:ssn => "354-12-1221")
     end
 
     let!(:person_two) do
-      Person.create(:ssn => "354-12-1222")
+      Person.safely.create!(:ssn => "354-12-1222")
     end
 
     context "when providing object ids" do
