@@ -38,9 +38,9 @@ describe Mongoid::Dirty do
     end
 
     it "records the foreign key dirty changes" do
-      person.previous_changes.should eq({
-        "preference_ids" => [[], [ preference.id ]], "version" => [1, 2]
-      })
+      person.previous_changes["preference_ids"].should eq(
+        [[], [ preference.id ]]
+      )
     end
   end
 
