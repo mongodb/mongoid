@@ -84,7 +84,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.6
     def attribute_changed?(attr)
-      return false unless changed_attributes.include?(attr)
+      return false unless changed_attributes.has_key?(attr)
       changed_attributes[attr] != attributes[attr]
     end
 
@@ -100,10 +100,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def attribute_will_change!(attr)
-      unless changed_attributes.include?(attr)
-        value = read_attribute(attr)
-        value = value.duplicable? ? value.clone : value
-        changed_attributes[attr] = value
+      unless changed_attributes.has_key?(attr)
+        changed_attributes[attr] = read_attribute(attr)._deep_copy
       end
     end
   end

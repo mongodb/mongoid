@@ -247,9 +247,7 @@ module Mongoid #:nodoc
               def #{meth}
                 read_attribute(#{name.inspect}).tap do |value|
                   if value.is_a?(Array) || value.is_a?(Hash)
-                    unless changed_attributes.include?(#{name.inspect})
-                      changed_attributes[#{name.inspect}] = value.clone
-                    end
+                    attribute_will_change!(#{name.inspect})
                   end
                 end
               end

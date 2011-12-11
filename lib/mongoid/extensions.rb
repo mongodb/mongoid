@@ -1,11 +1,14 @@
 # encoding: utf-8
+require "mongoid/extensions/array/deep_copy"
 require "mongoid/extensions/array/deletion"
 require "mongoid/extensions/false_class/equality"
+require "mongoid/extensions/hash/deep_copy"
 require "mongoid/extensions/hash/criteria_helpers"
 require "mongoid/extensions/hash/scoping"
 require "mongoid/extensions/integer/checks"
 require "mongoid/extensions/nil/collectionization"
 require "mongoid/extensions/object/checks"
+require "mongoid/extensions/object/deep_copy"
 require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/object/substitutable"
 require "mongoid/extensions/object/yoda"
@@ -19,6 +22,7 @@ require "mongoid/extensions/true_class/equality"
 require "mongoid/extensions/object_id/conversions"
 
 class Array #:nodoc
+  include Mongoid::Extensions::Array::DeepCopy
   include Mongoid::Extensions::Array::Deletion
 end
 
@@ -32,6 +36,7 @@ class FalseClass #:nodoc
 end
 
 class Hash #:nodoc
+  include Mongoid::Extensions::Hash::DeepCopy
   include Mongoid::Extensions::Hash::CriteriaHelpers
   include Mongoid::Extensions::Hash::Scoping
 end
@@ -46,6 +51,7 @@ end
 
 class Object #:nodoc:
   include Mongoid::Extensions::Object::Checks
+  include Mongoid::Extensions::Object::DeepCopy
   include Mongoid::Extensions::Object::Reflections
   include Mongoid::Extensions::Object::Substitutable
   include Mongoid::Extensions::Object::Yoda
