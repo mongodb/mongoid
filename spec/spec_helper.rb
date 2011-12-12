@@ -21,8 +21,41 @@ Mongoid.configure do |config|
   config.logger = nil
 end
 
-Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
-Dir[ File.join(SUPPORT, "*.rb") ].each { |file| require File.basename(file) }
+Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
+  name = File.basename(file, ".rb")
+  autoload name.camelize.to_sym, name
+end
+
+module Medical
+  autoload :Patient, "medical/patient"
+  autoload :Prescription, "medical/prescription"
+end
+
+module MyCompany
+  module Model
+    autoload :TrackingId, "my_company/model/tracking_id"
+    autoload :TrackingIdValidationHistory, "my_company/model/tracking_id_validation_history"
+  end
+end
+
+module Trees
+  autoload :Node, "trees/node"
+end
+
+module Custom
+  autoload :String, "custom/string"
+  autoload :Type, "custom/type"
+end
+
+module Mongoid
+  module MyExtension
+    autoload :Object, "mongoid/my_extension/object"
+  end
+end
+
+Dir[ File.join(SUPPORT, "*.rb") ].each do |file|
+  require File.basename(file)
+end
 
 RSpec.configure do |config|
   config.mock_with(:mocha)

@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::NestedAttributes do
 
+  before(:all) do
+    [ HtmlWriter, BigPalette, Square, Circle, Truck, Car, Learner ]
+  end
+
   before do
     [ Person, Post, Game, Pizza, Topping ].map(&:delete_all)
   end

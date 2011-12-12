@@ -1,0 +1,1 @@
+class Eraser < Tool; end

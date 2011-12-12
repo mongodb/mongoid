@@ -1,12 +1,3 @@
-class ParentDoc
-  include Mongoid::Document
-
-  embeds_many :child_docs
-
-  field :statistic
-  field :children_order, :type => Array, :default => [] # hold all the children's id
-end
-
 class ChildDoc
   include Mongoid::Document
 

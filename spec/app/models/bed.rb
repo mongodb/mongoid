@@ -1,0 +1,1 @@
+class Bed; end

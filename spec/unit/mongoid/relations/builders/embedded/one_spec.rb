@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Embedded::One do
 
+  before(:all) do
+    PdfWriter
+  end
+
   let(:base) do
     stub
   end

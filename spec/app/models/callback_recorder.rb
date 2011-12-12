@@ -1,21 +1,3 @@
-class Actor
-  include Mongoid::Document
-  field :name
-
-  has_and_belongs_to_many :tags
-end
-
-class Actress < Actor
-end
-
-class ActorObserver < Mongoid::Observer
-  attr_reader :last_after_create_record
-
-  def after_create(record)
-    @last_after_create_record = record
-  end
-end
-
 class CallbackRecorder < Mongoid::Observer
   observe :actor
 

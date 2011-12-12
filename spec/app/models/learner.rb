@@ -1,0 +1,2 @@
+class Learner < Driver
+end

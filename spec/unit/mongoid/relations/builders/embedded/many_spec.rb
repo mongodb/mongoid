@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Embedded::Many do
 
+  before(:all) do
+    [ Square, Circle ]
+  end
+
   let(:base) do
     stub
   end
