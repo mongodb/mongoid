@@ -30,6 +30,17 @@ describe Mongoid::Fields::Internal::Localized do
 
   describe "#deserialize" do
 
+    context "when the field is nil" do
+
+      let(:value) do
+        field.deserialize(nil)
+      end
+
+      it "returns nil" do
+        value.should be_nil
+      end
+    end
+    
     context "when no locale is defined" do
 
       let(:value) do

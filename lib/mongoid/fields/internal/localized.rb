@@ -19,6 +19,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.3.0
         def deserialize(object)
+          return nil if object.nil?
+          
           locale = ::I18n.locale
           if ::I18n.respond_to?(:fallbacks)
             object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| object[loc] }]
