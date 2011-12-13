@@ -91,11 +91,9 @@ describe Mongoid::Relations::Builders::Embedded::One do
         @document = builder.build
       end
 
-      # FIXME this fails when run via 'rspec ./spec',
-      #       @doc is a Writer then - why?
-      # it "creates the correct type of document" do
-      #   @document.should be_a_kind_of(PdfWriter)
-      # end
+      it "creates the correct type of document" do
+        @document.should be_a_kind_of(PdfWriter)
+      end
 
       it "sets the object on the document" do
         @document.speed.should == 100
