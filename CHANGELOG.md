@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
+* \#1496 Mongoid now casts strings back to symbols for symbol fields that
+  get saved as strings by another application.
+
 * \#1454, \#900 Associations now have an `after_build` callback that gets
   executed after `.build` or `build_` methods are called.
   (Jeffrey Jones, Ryan Townsend)

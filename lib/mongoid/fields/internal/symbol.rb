@@ -21,6 +21,7 @@ module Mongoid #:nodoc:
         def serialize(object)
           object.blank? ? nil : object.to_sym
         end
+        alias :deserialize :serialize
       end
     end
   end

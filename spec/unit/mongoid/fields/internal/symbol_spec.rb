@@ -8,8 +8,18 @@ describe Mongoid::Fields::Internal::Symbol do
 
   describe ".deserialize" do
 
-    it "returns the string" do
-      field.deserialize(:test).should == :test
+    context "when provided a symbol" do
+
+      it "returns the symbol" do
+        field.deserialize(:test).should == :test
+      end
+    end
+
+    context "when provided a string" do
+
+      it "returns a symbol" do
+        field.deserialize("test").should eq(:test)
+      end
     end
   end
 
