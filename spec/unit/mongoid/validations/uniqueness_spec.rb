@@ -99,7 +99,6 @@ describe Mongoid::Validations::UniquenessValidator do
 
         before do
           Dictionary.expects(:where).with(:name => "Oxford").returns(criteria)
-          criteria.expects(:where).with(:year => dictionary.year).returns(criteria)
           criteria.expects(:exists?).returns(true)
           validator.validate_each(dictionary, :name, "Oxford")
         end

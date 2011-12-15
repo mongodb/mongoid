@@ -47,9 +47,20 @@ module Mongoid #:nodoc:
           criteria = relation.where(criterion(document, attribute, value))
           criteria = scope(criteria, document, attribute)
           if document.primary_key == Array.wrap(attribute)
-            document.errors.add(attribute, :taken, options.except(:case_sensitive, :scope).merge(:value => value)) if criteria.count > 1
+            if criteria.count > 1
+              document.errors.add(
+                attribute,
+                :taken, options.except(:case_sensitive, :scope).merge(:value => value)
+              )
+            end
           else
-            document.errors.add(attribute, :taken, options.except(:case_sensitive, :scope).merge(:value => value)) if criteria.exists?
+            if criteria.exists?
+              document.errors.add(
+                attribute,
+                :taken,
+                options.except(:case_sensitive, :scope).merge(:value => value)
+              )
+            end
           end
         else
           criteria = klass.where(criterion(document, attribute, value))
