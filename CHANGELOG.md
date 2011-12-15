@@ -45,6 +45,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1491 Return nil when no default set on localized fields. (Tiago Rafael Godinho)
+
 * \#1483 Sending module includes at runtime which add new fields to a parent
   document, also have the fields added to subclasses.
 
