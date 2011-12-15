@@ -90,6 +90,24 @@ describe Mongoid::Validations::UniquenessValidator do
           dictionary.errors[:name].should eq([ "is already taken" ])
         end
       end
+
+      context "when providing a message" do
+
+        let(:options) do
+          { :attributes => dictionary.attributes, :message => "my test message" }
+        end
+
+        before do
+          Dictionary.expects(:where).with(:name => "Oxford").returns(criteria)
+          criteria.expects(:where).with(:year => dictionary.year).returns(criteria)
+          criteria.expects(:exists?).returns(true)
+          validator.validate_each(dictionary, :name, "Oxford")
+        end
+
+        it "checks existance with a message" do
+          dictionary.errors[:name].should eq([ "my test message" ])
+        end
+      end
     end
 
     context "when the document is embedded" do
