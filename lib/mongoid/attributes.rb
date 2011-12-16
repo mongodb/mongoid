@@ -169,7 +169,11 @@ module Mongoid #:nodoc:
       defaults.each do |name|
         unless attributes.has_key?(name)
           if field = fields[name]
-            attributes[name] = field.eval_default(self)
+            default = field.eval_default(self)
+            if attributes[name] != default
+              attribute_will_change!(name)
+              attributes[name] = default
+            end
           end
         end
       end

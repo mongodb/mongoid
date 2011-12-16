@@ -41,7 +41,7 @@ describe Mongoid::Timestamps do
   context "when the document has not changed" do
 
     let(:person) do
-      Person.instantiate(:created_at => Time.now.utc)
+      Person.instantiate(Person.new.attributes)
     end
 
     before do

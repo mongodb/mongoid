@@ -103,6 +103,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1333 Fixed errors with custom types that exist in namespaces. (Peter Gumeson)
 
+* \#1259 Default values are treated as dirty if they differ from the database
+  state.
+
 ## 2.3.4
 
 * \#1445 Prevent duplicate documents in the loaded array on the target
