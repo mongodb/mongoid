@@ -79,6 +79,17 @@ describe Mongoid::Relations::Cyclic do
         document.cyclic.should be_true
       end
     end
+
+    context "when cascading_callbacks are enabled" do
+
+      let(:document) do
+        Fruits::Pineapple.new
+      end
+
+      it "creates relation with cascading callbacks enabled" do
+        document.class.relations['child_pineapples'].should be_cascading_callbacks
+      end
+    end
   end
 
   describe ".recursively_embeds_one" do
