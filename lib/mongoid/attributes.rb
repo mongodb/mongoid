@@ -226,8 +226,12 @@ module Mongoid #:nodoc:
           alias :#{name} :#{original}
           alias :#{name}= :#{original}=
           alias :#{name}? :#{original}?
+          alias :#{name}_change :#{original}_change
+          alias :#{name}_changed? :#{original}_changed?
+          alias :reset_#{name}! :reset_#{original}!
+          alias :#{name}_was :#{original}_was
+          alias :#{name}_will_change! :#{original}_will_change!
         RUBY
-        super
       end
     end
   end

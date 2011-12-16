@@ -179,7 +179,7 @@ module Mongoid #:nodoc
           defaults << name unless field.default_val.nil?
           create_accessors(name, meth, options)
           process_options(field)
-          define_attribute_method(name)
+          create_dirty_methods(name)
         end
       end
 
@@ -235,7 +235,7 @@ module Mongoid #:nodoc
       # @param [ Hash ] options The options.
       def create_accessors(name, meth, options = {})
         field = fields[name]
-        generated_field_methods.module_eval do
+        generated_methods.module_eval do
           if field.cast_on_read?
             class_eval <<-EOM
               def #{meth}
@@ -257,6 +257,7 @@ module Mongoid #:nodoc
             def #{meth}=(value)
               write_attribute(#{name.inspect}, value)
             end
+
             def #{meth}?
               attr = read_attribute(#{name.inspect})
               attr == true || attr.present?
@@ -268,6 +269,7 @@ module Mongoid #:nodoc
               def #{meth}_translations
                 attributes[#{name.inspect}]
               end
+
               def #{meth}_translations=(value)
                 attribute_will_change!(#{name.inspect})
                 attributes[#{name.inspect}] = value
@@ -280,9 +282,9 @@ module Mongoid #:nodoc
       # Include the field methods as a module, so they can be overridden.
       #
       # @example Include the fields.
-      #   Person.generated_field_methods
-      def generated_field_methods
-        @generated_field_methods ||= begin
+      #   Person.generated_methods
+      def generated_methods
+        @generated_methods ||= begin
           Module.new.tap do |mod|
             include mod
           end
