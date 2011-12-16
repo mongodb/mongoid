@@ -14,4 +14,9 @@ module Fruits
     include Mongoid::Document
     recursively_embeds_many :cascade_callbacks => true
   end
+
+  class Mango
+    include Mongoid::Document
+    recursively_embeds_one :cascade_callbacks => true
+  end
 end
