@@ -168,7 +168,7 @@ module Mongoid #:nodoc:
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
       attributes.tap do |attrs|
-        break if frozen?
+        return attrs if frozen?
         relations.each_pair do |name, meta|
           if meta.embedded?
             relation = send(name)

@@ -11,7 +11,13 @@ describe Mongoid::Copyable do
     describe "##{method}" do
 
       let(:person) do
-        Person.new(:title => "Sir", :ssn => "234-33-3123", :version => 4)
+        Person.new(
+          :title => "Sir",
+          :ssn => "234-33-3123",
+          :version => 4,
+          :created_at => Time.now,
+          :updated_at => Time.now
+        )
       end
 
       let!(:address) do
