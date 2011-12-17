@@ -9,4 +9,14 @@ module Fruits
     include Mongoid::Document
     belongs_to :apple, :class_name => "Fruits::Apple"
   end
+
+  class Pineapple
+    include Mongoid::Document
+    recursively_embeds_many :cascade_callbacks => true
+  end
+
+  class Mango
+    include Mongoid::Document
+    recursively_embeds_one :cascade_callbacks => true
+  end
 end
