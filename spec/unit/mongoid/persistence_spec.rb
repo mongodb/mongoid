@@ -153,7 +153,7 @@ describe Mongoid::Persistence do
     context "when conditions provided" do
 
       before do
-        Person.expects(:all).with(:conditions => { :title => "Sir" }).returns([ person ])
+        Person.expects(:where).with(:title => "Sir").returns([ person ])
         person.expects(:run_callbacks).with(:destroy).yields
         Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
         remove.expects(:persist).returns(true)
@@ -171,7 +171,7 @@ describe Mongoid::Persistence do
     context "when conditions not provided" do
 
       before do
-        Person.expects(:all).with({}).returns([ person ])
+        Person.expects(:where).with({}).returns([ person ])
         person.expects(:run_callbacks).with(:destroy).yields
         Mongoid::Persistence::Operations::Remove.expects(:new).with(person, {}).returns(remove)
         remove.expects(:persist).returns(true)

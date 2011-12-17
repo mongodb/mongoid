@@ -214,7 +214,8 @@ module Mongoid #:nodoc:
       #
       # @return [ Integer ] The number of documents deleted.
       def delete_all(conditions = nil)
-        selector = (conditions || {})[:conditions] || {}
+        conds = conditions || {}
+        selector = conds[:conditions] || conds
         selector.merge!(:_type => name) if hereditary?
         collection.find(selector).count.tap do
           collection.remove(selector, Safety.merge_safety_options)
@@ -235,8 +236,9 @@ module Mongoid #:nodoc:
       # @param [ Hash ] conditions Optional conditions to destroy by.
       #
       # @return [ Integer ] The number of documents destroyed.
-      def destroy_all(conditions = {})
-        documents = all(conditions)
+      def destroy_all(conditions = nil)
+        conds = conditions || {}
+        documents = where(conds[:conditions] || conds)
         documents.count.tap do
           documents.each { |doc| doc.destroy }
         end

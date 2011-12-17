@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
+* \#1505 `Model.delete_all/destroy_all` now take either a :conditions hash or
+  the attributes directly.
+
 * \#1496 Mongoid now casts strings back to symbols for symbol fields that
   get saved as strings by another application.
 

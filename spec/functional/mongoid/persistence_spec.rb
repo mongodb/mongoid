@@ -1032,19 +1032,59 @@ describe Mongoid::Persistence do
     describe "##{method}" do
 
       let!(:person) do
-        Person.create(:ssn => "712-34-5111")
+        Person.create(:ssn => "712-34-5111", :title => "sir")
       end
 
-      let!(:removed) do
-        Person.send(method)
+      context "when no conditions are provided" do
+
+        let!(:removed) do
+          Person.send(method)
+        end
+
+        it "removes all the documents" do
+          Person.count.should eq(0)
+        end
+
+        it "returns the number of documents removed" do
+          removed.should eq(1)
+        end
       end
 
-      it "removes all the documents" do
-        Person.count.should eq(0)
-      end
+      context "when conditions are provided" do
 
-      it "returns the number of documents removed" do
-        removed.should eq(1)
+        let!(:person_two) do
+          Person.create(:ssn => "712-34-5112", :title => "madam")
+        end
+
+        context "when in a conditions attribute" do
+
+          let!(:removed) do
+            Person.send(method, :conditions => { :title => "sir" })
+          end
+
+          it "removes the matching documents" do
+            Person.count.should eq(1)
+          end
+
+          it "returns the number of documents removed" do
+            removed.should eq(1)
+          end
+        end
+
+        context "when no conditions attribute provided" do
+
+          let!(:removed) do
+            Person.send(method, :title => "sir")
+          end
+
+          it "removes the matching documents" do
+            Person.count.should eq(1)
+          end
+
+          it "returns the number of documents removed" do
+            removed.should eq(1)
+          end
+        end
       end
     end
   end
