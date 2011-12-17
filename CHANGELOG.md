@@ -13,6 +13,9 @@ For instructions on upgrading to newer versions, visit
 * \#1505 `Model.delete_all/destroy_all` now take either a :conditions hash or
   the attributes directly.
 
+* \#1504 `Model.recursively_embeds_many` now accepts a :cascade_callbacks
+  option. (Pavel Pravosud)
+
 * \#1496 Mongoid now casts strings back to symbols for symbol fields that
   get saved as strings by another application.
 

@@ -81,6 +81,7 @@ describe Mongoid::Relations::Cyclic do
     end
 
     context "when cascading callbacks are enabled" do
+
       let(:document) do
         Fruits::Pineapple.new
       end
@@ -110,6 +111,7 @@ describe Mongoid::Relations::Cyclic do
     end
 
     context "when cascading callbacks are enabled" do
+
       let(:document) do
         Fruits::Mango.new
       end
@@ -118,6 +120,5 @@ describe Mongoid::Relations::Cyclic do
         document.class.relations['child_mango'].should be_cascading_callbacks
       end
     end
-
   end
 end

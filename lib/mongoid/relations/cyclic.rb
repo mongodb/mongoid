@@ -35,8 +35,11 @@ module Mongoid # :nodoc:
         # or its children.
         #
         # @since 2.0.0.rc.1
-        def recursively_embeds_many(embeds_options={})
-          embeds_many cyclic_child_name, embeds_options.merge(:class_name => self.name, :cyclic => true)
+        def recursively_embeds_many(options = {})
+          embeds_many(
+            cyclic_child_name,
+            options.merge(:class_name => self.name, :cyclic => true)
+          )
           embedded_in cyclic_parent_name, :class_name => self.name, :cyclic => true
         end
 
@@ -62,8 +65,11 @@ module Mongoid # :nodoc:
         # or its children.
         #
         # @since 2.0.0.rc.1
-        def recursively_embeds_one(embeds_options={})
-          embeds_one cyclic_child_name(false), embeds_options.merge(:class_name => self.name, :cyclic => true)
+        def recursively_embeds_one(options = {})
+          embeds_one(
+            cyclic_child_name(false),
+            options.merge(:class_name => self.name, :cyclic => true)
+          )
           embedded_in cyclic_parent_name, :class_name => self.name, :cyclic => true
         end
 
