@@ -15,6 +15,7 @@ module Mongoid #:nodoc:
 
     included do
       field :deleted_at, :type => Time
+      self.paranoid = true
     end
 
     # Delete the paranoid +Document+ from the database completely. This will

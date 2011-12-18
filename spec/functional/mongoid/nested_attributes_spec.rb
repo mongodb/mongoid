@@ -908,6 +908,14 @@ describe Mongoid::NestedAttributes do
           Address.new(:street => "Kurfeurstendamm")
         end
 
+        let(:phone_one) do
+          ParanoidPhone.new(:number => "1")
+        end
+
+        let(:phone_two) do
+          ParanoidPhone.new(:number => "2")
+        end
+
         context "when a limit is specified" do
 
           before(:all) do
@@ -1141,173 +1149,256 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
-                before(:all) do
-                  Person.send(:undef_method, :addresses_attributes=)
-                  Person.accepts_nested_attributes_for :addresses, :allow_destroy => true
-                end
+                context "when the child is not paranoid" do
 
-                after(:all) do
-                  Person.send(:undef_method, :addresses_attributes=)
-                  Person.accepts_nested_attributes_for :addresses
-                end
+                  before(:all) do
+                    Person.send(:undef_method, :addresses_attributes=)
+                    Person.accepts_nested_attributes_for :addresses, :allow_destroy => true
+                  end
 
-                [ 1, "1", true, "true" ].each do |truth|
+                  after(:all) do
+                    Person.send(:undef_method, :addresses_attributes=)
+                    Person.accepts_nested_attributes_for :addresses
+                  end
 
-                  context "when passed a #{truth} with destroy" do
+                  [ 1, "1", true, "true" ].each do |truth|
 
-                    context "when the parent is new" do
+                    context "when passed a #{truth} with destroy" do
 
-                      before do
-                        person.addresses_attributes =
-                          {
-                            "bar" => { "id" => address_one.id.to_s, "_destroy" => truth },
-                            "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
-                          }
-                      end
-
-                      it "deletes the marked document" do
-                        person.addresses.size.should == 1
-                      end
-
-                      it "does not delete the unmarked document" do
-                        person.addresses.first.street.should == "Alexander Platz"
-                      end
-                    end
-
-                    context "when the parent is persisted" do
-
-                      let!(:persisted) do
-                        Person.create(:ssn => "123-12-1111") do |p|
-                          p.addresses << [ address_one, address_two ]
-                        end
-                      end
-
-                      context "when setting, pulling, and pushing in one op" do
+                      context "when the parent is new" do
 
                         before do
-                          persisted.addresses_attributes =
+                          person.addresses_attributes =
                             {
-                              "bar" => { "id" => address_one.id, "_destroy" => truth },
-                              "foo" => { "id" => address_two.id, "street" => "Alexander Platz" },
-                              "baz" => { "street" => "Potsdammer Platz" }
+                              "bar" => { "id" => address_one.id.to_s, "_destroy" => truth },
+                              "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
                             }
                         end
 
-                        it "removes the first document from the relation" do
-                          persisted.addresses.size.should eq(2)
+                        it "deletes the marked document" do
+                          person.addresses.size.should == 1
                         end
 
                         it "does not delete the unmarked document" do
-                          persisted.addresses.first.street.should eq(
-                            "Alexander Platz"
-                          )
+                          person.addresses.first.street.should == "Alexander Platz"
+                        end
+                      end
+
+                      context "when the parent is persisted" do
+
+                        let!(:persisted) do
+                          Person.create(:ssn => "123-12-1111") do |p|
+                            p.addresses << [ address_one, address_two ]
+                          end
                         end
 
-                        it "adds the new document to the relation" do
-                          persisted.addresses.last.street.should eq(
-                            "Potsdammer Platz"
-                          )
-                        end
-
-                        it "has the proper persisted count" do
-                          persisted.addresses.count.should eq(1)
-                        end
-
-                        it "does not delete the removed document" do
-                          address_one.should_not be_destroyed
-                        end
-
-                        context "when saving the parent" do
+                        context "when setting, pulling, and pushing in one op" do
 
                           before do
-                            persisted.safely.save
+                            persisted.addresses_attributes =
+                              {
+                                "bar" => { "id" => address_one.id, "_destroy" => truth },
+                                "foo" => { "id" => address_two.id, "street" => "Alexander Platz" },
+                                "baz" => { "street" => "Potsdammer Platz" }
+                              }
                           end
 
-                          it "deletes the marked document from the relation" do
-                            persisted.reload.addresses.count.should eq(2)
+                          it "removes the first document from the relation" do
+                            persisted.addresses.size.should eq(2)
                           end
 
                           it "does not delete the unmarked document" do
-                            persisted.reload.addresses.first.street.should eq(
+                            persisted.addresses.first.street.should eq(
                               "Alexander Platz"
                             )
                           end
 
-                          it "persists the new document to the relation" do
-                            persisted.reload.addresses.last.street.should eq(
+                          it "adds the new document to the relation" do
+                            persisted.addresses.last.street.should eq(
                               "Potsdammer Platz"
                             )
                           end
+
+                          it "has the proper persisted count" do
+                            persisted.addresses.count.should eq(1)
+                          end
+
+                          it "does not delete the removed document" do
+                            address_one.should_not be_destroyed
+                          end
+
+                          context "when saving the parent" do
+
+                            before do
+                              persisted.safely.save
+                            end
+
+                            it "deletes the marked document from the relation" do
+                              persisted.reload.addresses.count.should eq(2)
+                            end
+
+                            it "does not delete the unmarked document" do
+                              persisted.reload.addresses.first.street.should eq(
+                                "Alexander Platz"
+                              )
+                            end
+
+                            it "persists the new document to the relation" do
+                              persisted.reload.addresses.last.street.should eq(
+                                "Potsdammer Platz"
+                              )
+                            end
+                          end
                         end
-                      end
 
-                      context "when pulling and pushing in one op" do
-
-                        before do
-                          persisted.addresses_attributes =
-                            {
-                              "bar" => { "id" => address_one.id, "_destroy" => truth },
-                              "baz" => { "street" => "Potsdammer Platz" }
-                            }
-                        end
-
-                        it "removes the first document from the relation" do
-                          persisted.addresses.size.should eq(2)
-                        end
-
-                        it "adds the new document to the relation" do
-                          persisted.addresses.last.street.should eq(
-                            "Potsdammer Platz"
-                          )
-                        end
-
-                        it "has the proper persisted count" do
-                          persisted.addresses.count.should eq(1)
-                        end
-
-                        it "does not delete the removed document" do
-                          address_one.should_not be_destroyed
-                        end
-
-                        context "when saving the parent" do
+                        context "when pulling and pushing in one op" do
 
                           before do
-                            persisted.safely.save
+                            persisted.addresses_attributes =
+                              {
+                                "bar" => { "id" => address_one.id, "_destroy" => truth },
+                                "baz" => { "street" => "Potsdammer Platz" }
+                              }
                           end
 
-                          it "deletes the marked document from the relation" do
-                            persisted.reload.addresses.count.should eq(2)
+                          it "removes the first document from the relation" do
+                            persisted.addresses.size.should eq(2)
                           end
 
-                          it "persists the new document to the relation" do
-                            persisted.reload.addresses.last.street.should eq(
+                          it "adds the new document to the relation" do
+                            persisted.addresses.last.street.should eq(
                               "Potsdammer Platz"
                             )
+                          end
+
+                          it "has the proper persisted count" do
+                            persisted.addresses.count.should eq(1)
+                          end
+
+                          it "does not delete the removed document" do
+                            address_one.should_not be_destroyed
+                          end
+
+                          context "when saving the parent" do
+
+                            before do
+                              persisted.safely.save
+                            end
+
+                            it "deletes the marked document from the relation" do
+                              persisted.reload.addresses.count.should eq(2)
+                            end
+
+                            it "persists the new document to the relation" do
+                              persisted.reload.addresses.last.street.should eq(
+                                "Potsdammer Platz"
+                              )
+                            end
                           end
                         end
                       end
                     end
                   end
+
+                  [ 0, "0", false, "false" ].each do |falsehood|
+
+                    context "when passed a #{falsehood} with destroy" do
+
+                      before do
+                        person.addresses_attributes =
+                          {
+                            "bar" => { "id" => address_one.id, "_destroy" => falsehood },
+                            "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
+                          }
+                      end
+
+                      it "does not delete the marked document" do
+                        person.addresses.size.should == 2
+                      end
+
+                      it "does not delete the unmarked document" do
+                        person.addresses.last.street.should == "Alexander Platz"
+                      end
+                    end
+                  end
                 end
 
-                [ 0, "0", false, "false" ].each do |falsehood|
+                context "when the child is paranoid" do
 
-                  context "when passed a #{falsehood} with destroy" do
+                  before(:all) do
+                    Person.send(:undef_method, :paranoid_phones_attributes=)
+                    Person.accepts_nested_attributes_for :paranoid_phones,
+                      :allow_destroy => true
+                  end
 
-                    before do
-                      person.addresses_attributes =
-                        {
-                          "bar" => { "id" => address_one.id, "_destroy" => falsehood },
-                          "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
-                        }
-                    end
+                  after(:all) do
+                    Person.send(:undef_method, :paranoid_phones_attributes=)
+                    Person.accepts_nested_attributes_for :paranoid_phones
+                  end
 
-                    it "does not delete the marked document" do
-                      person.addresses.size.should == 2
-                    end
+                  [ 1, "1", true, "true" ].each do |truth|
 
-                    it "does not delete the unmarked document" do
-                      person.addresses.last.street.should == "Alexander Platz"
+                    context "when passed a #{truth} with destroy" do
+
+                      context "when the parent is persisted" do
+
+                        let!(:persisted) do
+                          Person.create(:ssn => "123-12-1111") do |p|
+                            p.paranoid_phones << [ phone_one, phone_two ]
+                          end
+                        end
+
+                        context "when setting, pulling, and pushing in one op" do
+
+                          before do
+                            persisted.paranoid_phones_attributes =
+                              {
+                                "bar" => { "id" => phone_one.id, "_destroy" => truth },
+                                "foo" => { "id" => phone_two.id, "number" => "3" },
+                                "baz" => { "number" => "4" }
+                              }
+                          end
+
+                          it "removes the first document from the relation" do
+                            persisted.paranoid_phones.size.should eq(2)
+                          end
+
+                          it "does not delete the unmarked document" do
+                            persisted.paranoid_phones.first.number.should eq("3")
+                          end
+
+                          it "adds the new document to the relation" do
+                            persisted.paranoid_phones.last.number.should eq("4")
+                          end
+
+                          it "has the proper persisted count" do
+                            persisted.paranoid_phones.count.should eq(1)
+                          end
+
+                          it "soft deletes the removed document" do
+                            phone_one.should be_destroyed
+                          end
+
+                          context "when saving the parent" do
+
+                            before do
+                              persisted.safely.save
+                            end
+
+                            it "deletes the marked document from the relation" do
+                              persisted.reload.paranoid_phones.count.should eq(2)
+                            end
+
+                            it "does not delete the unmarked document" do
+                              persisted.reload.paranoid_phones.first.number.should eq("3")
+                            end
+
+                            it "persists the new document to the relation" do
+                              persisted.reload.paranoid_phones.last.number.should eq("4")
+                            end
+                          end
+                        end
+                      end
                     end
                   end
                 end

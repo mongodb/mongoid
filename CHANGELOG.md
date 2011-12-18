@@ -54,6 +54,9 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* #1502 Nested attributes on embedded documents respects if the child is
+  paranoid.
+
 * \#1497 Use provided message on failing uniqueness validation. (Justin Etheredge)
 
 * \#1491 Return nil when no default set on localized fields. (Tiago Rafael Godinho)

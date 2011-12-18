@@ -8,6 +8,8 @@ module Mongoid #:nodoc
     included do
       extend ActiveModel::Translation
       extend Mongoid::Finders
+
+      class_attribute :paranoid
     end
 
     include ActiveModel::Conversion
