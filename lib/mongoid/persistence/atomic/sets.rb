@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
         # @ssete 2.0.0
         def persist
           prepare do
-            value ? document[field] = value : @value = document[field]
+            (not value.nil?) ? document[field] = value : @value = document[field]
             document[field].tap do
               collection.update(document.atomic_selector, operation("$set"), options)
               document.remove_change(field)
