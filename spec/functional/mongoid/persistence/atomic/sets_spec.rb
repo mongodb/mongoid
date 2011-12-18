@@ -9,7 +9,7 @@ describe Mongoid::Persistence::Atomic::Sets do
   describe "#set" do
 
     let(:person) do
-      Person.create(:ssn => "777-66-1010", :age => 100)
+      Person.create(:ssn => "777-66-1010", :age => 100, :pets => true)
     end
 
     let(:reloaded) do
@@ -56,6 +56,30 @@ describe Mongoid::Persistence::Atomic::Sets do
       it "resets the dirty attributes" do
         person.changes["age"].should be_nil
       end
+    end
+
+    context "when setting a field to false" do
+
+      let!(:set) do
+        person.set(:pets, false)
+      end
+
+      it "sets the provided value" do
+        person.pets.should == false
+      end
+
+      it "returns the new value" do
+        set.should == false
+      end
+
+      it "persists the changes" do
+        reloaded.pets.should == false
+      end
+
+      it "resets the dirty attributes" do
+        person.changes["pets"].should be_nil
+      end
+
     end
 
     context "when setting a nil field" do
