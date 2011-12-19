@@ -366,6 +366,11 @@ For instructions on upgrading to newer versions, visit
 * Deleting versions created with `Mongoid::Versioning` no longer fires off
   dependent cascading on relations.
 
+## 2.2.5
+
+* This was a small patch release to address 2.2.x Heroku errors during asset
+  compilation.
+
 ## 2.2.4
 
 * \#1377 Fix aggregation functions to properly handle nil or indefined values.
