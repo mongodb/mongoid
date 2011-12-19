@@ -79,4 +79,20 @@ describe Mongoid::Validations do
       klass.validates(:title, :uniqueness => true)
     end
   end
+  
+  describe ".validates_presence_of" do
+    before do
+      klass.expects(:validates_with).with(
+        Mongoid::Validations::PresenceValidator, { :attributes => [ :title ] }
+      )
+    end
+    
+    it "adds the presence validator" do
+      klass.validates_presence_of(:title)
+    end
+    
+    it "is picked up by validates method" do
+      klass.validates(:title, :presence => true)
+    end
+  end
 end
