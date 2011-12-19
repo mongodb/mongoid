@@ -3923,35 +3923,153 @@ describe Mongoid::NestedAttributes do
 
       context "when the second level is a one to one" do
 
-        let(:attributes) do
-          { :addresses_attributes =>
-            { "0" =>
-              {
-                :street => "Alexanderstr",
-                :code_attributes => { :name => "Home" }
+        context "when the nested document is new" do
+
+          let(:attributes) do
+            { :addresses_attributes =>
+              { "0" =>
+                {
+                  :street => "Alexanderstr",
+                  :code_attributes => { :name => "Home" }
+                }
               }
             }
-          }
+          end
+
+          before do
+            person.safely.update_attributes(attributes)
+          end
+
+          let(:address) do
+            person.addresses.first
+          end
+
+          let(:code) do
+            address.code
+          end
+
+          it "adds the new first level embedded document" do
+            address.street.should eq("Alexanderstr")
+          end
+
+          it "adds the nested embedded document" do
+            code.name.should eq("Home")
+          end
+        end
+      end
+
+      context "when the nested document is getting updated" do
+
+        context "when the nested document is not polymorphic" do
+
+          let!(:address) do
+            person.addresses.create(:street => "Alexanderstr", :number => 1)
+          end
+
+          let!(:code) do
+            address.create_code(:name => "Home")
+          end
+
+          let(:attributes) do
+            { :addresses_attributes =>
+              { "0" =>
+                {
+                  :_id => address.id,
+                  :number => 45,
+                  :code_attributes => {
+                    :_id => code.id,
+                    :name => "Work"
+                  }
+                }
+              }
+            }
+          end
+
+          before do
+            person.safely.update_attributes(attributes)
+          end
+
+          it "updates the first level embedded document" do
+            address.number.should eq(45)
+          end
+
+          it "updates the nested embedded document" do
+            code.name.should eq("Work")
+          end
         end
 
-        before do
-          person.safely.update_attributes(attributes)
-        end
+        context "when the nested document is polymorphic" do
 
-        let(:address) do
-          person.addresses.first
-        end
+          context "when the first level is an embeds many" do
 
-        let(:code) do
-          address.code
-        end
+            let!(:address) do
+              person.addresses.create(:street => "Alexanderstr", :number => 1)
+            end
 
-        it "adds the new first level embedded document" do
-          address.street.should eq("Alexanderstr")
-        end
+            let!(:target) do
+              address.create_target(:name => "test")
+            end
 
-        it "adds the nested embedded document" do
-          code.name.should eq("Home")
+            let(:attributes) do
+              { :addresses_attributes =>
+                { "0" =>
+                  {
+                    :_id => address.id,
+                    :number => 45,
+                    :target_attributes => {
+                      :_id => target.id,
+                      :name => "updated"
+                    }
+                  }
+                }
+              }
+            end
+
+            before do
+              person.safely.update_attributes(attributes)
+            end
+
+            it "updates the first level embedded document" do
+              address.number.should eq(45)
+            end
+
+            it "updates the nested embedded document" do
+              target.name.should eq("updated")
+            end
+          end
+
+          context "when the first level is an embeds one" do
+
+            context "when the id is passed as a string" do
+
+              let!(:name) do
+                person.create_name(:first_name => "john", :last_name => "doe")
+              end
+
+              let!(:language) do
+                name.create_language(:name => "english")
+              end
+
+              let(:attributes) do
+                { :name_attributes =>
+                  {
+                    :language_attributes => {
+                      :_id => language.id.to_s,
+                      :name => "deutsch"
+                    }
+                  }
+                }
+              end
+
+              before do
+                person.safely.update_attributes(attributes)
+              end
+
+              it "updates the nested embedded document" do
+                language.name.should eq("deutsch")
+              end
+            end
+          end
         end
       end
     end

@@ -60,15 +60,16 @@ module Mongoid # :nodoc:
       # @todo Durran: Move this into a common reusable place.
       #
       # @example Convert the id.
-      #   builder.convert_id("4d371b444835d98b8b000010")
+      #   builder.convert_id(Person, "4d371b444835d98b8b000010")
       #
+      # @param [ Class ] klass The class we're trying to convert for.
       # @param [ String ] id The id, usually coming from the form.
       #
       # @return [ BSON::ObjectId, String, Object ] The converted id.
       #
       # @since 2.0.0.rc.6
-      def convert_id(id)
-        metadata.constraint.convert(id)
+      def convert_id(klass, id)
+        BSON::ObjectId.convert(klass, id)
       end
     end
   end
