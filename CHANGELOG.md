@@ -56,6 +56,9 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* \#1517 Fix Mongoid documents to properly work with RSpec's stub_model.
+  (Tiago Rafael Godinho)
+
 * #1502 Nested attributes on embedded documents respects if the child is
   paranoid.
 
