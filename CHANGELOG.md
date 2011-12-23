@@ -56,6 +56,8 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* \#1523 Allow disabling of observers via `disable`. (Jonas Schneider)
+
 * \#1522 Fixed create indexes rake task for Rails 3.2. (Gray Manley)
 
 * \#1517 Fix Mongoid documents to properly work with RSpec's stub_model.
