@@ -159,7 +159,11 @@ module Mongoid #:nodoc:
           callback_meth = :"_notify_#{observer_name}_for_#{callback}"
           unless klass.respond_to?(callback_meth)
             klass.send(:define_method, callback_meth) do |&block|
-              observer.send(callback, self, &block)
+              if value = observer.update(callback, self, &block)
+                value
+              else
+                block.call if block
+              end
             end
             klass.send(callback, callback_meth)
           end
