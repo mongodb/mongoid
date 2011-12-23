@@ -37,6 +37,22 @@ describe Mongoid::Observer do
       actress and observer.last_after_create_record.try(:name).should == actress.name
     end
   end
+  
+  context "when the observer is disabled" do
+    let!(:observer) do
+      ActorObserver.instance
+    end
+
+    let(:actor) do
+      Actor.create!(:name => "Johnny Depp")
+    end
+
+    it "does not fire the observer" do
+      Actor.observers.disable(:all) do
+        actor and observer.last_after_create_record.should_not == actor
+      end
+    end
+  end
 
   context "when the document is new" do
 
