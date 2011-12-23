@@ -10,7 +10,7 @@ describe Mongoid::Relations::Referenced::Many do
     [ Person, Post, OrderedPost, Movie, Rating, Game, Drug ].map(&:delete_all)
   end
 
-  [ :<<, :push, :concat ].each do |method|
+  [ :<<, :push ].each do |method|
 
     describe "##{method}" do
 
@@ -148,8 +148,12 @@ describe Mongoid::Relations::Referenced::Many do
               person.posts.count.should eq(2)
             end
 
-            it "contains all documents in the target" do
-              person.posts.should eq([ post, post_two ])
+            it "contains the initial document in the target" do
+              person.posts.should include(post)
+            end
+
+            it "contains the added document in the target" do
+              person.posts.should include(post_two)
             end
           end
         end
@@ -872,6 +876,239 @@ describe Mongoid::Relations::Referenced::Many do
         it "clears out the relation" do
           movie.ratings.should be_empty
         end
+      end
+    end
+  end
+
+  describe "#concat" do
+
+    context "when the relations are not polymorphic" do
+
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts.concat([ post ])
+        end
+
+        it "sets the foreign key on the relation" do
+          post.person_id.should eq(person.id)
+        end
+
+        it "sets the base on the inverse relation" do
+          post.person.should eq(person)
+        end
+
+        it "sets the same instance on the inverse relation" do
+          post.person.should eql(person)
+        end
+
+        it "does not save the target" do
+          post.should be_new
+        end
+
+        it "adds the document to the target" do
+          person.posts.size.should eq(1)
+        end
+      end
+
+      context "when appending in a parent create block" do
+
+        let!(:post) do
+          Post.create(:title => "testing")
+        end
+
+        let!(:person) do
+          Person.create(:ssn => "345-11-1124") do |doc|
+            doc.posts.concat([ post ])
+          end
+        end
+
+        it "adds the documents to the relation" do
+          person.posts.should eq([ post ])
+        end
+
+        it "sets the foreign key on the inverse relation" do
+          post.person_id.should eq(person.id)
+        end
+
+        it "saves the target" do
+          post.should be_persisted
+        end
+
+        it "adds the correct number of documents" do
+          person.posts.size.should eq(1)
+        end
+
+        it "persists the link" do
+          person.reload.posts.should eq([ post ])
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:person) do
+          Person.create(:ssn => "554-44-3891")
+        end
+
+        let(:post) do
+          Post.new
+        end
+
+        before do
+          person.posts.concat([ post ])
+        end
+
+        it "sets the foreign key on the relation" do
+          post.person_id.should eq(person.id)
+        end
+
+        it "sets the base on the inverse relation" do
+          post.person.should eq(person)
+        end
+
+        it "sets the same instance on the inverse relation" do
+          post.person.should eql(person)
+        end
+
+        it "saves the target" do
+          post.should be_persisted
+        end
+
+        it "adds the document to the target" do
+          person.posts.count.should eq(1)
+        end
+
+        context "when documents already exist on the relation" do
+
+          let(:post_two) do
+            Post.new(:title => "Test")
+          end
+
+          before do
+            person.posts.concat([ post_two ])
+          end
+
+          it "sets the foreign key on the relation" do
+            post_two.person_id.should eq(person.id)
+          end
+
+          it "sets the base on the inverse relation" do
+            post_two.person.should eq(person)
+          end
+
+          it "sets the same instance on the inverse relation" do
+            post_two.person.should eql(person)
+          end
+
+          it "saves the target" do
+            post_two.should be_persisted
+          end
+
+          it "adds the document to the target" do
+            person.posts.count.should eq(2)
+          end
+
+          it "contains the initial document in the target" do
+            person.posts.should include(post)
+          end
+
+          it "contains the added document in the target" do
+            person.posts.should include(post_two)
+          end
+        end
+      end
+    end
+  end
+
+  context "when the relations are polymorphic" do
+
+    context "when the parent is a new record" do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:rating) do
+        Rating.new
+      end
+
+      before do
+        movie.ratings.concat([ rating ])
+      end
+
+      it "sets the foreign key on the relation" do
+        rating.ratable_id.should eq(movie.id)
+      end
+
+      it "sets the base on the inverse relation" do
+        rating.ratable.should eq(movie)
+      end
+
+      it "does not save the target" do
+        rating.should be_new
+      end
+
+      it "adds the document to the target" do
+        movie.ratings.size.should eq(1)
+      end
+    end
+
+    context "when the parent is not a new record" do
+
+      let(:movie) do
+        Movie.create
+      end
+
+      let(:rating) do
+        Rating.new
+      end
+
+      before do
+        movie.ratings.concat([ rating ])
+      end
+
+      it "sets the foreign key on the relation" do
+        rating.ratable_id.should eq(movie.id)
+      end
+
+      it "sets the base on the inverse relation" do
+        rating.ratable.should eq(movie)
+      end
+
+      it "saves the target" do
+        rating.should be_persisted
+      end
+
+      it "adds the document to the target" do
+        movie.ratings.count.should eq(1)
+      end
+    end
+
+    context "when parent has String identity" do
+
+      before do
+        Movie.identity :type => String
+        movie.ratings << Rating.new
+      end
+
+      after do
+        Movie.identity :type => BSON::ObjectId
+      end
+
+      let(:movie) do
+        Movie.create
+      end
+
+      it "should have rating references" do
+        movie.ratings.count.should eq(1)
       end
     end
   end

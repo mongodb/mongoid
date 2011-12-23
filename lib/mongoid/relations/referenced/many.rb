@@ -29,16 +29,40 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def <<(*args)
+          docs = args.flatten
+          return concat(docs) if docs.size > 1
+          if doc = docs.first
+            append(doc)
+            doc.save if persistable? && !doc.validated?
+          end
+        end
+        alias :push :<<
+
+        # Appends an array of documents to the relation. Performs a batch
+        # insert of the documents instead of persisting one at a time.
+        #
+        # @note When performing batch inserts the *after* callbacks will get
+        #   executed before the documents have actually been persisted to the
+        #   database due to an issue with Active Support's callback system - we
+        #   cannot explicitly fire the after callbacks by themselves.
+        #
+        # @example Concat with other documents.
+        #   person.posts.concat([ post_one, post_two ])
+        #
+        # @param [ Array<Document> ] documents The docs to add.
+        #
+        # @return [ Array<Document> ] The documents.
+        #
+        # @since 2.4.0
+        def concat(documents)
           batched do
-            args.flatten.each do |doc|
+            documents.each do |doc|
               next unless doc
               append(doc)
-              doc.save if persistable? && !doc.validated?
+              doc.save if persistable?
             end
           end
         end
-        alias :concat :<<
-        alias :push :<<
 
         # Build a new document from the attributes and append it to this
         # relation without saving.
@@ -409,7 +433,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persistable?
-          _creating? || base.persisted? && !_binding? && !_building?
+          !_binding? && (_creating? || base.persisted? && !_building?)
         end
 
         # Deletes all related documents from the database given the supplied

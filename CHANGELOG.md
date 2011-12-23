@@ -63,6 +63,8 @@ For instructions on upgrading to newer versions, visit
 * \#1517 Fix Mongoid documents to properly work with RSpec's stub_model.
   (Tiago Rafael Godinho)
 
+* \#1516 Don't duplicate relational many documents on bind.
+
 * #1502 Nested attributes on embedded documents respects if the child is
   paranoid.
 
