@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * Ranges can now be passed to #where criteria to create a $gte/$lte query under the
   covers. `Person.where(dob: start_date...end_date)`
 
+* Custom serializable fields can now override #selection to provide
+  customized serialization for criteria queries.
+
 * \#1506 `Model.set` will now accept false and nil values. (Marten Veldthuis)
 
 * \#1505 `Model.delete_all/destroy_all` now take either a :conditions hash or
@@ -64,6 +67,9 @@ For instructions on upgrading to newer versions, visit
   (Tiago Rafael Godinho)
 
 * \#1516 Don't duplicate relational many documents on bind.
+
+* \#1515 Mongoid no longer attempts to serialize custom fields on complex
+  criteria by default.
 
 * #1502 Nested attributes on embedded documents respects if the child is
   paranoid.
