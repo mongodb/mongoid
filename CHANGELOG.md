@@ -71,7 +71,7 @@ For instructions on upgrading to newer versions, visit
 * \#1515 Mongoid no longer attempts to serialize custom fields on complex
   criteria by default.
 
-* #1502 Nested attributes on embedded documents respects if the child is
+* \#1502 Nested attributes on embedded documents respects if the child is
   paranoid.
 
 * \#1497 Use provided message on failing uniqueness validation. (Justin Etheredge)
