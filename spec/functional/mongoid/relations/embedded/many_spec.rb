@@ -7,7 +7,7 @@ describe Mongoid::Relations::Embedded::Many do
       Quiz, Role, Patient, Product, Purchase ].map(&:delete_all)
   end
 
-  [ :<<, :push, :concat ].each do |method|
+  [ :<<, :push ].each do |method|
 
     describe "##{method}" do
 
@@ -883,6 +883,163 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "clears out the relation" do
         person.addresses.should be_empty
+      end
+    end
+  end
+
+  describe "#concat" do
+
+    context "when the parent is a new record" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        person.addresses.concat([ address ])
+      end
+
+      it "appends to the target" do
+        person.addresses.should == [ address ]
+      end
+
+      it "sets the base on the inverse relation" do
+        address.addressable.should == person
+      end
+
+      it "sets the same instance on the inverse relation" do
+        address.addressable.should eql(person)
+      end
+
+      it "does not save the new document" do
+        address.should_not be_persisted
+      end
+
+      it "sets the parent on the child" do
+        address._parent.should == person
+      end
+
+      it "sets the metadata on the child" do
+        address.metadata.should_not be_nil
+      end
+
+      it "sets the index on the child" do
+        address._index.should == 0
+      end
+    end
+
+    context "when the parent is not a new record" do
+
+      let(:person) do
+        Person.create(:ssn => "234-44-4432")
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      before do
+        person.addresses.concat([ address ])
+      end
+
+      it "saves the new document" do
+        address.should be_persisted
+      end
+    end
+
+    context "when appending more than one document at once" do
+
+      let(:person) do
+        Person.create(:ssn => "234-44-4432")
+      end
+
+      let(:address_one) do
+        Address.new
+      end
+
+      let(:address_two) do
+        Address.new
+      end
+
+      before do
+        person.addresses.concat([ address_one, address_two ])
+      end
+
+      it "saves the first document" do
+        address_one.should be_persisted
+      end
+
+      it "saves the second document" do
+        address_two.should be_persisted
+      end
+    end
+
+    context "when the parent and child have a cyclic relation" do
+
+      context "when the parent is a new record" do
+
+        let(:parent_role) do
+          Role.new
+        end
+
+        let(:child_role) do
+          Role.new
+        end
+
+        before do
+          parent_role.child_roles.concat([ child_role ])
+        end
+
+        it "appends to the target" do
+          parent_role.child_roles.should == [ child_role ]
+        end
+
+        it "sets the base on the inverse relation" do
+          child_role.parent_role.should == parent_role
+        end
+
+        it "sets the same instance on the inverse relation" do
+          child_role.parent_role.should eql(parent_role)
+        end
+
+        it "does not save the new document" do
+          child_role.should_not be_persisted
+        end
+
+        it "sets the parent on the child" do
+          child_role._parent.should == parent_role
+        end
+
+        it "sets the metadata on the child" do
+          child_role.metadata.should_not be_nil
+        end
+
+        it "sets the index on the child" do
+          child_role._index.should == 0
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:parent_role) do
+          Role.create(:name => "CEO")
+        end
+
+        let(:child_role) do
+          Role.new(:name => "COO")
+        end
+
+        before do
+          parent_role.child_roles.concat([ child_role ])
+        end
+
+        it "saves the new document" do
+          child_role.should be_persisted
+        end
       end
     end
   end

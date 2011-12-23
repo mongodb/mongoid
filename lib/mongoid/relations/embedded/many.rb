@@ -17,21 +17,42 @@ module Mongoid # :nodoc:
         # @example Push a document.
         #   person.addresses.push(address)
         #
+        # @param [ Document, Array<Document> ] *args Any number of documents.
+        def <<(*args)
+          docs = args.flatten
+          return concat(docs) if docs.size > 1
+          if doc = docs.first
+            append(doc)
+            doc.save if persistable? && !_assigning?
+          end
+        end
+        alias :push :<<
+
+        # Appends an array of documents to the relation. Performs a batch
+        # insert of the documents instead of persisting one at a time.
+        #
+        # @note When performing batch inserts the *after* callbacks will get
+        #   executed before the documents have actually been persisted to the
+        #   database due to an issue with Active Support's callback system - we
+        #   cannot explicitly fire the after callbacks by themselves.
+        #
         # @example Concat with other documents.
         #   person.addresses.concat([ address_one, address_two ])
         #
-        # @param [ Document, Array<Document> ] *args Any number of documents.
-        def <<(*args)
+        # @param [ Array<Document> ] documents The docs to add.
+        #
+        # @return [ Array<Document> ] The documents.
+        #
+        # @since 2.4.0
+        def concat(documents)
           atomically(:$pushAll) do
-            args.flatten.each do |doc|
+            documents.each do |doc|
               next unless doc
               append(doc)
-              doc.save if persistable? && !_assigning?
+              doc.save if persistable?
             end
           end
         end
-        alias :concat :<<
-        alias :push :<<
 
         # Builds a new document in the relation and appends it to the target.
         # Takes an optional type if you want to specify a subclass.

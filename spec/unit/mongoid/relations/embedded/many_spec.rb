@@ -34,7 +34,7 @@ describe Mongoid::Relations::Embedded::Many do
     Person.relations["addresses"]
   end
 
-  [ :<<, :push, :concat ].each do |method|
+  [ :<<, :push ].each do |method|
 
     describe "##{method}" do
 
@@ -167,6 +167,52 @@ describe Mongoid::Relations::Embedded::Many do
 
     it "returns the number of persisted documents" do
       relation.count.should == 1
+    end
+  end
+
+  describe "#concat" do
+
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    let(:document) do
+      Address.new(:street => "Bond St")
+    end
+
+    before do
+      relation.loaded = true
+      binding_klass.expects(:new).returns(binding)
+      binding.expects(:bind_one)
+    end
+
+    context "when the base is persisted" do
+
+      before do
+        base.expects(:persisted?).returns(true)
+        document.expects(:save).returns(true)
+        relation.concat([ document ])
+      end
+
+      it "appends the document to the target" do
+        relation.target.size.should == 2
+      end
+
+      it "adds the metadata to the target" do
+        document.metadata.should == metadata
+      end
+
+      it "indexes the target" do
+        document._index.should == 1
+      end
+    end
+
+    context "when the base is not persisted" do
+
+      it "does not save the target" do
+        document.expects(:save).never
+        relation.concat([ document ])
+      end
     end
   end
 
