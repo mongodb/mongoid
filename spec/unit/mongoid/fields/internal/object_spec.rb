@@ -100,6 +100,31 @@ describe Mongoid::Fields::Internal::Object do
     end
   end
 
+  describe "#selection" do
+
+    let(:field) do
+      described_class.instantiate(:test)
+    end
+
+    context "when providing a single value" do
+
+      it "returns the value" do
+        field.selection("test").should eq("test")
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     let(:field) do

@@ -22,6 +22,25 @@ module Mongoid #:nodoc:
           object.nil? ? nil : ::Range.new(object["min"], object["max"])
         end
 
+        # Convert the provided object to a Mongoid criteria friendly value. For
+        # ranges this will look for something between the min and max values.
+        #
+        # @example Convert the field.
+        #   field.selection(object)
+        #
+        # @param [ Object ] The object to convert.
+        #
+        # @return [ Object ] The converted object.
+        #
+        # @since 2.4.0
+        def selection(object)
+          return object if object.is_a?(::Hash)
+          {
+            "min" => { "$gte" => object.first },
+            "max" => { "$lte" => object.last }
+          }
+        end
+
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
         #

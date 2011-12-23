@@ -24,6 +24,27 @@ describe Mongoid::Fields::Internal::DateTime do
     end
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts the value to a utc time" do
+        field.selection(time.utc.to_s).should be_within(1).of(time.utc)
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     # This is ridiculous - Ruby 1.8.x returns the current time when calling

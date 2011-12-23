@@ -13,6 +13,27 @@ describe Mongoid::Fields::Internal::Integer do
     end
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts the value to an integer" do
+        field.selection("23").should eq(23)
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     context "when the value is a number" do

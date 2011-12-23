@@ -10,14 +10,41 @@ describe Mongoid::Fields::Internal::ObjectId do
     BSON::ObjectId.new
   end
 
-  describe ".deserialize" do
+  describe "#deserialize" do
 
     it "returns self" do
       field.deserialize(object_id).should == object_id
     end
   end
 
-  describe ".serialize" do
+  describe "#selection" do
+
+    let(:object_id_string) do
+      "4c52c439931a90ab29000003"
+    end
+
+    context "when providing a single value" do
+
+      it "converts the value to an object id" do
+        field.selection(object_id_string).should eq(
+          BSON::ObjectId.from_string(object_id_string)
+        )
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
+  describe "#serialize" do
 
     let(:object_id_string) do
       "4c52c439931a90ab29000003"

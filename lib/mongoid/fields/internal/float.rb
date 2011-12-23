@@ -7,6 +7,21 @@ module Mongoid #:nodoc:
       class Float
         include Serializable
 
+        # Special case to serialize the object.
+        #
+        # @example Convert to a selection.
+        #   field.selection(object)
+        #
+        # @param [ Object ] The object to convert.
+        #
+        # @return [ Object ] The converted object.
+        #
+        # @since 2.4.0
+        def selection(object)
+          return object if object.is_a?(::Hash)
+          serialize(object)
+        end
+
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
         #

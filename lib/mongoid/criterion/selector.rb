@@ -104,7 +104,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def typecast_value_for(field, value)
-        return field.serialize(value) if field.type === value
+        return field.selection(value) if field.type === value
         case value
         when Hash
           value = value.dup
@@ -124,7 +124,7 @@ module Mongoid #:nodoc:
           if field.type == Array
             Serialization.mongoize(value, value.class)
           else
-            field.serialize(value)
+            field.selection(value)
           end
         end
       end

@@ -13,6 +13,27 @@ describe Mongoid::Fields::Internal::Float do
     end
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts the value to a float" do
+        field.selection("2.3").should eq(2.3)
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     context "when the value is a number" do

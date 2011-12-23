@@ -571,6 +571,25 @@ describe Mongoid::Criterion::Inclusion do
 
   describe "#where" do
 
+    context "when searching on a custom type" do
+
+      let(:criteria) do
+        Bar.where(:lat_lng => {
+          "$nearSphere" => [ 20, 20 ],
+          "$maxDistance" => 1.5
+        })
+      end
+
+      it "does not convert the selector" do
+        criteria.selector.should eq({
+          :lat_lng => {
+            "$nearSphere" => [ 20, 20 ],
+            "$maxDistance" => 1.5
+          }
+        })
+      end
+    end
+
     context "when provided a hash" do
 
       context "with simple hash keys" do

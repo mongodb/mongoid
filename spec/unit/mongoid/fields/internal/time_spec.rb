@@ -10,6 +10,27 @@ describe Mongoid::Fields::Internal::Time do
     Time.local(2010, 11, 19)
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts the value to a utc time" do
+        field.selection(time.utc.to_s).should be_within(1).of(time.utc)
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     context "when given nil" do

@@ -17,6 +17,27 @@ describe Mongoid::Fields::Internal::BigDecimal do
     end
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts the value to a string" do
+        field.selection(number).should eq("123456.789")
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#deserialize" do
 
     context "when the the value is a string" do

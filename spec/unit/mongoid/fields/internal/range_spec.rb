@@ -28,6 +28,29 @@ describe Mongoid::Fields::Internal::Range do
     end
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts to a range query" do
+        field.selection(1..3).should eq(
+          { "min" => { "$gte" => 1 }, "max" => { "$lte" => 3 }}
+        )
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     context "when the value is not nil" do

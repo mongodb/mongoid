@@ -87,6 +87,27 @@ describe Mongoid::Fields::Internal::Date do
     end
   end
 
+  describe "#selection" do
+
+    context "when providing a single value" do
+
+      it "converts the value to a utc time" do
+        field.selection(time.utc.to_s).should eq(time.midnight.utc)
+      end
+    end
+
+    context "when providing a complex criteria" do
+
+      let(:criteria) do
+        { "$ne" => "test" }
+      end
+
+      it "returns the criteria" do
+        field.selection(criteria).should eq(criteria)
+      end
+    end
+  end
+
   describe "#serialize" do
 
     context "when given nil" do

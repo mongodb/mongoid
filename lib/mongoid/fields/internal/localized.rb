@@ -20,13 +20,27 @@ module Mongoid #:nodoc:
         # @since 2.3.0
         def deserialize(object)
           return nil if object.nil?
-          
           locale = ::I18n.locale
           if ::I18n.respond_to?(:fallbacks)
             object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| object[loc] }]
           else
             object[locale.to_s]
           end
+        end
+
+        # Special case to serialize the object.
+        #
+        # @example Convert to a selection.
+        #   field.selection(object)
+        #
+        # @param [ Object ] The object to convert.
+        #
+        # @return [ Object ] The converted object.
+        #
+        # @since 2.4.0
+        def selection(object)
+          return object if object.is_a?(::Hash)
+          serialize(object)
         end
 
         # Convert the provided string into a hash for the locale.
