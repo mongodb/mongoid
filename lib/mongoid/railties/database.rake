@@ -78,7 +78,7 @@ namespace :db do
     desc 'Create the indexes defined on your mongoid models'
     task :create_indexes => :environment do
       engines_models_paths = Rails.application.railties.engines.map do |engine|
-        engine.paths["app/models"].paths
+        engine.paths["app/models"].expanded
       end
       root_models_paths = Rails.application.paths["app/models"]
       models_paths = engines_models_paths.push(root_models_paths).flatten
