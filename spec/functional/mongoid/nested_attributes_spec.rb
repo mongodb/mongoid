@@ -2586,7 +2586,11 @@ describe Mongoid::NestedAttributes do
             end
 
             it "sets the documents on the relation" do
-              person.posts.size.should == 2
+              person.posts.size.should eq(2)
+            end
+
+            it "does not persist the new documents" do
+              person.posts.count.should eq(0)
             end
           end
         end
@@ -2853,34 +2857,77 @@ describe Mongoid::NestedAttributes do
 
           context "when no destroy attributes are passed" do
 
-            before do
-              person.posts_attributes =
-                {
-                  "4" => { "title" => "Third" },
-                  "1" => { "title" => "First" },
-                  "2" => { "title" => "Second" }
-                }
+            context "when passing a hash of attributes" do
+
+              before do
+                person.posts_attributes =
+                  {
+                    "4" => { "title" => "Third" },
+                    "1" => { "title" => "First" },
+                    "2" => { "title" => "Second" }
+                  }
+              end
+
+              it "builds a new first document" do
+                person.posts.first.title.should == "First"
+              end
+
+              it "builds a new second document" do
+                person.posts.second.title.should == "Second"
+              end
+
+              it "builds a new third document" do
+                person.posts.third.title.should == "Third"
+              end
+
+              it "does not add extra documents" do
+                person.posts.size.should == 3
+              end
+
+              it "does not persist the documents" do
+                person.posts.count.should eq(0)
+              end
+
+              it "adds the documents in the sorted hash key order" do
+                person.posts.map(&:title).should ==
+                  [ "First", "Second", "Third" ]
+              end
             end
 
-            it "builds a new first document" do
-              person.posts.first.title.should == "First"
-            end
+            context "when passing an array of attributes" do
 
-            it "builds a new second document" do
-              person.posts.second.title.should == "Second"
-            end
+              context "when the parent is saved" do
 
-            it "builds a new third document" do
-              person.posts.third.title.should == "Third"
-            end
+                before do
+                  person.save
+                  person.posts_attributes =
+                    [
+                      { "title" => "Third" },
+                      { "title" => "First" },
+                      { "title" => "Second" }
+                    ]
+                end
 
-            it "does not add extra documents" do
-              person.posts.size.should == 3
-            end
+                it "builds a new first document" do
+                  person.posts.first.title.should eq("Third")
+                end
 
-            it "adds the documents in the sorted hash key order" do
-              person.posts.map(&:title).should ==
-                [ "First", "Second", "Third" ]
+                it "builds a new second document" do
+                  person.posts.second.title.should eq("First")
+                end
+
+                it "builds a new third document" do
+                  person.posts.third.title.should eq("Second")
+                end
+
+                it "does not add extra documents" do
+                  person.posts.size.should eq(3)
+                end
+
+                it "does not persist the documents" do
+                  person.posts.count.should eq(0)
+                end
+              end
             end
           end
 

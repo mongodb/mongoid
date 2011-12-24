@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
           return concat(docs) if docs.size > 1
           if doc = docs.first
             append(doc)
-            doc.save if persistable? && !doc.validated?
+            doc.save if persistable? && !_assigning? && !doc.validated?
           end
         end
         alias :push :<<

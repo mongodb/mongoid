@@ -101,6 +101,9 @@ For instructions on upgrading to newer versions, visit
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
 
+* \#1462 Assigning has many relations via nested attribtues `*_attributes=` does
+  not autosave the relation.
+
 * \#1461 Fixed serialization of foreign key fields in complex criteria not to
   escape the entire hash.
 
