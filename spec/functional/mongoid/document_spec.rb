@@ -235,7 +235,7 @@ describe Mongoid::Document do
     let!(:knight) do
       Person.create(
         :title => "Sir",
-        :age => 55,
+        :age => 75,
         :terms => true,
         :ssn => "123-11-1111"
       )
