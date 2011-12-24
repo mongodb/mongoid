@@ -230,19 +230,23 @@ describe Mongoid::Document do
     end
   end
 
-  context "chaining criteria scopes" do
+  context "when chaining criteria scopes" do
 
-    before do
-      @one = Person.create(:title => "Mr", :age => 55, :terms => true, :ssn => "q")
-      @two = Person.create(:title => "Sir", :age => 55, :terms => true, :ssn => "w")
-      @three = Person.create(:title => "Sir", :age => 35, :terms => true, :ssn => "e")
-      @four = Person.create(:title => "Sir", :age => 55, :terms => false, :ssn => "r")
+    let!(:knight) do
+      Person.create(
+        :title => "Sir",
+        :age => 55,
+        :terms => true,
+        :ssn => "123-11-1111"
+      )
+    end
+
+    let(:chained) do
+      Person.old.accepted.knight
     end
 
     it "finds by the merged criteria" do
-      people = Person.old.accepted.knight
-      people.count.should == 1
-      people.first.should == @two
+      chained.should eq([ knight ])
     end
   end
 
