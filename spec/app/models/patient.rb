@@ -1,10 +1,3 @@
-class Email
-  include Mongoid::Document
-  field :address
-  validates_uniqueness_of :address
-  embedded_in :patient
-end
-
 class Patient
   include Mongoid::Document
   field :title, :type => "String"
