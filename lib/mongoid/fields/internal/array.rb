@@ -7,6 +7,16 @@ module Mongoid #:nodoc:
       class Array
         include Serializable
 
+        # Array fields are resizable.
+        #
+        # @example Is this field resizable?
+        #   field.resizable?
+        #
+        # @return [ true ] Always true.
+        #
+        # @since 2.4.0
+        def resizable?; true; end
+
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
         #

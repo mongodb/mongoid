@@ -117,6 +117,16 @@ module Mongoid #:nodoc:
         @object_id_field ||= (type == BSON::ObjectId)
       end
 
+      # Can the field vary in size, similar to arrays.
+      #
+      # @example Is the field varying in size?
+      #   field.resizable?
+      #
+      # @return [ false ] false by default.
+      #
+      # @since 2.4.0
+      def resizable?; false; end
+
       # Serialize the object from the type defined in the model to a MongoDB
       # compatible object to store.
       #

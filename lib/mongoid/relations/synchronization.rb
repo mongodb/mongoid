@@ -75,11 +75,28 @@ module Mongoid # :nodoc:
       #
       # @since 2.1.0
       def update_inverse_keys(meta)
-        return unless changes.has_key?(meta.foreign_key)
-        old, new = changes[meta.foreign_key]
-        adds, subs = new - (old || []), (old || []) - new
-        meta.criteria(adds).add_to_set(meta.inverse_foreign_key, id) unless adds.empty?
-        meta.criteria(subs).pull(meta.inverse_foreign_key, id) unless subs.empty?
+        if changes.has_key?(meta.foreign_key)
+          old, new = changes[meta.foreign_key]
+          adds, subs = new - (old || []), (old || []) - new
+
+          # If we are autosaving we don't want a duplicate to get added - the
+          # $addToSet would run previously and then the $pushAll from the
+          # inverse on the autosave would cause this. We delete each id from
+          # what's in memory in case a mix of id addition and object addition
+          # had occurred.
+          if meta.autosave?
+            send(meta.name).in_memory.each do |doc|
+              adds.delete_one(doc.id)
+            end
+          end
+
+          unless adds.empty?
+            meta.criteria(adds).add_to_set(meta.inverse_foreign_key, id)
+          end
+          unless subs.empty?
+            meta.criteria(subs).pull(meta.inverse_foreign_key, id)
+          end
+        end
       end
 
       module ClassMethods #:nodoc:

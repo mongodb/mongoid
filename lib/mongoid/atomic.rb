@@ -9,11 +9,57 @@ module Mongoid #:nodoc:
   module Atomic
     extend ActiveSupport::Concern
 
+    UPDATES = [
+      :atomic_array_pushes,
+      :atomic_array_pulls,
+      :atomic_pulls,
+      :atomic_unsets,
+      :delayed_atomic_sets,
+      :delayed_atomic_pulls
+    ]
+
     included do
 
       # When MongoDB finally fully implements the positional operator, we can
       # get rid of all indexing related code in Mongoid.
       attr_accessor :_index
+    end
+
+    # Add the document as an atomic pull.
+    #
+    # @example Add the atomic pull.
+    #   person.add_atomic_pull(address)
+    #
+    # @param [ Document ] The embedded document to pull.
+    #
+    # @since 2.2.0
+    def add_atomic_pull(document)
+      document.flagged_for_destroy = true
+      (delayed_atomic_pulls[document.metadata.name.to_s] ||= []).push(document)
+    end
+
+    # For array fields these are the pushes that need to happen.
+    #
+    # @example Get the array pushes.
+    #   person.atomic_array_pushes
+    #
+    # @return [ Hash ] The array pushes.
+    #
+    # @since 2.4.0
+    def atomic_array_pushes
+      @atomic_array_pushes ||= {}
+    end
+
+    # For array fields these are the pulls that need to happen.
+    #
+    # @example Get the array pulls.
+    #   person.atomic_array_pulls
+    #
+    # @return [ Hash ] The array pulls.
+    #
+    # @since 2.4.0
+    def atomic_array_pulls
+      @atomic_array_pulls ||= {}
     end
 
     # Get all the atomic updates that need to happen for the current
@@ -110,19 +156,6 @@ module Mongoid #:nodoc:
           end
         end
       end
-    end
-
-    # Add the document as an atomic pull.
-    #
-    # @example Add the atomic pull.
-    #   person.add_atomic_pull(address)
-    #
-    # @param [ Document ] The embedded document to pull.
-    #
-    # @since 2.2.0
-    def add_atomic_pull(document)
-      document.flagged_for_destroy = true
-      (delayed_atomic_pulls[document.metadata.name.to_s] ||= []).push(document)
     end
 
     # Get all the push attributes that need to occur.
@@ -225,6 +258,8 @@ module Mongoid #:nodoc:
       mods.set(doc.atomic_sets)
       mods.set(doc.delayed_atomic_sets)
       mods.push(doc.atomic_pushes)
+      mods.push(doc.atomic_array_pushes)
+      mods.pull(doc.atomic_array_pulls)
     end
   end
 end

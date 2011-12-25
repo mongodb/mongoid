@@ -543,7 +543,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           it "maintains the base on the inverse relation" do
             preference.people.first.should == person
           end
-
         end
       end
 

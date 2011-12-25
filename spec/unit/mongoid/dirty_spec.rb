@@ -596,6 +596,70 @@ describe Mongoid::Dirty do
 
     context "when the document has changed" do
 
+      let(:person) do
+        Person.new(:aliases => [ "007" ]).tap do |p|
+          p.new_record = false
+          p.move_changes
+        end
+      end
+
+      context "when an array field has changed" do
+
+        context "when the array has values removed" do
+
+          before do
+            person.aliases.delete_one("007")
+          end
+
+          let!(:setters) do
+            person.setters
+          end
+
+          it "does not contain array changes in the setters" do
+            setters.should eq({})
+          end
+
+          it "adds to the atomic array pulls" do
+            person.atomic_array_pulls.should eq({ "aliases" => [ "007" ] })
+          end
+        end
+
+        context "when the array has values added" do
+
+          before do
+            person.aliases << "008"
+          end
+
+          let!(:setters) do
+            person.setters
+          end
+
+          it "does not contain array changes in the setters" do
+            setters.should eq({})
+          end
+
+          it "adds to the atomic array pushes" do
+            person.atomic_array_pushes.should eq({ "aliases" => [ "008" ] })
+          end
+        end
+
+        context "when the array has changed completely" do
+
+          before do
+            person.aliases << "008"
+            person.aliases.delete_one("007")
+          end
+
+          let!(:setters) do
+            person.setters
+          end
+
+          it "does not contain array changes in the setters" do
+            setters.should eq({ "aliases" => [ "008" ]})
+          end
+        end
+      end
+
       context "when the document is a root document" do
 
         let(:person) do

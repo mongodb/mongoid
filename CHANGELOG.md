@@ -54,6 +54,12 @@ For instructions on upgrading to newer versions, visit
 
 * \#1362 Aliased fields now properly typecast in criteria.
 
+* \#1337 Array fields, including HABTM many foreign keys now have smarter dirty
+  checking and no longer perform a simple $set if the array has changed. If
+  items have only been added to the array, it performs a $pushAll. If items
+  have only been removed, it performs a $pullAll. If both additions and
+  removals have occurred it performs a $set to avoid conflicting mods.
+
 ### Resolved Issues
 
 * Calling `Document#as_document` on a frozen document on Rubinius returns the

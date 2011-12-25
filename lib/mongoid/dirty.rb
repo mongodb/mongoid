@@ -67,10 +67,9 @@ module Mongoid #:nodoc:
     def move_changes
       @_children = nil
       @previous_changes = changes
-      atomic_pulls.clear
-      atomic_unsets.clear
-      delayed_atomic_sets.clear
-      delayed_atomic_pulls.clear
+      Atomic::UPDATES.each do |update|
+        send(update).clear
+      end
       changed_attributes.clear
     end
 
@@ -102,6 +101,8 @@ module Mongoid #:nodoc:
     # Gets all the new values for each of the changed fields, to be passed to
     # a MongoDB $set modifier.
     #
+    # @todo: Durran: Refactor 3.0
+    #
     # @example Get the setters for the atomic updates.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
@@ -110,10 +111,23 @@ module Mongoid #:nodoc:
     # @return [ Hash ] A +Hash+ of atomic setters.
     def setters
       {}.tap do |modifications|
-        changes.each_pair do |field, changes|
+        changes.each_pair do |name, changes|
           if changes
-            key = embedded? ? "#{atomic_position}.#{field}" : field
-            modifications[key] = changes[1]
+            old, new = changes
+            field = fields[name]
+            key = embedded? ? "#{atomic_position}.#{name}" : name
+            if field && field.resizable?
+              pushes, pulls = new - (old || []), (old || []) - new
+              if pushes.any? && pulls.any?
+                modifications[key] = new
+              elsif pushes.any?
+                atomic_array_pushes[key] = pushes
+              else
+                atomic_array_pulls[key] = pulls
+              end
+            else
+              modifications[key] = new
+            end
           end
         end
       end
