@@ -318,9 +318,18 @@ module Mongoid #:nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            if replacement != proxy.in_memory
+            if replacement
+              if replacement != proxy.in_memory
+                new_docs, docs = replacement.compact.uniq, []
+                new_ids = new_docs.map { |doc| doc.id }
+                remove_not_in(new_ids)
+                new_docs.each do |doc|
+                  docs.push(doc) if doc.send(metadata.foreign_key) != base.id
+                end
+                proxy.concat(docs)
+              end
+            else
               proxy.purge
-              proxy.push(replacement.compact.uniq) if replacement
             end
           end
         end
@@ -457,6 +466,36 @@ module Mongoid #:nodoc:
             target.delete_if do |doc|
               if doc.matches?(selector)
                 unbind_one(doc) and true
+              end
+            end
+          end
+        end
+
+        # Remove all the documents in the proxy that do not have the provided
+        # ids.
+        #
+        # @todo: Durran: Refactor 3.0. Temp for bug fix in 2.4.
+        #
+        # @example Remove all documents without the ids.
+        #   proxy.remove_not_in([ id ])
+        #
+        # @param [ Array<Object> ] ids The ids.
+        #
+        # @since 2.4.0
+        def remove_not_in(ids)
+          removed = criteria.not_in(:_id => ids)
+          if metadata.destructive?
+            removed.delete_all
+          else
+            removed.update(metadata.foreign_key => nil)
+          end
+          in_memory.each do |doc|
+            if !ids.include?(doc.id)
+              unbind_one(doc)
+              added.try { |p| p.delete_one(doc) }
+              loaded.try { |p| p.delete_one(doc) }
+              if metadata.destructive?
+                doc.destroyed = true
               end
             end
           end

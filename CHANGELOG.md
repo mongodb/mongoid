@@ -77,6 +77,9 @@ For instructions on upgrading to newer versions, visit
 * \#1515 Mongoid no longer attempts to serialize custom fields on complex
   criteria by default.
 
+* \#1503 Has many relation substitution now handles any kind of mix of existing
+  and new docs.
+
 * \#1502 Nested attributes on embedded documents respects if the child is
   paranoid.
 

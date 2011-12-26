@@ -310,6 +310,125 @@ describe Mongoid::Relations::Referenced::Many do
         it "saves the target" do
           post.should be_persisted
         end
+
+        context "when replacing the relation with the same documents" do
+
+          context "when using the same in memory instance" do
+
+            before do
+              person.posts = [ post ]
+            end
+
+            it "keeps the relation intact" do
+              person.posts.should eq([ post ])
+            end
+
+            it "does not delete the relation" do
+              person.reload.posts.should eq([ post ])
+            end
+          end
+
+          context "when using a new instance" do
+
+            let(:from_db) do
+              Person.find(person.id)
+            end
+
+            before do
+              from_db.posts = [ post ]
+            end
+
+            it "keeps the relation intact" do
+              from_db.posts.should eq([ post ])
+            end
+
+            it "does not delete the relation" do
+              from_db.reload.posts.should eq([ post ])
+            end
+          end
+        end
+
+        context "when replacing the with a combination of old and new docs" do
+
+          let(:new_post) do
+            Post.create(:title => "new post")
+          end
+
+          context "when using the same in memory instance" do
+
+            before do
+              person.posts = [ post, new_post ]
+            end
+
+            it "keeps the relation intact" do
+              person.posts.should eq([ post, new_post ])
+            end
+
+            it "does not delete the relation" do
+              person.reload.posts.should eq([ post, new_post ])
+            end
+          end
+
+          context "when using a new instance" do
+
+            let(:from_db) do
+              Person.find(person.id)
+            end
+
+            before do
+              from_db.posts = [ post, new_post ]
+            end
+
+            it "keeps the relation intact" do
+              from_db.posts.should eq([ post, new_post ])
+            end
+
+            it "does not delete the relation" do
+              from_db.reload.posts.should eq([ post, new_post ])
+            end
+          end
+        end
+
+        context "when replacing the with a combination of only new docs" do
+
+          let(:new_post) do
+            Post.create(:title => "new post")
+          end
+
+          context "when using the same in memory instance" do
+
+            before do
+              person.posts = [ new_post ]
+            end
+
+            it "keeps the relation intact" do
+              person.posts.should eq([ new_post ])
+            end
+
+            it "does not delete the relation" do
+              person.reload.posts.should eq([ new_post ])
+            end
+          end
+
+          context "when using a new instance" do
+
+            let(:from_db) do
+              Person.find(person.id)
+            end
+
+            before do
+              from_db.posts = [ new_post ]
+            end
+
+            it "keeps the relation intact" do
+              from_db.posts.should eq([ new_post ])
+            end
+
+            it "does not delete the relation" do
+              from_db.reload.posts.should eq([ new_post ])
+            end
+          end
+        end
       end
     end
 

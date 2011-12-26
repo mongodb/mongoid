@@ -128,6 +128,27 @@ module Mongoid # :nodoc:
         alias :clear :nullify
         alias :purge :nullify
 
+        # Substitutes the supplied target documents for the existing documents
+        # in the relation. If the new target is nil, perform the necessary
+        # deletion.
+        #
+        # @example Replace the relation.
+        # person.preferences.substitute([ new_post ])
+        #
+        # @param [ Array<Document> ] replacement The replacement target.
+        #
+        # @return [ Many ] The relation.
+        #
+        # @since 2.0.0.rc.1
+        def substitute(replacement)
+          tap do |proxy|
+            if replacement != proxy.in_memory
+              proxy.purge
+              proxy.push(replacement.compact.uniq) if replacement
+            end
+          end
+        end
+
         private
 
         # Appends the document to the target array, updating the index on the
