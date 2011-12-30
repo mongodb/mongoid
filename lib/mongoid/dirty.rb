@@ -118,13 +118,7 @@ module Mongoid #:nodoc:
             key = embedded? ? "#{atomic_position}.#{name}" : name
             if field && field.resizable?
               pushes, pulls = new - (old || []), (old || []) - new
-              if pushes.any? && pulls.any?
-                modifications[key] = new
-              elsif pushes.any?
-                atomic_array_pushes[key] = pushes
-              else
-                atomic_array_pulls[key] = pulls
-              end
+              field.add_atomic_changes(self, key, modifications, pushes, pulls)
             else
               modifications[key] = new
             end

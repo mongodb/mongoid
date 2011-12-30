@@ -6,6 +6,26 @@ module Mongoid #:nodoc:
     # database.
     class Modifiers < Hash
 
+      # Add the atomic $addToSet modifiers to the hash.
+      #
+      # @example Add the $addToSet modifiers.
+      #   modifiers.add_to_set({ "preference_ids" => [ "one" ] })
+      #
+      # @param [ Hash ] modifications The add to set modifiers.
+      #
+      # @since 2.4.0
+      def add_to_set(modifications)
+        modifications.each_pair do |field, value|
+          if add_to_sets.has_key?(field)
+            value.each do |val|
+              add_to_sets[field]["$each"].push(val)
+            end
+          else
+            add_to_sets[field] = { "$each" => value }
+          end
+        end
+      end
+
       # Adds pull modifiers to the modifiers hash.
       #
       # @example Add pull operations.
@@ -88,6 +108,18 @@ module Mongoid #:nodoc:
         else
           mods[field] = value
         end
+      end
+
+      # Get the $addToSet operations or intialize a new one.
+      #
+      # @example Get the $addToSet operations.
+      #   modifiers.add_to_sets
+      #
+      # @return [ Hash ] The $addToSet operations.
+      #
+      # @since 2.4.0
+      def add_to_sets
+        self["$addToSet"] ||= {}
       end
 
       # Is the operation going to be a conflict for a $set?
@@ -194,7 +226,7 @@ module Mongoid #:nodoc:
       # Get the $pullAll operations or intialize a new one.
       #
       # @example Get the $pullAll operations.
-      #   modifiers.pulles
+      #   modifiers.pulls
       #
       # @return [ Hash ] The $pullAll operations.
       #

@@ -7,6 +7,28 @@ module Mongoid #:nodoc:
       class Array
         include Serializable
 
+        # Adds the atomic changes for this type of resizable field.
+        #
+        # @example Add the atomic changes.
+        #   field.add_atomic_changes(doc, "key", {}, [], [])
+        #
+        # @param [ Document ] document The document to add to.
+        # @param [ String ] key The name of the field.
+        # @param [ Hash ] mods The current modifications.
+        # @param [ Array ] new The new elements to add.
+        # @param [ Array ] old The old elements getting removed.
+        #
+        # @since 2.4.0
+        def add_atomic_changes(document, key, mods, new, old)
+          if new.any? && old.any?
+            mods[key] = new
+          elsif new.any?
+            document.atomic_array_pushes[key] = new
+          elsif old.any?
+            document.atomic_array_pulls[key] = old
+          end
+        end
+
         # Array fields are resizable.
         #
         # @example Is this field resizable?

@@ -12,6 +12,7 @@ module Mongoid #:nodoc:
     UPDATES = [
       :atomic_array_pushes,
       :atomic_array_pulls,
+      :atomic_array_add_to_sets,
       :atomic_pulls,
       :atomic_unsets,
       :delayed_atomic_sets,
@@ -60,6 +61,18 @@ module Mongoid #:nodoc:
     # @since 2.4.0
     def atomic_array_pulls
       @atomic_array_pulls ||= {}
+    end
+
+    # For array fields these are the unique adds that need to happen.
+    #
+    # @example Get the array unique adds.
+    #   person.atomic_array_add_to_sets
+    #
+    # @return [ Hash ] The array add_to_sets.
+    #
+    # @since 2.4.0
+    def atomic_array_add_to_sets
+      @atomic_array_add_to_sets ||= {}
     end
 
     # Get all the atomic updates that need to happen for the current
@@ -259,6 +272,7 @@ module Mongoid #:nodoc:
       mods.set(doc.delayed_atomic_sets)
       mods.push(doc.atomic_pushes)
       mods.push(doc.atomic_array_pushes)
+      mods.add_to_set(doc.atomic_array_add_to_sets)
       mods.pull(doc.atomic_array_pulls)
     end
   end

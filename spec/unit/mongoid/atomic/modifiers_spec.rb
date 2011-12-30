@@ -6,6 +6,61 @@ describe Mongoid::Atomic::Modifiers do
     described_class.new
   end
 
+  describe "#add_to_set" do
+
+    context "when the unique adds are empty" do
+
+      before do
+        modifiers.add_to_set({})
+      end
+
+      it "does not contain any operations" do
+        modifiers.should eq({})
+      end
+    end
+
+    context "when the adds are not empty" do
+
+      let(:adds) do
+        { "preference_ids" => [ "one", "two" ] }
+      end
+
+      context "when adding a single field" do
+
+        before do
+          modifiers.add_to_set(adds)
+        end
+
+        it "adds the add to set with each modifiers" do
+          modifiers.should eq({
+            "$addToSet" => { "preference_ids" => { "$each" => [ "one", "two" ] }}
+          })
+        end
+      end
+
+      context "when adding to an existing field" do
+
+        let(:adds_two) do
+          { "preference_ids" => [ "three" ] }
+        end
+
+        before do
+          modifiers.add_to_set(adds)
+          modifiers.add_to_set(adds_two)
+        end
+
+        it "adds the add to set with each modifiers" do
+          modifiers.should eq({
+            "$addToSet" =>
+              { "preference_ids" =>
+                { "$each" => [ "one", "two", "three" ] }
+              }
+          })
+        end
+      end
+    end
+  end
+
   describe "#pull" do
 
     context "when the pulls are empty" do

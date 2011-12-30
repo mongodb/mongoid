@@ -65,6 +65,9 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* \#1530 Don't duplicate added values to arrays via dirty tracking if the
+  array is a foreign key field.
+
 * \#1523 Allow disabling of observers via `disable`. (Jonas Schneider)
 
 * \#1522 Fixed create indexes rake task for Rails 3.2. (Gray Manley)
