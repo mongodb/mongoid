@@ -13,6 +13,13 @@ describe Mongoid::Fields::Internal::String do
     end
   end
 
+  describe "#foreign_key?" do
+
+    it "returns false" do
+      field.should_not be_foreign_key
+    end
+  end
+
   describe "#selection" do
 
     context "when providing a single value" do

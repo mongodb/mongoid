@@ -68,6 +68,9 @@ For instructions on upgrading to newer versions, visit
 * \#1530 Don't duplicate added values to arrays via dirty tracking if the
   array is a foreign key field.
 
+* \#1524 Allow access to relations in overridden field setters by pre-setting
+  foreign key default values.
+
 * \#1523 Allow disabling of observers via `disable`. (Jonas Schneider)
 
 * \#1522 Fixed create indexes rake task for Rails 3.2. (Gray Manley)

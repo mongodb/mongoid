@@ -125,7 +125,7 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil, options = nil)
       _building do
         @new_record = true
-        @attributes ||= {}
+        @attributes ||= attributes_with_foreign_key_defaults
         options ||= {}
         process(attrs, options[:as] || :default, !options[:without_protection]) do
           identify

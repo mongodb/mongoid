@@ -81,6 +81,18 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Is this field a foreign key?
+      #
+      # @example Is the field a foreign key?
+      #   field.foreign_key?
+      #
+      # @return [ true, false ] If the field is a foreign key.
+      #
+      # @since 2.4.0
+      def foreign_key?
+        !!options[:identity]
+      end
+
       # Is the field localized or not?
       #
       # @example Is the field localized?

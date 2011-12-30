@@ -123,6 +123,37 @@ describe Mongoid::Fields do
     end
   end
 
+  describe "#foreign_key_defaults" do
+
+    context "on parent classes" do
+
+      let(:person) do
+        Person.new
+      end
+
+      it "does not return subclass foreign key defaults" do
+        person.foreign_key_defaults.should eq([
+          "preference_ids", "user_account_ids", "house_ids",
+          "ordered_preference_ids", "administrated_event_ids"
+        ])
+      end
+    end
+
+    context "on subclasses" do
+
+      let(:doctor) do
+        Doctor.new
+      end
+
+      it "contains the parent and child foreign key defaults" do
+        doctor.foreign_key_defaults.should eq([
+          "preference_ids", "user_account_ids", "house_ids",
+          "ordered_preference_ids", "administrated_event_ids", "user_ids"
+        ])
+      end
+    end
+  end
+
   describe ".field" do
 
     it "returns the generated field" do

@@ -27,6 +27,23 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
     end
   end
 
+  describe "#foreign_key?" do
+
+    let(:field) do
+      described_class.instantiate(
+        :vals,
+        :metadata => Person.relations["posts"],
+        :type => Array,
+        :default => [],
+        :identity => true
+      )
+    end
+
+    it "returns true" do
+      field.should be_foreign_key
+    end
+  end
+
   describe "#serialize" do
 
     context "when the array is object ids" do

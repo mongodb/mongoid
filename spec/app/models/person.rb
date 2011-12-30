@@ -167,7 +167,3 @@ class Person
     'i_am_foo'
   end
 end
-
-class Doctor < Person
-  field :specialty
-end

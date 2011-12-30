@@ -36,10 +36,12 @@ module Mongoid #:nodoc
       class_attribute :aliased_fields
       class_attribute :defaults
       class_attribute :fields
+      class_attribute :foreign_key_defaults
 
       self.aliased_fields = {}
       self.defaults = []
       self.fields = {}
+      self.foreign_key_defaults = []
 
       field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
@@ -124,7 +126,8 @@ module Mongoid #:nodoc
       # @since 2.0.0.rc.6
       def inherited(subclass)
         super
-        subclass.defaults, subclass.fields = defaults.dup, fields.dup
+        subclass.defaults, subclass.fields, subclass.foreign_key_defaults =
+          defaults.dup, fields.dup, foreign_key_defaults.dup
       end
 
       # Is the field with the provided name a BSON::ObjectId?
@@ -177,6 +180,7 @@ module Mongoid #:nodoc
         Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field
           defaults << name unless field.default_val.nil?
+          foreign_key_defaults << name if field.foreign_key?
           create_accessors(name, meth, options)
           process_options(field)
           create_dirty_methods(name)

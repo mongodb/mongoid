@@ -179,6 +179,23 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Provide a hash of foreign key defaults.
+    #
+    # @example Get a hash with fk defaults.
+    #   document.attributes_with_foreign_key_defaults
+    #
+    # @return [ Hash ] A hash with default fk values.
+    #
+    # @since 2.4.0
+    def attributes_with_foreign_key_defaults
+      {}.tap do |attrs|
+        foreign_key_defaults.each do |name|
+          default = fields[name].eval_default(self)
+          attrs[name] = default if default
+        end
+      end
+    end
+
     # Used for allowing accessor methods for dynamic attributes.
     #
     # @param [ String, Symbol ] name The name of the method.
