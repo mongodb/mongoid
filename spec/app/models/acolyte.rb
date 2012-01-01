@@ -4,6 +4,7 @@ class Acolyte
   field :name
 
   embeds_many :versions, :as => :memorable
+  belongs_to :church
 
   default_scope asc(:name)
   scope :active, lambda { where(:status => "active") }

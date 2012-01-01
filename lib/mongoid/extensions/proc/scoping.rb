@@ -16,8 +16,8 @@ module Mongoid #:nodoc:
         # @return [ Object ] The result of the proc call.
         #
         # @since 1.0.0
-        def scoped(*args)
-          call(*args).scoped
+        def as_conditions(*args)
+          call(*args).as_conditions
         end
       end
     end

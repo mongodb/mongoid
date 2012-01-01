@@ -149,6 +149,19 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Get a criteria for the documents without the default scoping
+        # applied.
+        #
+        # @example Get the unscoped criteria.
+        #   person.preferences.unscoped
+        #
+        # @return [ Criteria ] The unscoped criteria.
+        #
+        # @since 2.4.0
+        def unscoped
+          klass.unscoped.any_in(:_id => base.send(metadata.foreign_key))
+        end
+
         private
 
         # Appends the document to the target array, updating the index on the

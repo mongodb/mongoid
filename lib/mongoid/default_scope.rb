@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def default_scope(conditions = {})
-        self.default_scoping = Scope.new(conditions).conditions.scoped
+        self.default_scoping = Scope.new(conditions).conditions.as_conditions
       end
     end
   end

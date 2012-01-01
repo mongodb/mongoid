@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
         # @return [ Hash ] The hash unmodified.
         #
         # @since 1.0.0
-        def scoped(*args)
+        def as_conditions(*args)
           self
         end
       end

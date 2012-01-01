@@ -255,10 +255,10 @@ module Mongoid #:nodoc:
     # scope for use with named scopes.
     #
     # @example Get the criteria as a scoped hash.
-    #   criteria.scoped
+    #   criteria.as_conditions
     #
     # @return [ Hash ] The criteria as a scoped hash.
-    def scoped
+    def as_conditions
       scope_options = @options.dup
       sorting = scope_options.delete(:sort)
       scope_options[:order_by] = sorting if sorting

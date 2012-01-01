@@ -923,7 +923,7 @@ describe Mongoid::Criteria do
 
   end
 
-  describe "#scoped" do
+  describe "#as_conditions" do
 
     context "when the options contain sort criteria" do
 
@@ -932,7 +932,9 @@ describe Mongoid::Criteria do
       end
 
       it "changes sort to order_by" do
-        criteria.scoped.should == { :where => { :title => "Sir" }, :order_by => [[:score, :asc]] }
+        criteria.as_conditions.should eq(
+          { :where => { :title => "Sir" }, :order_by => [[ :score, :asc ]] }
+        )
       end
     end
   end

@@ -334,6 +334,21 @@ module Mongoid #:nodoc:
           end
         end
 
+        # Get a criteria for the documents without the default scoping
+        # applied.
+        #
+        # @example Get the unscoped criteria.
+        #   person.posts.unscoped
+        #
+        # @return [ Criteria ] The unscoped criteria.
+        #
+        # @since 2.4.0
+        def unscoped
+          klass.unscoped.where(
+            metadata.foreign_key => Conversions.flag(base.id, metadata)
+          )
+        end
+
         private
 
         # Appends the document to the target array, updating the index on the

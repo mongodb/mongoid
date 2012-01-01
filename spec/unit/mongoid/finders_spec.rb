@@ -27,24 +27,26 @@ describe Mongoid::Finders do
     context "when a selector is provided" do
 
       before do
-        Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
+        Mongoid::Criteria.expects(:new).with(Church, false).returns(criteria)
+        criteria.expects(:apply_default_scope).returns(criteria)
         criteria.expects(:find).with(:all, conditions)
       end
 
       it "finds from the collection and instantiate objects for each returned" do
-        Person.all(conditions)
+        Church.all(conditions)
       end
     end
 
     context "when a selector is not provided" do
 
       before do
-        Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
+        Mongoid::Criteria.expects(:new).with(Church, false).returns(criteria)
+        criteria.expects(:apply_default_scope).returns(criteria)
         criteria.expects(:find).with(:all, nil)
       end
 
       it "finds from the collection and instantiate objects for each returned" do
-        Person.all
+        Church.all
       end
     end
   end
@@ -85,6 +87,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
+        criteria.expects(:apply_default_scope).returns(criteria)
         criteria.expects(:find).with(:all, conditions).returns(criteria)
         criteria.expects(:count).returns(10)
       end
@@ -98,6 +101,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
+        criteria.expects(:apply_default_scope).returns(criteria)
         criteria.expects(:find).with(:all, nil).returns(criteria)
         criteria.expects(:count).returns(10)
       end
@@ -122,6 +126,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
+        criteria.expects(:apply_default_scope).returns(criteria)
         criteria.expects(:find).with(:all, conditions).returns(criteria)
       end
 
@@ -152,6 +157,7 @@ describe Mongoid::Finders do
 
       before do
         Mongoid::Criteria.expects(:new).with(Person, false).returns(criteria)
+        criteria.expects(:apply_default_scope).returns(criteria)
         criteria.expects(:find).with(:all, nil).returns(criteria)
       end
 

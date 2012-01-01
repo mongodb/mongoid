@@ -24,16 +24,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def criteria(embedded = false, scoped = true)
-        scope_stack.last || Criteria.new(self, embedded).tap do |crit|
-          # @todo: Durran, Need to rewrite all the scoping code for 3.0.0 to
-          # avoid the lambda workaround.
-          if scoped
-            if default_scoping && !crit.unscopable?
-              return crit.fuse(default_scoping)
-            end
-          else
-            crit.unscopable = true
-          end
+        (scope_stack.last || Criteria.new(self, embedded)).tap do |crit|
+          return crit.apply_default_scope if scoped
         end
       end
 
@@ -64,7 +56,7 @@ module Mongoid #:nodoc:
         (class << self; self; end).class_eval <<-EOT
           def #{name}(*args)
             scope = scopes[:#{name}]
-            scope.extend(criteria.fuse(scope.conditions.scoped(*args)))
+            scope.extend(criteria.fuse(scope.conditions.as_conditions(*args)))
           end
         EOT
       end
@@ -81,7 +73,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def scoped(embedded = false)
-        criteria(embedded, true)
+        criteria(embedded).scoped
       end
 
       # Initializes and returns the current scope stack.
@@ -107,7 +99,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def unscoped(embedded = false)
-        criteria(embedded, false)
+        criteria(embedded).unscoped
       end
 
       # Pushes the provided criteria onto the scope stack, and removes it after the

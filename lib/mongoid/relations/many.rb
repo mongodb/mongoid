@@ -116,6 +116,19 @@ module Mongoid #:nodoc:
         target.map { |document| document.serializable_hash(options) }
       end
 
+      # Get a criteria for the embedded documents without the default scoping
+      # applied.
+      #
+      # @example Get the unscoped criteria.
+      #   person.addresses.unscoped
+      #
+      # @return [ Criteria ] The unscoped criteria.
+      #
+      # @since 2.4.0
+      def unscoped
+        criteria.unscoped
+      end
+
       private
 
       # Find the first object given the supplied attributes or create/initialize it.

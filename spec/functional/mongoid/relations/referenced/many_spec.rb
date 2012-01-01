@@ -7,7 +7,8 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   before do
-    [ Person, Post, OrderedPost, Movie, Rating, Game, Drug ].map(&:delete_all)
+    [ Person, Post, OrderedPost, Movie, Rating,
+      Game, Drug, Church, Acolyte ].map(&:delete_all)
   end
 
   [ :<<, :push ].each do |method|
@@ -2809,6 +2810,59 @@ describe Mongoid::Relations::Referenced::Many do
         it "returns the total number of documents" do
           movie.ratings.send(method).should eq(2)
         end
+      end
+    end
+  end
+
+  describe "#unscoped" do
+
+    context "when the relation has no default scope" do
+
+      let!(:person) do
+        Person.create(:ssn => "123-11-1111")
+      end
+
+      let!(:post_one) do
+        person.posts.create(:title => "first")
+      end
+
+      let!(:post_two) do
+        Post.create(:title => "second")
+      end
+
+      let(:unscoped) do
+        person.posts.unscoped
+      end
+
+      it "returns only the associated documents" do
+        unscoped.should eq([ post_one ])
+      end
+    end
+
+    context "when the relation has a default scope" do
+
+      let!(:church) do
+        Church.create
+      end
+
+      let!(:acolyte_one) do
+        church.acolytes.create(:name => "first")
+      end
+
+      let!(:acolyte_two) do
+        Acolyte.create(:name => "second")
+      end
+
+      let(:unscoped) do
+        church.acolytes.unscoped
+      end
+
+      it "only returns associated documents" do
+        unscoped.should eq([ acolyte_one ])
+      end
+
+      it "removes the default scoping options" do
+        unscoped.options.should eq({})
       end
     end
   end
