@@ -446,7 +446,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let!(:criteria) do
-          Person.includes(:posts).limit(1).entries
+          Person.includes(:posts).asc(:_id).limit(1).entries
         end
 
         it "returns the correct documents" do
@@ -530,7 +530,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         let!(:criteria) do
-          Person.includes(:game).limit(1).entries
+          Person.includes(:game).asc(:_id).limit(1).entries
         end
 
         it "returns the correct documents" do
@@ -587,7 +587,7 @@ describe Mongoid::Criterion::Inclusion do
       context "when the criteria has limiting options" do
 
         let!(:criteria) do
-          Game.includes(:person).limit(1).entries
+          Game.includes(:person).asc(:_id).limit(1).entries
         end
 
         it "returns the correct documents" do
@@ -671,7 +671,6 @@ describe Mongoid::Criterion::Inclusion do
     end
 
     it "returns the documents sorted closest to furthest" do
-      p bars.entries
       bars.should eq([ paris, prague, berlin ])
     end
   end
