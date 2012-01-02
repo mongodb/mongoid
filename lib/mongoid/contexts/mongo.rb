@@ -146,9 +146,9 @@ module Mongoid #:nodoc:
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
         collection, options = klass.collection, process_options
-        collection.find(selector, options).tap do
-          if criteria.inclusions.any?
-            parent_ids = load_ids("_id")
+        if criteria.inclusions.any?
+          collection.find(selector, options).entries.tap do |docs|
+            parent_ids = docs.map(&:id)
             criteria.inclusions.reject! do |metadata|
               if metadata.macro == :referenced_in
                 child_ids = load_ids(metadata.foreign_key)
@@ -158,6 +158,8 @@ module Mongoid #:nodoc:
               end
             end
           end
+        else
+          collection.find(selector, options)
         end
       end
 

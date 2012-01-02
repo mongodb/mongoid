@@ -265,10 +265,6 @@ describe Mongoid::Criterion::Inclusion do
           Post.new(:person_id => person.id)
         end
 
-        let(:fields) do
-          { :fields => { "_id" => 1 }}
-        end
-
         let(:ids) do
           [{ "_id" => person.id }]
         end
@@ -278,7 +274,6 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         before do
-          driver.expects(:find).with({}, fields).returns(ids)
           collection.expects(:find).with({}, {}).returns([ person ])
           post_collection.expects(:find).with(
             { "person_id" => { "$in" => [ person.id ] }}, {}
@@ -309,10 +304,6 @@ describe Mongoid::Criterion::Inclusion do
           Post.new(:person_id => person.id)
         end
 
-        let(:fields) do
-          { :fields => { "_id" => 1 }}
-        end
-
         let(:ids) do
           [{ "_id" => person.id }]
         end
@@ -322,7 +313,6 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         before do
-          driver.expects(:find).with({}, fields).returns(ids)
           collection.expects(:find).with({}, {}).returns([ person ])
           post_collection.expects(:find).with(
             { "person_id" => { "$in" => [ person.id ] }}, {}
@@ -373,10 +363,6 @@ describe Mongoid::Criterion::Inclusion do
           Game.new(:person_id => person.id)
         end
 
-        let(:fields) do
-          { :fields => { "_id" => 1 }}
-        end
-
         let(:ids) do
           [{ "_id" => person.id }]
         end
@@ -386,7 +372,6 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         before do
-          driver.expects(:find).with({}, fields).returns(ids)
           collection.expects(:find).with({}, {}).returns([ person ])
           game_collection.expects(:find).with(
             { "person_id" => { "$in" => [ person.id ] }}, {}
@@ -417,10 +402,6 @@ describe Mongoid::Criterion::Inclusion do
           Game.new(:person_id => person.id)
         end
 
-        let(:fields) do
-          { :fields => { "_id" => 1 }}
-        end
-
         let(:ids) do
           [{ "_id" => person.id }]
         end
@@ -430,7 +411,6 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         before do
-          driver.expects(:find).with({}, fields).returns(ids)
           collection.expects(:find).with({}, {}).returns([ person ])
           game_collection.expects(:find).with(
             { "person_id" => { "$in" => [ person.id ] }}, {}
@@ -496,9 +476,6 @@ describe Mongoid::Criterion::Inclusion do
         before do
           driver.expects(:find).with({}, fields).returns(ids)
           game_collection.expects(:find).with({}, {}).returns([ game ])
-          driver.expects(:find).with(
-            {}, { :fields => { "_id" => 1 }}
-          ).returns([ game ])
           collection.expects(:find).with(
             { "_id" => { "$in" => [ person.id ] }}, {}
           ).returns([ person ])
@@ -543,9 +520,6 @@ describe Mongoid::Criterion::Inclusion do
         before do
           driver.expects(:find).with({}, fields).returns(ids)
           game_collection.expects(:find).with({}, {}).returns([ game ])
-          driver.expects(:find).with(
-            {}, { :fields => { "_id" => 1 }}
-          ).returns([ game ])
           collection.expects(:find).with(
             { "_id" => { "$in" => [ person.id ] }}, {}
           ).returns([ person ])
