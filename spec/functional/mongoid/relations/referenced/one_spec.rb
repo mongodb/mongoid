@@ -967,7 +967,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let!(:eager) do
-        described_class.eager_load(metadata, Person.all)
+        described_class.eager_load(metadata, Person.all.map(&:_id))
       end
 
       let(:map) do
@@ -1006,7 +1006,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let!(:eager) do
-        described_class.eager_load(metadata, Book.all)
+        described_class.eager_load(metadata, Book.all.map(&:_id))
       end
 
       let(:map) do

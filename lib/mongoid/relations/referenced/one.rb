@@ -132,14 +132,14 @@ module Mongoid # :nodoc:
           #   Proxy.eager_load(metadata, criteria)
           #
           # @param [ Metadata ] metadata The relation metadata.
-          # @param [ Criteria ] criteria The criteria being used.
+          # @param [ Array<Object> ] ids The ids of the base docs.
           #
           # @return [ Criteria ] The criteria to eager load the relation.
           #
           # @since 2.2.0
-          def eager_load(metadata, criteria)
+          def eager_load(metadata, ids)
             klass, foreign_key = metadata.klass, metadata.foreign_key
-            klass.any_in(foreign_key => criteria.load_ids("_id").uniq).each do |doc|
+            klass.any_in(foreign_key => ids).each do |doc|
               IdentityMap.set_one(doc, foreign_key => doc.send(foreign_key))
             end
           end

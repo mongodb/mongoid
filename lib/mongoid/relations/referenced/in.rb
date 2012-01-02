@@ -117,15 +117,15 @@ module Mongoid # :nodoc:
           #   Proxy.eager_load(metadata, criteria)
           #
           # @param [ Metadata ] metadata The relation metadata.
-          # @param [ Criteria ] criteria The criteria being used.
+          # @param [ Array<Object> ] ids The ids of the target docs.
           #
           # @return [ Criteria ] The criteria to eager load the relation.
           #
           # @since 2.2.0
-          def eager_load(metadata, criteria)
+          def eager_load(metadata, ids)
             raise Errors::EagerLoad.new(metadata.name) if metadata.polymorphic?
             klass, foreign_key = metadata.klass, metadata.foreign_key
-            klass.any_in("_id" => criteria.load_ids(foreign_key).uniq).each do |doc|
+            klass.any_in("_id" => ids).each do |doc|
               IdentityMap.set(doc)
             end
           end

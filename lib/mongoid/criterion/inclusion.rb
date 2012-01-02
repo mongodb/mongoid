@@ -228,21 +228,6 @@ module Mongoid #:nodoc:
         @inclusions ||= []
       end
 
-      # Loads an array of ids only for the current criteria. Used by eager
-      # loading to determine the documents to load.
-      #
-      # @example Load the related ids.
-      #   criteria.load_ids("person_id")
-      #
-      # @param [ String ] key The id or foriegn key string.
-      #
-      # @return [ Array<String, BSON::ObjectId> ] The ids to load.
-      #
-      # @since 2.2.0
-      def load_ids(key)
-        driver.find(selector, { :fields => { key => 1 }}).map { |doc| doc[key] }
-      end
-
       # Adds a criterion to the +Criteria+ that specifies values to do
       # geospacial searches by. The field must be indexed with the "2d" option.
       #

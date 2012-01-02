@@ -1823,7 +1823,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       let!(:eager) do
-        described_class.eager_load(metadata, Person.all)
+        described_class.eager_load(metadata, Person.all.map(&:_id))
       end
 
       let(:map) do
@@ -1862,7 +1862,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       let!(:eager) do
-        described_class.eager_load(metadata, Movie.all)
+        described_class.eager_load(metadata, Movie.all.map(&:_id))
       end
 
       let(:map) do

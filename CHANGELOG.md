@@ -65,6 +65,9 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* \#1542 Eager loading now respects the options (ie skip, limit) provided to
+  the criteria when fetch the associations.
+
 * \#1530 Don't duplicate added values to arrays via dirty tracking if the
   array is a foreign key field.
 

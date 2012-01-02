@@ -197,13 +197,13 @@ module Mongoid # :nodoc:
       # @example Get the eager loading criteria.
       #   metadata.eager_load(criteria)
       #
-      # @param [ Criteria ] criteria The criteria to load from.
+      # @param [ Array<Object> ] ids The ids of the returned parents.
       #
       # @return [ Criteria ] The eager loading criteria.
       #
       # @since 2.2.0
-      def eager_load(criteria)
-        relation.eager_load(self, criteria.clone)
+      def eager_load(ids)
+        relation.eager_load(self, ids)
       end
 
       # Will determine if the relation is an embedded one or not. Currently

@@ -145,10 +145,38 @@ module Mongoid #:nodoc:
       #
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
-        criteria.inclusions.reject! do |metadata|
-          metadata.eager_load(criteria)
+        collection, options = klass.collection, process_options
+        collection.find(selector, options).tap do
+          if criteria.inclusions.any?
+            parent_ids = load_ids("_id")
+            criteria.inclusions.reject! do |metadata|
+              if metadata.macro == :referenced_in
+                child_ids = load_ids(metadata.foreign_key)
+                metadata.eager_load(child_ids)
+              else
+                metadata.eager_load(parent_ids)
+              end
+            end
+          end
         end
-        klass.collection.find(selector, process_options) || []
+      end
+
+      # Loads an array of ids only for the current criteria. Used by eager
+      # loading to determine the documents to load.
+      #
+      # @example Load the related ids.
+      #   criteria.load_ids("person_id")
+      #
+      # @param [ String ] key The id or foriegn key string.
+      #
+      # @return [ Array<String, BSON::ObjectId> ] The ids to load.
+      #
+      # @since 2.2.0
+      def load_ids(key)
+        klass.collection.driver.find(
+          selector,
+          process_options.merge({ :fields => { key => 1 }})
+        ).map { |doc| doc[key] }
       end
 
       # Return the first result for the +Context+.
