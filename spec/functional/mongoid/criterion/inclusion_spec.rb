@@ -502,7 +502,7 @@ describe Mongoid::Criterion::Inclusion do
       end
 
         it "deletes the replaced document from the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+          Mongoid::IdentityMap[Game.collection_name][game_one.id].should eq(game_one)
       end
 
       it "inserts the second document into the identity map" do
@@ -653,7 +653,7 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "removes the first has one document from the identity map" do
-        Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+        Mongoid::IdentityMap[Game.collection_name][game_one.id].should eq(game_one)
       end
 
       it "inserts the second has one document into the identity map" do
