@@ -3,5 +3,6 @@ class Product
   field :description, :localize => true
   field :name, :localize => true, :default => "no translation"
   field :price, :type => Integer
+  field :brand_name
   alias_attribute :cost, :price
 end
