@@ -2,6 +2,8 @@ nl:
   mongoid:
     errors:
       messages:
+        blank:
+          mag niet leeg zijn
         taken:
           al in gebruik
         callbacks:
