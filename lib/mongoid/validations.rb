@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/validations/associated"
 require "mongoid/validations/uniqueness"
+require "mongoid/validations/presence"
 
 module Mongoid #:nodoc:
 
@@ -117,6 +118,10 @@ module Mongoid #:nodoc:
       # @param [ Array ] *args The arguments to pass to the validator.
       def validates_uniqueness_of(*args)
         validates_with(UniquenessValidator, _merge_attributes(args))
+      end
+      
+      def validates_presence_of(*args)
+        validates_with(PresenceValidator, _merge_attributes(args))
       end
 
       protected
