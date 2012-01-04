@@ -426,7 +426,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def reindex
-          target.each_with_index do |doc, index|
+          _unscoped.each_with_index do |doc, index|
             doc._index = index
           end
         end

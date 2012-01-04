@@ -2712,4 +2712,53 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when indexing the documents" do
+
+    let!(:person) do
+      Person.create(:ssn => "456-33-3333")
+    end
+
+    context "when the documents have a limiting default scope" do
+
+      let(:active) do
+        Appointment.new
+      end
+
+      let(:inactive) do
+        Appointment.new(:active => false)
+      end
+
+      before do
+        person.appointments.concat([ inactive, active ])
+      end
+
+      let(:relation) do
+        person.reload.appointments
+      end
+
+      it "retains the unscoped index for the excluded document" do
+        relation.send(:_unscoped).first._index.should eq(0)
+      end
+
+      it "retains the unscoped index for the included document" do
+        relation.first._index.should eq(1)
+      end
+
+      context "when a reindexing operation occurs" do
+
+        before do
+          relation.send(:reindex)
+        end
+
+        it "retains the unscoped index for the excluded document" do
+          relation.send(:_unscoped).first._index.should eq(0)
+        end
+
+        it "retains the unscoped index for the included document" do
+          relation.first._index.should eq(1)
+        end
+      end
+    end
+  end
 end
