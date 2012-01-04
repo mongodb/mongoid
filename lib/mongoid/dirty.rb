@@ -48,7 +48,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def changes
-      changed.inject({}) do |changes, attr|
+      changed.inject({}.with_indifferent_access) do |changes, attr|
         changes.tap do |hash|
           hash[attr] = attribute_change(attr)
         end

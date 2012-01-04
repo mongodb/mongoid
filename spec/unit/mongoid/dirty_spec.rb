@@ -578,6 +578,12 @@ describe Mongoid::Dirty do
           [ nil, "Captain Obvious" ]
         )
       end
+
+      it "returns a hash with indifferent access" do
+        person.changes[:title].should eq(
+          [ nil, "Captain Obvious" ]
+        )
+      end
     end
 
     context "when the document has not changed" do
