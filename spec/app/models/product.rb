@@ -5,4 +5,6 @@ class Product
   field :price, :type => Integer
   field :brand_name
   alias_attribute :cost, :price
+
+  validates :name, :presence => true
 end

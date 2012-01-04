@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid #:nodoc:
   module Validations #:nodoc:
-    
+
     # Validates that the specified attributes are not blank (as defined by
     # Object#blank?).
     #
@@ -13,12 +13,23 @@ module Mongoid #:nodoc:
     #
     #     validates_presence_of :title
     #   end
-    
     class PresenceValidator < ActiveModel::EachValidator
+
+      # Validate the document for the attribute and value.
+      #
+      # @example Validate the document.
+      #   validator.validate_each(doc, :title, "")
+      #
+      # @param [ Document ] document The document to validate.
+      # @param [ Symbol ] attribute The attribute name.
+      # @param [ Object ] value The current value of the field.
+      #
+      # @since 2.4.0
       def validate_each(document, attribute, value)
-        if document.fields[attribute.to_s] && document.fields[attribute.to_s].localized? && value.kind_of?(Hash)
-          value.keys.each do |language|
-            document.errors.add(attribute, :blank, options) if value[language.to_s].blank?
+        field = document.fields[attribute.to_s]
+        if field && field.localized? && !value.blank?
+          value.each_pair do |locale, value|
+            document.errors.add(attribute, :blank, options) if value.blank?
           end
         else
           document.errors.add(attribute, :blank, options) if value.blank?

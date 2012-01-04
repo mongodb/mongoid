@@ -13,6 +13,8 @@ For instructions on upgrading to newer versions, visit
 * Custom serializable fields can now override #selection to provide
   customized serialization for criteria queries.
 
+* \#1511 Presence validation now supports localized fields. (Tiago Rafael Godinho)
+
 * \#1506 `Model.set` will now accept false and nil values. (Marten Veldthuis)
 
 * \#1505 `Model.delete_all/destroy_all` now take either a :conditions hash or
