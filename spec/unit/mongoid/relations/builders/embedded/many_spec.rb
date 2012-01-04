@@ -132,26 +132,5 @@ describe Mongoid::Relations::Builders::Embedded::Many do
         @documents[1].width.should == 50
       end
     end
-
-
-    context "when when order specified" do
-      let(:metadata) do
-        stub_everything(:klass => Shape, :name => :shapes, :order => :radius.asc)
-      end
-
-      let(:small_circle)  { { "_type" => "Circle", "radius" => 100} }
-      let(:normal_circle) { { "_type" => "Circle", "radius" => 200} }
-      let(:big_circle)    { { "_type" => "Circle", "radius" => 500}  }
-
-      let(:object) {[ small_circle, big_circle, normal_circle ]}
-
-      before do
-        @documents = builder.build
-      end
-
-      it "returns ordered documents" do
-        @documents.map(&:radius).should == [ small_circle["radius"], normal_circle["radius"], big_circle["radius"] ]
-      end
-    end
   end
 end

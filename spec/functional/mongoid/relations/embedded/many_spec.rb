@@ -2494,4 +2494,74 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when the relation has a default scope" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-11-1111")
+    end
+
+    context "when the default scope is a sort" do
+
+      let(:cough) do
+        Symptom.new(:name => "cough")
+      end
+
+      let(:headache) do
+        Symptom.new(:name => "headache")
+      end
+
+      let(:nausea) do
+        Symptom.new(:name => "nausea")
+      end
+
+      before do
+        person.symptoms.concat([ nausea, cough, headache ])
+      end
+
+      context "when accessing the relation" do
+
+        let(:symptoms) do
+          person.reload.symptoms
+        end
+
+        it "applies the default scope" do
+          symptoms.should eq([ cough, headache, nausea ])
+        end
+      end
+
+      context "when modifying the relation" do
+
+        let(:constipation) do
+          Symptom.new(:name => "constipation")
+        end
+
+        before do
+          person.symptoms.push(constipation)
+        end
+
+        context "when reloading" do
+
+          let(:symptoms) do
+            person.reload.symptoms
+          end
+
+          it "applies the default scope" do
+            symptoms.should eq([ constipation, cough, headache, nausea ])
+          end
+        end
+      end
+
+      context "when unscoping the relation" do
+
+        let(:unscoped) do
+          person.reload.symptoms.unscoped
+        end
+
+        it "removes the default scope" do
+          unscoped.should eq([ nausea, cough, headache ])
+        end
+      end
+    end
+  end
 end

@@ -1,12 +1,9 @@
 # encoding: utf-8
-require "mongoid/relations/embedded/sort"
-
 module Mongoid # :nodoc:
   module Relations #:nodoc:
     module Builders #:nodoc:
       module Embedded #:nodoc:
         class Many < Builder #:nodoc:
-          include Relations::Embedded::Sort
 
           # Builds the document out of the attributes using the provided
           # metadata on the relation. Instantiates through the factory in order
@@ -25,12 +22,11 @@ module Mongoid # :nodoc:
             [].tap do |docs|
               object.each do |attrs|
                 if _loading?
-                  docs << Factory.from_db(klass, attrs)
+                  docs.push(Factory.from_db(klass, attrs))
                 else
-                  docs << Factory.build(klass, attrs)
+                  docs.push(Factory.build(klass, attrs))
                 end
               end
-              sort_documents!(docs, metadata) if metadata.order
             end
           end
         end

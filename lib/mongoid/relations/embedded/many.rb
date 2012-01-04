@@ -246,6 +246,8 @@ module Mongoid # :nodoc:
               integrate(doc)
               doc._index = index
             end
+            @_unscoped = target.dup
+            @target = scope(target)
           end
         end
 
@@ -315,6 +317,12 @@ module Mongoid # :nodoc:
           end
         end
 
+        def unscoped
+          klass.criteria(true, false).tap do |criterion|
+            criterion.documents = _unscoped
+          end
+        end
+
         private
 
         # Appends the document to the target array, updating the index on the
@@ -328,6 +336,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def append(document)
           target.push(document)
+          # _unscoped.push(document)
           integrate(document)
           document._index = target.size - 1
         end
@@ -416,6 +425,24 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Apply the metadata ordering or the default scoping to the provided
+        # documents.
+        #
+        # @example Apply scoping.
+        #   person.addresses.scope(target)
+        #
+        # @param [ Array<Document> ] docs The documents to scope.
+        #
+        # @return [ Array<Document> ] The scoped docs.
+        #
+        # @since 2.4.0
+        def scope(docs)
+          return docs unless metadata.order || metadata.klass.default_scoping?
+          metadata.klass.criteria(true).order_by(metadata.order).tap do |crit|
+            crit.documents = docs
+          end
+        end
+
         # Remove all documents from the relation, either with a delete or a
         # destroy depending on what this was called through.
         #
@@ -436,6 +463,14 @@ module Mongoid # :nodoc:
             end
             reindex
           end
+        end
+
+        def _unscoped
+          @_unscoped ||= []
+        end
+
+        def _unscoped=(docs)
+          @_unscoped = docs
         end
 
         class << self
