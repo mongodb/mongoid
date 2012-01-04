@@ -93,7 +93,10 @@ module Mongoid # :nodoc:
         # @return [ Many ] The empty relation.
         def clear
           tap do |proxy|
-            atomically(:$unset) { proxy.delete_all }
+            atomically(:$unset) do
+              proxy.delete_all
+              _unscoped.clear
+            end
           end
         end
 
@@ -167,6 +170,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def delete(document)
           target.delete_one(document).tap do |doc|
+            _unscoped.delete_one(doc)
             if doc && !_binding?
               if _assigning? && !doc.paranoid?
                 base.add_atomic_pull(doc)
@@ -287,7 +291,9 @@ module Mongoid # :nodoc:
                 if replacement.first.is_a?(Hash)
                   replacement = Many.builder(base, metadata, replacement).build
                 end
-                proxy.target = replacement.compact
+                docs = replacement.compact
+                proxy.target = docs
+                self._unscoped = docs.dup
                 if _assigning?
                   base.delayed_atomic_sets[metadata.name.to_s] = proxy.as_document
                 end
@@ -311,8 +317,8 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def as_document
           [].tap do |attributes|
-            target.each do |doc|
-              attributes << doc.as_document
+            _unscoped.each do |doc|
+              attributes.push(doc.as_document)
             end
           end
         end
@@ -336,7 +342,7 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def append(document)
           target.push(document)
-          # _unscoped.push(document)
+          _unscoped.push(document)
           integrate(document)
           document._index = target.size - 1
         end
@@ -440,7 +446,7 @@ module Mongoid # :nodoc:
           return docs unless metadata.order || metadata.klass.default_scoping?
           metadata.klass.criteria(true).order_by(metadata.order).tap do |crit|
             crit.documents = docs
-          end
+          end.entries
         end
 
         # Remove all documents from the relation, either with a delete or a
@@ -458,6 +464,7 @@ module Mongoid # :nodoc:
           criteria.size.tap do
             criteria.each do |doc|
               target.delete_one(doc)
+              _unscoped.delete_one(doc)
               doc.send(method, :suppress => true) unless _assigning?
               unbind_one(doc)
             end
@@ -465,10 +472,28 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Get the internal unscoped documents.
+        #
+        # @example Get the unscoped documents.
+        #   relation._unscoped
+        #
+        # @return [ Array<Document> ] The unscoped documents.
+        #
+        # @since 2.4.0
         def _unscoped
           @_unscoped ||= []
         end
 
+        # Set the internal unscoped documents.
+        #
+        # @example Set the unscoped documents.
+        #   relation._unscoped = docs
+        #
+        # @param [ Array<Document> ] docs The documents.
+        #
+        # @return [ Array<Document ] The unscoped docs.
+        #
+        # @since 2.4.0
         def _unscoped=(docs)
           @_unscoped = docs
         end

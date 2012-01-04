@@ -55,6 +55,7 @@ class Person
   embeds_many :paranoid_phones, :validate => false
   embeds_many :services, :cascade_callbacks => true
   embeds_many :symptoms, :validate => false
+  embeds_many :appointments, :validate => false
 
   embeds_one :pet, :class_name => "Animal"
   embeds_one :name, :as => :namable, :validate => false do

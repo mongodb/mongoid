@@ -52,6 +52,47 @@ describe Mongoid::Relations::Embedded::Many do
         it "sets the index on the child" do
           address._index.should == 0
         end
+
+        context "with a limiting default scope" do
+
+          context "when the document matches the scope" do
+
+            let(:active) do
+              Appointment.new
+            end
+
+            before do
+              person.appointments.send(method, active)
+            end
+
+            it "appends to the target" do
+              person.appointments.target.should eq([ active ])
+            end
+
+            it "appends to the _unscoped" do
+              person.appointments.send(:_unscoped).should eq([ active ])
+            end
+          end
+
+          context "when the document does not match the scope" do
+
+            let(:inactive) do
+              Appointment.new(:active => false)
+            end
+
+            before do
+              person.appointments.send(method, inactive)
+            end
+
+            it "appends to the target" do
+              person.appointments.target.should eq([ inactive ])
+            end
+
+            it "appends to the _unscoped" do
+              person.appointments.send(:_unscoped).should eq([ inactive ])
+            end
+          end
+        end
       end
 
       context "when the parent is not a new record" do
@@ -185,6 +226,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "sets the target of the relation" do
         person.addresses.should == [ address ]
+      end
+
+      it "sets the _unscoped of the relation" do
+        person.addresses.send(:_unscoped).should eq([ address ])
       end
 
       it "sets the base on the inverse relation" do
@@ -464,6 +509,10 @@ describe Mongoid::Relations::Embedded::Many do
           person.addresses.should be_empty
         end
 
+        it "sets the unscoped to empty" do
+          person.addresses.send(:_unscoped).should be_empty
+        end
+
         it "removes the inverse relation" do
           address.addressable.should be_nil
         end
@@ -647,6 +696,77 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#as_document" do
+
+    let!(:person) do
+      Person.create(:ssn => "243-78-2437")
+    end
+
+    context "when the relation has no default scope" do
+
+      let!(:address) do
+        person.addresses.create(:street => "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document
+      end
+
+      it "returns the documents as an array of hashes" do
+        document.should eq([ address.as_document ])
+      end
+    end
+
+    context "when the relation has a default scope" do
+
+      context "when the default scope sorts" do
+
+        let(:cough) do
+          Symptom.new(:name => "cough")
+        end
+
+        let(:headache) do
+          Symptom.new(:name => "headache")
+        end
+
+        before do
+          person.symptoms.concat([ headache, cough ])
+        end
+
+        let(:document) do
+          person.reload.symptoms.as_document
+        end
+
+        it "returns the unscoped documents as an array of hashes" do
+          document.should eq([ headache.as_document, cough.as_document ])
+        end
+      end
+
+      context "when the default scope limits" do
+
+        let(:active) do
+          Appointment.new
+        end
+
+        let(:inactive) do
+          Appointment.new(:active => false)
+        end
+
+        before do
+          person.appointments.concat([ active, inactive ])
+        end
+
+        let(:document) do
+          person.reload.appointments.as_document
+        end
+
+        it "returns the unscoped documents as an array of hashes" do
+          document.should eq([ active.as_document, inactive.as_document ])
+        end
+      end
+    end
+  end
+
   describe "#avg" do
 
     let(:person) do
@@ -714,6 +834,10 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "appends to the target" do
           person.addresses.should == [ address ]
+        end
+
+        it "appends to the unscoped" do
+          person.addresses.send(:_unscoped).should eq([ address ])
         end
 
         it "sets the base on the inverse relation" do
@@ -838,6 +962,10 @@ describe Mongoid::Relations::Embedded::Many do
           person.addresses.should be_empty
         end
 
+        it "clears the unscoped" do
+          person.addresses.send(:_unscoped).should be_empty
+        end
+
         it "marks the documents as deleted" do
           address.should be_destroyed
         end
@@ -905,6 +1033,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "appends to the target" do
         person.addresses.should == [ address ]
+      end
+
+      it "appends to the unscoped" do
+        person.addresses.send(:_unscoped).should eq([ address ])
       end
 
       it "sets the base on the inverse relation" do
@@ -1099,6 +1231,10 @@ describe Mongoid::Relations::Embedded::Many do
         person.reload.addresses.should == [ address ]
       end
 
+      it "appends to the unscoped" do
+        person.reload.addresses.send(:_unscoped).should eq([ address ])
+      end
+
       it "sets the base on the inverse relation" do
         address.addressable.should == person
       end
@@ -1188,6 +1324,10 @@ describe Mongoid::Relations::Embedded::Many do
         person.addresses.should == [ address ]
       end
 
+      it "appends to the unscoped" do
+        person.addresses.send(:_unscoped).should eq([ address ])
+      end
+
       it "sets the base on the inverse relation" do
         address.addressable.should == person
       end
@@ -1243,12 +1383,16 @@ describe Mongoid::Relations::Embedded::Many do
 
     context "when the document exists in the relation" do
 
-      before do
-        @deleted = person.addresses.delete(address_one)
+      let!(:deleted) do
+        person.addresses.delete(address_one)
       end
 
       it "deletes the document" do
         person.addresses.should == [ address_two ]
+      end
+
+      it "deletes the document from the unscoped" do
+        person.addresses.send(:_unscoped).should eq([ address_two ])
       end
 
       it "reindexes the relation" do
@@ -1256,7 +1400,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns the document" do
-        @deleted.should == address_one
+        deleted.should == address_one
       end
     end
 
@@ -1297,6 +1441,10 @@ describe Mongoid::Relations::Embedded::Many do
 
           it "removes the matching documents" do
             person.addresses.size.should == 1
+          end
+
+          it "removes from the unscoped" do
+            person.addresses.send(:_unscoped).size.should eq(1)
           end
 
           it "returns the number deleted" do
@@ -1473,7 +1621,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns true" do
-        person.addresses.exists?.should == true
+        person.addresses.exists?.should be_true
       end
     end
 
@@ -1484,7 +1632,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns false" do
-        person.addresses.exists?.should == false
+        person.addresses.exists?.should be_false
       end
     end
   end
