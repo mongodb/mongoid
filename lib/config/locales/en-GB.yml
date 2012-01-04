@@ -2,6 +2,8 @@ en-GB:
   mongoid:
     errors:
       messages:
+        blank:
+          cannot be blank
         taken:
           is already taken
         callbacks:
