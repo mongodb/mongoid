@@ -3,7 +3,7 @@ en:
     errors:
       messages:
         blank:
-          cannot be blank
+          can't be blank
         taken:
           is already taken
         callbacks:
