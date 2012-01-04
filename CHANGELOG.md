@@ -164,6 +164,8 @@ For instructions on upgrading to newer versions, visit
 * \#1259 Default values are treated as dirty if they differ from the database
   state.
 
+* \#1255 Ensure embedded documents respect the defined default scope.
+
 ## 2.3.4
 
 * \#1445 Prevent duplicate documents in the loaded array on the target

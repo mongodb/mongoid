@@ -323,6 +323,15 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Return the relation with all previous scoping removed. This is the
+        # exact representation of the docs in the database.
+        #
+        # @example Get the unscoped documents.
+        #   person.addresses.unscoped
+        #
+        # @return [ Criteria ] The unscoped relation.
+        #
+        # @since 2.4.0
         def unscoped
           klass.criteria(true, false).tap do |criterion|
             criterion.documents = _unscoped
