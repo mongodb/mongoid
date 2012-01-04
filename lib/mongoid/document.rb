@@ -127,8 +127,9 @@ module Mongoid #:nodoc:
         @new_record = true
         @attributes ||= attributes_with_foreign_key_defaults
         options ||= {}
+        identify if using_object_ids?
         process(attrs, options[:as] || :default, !options[:without_protection]) do
-          identify
+          identify unless using_object_ids?
           apply_defaults
           yield(self) if block_given?
         end

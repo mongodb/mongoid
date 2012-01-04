@@ -168,4 +168,15 @@ class Person
   def foo
     'i_am_foo'
   end
+
+  def preference_names=(names)
+    names.split(",").each do |name|
+      preference = Preference.where(:name => name).first
+      if preference
+        self.preferences << preference
+      else
+        preferences.build(:name => name)
+      end
+    end
+  end
 end

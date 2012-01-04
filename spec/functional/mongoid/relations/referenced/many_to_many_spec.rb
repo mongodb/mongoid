@@ -2471,4 +2471,38 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  context "when adding to a relation via a field setter" do
+
+    context "when the document is new" do
+
+      let!(:person) do
+        Person.create(:ssn => "123-11-1111", :preference_names => "one, two")
+      end
+
+      let(:preference_one) do
+        person.reload.preferences.first
+      end
+
+      let(:preference_two) do
+        person.reload.preferences.last
+      end
+
+      it "persists the first preference" do
+        preference_one.should_not be_nil
+      end
+
+      it "sets the first inverse" do
+        preference_one.people.should eq([ person ])
+      end
+
+      it "persists the second preference" do
+        preference_two.should_not be_nil
+      end
+
+      it "sets the second inverse keys" do
+        preference_two.people.should eq([ person ])
+      end
+    end
+  end
 end
