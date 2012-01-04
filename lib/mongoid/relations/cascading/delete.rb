@@ -11,7 +11,7 @@ module Mongoid # :nodoc:
         # @example Perform the cascading delete.
         #   strategy.cascade
         def cascade
-          relation.to_a.each { |doc| doc.delete } if relation
+          Array.wrap(relation).each { |doc| doc.delete } if relation
         end
       end
     end

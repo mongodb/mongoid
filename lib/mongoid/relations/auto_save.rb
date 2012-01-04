@@ -25,7 +25,7 @@ module Mongoid # :nodoc:
             set_callback :save, :after do |document|
               relation = document.send(metadata.name)
               if relation
-                (relation.do_or_do_not(:in_memory) || relation.to_a).each do |doc|
+                (relation.do_or_do_not(:in_memory) || Array.wrap(relation)).each do |doc|
                   doc.save
                 end
               end

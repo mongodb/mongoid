@@ -24,7 +24,7 @@ module Mongoid #:nodoc
           relations.each_pair do |name, metadata|
             if metadata.embedded?
               child = send(name)
-              child.to_a.each do |doc|
+              Array.wrap(child).each do |doc|
                 children.push(doc)
                 children.concat(doc._children) unless metadata.versioned?
               end if child
