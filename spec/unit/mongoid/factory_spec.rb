@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Factory do
 
+  before(:all) do
+    Doctor
+  end
+
   describe ".build" do
 
     context "when the type attribute is present" do

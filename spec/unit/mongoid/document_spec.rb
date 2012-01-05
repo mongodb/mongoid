@@ -2,7 +2,13 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
-  let(:klass) { Person }
+  before(:all) do
+    Doctor
+  end
+
+  let(:klass) do
+    Person
+  end
 
   let(:person) do
     Person.new
