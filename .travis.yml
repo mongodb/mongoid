@@ -1,8 +1,7 @@
 rvm:
-  - 1.8.7
   - 1.9.2
   - 1.9.3
   - ruby-head
   - jruby
-  - rbx-18mode
-  - ree
+env:
+  - JRUBY_OPTS="--1.9 --server"
