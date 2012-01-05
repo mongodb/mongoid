@@ -69,6 +69,9 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* \#1553 Combinations of adding and removing values from an array use a $set
+  on the current contents of the array, not the new values.
+
 * \#1546 Dirty changes should be returned in a hash with indifferent access.
 
 * \#1542 Eager loading now respects the options (ie skip, limit) provided to
