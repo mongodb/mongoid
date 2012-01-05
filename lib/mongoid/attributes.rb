@@ -157,45 +157,6 @@ module Mongoid #:nodoc:
 
     protected
 
-    # Set any missing default values in the attributes.
-    #
-    # @example Get the raw attributes after defaults have been applied.
-    #   person.apply_defaults
-    #
-    # @return [ Hash ] The raw attributes.
-    #
-    # @since 2.0.0.rc.8
-    def apply_defaults
-      defaults.each do |name|
-        unless attributes.has_key?(name)
-          if field = fields[name]
-            default = field.eval_default(self)
-            if attributes[name] != default
-              attribute_will_change!(name)
-              attributes[name] = default
-            end
-          end
-        end
-      end
-    end
-
-    # Provide a hash of foreign key defaults.
-    #
-    # @example Get a hash with fk defaults.
-    #   document.attributes_with_foreign_key_defaults
-    #
-    # @return [ Hash ] A hash with default fk values.
-    #
-    # @since 2.4.0
-    def attributes_with_foreign_key_defaults
-      {}.tap do |attrs|
-        foreign_key_defaults.each do |name|
-          default = fields[name].eval_default(self)
-          attrs[name] = default if default
-        end
-      end
-    end
-
     # Used for allowing accessor methods for dynamic attributes.
     #
     # @param [ String, Symbol ] name The name of the method.

@@ -29,7 +29,7 @@ describe Mongoid::Fields do
 
         after do
           Person.fields.delete("array_testing")
-          Person.defaults.delete_one("array_testing")
+          Person.non_proc_defaults.delete_one("array_testing")
         end
 
         it "returns an equal object of a different instance" do
@@ -68,7 +68,7 @@ describe Mongoid::Fields do
 
           after do
             Person.fields.delete("generated_testing")
-            Person.defaults.delete_one("generated_testing")
+            Person.non_proc_defaults.delete_one("generated_testing")
           end
 
           it "returns an equal object of a different instance" do
@@ -90,7 +90,7 @@ describe Mongoid::Fields do
 
           after do
             Person.fields.delete("rank")
-            Person.defaults.delete_one("rank")
+            Person.proc_defaults.delete_one("rank")
           end
 
           it "yields the document to the proc" do
@@ -119,37 +119,6 @@ describe Mongoid::Fields do
 
       it "has the parent and child defaults" do
         circle.defaults.should eq([ "x", "y", "radius" ])
-      end
-    end
-  end
-
-  describe "#foreign_key_defaults" do
-
-    context "on parent classes" do
-
-      let(:person) do
-        Person.new
-      end
-
-      it "does not return subclass foreign key defaults" do
-        person.foreign_key_defaults.should eq([
-          "preference_ids", "user_account_ids", "house_ids",
-          "ordered_preference_ids", "administrated_event_ids"
-        ])
-      end
-    end
-
-    context "on subclasses" do
-
-      let(:doctor) do
-        Doctor.new
-      end
-
-      it "contains the parent and child foreign key defaults" do
-        doctor.foreign_key_defaults.should eq([
-          "preference_ids", "user_account_ids", "house_ids",
-          "ordered_preference_ids", "administrated_event_ids", "user_ids"
-        ])
       end
     end
   end

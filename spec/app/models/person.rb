@@ -18,6 +18,7 @@ class Person
   field :lunch_time, :type => Time
   field :aliases, :type => Array
   field :map, :type => Hash
+  field :map_with_default, :type => Hash, :default => {}
   field :score, :type => Integer
   field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
   field :last_drink_taken_at, :type => Date, :default => lambda { 1.day.ago.in_time_zone("Alaska") }
@@ -178,5 +179,9 @@ class Person
         preferences.build(:name => name)
       end
     end
+  end
+
+  def set_on_map_with_default=(value)
+    self.map_with_default["key"] = value
   end
 end

@@ -34,20 +34,89 @@ module Mongoid #:nodoc
 
     included do
       class_attribute :aliased_fields
-      class_attribute :defaults
       class_attribute :fields
-      class_attribute :foreign_key_defaults
+      class_attribute :non_proc_defaults
+      class_attribute :proc_defaults
 
       self.aliased_fields = {}
-      self.defaults = []
       self.fields = {}
-      self.foreign_key_defaults = []
+      self.non_proc_defaults = []
+      self.proc_defaults = []
 
       field(:_type, :type => String)
       field(:_id, :type => BSON::ObjectId)
 
       alias :id :_id
       alias :id= :_id=
+    end
+
+    # Apply all default values to the document which are not procs.
+    #
+    # @example Apply all the non-proc defaults.
+    #   model.apply_non_proc_defaults
+    #
+    # @return [ Array<String ] The names of the non-proc defaults.
+    #
+    # @since 2.4.0
+    def apply_non_proc_defaults
+      non_proc_defaults.each do |name|
+        apply_default(name)
+      end
+    end
+
+    # Apply all default values to the document which are procs.
+    #
+    # @example Apply all the proc defaults.
+    #   model.apply_proc_defaults
+    #
+    # @return [ Array<String ] The names of the proc defaults.
+    #
+    # @since 2.4.0
+    def apply_proc_defaults
+      proc_defaults.each do |name|
+        apply_default(name)
+      end
+    end
+
+    # Applies a single default value for the given name.
+    #
+    # @example Apply a single default.
+    #   model.apply_default("name")
+    #
+    # @param [ String ] name The name of the field.
+    #
+    # @since 2.4.0
+    def apply_default(name)
+      unless attributes.has_key?(name)
+        if field = fields[name]
+          default = field.eval_default(self)
+          attribute_will_change!(name)
+          attributes[name] = default
+        end
+      end
+    end
+
+    # Apply all the defaults at once.
+    #
+    # @example Apply all the defaults.
+    #   model.apply_defaults
+    #
+    # @since 2.4.0
+    def apply_defaults
+      apply_non_proc_defaults
+      apply_proc_defaults
+    end
+
+    # Get a list of all the default fields for the model.
+    #
+    # @example Get a list of the defaults.
+    #   model.defaults
+    #
+    # @return [ Array<String ] The names of all defaults.
+    #
+    # @since 2.4.0
+    def defaults
+      self.class.defaults
     end
 
     class << self
@@ -89,6 +158,18 @@ module Mongoid #:nodoc
 
     module ClassMethods #:nodoc
 
+      # Get a list of all the default fields for the model.
+      #
+      # @example Get a list of the defaults.
+      #   Model.defaults
+      #
+      # @return [ Array<String ] The names of all defaults.
+      #
+      # @since 2.4.0
+      def defaults
+        non_proc_defaults + proc_defaults
+      end
+
       # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.
@@ -126,8 +207,8 @@ module Mongoid #:nodoc
       # @since 2.0.0.rc.6
       def inherited(subclass)
         super
-        subclass.defaults, subclass.fields, subclass.foreign_key_defaults =
-          defaults.dup, fields.dup, foreign_key_defaults.dup
+        subclass.fields, subclass.non_proc_defaults, subclass.proc_defaults =
+          fields.dup, non_proc_defaults.dup, proc_defaults.dup
       end
 
       # Is the field with the provided name a BSON::ObjectId?
@@ -165,6 +246,26 @@ module Mongoid #:nodoc
 
       protected
 
+      # Add the defaults to the model. This breaks them up between ones that
+      # are procs and ones that are not.
+      #
+      # @example Add to the defaults.
+      #   Model.add_defaults(field)
+      #
+      # @param [ Field ] field The field to add for.
+      #
+      # @since 2.4.0
+      def add_defaults(field)
+        default, name = field.default_val, field.name.to_s
+        unless default.nil?
+          if field.default_val.is_a?(::Proc)
+            proc_defaults.push(name)
+          else
+            non_proc_defaults.push(name)
+          end
+        end
+      end
+
       # Define a field attribute for the +Document+.
       #
       # @example Set the field.
@@ -179,8 +280,7 @@ module Mongoid #:nodoc
         type = options[:localize] ? Fields::Internal::Localized : options[:type]
         Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field
-          defaults << name unless field.default_val.nil?
-          foreign_key_defaults << name if field.foreign_key?
+          add_defaults(field)
           create_accessors(name, meth, options)
           process_options(field)
           create_dirty_methods(name)

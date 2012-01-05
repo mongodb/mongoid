@@ -125,14 +125,15 @@ module Mongoid #:nodoc:
     def initialize(attrs = nil, options = nil)
       _building do
         @new_record = true
-        @attributes ||= attributes_with_foreign_key_defaults
+        @attributes ||= {}
         options ||= {}
+        apply_non_proc_defaults
         identify if using_object_ids?
         process(attrs, options[:as] || :default, !options[:without_protection]) do
           identify unless using_object_ids?
-          apply_defaults
           yield(self) if block_given?
         end
+        apply_proc_defaults
         run_callbacks(:initialize) { self }
       end
     end
@@ -291,7 +292,7 @@ module Mongoid #:nodoc:
         attributes = attrs || {}
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
-          doc.send(:apply_defaults)
+          doc.apply_defaults
           IdentityMap.set(doc) unless _loading_revision?
           doc.run_callbacks(:initialize) { doc }
         end

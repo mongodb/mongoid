@@ -69,6 +69,10 @@ For instructions on upgrading to newer versions, visit
 * Calling `Document#as_document` on a frozen document on Rubinius returns the
   attributes instead of nil.
 
+* \#1554 Split application of default values into proc/non-procs, where
+  non-procs get executed immediately during instantiation, and procs get
+  executed after all other values are set.
+
 * \#1553 Combinations of adding and removing values from an array use a $set
   on the current contents of the array, not the new values.
 

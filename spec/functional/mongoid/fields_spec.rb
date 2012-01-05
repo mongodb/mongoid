@@ -252,4 +252,15 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  context "when a setter accesses a field with a default" do
+
+    let(:person) do
+      Person.new(:set_on_map_with_default => "testing")
+    end
+
+    it "sets the default value pre process" do
+      person.map_with_default.should eq({ "key" => "testing" })
+    end
+  end
 end
