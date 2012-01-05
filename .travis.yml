@@ -4,4 +4,4 @@ rvm:
   - ruby-head
   - jruby
 env:
-  - JRUBY_OPTS="--1.9 --server"
+  - JRUBY_OPTS="--1.9"
