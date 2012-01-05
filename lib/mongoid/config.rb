@@ -33,25 +33,6 @@ module Mongoid #:nodoc
     option :time_zone, :default => nil
     option :use_utc, :default => false
 
-    # Adds a new I18n locale file to the load path.
-    #
-    # @example Add a portuguese locale.
-    #   Mongoid::Config.add_language('pt')
-    #
-    # @example Add all available languages.
-    #   Mongoid::Config.add_language('*')
-    #
-    # @param [ String ] language_code The language to add.
-    def add_language(language_code = nil)
-      Dir[
-        File.join(
-          File.dirname(__FILE__), "..", "config", "locales", "#{language_code}.yml"
-      )
-      ].each do |file|
-        I18n.load_path << File.expand_path(file)
-      end
-    end
-
     # Get any extra databases that have been configured.
     #
     # @example Get the extras.

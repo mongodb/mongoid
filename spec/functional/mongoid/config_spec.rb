@@ -35,27 +35,6 @@ describe Mongoid::Config do
     end
   end
 
-  describe ".add_language" do
-
-    context "when adding a language" do
-
-      before do
-        described_class.add_language("de")
-        I18n.reload!
-        I18n.locale = :de
-      end
-
-      after do
-        I18n.locale = :en
-      end
-
-      it "adds the language" do
-        I18n.translate("mongoid.errors.messages.taken").should ==
-          "ist bereits vergeben"
-      end
-    end
-  end
-
   describe ".destructive_fields" do
 
     it "returns a list of method names" do

@@ -240,7 +240,8 @@ module Mongoid #:nodoc
       #
       # @since 2.1.0
       def replace_field(name, type)
-        defaults.delete_one(name)
+        non_proc_defaults.delete_one(name)
+        proc_defaults.delete_one(name)
         add_field(name, fields[name].options.merge(:type => type))
       end
 
