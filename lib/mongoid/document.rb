@@ -291,6 +291,7 @@ module Mongoid #:nodoc:
         attributes = attrs || {}
         allocate.tap do |doc|
           doc.instance_variable_set(:@attributes, attributes)
+          attributes.each { |name, value| doc.instance_variable_set "@#{name}_before_type_cast", value }
           doc.send(:apply_defaults)
           IdentityMap.set(doc) unless _loading_revision?
           doc.run_callbacks(:initialize) { doc }

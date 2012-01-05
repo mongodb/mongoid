@@ -453,6 +453,10 @@ describe Mongoid::Document do
         person.title.should == "Sir"
       end
 
+      it "sets the *_before_type_cast attributes" do
+        person.title_before_type_cast.should == "Sir"
+      end
+
       it "sets persisted to true" do
         person.should be_persisted
       end

@@ -970,6 +970,17 @@ describe Mongoid::Attributes do
         person.terms.should be_true
       end
     end
+
+    context "when setting the attribute" do
+
+      let(:person) do
+        Person.new(:age => 30)
+      end
+
+      it "sets the before_type_cast attribute for the field to the same value" do
+        person.age_before_type_cast.should == 30
+      end
+    end
   end
 
   describe "#typed_value_for" do
