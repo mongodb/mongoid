@@ -6,7 +6,6 @@ class Person
 
   embeds_one :name, :validate => false
   embeds_many :addresses, :validate => false
-  embeds_many :phones, :validate => false
 
   has_many :posts, :validate => false
   has_one :game, :validate => false
