@@ -13,6 +13,10 @@ For instructions on upgrading to newer versions, visit
   combination of `Model.pre_processed_defaults` and
   `Model.post_processed_defaults`
 
+* `Model.identity` and `Model.key` have been removed. For custome ids,
+  users must now override the _id field like so:
+  `field :_id, type: String, default: ->{ name }`.
+
 ### Resolved Issues
 
 ## 2.4.0
