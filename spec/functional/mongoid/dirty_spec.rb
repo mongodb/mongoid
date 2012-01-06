@@ -26,9 +26,14 @@ describe Mongoid::Dirty do
   context "when modifying an embeds many field" do
 
     let!(:person) { Person.create(:videos => [Video.new]) }
+    let(:video) { person.videos.first }
 
     before do
-      person.videos.first.title = "Snatch"
+      video.title = "Snatch"
+    end
+
+    it "marks the embedded document as changed" do
+      video.changed?.should be
     end
 
     it "marks the parent as changed" do
@@ -40,9 +45,14 @@ describe Mongoid::Dirty do
   context "when modifying an embeds one field" do
 
     let!(:person) { Person.create(:pet => Pet.new) }
+    let(:pet) { person.pet }
 
     before do
-      person.pet.first.name = "Daisy"
+      pet.name = "Daisy"
+    end
+
+    it "marks the embedded document as changed" do
+      pet.changed?.should be
     end
 
     it "marks the parent as changed" do
