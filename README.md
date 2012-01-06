@@ -15,7 +15,7 @@ Project Tracking
 Compatibility
 -------------
 
-Mongoid is tested against Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius, and JRuby.
+Mongoid is tested against Ruby 1.9.2, 1.9.3, Rubinius (1.9), and JRuby (1.9).
 
 <img src="https://secure.travis-ci.org/mongoid/mongoid.png?branch=master&.png"/>
 
@@ -35,7 +35,7 @@ Donating
 License
 -------
 
-Copyright (c) 2009, 2010, 2011 Durran Jordan
+Copyright (c) 2009-2012 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
