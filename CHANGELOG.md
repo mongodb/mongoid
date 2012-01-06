@@ -20,6 +20,9 @@ For instructions on upgrading to newer versions, visit
 * Custom application exceptions in various languages has been removed,
   along with the `Mongoid.add_language` feature.
 
+* Mongoid no longer supports 1.8 syntax. 1.9.x or other vms running in
+  1.9 mode is now only supported.
+
 ### Resolved Issues
 
 ## 2.4.0
