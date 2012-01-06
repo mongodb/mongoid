@@ -2,13 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Fields do
 
-  describe ".defaults" do
-
-    it "returns an array of all the default values" do
-      Game.defaults.should eq([ "high_score", "score" ])
-    end
-  end
-
   describe "#defaults" do
 
     context "with defaults specified as a non-primitive" do
@@ -29,7 +22,7 @@ describe Mongoid::Fields do
 
         after do
           Person.fields.delete("array_testing")
-          Person.non_proc_defaults.delete_one("array_testing")
+          Person.pre_processed_defaults.delete_one("array_testing")
         end
 
         it "returns an equal object of a different instance" do
@@ -68,7 +61,7 @@ describe Mongoid::Fields do
 
           after do
             Person.fields.delete("generated_testing")
-            Person.non_proc_defaults.delete_one("generated_testing")
+            Person.pre_processed_defaults.delete_one("generated_testing")
           end
 
           it "returns an equal object of a different instance" do
@@ -90,7 +83,7 @@ describe Mongoid::Fields do
 
           after do
             Person.fields.delete("rank")
-            Person.proc_defaults.delete_one("rank")
+            Person.post_processed_defaults.delete_one("rank")
           end
 
           it "yields the document to the proc" do
@@ -107,7 +100,7 @@ describe Mongoid::Fields do
       end
 
       it "does not return subclass defaults" do
-        shape.defaults.should eq([ "x", "y" ])
+        shape.pre_processed_defaults.should eq([ "x", "y" ])
       end
     end
 
@@ -118,7 +111,7 @@ describe Mongoid::Fields do
       end
 
       it "has the parent and child defaults" do
-        circle.defaults.should eq([ "x", "y", "radius" ])
+        circle.pre_processed_defaults.should eq([ "x", "y", "radius" ])
       end
     end
   end

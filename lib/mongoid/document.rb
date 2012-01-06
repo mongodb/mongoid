@@ -127,13 +127,13 @@ module Mongoid #:nodoc:
         @new_record = true
         @attributes ||= {}
         options ||= {}
-        apply_non_proc_defaults
+        apply_pre_processed_defaults
         identify if using_object_ids?
         process(attrs, options[:as] || :default, !options[:without_protection]) do
           identify unless using_object_ids?
           yield(self) if block_given?
         end
-        apply_proc_defaults
+        apply_post_processed_defaults
         run_callbacks(:initialize) { self }
       end
     end
