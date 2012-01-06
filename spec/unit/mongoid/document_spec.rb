@@ -299,26 +299,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#identify" do
-
-    let!(:person) do
-      Person.new
-    end
-
-    let!(:identifier) do
-      stub
-    end
-
-    before do
-      Mongoid::Identity.expects(:new).with(person).returns(identifier)
-    end
-
-    it "creates a new identity" do
-      identifier.expects(:create)
-      person.identify
-    end
-  end
-
   describe "#initialize" do
 
     let(:person) do

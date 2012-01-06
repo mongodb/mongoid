@@ -130,9 +130,7 @@ module Mongoid #:nodoc:
     # @since 2.2.1
     def assign_attributes(attrs = nil, options = {})
       _assigning do
-        process(attrs, options[:as] || :default, !options[:without_protection]) do |document|
-          document.identify if new? && id.blank?
-        end
+        process(attrs, options[:as] || :default, !options[:without_protection])
       end
     end
 

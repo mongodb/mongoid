@@ -135,9 +135,9 @@ describe Mongoid::Validations::UniquenessValidator do
 
         before do
           word.definitions.expects(:where).with(
-            :description => "Testy", :_id => { "$ne" => definition.id }
+            :description => "Testy"
           ).returns(criteria)
-          criteria.expects(:exists?).returns(true)
+          criteria.expects(:count).returns(2)
           validator.validate_each(definition, :description, "Testy")
         end
 
@@ -154,9 +154,9 @@ describe Mongoid::Validations::UniquenessValidator do
 
         before do
           word.definitions.expects(:where).with(
-            :description => "Testy", :_id => { "$ne" => definition.id }
+            :description => "Testy"
           ).returns(criteria)
-          criteria.expects(:exists?).returns(true)
+          criteria.expects(:count).returns(2)
           validator.validate_each(definition, :description, "Testy")
         end
 
@@ -173,9 +173,9 @@ describe Mongoid::Validations::UniquenessValidator do
 
         before do
           word.definitions.expects(:where).with(
-            :description => /^Testy$/i, :_id => { "$ne" => definition.id }
+            :description => /^Testy$/i
           ).returns(criteria)
-          criteria.expects(:exists?).returns(true)
+          criteria.expects(:count).returns(2)
           validator.validate_each(definition, :description, "Testy")
         end
 
@@ -192,10 +192,10 @@ describe Mongoid::Validations::UniquenessValidator do
 
         before do
           word.definitions.expects(:where).with(
-            :description => "Testy", :_id => { "$ne" => definition.id }
+            :description => "Testy"
           ).returns(criteria)
           criteria.expects(:where).with(:part => definition.part).returns(criteria)
-          criteria.expects(:exists?).returns(true)
+          criteria.expects(:count).returns(2)
           validator.validate_each(definition, :description, "Testy")
         end
 

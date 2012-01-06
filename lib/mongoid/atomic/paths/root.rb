@@ -31,8 +31,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def selector
-          { "_id" => document.identifier || document._id }.
-            merge!(document.shard_key_selector)
+          { "_id" => document._id }.merge!(document.shard_key_selector)
         end
       end
     end

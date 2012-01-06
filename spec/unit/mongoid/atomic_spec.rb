@@ -52,7 +52,7 @@ describe Mongoid::Atomic do
               {
                 "$set" => {
                   "title" => "Sir",
-                  "name" => { "_id" => "lionel", "first_name" => "Lionel" }
+                  "name" => { "_id" => "Lionel-", "first_name" => "Lionel" }
                 }
               }
           end

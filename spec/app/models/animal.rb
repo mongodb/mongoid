@@ -1,10 +1,12 @@
 class Animal
   include Mongoid::Document
+
+  field :_id, type: String, default: ->{ name.try(:parameterize) }
+
   field :name
   field :height, :type => Integer
   field :weight, :type => Integer
   field :tags, :type => Array
-  key :name
 
   embedded_in :person
   embedded_in :circus

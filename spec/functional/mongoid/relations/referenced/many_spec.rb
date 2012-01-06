@@ -227,12 +227,22 @@ describe Mongoid::Relations::Referenced::Many do
         context "when parent has String identity" do
 
           before do
-            Movie.identity :type => String
+            Movie.field(
+              :_id,
+              type: String,
+              pre_processed: true,
+              default: ->{ BSON::ObjectId.new.to_s }
+            )
             movie.ratings << Rating.new
           end
 
           after do
-            Movie.identity :type => BSON::ObjectId
+            Movie.field(
+              :_id,
+              type: BSON::ObjectId,
+              pre_processed: true,
+              default: ->{ BSON::ObjectId.new }
+            )
           end
 
           let(:movie) do
@@ -1215,12 +1225,22 @@ describe Mongoid::Relations::Referenced::Many do
     context "when parent has String identity" do
 
       before do
-        Movie.identity :type => String
+        Movie.field(
+          :_id,
+          pre_processeded: true,
+          type: String,
+          default: ->{ BSON::ObjectId.new.to_s }
+        )
         movie.ratings << Rating.new
       end
 
       after do
-        Movie.identity :type => BSON::ObjectId
+        Movie.field(
+          :_id,
+          pre_processeded: true,
+          type: BSON::ObjectId,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       let(:movie) do

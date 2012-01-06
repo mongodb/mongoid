@@ -63,11 +63,21 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
             end
 
             before do
-              Person.identity :type => String
+              Person.field(
+                :_id,
+                type: String,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new.to_s }
+              )
             end
 
             after do
-              Person.identity :type => BSON::ObjectId
+              Person.field(
+                :_id,
+                type: BSON::ObjectId,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new }
+              )
             end
 
             it "does not convert" do
@@ -82,11 +92,21 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
             end
 
             before do
-              Person.identity :type => String
+              Person.field(
+                :_id,
+                type: String,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new.to_s }
+              )
             end
 
             after do
-              Person.identity :type => BSON::ObjectId
+              Person.field(
+                :_id,
+                type: BSON::ObjectId,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new }
+              )
             end
 
             let(:criterion) do
@@ -106,11 +126,16 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
           context "when provided a string" do
 
             before do
-              Person.identity :type => Integer
+              Person.field(:_id, type: Integer)
             end
 
             after do
-              Person.identity :type => BSON::ObjectId
+              Person.field(
+                :_id,
+                type: BSON::ObjectId,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new }
+              )
             end
 
             it "does not convert" do
@@ -121,11 +146,16 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
           context "when provided a hash with a string value" do
 
             before do
-              Person.identity :type => Integer
+              Person.field(:_id, type: Integer)
             end
 
             after do
-              Person.identity :type => BSON::ObjectId
+              Person.field(
+                :_id,
+                type: BSON::ObjectId,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new }
+              )
             end
 
             let(:criterion) do
@@ -142,11 +172,16 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
           context "when provided a hash with an array of string values" do
 
             before do
-              Person.identity :type => Integer
+              Person.field(:_id, type: Integer)
             end
 
             after do
-              Person.identity :type => BSON::ObjectId
+              Person.field(
+                :_id,
+                type: BSON::ObjectId,
+                pre_processed: true,
+                default: ->{ BSON::ObjectId.new }
+              )
             end
 
             let(:criterion) do

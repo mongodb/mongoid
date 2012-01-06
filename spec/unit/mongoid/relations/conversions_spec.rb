@@ -26,11 +26,21 @@ describe Mongoid::Relations::Conversions do
     context "when the inverse uses string ids" do
 
       before do
-        Person.identity :type => String
+        Person.field(
+          :_id,
+          type: String,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new.to_s }
+        )
       end
 
       after do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       let(:metadata) do

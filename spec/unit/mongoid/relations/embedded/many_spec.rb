@@ -23,7 +23,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   let(:address) do
-    Address.new
+    Address.new(:street => "first")
   end
 
   let(:target) do
@@ -629,7 +629,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#as_document" do
 
     it "returns an array of document hashes" do
-      relation.as_document.should == [ { "_id" => address.id } ]
+      relation.as_document.should == [ { "_id" => address.id, "street" => "first" } ]
     end
   end
 

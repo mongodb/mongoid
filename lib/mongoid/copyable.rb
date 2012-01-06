@@ -42,7 +42,7 @@ module Mongoid #:nodoc:
         attributes["version"] = 1
       end
       @new_record = true
-      identify
+      apply_defaults
     end
   end
 end

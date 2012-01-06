@@ -46,26 +46,21 @@ module Mongoid #:nodoc:
           relation = document._parent.send(document.metadata.name)
           criteria = relation.where(criterion(document, attribute, value))
           criteria = scope(criteria, document, attribute)
-          if document.primary_key == Array.wrap(attribute)
-            if criteria.count > 1
-              document.errors.add(
-                attribute,
-                :taken, options.except(:case_sensitive, :scope).merge(:value => value)
-              )
-            end
-          else
-            if criteria.exists?
-              document.errors.add(
-                attribute,
-                :taken,
-                options.except(:case_sensitive, :scope).merge(:value => value)
-              )
-            end
+          if criteria.count > 1
+            document.errors.add(
+              attribute,
+              :taken,
+              options.except(:case_sensitive, :scope).merge(:value => value)
+            )
           end
         else
           criteria = klass.where(criterion(document, attribute, value))
           criteria = scope(criteria, document, attribute)
-          document.errors.add(attribute, :taken, options.except(:case_sensitive, :scope).merge(:value => value)) if criteria.exists?
+          if criteria.exists?
+            document.errors.add(
+              attribute, :taken, options.except(:case_sensitive, :scope).merge(:value => value)
+            )
+          end
         end
       end
 
@@ -97,8 +92,7 @@ module Mongoid #:nodoc:
       # @since 2.3.0
       def criterion(document, attribute, value)
         { attribute => filter(value) }.tap do |selector|
-          if document.persisted? ||
-            (document.embedded? && (document.primary_key != Array.wrap(attribute)))
+          if document.persisted? && !document.embedded?
             selector.merge!(:_id => { "$ne" => document.id })
           end
         end
@@ -130,10 +124,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.0
       def scope(criteria, document, attribute)
-        unless document.primary_key == Array.wrap(attribute)
-          Array.wrap(options[:scope]).each do |item|
-            criteria = criteria.where(item => document.attributes[item.to_s])
-          end
+        Array.wrap(options[:scope]).each do |item|
+          criteria = criteria.where(item => document.attributes[item.to_s])
         end
         criteria
       end

@@ -641,13 +641,8 @@ describe Mongoid::Validations::UniquenessValidator do
               Login.new(:username => "Oxford")
             end
 
-            it "returns false" do
-              login.should_not be_valid
-            end
-
-            it "adds the uniqueness errors" do
-              login.valid?
-              login.errors[:username].should eq([ "is already taken" ])
+            it "returns true" do
+              login.should be_valid
             end
           end
 
@@ -661,13 +656,8 @@ describe Mongoid::Validations::UniquenessValidator do
               Login.new(:username => "Oxford", :application_id => 2)
             end
 
-            it "returns false" do
-              login.should_not be_valid
-            end
-
-            it "adds the uniqueness errors" do
-              login.valid?
-              login.errors[:username].should eq([ "is already taken" ])
+            it "returns true" do
+              login.should be_valid
             end
           end
 

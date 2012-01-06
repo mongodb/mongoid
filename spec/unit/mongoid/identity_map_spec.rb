@@ -169,7 +169,7 @@ describe Mongoid::IdentityMap do
     context "embedded class" do
 
       let!(:animal) do
-        circus = Circus.new(:animals => [Animal.new])
+        circus = Circus.new(:animals => [ Animal.new(:name => "Lion") ])
         circus.animals.first
       end
 

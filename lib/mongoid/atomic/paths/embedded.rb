@@ -34,8 +34,7 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def selector
           parent.atomic_selector.
-            merge!({ "#{path}._id" => document.identifier || document._id }).
-            merge!(document.shard_key_selector)
+            merge!({ "#{path}._id" => document._id }).merge!(document.shard_key_selector)
         end
       end
     end

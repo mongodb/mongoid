@@ -1370,11 +1370,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new
+      Address.new(:street => "first")
     end
 
     let(:address_two) do
-      Address.new
+      Address.new(:street => "second")
     end
 
     before do

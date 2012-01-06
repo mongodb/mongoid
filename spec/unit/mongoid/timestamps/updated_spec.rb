@@ -37,7 +37,7 @@ describe Mongoid::Timestamps::Updated do
   context "when the document has not changed" do
 
     let(:agent) do
-      Agent.instantiate("account_ids" => [])
+      Agent.instantiate("_id" => BSON::ObjectId.new, "account_ids" => [])
     end
 
     before do

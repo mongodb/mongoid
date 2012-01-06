@@ -1,5 +1,8 @@
 class Account
   include Mongoid::Document
+
+  field :_id, type: String, default: ->{ name.try(:parameterize) }
+
   field :number, :type => String
   field :balance, :type => String
   field :nickname, :type => String
@@ -7,7 +10,6 @@ class Account
   field :balanced, :type => Boolean, :default => lambda { balance? ? true : false }
 
   field :overridden, :type => String
-  key :name
 
   embeds_many :memberships
   belongs_to :creator, :class_name => "User", :foreign_key => :creator_id

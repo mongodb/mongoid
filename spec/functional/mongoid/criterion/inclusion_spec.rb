@@ -35,11 +35,21 @@ describe Mongoid::Criterion::Inclusion do
       context "when not using object ids" do
 
         before(:all) do
-          Person.identity :type => String
+          Person.field(
+            :_id,
+            type: String,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new.to_s }
+          )
         end
 
         after(:all) do
-          Person.identity :type => BSON::ObjectId
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new }
+          )
         end
 
         let!(:person) do

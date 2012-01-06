@@ -3,7 +3,19 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.0 \[ In Development \] \[ Branch: master \]
+## 3.0.0 \[ In Development \] \[ Branch: master \]
+
+### New Features
+
+### Major Changes
+
+* `Model.defaults` no longer exists. You may get all defaults with a
+  combination of `Model.pre_processed_defaults` and
+  `Model.post_processed_defaults`
+
+### Resolved Issues
+
+## 2.4.0
 
 ### New Features
 

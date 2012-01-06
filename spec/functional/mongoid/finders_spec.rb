@@ -11,11 +11,16 @@ describe Mongoid::Finders do
     context "when using integer ids" do
 
       before(:all) do
-        Person.identity :type => Integer
+        Person.field(:_id, type: Integer)
       end
 
       after(:all) do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       context "when passed a string" do
@@ -62,11 +67,21 @@ describe Mongoid::Finders do
       end
 
       before(:all) do
-        Person.identity :type => String
+        Person.field(
+          :_id,
+          type: String,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new.to_s }
+        )
       end
 
       after(:all) do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       context "with an id as an argument" do
@@ -183,7 +198,12 @@ describe Mongoid::Finders do
       end
 
       before(:all) do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       context "when passed a BSON::ObjectId as an argument" do

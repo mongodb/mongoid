@@ -1,6 +1,8 @@
 class Address
   include Mongoid::Document
 
+  field :_id, type: String, default: ->{ street.try(:parameterize) }
+
   attr_accessor :mode
 
   field :address_type
@@ -13,7 +15,6 @@ class Address
   field :services, :type => Array
   field :latlng, :type => Array
   field :map, :type => Hash
-  key :street
 
   embeds_many :locations, :validate => false
   embeds_one :code, :validate => false

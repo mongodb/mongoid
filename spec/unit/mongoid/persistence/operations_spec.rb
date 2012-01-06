@@ -114,7 +114,7 @@ describe Mongoid::Persistence::Operations do
 
     it "returns the insert atomic modifiers" do
       inserts.should eq(
-        { "$set" => { "name" => { "first_name" => "Syd", "_id" => "syd" } } }
+        { "$set" => { "name" => { "first_name" => "Syd", "_id" => "Syd-" } } }
       )
     end
   end

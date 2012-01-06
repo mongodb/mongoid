@@ -114,7 +114,7 @@ describe Mongoid::Serialization do
             hash["addresses"]
           end
 
-          context "when the ids were not loaded" do
+          pending "when the ids were not loaded" do
 
             before do
               person.save

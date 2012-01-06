@@ -100,7 +100,7 @@ describe Mongoid::Fields do
       end
 
       it "does not return subclass defaults" do
-        shape.pre_processed_defaults.should eq([ "x", "y" ])
+        shape.pre_processed_defaults.should eq([ "_id", "x", "y" ])
       end
     end
 
@@ -111,7 +111,7 @@ describe Mongoid::Fields do
       end
 
       it "has the parent and child defaults" do
-        circle.pre_processed_defaults.should eq([ "x", "y", "radius" ])
+        circle.pre_processed_defaults.should eq([ "_id", "x", "y", "radius" ])
       end
     end
   end
@@ -123,15 +123,6 @@ describe Mongoid::Fields do
     end
 
     context "when the field name conflicts with mongoid's internals" do
-
-      context "when the field is named identifier" do
-
-        it "raises an error" do
-          expect {
-            Person.field(:identifier)
-          }.to raise_error(Mongoid::Errors::InvalidField)
-        end
-      end
 
       context "when the field is named metadata" do
 

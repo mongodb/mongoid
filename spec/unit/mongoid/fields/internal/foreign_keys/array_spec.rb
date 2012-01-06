@@ -158,11 +158,21 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
         end
 
         before do
-          Person.identity :type => String
+          Person.field(
+            :_id,
+            type: String,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new.to_s }
+          )
         end
 
         after do
-          Person.identity :type => BSON::ObjectId
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new }
+          )
         end
 
         it "does not convert" do

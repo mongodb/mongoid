@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
+  before do
+    Person.delete_all
+  end
+
   describe "\#{attribute}" do
 
     context "when setting the value in the getter" do
@@ -46,7 +50,7 @@ describe Mongoid::Attributes do
     context "when the document is an existing record" do
 
       let(:person) do
-        Person.create(:ssn => "123-11-4412")
+        Person.create!(:ssn => "123-11-4413")
       end
 
       context "when the attribute does not exist" do
@@ -371,13 +375,23 @@ describe Mongoid::Attributes do
   describe "#_id=" do
 
     after(:all) do
-      Person.identity :type => BSON::ObjectId
+      Person.field(
+        :_id,
+        type: BSON::ObjectId,
+        pre_processed: true,
+        default: ->{ BSON::ObjectId.new }
+      )
     end
 
     context "when using object ids" do
 
       before(:all) do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       let(:person) do
@@ -425,7 +439,12 @@ describe Mongoid::Attributes do
     context "when using string ids" do
 
       before(:all) do
-        Person.identity :type => String
+        Person.field(
+          :_id,
+          type: String,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new.to_s }
+        )
       end
 
       let(:person) do
@@ -473,7 +492,7 @@ describe Mongoid::Attributes do
     context "when using integer ids" do
 
       before(:all) do
-        Person.identity :type => Integer
+        Person.field(:_id, type: Integer)
       end
 
       let(:person) do
@@ -1127,7 +1146,7 @@ describe Mongoid::Attributes do
 
           it "sets the child attributes on the parent" do
             name.attributes.should ==
-              { "_id" => "test-user", "first_name" => "Test2", "last_name" => "User2" }
+              { "_id" => "Test-User", "first_name" => "Test2", "last_name" => "User2" }
           end
         end
 

@@ -3,7 +3,12 @@ require "spec_helper"
 describe Mongoid::Relations do
 
   before(:all) do
-    Person.identity :type => BSON::ObjectId
+    Person.field(
+      :_id,
+      type: BSON::ObjectId,
+      pre_processed: true,
+      default: ->{ BSON::ObjectId.new }
+    )
   end
 
   describe "#embedded?" do

@@ -552,7 +552,7 @@ describe Mongoid::Dirty do
     context "when the document has not changed" do
 
       let(:acolyte) do
-        Acolyte.instantiate
+        Acolyte.instantiate("_id" => BSON::ObjectId.new)
       end
 
       it "returns false" do
@@ -589,7 +589,7 @@ describe Mongoid::Dirty do
     context "when the document has not changed" do
 
       let(:acolyte) do
-        Acolyte.instantiate
+        Acolyte.instantiate("_id" => BSON::ObjectId.new)
       end
 
       it "returns an empty hash" do
@@ -728,7 +728,7 @@ describe Mongoid::Dirty do
     context "when the document has not changed" do
 
       let(:acolyte) do
-        Acolyte.instantiate
+        Acolyte.instantiate("_id" => BSON::ObjectId.new)
       end
 
       it "returns an empty hash" do

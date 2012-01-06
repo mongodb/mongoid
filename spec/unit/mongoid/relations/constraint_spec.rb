@@ -7,7 +7,12 @@ describe Mongoid::Relations::Constraint do
     context "when the id's class stores object ids" do
 
       before(:all) do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       let(:metadata) do

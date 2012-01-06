@@ -43,8 +43,13 @@ module Mongoid #:nodoc
       self.pre_processed_defaults = []
       self.post_processed_defaults = []
 
-      field(:_type, :type => String)
-      field(:_id, :type => BSON::ObjectId)
+      field(:_type, default: ->{ self.class.name if hereditary? }, type: String)
+      field(
+        :_id,
+        default: ->{ BSON::ObjectId.new },
+        pre_processed: true,
+        type: BSON::ObjectId
+      )
 
       alias :id :_id
       alias :id= :_id=
@@ -107,6 +112,18 @@ module Mongoid #:nodoc
     def apply_defaults
       apply_pre_processed_defaults
       apply_post_processed_defaults
+    end
+
+    # Is the document using object ids?
+    #
+    # @note Refactored from using delegate for class load performance.
+    #
+    # @example Is the document using object ids?
+    #   model.using_object_ids?
+    #
+    # @return [ true, false ] Using object ids.
+    def using_object_ids?
+      self.class.using_object_ids?
     end
 
     class << self
@@ -218,9 +235,21 @@ module Mongoid #:nodoc
       #
       # @since 2.1.0
       def replace_field(name, type)
-        pre_processed_defaults.delete_one(name)
-        post_processed_defaults.delete_one(name)
+        remove_defaults(name)
         add_field(name, fields[name].options.merge(:type => type))
+      end
+
+      # Convenience method for determining if we are using +BSON::ObjectIds+ as
+      # our id.
+      #
+      # @example Does this class use object ids?
+      #   person.using_object_ids?
+      #
+      # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
+      #
+      # @since 1.0.0
+      def using_object_ids?
+        fields["_id"].object_id_field?
       end
 
       protected
@@ -236,11 +265,12 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def add_defaults(field)
         default, name = field.default_val, field.name.to_s
+        remove_defaults(name)
         unless default.nil?
-          if field.default_val.is_a?(::Proc)
-            post_processed_defaults.push(name)
-          else
+          if field.pre_processed?
             pre_processed_defaults.push(name)
+          else
+            post_processed_defaults.push(name)
           end
         end
       end
@@ -372,6 +402,11 @@ module Mongoid #:nodoc
             include mod
           end
         end
+      end
+
+      def remove_defaults(name)
+        pre_processed_defaults.delete_one(name)
+        post_processed_defaults.delete_one(name)
       end
     end
   end

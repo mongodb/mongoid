@@ -43,9 +43,7 @@ describe Mongoid::Criterion::Optional do
         it "converts to dot notation with the default locale" do
           criteria.options[:sort].should == [[:"description.de", :asc]]
         end
-
       end
-
     end
 
     context "when providing a field" do
@@ -313,11 +311,21 @@ describe Mongoid::Criterion::Optional do
     context "with not using object ids" do
 
       before do
-        Person.identity :type => String
+        Person.field(
+          :_id,
+          type: String,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new.to_s }
+        )
       end
 
       after do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       context "when passing a single id" do
@@ -392,7 +400,12 @@ describe Mongoid::Criterion::Optional do
     context "when using object ids" do
 
       before do
-        Person.identity :type => BSON::ObjectId
+        Person.field(
+          :_id,
+          type: BSON::ObjectId,
+          pre_processed: true,
+          default: ->{ BSON::ObjectId.new }
+        )
       end
 
       context "when passing a single id" do
