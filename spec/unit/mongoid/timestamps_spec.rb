@@ -54,6 +54,21 @@ describe Mongoid::Timestamps do
     end
   end
 
+  context "when a embedded document is updated" do
+
+    let!(:person) { Person.create(:videos => [Video.new]) }
+    let(:video) { person.videos.first }
+
+    before do
+      video.title = "Snatch"
+      video.save
+    end
+
+    it "sets updated_at on the parent" do
+      person.expects(:updated_at=).once
+    end
+  end
+
   context "when the document has changed with updated_at specified" do
 
     let(:person) do
