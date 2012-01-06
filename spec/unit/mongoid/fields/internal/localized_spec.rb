@@ -9,7 +9,7 @@ describe Mongoid::Fields::Internal::Localized do
   context "when no default is provided" do
 
     it "defaults to nil" do
-      field.default.should be_nil
+      field.default_val.should be_nil
     end
   end
 
@@ -24,7 +24,7 @@ describe Mongoid::Fields::Internal::Localized do
     end
 
     it "defaults to the value" do
-      field.default.should eq("No translation")
+      field.default_val.should eq("No translation")
     end
   end
 

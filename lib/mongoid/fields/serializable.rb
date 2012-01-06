@@ -26,11 +26,6 @@ module Mongoid #:nodoc:
       extend ActiveSupport::Concern
 
       included do
-        # @todo: Durran: Pull out in 3.0.0
-        unless method_defined?(:default)
-          alias :default :default_val
-        end
-
         class_attribute :cast_on_read
       end
 
@@ -127,6 +122,19 @@ module Mongoid #:nodoc:
       # @since 2.2.0
       def object_id_field?
         @object_id_field ||= (type == BSON::ObjectId)
+      end
+
+      # Does the field pre-process it's default value?
+      #
+      # @example Does the field pre-process the default?
+      #   field.pre_processed?
+      #
+      # @return [ true, false ] If the field's default is pre-processed.
+      #
+      # @since 3.0.0
+      def pre_processed?
+        @pre_processed ||=
+          (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
       end
 
       # Can the field vary in size, similar to arrays.

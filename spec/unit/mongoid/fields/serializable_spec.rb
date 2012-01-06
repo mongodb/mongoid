@@ -2,6 +2,75 @@ require "spec_helper"
 
 describe Mongoid::Fields::Serializable do
 
+  describe "#pre_processed?" do
+
+    context "when the field has a default" do
+
+      context "when the default is a proc" do
+
+        context "when the pre-processed option is true" do
+
+          let(:field) do
+            Mongoid::Fields::Internal::String.instantiate(
+              :test,
+              default: ->{ "testing" },
+              pre_processed: true,
+              type: String
+            )
+          end
+
+          it "returns true" do
+            field.should be_pre_processed
+          end
+        end
+
+        context "when the pre-processed option is not true" do
+
+          let(:field) do
+            Mongoid::Fields::Internal::String.instantiate(
+              :test,
+              default: ->{ "testing" },
+              type: String
+            )
+          end
+
+          it "returns false" do
+            field.should_not be_pre_processed
+          end
+        end
+      end
+
+      context "when the default is not a proc" do
+
+        let(:field) do
+          Mongoid::Fields::Internal::String.instantiate(
+            :test,
+            default: "testing",
+            type: String
+          )
+        end
+
+        it "returns true" do
+          field.should be_pre_processed
+        end
+      end
+    end
+
+    context "when the field has no default" do
+
+      let(:field) do
+        Mongoid::Fields::Internal::String.instantiate(
+          :test,
+          type: String
+        )
+      end
+
+      it "returns false" do
+        field.should_not be_pre_processed
+      end
+    end
+  end
+
   context "when checking hash values in a custom serializer" do
 
     let(:image) do

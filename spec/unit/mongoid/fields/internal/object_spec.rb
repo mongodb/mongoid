@@ -33,7 +33,7 @@ describe Mongoid::Fields::Internal::Object do
       end
 
       it "returns the default value" do
-        field.default.should == "test"
+        field.default_val.should == "test"
       end
     end
   end
