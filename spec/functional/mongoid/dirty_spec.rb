@@ -23,6 +23,34 @@ describe Mongoid::Dirty do
     end
   end
 
+  context "when modifying an embeds many field" do
+
+    let!(:person) { Person.create(:videos => [Video.new]) }
+
+    before do
+      person.videos.first.title = "Snatch"
+    end
+
+    it "marks the parent as changed" do
+      person.changed?.should be
+    end
+
+  end
+
+  context "when modifying an embeds one field" do
+
+    let!(:person) { Person.create(:pet => Pet.new) }
+
+    before do
+      person.pet.first.name = "Daisy"
+    end
+
+    it "marks the parent as changed" do
+      person.changed?.should be
+    end
+
+  end
+
   context "when modifying a many to many key" do
 
     let!(:person) do
