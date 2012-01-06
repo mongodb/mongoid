@@ -17,6 +17,9 @@ For instructions on upgrading to newer versions, visit
   users must now override the _id field like so:
   `field :_id, type: String, default: ->{ name }`.
 
+* Custom application exceptions in various languages has been removed,
+  along with the `Mongoid.add_language` feature.
+
 ### Resolved Issues
 
 ## 2.4.0
