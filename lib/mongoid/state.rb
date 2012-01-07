@@ -18,7 +18,6 @@ module Mongoid #:nodoc:
     def new_record?
       @new_record == true
     end
-    alias :new? :new_record?
 
     # Checks if the document has been saved to the database. Returns false
     # if the document has been destroyed.
@@ -64,7 +63,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] Is the document new and embedded?
     def pushable?
-      new? &&
+      new_record? &&
         embedded_many? &&
         _parent.persisted? &&
         !_parent.delayed_atomic_sets[metadata.name.to_s]
@@ -79,7 +78,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def settable?
-      new? && embedded_one? && _parent.persisted?
+      new_record? && embedded_one? && _parent.persisted?
     end
 
     # Is the document updateable?

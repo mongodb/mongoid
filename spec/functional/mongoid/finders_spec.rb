@@ -346,7 +346,7 @@ describe Mongoid::Finders do
         end
 
         it "creates a new document" do
-          person.should be_new
+          person.should be_new_record
         end
 
         it "sets the attributes" do
@@ -363,7 +363,7 @@ describe Mongoid::Finders do
         end
 
         it "creates a new document" do
-          person.should be_new
+          person.should be_new_record
         end
 
         it "sets the attributes" do

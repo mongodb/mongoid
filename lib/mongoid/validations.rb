@@ -71,7 +71,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0.rc.6
     def valid?(context = nil)
-      super context ? context : (new? ? :create : :update)
+      super context ? context : (new_record? ? :create : :update)
     end
 
     # Used to prevent infinite loops in associated validations.

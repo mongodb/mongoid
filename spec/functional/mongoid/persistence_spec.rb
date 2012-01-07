@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
-    [ Person, Post, Product, Game ].each(&:delete_all)
+    [ Account, Person, Post, Product, Game ].each(&:delete_all)
   end
 
   before(:all) do

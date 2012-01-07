@@ -195,7 +195,7 @@ module Mongoid #:nodoc:
         _creating do
           new(attributes, options, &block).tap do |doc|
             fail_validate!(doc) if doc.insert.errors.any?
-            fail_callback!(doc, :create!) if doc.new?
+            fail_callback!(doc, :create!) if doc.new_record?
           end
         end
       end

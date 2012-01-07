@@ -46,7 +46,7 @@ describe Mongoid::Persistence do
         Patient.expects(:new).returns(patient)
         patient.expects(:insert).returns(patient)
         patient.expects(:errors).returns([])
-        patient.expects(:new?).returns(false)
+        patient.expects(:new_record?).returns(false)
       end
 
       it "returns the new document" do
@@ -77,7 +77,7 @@ describe Mongoid::Persistence do
         Patient.expects(:new).returns(patient)
         patient.expects(:insert).returns(patient)
         patient.expects(:errors).at_least_once.returns([])
-        patient.expects(:new?).returns(true)
+        patient.expects(:new_record?).returns(true)
       end
 
       it "raises an error" do

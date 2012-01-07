@@ -30,6 +30,9 @@ For instructions on upgrading to newer versions, visit
   only :has_one, :has_many, :has_and_belongs_to_many, and :belongs_to
   exist now.
 
+* \#1268 `Model#new?` has been removed, developers must now always use
+  `Model#new_record?`.
+
 ### Resolved Issues
 
 * \#1335 Don't add id sorting criteria to first/last is there is already

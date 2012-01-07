@@ -34,7 +34,7 @@ module Mongoid #:nodoc:
           # @since 2.1.0
           def position
             pos = parent.atomic_position
-            locator = document.new? ? "" : ".#{document._index}"
+            locator = document.new_record? ? "" : ".#{document._index}"
             "#{pos}#{"." unless pos.blank?}#{document.metadata.name}#{locator}"
           end
         end

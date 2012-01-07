@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
           # @return [ Document ] The document to be inserted.
           def persist
             prepare do
-              if parent.new?
+              if parent.new_record?
                 parent.insert
               else
                 collection.update(parent.atomic_selector, inserts, options)

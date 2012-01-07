@@ -44,7 +44,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            post.should be_new
+            post.should be_new_record
           end
 
           it "adds the document to the target" do
@@ -185,7 +185,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            rating.should be_new
+            rating.should be_new_record
           end
 
           it "adds the document to the target" do
@@ -750,7 +750,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            post.should be_new
+            post.should be_new_record
           end
 
           it "adds the document to the target" do
@@ -785,7 +785,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            post.should be_new
+            post.should be_new_record
           end
 
           it "adds the document to the target" do
@@ -819,7 +819,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            rating.should be_new
+            rating.should be_new_record
           end
 
           it "adds the document to the target" do
@@ -854,7 +854,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "does not save the target" do
-            rating.should be_new
+            rating.should be_new_record
           end
 
           it "adds the document to the target" do
@@ -1041,7 +1041,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "does not save the target" do
-          post.should be_new
+          post.should be_new_record
         end
 
         it "adds the document to the target" do
@@ -1183,7 +1183,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "does not save the target" do
-        rating.should be_new
+        rating.should be_new_record
       end
 
       it "adds the document to the target" do
@@ -1425,7 +1425,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "saves the target" do
-          rating.should_not be_new
+          rating.should_not be_new_record
         end
 
         it "adds the document to the target" do
@@ -1556,7 +1556,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "saves the target" do
-          rating.should_not be_new
+          rating.should_not be_new_record
         end
 
         it "adds the document to the target" do

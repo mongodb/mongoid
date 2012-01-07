@@ -109,7 +109,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "does not save the target" do
-              preference.should be_new
+              preference.should be_new_record
             end
 
             it "adds the correct number of documents" do
@@ -232,7 +232,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "saves the target" do
-            preference.should_not be_new
+            preference.should_not be_new_record
           end
 
           it "adds the document to the target" do
@@ -270,7 +270,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "saves the target" do
-              preference.should_not be_new
+              preference.should_not be_new_record
             end
 
             it "adds the document to the target" do
@@ -491,7 +491,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "does not save the target" do
-          preference.should be_new
+          preference.should be_new_record
         end
       end
 
@@ -867,7 +867,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "does not save the target" do
-            preference.should be_new
+            preference.should be_new_record
           end
 
           it "adds the correct number of documents" do
@@ -906,7 +906,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "does not save the target" do
-            preference.should be_new
+            preference.should be_new_record
           end
 
           it "adds the correct number of documents" do
