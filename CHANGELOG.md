@@ -26,6 +26,10 @@ For instructions on upgrading to newer versions, visit
 * \#1342 `Model.find` and `model.relation.find` now only take a single or
   multiple ids. The first/last/all with a conditions hash has been removed.
 
+* \#1270 Relation macros have been changed to match their AR counterparts:
+  only :has_one, :has_many, :has_and_belongs_to_many, and :belongs_to
+  exist now.
+
 ### Resolved Issues
 
 * \#1335 Don't add id sorting criteria to first/last is there is already

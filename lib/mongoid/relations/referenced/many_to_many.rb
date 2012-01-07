@@ -298,9 +298,9 @@ module Mongoid # :nodoc:
           # @example Get the macro.
           #   Referenced::ManyToMany.macro
           #
-          # @return [ Symbol ] :references_and_referenced_in_many
+          # @return [ Symbol ] :has_and_belongs_to_many
           def macro
-            :references_and_referenced_in_many
+            :has_and_belongs_to_many
           end
 
           # Return the nested builder that is responsible for generating the documents

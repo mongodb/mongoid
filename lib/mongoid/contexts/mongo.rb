@@ -150,7 +150,7 @@ module Mongoid #:nodoc:
           collection.find(selector, options).entries.tap do |docs|
             parent_ids = docs.map(&:id)
             criteria.inclusions.reject! do |metadata|
-              if metadata.macro == :referenced_in
+              if metadata.macro == :belongs_to
                 child_ids = load_ids(metadata.foreign_key)
                 metadata.eager_load(child_ids)
               else

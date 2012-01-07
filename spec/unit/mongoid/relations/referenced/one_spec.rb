@@ -38,8 +38,8 @@ describe Mongoid::Relations::Referenced::One do
 
   describe ".macro" do
 
-    it "returns references_one" do
-      described_class.macro.should == :references_one
+    it "returns has_one" do
+      described_class.macro.should == :has_one
     end
   end
 

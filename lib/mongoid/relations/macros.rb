@@ -136,8 +136,6 @@ module Mongoid # :nodoc:
             validates_relation(meta)
           end
         end
-        alias :belongs_to_related :belongs_to
-        alias :referenced_in :belongs_to
 
         # Adds a relational association from a parent Document to many
         # Documents in another database or collection.
@@ -165,8 +163,6 @@ module Mongoid # :nodoc:
             validates_relation(meta)
           end
         end
-        alias :has_many_related :has_many
-        alias :references_many :has_many
 
         # Adds a relational many-to-many association between many of this
         # Document and many of another Document.
@@ -197,7 +193,6 @@ module Mongoid # :nodoc:
             synced(meta)
           end
         end
-        alias :references_and_referenced_in_many :has_and_belongs_to_many
 
         # Adds a relational association from the child Document to a Document in
         # another database or collection.
@@ -225,8 +220,6 @@ module Mongoid # :nodoc:
             validates_relation(meta)
           end
         end
-        alias :has_one_related :has_one
-        alias :references_one :has_one
 
         private
 

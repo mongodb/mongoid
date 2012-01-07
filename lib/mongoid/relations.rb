@@ -92,7 +92,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      metadata && metadata.macro == :references_many
+      metadata && metadata.macro == :has_many
     end
 
     # Determine if the document is part of an references_one relation.
@@ -104,7 +104,7 @@ module Mongoid # :nodoc:
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      metadata && metadata.macro == :references_one
+      metadata && metadata.macro == :has_one
     end
 
     # Convenience method for iterating through the loaded relations and

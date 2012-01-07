@@ -38,8 +38,8 @@ describe Mongoid::Relations::Referenced::In do
 
   describe ".macro" do
 
-    it "returns referenced_in" do
-      described_class.macro.should == :referenced_in
+    it "returns belongs_to" do
+      described_class.macro.should == :belongs_to
     end
   end
 

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Reflections do
 
   class TestClass
-    include Mongoid::Relations
+    include Mongoid::Document
   end
 
   let(:klass) do
@@ -50,13 +50,13 @@ describe Mongoid::Relations::Reflections do
       before do
         klass.embeds_one(:name)
         klass.embeds_many(:addresses)
-        klass.references_one(:user)
+        klass.has_one(:user)
       end
 
       context "when passing multiple arguments" do
 
         let(:relations) do
-          klass.reflect_on_all_associations(:embeds_one, :references_one)
+          klass.reflect_on_all_associations(:embeds_one, :has_one)
         end
 
         it "returns an array of the relations" do

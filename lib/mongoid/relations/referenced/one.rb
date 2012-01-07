@@ -187,9 +187,9 @@ module Mongoid # :nodoc:
           # @example Get the macro.
           #   Referenced::One.macro
           #
-          # @return [ Symbol ] :references_one.
+          # @return [ Symbol ] :has_one.
           def macro
-            :references_one
+            :has_one
           end
 
           # Return the nested builder that is responsible for generating the documents

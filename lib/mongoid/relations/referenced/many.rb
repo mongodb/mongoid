@@ -602,9 +602,9 @@ module Mongoid #:nodoc:
           # @example Get the macro.
           #   Referenced::Many.macro
           #
-          # @return [ Symbol ] :references_many
+          # @return [ Symbol ] :has_many
           def macro
-            :references_many
+            :has_many
           end
 
           # Return the nested builder that is responsible for generating the documents
