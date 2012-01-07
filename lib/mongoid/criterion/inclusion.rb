@@ -96,10 +96,7 @@ module Mongoid #:nodoc:
       end
       alias :or :any_of
 
-      # Find the matchind document in the criteria, either based on id or
-      # conditions.
-      #
-      # @todo Durran: DRY up duplicated code in a few places.
+      # Find the matchind document(s) in the criteria for the provided ids.
       #
       # @example Find by an id.
       #   criteria.find(BSON::ObjectId.new)
@@ -107,38 +104,21 @@ module Mongoid #:nodoc:
       # @example Find by multiple ids.
       #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
       #
-      # @example Conditionally find all matching documents.
-      #   criteria.find(:all, :conditions => { :title => "Sir" })
+      # @param [ Array<BSON::ObjectId> ] args The ids to search for.
       #
-      # @example Conditionally find the first document.
-      #   criteria.find(:first, :conditions => { :title => "Sir" })
-      #
-      # @example Conditionally find the last document.
-      #   criteria.find(:last, :conditions => { :title => "Sir" })
-      #
-      # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
-      #   argument to search with.
-      # @param [ Hash ] options The options to search with.
-      #
-      # @return [ Document, Criteria ] The matching document(s).
+      # @return [ Array<Document>, Document ] The matching document(s).
       def find(*args)
-        type, crit = search(*args)
-        case type
-        when :first then crit.one
-        when :last then crit.last
-        when :ids then crit.execute_or_raise(args)
-        else
-          crit
-        end
+        ids = args.flatten
+        raise_invalid if ids.any?(&:nil?)
+        for_ids(ids).execute_or_raise(args)
       end
 
       # Execute the criteria or raise an error if no documents found.
       #
       # @example Execute or raise
-      #   criteria.execute_or_raise(id, criteria)
+      #   criteria.execute_or_raise(id)
       #
       # @param [ Object ] args The arguments passed.
-      # @param [ Criteria ] criteria The criteria to execute.
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #

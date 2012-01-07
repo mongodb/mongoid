@@ -22,8 +22,8 @@ module Mongoid #:nodoc:
     # @param [ Array ] args The conditions with options.
     #
     # @return [ Criteria ] The matching documents.
-    def all(*args)
-      find(:all, *args)
+    def all
+      criteria
     end
 
     # Returns a count of matching records in the database based on the
@@ -35,8 +35,8 @@ module Mongoid #:nodoc:
     # @param [ Array ] args The conditions.
     #
     # @return [ Integer ] The number of matching documents.
-    def count(*args)
-      find(:all, *args).count
+    def count
+      criteria.count
     end
 
     # Returns true if count is zero
@@ -56,8 +56,8 @@ module Mongoid #:nodoc:
     #   Person.exists?(:conditions => { :attribute => "value" })
     #
     # @param [ Array ] args The conditions.
-    def exists?(*args)
-       find(:all, *args).count > 0
+    def exists?
+      criteria.exists?
     end
 
     # Find a +Document+ in several different ways.
@@ -67,12 +67,6 @@ module Mongoid #:nodoc:
     # +Document+ based on that id. If a +Symbol+ and +Hash+ is provided then
     # it will attempt to find either a single +Document+ or multiples based
     # on the conditions provided and the first parameter.
-    #
-    # @example Find the first matching document.
-    #   Person.find(:first, :conditions => { :attribute => "value" })
-    #
-    # @example Find all matching documents.
-    #   Person.find(:all, :conditions => { :attribute => "value" })
     #
     # @example Find a single document by an id.
     #   Person.find(BSON::ObjectId)
@@ -118,8 +112,8 @@ module Mongoid #:nodoc:
     # @param [ Array ] args The conditions with options.
     #
     # @return [ Document ] The first matching document.
-    def first(*args)
-      find(:first, *args)
+    def first
+      criteria.first
     end
 
     # Find the last +Document+ given the conditions.
@@ -130,8 +124,8 @@ module Mongoid #:nodoc:
     # @param [ Array ] args The conditions with options.
     #
     # @return [ Document ] The last matching document.
-    def last(*args)
-      find(:last, *args)
+    def last
+      criteria.last
     end
 
     protected
@@ -146,7 +140,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The first or new document.
     def find_or(method, attrs = {}, &block)
-      first(:conditions => attrs) || send(method, attrs, &block)
+      where(attrs).first || send(method, attrs, &block)
     end
   end
 end

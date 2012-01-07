@@ -141,7 +141,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] A matching document or a new/created one.
       def find_or(method, attrs = {}, &block)
-        find(:first, :conditions => attrs) || send(method, attrs, &block)
+        where(attrs).first || send(method, attrs, &block)
       end
     end
   end

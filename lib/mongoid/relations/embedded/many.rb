@@ -188,7 +188,7 @@ module Mongoid # :nodoc:
         #   person.addresses.delete_all
         #
         # @example Conditionally delete documents from the relation.
-        #   person.addresses.delete_all(:conditions => { :street => "Bond" })
+        #   person.addresses.delete_all({ :street => "Bond" })
         #
         # @param [ Hash ] conditions Conditions on which documents to delete.
         #
@@ -203,7 +203,7 @@ module Mongoid # :nodoc:
         #   person.addresses.destroy_all
         #
         # @example Conditionally destroy documents from the relation.
-        #   person.addresses.destroy_all(:conditions => { :street => "Bond" })
+        #   person.addresses.destroy_all({ :street => "Bond" })
         #
         # @param [ Hash ] conditions Conditions on which documents to destroy.
         #
@@ -220,11 +220,6 @@ module Mongoid # :nodoc:
         #
         # @example Find documents for multiple ids.
         #   person.addresses.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
-        #
-        # @example Find documents based on conditions.
-        #   person.addresses.find(:all, :conditions => { :number => 10 })
-        #   person.addresses.find(:first, :conditions => { :number => 10 })
-        #   person.addresses.find(:last, :conditions => { :number => 10 })
         #
         # @param [ Array<Object> ] args Various arguments.
         #
@@ -468,7 +463,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents removed.
         def remove_all(conditions = {}, method = :delete)
-          criteria = find(:all, conditions || {})
+          criteria = where(conditions || {})
           criteria.size.tap do
             criteria.each do |doc|
               target.delete_one(doc)

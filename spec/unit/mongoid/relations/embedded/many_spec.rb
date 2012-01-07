@@ -317,7 +317,7 @@ describe Mongoid::Relations::Embedded::Many do
         before do
           name = method.to_s.gsub("_all", "")
           document.expects(name)
-          relation.send(method, :conditions => { :street => "Folsom" })
+          relation.send(method, { :street => "Folsom" })
         end
 
         it "removes the matching documents" do
@@ -461,81 +461,6 @@ describe Mongoid::Relations::Embedded::Many do
           it "returns an empty array" do
             addresses.should be_empty
           end
-        end
-      end
-    end
-
-    context "when finding first" do
-
-      context "when there is a match" do
-
-        let(:address) do
-          relation.find(:first, :conditions => { :city => "London" })
-        end
-
-        it "returns the first matching document" do
-          address.should == address_one
-        end
-      end
-
-      context "when there is no match" do
-
-        let(:address) do
-          relation.find(:first, :conditions => { :city => "Praha" })
-        end
-
-        it "returns nil" do
-          address.should be_nil
-        end
-      end
-    end
-
-    context "when finding last" do
-
-      context "when there is a match" do
-
-        let(:address) do
-          relation.find(:last, :conditions => { :city => "London" })
-        end
-
-        it "returns the last matching document" do
-          address.should == address_two
-        end
-      end
-
-      context "when there is no match" do
-
-        let(:address) do
-          relation.find(:last, :conditions => { :city => "Praha" })
-        end
-
-        it "returns nil" do
-          address.should be_nil
-        end
-      end
-    end
-
-    context "when finding all" do
-
-      context "when there is a match" do
-
-        let(:addresses) do
-          relation.find(:all, :conditions => { :city => "London" })
-        end
-
-        it "returns the matching documents" do
-          addresses.should == [ address_one, address_two ]
-        end
-      end
-
-      context "when there is no match" do
-
-        let(:address) do
-          relation.find(:all, :conditions => { :city => "Praha" })
-        end
-
-        it "returns an empty array" do
-          address.should be_empty
         end
       end
     end

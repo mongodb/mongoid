@@ -174,7 +174,7 @@ module Mongoid #:nodoc:
         #   person.posts.delete_all
         #
         # @example Conditonally delete all documents in the relation.
-        #   person.posts.delete_all(:conditions => { :title => "Testing" })
+        #   person.posts.delete_all({ :title => "Testing" })
         #
         # @param [ Hash ] conditions Optional conditions to delete with.
         #
@@ -192,7 +192,7 @@ module Mongoid #:nodoc:
         #   person.posts.destroy_all
         #
         # @example Conditonally destroy all documents in the relation.
-        #   person.posts.destroy_all(:conditions => { :title => "Testing" })
+        #   person.posts.destroy_all({ :title => "Testing" })
         #
         # @param [ Hash ] conditions Optional conditions to destroy with.
         #
@@ -229,18 +229,7 @@ module Mongoid #:nodoc:
         # @example Find by multiple ids.
         #   person.posts.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
         #
-        # @example Conditionally find all matching documents.
-        #   person.posts.find(:all, :conditions => { :title => "Sir" })
-        #
-        # @example Conditionally find the first document.
-        #   person.posts.find(:first, :conditions => { :title => "Sir" })
-        #
-        # @example Conditionally find the last document.
-        #   person.posts.find(:last, :conditions => { :title => "Sir" })
-        #
-        # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
-        #   argument to search with.
-        # @param [ Hash ] options The options to search with.
+        # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] arg The ids.
         #
         # @return [ Document, Criteria ] The matching document(s).
         #
@@ -467,7 +456,7 @@ module Mongoid #:nodoc:
         #   person.posts.delete_all
         #
         # @example Conditonally delete all documents in the relation.
-        #   person.posts.delete_all(:conditions => { :title => "Testing" })
+        #   person.posts.delete_all({ :title => "Testing" })
         #
         # @param [ Hash ] conditions Optional conditions to delete with.
         # @param [ Symbol ] The deletion method to call.
@@ -476,8 +465,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def remove_all(conditions = nil, method = :delete_all)
-          selector = (conditions || {})[:conditions] || {}
-          klass.send(method, :conditions => selector.merge!(criteria.selector)).tap do
+          selector = conditions || {}
+          klass.send(method, selector.merge!(criteria.selector)).tap do
             target.delete_if do |doc|
               if doc.matches?(selector)
                 unbind_one(doc) and true

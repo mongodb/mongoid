@@ -278,43 +278,6 @@ module Mongoid #:nodoc:
       entries.as_json(options)
     end
 
-    # Search for documents based on a variety of args.
-    #
-    # @example Find by an id.
-    #   criteria.search(BSON::ObjectId.new)
-    #
-    # @example Find by multiple ids.
-    #   criteria.search([ BSON::ObjectId.new, BSON::ObjectId.new ])
-    #
-    # @example Conditionally find all matching documents.
-    #   criteria.search(:all, :conditions => { :title => "Sir" })
-    #
-    # @example Conditionally find the first document.
-    #   criteria.search(:first, :conditions => { :title => "Sir" })
-    #
-    # @example Conditionally find the last document.
-    #   criteria.search(:last, :conditions => { :title => "Sir" })
-    #
-    # @param [ Symbol, BSON::ObjectId, Array<BSON::ObjectId> ] arg The
-    #   argument to search with.
-    # @param [ Hash ] options The options to search with.
-    #
-    # @return [ Array<Symbol, Criteria> ] The type and criteria.
-    #
-    # @since 2.0.0
-    def search(*args)
-      raise_invalid if args[0].nil?
-      type = args[0]
-      params = args[1] || {}
-      return [ :ids, for_ids(type) ] unless type.is_a?(Symbol)
-      conditions = params.delete(:conditions) || {}
-      if conditions.include?(:id)
-        conditions[:_id] = conditions[:id]
-        conditions.delete(:id)
-      end
-      return [ type, where(conditions).extras(params) ]
-    end
-
     # Convenience method of raising an invalid options error.
     #
     # @example Raise the error.

@@ -1435,7 +1435,7 @@ describe Mongoid::Relations::Embedded::Many do
           let!(:deleted) do
             person.addresses.send(
               method,
-              :conditions => { :street => "Bond" }
+              { :street => "Bond" }
             )
           end
 
@@ -1483,7 +1483,7 @@ describe Mongoid::Relations::Embedded::Many do
           let!(:deleted) do
             person.addresses.send(
               method,
-              :conditions => { :street => "Bond" }
+              { :street => "Bond" }
             )
           end
 
@@ -1745,81 +1745,6 @@ describe Mongoid::Relations::Embedded::Many do
           it "returns an empty array" do
             addresses.should be_empty
           end
-        end
-      end
-    end
-
-    context "when finding first" do
-
-      context "when there is a match" do
-
-        let(:address) do
-          person.addresses.find(:first, :conditions => { :city => "London" })
-        end
-
-        it "returns the first matching document" do
-          address.should == address_one
-        end
-      end
-
-      context "when there is no match" do
-
-        let(:address) do
-          person.addresses.find(:first, :conditions => { :city => "Praha" })
-        end
-
-        it "returns nil" do
-          address.should be_nil
-        end
-      end
-    end
-
-    context "when finding last" do
-
-      context "when there is a match" do
-
-        let(:address) do
-          person.addresses.find(:last, :conditions => { :city => "London" })
-        end
-
-        it "returns the last matching document" do
-          address.should == address_two
-        end
-      end
-
-      context "when there is no match" do
-
-        let(:address) do
-          person.addresses.find(:last, :conditions => { :city => "Praha" })
-        end
-
-        it "returns nil" do
-          address.should be_nil
-        end
-      end
-    end
-
-    context "when finding all" do
-
-      context "when there is a match" do
-
-        let(:addresses) do
-          person.addresses.find(:all, :conditions => { :city => "London" })
-        end
-
-        it "returns the matching documents" do
-          addresses.should == [ address_one, address_two ]
-        end
-      end
-
-      context "when there is no match" do
-
-        let(:address) do
-          person.addresses.find(:all, :conditions => { :city => "Praha" })
-        end
-
-        it "returns an empty array" do
-          address.should be_empty
         end
       end
     end

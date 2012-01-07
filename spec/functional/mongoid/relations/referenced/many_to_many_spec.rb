@@ -1449,7 +1449,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           let!(:deleted) do
             person.preferences.send(
               method,
-              :conditions => { :name => "Testing" }
+              { :name => "Testing" }
             )
           end
 
@@ -1687,81 +1687,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             it "returns an empty array" do
               preferences.should be_empty
             end
-          end
-        end
-      end
-
-      context "when finding first" do
-
-        context "when there is a match" do
-
-          let(:preference) do
-            person.preferences.find(:first, :conditions => { :name => "Test" })
-          end
-
-          it "returns the first matching document" do
-            preference.should == preference_one
-          end
-        end
-
-        context "when there is no match" do
-
-          let(:preference) do
-            person.preferences.find(:first, :conditions => { :name => "Testing" })
-          end
-
-          it "returns nil" do
-            preference.should be_nil
-          end
-        end
-      end
-
-      context "when finding last" do
-
-        context "when there is a match" do
-
-          let(:preference) do
-            person.preferences.find(:last, :conditions => { :name => "OMG I has relations" })
-          end
-
-          it "returns the last matching document" do
-            preference.should == preference_two
-          end
-        end
-
-        context "when there is no match" do
-
-          let(:preference) do
-            person.preferences.find(:last, :conditions => { :name => "Testing" })
-          end
-
-          it "returns nil" do
-            preference.should be_nil
-          end
-        end
-      end
-
-      context "when finding all" do
-
-        context "when there is a match" do
-
-          let(:preferences) do
-            person.preferences.find(:all, :conditions => { :name => { "$exists" => true } })
-          end
-
-          it "returns the matching documents" do
-            preferences.should == [ preference_one, preference_two ]
-          end
-        end
-
-        context "when there is no match" do
-
-          let(:preferences) do
-            person.preferences.find(:all, :conditions => { :name => "Other" })
-          end
-
-          it "returns an empty array" do
-            preferences.should be_empty
           end
         end
       end

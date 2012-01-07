@@ -23,6 +23,9 @@ For instructions on upgrading to newer versions, visit
 * Mongoid no longer supports 1.8 syntax. 1.9.x or other vms running in
   1.9 mode is now only supported.
 
+* `Model.find` and `model.relation.find` now only take a single or multiple
+  ids. The first/last/all with a conditions hash has been removed.
+
 ### Resolved Issues
 
 ## 2.4.0
