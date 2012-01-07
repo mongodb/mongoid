@@ -21,7 +21,7 @@ For instructions on upgrading to newer versions, visit
   along with the `Mongoid.add_language` feature.
 
 * Mongoid no longer supports 1.8 syntax. 1.9.x or other vms running in
-  1.9 mode is now only supported.a
+  1.9 mode is now only supported.
 
 * \#1484 `Model#has_attribute?` now behaves the same as Active Record.
 
