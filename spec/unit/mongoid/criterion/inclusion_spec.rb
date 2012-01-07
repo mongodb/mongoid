@@ -831,7 +831,7 @@ describe Mongoid::Criterion::Inclusion do
         context "#size" do
 
           let(:criteria) do
-            base.where(:aliases.size => 2)
+            base.where(:aliases.count => 2)
           end
 
           it "returns a selector matching a size clause" do

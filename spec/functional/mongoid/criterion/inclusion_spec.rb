@@ -868,7 +868,7 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "typecasts size criterion to integer" do
-        Person.where(:aliases.size => "2").should == [ person ]
+        Person.where(:aliases.count => "2").should == [ person ]
       end
 
       it "typecasts exists criterion to boolean" do
@@ -976,7 +976,7 @@ describe Mongoid::Criterion::Inclusion do
       context "#size" do
 
         it "returns those matching a size clause" do
-          Person.where(:aliases.size => 2).should == [person]
+          Person.where(:aliases.count => 2).should == [person]
         end
       end
 

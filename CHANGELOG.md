@@ -35,6 +35,9 @@ For instructions on upgrading to newer versions, visit
 * \#1268 `Model#new?` has been removed, developers must now always use
   `Model#new_record?`.
 
+* \#933 `:field.size` has been renamed to `:field.count` in criteria for
+  $size not to conflict with Symbol's size method.
+
 ### Resolved Issues
 
 * \#1335 Don't add id sorting criteria to first/last is there is already
