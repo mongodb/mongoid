@@ -1,5 +1,4 @@
 .DS_Store
-coverage/*
 pkg/*
 scratch_directory/*
 sandbox/*
@@ -11,6 +10,7 @@ rdoc/*
 TODO
 ISSUES
 DONATE
+SPECS.txt
 .yardoc/*
 doc/*
 *.swp
