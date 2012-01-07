@@ -847,85 +847,113 @@ describe Mongoid::Attributes do
     end
   end
 
-  [ :attribute_present?, :has_attribute? ].each do |method|
+  describe "#attribute_present?" do
 
-    describe "##{method}" do
+    context "when document is a new record" do
 
-      context "when document is a new record" do
+      let(:person) do
+        Person.new
+      end
 
-        let(:person) do
-          Person.new
-        end
-
-        context "when attribute does not exist" do
-          it "returns false" do
-            person.send(method, :owner_id).should be_false
-          end
-        end
-
-        context "when attribute does exist" do
-          before do
-            person.owner_id = 5
-          end
-
-          it "returns true" do
-            person.send(method, :owner_id).should be_true
-          end
+      context "when attribute does not exist" do
+        it "returns false" do
+          person.attribute_present?(:owner_id).should be_false
         end
       end
 
-      context "when the document is an existing record" do
-
-        let(:person) do
-          Person.create
+      context "when attribute does exist" do
+        before do
+          person.owner_id = 5
         end
 
-        context "when the attribute does not exist" do
+        it "returns true" do
+          person.attribute_present?(:owner_id).should be_true
+        end
+      end
+    end
 
-          before do
-            person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
-            Mongoid.raise_not_found_error = false
-            person.reload
-            Mongoid.raise_not_found_error = true
+    context "when the document is an existing record" do
+
+      let(:person) do
+        Person.create
+      end
+
+      context "when the attribute does not exist" do
+
+        before do
+          person.collection.update({:_id => person.id}, {'$unset' => {:age => 1}})
+          Mongoid.raise_not_found_error = false
+          person.reload
+          Mongoid.raise_not_found_error = true
+        end
+
+        it "returns true" do
+          person.attribute_present?(:age).should be_true
+        end
+      end
+    end
+
+    context "when the value is boolean" do
+      let(:person) do
+        Person.new
+      end
+
+      context "when attribute does not exist" do
+        context "when the value is true" do
+
+          it "return true"  do
+            person.terms = false
+            person.attribute_present?(:terms).should be_true
           end
+        end
 
-          it "returns true" do
-            person.send(method, :age).should be_true
+        context "when the value is false" do
+          it "return true"  do
+            person.terms = false
+            person.attribute_present?(:terms).should be_true
           end
         end
       end
+    end
 
-      context "when the value is boolean" do
-        let(:person) do
-          Person.new
-        end
+    context "when the value is blank string" do
+      let(:person) do
+        Person.new(:title => '')
+      end
 
-        context "when attribute does not exist" do
-          context "when the value is true" do
+      it "return false" do
+        person.attribute_present?(:title).should be_false
+      end
+    end
+  end
 
-            it "return true"  do
-              person.terms = false
-              person.send(method, :terms).should be_true
-            end
-          end
+  describe "#has_attribute?" do
 
-          context "when the value is false" do
-            it "return true"  do
-              person.terms = false
-              person.send(method, :terms).should be_true
-            end
-          end
+    let(:person) do
+      Person.new(title: "sir")
+    end
+
+    context "when the key is in the attributes" do
+
+      context "when provided a symbol" do
+
+        it "returns true" do
+          person.has_attribute?(:title).should be_true
         end
       end
 
-      context "when the value is blank string" do
-        let(:person) do
-          Person.new(:title => '')
-        end
+      context "when provided a string" do
 
-        it "return false" do
-          person.send(method, :title).should be_false
+        it "returns true" do
+          person.has_attribute?("title").should be_true
         end
+      end
+    end
+
+    context "when the key is not in the attributes" do
+
+      it "returns false" do
+        person.has_attribute?(:employer_id).should be_false
       end
     end
   end

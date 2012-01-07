@@ -26,7 +26,20 @@ module Mongoid #:nodoc:
       attribute = read_attribute(name)
       ! attribute.blank? || attribute == false
     end
-    alias :has_attribute? :attribute_present?
+
+    # Does the document have the provided attribute?
+    #
+    # @example Does the document have the attribute?
+    #   model.has_attribute?(:name)
+    #
+    # @param [ String, Symbol ] name The name of the attribute.
+    #
+    # @return [ true, false ] If the key is present in the attributes.
+    #
+    # @since 3.0.0
+    def has_attribute?(name)
+      attributes.has_key?(name.to_s)
+    end
 
     # Read a value from the document attributes. If the value does not exist
     # it will return nil.
