@@ -3,6 +3,5 @@ rvm:
   - 1.9.3
   - ruby-head
   - jruby
-  - rbx-19mode
 env:
   - JRUBY_OPTS="--1.9 --server"
