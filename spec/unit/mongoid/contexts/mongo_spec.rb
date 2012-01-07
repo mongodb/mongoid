@@ -581,6 +581,35 @@ describe Mongoid::Contexts::Mongo do
       end
     end
 
+    context "when sorting criteria is already present" do
+
+      let(:collection) do
+        mock
+      end
+
+      let(:criteria) do
+        Mongoid::Criteria.new(Person).asc(:name)
+      end
+
+      let(:context) do
+        Mongoid::Contexts::Mongo.new(criteria)
+      end
+
+      before do
+        Person.expects(:collection).returns(collection)
+        collection.expects(:find_one).with(
+          {},
+          {:sort => [[:name, :asc ]]}
+        ).returns(
+          { "title"=> "Sir", "_type" => "Person" }
+        )
+      end
+
+      it "calls find on the collection with the selector and options" do
+        context.one.should be_a_kind_of(Person)
+      end
+    end
+
     context "when no documents exist" do
 
       let(:collection) do
