@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
     # Delegate to the criteria methods that are natural for creating a new
     # criteria.
     critera_methods = [ :all_in, :all_of, :any_in, :any_of, :asc, :ascending,
-                        :avg, :desc, :descending, :excludes,
+                        :avg, :desc, :descending, :excludes, :extras,
                         :includes, :limit, :max, :min, :not_in, :only,
                         :order_by, :search, :skip, :sum, :without, :where,
                         :update, :update_all, :near ]
