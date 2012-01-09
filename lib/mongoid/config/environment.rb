@@ -39,6 +39,14 @@ module Mongoid #:nodoc
 
       private
 
+      # Fallback to the development environment with a warning.
+      #
+      # @example Fallback to the dev env.
+      #   config.fallback_environment
+      #
+      # @return [ String ] development.
+      #
+      # @since 2.4.1
       def fallback_environment
         if Mongoid.logger
           Mongoid.logger.warn(
