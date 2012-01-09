@@ -19,7 +19,7 @@ module Mongoid #:nodoc
       def env_name
         return Rails.env if defined?(Rails)
         return Sinatra::Base.environment.to_s if defined?(Sinatra)
-        ENV["RACK_ENV"] || ENV["MONGOID_ENV"] || fallback_environment
+        ENV["RACK_ENV"] || ENV["MONGOID_ENV"] || raise(Errors::NoEnvironment.new)
       end
 
       # Load the yaml from the provided path and return the settings for the
@@ -35,27 +35,6 @@ module Mongoid #:nodoc
       # @since 2.3.0
       def load_yaml(path)
         YAML.load(ERB.new(File.new(path).read).result)[env_name]
-      end
-
-      private
-
-      # Fallback to the development environment with a warning.
-      #
-      # @example Fallback to the dev env.
-      #   config.fallback_environment
-      #
-      # @return [ String ] development.
-      #
-      # @since 2.4.1
-      def fallback_environment
-        if Mongoid.logger
-          Mongoid.logger.warn(
-            "Mongoid attempted to find the appropriate environment but no Rails.env, " +
-            "Sinatra::Base.environment, RACK_ENV, or MONGOID_ENV could be found. " +
-            "Defaulting to 'development'."
-          )
-        end
-        "development"
       end
     end
   end
