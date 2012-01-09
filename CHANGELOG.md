@@ -49,6 +49,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1568 Fallback to development environment with warning when no env configured.
 
+* \#1557 Internal strategy class no longer conflicts with models.
+
 ## 2.4.0
 
 ### New Features

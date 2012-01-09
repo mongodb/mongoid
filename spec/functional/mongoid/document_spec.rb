@@ -6,6 +6,17 @@ describe Mongoid::Document do
     Person.delete_all
   end
 
+  context "when a model name conflicts with a mongoid internal" do
+
+    let(:scheduler) do
+      Scheduler.new
+    end
+
+    it "allows the model name" do
+      scheduler.strategy.should be_a(Strategy)
+    end
+  end
+
   describe "#initialize" do
 
     context "when providing a block" do
