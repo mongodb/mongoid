@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/relations/cascading/strategy"
 require "mongoid/relations/cascading/delete"
 require "mongoid/relations/cascading/destroy"
 require "mongoid/relations/cascading/nullify"
