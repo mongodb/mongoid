@@ -59,10 +59,8 @@ describe Mongoid::Config::Environment do
 
     context "when no environment information is found" do
 
-      it "raises an error" do
-        expect { described_class.env_name }.to raise_error(
-          Mongoid::Errors::NoEnvironment
-        )
+      it "returns development" do
+        described_class.env_name.should eq("development")
       end
     end
   end

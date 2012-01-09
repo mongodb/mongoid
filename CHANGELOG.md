@@ -3,7 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.0 \[ In Development \] \[ Branch: master \]
+## 2.4.1 \[ In Development \] \[ Branch: 2.4.0-stable \]
+
+### Resolved Issues
+
+* \#1568 Fallback to development environment with warning when no env configured.
+
+## 2.4.0
 
 ### New Features
 
