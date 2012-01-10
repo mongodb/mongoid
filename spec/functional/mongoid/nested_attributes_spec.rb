@@ -1865,8 +1865,12 @@ describe Mongoid::NestedAttributes do
               }
           end
 
-          it "instantiates an object of the given type" do
-            canvas.shapes.map(&:class).should == [Square, Circle]
+          it "instantiates an object of the first type" do
+            canvas.shapes.map(&:class).should include(Square)
+          end
+
+          it "instantiates an object of the second type" do
+            canvas.shapes.map(&:class).should include(Circle)
           end
         end
       end
@@ -3235,8 +3239,12 @@ describe Mongoid::NestedAttributes do
               }
           end
 
-          it "instantiates an object of the given type" do
-            shipping_container.vehicles.map(&:class).should == [Car, Truck]
+          it "instantiates an object of the first type" do
+            shipping_container.vehicles.map(&:class).should include(Car)
+          end
+
+          it "instantiates an object of the second type" do
+            shipping_container.vehicles.map(&:class).should include(Truck)
           end
         end
       end
