@@ -79,6 +79,21 @@ describe Mongoid::Criterion::Inclusion do
 
   describe "#any_in" do
 
+    context "when querying a set field" do
+
+      let(:time) do
+        Time.now
+      end
+
+      let(:criteria) do
+        Video.any_in(:release_dates => [ time ])
+      end
+
+      it "converts the selector properly" do
+        criteria.selector.should eq({ :release_dates => { "$in" => [ time ] }})
+      end
+    end
+
     context "when providing multiple fields" do
 
       let(:criteria) do

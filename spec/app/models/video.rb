@@ -2,6 +2,7 @@ class Video
   include Mongoid::Document
   field :title, :type => String
   field :year, :type => Integer
+  field :release_dates, :type => Set
 
   embedded_in :person
   belongs_to :post
