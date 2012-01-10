@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.4.0
         def selection(object)
-          return object if object.is_a?(::Hash)
+          return object unless object.is_a?(::Set)
           serialize(object)
         end
 
