@@ -207,33 +207,34 @@ module Mongoid #:nodoc:
       # Generate all the dirty methods needed for the attribute.
       #
       # @example Generate the dirty methods.
-      #   Model.create_dirty_methods("name")
+      #   Model.create_dirty_methods("name", "name")
       #
-      # @param [ String ] name The name of the attribute.
+      # @param [ String ] name The name of the field.
+      # @param [ String ] name The name of the accessor.
       #
       # @return [ Module ] The fields module.
       #
       # @since 2.4.0
-      def create_dirty_methods(name)
+      def create_dirty_methods(name, meth)
         generated_methods.module_eval do
           class_eval <<-EOM
-            def #{name}_change
+            def #{meth}_change
               attribute_change(#{name.inspect})
             end
 
-            def #{name}_changed?
+            def #{meth}_changed?
               attribute_changed?(#{name.inspect})
             end
 
-            def #{name}_was
+            def #{meth}_was
               attribute_was(#{name.inspect})
             end
 
-            def #{name}_will_change!
+            def #{meth}_will_change!
               attribute_will_change!(#{name.inspect})
             end
 
-            def reset_#{name}!
+            def reset_#{meth}!
               reset_attribute!(#{name.inspect})
             end
           EOM
