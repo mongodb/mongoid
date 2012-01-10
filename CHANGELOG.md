@@ -50,6 +50,9 @@ For instructions on upgrading to newer versions, visit
 * \#1576 Don't hit database on uniqueness validation if the field getting
   validated has not changed.
 
+* \#1571 Aliased fields get all the dirty attribute methods and all getters and
+  setters for both the original name and the alias. (Hans Hasselberg)
+
 * \#1568 Fallback to development environment with warning when no env configured.
 
 * \#1557 Internal strategy class no longer conflicts with models.
