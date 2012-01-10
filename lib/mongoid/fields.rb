@@ -285,14 +285,15 @@ module Mongoid #:nodoc
       def add_field(name, options = {})
         aliased = options[:as]
         aliased_fields[aliased.to_s] = name if aliased
-        meth = aliased || name
         type = options[:localize] ? Fields::Internal::Localized : options[:type]
         Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
           fields[name] = field
           add_defaults(field)
-          create_accessors(name, meth, options)
+          create_accessors(name, name, options)
+          create_accessors(name, aliased, options) if aliased
           process_options(field)
-          create_dirty_methods(name)
+          create_dirty_methods(name, name)
+          create_dirty_methods(name, aliased) if aliased
         end
       end
 
