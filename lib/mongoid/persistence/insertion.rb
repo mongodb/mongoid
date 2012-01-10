@@ -25,11 +25,12 @@ module Mongoid #:nodoc:
               doc.run_callbacks(:create) do
                 yield(doc)
                 doc.new_record = false
-                doc.reset_persisted_children and true
+                true
               end
             end
 
             unless result == false
+              doc.reset_persisted_children
               doc.move_changes
               Threaded.clear_options!
             end
