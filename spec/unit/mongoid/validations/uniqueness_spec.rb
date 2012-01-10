@@ -11,7 +11,7 @@ describe Mongoid::Validations::UniquenessValidator do
     context "when the document is the root" do
 
       let(:dictionary) do
-        Dictionary.new(:year => 1999)
+        Dictionary.new(:year => 1999, :name => "")
       end
 
       let(:criteria) do
@@ -116,7 +116,7 @@ describe Mongoid::Validations::UniquenessValidator do
       end
 
       let(:definition) do
-        word.definitions.build
+        word.definitions.build(:description => "")
       end
 
       let(:criteria) do

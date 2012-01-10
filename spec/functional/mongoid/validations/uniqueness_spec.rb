@@ -65,8 +65,27 @@ describe Mongoid::Validations::UniquenessValidator do
                 Dictionary.create(:name => "Oxford")
               end
 
-              it "returns true" do
-                dictionary.should be_valid
+              context "when the field has changed" do
+
+                it "returns true" do
+                  dictionary.should be_valid
+                end
+              end
+
+              context "when the field has not changed" do
+
+                let(:from_db) do
+                  Dictionary.find(dictionary.id)
+                end
+
+                it "returns true" do
+                  from_db.should be_valid
+                end
+
+                it "does not touch the database" do
+                  Dictionary.expects(:where).never
+                  from_db.valid?
+                end
               end
             end
           end
