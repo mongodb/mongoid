@@ -54,6 +54,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1557 Internal strategy class no longer conflicts with models.
 
+* \#1547 Resetting persisted children from a parent save when new waits until post
+  callbacks, mirroring update functionality.
+
 ## 2.4.0
 
 ### New Features
