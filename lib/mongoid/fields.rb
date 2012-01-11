@@ -347,43 +347,164 @@ module Mongoid #:nodoc
       # @param [ Symbol ] name The name of the field.
       # @param [ Symbol ] meth The name of the accessor.
       # @param [ Hash ] options The options.
+      #
+      # @since 2.0.0
       def create_accessors(name, meth, options = {})
         field = fields[name]
+
+        create_field_getter(name, meth, field)
+        create_field_setter(name, meth)
+        create_field_check(name, meth)
+
+        if options[:localize]
+          create_translations_getter(name, meth)
+          create_translations_setter(name, meth)
+        end
+      end
+
+      # Create the getter method for the provided field.
+      #
+      # @example Create the getter.
+      #   Model.create_field_getter("name", "name", field)
+      #
+      # @param [ String ] name The name of the attribute.
+      # @param [ String ] meth The name of the method.
+      # @param [ Field ] field The field.
+      #
+      # @since 2.4.0
+      def create_field_getter(name, meth, field)
         generated_methods.module_eval do
-          if field.cast_on_read?
-            class_eval <<-EOM
-              def #{meth}
-                fields[#{name.inspect}].deserialize(read_attribute(#{name.inspect}))
+          if meth =~ /\W/
+            if field.cast_on_read?
+              define_method(meth) do
+                fields[name].deserialize(read_attribute(name))
               end
-            EOM
-          else
-            class_eval <<-EOM
-              def #{meth}
-                read_attribute(#{name.inspect}).tap do |value|
+            else
+              define_method(meth) do
+                read_attribute(name).tap do |value|
                   if value.is_a?(Array) || value.is_a?(Hash)
-                    attribute_will_change!(#{name.inspect})
+                    attribute_will_change!(name)
                   end
                 end
               end
+            end
+          else
+            if field.cast_on_read?
+              class_eval <<-EOM
+                def #{meth}
+                  fields[#{name.inspect}].deserialize(read_attribute(#{name.inspect}))
+                end
+              EOM
+            else
+              class_eval <<-EOM
+                def #{meth}
+                  read_attribute(#{name.inspect}).tap do |value|
+                    if value.is_a?(Array) || value.is_a?(Hash)
+                      attribute_will_change!(#{name.inspect})
+                    end
+                  end
+                end
+              EOM
+            end
+          end
+        end
+      end
+
+      # Create the setter method for the provided field.
+      #
+      # @example Create the setter.
+      #   Model.create_field_setter("name", "name")
+      #
+      # @param [ String ] name The name of the attribute.
+      # @param [ String ] meth The name of the method.
+      #
+      # @since 2.4.0
+      def create_field_setter(name, meth)
+        generated_methods.module_eval do
+          if meth =~ /\W/
+            define_method(meth) do |value|
+              write_attribute(name, value)
+            end
+          else
+            class_eval <<-EOM
+              def #{meth}=(value)
+                write_attribute(#{name.inspect}, value)
+              end
             EOM
           end
-          class_eval <<-EOM
-            def #{meth}=(value)
-              write_attribute(#{name.inspect}, value)
-            end
+        end
+      end
 
-            def #{meth}?
-              attr = read_attribute(#{name.inspect})
+      # Create the check method for the provided field.
+      #
+      # @example Create the check.
+      #   Model.create_field_check("name", "name")
+      #
+      # @param [ String ] name The name of the attribute.
+      # @param [ String ] meth The name of the method.
+      #
+      # @since 2.4.0
+      def create_field_check(name, meth)
+        generated_methods.module_eval do
+          if meth =~ /\W/
+            define_method("#{meth}?") do
+              attr = read_attribute(name)
               attr == true || attr.present?
             end
-          EOM
+          else
+            class_eval <<-EOM
+              def #{meth}?
+                attr = read_attribute(#{name.inspect})
+                attr == true || attr.present?
+              end
+            EOM
+          end
+        end
+      end
 
-          if options[:localize]
+      # Create the translation getter method for the provided field.
+      #
+      # @example Create the translation getter.
+      #   Model.create_translations_getter("name", "name")
+      #
+      # @param [ String ] name The name of the attribute.
+      # @param [ String ] meth The name of the method.
+      #
+      # @since 2.4.0
+      def create_translations_getter(name, meth)
+        generated_methods.module_eval do
+          if meth =~ /\W/
+            define_method("#{meth}_translations") do
+              attributes[name]
+            end
+          else
             class_eval <<-EOM
               def #{meth}_translations
                 attributes[#{name.inspect}]
               end
+            EOM
+          end
+        end
+      end
 
+      # Create the translation setter method for the provided field.
+      #
+      # @example Create the translation setter.
+      #   Model.create_translations_setter("name", "name")
+      #
+      # @param [ String ] name The name of the attribute.
+      # @param [ String ] meth The name of the method.
+      #
+      # @since 2.4.0
+      def create_translations_setter(name, meth)
+        generated_methods.module_eval do
+          if meth =~ /\W/
+            define_method("#{meth}_translations=") do |value|
+              attribute_will_change!(name)
+              attributes[name] = value
+            end
+          else
+            class_eval <<-EOM
               def #{meth}_translations=(value)
                 attribute_will_change!(#{name.inspect})
                 attributes[#{name.inspect}] = value
@@ -397,11 +518,13 @@ module Mongoid #:nodoc
       #
       # @example Include the fields.
       #   Person.generated_methods
+      #
+      # @return [ Module ] The module of generated methods.
+      #
+      # @since 2.0.0
       def generated_methods
         @generated_methods ||= begin
-          Module.new.tap do |mod|
-            include mod
-          end
+          Module.new.tap { |mod| include(mod) }
         end
       end
 

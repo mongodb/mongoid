@@ -217,27 +217,49 @@ module Mongoid #:nodoc:
       # @since 2.4.0
       def create_dirty_methods(name, meth)
         generated_methods.module_eval do
-          class_eval <<-EOM
-            def #{meth}_change
-              attribute_change(#{name.inspect})
+          if meth =~ /\W/
+            define_method("#{meth}_change") do
+              attribute_change(name)
             end
 
-            def #{meth}_changed?
-              attribute_changed?(#{name.inspect})
+            define_method("#{meth}_changed?") do
+              attribute_changed?(name)
             end
 
-            def #{meth}_was
-              attribute_was(#{name.inspect})
+            define_method("#{meth}_was") do
+              attribute_was(name)
             end
 
-            def #{meth}_will_change!
-              attribute_will_change!(#{name.inspect})
+            define_method("#{meth}_will_change!") do
+              attribute_will_change!(name)
             end
 
-            def reset_#{meth}!
-              reset_attribute!(#{name.inspect})
+            define_method("reset_#{meth}!") do
+              reset_attribute!(name)
             end
-          EOM
+          else
+            class_eval <<-EOM
+              def #{meth}_change
+                attribute_change(#{name.inspect})
+              end
+
+              def #{meth}_changed?
+                attribute_changed?(#{name.inspect})
+              end
+
+              def #{meth}_was
+                attribute_was(#{name.inspect})
+              end
+
+              def #{meth}_will_change!
+                attribute_will_change!(#{name.inspect})
+              end
+
+              def reset_#{meth}!
+                reset_attribute!(#{name.inspect})
+              end
+            EOM
+          end
         end
       end
     end

@@ -57,6 +57,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#1568 Fallback to development environment with warning when no env configured.
 
+* \#1565 For fields and foreign keys with non-standard Ruby or database names,
+  use define_method instead of class_eval for creating the accessors and
+  dirty methods.
+
 * \#1557 Internal strategy class no longer conflicts with models.
 
 * \#1547 Resetting persisted children from a parent save when new waits until post
