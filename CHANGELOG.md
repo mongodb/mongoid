@@ -47,6 +47,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1580 Allow arrays to be set to nil post save, and not just empty.
+
 * \#1579 Don't call #to_a on individual set field elements in criterion.
 
 * \#1576 Don't hit database on uniqueness validation if the field getting
