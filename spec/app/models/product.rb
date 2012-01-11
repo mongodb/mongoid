@@ -4,6 +4,7 @@ class Product
   field :name, :localize => true, :default => "no translation"
   field :price, :type => Integer
   field :brand_name
+  field :stores, :type => Array
   alias_attribute :cost, :price
 
   validates :name, :presence => true

@@ -191,6 +191,26 @@ describe Mongoid::Fields do
       Product.new
     end
 
+    context "when the field is an array" do
+
+      before do
+        product.stores = [ "kadewe", "karstadt" ]
+        product.save
+      end
+
+      context "when setting the value to nil" do
+
+        before do
+          product.stores = nil
+          product.save
+        end
+
+        it "allows the set" do
+          product.stores.should be_nil
+        end
+      end
+    end
+
     context "when a field is localized" do
 
       context "when no locale is set" do
