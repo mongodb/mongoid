@@ -16,20 +16,34 @@ describe Mongoid::Fields::Internal::Array do
       {}
     end
 
-    before do
-      person.aliases = [ "007", "008" ]
-    end
-
     context "when adding and removing" do
 
-      before do
-        field.add_atomic_changes(
-          person, "aliases", mods, [ "008" ], [ "009" ]
-        )
+      context "when there are no nil values" do
+
+        before do
+          person.aliases = [ "007", "008" ]
+          field.add_atomic_changes(
+            person, "aliases", mods, [ "008" ], [ "009" ]
+          )
+        end
+
+        it "adds the current to the modifications" do
+          mods["aliases"].should eq([ "007", "008" ])
+        end
       end
 
-      it "adds the current to the modifications" do
-        mods["aliases"].should eq([ "007", "008" ])
+      context "when there are nil values" do
+
+        before do
+          person.aliases = [ "007", nil ]
+          field.add_atomic_changes(
+            person, "aliases", mods, [ nil ], [ "008" ]
+          )
+        end
+
+        it "adds the current to the modifications" do
+          mods["aliases"].should eq([ "007", nil ])
+        end
       end
     end
   end

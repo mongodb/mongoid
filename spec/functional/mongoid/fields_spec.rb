@@ -209,6 +209,22 @@ describe Mongoid::Fields do
           product.stores.should be_nil
         end
       end
+
+      context "when setting any of the values to nil" do
+
+        before do
+          product.stores = [ "kadewe", nil ]
+          product.save
+        end
+
+        it "allows the set of nil values" do
+          product.stores.should eq([ "kadewe", nil ])
+        end
+
+        it "persists the nil values" do
+          product.reload.stores.should eq([ "kadewe", nil ])
+        end
+      end
     end
 
     context "when a field is localized" do
