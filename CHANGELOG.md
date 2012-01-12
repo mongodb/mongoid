@@ -47,6 +47,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1585 `Model#respond_to?` returns true now for the setter when allowing
+  dynamic fields.
+
 * \#1582 Allow nil values to be set in arrays.
 
 * \#1580 Allow arrays to be set to nil post save, and not just empty.

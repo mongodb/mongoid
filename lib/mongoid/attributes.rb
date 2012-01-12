@@ -90,7 +90,7 @@ module Mongoid #:nodoc:
     def respond_to?(*args)
       (Mongoid.allow_dynamic_fields &&
         attributes &&
-        attributes.has_key?(args.first.to_s)
+        attributes.has_key?(args.first.to_s.delete("="))
       ) || super
     end
 

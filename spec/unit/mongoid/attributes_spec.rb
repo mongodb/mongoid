@@ -49,8 +49,8 @@ describe Mongoid::Attributes do
 
     context "when the document is an existing record" do
 
-      let(:person) do
-        Person.create!(:ssn => "123-11-4413")
+      let!(:person) do
+        Person.create(:ssn => "123-11-4413")
       end
 
       context "when the attribute does not exist" do
@@ -975,6 +975,91 @@ describe Mongoid::Attributes do
         person = Person.new
         person.remove_attribute(:title)
         person.title.should be_nil
+      end
+    end
+  end
+
+  describe "#respond_to?" do
+
+    context "when allowing dynamic fields" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before(:all) do
+        Mongoid.allow_dynamic_fields = true
+      end
+
+      context "when asking for the getter" do
+
+        context "when the attribute exists" do
+
+          before do
+            person[:attr] = "test"
+          end
+
+          it "returns true" do
+            person.should respond_to(:attr)
+          end
+        end
+
+        context "when the attribute does not exist" do
+
+          it "returns false" do
+            person.should_not respond_to(:attr)
+          end
+        end
+      end
+
+      context "when asking for the setter" do
+
+        context "when the attribute exists" do
+
+          before do
+            person[:attr] = "test"
+          end
+
+          it "returns true" do
+            person.should respond_to(:attr=)
+          end
+        end
+
+        context "when the attribute does not exist" do
+
+          it "returns false" do
+            person.should_not respond_to(:attr=)
+          end
+        end
+      end
+    end
+
+    context "when not allowing dynamic fields" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before(:all) do
+        Mongoid.allow_dynamic_fields = false
+      end
+
+      after(:all) do
+        Mongoid.allow_dynamic_fields = true
+      end
+
+      context "when asking for the getter" do
+
+        it "returns false" do
+          person.should_not respond_to(:attr)
+        end
+      end
+
+      context "when asking for the setter" do
+
+        it "returns false" do
+          person.should_not respond_to(:attr=)
+        end
       end
     end
   end
