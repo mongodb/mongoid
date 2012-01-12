@@ -100,7 +100,7 @@ module Mongoid #:nodoc:
         #
         # @return [ String ] The string stripped of "=".
         def reader
-          writer? ? gsub("=", "") : self
+          delete("=")
         end
 
         # Is this string a writer?
