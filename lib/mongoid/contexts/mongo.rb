@@ -135,6 +135,26 @@ module Mongoid #:nodoc:
         klass.collection.distinct(field, selector)
       end
 
+      # Eager load the inclusions for the provided documents.
+      #
+      # @example Eager load the inclusions.
+      #   context.eager_load(docs)
+      #
+      # @param [ Array<Document> ] docs The docs returning from the db.
+      #
+      # @since 2.4.1
+      def eager_load(docs)
+        parent_ids = docs.map(&:id)
+        criteria.inclusions.reject! do |metadata|
+          if metadata.macro == :belongs_to
+            child_ids = load_ids(metadata.foreign_key)
+            metadata.eager_load(child_ids)
+          else
+            metadata.eager_load(parent_ids)
+          end
+        end
+      end
+
       # Execute the context. This will take the selector and options
       # and pass them on to the Ruby driver's +find()+ method on the collection. The
       # collection itself will be retrieved from the class provided, and once the
@@ -148,15 +168,7 @@ module Mongoid #:nodoc:
         collection, options = klass.collection, process_options
         if criteria.inclusions.any?
           collection.find(selector, options).entries.tap do |docs|
-            parent_ids = docs.map(&:id)
-            criteria.inclusions.reject! do |metadata|
-              if metadata.macro == :belongs_to
-                child_ids = load_ids(metadata.foreign_key)
-                metadata.eager_load(child_ids)
-              else
-                metadata.eager_load(parent_ids)
-              end
-            end
+            eager_load(docs)
           end
         else
           collection.find(selector, options)
@@ -189,7 +201,10 @@ module Mongoid #:nodoc:
       # @return [ Document ] The first document in the collection.
       def first
         attributes = klass.collection.find_one(selector, options_with_default_sorting)
-        attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
+        return nil unless attributes
+        Mongoid::Factory.from_db(klass, attributes).tap do |doc|
+          eager_load([ doc ]) if criteria.inclusions.any?
+        end
       end
       alias :one :first
 
@@ -255,7 +270,10 @@ module Mongoid #:nodoc:
         opts = options_with_default_sorting
         opts[:sort] = opts[:sort].map{ |option| [ option[0], option[1].invert ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
-        attributes ? Mongoid::Factory.from_db(klass, attributes) : nil
+        return nil unless attributes
+        Mongoid::Factory.from_db(klass, attributes).tap do |doc|
+          eager_load([ doc ]) if criteria.inclusions.any?
+        end
       end
 
       # Return the max value for a field.

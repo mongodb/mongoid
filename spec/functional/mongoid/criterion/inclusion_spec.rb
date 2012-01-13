@@ -441,6 +441,52 @@ describe Mongoid::Criterion::Inclusion do
         end
       end
 
+      context "when calling first on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:posts).first
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when calling last on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:posts).last
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
