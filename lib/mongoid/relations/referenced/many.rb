@@ -308,15 +308,13 @@ module Mongoid #:nodoc:
         def substitute(replacement)
           tap do |proxy|
             if replacement
-              if replacement != proxy.in_memory
-                new_docs, docs = replacement.compact.uniq, []
-                new_ids = new_docs.map { |doc| doc.id }
-                remove_not_in(new_ids)
-                new_docs.each do |doc|
-                  docs.push(doc) if doc.send(metadata.foreign_key) != base.id
-                end
-                proxy.concat(docs)
+              new_docs, docs = replacement.compact.uniq, []
+              new_ids = new_docs.map { |doc| doc.id }
+              remove_not_in(new_ids)
+              new_docs.each do |doc|
+                docs.push(doc) if doc.send(metadata.foreign_key) != base.id
               end
+              proxy.concat(docs)
             else
               proxy.purge
             end

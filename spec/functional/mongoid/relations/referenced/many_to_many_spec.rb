@@ -655,72 +655,40 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  describe "#= nil" do
+  [ nil, [] ].each do |value|
 
-    context "when the relation is not polymorphic" do
+    describe "#= #{value}" do
 
-      context "when the inverse relation is not defined" do
+      context "when the relation is not polymorphic" do
 
-        let(:person) do
-          Person.new
-        end
-
-        let(:house) do
-          House.new
-        end
-
-        before do
-          person.houses << house
-          person.houses = nil
-        end
-
-        it "clears the relation" do
-          person.houses.should be_empty
-        end
-
-        it "clears the foreign keys" do
-          person.house_ids.should be_empty
-        end
-      end
-
-      context "when the parent is a new record" do
-
-        let(:person) do
-          Person.new
-        end
-
-        let(:preference) do
-          Preference.new
-        end
-
-        before do
-          person.preferences = [ preference ]
-          person.preferences = nil
-        end
-
-        it "sets the relation to an empty array" do
-          person.preferences.should be_empty
-        end
-
-        it "removed the inverse relation" do
-          preference.people.should be_empty
-        end
-
-        it "removes the foreign key values" do
-          person.preference_ids.should be_empty
-        end
-
-        it "removes the inverse foreign key values" do
-          preference.person_ids.should be_empty
-        end
-      end
-
-      context "when the parent is not a new record" do
-
-        context "when the relation has been loaded" do
+        context "when the inverse relation is not defined" do
 
           let(:person) do
-            Person.create(:ssn => "437-11-1112")
+            Person.new
+          end
+
+          let(:house) do
+            House.new
+          end
+
+          before do
+            person.houses << house
+            person.houses = value
+          end
+
+          it "clears the relation" do
+            person.houses.should be_empty
+          end
+
+          it "clears the foreign keys" do
+            person.house_ids.should be_empty
+          end
+        end
+
+        context "when the parent is a new record" do
+
+          let(:person) do
+            Person.new
           end
 
           let(:preference) do
@@ -729,7 +697,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           before do
             person.preferences = [ preference ]
-            person.preferences = nil
+            person.preferences = value
           end
 
           it "sets the relation to an empty array" do
@@ -747,38 +715,74 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           it "removes the inverse foreign key values" do
             preference.person_ids.should be_empty
           end
-
-          it "does not delete the target from the database" do
-            preference.should_not be_destroyed
-          end
         end
 
-        context "when the relation has not been loaded" do
+        context "when the parent is not a new record" do
 
-          let(:preference) do
-            Preference.new
-          end
+          context "when the relation has been loaded" do
 
-          let(:person) do
-            Person.create(:ssn => "437-11-1112").tap do |p|
-              p.preferences = [ preference ]
+            let(:person) do
+              Person.create(:ssn => "437-11-1112")
+            end
+
+            let(:preference) do
+              Preference.new
+            end
+
+            before do
+              person.preferences = [ preference ]
+              person.preferences = value
+            end
+
+            it "sets the relation to an empty array" do
+              person.preferences.should be_empty
+            end
+
+            it "removed the inverse relation" do
+              preference.people.should be_empty
+            end
+
+            it "removes the foreign key values" do
+              person.preference_ids.should be_empty
+            end
+
+            it "removes the inverse foreign key values" do
+              preference.person_ids.should be_empty
+            end
+
+            it "does not delete the target from the database" do
+              preference.should_not be_destroyed
             end
           end
 
-          let(:from_db) do
-            Person.find(person.id)
-          end
+          context "when the relation has not been loaded" do
 
-          before do
-            from_db.preferences = nil
-          end
+            let(:preference) do
+              Preference.new
+            end
 
-          it "sets the relation to an empty array" do
-            from_db.preferences.should be_empty
-          end
+            let(:person) do
+              Person.create(:ssn => "437-11-1112").tap do |p|
+                p.preferences = [ preference ]
+              end
+            end
 
-          it "removes the foreign key values" do
-            from_db.preference_ids.should be_empty
+            let!(:from_db) do
+              Person.find(person.id)
+            end
+
+            before do
+              p "###############################"
+              from_db.preferences = value
+            end
+
+            it "sets the relation to an empty array" do
+              from_db.preferences.should be_empty
+            end
+
+            it "removes the foreign key values" do
+              from_db.preference_ids.should be_empty
+            end
           end
         end
       end

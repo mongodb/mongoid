@@ -142,10 +142,8 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def substitute(replacement)
           tap do |proxy|
-            if replacement != proxy.in_memory
-              proxy.purge
-              proxy.push(replacement.compact.uniq) if replacement
-            end
+            proxy.purge
+            proxy.push(replacement.compact.uniq) unless replacement.blank?
           end
         end
 
