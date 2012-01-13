@@ -772,7 +772,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             before do
-              p "###############################"
               from_db.preferences = value
             end
 
