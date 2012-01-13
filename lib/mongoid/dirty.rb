@@ -24,7 +24,21 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def changed?
-      changed_attributes.any?
+      changed_attributes.any? || children_changed?
+    end
+
+    # Have any children (embedded documents) of this document changed?
+    #
+    # @example Have any children changed?
+    #   model.children_changed?
+    #
+    # @return [ true, false ] If any children have changed.
+    #
+    # @since 2.4.1
+    def children_changed?
+      _children.any? do |child|
+        child.changed?
+      end
     end
 
     # Get the attribute changes.

@@ -73,6 +73,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1557 Internal strategy class no longer conflicts with models.
 
+* \#1551 Parent documents now return `true` for `Model#changed?` if only child
+  (embedded) documents have changed.
+
 * \#1547 Resetting persisted children from a parent save when new waits until post
   callbacks, mirroring update functionality.
 
