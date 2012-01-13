@@ -79,7 +79,7 @@ For instructions on upgrading to newer versions, visit
 * \#1547 Resetting persisted children from a parent save when new waits until post
   callbacks, mirroring update functionality.
 
-* \#1535 Eager loading now happens when calling `first` or `last` on a
+* \#1536 Eager loading now happens when calling `first` or `last` on a
   criteria if inclusions are specified.
 
 ## 2.4.0
