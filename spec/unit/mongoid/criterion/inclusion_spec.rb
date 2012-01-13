@@ -585,6 +585,20 @@ describe Mongoid::Criterion::Inclusion do
       end
     end
 
+    context "when providing a complex criteria with a boolean" do
+
+      context "when the field is not defined" do
+
+        let(:criteria) do
+          Person.where(:service_area => { "$ne" => true })
+        end
+
+        it "creates the proper selector" do
+          criteria.selector.should eq({ :service_area => { "$ne" => true }})
+        end
+      end
+    end
+
     context "when provided a hash" do
 
       context "with simple hash keys" do
