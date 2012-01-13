@@ -6,6 +6,93 @@ describe Mongoid::Dirty do
     [ Person, Preference ].each(&:delete_all)
   end
 
+  context "when only embedded documents change" do
+
+    let!(:person) do
+      Person.create(:ssn => "132-11-1111")
+    end
+
+    context "when the child is an embeds one" do
+
+      context "when the child is new" do
+
+        let!(:name) do
+          person.build_name(:first_name => "Gordon", :last_name => "Ramsay")
+        end
+
+        it "flags the parent as changed" do
+          person.should be_changed
+        end
+      end
+
+      context "when the child is modified" do
+
+        let!(:name) do
+          person.create_name(:first_name => "Gordon", :last_name => "Ramsay")
+        end
+
+        before do
+          name.first_name = "G"
+        end
+
+        it "flags the parent as changed" do
+          person.should be_changed
+        end
+      end
+
+      context "when the child is not modified" do
+
+        let!(:name) do
+          person.create_name(:first_name => "Gordon", :last_name => "Ramsay")
+        end
+
+        it "does not flag the parent as changed" do
+          person.should_not be_changed
+        end
+      end
+    end
+
+    context "when the child is an embeds many" do
+
+      context "when a child is new" do
+
+        let!(:address) do
+          person.addresses.build(:street => "jakobstr.")
+        end
+
+        it "flags the parent as changed" do
+          person.should be_changed
+        end
+      end
+
+      context "when a child is modified" do
+
+        let!(:address) do
+          person.addresses.create(:street => "jakobstr.")
+        end
+
+        before do
+          address.city = "Berlin"
+        end
+
+        it "flags the parent as changed" do
+          person.should be_changed
+        end
+      end
+
+      context "when no child is modified" do
+
+        let!(:address) do
+          person.addresses.create(:street => "skalitzerstr.")
+        end
+
+        it "does not flag the parent as changed" do
+          person.should_not be_changed
+        end
+      end
+    end
+  end
+
   context "when changing a hash of hashes" do
 
     let!(:person) do

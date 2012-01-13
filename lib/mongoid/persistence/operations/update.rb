@@ -42,15 +42,6 @@ module Mongoid #:nodoc:
         def persist
           prepare do
             unless updates.empty?
-              # @todo Durran: This is a temporary fix for #791 until we rewrite
-              # the dirty tracking to properly flag a document as changed if
-              # only embedded documents have changed.
-              if document.respond_to?(:updated_at)
-                if document.timestamping? && !document.updated_at_changed?
-                  document.updated_at = Time.now
-                end
-              end
-
               collection.update(selector, updates, options)
               conflicts.each_pair do |key, value|
                 collection.update(selector, { key => value }, options)
