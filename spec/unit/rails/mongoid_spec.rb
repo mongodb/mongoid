@@ -8,6 +8,26 @@ describe "Rails::Mongoid" do
 
   describe ".create_indexes" do
 
+    context "when an exception is raised" do
+
+      let(:model) do
+        stub
+      end
+
+      before do
+        Rails::Mongoid.expects(:determine_model).with(
+          "spec/app/models/account.rb"
+        ).returns(model)
+        model.expects(:create_indexes).raises(Mongo::MongoArgumentError)
+      end
+
+      it "is not swallowed" do
+        expect {
+          Rails::Mongoid.create_indexes("spec/app/models/**/*.rb")
+        }.to raise_error(Mongo::MongoArgumentError)
+      end
+    end
+
     context "with ordinary Rails models" do
 
       let(:model_paths) do

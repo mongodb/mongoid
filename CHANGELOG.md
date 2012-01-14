@@ -47,6 +47,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1592 Don't swallow exceptions from index generation in the create_indexes
+  rake task.
+
 * \#1589 Allow assignment of empty array to HABTM when no documents are yet
   loaded into memory.
 
