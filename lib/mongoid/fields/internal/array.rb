@@ -20,12 +20,16 @@ module Mongoid #:nodoc:
         #
         # @since 2.4.0
         def add_atomic_changes(document, key, mods, new, old)
-          if !new.empty? && !old.empty?
+          pushes = (new || []) - (old || [])
+          pulls = (old || []) - (new || [])
+          if old.nil?
+            mods[key] = pushes
+          elsif !pushes.empty? && !pulls.empty?
             mods[key] = document.attributes[key]
-          elsif !new.empty?
-            document.atomic_array_pushes[key] = new
-          elsif !old.empty?
-            document.atomic_array_pulls[key] = old
+          elsif !pushes.empty?
+            document.atomic_array_pushes[key] = pushes
+          elsif !pulls.empty?
+            document.atomic_array_pulls[key] = pulls
           end
         end
 

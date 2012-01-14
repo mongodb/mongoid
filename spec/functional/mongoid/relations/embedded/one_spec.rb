@@ -653,7 +653,8 @@ describe Mongoid::Relations::Embedded::One do
     let!(:name) do
       person.create_name(
         :first_name => "Syd",
-        :last_name => "Vicious"
+        :last_name => "Vicious",
+        :aliases => nil
       )
     end
 
