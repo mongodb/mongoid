@@ -50,6 +50,9 @@ For instructions on upgrading to newer versions, visit
 * \#1589 Allow assignment of empty array to HABTM when no documents are yet
   loaded into memory.
 
+* \#1587 When a previous value for an array field was an explicit nil, it can
+  now be reset atomically with new values.
+
 * \#1585 `Model#respond_to?` returns true now for the setter when allowing
   dynamic fields.
 

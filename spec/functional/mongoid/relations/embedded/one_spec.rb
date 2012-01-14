@@ -643,4 +643,39 @@ describe Mongoid::Relations::Embedded::One do
       end
     end
   end
+
+  context "when the embedded document has an array field" do
+
+    let!(:person) do
+      Person.create(:ssn => "673-11-2321")
+    end
+
+    let!(:name) do
+      person.create_name(
+        :first_name => "Syd",
+        :last_name => "Vicious",
+        :aliases => nil
+      )
+    end
+
+    context "when saving the array on a persisted document" do
+
+      let(:from_db) do
+        Person.find(person.id).name
+      end
+
+      before do
+        from_db.aliases = [ "Syd", "Sydney" ]
+        from_db.save
+      end
+
+      it "sets the values of the array" do
+        from_db.aliases.should eq([ "Syd", "Sydney" ])
+      end
+
+      it "persists the array" do
+        Person.find(person.id).name.aliases.should eq([ "Syd", "Sydney" ])
+      end
+    end
+  end
 end
