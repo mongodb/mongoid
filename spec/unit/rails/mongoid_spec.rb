@@ -15,9 +15,7 @@ describe "Rails::Mongoid" do
       end
 
       before do
-        Rails::Mongoid.expects(:determine_model).with(
-          "spec/app/models/account.rb"
-        ).returns(model)
+        Rails::Mongoid.expects(:determine_model).returns(model)
         model.expects(:create_indexes).raises(Mongo::MongoArgumentError)
       end
 
