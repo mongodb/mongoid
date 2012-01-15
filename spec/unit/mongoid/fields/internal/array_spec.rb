@@ -23,7 +23,7 @@ describe Mongoid::Fields::Internal::Array do
         before do
           person.aliases = [ "007", "008" ]
           field.add_atomic_changes(
-            person, "aliases", mods, [ "008" ], [ "009" ]
+            person, "aliases", "aliases", mods, [ "008" ], [ "009" ]
           )
         end
 
@@ -37,7 +37,7 @@ describe Mongoid::Fields::Internal::Array do
         before do
           person.aliases = [ "007", nil ]
           field.add_atomic_changes(
-            person, "aliases", mods, [ nil ], [ "008" ]
+            person, "aliases", "aliases", mods, [ nil ], [ "008" ]
           )
         end
 

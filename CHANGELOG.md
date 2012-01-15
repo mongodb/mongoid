@@ -47,6 +47,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1593 Arrays on embedded documents now properly atomically update when
+  modified from original version.
+
 * \#1592 Don't swallow exceptions from index generation in the create_indexes
   rake task.
 

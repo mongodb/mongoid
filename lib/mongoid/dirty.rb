@@ -131,7 +131,14 @@ module Mongoid #:nodoc:
             field = fields[name]
             key = embedded? ? "#{atomic_position}.#{name}" : name
             if field && field.resizable?
-              field.add_atomic_changes(self, key, modifications, new, old)
+              field.add_atomic_changes(
+                self,
+                name,
+                key,
+                modifications,
+                new,
+                old
+              )
             else
               modifications[key] = new
             end

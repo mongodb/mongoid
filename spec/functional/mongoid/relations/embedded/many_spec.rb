@@ -2686,4 +2686,58 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when the embedded document has an array field" do
+
+    let!(:person) do
+      Person.create(:ssn => "673-11-2322")
+    end
+
+    let!(:video) do
+      person.videos.create
+    end
+
+    context "when saving the array on a persisted document" do
+
+      before do
+        video.genres = [ "horror", "scifi" ]
+        video.save
+      end
+
+      it "sets the value" do
+        video.genres.should eq([ "horror", "scifi" ])
+      end
+
+      it "persists the value" do
+        video.reload.genres.should eq([ "horror", "scifi" ])
+      end
+
+      context "when reloading the parent" do
+
+        let!(:loaded_person) do
+          Person.find(person.id)
+        end
+
+        let!(:loaded_video) do
+          loaded_person.videos.find(video.id)
+        end
+
+        context "when writing a new array value" do
+
+          before do
+            loaded_video.genres = [ "comedy" ]
+            loaded_video.save
+          end
+
+          it "sets the new value" do
+            loaded_video.genres.should eq([ "comedy" ])
+          end
+
+          it "persists the new value" do
+            loaded_video.reload.genres.should eq([ "comedy" ])
+          end
+        end
+      end
+    end
+  end
 end
