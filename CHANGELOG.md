@@ -43,7 +43,12 @@ For instructions on upgrading to newer versions, visit
 * \#1335 Don't add id sorting criteria to first/last is there is already
   sorting options on the criteria.
 
-## 2.4.1 \[ In Development \] \[ Branch: 2.4.0-stable \]
+## 2.4.2 \[ In Development \] \[ Branch: 2.4.0-stable \]
+
+* \#1590 Allow proper serialization of boolean values in criteria where the
+  field is nested inside an array.
+
+## 2.4.1
 
 ### Resolved Issues
 
