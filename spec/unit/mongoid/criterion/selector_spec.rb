@@ -6,6 +6,14 @@ describe Mongoid::Criterion::Selector do
     stub(:type => Integer, :localized? => false)
   end
 
+  let(:klass) do
+    Class.new
+  end
+
+  let(:selector) do
+    Mongoid::Criterion::Selector.new(klass)
+  end
+
   describe "#initialize" do
 
     let(:klass) do
@@ -23,14 +31,6 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#[]=" do
-
-    let(:klass) do
-      Class.new
-    end
-
-    let(:selector) do
-      Mongoid::Criterion::Selector.new(klass)
-    end
 
     it "should store the values provided" do
       klass.stubs(:fields).returns({})
@@ -91,15 +91,6 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#update" do
-
-    let(:klass) do
-      Class.new
-    end
-
-    let(:selector) do
-      Mongoid::Criterion::Selector.new(klass)
-    end
-
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
@@ -110,15 +101,6 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#merge!" do
-
-    let(:klass) do
-      Class.new
-    end
-
-    let(:selector) do
-      Mongoid::Criterion::Selector.new(klass)
-    end
-
     it "should typecast values when possible" do
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
@@ -129,13 +111,37 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#try_to_typecast" do
+    context "when the key is $or or $and" do
+      let(:value) { { "age" => "45"  } }
 
-    let(:klass) do
-      Class.new
-    end
+      before do
+        klass.stubs(:fields).returns({})
+        klass.stubs(:aliased_fields).returns({})
+      end
 
-    let(:selector) do
-      Mongoid::Criterion::Selector.new(klass)
+      context "when the value is not an array" do
+        it "returns the value" do
+          selector.expects(:typecast_value_for).with(field, value["age"]).never
+          selector.send(:try_to_typecast, "$or", value).should == value
+        end
+      end
+
+      context "when the value is an array containing hashes" do
+        context "when the keys are not declared" do
+          it "returns the array" do
+            selector.expects(:typecast_value_for).with(field, value["time"]).never
+            selector.send(:try_to_typecast, "$or", [value]).should == [value]
+          end
+        end
+
+        context "when the keys are declared" do
+          it "returns the typecasted array" do
+            klass.stubs(:fields).returns({"age" => field})
+            field.expects(:selection).with("45").returns(45).once
+            selector.send(:try_to_typecast, "$or", [value]).should == ["age" => 45]
+          end
+        end
+      end
     end
 
     context "when the key is not a declared field" do
@@ -154,6 +160,59 @@ describe Mongoid::Criterion::Selector do
         selector.expects(:typecast_value_for).with(field, "45")
         selector.send(:try_to_typecast, "age", "45")
       end
+    end
+  end
+
+  describe "#proper_and_or_value" do
+    before do
+      klass.stubs(:fields).returns({})
+      klass.stubs(:aliased_fields).returns({})
+    end
+
+    context "when the key is not $or or $and" do
+      it "returns false" do
+        selector.send(:proper_and_or_value?, "fubar", nil).should be_false
+      end
+    end
+
+    context "when the key is $or or $and" do
+      context "when the value is not an array" do
+        it "returns false" do
+          selector.send(:proper_and_or_value?, "$or", nil).should be_false
+        end
+      end
+
+      context "when the value is an array" do
+        context "when the entries are no hashes" do
+          it "returns false" do
+            selector.send(:proper_and_or_value?, "$or", [nil]).should be_false
+          end
+        end
+
+        context "when the array is empty" do
+          it "returns true" do
+            selector.send(:proper_and_or_value?, "$or", []).should be_true
+          end
+        end
+
+        context "when the entries are hashes" do
+          it "returns true" do
+            selector.send(:proper_and_or_value?, "$or", [{}]).should be_true
+          end
+        end
+      end
+    end
+  end
+
+  describe "#handle_and_or_value" do
+    before do
+      klass.stubs(:fields).returns({})
+      klass.stubs(:aliased_fields).returns({})
+    end
+
+    it "tries to typecast every entry" do
+      selector.expects(:try_to_typecast).with("age", "45").once
+      selector.send(:handle_and_or_value, [{"age" => "45"}])
     end
   end
 
