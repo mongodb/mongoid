@@ -597,6 +597,24 @@ describe Mongoid::Criterion::Inclusion do
           criteria.selector.should eq({ :service_area => { "$ne" => true }})
         end
       end
+
+      context "when using matches on an existing field" do
+
+        context "when the field is an array" do
+
+          let(:criteria) do
+            Person.where(:aliases.matches => {
+              :verified => { "$ne" => true }
+            })
+          end
+
+          it "properly typecasts the boolean values" do
+            criteria.selector.should eq(
+              { :aliases => { "$elemMatch" => { :verified => { "$ne" => true }}}}
+            )
+          end
+        end
+      end
     end
 
     context "when provided a hash" do

@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1590 Allow proper serialization of boolean values in criteria where the
+  field is nested inside an array.
+
 ## 2.4.1
 
 ### Resolved Issues
