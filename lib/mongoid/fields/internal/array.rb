@@ -13,19 +13,20 @@ module Mongoid #:nodoc:
         #   field.add_atomic_changes(doc, "key", {}, [], [])
         #
         # @param [ Document ] document The document to add to.
-        # @param [ String ] key The name of the field.
+        # @param [ String ] name The name of the field.
+        # @param [ String ] key The atomic location of the field.
         # @param [ Hash ] mods The current modifications.
         # @param [ Array ] new The new elements to add.
         # @param [ Array ] old The old elements getting removed.
         #
         # @since 2.4.0
-        def add_atomic_changes(document, key, mods, new, old)
+        def add_atomic_changes(document, name, key, mods, new, old)
           pushes = (new || []) - (old || [])
           pulls = (old || []) - (new || [])
           if old.nil?
             mods[key] = pushes
           elsif !pushes.empty? && !pulls.empty?
-            mods[key] = document.attributes[key]
+            mods[key] = document.attributes[name]
           elsif !pushes.empty?
             document.atomic_array_pushes[key] = pushes
           elsif !pulls.empty?

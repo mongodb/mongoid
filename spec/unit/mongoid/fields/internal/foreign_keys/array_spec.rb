@@ -42,7 +42,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
 
       before do
         field.add_atomic_changes(
-          person, "preference_ids", mods, [ preference_three.id ], [ preference_two.id ]
+          person, "preference_ids", "preference_ids", mods, [ preference_three.id ], [ preference_two.id ]
         )
       end
 
