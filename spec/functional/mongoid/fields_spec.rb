@@ -225,6 +225,22 @@ describe Mongoid::Fields do
           product.reload.stores.should eq([ "kadewe", nil ])
         end
       end
+
+      context "when reversing the array values" do
+
+        before do
+          product.stores = [ "karstadt", "kadewe" ]
+          product.save
+        end
+
+        it "reverses the values" do
+          product.stores.should eq([ "karstadt", "kadewe" ])
+        end
+
+        it "persists the changes" do
+          product.reload.stores.should eq([ "karstadt", "kadewe" ])
+        end
+      end
     end
 
     context "when a field is localized" do

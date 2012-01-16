@@ -45,10 +45,13 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.4.2 \[ In Development \] \[ Branch: 2.4.0-stable \]
 
+* \#1600 Uniqueness validation no longer errors when provided a relation.
+
+* \#1597 Fix the ability to change the order of array fields with the same
+  elements.
+
 * \#1590 Allow proper serialization of boolean values in criteria where the
   field is nested inside an array.
-
-* \#1600 Uniqueness validation no longer errors when provided a relation.
 
 ## 2.4.1
 
