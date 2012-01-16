@@ -3,19 +3,20 @@ require 'spec_helper'
 # Generators are not automatically loaded by Rails
 require 'rails/generators/mongoid/config/config_generator'
 
-module Rails
-  class Application
-  end
-end
-module MyApp
-  class Application < Rails::Application
-  end
-end
-
 describe Mongoid::Generators::ConfigGenerator do
+
+  module Rails
+    class Application
+    end
+  end
+
+  module MyApp
+    class Application < Rails::Application
+    end
+  end
+
   # Tell the generator where to put its output (what it thinks of as Rails.root)
   destination File.expand_path("../../../../../../tmp", __FILE__)
-
 
   before do
     prepare_destination

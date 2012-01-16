@@ -31,6 +31,7 @@ module Mongoid #:nodoc
     option :raise_not_found_error, :default => true
     option :skip_version_check, :default => false
     option :time_zone, :default => nil
+    option :use_activesupport_time_zone, :default => true
     option :use_utc, :default => false
 
     # Get any extra databases that have been configured.
@@ -137,23 +138,6 @@ module Mongoid #:nodoc
         collection.drop if collection.name !~ /system/
       end
     end
-
-    # Sets whether the times returned from the database use the ruby or
-    # the ActiveSupport time zone.
-    #
-    # @note If you omit this setting, then times will use the ruby time zone.
-    #
-    # @example Set the time zone config.
-    #   Config.use_activesupport_time_zone = true
-    #
-    # @param [ true, false ] value Whether to use Active Support time zones.
-    #
-    # @return [ true, false ] The supplied value or false if nil.
-    def use_activesupport_time_zone=(value)
-      @use_activesupport_time_zone = value || false
-    end
-    attr_reader :use_activesupport_time_zone
-    alias_method :use_activesupport_time_zone?, :use_activesupport_time_zone
 
     # Sets the Mongo::DB master database to be used. If the object trying to be
     # set is not a valid +Mongo::DB+, then an error will be raised.

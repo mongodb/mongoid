@@ -105,4 +105,11 @@ describe Mongoid::Config do
       end
     end
   end
+
+  describe "#use_activesupport_time_zone" do
+
+    it "defaults to true" do
+      described_class.use_activesupport_time_zone.should be_true
+    end
+  end
 end

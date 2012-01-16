@@ -85,7 +85,7 @@ module Mongoid #:nodoc:
         #
         # @since 1.0.0
         def convert_to_time(value)
-          time = Mongoid::Config.use_activesupport_time_zone? ? ::Time.zone : ::Time
+          time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
           case value
             when ::String
               time.parse(value)

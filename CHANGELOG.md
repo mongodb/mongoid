@@ -25,6 +25,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1484 `Model#has_attribute?` now behaves the same as Active Record.
 
+* \#1475 Active support's time zone is now used by default in time
+  serialization if it is defined.
+
 * \#1342 `Model.find` and `model.relation.find` now only take a single or
   multiple ids. The first/last/all with a conditions hash has been removed.
 
