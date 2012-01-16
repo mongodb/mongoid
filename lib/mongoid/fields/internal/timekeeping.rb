@@ -67,8 +67,7 @@ module Mongoid #:nodoc:
         def serialize(object)
           return nil if object.blank?
           begin
-            time = convert_to_time(object)
-            strip_milliseconds(time).utc
+            convert_to_time(object).utc
           rescue ArgumentError
             raise Errors::InvalidTime.new(object)
           end
@@ -98,22 +97,6 @@ module Mongoid #:nodoc:
             else
               value
           end
-        end
-
-        # Strip the milliseconds off the time.
-        #
-        # @todo Durran: Why is this here? Still need time refactoring.
-        #
-        # @example Strip.
-        #   Time.strip_millseconds(Time.now)
-        #
-        # @param [ Time ] time The time to strip.
-        #
-        # @return [ Time ] The time without millis.
-        #
-        # @since 2.1.0
-        def strip_milliseconds(time)
-          ::Time.at(time.to_i)
         end
       end
     end

@@ -25,6 +25,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1484 `Model#has_attribute?` now behaves the same as Active Record.
 
+* \#1471 Mongoid no longer strips any level of precision off of times.
+
 * \#1475 Active support's time zone is now used by default in time
   serialization if it is defined.
 
