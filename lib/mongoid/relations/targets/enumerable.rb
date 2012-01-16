@@ -365,7 +365,6 @@ module Mongoid #:nodoc:
         private
 
         def method_missing(name, *args, &block)
-          p "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           entries.send(name, *args, &block)
         end
       end
