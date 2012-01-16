@@ -151,8 +151,9 @@ module Mongoid #:nodoc:
             end
           else
             unloaded.each do |doc|
-              yield(doc)
-              loaded.push(added.delete_one(doc) || loaded.delete_one(doc) || doc)
+              document = added.delete_one(doc) || loaded.delete_one(doc) || doc
+              yield(document)
+              loaded.push(document)
             end
           end
           added.each do |doc|
@@ -364,6 +365,7 @@ module Mongoid #:nodoc:
         private
 
         def method_missing(name, *args, &block)
+          p "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
           entries.send(name, *args, &block)
         end
       end

@@ -636,6 +636,40 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#entries" do
+
+    let(:person) do
+      Person.create(:ssn => "543-98-1234")
+    end
+
+    let(:criteria) do
+      Post.where(:person_id => person.id)
+    end
+
+    let!(:enumerable) do
+      described_class.new(criteria)
+    end
+
+    context "when the added contains a persisted document" do
+
+      let!(:post) do
+        Post.create(:person_id => person.id)
+      end
+
+      before do
+        enumerable << post
+      end
+
+      let(:entries) do
+        enumerable.entries
+      end
+
+      it "yields to the in memory documents first" do
+        entries.first.should equal(post)
+      end
+    end
+  end
+
   describe "#first" do
 
     let(:person) do
