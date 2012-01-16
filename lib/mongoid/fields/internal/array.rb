@@ -31,6 +31,8 @@ module Mongoid #:nodoc:
             document.atomic_array_pushes[key] = pushes
           elsif !pulls.empty?
             document.atomic_array_pulls[key] = pulls
+          elsif new != old
+            mods[key] = new
           end
         end
 
