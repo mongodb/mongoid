@@ -144,12 +144,12 @@ module Mongoid #:nodoc:
       #
       # @since 2.4.1
       def eager_load(docs)
-        parent_ids = docs.map(&:id)
         criteria.inclusions.reject! do |metadata|
-          if metadata.macro == :belongs_to
-            child_ids = load_ids(metadata.foreign_key)
+          if metadata.stores_foreign_key?
+            child_ids = load_ids(metadata.foreign_key).flatten
             metadata.eager_load(child_ids)
           else
+            parent_ids = docs.map(&:id)
             metadata.eager_load(parent_ids)
           end
         end

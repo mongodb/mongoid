@@ -1504,14 +1504,47 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
   describe ".eager_load" do
 
-    let(:metadata) do
-      Person.relations["preferences"]
+    before do
+      Mongoid.identity_map_enabled = true
     end
 
-    it "raises an error" do
-      expect {
-        described_class.eager_load(metadata, Person.all)
-      }.to raise_error(Mongoid::Errors::EagerLoad)
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let!(:person) do
+        Person.create(:ssn => "243-12-5243")
+      end
+
+      let!(:preference) do
+        person.preferences.create(:name => "testing")
+      end
+
+      let(:metadata) do
+        Person.relations["preferences"]
+      end
+
+      let(:ids) do
+        [ preference.id ]
+      end
+
+      let!(:eager) do
+        described_class.eager_load(metadata, ids)
+      end
+
+      let(:map) do
+        Mongoid::IdentityMap.get(Preference, ids)
+      end
+
+      it "returns the appropriate criteria" do
+        eager.selector.should eq({ :_id => { "$in" => ids }})
+      end
+
+      it "puts the documents in the identity map" do
+        map.should eq([ preference ])
+      end
     end
   end
 

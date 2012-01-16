@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1348 Eager loading is now supported on many-to-many relations.
+
 ### Major Changes
 
 * `Model.defaults` no longer exists. You may get all defaults with a

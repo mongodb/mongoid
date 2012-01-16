@@ -244,13 +244,15 @@ module Mongoid # :nodoc:
           #   Proxy.eager_load(metadata, criteria)
           #
           # @param [ Metadata ] metadata The relation metadata.
-          # @param [ Criteria ] criteria The criteria being used.
+          # @param [ Array<Object> ] ids The ids of the documents to load.
           #
           # @return [ Criteria ] The criteria to eager load the relation.
           #
           # @since 2.2.0
-          def eager_load(metadata, criteria)
-            raise Errors::EagerLoad.new(metadata.name)
+          def eager_load(metadata, ids)
+            metadata.klass.any_in(:_id => ids).each do |doc|
+              IdentityMap.set(doc)
+            end
           end
 
           # Returns true if the relation is an embedded one. In this case

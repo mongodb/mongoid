@@ -408,6 +408,137 @@ describe Mongoid::Criterion::Inclusion do
       Person.create(:ssn => "123-12-1211")
     end
 
+    context "when including a has and belongs to many" do
+
+      let!(:preference_one) do
+        person.preferences.create(:name => "one")
+      end
+
+      let!(:preference_two) do
+        person.preferences.create(:name => "two")
+      end
+
+      context "when the criteria has no options" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:preferences).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+      end
+
+      context "when calling first on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:preferences).first
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+      end
+
+      context "when calling last on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:preferences).last
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+      end
+
+      context "when the criteria has limiting options" do
+
+        let!(:person_two) do
+          Person.create(:ssn => "123-43-2123")
+        end
+
+        let!(:preference_three) do
+          person_two.preferences.create(:name => "three")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:preferences).asc(:_id).limit(1).entries
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+
+        it "does not insert the third preference into the identity map" do
+          preference_map[preference_three.id].should be_nil
+        end
+      end
+    end
+
     context "when including a has many" do
 
       let!(:post_one) do

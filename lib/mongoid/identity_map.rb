@@ -17,7 +17,14 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def get(klass, identifier)
       return nil unless Mongoid.identity_map_enabled? && klass
-      documents_for(klass)[identifier]
+      if identifier.is_a?(::Array)
+        documents = documents_for(klass)
+        identifier.map do |id|
+          documents[id] || (return nil)
+        end
+      else
+        documents_for(klass)[identifier]
+      end
     end
 
     # Remove the document from the identity map.

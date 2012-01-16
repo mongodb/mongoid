@@ -8,12 +8,16 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
 
   describe "#build" do
 
+    let(:criteria) do
+      stub(:klass => Preference, :selector => { "_id" => { "$in" => [] }})
+    end
+
     let(:metadata) do
       stub_everything(
-        :klass => Post,
-        :name => :posts,
-        :foreign_key => "post_ids",
-        :criteria => [ post ]
+        :klass => Preference,
+        :name => :preferences,
+        :foreign_key => "preference_ids",
+        :criteria => criteria
       )
     end
 
@@ -31,7 +35,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         [ object_id ]
       end
 
-      let(:post) do
+      let(:preference) do
         stub
       end
 
@@ -40,7 +44,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       it "sets the documents" do
-        documents.should == [ post ]
+        documents.should == criteria
       end
     end
 
@@ -49,11 +53,11 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       let(:metadata) do
         stub_everything(
           :klass => Post,
-          :name => :posts,
+          :name => :preferences,
           :foreign_key => "person_id",
           :inverse_klass => Person,
           :order => :rating.asc,
-          :criteria => [ post ]
+          :criteria => criteria
         )
       end
 
@@ -65,16 +69,16 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         [ object_id ]
       end
 
-      let(:post) do
+      let(:preference) do
         stub
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "ordered by specified filed" do
-        @documents.should == [ post ]
+        documents.should == criteria
       end
     end
 
@@ -86,7 +90,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
           [ Post.new ]
         end
 
-        let(:post) do
+        let(:preference) do
           stub
         end
 
@@ -104,9 +108,9 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         let(:metadata) do
           stub_everything(
             :klass => Post,
-            :name => :posts,
-            :foreign_key => "post_ids",
-            :criteria => nil
+            :name => :preferences,
+            :foreign_key => "preference_ids",
+            :criteria => criteria
           )
         end
 
@@ -119,7 +123,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
 
         it "returns the object" do
-          documents.should be_nil
+          documents.should eq(criteria)
         end
       end
     end

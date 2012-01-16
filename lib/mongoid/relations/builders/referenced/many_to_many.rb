@@ -16,7 +16,9 @@ module Mongoid # :nodoc:
           # @return [ Array<Document> ] The documents.
           def build(type = nil)
             return object.try(:dup) unless query?
-            metadata.criteria(object || [])
+            ids = object || []
+            crit = metadata.criteria(ids)
+            IdentityMap.get(crit.klass, ids) || crit
           end
 
           # Do we need to perform a database query? It will be so if the object we

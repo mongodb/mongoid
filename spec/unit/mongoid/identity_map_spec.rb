@@ -84,6 +84,39 @@ describe Mongoid::IdentityMap do
         end
       end
 
+      context "when getting by an array of ids" do
+
+        context "when the document exists in the identity map" do
+
+          before do
+            identity_map.set(person)
+          end
+
+          let(:get) do
+            identity_map.get(Person, [ person.id ])
+          end
+
+          it "returns the matching documents" do
+            get.should eq([ person ])
+          end
+        end
+
+        context "when any id is not found in the map" do
+
+          before do
+            identity_map.set(person)
+          end
+
+          let(:get) do
+            identity_map.get(Person, [ person.id, BSON::ObjectId.new ])
+          end
+
+          it "returns nil" do
+            get.should be_nil
+          end
+        end
+      end
+
       context "when getting by selector" do
 
         let!(:post_one) do

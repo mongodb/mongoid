@@ -300,7 +300,7 @@ Benchmark.bm do |bm|
     end
   end
 
-  [ 1000, 10000].each do |i|
+  [ 1000, 10000 ].each do |i|
 
     GC.start
 
@@ -308,6 +308,7 @@ Benchmark.bm do |bm|
 
       Person.create(:title => "#{n}").tap do |person|
         person.posts.create(:title => "#{n}")
+        person.preferences.create(:name => "#{n}")
       end
     end
 
@@ -347,6 +348,27 @@ Benchmark.bm do |bm|
       bm.report("#each [ eager ]  ") do
         Person.includes(:posts).each do |person|
           person.posts.each { |post| post.title }
+        end
+      end
+
+      Mongoid.identity_map_enabled = false
+    end
+
+    puts "\n[ Iterate with association load n-n ]"
+
+    Mongoid.unit_of_work do
+
+      bm.report("#each [ normal ] ") do
+        Person.all.each do |person|
+          person.preferences.each { |preference| preference.name }
+        end
+      end
+
+      Mongoid.identity_map_enabled = true
+
+      bm.report("#each [ eager ]  ") do
+        Person.includes(:preferences).each do |person|
+          person.preferences.each { |preference| preference.name }
         end
       end
 
