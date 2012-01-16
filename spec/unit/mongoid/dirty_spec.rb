@@ -621,12 +621,8 @@ describe Mongoid::Dirty do
             person.setters
           end
 
-          it "does not contain array changes in the setters" do
-            setters.should eq({})
-          end
-
-          it "adds to the atomic array pulls" do
-            person.atomic_array_pulls.should eq({ "aliases" => [ "007" ] })
+          it "contains array changes in the setters" do
+            setters.should eq({ "aliases" => [] })
           end
         end
 
@@ -640,12 +636,8 @@ describe Mongoid::Dirty do
             person.setters
           end
 
-          it "does not contain array changes in the setters" do
-            setters.should eq({})
-          end
-
-          it "adds to the atomic array pushes" do
-            person.atomic_array_pushes.should eq({ "aliases" => [ "008" ] })
+          it "contains array changes in the setters" do
+            setters.should eq({ "aliases" => [ "007", "008" ] })
           end
         end
 
