@@ -176,7 +176,7 @@ module Mongoid #:nodoc:
       attr = name.to_s
       return super unless attributes.has_key?(attr.reader)
       if attr.writer?
-        write_attribute(attr.reader, (args.size > 1) ? args : args.first)
+        write_attribute(attr.reader, args.first)
       else
         read_attribute(attr.reader)
       end
