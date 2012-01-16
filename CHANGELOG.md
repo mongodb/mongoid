@@ -48,6 +48,8 @@ For instructions on upgrading to newer versions, visit
 * \#1590 Allow proper serialization of boolean values in criteria where the
   field is nested inside an array.
 
+* \#1600 Uniqueness validation no longer errors when provided a relation.
+
 ## 2.4.1
 
 ### Resolved Issues

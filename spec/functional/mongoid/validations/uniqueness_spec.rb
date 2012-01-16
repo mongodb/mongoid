@@ -12,6 +12,32 @@ describe Mongoid::Validations::UniquenessValidator do
 
       context "when the document contains no compound key" do
 
+        context "when validating a relation" do
+
+          before do
+            Word.validates_uniqueness_of :dictionary
+          end
+
+          after do
+            Word.reset_callbacks(:validate)
+          end
+
+          context "when the attribute id is unique" do
+
+            let(:dictionary) do
+              Dictionary.create
+            end
+
+            let(:word) do
+              Word.new(:dictionary => dictionary)
+            end
+
+            it "returns true" do
+              word.should be_valid
+            end
+          end
+        end
+
         context "when no scope is provided" do
 
           before do

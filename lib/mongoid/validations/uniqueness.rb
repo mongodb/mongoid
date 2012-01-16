@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def validate_each(document, attribute, value)
-        return unless document.send("#{attribute}_changed?")
+        return unless document.send("attribute_changed?", attribute.to_s)
         if document.embedded?
           return if skip_validation?(document)
           relation = document._parent.send(document.metadata.name)
