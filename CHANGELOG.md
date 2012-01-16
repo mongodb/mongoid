@@ -47,6 +47,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1600 Uniqueness validation no longer errors when provided a relation.
 
+* \#1599 Make sure enumerable targets yield to what is in memory first when
+  performing #each, not always the unloaded first.
+
 * \#1597 Fix the ability to change the order of array fields with the same
   elements.
 
