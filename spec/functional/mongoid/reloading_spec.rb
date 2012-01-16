@@ -127,6 +127,22 @@ describe Mongoid::Reloading do
           it "reloads the reference on the parent" do
             person.addresses.first.should eq(reloaded)
           end
+
+          it "obeys fields selections from the default scope" do
+            person_ds = PersonDs.create
+            person_ds.addresses.create(:street => "Main St", :number => 1)
+
+            person.reload.addresses.should_not == []
+            person_ds.reload.addresses.should  == []
+          end
+
+          it "reloads all fields when called via reload_unscoped" do
+            person_ds = PersonDs.create
+            person_ds.addresses.create(:street => "Main St", :number => 1)
+
+            person_ds.reload_unscoped.addresses.should_not == []
+          end
+
         end
 
         context "when the relation is an embeds one" do

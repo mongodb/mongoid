@@ -420,26 +420,26 @@ describe Mongoid::Criterion::Inclusion do
 
       context "when the criteria has no options" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
-        let!(:criteria) do
-          Person.includes(:posts).entries
-        end
-
-        it "returns the correct documents" do
-          criteria.should eq([ person ])
-        end
-
-        it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
-        end
+      before do
+        Mongoid::IdentityMap.clear
       end
+
+      let!(:criteria) do
+        Person.includes(:posts).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+      end
+    end
 
       context "when calling first on the criteria" do
 
@@ -535,41 +535,41 @@ describe Mongoid::Criterion::Inclusion do
 
       context "when the criteria has no options" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
+      before do
+        Mongoid::IdentityMap.clear
+      end
 
-        let!(:criteria) do
-          Person.includes(:game).entries
-        end
+      let!(:criteria) do
+        Person.includes(:game).entries
+      end
 
-        it "returns the correct documents" do
-          criteria.should eq([ person ])
-        end
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
 
         it "deletes the replaced document from the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+          Mongoid::IdentityMap[Game.collection_name][game_one.id].should eq(game_one)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+      end
+
+      context "when asking from map or db" do
+
+        let(:in_map) do
+          Mongoid::IdentityMap[Game.collection_name][game_two.id]
         end
 
-        it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+        let(:game) do
+          Game.where("person_id" => person.id).from_map_or_db
         end
 
-        context "when asking from map or db" do
-
-          let(:in_map) do
-            Mongoid::IdentityMap[Game.collection_name][game_two.id]
-          end
-
-          let(:game) do
-            Game.where("person_id" => person.id).from_map_or_db
-          end
-
-          it "returns the document from the map" do
-            game.should equal(in_map)
-          end
+        it "returns the document from the map" do
+          game.should equal(in_map)
         end
       end
+    end
 
       context "when the criteria has limiting options" do
 
@@ -623,22 +623,22 @@ describe Mongoid::Criterion::Inclusion do
 
       context "when providing no options" do
 
-        let!(:criteria) do
-          Game.includes(:person).entries
-        end
-
-        it "returns the correct documents" do
-          criteria.should eq([ game_one, game_two ])
-        end
-
-        it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
-        end
-
-        it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
-        end
+      let!(:criteria) do
+        Game.includes(:person).entries
       end
+
+      it "returns the correct documents" do
+        criteria.should eq([ game_one, game_two ])
+      end
+
+      it "inserts the first document into the identity map" do
+        Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+      end
+
+      it "inserts the second document into the identity map" do
+        Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
+      end
+    end
 
       context "when the criteria has limiting options" do
 
@@ -699,7 +699,7 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "removes the first has one document from the identity map" do
-        Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+        Mongoid::IdentityMap[Game.collection_name][game_one.id].should eq(game_one)
       end
 
       it "inserts the second has one document into the identity map" do

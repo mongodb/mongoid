@@ -145,8 +145,8 @@ describe Mongoid::Config do
 
   describe ".load!" do
 
-    before(:all) do
-      Object.send(:remove_const, :Rails) if defined?(Rails)
+    before(:each) do
+      Rails.stubs(:env).returns('test')
     end
 
     before do

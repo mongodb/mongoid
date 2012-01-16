@@ -17,7 +17,12 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def get(klass, identifier)
       return nil unless Mongoid.identity_map_enabled? && klass
-      documents_for(klass)[identifier]
+
+      return documents_for(klass)[identifier] unless identifier.is_a?(Hash)
+      return nil unless (map_ids = documents_for(klass)[identifier])
+
+      return map_ids.map{|mid| documents_for(klass)[mid] } if map_ids.is_a?(Array)
+      documents_for(klass)[map_ids]
     end
 
     # Remove the document from the identity map.
@@ -31,6 +36,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def remove(document)
+      # FIXME this doesn't take stores via selector into account
       return nil unless Mongoid.identity_map_enabled? && document && document.id
       documents_for(document.class).delete(document.id)
     end
@@ -47,7 +53,27 @@ module Mongoid #:nodoc:
     # @since 2.1.0
     def set(document)
       return nil unless Mongoid.identity_map_enabled? && document && document.id
+      if (old_doc = documents_for(document.class)[document.id])
+        log_reset_warning(old_doc, document)
+        return old_doc
+      end
       documents_for(document.class)[document.id] = document
+    end
+
+    # Logs a warning if an instance is set where it already existed.
+    #
+    # @example Log a warning.
+    #   identity_map.log_reset_warning(old_doc, new_doc)
+    #
+    # @param [ Document ] document The old document.
+    # @param [ Document ] document The new document.
+    #
+    # @since 2.?.?
+    def log_reset_warning(old_doc, document)
+      return unless Mongoid.logger
+      warning = "MONGOID An attempt to reset the #{old_doc.class.name} instance #{old_doc.id} in the IdentityMap has been canceled. " +
+                "Object_id new: #{document.object_id}, old: #{old_doc.object_id}."
+      Mongoid.logger.warn(warning)
     end
 
     # Set a document in the identity map for the provided selector.
@@ -62,7 +88,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def set_many(document, selector)
-      (documents_for(document.class)[selector] ||= []).push(document)
+      (documents_for(document.class)[selector] ||= []).push(document.id)
+      set(document)
     end
 
     # Set a document in the identity map for the provided selector.
@@ -77,7 +104,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def set_one(document, selector)
-     documents_for(document.class)[selector] = document
+      documents_for(document.class)[selector] = document.id
+      set(document)
     end
 
     private

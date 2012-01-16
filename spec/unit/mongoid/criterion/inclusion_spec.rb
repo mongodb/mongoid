@@ -299,9 +299,10 @@ describe Mongoid::Criterion::Inclusion do
           criteria.entries.should eq([ person ])
         end
 
-        it "puts the related documents in the identity map" do
+        it "puts the related document in the identity map" do
           criteria.entries
-          map[Post.collection_name][{"person_id" => person.id}].should eq([ post ])
+          map[Post.collection_name][{"person_id" => person.id}].should eq([ post.id ])
+          map[Post.collection_name][post.id].should eq(post)
         end
       end
 
@@ -340,7 +341,8 @@ describe Mongoid::Criterion::Inclusion do
 
         it "puts the related documents in the identity map" do
           criteria.entries
-          map[Post.collection_name][{"person_id" => person.id}].should eq([ post ])
+          map[Post.collection_name][{"person_id" => person.id}].should eq([ post.id ])
+          map[Post.collection_name][post.id].should eq(post)
         end
       end
     end
@@ -399,7 +401,8 @@ describe Mongoid::Criterion::Inclusion do
 
         it "puts the related documents in the identity map" do
           criteria.entries
-          map[Game.collection_name][{"person_id" => person.id}].should eq(game)
+          map[Game.collection_name][{"person_id" => person.id}].should eq(game.id)
+          map[Game.collection_name][game.id].should eq(game)
         end
       end
 
@@ -438,7 +441,8 @@ describe Mongoid::Criterion::Inclusion do
 
         it "puts the related documents in the identity map" do
           criteria.entries
-          map[Game.collection_name][{"person_id" => person.id}].should eq(game)
+          map[Game.collection_name][{"person_id" => person.id}].should eq(game.id)
+          map[Game.collection_name][game.id].should eq(game)
         end
       end
     end

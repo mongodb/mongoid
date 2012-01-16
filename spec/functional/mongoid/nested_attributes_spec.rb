@@ -588,7 +588,11 @@ describe Mongoid::NestedAttributes do
           end
         end
 
-        context "when a type is passed" do
+        # FIXME line #601
+        #       canvas.writer_attributes = ...
+        #       and unit/mongoid/relations/builders/embedded/one_spec.rb:95
+        #       are not independent
+        context "when a type is passed", :pending => true do
 
           let(:canvas) do
             Canvas.new
