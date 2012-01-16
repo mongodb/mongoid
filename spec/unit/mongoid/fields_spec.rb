@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Fields do
 
+  before(:all) do
+    Mongoid.use_activesupport_time_zone = false
+  end
+
   describe "#defaults" do
 
     context "with defaults specified as a non-primitive" do
