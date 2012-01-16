@@ -28,7 +28,7 @@ describe Mongoid::Fields::Internal::Array do
         end
 
         it "adds the current to the modifications" do
-          mods["aliases"].should eq([ "007", "008" ])
+          mods["aliases"].should eq([ "008" ])
         end
       end
 
@@ -42,7 +42,7 @@ describe Mongoid::Fields::Internal::Array do
         end
 
         it "adds the current to the modifications" do
-          mods["aliases"].should eq([ "007", nil ])
+          mods["aliases"].should eq([ nil ])
         end
       end
     end

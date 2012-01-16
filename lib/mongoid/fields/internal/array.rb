@@ -21,19 +21,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.4.0
         def add_atomic_changes(document, name, key, mods, new, old)
-          pushes = (new || []) - (old || [])
-          pulls = (old || []) - (new || [])
-          if old.nil?
-            mods[key] = pushes
-          elsif !pushes.empty? && !pulls.empty?
-            mods[key] = document.attributes[name]
-          elsif !pushes.empty?
-            document.atomic_array_pushes[key] = pushes
-          elsif !pulls.empty?
-            document.atomic_array_pulls[key] = pulls
-          elsif new != old
-            mods[key] = new
-          end
+          mods[key] = new
         end
 
         # Array fields are resizable.
