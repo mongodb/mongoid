@@ -32,6 +32,10 @@ module Mongoid #:nodoc:
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :localize, :name, :options
 
+      def normalized_name
+        name.to_sym
+      end
+
       # Get the constraint from the metadata once.
       #
       # @example Get the constraint.

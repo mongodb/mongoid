@@ -56,6 +56,10 @@ module Mongoid #:nodoc:
         def serialize(object, previous={})
           previous.merge ::I18n.locale.to_s => object.try(:to_s)
         end
+
+        def normalized_name
+          :"#{name}.#{::I18n.locale}"
+        end
       end
     end
   end
