@@ -52,6 +52,8 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.4.2 \[ In Development \] \[ Branch: 2.4.0-stable \]
 
+* \#1602 Preserve structure of $and and $or queries when typecasting.
+
 * \#1600 Uniqueness validation no longer errors when provided a relation.
 
 * \#1599 Make sure enumerable targets yield to what is in memory first when
