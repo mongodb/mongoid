@@ -208,11 +208,18 @@ describe Mongoid::Criterion::Selector do
     before do
       klass.stubs(:fields).returns({})
       klass.stubs(:aliased_fields).returns({})
+      selector.expects(:try_to_typecast).with("age", "45").once.returns("45")
+      selector.expects(:try_to_typecast).with("title", "Chief Visionary").once.returns("Chief Visionary")
     end
 
+    let(:values) { [{ "age" => "45", "title" => "Chief Visionary" }] }
+
     it "tries to typecast every entry" do
-      selector.expects(:try_to_typecast).with("age", "45").once
-      selector.send(:handle_and_or_value, [{"age" => "45"}])
+      selector.send(:handle_and_or_value, values)
+    end
+
+    it "preserves the structure" do
+      selector.send(:handle_and_or_value, values).should eq(values)
     end
   end
 
