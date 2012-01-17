@@ -26,10 +26,6 @@ describe Mongoid::Fields::Internal::DateTime do
     it "converts to a datetime" do
       date_time.should be_kind_of(DateTime)
     end
-
-    it "converts from utc" do
-      date_time.zone.should_not eq("+00:00")
-    end
   end
 
   describe "#selection" do
