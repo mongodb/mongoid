@@ -87,10 +87,10 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if it does, false if not.
     #
     # @since 1.0.0
-    def respond_to?(*args)
+    def respond_to?(name, include_private=false)
       (Mongoid.allow_dynamic_fields &&
         attributes &&
-        attributes.has_key?(args.first.to_s.reader)
+        attributes.has_key?(name.to_s.reader)
       ) || super
     end
 
