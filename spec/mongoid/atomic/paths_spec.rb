@@ -165,9 +165,12 @@ describe Mongoid::Atomic::Paths do
 
     context "when document embedded multiple levels" do
 
+      let(:other) do
+        Location.new
+      end
+
       before do
-        @other = Location.new
-        address.locations << [ @other, location ]
+        address.locations << [ other, location ]
         address.instance_variable_set(:@new_record, false)
         person.addresses << address
       end
@@ -235,9 +238,12 @@ describe Mongoid::Atomic::Paths do
 
     context "when document embedded multiple levels" do
 
+      let(:other) do
+        Location.new
+      end
+
       before do
-        @other = Location.new
-        address.locations << [ @other, location ]
+        address.locations << [ other, location ]
         address.instance_variable_set(:@new_record, false)
         person.addresses << address
       end

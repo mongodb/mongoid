@@ -1406,7 +1406,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "deletes the document from the relation" do
-            # @todo: Durran:
             reloaded.related.should be_empty
           end
 

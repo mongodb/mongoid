@@ -721,8 +721,8 @@ describe Mongoid::Document do
 
     context "when defining collection" do
 
-      before do
-        @model = Class.new do
+      let(:model) do
+        Class.new do
           include Mongoid::Document
           store_in :anonymous
           field :gender
@@ -730,7 +730,7 @@ describe Mongoid::Document do
       end
 
       it "allows the creation" do
-        Object.const_set "Anonymous", @model
+        Object.const_set "Anonymous", model
       end
     end
   end
@@ -743,68 +743,103 @@ describe Mongoid::Document do
       end
     end
 
-    %w{upcasting downcasting}.each do |ctx|
-      context ctx do
-        before(:all) do
-          if ctx == 'upcasting'
-            @klass = Manager
-            @to_become = Person
-          else
-            @klass = Person
-            @to_become = Manager
+    %w{upcasting downcasting}.each do |context|
+
+      context "when #{context}" do
+
+        if context == 'upcasting'
+
+          let(:klass) do
+            Manager
+          end
+
+          let(:to_become) do
+            Person
+          end
+        else
+
+          let(:klass) do
+            Person
+          end
+
+          let(:to_become) do
+            Manager
           end
         end
 
-        before(:each) do
-          @obj = @klass.new(:title => 'Sir')
+        let(:obj) do
+          klass.new(:title => 'Sir')
+        end
+
+        let(:became) do
+          obj.becomes(to_become)
         end
 
         it "copies attributes" do
-          became = @obj.becomes(@to_become)
           became.title.should == 'Sir'
         end
 
-        it "copies state" do
-          @obj.should be_new_record
-          became = @obj.becomes(@to_become)
-          became.should be_new_record
+        context "when the document is new" do
 
-          @obj.save
-          @obj.should_not be_new_record
-          became = @obj.becomes(@to_become)
-          became.should_not be_new_record
-
-          @obj.destroy
-          @obj.should be_destroyed
-          became = @obj.becomes(@to_become)
-          became.should be_destroyed
+          it "copies the state" do
+            became.should be_new_record
+          end
         end
 
-        it "copies errors" do
-          @obj.ssn = '$$$'
-          @obj.should_not be_valid
-          @obj.errors.should include(:ssn)
-          became = @obj.becomes(@to_become)
-          became.should_not be_valid
-          became.errors.should include(:ssn)
+        context "when the document is persisted" do
+
+          before do
+            obj.save
+          end
+
+          it "copies the state" do
+            became.should be_persisted
+          end
+        end
+
+        context "when the document is destroyed" do
+
+          before do
+            obj.destroy
+          end
+
+          it "copies the state" do
+            became.should be_destroyed
+          end
+        end
+
+        context "when the document is invalid" do
+
+          before do
+            obj.ssn = "$$$"
+            obj.valid?
+          end
+
+          it "copies the errors" do
+            became.errors.should include(:ssn)
+          end
         end
 
         it "sets the class type" do
-          became = @obj.becomes(@to_become)
-          became._type.should == @to_become.to_s
+          became._type.should == to_become.to_s
         end
 
         it "raises an error when inappropriate class is provided" do
-          lambda {@obj.becomes(String)}.should raise_error(ArgumentError)
+          expect {
+            obj.becomes(String)
+          }.to raise_error(ArgumentError)
         end
       end
     end
 
     context "upcasting to class with default attributes" do
 
+      let(:obj) do
+        Person.new(:title => 'Sir').becomes(Manager)
+      end
+
       it "applies default attributes" do
-        @obj = Person.new(:title => 'Sir').becomes(Manager)
-        @obj.level.should == 1
+        obj.level.should == 1
       end
     end
   end

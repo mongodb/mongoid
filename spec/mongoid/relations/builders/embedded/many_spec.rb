@@ -22,12 +22,12 @@ describe Mongoid::Relations::Builders::Embedded::Many do
         [ Address.new(:city => "London") ]
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "returns an array of documents" do
-        @documents.should == object
+        documents.should == object
       end
     end
 
@@ -41,12 +41,12 @@ describe Mongoid::Relations::Builders::Embedded::Many do
         []
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "returns an empty array" do
-        @documents.should == object
+        documents.should == object
       end
     end
 
@@ -60,12 +60,12 @@ describe Mongoid::Relations::Builders::Embedded::Many do
         described_class.new(nil, metadata, nil)
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "returns an empty array" do
-        @documents.should == []
+        documents.should == []
       end
     end
 
@@ -79,21 +79,21 @@ describe Mongoid::Relations::Builders::Embedded::Many do
         [ { "city" => "London" }, { "city" => "Shanghai" } ]
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "returns an array of documents" do
-        @documents.should be_a_kind_of(Array)
+        documents.should be_a_kind_of(Array)
       end
 
       it "creates the correct type of documents" do
-        @documents[0].should be_a_kind_of(Address)
+        documents[0].should be_a_kind_of(Address)
       end
 
       it "sets the object on the documents" do
-        @documents[0].city.should == "London"
-        @documents[1].city.should == "Shanghai"
+        documents[0].city.should == "London"
+        documents[1].city.should == "Shanghai"
       end
     end
 
@@ -110,22 +110,22 @@ describe Mongoid::Relations::Builders::Embedded::Many do
         ]
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "returns an array of documents" do
-        @documents.should be_a_kind_of(Array)
+        documents.should be_a_kind_of(Array)
       end
 
       it "creates the correct type of document" do
-        @documents[0].should be_a_kind_of(Circle)
-        @documents[1].should be_a_kind_of(Square)
+        documents[0].should be_a_kind_of(Circle)
+        documents[1].should be_a_kind_of(Square)
       end
 
       it "sets the object on the document" do
-        @documents[0].radius.should == 100
-        @documents[1].width.should == 50
+        documents[0].radius.should == 100
+        documents[1].width.should == 50
       end
     end
   end

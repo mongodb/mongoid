@@ -47,11 +47,14 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
         before do
           criteria.expects(:first).returns(person)
-          @document = builder.build
+        end
+
+        let!(:document) do
+          builder.build
         end
 
         it "sets the document" do
-          @document.should == person
+          document.should == person
         end
       end
 
@@ -69,11 +72,14 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
         before do
           criteria.expects(:first).returns(person)
-          @document = builder.build
+        end
+
+        let!(:document) do
+          builder.build
         end
 
         it "sets the document" do
-          @document.should == person
+          document.should == person
         end
       end
     end
@@ -84,12 +90,12 @@ describe Mongoid::Relations::Builders::Referenced::In do
         Person.new
       end
 
-      before do
-        @document = builder.build
+      let(:document) do
+        builder.build
       end
 
       it "returns the object" do
-        @document.should == object
+        document.should == object
       end
     end
   end

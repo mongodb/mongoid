@@ -22,12 +22,12 @@ describe Mongoid::Relations::Builders::Embedded::One do
         described_class.new(nil, metadata, nil)
       end
 
-      before do
-        @document = builder.build
+      let(:document) do
+        builder.build
       end
 
       it "returns nil" do
-        @document.should be_nil
+        document.should be_nil
       end
     end
 
@@ -41,12 +41,12 @@ describe Mongoid::Relations::Builders::Embedded::One do
         Name.new
       end
 
-      before do
-        @document = builder.build
+      let(:document) do
+        builder.build
       end
 
       it "returns the document" do
-        @document.should == object
+        document.should == object
       end
     end
 
@@ -60,16 +60,16 @@ describe Mongoid::Relations::Builders::Embedded::One do
         { "first_name" => "Corbin" }
       end
 
-      before do
-        @document = builder.build
+      let(:document) do
+        builder.build
       end
 
       it "creates the correct type of document" do
-        @document.should be_a_kind_of(Name)
+        document.should be_a_kind_of(Name)
       end
 
       it "sets the object on the document" do
-        @document.first_name.should == "Corbin"
+        document.first_name.should == "Corbin"
       end
     end
 

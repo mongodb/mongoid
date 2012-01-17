@@ -190,20 +190,24 @@ describe Mongoid::Fields::Internal::Date do
 
     context "when given a Date" do
 
-      before { @date = Date.today }
+      let(:date) do
+        Date.today
+      end
 
       it "converts to a utc time" do
-        field.serialize(@date).should == Time.utc(@date.year, @date.month, @date.day)
+        field.serialize(date).should == Time.utc(date.year, date.month, date.day)
       end
     end
 
     context "when given an Array" do
 
-      before { @array = [time.year, time.month, time.day] }
+      let(:array) do
+        [ time.year, time.month, time.day ]
+      end
 
       it "converts to a utc time" do
-        field.serialize(@array).should == Time.utc(*@array)
-        field.serialize(@array).utc_offset.should == 0
+        field.serialize(array).should == Time.utc(*array)
+        field.serialize(array).utc_offset.should == 0
       end
     end
   end

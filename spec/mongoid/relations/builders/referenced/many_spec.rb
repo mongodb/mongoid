@@ -40,12 +40,12 @@ describe Mongoid::Relations::Builders::Referenced::Many do
         stub
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "sets the documents" do
-        @documents.should eq(criteria)
+        documents.should eq(criteria)
       end
     end
 
@@ -74,12 +74,12 @@ describe Mongoid::Relations::Builders::Referenced::Many do
         stub
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "ordered by specified filed" do
-        @documents.should eq(criteria)
+        documents.should eq(criteria)
       end
     end
 
@@ -98,12 +98,12 @@ describe Mongoid::Relations::Builders::Referenced::Many do
         [ Person.new ]
       end
 
-      before do
-        @documents = builder.build
+      let(:documents) do
+        builder.build
       end
 
       it "returns the object" do
-        @documents.should == object
+        documents.should == object
       end
     end
   end

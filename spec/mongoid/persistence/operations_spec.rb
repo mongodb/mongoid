@@ -6,8 +6,8 @@ describe Mongoid::Persistence::Operations do
     Person.new
   end
 
-  before(:all) do
-    @klass = Class.new do
+  let(:klass) do
+    Class.new do
       include Mongoid::Persistence::Operations
     end
   end
@@ -21,7 +21,7 @@ describe Mongoid::Persistence::Operations do
     context "when the document is a root" do
 
       let(:operation) do
-        @klass.new(document, options)
+        klass.new(document, options)
       end
 
       let(:collection) do
@@ -40,7 +40,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       let(:operation) do
-        @klass.new(name, options)
+        klass.new(name, options)
       end
 
       let(:collection) do
@@ -62,7 +62,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       let(:operation) do
-        @klass.new(child)
+        klass.new(child)
       end
 
       let(:deletes) do
@@ -83,7 +83,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       let(:operation) do
-        @klass.new(child)
+        klass.new(child)
       end
 
       let(:deletes) do
@@ -105,7 +105,7 @@ describe Mongoid::Persistence::Operations do
     end
 
     let(:operation) do
-      @klass.new(child)
+      klass.new(child)
     end
 
     let(:inserts) do
@@ -122,7 +122,7 @@ describe Mongoid::Persistence::Operations do
   describe "#notifying_parent?" do
 
     let(:operation) do
-      @klass.new(document, options)
+      klass.new(document, options)
     end
 
     context "when the suppress option is true" do
@@ -162,7 +162,7 @@ describe Mongoid::Persistence::Operations do
   describe "#options" do
 
     let(:operation) do
-      @klass.new(document, options)
+      klass.new(document, options)
     end
 
     context "safe is true" do
@@ -255,7 +255,7 @@ describe Mongoid::Persistence::Operations do
     end
 
     let(:operation) do
-      @klass.new(child)
+      klass.new(child)
     end
 
     it "returns the document's parent" do
@@ -266,7 +266,7 @@ describe Mongoid::Persistence::Operations do
   describe "#selector" do
 
     let(:operation) do
-      @klass.new(document)
+      klass.new(document)
     end
 
     it "returns the document's atomic selector" do
@@ -279,7 +279,7 @@ describe Mongoid::Persistence::Operations do
     context "when there are no conflicting mods" do
 
       let(:operation) do
-        @klass.new(document)
+        klass.new(document)
       end
 
       let(:updates) do
@@ -311,7 +311,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       let(:operation) do
-        @klass.new(document)
+        klass.new(document)
       end
 
       let!(:updates) do
@@ -348,7 +348,7 @@ describe Mongoid::Persistence::Operations do
   describe "#validating?" do
 
     let(:operation) do
-      @klass.new(document, options)
+      klass.new(document, options)
     end
 
     context "when validate option is true" do

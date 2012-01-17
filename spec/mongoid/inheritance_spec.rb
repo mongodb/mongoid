@@ -133,8 +133,8 @@ describe Mongoid::Document do
 
   context "when document has subclasses" do
 
-    before do
-      @firefox = Firefox.create(:name => "firefox")
+    let!(:firefox) do
+      Firefox.create(:name => "firefox")
     end
 
     after do
@@ -142,105 +142,158 @@ describe Mongoid::Document do
     end
 
     it 'should find object with String args' do
-      Firefox.find(@firefox.id.to_s).should == @firefox
+      Firefox.find(firefox.id.to_s).should == firefox
     end
 
     it "returns subclasses for querying parents" do
       firefox = Canvas.where(:name => "firefox").first
       firefox.should be_a_kind_of(Firefox)
-      firefox.should == @firefox
+      firefox.should == firefox
     end
-
   end
 
   context "deleting subclasses" do
 
-    before do
-      @firefox = Firefox.create(:name => "firefox")
-      @firefox2 = Firefox.create(:name => "firefox 2")
-      @browser = Browser.create(:name => "browser")
-      @canvas = Canvas.create(:name => "canvas")
+    let!(:firefox) do
+      Firefox.create(:name => "firefox")
     end
 
-    it "deletes from the parent class collection" do
-      @firefox.delete
-      Firefox.count.should == 1
-      Browser.count.should == 2
-      Canvas.count.should == 3
+    let!(:firefox2) do
+      Firefox.create(:name => "firefox 2")
     end
 
-    it "deletes all documents except for those belonging to parent class collection" do
-      Firefox.delete_all
-      Firefox.count.should == 0
-      Browser.count.should == 1
-      Canvas.count.should == 2
+    let!(:browser) do
+      Browser.create(:name => "browser")
     end
 
+    let!(:canvas) do
+      Canvas.create(:name => "canvas")
+    end
+
+    context "when deleting a single document" do
+
+      before do
+        firefox.delete
+      end
+
+      it "deletes from the parent class collection" do
+        Firefox.count.should == 1
+        Browser.count.should == 2
+        Canvas.count.should == 3
+      end
+    end
+
+    context "when deleting all documents" do
+
+      before do
+        Firefox.delete_all
+      end
+
+      it "deletes all documents except for those belonging to parent class collection" do
+        Firefox.count.should == 0
+        Browser.count.should == 1
+        Canvas.count.should == 2
+      end
+    end
   end
 
   context "when document is a subclass and its parent is an embedded document" do
 
-    before do
-      @canvas = Canvas.create(:name => "canvas")
-      @canvas.create_palette({})
-      @canvas.palette.tools << Pencil.new
-      @canvas.palette.tools << Eraser.new
+    let!(:canvas) do
+      Canvas.create(:name => "canvas")
     end
 
-    after do
-      Canvas.delete_all
+    before do
+      canvas.create_palette
+      canvas.palette.tools << Pencil.new
+      canvas.palette.tools << Eraser.new
+    end
+
+    let(:from_db) do
+      Canvas.find(canvas.id)
     end
 
     it "properly saves the subclasses" do
-      from_db = Canvas.find(@canvas.id)
       from_db.palette.tools.map(&:class).should == [Pencil, Eraser]
     end
   end
 
   context "Creating references_many documents from a parent association" do
 
-    before do
-      @container = ShippingContainer.create
+    let!(:container) do
+      ShippingContainer.create
     end
 
-    it "should allow STI from << using model.new" do
-      @container.vehicles << Car.new({})
-      @container.vehicles << Truck.new({})
-      @container.vehicles.map(&:class).should == [Car,Truck]
+    context "when appending new documents" do
+
+      before do
+        container.vehicles << Car.new
+        container.vehicles << Truck.new
+      end
+
+      it "should allow STI from << using model.new" do
+        container.vehicles.map(&:class).should == [Car,Truck]
+      end
     end
 
-    it "should allow STI from << using model.create" do
-      @container.vehicles << Car.create({})
-      @container.vehicles << Truck.create({})
-      @container.vehicles.map(&:class).should == [Car,Truck]
+    context "when appending persisted documents" do
+
+      before do
+        container.vehicles << Car.create
+        container.vehicles << Truck.create
+      end
+
+      it "should allow STI from << using model.create" do
+        container.vehicles.map(&:class).should == [Car,Truck]
+      end
     end
 
-    it "should allow STI from the build call" do
-      car = @container.vehicles.build({}, Car)
-      car.save
+    context "when building related documents" do
 
-      truck = @container.vehicles.build({}, Truck)
-      truck.save
+      before do
+        container.vehicles.build({}, Car).save
+        container.vehicles.build({}, Truck).save
+      end
 
-      @container.vehicles.map(&:class).should == [Car,Truck]
+      it "should allow STI from the build call" do
+        container.vehicles.map(&:class).should == [Car,Truck]
+      end
     end
 
-    it "should respect the _type attribute from the build call" do
-      @container.vehicles.build({ "_type" => "Car" })
-      @container.vehicles.build({ "_type" => "Truck" })
-      @container.vehicles.map(&:class).should == [Car,Truck]
+    context "when building with a type attribute" do
+
+      before do
+        container.vehicles.build({ "_type" => "Car" })
+        container.vehicles.build({ "_type" => "Truck" })
+      end
+
+      it "should respect the _type attribute from the build call" do
+        container.vehicles.map(&:class).should == [Car,Truck]
+      end
     end
 
-    it "should allow STI from the create call" do
-      @container.vehicles.create({}, Car)
-      @container.vehicles.create({}, Truck)
-      @container.vehicles.map(&:class).should == [Car,Truck]
+    context "when creating related documents" do
+
+      before do
+        container.vehicles.create({}, Car)
+        container.vehicles.create({}, Truck)
+      end
+
+      it "should allow STI from the create call" do
+        container.vehicles.map(&:class).should == [Car,Truck]
+      end
     end
 
-    it "should respect the _type attribute from the create call" do
-      @container.vehicles.create({ "_type" => "Car" })
-      @container.vehicles.create({ "_type" => "Truck" })
-      @container.vehicles.map(&:class).should == [Car,Truck]
+    context "when creating with a type attribute" do
+
+      before do
+        container.vehicles.create({ "_type" => "Car" })
+        container.vehicles.create({ "_type" => "Truck" })
+      end
+
+      it "should respect the _type attribute from the create call" do
+        container.vehicles.map(&:class).should == [Car,Truck]
+      end
     end
 
     it "should not bleed relations from one subclass to another" do

@@ -14,4 +14,3 @@ class Canvas
 end
 
 require "app/models/browser"
-require "app/models/firefox"
