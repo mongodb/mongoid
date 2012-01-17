@@ -6,3 +6,6 @@ class Writer
 
   def write; end
 end
+
+require "app/models/pdf_writer"
+require "app/models/html_writer"

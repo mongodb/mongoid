@@ -3,3 +3,5 @@ class Actor
   field :name
   has_and_belongs_to_many :tags
 end
+
+require "app/models/actress"

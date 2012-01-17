@@ -1,0 +1,110 @@
+require "spec_helper"
+
+describe Mongoid::Relations::Builders::Referenced::One do
+
+  before do
+    [ Person, Game ].each(&:delete_all)
+  end
+
+  let(:base) do
+    stub(:new_record? => false)
+  end
+
+  describe "#build" do
+
+    let(:criteria) do
+      Post.where("person_id" => object)
+    end
+
+    let(:metadata) do
+      stub(
+        :klass => Post,
+        :name => :post,
+        :foreign_key => "person_id",
+        :criteria => criteria,
+        :inverse_klass => Person
+      )
+    end
+
+    let(:builder) do
+      described_class.new(base, metadata, object)
+    end
+
+    context "when provided an id" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:object) do
+        object_id
+      end
+
+      let(:post) do
+        stub
+      end
+
+      before do
+        criteria.expects(:first).returns(post)
+        @documents = builder.build
+      end
+
+      it "sets the document" do
+        @documents.should == post
+      end
+    end
+
+    context "when provided a object" do
+
+      let(:object) do
+        Post.new
+      end
+
+      before do
+        @document = builder.build
+      end
+
+      it "returns the object" do
+        @document.should == object
+      end
+    end
+  end
+
+  describe "#build" do
+
+    let(:person) do
+      Person.new(:ssn => "345-12-1212")
+    end
+
+    context "when the document is not found" do
+
+      it "returns nil" do
+        person.game.should be_nil
+      end
+    end
+
+    context "when the document is persisted" do
+
+      before do
+        Mongoid.identity_map_enabled = true
+        person.save
+      end
+
+      after do
+        Mongoid.identity_map_enabled = false
+      end
+
+      let!(:game) do
+        Game.create(:person_id => person.id)
+      end
+
+      it "returns the document" do
+        person.game.should eq(game)
+      end
+
+      it "pulls the document from the identity map" do
+        person.game.should equal(game)
+      end
+    end
+  end
+end

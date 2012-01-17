@@ -185,3 +185,5 @@ class Person
     self.map_with_default["key"] = value
   end
 end
+
+require "app/models/doctor"

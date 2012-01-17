@@ -8,3 +8,5 @@ class Item
   attr_protected :is_rss, :as => :parser
   attr_protected :user_login
 end
+
+require "app/models/sub_item"

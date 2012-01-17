@@ -6,3 +6,6 @@ class Vehicle
   accepts_nested_attributes_for :driver
   accepts_nested_attributes_for :shipping_containers
 end
+
+require "app/models/car"
+require "app/models/truck"

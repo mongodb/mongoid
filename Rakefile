@@ -28,8 +28,8 @@ RSpec::Core::RakeTask.new("spec:unit") do |spec|
   spec.pattern = "spec/unit/**/*_spec.rb"
 end
 
-RSpec::Core::RakeTask.new("spec:functional") do |spec|
-  spec.pattern = "spec/functional/**/*_spec.rb"
+RSpec::Core::RakeTask.new("spec") do |spec|
+  spec.pattern = "spec/**/*_spec.rb"
 end
 
 RSpec::Core::RakeTask.new('spec:progress') do |spec|
@@ -45,5 +45,4 @@ RDoc::Task.new do |rdoc|
   rdoc.rdoc_files.include("lib/**/*.rb")
 end
 
-task :spec => [ "spec:functional", "spec:unit" ]
 task :default => :spec

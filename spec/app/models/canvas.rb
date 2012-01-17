@@ -12,3 +12,6 @@ class Canvas
     shapes.each { |shape| render }
   end
 end
+
+require "app/models/browser"
+require "app/models/firefox"
