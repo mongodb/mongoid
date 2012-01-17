@@ -216,14 +216,14 @@ module Mongoid #:nodoc:
       # @since 2.3.0
       def alias_attribute(name, original)
         class_eval <<-RUBY
-          alias :#{name} :#{original}
-          alias :#{name}= :#{original}=
-          alias :#{name}? :#{original}?
-          alias :#{name}_change :#{original}_change
-          alias :#{name}_changed? :#{original}_changed?
-          alias :reset_#{name}! :reset_#{original}!
-          alias :#{name}_was :#{original}_was
-          alias :#{name}_will_change! :#{original}_will_change!
+          alias #{name}  #{original}
+          alias #{name}= #{original}=
+          alias #{name}? #{original}?
+          alias #{name}_change   #{original}_change
+          alias #{name}_changed? #{original}_changed?
+          alias reset_#{name}!   reset_#{original}!
+          alias #{name}_was      #{original}_was
+          alias #{name}_will_change! #{original}_will_change!
         RUBY
       end
     end
