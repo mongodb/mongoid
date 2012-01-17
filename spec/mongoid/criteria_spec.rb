@@ -395,7 +395,7 @@ describe Mongoid::Criteria do
     context "chaining more than one scope" do
 
       let(:criteria) do
-        Person.accepted.old.knight
+        Person.accepted.knight
       end
 
       let(:chained) do
@@ -404,7 +404,7 @@ describe Mongoid::Criteria do
 
       it "returns the final merged criteria" do
         criteria.selector.should ==
-          { :title => "Sir", :terms => true, :age => { "$gt" => 50 } }
+          { :title => "Sir", :terms => true }
       end
 
       it "always returns a new criteria" do
