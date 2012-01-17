@@ -102,11 +102,9 @@ module Mongoid #:nodoc:
 
       def handle_and_or_value(values)
         [].tap do |result|
-          values.map do |value|
-            value.each do |key, value|
-              result.push key => try_to_typecast(key, value)
-            end
-          end
+           result.push(*values.map do |value|
+            Hash[value.map{ |key, value| [key, try_to_typecast(key, value)] }]
+          end)
         end
       end
 
