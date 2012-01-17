@@ -618,7 +618,7 @@ describe Mongoid::Attributes do
         end
 
         it "raises an error" do
-          lambda { Person.new({ :anothernew => "Test" }) }.should raise_error
+          lambda { Person.new({ :anothernew => "Test" }) }.should raise_error(Mongoid::Errors::UnknownAttributeError)
         end
       end
     end
