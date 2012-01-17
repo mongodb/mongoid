@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def deserialize(object)
-          object.try(:to_datetime)
+          super(object).try(:to_datetime)
         end
       end
     end

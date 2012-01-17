@@ -19,8 +19,16 @@ describe Mongoid::Fields::Internal::DateTime do
 
   describe "#deserialize" do
 
+    let(:date_time) do
+      field.deserialize(time)
+    end
+
     it "converts to a datetime" do
-      field.deserialize(time).should be_kind_of(DateTime)
+      date_time.should be_kind_of(DateTime)
+    end
+
+    it "converts from utc" do
+      date_time.zone.should_not eq("+00:00")
     end
   end
 
