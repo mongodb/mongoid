@@ -111,16 +111,11 @@ module Mongoid #:nodoc:
     def write_attribute(name, value)
       _assigning do
         access = name.to_s
-        localized = fields[access].try(:localized?)
         typed_value_for(access, value).tap do |typed_value|
           unless attributes[access] == typed_value || attribute_changed?(access)
             attribute_will_change!(access)
           end
-          if localized
-            (attributes[access] ||= {}).merge!(typed_value)
-          else
-            attributes[access] = typed_value
-          end
+          attributes[access] = typed_value
         end
       end
     end
@@ -194,7 +189,15 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].serialize(value) : value
+      if fields.has_key?(key)
+        begin
+          fields[key].serialize(value, read_attribute(key))
+        rescue ArgumentError
+          fields[key].serialize(value) # for backwards compatibility
+        end
+      else
+        value
+      end
     end
 
     module ClassMethods #:nodoc:

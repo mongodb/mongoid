@@ -53,8 +53,8 @@ module Mongoid #:nodoc:
         # @return [ Hash ] The locale with string translation.
         #
         # @since 2.3.0
-        def serialize(object)
-          { ::I18n.locale.to_s => object.try(:to_s) }
+        def serialize(object, previous={})
+          previous.merge ::I18n.locale.to_s => object.try(:to_s)
         end
       end
     end

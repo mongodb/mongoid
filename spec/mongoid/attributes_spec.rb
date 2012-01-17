@@ -1113,7 +1113,7 @@ describe Mongoid::Attributes do
       end
 
       it "retuns the typed value" do
-        person.fields["age"].expects(:serialize).with("51")
+        person.fields["age"].expects(:serialize).with("51", person.age)
         person.send(:typed_value_for, "age", "51")
       end
 
