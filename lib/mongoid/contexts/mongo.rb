@@ -207,6 +207,34 @@ module Mongoid #:nodoc:
         end
       end
       alias :one :first
+      
+      # Reduce the context. This will take the internally built selector and otions
+      # and pass them on to the Ruby driver's +group()+ method on the collection. The
+      # reduction operation will be executed in mongodb, and the result of that operation
+      # will be returned in the hash result.
+      #
+      # Reduction operations can be either named entries (:sum, :min, :max,) or a custom
+      # function can be provided
+      #
+      # @param [ Hash ] fields
+      #
+      # @example Use a standard reduction funtions on the criteria as a group
+      #   context.reduce :age => [:min, :sum, :max]
+      #
+      # @example Use a custom reduction function on the criteria as a group
+      #   context.reduce :age => "prev.result.age_random = obj.age Math.random() > 0"
+      #
+      # @return [ Hash ] Hash with field values as keys, arrays of documents as values.
+      def reduce(fields)
+        klass.collection.group(
+          :key => field_list,
+          :cond => selector,
+          :initial => initial(fields),
+          :reduce => Javascript.compound(fields),
+          :finalize => Javascript.compound_finalize(fields)
+        )
+      end
+
 
       # Groups the context. This will take the internally built selector and options
       # and pass them on to the Ruby driver's +group()+ method on the collection. The
@@ -452,6 +480,24 @@ module Mongoid #:nodoc:
         end
         options.dup
       end
+      
+      # Create an initial hash for reduce queries
+      #
+      # @param [ Hash ] fields
+      #
+      # @example
+      #   context.initial :age => [:min, :sum], :height => "..custom code.."
+      #   -> {"age_min" => "start", "age_sum" => "start", "height" => ""}
+      #
+      # @return [ Hash ] initial hash
+      def initial(fields)
+        Hash[
+          fields.expand_reduction_fields.map do |field, name, func|
+            [name, "start"]
+          end
+        ]
+      end
+
     end
   end
 end

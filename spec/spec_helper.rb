@@ -86,3 +86,9 @@ end
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
+
+def remove_whitespace str
+  # Replace non-space         # Remove space      # Remove space
+  # whitespace                # between tabs      # at head & tail
+  str.gsub(/[\n|\t|\s\s+]+/, " ").gsub(/>\s*</, "><").gsub(/(^\s*|\s*$)/, '')
+end

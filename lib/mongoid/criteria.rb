@@ -63,6 +63,7 @@ module Mongoid #:nodoc:
       :min,
       :one,
       :pull,
+      :reduce,
       :shift,
       :sum,
       :update,
