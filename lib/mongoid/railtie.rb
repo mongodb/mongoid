@@ -81,10 +81,15 @@ module Rails #:nodoc:
       # 404s and not 500s, validation errors are 422s.
       initializer "load http errors" do |app|
         config.after_initialize do
-          ActionDispatch::ShowExceptions.rescue_responses.update({
+          responses = {
             "Mongoid::Errors::DocumentNotFound" => :not_found,
             "Mongoid::Errors::Validations" => 422
-          })
+          }
+          if rescue_responses = config.action_dispatch.rescue_responses
+            rescue_responses.update(responses)
+          else
+            ActionDispatch::ShowExceptions.rescue_responses.update(responses)
+          end
         end
       end
 
