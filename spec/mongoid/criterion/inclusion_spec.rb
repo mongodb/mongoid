@@ -1266,7 +1266,7 @@ describe Mongoid::Criterion::Inclusion do
       end
 
       it "typecasts datetimes" do
-        Person.where(:lunch_time.gt => lunch_time.to_s).should == [ person ]
+        Person.where(:lunch_time => lunch_time.to_s).should == [ person ]
       end
 
       it "typecasts dates" do

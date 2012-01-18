@@ -152,8 +152,8 @@ describe Mongoid::Fields::Internal::Time do
         field.serialize(time).utc_offset.should eq(0)
       end
 
-      it "does not strip microseconds" do
-        field.serialize(Time.now).usec.should_not eq(0)
+      it "strips microseconds" do
+        field.serialize(Time.now).usec.should eq(0)
       end
 
       it "returns utc times unchanged" do
