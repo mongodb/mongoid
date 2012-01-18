@@ -26,13 +26,12 @@ module Mongoid #:nodoc:
       criteria
     end
 
-    # Returns a count of matching records in the database based on the
-    # provided arguments.
+    # Returns a count of records in the database.
+    # If you want to specify conditions use where.
     #
     # @example Get the count of matching documents.
-    #   Person.count(:conditions => { :attribute => "value" })
-    #
-    # @param [ Array ] args The conditions.
+    #   Person.count
+    #   Person.where(title: "Sir").count
     #
     # @return [ Integer ] The number of matching documents.
     def count
