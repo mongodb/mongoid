@@ -171,7 +171,7 @@ describe Mongoid::Safety do
             Person.unsafely.create(:ssn => "432-97-1111").should be_true
           end
 
-          it "stills use defaults for subsequent requests" do
+          it "uses defaults for subsequent requests" do
             Person.unsafely.create(:ssn => "432-97-1111")
             lambda {
               Person.create(:ssn => "432-97-1111")
@@ -196,7 +196,7 @@ describe Mongoid::Safety do
             person.unsafely.save(:ssn => "432-97-1113").should be_true
           end
 
-          it "stills use defaults for subsequent requests" do
+          it "uses defaults for subsequent requests" do
             person.unsafely.save(:ssn => "432-97-1113")
             lambda {
               Person.create(:ssn => "432-97-1113")
