@@ -9,11 +9,11 @@ describe "Date/Time attributes" do
       user
     end
 
-    it "should be read for persistance as a UTC Time" do
+    it "reads for persistance as a UTC Time" do
       user.changes["last_login"].last.class.should eq(Time)
     end
 
-    it "should persist with no exceptions thrown" do
+    it "persists with no exceptions thrown" do
       user.save!
     end
   end
@@ -25,11 +25,11 @@ describe "Date/Time attributes" do
       user
     end
 
-    it "should be read for persistance as a UTC Time" do
+    it "reads for persistance as a UTC Time" do
       user.changes["account_expires"].last.class.should eq(Time)
     end
 
-    it "should persist with no exceptions thrown" do
+    it "persists with no exceptions thrown" do
       user.save!
     end
   end

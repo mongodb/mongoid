@@ -207,7 +207,7 @@ describe Mongoid::Reloading do
         person.reload
       end
 
-      it "should reload the association" do
+      it "reloads the association" do
         person.addresses.should be_empty
       end
     end

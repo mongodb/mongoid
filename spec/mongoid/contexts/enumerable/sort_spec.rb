@@ -61,7 +61,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
 
       context "and b is not nil" do
         let(:other_value) { "b" }
-        it "should use default comparison" do
+        it "uses default comparison" do
           value.expects(:<=>).with(other_value)
           subject
         end

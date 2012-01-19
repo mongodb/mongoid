@@ -32,14 +32,14 @@ describe Mongoid::Criterion::Selector do
 
   describe "#[]=" do
 
-    it "should store the values provided" do
+    it "stores the values provided" do
       klass.stubs(:fields).returns({})
       klass.stubs(:aliased_fields).returns({})
       selector["age"] = 45
       selector["age"].should eq(45)
     end
 
-    it "should typecast values when possible" do
+    it "typecasts values when possible" do
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -47,7 +47,7 @@ describe Mongoid::Criterion::Selector do
       selector["age"].should eq(45)
     end
 
-    it "should typecast complex conditions" do
+    it "typecasts complex conditions" do
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -91,7 +91,7 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#update" do
-    it "should typecast values when possible" do
+    it "typecasts values when possible" do
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -101,7 +101,7 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#merge!" do
-    it "should typecast values when possible" do
+    it "typecasts values when possible" do
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -255,7 +255,7 @@ describe Mongoid::Criterion::Selector do
     end
 
     context "when the value is simple" do
-      it "should delegate to the field to typecast" do
+      it "delegates to the field to typecast" do
         field.expects(:selection).with("45")
         selector.send(:typecast_value_for, field, "45")
       end
@@ -272,7 +272,7 @@ describe Mongoid::Criterion::Selector do
     end
 
     context "when the value is a regex" do
-      it "should return the regex unmodified" do
+      it "returns the regex unmodified" do
         field.expects(:selection).never
         selector.send(:typecast_value_for, field, /Regex/)
       end
@@ -281,7 +281,7 @@ describe Mongoid::Criterion::Selector do
     context "when the value is an array" do
 
       context "and the field type is array" do
-        it "should let the field typecast the value" do
+        it "lets the field typecast the value" do
           field.stubs(:type).returns(Array)
           field.expects(:selection).with([]).once
           selector.send(:typecast_value_for, field, [])
@@ -289,7 +289,7 @@ describe Mongoid::Criterion::Selector do
       end
 
       context "and the field type is not array" do
-        it "should typecast each value" do
+        it "typecasts each value" do
           field.stubs(:type).returns(Integer)
           field.expects(:selection).twice
           selector.send(:typecast_value_for, field, ["1", "2"])
@@ -302,7 +302,7 @@ describe Mongoid::Criterion::Selector do
       context "and the field type is not hash" do
         before { field.stubs(:type => Integer) }
 
-        it "should not modify the original value" do
+        it "does not modify the original value" do
           value = {}
           value.expects(:dup).returns({})
           selector.send(:typecast_value_for, field, value)
@@ -310,7 +310,7 @@ describe Mongoid::Criterion::Selector do
 
         context "when the hash is an $exists query" do
 
-          it "should not typecast the hash" do
+          it "does not typecast the hash" do
             value = {"$exists" => true}
             field.expects(:selection).never
             selector.send(:typecast_value_for, field, value)
@@ -325,7 +325,7 @@ describe Mongoid::Criterion::Selector do
 
         context "when the hash is a $size query" do
 
-          it "should not typecast the hash" do
+          it "does not typecast the hash" do
             value = {"$size" => 2}
             field.expects(:selection).never
             selector.send(:typecast_value_for, field, value)
@@ -343,7 +343,7 @@ describe Mongoid::Criterion::Selector do
 
         before { field.stubs(:type => Hash) }
 
-        it "should let the field typecast the value" do
+        it "lets the field typecast the value" do
           value = { "name" => "John" }
           field.expects(:selection).with(value).once
           selector.send(:typecast_value_for, field, value)

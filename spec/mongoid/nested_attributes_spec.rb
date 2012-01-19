@@ -75,7 +75,7 @@ describe Mongoid::NestedAttributes do
           end
         end
 
-        it "should preserve the order of the children" do
+        it "preserves the order of the children" do
           person.addresses.map(&:number).should eq((0..10).to_a)
         end
       end
