@@ -1143,7 +1143,7 @@ describe Mongoid::Dirty do
       person.addresses = [ Address.new ]
     end
 
-    it "should not set the association to nil when hitting the database" do
+    it "does not set the association to nil when hitting the database" do
       person.setters.should_not eq({ "addresses" => nil })
     end
   end

@@ -30,30 +30,30 @@ describe Mongoid::Relations::Synchronization do
         end
       end
 
-      it "should have persisted :agent" do
+      it "has persisted :agent" do
         agent.persisted?.should be_true
       end
 
-      it "should have persisted :user" do
+      it "has persisted :user" do
         user.persisted?.should be_true
       end
 
-      it "should have persisted :person" do
+      it "has persisted :person" do
         person.persisted?.should be_true
       end
 
-      it "should not have persisted :account" do
+      it "does not have persisted :account" do
         account.persisted?.should be_false
       end
 
-      it "should have instantiated a .valid? :account" do
+      it "has instantiated a .valid? :account" do
         account.valid?
         account.valid?.should be_true
       end
 
       context "and is Persisted" do
 
-        it "should be able to :save" do
+        it "is able to :save" do
           account.save.should be_true
         end
       end
@@ -64,7 +64,7 @@ describe Mongoid::Relations::Synchronization do
           account.agents.where(:_id => agent.id).exists?
         end
 
-        it "should be able to :save" do
+        it "is able to :save" do
           account.save.should be_true
         end
       end

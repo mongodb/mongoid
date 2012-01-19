@@ -580,7 +580,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           preference.should be_persisted
         end
 
-        it "should persist the relation" do
+        it "persists the relation" do
           person.reload.preferences == [ preference ]
         end
 
