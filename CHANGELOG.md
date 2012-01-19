@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1608 Guard against no method errors when passing ids in nested attributes
+  and the documents do not exist.
+
 * \#1605 Remove deprecation warning on rescue responses, Rails 3.2
 
 * \#1602 Preserve structure of $and and $or queries when typecasting.
