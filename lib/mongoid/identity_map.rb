@@ -117,11 +117,11 @@ module Mongoid #:nodoc:
       #   IdentityMap.set(document)
       #
       # @since 2.1.0
-      delegate *(
+      delegate(*(
         Hash.public_instance_methods(false) +
         IdentityMap.public_instance_methods(false) <<
         { :to => :"Mongoid::Threaded.identity_map" }
-      )
+      ))
     end
   end
 end

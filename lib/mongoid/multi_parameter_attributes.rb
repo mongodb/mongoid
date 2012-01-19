@@ -97,7 +97,7 @@ module Mongoid #:nodoc:
       if klass == DateTime || klass == Date || klass == Time
         field.serialize(values)
       elsif klass
-        klass.new *values
+        klass.new(*values)
       else
         values
       end
