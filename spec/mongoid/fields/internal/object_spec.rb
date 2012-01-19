@@ -22,7 +22,7 @@ describe Mongoid::Fields::Internal::Object do
       end
 
       it "returns the called proc" do
-        field.eval_default(nil).should == 1
+        field.eval_default(nil).should eq(1)
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Fields::Internal::Object do
       end
 
       it "returns the default value" do
-        field.default_val.should == "test"
+        field.default_val.should eq("test")
       end
     end
   end
@@ -49,7 +49,7 @@ describe Mongoid::Fields::Internal::Object do
     end
 
     it "returns the provided value" do
-      value.should == "testing"
+      value.should eq("testing")
     end
   end
 
@@ -60,15 +60,15 @@ describe Mongoid::Fields::Internal::Object do
     end
 
     it "sets the name" do
-      field.name.should == :test
+      field.name.should eq(:test)
     end
 
     it "sets the label" do
-      field.label.should == "test"
+      field.label.should eq("test")
     end
 
     it "sets the options" do
-      field.options.should == { :type => Integer, :label => "test" }
+      field.options.should eq({ :type => Integer, :label => "test" })
     end
   end
 
@@ -136,7 +136,7 @@ describe Mongoid::Fields::Internal::Object do
     end
 
     it "returns the provided value" do
-      value.should == "testing"
+      value.should eq("testing")
     end
   end
 end

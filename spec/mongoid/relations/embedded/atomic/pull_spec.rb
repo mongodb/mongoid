@@ -29,20 +29,21 @@ describe Mongoid::Relations::Embedded::Atomic::Pull do
         end
 
         it "pulls the selector" do
-          pull.selector.should == selector
+          pull.selector.should eq(selector)
         end
 
         it "pulls the $pullAll operations" do
-          pull.operations.should ==
+          pull.operations.should eq(
             { "$pull" =>
               { "addresses" =>
                 { "_id" => { "$in" => [ "street" ] } }
               }
             }
+          )
         end
 
         it "pulls the options" do
-          pull.options.should == options
+          pull.options.should eq(options)
         end
       end
 
@@ -74,20 +75,21 @@ describe Mongoid::Relations::Embedded::Atomic::Pull do
         end
 
         it "pulls the selector" do
-          pull.selector.should == selector
+          pull.selector.should eq(selector)
         end
 
         it "pulls the $pullAll operations" do
-          pull.operations.should ==
+          pull.operations.should eq(
             { "$pull" =>
               { "addresses" =>
                 { "_id" => { "$in" => [ "bond-street", "high-street" ] } }
               }
             }
+          )
         end
 
         it "pulls the options" do
-          pull.options.should == options
+          pull.options.should eq(options)
         end
       end
     end
@@ -117,20 +119,21 @@ describe Mongoid::Relations::Embedded::Atomic::Pull do
         end
 
         it "pulls the selector" do
-          pull.selector.should == selector
+          pull.selector.should eq(selector)
         end
 
         it "pulls the $pull operations" do
-          pull.operations.should ==
+          pull.operations.should eq(
             { "$pull" =>
               { "addresses" =>
                 { "_id" => { "$in" => [ "street" ] } }
               }
             }
+          )
         end
 
         it "pulls the options" do
-          pull.options.should == options
+          pull.options.should eq(options)
         end
       end
 
@@ -162,20 +165,21 @@ describe Mongoid::Relations::Embedded::Atomic::Pull do
         end
 
         it "pulls the selector" do
-          pull.selector.should == selector
+          pull.selector.should eq(selector)
         end
 
         it "pulls the $pull operations" do
-          pull.operations.should ==
+          pull.operations.should eq(
             { "$pull" =>
               { "addresses" =>
                 { "_id" => { "$in" => [ "bond-street", "high-street" ] } }
               }
             }
+          )
         end
 
         it "pulls the options" do
-          pull.options.should == options
+          pull.options.should eq(options)
         end
       end
     end

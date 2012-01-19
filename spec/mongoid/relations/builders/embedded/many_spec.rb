@@ -27,7 +27,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an array of documents" do
-        documents.should == object
+        documents.should eq(object)
       end
     end
 
@@ -46,7 +46,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an empty array" do
-        documents.should == object
+        documents.should eq(object)
       end
     end
 
@@ -65,7 +65,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an empty array" do
-        documents.should == []
+        documents.should be_empty
       end
     end
 
@@ -92,8 +92,8 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "sets the object on the documents" do
-        documents[0].city.should == "London"
-        documents[1].city.should == "Shanghai"
+        documents[0].city.should eq("London")
+        documents[1].city.should eq("Shanghai")
       end
     end
 
@@ -124,8 +124,8 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "sets the object on the document" do
-        documents[0].radius.should == 100
-        documents[1].width.should == 50
+        documents[0].radius.should eq(100)
+        documents[1].width.should eq(50)
       end
     end
   end

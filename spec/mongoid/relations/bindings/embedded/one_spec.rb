@@ -27,11 +27,11 @@ describe Mongoid::Relations::Bindings::Embedded::One do
       end
 
       it "parentizes the documents" do
-        target._parent.should == person
+        target._parent.should eq(person)
       end
 
       it "sets the inverse relation" do
-        target.namable.should == person
+        target.namable.should eq(person)
       end
     end
 

@@ -13,7 +13,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should == { :aliases => { "$all" => [ "Bond", "007" ] } }
+      criteria.selector.should eq({ :aliases => { "$all" => [ "Bond", "007" ] } })
     end
   end
 
@@ -24,7 +24,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should == { :aliases => { "$in" => [ "Bond", "007" ] } }
+      criteria.selector.should eq({ :aliases => { "$in" => [ "Bond", "007" ] } })
     end
   end
 
@@ -32,7 +32,7 @@ describe Mongoid::Finders do
 
     it "returns a new criteria with select conditions added" do
       criteria = Person.excludes(:title => "Sir")
-      criteria.selector.should == { :title => { "$ne" => "Sir" } }
+      criteria.selector.should eq({ :title => { "$ne" => "Sir" } })
     end
   end
 
@@ -119,7 +119,7 @@ describe Mongoid::Finders do
         context "when the document is found" do
 
           it "returns the document" do
-            Person.find(person.id).should == person
+            Person.find(person.id).should eq(person)
           end
         end
 
@@ -187,7 +187,7 @@ describe Mongoid::Finders do
           end
 
           it "returns an array of the documents" do
-            people.should == documents
+            people.should eq(documents)
           end
         end
 
@@ -241,7 +241,7 @@ describe Mongoid::Finders do
         context "when the document is found" do
 
           it "returns the document" do
-            Person.find(person.id).should == person
+            Person.find(person.id).should eq(person)
           end
         end
 
@@ -260,7 +260,7 @@ describe Mongoid::Finders do
         context "when the document is found" do
 
           it "returns the document" do
-            Person.find(person.id.to_s).should == person
+            Person.find(person.id.to_s).should eq(person)
           end
         end
 
@@ -283,7 +283,7 @@ describe Mongoid::Finders do
           end
 
           it "returns an array of the documents" do
-            people.should == documents
+            people.should eq(documents)
           end
         end
 
@@ -310,7 +310,7 @@ describe Mongoid::Finders do
       end
 
       it "returns the document" do
-        Person.find_or_create_by(:title => "Senior").should == person
+        Person.find_or_create_by(:title => "Senior").should eq(person)
       end
     end
 
@@ -327,7 +327,7 @@ describe Mongoid::Finders do
         end
 
         it "sets the attributes" do
-          person.title.should == "Senorita"
+          person.title.should eq("Senorita")
         end
       end
 
@@ -344,11 +344,11 @@ describe Mongoid::Finders do
         end
 
         it "sets the attributes" do
-          person.title.should == "Senorita"
+          person.title.should eq("Senorita")
         end
 
         it "calls the block" do
-          person.pets.should == true
+          person.pets.should be_true
         end
       end
     end
@@ -363,7 +363,7 @@ describe Mongoid::Finders do
       end
 
       it "returns the document" do
-        Person.find_or_initialize_by(:title => "Senior").should == person
+        Person.find_or_initialize_by(:title => "Senior").should eq(person)
       end
     end
 
@@ -380,7 +380,7 @@ describe Mongoid::Finders do
         end
 
         it "sets the attributes" do
-          person.title.should == "Senorita"
+          person.title.should eq("Senorita")
         end
       end
 
@@ -397,11 +397,11 @@ describe Mongoid::Finders do
         end
 
         it "sets the attributes" do
-          person.title.should == "Senorita"
+          person.title.should eq("Senorita")
         end
 
         it "calls the block" do
-          person.pets.should == true
+          person.pets.should be_true
         end
       end
     end
@@ -414,7 +414,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.options.should == { :fields => {:_type => 1, :title => 1, :age => 1} }
+      criteria.options.should eq({ :fields => {:_type => 1, :title => 1, :age => 1} })
     end
   end
 
@@ -425,7 +425,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should == { :title => "Sir" }
+      criteria.selector.should eq({ :title => "Sir" })
     end
   end
 
@@ -436,8 +436,9 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should ==
-        { :latlng => { "$near" => [37.761523, -122.423575, 1] } }
+      criteria.selector.should eq(
+        { :latlng => { "$near" => [37.761523, -122.423575, 1] }}
+      )
     end
   end
 end

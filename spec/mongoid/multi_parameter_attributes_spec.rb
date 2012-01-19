@@ -17,7 +17,7 @@ describe Mongoid::MultiParameterAttributes do
       end
 
       it "should set a multi-parameter Time attribute correctly" do
-        post.created_at.should == Time.local(2010, 8, 12, 15, 45)
+        post.created_at.should eq(Time.local(2010, 8, 12, 15, 45))
       end
 
       it "should not leave ugly attributes on the model" do
@@ -38,7 +38,7 @@ describe Mongoid::MultiParameterAttributes do
         end
 
         it "should set a multi-parameter Date attribute correctly" do
-          person.dob.should == Date.civil(1980, 7, 27)
+          person.dob.should eq(Date.civil(1980, 7, 27))
         end
       end
 
@@ -85,15 +85,15 @@ describe Mongoid::MultiParameterAttributes do
       end
 
       it "should set empty date's year" do
-        person.dob.year.should == 1980
+        person.dob.year.should eq(1980)
       end
 
       it "should set empty date's month" do
-        person.dob.month.should == 1
+        person.dob.month.should eq(1)
       end
 
       it "should set empty date's day" do
-        person.dob.day.should == 1
+        person.dob.day.should eq(1)
       end
     end
   end

@@ -829,7 +829,7 @@ describe Mongoid::Dirty do
     end
 
     it "defines a _changed? method" do
-      person.updated_at_changed?.should eq(false)
+      person.updated_at_changed?.should be_false
     end
 
     it "defines a _changes method" do
@@ -1020,15 +1020,15 @@ describe Mongoid::Dirty do
     end
 
     it "marks the document as changed" do
-      person.changed?.should == true
+      person.should be_changed
     end
 
     it "marks field changes" do
-      person.changes.should == {
+      person.changes.should eq({
         "title" => [ "MC", "DJ" ],
         "ssn" => [ "234-11-2533", "222-22-2222" ],
         "some_dynamic_field" => [ "blah", "bloop" ]
-      }
+      })
     end
 
     it "marks changed fields" do
@@ -1036,20 +1036,20 @@ describe Mongoid::Dirty do
     end
 
     it "marks the field as changed" do
-      person.title_changed?.should == true
+      person.title_changed?.should be_true
     end
 
     it "stores previous field values" do
-      person.title_was.should == "MC"
+      person.title_was.should eq("MC")
     end
 
     it "marks field changes" do
-      person.title_change.should == [ "MC", "DJ" ]
+      person.title_change.should eq([ "MC", "DJ" ])
     end
 
     it "allows reset of field changes" do
       person.reset_title!
-      person.title.should == "MC"
+      person.title.should eq("MC")
       person.changed.should =~ [ "ssn", "some_dynamic_field", "title" ]
     end
 
@@ -1064,8 +1064,8 @@ describe Mongoid::Dirty do
       end
 
       it "stores previous changes" do
-        person.previous_changes["title"].should == [ "MC", "DJ" ]
-        person.previous_changes["ssn"].should == [ "234-11-2533", "222-22-2222" ]
+        person.previous_changes["title"].should eq([ "MC", "DJ" ])
+        person.previous_changes["ssn"].should eq([ "234-11-2533", "222-22-2222" ])
       end
     end
 
@@ -1092,7 +1092,7 @@ describe Mongoid::Dirty do
 
       before do
         Acolyte.set_callback(:save, :after, :if => :callback_test?) do |doc|
-          doc.changes.should == { "status" => [ nil, "testing" ] }
+          doc[:changed_in_callback] = doc.changes.dup
         end
       end
 
@@ -1104,6 +1104,7 @@ describe Mongoid::Dirty do
 
       it "retains the changes until after all callbacks" do
         acolyte.update_attribute(:status, "testing")
+        acolyte.changed_in_callback.should eq({ "status" => [ nil, "testing" ] })
       end
     end
 
@@ -1115,7 +1116,7 @@ describe Mongoid::Dirty do
 
       before do
         Acolyte.set_callback(:save, :after, :if => :callback_test?) do |doc|
-          doc.changes["name"].should == [ nil, "callback-test" ]
+          doc[:changed_in_callback] = doc.changes.dup
         end
       end
 
@@ -1127,6 +1128,7 @@ describe Mongoid::Dirty do
 
       it "retains the changes until after all callbacks" do
         acolyte.save
+        acolyte.changed_in_callback["name"].should eq([ nil, "callback-test" ])
       end
     end
   end
@@ -1142,7 +1144,7 @@ describe Mongoid::Dirty do
     end
 
     it "should not set the association to nil when hitting the database" do
-      person.setters.should_not == { "addresses" => nil }
+      person.setters.should_not eq({ "addresses" => nil })
     end
   end
 end

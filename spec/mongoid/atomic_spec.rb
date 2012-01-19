@@ -21,7 +21,7 @@ describe Mongoid::Atomic do
         end
 
         it "returns the atomic updates" do
-          person.atomic_updates.should == { "$set" => { "title" => "Sir" } }
+          person.atomic_updates.should eq({ "$set" => { "title" => "Sir" }})
         end
 
         context "when an embeds many child is added" do
@@ -31,13 +31,14 @@ describe Mongoid::Atomic do
           end
 
           it "returns a $set and $pushAll for modifications" do
-            person.atomic_updates.should ==
+            person.atomic_updates.should eq(
               {
                 "$set" => { "title" => "Sir" },
                 "$pushAll" => { "addresses" => [
                     { "_id" => "oxford-st", "street" => "Oxford St" }
                   ]}
               }
+            )
           end
         end
 
@@ -48,13 +49,14 @@ describe Mongoid::Atomic do
           end
 
           it "returns a $set for modifications" do
-            person.atomic_updates.should ==
+            person.atomic_updates.should eq(
               {
                 "$set" => {
                   "title" => "Sir",
                   "name" => { "_id" => "Lionel-", "first_name" => "Lionel" }
                 }
               }
+            )
           end
         end
 
@@ -69,8 +71,9 @@ describe Mongoid::Atomic do
           end
 
           it "returns the $set with correct position and modifications" do
-            person.atomic_updates.should ==
-              { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" } }
+            person.atomic_updates.should eq(
+              { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" }}
+            )
           end
 
           context "when an existing 2nd level embedded child gets modified" do
@@ -84,12 +87,13 @@ describe Mongoid::Atomic do
             end
 
             it "returns the $set with correct positions and modifications" do
-              person.atomic_updates.should ==
+              person.atomic_updates.should eq(
                 { "$set" => {
                   "title" => "Sir",
                   "addresses.0.street" => "Bond St",
                   "addresses.0.locations.0.name" => "Work" }
                 }
+              )
             end
           end
 
@@ -100,7 +104,7 @@ describe Mongoid::Atomic do
             end
 
             it "returns the $set with correct positions and modifications" do
-              person.atomic_updates.should ==
+              person.atomic_updates.should eq(
                 {
                   "$set" => {
                     "title" => "Sir",
@@ -112,6 +116,7 @@ describe Mongoid::Atomic do
                     }
                   }
                 }
+              )
             end
           end
 
@@ -144,7 +149,7 @@ describe Mongoid::Atomic do
             end
 
             it "returns the $set for 1st level and other for the 2nd level" do
-              person.atomic_updates.should ==
+              person.atomic_updates.should eq(
                 {
                   "$set" => {
                     "title" => "Sir",
@@ -163,6 +168,7 @@ describe Mongoid::Atomic do
                     }
                   }
                 }
+              )
             end
           end
         end
@@ -178,7 +184,7 @@ describe Mongoid::Atomic do
           end
 
           it "returns the proper $sets and $pushAlls for all levels" do
-            person.atomic_updates.should ==
+            person.atomic_updates.should eq(
               {
                 "$set" => {
                   "title" => "Sir",
@@ -194,6 +200,7 @@ describe Mongoid::Atomic do
                   }]
                 }
               }
+            )
           end
         end
       end

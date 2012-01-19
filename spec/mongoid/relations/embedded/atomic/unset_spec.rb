@@ -29,16 +29,17 @@ describe Mongoid::Relations::Embedded::Atomic::Unset do
         end
 
         it "unsets the selector" do
-          unset.selector.should == selector
+          unset.selector.should eq(selector)
         end
 
         it "unsets the $unset operations" do
-          unset.operations.should ==
+          unset.operations.should eq(
             { "$unset" => { "addresses" => true } }
+          )
         end
 
         it "unsets the options" do
-          unset.options.should == options
+          unset.options.should eq(options)
         end
       end
 
@@ -70,16 +71,17 @@ describe Mongoid::Relations::Embedded::Atomic::Unset do
         end
 
         it "unsets the selector" do
-          unset.selector.should == selector
+          unset.selector.should eq(selector)
         end
 
         it "unsets the $unset operations" do
-          unset.operations.should ==
+          unset.operations.should eq(
             { "$unset" => { "addresses" => true } }
+          )
         end
 
         it "unsets the options" do
-          unset.options.should == options
+          unset.options.should eq(options)
         end
       end
     end
@@ -109,16 +111,17 @@ describe Mongoid::Relations::Embedded::Atomic::Unset do
         end
 
         it "unsets the selector" do
-          unset.selector.should == selector
+          unset.selector.should eq(selector)
         end
 
         it "unsets the $unset operations" do
-          unset.operations.should ==
+          unset.operations.should eq(
             { "$unset" => { "addresses" => true } }
+          )
         end
 
         it "unsets the options" do
-          unset.options.should == options
+          unset.options.should eq(options)
         end
       end
 
@@ -150,16 +153,17 @@ describe Mongoid::Relations::Embedded::Atomic::Unset do
         end
 
         it "unsets the selector" do
-          unset.selector.should == selector
+          unset.selector.should eq(selector)
         end
 
         it "unsets the $unset operations" do
-          unset.operations.should ==
+          unset.operations.should eq(
             { "$unset" => { "addresses" => true } }
+          )
         end
 
         it "unsets the options" do
-          unset.options.should == options
+          unset.options.should eq(options)
         end
       end
     end

@@ -9,7 +9,7 @@ describe Mongoid::Fields::Internal::String do
   describe "#deserialize" do
 
     it "returns the string" do
-      field.deserialize("test").should == "test"
+      field.deserialize("test").should eq("test")
     end
   end
 
@@ -46,7 +46,7 @@ describe Mongoid::Fields::Internal::String do
     context "when the value is not nil" do
 
       it "returns the object to_s" do
-        field.serialize(1).should == "1"
+        field.serialize(1).should eq("1")
       end
     end
 

@@ -99,7 +99,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the is rss field for parse role" do
-          item.is_rss.should eq(false)
+          item.is_rss.should be_false
         end
 
         it "does not set the title field" do
@@ -230,7 +230,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the is rss field for parse role" do
-          item.is_rss.should eq(false)
+          item.is_rss.should be_false
         end
 
         it "does not set the title field" do

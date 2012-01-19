@@ -26,11 +26,11 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "appends to the target" do
-          person.addresses.should == [ address ]
+          person.addresses.should eq([ address ])
         end
 
         it "sets the base on the inverse relation" do
-          address.addressable.should == person
+          address.addressable.should eq(person)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -42,7 +42,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the parent on the child" do
-          address._parent.should == person
+          address._parent.should eq(person)
         end
 
         it "sets the metadata on the child" do
@@ -50,7 +50,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the index on the child" do
-          address._index.should == 0
+          address._index.should eq(0)
         end
 
         context "with a limiting default scope" do
@@ -158,11 +158,11 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "appends to the target" do
-            parent_role.child_roles.should == [ child_role ]
+            parent_role.child_roles.should eq([ child_role ])
           end
 
           it "sets the base on the inverse relation" do
-            child_role.parent_role.should == parent_role
+            child_role.parent_role.should eq(parent_role)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -174,7 +174,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "sets the parent on the child" do
-            child_role._parent.should == parent_role
+            child_role._parent.should eq(parent_role)
           end
 
           it "sets the metadata on the child" do
@@ -182,7 +182,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "sets the index on the child" do
-            child_role._index.should == 0
+            child_role._index.should eq(0)
           end
         end
 
@@ -225,7 +225,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the target of the relation" do
-        person.addresses.should == [ address ]
+        person.addresses.should eq([ address ])
       end
 
       it "sets the _unscoped of the relation" do
@@ -233,7 +233,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the base on the inverse relation" do
-        address.addressable.should == person
+        address.addressable.should eq(person)
       end
 
       it "sets the same instance on the inverse relation" do
@@ -245,7 +245,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the parent on the child" do
-        address._parent.should == person
+        address._parent.should eq(person)
       end
 
       it "sets the metadata on the child" do
@@ -253,7 +253,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the index on the child" do
-        address._index.should == 0
+        address._index.should eq(0)
       end
     end
 
@@ -354,7 +354,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "allows creation of the embedded document" do
-        tracking_id.validation_history.size.should == 1
+        tracking_id.validation_history.size.should eq(1)
       end
 
       it "saves the relation" do
@@ -362,7 +362,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "remains on reload" do
-        tracking_id.reload.validation_history.size.should == 1
+        tracking_id.reload.validation_history.size.should eq(1)
       end
     end
 
@@ -381,7 +381,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "requires an inflection to determine the class" do
-        slave.reload.address_numbers.size.should == 1
+        slave.reload.address_numbers.size.should eq(1)
       end
     end
 
@@ -437,11 +437,11 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the target of the relation" do
-          parent_role.child_roles.should == [ child_role ]
+          parent_role.child_roles.should eq([ child_role ])
         end
 
         it "sets the base on the inverse relation" do
-          child_role.parent_role.should == parent_role
+          child_role.parent_role.should eq(parent_role)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -453,7 +453,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the parent on the child" do
-          child_role._parent.should == parent_role
+          child_role._parent.should eq(parent_role)
         end
 
         it "sets the metadata on the child" do
@@ -461,7 +461,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the index on the child" do
-          child_role._index.should == 0
+          child_role._index.should eq(0)
         end
       end
 
@@ -790,7 +790,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the average value of the supplied field" do
-      avg.should == 7.5
+      avg.should eq(7.5)
     end
   end
 
@@ -833,7 +833,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "appends to the target" do
-          person.addresses.should == [ address ]
+          person.addresses.should eq([ address ])
         end
 
         it "appends to the unscoped" do
@@ -841,7 +841,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the base on the inverse relation" do
-          address.addressable.should == person
+          address.addressable.should eq(person)
         end
 
         it "does not save the new document" do
@@ -849,7 +849,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the parent on the child" do
-          address._parent.should == person
+          address._parent.should eq(person)
         end
 
         it "sets the metadata on the child" do
@@ -857,15 +857,15 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the index on the child" do
-          address._index.should == 0
+          address._index.should eq(0)
         end
 
         it "writes to the attributes" do
-          address.street.should == "Bond"
+          address.street.should eq("Bond")
         end
 
         it "calls the passed block" do
-          address.state.should == "CA"
+          address.state.should eq("CA")
         end
       end
 
@@ -880,11 +880,11 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "appends to the target" do
-          parent_role.child_roles.should == [ child_role ]
+          parent_role.child_roles.should eq([ child_role ])
         end
 
         it "sets the base on the inverse relation" do
-          child_role.parent_role.should == parent_role
+          child_role.parent_role.should eq(parent_role)
         end
 
         it "does not save the new document" do
@@ -892,7 +892,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the parent on the child" do
-          child_role._parent.should == parent_role
+          child_role._parent.should eq(parent_role)
         end
 
         it "sets the metadata on the child" do
@@ -900,11 +900,11 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the index on the child" do
-          child_role._index.should == 0
+          child_role._index.should eq(0)
         end
 
         it "writes to the attributes" do
-          child_role.name.should == "CTO"
+          child_role.name.should eq("CTO")
         end
       end
 
@@ -933,7 +933,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "persists the deeply embedded document" do
-            location.name.should == "Home"
+            location.name.should eq("Home")
           end
         end
       end
@@ -1003,7 +1003,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "returns the relation" do
-          relation.should == []
+          relation.should be_empty
         end
       end
 
@@ -1060,7 +1060,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "appends to the target" do
-        person.addresses.should == [ address ]
+        person.addresses.should eq([ address ])
       end
 
       it "appends to the unscoped" do
@@ -1068,7 +1068,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the base on the inverse relation" do
-        address.addressable.should == person
+        address.addressable.should eq(person)
       end
 
       it "sets the same instance on the inverse relation" do
@@ -1080,7 +1080,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the parent on the child" do
-        address._parent.should == person
+        address._parent.should eq(person)
       end
 
       it "sets the metadata on the child" do
@@ -1088,7 +1088,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the index on the child" do
-        address._index.should == 0
+        address._index.should eq(0)
       end
     end
 
@@ -1155,11 +1155,11 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "appends to the target" do
-          parent_role.child_roles.should == [ child_role ]
+          parent_role.child_roles.should eq([ child_role ])
         end
 
         it "sets the base on the inverse relation" do
-          child_role.parent_role.should == parent_role
+          child_role.parent_role.should eq(parent_role)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -1171,7 +1171,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the parent on the child" do
-          child_role._parent.should == parent_role
+          child_role._parent.should eq(parent_role)
         end
 
         it "sets the metadata on the child" do
@@ -1179,7 +1179,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the index on the child" do
-          child_role._index.should == 0
+          child_role._index.should eq(0)
         end
       end
 
@@ -1216,7 +1216,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the number of persisted documents" do
-      person.addresses.count.should == 1
+      person.addresses.count.should eq(1)
     end
   end
 
@@ -1256,7 +1256,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "appends to the target" do
-        person.reload.addresses.should == [ address ]
+        person.reload.addresses.should eq([ address ])
       end
 
       it "appends to the unscoped" do
@@ -1264,7 +1264,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the base on the inverse relation" do
-        address.addressable.should == person
+        address.addressable.should eq(person)
       end
 
       it "saves the document" do
@@ -1272,7 +1272,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the parent on the child" do
-        address._parent.should == person
+        address._parent.should eq(person)
       end
 
       it "sets the metadata on the child" do
@@ -1280,15 +1280,15 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the index on the child" do
-        address._index.should == 0
+        address._index.should eq(0)
       end
 
       it "writes to the attributes" do
-        address.street.should == "Bond"
+        address.street.should eq("Bond")
       end
 
       it "calls the passed block" do
-        address.state.should == "CA"
+        address.state.should eq("CA")
       end
 
       context "when embedding a multi word named document" do
@@ -1298,7 +1298,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "saves the embedded document" do
-          person.reload.address_components.first.should == component
+          person.reload.address_components.first.should eq(component)
         end
       end
     end
@@ -1349,7 +1349,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "appends to the target" do
-        person.addresses.should == [ address ]
+        person.addresses.should eq([ address ])
       end
 
       it "appends to the unscoped" do
@@ -1357,7 +1357,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the base on the inverse relation" do
-        address.addressable.should == person
+        address.addressable.should eq(person)
       end
 
       it "saves the document" do
@@ -1365,7 +1365,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the parent on the child" do
-        address._parent.should == person
+        address._parent.should eq(person)
       end
 
       it "sets the metadata on the child" do
@@ -1373,11 +1373,11 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the index on the child" do
-        address._index.should == 0
+        address._index.should eq(0)
       end
 
       it "writes to the attributes" do
-        address.street.should == "Bond"
+        address.street.should eq("Bond")
       end
     end
 
@@ -1416,7 +1416,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "deletes the document" do
-        person.addresses.should == [ address_two ]
+        person.addresses.should eq([ address_two ])
       end
 
       it "deletes the document from the unscoped" do
@@ -1424,11 +1424,11 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "reindexes the relation" do
-        address_two._index.should == 0
+        address_two._index.should eq(0)
       end
 
       it "returns the document" do
-        deleted.should == address_one
+        deleted.should eq(address_one)
       end
     end
 
@@ -1468,7 +1468,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "removes the matching documents" do
-            person.addresses.size.should == 1
+            person.addresses.size.should eq(1)
           end
 
           it "removes from the unscoped" do
@@ -1476,7 +1476,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "returns the number deleted" do
-            deleted.should == 1
+            deleted.should eq(1)
           end
         end
 
@@ -1487,11 +1487,11 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "removes all documents" do
-            person.addresses.size.should == 0
+            person.addresses.size.should eq(0)
           end
 
           it "returns the number deleted" do
-            deleted.should == 2
+            deleted.should eq(2)
           end
         end
       end
@@ -1516,15 +1516,15 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "deletes the matching documents" do
-            person.addresses.count.should == 1
+            person.addresses.count.should eq(1)
           end
 
           it "deletes the matching documents from the db" do
-            person.reload.addresses.count.should == 1
+            person.reload.addresses.count.should eq(1)
           end
 
           it "returns the number deleted" do
-            deleted.should == 1
+            deleted.should eq(1)
           end
         end
 
@@ -1535,15 +1535,15 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "deletes all the documents" do
-            person.addresses.count.should == 0
+            person.addresses.count.should eq(0)
           end
 
           it "deletes all the documents from the db" do
-            person.reload.addresses.count.should == 0
+            person.reload.addresses.count.should eq(0)
           end
 
           it "returns the number deleted" do
-            deleted.should == 2
+            deleted.should eq(2)
           end
         end
 
@@ -1580,15 +1580,15 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "deletes all the documents" do
-            person.addresses.count.should == 0
+            person.addresses.count.should eq(0)
           end
 
           it "deletes all the documents from the db" do
-            person.reload.addresses.count.should == 0
+            person.reload.addresses.count.should eq(0)
           end
 
           it "returns the number deleted" do
-            deleted.should == 0
+            deleted.should eq(0)
           end
         end
 
@@ -1602,15 +1602,15 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "deletes all the documents" do
-            person.addresses.count.should == 0
+            person.addresses.count.should eq(0)
           end
 
           it "deletes all the documents from the db" do
-            person.reload.addresses.count.should == 0
+            person.reload.addresses.count.should eq(0)
           end
 
           it "returns the number deleted" do
-            deleted.should == 0
+            deleted.should eq(0)
           end
         end
 
@@ -1621,15 +1621,15 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "deletes all the documents" do
-            person.addresses.count.should == 0
+            person.addresses.count.should eq(0)
           end
 
           it "deletes all the documents from the db" do
-            person.reload.addresses.count.should == 0
+            person.reload.addresses.count.should eq(0)
           end
 
           it "returns the number deleted" do
-            deleted.should == 0
+            deleted.should eq(0)
           end
         end
       end
@@ -1695,7 +1695,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "returns the matching document" do
-          address.should == address_one
+          address.should eq(address_one)
         end
       end
 
@@ -1744,7 +1744,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "returns the matching documents" do
-          addresses.should == [ address_one, address_two ]
+          addresses.should eq([ address_one, address_two ])
         end
       end
 
@@ -1802,7 +1802,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns the document" do
-        found.should == address
+        found.should eq(address)
       end
     end
 
@@ -1815,7 +1815,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the new document attributes" do
-        found.street.should == "King"
+        found.street.should eq("King")
       end
 
       it "returns a newly persisted document" do
@@ -1823,7 +1823,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "calls the passed block" do
-        found.state.should == "CA"
+        found.state.should eq("CA")
       end
     end
 
@@ -1867,7 +1867,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns the document" do
-        found.should == address
+        found.should eq(address)
       end
     end
 
@@ -1880,7 +1880,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the new document attributes" do
-        found.street.should == "King"
+        found.street.should eq("King")
       end
 
       it "returns a non persisted document" do
@@ -1888,7 +1888,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "calls the passed block" do
-        found.state.should == "CA"
+        found.state.should eq("CA")
       end
     end
   end
@@ -1896,7 +1896,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe ".macro" do
 
     it "returns embeds_many" do
-      described_class.macro.should == :embeds_many
+      described_class.macro.should eq(:embeds_many)
     end
   end
 
@@ -1923,7 +1923,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the max value of the supplied field" do
-      max.should == 10
+      max.should eq(10)
     end
   end
 
@@ -1958,7 +1958,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "applies the criteria to the documents" do
-          addresses.should == [ address_one ]
+          addresses.should eq([ address_one ])
         end
       end
 
@@ -1969,7 +1969,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "applies the criteria to the documents" do
-          addresses.should == [ address_one, address_two ]
+          addresses.should eq([ address_one, address_two ])
         end
       end
 
@@ -1980,7 +1980,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "applies the criteria to the documents" do
-          addresses.should == [ address_one, address_two ]
+          addresses.should eq([ address_one, address_two ])
         end
       end
     end
@@ -1992,7 +1992,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "applies the criteria to the documents" do
-        addresses.should == [ address_one ]
+        addresses.should eq([ address_one ])
       end
     end
 
@@ -2003,7 +2003,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "applies the criteria to the documents" do
-        addresses.should == [ address_one ]
+        addresses.should eq([ address_one ])
       end
     end
 
@@ -2042,7 +2042,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the min value of the supplied field" do
-      min.should == 5
+      min.should eq(5)
     end
   end
 
@@ -2136,7 +2136,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns the number of persisted documents" do
-        person.addresses.send(method).should == 2
+        person.addresses.send(method).should eq(2)
       end
     end
   end
@@ -2164,7 +2164,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     it "returns the sum of all the supplied field values" do
-      sum.should == 15
+      sum.should eq(15)
     end
   end
 
@@ -2194,15 +2194,16 @@ describe Mongoid::Relations::Embedded::Many do
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
+      described_class.valid_options.should eq(
         [ :as, :cascade_callbacks, :cyclic, :order, :versioned ]
+      )
     end
   end
 
   describe ".validation_default" do
 
     it "returns true" do
-      described_class.validation_default.should eq(true)
+      described_class.validation_default.should be_true
     end
   end
 
@@ -2267,15 +2268,15 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets up the hierarchy" do
-          animal.circus.should == circus
+          animal.circus.should eq(circus)
         end
 
         it "assigns the attributes" do
-          animal.name.should == animal_name
+          animal.name.should eq(animal_name)
         end
 
         it "uses custom writer methods" do
-          animal.tag_list.should == tag_list
+          animal.tag_list.should eq(tag_list)
         end
       end
 
@@ -2286,15 +2287,15 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets up the hierarchy" do
-          animal.circus.should == circus
+          animal.circus.should eq(circus)
         end
 
         it "assigns the attributes" do
-          animal.name.should == animal_name
+          animal.name.should eq(animal_name)
         end
 
         it "uses custom writer methods" do
-          animal.tag_list.should == tag_list
+          animal.tag_list.should eq(tag_list)
         end
       end
     end
@@ -2323,7 +2324,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets up the hierarchy" do
-        question.should == page_question
+        question.should eq(page_question)
       end
     end
 
@@ -2346,7 +2347,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets up the hierarchy" do
-        question.should == page_question
+        question.should eq(page_question)
       end
     end
 
@@ -2374,7 +2375,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets up the hierarchy" do
-        question.should == page_question
+        question.should eq(page_question)
       end
 
       context "when reloading" do
@@ -2388,7 +2389,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "reloads the entire tree" do
-          reloaded_question.should == question
+          reloaded_question.should eq(question)
         end
       end
     end
@@ -2487,7 +2488,7 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "should ignore the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
-          reloaded.phone_numbers.should == person.phone_numbers
+          reloaded.phone_numbers.should eq(person.phone_numbers)
         end
       end
 
@@ -2506,7 +2507,7 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "should ignore the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
-          reloaded.phone_numbers.should == person.phone_numbers
+          reloaded.phone_numbers.should eq(person.phone_numbers)
         end
       end
 
@@ -2525,7 +2526,7 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "should ignore the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
-          reloaded.phone_numbers.should == person.phone_numbers
+          reloaded.phone_numbers.should eq(person.phone_numbers)
         end
       end
     end
@@ -2623,7 +2624,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "does not lose the parent reference" do
-        from_db.memberships.first.account.should == account
+        from_db.memberships.first.account.should eq(account)
       end
     end
 
@@ -2634,7 +2635,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "does not lose the parent reference" do
-        from_db.memberships.first.account.should == account
+        from_db.memberships.first.account.should eq(account)
       end
     end
   end

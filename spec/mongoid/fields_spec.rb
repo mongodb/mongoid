@@ -462,7 +462,7 @@ describe Mongoid::Fields do
         end
 
         it "performs the necessary time conversions" do
-          person.lunch_time.to_s.should == time.getlocal.to_s
+          person.lunch_time.to_s.should eq(time.getlocal.to_s)
         end
       end
     end
@@ -478,12 +478,12 @@ describe Mongoid::Fields do
       end
 
       it "adds a reader for the fields defined" do
-        person.testing.should == "Test"
+        person.testing.should eq("Test")
       end
 
       it "adds a writer for the fields defined" do
         person.testing = "Testy"
-        person.testing.should == "Testy"
+        person.testing.should eq("Testy")
       end
 
       it "adds an existance method" do
@@ -511,7 +511,7 @@ describe Mongoid::Fields do
       end
 
       it "returns the given value" do
-        bob.reading.should == 10.023
+        bob.reading.should eq(10.023)
       end
     end
 
@@ -812,11 +812,11 @@ describe Mongoid::Fields do
     end
 
     it "sets the new type on the field" do
-      new_field.type.should == String
+      new_field.type.should eq(String)
     end
 
     it "keeps the options from the old field" do
-      new_field.options[:label].should == "id"
+      new_field.options[:label].should eq("id")
     end
   end
 

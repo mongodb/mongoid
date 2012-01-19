@@ -48,7 +48,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
         end
 
         it "performs conversion on the ids if strings" do
-          field.serialize(object_id.to_s).should == object_id
+          field.serialize(object_id.to_s).should eq(object_id)
         end
       end
 
@@ -81,7 +81,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
             end
 
             it "does not convert" do
-              field.serialize(object_id.to_s).should == object_id.to_s
+              field.serialize(object_id.to_s).should eq(object_id.to_s)
             end
           end
 

@@ -93,8 +93,9 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the delete strategy" do
-        metadata.cascade_strategy.should ==
+        metadata.cascade_strategy.should eq(
           Mongoid::Relations::Cascading::Delete
+        )
       end
     end
 
@@ -109,8 +110,9 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the destroy strategy" do
-        metadata.cascade_strategy.should ==
+        metadata.cascade_strategy.should eq(
           Mongoid::Relations::Cascading::Destroy
+        )
       end
     end
 
@@ -125,8 +127,9 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the nullify strategy" do
-        metadata.cascade_strategy.should ==
+        metadata.cascade_strategy.should eq(
           Mongoid::Relations::Cascading::Nullify
+        )
       end
     end
   end
@@ -173,7 +176,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "constantizes the class name" do
-          metadata.class_name.should == "Person"
+          metadata.class_name.should eq("Person")
         end
       end
     end
@@ -191,7 +194,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "classifies and constantizes the association name" do
-          metadata.class_name.should == "Name"
+          metadata.class_name.should eq("Name")
         end
       end
 
@@ -206,7 +209,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "classifies and constantizes the association name" do
-          metadata.class_name.should == "Address"
+          metadata.class_name.should eq("Address")
         end
       end
     end
@@ -281,7 +284,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the extend property" do
-      metadata.extension.should == :value
+      metadata.extension.should eq(:value)
     end
   end
 
@@ -297,7 +300,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.extension?.should == true
+        metadata.extension?.should be_true
       end
     end
 
@@ -310,7 +313,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.extension?.should == false
+        metadata.extension?.should be_false
       end
     end
   end
@@ -333,7 +336,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should == "person_id"
+              metadata.foreign_key.should eq("person_id")
             end
           end
 
@@ -348,7 +351,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should == "person_id"
+              metadata.foreign_key.should eq("person_id")
             end
           end
 
@@ -363,7 +366,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key without the module name" do
-              metadata.foreign_key.should == "apple_id"
+              metadata.foreign_key.should eq("apple_id")
             end
           end
         end
@@ -378,7 +381,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the foreign_key" do
-            metadata.foreign_key.should == "person_ids"
+            metadata.foreign_key.should eq("person_ids")
           end
 
           context "given a specific foreign key" do
@@ -391,7 +394,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should == "follower_list"
+              metadata.foreign_key.should eq("follower_list")
             end
           end
 
@@ -405,7 +408,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should == "follower_ids"
+              metadata.foreign_key.should eq("follower_ids")
             end
           end
 
@@ -420,11 +423,11 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key without the module name" do
-              metadata.foreign_key.should == "banana_ids"
+              metadata.foreign_key.should eq("banana_ids")
             end
 
             it "returns the inverse_foreign_key without the module name" do
-              metadata.inverse_foreign_key.should == "apple_ids"
+              metadata.inverse_foreign_key.should eq("apple_ids")
             end
           end
         end
@@ -443,7 +446,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the inverse foreign key" do
-            metadata.foreign_key.should == "person_id"
+            metadata.foreign_key.should eq("person_id")
           end
         end
 
@@ -461,7 +464,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the inverse_of plus suffix" do
-              metadata.foreign_key.should == "creator_id"
+              metadata.foreign_key.should eq("creator_id")
             end
           end
 
@@ -476,7 +479,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the inverse foreign key" do
-              metadata.foreign_key.should == "person_id"
+              metadata.foreign_key.should eq("person_id")
             end
           end
 
@@ -492,7 +495,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key without the module name" do
-              metadata.foreign_key.should == "apple_id"
+              metadata.foreign_key.should eq("apple_id")
             end
           end
         end
@@ -510,7 +513,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the foreign_key" do
-        metadata.foreign_key.should == "blog_post_id"
+        metadata.foreign_key.should eq("blog_post_id")
       end
     end
   end
@@ -528,7 +531,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns an empty array" do
-        metadata.foreign_key_default.should == []
+        metadata.foreign_key_default.should be_empty
       end
     end
 
@@ -561,7 +564,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the foreign_key plus =" do
-        metadata.foreign_key_setter.should == "person_id="
+        metadata.foreign_key_setter.should eq("person_id=")
       end
     end
 
@@ -577,7 +580,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the polymorphic foreign_key plus =" do
-        metadata.foreign_key_setter.should == "ratable_id="
+        metadata.foreign_key_setter.should eq("ratable_id=")
       end
     end
   end
@@ -593,7 +596,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "contains all relevant information" do
-      metadata.inspect.should ==
+      metadata.inspect.should eq(
         "#<Mongoid::Relations::Metadata\n" <<
         "  class_name:           #{metadata.class_name},\n" <<
         "  cyclic:               #{metadata.cyclic || "No"},\n" <<
@@ -607,6 +610,7 @@ describe Mongoid::Relations::Metadata do
         "  relation:             #{metadata.relation},\n" <<
         "  setter:               #{metadata.setter},\n" <<
         "  versioned:            #{metadata.versioned? || "No"}>\n"
+      )
     end
   end
 
@@ -639,7 +643,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the polymorphic name plus type" do
-        metadata.inverse_type.should == "ratable_type"
+        metadata.inverse_type.should eq("ratable_type")
       end
     end
   end
@@ -673,7 +677,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the inverse type plus =" do
-        metadata.inverse_type_setter.should == "ratable_type="
+        metadata.inverse_type_setter.should eq("ratable_type=")
       end
     end
   end
@@ -690,7 +694,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.indexed?.should == true
+        metadata.indexed?.should be_true
       end
     end
 
@@ -703,7 +707,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.indexed?.should == false
+        metadata.indexed?.should be_false
       end
     end
 
@@ -717,7 +721,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.indexed?.should == false
+        metadata.indexed?.should be_false
       end
     end
   end
@@ -767,7 +771,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the inverse_of property" do
-            metadata.inverse.should == :crazy_name
+            metadata.inverse.should eq(:crazy_name)
           end
         end
       end
@@ -784,7 +788,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the relation" do
-          metadata.inverse.should == :person
+          metadata.inverse.should eq(:person)
         end
       end
 
@@ -800,7 +804,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the relation" do
-          metadata.inverse.should == :addressable
+          metadata.inverse.should eq(:addressable)
         end
       end
 
@@ -816,7 +820,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the relation" do
-          metadata.inverse(Person.new).should == :addresses
+          metadata.inverse(Person.new).should eq(:addresses)
         end
       end
 
@@ -835,7 +839,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the relation" do
-            metadata.inverse(Role.new).should == :child_roles
+            metadata.inverse(Role.new).should eq(:child_roles)
           end
         end
 
@@ -852,7 +856,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the relation" do
-            metadata.inverse(Entry.new).should == :child_entries
+            metadata.inverse(Entry.new).should eq(:child_entries)
           end
         end
       end
@@ -874,7 +878,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the inverse class name plus suffix" do
-        metadata.inverse_foreign_key.should == "person_ids"
+        metadata.inverse_foreign_key.should eq("person_ids")
       end
     end
 
@@ -905,7 +909,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "constantizes the inverse_class_name" do
-      metadata.inverse_klass.should == Person
+      metadata.inverse_klass.should eq(Person)
     end
   end
 
@@ -923,7 +927,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns a string for the setter" do
-        metadata.inverse_setter.should == "person="
+        metadata.inverse_setter.should eq("person=")
       end
     end
 
@@ -945,7 +949,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns a string for the setter" do
-          metadata.inverse_setter(other).should == "ratings="
+          metadata.inverse_setter(other).should eq("ratings=")
         end
       end
 
@@ -961,7 +965,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns a string for the setter" do
-          metadata.inverse_setter.should == "ratable="
+          metadata.inverse_setter.should eq("ratable=")
         end
       end
     end
@@ -979,7 +983,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the name as a string" do
-        metadata.key.should == "addresses"
+        metadata.key.should eq("addresses")
       end
     end
 
@@ -997,7 +1001,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the foreign_key" do
-            metadata.key.should == "post_ids"
+            metadata.key.should eq("post_ids")
           end
         end
 
@@ -1012,7 +1016,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the polymorphic foreign_key" do
-            metadata.key.should == "ratable_id"
+            metadata.key.should eq("ratable_id")
           end
         end
       end
@@ -1028,7 +1032,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns _id" do
-          metadata.key.should == "_id"
+          metadata.key.should eq("_id")
         end
       end
     end
@@ -1043,7 +1047,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns order criteria" do
-      metadata.order.should == :rating.asc
+      metadata.order.should eq(:rating.asc)
     end
 
   end
@@ -1111,7 +1115,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the macro from the relation" do
-      metadata.macro.should == :embeds_one
+      metadata.macro.should eq(:embeds_one)
     end
   end
 
@@ -1151,7 +1155,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns true" do
-          metadata.validate?.should eq(true)
+          metadata.validate?.should be_true
         end
       end
 
@@ -1167,7 +1171,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns false" do
-          metadata.validate?.should eq(false)
+          metadata.validate?.should be_false
         end
       end
     end
@@ -1183,7 +1187,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the relation default" do
-        metadata.validate?.should eq(true)
+        metadata.validate?.should be_true
       end
     end
   end
@@ -1256,7 +1260,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the #{property} property" do
-          metadata.send(property).should == :value
+          metadata.send(property).should eq(:value)
         end
       end
 
@@ -1272,7 +1276,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns true" do
-            metadata.send("#{property}?").should == true
+            metadata.send("#{property}?").should be_true
           end
         end
 
@@ -1285,7 +1289,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns false" do
-            metadata.send("#{property}?").should == false
+            metadata.send("#{property}?").should be_false
           end
         end
       end

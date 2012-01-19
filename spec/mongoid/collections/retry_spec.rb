@@ -104,7 +104,7 @@ describe Mongoid::Collections::Retry do
       end
 
       it "should return the result of the command" do
-        subject.perform.should == result
+        subject.perform.should eq(result)
       end
 
       it "sends warning message to logger on retry attempts" do
@@ -193,7 +193,7 @@ describe Mongoid::Collections::Retry do
         end
 
         it "should return the result of the command" do
-          subject.perform.should == result
+          subject.perform.should eq(result)
         end
 
         it "sends warning message to logger on retry attempts" do

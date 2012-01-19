@@ -52,7 +52,7 @@ describe Mongoid::Fields::Internal::Time do
       context "when the string is a valid time" do
 
         it "converts to a utc time" do
-          field.serialize(time.to_s).utc_offset.should == 0
+          field.serialize(time.to_s).utc_offset.should eq(0)
         end
 
         it "serializes with time parsing" do
@@ -183,11 +183,11 @@ describe Mongoid::Fields::Internal::Time do
       end
 
       it "converts to a utc time" do
-        field.serialize(date).should == Time.local(date.year, date.month, date.day)
+        field.serialize(date).should eq(Time.local(date.year, date.month, date.day))
       end
 
       it "has a zero utc offset" do
-        field.serialize(date).utc_offset.should == 0
+        field.serialize(date).utc_offset.should eq(0)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -208,7 +208,7 @@ describe Mongoid::Fields::Internal::Time do
         end
 
         it "assumes the given time is local" do
-          field.serialize(date).should == Time.utc(2010, 11, 18, 23)
+          field.serialize(date).should eq(Time.utc(2010, 11, 18, 23))
         end
       end
     end
@@ -220,7 +220,7 @@ describe Mongoid::Fields::Internal::Time do
       end
 
       it "returns a time" do
-        field.serialize(array).should == Time.local(*array)
+        field.serialize(array).should eq(Time.local(*array))
       end
 
       context "when using the ActiveSupport time zone" do
@@ -494,7 +494,7 @@ describe Mongoid::Fields::Internal::Time do
         end
 
         it "changes the day since UTC is behind Stockholm" do
-          field.deserialize(new_time).day.should == 18
+          field.deserialize(new_time).day.should eq(18)
         end
       end
     end

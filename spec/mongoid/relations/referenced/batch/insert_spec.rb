@@ -25,11 +25,11 @@ describe Mongoid::Relations::Referenced::Batch::Insert do
     end
 
     it "sets the options" do
-      insert.options.should == options
+      insert.options.should eq(options)
     end
 
     it "appends the document" do
-      insert.documents.should == [ document ]
+      insert.documents.should eq([ document ])
     end
   end
 

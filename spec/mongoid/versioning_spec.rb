@@ -19,7 +19,7 @@ describe Mongoid::Versioning do
       end
 
       it "sets the class version max" do
-        WikiPage.version_max.should == 10
+        WikiPage.version_max.should eq(10)
       end
     end
 
@@ -34,7 +34,7 @@ describe Mongoid::Versioning do
       end
 
       it "sets the class version max" do
-        WikiPage.version_max.should == 10
+        WikiPage.version_max.should eq(10)
       end
     end
   end

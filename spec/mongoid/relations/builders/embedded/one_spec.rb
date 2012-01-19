@@ -46,7 +46,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
       end
 
       it "returns the document" do
-        document.should == object
+        document.should eq(object)
       end
     end
 
@@ -69,7 +69,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
       end
 
       it "sets the object on the document" do
-        document.first_name.should == "Corbin"
+        document.first_name.should eq("Corbin")
       end
     end
 
@@ -92,7 +92,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
       end
 
       it "sets the object on the document" do
-        document.speed.should == 100
+        document.speed.should eq(100)
       end
     end
   end

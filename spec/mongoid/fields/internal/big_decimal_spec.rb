@@ -43,7 +43,7 @@ describe Mongoid::Fields::Internal::BigDecimal do
     context "when the the value is a string" do
 
       it "returns a big decimal" do
-        field.deserialize(number.to_s).should == number
+        field.deserialize(number.to_s).should eq(number)
       end
     end
 
@@ -60,7 +60,7 @@ describe Mongoid::Fields::Internal::BigDecimal do
     context "when the value is a big decimal" do
 
       it "returns a string" do
-        field.serialize(number).should == number.to_s
+        field.serialize(number).should eq(number.to_s)
       end
     end
 

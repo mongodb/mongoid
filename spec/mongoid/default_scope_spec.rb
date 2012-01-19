@@ -76,11 +76,11 @@ describe Mongoid::DefaultScope do
     end
 
     it "returns them in the correct order" do
-      Tree.all.entries.should == [ birch, fir, pine ]
+      Tree.all.entries.should eq([ birch, fir, pine ])
     end
 
     it "respects other scopes" do
-      Tree.verdant.entries.should == [ fir, pine ]
+      Tree.verdant.entries.should eq([ fir, pine ])
     end
   end
 
@@ -99,7 +99,7 @@ describe Mongoid::DefaultScope do
     end
 
     it "respects the default scope" do
-      person.reload.videos.all.should == [ bladerunner, tron ]
+      person.reload.videos.all.should eq([ bladerunner, tron ])
     end
   end
 end

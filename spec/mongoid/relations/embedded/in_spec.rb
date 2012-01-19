@@ -51,11 +51,11 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "sets the target of the relation" do
-          name.namable.should == person
+          name.namable.should eq(person)
         end
 
         it "sets the base on the inverse relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -82,11 +82,11 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "sets the target of the relation" do
-          name.namable.should == person
+          name.namable.should eq(person)
         end
 
         it "sets the base on the inverse relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -116,11 +116,11 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "sets the target of the relation" do
-          address.addressable.should == person
+          address.addressable.should eq(person)
         end
 
         it "appends the base on the inverse relation" do
-          person.addresses.should == [ address ]
+          person.addresses.should eq([ address ])
         end
 
         it "sets the same instance in the inverse relation" do
@@ -147,7 +147,7 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "sets the target of the relation" do
-          address.addressable.should == person
+          address.addressable.should eq(person)
         end
 
         it "sets the same instance in the inverse relation" do
@@ -155,7 +155,7 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "appends the base on the inverse relation" do
-          person.addresses.should == [ address ]
+          person.addresses.should eq([ address ])
         end
       end
     end
@@ -334,7 +334,7 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "removed the inverse relation" do
-          person.addresses.should == [ address_two ]
+          person.addresses.should eq([ address_two ])
         end
 
         it "deletes the child document" do
@@ -342,7 +342,7 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         it "reindexes the children" do
-          address_two._index.should == 0
+          address_two._index.should eq(0)
         end
       end
     end
@@ -381,7 +381,7 @@ describe Mongoid::Relations::Embedded::In do
   describe ".macro" do
 
     it "returns embeds_one" do
-      described_class.macro.should == :embedded_in
+      described_class.macro.should eq(:embedded_in)
     end
   end
 
@@ -433,15 +433,14 @@ describe Mongoid::Relations::Embedded::In do
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
-        [ :cyclic, :polymorphic ]
+      described_class.valid_options.should eq([ :cyclic, :polymorphic ])
     end
   end
 
   describe ".validation_default" do
 
     it "returns false" do
-      described_class.validation_default.should eq(false)
+      described_class.validation_default.should be_false
     end
   end
 
@@ -464,24 +463,25 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     it "saves the child" do
-      Person.last.addresses.last.should == address
+      Person.last.addresses.last.should eq(address)
     end
 
     it "indexes the child" do
-      address._index.should == 0
+      address._index.should eq(0)
     end
 
     it "saves the first location with the correct index" do
-      first_location._index.should == 0
+      first_location._index.should eq(0)
     end
 
     it "saves the second location with the correct index" do
-      second_location._index.should == 1
+      second_location._index.should eq(1)
     end
 
     it "has the locations in the association array" do
-      Person.last.addresses.last.locations.should ==
+      Person.last.addresses.last.locations.should eq(
         [first_location, second_location]
+      )
     end
   end
 

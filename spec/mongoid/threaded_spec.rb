@@ -66,7 +66,7 @@ describe Mongoid::Threaded do
       end
 
       it "returns an empty stack" do
-        loading.should eq([])
+        loading.should be_empty
       end
     end
 

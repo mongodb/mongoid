@@ -115,7 +115,7 @@ describe Mongoid::Hierarchy do
     end
 
     it "sets the parent document" do
-      address._parent.should == person
+      address._parent.should eq(person)
     end
   end
 
@@ -173,14 +173,14 @@ describe Mongoid::Hierarchy do
     context "when the document is not the root" do
 
       it "returns the root" do
-        address._root.should == person
+        address._root.should eq(person)
       end
     end
 
     context "when the document is the root" do
 
       it "returns self" do
-        person._root.should == person
+        person._root.should eq(person)
       end
     end
   end

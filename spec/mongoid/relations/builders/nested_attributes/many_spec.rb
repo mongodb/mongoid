@@ -120,7 +120,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "updates existing documents" do
-        person.addresses.first.street.should == "Maybachufer"
+        person.addresses.first.street.should eq("Maybachufer")
       end
     end
 
@@ -139,7 +139,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "adds new documents" do
-        person.addresses.first.street.should == "Maybachufer"
+        person.addresses.first.street.should eq("Maybachufer")
       end
     end
   end
@@ -159,7 +159,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     end
 
     it "sorts the attributes" do
-      builder.attributes.map { |e| e[0] }.should == [ "1", "2", "4" ]
+      builder.attributes.map { |e| e[0] }.should eq([ "1", "2", "4" ])
     end
   end
 

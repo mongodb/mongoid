@@ -31,7 +31,7 @@ describe Mongoid::Attributes do
       context "when attribute does not exist" do
 
         it "returns the default value" do
-          person[:age].should == 100
+          person[:age].should eq(100)
         end
       end
 
@@ -42,7 +42,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns the value" do
-          person[:owner_id].should == 5
+          person[:owner_id].should eq(5)
         end
       end
     end
@@ -66,7 +66,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns the default value" do
-            found[:age].should == 100
+            found[:age].should eq(100)
           end
         end
 
@@ -79,7 +79,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns the default value" do
-            person[:age].should == 100
+            person[:age].should eq(100)
           end
         end
       end
@@ -146,7 +146,7 @@ describe Mongoid::Attributes do
       end
 
       it "ignores any protected attribute" do
-        account.balance.should == "ABBA"
+        account.balance.should eq("ABBA")
       end
     end
 
@@ -157,7 +157,7 @@ describe Mongoid::Attributes do
 
       it "ignores any protected attribute" do
         account.write_attributes({:balance => "ABBA"}, false)
-        account.balance.should == "ABBA"
+        account.balance.should eq("ABBA")
       end
     end
 
@@ -182,7 +182,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the rss field for the default role" do
-          article.is_rss.should eq(false)
+          article.is_rss.should be_false
         end
       end
 
@@ -267,7 +267,7 @@ describe Mongoid::Attributes do
       end
 
       it "ignores any protected attribute" do
-        person.security_code.should == "ABBA"
+        person.security_code.should eq("ABBA")
       end
     end
 
@@ -279,7 +279,7 @@ describe Mongoid::Attributes do
 
       it "ignores any protected attribute" do
         person.write_attributes({:security_code => "ABBA"}, false)
-        person.security_code.should == "ABBA"
+        person.security_code.should eq("ABBA")
       end
     end
 
@@ -327,7 +327,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the is rss field for parse role" do
-          item.is_rss.should eq(false)
+          item.is_rss.should be_false
         end
 
         it "does not set the title field" do
@@ -368,7 +368,7 @@ describe Mongoid::Attributes do
     end
 
     it "delegates to #id" do
-      person._id.should == person.id
+      person._id.should eq(person.id)
     end
   end
 
@@ -409,7 +409,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the object id" do
-          person.id.should == bson_id
+          person.id.should eq(bson_id)
         end
       end
 
@@ -420,7 +420,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the object id" do
-          person.id.should == bson_id
+          person.id.should eq(bson_id)
         end
       end
 
@@ -431,7 +431,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the supplied value to_s" do
-          person.id.should == 2
+          person.id.should eq(2)
         end
       end
     end
@@ -462,7 +462,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the string of the object id" do
-          person.id.should == bson_id.to_s
+          person.id.should eq(bson_id.to_s)
         end
       end
 
@@ -473,7 +473,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the string" do
-          person.id.should == bson_id.to_s
+          person.id.should eq(bson_id.to_s)
         end
       end
 
@@ -484,7 +484,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the supplied value to_s" do
-          person.id.should == "2"
+          person.id.should eq("2")
         end
       end
     end
@@ -506,7 +506,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the integer" do
-          person.id.should == 1
+          person.id.should eq(1)
         end
       end
 
@@ -517,7 +517,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the supplied value" do
-          person.id.should == 2
+          person.id.should eq(2)
         end
       end
     end
@@ -540,16 +540,16 @@ describe Mongoid::Attributes do
     context "when an attribute exists" do
 
       it "allows the getter" do
-        person.testing.should == "Testing"
+        person.testing.should eq("Testing")
       end
 
       it "allows the setter" do
         person.testing = "Test"
-        person.testing.should == "Test"
+        person.testing.should eq("Test")
       end
 
       it "returns true for respond_to?" do
-        person.respond_to?(:testing).should == true
+        person.respond_to?(:testing).should be_true
       end
     end
   end
@@ -590,14 +590,14 @@ describe Mongoid::Attributes do
         context "when attribute is a string" do
 
           it "adds the string to the attributes" do
-            person.attributes["nofieldstring"].should == "Testing"
+            person.attributes["nofieldstring"].should eq("Testing")
           end
         end
 
         context "when attribute is not a string" do
 
           it "adds a cast value to the attributes" do
-            person.attributes["nofieldint"].should == 5
+            person.attributes["nofieldint"].should eq(5)
           end
         end
       end
@@ -651,15 +651,15 @@ describe Mongoid::Attributes do
       end
 
       it "casts integers" do
-        person[:age].should == 30
+        person[:age].should eq(30)
       end
 
       it "casts booleans" do
-        person[:terms].should == true
+        person[:terms].should be_true
       end
 
       it "casts ids" do
-        person[:_id].should == bson_id
+        person[:_id].should eq(bson_id)
       end
 
       it "sets empty strings to nil" do
@@ -703,11 +703,11 @@ describe Mongoid::Attributes do
         end
 
         it "sets the parent association" do
-          person.game.should == game
+          person.game.should eq(game)
         end
 
         it "sets the inverse association" do
-          game.person.should == person
+          game.person.should eq(person)
         end
       end
 
@@ -722,7 +722,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the association" do
-          name.person.should == person
+          name.person.should eq(person)
         end
       end
     end
@@ -742,7 +742,7 @@ describe Mongoid::Attributes do
       end
 
       it "calls the setter for the association" do
-        person.employer_id.should == "1"
+        person.employer_id.should eq("1")
       end
     end
 
@@ -757,7 +757,7 @@ describe Mongoid::Attributes do
       end
 
       it "sets the empty array" do
-        person.aliases.should == []
+        person.aliases.should be_empty
       end
     end
 
@@ -772,7 +772,7 @@ describe Mongoid::Attributes do
       end
 
       it "sets the empty hash" do
-        person.map.should == {}
+        person.map.should eq({})
       end
     end
   end
@@ -792,7 +792,7 @@ describe Mongoid::Attributes do
     end
 
     it "only overwrites supplied attributes" do
-      person.title.should == "Sir"
+      person.title.should eq("Sir")
     end
   end
 
@@ -807,8 +807,8 @@ describe Mongoid::Attributes do
       context "when attribute does not exist" do
 
         it "returns the default value" do
-          person.age.should == 100
-          person.pets.should == false
+          person.age.should eq(100)
+          person.pets.should be_false
         end
 
       end
@@ -820,7 +820,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns the value" do
-          person.read_attribute(:owner_id).should == 5
+          person.read_attribute(:owner_id).should eq(5)
         end
       end
     end
@@ -841,7 +841,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns the default value" do
-          person.age.should == 100
+          person.age.should eq(100)
         end
       end
     end
@@ -1073,7 +1073,7 @@ describe Mongoid::Attributes do
       end
 
       it "returns the default value" do
-        person.age.should == 100
+        person.age.should eq(100)
       end
     end
 
@@ -1128,7 +1128,7 @@ describe Mongoid::Attributes do
       before { person.stubs(:fields).returns({}) }
 
       it "returns the value" do
-        person.send(:typed_value_for, "age", "51").should == "51"
+        person.send(:typed_value_for, "age", "51").should eq("51")
       end
 
     end
@@ -1219,8 +1219,8 @@ describe Mongoid::Attributes do
           end
 
           it "does not overwrite child attributes if not in the hash" do
-            owner.pet.name.should == "Bingo"
-            owner.pet.vet_visits.size.should == 1
+            owner.pet.name.should eq("Bingo")
+            owner.pet.vet_visits.size.should eq(1)
           end
         end
 
@@ -1258,8 +1258,9 @@ describe Mongoid::Attributes do
           end
 
           it "sets the child attributes on the parent" do
-            name.attributes.should ==
+            name.attributes.should eq(
               { "_id" => "Test-User", "first_name" => "Test2", "last_name" => "User2" }
+            )
           end
         end
 
@@ -1279,8 +1280,9 @@ describe Mongoid::Attributes do
           end
 
           it "updates the child attributes on the parent" do
-            address.attributes.should ==
+            address.attributes.should eq(
               { "_id" => "test", "street" => "Test2" }
+            )
           end
         end
       end
@@ -1383,7 +1385,7 @@ describe Mongoid::Attributes do
 
     it "saves the default" do
       expect { person.save }.to_not raise_error
-      person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
+      person.last_drink_taken_at.should eq(1.day.ago.in_time_zone("Alaska").to_date)
     end
   end
 
@@ -1396,7 +1398,7 @@ describe Mongoid::Attributes do
       end
 
       it "applies the default value" do
-        person.last_drink_taken_at.should == 1.day.ago.in_time_zone("Alaska").to_date
+        person.last_drink_taken_at.should eq(1.day.ago.in_time_zone("Alaska").to_date)
       end
     end
 
@@ -1468,7 +1470,7 @@ describe Mongoid::Attributes do
         end
 
         it "allows access to the legacy data" do
-          Person.first.pet.read_attribute(:unrecognized_field).should == true
+          Person.first.pet.read_attribute(:unrecognized_field).should be_true
         end
       end
     end

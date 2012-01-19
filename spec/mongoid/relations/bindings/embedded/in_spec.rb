@@ -41,11 +41,11 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         end
 
         it "parentizes the documents" do
-          name._parent.should == person
+          name._parent.should eq(person)
         end
 
         it "sets the inverse relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
       end
 
@@ -77,7 +77,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
           end
 
           it "parentizes the documents" do
-            address._parent.should == person
+            address._parent.should eq(person)
           end
 
           it "sets the inverse relation" do

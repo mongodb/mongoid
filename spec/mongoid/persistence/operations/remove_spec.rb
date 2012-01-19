@@ -27,11 +27,11 @@ describe Mongoid::Persistence::Operations::Remove do
     end
 
     it "sets the document" do
-      remove.document.should == document
+      remove.document.should eq(document)
     end
 
     it "sets the collection" do
-      remove.collection.should == document.collection
+      remove.collection.should eq(document.collection)
     end
 
     it "defaults validation to true" do
@@ -39,8 +39,7 @@ describe Mongoid::Persistence::Operations::Remove do
     end
 
     it "sets the options" do
-      remove.options.should ==
-        { :safe => Mongoid.persist_in_safe_mode }
+      remove.options.should eq({ :safe => Mongoid.persist_in_safe_mode })
     end
   end
 
@@ -63,7 +62,7 @@ describe Mongoid::Persistence::Operations::Remove do
 
       it "removes the document from the collection" do
         root_delete_expectation.call
-        remove.persist.should == true
+        remove.persist.should be_true
       end
     end
   end

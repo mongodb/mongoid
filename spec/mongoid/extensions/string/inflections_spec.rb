@@ -7,14 +7,14 @@ describe Mongoid::Extensions::String::Inflections do
     context "when class is namepaced" do
 
       it "returns an underscored tableized name" do
-        Medical::Patient.name.collectionize.should == "medical_patients"
+        Medical::Patient.name.collectionize.should eq("medical_patients")
       end
     end
 
     context "when class is not namespaced" do
 
       it "returns an underscored tableized name" do
-        MixedDrink.name.collectionize.should == "mixed_drinks"
+        MixedDrink.name.collectionize.should eq("mixed_drinks")
       end
     end
   end
@@ -24,7 +24,7 @@ describe Mongoid::Extensions::String::Inflections do
     context "when parameterizing composite keys" do
 
       it "converts the string to all lowercase and dashed" do
-        "A Midsummer Night's Dream".identify.should == "a-midsummer-night-quo-s-dream"
+        "A Midsummer Night's Dream".identify.should eq("a-midsummer-night-quo-s-dream")
       end
     end
 
@@ -39,7 +39,7 @@ describe Mongoid::Extensions::String::Inflections do
       end
 
       it "does nothing to the keys" do
-        "A Midsummer Night's Dream".identify.should == "A Midsummer Night's Dream"
+        "A Midsummer Night's Dream".identify.should eq("A Midsummer Night's Dream")
       end
     end
   end
@@ -49,28 +49,28 @@ describe Mongoid::Extensions::String::Inflections do
     context "when asc" do
 
       it "returns desc" do
-        "asc".invert.should == "desc"
+        "asc".invert.should eq("desc")
       end
     end
 
     context "when ascending" do
 
       it "returns descending" do
-        "ascending".invert.should == "descending"
+        "ascending".invert.should eq("descending")
       end
     end
 
     context "when desc" do
 
       it "returns asc" do
-        "desc".invert.should == "asc"
+        "desc".invert.should eq("asc")
       end
     end
 
     context "when descending" do
 
       it "returns ascending" do
-        "descending".invert.should == "ascending"
+        "descending".invert.should eq("ascending")
       end
     end
   end
@@ -80,14 +80,14 @@ describe Mongoid::Extensions::String::Inflections do
     context "when string is a reader" do
 
       it "returns self" do
-        "attribute".reader.should == "attribute"
+        "attribute".reader.should eq("attribute")
       end
     end
 
     context "when string is a writer" do
 
       it "returns the reader" do
-        "attribute=".reader.should == "attribute"
+        "attribute=".reader.should eq("attribute")
       end
     end
   end
@@ -107,7 +107,6 @@ describe Mongoid::Extensions::String::Inflections do
         "attribute=".writer?.should be_true
       end
     end
-
   end
 
   describe "#singularize" do
@@ -115,16 +114,15 @@ describe Mongoid::Extensions::String::Inflections do
     context "when string is address" do
 
       it "returns address" do
-        "address".singularize.should == "address"
+        "address".singularize.should eq("address")
       end
     end
 
     context "when string is address_profiles" do
 
       it "returns address_profile" do
-        "address_profiles".singularize.should == "address_profile"
+        "address_profiles".singularize.should eq("address_profile")
       end
     end
-
   end
 end

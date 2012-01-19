@@ -7,28 +7,28 @@ describe Mongoid::Extensions::Symbol::Inflections do
     context "when :asc" do
 
       it "returns :desc" do
-        :asc.invert.should == :desc
+        :asc.invert.should eq(:desc)
       end
     end
 
     context "when :ascending" do
 
       it "returns :descending" do
-        :ascending.invert.should == :descending
+        :ascending.invert.should eq(:descending)
       end
     end
 
     context "when :desc" do
 
       it "returns :asc" do
-        :desc.invert.should == :asc
+        :desc.invert.should eq(:asc)
       end
     end
 
     context "when :descending" do
 
       it "returns :ascending" do
-        :descending.invert.should == :ascending
+        :descending.invert.should eq(:ascending)
       end
     end
   end
@@ -37,8 +37,8 @@ describe Mongoid::Extensions::Symbol::Inflections do
 
     it 'returns :"foo $gt"' do
       ret = :foo.gt
-      ret.key.should == :foo
-      ret.operator.should == "gt"
+      ret.key.should eq(:foo)
+      ret.operator.should eq("gt")
     end
   end
 
@@ -46,8 +46,8 @@ describe Mongoid::Extensions::Symbol::Inflections do
 
     it 'returns :"foo $near"' do
       ret = :foo.near
-      ret.key.should == :foo
-      ret.operator.should == "near"
+      ret.key.should eq(:foo)
+      ret.operator.should eq("near")
     end
   end
 
@@ -55,8 +55,8 @@ describe Mongoid::Extensions::Symbol::Inflections do
 
     it 'returns :"foo $not"' do
       ret = :foo.not
-      ret.key.should == :foo
-      ret.operator.should == "not"
+      ret.key.should eq(:foo)
+      ret.operator.should eq("not")
     end
   end
 
@@ -64,8 +64,8 @@ describe Mongoid::Extensions::Symbol::Inflections do
 
     it "returns :foo $within" do
       ret = :foo.within
-      ret.key.should == :foo
-      ret.operator.should == "within"
+      ret.key.should eq(:foo)
+      ret.operator.should eq("within")
     end
   end
 end

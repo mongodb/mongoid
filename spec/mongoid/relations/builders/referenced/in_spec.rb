@@ -54,7 +54,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         it "sets the document" do
-          document.should == person
+          document.should eq(person)
         end
       end
 
@@ -79,7 +79,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         it "sets the document" do
-          document.should == person
+          document.should eq(person)
         end
       end
     end
@@ -95,7 +95,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it "returns the object" do
-        document.should == object
+        document.should eq(object)
       end
     end
   end
@@ -168,7 +168,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it 'does not delete the person' do
-        Person.find(person.id).should == person
+        Person.find(person.id).should eq(person)
       end
     end
   end
@@ -187,7 +187,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it 'does not delete the person' do
-        Person.find(person.id).should == person
+        Person.find(person.id).should eq(person)
       end
     end
 
@@ -198,11 +198,11 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it 'sets the person_id to nil' do
-        game.person_id.should == other_person.id
+        game.person_id.should eq(other_person.id)
       end
 
       it 'does not delete the person' do
-        Person.find(person.id).should == person
+        Person.find(person.id).should eq(person)
       end
     end
   end

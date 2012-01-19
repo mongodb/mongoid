@@ -8,11 +8,11 @@ describe Mongoid::Contexts::Enumerable::Sort do
     let(:sort) { Sort.new("value", :asc) }
 
     it "sets the value" do
-      sort.value.should == "value"
+      sort.value.should eq("value")
     end
 
     it "sets the sort order" do
-      sort.direction.should == :asc
+      sort.direction.should eq(:asc)
     end
   end
 
@@ -42,12 +42,12 @@ describe Mongoid::Contexts::Enumerable::Sort do
 
       context "and b is nil" do
         let(:other_value) { nil }
-        it { should == 0 }
+        it { should eq(0) }
       end
 
       context "and b is not nil" do
         let(:other_value) { "a" }
-        it { should == 1 }
+        it { should eq(1) }
       end
     end
 
@@ -56,7 +56,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
 
       context "and b is nil" do
         let(:other_value) { nil }
-        it { should == -1 }
+        it { should eq(-1) }
       end
 
       context "and b is not nil" do
@@ -76,7 +76,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
         sort = Sort.new(0, :asc)
         other = stub(:value => 1)
         sort.expects(:compare).with(0, other.value).returns(-1)
-        (sort <=> other).should == -1
+        (sort <=> other).should eq(-1)
       end
     end
 
@@ -85,7 +85,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
         sort = Sort.new(0, :desc)
         other = stub(:value => 1)
         sort.expects(:compare).with(0, other.value).returns(-1)
-        (sort <=> other).should == 1
+        (sort <=> other).should eq(1)
       end
     end
   end

@@ -61,7 +61,7 @@ describe Mongoid::Document do
           end
 
           it "returns true" do
-            person.should == other
+            person.should eq(other)
           end
         end
       end
@@ -75,7 +75,7 @@ describe Mongoid::Document do
         context "when the instances are the same" do
 
           it "returns true" do
-            person.should == person
+            person.should eq(person)
           end
         end
 
@@ -152,7 +152,7 @@ describe Mongoid::Document do
     end
 
     it "compares based on the document id" do
-      (first <=> second ).should == -1
+      (first <=> second ).should eq(-1)
     end
   end
 
@@ -180,7 +180,7 @@ describe Mongoid::Document do
       end
 
       it "returns the document" do
-        types.should == [ "Address" ]
+        types.should eq([ "Address" ])
       end
     end
   end
@@ -192,7 +192,7 @@ describe Mongoid::Document do
     end
 
     it "returns the attributes with indifferent access" do
-      person[:title].should == "Sir"
+      person[:title].should eq("Sir")
     end
   end
 
@@ -295,7 +295,7 @@ describe Mongoid::Document do
     end
 
     it "returns the id hash" do
-      person.hash.should == person.id.hash
+      person.hash.should eq(person.id.hash)
     end
   end
 
@@ -314,7 +314,7 @@ describe Mongoid::Document do
     end
 
     it "sets the attributes" do
-      person.title.should == "Sir"
+      person.title.should eq("Sir")
     end
 
     context "when accessing a relation from an overridden setter" do
@@ -347,7 +347,7 @@ describe Mongoid::Document do
         end
 
         it "runs the callbacks" do
-          person.title.should == "Madam"
+          person.title.should eq("Madam")
         end
       end
 
@@ -368,7 +368,7 @@ describe Mongoid::Document do
         end
 
         it "runs the callbacks" do
-          person.game.name.should == "Ms. Pacman"
+          person.game.name.should eq("Ms. Pacman")
         end
       end
 
@@ -389,7 +389,7 @@ describe Mongoid::Document do
         end
 
         it "runs the callbacks" do
-          person.title.should == "Madam"
+          person.title.should eq("Madam")
         end
       end
     end
@@ -397,7 +397,7 @@ describe Mongoid::Document do
     context "when defaults are defined" do
 
       it "sets the default values" do
-        person.age.should == 100
+        person.age.should eq(100)
       end
     end
 
@@ -410,7 +410,7 @@ describe Mongoid::Document do
       end
 
       it "yields to the block" do
-        person.title.should == "King"
+        person.title.should eq("King")
       end
     end
   end
@@ -436,7 +436,7 @@ describe Mongoid::Document do
       end
 
       it "sets the attributes" do
-        person.title.should == "Sir"
+        person.title.should eq("Sir")
       end
 
       it "sets persisted to true" do
@@ -467,7 +467,7 @@ describe Mongoid::Document do
     end
 
     it "returns the internal attributes" do
-      person.raw_attributes["title"].should == "Sir"
+      person.raw_attributes["title"].should eq("Sir")
     end
   end
 
@@ -482,7 +482,7 @@ describe Mongoid::Document do
     end
 
     it "returns the document in an array" do
-      people.should == [ person ]
+      people.should eq([ person ])
     end
   end
 
@@ -537,7 +537,7 @@ describe Mongoid::Document do
       end
 
       it "returns the id in an array" do
-        person.to_key.should == [ person.id ]
+        person.to_key.should eq([ person.id ])
       end
     end
 
@@ -550,7 +550,7 @@ describe Mongoid::Document do
       end
 
       it "returns the id in an array" do
-        person.to_key.should == [ person.id ]
+        person.to_key.should eq([ person.id ])
       end
     end
   end
@@ -575,7 +575,7 @@ describe Mongoid::Document do
       end
 
       it "returns the id as a string" do
-        person.to_param.should == person.id.to_s
+        person.to_param.should eq(person.id.to_s)
       end
     end
   end
@@ -610,7 +610,7 @@ describe Mongoid::Document do
     context "when not frozen" do
 
       it "freezes attributes" do
-        person.freeze.should == person
+        person.freeze.should eq(person)
         lambda { person.title = "something" }.should raise_error
       end
     end
@@ -698,7 +698,7 @@ describe Mongoid::Document do
     end
 
     it "has the correct value" do
-      person.bson_id.should == bson_id
+      person.bson_id.should eq(bson_id)
     end
   end
 
@@ -776,7 +776,7 @@ describe Mongoid::Document do
         end
 
         it "copies attributes" do
-          became.title.should == 'Sir'
+          became.title.should eq('Sir')
         end
 
         context "when the document is new" do
@@ -821,7 +821,7 @@ describe Mongoid::Document do
         end
 
         it "sets the class type" do
-          became._type.should == to_become.to_s
+          became._type.should eq(to_become.to_s)
         end
 
         it "raises an error when inappropriate class is provided" do
@@ -839,7 +839,7 @@ describe Mongoid::Document do
       end
 
       it "applies default attributes" do
-        obj.level.should == 1
+        obj.level.should eq(1)
       end
     end
   end

@@ -7,7 +7,7 @@ describe Mongoid do
     context "when no block supplied" do
 
       it "returns the config singleton" do
-        Mongoid.configure.should == Mongoid::Config
+        Mongoid.configure.should eq(Mongoid::Config)
       end
     end
 

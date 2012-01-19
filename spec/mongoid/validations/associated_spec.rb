@@ -114,7 +114,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "translates the error in english" do
-          person.errors[:name][0].should == "is invalid"
+          person.errors[:name][0].should eq("is invalid")
         end
       end
     end

@@ -28,14 +28,14 @@ describe Mongoid::Atomic::Paths do
     context "when document is an embeds_one" do
 
       it "returns $unset" do
-        name.atomic_delete_modifier.should == "$unset"
+        name.atomic_delete_modifier.should eq("$unset")
       end
     end
 
     context "when document is an embeds_many" do
 
       it "returns $pull" do
-        address.atomic_delete_modifier.should == "$pull"
+        address.atomic_delete_modifier.should eq("$pull")
       end
     end
   end
@@ -50,14 +50,14 @@ describe Mongoid::Atomic::Paths do
     context "when document is an embeds_one" do
 
       it "returns $set" do
-        name.atomic_insert_modifier.should == "$set"
+        name.atomic_insert_modifier.should eq("$set")
       end
     end
 
     context "when document is an embeds_many" do
 
       it "returns $push" do
-        address.atomic_insert_modifier.should == "$push"
+        address.atomic_insert_modifier.should eq("$push")
       end
     end
   end
@@ -67,7 +67,7 @@ describe Mongoid::Atomic::Paths do
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person.atomic_path.should == ""
+        person.atomic_path.should be_empty
       end
     end
 
@@ -78,7 +78,7 @@ describe Mongoid::Atomic::Paths do
       end
 
       it "returns the inverse_of value of the association" do
-        address.atomic_path.should == "addresses"
+        address.atomic_path.should eq("addresses")
       end
     end
 
@@ -90,7 +90,7 @@ describe Mongoid::Atomic::Paths do
       end
 
       it "returns the JSON notation to the document" do
-        location.atomic_path.should == "addresses.locations"
+        location.atomic_path.should eq("addresses.locations")
       end
     end
   end
@@ -100,7 +100,7 @@ describe Mongoid::Atomic::Paths do
     context "when the document is a parent" do
 
       it "returns an id.atomic_selector" do
-        person.atomic_selector.should == { "_id" => person.id }
+        person.atomic_selector.should eq({ "_id" => person.id })
       end
     end
 
@@ -111,7 +111,9 @@ describe Mongoid::Atomic::Paths do
       end
 
       it "returns the association with id.atomic_selector" do
-        address.atomic_selector.should == { "_id" => person.id, "addresses._id" => address.id }
+        address.atomic_selector.should eq(
+          { "_id" => person.id, "addresses._id" => address.id }
+        )
       end
     end
 
@@ -123,8 +125,13 @@ describe Mongoid::Atomic::Paths do
       end
 
       it "returns the JSON notation to the document with ids" do
-        location.atomic_selector.should ==
-          { "_id" => person.id, "addresses._id" => address.id, "addresses.locations._id" => location.id }
+        location.atomic_selector.should eq(
+          {
+            "_id" => person.id,
+            "addresses._id" => address.id,
+            "addresses.locations._id" => location.id
+          }
+        )
       end
     end
   end
@@ -134,7 +141,7 @@ describe Mongoid::Atomic::Paths do
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person.atomic_position.should == ""
+        person.atomic_position.should be_empty
       end
     end
 
@@ -147,7 +154,7 @@ describe Mongoid::Atomic::Paths do
       context "when the document is new" do
 
         it "returns the.atomic_path without index" do
-          address.atomic_position.should == "addresses"
+          address.atomic_position.should eq("addresses")
         end
       end
 
@@ -158,7 +165,7 @@ describe Mongoid::Atomic::Paths do
         end
 
         it "returns the.atomic_path plus index" do
-          address.atomic_position.should == "addresses.0"
+          address.atomic_position.should eq("addresses.0")
         end
       end
     end
@@ -178,7 +185,7 @@ describe Mongoid::Atomic::Paths do
       context "when the document is new" do
 
         it "returns the.atomic_path with parent indexes" do
-          location.atomic_position.should == "addresses.0.locations"
+          location.atomic_position.should eq("addresses.0.locations")
         end
       end
 
@@ -189,7 +196,7 @@ describe Mongoid::Atomic::Paths do
         end
 
         it "returns the.atomic_path plus index" do
-          location.atomic_position.should == "addresses.0.locations.1"
+          location.atomic_position.should eq("addresses.0.locations.1")
         end
       end
     end
@@ -200,7 +207,7 @@ describe Mongoid::Atomic::Paths do
     context "when the document is a parent" do
 
       it "returns an empty string" do
-        person.atomic_path.should == ""
+        person.atomic_path.should be_empty
       end
     end
 
@@ -217,7 +224,7 @@ describe Mongoid::Atomic::Paths do
         end
 
         it "returns the.atomic_path without the index" do
-          address.atomic_path.should == "addresses"
+          address.atomic_path.should eq("addresses")
         end
 
         context "and there are 10 or more documents" do
@@ -229,9 +236,8 @@ describe Mongoid::Atomic::Paths do
           end
 
           it "returns the.atomic_path without the index" do
-            address.atomic_path.should == "addresses"
+            address.atomic_path.should eq("addresses")
           end
-
         end
       end
     end
@@ -255,7 +261,7 @@ describe Mongoid::Atomic::Paths do
         end
 
         it "returns the.atomic_path plus index" do
-          location.atomic_path.should == "addresses.0.locations"
+          location.atomic_path.should eq("addresses.0.locations")
         end
 
       end

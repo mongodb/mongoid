@@ -276,15 +276,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the target of the relation" do
-          person.posts.target.should == [ post ]
+          person.posts.target.should eq([ post ])
         end
 
         it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
+          post.person_id.should eq(person.id)
         end
 
         it "sets the base on the inverse relation" do
-          post.person.should == person
+          post.person.should eq(person)
         end
 
         it "does not save the target" do
@@ -307,15 +307,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the target of the relation" do
-          person.posts.target.should == [ post ]
+          person.posts.target.should eq([ post ])
         end
 
         it "sets the foreign key of the relation" do
-          post.person_id.should == person.id
+          post.person_id.should eq(person.id)
         end
 
         it "sets the base on the inverse relation" do
-          post.person.should == person
+          post.person.should eq(person)
         end
 
         it "saves the target" do
@@ -372,7 +372,15 @@ describe Mongoid::Relations::Referenced::Many do
             end
 
             it "keeps the relation intact" do
-              person.posts.should eq([ post, new_post ])
+              person.posts.size.should eq(2)
+            end
+
+            it "keeps the first post" do
+              person.posts.should include(post)
+            end
+
+            it "keeps the second post" do
+              person.posts.should include(new_post)
             end
 
             it "does not delete the relation" do
@@ -460,15 +468,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the target of the relation" do
-          movie.ratings.target.should == [ rating ]
+          movie.ratings.target.should eq([ rating ])
         end
 
         it "sets the foreign key on the relation" do
-          rating.ratable_id.should == movie.id
+          rating.ratable_id.should eq(movie.id)
         end
 
         it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
+          rating.ratable.should eq(movie)
         end
 
         it "does not save the target" do
@@ -491,15 +499,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the target of the relation" do
-          movie.ratings.target.should == [ rating ]
+          movie.ratings.target.should eq([ rating ])
         end
 
         it "sets the foreign key of the relation" do
-          rating.ratable_id.should == movie.id
+          rating.ratable_id.should eq(movie.id)
         end
 
         it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
+          rating.ratable.should eq(movie)
         end
 
         it "saves the target" do
@@ -695,7 +703,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     it "returns the average value of the supplied field" do
-      avg.should == 7.5
+      avg.should eq(7.5)
     end
   end
 
@@ -738,15 +746,15 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            post.person_id.should == person.id
+            post.person_id.should eq(person.id)
           end
 
           it "sets the base on the inverse relation" do
-            post.person.should == person
+            post.person.should eq(person)
           end
 
           it "sets the attributes" do
-            post.title.should == "$$$"
+            post.title.should eq("$$$")
           end
 
           it "does not save the target" do
@@ -754,7 +762,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            person.posts.size.should == 1
+            person.posts.size.should eq(1)
           end
 
           it "does not perform validation" do
@@ -773,15 +781,15 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            post.person_id.should == person.id
+            post.person_id.should eq(person.id)
           end
 
           it "sets the base on the inverse relation" do
-            post.person.should == person
+            post.person.should eq(person)
           end
 
           it "sets the attributes" do
-            post.text.should == "Testing"
+            post.text.should eq("Testing")
           end
 
           it "does not save the target" do
@@ -789,7 +797,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            person.posts.size.should == 1
+            person.posts.size.should eq(1)
           end
         end
       end
@@ -807,15 +815,15 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            rating.ratable_id.should == movie.id
+            rating.ratable_id.should eq(movie.id)
           end
 
           it "sets the base on the inverse relation" do
-            rating.ratable.should == movie
+            rating.ratable.should eq(movie)
           end
 
           it "sets the attributes" do
-            rating.value.should == 3
+            rating.value.should eq(3)
           end
 
           it "does not save the target" do
@@ -823,7 +831,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            movie.ratings.size.should == 1
+            movie.ratings.size.should eq(1)
           end
 
           it "does not perform validation" do
@@ -842,15 +850,15 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "sets the foreign key on the relation" do
-            rating.ratable_id.should == movie.id
+            rating.ratable_id.should eq(movie.id)
           end
 
           it "sets the base on the inverse relation" do
-            rating.ratable.should == movie
+            rating.ratable.should eq(movie)
           end
 
           it "sets the attributes" do
-            rating.value.should == 4
+            rating.value.should eq(4)
           end
 
           it "does not save the target" do
@@ -858,7 +866,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            movie.ratings.size.should == 1
+            movie.ratings.size.should eq(1)
           end
         end
       end
@@ -918,7 +926,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "returns the relation" do
-            relation.should == []
+            relation.should be_empty
           end
         end
 
@@ -989,7 +997,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "returns the relation" do
-            relation.should == []
+            relation.should be_empty
           end
         end
 
@@ -1286,7 +1294,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "returns the number of persisted documents" do
-        movie.ratings.count.should == 1
+        movie.ratings.count.should eq(1)
       end
     end
 
@@ -1297,7 +1305,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "returns 0" do
-        movie.ratings.count.should == 0
+        movie.ratings.count.should eq(0)
       end
     end
 
@@ -1310,7 +1318,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the count from the db" do
-          movie.ratings.count.should == 1
+          movie.ratings.count.should eq(1)
         end
       end
 
@@ -1321,7 +1329,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the count from the db" do
-          movie.ratings.count.should == 0
+          movie.ratings.count.should eq(0)
         end
       end
     end
@@ -1380,15 +1388,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
+          post.person_id.should eq(person.id)
         end
 
         it "sets the base on the inverse relation" do
-          post.person.should == person
+          post.person.should eq(person)
         end
 
         it "sets the attributes" do
-          post.text.should == "Testing"
+          post.text.should eq("Testing")
         end
 
         it "saves the target" do
@@ -1396,11 +1404,11 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "calls the passed block" do
-          post.content.should == "The Content"
+          post.content.should eq("The Content")
         end
 
         it "adds the document to the target" do
-          person.posts.count.should == 1
+          person.posts.count.should eq(1)
         end
       end
     end
@@ -1433,15 +1441,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the foreign key on the relation" do
-          rating.ratable_id.should == movie.id
+          rating.ratable_id.should eq(movie.id)
         end
 
         it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
+          rating.ratable.should eq(movie)
         end
 
         it "sets the attributes" do
-          rating.value.should == 3
+          rating.value.should eq(3)
         end
 
         it "saves the target" do
@@ -1449,7 +1457,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          movie.ratings.count.should == 1
+          movie.ratings.count.should eq(1)
         end
       end
     end
@@ -1506,15 +1514,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the foreign key on the relation" do
-          post.person_id.should == person.id
+          post.person_id.should eq(person.id)
         end
 
         it "sets the base on the inverse relation" do
-          post.person.should == person
+          post.person.should eq(person)
         end
 
         it "sets the attributes" do
-          post.title.should == "Testing"
+          post.title.should eq("Testing")
         end
 
         it "saves the target" do
@@ -1522,7 +1530,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          person.posts.count.should == 1
+          person.posts.count.should eq(1)
         end
 
         context "when validation fails" do
@@ -1564,15 +1572,15 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the foreign key on the relation" do
-          rating.ratable_id.should == movie.id
+          rating.ratable_id.should eq(movie.id)
         end
 
         it "sets the base on the inverse relation" do
-          rating.ratable.should == movie
+          rating.ratable.should eq(movie)
         end
 
         it "sets the attributes" do
-          rating.value.should == 4
+          rating.value.should eq(4)
         end
 
         it "saves the target" do
@@ -1580,7 +1588,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          movie.ratings.count.should == 1
+          movie.ratings.count.should eq(1)
         end
 
         context "when validation fails" do
@@ -1741,16 +1749,16 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "removes the correct posts" do
             person.posts.send(method, :conditions => { :title => "Testing" })
-            person.posts.count.should == 1
+            person.posts.count.should eq(1)
           end
 
           it "deletes the documents from the database" do
             person.posts.send(method, :conditions => {:title => "Testing" })
-            Post.where(:title => "Testing").count.should == 0
+            Post.where(:title => "Testing").count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
-            person.posts.send(method, :conditions => { :title => "Testing" }).should == 1
+            person.posts.send(method, :conditions => { :title => "Testing" }).should eq(1)
           end
         end
 
@@ -1767,16 +1775,16 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "removes the correct posts" do
             person.posts.send(method)
-            person.posts.count.should == 0
+            person.posts.count.should eq(0)
           end
 
           it "deletes the documents from the database" do
             person.posts.send(method)
-            Post.where(:title => "Testing").count.should == 0
+            Post.where(:title => "Testing").count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
-            person.posts.send(method).should == 2
+            person.posts.send(method).should eq(2)
           end
         end
       end
@@ -1796,16 +1804,16 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "removes the correct ratings" do
             movie.ratings.send(method, :conditions => { :value => 1 })
-            movie.ratings.count.should == 1
+            movie.ratings.count.should eq(1)
           end
 
           it "deletes the documents from the database" do
             movie.ratings.send(method, :conditions => { :value => 1 })
-            Rating.where(:value => 1).count.should == 0
+            Rating.where(:value => 1).count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
-            movie.ratings.send(method, :conditions => { :value => 1 }).should == 1
+            movie.ratings.send(method, :conditions => { :value => 1 }).should eq(1)
           end
         end
 
@@ -1822,16 +1830,16 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "removes the correct ratings" do
             movie.ratings.send(method)
-            movie.ratings.count.should == 0
+            movie.ratings.count.should eq(0)
           end
 
           it "deletes the documents from the database" do
             movie.ratings.send(method)
-            Rating.where(:value => 1).count.should == 0
+            Rating.where(:value => 1).count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
-            movie.ratings.send(method).should == 2
+            movie.ratings.send(method).should eq(2)
           end
         end
       end
@@ -1939,7 +1947,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "returns true" do
-        person.posts.exists?.should == true
+        person.posts.exists?.should be_true
       end
     end
 
@@ -1950,7 +1958,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "returns false" do
-        person.posts.exists?.should == false
+        person.posts.exists?.should be_false
       end
     end
   end
@@ -2015,7 +2023,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "returns the matching document" do
-            post.should == post_one
+            post.should eq(post_one)
           end
         end
 
@@ -2077,7 +2085,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "returns the matching documents" do
-            posts.should == [ post_one, post_two ]
+            posts.should eq([ post_one, post_two ])
           end
         end
 
@@ -2141,7 +2149,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "returns the matching document" do
-            rating.should == rating_one
+            rating.should eq(rating_one)
           end
         end
 
@@ -2190,7 +2198,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "returns the matching documents" do
-            ratings.should == [ rating_one, rating_two ]
+            ratings.should eq([ rating_one, rating_two ])
           end
         end
 
@@ -2251,7 +2259,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the document" do
-          found.should == post
+          found.should eq(post)
         end
       end
 
@@ -2264,7 +2272,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the new document attributes" do
-          found.title.should == "Test"
+          found.title.should eq("Test")
         end
 
         it "returns a newly persisted document" do
@@ -2272,7 +2280,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "calls the passed block" do
-          found.content.should == "The Content"
+          found.content.should eq("The Content")
         end
       end
     end
@@ -2294,7 +2302,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the document" do
-          found.should == rating
+          found.should eq(rating)
         end
       end
 
@@ -2305,7 +2313,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the new document attributes" do
-          found.value.should == 3
+          found.value.should eq(3)
         end
 
         it "returns a newly persisted document" do
@@ -2334,7 +2342,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the document" do
-          found.should == post
+          found.should eq(post)
         end
       end
 
@@ -2347,7 +2355,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the new document attributes" do
-          found.title.should == "Test"
+          found.title.should eq("Test")
         end
 
         it "returns a non persisted document" do
@@ -2355,7 +2363,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "calls the passed block" do
-          found.content.should == "The Content"
+          found.content.should eq("The Content")
         end
       end
     end
@@ -2377,7 +2385,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "returns the document" do
-          found.should == rating
+          found.should eq(rating)
         end
       end
 
@@ -2388,7 +2396,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "sets the new document attributes" do
-          found.value.should == 3
+          found.value.should eq(3)
         end
 
         it "returns a non persisted document" do
@@ -2401,7 +2409,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe ".foreign_key_suffix" do
 
     it "returns _id" do
-      described_class.foreign_key_suffix.should == "_id"
+      described_class.foreign_key_suffix.should eq("_id")
     end
   end
 
@@ -2424,7 +2432,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe ".macro" do
 
     it "returns has_many" do
-      described_class.macro.should == :has_many
+      described_class.macro.should eq(:has_many)
     end
   end
 
@@ -2451,7 +2459,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     it "returns the max value of the supplied field" do
-      max.should == 10
+      max.should eq(10)
     end
   end
 
@@ -2476,7 +2484,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "applies the criteria to the documents" do
-        posts.should == [ post_one ]
+        posts.should eq([ post_one ])
       end
     end
 
@@ -2487,7 +2495,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "applies the criteria to the documents" do
-        posts.should == [ post_one ]
+        posts.should eq([ post_one ])
       end
     end
 
@@ -2498,7 +2506,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "applies the criteria to the documents" do
-        posts.should == [ post_one ]
+        posts.should eq([ post_one ])
       end
     end
 
@@ -2536,7 +2544,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     it "returns the min value of the supplied field" do
-      min.should == 5
+      min.should eq(5)
     end
   end
 
@@ -2690,7 +2698,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe ".stores_foreign_key?" do
 
     it "returns false" do
-      described_class.stores_foreign_key?.should == false
+      described_class.stores_foreign_key?.should be_false
     end
   end
 
@@ -2717,7 +2725,7 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     it "returns the sum values of the supplied field" do
-      sum.should == 15
+      sum.should eq(15)
     end
   end
 
@@ -2829,15 +2837,16 @@ describe Mongoid::Relations::Referenced::Many do
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
+      described_class.valid_options.should eq(
         [ :as, :autosave, :dependent, :foreign_key, :order ]
+      )
     end
   end
 
   describe ".validation_default" do
 
     it "returns true" do
-      described_class.validation_default.should eq(true)
+      described_class.validation_default.should be_true
     end
   end
 

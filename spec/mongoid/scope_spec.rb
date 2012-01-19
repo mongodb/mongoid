@@ -17,7 +17,7 @@ describe Mongoid::Scope do
     end
 
     it "stores the provided conditions" do
-      scope.conditions.should == conditions
+      scope.conditions.should eq(conditions)
     end
 
     context "when a block is passed in" do

@@ -11,7 +11,7 @@ describe Mongoid::Fields::Internal::Symbol do
     context "when provided a symbol" do
 
       it "returns the symbol" do
-        field.deserialize(:test).should == :test
+        field.deserialize(:test).should eq(:test)
       end
     end
 
@@ -63,14 +63,14 @@ describe Mongoid::Fields::Internal::Symbol do
     context "when given a symbol" do
 
       it "returns the symbol" do
-        field.serialize(:testing).should == :testing
+        field.serialize(:testing).should eq(:testing)
       end
     end
 
     context "when given a string" do
 
       it "returns the symbol" do
-        field.serialize("testing").should == :testing
+        field.serialize("testing").should eq(:testing)
       end
     end
   end

@@ -11,7 +11,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.new_record?.should == true
+        person.new_record?.should be_true
       end
     end
 

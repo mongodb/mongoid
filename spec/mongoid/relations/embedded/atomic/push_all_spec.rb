@@ -29,16 +29,17 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         it "push alls the selector" do
-          push_all.selector.should == selector
+          push_all.selector.should eq(selector)
         end
 
         it "push alls the $pushAll operations" do
-          push_all.operations.should ==
+          push_all.operations.should eq(
             { "$pushAll" => { "addresses" => [{ "_id" => "street" }] } }
+          )
         end
 
         it "push alls the options" do
-          push_all.options.should == options
+          push_all.options.should eq(options)
         end
       end
 
@@ -70,19 +71,20 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         it "push alls the selector" do
-          push_all.selector.should == selector
+          push_all.selector.should eq(selector)
         end
 
         it "push alls the $pushAll operations" do
-          push_all.operations.should ==
+          push_all.operations.should eq(
             { "$pushAll" => {
                 "addresses" => [{ "_id" => "bond-street" }, { "_id" => "high-street" }]
               }
             }
+          )
         end
 
         it "push alls the options" do
-          push_all.options.should == options
+          push_all.options.should eq(options)
         end
       end
     end
@@ -112,16 +114,17 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         it "push alls the selector" do
-          push_all.selector.should == selector
+          push_all.selector.should eq(selector)
         end
 
         it "push alls the $push operations" do
-          push_all.operations.should ==
+          push_all.operations.should eq(
             { "$pushAll" => { "addresses" => [{ "_id" => "street" }] } }
+          )
         end
 
         it "push alls the options" do
-          push_all.options.should == options
+          push_all.options.should eq(options)
         end
       end
 
@@ -153,19 +156,20 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         it "push alls the selector" do
-          push_all.selector.should == selector
+          push_all.selector.should eq(selector)
         end
 
         it "push alls the $push operations" do
-          push_all.operations.should ==
+          push_all.operations.should eq(
             { "$pushAll" => {
                 "addresses" => [{ "_id" => "bond-street" }, { "_id" => "high-street" }]
               }
             }
+          )
         end
 
         it "push alls the options" do
-          push_all.options.should == options
+          push_all.options.should eq(options)
         end
       end
     end

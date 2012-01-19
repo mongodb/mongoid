@@ -27,7 +27,7 @@ describe Mongoid::Validations do
       end
 
       it "returns the value" do
-        value.should == "Mr"
+        value.should eq("Mr")
       end
     end
 
@@ -46,7 +46,7 @@ describe Mongoid::Validations do
       end
 
       it "returns the value" do
-        value.should == [ address ]
+        value.should eq([ address ])
       end
     end
   end
@@ -129,7 +129,7 @@ describe Mongoid::Validations do
 
             it "adds the errors to the document" do
               movie.valid?
-              movie.errors[:ratings].should == [ "is invalid" ]
+              movie.errors[:ratings].should eq([ "is invalid" ])
             end
           end
 
@@ -167,7 +167,7 @@ describe Mongoid::Validations do
 
             it "adds the errors to the document" do
               person.valid?
-              person.errors[:services].should == [ "is invalid" ]
+              person.errors[:services].should eq([ "is invalid" ])
             end
           end
 

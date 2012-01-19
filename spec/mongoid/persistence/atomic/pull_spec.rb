@@ -25,11 +25,11 @@ describe Mongoid::Persistence::Atomic::Pull do
         end
 
         it "pulls the value from the array" do
-          person.aliases.should == [ "008" ]
+          person.aliases.should eq([ "008" ])
         end
 
         it "persists the data" do
-          reloaded.aliases.should == [ "008" ]
+          reloaded.aliases.should eq([ "008" ])
         end
 
         it "removes the field from the dirty attributes" do
@@ -41,7 +41,7 @@ describe Mongoid::Persistence::Atomic::Pull do
         end
 
         it "returns the new array value" do
-          pulled.should == [ "008" ]
+          pulled.should eq([ "008" ])
         end
       end
     end

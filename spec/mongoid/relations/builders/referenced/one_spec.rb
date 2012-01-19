@@ -53,7 +53,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       it "sets the document" do
-        documents.should == post
+        documents.should eq(post)
       end
     end
 
@@ -68,7 +68,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       it "returns the object" do
-        document.should == object
+        document.should eq(object)
       end
     end
   end

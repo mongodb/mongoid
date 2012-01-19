@@ -103,7 +103,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       it "returns the object" do
-        documents.should == object
+        documents.should eq(object)
       end
     end
   end

@@ -44,7 +44,7 @@ describe Mongoid::Serialization do
       context "when specifying which fields to only include" do
 
         it "only includes the specified fields" do
-          person.serializable_hash(:only => [:title]).should == { 'title' => attributes['title'] }
+          person.serializable_hash(:only => [:title]).should eq({ 'title' => attributes['title'] })
         end
       end
 
@@ -71,13 +71,13 @@ describe Mongoid::Serialization do
       end
 
       it "includes dynamic fields" do
-        person.serializable_hash[dynamic_field_name].should == dynamic_value
+        person.serializable_hash[dynamic_field_name].should eq(dynamic_value)
       end
 
       context "when specifying which dynamic fields to only include" do
 
         it "only includes the specified dynamic fields" do
-          person.serializable_hash(:only => [dynamic_field_name]).should == { dynamic_field_name => dynamic_value }
+          person.serializable_hash(:only => [dynamic_field_name]).should eq({ dynamic_field_name => dynamic_value })
         end
       end
 
@@ -329,11 +329,11 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first document related fields" do
-              relation_hash[0]["title"].should == "First"
+              relation_hash[0]["title"].should eq("First")
             end
 
             it "includes the second document related fields" do
-              relation_hash[1]["title"].should == "Second"
+              relation_hash[1]["title"].should eq("Second")
             end
           end
 
@@ -348,11 +348,11 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first document related fields" do
-              relation_hash[0]["title"].should == "First"
+              relation_hash[0]["title"].should eq("First")
             end
 
             it "includes the second document related fields" do
-              relation_hash[1]["title"].should == "Second"
+              relation_hash[1]["title"].should eq("Second")
             end
           end
 
@@ -367,11 +367,11 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first document related fields" do
-              relation_hash[0]["title"].should == "First"
+              relation_hash[0]["title"].should eq("First")
             end
 
             it "includes the second document related fields" do
-              relation_hash[1]["title"].should == "Second"
+              relation_hash[1]["title"].should eq("Second")
             end
 
             it "does not include the first document exceptions" do
@@ -409,11 +409,11 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first document related fields" do
-              relation_hash[0]["name"].should == "First"
+              relation_hash[0]["name"].should eq("First")
             end
 
             it "includes the second document related fields" do
-              relation_hash[1]["name"].should == "Second"
+              relation_hash[1]["name"].should eq("Second")
             end
           end
 
@@ -428,11 +428,11 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first document related fields" do
-              relation_hash[0]["name"].should == "First"
+              relation_hash[0]["name"].should eq("First")
             end
 
             it "includes the second document related fields" do
-              relation_hash[1]["name"].should == "Second"
+              relation_hash[1]["name"].should eq("Second")
             end
           end
 
@@ -454,11 +454,11 @@ describe Mongoid::Serialization do
             end
 
             it "includes the first document related fields" do
-              relation_hash[0]["name"].should == "First"
+              relation_hash[0]["name"].should eq("First")
             end
 
             it "includes the second document related fields" do
-              relation_hash[1]["name"].should == "Second"
+              relation_hash[1]["name"].should eq("Second")
             end
 
             it "does not include the first document exceptions" do
@@ -487,7 +487,7 @@ describe Mongoid::Serialization do
       end
 
       it "serializes the value to the provided type" do
-        value.should == true
+        value.should be_true
       end
     end
 
@@ -498,7 +498,7 @@ describe Mongoid::Serialization do
       end
 
       it "returns the value untouched" do
-        value.should == 47
+        value.should eq(47)
       end
     end
   end

@@ -31,7 +31,7 @@ describe Mongoid::Safety do
         context "when no error occurs" do
 
           it "inserts the document" do
-            Person.count.should == 1
+            Person.count.should eq(1)
           end
         end
 
@@ -62,7 +62,7 @@ describe Mongoid::Safety do
         context "when no error occurs" do
 
           it "inserts the document" do
-            Person.count.should == 1
+            Person.count.should eq(1)
           end
         end
 
@@ -161,7 +161,7 @@ describe Mongoid::Safety do
         context "when no error occurs" do
 
           it "inserts the document" do
-            Person.count.should == 1
+            Person.count.should eq(1)
           end
         end
 

@@ -26,7 +26,7 @@ describe Mongoid::NestedAttributes do
     end
 
     it "adds the method name to the nested attributes list" do
-      Person.nested_attributes.should == [ "favorites_attributes=" ]
+      Person.nested_attributes.should eq([ "favorites_attributes=" ])
     end
   end
 
@@ -44,7 +44,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        person.name.first_name.should == "Johnny"
+        person.name.first_name.should eq("Johnny")
       end
     end
 
@@ -60,7 +60,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        person.addresses.first.street.should == "Alexanderstr"
+        person.addresses.first.street.should eq("Alexanderstr")
       end
 
       context "when there are 10 or more child records" do
@@ -76,7 +76,7 @@ describe Mongoid::NestedAttributes do
         end
 
         it "should preserve the order of the children" do
-          person.addresses.map(&:number).should == (0..10).to_a
+          person.addresses.map(&:number).should eq((0..10).to_a)
         end
       end
     end
@@ -92,7 +92,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        video.person.title.should == "Sir"
+        video.person.title.should eq("Sir")
       end
     end
 
@@ -108,7 +108,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        person.game.name.should == "Tron"
+        person.game.name.should eq("Tron")
       end
     end
 
@@ -124,7 +124,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        person.posts.first.title.should == "First"
+        person.posts.first.title.should eq("First")
       end
     end
 
@@ -140,7 +140,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        person.preferences.first.name.should == "First"
+        person.preferences.first.name.should eq("First")
       end
     end
 
@@ -155,7 +155,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        post.person.title.should == "Sir"
+        post.person.title.should eq("Sir")
       end
     end
   end
@@ -245,7 +245,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "adds the document" do
-              person.name.first_name.should == "Lang"
+              person.name.first_name.should eq("Lang")
             end
           end
         end
@@ -281,7 +281,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "adds the document" do
-              person.name.first_name.should == "Lang"
+              person.name.first_name.should eq("Lang")
             end
           end
         end
@@ -295,7 +295,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "builds a new document" do
-              person.name.first_name.should == "Leo"
+              person.name.first_name.should eq("Leo")
             end
           end
 
@@ -339,7 +339,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "builds the document" do
-                person.name.first_name.should == "Leo"
+                person.name.first_name.should eq("Leo")
               end
             end
           end
@@ -365,7 +365,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "replaces the document" do
-                person.name.first_name.should == "Jack"
+                person.name.first_name.should eq("Jack")
               end
             end
 
@@ -389,7 +389,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "does not replace the document" do
-                  person.name.first_name.should == "Michael"
+                  person.name.first_name.should eq("Michael")
                 end
               end
 
@@ -411,7 +411,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "replaces the document" do
-                  person.name.first_name.should == "Jack"
+                  person.name.first_name.should eq("Jack")
                 end
               end
             end
@@ -440,7 +440,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  person.name.first_name.should == "Bob"
+                  person.name.first_name.should eq("Bob")
                 end
               end
 
@@ -452,7 +452,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  person.name.first_name.should == "Bob"
+                  person.name.first_name.should eq("Bob")
                 end
               end
 
@@ -493,7 +493,7 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not destroy the existing document" do
-                      person.name.should == name
+                      person.name.should eq(name)
                     end
                   end
                 end
@@ -519,7 +519,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "does not destroy the document" do
-                    person.name.should == name
+                    person.name.should eq(name)
                   end
                 end
               end
@@ -547,7 +547,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    person.name.first_name.should == "Ro"
+                    person.name.first_name.should eq("Ro")
                   end
                 end
 
@@ -559,7 +559,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    person.name.first_name.should == "Durran"
+                    person.name.first_name.should eq("Durran")
                   end
                 end
 
@@ -589,7 +589,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  person.quiz.topic.should == "English"
+                  person.quiz.topic.should eq("English")
                 end
               end
             end
@@ -621,7 +621,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "instantiates an object of the given type" do
-            canvas.writer.class.should == HtmlWriter
+            canvas.writer.class.should eq(HtmlWriter)
           end
         end
       end
@@ -643,7 +643,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "builds a new document" do
-                animal.person.title.should == "Sir"
+                animal.person.title.should eq("Sir")
               end
 
             end
@@ -688,7 +688,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "builds a new document" do
-                  animal.person.title.should == "Sir"
+                  animal.person.title.should eq("Sir")
                 end
               end
             end
@@ -709,7 +709,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  animal.person.title.should == "Sir"
+                  animal.person.title.should eq("Sir")
                 end
               end
             end
@@ -757,7 +757,7 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not destroy the existing document" do
-                      animal.person.should == person
+                      animal.person.should eq(person)
                     end
                   end
                 end
@@ -783,7 +783,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "does not delete the document" do
-                    animal.person.should == person
+                    animal.person.should eq(person)
                   end
                 end
               end
@@ -806,7 +806,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    animal.person.title.should == "Madam"
+                    animal.person.title.should eq("Madam")
                   end
                 end
 
@@ -818,7 +818,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    animal.person.title.should == "Madam"
+                    animal.person.title.should eq("Madam")
                   end
                 end
 
@@ -861,7 +861,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "instantiates an object of the given type" do
-            tool.palette.class.should == BigPalette
+            tool.palette.class.should eq(BigPalette)
           end
         end
       end
@@ -979,7 +979,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "sets the documents on the relation" do
-              person.addresses.size.should == 2
+              person.addresses.size.should eq(2)
             end
           end
 
@@ -997,7 +997,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "sets the documents on the relation" do
-              person.addresses.size.should == 2
+              person.addresses.size.should eq(2)
             end
 
           end
@@ -1022,15 +1022,15 @@ describe Mongoid::NestedAttributes do
               end
 
               it "updates the first existing document" do
-                person.addresses.first.street.should == "Maybachufer"
+                person.addresses.first.street.should eq("Maybachufer")
               end
 
               it "updates the second existing document" do
-                person.addresses.second.street.should == "Alexander Platz"
+                person.addresses.second.street.should eq("Alexander Platz")
               end
 
               it "does not add new documents" do
-                person.addresses.size.should == 2
+                person.addresses.size.should eq(2)
               end
             end
 
@@ -1055,7 +1055,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "does not add new documents" do
-                  person.addresses.size.should == 2
+                  person.addresses.size.should eq(2)
                 end
               end
 
@@ -1078,7 +1078,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "does not add new documents" do
-                  person.addresses.size.should == 2
+                  person.addresses.size.should eq(2)
                 end
               end
             end
@@ -1102,7 +1102,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "does not add new documents" do
-                person.addresses.size.should == 2
+                person.addresses.size.should eq(2)
               end
             end
 
@@ -1196,11 +1196,11 @@ describe Mongoid::NestedAttributes do
                         end
 
                         it "deletes the marked document" do
-                          person.addresses.size.should == 1
+                          person.addresses.size.should eq(1)
                         end
 
                         it "does not delete the unmarked document" do
-                          person.addresses.first.street.should == "Alexander Platz"
+                          person.addresses.first.street.should eq("Alexander Platz")
                         end
                       end
 
@@ -1333,11 +1333,11 @@ describe Mongoid::NestedAttributes do
                       end
 
                       it "does not delete the marked document" do
-                        person.addresses.size.should == 2
+                        person.addresses.size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.addresses.last.street.should == "Alexander Platz"
+                        person.addresses.last.street.should eq("Alexander Platz")
                       end
                     end
                   end
@@ -1450,15 +1450,15 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not ignore the marked document" do
-                      person.addresses.first.street.should == "Maybachufer"
+                      person.addresses.first.street.should eq("Maybachufer")
                     end
 
                     it "does not delete the unmarked document" do
-                      person.addresses.last.street.should == "Alexander Platz"
+                      person.addresses.last.street.should eq("Alexander Platz")
                     end
 
                     it "does not add additional documents" do
-                      person.addresses.size.should == 2
+                      person.addresses.size.should eq(2)
                     end
                   end
                 end
@@ -1476,11 +1476,11 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not delete the marked document" do
-                      person.addresses.size.should == 2
+                      person.addresses.size.should eq(2)
                     end
 
                     it "does not delete the unmarked document" do
-                      person.addresses.last.street.should == "Alexander Platz"
+                      person.addresses.last.street.should eq("Alexander Platz")
                     end
                   end
                 end
@@ -1507,15 +1507,15 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not ignore the marked document" do
-                      person.addresses.first.street.should == "Maybachufer"
+                      person.addresses.first.street.should eq("Maybachufer")
                     end
 
                     it "does not delete the unmarked document" do
-                      person.addresses.last.street.should == "Alexander Platz"
+                      person.addresses.last.street.should eq("Alexander Platz")
                     end
 
                     it "does not add additional documents" do
-                      person.addresses.size.should == 2
+                      person.addresses.size.should eq(2)
                     end
                   end
                 end
@@ -1533,11 +1533,11 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not delete the marked document" do
-                      person.addresses.size.should == 2
+                      person.addresses.size.should eq(2)
                     end
 
                     it "does not delete the unmarked document" do
-                      person.addresses.last.street.should == "Alexander Platz"
+                      person.addresses.last.street.should eq("Alexander Platz")
                     end
                   end
                 end
@@ -1560,24 +1560,25 @@ describe Mongoid::NestedAttributes do
             end
 
             it "builds a new first document" do
-              person.addresses.first.street.should == "Frederichstrasse"
+              person.addresses.first.street.should eq("Frederichstrasse")
             end
 
             it "builds a new second document" do
-              person.addresses.second.street.should == "Alexander Platz"
+              person.addresses.second.street.should eq("Alexander Platz")
             end
 
             it "builds a new third document" do
-              person.addresses.third.street.should == "Maybachufer"
+              person.addresses.third.street.should eq("Maybachufer")
             end
 
             it "does not add extra documents" do
-              person.addresses.size.should == 3
+              person.addresses.size.should eq(3)
             end
 
             it "adds the documents in the sorted hash key order" do
-              person.addresses.map(&:street).should ==
+              person.addresses.map(&:street).should eq(
                 [ "Frederichstrasse", "Alexander Platz", "Maybachufer" ]
+              )
             end
           end
 
@@ -1614,11 +1615,11 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the new document" do
-                person.addresses.size.should == 1
+                person.addresses.size.should eq(1)
               end
 
               it "sets the correct attributes" do
-                person.addresses.first.street.should == "Maybachufer"
+                person.addresses.first.street.should eq("Maybachufer")
               end
             end
           end
@@ -1656,11 +1657,11 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the new document" do
-                person.addresses.size.should == 1
+                person.addresses.size.should eq(1)
               end
 
               it "sets the correct attributes" do
-                person.addresses.first.street.should == "Maybachufer"
+                person.addresses.first.street.should eq("Maybachufer")
               end
             end
           end
@@ -1692,11 +1693,11 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "ignores the the marked document" do
-                    person.addresses.size.should == 1
+                    person.addresses.size.should eq(1)
                   end
 
                   it "adds the new unmarked document" do
-                    person.addresses.first.street.should == "Alexander Platz"
+                    person.addresses.first.street.should eq("Alexander Platz")
                   end
                 end
               end
@@ -1714,15 +1715,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.addresses.first.street.should == "Maybachufer"
+                    person.addresses.first.street.should eq("Maybachufer")
                   end
 
                   it "adds the new unmarked document" do
-                    person.addresses.last.street.should == "Alexander Platz"
+                    person.addresses.last.street.should eq("Alexander Platz")
                   end
 
                   it "does not add extra documents" do
-                    person.addresses.size.should == 2
+                    person.addresses.size.should eq(2)
                   end
                 end
               end
@@ -1753,15 +1754,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the the marked document" do
-                    person.addresses.first.street.should == "Maybachufer"
+                    person.addresses.first.street.should eq("Maybachufer")
                   end
 
                   it "adds the new unmarked document" do
-                    person.addresses.last.street.should == "Alexander Platz"
+                    person.addresses.last.street.should eq("Alexander Platz")
                   end
 
                   it "adds the correct number of documents" do
-                    person.addresses.size.should == 2
+                    person.addresses.size.should eq(2)
                   end
                 end
               end
@@ -1779,15 +1780,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.addresses.first.street.should == "Maybachufer"
+                    person.addresses.first.street.should eq("Maybachufer")
                   end
 
                   it "adds the new unmarked document" do
-                    person.addresses.last.street.should == "Alexander Platz"
+                    person.addresses.last.street.should eq("Alexander Platz")
                   end
 
                   it "does not add extra documents" do
-                    person.addresses.size.should == 2
+                    person.addresses.size.should eq(2)
                   end
                 end
               end
@@ -1813,15 +1814,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the the marked document" do
-                    person.addresses.first.street.should == "Maybachufer"
+                    person.addresses.first.street.should eq("Maybachufer")
                   end
 
                   it "adds the new unmarked document" do
-                    person.addresses.last.street.should == "Alexander Platz"
+                    person.addresses.last.street.should eq("Alexander Platz")
                   end
 
                   it "adds the correct number of documents" do
-                    person.addresses.size.should == 2
+                    person.addresses.size.should eq(2)
                   end
                 end
               end
@@ -1839,15 +1840,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.addresses.first.street.should == "Maybachufer"
+                    person.addresses.first.street.should eq("Maybachufer")
                   end
 
                   it "adds the new unmarked document" do
-                    person.addresses.last.street.should == "Alexander Platz"
+                    person.addresses.last.street.should eq("Alexander Platz")
                   end
 
                   it "does not add extra documents" do
-                    person.addresses.size.should == 2
+                    person.addresses.size.should eq(2)
                   end
                 end
               end
@@ -1886,7 +1887,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "instantiates an object of the given type" do
-            canvas.shapes.map(&:class).should == [Square, Circle]
+            canvas.shapes.map(&:class).should eq([Square, Circle])
           end
         end
       end
@@ -1928,7 +1929,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "adds the document" do
-              person.game.name.should == "Tron"
+              person.game.name.should eq("Tron")
             end
           end
         end
@@ -1964,7 +1965,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "adds the document" do
-              person.game.name.should == "Tron"
+              person.game.name.should eq("Tron")
             end
           end
         end
@@ -1978,7 +1979,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "builds a new document" do
-              person.game.name.should == "Tron"
+              person.game.name.should eq("Tron")
             end
           end
 
@@ -2022,7 +2023,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "builds the document" do
-                person.game.name.should == "Tron"
+                person.game.name.should eq("Tron")
               end
             end
           end
@@ -2048,7 +2049,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "replaces the document" do
-                person.game.name.should == "Pong"
+                person.game.name.should eq("Pong")
               end
             end
 
@@ -2088,7 +2089,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "does not replace the document" do
-                  person.game.name.should == "Tron"
+                  person.game.name.should eq("Tron")
                 end
               end
 
@@ -2110,7 +2111,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "replaces the document" do
-                  person.game.name.should == "Pong"
+                  person.game.name.should eq("Pong")
                 end
               end
             end
@@ -2139,7 +2140,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  person.game.name.should == "Pong"
+                  person.game.name.should eq("Pong")
                 end
               end
 
@@ -2151,7 +2152,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  person.game.name.should == "Pong"
+                  person.game.name.should eq("Pong")
                 end
               end
 
@@ -2192,7 +2193,7 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not destroy the existing document" do
-                      person.game.should == game
+                      person.game.should eq(game)
                     end
                   end
                 end
@@ -2218,7 +2219,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "does not destroy the document" do
-                    person.game.should == game
+                    person.game.should eq(game)
                   end
                 end
               end
@@ -2246,7 +2247,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    person.game.name.should == "Donkey Kong"
+                    person.game.name.should eq("Donkey Kong")
                   end
                 end
 
@@ -2258,7 +2259,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    person.game.name.should == "Pong"
+                    person.game.name.should eq("Pong")
                   end
                 end
 
@@ -2303,7 +2304,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "instantiates an object of the given type" do
-            driver.vehicle.class.should == Truck
+            driver.vehicle.class.should eq(Truck)
           end
         end
       end
@@ -2325,7 +2326,7 @@ describe Mongoid::NestedAttributes do
               end
 
               it "builds a new document" do
-                game.person.title.should == "Sir"
+                game.person.title.should eq("Sir")
               end
 
             end
@@ -2370,7 +2371,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "builds a new document" do
-                  game.person.title.should == "Sir"
+                  game.person.title.should eq("Sir")
                 end
               end
             end
@@ -2391,7 +2392,7 @@ describe Mongoid::NestedAttributes do
                 end
 
                 it "updates the existing document" do
-                  game.person.title.should == "Sir"
+                  game.person.title.should eq("Sir")
                 end
               end
             end
@@ -2439,7 +2440,7 @@ describe Mongoid::NestedAttributes do
                     end
 
                     it "does not destroy the existing document" do
-                      game.person.should == person
+                      game.person.should eq(person)
                     end
                   end
                 end
@@ -2465,7 +2466,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "does not delete the document" do
-                    game.person.should == person
+                    game.person.should eq(person)
                   end
                 end
               end
@@ -2488,7 +2489,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    game.person.title.should == "Madam"
+                    game.person.title.should eq("Madam")
                   end
                 end
 
@@ -2500,7 +2501,7 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "updates the existing document" do
-                    game.person.title.should == "Madam"
+                    game.person.title.should eq("Madam")
                   end
                 end
 
@@ -2544,7 +2545,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "instantiates an object of the given type" do
-            vehicle.driver.class.should == Learner
+            vehicle.driver.class.should eq(Learner)
           end
         end
       end
@@ -2640,15 +2641,15 @@ describe Mongoid::NestedAttributes do
               context "when reloading the document" do
 
                 it "updates the first existing document" do
-                  person.posts(true).first.title.should == "First"
+                  person.posts(true).first.title.should eq("First")
                 end
 
                 it "updates the second existing document" do
-                  person.posts(true).last.title.should == "Second"
+                  person.posts(true).last.title.should eq("Second")
                 end
 
                 it "does not add new documents" do
-                  person.posts(true).size.should == 2
+                  person.posts(true).size.should eq(2)
                 end
               end
 
@@ -2711,11 +2712,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the documents" do
 
                       it "deletes the marked document" do
-                        person.posts(true).size.should == 1
+                        person.posts(true).size.should eq(1)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).first.title.should == "My Blog"
+                        person.posts(true).first.title.should eq("My Blog")
                       end
                     end
                   end
@@ -2736,7 +2737,7 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the document" do
 
                       it "does not delete the marked document" do
-                        person.posts(true).size.should == 2
+                        person.posts(true).size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
@@ -2775,15 +2776,15 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        person.posts(true).first.title.should == "Another Title"
+                        person.posts(true).first.title.should eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).last.title.should == "New Title"
+                        person.posts(true).last.title.should eq("New Title")
                       end
 
                       it "does not add additional documents" do
-                        person.posts(true).size.should == 2
+                        person.posts(true).size.should eq(2)
                       end
                     end
                   end
@@ -2804,11 +2805,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the documents" do
 
                       it "does not delete the marked document" do
-                        person.posts(true).size.should == 2
+                        person.posts(true).size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).last.title.should == "New Title"
+                        person.posts(true).last.title.should eq("New Title")
                       end
                     end
                   end
@@ -2846,15 +2847,15 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        person.posts(true).find(post_one.id).title.should == "Another Title"
+                        person.posts(true).find(post_one.id).title.should eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).find(post_two.id).title.should == "New Title"
+                        person.posts(true).find(post_two.id).title.should eq("New Title")
                       end
 
                       it "does not add additional documents" do
-                        person.posts(true).size.should == 2
+                        person.posts(true).size.should eq(2)
                       end
                     end
                   end
@@ -2875,11 +2876,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not delete the marked document" do
-                        person.posts(true).size.should == 2
+                        person.posts(true).size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.posts(true).last.title.should == "New Title"
+                        person.posts(true).last.title.should eq("New Title")
                       end
                     end
                   end
@@ -2905,19 +2906,19 @@ describe Mongoid::NestedAttributes do
               end
 
               it "builds a new first document" do
-                person.posts.first.title.should == "First"
+                person.posts.first.title.should eq("First")
               end
 
               it "builds a new second document" do
-                person.posts.second.title.should == "Second"
+                person.posts.second.title.should eq("Second")
               end
 
               it "builds a new third document" do
-                person.posts.third.title.should == "Third"
+                person.posts.third.title.should eq("Third")
               end
 
               it "does not add extra documents" do
-                person.posts.size.should == 3
+                person.posts.size.should eq(3)
               end
 
               it "does not persist the documents" do
@@ -2925,8 +2926,9 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the documents in the sorted hash key order" do
-                person.posts.map(&:title).should ==
+                person.posts.map(&:title).should eq(
                   [ "First", "Second", "Third" ]
+                )
               end
             end
 
@@ -3000,11 +3002,11 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the new document" do
-                person.posts.size.should == 1
+                person.posts.size.should eq(1)
               end
 
               it "sets the correct attributes" do
-                person.posts.first.title.should == "Blogging"
+                person.posts.first.title.should eq("Blogging")
               end
             end
           end
@@ -3042,11 +3044,11 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the new document" do
-                person.posts.size.should == 1
+                person.posts.size.should eq(1)
               end
 
               it "sets the correct attributes" do
-                person.posts.first.title.should == "Blogging"
+                person.posts.first.title.should eq("Blogging")
               end
             end
           end
@@ -3078,11 +3080,11 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "ignores the the marked document" do
-                    person.posts.size.should == 1
+                    person.posts.size.should eq(1)
                   end
 
                   it "adds the new unmarked document" do
-                    person.posts.first.title.should == "Blog Two"
+                    person.posts.first.title.should eq("Blog Two")
                   end
                 end
               end
@@ -3100,15 +3102,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.posts.first.title.should == "New Blog"
+                    person.posts.first.title.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.posts.last.title.should == "Blog Two"
+                    person.posts.last.title.should eq("Blog Two")
                   end
 
                   it "does not add extra documents" do
-                    person.posts.size.should == 2
+                    person.posts.size.should eq(2)
                   end
                 end
               end
@@ -3139,15 +3141,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the the marked document" do
-                    person.posts.first.title.should == "New Blog"
+                    person.posts.first.title.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.posts.last.title.should == "Blog Two"
+                    person.posts.last.title.should eq("Blog Two")
                   end
 
                   it "adds the correct number of documents" do
-                    person.posts.size.should == 2
+                    person.posts.size.should eq(2)
                   end
                 end
               end
@@ -3165,15 +3167,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.posts.first.title.should == "New Blog"
+                    person.posts.first.title.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.posts.last.title.should == "Blog Two"
+                    person.posts.last.title.should eq("Blog Two")
                   end
 
                   it "does not add extra documents" do
-                    person.posts.size.should == 2
+                    person.posts.size.should eq(2)
                   end
                 end
               end
@@ -3199,15 +3201,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the the marked document" do
-                    person.posts.first.title.should == "New Blog"
+                    person.posts.first.title.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.posts.last.title.should == "Blog Two"
+                    person.posts.last.title.should eq("Blog Two")
                   end
 
                   it "adds the correct number of documents" do
-                    person.posts.size.should == 2
+                    person.posts.size.should eq(2)
                   end
                 end
               end
@@ -3225,15 +3227,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.posts.first.title.should == "New Blog"
+                    person.posts.first.title.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.posts.last.title.should == "Blog Two"
+                    person.posts.last.title.should eq("Blog Two")
                   end
 
                   it "does not add extra documents" do
-                    person.posts.size.should == 2
+                    person.posts.size.should eq(2)
                   end
                 end
               end
@@ -3272,7 +3274,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "instantiates an object of the given type" do
-            shipping_container.vehicles.map(&:class).should == [Car, Truck]
+            shipping_container.vehicles.map(&:class).should eq([Car, Truck])
           end
         end
       end
@@ -3334,7 +3336,7 @@ describe Mongoid::NestedAttributes do
             end
 
             it "sets the documents on the relation" do
-              person.preferences.size.should == 2
+              person.preferences.size.should eq(2)
             end
           end
         end
@@ -3364,15 +3366,15 @@ describe Mongoid::NestedAttributes do
               context "when reloading the document" do
 
                 it "updates the first existing document" do
-                  person.preferences(true).first.name.should == "First"
+                  person.preferences(true).first.name.should eq("First")
                 end
 
                 it "updates the second existing document" do
-                  person.preferences(true).second.name.should == "Second"
+                  person.preferences(true).second.name.should eq("Second")
                 end
 
                 it "does not add new documents" do
-                  person.preferences(true).size.should == 2
+                  person.preferences(true).size.should eq(2)
                 end
               end
             end
@@ -3419,11 +3421,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the documents" do
 
                       it "deletes the marked document" do
-                        person.preferences(true).size.should == 1
+                        person.preferences(true).size.should eq(1)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.preferences(true).first.name.should == "My Blog"
+                        person.preferences(true).first.name.should eq("My Blog")
                       end
                     end
                   end
@@ -3444,11 +3446,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the document" do
 
                       it "does not delete the marked document" do
-                        person.preferences(true).size.should == 2
+                        person.preferences(true).size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.preferences(true).last.name.should == "My Blog"
+                        person.preferences(true).last.name.should eq("My Blog")
                       end
                     end
                   end
@@ -3483,15 +3485,15 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        person.preferences(true).first.name.should == "Another Title"
+                        person.preferences(true).first.name.should eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        person.preferences(true).last.name.should == "New Title"
+                        person.preferences(true).last.name.should eq("New Title")
                       end
 
                       it "does not add additional documents" do
-                        person.preferences(true).size.should == 2
+                        person.preferences(true).size.should eq(2)
                       end
                     end
                   end
@@ -3512,11 +3514,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading the documents" do
 
                       it "does not delete the marked document" do
-                        person.preferences(true).size.should == 2
+                        person.preferences(true).size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.preferences(true).last.name.should == "New Title"
+                        person.preferences(true).last.name.should eq("New Title")
                       end
                     end
                   end
@@ -3546,15 +3548,15 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        person.preferences(true).first.name.should == "Another Title"
+                        person.preferences(true).first.name.should eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        person.preferences(true).last.name.should == "New Title"
+                        person.preferences(true).last.name.should eq("New Title")
                       end
 
                       it "does not add additional documents" do
-                        person.preferences(true).size.should == 2
+                        person.preferences(true).size.should eq(2)
                       end
                     end
                   end
@@ -3575,11 +3577,11 @@ describe Mongoid::NestedAttributes do
                     context "when reloading" do
 
                       it "does not delete the marked document" do
-                        person.preferences(true).size.should == 2
+                        person.preferences(true).size.should eq(2)
                       end
 
                       it "does not delete the unmarked document" do
-                        person.preferences(true).last.name.should == "New Title"
+                        person.preferences(true).last.name.should eq("New Title")
                       end
                     end
                   end
@@ -3603,24 +3605,25 @@ describe Mongoid::NestedAttributes do
             end
 
             it "builds a new first document" do
-              person.preferences.first.name.should == "First"
+              person.preferences.first.name.should eq("First")
             end
 
             it "builds a new second document" do
-              person.preferences.second.name.should == "Second"
+              person.preferences.second.name.should eq("Second")
             end
 
             it "builds a new third document" do
-              person.preferences.third.name.should == "Third"
+              person.preferences.third.name.should eq("Third")
             end
 
             it "does not add extra documents" do
-              person.preferences.size.should == 3
+              person.preferences.size.should eq(3)
             end
 
             it "adds the documents in the sorted hash key order" do
-              person.preferences.map(&:name).should ==
+              person.preferences.map(&:name).should eq(
                 [ "First", "Second", "Third" ]
+              )
             end
           end
 
@@ -3657,11 +3660,11 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the new document" do
-                person.preferences.size.should == 1
+                person.preferences.size.should eq(1)
               end
 
               it "sets the correct attributes" do
-                person.preferences.first.name.should == "Blogging"
+                person.preferences.first.name.should eq("Blogging")
               end
             end
           end
@@ -3699,11 +3702,11 @@ describe Mongoid::NestedAttributes do
               end
 
               it "adds the new document" do
-                person.preferences.size.should == 1
+                person.preferences.size.should eq(1)
               end
 
               it "sets the correct attributes" do
-                person.preferences.first.name.should == "Blogging"
+                person.preferences.first.name.should eq("Blogging")
               end
             end
           end
@@ -3735,11 +3738,11 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "ignores the the marked document" do
-                    person.preferences.size.should == 1
+                    person.preferences.size.should eq(1)
                   end
 
                   it "adds the new unmarked document" do
-                    person.preferences.first.name.should == "Blog Two"
+                    person.preferences.first.name.should eq("Blog Two")
                   end
                 end
               end
@@ -3757,15 +3760,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.preferences.first.name.should == "New Blog"
+                    person.preferences.first.name.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.preferences.last.name.should == "Blog Two"
+                    person.preferences.last.name.should eq("Blog Two")
                   end
 
                   it "does not add extra documents" do
-                    person.preferences.size.should == 2
+                    person.preferences.size.should eq(2)
                   end
                 end
               end
@@ -3796,15 +3799,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the the marked document" do
-                    person.preferences.first.name.should == "New Blog"
+                    person.preferences.first.name.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.preferences.last.name.should == "Blog Two"
+                    person.preferences.last.name.should eq("Blog Two")
                   end
 
                   it "adds the correct number of documents" do
-                    person.preferences.size.should == 2
+                    person.preferences.size.should eq(2)
                   end
                 end
               end
@@ -3822,15 +3825,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.preferences.first.name.should == "New Blog"
+                    person.preferences.first.name.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.preferences.last.name.should == "Blog Two"
+                    person.preferences.last.name.should eq("Blog Two")
                   end
 
                   it "does not add extra documents" do
-                    person.preferences.size.should == 2
+                    person.preferences.size.should eq(2)
                   end
                 end
               end
@@ -3856,15 +3859,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the the marked document" do
-                    person.preferences.first.name.should == "New Blog"
+                    person.preferences.first.name.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.preferences.last.name.should == "Blog Two"
+                    person.preferences.last.name.should eq("Blog Two")
                   end
 
                   it "adds the correct number of documents" do
-                    person.preferences.size.should == 2
+                    person.preferences.size.should eq(2)
                   end
                 end
               end
@@ -3882,15 +3885,15 @@ describe Mongoid::NestedAttributes do
                   end
 
                   it "adds the new marked document" do
-                    person.preferences.first.name.should == "New Blog"
+                    person.preferences.first.name.should eq("New Blog")
                   end
 
                   it "adds the new unmarked document" do
-                    person.preferences.last.name.should == "Blog Two"
+                    person.preferences.last.name.should eq("Blog Two")
                   end
 
                   it "does not add extra documents" do
-                    person.preferences.size.should == 2
+                    person.preferences.size.should eq(2)
                   end
                 end
               end
@@ -4178,7 +4181,7 @@ describe Mongoid::NestedAttributes do
       end
 
       it "sets the nested attributes" do
-        league.reload.divisions.first.name.should == "New Name"
+        league.reload.divisions.first.name.should eq("New Name")
       end
 
       context "with corrupted data" do
@@ -4198,7 +4201,7 @@ describe Mongoid::NestedAttributes do
         end
 
         it "sets the nested attributes" do
-          league.reload.divisions.first.name.should == "Name"
+          league.reload.divisions.first.name.should eq("Name")
         end
       end
     end

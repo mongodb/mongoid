@@ -55,21 +55,21 @@ describe Mongoid::NamedScope do
     context "accessing a single named scope" do
 
       it "returns the document" do
-        Person.doctors.first.should == document
+        Person.doctors.first.should eq(document)
       end
     end
 
     context "chaining named scopes" do
 
       it "returns the document" do
-        Person.old.doctors.first.should == document
+        Person.old.doctors.first.should eq(document)
       end
     end
 
     context "mixing named scopes and class methods" do
 
       it "returns the document" do
-        Person.accepted.old.doctors.first.should == document
+        Person.accepted.old.doctors.first.should eq(document)
       end
     end
 
@@ -83,14 +83,14 @@ describe Mongoid::NamedScope do
 
       it "sorts the results" do
         docs = Person.alki
-        docs.first.blood_alcohol_content.should == 0.4
+        docs.first.blood_alcohol_content.should eq(0.4)
       end
     end
 
     context "when an class attribute is defined" do
 
       it "should be accessible" do
-        Person.somebody_elses_important_class_options.should == { :keep_me_around => true }
+        Person.somebody_elses_important_class_options.should eq({ :keep_me_around => true })
       end
 
     end
@@ -98,11 +98,11 @@ describe Mongoid::NamedScope do
     context "when calling scopes on parent classes" do
 
       it "inherits the scope" do
-        Doctor.minor.should == []
+        Doctor.minor.should be_empty
       end
 
       it "inherits the class attribute methods" do
-        Doctor.somebody_elses_important_class_options.should == { :keep_me_around => true }
+        Doctor.somebody_elses_important_class_options.should eq({ :keep_me_around => true })
       end
     end
 
@@ -155,14 +155,14 @@ describe Mongoid::NamedScope do
       context "when the proc delegates to a hash" do
 
         it "adds the selector to the scope" do
-          Player.frags_over(50).selector[:frags].should == { "$gt" => 50 }
+          Player.frags_over(50).selector[:frags].should eq({ "$gt" => 50 })
         end
       end
 
       context "when the proc delegates to a criteria" do
 
         it "adds the selector to the scope" do
-          Player.deaths_under(40).selector[:deaths].should == { "$lt" => 40 }
+          Player.deaths_under(40).selector[:deaths].should eq({ "$lt" => 40 })
         end
       end
     end
@@ -212,7 +212,7 @@ describe Mongoid::NamedScope do
       end
 
       it "returns a criteria with default scoping options" do
-        criteria.options.should == { :sort => [[ :name, :asc ]] }
+        criteria.options.should eq({ :sort => [[ :name, :asc ]] })
       end
     end
 
@@ -223,11 +223,11 @@ describe Mongoid::NamedScope do
       end
 
       it "returns a criteria with no default scoping" do
-        criteria.selector.should == {}
+        criteria.selector.should eq({})
       end
 
       it "returns a criteria with no default options" do
-        criteria.options.should == {}
+        criteria.options.should eq({})
       end
     end
   end
@@ -249,14 +249,14 @@ describe Mongoid::NamedScope do
       end
 
       it "returns the scope stack for the class" do
-        Person.scope_stack.should == [ criteria ]
+        Person.scope_stack.should eq([ criteria ])
       end
     end
 
     context "when no scope is on the stack" do
 
       it "returns an empty array" do
-        Person.scope_stack.should == []
+        Person.scope_stack.should be_empty
       end
     end
   end
@@ -268,11 +268,11 @@ describe Mongoid::NamedScope do
     end
 
     it "returns a criteria with no selector" do
-      criteria.selector.should == {}
+      criteria.selector.should eq({})
     end
 
     it "returns a criteria with no options" do
-      criteria.options.should == {}
+      criteria.options.should eq({})
     end
   end
 
@@ -289,7 +289,7 @@ describe Mongoid::NamedScope do
       end
 
       it "retains the second criteria" do
-        selector[:frags].should == { "$gt" => 10 }
+        selector[:frags].should eq({ "$gt" => 10 })
       end
 
       context "when both scoped have in clauses" do
@@ -321,11 +321,11 @@ describe Mongoid::NamedScope do
       end
 
       it "retains the second criteria" do
-        selector[:frags].should == { "$gt" => 10 }
+        selector[:frags].should eq({ "$gt" => 10 })
       end
 
       it "retains the class method criteria" do
-        selector[:status].should == "Alive"
+        selector[:status].should eq("Alive")
       end
     end
   end

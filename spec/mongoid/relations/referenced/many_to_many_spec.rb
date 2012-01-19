@@ -35,11 +35,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "appends the document to the relation" do
-            person.houses.should == [ house ]
+            person.houses.should eq([ house ])
           end
 
           it "sets the foreign key on the relation" do
-            person.house_ids.should == [ house.id ]
+            person.house_ids.should eq([ house.id ])
           end
         end
 
@@ -97,15 +97,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the documents to the relation" do
-              person.preferences.should == [ preference ]
+              person.preferences.should eq([ preference ])
             end
 
             it "sets the foreign key on the relation" do
-              person.preference_ids.should == [ preference.id ]
+              person.preference_ids.should eq([ preference.id ])
             end
 
             it "sets the foreign key on the inverse relation" do
-              preference.person_ids.should == [ person.id ]
+              preference.person_ids.should eq([ person.id ])
             end
 
             it "does not save the target" do
@@ -113,7 +113,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the correct number of documents" do
-              person.preferences.size.should == 1
+              person.preferences.size.should eq(1)
             end
           end
 
@@ -133,15 +133,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the documents to the relation" do
-              person.preferences.should == [ preference ]
+              person.preferences.should eq([ preference ])
             end
 
             it "sets the foreign key on the relation" do
-              person.preference_ids.should == [ preference.id ]
+              person.preference_ids.should eq([ preference.id ])
             end
 
             it "sets the foreign key on the inverse relation" do
-              preference.person_ids.should == [ person.id ]
+              preference.person_ids.should eq([ person.id ])
             end
 
             it "saves the target" do
@@ -149,7 +149,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the correct number of documents" do
-              person.preferences.size.should == 1
+              person.preferences.size.should eq(1)
             end
 
             it "persists the link" do
@@ -176,19 +176,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the documents to the relation" do
-              person.preferences.should == [ preference ]
+              person.preferences.should eq([ preference ])
             end
 
             it "sets the foreign key on the relation" do
-              person.preference_ids.should == [ preference.id ]
+              person.preference_ids.should eq([ preference.id ])
             end
 
             it "sets the foreign key on the inverse relation" do
-              preference.reload.person_ids.should == [ person.id ]
+              preference.reload.person_ids.should eq([ person.id ])
             end
 
             it "adds the correct number of documents" do
-              person.preferences.size.should == 1
+              person.preferences.size.should eq(1)
             end
 
             it "persists the link" do
@@ -212,19 +212,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the documents to the relation" do
-            person.preferences.should == [ preference ]
+            person.preferences.should eq([ preference ])
           end
 
           it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
+            person.preference_ids.should eq([ preference.id ])
           end
 
           it "sets the foreign key on the inverse relation" do
-            preference.person_ids.should == [ person.id ]
+            preference.person_ids.should eq([ person.id ])
           end
 
           it "sets the base on the inverse relation" do
-            preference.people.should == [ person ]
+            preference.people.should eq([ person ])
           end
 
           it "sets the same instance on the inverse relation" do
@@ -236,7 +236,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the document to the target" do
-            person.preferences.count.should == 1
+            person.preferences.count.should eq(1)
           end
 
           context "when documents already exist on the relation" do
@@ -250,19 +250,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the documents to the relation" do
-              person.preferences.should == [ preference, preference_two ]
+              person.preferences.should eq([ preference, preference_two ])
             end
 
             it "sets the foreign key on the relation" do
-              person.preference_ids.should == [ preference.id, preference_two.id ]
+              person.preference_ids.should eq([ preference.id, preference_two.id ])
             end
 
             it "sets the foreign key on the inverse relation" do
-              preference_two.person_ids.should == [ person.id ]
+              preference_two.person_ids.should eq([ person.id ])
             end
 
             it "sets the base on the inverse relation" do
-              preference_two.people.should == [ person ]
+              preference_two.people.should eq([ person ])
             end
 
             it "sets the same instance on the inverse relation" do
@@ -274,7 +274,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "adds the document to the target" do
-              person.preferences.count.should == 2
+              person.preferences.count.should eq(2)
             end
           end
         end
@@ -294,21 +294,21 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the front side of the relation" do
-            person.administrated_events.should == [ event ]
+            person.administrated_events.should eq([ event ])
           end
 
           it "sets the inverse side of the relation" do
-            event.administrators.should == [ person ]
+            event.administrators.should eq([ person ])
           end
 
           context "when reloading" do
 
             it "sets the front side of the relation" do
-              person.reload.administrated_events.should == [ event ]
+              person.reload.administrated_events.should eq([ event ])
             end
 
             it "sets the inverse side of the relation" do
-              event.reload.administrators.should == [ person ]
+              event.reload.administrators.should eq([ person ])
             end
           end
 
@@ -323,11 +323,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "sets the front side of the relation" do
-              loaded_person.administrated_events.should == [ event ]
+              loaded_person.administrated_events.should eq([ event ])
             end
 
             it "sets the inverse side of the relation" do
-              loaded_event.administrators.should == [ person ]
+              loaded_event.administrators.should eq([ person ])
             end
           end
         end
@@ -351,7 +351,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "creates a single artwork object" do
-            Artwork.count.should == 1
+            Artwork.count.should eq(1)
           end
         end
 
@@ -370,21 +370,21 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the front side of the relation" do
-            tag_one.related.should == [ tag_two ]
+            tag_one.related.should eq([ tag_two ])
           end
 
           it "sets the inverse side of the relation" do
-            tag_two.related.should == [ tag_one ]
+            tag_two.related.should eq([ tag_one ])
           end
 
           context "when reloading" do
 
             it "sets the front side of the relation" do
-              tag_one.reload.related.should == [ tag_two ]
+              tag_one.reload.related.should eq([ tag_two ])
             end
 
             it "sets the inverse side of the relation" do
-              tag_two.reload.related.should == [ tag_one ]
+              tag_two.reload.related.should eq([ tag_one ])
             end
           end
 
@@ -399,11 +399,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "sets the front side of the relation" do
-              loaded_tag_one.related.should == [ tag_two ]
+              loaded_tag_one.related.should eq([ tag_two ])
             end
 
             it "sets the inverse side of the relation" do
-              loaded_tag_two.related.should == [ tag_one ]
+              loaded_tag_two.related.should eq([ tag_one ])
             end
           end
         end
@@ -479,15 +479,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the relation" do
-          person.preferences.should == [ preference ]
+          person.preferences.should eq([ preference ])
         end
 
         it "sets the foreign key on the relation" do
-          person.preference_ids.should == [ preference.id ]
+          person.preference_ids.should eq([ preference.id ])
         end
 
         it "sets the foreign key on the inverse relation" do
-          preference.person_ids.should == [ person.id ]
+          preference.person_ids.should eq([ person.id ])
         end
 
         it "does not save the target" do
@@ -510,15 +510,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the relation" do
-          person.preferences.should == [ preference ]
+          person.preferences.should eq([ preference ])
         end
 
         it "sets the foreign key on the relation" do
-          person.preference_ids.should == [ preference.id ]
+          person.preference_ids.should eq([ preference.id ])
         end
 
         it "sets the foreign key on the inverse relation" do
-          preference.person_ids.should == [ person.id ]
+          preference.person_ids.should eq([ person.id ])
         end
 
         context "and the parent is persisted" do
@@ -529,19 +529,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "maintains the relation" do
-            person.preferences.should == [ preference ]
+            person.preferences.should eq([ preference ])
           end
 
           it "maintains the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
+            person.preference_ids.should eq([ preference.id ])
           end
 
           it "maintains the foreign key on the inverse relation" do
-            preference.person_ids.should == [ person.id ]
+            preference.person_ids.should eq([ person.id ])
           end
 
           it "maintains the base on the inverse relation" do
-            preference.people.first.should == person
+            preference.people.first.should eq(person)
           end
         end
       end
@@ -561,19 +561,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the relation" do
-          person.preferences.should == [ preference ]
+          person.preferences.should eq([ preference ])
         end
 
         it "sets the foreign key on the relation" do
-          person.preference_ids.should == [ preference.id ]
+          person.preference_ids.should eq([ preference.id ])
         end
 
         it "sets the foreign key on the inverse relation" do
-          preference.person_ids.should == [ person.id ]
+          preference.person_ids.should eq([ person.id ])
         end
 
         it "sets the base on the inverse relation" do
-          preference.people.first.should == person
+          preference.people.first.should eq(person)
         end
 
         it "saves the target" do
@@ -595,7 +595,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the relation" do
-            person.preferences.should == [ another_preference ]
+            person.preferences.should eq([ another_preference ])
           end
 
           it "saves the target" do
@@ -603,11 +603,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "does not leave foreign keys of the previous relation" do
-            person.preference_ids.should == [ another_preference.id ]
+            person.preference_ids.should eq([ another_preference.id ])
           end
 
           it "clears its own key on the foreign relation" do
-            preference.person_ids.should == []
+            preference.person_ids.should be_empty
           end
 
           context "and person reloaded instead of saved" do
@@ -618,15 +618,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "persists the relation between person and another_preference" do
-              person.preferences.should == [ another_preference ]
+              person.preferences.should eq([ another_preference ])
             end
 
             it "persists the relation between another_prefrence and person" do
-              another_preference.people.should == [ person ]
+              another_preference.people.should eq([ person ])
             end
 
             it "no longer has any relation between preference and person" do
-              preference.people.should == []
+              preference.people.should be_empty
             end
           end
 
@@ -639,15 +639,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             it "persists the relation between person and another_preference" do
-              person.preferences.should == [ another_preference ]
+              person.preferences.should eq([ another_preference ])
             end
 
             it "persists the relation between another_prefrence and person" do
-              another_preference.people.should == [ person ]
+              another_preference.people.should eq([ person ])
             end
 
             it "no longer has any relation between preference and person" do
-              preference.people.should == []
+              preference.people.should be_empty
             end
           end
         end
@@ -811,7 +811,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     it "returns the avg value of the supplied field" do
-      avg.should == 7.5
+      avg.should eq(7.5)
     end
   end
 
@@ -854,19 +854,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the document to the relation" do
-            person.preferences.should == [ preference ]
+            person.preferences.should eq([ preference ])
           end
 
           it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
+            person.preference_ids.should eq([ preference.id ])
           end
 
           it "sets the inverse foreign key on the relation" do
-            preference.person_ids.should == [ person.id ]
+            preference.person_ids.should eq([ person.id ])
           end
 
           it "sets the attributes" do
-            preference.name.should == "settings"
+            preference.name.should eq("settings")
           end
 
           it "does not save the target" do
@@ -874,7 +874,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the correct number of documents" do
-            person.preferences.size.should == 1
+            person.preferences.size.should eq(1)
           end
         end
 
@@ -889,23 +889,23 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the document to the relation" do
-            person.preferences.should == [ preference ]
+            person.preferences.should eq([ preference ])
           end
 
           it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
+            person.preference_ids.should eq([ preference.id ])
           end
 
           it "sets the inverse foreign key on the relation" do
-            preference.person_ids.should == [ person.id ]
+            preference.person_ids.should eq([ person.id ])
           end
 
           it "sets the base on the inverse relation" do
-            preference.people.should == [ person ]
+            preference.people.should eq([ person ])
           end
 
           it "sets the attributes" do
-            preference.name.should == "settings"
+            preference.name.should eq("settings")
           end
 
           it "does not save the target" do
@@ -913,7 +913,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the correct number of documents" do
-            person.preferences.size.should == 1
+            person.preferences.size.should eq(1)
           end
 
           context "when saving the target" do
@@ -996,7 +996,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "returns the relation" do
-            relation.should == []
+            relation.should be_empty
           end
         end
 
@@ -1050,7 +1050,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "returns the number of persisted documents" do
-        person.preferences.count.should == 1
+        person.preferences.count.should eq(1)
       end
     end
 
@@ -1077,7 +1077,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "returns 0" do
-        person.preferences.count.should == 0
+        person.preferences.count.should eq(0)
       end
     end
 
@@ -1090,7 +1090,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the count from the db" do
-          person.reload.preferences.count.should == 1
+          person.reload.preferences.count.should eq(1)
         end
       end
 
@@ -1101,7 +1101,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the count from the db" do
-          person.preferences.count.should == 0
+          person.preferences.count.should eq(0)
         end
       end
     end
@@ -1115,7 +1115,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the number of persisted documents" do
-          person.houses.count.should == 1
+          person.houses.count.should eq(1)
         end
       end
 
@@ -1126,7 +1126,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns 0" do
-          person.preferences.count.should == 0
+          person.preferences.count.should eq(0)
         end
       end
     end
@@ -1171,7 +1171,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "does not convert the string key to an object id" do
-            agent.account_ids.should == [ "testing-again" ]
+            agent.account_ids.should eq([ "testing-again" ])
           end
         end
 
@@ -1199,23 +1199,23 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the foreign key on the relation" do
-            person.preference_ids.should == [ preference.id ]
+            person.preference_ids.should eq([ preference.id ])
           end
 
           it "sets the foreign key on the inverse relation" do
-            preference.person_ids.should == [ person.id ]
+            preference.person_ids.should eq([ person.id ])
           end
 
           it "adds the document" do
-            person.preferences.should == [ preference ]
+            person.preferences.should eq([ preference ])
           end
 
           it "sets the base on the inverse relation" do
-            preference.people.should == [ person ]
+            preference.people.should eq([ person ])
           end
 
           it "sets the attributes" do
-            preference.name.should == "Testing"
+            preference.name.should eq("Testing")
           end
 
           it "saves the target" do
@@ -1223,7 +1223,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "adds the document to the target" do
-            person.preferences.count.should == 1
+            person.preferences.count.should eq(1)
           end
 
           it "does not duplicate documents" do
@@ -1282,15 +1282,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "removes the document from the relation" do
-        person.preferences.should == [ preference_two ]
+        person.preferences.should eq([ preference_two ])
       end
 
       it "returns the document" do
-        deleted.should == preference_one
+        deleted.should eq(preference_one)
       end
 
       it "removes the document key from the foreign key" do
-        person.preference_ids.should == [ preference_two.id ]
+        person.preference_ids.should eq([ preference_two.id ])
       end
 
       it "removes the inverse reference" do
@@ -1310,11 +1310,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "nullifies the deleted preference" do
-          person.preferences.should == [ preference_two ]
+          person.preferences.should eq([ preference_two ])
         end
 
         it "retains the ids for one preference" do
-          person.preference_ids.should == [ preference_two.id ]
+          person.preference_ids.should eq([ preference_two.id ])
         end
       end
     end
@@ -1330,11 +1330,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "does not modify the relation" do
-        person.preferences.should == [ preference_one, preference_two ]
+        person.preferences.should eq([ preference_one, preference_two ])
       end
 
       it "does not modify the keys" do
-        person.preference_ids.should == [ preference_one.id, preference_two.id ]
+        person.preference_ids.should eq([ preference_one.id, preference_two.id ])
       end
     end
 
@@ -1476,19 +1476,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "removes the correct preferences" do
-            person.preferences.count.should == 1
+            person.preferences.count.should eq(1)
           end
 
           it "deletes the documents from the database" do
-            Preference.where(:name => "Testing").count.should == 0
+            Preference.where(:name => "Testing").count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
-            deleted.should == 1
+            deleted.should eq(1)
           end
 
           it "removes the ids from the foreign key" do
-            person.preference_ids.should == [ preference_two.id ]
+            person.preference_ids.should eq([ preference_two.id ])
           end
         end
 
@@ -1506,15 +1506,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "removes the correct preferences" do
-            person.preferences.count.should == 0
+            person.preferences.count.should eq(0)
           end
 
           it "deletes the documents from the database" do
-            Preference.count.should == 0
+            Preference.count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
-            deleted.should == 2
+            deleted.should eq(2)
           end
         end
       end
@@ -1587,7 +1587,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "returns true" do
-        person.preferences.exists?.should == true
+        person.preferences.exists?.should be_true
       end
     end
 
@@ -1598,7 +1598,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "returns false" do
-        person.preferences.exists?.should == false
+        person.preferences.exists?.should be_false
       end
     end
   end
@@ -1636,7 +1636,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "returns the matching document" do
-            preference.should == preference_one
+            preference.should eq(preference_one)
           end
         end
 
@@ -1698,7 +1698,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "returns the matching documents" do
-            preferences.should == [ preference_one, preference_two ]
+            preferences.should eq([ preference_one, preference_two ])
           end
         end
 
@@ -1774,7 +1774,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the document" do
-          found.should == preference
+          found.should eq(preference)
         end
       end
 
@@ -1785,7 +1785,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the new document attributes" do
-          found.name.should == "Test"
+          found.name.should eq("Test")
         end
 
         it "returns a newly persisted document" do
@@ -1814,7 +1814,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the document" do
-          found.should == preference
+          found.should eq(preference)
         end
       end
 
@@ -1825,7 +1825,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the new document attributes" do
-          found.name.should == "Test"
+          found.name.should eq("Test")
         end
 
         it "returns a non persisted document" do
@@ -1838,14 +1838,14 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   describe ".foreign_key_suffix" do
 
     it "returns _ids" do
-      described_class.foreign_key_suffix.should == "_ids"
+      described_class.foreign_key_suffix.should eq("_ids")
     end
   end
 
   describe ".macro" do
 
     it "returns has_and_belongs_to_many" do
-      described_class.macro.should == :has_and_belongs_to_many
+      described_class.macro.should eq(:has_and_belongs_to_many)
     end
   end
 
@@ -1872,7 +1872,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     it "returns the max value of the supplied field" do
-      max.should == 10
+      max.should eq(10)
     end
   end
 
@@ -1901,7 +1901,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "applies the criteria to the documents" do
-        preferences.should == [ preference_one ]
+        preferences.should eq([ preference_one ])
       end
     end
 
@@ -1923,7 +1923,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "applies the criteria to the documents" do
-        preferences.should == [ preference_one ]
+        preferences.should eq([ preference_one ])
       end
     end
 
@@ -1934,7 +1934,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "applies the criteria to the documents" do
-        preferences.should == [ preference_one ]
+        preferences.should eq([ preference_one ])
       end
     end
 
@@ -1954,7 +1954,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "returns the distinct values for the fields" do
-            person.houses.distinct(:name).should == [ house.name ]
+            person.houses.distinct(:name).should eq([ house.name ])
           end
         end
       end
@@ -1984,7 +1984,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     it "returns the min value of the supplied field" do
-      min.should == 5
+      min.should eq(5)
     end
   end
 
@@ -2086,7 +2086,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   describe ".stores_foreign_key?" do
 
     it "returns true" do
-      described_class.stores_foreign_key?.should == true
+      described_class.stores_foreign_key?.should be_true
     end
   end
 
@@ -2113,7 +2113,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     it "returns the sum value of the supplied field" do
-      sum.should == 15
+      sum.should eq(15)
     end
   end
 
@@ -2151,7 +2151,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the number of documents" do
-          person.preferences.send(method).should == 1
+          person.preferences.send(method).should eq(1)
         end
       end
 
@@ -2163,7 +2163,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "returns the total number of documents" do
-          person.preferences.send(method).should == 2
+          person.preferences.send(method).should eq(2)
         end
       end
     end
@@ -2225,15 +2225,16 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
+      described_class.valid_options.should eq(
         [ :autosave, :dependent, :foreign_key, :index, :order ]
+      )
     end
   end
 
   describe ".validation_default" do
 
     it "returns true" do
-      described_class.validation_default.should eq(true)
+      described_class.validation_default.should be_true
     end
   end
 

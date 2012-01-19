@@ -51,11 +51,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should == person
+          name.namable.should eq(person)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -84,11 +84,11 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should == name
+            person.name.should eq(name)
           end
 
           it "sets the base on the inverse relation" do
-            name.namable.should == person
+            name.namable.should eq(person)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -134,11 +134,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          parent_shelf.child_shelf.should == child_shelf
+          parent_shelf.child_shelf.should eq(child_shelf)
         end
 
         it "sets the base on the inverse relation" do
-          child_shelf.parent_shelf.should == parent_shelf
+          child_shelf.parent_shelf.should eq(parent_shelf)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -165,11 +165,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          parent_shelf.child_shelf.should == child_shelf
+          parent_shelf.child_shelf.should eq(child_shelf)
         end
 
         it "sets the base on the inverse relation" do
-          child_shelf.parent_shelf.should == parent_shelf
+          child_shelf.parent_shelf.should eq(parent_shelf)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -385,11 +385,11 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "sets the target of the relation" do
-              person.name.should == name
+              person.name.should eq(name)
             end
 
             it "sets the base on the inverse relation" do
-              name.namable.should == person
+              name.namable.should eq(person)
             end
 
             it "sets no attributes" do
@@ -413,11 +413,11 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "sets the target of the relation" do
-              person.name.should == name
+              person.name.should eq(name)
             end
 
             it "sets the base on the inverse relation" do
-              name.namable.should == person
+              name.namable.should eq(person)
             end
 
             it "sets no attributes" do
@@ -441,11 +441,11 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should == name
+            person.name.should eq(name)
           end
 
           it "sets the base on the inverse relation" do
-            name.namable.should == person
+            name.namable.should eq(person)
           end
 
           it "sets no attributes" do
@@ -468,15 +468,15 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should == name
+            person.name.should eq(name)
           end
 
           it "sets the base on the inverse relation" do
-            name.namable.should == person
+            name.namable.should eq(person)
           end
 
           it "sets the attributes" do
-            name.first_name.should == "James"
+            name.first_name.should eq("James")
           end
 
           it "does not save the target" do
@@ -514,15 +514,15 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          parent_shelf.child_shelf.should == child_shelf
+          parent_shelf.child_shelf.should eq(child_shelf)
         end
 
         it "sets the base on the inverse relation" do
-          child_shelf.parent_shelf.should == parent_shelf
+          child_shelf.parent_shelf.should eq(parent_shelf)
         end
 
         it "sets the attributes" do
-          child_shelf.level.should == 1
+          child_shelf.level.should eq(1)
         end
 
         it "does not save the target" do
@@ -606,11 +606,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should == person
+          name.namable.should eq(person)
         end
 
         it "sets no attributes" do
@@ -633,11 +633,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should == person
+          name.namable.should eq(person)
         end
 
         it "sets no attributes" do
@@ -660,15 +660,15 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should == name
+          person.name.should eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should == person
+          name.namable.should eq(person)
         end
 
         it "sets the attributes" do
-          name.first_name.should == "James"
+          name.first_name.should eq("James")
         end
 
         it "saves the target" do
@@ -703,7 +703,7 @@ describe Mongoid::Relations::Embedded::One do
   describe ".macro" do
 
     it "returns embeds_one" do
-      described_class.macro.should == :embeds_one
+      described_class.macro.should eq(:embeds_one)
     end
   end
 
@@ -759,15 +759,16 @@ describe Mongoid::Relations::Embedded::One do
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
+      described_class.valid_options.should eq(
         [ :as, :cascade_callbacks, :cyclic ]
+      )
     end
   end
 
   describe ".validation_default" do
 
     it "returns true" do
-      described_class.validation_default.should eq(true)
+      described_class.validation_default.should be_true
     end
   end
 

@@ -79,7 +79,7 @@ describe Mongoid::Contexts::Mongo do
     context "when no documents are in the collection" do
 
       it "returns nil" do
-        Person.avg(:age).should == nil
+        Person.avg(:age).should be_nil
       end
     end
 
@@ -99,7 +99,7 @@ describe Mongoid::Contexts::Mongo do
         end
 
         it "returns the average for the field" do
-          Person.avg(:age).should == 30
+          Person.avg(:age).should eq(30)
         end
       end
 
@@ -144,7 +144,7 @@ describe Mongoid::Contexts::Mongo do
 
       context "without skip or limit" do
         it "returns the number of documents" do
-          Person.count.should == 13
+          Person.count.should eq(13)
         end
       end
 
@@ -153,21 +153,21 @@ describe Mongoid::Contexts::Mongo do
         context "by default" do
 
           it "ignores previous offset/limit statements" do
-            Person.limit(5).offset(10).count.should == 13
+            Person.limit(5).offset(10).count.should eq(13)
           end
         end
 
         context "when passed 'true'" do
 
           it "includes previous offset/limit statements" do
-            Person.limit(5).offset(5).count(true).should == 5
+            Person.limit(5).offset(5).count(true).should eq(5)
           end
         end
 
         context "when passed 'false'" do
 
           it "ignores previous offset/limit statements" do
-            Person.limit(5).offset(10).count(false).should == 13
+            Person.limit(5).offset(10).count(false).should eq(13)
           end
         end
       end
@@ -179,7 +179,7 @@ describe Mongoid::Contexts::Mongo do
     context "when no documents are in the collection" do
 
       it "returns true" do
-        Person.empty?.should == true
+        Person.empty?.should be_true
       end
     end
 
@@ -197,7 +197,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "returns false" do
-        Person.empty?.should == false
+        Person.empty?.should be_false
       end
     end
   end
@@ -207,7 +207,7 @@ describe Mongoid::Contexts::Mongo do
     context "when no documents are in the collection" do
 
       it "returns nil" do
-        Person.max(:age).should == nil
+        Person.max(:age).should be_nil
       end
     end
 
@@ -225,7 +225,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "returns the maximum for the field" do
-        Person.max(:age).should == 40
+        Person.max(:age).should eq(40)
       end
 
       context "when the field is not defined" do
@@ -258,7 +258,7 @@ describe Mongoid::Contexts::Mongo do
     context "when no documents are in the collection" do
 
       it "returns nil" do
-        Person.min(:age).should == nil
+        Person.min(:age).should be_nil
       end
     end
 
@@ -276,7 +276,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "returns the minimum for the field" do
-        Person.min(:age).should == 10.0
+        Person.min(:age).should eq(10.0)
       end
 
       context "when the field is not defined" do

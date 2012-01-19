@@ -15,7 +15,7 @@ describe Mongoid::Indexes do
     end
 
     it "defaults index_options to empty hash" do
-      klass.index_options.should == {}
+      klass.index_options.should eq({})
     end
   end
 
@@ -81,7 +81,7 @@ describe Mongoid::Indexes do
       end
 
       it "creates a unique index on the collection" do
-        klass.index_options[:name].should == {:unique => true}
+        klass.index_options[:name].should eq({:unique => true})
       end
     end
 
@@ -92,7 +92,7 @@ describe Mongoid::Indexes do
       end
 
       it "creates an index on the collection" do
-        klass.index_options[:name].should == {:unique => false}
+        klass.index_options[:name].should eq({:unique => false})
       end
     end
   end

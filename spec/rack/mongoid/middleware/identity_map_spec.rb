@@ -43,7 +43,7 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
       end
 
       it "returns the call" do
-        result.should eq([])
+        result.should be_empty
       end
 
       it "clears out the identity map" do

@@ -26,7 +26,7 @@ describe Mongoid::Criterion::Selector do
     end
 
     it "stores the class" do
-      Mongoid::Criterion::Selector.new(klass).klass.should == klass
+      Mongoid::Criterion::Selector.new(klass).klass.should eq(klass)
     end
   end
 
@@ -36,7 +36,7 @@ describe Mongoid::Criterion::Selector do
       klass.stubs(:fields).returns({})
       klass.stubs(:aliased_fields).returns({})
       selector["age"] = 45
-      selector["age"].should == 45
+      selector["age"].should eq(45)
     end
 
     it "should typecast values when possible" do
@@ -44,7 +44,7 @@ describe Mongoid::Criterion::Selector do
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
       selector["age"] = "45"
-      selector["age"].should == 45
+      selector["age"].should eq(45)
     end
 
     it "should typecast complex conditions" do
@@ -52,7 +52,7 @@ describe Mongoid::Criterion::Selector do
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
       selector["age"] = { "$gt" => "45" }
-      selector["age"].should == { "$gt" => 45 }
+      selector["age"].should eq({ "$gt" => 45 })
     end
 
     context "when the field is localized" do
@@ -96,7 +96,7 @@ describe Mongoid::Criterion::Selector do
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
       selector.update({"age" => "45"})
-      selector["age"].should == 45
+      selector["age"].should eq(45)
     end
   end
 
@@ -106,7 +106,7 @@ describe Mongoid::Criterion::Selector do
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
       selector.merge!({"age" => "45"})
-      selector["age"].should == 45
+      selector["age"].should eq(45)
     end
   end
 
@@ -122,7 +122,7 @@ describe Mongoid::Criterion::Selector do
       context "when the value is not an array" do
         it "returns the value" do
           selector.expects(:typecast_value_for).with(field, value["age"]).never
-          selector.send(:try_to_typecast, "$or", value).should == value
+          selector.send(:try_to_typecast, "$or", value).should eq(value)
         end
       end
 
@@ -130,7 +130,7 @@ describe Mongoid::Criterion::Selector do
         context "when the keys are not declared" do
           it "returns the array" do
             selector.expects(:typecast_value_for).with(field, value["time"]).never
-            selector.send(:try_to_typecast, "$or", [value]).should == [value]
+            selector.send(:try_to_typecast, "$or", [value]).should eq([value])
           end
         end
 
@@ -138,7 +138,7 @@ describe Mongoid::Criterion::Selector do
           it "returns the typecasted array" do
             klass.stubs(:fields).returns({"age" => field})
             field.expects(:selection).with("45").returns(45).once
-            selector.send(:try_to_typecast, "$or", [value]).should == ["age" => 45]
+            selector.send(:try_to_typecast, "$or", [value]).should eq(["age" => 45])
           end
         end
       end
@@ -148,7 +148,7 @@ describe Mongoid::Criterion::Selector do
       it "returns the value" do
         klass.stubs(:fields).returns({})
         klass.stubs(:aliased_fields).returns({})
-        selector.send(:try_to_typecast, "age", "45").should == "45"
+        selector.send(:try_to_typecast, "age", "45").should eq("45")
       end
     end
 

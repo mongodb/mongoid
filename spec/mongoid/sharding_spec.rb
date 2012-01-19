@@ -15,7 +15,7 @@ describe Mongoid::Sharding do
     end
 
     it "defaults shard_key_fields to an empty array" do
-      klass.shard_key_fields.should == []
+      klass.shard_key_fields.should be_empty
     end
   end
 
@@ -32,7 +32,7 @@ describe Mongoid::Sharding do
     end
 
     it "specifies a shard key on the collection" do
-      klass.shard_key_fields.should == [:name]
+      klass.shard_key_fields.should eq([:name])
     end
   end
 
@@ -55,7 +55,7 @@ describe Mongoid::Sharding do
     end
 
     it "returns a hash of shard key names and values" do
-      object.shard_key_selector.should == { "name" => "Jo" }
+      object.shard_key_selector.should eq({ "name" => "Jo" })
     end
   end
 end

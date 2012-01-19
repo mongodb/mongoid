@@ -114,8 +114,9 @@ describe Mongoid::Errors do
       end
 
       it "returns a message with the bad version and good version" do
-        error.message.should ==
+        error.message.should eq(
           "MongoDB 1.2.4 not supported, please upgrade to #{Mongoid::MONGODB_VERSION}."
+        )
       end
     end
   end
@@ -139,7 +140,7 @@ describe Mongoid::Errors do
       context "default" do
 
         it "contains the errors' full messages" do
-          error.message.should == "Validation failed - Error 1, Error 2."
+          error.message.should eq("Validation failed - Error 1, Error 2.")
         end
       end
     end
@@ -147,7 +148,7 @@ describe Mongoid::Errors do
     describe "#document" do
 
       it "contains the a reference to the document" do
-        error.document.should == document
+        error.document.should eq(document)
       end
     end
   end

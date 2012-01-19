@@ -16,7 +16,7 @@ describe Mongoid::Fields::Internal::Set do
   describe "#deserialize" do
 
     it "returns the set if Array" do
-      field.deserialize(["test"]).should == Set.new(["test"])
+      field.deserialize(["test"]).should eq(Set.new(["test"]))
     end
   end
 
@@ -44,7 +44,7 @@ describe Mongoid::Fields::Internal::Set do
   describe "#serialize" do
 
     it "returns an array" do
-      field.serialize(["test"]).should == ["test"]
+      field.serialize(["test"]).should eq(["test"])
     end
 
     it "returns an array even if the value is a set" do

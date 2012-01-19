@@ -29,16 +29,17 @@ describe Mongoid::Relations::Embedded::Atomic::Set do
         end
 
         it "sets the selector" do
-          set.selector.should == selector
+          set.selector.should eq(selector)
         end
 
         it "sets the $set operations" do
-          set.operations.should ==
+          set.operations.should eq(
             { "$set" => { "addresses" => [{ "_id" => "street" }] } }
+          )
         end
 
         it "sets the options" do
-          set.options.should == options
+          set.options.should eq(options)
         end
       end
 
@@ -70,19 +71,20 @@ describe Mongoid::Relations::Embedded::Atomic::Set do
         end
 
         it "sets the selector" do
-          set.selector.should == selector
+          set.selector.should eq(selector)
         end
 
         it "sets the $set operations" do
-          set.operations.should ==
+          set.operations.should eq(
             { "$set" => {
                 "addresses" => [{ "_id" => "bond-street" }, { "_id" => "high-street" }]
               }
             }
+          )
         end
 
         it "sets the options" do
-          set.options.should == options
+          set.options.should eq(options)
         end
       end
     end
@@ -112,16 +114,17 @@ describe Mongoid::Relations::Embedded::Atomic::Set do
         end
 
         it "sets the selector" do
-          set.selector.should == selector
+          set.selector.should eq(selector)
         end
 
         it "sets the $set operations" do
-          set.operations.should ==
+          set.operations.should eq(
             { "$set" => { "addresses" => [{ "_id" => "street" }] } }
+          )
         end
 
         it "sets the options" do
-          set.options.should == options
+          set.options.should eq(options)
         end
       end
 
@@ -153,19 +156,20 @@ describe Mongoid::Relations::Embedded::Atomic::Set do
         end
 
         it "sets the selector" do
-          set.selector.should == selector
+          set.selector.should eq(selector)
         end
 
         it "sets the $set operations" do
-          set.operations.should ==
+          set.operations.should eq(
             { "$set" => {
                 "addresses" => [{ "_id" => "bond-street" }, { "_id" => "high-street" }]
               }
             }
+          )
         end
 
         it "sets the options" do
-          set.options.should == options
+          set.options.should eq(options)
         end
       end
     end
@@ -195,16 +199,17 @@ describe Mongoid::Relations::Embedded::Atomic::Set do
         end
 
         it "sets the selector" do
-          set.selector.should == selector
+          set.selector.should eq(selector)
         end
 
         it "sets the $set operations" do
-          set.operations.should ==
+          set.operations.should eq(
             { "$set" => { "addresses" => [{ "_id" => "street" }] } }
+          )
         end
 
         it "sets the options" do
-          set.options.should == options
+          set.options.should eq(options)
         end
       end
 
@@ -236,19 +241,20 @@ describe Mongoid::Relations::Embedded::Atomic::Set do
         end
 
         it "replaces the selector" do
-          set.selector.should == selector
+          set.selector.should eq(selector)
         end
 
         it "replaces the $set operations" do
-          set.operations.should ==
+          set.operations.should eq(
             { "$set" => {
                 "addresses" => [{ "_id" => "high-street" }]
               }
             }
+          )
         end
 
         it "replaces the options" do
-          set.options.should == options
+          set.options.should eq(options)
         end
       end
     end

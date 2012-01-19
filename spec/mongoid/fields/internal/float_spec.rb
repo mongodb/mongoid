@@ -9,7 +9,7 @@ describe Mongoid::Fields::Internal::Float do
   describe "#deserialize" do
 
     it "returns the float" do
-      field.deserialize(3.45).should == 3.45
+      field.deserialize(3.45).should eq(3.45)
     end
   end
 
@@ -39,7 +39,7 @@ describe Mongoid::Fields::Internal::Float do
     context "when the value is a number" do
 
       it "converts the number to a float" do
-        field.serialize(3.45).should == 3.45
+        field.serialize(3.45).should eq(3.45)
       end
     end
 
@@ -48,14 +48,14 @@ describe Mongoid::Fields::Internal::Float do
       context "when the value is non numerical" do
 
         it "returns the string" do
-          field.serialize("foo").should == "foo"
+          field.serialize("foo").should eq("foo")
         end
       end
 
       context "when the string is numerical" do
 
         it "returns the float value for the string" do
-          field.serialize("3.45").should == 3.45
+          field.serialize("3.45").should eq(3.45)
         end
       end
 

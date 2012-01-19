@@ -44,8 +44,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["person"].relation.should ==
+        klass.relations["person"].relation.should eq(
           Mongoid::Relations::Embedded::In
+        )
       end
 
       it "does not add associated validations" do
@@ -59,11 +60,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :person
+          metadata.name.should eq(:person)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -94,8 +95,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["addresses"].relation.should ==
+        klass.relations["addresses"].relation.should eq(
           Mongoid::Relations::Embedded::Many
+        )
       end
 
       it "adds an associated validation" do
@@ -111,11 +113,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :addresses
+          metadata.name.should eq(:addresses)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -184,8 +186,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["name"].relation.should ==
+        klass.relations["name"].relation.should eq(
           Mongoid::Relations::Embedded::One
+        )
       end
 
       it "adds an associated validation" do
@@ -201,11 +204,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :name
+          metadata.name.should eq(:name)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -247,8 +250,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["person"].relation.should ==
+        klass.relations["person"].relation.should eq(
           Mongoid::Relations::Referenced::In
+        )
       end
 
       it "creates the field for the foreign key" do
@@ -262,11 +266,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :person
+          metadata.name.should eq(:person)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -297,8 +301,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["posts"].relation.should ==
+        klass.relations["posts"].relation.should eq(
           Mongoid::Relations::Referenced::Many
+        )
       end
 
       it "adds an associated validation" do
@@ -314,11 +319,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :posts
+          metadata.name.should eq(:posts)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -379,8 +384,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["preferences"].relation.should ==
+        klass.relations["preferences"].relation.should eq(
           Mongoid::Relations::Referenced::ManyToMany
+        )
       end
 
       it "creates the field for the foreign key" do
@@ -414,11 +420,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :preferences
+          metadata.name.should eq(:preferences)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -457,8 +463,9 @@ describe Mongoid::Relations::Macros do
       end
 
       it "creates the correct relation" do
-        klass.relations["game"].relation.should ==
+        klass.relations["game"].relation.should eq(
           Mongoid::Relations::Referenced::One
+        )
       end
 
       it "adds an associated validation" do
@@ -474,11 +481,11 @@ describe Mongoid::Relations::Macros do
         end
 
         it "automatically adds the name" do
-          metadata.name.should == :game
+          metadata.name.should eq(:game)
         end
 
         it "automatically adds the inverse class name" do
-          metadata.inverse_class_name.should == "TestClass"
+          metadata.inverse_class_name.should eq("TestClass")
         end
       end
     end
@@ -506,7 +513,7 @@ describe Mongoid::Relations::Macros do
     end
 
     it "has keys that are the relation name" do
-      klass.allocate.relations.keys.first.should == "name"
+      klass.allocate.relations.keys.first.should eq("name")
     end
 
     it "has values that are metadata" do
@@ -526,7 +533,7 @@ describe Mongoid::Relations::Macros do
     end
 
     it "has keys that are the relation name" do
-      klass.relations.keys.first.should == "name"
+      klass.relations.keys.first.should eq("name")
     end
 
     it "has values that are metadata" do

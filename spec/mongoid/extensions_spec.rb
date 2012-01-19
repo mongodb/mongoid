@@ -48,7 +48,7 @@ describe Mongoid::Extensions do
       it "should set the foreign key as ObjectID" do
         game.person_id = person.id.to_s
         game.save
-        game.reload.person_id.should == person.id
+        game.reload.person_id.should eq(person.id)
       end
     end
 
@@ -57,7 +57,7 @@ describe Mongoid::Extensions do
       it "should keep the the foreign key as ObjectID" do
         game.person_id = person.id
         game.save
-        game.reload.person_id.should == person.id
+        game.reload.person_id.should eq(person.id)
       end
     end
   end

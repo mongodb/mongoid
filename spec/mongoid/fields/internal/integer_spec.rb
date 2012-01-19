@@ -9,7 +9,7 @@ describe Mongoid::Fields::Internal::Integer do
   describe "#deserialize" do
 
     it "returns the integer" do
-      field.deserialize(3).should == 3
+      field.deserialize(3).should eq(3)
     end
   end
 
@@ -43,7 +43,7 @@ describe Mongoid::Fields::Internal::Integer do
         context "when the value is small" do
 
           it "it returns the integer" do
-            field.serialize(3).should == 3
+            field.serialize(3).should eq(3)
           end
         end
 
@@ -58,7 +58,7 @@ describe Mongoid::Fields::Internal::Integer do
       context "when the value is a decimal" do
 
         it "returns the decimal" do
-          field.serialize(2.5).should == 2.5
+          field.serialize(2.5).should eq(2.5)
         end
       end
 
@@ -89,14 +89,14 @@ describe Mongoid::Fields::Internal::Integer do
       context "when the string is non numerical" do
 
         it "returns the string" do
-          field.serialize("foo").should == "foo"
+          field.serialize("foo").should eq("foo")
         end
       end
 
       context "when the string is numerical" do
 
         it "returns the integer value for the string" do
-          field.serialize("3").should == 3
+          field.serialize("3").should eq(3)
         end
       end
 

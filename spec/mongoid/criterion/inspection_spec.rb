@@ -27,7 +27,7 @@ describe Mongoid::Criterion::Inspection do
       end
 
       it "returns the selector, options, and empty array" do
-        criteria.inspect.should == inspection
+        criteria.inspect.should eq(inspection)
       end
     end
 
@@ -46,7 +46,7 @@ describe Mongoid::Criterion::Inspection do
       end
 
       it "returns the selector, options, and empty array" do
-        criteria.inspect.should == inspection
+        criteria.inspect.should eq(inspection)
       end
     end
   end

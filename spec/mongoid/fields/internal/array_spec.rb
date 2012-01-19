@@ -68,7 +68,7 @@ describe Mongoid::Fields::Internal::Array do
       end
 
       it "calls the proc" do
-        field.eval_default(nil).should == [ "test" ]
+        field.eval_default(nil).should eq([ "test" ])
       end
     end
 
@@ -87,7 +87,7 @@ describe Mongoid::Fields::Internal::Array do
       end
 
       it "returns the correct value" do
-        field.eval_default(nil).should == default
+        field.eval_default(nil).should eq(default)
       end
 
       it "returns a duped array" do
@@ -138,7 +138,7 @@ describe Mongoid::Fields::Internal::Array do
     context "when the value is an array" do
 
       it "returns the array" do
-        field.serialize(["test"]).should == ["test"]
+        field.serialize(["test"]).should eq(["test"])
       end
     end
   end

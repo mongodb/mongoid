@@ -33,7 +33,7 @@ describe Mongoid::Relations::Polymorphic do
         end
 
         it "returns self" do
-          polymorphed.should == klass
+          polymorphed.should eq(klass)
         end
       end
 

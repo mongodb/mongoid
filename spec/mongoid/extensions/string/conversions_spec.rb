@@ -9,7 +9,7 @@ describe Mongoid::Extensions::String::Conversions do
     end
 
     it "returns an array with the string in it" do
-      value.to_a.should == [ value ]
+      value.to_a.should eq([ value ])
     end
   end
 end

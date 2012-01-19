@@ -23,11 +23,11 @@ describe Mongoid::Persistence::Atomic::Rename do
       end
 
       it "adds the new field" do
-        person.years.should == 100
+        person.years.should eq(100)
       end
 
       it "returns the value" do
-        rename.should == 100
+        rename.should eq(100)
       end
 
       it "resets the old dirty attributes" do
@@ -39,7 +39,7 @@ describe Mongoid::Persistence::Atomic::Rename do
       end
 
       it "persists the changes" do
-        person.reload.years.should == 100
+        person.reload.years.should eq(100)
       end
     end
   end

@@ -109,7 +109,7 @@ describe Mongoid::Factory do
         end
 
         it "sets the attributes" do
-          document.title.should == "Sir"
+          document.title.should eq("Sir")
         end
       end
 
@@ -128,7 +128,7 @@ describe Mongoid::Factory do
         end
 
         it "sets the attributes" do
-          document.title.should == "Sir"
+          document.title.should eq("Sir")
         end
       end
 
@@ -163,7 +163,7 @@ describe Mongoid::Factory do
       end
 
       it "sets the attributes" do
-        document.title.should == "Sir"
+        document.title.should eq("Sir")
       end
     end
   end

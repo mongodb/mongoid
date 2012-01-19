@@ -18,7 +18,7 @@ describe Mongoid::Fields::Internal::Boolean do
     context "when providing a single value" do
 
       it "converts the value to a boolean" do
-        field.selection("true").should eq(true)
+        field.selection("true").should be_true
       end
     end
 

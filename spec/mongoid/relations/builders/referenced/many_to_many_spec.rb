@@ -48,7 +48,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       it "sets the documents" do
-        documents.should == criteria
+        documents.should eq(criteria)
       end
     end
 
@@ -82,7 +82,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       it "ordered by specified filed" do
-        documents.should == criteria
+        documents.should eq(criteria)
       end
     end
 
@@ -103,7 +103,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
 
         it "returns the objects" do
-          documents.should == object
+          documents.should eq(object)
         end
       end
 
@@ -172,7 +172,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     end
 
     it "returns the criteria" do
-      criteria.should eq([])
+      criteria.should be_empty
     end
   end
 end

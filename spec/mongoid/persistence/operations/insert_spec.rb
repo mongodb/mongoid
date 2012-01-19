@@ -52,11 +52,11 @@ describe Mongoid::Persistence::Operations::Insert do
     end
 
     it "sets the document" do
-      insert.document.should == document
+      insert.document.should eq(document)
     end
 
     it "sets the collection" do
-      insert.collection.should == document.collection
+      insert.collection.should eq(document.collection)
     end
 
     it "defaults validation to true" do
@@ -64,8 +64,7 @@ describe Mongoid::Persistence::Operations::Insert do
     end
 
     it "sets the options" do
-      insert.options.should ==
-        { :safe => Mongoid.persist_in_safe_mode }
+      insert.options.should eq({ :safe => Mongoid.persist_in_safe_mode })
     end
   end
 
@@ -103,13 +102,13 @@ describe Mongoid::Persistence::Operations::Insert do
 
       it "returns the document" do
         root_set_expectation.call
-        insert.persist.should == document
+        insert.persist.should eq(document)
       end
 
       it "sets new_record to false" do
         root_set_expectation.call
         insert.persist
-        document.new_record?.should == false
+        document.new_record?.should be_false
       end
     end
 
@@ -120,12 +119,12 @@ describe Mongoid::Persistence::Operations::Insert do
       end
 
       it "returns the document" do
-        insert.persist.should == document
+        insert.persist.should eq(document)
       end
 
       it "leaves the document as a new record" do
         insert.persist
-        document.new_record?.should == true
+        document.new_record?.should be_true
       end
     end
 
@@ -142,7 +141,7 @@ describe Mongoid::Persistence::Operations::Insert do
       it "inserts the document in the database" do
         root_set_expectation.call
         insert.persist
-        document.new_record?.should == false
+        document.new_record?.should be_false
       end
     end
   end

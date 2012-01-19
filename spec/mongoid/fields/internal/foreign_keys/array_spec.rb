@@ -75,7 +75,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
     end
 
     it "returns the correct value" do
-      field.eval_default(nil).should == default
+      field.eval_default(nil).should eq(default)
     end
   end
 
@@ -121,7 +121,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
       context "when provided nil" do
 
         it "returns an empty array" do
-          field.serialize(nil).should eq([])
+          field.serialize(nil).should be_empty
         end
       end
 
@@ -147,7 +147,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
         end
 
         it "performs conversion on the ids if strings" do
-          field.serialize([object_id.to_s]).should == [object_id]
+          field.serialize([object_id.to_s]).should eq([object_id])
         end
       end
 
@@ -176,7 +176,7 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
         end
 
         it "does not convert" do
-          field.serialize([object_id.to_s]).should == [object_id.to_s]
+          field.serialize([object_id.to_s]).should eq([object_id.to_s])
         end
       end
     end

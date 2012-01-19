@@ -25,7 +25,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should == [[:"description.en", :asc]]
+          criteria.options[:sort].should eq([[:"description.en", :asc]])
         end
 
       end
@@ -45,7 +45,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should == [[:"description.de", :asc]]
+          criteria.options[:sort].should eq([[:"description.de", :asc]])
         end
       end
     end
@@ -57,7 +57,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the ascending sort criteria" do
-        criteria.options[:sort].should == [[ :title, :asc ]]
+        criteria.options[:sort].should eq([[ :title, :asc ]])
       end
     end
 
@@ -79,7 +79,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrites by last" do
-         criteria.options[:sort].should == [[:title, :desc]]
+         criteria.options[:sort].should eq([[:title, :desc]])
         end
       end
 
@@ -89,7 +89,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrite previous" do
-         criteria.options[:sort].should == [[:title, :asc]]
+         criteria.options[:sort].should eq([[:title, :asc]])
         end
       end
     end
@@ -105,7 +105,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the ascending sort criteria" do
-        criteria.options[:sort].should == [[ :title, :asc ], [ :dob, :asc ]]
+        criteria.options[:sort].should eq([[ :title, :asc ], [ :dob, :asc ]])
       end
     end
 
@@ -167,8 +167,9 @@ describe Mongoid::Criterion::Optional do
     end
 
     it "does not overwrite any previous criteria" do
-      criteria.options[:sort].should ==
+      criteria.options[:sort].should eq(
         [[ :title, :asc ], [ :dob, :desc ], [ :name, :desc ], [ :score, :asc ]]
+      )
     end
 
     it 'does not alter the original criteria' do
@@ -226,7 +227,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should == [[:"description.en", :desc]]
+          criteria.options[:sort].should eq([[:"description.en", :desc]])
         end
       end
 
@@ -245,7 +246,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should == [[:"description.de", :desc]]
+          criteria.options[:sort].should eq([[:"description.de", :desc]])
         end
       end
     end
@@ -257,7 +258,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the descending sort criteria" do
-        criteria.options[:sort].should == [[ :title, :desc ]]
+        criteria.options[:sort].should eq([[ :title, :desc ]])
       end
     end
 
@@ -279,7 +280,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrites by last" do
-         criteria.options[:sort].should == [[:title, :asc]]
+         criteria.options[:sort].should eq([[:title, :asc]])
         end
       end
 
@@ -289,7 +290,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrite previous" do
-         criteria.options[:sort].should == [[:title, :desc]]
+         criteria.options[:sort].should eq([[:title, :desc]])
         end
       end
     end
@@ -304,7 +305,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the descending sort criteria" do
-        criteria.options[:sort].should == [[ :title, :desc ], [ :dob, :desc ]]
+        criteria.options[:sort].should eq([[ :title, :desc ], [ :dob, :desc ]])
       end
     end
 
@@ -330,7 +331,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the extras to the options" do
-          criteria.options.should == { :skip => 10, :limit => 10 }
+          criteria.options.should eq({ :skip => 10, :limit => 10 })
         end
       end
     end
@@ -414,8 +415,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the _id query to the selector" do
-          criteria.selector.should ==
-            { :_id => { "$in" => ids } }
+          criteria.selector.should eq({ :_id => { "$in" => ids }})
         end
       end
 
@@ -494,8 +494,9 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the _id query to the selector with all ids like BSON::ObjectId" do
-          criteria.selector.should ==
-            { :_id => { "$in" => ids.map { |i| BSON::ObjectId(i) } } }
+          criteria.selector.should eq(
+            { :_id => { "$in" => ids.map { |i| BSON::ObjectId(i) }}}
+          )
         end
       end
     end
@@ -510,7 +511,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the limit to the options" do
-        criteria.options.should == { :limit => 100 }
+        criteria.options.should eq({ :limit => 100 })
       end
     end
 
@@ -521,7 +522,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "defaults to 20" do
-        criteria.options.should == { :limit => 20 }
+        criteria.options.should eq({ :limit => 20 })
       end
     end
 
@@ -539,7 +540,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "returns the skip option" do
-        criteria.offset.should == 20
+        criteria.offset.should eq(20)
       end
     end
 
@@ -550,7 +551,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "delegates to skip" do
-        criteria.options[:skip].should == 40
+        criteria.options[:skip].should eq(40)
       end
     end
 
@@ -577,7 +578,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should == [[:"description.en", :desc]]
+          criteria.options[:sort].should eq([[:"description.en", :desc]])
         end
       end
 
@@ -596,7 +597,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should == [[:"description.de", :desc]]
+          criteria.options[:sort].should eq([[:"description.de", :desc]])
         end
       end
     end
@@ -608,7 +609,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+        criteria.options.should eq({ :sort => [[:title, :asc], [:text, :desc]] })
       end
     end
 
@@ -653,7 +654,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        criteria.options.should == { :sort => [[:title, :asc], [:text, :desc]] }
+        criteria.options.should eq({ :sort => [[:title, :asc], [:text, :desc]] })
       end
     end
 
@@ -711,7 +712,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the skip value to the options" do
-        criteria.options.should == { :skip => 20 }
+        criteria.options.should eq({ :skip => 20 })
       end
     end
 
@@ -722,7 +723,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "defaults to zero" do
-        criteria.options.should == { :skip => 0 }
+        criteria.options.should eq({ :skip => 0 })
       end
     end
 
@@ -740,7 +741,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the _type query to the selector" do
-        criteria.selector.should == { :_type => { '$in' => ['Browser'] } }
+        criteria.selector.should eq({ :_type => { '$in' => ['Browser'] } })
       end
 
       it "returns a copy" do
@@ -755,7 +756,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the _type query to the selector" do
-        criteria.selector.should == { :_type => { '$in' => ['Browser', 'Firefox'] } }
+        criteria.selector.should eq({ :_type => { '$in' => ['Browser', 'Firefox'] } })
       end
 
       it "returns a copy" do

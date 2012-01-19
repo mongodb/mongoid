@@ -23,15 +23,15 @@ describe Mongoid::Document do
     end
 
     it "persists the versions" do
-      attributes["version"].should == 3
+      attributes["version"].should eq(3)
     end
 
     it "persists the type" do
-      attributes["_type"].should == "Browser"
+      attributes["_type"].should eq("Browser")
     end
 
     it "persists the attributes" do
-      attributes["name"].should == "Test"
+      attributes["name"].should eq("Test")
     end
   end
 
@@ -54,27 +54,27 @@ describe Mongoid::Document do
     end
 
     it "persists the versions" do
-      attributes["version"].should == 2
+      attributes["version"].should eq(2)
     end
 
     it "persists the type" do
-      attributes["_type"].should == "Firefox"
+      attributes["_type"].should eq("Firefox")
     end
 
     it "persists the attributes" do
-      attributes["name"].should == "Testy"
+      attributes["name"].should eq("Testy")
     end
 
     it "returns the document when querying for superclass" do
-      Browser.where(:name => "Testy").first.should == firefox
+      Browser.where(:name => "Testy").first.should eq(firefox)
     end
 
     it "returns the document when querying for root class" do
-      Canvas.where(:name => "Testy").first.should == firefox
+      Canvas.where(:name => "Testy").first.should eq(firefox)
     end
 
     it 'should returns on of this subclasses if you find by _type' do
-      Canvas.where(:_type.in => ['Firefox']).count.should == 1
+      Canvas.where(:_type.in => ['Firefox']).count.should eq(1)
     end
   end
 
@@ -111,23 +111,23 @@ describe Mongoid::Document do
     end
 
     it "properly persists the one-to-one relations" do
-      from_db.writer.should == writer
+      from_db.writer.should eq(writer)
     end
 
     it "properly persists the one-to-many type" do
-      from_db.shapes.first.should == circle
+      from_db.shapes.first.should eq(circle)
     end
 
     it "properly persists the one-to-many relations" do
-      from_db.shapes.last.should == square
+      from_db.shapes.last.should eq(square)
     end
 
     it "properly sets up the parent relation" do
-      from_db.shapes.first.should == circle
+      from_db.shapes.first.should eq(circle)
     end
 
     it "properly sets up the entire hierarchy" do
-      from_db.shapes.first.canvas.should == firefox
+      from_db.shapes.first.canvas.should eq(firefox)
     end
   end
 
@@ -142,13 +142,13 @@ describe Mongoid::Document do
     end
 
     it 'should find object with String args' do
-      Firefox.find(firefox.id.to_s).should == firefox
+      Firefox.find(firefox.id.to_s).should eq(firefox)
     end
 
     it "returns subclasses for querying parents" do
       firefox = Canvas.where(:name => "firefox").first
       firefox.should be_a_kind_of(Firefox)
-      firefox.should == firefox
+      firefox.should eq(firefox)
     end
   end
 
@@ -177,9 +177,9 @@ describe Mongoid::Document do
       end
 
       it "deletes from the parent class collection" do
-        Firefox.count.should == 1
-        Browser.count.should == 2
-        Canvas.count.should == 3
+        Firefox.count.should eq(1)
+        Browser.count.should eq(2)
+        Canvas.count.should eq(3)
       end
     end
 
@@ -190,9 +190,9 @@ describe Mongoid::Document do
       end
 
       it "deletes all documents except for those belonging to parent class collection" do
-        Firefox.count.should == 0
-        Browser.count.should == 1
-        Canvas.count.should == 2
+        Firefox.count.should eq(0)
+        Browser.count.should eq(1)
+        Canvas.count.should eq(2)
       end
     end
   end
@@ -214,7 +214,7 @@ describe Mongoid::Document do
     end
 
     it "properly saves the subclasses" do
-      from_db.palette.tools.map(&:class).should == [Pencil, Eraser]
+      from_db.palette.tools.map(&:class).should eq([Pencil, Eraser])
     end
   end
 
@@ -232,7 +232,7 @@ describe Mongoid::Document do
       end
 
       it "should allow STI from << using model.new" do
-        container.vehicles.map(&:class).should == [Car,Truck]
+        container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 
@@ -244,7 +244,7 @@ describe Mongoid::Document do
       end
 
       it "should allow STI from << using model.create" do
-        container.vehicles.map(&:class).should == [Car,Truck]
+        container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 
@@ -256,7 +256,7 @@ describe Mongoid::Document do
       end
 
       it "should allow STI from the build call" do
-        container.vehicles.map(&:class).should == [Car,Truck]
+        container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 
@@ -268,7 +268,7 @@ describe Mongoid::Document do
       end
 
       it "should respect the _type attribute from the build call" do
-        container.vehicles.map(&:class).should == [Car,Truck]
+        container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 
@@ -280,7 +280,7 @@ describe Mongoid::Document do
       end
 
       it "should allow STI from the create call" do
-        container.vehicles.map(&:class).should == [Car,Truck]
+        container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 
@@ -292,7 +292,7 @@ describe Mongoid::Document do
       end
 
       it "should respect the _type attribute from the create call" do
-        container.vehicles.map(&:class).should == [Car,Truck]
+        container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 

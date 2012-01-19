@@ -23,7 +23,7 @@ describe Mongoid::Inspection do
       end
 
       it "returns a string of class name and attributes" do
-        person.inspect.should == "#<Person _id: #{person.id}, #{attributes}>"
+        person.inspect.should eq("#<Person _id: #{person.id}, #{attributes}>")
       end
     end
 
@@ -47,7 +47,7 @@ describe Mongoid::Inspection do
       end
 
       it "returns a string of class name, attributes, and dynamic attributes" do
-        person.inspect.should == "#<Person _id: #{person.id}, #{attributes}>"
+        person.inspect.should eq("#<Person _id: #{person.id}, #{attributes}>")
       end
     end
   end

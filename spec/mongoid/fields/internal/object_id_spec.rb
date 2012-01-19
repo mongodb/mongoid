@@ -13,7 +13,7 @@ describe Mongoid::Fields::Internal::ObjectId do
   describe "#deserialize" do
 
     it "returns self" do
-      field.deserialize(object_id).should == object_id
+      field.deserialize(object_id).should eq(object_id)
     end
   end
 
@@ -60,15 +60,16 @@ describe Mongoid::Fields::Internal::ObjectId do
     context "with a populated string" do
 
       it "returns an object id" do
-        field.serialize(object_id_string).should ==
+        field.serialize(object_id_string).should eq(
           BSON::ObjectId.from_string(object_id_string)
+        )
       end
     end
 
     context "with an object id" do
 
       it "returns self" do
-        field.serialize(object_id).should == object_id
+        field.serialize(object_id).should eq(object_id)
       end
     end
   end

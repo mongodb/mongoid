@@ -42,15 +42,15 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "sets the target of the relation" do
-          person.game.target.should == game
+          person.game.target.should eq(game)
         end
 
         it "sets the foreign key on the relation" do
-          game.person_id.should == person.id
+          game.person_id.should eq(person.id)
         end
 
         it "sets the base on the inverse relation" do
-          game.person.should == person
+          game.person.should eq(person)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -77,15 +77,15 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "sets the target of the relation" do
-          person.game.target.should == game
+          person.game.target.should eq(game)
         end
 
         it "sets the foreign key of the relation" do
-          game.person_id.should == person.id
+          game.person_id.should eq(person.id)
         end
 
         it "sets the base on the inverse relation" do
-          game.person.should == person
+          game.person.should eq(person)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -115,15 +115,15 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "sets the target of the relation" do
-          bar.rating.target.should == rating
+          bar.rating.target.should eq(rating)
         end
 
         it "sets the foreign key on the relation" do
-          rating.ratable_id.should == bar.id
+          rating.ratable_id.should eq(bar.id)
         end
 
         it "sets the base on the inverse relation" do
-          rating.ratable.should == bar
+          rating.ratable.should eq(bar)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -150,15 +150,15 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "sets the target of the relation" do
-          bar.rating.target.should == rating
+          bar.rating.target.should eq(rating)
         end
 
         it "sets the foreign key of the relation" do
-          rating.ratable_id.should == bar.id
+          rating.ratable_id.should eq(bar.id)
         end
 
         it "sets the base on the inverse relation" do
-          rating.ratable.should == bar
+          rating.ratable.should eq(bar)
         end
 
         it "sets the same instance on the inverse relation" do
@@ -711,15 +711,15 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "returns a new document" do
-          game.score.should == 50
+          game.score.should eq(50)
         end
 
         it "sets the foreign key on the document" do
-          game.person_id.should == person.id
+          game.person_id.should eq(person.id)
         end
 
         it "sets the inverse relation" do
-          game.person.should == person
+          game.person.should eq(person)
         end
 
         it "does not save the built document" do
@@ -738,11 +738,11 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "sets the foreign key on the document" do
-          game.person_id.should == person.id
+          game.person_id.should eq(person.id)
         end
 
         it "sets the inverse relation" do
-          game.person.should == person
+          game.person.should eq(person)
         end
 
         it "does not save the built document" do
@@ -761,11 +761,11 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "sets the foreign key on the document" do
-          game.person_id.should == person.id
+          game.person_id.should eq(person.id)
         end
 
         it "sets the inverse relation" do
-          game.person.should == person
+          game.person.should eq(person)
         end
 
         it "does not save the built document" do
@@ -787,15 +787,15 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         it "returns a new document" do
-          rating.value.should == 5
+          rating.value.should eq(5)
         end
 
         it "sets the foreign key on the document" do
-          rating.ratable_id.should == bar.id
+          rating.ratable_id.should eq(bar.id)
         end
 
         it "sets the inverse relation" do
-          rating.ratable.should == bar
+          rating.ratable.should eq(bar)
         end
 
         it "does not save the built document" do
@@ -872,15 +872,15 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       it "returns a new document" do
-        game.score.should == 50
+        game.score.should eq(50)
       end
 
       it "sets the foreign key on the document" do
-        game.person_id.should == person.id
+        game.person_id.should eq(person.id)
       end
 
       it "sets the inverse relation" do
-        game.person.should == person
+        game.person.should eq(person)
       end
 
       it "saves the document" do
@@ -899,11 +899,11 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       it "sets the foreign key on the document" do
-        game.person_id.should == person.id
+        game.person_id.should eq(person.id)
       end
 
       it "sets the inverse relation" do
-        game.person.should == person
+        game.person.should eq(person)
       end
 
       it "saves the document" do
@@ -922,11 +922,11 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       it "sets the foreign key on the document" do
-        game.person_id.should == person.id
+        game.person_id.should eq(person.id)
       end
 
       it "sets the inverse relation" do
-        game.person.should == person
+        game.person.should eq(person)
       end
 
       it "saves the document" do
@@ -945,15 +945,15 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       it "returns a new document" do
-        rating.value.should == 5
+        rating.value.should eq(5)
       end
 
       it "sets the foreign key on the document" do
-        rating.ratable_id.should == bar.id
+        rating.ratable_id.should eq(bar.id)
       end
 
       it "sets the inverse relation" do
-        rating.ratable.should == bar
+        rating.ratable.should eq(bar)
       end
 
       it "saves the document" do
@@ -1053,14 +1053,14 @@ describe Mongoid::Relations::Referenced::One do
   describe ".foreign_key_suffix" do
 
     it "returns _id" do
-      described_class.foreign_key_suffix.should == "_id"
+      described_class.foreign_key_suffix.should eq("_id")
     end
   end
 
   describe ".macro" do
 
     it "returns has_one" do
-      described_class.macro.should == :has_one
+      described_class.macro.should eq(:has_one)
     end
   end
 
@@ -1141,22 +1141,23 @@ describe Mongoid::Relations::Referenced::One do
   describe ".stores_foreign_key?" do
 
     it "returns false" do
-      described_class.stores_foreign_key?.should == false
+      described_class.stores_foreign_key?.should be_false
     end
   end
 
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
+      described_class.valid_options.should eq(
         [ :as, :autosave, :dependent, :foreign_key ]
+      )
     end
   end
 
   describe ".validation_default" do
 
     it "returns true" do
-      described_class.validation_default.should eq(true)
+      described_class.validation_default.should be_true
     end
   end
 

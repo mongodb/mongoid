@@ -23,11 +23,11 @@ describe Mongoid::Persistence::Atomic::Push do
       end
 
       it "pushes the value onto the array" do
-        person.aliases.should == [ "007", "Bond" ]
+        person.aliases.should eq([ "007", "Bond" ])
       end
 
       it "persists the data" do
-        reloaded.aliases.should == [ "007", "Bond" ]
+        reloaded.aliases.should eq([ "007", "Bond" ])
       end
 
       it "removes the field from the dirty attributes" do
@@ -39,7 +39,7 @@ describe Mongoid::Persistence::Atomic::Push do
       end
 
       it "returns the new array value" do
-        pushed.should == [ "007", "Bond" ]
+        pushed.should eq([ "007", "Bond" ])
       end
     end
 
@@ -58,11 +58,11 @@ describe Mongoid::Persistence::Atomic::Push do
       end
 
       it "pushes the value onto the array" do
-        person.aliases.should == [ "Bond" ]
+        person.aliases.should eq([ "Bond" ])
       end
 
       it "persists the data" do
-        reloaded.aliases.should == [ "Bond" ]
+        reloaded.aliases.should eq([ "Bond" ])
       end
 
       it "removes the field from the dirty attributes" do
@@ -74,7 +74,7 @@ describe Mongoid::Persistence::Atomic::Push do
       end
 
       it "returns the new array value" do
-        pushed.should == [ "Bond" ]
+        pushed.should eq([ "Bond" ])
       end
     end
   end

@@ -29,11 +29,11 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       end
 
       it "sets the inverse relation" do
-        game.person.should == person
+        game.person.should eq(person)
       end
 
       it "sets the foreign key" do
-        game.person_id.should == person.id
+        game.person_id.should eq(person.id)
       end
     end
 

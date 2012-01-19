@@ -21,7 +21,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
         end
 
         it "returns the object id" do
-          converted.should == object_id
+          converted.should eq(object_id)
         end
       end
 
@@ -36,7 +36,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
         end
 
         it "returns the array of object ids" do
-          converted.should == [ object_id, other_id ]
+          converted.should eq([ object_id, other_id ])
         end
       end
 
@@ -71,7 +71,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           end
 
           it "converts to an object id" do
-            converted.should == object_id
+            converted.should eq(object_id)
           end
         end
 
@@ -109,7 +109,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           end
 
           it "converts to an array of object ids" do
-            converted.should == [ object_id, other_id ]
+            converted.should eq([ object_id, other_id ])
           end
         end
 
@@ -146,7 +146,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash" do
-              converted.should == hash
+              converted.should eq(hash)
             end
           end
 
@@ -165,7 +165,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash" do
-              converted.should == hash
+              converted.should eq(hash)
             end
           end
 
@@ -180,7 +180,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted value" do
-              converted.should == { :_id => object_id }
+              converted.should eq({ :_id => object_id })
             end
           end
 
@@ -199,7 +199,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted values" do
-              converted.should == { :_id => [ object_id, other_id ] }
+              converted.should eq({ :_id => [ object_id, other_id ] })
             end
           end
         end
@@ -217,7 +217,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash" do
-              converted.should == hash
+              converted.should eq(hash)
             end
           end
 
@@ -236,7 +236,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash" do
-              converted.should == hash
+              converted.should eq(hash)
             end
           end
 
@@ -251,7 +251,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted value" do
-              converted.should == { :id => object_id }
+              converted.should eq({ :id => object_id })
             end
           end
 
@@ -270,7 +270,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted values" do
-              converted.should == { :id => [ object_id, other_id ] }
+              converted.should eq({ :id => [ object_id, other_id ] })
             end
           end
         end
@@ -288,7 +288,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash" do
-              converted.should == hash
+              converted.should eq(hash)
             end
           end
 
@@ -303,7 +303,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash" do
-              converted.should == hash
+              converted.should eq(hash)
             end
           end
         end
@@ -319,7 +319,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
         end
 
         it "returns the object" do
-          converted.should == 100
+          converted.should eq(100)
         end
       end
 
@@ -330,7 +330,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
         end
 
         it "returns the array" do
-          converted.should == [ 100 ]
+          converted.should eq([ 100 ])
         end
       end
 
@@ -341,7 +341,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
         end
 
         it "returns the hash" do
-          converted.should == { :key => 100 }
+          converted.should eq({ :key => 100 })
         end
       end
     end

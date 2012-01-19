@@ -31,11 +31,11 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
       end
 
       it "parentizes the documents" do
-        address._parent.should == person
+        address._parent.should eq(person)
       end
 
       it "sets the inverse relation" do
-        address.addressable.should == person
+        address.addressable.should eq(person)
       end
     end
 
@@ -69,11 +69,11 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
       end
 
       it "parentizes the document" do
-        address_two._parent.should == person
+        address_two._parent.should eq(person)
       end
 
       it "sets the inverse relation" do
-        address_two.addressable.should == person
+        address_two.addressable.should eq(person)
       end
     end
 

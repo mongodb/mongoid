@@ -27,7 +27,7 @@ describe Mongoid::Relations::Reflections do
       end
 
       it "returns the association metadata" do
-        relation.macro.should == :embeds_many
+        relation.macro.should eq(:embeds_many)
       end
     end
 
@@ -60,7 +60,7 @@ describe Mongoid::Relations::Reflections do
         end
 
         it "returns an array of the relations" do
-          relations.size.should == 2
+          relations.size.should eq(2)
         end
       end
 
@@ -71,7 +71,7 @@ describe Mongoid::Relations::Reflections do
         end
 
         it "returns an array of the relations" do
-          relations.size.should == 1
+          relations.size.should eq(1)
         end
       end
     end
@@ -83,7 +83,7 @@ describe Mongoid::Relations::Reflections do
       end
 
       it "returns an empty array" do
-        relations.should == []
+        relations.should be_empty
       end
     end
 
@@ -94,7 +94,7 @@ describe Mongoid::Relations::Reflections do
       end
 
       it "returns an empty array" do
-        relations.should == []
+        relations.should be_empty
       end
     end
   end

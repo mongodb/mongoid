@@ -102,7 +102,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "updates the relation" do
-        person.name.last_name.should == "Lang"
+        person.name.last_name.should eq("Lang")
       end
     end
 
@@ -123,7 +123,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "updates the relation" do
-        person.name.last_name.should == "Lang"
+        person.name.last_name.should eq("Lang")
       end
     end
 
@@ -164,7 +164,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the value" do
-        builder.destroy.should == true
+        builder.destroy.should be_true
       end
     end
 

@@ -208,7 +208,7 @@ describe Mongoid::Reloading do
       end
 
       it "should reload the association" do
-        person.addresses.should eq([])
+        person.addresses.should be_empty
       end
     end
 

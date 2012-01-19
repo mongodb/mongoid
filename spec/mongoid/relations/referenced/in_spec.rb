@@ -50,11 +50,11 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       it "sets the relation" do
-        agent.game.should == game
+        agent.game.should eq(game)
       end
 
       it "sets the foreign_key" do
-        agent.game_id.should == game.id
+        agent.game_id.should eq(game.id)
       end
     end
 
@@ -77,7 +77,7 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       it "sets the relation" do
-        address.account.should == account
+        address.account.should eq(account)
       end
 
       it "does not erase the metadata" do
@@ -108,15 +108,15 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            game.person.target.should == person
+            game.person.target.should eq(person)
           end
 
           it "sets the foreign key on the relation" do
-            game.person_id.should == person.id
+            game.person_id.should eq(person.id)
           end
 
           it "sets the base on the inverse relation" do
-            person.game.should == game
+            person.game.should eq(game)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -143,15 +143,15 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            game.person.target.should == person
+            game.person.target.should eq(person)
           end
 
           it "sets the foreign key of the relation" do
-            game.person_id.should == person.id
+            game.person_id.should eq(person.id)
           end
 
           it "sets the base on the inverse relation" do
-            person.game.should == game
+            person.game.should eq(game)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -181,15 +181,15 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            rating.ratable.target.should == bar
+            rating.ratable.target.should eq(bar)
           end
 
           it "sets the foreign key on the relation" do
-            rating.ratable_id.should == bar.id
+            rating.ratable_id.should eq(bar.id)
           end
 
           it "sets the base on the inverse relation" do
-            bar.rating.should == rating
+            bar.rating.should eq(rating)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -216,15 +216,15 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            rating.ratable.target.should == bar
+            rating.ratable.target.should eq(bar)
           end
 
           it "sets the foreign key of the relation" do
-            rating.ratable_id.should == bar.id
+            rating.ratable_id.should eq(bar.id)
           end
 
           it "sets the base on the inverse relation" do
-            bar.rating.should == rating
+            bar.rating.should eq(rating)
           end
 
           it "sets the same instance on the inverse relation" do
@@ -257,11 +257,11 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            post.person.target.should == person
+            post.person.target.should eq(person)
           end
 
           it "sets the foreign key on the relation" do
-            post.person_id.should == person.id
+            post.person_id.should eq(person.id)
           end
 
           it "does not save the target" do
@@ -284,11 +284,11 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            post.person.target.should == person
+            post.person.target.should eq(person)
           end
 
           it "sets the foreign key of the relation" do
-            post.person_id.should == person.id
+            post.person_id.should eq(person.id)
           end
 
           it "does not saves the target" do
@@ -314,11 +314,11 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            rating.ratable.target.should == movie
+            rating.ratable.target.should eq(movie)
           end
 
           it "sets the foreign key on the relation" do
-            rating.ratable_id.should == movie.id
+            rating.ratable_id.should eq(movie.id)
           end
 
           it "does not save the target" do
@@ -341,11 +341,11 @@ describe Mongoid::Relations::Referenced::In do
           end
 
           it "sets the target of the relation" do
-            rating.ratable.target.should == movie
+            rating.ratable.target.should eq(movie)
           end
 
           it "sets the foreign key of the relation" do
-            rating.ratable_id.should == movie.id
+            rating.ratable_id.should eq(movie.id)
           end
 
           it "does not saves the target" do
@@ -710,14 +710,14 @@ describe Mongoid::Relations::Referenced::In do
   describe ".foreign_key_suffix" do
 
     it "returns _id" do
-      described_class.foreign_key_suffix.should == "_id"
+      described_class.foreign_key_suffix.should eq("_id")
     end
   end
 
   describe ".macro" do
 
     it "returns belongs_to" do
-      described_class.macro.should == :belongs_to
+      described_class.macro.should eq(:belongs_to)
     end
   end
 
@@ -749,22 +749,23 @@ describe Mongoid::Relations::Referenced::In do
   describe ".stores_foreign_key?" do
 
     it "returns true" do
-      described_class.stores_foreign_key?.should == true
+      described_class.stores_foreign_key?.should be_true
     end
   end
 
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should ==
+      described_class.valid_options.should eq(
         [ :autosave, :foreign_key, :index, :polymorphic ]
+      )
     end
   end
 
   describe ".validation_default" do
 
     it "returns false" do
-      described_class.validation_default.should eq(false)
+      described_class.validation_default.should be_false
     end
   end
 

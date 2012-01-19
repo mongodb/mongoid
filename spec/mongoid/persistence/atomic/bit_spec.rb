@@ -23,15 +23,15 @@ describe Mongoid::Persistence::Atomic::Bit do
       end
 
       it "performs the bitwise operation" do
-        person.age.should == 12
+        person.age.should eq(12)
       end
 
       it "returns the new value" do
-        bit.should == 12
+        bit.should eq(12)
       end
 
       it "persists the changes" do
-        reloaded.age.should == 12
+        reloaded.age.should eq(12)
       end
 
       it "resets the dirty attributes" do
@@ -46,15 +46,15 @@ describe Mongoid::Persistence::Atomic::Bit do
       end
 
       it "performs the bitwise operation" do
-        person.age.should == 61
+        person.age.should eq(61)
       end
 
       it "returns the new value" do
-        bit.should == 61
+        bit.should eq(61)
       end
 
       it "persists the changes" do
-        reloaded.age.should == 61
+        reloaded.age.should eq(61)
       end
 
       it "resets the dirty attributes" do
@@ -76,15 +76,15 @@ describe Mongoid::Persistence::Atomic::Bit do
       end
 
       it "performs the bitwise operation" do
-        person.age.should == 14
+        person.age.should eq(14)
       end
 
       it "returns the new value" do
-        bit.should == 14
+        bit.should eq(14)
       end
 
       it "persists the changes" do
-        reloaded.age.should == 14
+        reloaded.age.should eq(14)
       end
 
       it "resets the dirty attributes" do

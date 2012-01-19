@@ -13,7 +13,7 @@ describe Mongoid::Collections do
     end
 
     it "sets the collection name to the class pluralized" do
-      Person.collection.name.should == "people"
+      Person.collection.name.should eq("people")
     end
 
     context "when the document is embedded" do
@@ -40,7 +40,7 @@ describe Mongoid::Collections do
 
       it "sets the collection name on the document class" do
         Patient.collection_name = "pats"
-        Patient.collection_name.should == "pats"
+        Patient.collection_name.should eq("pats")
       end
     end
 
@@ -52,7 +52,7 @@ describe Mongoid::Collections do
 
       it "sets the collection name for the entire hierarchy" do
         Firefox.collection_name = "browsers"
-        Canvas.collection_name.should == "browsers"
+        Canvas.collection_name.should eq("browsers")
       end
     end
   end
