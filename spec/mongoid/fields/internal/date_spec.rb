@@ -228,7 +228,7 @@ describe Mongoid::Fields::Internal::Date do
       context "when the local time is not observing daylight saving" do
 
         before do
-          time = field.serialize(Time.zone.local(2010, 11, 19, 0, 30))
+          field.serialize(Time.zone.local(2010, 11, 19, 0, 30))
         end
 
         it "does not change the day" do
@@ -239,7 +239,7 @@ describe Mongoid::Fields::Internal::Date do
       context "when the local time is observing daylight saving" do
 
         before do
-          time = field.serialize(Time.zone.local(2010, 9, 19, 0, 30))
+          field.serialize(Time.zone.local(2010, 9, 19, 0, 30))
         end
 
         it "does not change the day" do

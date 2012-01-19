@@ -43,7 +43,7 @@ describe "Rails::Mongoid" do
               if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
                 documents << klass
               end
-            rescue => e
+            rescue
             end
           end
         end

@@ -1136,7 +1136,7 @@ describe Mongoid::Dirty do
   context "when associations are getting changed" do
 
     let(:person) do
-      person = Person.create(:addresses => [ Address.new ])
+      Person.create(:addresses => [ Address.new ])
     end
 
     before do

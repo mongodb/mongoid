@@ -54,7 +54,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.1
     def revise!
-      new_version = versions.build(
+      versions.build(
         (previous_revision || self).versioned_attributes, :without_protection => true
       )
       versions.shift if version_max.present? && versions.length > version_max

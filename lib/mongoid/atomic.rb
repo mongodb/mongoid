@@ -160,7 +160,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def atomic_pulls
-      delayed_atomic_pulls.inject({}) do |pulls, (name, docs)|
+      delayed_atomic_pulls.inject({}) do |pulls, (_, docs)|
         pulls.tap do |pull|
           docs.each do |doc|
             (pull[doc.atomic_path] ||= []).push(doc.as_document)
