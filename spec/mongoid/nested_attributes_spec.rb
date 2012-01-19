@@ -2651,6 +2651,22 @@ describe Mongoid::NestedAttributes do
                   person.posts(true).size.should == 2
                 end
               end
+
+              context "when there are no documents" do
+
+                before do
+                  person.posts.clear
+                end
+
+                it "raises a document not found error" do
+                  expect {
+                    person.posts_attributes =
+                      { "0" =>
+                        { "id" => BSON::ObjectId.new.to_s, "title" => "Rogue" }
+                      }
+                  }.to raise_error(Mongoid::Errors::DocumentNotFound)
+                end
+              end
             end
 
             context "when the ids do not match" do

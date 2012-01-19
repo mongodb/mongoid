@@ -92,7 +92,9 @@ module Mongoid # :nodoc:
           def process(parent, attrs)
             return if reject?(parent, attrs)
             if id = attrs.extract_id
-              doc = existing.find(convert_id(existing.first.class, id))
+              first = existing.first
+              converted = first ? convert_id(first.class, id) : id
+              doc = existing.find(converted)
               if destroyable?(attrs)
                 existing.delete(doc)
                 doc.destroy unless doc.embedded?
