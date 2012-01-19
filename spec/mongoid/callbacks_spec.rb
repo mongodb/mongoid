@@ -1173,7 +1173,7 @@ describe Mongoid::Callbacks do
 
   context "callback on valid?" do
 
-    it "gos in all validation callback in good order" do
+    it "goes in all validation callback in good order" do
       shin = ValidationCallback.new
       shin.valid?
       shin.history.should eq([:before_validation, :validate, :after_validation])
