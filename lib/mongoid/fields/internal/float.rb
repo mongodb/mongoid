@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
           return nil if object.blank?
           begin
             Float(object)
-          rescue ArgumentError => e
+          rescue ArgumentError
             object
           end
         end

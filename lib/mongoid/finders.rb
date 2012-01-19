@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
                         :includes, :limit, :max, :min, :not_in, :only,
                         :order_by, :search, :skip, :sum, :without, :where,
                         :update, :update_all, :near ]
-    delegate *(critera_methods.dup << { :to => :criteria })
+    delegate(*(critera_methods.dup << { :to => :criteria }))
 
     # Find all documents that match the given conditions.
     #

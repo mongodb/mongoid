@@ -185,7 +185,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Numeric ] The numerical sum of all the document field values.
       def sum(field)
-        sum = execute.inject(nil) do |memo, doc|
+        execute.inject(nil) do |memo, doc|
           value = doc.send(field) || 0
           memo ? memo += value : value
         end
@@ -227,7 +227,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Array<Document> ] The matching documents.
       def determine(field, operator)
-        matching = documents.inject(nil) do |memo, doc|
+        documents.inject(nil) do |memo, doc|
           value = doc.send(field) || 0
           (memo && memo.send(operator, value)) ? memo : value
         end

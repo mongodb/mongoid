@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Extras do
 
   let(:klass) do
-    klass = Class.new do
+    Class.new do
       include Mongoid::Extras
     end
   end
