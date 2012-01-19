@@ -109,7 +109,7 @@ describe Mongoid::Attributes do
         person[:terms] = true
       end
 
-      it "should allow overwriting of the default value" do
+      it "allows overwriting of the default value" do
         person.terms.should be_true
       end
     end
@@ -1098,7 +1098,7 @@ describe Mongoid::Attributes do
         person.terms = true
       end
 
-      it "should allow overwriting of the default value" do
+      it "allows overwriting of the default value" do
         person.terms.should be_true
       end
     end
@@ -1158,7 +1158,7 @@ describe Mongoid::Attributes do
           person.send(method, { :videos => [{:title => "Fight Club"}] })
         end
 
-        it "should set nested documents" do
+        it "sets nested documents" do
           person.videos.first.title.should eq("Fight Club")
         end
       end

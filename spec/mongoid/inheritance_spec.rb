@@ -231,7 +231,7 @@ describe Mongoid::Document do
         container.vehicles << Truck.new
       end
 
-      it "should allow STI from << using model.new" do
+      it "allows STI from << using model.new" do
         container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
@@ -243,7 +243,7 @@ describe Mongoid::Document do
         container.vehicles << Truck.create
       end
 
-      it "should allow STI from << using model.create" do
+      it "allows STI from << using model.create" do
         container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
@@ -255,7 +255,7 @@ describe Mongoid::Document do
         container.vehicles.build({}, Truck).save
       end
 
-      it "should allow STI from the build call" do
+      it "allows STI from the build call" do
         container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
@@ -267,7 +267,7 @@ describe Mongoid::Document do
         container.vehicles.build({ "_type" => "Truck" })
       end
 
-      it "should respect the _type attribute from the build call" do
+      it "respects the _type attribute from the build call" do
         container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
@@ -279,7 +279,7 @@ describe Mongoid::Document do
         container.vehicles.create({}, Truck)
       end
 
-      it "should allow STI from the create call" do
+      it "allows STI from the create call" do
         container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
@@ -291,12 +291,12 @@ describe Mongoid::Document do
         container.vehicles.create({ "_type" => "Truck" })
       end
 
-      it "should respect the _type attribute from the create call" do
+      it "respects the _type attribute from the create call" do
         container.vehicles.map(&:class).should eq([Car,Truck])
       end
     end
 
-    it "should not bleed relations from one subclass to another" do
+    it "nots bleed relations from one subclass to another" do
       Truck.relations.keys.should =~ %w/ shipping_container driver bed /
       Car.relations.keys.should =~ %w/ shipping_container driver /
     end

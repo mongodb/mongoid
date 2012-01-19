@@ -2422,7 +2422,7 @@ describe Mongoid::Relations::Embedded::Many do
           person.save!
         end
 
-        it "should ignore the nil and persist the remaining items" do
+        it "ignores the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
           reloaded.phone_numbers.should eq([ home_phone, office_phone ])
         end
@@ -2443,7 +2443,7 @@ describe Mongoid::Relations::Embedded::Many do
           person.save!
         end
 
-        it "should ignore the nil and persist the remaining items" do
+        it "ignores the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
           reloaded.phone_numbers.should eq([ home_phone, office_phone ])
         end
@@ -2464,7 +2464,7 @@ describe Mongoid::Relations::Embedded::Many do
           person.save!
         end
 
-        it "should ignore the nil and persist the remaining items" do
+        it "ignores the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
           reloaded.phone_numbers.should eq([ home_phone, office_phone ])
         end
@@ -2486,7 +2486,7 @@ describe Mongoid::Relations::Embedded::Many do
           person.save!
         end
 
-        it "should ignore the nil and persist the remaining items" do
+        it "ignores the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
           reloaded.phone_numbers.should eq(person.phone_numbers)
         end
@@ -2505,7 +2505,7 @@ describe Mongoid::Relations::Embedded::Many do
           person.save!
         end
 
-        it "should ignore the nil and persist the remaining items" do
+        it "ignores the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
           reloaded.phone_numbers.should eq(person.phone_numbers)
         end
@@ -2524,7 +2524,7 @@ describe Mongoid::Relations::Embedded::Many do
           person.save!
         end
 
-        it "should ignore the nil and persist the remaining items" do
+        it "ignores the nil and persist the remaining items" do
           reloaded = Person.find(person.id)
           reloaded.phone_numbers.should eq(person.phone_numbers)
         end

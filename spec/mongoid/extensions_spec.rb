@@ -36,7 +36,7 @@ describe Mongoid::Extensions do
 
     context "when value is an empty string" do
 
-      it "should set the foreign key to empty" do
+      it "sets the foreign key to empty" do
         game.person_id = ""
         game.save
         game.reload.person_id.should be_blank
@@ -45,7 +45,7 @@ describe Mongoid::Extensions do
 
     context "when value is a populated string" do
 
-      it "should set the foreign key as ObjectID" do
+      it "sets the foreign key as ObjectID" do
         game.person_id = person.id.to_s
         game.save
         game.reload.person_id.should eq(person.id)
@@ -54,7 +54,7 @@ describe Mongoid::Extensions do
 
     context "when value is a ObjectID" do
 
-      it "should keep the the foreign key as ObjectID" do
+      it "keeps the the foreign key as ObjectID" do
         game.person_id = person.id
         game.save
         game.reload.person_id.should eq(person.id)

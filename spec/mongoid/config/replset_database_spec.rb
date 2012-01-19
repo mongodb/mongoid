@@ -51,7 +51,7 @@ describe Mongoid::Config::ReplsetDatabase do
         Mongo::ReplSetConnection.stubs(:new).returns(repl_set_connection)
       end
 
-      it "should add authentication and apply" do
+      it "adds authentication and apply" do
         repl_set_connection.expects(:db)
         repl_set_connection.expects(:add_auth).with(options['authenticated']['database'], options['authenticated']['username'], options['authenticated']['password'])
         repl_set_connection.expects(:apply_saved_authentication)

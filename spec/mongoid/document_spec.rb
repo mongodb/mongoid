@@ -253,7 +253,7 @@ describe Mongoid::Document do
 
     context "when the document is new" do
 
-      it "should have a new key name" do
+      it "haves a new key name" do
         person.cache_key.should eq("people/new")
       end
     end
@@ -270,7 +270,7 @@ describe Mongoid::Document do
           person.updated_at.utc.to_s(:number)
         end
 
-        it "should have the id and updated_at key name" do
+        it "haves the id and updated_at key name" do
           person.cache_key.should eq("people/#{person.id}-#{updated_at}")
         end
       end
@@ -281,7 +281,7 @@ describe Mongoid::Document do
           person.updated_at = nil
         end
 
-        it "should have the id key name" do
+        it "haves the id key name" do
           person.cache_key.should eq("people/#{person.id}")
         end
       end

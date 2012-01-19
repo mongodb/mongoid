@@ -176,7 +176,7 @@ describe Mongoid::Criterion::Exclusion do
         base.only.should_not eql(base)
 
       end
-      it "should assign the field list" do
+      it "assigns the field list" do
         criteria.without(:title, :text).field_list == [:title, :text]
       end
     end
@@ -191,7 +191,7 @@ describe Mongoid::Criterion::Exclusion do
         criteria.options[:fields].should be_nil
       end
 
-      it "should not assign the field list" do
+      it "nots assign the field list" do
         criteria.only.field_list.should be_nil
       end
     end
@@ -239,7 +239,7 @@ describe Mongoid::Criterion::Exclusion do
         criteria.options[:fields].should be_nil
       end
 
-      it "should not assign the field list" do
+      it "nots assign the field list" do
         criteria.field_list.should be_nil
       end
     end

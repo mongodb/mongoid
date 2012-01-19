@@ -16,11 +16,11 @@ describe Mongoid::MultiParameterAttributes do
         })
       end
 
-      it "should set a multi-parameter Time attribute correctly" do
+      it "sets a multi-parameter Time attribute correctly" do
         post.created_at.should eq(Time.local(2010, 8, 12, 15, 45))
       end
 
-      it "should not leave ugly attributes on the model" do
+      it "nots leave ugly attributes on the model" do
         post.attributes.should_not have_key("created_at(1i)")
       end
     end
@@ -37,14 +37,14 @@ describe Mongoid::MultiParameterAttributes do
           })
         end
 
-        it "should set a multi-parameter Date attribute correctly" do
+        it "sets a multi-parameter Date attribute correctly" do
           person.dob.should eq(Date.civil(1980, 7, 27))
         end
       end
 
       context "with an invalid DOB" do
 
-        it "should raise an exception" do
+        it "raises an exception" do
           lambda {
             Person.new({
               "dob(1i)" => "1980",
@@ -69,7 +69,7 @@ describe Mongoid::MultiParameterAttributes do
         })
       end
 
-      it "should generate a nil date" do
+      it "generates a nil date" do
         person.dob.should be_nil
       end
     end
@@ -84,15 +84,15 @@ describe Mongoid::MultiParameterAttributes do
         })
       end
 
-      it "should set empty date's year" do
+      it "sets empty date's year" do
         person.dob.year.should eq(1980)
       end
 
-      it "should set empty date's month" do
+      it "sets empty date's month" do
         person.dob.month.should eq(1)
       end
 
-      it "should set empty date's day" do
+      it "sets empty date's day" do
         person.dob.day.should eq(1)
       end
     end

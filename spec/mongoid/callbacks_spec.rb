@@ -123,7 +123,7 @@ describe Mongoid::Callbacks do
         artist.expects(:before_create_stub).returns(true)
       end
 
-      it "should get saved" do
+      it "gets saved" do
         artist.save.should be_true
         artist.persisted?.should be_true
       end
@@ -135,7 +135,7 @@ describe Mongoid::Callbacks do
         artist.expects(:before_create_stub).returns(false)
       end
 
-      it "should not get saved" do
+      it "nots get saved" do
         artist.save.should be_false
         artist.persisted?.should be_false
       end
@@ -159,7 +159,7 @@ describe Mongoid::Callbacks do
           artist.expects(:before_save_stub).returns(true)
         end
 
-        it "should return true" do
+        it "returns true" do
           artist.save.should be_true
         end
       end
@@ -169,7 +169,7 @@ describe Mongoid::Callbacks do
           artist.expects(:before_save_stub).returns(false)
         end
 
-        it "should return false" do
+        it "returns false" do
           artist.save.should be_false
         end
       end
@@ -192,7 +192,7 @@ describe Mongoid::Callbacks do
           artist.expects(:before_save_stub).returns(true)
         end
 
-        it "should return true" do
+        it "returns true" do
           artist.save.should be_true
         end
       end
@@ -202,7 +202,7 @@ describe Mongoid::Callbacks do
           artist.expects(:before_save_stub).returns(false)
         end
 
-        it "should return false" do
+        it "returns false" do
           artist.save.should be_false
         end
       end
@@ -229,7 +229,7 @@ describe Mongoid::Callbacks do
         artist.expects(:before_destroy_stub).returns(true)
       end
 
-      it "should return true" do
+      it "returns true" do
         artist.destroy.should be_true
       end
     end
@@ -240,7 +240,7 @@ describe Mongoid::Callbacks do
         artist.expects(:before_destroy_stub).returns(false)
       end
 
-      it "should return false" do
+      it "returns false" do
         artist.destroy.should be_false
       end
     end
@@ -1173,7 +1173,7 @@ describe Mongoid::Callbacks do
 
   context "callback on valid?" do
 
-    it "should go in all validation callback in good order" do
+    it "gos in all validation callback in good order" do
       shin = ValidationCallback.new
       shin.valid?
       shin.history.should eq([:before_validation, :validate, :after_validation])

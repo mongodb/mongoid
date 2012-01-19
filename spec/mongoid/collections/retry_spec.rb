@@ -99,11 +99,11 @@ describe Mongoid::Collections::Retry do
         Mongoid.max_retries_on_connection_failure = 0
       end
 
-      it "should not raise Mongo::ConnectionFailure" do
+      it "nots raise Mongo::ConnectionFailure" do
         expect { subject.perform }.to_not raise_error(Mongo::ConnectionFailure)
       end
 
-      it "should return the result of the command" do
+      it "returns the result of the command" do
         subject.perform.should eq(result)
       end
 
@@ -188,11 +188,11 @@ describe Mongoid::Collections::Retry do
           Mongoid.max_retries_on_connection_failure = 0
         end
 
-        it "should not raise Mongo::ConnectionFailure" do
+        it "nots raise Mongo::ConnectionFailure" do
           expect { subject.perform }.to_not raise_error(Mongo::OperationFailure)
         end
 
-        it "should return the result of the command" do
+        it "returns the result of the command" do
           subject.perform.should eq(result)
         end
 
