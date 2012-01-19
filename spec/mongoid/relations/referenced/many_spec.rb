@@ -249,7 +249,7 @@ describe Mongoid::Relations::Referenced::Many do
             Movie.create
           end
 
-          it "haves rating references" do
+          it "has rating references" do
             movie.ratings.count.should eq(1)
           end
         end
@@ -1275,7 +1275,7 @@ describe Mongoid::Relations::Referenced::Many do
         Movie.create
       end
 
-      it "haves rating references" do
+      it "has rating references" do
         movie.ratings.count.should eq(1)
       end
     end
