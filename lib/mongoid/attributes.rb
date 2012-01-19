@@ -112,14 +112,14 @@ module Mongoid #:nodoc:
       _assigning do
         access = name.to_s
         localized = fields[access].try(:localized?)
-        typed_value_for(access, value).tap do |value|
-          unless attributes[access] == value || attribute_changed?(access)
+        typed_value_for(access, value).tap do |typed_value|
+          unless attributes[access] == typed_value || attribute_changed?(access)
             attribute_will_change!(access)
           end
           if localized
-            (attributes[access] ||= {}).merge!(value)
+            (attributes[access] ||= {}).merge!(typed_value)
           else
-            attributes[access] = value
+            attributes[access] = typed_value
           end
         end
       end

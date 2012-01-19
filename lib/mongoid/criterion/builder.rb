@@ -21,9 +21,9 @@ module Mongoid #:nodoc:
       def build(attrs = {})
         klass.new(
           selector.inject(attrs) do |hash, (key, value)|
-            hash.tap do |attrs|
+            hash.tap do |_attrs|
               unless key.to_s =~ /\$/ || value.is_a?(Hash)
-                attrs[key] = value
+                _attrs[key] = value
               end
             end
           end

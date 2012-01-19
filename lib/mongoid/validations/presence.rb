@@ -28,8 +28,8 @@ module Mongoid #:nodoc:
       def validate_each(document, attribute, value)
         field = document.fields[attribute.to_s]
         if field && field.localized? && !value.blank?
-          value.each_pair do |locale, value|
-            document.errors.add(attribute, :blank, options) if value.blank?
+          value.each_pair do |_locale, _value|
+            document.errors.add(attribute, :blank, options) if _value.blank?
           end
         else
           document.errors.add(attribute, :blank, options) if value.blank?

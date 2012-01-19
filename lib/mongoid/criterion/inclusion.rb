@@ -253,8 +253,8 @@ module Mongoid #:nodoc:
                 end
               elsif crit.selector[key].respond_to?(:merge) && value.respond_to?(:merge)
                 crit.selector[key] =
-                  crit.selector[key].merge(value) do |key, old, new|
-                    key == '$in' ? old & new : new
+                  crit.selector[key].merge(value) do |_key, old, new|
+                    _key == '$in' ? old & new : new
                   end
               else
                 crit.selector[key] = value

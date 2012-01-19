@@ -81,8 +81,8 @@ module Mongoid #:nodoc:
       # @since 2.2.1
       def extract_attribute(document, key)
         if (key_string = key.to_s) =~ /.+\..+/
-          key_string.split('.').inject(document.attributes) do |attribs, key|
-            attribs.try(:[], key)
+          key_string.split('.').inject(document.attributes) do |_attribs, _key|
+            _attribs.try(:[], _key)
           end
         else
           document.attributes[key_string]
