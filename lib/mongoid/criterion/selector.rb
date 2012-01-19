@@ -84,7 +84,6 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def try_to_typecast(key, value)
-        access = key.to_s
         if field = fields[key.to_s] || fields[aliased_fields[key.to_s]]
           typecast_value_for(field, value)
         elsif proper_and_or_value?(key, value)

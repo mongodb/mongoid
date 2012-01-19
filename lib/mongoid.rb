@@ -140,7 +140,7 @@ module Mongoid #:nodoc
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  delegate *(Config.public_instance_methods(false) +
+  delegate(*(Config.public_instance_methods(false) +
     ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
-    { :to => Config })
+    { :to => Config }))
 end

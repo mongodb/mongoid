@@ -15,7 +15,7 @@ module Mongoid #:nodoc
     #
     # @example Delegate the operation.
     #   collection.save({ :name => "Al" })
-    delegate *(Collections::Operations::PROXIED.dup << {:to => :master})
+    delegate(*(Collections::Operations::PROXIED.dup << {:to => :master}))
 
     # Get the unwrapped driver collection for this mongoid collection.
     #

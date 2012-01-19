@@ -124,7 +124,7 @@ module Mongoid # :nodoc:
           # @since 2.2.0
           def eager_load(metadata, ids)
             raise Errors::EagerLoad.new(metadata.name) if metadata.polymorphic?
-            klass, foreign_key = metadata.klass, metadata.foreign_key
+            klass, _ = metadata.klass, metadata.foreign_key
             klass.any_in("_id" => ids).each do |doc|
               IdentityMap.set(doc)
             end

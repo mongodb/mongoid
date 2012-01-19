@@ -167,7 +167,7 @@ describe Mongoid::Fields::Internal::Time do
 
     context "when given an ActiveSupport::TimeWithZone" do
 
-      before { time = 1.hour.ago }
+      before { 1.hour.ago }
 
       it "converts it to utc" do
         field.serialize(time.in_time_zone("Alaska")).should eq(
