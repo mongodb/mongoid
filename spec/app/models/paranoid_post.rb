@@ -4,6 +4,8 @@ class ParanoidPost
   include Mongoid::Timestamps
   include Mongoid::Paranoia
 
+  max_versions 2
+
   field :title, :type => String
 
   attr_accessor :after_destroy_called, :before_destroy_called

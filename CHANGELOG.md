@@ -56,6 +56,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1610 When versioning paranoid documents and max version is set, hard
+  delete old versions from the embedded relation.
+
 * \#1608 Guard against no method errors when passing ids in nested attributes
   and the documents do not exist.
 
