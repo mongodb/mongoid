@@ -9,7 +9,7 @@ describe "Date/Time attributes" do
       user
     end
 
-    it "bes read for persistance as a UTC Time" do
+    it "reads for persistance as a UTC Time" do
       user.changes["last_login"].last.class.should eq(Time)
     end
 
@@ -25,7 +25,7 @@ describe "Date/Time attributes" do
       user
     end
 
-    it "bes read for persistance as a UTC Time" do
+    it "reads for persistance as a UTC Time" do
       user.changes["account_expires"].last.class.should eq(Time)
     end
 

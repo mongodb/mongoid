@@ -89,7 +89,7 @@ describe Mongoid::NamedScope do
 
     context "when an class attribute is defined" do
 
-      it "bes accessible" do
+      it "is accessible" do
         Person.somebody_elses_important_class_options.should eq({ :keep_me_around => true })
       end
 

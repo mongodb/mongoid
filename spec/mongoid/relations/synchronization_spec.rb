@@ -53,7 +53,7 @@ describe Mongoid::Relations::Synchronization do
 
       context "and is Persisted" do
 
-        it "bes able to :save" do
+        it "is able to :save" do
           account.save.should be_true
         end
       end
@@ -64,7 +64,7 @@ describe Mongoid::Relations::Synchronization do
           account.agents.where(:_id => agent.id).exists?
         end
 
-        it "bes able to :save" do
+        it "is able to :save" do
           account.save.should be_true
         end
       end
