@@ -45,8 +45,11 @@ module Mongoid #:nodoc
     # @example Iterate over the cursor.
     #   cursor.each { |doc| p doc.title }
     def each
-      cursor.each do |document|
-        yield Mongoid::Factory.from_db(klass, document)
+      loop do
+        retry_on_connection_failure do
+          return unless document = cursor.next
+          yield Mongoid::Factory.from_db(klass, document)
+        end
       end
     end
 
