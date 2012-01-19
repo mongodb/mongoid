@@ -73,7 +73,7 @@ describe Mongoid::Document do
       Canvas.where(:name => "Testy").first.should eq(firefox)
     end
 
-    it 'should returns on of this subclasses if you find by _type' do
+    it 'returnss on of this subclasses if you find by _type' do
       Canvas.where(:_type.in => ['Firefox']).count.should eq(1)
     end
   end
@@ -141,7 +141,7 @@ describe Mongoid::Document do
       Firefox.delete_all
     end
 
-    it 'should find object with String args' do
+    it 'finds object with String args' do
       Firefox.find(firefox.id.to_s).should eq(firefox)
     end
 

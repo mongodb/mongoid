@@ -100,11 +100,11 @@ describe Mongoid::Criteria do
         )
       end
 
-      it 'should find object with String args' do
+      it 'finds object with String args' do
         Person.find(person.id.to_s).should eq(person)
       end
 
-      it 'should find object with BSON::ObjectId  args' do
+      it 'finds object with BSON::ObjectId  args' do
         Person.find(person.id).should eq(person)
       end
     end
@@ -138,11 +138,11 @@ describe Mongoid::Criteria do
         )
       end
 
-      it 'should find the object with a matching String arg' do
+      it 'finds the object with a matching String arg' do
         Person.find(person.id.to_s).should eq(person)
       end
 
-      it 'should find the object with a matching BSON::ObjectId argument' do
+      it 'finds the object with a matching BSON::ObjectId argument' do
         Person.find(BSON::ObjectId(person.id)).should eq(person)
       end
     end
@@ -551,7 +551,7 @@ describe Mongoid::Criteria do
       Mongoid::Criteria.new(Person)
     end
 
-    it 'should not carry scope to cloned criteria' do
+    it 'nots carry scope to cloned criteria' do
       criteria.first
       criteria.limit(1).context.options[:limit].should eq(1)
     end
