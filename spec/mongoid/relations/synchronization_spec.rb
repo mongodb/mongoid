@@ -42,7 +42,7 @@ describe Mongoid::Relations::Synchronization do
         person.persisted?.should be_true
       end
 
-      it "nots have persisted :account" do
+      it "does not have persisted :account" do
         account.persisted?.should be_false
       end
 

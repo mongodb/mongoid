@@ -135,7 +135,7 @@ describe Mongoid::Callbacks do
         artist.expects(:before_create_stub).returns(false)
       end
 
-      it "nots get saved" do
+      it "does not get saved" do
         artist.save.should be_false
         artist.persisted?.should be_false
       end

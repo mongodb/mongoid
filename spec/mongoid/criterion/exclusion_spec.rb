@@ -191,7 +191,7 @@ describe Mongoid::Criterion::Exclusion do
         criteria.options[:fields].should be_nil
       end
 
-      it "nots assign the field list" do
+      it "does not assign the field list" do
         criteria.only.field_list.should be_nil
       end
     end
@@ -239,7 +239,7 @@ describe Mongoid::Criterion::Exclusion do
         criteria.options[:fields].should be_nil
       end
 
-      it "nots assign the field list" do
+      it "does not assign the field list" do
         criteria.field_list.should be_nil
       end
     end

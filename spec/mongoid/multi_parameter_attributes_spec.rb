@@ -20,7 +20,7 @@ describe Mongoid::MultiParameterAttributes do
         post.created_at.should eq(Time.local(2010, 8, 12, 15, 45))
       end
 
-      it "nots leave ugly attributes on the model" do
+      it "does not leave ugly attributes on the model" do
         post.attributes.should_not have_key("created_at(1i)")
       end
     end

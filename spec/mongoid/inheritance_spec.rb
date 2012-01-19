@@ -296,7 +296,7 @@ describe Mongoid::Document do
       end
     end
 
-    it "nots bleed relations from one subclass to another" do
+    it "does not bleed relations from one subclass to another" do
       Truck.relations.keys.should =~ %w/ shipping_container driver bed /
       Car.relations.keys.should =~ %w/ shipping_container driver /
     end

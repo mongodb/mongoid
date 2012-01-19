@@ -302,7 +302,7 @@ describe Mongoid::Criterion::Selector do
       context "and the field type is not hash" do
         before { field.stubs(:type => Integer) }
 
-        it "nots modify the original value" do
+        it "does not modify the original value" do
           value = {}
           value.expects(:dup).returns({})
           selector.send(:typecast_value_for, field, value)
@@ -310,7 +310,7 @@ describe Mongoid::Criterion::Selector do
 
         context "when the hash is an $exists query" do
 
-          it "nots typecast the hash" do
+          it "does not typecast the hash" do
             value = {"$exists" => true}
             field.expects(:selection).never
             selector.send(:typecast_value_for, field, value)
@@ -325,7 +325,7 @@ describe Mongoid::Criterion::Selector do
 
         context "when the hash is a $size query" do
 
-          it "nots typecast the hash" do
+          it "does not typecast the hash" do
             value = {"$size" => 2}
             field.expects(:selection).never
             selector.send(:typecast_value_for, field, value)
