@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Accessors do
 
-  before do
-    [ Book, Movie, Rating, Person, Preference, Game ].each(&:delete_all)
-  end
-
   describe "\#{getter}" do
 
     context "when the relation is not polymorphic" do

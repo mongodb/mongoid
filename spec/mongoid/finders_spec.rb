@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Finders do
 
-  before do
-    Person.delete_all
-  end
-
   describe ".all_in" do
 
     let(:criteria) do

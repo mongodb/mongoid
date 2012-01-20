@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Cascading do
 
-  before do
-    [ Person, Post, Book, Movie, Rating ].each(&:delete_all)
-  end
-
   describe ".cascade" do
 
     let(:klass) do

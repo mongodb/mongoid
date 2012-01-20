@@ -2,78 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Contexts::Mongo do
 
-  before do
-    [ Person, Product ].each(&:delete_all)
-  end
-
-  describe "#first" do
-
-    let!(:first) do
-      Product.create
-    end
-
-    let!(:last) do
-      Product.create
-    end
-
-    let(:from_db) do
-      Product.first
-    end
-
-    it "returns the first document in the collection by id" do
-      from_db.should eq(first)
-    end
-
-    context "when chained on another criteria" do
-
-      let(:criteria) do
-        Product.desc(:description)
-      end
-
-      before do
-        criteria.first
-      end
-
-      it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
-      end
-    end
-  end
-
-  describe "#last" do
-
-    let!(:first) do
-      Product.create
-    end
-
-    let!(:last) do
-      Product.create
-    end
-
-    let(:from_db) do
-      Product.last
-    end
-
-    it "returns the last document in the collection by id" do
-      from_db.should eq(last)
-    end
-
-    context "when chained on another criteria" do
-
-      let(:criteria) do
-        Product.desc(:description)
-      end
-
-      before do
-        criteria.last
-      end
-
-      it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
-      end
-    end
-  end
-
   describe "#avg" do
 
     context "when no documents are in the collection" do
@@ -198,6 +126,74 @@ describe Mongoid::Contexts::Mongo do
 
       it "returns false" do
         Person.empty?.should be_false
+      end
+    end
+  end
+
+  describe "#first" do
+
+    let!(:first) do
+      Product.create
+    end
+
+    let!(:last) do
+      Product.create
+    end
+
+    let(:from_db) do
+      Product.first
+    end
+
+    it "returns the first document in the collection by id" do
+      from_db.should eq(first)
+    end
+
+    context "when chained on another criteria" do
+
+      let(:criteria) do
+        Product.desc(:description)
+      end
+
+      before do
+        criteria.first
+      end
+
+      it "does not modify the previous criteria's sorting" do
+        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
+      end
+    end
+  end
+
+  describe "#last" do
+
+    let!(:first) do
+      Product.create
+    end
+
+    let!(:last) do
+      Product.create
+    end
+
+    let(:from_db) do
+      Product.last
+    end
+
+    it "returns the last document in the collection by id" do
+      from_db.should eq(last)
+    end
+
+    context "when chained on another criteria" do
+
+      let(:criteria) do
+        Product.desc(:description)
+      end
+
+      before do
+        criteria.last
+      end
+
+      it "does not modify the previous criteria's sorting" do
+        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
       end
     end
   end

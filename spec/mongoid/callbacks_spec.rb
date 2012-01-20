@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Callbacks do
 
-  before do
-    [ Band, ParentDoc, ValidationCallback ].each(&:delete_all)
-  end
-
   class TestClass
     include Mongoid::Callbacks
   end
@@ -1240,10 +1236,6 @@ describe Mongoid::Callbacks do
             :addresses => [ address ]
           }
         end
-      end
-
-      after do
-        Person.delete_all
       end
 
       it "#save returns false" do

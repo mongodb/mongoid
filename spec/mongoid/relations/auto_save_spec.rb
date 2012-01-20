@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::AutoSave do
 
-  before do
-    [ Person, Game, Account, Drug ].each(&:delete_all)
-  end
-
   describe ".auto_save" do
 
     let(:person) do
@@ -101,10 +97,6 @@ describe Mongoid::Relations::AutoSave do
       end
 
       context "when the relation is a referenced in" do
-
-        before do
-          [ Ghost, Movie ].each(&:delete_all)
-        end
 
         let(:ghost) do
           Ghost.new(:name => "Slimer")

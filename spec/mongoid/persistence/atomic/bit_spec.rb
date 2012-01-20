@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence::Atomic::Bit do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#bit" do
 
     let(:person) do

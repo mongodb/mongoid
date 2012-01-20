@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders do
 
-  before do
-    [ Person, Game ].each(&:delete_all)
-  end
-
   describe "#build_#\{name}" do
 
     let(:person) do

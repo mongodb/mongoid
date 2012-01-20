@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe "when initialize a model with an embedded model" do
 
-  before do
-    Person.delete_all
-  end
-
   let(:person) do
     Person.new(:ssn => "444-44-1234", :pet => Pet.new)
   end

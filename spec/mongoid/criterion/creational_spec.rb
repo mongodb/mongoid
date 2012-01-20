@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Creational do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#create" do
 
     context "when provided a valid selector" do

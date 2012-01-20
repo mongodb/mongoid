@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Copyable do
 
-  before do
-    Person.delete_all
-  end
-
   [ :clone, :dup ].each do |method|
 
     describe "##{method}" do

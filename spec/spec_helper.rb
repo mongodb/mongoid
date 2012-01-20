@@ -67,9 +67,11 @@ Dir[ File.join(SUPPORT, "*.rb") ].each do |file|
 end
 
 RSpec.configure do |config|
+
   config.mock_with(:mocha)
 
   config.before(:each) do
+    Mongoid.purge!
     Mongoid::IdentityMap.clear
   end
 

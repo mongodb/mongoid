@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::One do
 
-  before do
-    [ Person, Shelf ].map(&:delete_all)
-  end
-
   describe "#===" do
 
     let(:base) do

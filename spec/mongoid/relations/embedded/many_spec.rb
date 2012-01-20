@@ -2,11 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::Many do
 
-  before do
-    [ Person, Account, Acolyte, League,
-      Quiz, Role, Patient, Product, Purchase ].map(&:delete_all)
-  end
-
   [ :<<, :push ].each do |method|
 
     describe "##{method}" do

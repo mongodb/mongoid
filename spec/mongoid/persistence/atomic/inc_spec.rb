@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence::Atomic::Inc do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#inc" do
 
     let(:person) do

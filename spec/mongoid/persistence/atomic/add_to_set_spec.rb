@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence::Atomic::AddToSet do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#persist" do
 
     context "when the document is new" do

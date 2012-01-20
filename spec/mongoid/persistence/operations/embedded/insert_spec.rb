@@ -19,7 +19,6 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
   end
 
   before do
-    Person.delete_all
     document.stubs(:collection).returns(collection)
   end
 

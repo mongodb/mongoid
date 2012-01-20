@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
-  before do
-    Person.delete_all
-  end
-
   let(:klass) do
     Person
   end

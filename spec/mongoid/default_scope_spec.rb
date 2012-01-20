@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe Mongoid::DefaultScope do
 
-  before do
-    [ Person, Tree ].each(&:delete_all)
-  end
-
   describe ".default_scope" do
 
     let(:criteria) do

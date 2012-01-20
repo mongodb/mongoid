@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence::Atomic::Sets do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#set" do
 
     let(:person) do

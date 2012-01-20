@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Validations::UniquenessValidator do
 
-  before do
-    [ Dictionary, Login, Word ].each(&:delete_all)
-  end
-
   describe "#valid?" do
 
     context "when the document is a root document" do

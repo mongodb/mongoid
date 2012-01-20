@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
-  before do
-    Person.delete_all
-  end
-
   context "===" do
 
     context "when the other object is a Criteria" do

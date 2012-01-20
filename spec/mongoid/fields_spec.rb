@@ -6,10 +6,6 @@ describe Mongoid::Fields do
     Mongoid.use_activesupport_time_zone = false
   end
 
-  before do
-    Product.delete_all
-  end
-
   describe "#\{field}_translations" do
 
     let(:product) do

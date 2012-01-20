@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::NestedAttributes do
 
-  before do
-    [ Person, Post, Game, Pizza, Topping ].map(&:delete_all)
-  end
-
   describe ".accepts_nested_attributes_for" do
 
     let(:person) do

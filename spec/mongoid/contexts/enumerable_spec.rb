@@ -37,7 +37,7 @@ describe Mongoid::Contexts::Enumerable do
   end
 
   let(:context) do
-    Mongoid::Contexts::Enumerable.new(criteria)
+    described_class.new(criteria)
   end
 
   describe "#aggregate" do
@@ -54,9 +54,15 @@ describe Mongoid::Contexts::Enumerable do
       counts.size.should eq(4)
     end
 
-    it "stores the counts in proper groups" do
+    it "groups the first group properly" do
       counts[1].should eq(1)
+    end
+
+    it "groups the second group properly" do
       counts[10].should eq(1)
+    end
+
+    it "groups the third group properly" do
       counts[20].should eq(2)
     end
   end
@@ -187,25 +193,39 @@ describe Mongoid::Contexts::Enumerable do
       group.size.should eq(4)
     end
 
-    it "stores the documents in proper groups" do
+    it "groups the first group properly" do
       group[1].should eq([ london ])
+    end
+
+    it "groups the second group properly" do
       group[10].should eq([ shanghai ])
+    end
+
+    it "groups the third group properly" do
       group[20].should eq([ melbourne, new_york ])
     end
   end
 
   describe ".initialize" do
 
-    let(:selector) { { :field => "value"  } }
-    let(:options) { { :skip => 20 } }
-    let(:documents) { [stub] }
+    let(:selector) do
+      { :field => "value"  }
+    end
+
+    let(:options) do
+      { :skip => 20 }
+    end
+
+    let(:documents) do
+      [ stub ]
+    end
 
     let(:crit) do
       criteria.where(selector).skip(20)
     end
 
     let(:context) do
-      Mongoid::Contexts::Enumerable.new(crit)
+      described_class.new(crit)
     end
 
     before do
@@ -223,7 +243,6 @@ describe Mongoid::Contexts::Enumerable do
     it "sets the documents" do
       context.documents.should eq(documents)
     end
-
   end
 
   describe "#iterate" do
@@ -233,15 +252,21 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     let(:context) do
-      Mongoid::Contexts::Enumerable.new(crit)
+      described_class.new(crit)
+    end
+
+    let(:iterated) do
+      []
+    end
+
+    before do
+      context.iterate do |doc|
+        iterated << doc
+      end
     end
 
     it "executes the criteria" do
-      acc = []
-      context.iterate do |doc|
-        acc << doc
-      end
-      acc.should eq([melbourne])
+      iterated.should eq([ melbourne ])
     end
   end
 
@@ -274,7 +299,7 @@ describe Mongoid::Contexts::Enumerable do
       end
 
       let(:context) do
-        Mongoid::Contexts::Enumerable.new(crit)
+        described_class.new(crit)
       end
 
       it "returns the last matching in the enumerable" do
@@ -306,7 +331,7 @@ describe Mongoid::Contexts::Enumerable do
       end
 
       let(:context) do
-        Mongoid::Contexts::Enumerable.new(crit)
+        described_class.new(crit)
       end
 
       it "returns the first matching in the enumerable" do
@@ -385,15 +410,23 @@ describe Mongoid::Contexts::Enumerable do
       end
     end
 
-    it "returns the first element" do
-      person.addresses.criteria.shift.number.should eq(0)
+    let(:criteria) do
+      person.addresses.criteria
     end
 
-    it "skips to the next value" do
-      criteria = person.addresses.criteria
-      criteria.shift
-      criteria.shift
-      criteria.first.number.should eq(2)
+    it "returns the first element" do
+      criteria.shift.number.should eq(0)
+    end
+
+    context "when shifting multiple times" do
+
+      before do
+        2.times { criteria.shift }
+      end
+
+      it "skips to the next value" do
+        criteria.first.number.should eq(2)
+      end
     end
   end
 

@@ -15,7 +15,6 @@ describe Mongoid::Criteria do
   end
 
   before do
-    Person.delete_all
     Person.create(:title => "Madam")
 
     2.times do |n|

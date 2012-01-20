@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Validations do
 
-  before do
-    [ Pizza, Topping ].each(&:delete_all)
-  end
-
   let(:account) do
     Account.new(:name => "Testing a really long name.")
   end

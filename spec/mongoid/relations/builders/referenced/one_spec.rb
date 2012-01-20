@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::One do
 
-  before do
-    [ Person, Game ].each(&:delete_all)
-  end
-
   let(:base) do
     stub(:new_record? => false)
   end

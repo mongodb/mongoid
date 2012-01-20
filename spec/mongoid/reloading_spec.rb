@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Reloading do
 
-  before do
-    [ Account, Person, Game ].each(&:delete_all)
-  end
-
   describe "#reload" do
 
     context "when using bson ids" do

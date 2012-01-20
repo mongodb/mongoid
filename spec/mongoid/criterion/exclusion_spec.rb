@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Exclusion do
 
-  before do
-    Person.delete_all
-  end
-
   let(:base) do
     Mongoid::Criteria.new(Person)
   end

@@ -6,14 +6,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     Mongoid.raise_not_found_error = true
   end
 
-  before do
-    [
-      Person, Preference, OrderedPreference, Event, Tag, House,
-      UserAccount, Agent, Account, Business, User,
-      Artwork, Exhibition, Exhibitor
-    ].map(&:delete_all)
-  end
-
   [ :<<, :push, :concat ].each do |method|
 
     describe "##{method}" do

@@ -2,12 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Referenced::In do
 
-  before do
-    [ Person, Game, Post, Bar, Agent,
-      Comment, Movie, Account, User, Book,
-      Series, Cookie, Jar ].map(&:delete_all)
-  end
-
   let(:person) do
     Person.create(:ssn => "555-55-1111")
   end

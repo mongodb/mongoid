@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Atomic do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#atomic_updates" do
 
     context "when the document is persisted" do

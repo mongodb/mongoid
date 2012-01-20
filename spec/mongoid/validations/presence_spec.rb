@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Validations::PresenceValidator do
 
-  before do
-    [ Manufacturer, Product ].each(&:delete_all)
-  end
-
   describe "#validate_each" do
 
     let(:product) do

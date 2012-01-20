@@ -6,11 +6,6 @@ describe Mongoid::Relations::Referenced::Many do
     Mongoid.raise_not_found_error = true
   end
 
-  before do
-    [ Person, Post, OrderedPost, Movie, Rating,
-      Game, Drug, Church, Acolyte ].map(&:delete_all)
-  end
-
   [ :<<, :push ].each do |method|
 
     describe "##{method}" do

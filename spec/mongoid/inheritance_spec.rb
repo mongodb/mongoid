@@ -2,12 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Document do
 
-  # @todo Durran: Rewrite this ugly-ass spec.
-
-  before do
-    [ Browser, Firefox, Canvas ].each(&:delete_all)
-  end
-
   context "when the document is a subclass of a root class" do
 
     let!(:browser) do
@@ -135,10 +129,6 @@ describe Mongoid::Document do
 
     let!(:firefox) do
       Firefox.create(:name => "firefox")
-    end
-
-    after do
-      Firefox.delete_all
     end
 
     it 'finds object with String args' do

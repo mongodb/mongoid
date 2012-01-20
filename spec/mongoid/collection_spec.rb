@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Collection do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#find" do
 
     let(:collection) do

@@ -2,10 +2,11 @@ require "spec_helper"
 
 describe Mongoid::Contexts::Enumerable::Sort do
 
-  Sort = Mongoid::Contexts::Enumerable::Sort
-
   describe "#initialize" do
-    let(:sort) { Sort.new("value", :asc) }
+
+    let(:sort) do
+      described_class.new("value", :asc)
+    end
 
     it "sets the value" do
       sort.value.should eq("value")
@@ -18,48 +19,64 @@ describe Mongoid::Contexts::Enumerable::Sort do
 
   describe "#ascending?" do
 
-    subject { Sort.new("", direction).ascending? }
+    context "when the direction is :asc" do
 
-    context "when direction is :asc" do
+      let(:sort) do
+        described_class.new("", :asc)
+      end
 
-      let(:direction) { :asc }
-      it { should be_true }
+      it "returns true" do
+        sort.should be_ascending
+      end
     end
 
-    context "when direction is :desc" do
-      let(:direction) { :desc }
-      it { should be_false }
+    context "when the direction is :desc" do
+
+      let(:sort) do
+        described_class.new("", :desc)
+      end
+
+      it "returns false" do
+        sort.should_not be_ascending
+      end
     end
   end
 
   describe "#compare" do
+
     subject do
-      Sort.allocate.send(:compare, value, other_value)
+      described_class.allocate.send(:compare, value, other_value)
     end
 
     context "when a is nil" do
+
       let(:value) { nil }
 
       context "and b is nil" do
+
         let(:other_value) { nil }
         it { should eq(0) }
       end
 
       context "and b is not nil" do
+
         let(:other_value) { "a" }
         it { should eq(1) }
       end
     end
 
     context "when a is not nil" do
+
       let(:value) { "a" }
 
       context "and b is nil" do
+
         let(:other_value) { nil }
         it { should eq(-1) }
       end
 
       context "and b is not nil" do
+
         let(:other_value) { "b" }
         it "uses default comparison" do
           value.expects(:<=>).with(other_value)
@@ -72,18 +89,32 @@ describe Mongoid::Contexts::Enumerable::Sort do
   describe "<=>" do
 
     context "when direction is ascending" do
+
+      let(:sort) do
+        described_class.new(0, :asc)
+      end
+
+      let(:other) do
+        stub(:value => 1)
+      end
+
       it "returns the results of compare" do
-        sort = Sort.new(0, :asc)
-        other = stub(:value => 1)
         sort.expects(:compare).with(0, other.value).returns(-1)
         (sort <=> other).should eq(-1)
       end
     end
 
     context "when direction is descending" do
+
+      let(:sort) do
+        described_class.new(0, :desc)
+      end
+
+      let(:other) do
+        stub(:value => 1)
+      end
+
       it "returns the inverse of compare" do
-        sort = Sort.new(0, :desc)
-        other = stub(:value => 1)
         sort.expects(:compare).with(0, other.value).returns(-1)
         (sort <=> other).should eq(1)
       end

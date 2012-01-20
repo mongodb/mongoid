@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Dirty do
 
-  before do
-    [ Person, Preference ].each(&:delete_all)
-  end
-
   describe "#attribute_change" do
 
     context "when the attribute has changed from the persisted value" do

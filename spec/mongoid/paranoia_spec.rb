@@ -2,11 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Paranoia do
 
-  before do
-    [ Author, Person ].each(&:delete_all)
-    ParanoidPost.all.each(&:delete!)
-  end
-
   describe ".criteria" do
 
     context "when setting embedded to true" do

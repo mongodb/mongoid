@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Extensions do
 
-  before do
-    Person.delete_all
-  end
-
   context "setting floating point numbers" do
 
     context "when value is an empty string" do

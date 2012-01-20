@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Attributes do
 
-  before do
-    [ Person, Agent, Account ].each(&:delete_all)
-  end
-
   describe "\#{attribute}" do
 
     context "when setting the value in the getter" do

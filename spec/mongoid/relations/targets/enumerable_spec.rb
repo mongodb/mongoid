@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Targets::Enumerable do
 
-  before do
-    [ Person, Post ].each(&:delete_all)
-  end
-
   describe "#==" do
 
     context "when comparing with an enumerable" do

@@ -2,14 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Inclusion do
 
-  before do
-    [ Account, Person, Post, Product, Game, Jar, Bar ].each(&:delete_all)
-  end
-
-  before(:all) do
-    Bar.create_indexes
-  end
-
   let(:base) do
     Mongoid::Criteria.new(Person)
   end
@@ -1095,6 +1087,10 @@ describe Mongoid::Criterion::Inclusion do
 
     let(:criteria) do
       base.near(:field => [ 72, -44 ])
+    end
+
+    before do
+      Bar.create_indexes
     end
 
     it "adds the $near modifier to the selector" do

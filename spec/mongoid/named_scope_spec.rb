@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::NamedScope do
 
-  before do
-    [ Person, Player ].each(&:delete_all)
-  end
-
   describe ".scope" do
 
     before(:all) do
@@ -23,10 +19,6 @@ describe Mongoid::NamedScope do
         :terms => true,
         :ssn => "123-22-8346"
       )
-    end
-
-    after do
-      Person.delete_all
     end
 
     it "adds a class method for the scope" do

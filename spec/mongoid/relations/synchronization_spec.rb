@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Synchronization do
 
-  before do
-    [ Person, Preference, Article, Tag, Agent, User, Account ].each(&:delete_all)
-  end
-
   describe ".update_inverse_keys" do
 
     let(:agent) do

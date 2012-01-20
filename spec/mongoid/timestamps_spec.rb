@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Timestamps do
 
-  before do
-    Person.delete_all
-  end
-
   describe ".included" do
 
     let(:person) do

@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence do
 
-  before do
-    [ Account, Person, Post, Product, Game ].each(&:delete_all)
-  end
-
   before(:all) do
     Mongoid.persist_in_safe_mode = true
     Mongoid.parameterize_keys = false
@@ -553,6 +549,7 @@ describe Mongoid::Persistence do
         end
 
         before do
+          Person.create_indexes
           Person.create!(:ssn => "555-55-9999")
         end
 

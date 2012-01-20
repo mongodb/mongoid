@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence::Atomic::Rename do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#rename" do
 
     context "when incrementing a field with a value" do

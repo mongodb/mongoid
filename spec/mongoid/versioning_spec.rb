@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Versioning do
 
-  before do
-    [ WikiPage, Comment ].each(&:delete_all)
-  end
-
   describe ".max_versions" do
 
     context "when provided an integer" do

@@ -2,18 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Safety do
 
-  before(:all) do
-    Mongoid.autocreate_indexes = true
-  end
-
-  before do
-    Person.delete_all
-  end
-
-  after do
-    Mongoid.autocreate_indexes = false
-  end
-
   describe ".safely" do
 
     context "when global safe mode is false" do
@@ -36,6 +24,10 @@ describe Mongoid::Safety do
         end
 
         context "when a mongodb error occurs" do
+
+          before do
+            Person.create_indexes
+          end
 
           it "bubbles up to the caller" do
             lambda {
@@ -68,6 +60,10 @@ describe Mongoid::Safety do
 
         context "when a mongodb error occurs" do
 
+          before do
+            Person.create_indexes
+          end
+
           it "bubbles up to the caller" do
             lambda {
               Person.safely.create!(:ssn => "432-97-1112")
@@ -97,6 +93,10 @@ describe Mongoid::Safety do
             Person.new(:ssn => "432-97-1113")
           end
 
+          before do
+            Person.create_indexes
+          end
+
           it "bubbles up to the caller" do
             lambda {
               person.safely.save(:ssn => "432-97-1113")
@@ -115,6 +115,10 @@ describe Mongoid::Safety do
 
           let(:person) do
             Person.new(:ssn => "432-97-1114")
+          end
+
+          before do
+            Person.create_indexes
           end
 
           it "bubbles up to the caller" do
@@ -167,6 +171,10 @@ describe Mongoid::Safety do
 
         context "when a mongodb error occurs" do
 
+          before do
+            Person.create_indexes
+          end
+
           it "fails silently" do
             Person.unsafely.create(:ssn => "432-97-1111").should be_true
           end
@@ -190,6 +198,10 @@ describe Mongoid::Safety do
 
           let(:person) do
             Person.new(:ssn => "432-97-1113")
+          end
+
+          before do
+            Person.create_indexes
           end
 
           it "fails silently" do

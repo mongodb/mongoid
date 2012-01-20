@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Observer do
 
-  before do
-    [ Actor, Actress ].each(&:delete_all)
-  end
-
   let(:recorder) do
     CallbackRecorder.instance
   end

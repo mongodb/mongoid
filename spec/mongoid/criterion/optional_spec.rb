@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Optional do
 
-  before do
-    [ Person, Book ].each(&:delete_all)
-  end
-
   let(:base) do
     Mongoid::Criteria.new(Person)
   end

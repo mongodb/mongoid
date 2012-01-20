@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Scope do
 
-  before do
-    Person.delete_all
-  end
-
   describe ".initialize" do
 
     let(:conditions) do

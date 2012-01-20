@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
-  before do
-    [ Person, Post, Preference ].each(&:delete_all)
-  end
-
   [ :update, :update_all ].each do |method|
 
     let!(:person) do

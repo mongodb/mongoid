@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Timestamps::Timeless do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#timeless" do
 
     context "when used as a proxy method" do

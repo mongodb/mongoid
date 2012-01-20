@@ -15,8 +15,6 @@ describe Mongoid::Persistence::Operations::Remove do
   end
 
   before do
-    [ Artist, Album, Person ].each(&:delete_all)
-    Mongoid::IdentityMap.clear
     document.stubs(:collection).returns(collection)
   end
 

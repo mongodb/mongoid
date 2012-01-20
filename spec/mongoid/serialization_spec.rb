@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Serialization do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#serializable_hash" do
 
     let(:person) do

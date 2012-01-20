@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Referenced::One do
 
-  before do
-    [ Person, Game, Bar, Book ].map(&:delete_all)
-  end
-
   describe "#=" do
 
     context "when the relationship is an illegal embedded reference" do

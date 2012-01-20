@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Embedded::In do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#===" do
 
     let(:base) do

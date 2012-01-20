@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Referenced::In do
 
-  before do
-    [ Person, Game ].each(&:delete_all)
-  end
-
   let(:base) do
     stub
   end

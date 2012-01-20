@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Inspection do
 
-  before do
-    Person.delete_all
-  end
-
   describe "#inspect" do
 
     context "when documents match in the database" do
