@@ -1,6 +1,6 @@
 test:
   database: mongoid_config_test
-  host: localhost
+  host: <%= ENV["MONGOID_SPEC_HOST"] %>
   databases:
     secondary:
       database: secondary_config_test

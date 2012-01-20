@@ -30,7 +30,7 @@ describe Mongoid::Config do
   after(:all) do
     Mongoid.configure do |config|
       name          = "mongoid_test"
-      config.master = Mongo::Connection.new.db(name)
+      config.master = Mongo::Connection.new(HOST, PORT).db(name)
       config.logger = nil
     end
   end
@@ -266,7 +266,7 @@ describe Mongoid::Config do
     context "when provided a mongo database" do
 
       before do
-        described_class.master = Mongo::Connection.new.db("mongoid_test")
+        described_class.master = Mongo::Connection.new(HOST, PORT).db("mongoid_test")
       end
 
       it "sets the master" do

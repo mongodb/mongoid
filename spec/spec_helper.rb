@@ -11,6 +11,12 @@ require "mocha"
 require "rspec"
 require "ammeter/init"
 
+ENV["MONGOID_SPEC_HOST"] ||= "localhost"
+ENV["MONGOID_SPEC_PORT"] ||= "27017"
+
+HOST = ENV["MONGOID_SPEC_HOST"]
+PORT = ENV["MONGOID_SPEC_PORT"]
+
 LOGGER = Logger.new($stdout)
 
 def database_id
@@ -18,7 +24,7 @@ def database_id
 end
 
 Mongoid.configure do |config|
-  database = Mongo::Connection.new.db(database_id)
+  database = Mongo::Connection.new(HOST, PORT).db(database_id)
   database.add_user("mongoid", "test")
   config.master = database
   config.logger = nil

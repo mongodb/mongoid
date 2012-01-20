@@ -1,6 +1,6 @@
 test:
   database: mongoid_config_test
-  host: localhost
+  host: <%= ENV["MONGOID_SPEC_HOST"] %>
   allow_dynamic_fields: false
   include_root_in_json: true
   parameterize_keys: false
