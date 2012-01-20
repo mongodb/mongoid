@@ -30,13 +30,9 @@ Mongoid.configure do |config|
   config.logger = nil
 end
 
-CLASSES = []
-
 Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
   name = File.basename(file, ".rb")
-  class_name = name.camelize
-  CLASSES.push(class_name)
-  autoload class_name.to_sym, name
+  autoload name.camelize.to_sym, name
 end
 
 module Medical
@@ -70,23 +66,13 @@ Dir[ File.join(SUPPORT, "*.rb") ].each do |file|
   require File.basename(file)
 end
 
-def delete_all_documents
-  CLASSES.each do |class_name|
-    if const_defined?(class_name)
-      class_name.constantize.delete_all
-    end
-  end
-end
-
 RSpec.configure do |config|
-
   config.mock_with(:mocha)
 
   config.before(:each) do
-    if ENV["CI"]
-      delete_all_documents
-    else
+    begin
       Mongoid.purge!
+    rescue Exception => e
     end
     Mongoid::IdentityMap.clear
   end
