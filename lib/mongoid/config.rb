@@ -135,11 +135,7 @@ module Mongoid #:nodoc
     # @since 2.0.2
     def purge!
       master.collections.map do |collection|
-        begin
-          collection.drop if collection.name !~ /system/
-        rescue Mongo::OperationError => e
-          ::Logger.new($stdout).info(collection.name)
-        end
+        collection.drop if collection.name !~ /system/
       end
     end
 
