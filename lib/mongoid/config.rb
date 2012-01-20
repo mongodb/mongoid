@@ -138,7 +138,7 @@ module Mongoid #:nodoc
         begin
           collection.drop if collection.name !~ /system/
         rescue Mongo::OperationError => e
-          p collection
+          ::Logger.new($stdout).info(collection.name)
         end
       end
     end
