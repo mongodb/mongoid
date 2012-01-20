@@ -74,7 +74,7 @@ RSpec.configure do |config|
     begin
       Mongoid.purge!
     rescue Mongo::OperationFailure => e
-      Mongoid.master.collection.each do |collection|
+      Mongoid.master.collections.each do |collection|
         collection.remove if collection.name !~ /system/
       end
     end
