@@ -1,5 +1,9 @@
 test:
-  hosts: [[localhost, 27017], [localhost, 27017]]
+  hosts:
+    - - <%= ENV["MONGOID_SPEC_HOST"] %>
+      - <%= ENV["MONGOID_SPEC_PORT"] %>
+    - - <%= ENV["MONGOID_SPEC_HOST"] %>
+      - <%= ENV["MONGOID_SPEC_PORT"] %>
   read: :secondary
   allow_dynamic_fields: false
   parameterize_keys: false
@@ -12,12 +16,20 @@ test:
   database: mongoid_config_test
   databases:
     shard_replset:
-      hosts: [ [localhost, 27017], [localhost, 27017] ]
+      hosts:
+        - - <%= ENV["MONGOID_SPEC_HOST"] %>
+          - <%= ENV["MONGOID_SPEC_PORT"] %>
+        - - <%= ENV["MONGOID_SPEC_HOST"] %>
+          - <%= ENV["MONGOID_SPEC_PORT"] %>
       database: multi_db_replset_test
       max_retries_on_connection_failure: 5
 
 authenticated:
-  hosts: [[localhost, 27017], [localhost, 27017]]
+  hosts:
+    - - <%= ENV["MONGOID_SPEC_HOST"] %>
+      - <%= ENV["MONGOID_SPEC_PORT"] %>
+    - - <%= ENV["MONGOID_SPEC_HOST"] %>
+      - <%= ENV["MONGOID_SPEC_PORT"] %>
   read: :secondary
   allow_dynamic_fields: false
   parameterize_keys: false
