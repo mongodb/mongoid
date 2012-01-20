@@ -71,13 +71,7 @@ RSpec.configure do |config|
   config.mock_with(:mocha)
 
   config.before(:each) do
-    begin
-      Mongoid.purge!
-    rescue Mongo::OperationFailure => e
-      Mongoid.master.collections.each do |collection|
-        collection.remove if collection.name !~ /system/
-      end
-    end
+    Mongoid.purge!
     Mongoid::IdentityMap.clear
   end
 
