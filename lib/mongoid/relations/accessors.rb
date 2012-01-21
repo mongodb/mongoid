@@ -90,20 +90,19 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def getter(name, metadata)
-          tap do
-            define_method(name) do |*args|
-              reload, variable = args.first, "@#{name}"
-              if instance_variable_defined?(variable) && !reload
-                instance_variable_get(variable)
-              else
-                _building do
-                  _loading do
-                    build(name, attributes[metadata.key], metadata)
-                  end
+          define_method(name) do |*args|
+            reload, variable = args.first, "@#{name}"
+            if instance_variable_defined?(variable) && !reload
+              instance_variable_get(variable)
+            else
+              _building do
+                _loading do
+                  build(name, attributes[metadata.key], metadata)
                 end
               end
             end
           end
+          self
         end
 
         # Defines the setter for the relation. This does a few things based on
@@ -121,16 +120,15 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def setter(name, metadata)
-          tap do
-            define_method("#{name}=") do |object|
-              if relation_exists?(name) || metadata.many? ||
-                (object.blank? && send(name))
-                set_relation(name, send(name).substitute(object.substitutable))
-              else
-                build(name, object.substitutable, metadata)
-              end
+          define_method("#{name}=") do |object|
+            if relation_exists?(name) || metadata.many? ||
+              (object.blank? && send(name))
+              set_relation(name, send(name).substitute(object.substitutable))
+            else
+              build(name, object.substitutable, metadata)
             end
           end
+          self
         end
       end
     end
