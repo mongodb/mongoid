@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
           #
           # @since 2.0.0
           def consumed?
-            !!@consumed
+            @consumed ||= false
           end
 
           # Execute the $pushAll operation on the collection.

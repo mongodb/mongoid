@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if new, false if not.
     def new_record?
-      @new_record == true
+      @new_record ||= false
     end
 
     # Checks if the document has been saved to the database. Returns false
@@ -40,7 +40,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.2
     def flagged_for_destroy?
-      !!@flagged_for_destroy
+      @flagged_for_destroy ||= false
     end
 
     # Returns true if the +Document+ has been succesfully destroyed, and false
@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if destroyed, false if not.
     def destroyed?
-      @destroyed == true
+      @destroyed ||= false
     end
     alias :deleted? :destroyed?
 

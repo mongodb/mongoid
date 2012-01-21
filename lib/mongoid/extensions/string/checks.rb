@@ -28,7 +28,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.2.1
         def unconvertable_to_bson?
-          !!@unconvertable_to_bson
+          @unconvertable_to_bson ||= false
         end
       end
     end

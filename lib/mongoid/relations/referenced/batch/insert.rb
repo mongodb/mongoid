@@ -34,7 +34,7 @@ module Mongoid #:nodoc:
           #
           # @since 2.0.2, batch-relational-insert
           def consumed?
-            !!@consumed
+            @consumed ||= false
           end
 
           # Execute the batch insert operation on the collection.

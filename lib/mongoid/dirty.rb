@@ -96,7 +96,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def previous_changes
-      @previous_changes
+      @previous_changes ||= {}
     end
 
     # Remove a change from the dirty attributes hash. Used by the single field

@@ -737,7 +737,7 @@ describe Mongoid::Dirty do
     context "when the document has not been saved" do
 
       it "returns an empty hash" do
-        person.previous_changes.should be_nil
+        person.previous_changes.should be_empty
       end
     end
   end

@@ -78,7 +78,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def destroyed?
-      @destroyed || !!deleted_at
+      (@destroyed ||= false) || !!deleted_at
     end
 
     # Restores a previously soft-deleted document. Handles this by removing the

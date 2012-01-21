@@ -11,7 +11,7 @@ describe "when initialize a model with an embedded model" do
   end
 
   it "does not have previous_changes in the embedded model" do
-    person.pet.previous_changes.should be_nil
+    person.pet.previous_changes.should be_empty
   end
 end
 

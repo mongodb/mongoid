@@ -160,7 +160,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def versionless?
-      !!@versionless
+      @versionless ||= false
     end
 
     # Filters fields that should not be versioned out of an attributes hash.

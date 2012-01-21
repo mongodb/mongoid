@@ -17,7 +17,7 @@ module Mongoid #:nodoc
     include ActiveModel::Observing
 
     # @attribute [rw] master The master database.
-    attr_accessor :master
+    attr_accessor :master, :reconnect
 
     option :allow_dynamic_fields, :default => true
     option :autocreate_indexes, :default => false
@@ -170,8 +170,8 @@ module Mongoid #:nodoc
         @master, @slaves = configure_databases(@settings) unless @settings.blank?
         raise Errors::InvalidDatabase.new(nil) unless @master
       end
-      if @reconnect
-        @reconnect = false
+      if reconnect
+        self.reconnect = false
         reconnect!
       end
       @master
@@ -191,7 +191,7 @@ module Mongoid #:nodoc
       else
         # We set a @reconnect flag so that #master knows to reconnect the next
         # time the connection is accessed.
-        @reconnect = true
+        self.reconnect = true
       end
     end
 

@@ -205,7 +205,7 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def initialize(target)
           if target.is_a?(Criteria)
-            @added, @loaded, @unloaded = [], [], target
+            @added, @executed, @loaded, @unloaded = [], false, [], target
           else
             @added, @executed, @loaded = [], true, target
           end

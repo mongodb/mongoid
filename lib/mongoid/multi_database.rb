@@ -7,13 +7,7 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
 
-      # Gets the database from the class.
-      #
-      # @example Get the database.
-      #   Model.database
-      #
-      # @return [ Mongo::DB ] The database.
-      def database; @database end
+      attr_reader :database
 
       # Set the database name.
       #
