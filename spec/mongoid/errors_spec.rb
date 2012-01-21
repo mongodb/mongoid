@@ -27,6 +27,20 @@ describe Mongoid::Errors do
           error.message.should include("Document not found")
         end
       end
+
+      context "attributes search" do
+         let(:error) do
+           Mongoid::Errors::DocumentNotFound.new(Person, ssn: "123")
+         end
+
+         it "contains document not found" do
+           error.message.should include("Document not found")
+         end
+
+         it "contains with attributes" do
+           error.message.should include("with attributes")
+         end
+      end
     end
   end
 
