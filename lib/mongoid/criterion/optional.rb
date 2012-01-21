@@ -250,7 +250,7 @@ module Mongoid #:nodoc:
       # @param [ <Symbol> ] field to normalize
       def normalize(name)
         if field = klass.fields[name.to_s]
-          field.normalized_name
+          field.sortable_name
         else
           name
         end
