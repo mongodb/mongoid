@@ -1085,4 +1085,410 @@ describe Mongoid::Persistence do
       end
     end
   end
+
+  context "when a DateTime attribute is updated and persisted" do
+
+    let(:user) do
+      User.create!(:last_login => 2.days.ago).tap do |u|
+        u.last_login = DateTime.now
+      end
+    end
+
+    it "reads for persistance as a UTC Time" do
+      user.changes["last_login"].last.class.should eq(Time)
+    end
+
+    it "persists with no exceptions thrown" do
+      user.save!
+    end
+  end
+
+  context "when a Date attribute is persisted" do
+
+    let(:user) do
+      User.create!(:account_expires => 2.years.from_now).tap do |u|
+        u.account_expires = "2/2/2002".to_date
+      end
+    end
+
+    it "reads for persistance as a UTC Time" do
+      user.changes["account_expires"].last.class.should eq(Time)
+    end
+
+    it "persists with no exceptions thrown" do
+      user.save!
+    end
+  end
+
+  context "when setting floating point numbers" do
+
+    context "when value is an empty string" do
+
+      let(:person) do
+        Person.new(:ssn => "555-55-5555")
+      end
+
+      before do
+        Person.validates_numericality_of :blood_alcohol_content, :allow_blank => true
+      end
+
+      it "does not set the value" do
+        person.save.should be_true
+      end
+    end
+  end
+
+  context "when setting association foreign keys" do
+
+    let(:game) do
+      Game.new
+    end
+
+    let(:person) do
+      Person.create(:ssn => "543-11-9999")
+    end
+
+    context "when value is an empty string" do
+
+      before do
+        game.person_id = ""
+        game.save
+      end
+
+      it "sets the foreign key to empty" do
+        game.reload.person_id.should be_blank
+      end
+    end
+
+    context "when value is a populated string" do
+
+      before do
+        game.person_id = person.id.to_s
+        game.save
+      end
+
+      it "sets the foreign key as ObjectID" do
+        game.reload.person_id.should eq(person.id)
+      end
+    end
+
+    context "when value is a ObjectID" do
+
+      before do
+        game.person_id = person.id
+        game.save
+      end
+
+      it "keeps the the foreign key as ObjectID" do
+        game.reload.person_id.should eq(person.id)
+      end
+    end
+  end
+
+  context "when the document is a subclass of a root class" do
+
+    let!(:browser) do
+      Browser.create(:version => 3, :name => "Test")
+    end
+
+    let(:collection) do
+      Mongoid.master.collection("canvases")
+    end
+
+    let(:attributes) do
+      collection.find({ :name => "Test"}, {}).first
+    end
+
+    it "persists the versions" do
+      attributes["version"].should eq(3)
+    end
+
+    it "persists the type" do
+      attributes["_type"].should eq("Browser")
+    end
+
+    it "persists the attributes" do
+      attributes["name"].should eq("Test")
+    end
+  end
+
+  context "when the document is a subclass of a subclass" do
+
+    let!(:firefox) do
+      Firefox.create(:version => 2, :name => "Testy")
+    end
+
+    let(:collection) do
+      Mongoid.master.collection("canvases")
+    end
+
+    let(:attributes) do
+      collection.find({ :name => "Testy"}, {}).first
+    end
+
+    before do
+      Browser.create(:name => 'Safari', :version => '4.0.0')
+    end
+
+    it "persists the versions" do
+      attributes["version"].should eq(2)
+    end
+
+    it "persists the type" do
+      attributes["_type"].should eq("Firefox")
+    end
+
+    it "persists the attributes" do
+      attributes["name"].should eq("Testy")
+    end
+
+    it "returns the document when querying for superclass" do
+      Browser.where(:name => "Testy").first.should eq(firefox)
+    end
+
+    it "returns the document when querying for root class" do
+      Canvas.where(:name => "Testy").first.should eq(firefox)
+    end
+
+    it 'returnss on of this subclasses if you find by _type' do
+      Canvas.where(:_type.in => ['Firefox']).count.should eq(1)
+    end
+  end
+
+  context "when the document has associations" do
+
+    let!(:firefox) do
+      Firefox.create(:name => "firefox")
+    end
+
+    let!(:writer) do
+      HtmlWriter.new(:speed => 100)
+    end
+
+    let!(:circle) do
+      Circle.new(:radius => 50)
+    end
+
+    let!(:square) do
+      Square.new(:width => 300, :height => 150)
+    end
+
+    let(:from_db) do
+      Firefox.find(firefox.id)
+    end
+
+    before do
+      firefox.writer = writer
+      firefox.shapes << [ circle, square ]
+      firefox.save!
+    end
+
+    it "properly persists the one-to-one type" do
+      from_db.should be_a_kind_of(Firefox)
+    end
+
+    it "properly persists the one-to-one relations" do
+      from_db.writer.should eq(writer)
+    end
+
+    it "properly persists the one-to-many type" do
+      from_db.shapes.first.should eq(circle)
+    end
+
+    it "properly persists the one-to-many relations" do
+      from_db.shapes.last.should eq(square)
+    end
+
+    it "properly sets up the parent relation" do
+      from_db.shapes.first.should eq(circle)
+    end
+
+    it "properly sets up the entire hierarchy" do
+      from_db.shapes.first.canvas.should eq(firefox)
+    end
+  end
+
+  context "when the document is subclassed" do
+
+    let!(:firefox) do
+      Firefox.create(:name => "firefox")
+    end
+
+    it "finds the document with String args" do
+      Firefox.find(firefox.id.to_s).should eq(firefox)
+    end
+
+    context "when querying for parent documents" do
+
+      let(:canvas) do
+        Canvas.where(:name => "firefox").first
+      end
+
+      it "returns matching subclasses" do
+        canvas.should eq(firefox)
+      end
+    end
+  end
+
+  context "when deleting subclasses" do
+
+    let!(:firefox) do
+      Firefox.create(:name => "firefox")
+    end
+
+    let!(:firefox2) do
+      Firefox.create(:name => "firefox 2")
+    end
+
+    let!(:browser) do
+      Browser.create(:name => "browser")
+    end
+
+    let!(:canvas) do
+      Canvas.create(:name => "canvas")
+    end
+
+    context "when deleting a single document" do
+
+      before do
+        firefox.delete
+      end
+
+      it "deletes from the parent class collection" do
+        Canvas.count.should eq(3)
+      end
+
+      it "returns correct counts for child classes" do
+        Firefox.count.should eq(1)
+      end
+
+      it "returns correct counts for root subclasses" do
+        Browser.count.should eq(2)
+      end
+    end
+
+    context "when deleting all documents" do
+
+      before do
+        Firefox.delete_all
+      end
+
+      it "deletes from the parent class collection" do
+        Canvas.count.should eq(2)
+      end
+
+      it "returns correct counts for child classes" do
+        Firefox.count.should eq(0)
+      end
+
+      it "returns correct counts for root subclasses" do
+        Browser.count.should eq(1)
+      end
+    end
+  end
+
+  context "when document is a subclass and its parent is an embedded document" do
+
+    let!(:canvas) do
+      Canvas.create(:name => "canvas")
+    end
+
+    before do
+      canvas.create_palette
+      canvas.palette.tools << Pencil.new
+      canvas.palette.tools << Eraser.new
+    end
+
+    let(:from_db) do
+      Canvas.find(canvas.id)
+    end
+
+    it "properly saves the subclasses" do
+      from_db.palette.tools.map(&:class).should eq([Pencil, Eraser])
+    end
+  end
+
+  context "Creating references_many documents from a parent association" do
+
+    let!(:container) do
+      ShippingContainer.create
+    end
+
+    context "when appending new documents" do
+
+      before do
+        container.vehicles << Car.new
+        container.vehicles << Truck.new
+      end
+
+      it "allows STI from << using model.new" do
+        container.vehicles.map(&:class).should eq([ Car, Truck ])
+      end
+    end
+
+    context "when appending persisted documents" do
+
+      before do
+        container.vehicles << Car.create
+        container.vehicles << Truck.create
+      end
+
+      it "allows STI from << using model.create" do
+        container.vehicles.map(&:class).should eq([ Car, Truck ])
+      end
+    end
+
+    context "when building related documents" do
+
+      before do
+        container.vehicles.build({}, Car).save
+        container.vehicles.build({}, Truck).save
+      end
+
+      it "allows STI from the build call" do
+        container.vehicles.map(&:class).should eq([ Car, Truck ])
+      end
+    end
+
+    context "when building with a type attribute" do
+
+      before do
+        container.vehicles.build({ "_type" => "Car" })
+        container.vehicles.build({ "_type" => "Truck" })
+      end
+
+      it "respects the _type attribute from the build call" do
+        container.vehicles.map(&:class).should eq([ Car, Truck ])
+      end
+    end
+
+    context "when creating related documents" do
+
+      before do
+        container.vehicles.create({}, Car)
+        container.vehicles.create({}, Truck)
+      end
+
+      it "allows STI from the create call" do
+        container.vehicles.map(&:class).should eq([ Car, Truck ])
+      end
+    end
+
+    context "when creating with a type attribute" do
+
+      before do
+        container.vehicles.create({ "_type" => "Car" })
+        container.vehicles.create({ "_type" => "Truck" })
+      end
+
+      it "respects the _type attribute from the create call" do
+        container.vehicles.map(&:class).should eq([ Car, Truck ])
+      end
+    end
+
+    it "does not bleed relations from one subclass to another" do
+      Truck.relations.keys.should =~ %w/ shipping_container driver bed /
+      Car.relations.keys.should =~ %w/ shipping_container driver /
+    end
+  end
 end

@@ -26,8 +26,11 @@ describe Mongoid::Finders do
 
   describe ".excludes" do
 
+    let(:criteria) do
+      Person.excludes(:title => "Sir")
+    end
+
     it "returns a new criteria with select conditions added" do
-      criteria = Person.excludes(:title => "Sir")
       criteria.selector.should eq({ :title => { "$ne" => "Sir" } })
     end
   end
