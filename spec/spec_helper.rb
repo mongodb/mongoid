@@ -70,10 +70,7 @@ RSpec.configure do |config|
   config.mock_with(:mocha)
 
   config.before(:each) do
-    begin
-      Mongoid.purge!
-    rescue Exception => e
-    end
+    Mongoid.purge!
     Mongoid::IdentityMap.clear
   end
 
