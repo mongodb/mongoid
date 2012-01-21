@@ -7,6 +7,16 @@ module Mongoid #:nodoc:
       class Localized
         include Serializable
 
+        # Sort by a field value in the current locale
+        def sortable_name
+          selectable_name.to_sym
+        end
+
+        # Select by a field value in the current locale
+        def selectable_name
+          "#{name}.#{::I18n.locale}"
+        end
+
         # Deserialize the object based on the current locale. Will look in the
         # hash for the current locale.
         #
@@ -53,8 +63,8 @@ module Mongoid #:nodoc:
         # @return [ Hash ] The locale with string translation.
         #
         # @since 2.3.0
-        def serialize(object)
-          { ::I18n.locale.to_s => object.try(:to_s) }
+        def serialize(object, previous={})
+          previous.merge ::I18n.locale.to_s => object.try(:to_s)
         end
       end
     end

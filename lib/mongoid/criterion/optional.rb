@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
       def ascending(*fields)
         clone.tap do |crit|
           setup_sort_options(crit.options) unless fields.first.nil?
-          fields.flatten.each { |field| merge_options(crit.options[:sort], [ localize(field), :asc ]) }
+          fields.flatten.each { |field| merge_options(crit.options[:sort], [ normalize(field), :asc ]) }
         end
       end
       alias :asc :ascending
@@ -57,7 +57,7 @@ module Mongoid #:nodoc:
       def descending(*fields)
         clone.tap do |crit|
           setup_sort_options(crit.options) unless fields.first.nil?
-          fields.flatten.each { |field| merge_options(crit.options[:sort], [ localize(field), :desc ]) }
+          fields.flatten.each { |field| merge_options(crit.options[:sort], [ normalize(field), :desc ]) }
         end
       end
       alias :desc :descending
@@ -199,12 +199,12 @@ module Mongoid #:nodoc:
                 "due to the fact that hash doesn't have order this may cause unpredictable results"
           end
           arguments.each_pair do |field, direction|
-            merge_options(crit.options[:sort], [ localize(field), direction ])
+            merge_options(crit.options[:sort], [ normalize(field), direction ])
           end
         when Array
-          merge_options(crit.options[:sort], arguments.map{ |field| localize(field) })
+          merge_options(crit.options[:sort], arguments.map{ |field| normalize(field) })
         when Complex
-          merge_options(crit.options[:sort], [ localize(arguments.key), arguments.operator.to_sym ])
+          merge_options(crit.options[:sort], [ normalize(arguments.key), arguments.operator.to_sym ])
         end
       end
 
@@ -242,18 +242,22 @@ module Mongoid #:nodoc:
         options[:sort] = options[:sort] ? options[:sort].dup : []
       end
 
-      # Check if field is localized and return localized version if it is.
+      # Check if field is normalized and return normalized version if it is.
       #
-      # @example localize
-      #   criteria.localize(:description)
+      # @example normalize
+      #   criteria.normalize(:description)
       #
-      # @param [ <Symbol> ] field to localize
-      def localize(field)
-        if klass.fields[field.to_s].try(:localized?)
-          field = "#{field}.#{::I18n.locale}".to_sym
+      # @param [ <Symbol> ] field to normalize
+      def normalize(name)
+        if field = klass.fields[name.to_s]
+          field.sortable_name
+        else
+          name
         end
-        field
       end
+      alias_method :localize, :normalize # for backwards compatibility
+                                         # because this is a public method
+
     end
   end
 end

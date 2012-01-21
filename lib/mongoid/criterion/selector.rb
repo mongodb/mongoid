@@ -31,7 +31,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def []=(key, value)
-        key = "#{key}.#{::I18n.locale}" if klass.fields[key.to_s].try(:localized?)
+        if field = klass.fields[key.to_s]
+          key = field.selectable_name
+        end
+
         super(key, try_to_typecast(key, value))
       end
 

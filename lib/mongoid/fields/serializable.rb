@@ -32,6 +32,14 @@ module Mongoid #:nodoc:
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :localize, :name, :options
 
+      # A name for sorting, some fields may customize this. See Internal::Localized for example.
+      def sortable_name
+        name.to_sym
+      end
+
+      # A name for Criterion::Selector, similar to #sortable_name
+      alias_method :selectable_name, :name
+
       # Get the constraint from the metadata once.
       #
       # @example Get the constraint.
