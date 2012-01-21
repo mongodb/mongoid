@@ -27,10 +27,9 @@ describe Mongoid::Config do
     described_class.logger = nil
   end
 
-  after(:all) do
+  after do
     Mongoid.configure do |config|
-      name          = "mongoid_test"
-      config.master = Mongo::Connection.new(HOST, PORT).db(name)
+      config.master = Mongo::Connection.new(HOST, PORT).db(database_id)
       config.logger = nil
     end
   end
@@ -310,7 +309,7 @@ describe Mongoid::Config do
     context "when a database was set" do
 
       it "returns the database" do
-        described_class.master.name.should eq("mongoid_config_test")
+        described_class.master.name.should eq(database_id)
       end
     end
   end
