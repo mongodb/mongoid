@@ -6,6 +6,12 @@ describe Mongoid::Extensions::String::Inflections do
 
     context "when class is namepaced" do
 
+      module Medical
+        class Patient
+          include Mongoid::Document
+        end
+      end
+
       it "returns an underscored tableized name" do
         Medical::Patient.name.collectionize.should eq("medical_patients")
       end

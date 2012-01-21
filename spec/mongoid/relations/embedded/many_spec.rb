@@ -336,6 +336,28 @@ describe Mongoid::Relations::Embedded::Many do
 
     context "when the relation has an unusual name" do
 
+      module MyCompany
+        module Model
+          class TrackingId
+            include Mongoid::Document
+            include Mongoid::Timestamps
+            store_in :tracking_ids
+            embeds_many \
+              :validation_history,
+              :class_name => "MyCompany::Model::TrackingIdValidationHistory"
+          end
+
+          class TrackingIdValidationHistory
+            include Mongoid::Document
+            field :old_state, :type => String
+            field :new_state, :type => String
+            field :when_changed, :type => DateTime
+            attr_protected :_id
+            embedded_in :tracking_id, :class_name => "MyCompany::Model::TrackingId"
+          end
+        end
+      end
+
       let(:tracking_id) do
         MyCompany::Model::TrackingId.create
       end

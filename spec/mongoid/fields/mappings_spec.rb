@@ -228,6 +228,16 @@ describe Mongoid::Fields::Mappings do
 
       context "with a module" do
 
+        module Custom
+          class Type
+            include Mongoid::Fields::Serializable
+          end
+
+          class String
+            include Mongoid::Fields::Serializable
+          end
+        end
+
         context "and a class not matching a defined serializable" do
 
           let(:klass) do
@@ -251,6 +261,14 @@ describe Mongoid::Fields::Mappings do
         end
 
         context "inside the Mongoid namespace" do
+
+          module Mongoid
+            module MyExtension
+              class Object
+                include Mongoid::Fields::Serializable
+              end
+            end
+          end
 
           let(:klass) do
             Mongoid::MyExtension::Object

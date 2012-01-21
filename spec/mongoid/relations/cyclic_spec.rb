@@ -44,6 +44,19 @@ describe Mongoid::Relations::Cyclic do
 
     context "when the document is namespaced" do
 
+      module Trees
+        class Node
+          include Mongoid::Document
+          recursively_embeds_many
+
+          field :name, :type => String
+
+          def is_root?
+            parent_node.nil?
+          end
+        end
+      end
+
       let(:document) do
         Trees::Node.new
       end
