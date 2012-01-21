@@ -11,7 +11,7 @@ describe Mongoid::Contexts do
     context "when criteria is for a top-level document" do
 
       let(:context) do
-        Mongoid::Contexts.context_for(criteria)
+        described_class.context_for(criteria)
       end
 
       it "creates a Mongo context" do
@@ -22,7 +22,7 @@ describe Mongoid::Contexts do
     context "when criteria is for an embedded document" do
 
       let(:context) do
-        Mongoid::Contexts.context_for(criteria, true)
+        described_class.context_for(criteria, true)
       end
 
       it "creates an Enumerable context" do

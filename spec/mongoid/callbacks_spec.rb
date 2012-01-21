@@ -117,10 +117,10 @@ describe Mongoid::Callbacks do
 
       before do
         artist.expects(:before_create_stub).returns(true)
+        artist.save
       end
 
       it "gets saved" do
-        artist.save.should be_true
         artist.persisted?.should be_true
       end
     end
@@ -129,10 +129,10 @@ describe Mongoid::Callbacks do
 
       before do
         artist.expects(:before_create_stub).returns(false)
+        artist.save
       end
 
       it "does not get saved" do
-        artist.save.should be_false
         artist.persisted?.should be_false
       end
     end
@@ -150,22 +150,24 @@ describe Mongoid::Callbacks do
         artist.delete
       end
 
-      context "callback returns true" do
+      context "when the callback returns true" do
+
         before do
           artist.expects(:before_save_stub).returns(true)
         end
 
-        it "returns true" do
+        it "the save returns true" do
           artist.save.should be_true
         end
       end
 
-      context "callback returns false" do
+      context "when callback returns false" do
+
         before do
           artist.expects(:before_save_stub).returns(false)
         end
 
-        it "returns false" do
+        it "the save returns false" do
           artist.save.should be_false
         end
       end
@@ -183,22 +185,24 @@ describe Mongoid::Callbacks do
         artist.delete
       end
 
-      context "callback returns true" do
+      context "when the callback returns true" do
+
         before do
           artist.expects(:before_save_stub).returns(true)
         end
 
-        it "returns true" do
+        it "the save returns true" do
           artist.save.should be_true
         end
       end
 
-      context "callback returns false" do
+      context "when the callback returns false" do
+
         before do
           artist.expects(:before_save_stub).returns(false)
         end
 
-        it "returns false" do
+        it "the save returns false" do
           artist.save.should be_false
         end
       end
@@ -219,24 +223,24 @@ describe Mongoid::Callbacks do
       artist.delete
     end
 
-    context "callback returns true" do
+    context "when the callback returns true" do
 
       before do
         artist.expects(:before_destroy_stub).returns(true)
       end
 
-      it "returns true" do
+      it "the destroy returns true" do
         artist.destroy.should be_true
       end
     end
 
-    context "callback returns false" do
+    context "when the callback returns false" do
 
       before do
         artist.expects(:before_destroy_stub).returns(false)
       end
 
-      it "returns false" do
+      it "the destroy returns false" do
         artist.destroy.should be_false
       end
     end

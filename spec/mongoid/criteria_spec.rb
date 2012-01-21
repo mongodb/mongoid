@@ -7,11 +7,11 @@ describe Mongoid::Criteria do
     context "when the other object is a Criteria" do
 
       let(:other) do
-        Mongoid::Criteria.allocate
+        described_class.allocate
       end
 
       it "returns true" do
-        (Mongoid::Criteria === other).should be_true
+        (described_class === other).should be_true
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns false" do
-        (Mongoid::Criteria === other).should be_false
+        (described_class === other).should be_false
       end
     end
   end
@@ -147,7 +147,7 @@ describe Mongoid::Criteria do
   describe "#fuse" do
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person)
+      described_class.new(Person)
     end
 
     context "when providing a selector" do
@@ -180,7 +180,7 @@ describe Mongoid::Criteria do
   describe "#initialize" do
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person)
+      described_class.new(Person)
     end
 
     it "sets the selector to an empty hash" do
@@ -203,7 +203,7 @@ describe Mongoid::Criteria do
   describe "#merge" do
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person)
+      described_class.new(Person)
     end
 
     before do
@@ -247,7 +247,7 @@ describe Mongoid::Criteria do
       context "when the other has no selector or options" do
 
         let(:other) do
-          Mongoid::Criteria.new(Person)
+          described_class.new(Person)
         end
 
         let(:selector) do
@@ -259,7 +259,7 @@ describe Mongoid::Criteria do
         end
 
         let(:new_criteria) do
-          Mongoid::Criteria.new(Person)
+          described_class.new(Person)
         end
 
         let(:merged) do
@@ -283,7 +283,7 @@ describe Mongoid::Criteria do
       context "when the other has a document collection" do
 
         let(:other) do
-          Mongoid::Criteria.new(Person)
+          described_class.new(Person)
         end
 
         let(:documents) do
@@ -373,7 +373,7 @@ describe Mongoid::Criteria do
   describe "#method_missing" do
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person)
+      described_class.new(Person)
     end
 
     let(:new_criteria) do
@@ -462,43 +462,76 @@ describe Mongoid::Criteria do
   describe "#respond_to?" do
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person)
+      described_class.new(Person)
     end
 
     before do
       Person.stubs(:ages => [])
     end
 
-    it "is true when asking about a model's class method" do
-      criteria.respond_to?(:ages).should be_true
+    context "when asking about a model public class method" do
+
+      it "returns true" do
+        criteria.respond_to?(:ages).should be_true
+      end
     end
 
-    it "is false when asking about a model's private class method even when including private methods" do
-      criteria.respond_to?(:alias_method, true).should be_false
+    context "when asking about a model private class method" do
+
+      context "when including private methods" do
+
+        it "returns true" do
+          criteria.respond_to?(:alias_method, true).should be_false
+        end
+      end
     end
 
-    it "is true when asking about a criteria's entries' instance method" do
-      criteria.respond_to?(:join).should be_true
+    context "when asking about a model class public instance method" do
+
+      it "returns true" do
+        criteria.respond_to?(:join).should be_true
+      end
     end
 
-    it "is false when asking about a criteria's entries' private instance methods without including private methods" do
-      criteria.respond_to?(:fork).should be_false
+    context "when asking about a model private instance method" do
+
+      context "when not including private methods" do
+
+        it "returns false" do
+          criteria.respond_to?(:fork).should be_false
+        end
+      end
+
+      context "when including private methods" do
+
+        it "returns true" do
+          criteria.respond_to?(:fork, true).should be_true
+        end
+      end
     end
 
-    it "is false when asking about a criteria's entries' private instance methods when including private methods" do
-      criteria.respond_to?(:fork, true).should be_true
+    context "when asking about a criteria instance method" do
+
+      it "returns true" do
+        criteria.respond_to?(:context).should be_true
+      end
     end
 
-    it "is true when asking about a criteria instance method" do
-      criteria.respond_to?(:context).should be_true
-    end
+    context "when asking about a private criteria instance method" do
 
-    it "is false when asking about a private criteria instance method without including private methods" do
-      criteria.respond_to?(:puts).should be_false
-    end
+      context "when not including private methods" do
 
-    it "is true when asking about a private criteria instance method when including private methods" do
-      criteria.respond_to?(:puts, true).should be_true
+        it "returns false" do
+          criteria.respond_to?(:puts).should be_false
+        end
+      end
+
+      context "when including private methods" do
+
+        it "returns true" do
+          criteria.respond_to?(:puts, true).should be_true
+        end
+      end
     end
   end
 
@@ -544,7 +577,7 @@ describe Mongoid::Criteria do
   context "when chaining criteria after an initial execute" do
 
     let(:criteria) do
-      Mongoid::Criteria.new(Person)
+      described_class.new(Person)
     end
 
     it 'nots carry scope to cloned criteria' do

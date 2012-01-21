@@ -34,20 +34,26 @@ describe Mongoid::Collections do
 
     context "on a parent class" do
 
-      it "sets the collection name on the document class" do
+      before do
         Patient.collection_name = "pats"
+      end
+
+      it "sets the collection name on the document class" do
         Patient.collection_name.should eq("pats")
       end
     end
 
     context "on a subclass" do
 
+      before do
+        Firefox.collection_name = "browsers"
+      end
+
       after do
         Canvas.collection_name = "canvases"
       end
 
       it "sets the collection name for the entire hierarchy" do
-        Firefox.collection_name = "browsers"
         Canvas.collection_name.should eq("browsers")
       end
     end
