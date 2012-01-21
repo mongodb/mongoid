@@ -2,57 +2,50 @@ require "spec_helper"
 
 describe Mongoid::Criterion::Selector do
 
-  let(:field) do
-    stub(:type => Integer, :localized? => false)
-  end
-
-  let(:klass) do
-    Class.new
-  end
-
   let(:selector) do
-    Mongoid::Criterion::Selector.new(klass)
+    described_class.new(Person)
   end
 
   describe "#initialize" do
 
-    let(:klass) do
-      stub
-    end
-
-    before do
-      klass.stubs(:fields).returns({})
-      klass.stubs(:aliased_fields).returns({})
-    end
-
     it "stores the class" do
-      Mongoid::Criterion::Selector.new(klass).klass.should eq(klass)
+      described_class.new(Person).klass.should eq(Person)
     end
   end
 
   describe "#[]=" do
 
-    it "stores the values provided" do
-      klass.stubs(:fields).returns({})
-      klass.stubs(:aliased_fields).returns({})
-      selector["age"] = 45
-      selector["age"].should eq(45)
+    context "when providing the correct type" do
+
+      before do
+        selector["age"] = 45
+      end
+
+      it "stores the provided value" do
+        selector["age"].should eq(45)
+      end
     end
 
-    it "typecasts values when possible" do
-      klass.stubs(:fields).returns({"age" => field})
-      klass.stubs(:aliased_fields).returns({})
-      field.expects(:selection).with("45").returns(45)
-      selector["age"] = "45"
-      selector["age"].should eq(45)
+    context "when providing a typecastable value" do
+
+      before do
+        selector["age"] = "45"
+      end
+
+      it "typecasts the provided values" do
+        selector["age"].should eq(45)
+      end
     end
 
-    it "typecasts complex conditions" do
-      klass.stubs(:fields).returns({"age" => field})
-      klass.stubs(:aliased_fields).returns({})
-      field.expects(:selection).with("45").returns(45)
-      selector["age"] = { "$gt" => "45" }
-      selector["age"].should eq({ "$gt" => 45 })
+    context "when providing a complex criterion" do
+
+      before do
+        selector["age"] = { "$gt" => "45" }
+      end
+
+      it "casts the values in the criterion" do
+        selector["age"].should eq({ "$gt" => 45 })
+      end
     end
 
     context "when the field is localized" do
@@ -90,54 +83,63 @@ describe Mongoid::Criterion::Selector do
     end
   end
 
-  describe "#update" do
-    it "typecasts values when possible" do
-      klass.stubs(:fields).returns({"age" => field})
-      klass.stubs(:aliased_fields).returns({})
-      field.expects(:selection).with("45").returns(45)
-      selector.update({"age" => "45"})
-      selector["age"].should eq(45)
-    end
-  end
+  [ :merge!, :update ].each do |method|
 
-  describe "#merge!" do
-    it "typecasts values when possible" do
-      klass.stubs(:fields).returns({"age" => field})
-      klass.stubs(:aliased_fields).returns({})
-      field.expects(:selection).with("45").returns(45)
-      selector.merge!({"age" => "45"})
-      selector["age"].should eq(45)
+    describe "##{method}" do
+
+      context "when providing the correct type" do
+
+        before do
+          selector.send(method, { "age" => 45 })
+        end
+
+        it "stores the provided value" do
+          selector["age"].should eq(45)
+        end
+      end
+
+      context "when providing a typecastable value" do
+
+        before do
+          selector.send(method, { "age" => "45" })
+        end
+
+        it "typecasts the provided values" do
+          selector["age"].should eq(45)
+        end
+      end
     end
   end
 
   describe "#try_to_typecast" do
+
     context "when the key is $or or $and" do
+
       let(:value) { { "age" => "45"  } }
 
-      before do
-        klass.stubs(:fields).returns({})
-        klass.stubs(:aliased_fields).returns({})
-      end
-
       context "when the value is not an array" do
+
         it "returns the value" do
-          selector.expects(:typecast_value_for).with(field, value["age"]).never
           selector.send(:try_to_typecast, "$or", value).should eq(value)
         end
       end
 
       context "when the value is an array containing hashes" do
+
         context "when the keys are not declared" do
+
+          let(:value) do
+            { "new_age" => "45" }
+          end
+
           it "returns the array" do
-            selector.expects(:typecast_value_for).with(field, value["time"]).never
             selector.send(:try_to_typecast, "$or", [value]).should eq([value])
           end
         end
 
         context "when the keys are declared" do
+
           it "returns the typecasted array" do
-            klass.stubs(:fields).returns({"age" => field})
-            field.expects(:selection).with("45").returns(45).once
             selector.send(:try_to_typecast, "$or", [value]).should eq(["age" => 45])
           end
         end
@@ -145,57 +147,56 @@ describe Mongoid::Criterion::Selector do
     end
 
     context "when the key is not a declared field" do
+
       it "returns the value" do
-        klass.stubs(:fields).returns({})
-        klass.stubs(:aliased_fields).returns({})
-        selector.send(:try_to_typecast, "age", "45").should eq("45")
+        selector.send(:try_to_typecast, "new_age", "45").should eq("45")
       end
     end
 
     context "when the key is a declared field" do
+
       it "returns the typecast value" do
-        field = stub_everything
-        klass.stubs(:fields).returns({"age" => field})
-        klass.stubs(:aliased_fields).returns({})
-        selector.expects(:typecast_value_for).with(field, "45")
-        selector.send(:try_to_typecast, "age", "45")
+        selector.send(:try_to_typecast, "age", "45").should eq(45)
       end
     end
   end
 
   describe "#proper_and_or_value" do
-    before do
-      klass.stubs(:fields).returns({})
-      klass.stubs(:aliased_fields).returns({})
-    end
 
     context "when the key is not $or or $and" do
+
       it "returns false" do
         selector.send(:proper_and_or_value?, "fubar", nil).should be_false
       end
     end
 
     context "when the key is $or or $and" do
+
       context "when the value is not an array" do
+
         it "returns false" do
           selector.send(:proper_and_or_value?, "$or", nil).should be_false
         end
       end
 
       context "when the value is an array" do
+
         context "when the entries are no hashes" do
+
           it "returns false" do
             selector.send(:proper_and_or_value?, "$or", [nil]).should be_false
           end
         end
 
         context "when the array is empty" do
+
           it "returns true" do
             selector.send(:proper_and_or_value?, "$or", []).should be_true
           end
         end
 
         context "when the entries are hashes" do
+
           it "returns true" do
             selector.send(:proper_and_or_value?, "$or", [{}]).should be_true
           end
@@ -205,17 +206,9 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#handle_and_or_value" do
-    before do
-      klass.stubs(:fields).returns({})
-      klass.stubs(:aliased_fields).returns({})
-      selector.expects(:try_to_typecast).with("age", "45").once.returns("45")
-      selector.expects(:try_to_typecast).with("title", "Chief Visionary").once.returns("Chief Visionary")
-    end
 
-    let(:values) { [{ "age" => "45", "title" => "Chief Visionary" }] }
-
-    it "tries to typecast every entry" do
-      selector.send(:handle_and_or_value, values)
+    let(:values) do
+      [{ "age" => 45, "title" => "Chief Visionary" }]
     end
 
     it "preserves the structure" do
@@ -224,8 +217,6 @@ describe Mongoid::Criterion::Selector do
   end
 
   describe "#typecast_value_for" do
-    let(:field) { stub(:type => Integer) }
-    let(:selector) { Mongoid::Criterion::Selector.allocate }
 
     context "when the value is a range" do
 
@@ -255,44 +246,59 @@ describe Mongoid::Criterion::Selector do
     end
 
     context "when the value is simple" do
-      it "delegates to the field to typecast" do
-        field.expects(:selection).with("45")
-        selector.send(:typecast_value_for, field, "45")
+
+      let(:field) do
+        Person.fields["age"]
       end
 
-      context "when the field is an array" do
+      it "delegates to the field to typecast" do
+        selector.send(:typecast_value_for, field, "45").should eq(45)
+      end
+    end
 
-        let(:field) { stub(:type => Array) }
+    context "when the field is an array" do
 
-        it "allows the simple value to be set" do
-          Mongoid::Serialization.expects(:mongoize).with("007", String)
-          selector.send(:typecast_value_for, field, "007")
-        end
+      let(:field) do
+        Person.fields["aliases"]
+      end
+
+      it "allows the simple value to be set" do
+        selector.send(:typecast_value_for, field, "007").should eq("007")
       end
     end
 
     context "when the value is a regex" do
+
+      let(:field) do
+        Person.fields["age"]
+      end
+
       it "returns the regex unmodified" do
-        field.expects(:selection).never
-        selector.send(:typecast_value_for, field, /Regex/)
+        selector.send(:typecast_value_for, field, /Regex/).should eq(/Regex/)
       end
     end
 
     context "when the value is an array" do
 
       context "and the field type is array" do
+
+        let(:field) do
+          Person.fields["aliases"]
+        end
+
         it "lets the field typecast the value" do
-          field.stubs(:type).returns(Array)
-          field.expects(:selection).with([]).once
-          selector.send(:typecast_value_for, field, [])
+          selector.send(:typecast_value_for, field, []).should eq([])
         end
       end
 
       context "and the field type is not array" do
+
+        let(:field) do
+          Person.fields["age"]
+        end
+
         it "typecasts each value" do
-          field.stubs(:type).returns(Integer)
-          field.expects(:selection).twice
-          selector.send(:typecast_value_for, field, ["1", "2"])
+          selector.send(:typecast_value_for, field, ["1", "2"]).should eq([ 1, 2 ])
         end
       end
     end
@@ -300,53 +306,86 @@ describe Mongoid::Criterion::Selector do
     context "when the value is a hash" do
 
       context "and the field type is not hash" do
-        before { field.stubs(:type => Integer) }
+
+        let(:field) do
+          Person.fields["age"]
+        end
+
+        let(:value) do
+          {}
+        end
 
         it "does not modify the original value" do
-          value = {}
-          value.expects(:dup).returns({})
-          selector.send(:typecast_value_for, field, value)
+          selector.send(:typecast_value_for, field, value).should_not equal(value)
         end
 
         context "when the hash is an $exists query" do
 
-          it "does not typecast the hash" do
-            value = {"$exists" => true}
-            field.expects(:selection).never
-            selector.send(:typecast_value_for, field, value)
+          context "when the value is already cast" do
+
+            let(:value) do
+              { "$exists" => true }
+            end
+
+            it "does not typecast the hash" do
+              selector.send(:typecast_value_for, field, value).should eq(value)
+            end
           end
 
-          it "typecasts the value" do
-            value = {"$exists" => "true"}
-            Mongoid::Serialization.expects(:mongoize).with("true", Boolean)
-            selector.send(:typecast_value_for, field, value)
+          context "when the value can be cast" do
+
+            let(:value) do
+              { "$exists" => "true" }
+            end
+
+            it "typecasts the value" do
+              selector.send(:typecast_value_for, field, value).should eq(
+                { "$exists" => true }
+              )
+            end
           end
         end
 
         context "when the hash is a $size query" do
 
-          it "does not typecast the hash" do
-            value = {"$size" => 2}
-            field.expects(:selection).never
-            selector.send(:typecast_value_for, field, value)
+          context "when the value is already cast" do
+
+            let(:value) do
+              { "$size" => 2 }
+            end
+
+            it "does not typecast the hash" do
+              selector.send(:typecast_value_for, field, value).should eq(value)
+            end
           end
 
-          it "typecasts the value" do
-            value = {"$size" => "2"}
-            Mongoid::Serialization.expects(:mongoize).with("2", Integer)
-            selector.send(:typecast_value_for, field, value)
+          context "when the value can be cast" do
+
+            let(:value) do
+              { "$size" => "2" }
+            end
+
+            it "typecasts the value" do
+              selector.send(:typecast_value_for, field, value).should eq(
+                { "$size" => 2 }
+              )
+            end
           end
         end
       end
 
       context "and the field type is a hash" do
 
-        before { field.stubs(:type => Hash) }
+        let(:field) do
+          Person.fields["map"]
+        end
+
+        let(:value) do
+          { "name" => "John" }
+        end
 
         it "lets the field typecast the value" do
-          value = { "name" => "John" }
-          field.expects(:selection).with(value).once
-          selector.send(:typecast_value_for, field, value)
+          selector.send(:typecast_value_for, field, value).should eq(value)
         end
       end
     end

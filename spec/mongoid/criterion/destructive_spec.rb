@@ -16,7 +16,6 @@ describe Mongoid::Criteria do
 
   before do
     Person.create(:title => "Madam")
-
     2.times do |n|
       Person.create(
         :title => "Sir",

@@ -18,8 +18,12 @@ describe Mongoid::Criterion::Complex do
   end
 
   describe "#to_mongo_query" do
+
     it "creates a query" do
       complex.to_mongo_query(5).should eq({ "$gt" => 5})
+    end
+
+    it "sets the operator" do
       complex.operator.should eq("gt")
     end
   end

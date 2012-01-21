@@ -69,7 +69,9 @@ describe Mongoid::Criterion::Optional do
     end
 
     context "when chained" do
+
       context "before another order on this field" do
+
         let(:criteria) do
           base.ascending(:title).order_by(:title.desc)
         end
@@ -80,6 +82,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       context "after another order on this field" do
+
         let(:criteria) do
           base.order_by(:title.desc).ascending(:title)
         end
@@ -154,6 +157,7 @@ describe Mongoid::Criterion::Optional do
   end
 
   context "when chaining sort criteria" do
+
     let(:original) do
       base.desc(:title)
     end
@@ -270,7 +274,9 @@ describe Mongoid::Criterion::Optional do
     end
 
     context "when chained" do
+
       context "before another order on this field" do
+
         let(:criteria) do
           base.descending(:title).order_by(:title.asc)
         end
@@ -281,6 +287,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       context "after another order on this field" do
+
         let(:criteria) do
           base.order_by(:title.asc).descending(:title)
         end
@@ -319,7 +326,8 @@ describe Mongoid::Criterion::Optional do
 
   describe "#extras" do
 
-    context "filtering" do
+    context "when applying filtering" do
+
       context "when extras are provided" do
 
         let(:criteria) do
@@ -677,6 +685,7 @@ describe Mongoid::Criterion::Optional do
     end
 
     context "when chained with mixed defenitions" do
+
       let(:criteria) do
         base.order_by(:title => :asc).order_by([ {:text => :desc}, :title.desc ])
       end

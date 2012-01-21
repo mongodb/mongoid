@@ -47,6 +47,5 @@ describe Mongoid::Criterion::Builder do
         criteria.build(:name => "Lancelot")
       end
     end
-
   end
 end
