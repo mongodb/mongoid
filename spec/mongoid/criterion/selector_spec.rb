@@ -40,6 +40,7 @@ describe Mongoid::Criterion::Selector do
     end
 
     it "typecasts values when possible" do
+      field.stubs(:selectable_name).returns("age")
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -48,6 +49,7 @@ describe Mongoid::Criterion::Selector do
     end
 
     it "typecasts complex conditions" do
+      field.stubs(:selectable_name).returns("age")
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -92,6 +94,7 @@ describe Mongoid::Criterion::Selector do
 
   describe "#update" do
     it "typecasts values when possible" do
+      field.stubs(:selectable_name).returns("age")
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)
@@ -102,6 +105,7 @@ describe Mongoid::Criterion::Selector do
 
   describe "#merge!" do
     it "typecasts values when possible" do
+      field.stubs(:selectable_name).returns("age")
       klass.stubs(:fields).returns({"age" => field})
       klass.stubs(:aliased_fields).returns({})
       field.expects(:selection).with("45").returns(45)

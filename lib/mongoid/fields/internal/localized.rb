@@ -9,7 +9,12 @@ module Mongoid #:nodoc:
 
         # Sort by a field value in the current locale
         def sortable_name
-          :"#{name}.#{::I18n.locale}"
+          selectable_name.to_sym
+        end
+
+        # Select by a field value in the current locale
+        def selectable_name
+          "#{name}.#{::I18n.locale}"
         end
 
         # Deserialize the object based on the current locale. Will look in the
