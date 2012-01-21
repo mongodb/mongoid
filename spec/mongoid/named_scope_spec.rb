@@ -73,8 +73,11 @@ describe Mongoid::NamedScope do
         Person.create(:blood_alcohol_content => 0.7, :ssn => "125-22-8346")
       end
 
+      let(:docs) do
+        Person.alki
+      end
+
       it "sorts the results" do
-        docs = Person.alki
         docs.first.blood_alcohol_content.should eq(0.4)
       end
     end
@@ -82,9 +85,10 @@ describe Mongoid::NamedScope do
     context "when an class attribute is defined" do
 
       it "is accessible" do
-        Person.somebody_elses_important_class_options.should eq({ :keep_me_around => true })
+        Person.somebody_elses_important_class_options.should eq(
+          { :keep_me_around => true }
+        )
       end
-
     end
 
     context "when calling scopes on parent classes" do
@@ -94,37 +98,50 @@ describe Mongoid::NamedScope do
       end
 
       it "inherits the class attribute methods" do
-        Doctor.somebody_elses_important_class_options.should eq({ :keep_me_around => true })
+        Doctor.somebody_elses_important_class_options.should eq(
+          { :keep_me_around => true }
+        )
       end
     end
 
     context "when overwriting an existing scope" do
 
-      it "logs warnings per default" do
-        require 'stringio'
-        log_io = StringIO.new
-        Mongoid.logger = ::Logger.new(log_io)
-        Mongoid.scope_overwrite_exception = false
+      require "stringio"
 
-        Person.class_eval do
-          scope :old, criteria.where(:age.gt => 67)
-        end
-
-        log_io.rewind
-        log_io.readlines.join.should =~
-          /Creating scope :old. Overwriting existing method Person.old/
+      let(:log_io) do
+        StringIO.new
       end
 
-      it "throws exception if configured with scope_overwrite_exception = true" do
-        Mongoid.scope_overwrite_exception = true
-        lambda {
+      context "when not overwriting exceptions" do
+
+        before do
+          Mongoid.scope_overwrite_exception = false
+          Mongoid.logger = ::Logger.new(log_io)
           Person.class_eval do
             scope :old, criteria.where(:age.gt => 67)
           end
-        }.should raise_error(
-          Mongoid::Errors::ScopeOverwrite,
-          "Cannot create scope :old, because of existing method Person.old."
-        )
+          log_io.rewind
+        end
+
+        it "logs the scope warning" do
+          log_io.readlines.join.should =~
+            /Creating scope :old. Overwriting existing method Person.old/
+        end
+      end
+
+      context "when raising overwrite exceptions" do
+
+        before do
+          Mongoid.scope_overwrite_exception = true
+        end
+
+        it "raises an error" do
+          lambda {
+            Person.class_eval do
+              scope :old, criteria.where(:age.gt => 67)
+            end
+          }.should raise_error(Mongoid::Errors::ScopeOverwrite)
+        end
       end
     end
 

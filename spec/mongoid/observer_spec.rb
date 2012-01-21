@@ -20,17 +20,12 @@ describe Mongoid::Observer do
       ActorObserver.instance
     end
 
-    let(:actor) do
-      Actor.create!(:name => "Johnny Depp")
-    end
-
-    let(:actress) do
+    let!(:actress) do
       Actress.create!(:name => "Tina Fey")
     end
 
     it "observes descendent class" do
-      actor and observer.last_after_create_record.try(:name).should eq(actor.name)
-      actress and observer.last_after_create_record.try(:name).should eq(actress.name)
+      observer.last_after_create_record.try(:name).should eq(actress.name)
     end
   end
 
@@ -46,7 +41,7 @@ describe Mongoid::Observer do
 
     it "does not fire the observer" do
       Actor.observers.disable(:all) do
-        actor and observer.last_after_create_record.should_not == actor
+        actor and observer.last_after_create_record.should_not eq(actor)
       end
     end
   end

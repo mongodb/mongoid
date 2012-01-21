@@ -179,11 +179,17 @@ describe Mongoid::Safety do
             Person.unsafely.create(:ssn => "432-97-1111").should be_true
           end
 
-          it "uses defaults for subsequent requests" do
-            Person.unsafely.create(:ssn => "432-97-1111")
-            lambda {
-              Person.create(:ssn => "432-97-1111")
-            }.should raise_error(Mongo::OperationFailure)
+          context "when creating again" do
+
+            before do
+              Person.unsafely.create(:ssn => "432-97-1111")
+            end
+
+            it "uses defaults for subsequent requests" do
+              lambda {
+                Person.create(:ssn => "432-97-1111")
+              }.should raise_error(Mongo::OperationFailure)
+            end
           end
         end
       end
@@ -208,11 +214,17 @@ describe Mongoid::Safety do
             person.unsafely.save(:ssn => "432-97-1113").should be_true
           end
 
-          it "uses defaults for subsequent requests" do
-            person.unsafely.save(:ssn => "432-97-1113")
-            lambda {
-              Person.create(:ssn => "432-97-1113")
-            }.should raise_error(Mongo::OperationFailure)
+          context "when persisting again" do
+
+            before do
+              person.unsafely.save(:ssn => "432-97-1113")
+            end
+
+            it "uses defaults for subsequent requests" do
+              lambda {
+                Person.create(:ssn => "432-97-1113")
+              }.should raise_error(Mongo::OperationFailure)
+            end
           end
         end
       end

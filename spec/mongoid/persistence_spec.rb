@@ -28,13 +28,15 @@ describe Mongoid::Persistence do
         person.should be_a_kind_of(Person)
       end
 
-      context "on an embedded document" do
+      context "when creating an embedded document" do
 
-        subject { Address.create(:addressable => person) }
+        let(:address) do
+          Address.create(:addressable => person)
+        end
 
-        it { should be_persisted }
-
-        it { should be_a_kind_of(Address) }
+        it "persists the document" do
+          address.should be_persisted
+        end
       end
     end
 
@@ -427,21 +429,6 @@ describe Mongoid::Persistence do
           name.first_name = "Ryan"
         end
 
-        it "saves the root document" do
-          person.save
-          person.title.should eq("King")
-        end
-
-        it "saves embedded many relations" do
-          person.save
-          person.addresses.first.street.should eq("Bond St")
-        end
-
-        it "saves embedded one relations" do
-          person.save
-          person.name.first_name.should eq("Ryan")
-        end
-
         it "persists with proper set and push modifiers" do
           person.atomic_updates.should eq({
             "$set" => {
@@ -452,6 +439,21 @@ describe Mongoid::Persistence do
               "addresses" => [ { "_id" => address.id, "street" => "Bond St" } ]
             }
           })
+        end
+
+        context "when saving the document" do
+
+          it "saves the root document" do
+            person.title.should eq("King")
+          end
+
+          it "saves embedded many relations" do
+            person.addresses.first.street.should eq("Bond St")
+          end
+
+          it "saves embedded one relations" do
+            person.name.first_name.should eq("Ryan")
+          end
         end
       end
 
@@ -569,7 +571,7 @@ describe Mongoid::Persistence do
         Service.new(:person => person, :sid => "a")
       end
 
-      it 'raises an error with multiple save attempts' do
+      it "raises an error with multiple save attempts" do
         expect { subject.save! }.should raise_error
         expect { subject.save! }.should raise_error
       end

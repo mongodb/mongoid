@@ -11,7 +11,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.new_record?.should be_true
+        person.should be_a_new_record
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::State do
       end
 
       it "returns false" do
-        person.new_record?.should be_false
+        person.should_not be_a_new_record
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.new_record?.should be_true
+        person.should be_a_new_record
       end
     end
   end
@@ -73,7 +73,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.destroyed?.should be_true
+        person.should be_destroyed
       end
     end
 
@@ -84,7 +84,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.destroyed?.should be_false
+        person.should_not be_destroyed
       end
     end
 
@@ -95,7 +95,7 @@ describe Mongoid::State do
       end
 
       it "returns false" do
-        person.destroyed?.should be_false
+        person.should_not be_destroyed
       end
     end
   end
