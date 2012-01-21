@@ -131,7 +131,7 @@ describe Mongoid::Attributes do
       end
 
       it "prevents setting via mass assignment" do
-        account._id.should_not == "ABBA"
+        account._id.should_not eq("ABBA")
       end
     end
 
@@ -252,7 +252,7 @@ describe Mongoid::Attributes do
       end
 
       it "prevents setting via mass assignment" do
-        game._id.should_not == "ABBA"
+        game._id.should_not eq("ABBA")
       end
     end
 

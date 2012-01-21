@@ -329,8 +329,9 @@ describe Mongoid::Fields do
         end
 
         it "returns an equal object of a different instance" do
-          person_one.array_testing.object_id.should_not ==
+          person_one.array_testing.object_id.should_not eq(
             person_two.array_testing.object_id
+          )
         end
       end
 
@@ -345,8 +346,9 @@ describe Mongoid::Fields do
         end
 
         it "returns an equal object of a different instance" do
-          person_one.hash_testing.object_id.should_not ==
+          person_one.hash_testing.object_id.should_not eq(
             person_two.hash_testing.object_id
+          )
         end
       end
 

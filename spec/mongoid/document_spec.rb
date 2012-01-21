@@ -23,7 +23,7 @@ describe Mongoid::Document do
       end
 
       it "returns false" do
-        person.should_not == other
+        person.should_not eq(other)
       end
     end
 
@@ -42,7 +42,7 @@ describe Mongoid::Document do
           end
 
           it "returns false" do
-            person.should_not == other
+            person.should_not eq(other)
           end
         end
 
@@ -78,7 +78,7 @@ describe Mongoid::Document do
         context "when the instances are different" do
 
           it "returns false" do
-            person.should_not == other
+            person.should_not eq(other)
           end
         end
       end

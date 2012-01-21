@@ -53,7 +53,7 @@ describe Mongoid::Copyable do
           end
 
           it "has a different id from the original" do
-            copy.id.should_not == person.id
+            copy.id.should_not eq(person.id)
           end
 
           it "does not copy the versions" do
@@ -150,7 +150,7 @@ describe Mongoid::Copyable do
           end
 
           it "has a different id from the original" do
-            copy.id.should_not == person.id
+            copy.id.should_not eq(person.id)
           end
 
           it "does not copy the versions" do
@@ -233,7 +233,7 @@ describe Mongoid::Copyable do
         end
 
         it "has a different id from the original" do
-          copy.id.should_not == person.id
+          copy.id.should_not eq(person.id)
         end
 
         it "returns a new instance" do
