@@ -22,6 +22,12 @@ describe Mongoid::Config::Database do
         connection.primary
       end
 
+      after do
+        Mongoid.configure do |config|
+          config.master = Mongo::Connection.new(HOST, PORT).db(database_id)
+        end
+      end
+
       context "when provided a uri" do
 
         context "when the uri is on mongohq", :config => :mongohq do
