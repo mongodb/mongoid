@@ -255,6 +255,8 @@ module Mongoid #:nodoc:
           name
         end
       end
+      alias_method :localize, :normalize # for backwards compatibility
+                                         # because this is a public method
 
     end
   end
