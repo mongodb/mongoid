@@ -101,7 +101,6 @@ describe Mongoid::Matchers::Or do
           matches.should be_false
         end
       end
-
     end
   end
 end

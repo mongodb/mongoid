@@ -2,7 +2,9 @@ require "spec_helper"
 
 describe Mongoid::Matchers::Ne do
 
-  let(:matcher) { Mongoid::Matchers::Ne.new("first") }
+  let(:matcher) do
+    described_class.new("first")
+  end
 
   describe "#matches?" do
 
@@ -11,7 +13,6 @@ describe Mongoid::Matchers::Ne do
       it "returns true" do
         matcher.matches?("$ne" => "second").should be_true
       end
-
     end
 
     context "when the values are equal" do
@@ -19,9 +20,6 @@ describe Mongoid::Matchers::Ne do
       it "returns false" do
         matcher.matches?("$ne" => "first").should be_false
       end
-
     end
-
   end
-
 end

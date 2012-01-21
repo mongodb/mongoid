@@ -7,7 +7,7 @@ describe Mongoid::Matchers::Default do
     context "when comparing strings" do
 
       let(:matcher) do
-        Mongoid::Matchers::Default.new("Testing")
+        described_class.new("Testing")
       end
 
       context "when the values are equal" do
@@ -32,7 +32,7 @@ describe Mongoid::Matchers::Default do
       end
 
       let(:matcher) do
-        Mongoid::Matchers::Default.new(object_id)
+        described_class.new(object_id)
       end
 
       context "when the values are equal" do
@@ -53,7 +53,7 @@ describe Mongoid::Matchers::Default do
     context "when comparing a string to an array" do
 
       let(:matcher) do
-        Mongoid::Matchers::Default.new(["Test1", "Test2", "Test3"])
+        described_class.new(["Test1", "Test2", "Test3"])
       end
 
       context "when the attribute contains the value" do
@@ -78,7 +78,7 @@ describe Mongoid::Matchers::Default do
       end
 
       let(:matcher) do
-        Mongoid::Matchers::Default.new([ object_id, BSON::ObjectId.new ])
+        described_class.new([ object_id, BSON::ObjectId.new ])
       end
 
       context "when the attribute contains the value" do
@@ -99,7 +99,7 @@ describe Mongoid::Matchers::Default do
     context "when comparing an array to an array" do
 
       let(:matcher) do
-        Mongoid::Matchers::Default.new(["Test1", "Test2", "Test3"])
+        described_class.new(["Test1", "Test2", "Test3"])
       end
 
       context "when the attribute contains the value" do
