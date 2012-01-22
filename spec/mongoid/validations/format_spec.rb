@@ -57,7 +57,10 @@ describe Mongoid::Validations::FormatValidator do
       context "when one of the localized values is invalid" do
 
         before do
-          validator.validate_each(product, :website, { "en" => "http://www.apple.com", "fr" => "not_a_website" })
+          validator.validate_each(
+            product,
+            :website, { "en" => "http://www.apple.com", "fr" => "not_a_website" }
+          )
         end
 
         it "adds errors" do
