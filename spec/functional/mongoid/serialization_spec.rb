@@ -26,13 +26,9 @@ describe Mongoid::Serialization do
         person.serializable_hash.should include attributes
       end
 
-      it "includes all defined fields except _type" do
-        field_names = person.fields.keys.map(&:to_s) - ['_type']
+      it "includes all defined fields" do
+        field_names = person.fields.keys.map(&:to_s)
         person.serializable_hash.keys.should include(*field_names)
-      end
-
-      it "does not include _type" do
-        person.serializable_hash.keys.should_not include '_type'
       end
 
       it "does not modify the options in the argument" do

@@ -31,8 +31,6 @@ module Mongoid # :nodoc:
       only   = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)
 
-      except |= ['_type']
-
       field_names = fields.keys.map { |field| field.to_s }
       attribute_names = (attributes.keys + field_names).sort
       if only.any?
