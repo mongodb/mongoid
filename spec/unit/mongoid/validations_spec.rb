@@ -79,20 +79,55 @@ describe Mongoid::Validations do
       klass.validates(:title, :uniqueness => true)
     end
   end
-  
+
   describe ".validates_presence_of" do
     before do
       klass.expects(:validates_with).with(
         Mongoid::Validations::PresenceValidator, { :attributes => [ :title ] }
       )
     end
-    
+
     it "adds the presence validator" do
       klass.validates_presence_of(:title)
     end
-    
+
     it "is picked up by validates method" do
       klass.validates(:title, :presence => true)
+    end
+  end
+
+  describe ".validates_format_of" do
+
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+      end
+    end
+
+    context "when adding via the traditional macro" do
+
+      before do
+        klass.validates_format_of(:website, :with => URI.regexp)
+      end
+
+      it "adds the validator" do
+        klass.validators.first.should be_a(
+          Mongoid::Validations::FormatValidator
+        )
+      end
+    end
+
+    context "when adding via the new syntax" do
+
+      before do
+        klass.validates(:website, :format => { :with => URI.regexp })
+      end
+
+      it "adds the validator" do
+        klass.validators.first.should be_a(
+          Mongoid::Validations::FormatValidator
+        )
+      end
     end
   end
 end

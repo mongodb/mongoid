@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/validations/associated"
+require "mongoid/validations/format"
 require "mongoid/validations/uniqueness"
 require "mongoid/validations/presence"
 
@@ -87,6 +88,21 @@ module Mongoid #:nodoc:
     end
 
     module ClassMethods #:nodoc:
+
+      # Validates whether or not a field matches a certain regular expression.
+      #
+      # @example
+      #   class Person
+      #     include Mongoid::Document
+      #     field :website
+      #
+      #     validates_format_of :website, :with => URI.regexp
+      #   end
+      #
+      # @param [ Array ] *args The arguments to pass to the validator.
+      def validates_format_of(*args)
+        validates_with(FormatValidator, _merge_attributes(args))
+      end
 
       # Validates whether or not an association is valid or not. Will correctly
       # handle has one and has many associations.
