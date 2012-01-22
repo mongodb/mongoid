@@ -376,6 +376,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
+          undef_method(meth) if method_defined?(meth)
           if meth =~ /\W/
             if field.cast_on_read?
               define_method(meth) do
@@ -423,6 +424,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_setter(name, meth)
         generated_methods.module_eval do
+          undef_method("#{meth}=") if method_defined?("#{meth}=")
           if meth =~ /\W/
             define_method(meth) do |value|
               write_attribute(name, value)
@@ -448,6 +450,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_check(name, meth)
         generated_methods.module_eval do
+          undef_method("#{meth}?") if method_defined?("#{meth}?")
           if meth =~ /\W/
             define_method("#{meth}?") do
               attr = read_attribute(name)
@@ -475,6 +478,9 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
+          if method_defined?("#{meth}_translations")
+            undef_method("#{meth}_translations")
+          end
           if meth =~ /\W/
             define_method("#{meth}_translations") do
               attributes[name]
@@ -500,6 +506,9 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_translations_setter(name, meth)
         generated_methods.module_eval do
+          if method_defined?("#{meth}_translations=")
+            undef_method("#{meth}_translations=")
+          end
           if meth =~ /\W/
             define_method("#{meth}_translations=") do |value|
               attribute_will_change!(name)
@@ -530,6 +539,14 @@ module Mongoid #:nodoc
         end
       end
 
+      # Remove the default keys for the provided name.
+      #
+      # @example Remove the default keys.
+      #   Model.remove_defaults(name)
+      #
+      # @param [ String ] name The field name.
+      #
+      # @since 2.4.0
       def remove_defaults(name)
         pre_processed_defaults.delete_one(name)
         post_processed_defaults.delete_one(name)

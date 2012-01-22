@@ -120,7 +120,9 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def setter(name, metadata)
-          define_method("#{name}=") do |object|
+          method = "#{name}="
+          undef_method(method) if method_defined?(method)
+          define_method(method) do |object|
             if relation_exists?(name) || metadata.many? ||
               (object.blank? && send(name))
               set_relation(name, send(name).substitute(object.substitutable))

@@ -236,45 +236,135 @@ module Mongoid #:nodoc:
       #
       # @since 2.4.0
       def create_dirty_methods(name, meth)
+        create_dirty_change_accessor(name, meth)
+        create_dirty_change_check(name, meth)
+        create_dirty_change_flag(name, meth)
+        create_dirty_previous_value_accessor(name, meth)
+        create_dirty_reset(name, meth)
+      end
+
+      # Creates the dirty change accessor.
+      #
+      # @example Create the accessor.
+      #   Model.create_dirty_change_accessor("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_change_accessor(name, meth)
         generated_methods.module_eval do
+          undef_method("#{meth}_change") if method_defined?("#{meth}_change")
           if meth =~ /\W/
             define_method("#{meth}_change") do
               attribute_change(name)
-            end
-
-            define_method("#{meth}_changed?") do
-              attribute_changed?(name)
-            end
-
-            define_method("#{meth}_was") do
-              attribute_was(name)
-            end
-
-            define_method("#{meth}_will_change!") do
-              attribute_will_change!(name)
-            end
-
-            define_method("reset_#{meth}!") do
-              reset_attribute!(name)
             end
           else
             class_eval <<-EOM
               def #{meth}_change
                 attribute_change(#{name.inspect})
               end
+            EOM
+          end
+        end
+      end
 
+      # Creates the dirty change check.
+      #
+      # @example Create the check.
+      #   Model.create_dirty_change_check("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_change_check(name, meth)
+        generated_methods.module_eval do
+          undef_method("#{meth}_changed?") if method_defined?("#{meth}_changed?")
+          if meth =~ /\W/
+            define_method("#{meth}_changed?") do
+              attribute_changed?(name)
+            end
+          else
+            class_eval <<-EOM
               def #{meth}_changed?
                 attribute_changed?(#{name.inspect})
               end
+            EOM
+          end
+        end
+      end
 
+      # Creates the dirty change previous value accessor.
+      #
+      # @example Create the accessor.
+      #   Model.create_dirty_previous_value_accessor("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_previous_value_accessor(name, meth)
+        generated_methods.module_eval do
+          undef_method("#{meth}_was") if method_defined?("#{meth}_was")
+          if meth =~ /\W/
+            define_method("#{meth}_was") do
+              attribute_was(name)
+            end
+          else
+            class_eval <<-EOM
               def #{meth}_was
                 attribute_was(#{name.inspect})
               end
+            EOM
+          end
+        end
+      end
 
+      # Creates the dirty change flag.
+      #
+      # @example Create the flag.
+      #   Model.create_dirty_change_flag("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_change_flag(name, meth)
+        generated_methods.module_eval do
+          undef_method("#{meth}_will_change!") if method_defined?("#{meth}_will_change!")
+          if meth =~ /\W/
+            define_method("#{meth}_will_change!") do
+              attribute_will_change!(name)
+            end
+          else
+            class_eval <<-EOM
               def #{meth}_will_change!
                 attribute_will_change!(#{name.inspect})
               end
+            EOM
+          end
+        end
+      end
 
+      # Creates the dirty change reset.
+      #
+      # @example Create the reset.
+      #   Model.create_dirty_reset("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_reset(name, meth)
+        generated_methods.module_eval do
+          undef_method("reset_#{meth}!") if method_defined?("reset_#{meth}!")
+          if meth =~ /\W/
+            define_method("reset_#{meth}!") do
+              reset_attribute!(name)
+            end
+          else
+            class_eval <<-EOM
               def reset_#{meth}!
                 reset_attribute!(#{name.inspect})
               end
