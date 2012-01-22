@@ -3,22 +3,22 @@ require "spec_helper"
 describe Mongoid::Matchers::All do
 
   let(:matcher) do
-    described_class.new(["first", "second"])
+    described_class.new(["first", "second", "third"])
   end
 
   describe "#matches?" do
 
-    context "when the values are equal" do
+    context "when the attribute includes all of the values" do
 
       it "returns true" do
-        matcher.matches?("$all" => ["first", "second"]).should be_true
+        matcher.matches?("$all" => ["first", /\Asec.*\z/]).should be_true
       end
     end
 
-    context "when the values are not equal" do
+    context "when the attributes doesn't include all of the values" do
 
       it "returns false" do
-        matcher.matches?("$all" => ["first"]).should be_false
+        matcher.matches?("$all" => ["second", "third", "fourth"]).should be_false
       end
     end
   end

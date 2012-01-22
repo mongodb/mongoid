@@ -106,7 +106,7 @@ describe Mongoid::Matchers do
 
       let(:document) do
         Address.new(
-          :services => ["first", "second"],
+          :services => ["first", "second", "third"],
           :number => 100,
           :map => { :key => "value" }
         )
@@ -114,7 +114,7 @@ describe Mongoid::Matchers do
 
       context "with an $all selector" do
 
-        context "when the attributes match" do
+        context "when the attribute includes all of the values" do
 
           let(:selector) do
             { :services => { "$all" => [ "first", "second" ] } }
@@ -125,10 +125,10 @@ describe Mongoid::Matchers do
           end
         end
 
-        context "when the attributes do not match" do
+        context "when the attributes doesn't include all of the values" do
 
           let(:selector) do
-            { :services => { "$all" => [ "first" ] } }
+            { :services => { "$all" => [ "second", "third", "fourth" ] } }
           end
 
           it "returns false" do
@@ -217,7 +217,7 @@ describe Mongoid::Matchers do
         context "when the attributes match" do
 
           let(:selector) do
-            { :services => { "$in" => [ "first" ] } }
+            { :services => { "$in" => [ /\Afir.*\z/, "second" ] } }
           end
 
           it "returns true" do
@@ -417,7 +417,7 @@ describe Mongoid::Matchers do
         context "when the attributes match" do
 
           let(:selector) do
-            { :services => { "$size" => 2 } }
+            { :services => { "$size" => 3 } }
           end
 
           it "returns true" do
