@@ -14,7 +14,8 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] If the values match.
       def matches?(value)
-        @attribute == value.values.first
+        attribute_array = Array.wrap(@attribute)
+        value.values.first.all? { |e| attribute_array.include?(e) }
       end
     end
   end
