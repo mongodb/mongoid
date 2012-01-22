@@ -64,6 +64,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1627 Validating format now works properly with localized fields.
+  (Douwe Maan)
+
 * \#1617 Relation proxy methods now show up in Mongoid's list of
   prohibited fields.
 
