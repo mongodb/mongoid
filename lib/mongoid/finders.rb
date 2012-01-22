@@ -103,7 +103,8 @@ module Mongoid #:nodoc:
       find_or(:new, attrs, &block)
     end
 
-    # Find the first +Document+ given the conditions, or raises Mongoid::Errors::DocumentNotFound
+    # Find the first +Document+ given the conditions, or raises
+    # Mongoid::Errors::DocumentNotFound
     #
     # @example Find the document by attribute other than id
     #   Person.find_by(:username => "superuser")
@@ -113,6 +114,8 @@ module Mongoid #:nodoc:
     # @raise [ Errors::DocumentNotFound ] If no document found.
     #
     # @return [ Document ] A matching document.
+    #
+    # @since 3.0.0
     def find_by(attrs = {})
       where(attrs).first || raise(Errors::DocumentNotFound.new(self, attrs))
     end

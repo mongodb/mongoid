@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1616 `Model.find_by` added which takes a hash of arugments to search
+  for in the database. If no single document is returned a DocumentNotFound
+  error is raised. (Piotr Jakubowski)
+
 * \#1348 Eager loading is now supported on many-to-many relations.
 
 * \#1053 Raise a `Mongoid::Errors::UnknownAttribute` instead of no method
