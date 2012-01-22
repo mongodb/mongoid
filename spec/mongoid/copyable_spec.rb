@@ -95,8 +95,8 @@ describe Mongoid::Copyable do
           Mongoid::Copyable::COPYABLES.each do |name|
 
             it "dups #{name}" do
-              copy.instance_variable_get(name).should_not
-                be_eql(person.instance_variable_get(name))
+              copy.instance_variable_get("@#{name}").should_not
+                be_eql(person.instance_variable_get("@#{name}"))
             end
           end
 
@@ -188,8 +188,8 @@ describe Mongoid::Copyable do
           Mongoid::Copyable::COPYABLES.each do |name|
 
             it "dups #{name}" do
-              copy.instance_variable_get(name).should_not
-                be_eql(person.instance_variable_get(name))
+              copy.instance_variable_get("@#{name}").should_not
+                be_eql(person.instance_variable_get("@#{name}"))
             end
           end
 
@@ -271,8 +271,8 @@ describe Mongoid::Copyable do
         Mongoid::Copyable::COPYABLES.each do |name|
 
           it "dups #{name}" do
-            copy.instance_variable_get(name).should_not
-              be_eql(person.instance_variable_get(name))
+            copy.instance_variable_get("@#{name}").should_not
+              be_eql(person.instance_variable_get("@#{name}"))
           end
         end
 

@@ -6,11 +6,10 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     COPYABLES = [
-      :@accessed,
-      :@attributes,
-      :@metadata,
-      :@modifications,
-      :@previous_modifications
+      :attributes,
+      :metadata,
+      :changed_attributes,
+      :previous_changes
     ]
 
     protected
@@ -34,8 +33,8 @@ module Mongoid #:nodoc:
       other.as_document
       instance_variables.each { |name| remove_instance_variable(name) }
       COPYABLES.each do |name|
-        value = other.instance_variable_get(name)
-        instance_variable_set(name, value ? value.dup : nil)
+        value = other.send(name)
+        instance_variable_set(:"@#{name}", value ? value.dup : nil)
       end
       attributes.delete("_id")
       if attributes.delete("versions")
