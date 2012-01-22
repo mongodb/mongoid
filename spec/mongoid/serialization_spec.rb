@@ -58,6 +58,15 @@ describe Mongoid::Serialization do
         end
       end
 
+      context "when specifying extra inclusions" do
+
+        it "includes the extra fields" do
+          person.serializable_hash(
+            :methods => [ :_type ]
+          ).has_key?("_type").should be_true
+        end
+      end
+
       context "when specifying which fields to exclude" do
 
         it "excludes the specified fields" do
