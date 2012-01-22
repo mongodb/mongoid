@@ -9,6 +9,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#1348 Eager loading is now supported on many-to-many relations.
 
+* \#1053 Raise a `Mongoid::Errors::UnknownAttribute` instead of no method
+  when attempting to set a field that is not defined and allow dynamic
+  fields is false. (Cyril Mougel)
+
 ### Major Changes
 
 * `Model.defaults` no longer exists. You may get all defaults with a

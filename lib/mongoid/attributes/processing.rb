@@ -92,9 +92,11 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.7
       def process_attribute(name, value)
-        if Mongoid.allow_dynamic_fields && !respond_to?("#{name}=")
+        responds = respond_to?("#{name}=")
+        if Mongoid.allow_dynamic_fields && !responds
           write_attribute(name, value)
         else
+          raise Errors::UnknownAttribute.new(self.class, name) unless responds
           send("#{name}=", value)
         end
       end

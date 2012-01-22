@@ -45,6 +45,9 @@ en:
         too_many_nested_attribute_records:
           "Accepting nested attributes for %{association} is limited
           to %{limit} records."
+        unknown_attribute:
+          "Attempted to set a value for '%{name}' on the model %{klass}, which
+          has no field defined for it and allow_dynamic_fields is false."
         unsaved_document:
           "You cannot call create or create! through a relational association
           relation (%{document}) who's parent (%{base}) is not already saved."

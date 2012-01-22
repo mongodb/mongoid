@@ -613,8 +613,10 @@ describe Mongoid::Attributes do
           Mongoid.configure.allow_dynamic_fields = true
         end
 
-        it "raises an error" do
-          lambda { Person.new({ :anothernew => "Test" }) }.should raise_error
+        it "raises an unknown attribute error" do
+          expect {
+            Person.new({ :anothernew => "Test" })
+          }.to raise_error(Mongoid::Errors::UnknownAttribute)
         end
       end
     end
