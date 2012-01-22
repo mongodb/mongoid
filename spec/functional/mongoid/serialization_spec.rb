@@ -41,6 +41,16 @@ describe Mongoid::Serialization do
         options[:except].should be_nil
       end
 
+      context "when include_type_for_serialization is true" do
+        before do
+          Mongoid.include_type_for_serialization = true
+        end
+
+        it "includes _type field" do
+          person.serializable_hash.keys.should include '_type'
+        end
+      end
+
       context "when specifying which fields to only include" do
 
         it "only includes the specified fields" do
