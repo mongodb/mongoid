@@ -2,6 +2,7 @@
 require "mongoid/validations/associated"
 require "mongoid/validations/uniqueness"
 require "mongoid/validations/presence"
+require "mongoid/validations/format"
 
 module Mongoid #:nodoc:
 
@@ -138,6 +139,21 @@ module Mongoid #:nodoc:
       # @since 2.4.0
       def validates_presence_of(*args)
         validates_with(PresenceValidator, _merge_attributes(args))
+      end
+      
+      # Validates whether or not a field matches a certain regular expression.
+      #
+      # @example
+      #   class Person
+      #     include Mongoid::Document
+      #     field :website
+      #
+      #     validates_format_of :website, :with => URI.regexp
+      #   end
+      #
+      # @param [ Array ] *args The arguments to pass to the validator.
+      def validates_format_of(*args)
+        validates_with(FormatValidator, _merge_attributes(args))
       end
 
       protected
