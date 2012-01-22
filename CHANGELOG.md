@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1629 $all and $in criteria on embedded many relations now properly
+  handles regex searches and elements of varying length. (Douwe Maan)
+
 ## 2.4.2
 
 ### Resolved Issues
