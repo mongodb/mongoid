@@ -64,6 +64,7 @@ module Mongoid #:nodoc
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
       Mongoid::Relations,
+      Mongoid::Relations::Proxy,
       Mongoid::Safety,
       Mongoid::Serialization,
       Mongoid::Sharding,

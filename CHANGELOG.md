@@ -56,6 +56,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1617 Relation proxy methods now show up in Mongoid's list of
+  prohibited fields.
+
 * \#1615 Allow a single configuration of host and port for all spec runs,
   overridden by setting MONGOID_SPEC_HOST and MONGOID_SPEC_PORT env vars.
 
