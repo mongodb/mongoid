@@ -64,6 +64,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1628 _type field can once again be included in serialization to json
+  or xml as a global option with `include_type_for_serialization`.
+  (Roman Shterenzon)
+
 * \#1627 Validating format now works properly with localized fields.
   (Douwe Maan)
 

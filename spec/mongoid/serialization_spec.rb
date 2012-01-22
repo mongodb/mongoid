@@ -50,8 +50,13 @@ describe Mongoid::Serialization do
       end
 
       context "when include_type_for_serialization is true" do
+
         before do
           Mongoid.include_type_for_serialization = true
+        end
+
+        after do
+          Mongoid.include_type_for_serialization = false
         end
 
         it "includes _type field" do
