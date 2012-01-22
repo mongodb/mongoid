@@ -11,7 +11,7 @@ describe Mongoid::Matchers::All do
     context "when the attribute includes all of the values" do
 
       it "returns true" do
-        matcher.matches?("$all" => ["first", "second"]).should be_true
+        matcher.matches?("$all" => ["first", /\Asec.*\z/]).should be_true
       end
     end
 

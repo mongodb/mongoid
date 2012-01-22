@@ -217,7 +217,7 @@ describe Mongoid::Matchers do
         context "when the attributes match" do
 
           let(:selector) do
-            { :services => { "$in" => [ "first" ] } }
+            { :services => { "$in" => [ /\Afir.*\z/, "second" ] } }
           end
 
           it "returns true" do
