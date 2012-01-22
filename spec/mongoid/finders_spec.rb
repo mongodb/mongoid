@@ -407,7 +407,9 @@ describe Mongoid::Finders do
   end
 
   describe ".find_by" do
+
     context "when the document is found" do
+
       let!(:person) do
         Person.create(:ssn => "333-22-1111")
       end
@@ -418,13 +420,13 @@ describe Mongoid::Finders do
     end
 
     context "when the document is not found" do
+
       it "raises an error" do
         expect {
           Person.find_by(:ssn => "333-22-1111")
         }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
-
   end
 
   describe ".only" do
