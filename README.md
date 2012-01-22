@@ -30,7 +30,7 @@ Please see the new Mongoid website for up-to-date documentation:
 Donating
 --------
 
-* [Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
+[Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
 
 <a href='http://www.pledgie.com/campaigns/7757'>
 <img alt='Click here to lend your support to: Mongoid and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/7757.png?skin_name=chrome' border='0'/>
