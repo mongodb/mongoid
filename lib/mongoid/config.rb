@@ -23,6 +23,7 @@ module Mongoid #:nodoc
     option :autocreate_indexes, :default => false
     option :identity_map_enabled, :default => false
     option :include_root_in_json, :default => false
+    option :include_type_for_serialization, :default => false
     option :max_retries_on_connection_failure, :default => 0
     option :parameterize_keys, :default => true
     option :scope_overwrite_exception, :default => false
