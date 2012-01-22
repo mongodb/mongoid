@@ -53,6 +53,7 @@ module Mongoid #:nodoc:
         name = name.to_sym
         valid_scope_name?(name)
         scopes[name] = Scope.new(conditions, &block)
+        undef_method(name) if method_defined?(name)
         (class << self; self; end).class_eval <<-EOT
           def #{name}(*args)
             scope = scopes[:#{name}]

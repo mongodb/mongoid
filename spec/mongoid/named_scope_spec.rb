@@ -7,7 +7,7 @@ describe Mongoid::NamedScope do
     before(:all) do
       Person.class_eval do
         scope :doctors, {:where => {:title => 'Dr.'} }
-        scope :old, criteria.where(:age.gt => 50)
+        scope :semiold, criteria.where(:age.gt => 50)
         scope :alki, where(:blood_alcohol_content.gt => 0.3).order_by(:blood_alcohol_content.asc)
       end
     end

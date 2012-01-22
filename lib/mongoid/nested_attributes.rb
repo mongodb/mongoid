@@ -40,7 +40,9 @@ module Mongoid #:nodoc:
         options = args.extract_options!
         options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
         args.each do |name|
-          self.nested_attributes += [ "#{name}_attributes=" ]
+          meth = "#{name}_attributes="
+          self.nested_attributes += [ meth ]
+          undef_method(meth) if method_defined?(meth)
           define_method("#{name}_attributes=") do |attrs|
             _assigning do
               relation = relations[name.to_s]
