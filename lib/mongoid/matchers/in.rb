@@ -14,7 +14,14 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        Array.wrap(@attribute).any? { |e| value.values.first.include?(e) }
+        attribute_array = Array.wrap(@attribute)
+        value.values.first.any? do |e| 
+          if e.is_a?(Regexp) 
+            attribute_array.any? { |_attribute| _attribute =~ e }
+          else
+            attribute_array.include?(e)
+          end
+        end
       end
     end
   end
