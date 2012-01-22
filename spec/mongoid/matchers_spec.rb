@@ -417,7 +417,7 @@ describe Mongoid::Matchers do
         context "when the attributes match" do
 
           let(:selector) do
-            { :services => { "$size" => 2 } }
+            { :services => { "$size" => 3 } }
           end
 
           it "returns true" do
