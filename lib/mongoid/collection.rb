@@ -78,6 +78,7 @@ module Mongoid #:nodoc
       @klass, @name, @options = klass, name, options || {}
     end
 
+    undef :insert
     # Inserts one or more documents in the collection.
     #
     # @example Insert documents.

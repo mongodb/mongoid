@@ -17,7 +17,7 @@ module Mongoid #:nodoc
     include ActiveModel::Observing
 
     # @attribute [rw] master The master database.
-    attr_accessor :master, :reconnect
+    attr_accessor :reconnect
 
     option :allow_dynamic_fields, :default => true
     option :autocreate_indexes, :default => false
