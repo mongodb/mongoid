@@ -125,7 +125,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the child is not a new record" do
 
           let(:person) do
-            Person.new(:ssn => "437-11-1112")
+            Person.new
           end
 
           let(:game) do
@@ -266,7 +266,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the child is not a new record" do
 
           let(:person) do
-            Person.new(:ssn => "437-11-1112")
+            Person.new
           end
 
           let(:post) do
@@ -536,7 +536,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.new(:ssn => "437-11-1112")
+            Person.new
           end
 
           let(:post) do

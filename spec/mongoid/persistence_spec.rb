@@ -368,7 +368,7 @@ describe Mongoid::Persistence do
   describe "#save" do
 
     let(:person) do
-      Person.new(:ssn => "811-82-8345")
+      Person.new
     end
 
     context "when saving with a hash field with invalid keys" do
@@ -619,7 +619,7 @@ describe Mongoid::Persistence do
       context "when the field is true" do
 
         let(:person) do
-          Person.new(:ssn => "234-11-1232", :terms => true)
+          Person.new(:terms => true)
         end
 
         context "when setting to false" do
@@ -956,7 +956,7 @@ describe Mongoid::Persistence do
     context "when in a deeply nested hierarchy" do
 
       let!(:person) do
-        Person.new(:title => "The Boss", :ssn => "098-76-5432")
+        Person.new(:title => "The Boss")
       end
 
       let!(:phone_number) do
@@ -1127,7 +1127,7 @@ describe Mongoid::Persistence do
     context "when value is an empty string" do
 
       let(:person) do
-        Person.new(:ssn => "555-55-5555")
+        Person.new
       end
 
       before do

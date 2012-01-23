@@ -5,7 +5,7 @@ describe Mongoid::Relations::AutoSave do
   describe ".auto_save" do
 
     let(:person) do
-      Person.new(:ssn => "222-22-2222")
+      Person.new
     end
 
     context "when the option is not provided" do

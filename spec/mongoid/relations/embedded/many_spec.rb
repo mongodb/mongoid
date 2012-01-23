@@ -787,7 +787,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#avg" do
 
     let(:person) do
-      Person.new(:ssn => "123-45-6789")
+      Person.new
     end
 
     let(:address_one) do
@@ -1920,7 +1920,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#max" do
 
     let(:person) do
-      Person.new(:ssn => "123-45-6789")
+      Person.new
     end
 
     let(:address_one) do
@@ -2039,7 +2039,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#min" do
 
     let(:person) do
-      Person.new(:ssn => "123-45-6789")
+      Person.new
     end
 
     let(:address_one) do
@@ -2161,7 +2161,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#sum" do
 
     let(:person) do
-      Person.new(:ssn => "123-45-6789")
+      Person.new
     end
 
     let(:address_one) do

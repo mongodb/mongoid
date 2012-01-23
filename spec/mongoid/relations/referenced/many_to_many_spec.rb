@@ -75,7 +75,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the parent is a new record" do
 
           let(:person) do
-            Person.new(:ssn => "423-12-0789")
+            Person.new
           end
 
           context "when the child is new" do

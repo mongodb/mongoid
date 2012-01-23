@@ -72,7 +72,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
   describe "#build" do
 
     let(:person) do
-      Person.new(:ssn => "345-12-1212")
+      Person.new
     end
 
     context "when the document is not found" do

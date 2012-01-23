@@ -98,9 +98,9 @@ describe Mongoid::Safety do
           end
 
           it "bubbles up to the caller" do
-            lambda {
-              person.safely.save(:ssn => "432-97-1113")
-            }.should raise_error(Mongo::OperationFailure)
+            expect {
+              person.safely.save
+            }.to raise_error(Mongo::OperationFailure)
           end
         end
       end
@@ -122,9 +122,9 @@ describe Mongoid::Safety do
           end
 
           it "bubbles up to the caller" do
-            lambda {
-              person.safely.save!(:ssn => "432-97-1113")
-            }.should raise_error(Mongo::OperationFailure)
+            expect {
+              person.safely.save!
+            }.to raise_error(Mongo::OperationFailure)
           end
         end
 
@@ -203,7 +203,7 @@ describe Mongoid::Safety do
         context "when a mongodb error occurs" do
 
           let(:person) do
-            Person.new(:ssn => "432-97-1113")
+            Person.new
           end
 
           before do
