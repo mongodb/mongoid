@@ -32,7 +32,8 @@ describe Mongoid::Config::ReplsetDatabase do
 
       it "does not modify the options in place" do
         options["test"]["hosts"].should eq(
-          [["localhost", 27017], ["localhost", 27017]]
+          [[ENV["MONGOID_SPEC_HOST"], ENV["MONGOID_SPEC_PORT"].to_i],
+           [ENV["MONGOID_SPEC_HOST"], ENV["MONGOID_SPEC_PORT"].to_i]]
         )
       end
     end
