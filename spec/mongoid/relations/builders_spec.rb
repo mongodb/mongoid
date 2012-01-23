@@ -68,7 +68,7 @@ describe Mongoid::Relations::Builders do
     context "when the parent is persisted" do
 
       let(:person) do
-        Person.create(:ssn => "123-45-1234")
+        Person.create
       end
 
       context "when the relation is a has one" do

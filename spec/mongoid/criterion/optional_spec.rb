@@ -182,11 +182,11 @@ describe Mongoid::Criterion::Optional do
   describe "#descending" do
 
     let!(:first) do
-      Person.create(:ssn => "123-45-6789")
+      Person.create
     end
 
     let!(:second) do
-      Person.create(:ssn => "123-45-6780")
+      Person.create
     end
 
     context "when combined with a #first" do

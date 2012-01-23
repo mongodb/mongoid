@@ -186,9 +186,9 @@ describe Mongoid::Safety do
             end
 
             it "uses defaults for subsequent requests" do
-              lambda {
+              expect {
                 Person.create(:ssn => "432-97-1111")
-              }.should raise_error(Mongo::OperationFailure)
+              }.to raise_error(Mongo::OperationFailure)
             end
           end
         end
@@ -221,9 +221,9 @@ describe Mongoid::Safety do
             end
 
             it "uses defaults for subsequent requests" do
-              lambda {
+              expect {
                 Person.create(:ssn => "432-97-1113")
-              }.should raise_error(Mongo::OperationFailure)
+              }.to raise_error(Mongo::OperationFailure)
             end
           end
         end

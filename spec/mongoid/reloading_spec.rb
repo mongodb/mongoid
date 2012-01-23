@@ -7,7 +7,7 @@ describe Mongoid::Reloading do
     context "when using bson ids" do
 
       let(:person) do
-        Person.create(:ssn => "112-11-1121", :title => "Sir")
+        Person.create
       end
 
       let!(:from_db) do
@@ -69,7 +69,7 @@ describe Mongoid::Reloading do
     context "when the document was dirty" do
 
       let(:person) do
-        Person.create(:ssn => "543-24-2341")
+        Person.create
       end
 
       before do
@@ -95,7 +95,7 @@ describe Mongoid::Reloading do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "112-11-1122", :title => "Sir")
+        Person.create
       end
 
       context "when embedded a single level" do
@@ -189,7 +189,7 @@ describe Mongoid::Reloading do
     context "when embedded documents change" do
 
       let(:person) do
-        Person.create(:ssn => "112-11-1123", :title => "Sir")
+        Person.create
       end
 
       let!(:address) do
@@ -211,7 +211,7 @@ describe Mongoid::Reloading do
     context "with relational associations" do
 
       let(:person) do
-        Person.create(:ssn => "112-11-1124", :title => "Sir")
+        Person.create
       end
 
       context "for a references_one" do

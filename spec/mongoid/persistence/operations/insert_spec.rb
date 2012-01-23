@@ -31,7 +31,7 @@ describe Mongoid::Persistence::Operations::Insert do
     context "when the insert succeeded" do
 
       let(:person) do
-        Person.create(:ssn => "323-21-1111")
+        Person.create
       end
 
       let(:in_map) do

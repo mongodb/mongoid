@@ -46,7 +46,7 @@ describe Mongoid::Criterion::Inclusion do
     context "when providing string ids" do
 
       let!(:person) do
-        Person.create(:ssn => "444-44-4444")
+        Person.create
       end
 
       let(:from_db) do
@@ -183,7 +183,7 @@ describe Mongoid::Criterion::Inclusion do
     context "when chaining after a where" do
 
       let!(:person) do
-        Person.create(:ssn => "423-11-1111", :title => "sir")
+        Person.create(:title => "sir")
       end
 
       let(:criteria) do
@@ -242,7 +242,7 @@ describe Mongoid::Criterion::Inclusion do
     context "when providing string ids" do
 
       let!(:person) do
-        Person.create(:ssn => "444-44-4444")
+        Person.create
       end
 
       let(:from_db) do
@@ -633,7 +633,7 @@ describe Mongoid::Criterion::Inclusion do
     end
 
     let!(:person) do
-      Person.create(:ssn => "123-12-1211")
+      Person.create
     end
 
     context "when including a has and belongs to many" do
@@ -730,7 +730,7 @@ describe Mongoid::Criterion::Inclusion do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create(:ssn => "123-43-2123")
+          Person.create
         end
 
         let!(:preference_three) do
@@ -849,7 +849,7 @@ describe Mongoid::Criterion::Inclusion do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create(:ssn => "123-43-2123")
+          Person.create
         end
 
         let!(:post_three) do
@@ -933,7 +933,7 @@ describe Mongoid::Criterion::Inclusion do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create(:ssn => "123-43-2125")
+          Person.create
         end
 
         let!(:game_three) do
@@ -965,7 +965,7 @@ describe Mongoid::Criterion::Inclusion do
     context "when including a belongs to" do
 
       let(:person_two) do
-        Person.create(:ssn => "243-11-0978")
+        Person.create
       end
 
       let!(:game_one) do

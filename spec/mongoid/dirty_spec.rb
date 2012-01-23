@@ -836,7 +836,7 @@ describe Mongoid::Dirty do
   context "when only embedded documents change" do
 
     let!(:person) do
-      Person.create(:ssn => "132-11-1111")
+      Person.create
     end
 
     context "when the child is an embeds one" do
@@ -940,7 +940,7 @@ describe Mongoid::Dirty do
   context "when modifying a many to many key" do
 
     let!(:person) do
-      Person.create(:ssn => "342-89-2439")
+      Person.create
     end
 
     let!(:preference) do
@@ -961,7 +961,7 @@ describe Mongoid::Dirty do
   context "when accessing an array field" do
 
     let!(:person) do
-      Person.create(:ssn => "342-89-2431")
+      Person.create
     end
 
     let(:from_db) do
@@ -983,7 +983,7 @@ describe Mongoid::Dirty do
   context "when reloading an unchanged document" do
 
     let!(:person) do
-      Person.create(:ssn => "452-11-1092")
+      Person.create
     end
 
     let(:from_db) do

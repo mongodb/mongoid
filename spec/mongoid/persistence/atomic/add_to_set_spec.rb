@@ -193,7 +193,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
     context "when the field does not exist" do
 
       let(:person) do
-        Person.create(:ssn => "123-34-3457")
+        Person.create
       end
 
       context "when adding a single value" do

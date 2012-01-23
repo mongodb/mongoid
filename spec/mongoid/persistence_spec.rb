@@ -267,7 +267,7 @@ describe Mongoid::Persistence do
     describe "##{method}" do
 
       let(:person) do
-        Person.create(:ssn => "218-32-6789")
+        Person.create
       end
 
       context "when removing a root document" do
@@ -777,7 +777,7 @@ describe Mongoid::Persistence do
     context "when updating a deeply embedded document" do
 
       let!(:person) do
-        Person.create(:ssn => "345-12-1212")
+        Person.create
       end
 
       let!(:address) do
@@ -811,7 +811,7 @@ describe Mongoid::Persistence do
     context "when saving with a hash field with invalid keys" do
 
       let(:person) do
-        Person.create(:ssn => "717-98-2342")
+        Person.create
       end
 
       it "raises an error" do
@@ -824,7 +824,7 @@ describe Mongoid::Persistence do
     context "when validation passes" do
 
       let(:person) do
-        Person.create(:ssn => "717-98-9999")
+        Person.create
       end
 
       let!(:saved) do
@@ -847,7 +847,7 @@ describe Mongoid::Persistence do
     context "when the document has been destroyed" do
 
       let!(:person) do
-        Person.create(:ssn => "717-98-9999")
+        Person.create
       end
 
       before do
@@ -905,7 +905,7 @@ describe Mongoid::Persistence do
       context "when providing a parent to a referenced in" do
 
         let!(:person) do
-          Person.create(:ssn => "666-66-6666")
+          Person.create
         end
 
         let!(:post) do
@@ -1031,7 +1031,7 @@ describe Mongoid::Persistence do
     describe "##{method}" do
 
       let!(:person) do
-        Person.create(:ssn => "712-34-5111", :title => "sir")
+        Person.create(:title => "sir")
       end
 
       context "when no conditions are provided" do
@@ -1052,7 +1052,7 @@ describe Mongoid::Persistence do
       context "when conditions are provided" do
 
         let!(:person_two) do
-          Person.create(:ssn => "712-34-5112", :title => "madam")
+          Person.create
         end
 
         context "when in a conditions attribute" do
@@ -1147,7 +1147,7 @@ describe Mongoid::Persistence do
     end
 
     let(:person) do
-      Person.create(:ssn => "543-11-9999")
+      Person.create
     end
 
     context "when value is an empty string" do

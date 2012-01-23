@@ -541,12 +541,12 @@ describe Mongoid::Criteria do
       Person.all
     end
 
-    before do
-      Person.create(:ssn => "555-55-1212")
+    let!(:person) do
+      Person.create
     end
 
     it "returns the results as a json string" do
-      criteria.to_json.should include("\"ssn\":\"555-55-1212\"")
+      criteria.to_json.should include("\"_id\":\"#{person.id}\"")
     end
   end
 

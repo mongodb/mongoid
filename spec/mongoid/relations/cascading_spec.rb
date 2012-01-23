@@ -63,7 +63,7 @@ describe Mongoid::Relations::Cascading do
         context "when dependent is delete" do
 
           let(:person) do
-            Person.create(:ssn => "609-00-4343")
+            Person.create
           end
 
           let!(:post) do
@@ -84,7 +84,7 @@ describe Mongoid::Relations::Cascading do
         context "when dependent is destroy" do
 
           let(:person) do
-            Person.create(:ssn => "609-00-4343")
+            Person.create
           end
 
           let!(:game) do
@@ -167,7 +167,7 @@ describe Mongoid::Relations::Cascading do
           context "when nullifying a many to many" do
 
             let(:person) do
-              Person.create(:ssn => "009-00-0111")
+              Person.create
             end
 
             let!(:preference) do

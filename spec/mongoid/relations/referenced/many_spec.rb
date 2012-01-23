@@ -54,7 +54,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           let!(:person) do
-            Person.create(:ssn => "345-11-1124") do |doc|
+            Person.create do |doc|
               doc.posts << post
             end
           end
@@ -83,7 +83,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create(:ssn => "554-44-3891")
+            Person.create
           end
 
           let(:post) do
@@ -290,7 +290,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:post) do
@@ -547,7 +547,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         context "when dependent is destructive" do
@@ -678,7 +678,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#avg" do
 
     let(:person) do
-      Person.create(:ssn => "123-45-6789")
+      Person.create
     end
 
     let(:post_one) do
@@ -768,7 +768,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create(:ssn => "554-44-3891")
+            Person.create
           end
 
           let!(:post) do
@@ -895,7 +895,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the parent has been persisted" do
 
         let!(:person) do
-          Person.create(:ssn => "123-45-9988")
+          Person.create
         end
 
         context "when the children are persisted" do
@@ -1079,7 +1079,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         let!(:person) do
-          Person.create(:ssn => "345-11-1124") do |doc|
+          Person.create do |doc|
             doc.posts.concat([ post ])
           end
         end
@@ -1108,7 +1108,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "554-44-3891")
+          Person.create
         end
 
         let(:post) do
@@ -1335,7 +1335,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when providing scoped mass assignment" do
 
       let(:person) do
-        Person.create(:ssn => "213-12-2121")
+        Person.create
       end
 
       let(:drug) do
@@ -1373,7 +1373,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "554-44-3891")
+          Person.create
         end
 
         let!(:post) do
@@ -1463,7 +1463,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when providing mass scoping options" do
 
       let(:person) do
-        Person.create(:ssn => "213-12-2121")
+        Person.create
       end
 
       let(:drug) do
@@ -1501,7 +1501,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "554-44-3891")
+          Person.create
         end
 
         let!(:post) do
@@ -1601,7 +1601,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#delete" do
 
     let!(:person) do
-      Person.create(:ssn => "123-11-1111")
+      Person.create
     end
 
     context "when the document is found" do
@@ -1734,7 +1734,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when conditions are provided" do
 
           let(:person) do
-            Person.create(:ssn => "123-32-2321")
+            Person.create
           end
 
           before do
@@ -1760,7 +1760,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when conditions are not provided" do
 
           let(:person) do
-            Person.create(:ssn => "123-32-2321")
+            Person.create
           end
 
           before do
@@ -1854,7 +1854,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when the relation is not polymorphic" do
 
       let!(:person) do
-        Person.create(:ssn => "243-12-5243")
+        Person.create
       end
 
       let!(:post) do
@@ -1932,7 +1932,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#exists?" do
 
     let!(:person) do
-      Person.create(:ssn => "292-19-4232")
+      Person.create
     end
 
     context "when documents exist in the database" do
@@ -1973,7 +1973,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when the document is in the map" do
 
         let(:person) do
-          Person.create(:ssn => "123-11-1111")
+          Person.create
         end
 
         before do
@@ -2434,7 +2434,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#max" do
 
     let(:person) do
-      Person.create(:ssn => "123-45-6789")
+      Person.create
     end
 
     let(:post_one) do
@@ -2461,7 +2461,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#method_missing" do
 
     let!(:person) do
-      Person.create(:ssn => "333-33-3333")
+      Person.create
     end
 
     let!(:post_one) do
@@ -2519,7 +2519,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#min" do
 
     let(:person) do
-      Person.create(:ssn => "123-45-6789")
+      Person.create
     end
 
     let(:post_one) do
@@ -2548,7 +2548,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when the inverse has not been loaded" do
 
       let(:person) do
-        Person.create(:ssn => "999-99-9988")
+        Person.create
       end
 
       let!(:post_one) do
@@ -2585,7 +2585,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create(:ssn => "999-99-9999")
+        Person.create
       end
 
       let!(:post_one) do
@@ -2700,7 +2700,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#sum" do
 
     let(:person) do
-      Person.create(:ssn => "123-45-6789")
+      Person.create
     end
 
     let(:post_one) do
@@ -2781,7 +2781,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when the relation has no default scope" do
 
       let!(:person) do
-        Person.create(:ssn => "123-11-1111")
+        Person.create
       end
 
       let!(:post_one) do
@@ -2848,7 +2848,7 @@ describe Mongoid::Relations::Referenced::Many do
   context "when the association has an order defined" do
 
     let(:person) do
-      Person.create(:ssn => "999-99-9999")
+      Person.create
     end
 
     let(:post_one) do
@@ -2884,7 +2884,7 @@ describe Mongoid::Relations::Referenced::Many do
   context "when reloading the relation" do
 
     let!(:person) do
-      Person.create(:ssn => "243-41-9678")
+      Person.create
     end
 
     let!(:post_one) do

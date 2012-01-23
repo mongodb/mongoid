@@ -33,7 +33,7 @@ end
 describe "when embedding a model on an already saved model" do
 
   let(:person) do
-    Person.create(:ssn => "654-33-2222")
+    Person.create
   end
 
   before do

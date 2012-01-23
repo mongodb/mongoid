@@ -35,7 +35,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
     context "when the insert succeeded" do
 
       let(:person) do
-        Person.create(:ssn => "323-21-1111")
+        Person.create
       end
 
       let(:address) do

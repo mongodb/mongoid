@@ -93,7 +93,7 @@ describe Mongoid::Relations::Synchronization do
   context "when first setting by the relation itself" do
 
     let!(:person) do
-      Person.create(:ssn => "342-12-2222")
+      Person.create
     end
 
     let!(:one) do
@@ -132,7 +132,7 @@ describe Mongoid::Relations::Synchronization do
   context "when setting new ids" do
 
     let!(:person) do
-      Person.create(:ssn => "342-12-2222")
+      Person.create
     end
 
     let!(:one) do

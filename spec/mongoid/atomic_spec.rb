@@ -7,7 +7,7 @@ describe Mongoid::Atomic do
     context "when the document is persisted" do
 
       let(:person) do
-        Person.create(:ssn => "231-11-9956")
+        Person.create
       end
 
       context "when the document is modified" do

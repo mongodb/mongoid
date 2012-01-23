@@ -7,7 +7,7 @@ describe Mongoid::Relations::Accessors do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create(:ssn => "666-66-6666")
+        Person.create
       end
 
       context "when the relation is a many to many" do

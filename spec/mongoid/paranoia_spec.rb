@@ -81,7 +81,7 @@ describe Mongoid::Paranoia do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "888-88-1212")
+        Person.create
       end
 
       let(:phone) do
@@ -169,7 +169,7 @@ describe Mongoid::Paranoia do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "888-88-1212")
+        Person.create
       end
 
       let(:phone) do
@@ -263,7 +263,7 @@ describe Mongoid::Paranoia do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "888-88-1212")
+        Person.create
       end
 
       let(:phone) do
@@ -318,7 +318,7 @@ describe Mongoid::Paranoia do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "888-88-1212")
+        Person.create
       end
 
       let(:phone) do
@@ -398,7 +398,7 @@ describe Mongoid::Paranoia do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "888-88-1212")
+        Person.create
       end
 
       let(:phone) do
@@ -494,7 +494,7 @@ describe Mongoid::Paranoia do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create(:ssn => "888-88-1212")
+        Person.create
       end
 
       let(:phone) do

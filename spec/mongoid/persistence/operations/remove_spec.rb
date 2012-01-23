@@ -70,7 +70,7 @@ describe Mongoid::Persistence::Operations::Remove do
     context "when the remove succeeded" do
 
       let!(:person) do
-        Person.create(:ssn => "323-21-1111")
+        Person.create
       end
 
       before do

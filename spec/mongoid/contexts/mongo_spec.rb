@@ -34,7 +34,7 @@ describe Mongoid::Contexts::Mongo do
       context "when values do not exist" do
 
         before do
-          Person.create(:ssn => "534-12-0923")
+          Person.create
         end
 
         it "returns nil" do
@@ -45,7 +45,7 @@ describe Mongoid::Contexts::Mongo do
       context "when no document has the field" do
 
         before do
-          Person.create(:ssn => "121-11-1234")
+          Person.create
         end
 
         it "returns 0" do
@@ -227,7 +227,7 @@ describe Mongoid::Contexts::Mongo do
       context "when the field is not defined" do
 
         before do
-          Person.create(:ssn => "123-22-1111")
+          Person.create
           Person.create(:ssn => "123-22-1112", :no_definition => 5)
         end
 
@@ -239,7 +239,7 @@ describe Mongoid::Contexts::Mongo do
       context "when no document has the field" do
 
         before do
-          Person.create(:ssn => "121-11-1234")
+          Person.create
         end
 
         it "returns 0" do
@@ -278,7 +278,7 @@ describe Mongoid::Contexts::Mongo do
       context "when the field is not defined" do
 
         before do
-          Person.create(:ssn => "123-22-1111")
+          Person.create
           Person.create(:ssn => "123-22-1112", :no_definition => 5)
         end
 
@@ -290,7 +290,7 @@ describe Mongoid::Contexts::Mongo do
       context "when no document has the field" do
 
         before do
-          Person.create(:ssn => "121-11-1234")
+          Person.create
         end
 
         it "returns 0" do
@@ -347,7 +347,7 @@ describe Mongoid::Contexts::Mongo do
       context "when they do not contain the field" do
 
         before do
-          Person.create(:ssn => "243-12-2143")
+          Person.create
         end
 
         it "returns nil" do
@@ -358,7 +358,7 @@ describe Mongoid::Contexts::Mongo do
       context "when the field is not defined" do
 
         before do
-          Person.create(:ssn => "123-22-1111")
+          Person.create
           Person.create(:ssn => "123-22-1112", :no_definition => 5)
         end
 
@@ -370,7 +370,7 @@ describe Mongoid::Contexts::Mongo do
       context "when no document has the field" do
 
         before do
-          Person.create(:ssn => "121-11-1234")
+          Person.create
         end
 
         it "returns 0" do

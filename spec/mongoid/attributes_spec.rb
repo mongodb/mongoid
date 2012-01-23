@@ -46,7 +46,7 @@ describe Mongoid::Attributes do
     context "when the document is an existing record" do
 
       let!(:person) do
-        Person.create(:ssn => "123-11-4413")
+        Person.create
       end
 
       context "when the attribute does not exist" do
@@ -1392,7 +1392,7 @@ describe Mongoid::Attributes do
     context "when no value exists in the database" do
 
       let(:person) do
-        Person.create(:ssn => "123-77-7763")
+        Person.create
       end
 
       it "applies the default value" do

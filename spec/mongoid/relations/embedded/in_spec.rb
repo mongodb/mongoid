@@ -66,7 +66,7 @@ describe Mongoid::Relations::Embedded::In do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:name) do
@@ -211,7 +211,7 @@ describe Mongoid::Relations::Embedded::In do
       context "when the documents are not new records" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:name) do
@@ -281,7 +281,7 @@ describe Mongoid::Relations::Embedded::In do
       context "when the documents are not new records" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:address) do
@@ -309,7 +309,7 @@ describe Mongoid::Relations::Embedded::In do
       context "when a child already exists on the parent" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:address_one) do
@@ -443,7 +443,7 @@ describe Mongoid::Relations::Embedded::In do
   context "when creating the tree through initialization" do
 
     let!(:person) do
-      Person.create(:ssn => "666-66-6666")
+      Person.create
     end
 
     let!(:address) do
@@ -484,7 +484,7 @@ describe Mongoid::Relations::Embedded::In do
   context "when instantiating a new child with a persisted parent" do
 
     let!(:person) do
-      Person.create(:ssn => "666-66-6666")
+      Person.create
     end
 
     let!(:address) do
@@ -507,11 +507,11 @@ describe Mongoid::Relations::Embedded::In do
   context "when replacing the relation with another" do
 
     let!(:person) do
-      Person.create(:ssn => "321-99-8888")
+      Person.create
     end
 
     let!(:person_two) do
-      Person.create(:ssn => "321-99-8889")
+      Person.create
     end
 
     let!(:address) do

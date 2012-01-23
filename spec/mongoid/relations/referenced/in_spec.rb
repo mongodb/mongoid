@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Referenced::In do
 
   let(:person) do
-    Person.create(:ssn => "555-55-1111")
+    Person.create
   end
 
   describe "#=" do
@@ -55,7 +55,7 @@ describe Mongoid::Relations::Referenced::In do
     context "when referencing a document from an embedded document" do
 
       let(:person) do
-        Person.create(:ssn => "111-11-1111")
+        Person.create
       end
 
       let(:address) do
@@ -411,7 +411,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create(:ssn => "437-11-1112")
+            Person.create
           end
 
           let(:game) do
@@ -656,7 +656,7 @@ describe Mongoid::Relations::Referenced::In do
     context "when the relation is not polymorphic" do
 
       let!(:person) do
-        Person.create(:ssn => "243-12-5243")
+        Person.create
       end
 
       let!(:post) do
@@ -792,7 +792,7 @@ describe Mongoid::Relations::Referenced::In do
   context "when replacing the relation with another" do
 
     let!(:person) do
-      Person.create(:ssn => "321-99-8888")
+      Person.create
     end
 
     let!(:post) do
@@ -878,11 +878,11 @@ describe Mongoid::Relations::Referenced::In do
   context "when reloading the relation" do
 
     let!(:person_one) do
-      Person.create(:ssn => "243-41-9678", :title => "Mr.")
+      Person.create
     end
 
     let!(:person_two) do
-      Person.create(:ssn => "243-41-9699", :title => "Sir")
+      Person.create(:title => "Sir")
     end
 
     let!(:game) do

@@ -45,7 +45,7 @@ describe Mongoid::Persistence::Atomic::Pull do
     context "when the field does not exist" do
 
       let(:person) do
-        Person.create(:ssn => "123-34-3457")
+        Person.create
       end
 
       let!(:pulled) do

@@ -130,7 +130,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       let!(:person) do
-        Person.create(:ssn => "456-11-1123")
+        Person.create
       end
 
       let(:game) do

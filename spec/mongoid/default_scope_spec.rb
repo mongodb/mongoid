@@ -83,7 +83,7 @@ describe Mongoid::DefaultScope do
   context "when providing a default scope on an embedded document" do
 
     let!(:person) do
-      Person.create(:ssn => "111-11-1111")
+      Person.create
     end
 
     let!(:tron) do

@@ -66,7 +66,7 @@ describe Mongoid::Relations::Embedded::One do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:name) do
@@ -225,7 +225,7 @@ describe Mongoid::Relations::Embedded::One do
       context "when the parent is persisted" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let(:name) do
@@ -484,7 +484,7 @@ describe Mongoid::Relations::Embedded::One do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let!(:name) do
@@ -675,7 +675,7 @@ describe Mongoid::Relations::Embedded::One do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create(:ssn => "437-11-1112")
+          Person.create
         end
 
         let!(:name) do
@@ -771,7 +771,7 @@ describe Mongoid::Relations::Embedded::One do
   context "when the embedded document has an array field" do
 
     let!(:person) do
-      Person.create(:ssn => "673-11-2321")
+      Person.create
     end
 
     let!(:name) do

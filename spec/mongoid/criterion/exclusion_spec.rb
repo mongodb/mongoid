@@ -196,7 +196,7 @@ describe Mongoid::Criterion::Exclusion do
   describe "#without" do
 
     let!(:person) do
-      Person.create(:ssn => "123-22-1212")
+      Person.create
     end
 
     context "when used in a named scope" do

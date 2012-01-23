@@ -411,11 +411,11 @@ describe Mongoid::Finders do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create(:ssn => "333-22-1111")
+        Person.create(:title => "sir")
       end
 
       it "returns the document" do
-        Person.find_by(:ssn => "333-22-1111").should eq(person)
+        Person.find_by(:title => "sir").should eq(person)
       end
     end
 

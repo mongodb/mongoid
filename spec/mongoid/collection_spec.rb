@@ -32,15 +32,13 @@ describe Mongoid::Collection do
     end
 
     let!(:person) do
-      Person.create(:ssn => "123-11-1232")
+      Person.create
     end
 
     context "when an enslave option does not exist" do
 
       it "sends the query to the master" do
-        collection.find_one(
-          { :ssn => "123-11-1232" }
-        )["_id"].should eq(person.id)
+        collection.find_one["_id"].should eq(person.id)
       end
     end
   end

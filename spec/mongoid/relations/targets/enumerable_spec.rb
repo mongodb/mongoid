@@ -7,7 +7,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when comparing with an enumerable" do
 
       let(:person) do
-        Person.create(:ssn => "543-98-1234")
+        Person.create
       end
 
       let!(:post) do
@@ -112,7 +112,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#<<" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let!(:post) do
@@ -142,7 +142,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#any?" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let!(:post_one) do
@@ -199,7 +199,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#clear" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let!(:post) do
@@ -245,7 +245,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#clone" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let!(:post) do
@@ -285,7 +285,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#delete" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     context "when the document is loaded" do
@@ -398,7 +398,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#delete_if" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     context "when the document is loaded" do
@@ -509,7 +509,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#each" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let!(:post) do
@@ -627,7 +627,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#entries" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let(:criteria) do
@@ -661,7 +661,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#first" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     context "when the enumerable is not loaded" do
@@ -826,7 +826,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#include?" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     let!(:post_one) do
@@ -1031,7 +1031,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#last" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1234")
+      Person.create
     end
 
     context "when the enumerable is not loaded" do
@@ -1187,7 +1187,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#load_all!" do
 
     let(:person) do
-      Person.create(:ssn => "422-21-9687")
+      Person.create
     end
 
     let!(:post) do
@@ -1222,7 +1222,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#reset" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1238")
+      Person.create
     end
 
     let(:post) do
@@ -1278,7 +1278,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#size" do
 
     let(:person) do
-      Person.create(:ssn => "543-98-1238")
+      Person.create
     end
 
     let!(:post) do
@@ -1361,7 +1361,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#to_json" do
 
     let(:person) do
-      Person.create(:ssn => "422-21-9687")
+      Person.create
     end
 
     let!(:post) do
@@ -1392,7 +1392,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#to_json(parameters)" do
 
     let(:person) do
-      Person.create(:ssn => "422-21-9687")
+      Person.create
     end
 
     let!(:post) do
@@ -1415,7 +1415,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#as_json" do
 
     let(:person) do
-      Person.create(:ssn => "422-21-9687")
+      Person.create
     end
 
     let!(:post) do
@@ -1447,7 +1447,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#as_json(parameters)" do
 
     let(:person) do
-      Person.create(:ssn => "422-21-9687")
+      Person.create
     end
 
     let!(:post) do
@@ -1471,7 +1471,7 @@ describe Mongoid::Relations::Targets::Enumerable do
   describe "#uniq" do
 
     let(:person) do
-      Person.create(:ssn => "422-21-9687")
+      Person.create
     end
 
     let!(:post) do
