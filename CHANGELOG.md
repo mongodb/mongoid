@@ -68,6 +68,7 @@ For instructions on upgrading to newer versions, visit
   handles regex searches and elements of varying length. (Douwe Maan)
 
 * \#1623 Default scopes no longer break Mongoid::Versioning.
+  (Hans Hasselberg)
 
 ## 2.4.2
 
