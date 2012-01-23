@@ -42,6 +42,7 @@ module Mongoid #:nodoc
     #
     # @return [ Hash ] A hash of secondary databases.
     def databases
+      @databases ||= nil
       configure_extras(@settings["databases"]) unless @databases || !@settings
       @databases || {}
     end
