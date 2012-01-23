@@ -64,7 +64,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def builder(name, metadata)
           tap do
-            define_method("build_#{name}") do |*args|
+            meth = "build_#{name}"
+            undef_method(meth) if method_defined?(meth)
+            define_method(meth) do |*args|
               attributes, options = parse_args(*args)
               document = Factory.build(metadata.klass, attributes, options)
               _building do
@@ -88,7 +90,9 @@ module Mongoid # :nodoc:
         # @since 2.0.0.rc.1
         def creator(name, metadata)
           tap do
-            define_method("create_#{name}") do |*args|
+            meth = "create_#{name}"
+            undef_method(meth) if method_defined?(meth)
+            define_method(meth) do |*args|
               attributes, options = parse_args(*args)
               document = Factory.build(metadata.klass, attributes, options)
               send("#{name}=", document).tap { |doc| doc.save }

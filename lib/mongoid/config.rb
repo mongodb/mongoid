@@ -17,7 +17,7 @@ module Mongoid #:nodoc
     include ActiveModel::Observing
 
     # @attribute [rw] master The master database.
-    attr_accessor :master, :reconnect
+    attr_accessor :reconnect
 
     option :allow_dynamic_fields, :default => true
     option :autocreate_indexes, :default => false
@@ -42,6 +42,7 @@ module Mongoid #:nodoc
     #
     # @return [ Hash ] A hash of secondary databases.
     def databases
+      @databases ||= nil
       configure_extras(@settings["databases"]) unless @databases || !@settings
       @databases || {}
     end
