@@ -557,8 +557,7 @@ describe Mongoid::Criteria do
         Person.create!(
           :title => "Sir",
           :age => (n * 10),
-          :aliases => ["D", "Durran"],
-          :ssn => "#{n}"
+          :aliases => ["D", "Durran"]
         )
       end
     end

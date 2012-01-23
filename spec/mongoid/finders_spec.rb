@@ -55,7 +55,7 @@ describe Mongoid::Finders do
       context "when passed a string" do
 
         let!(:person) do
-          Person.create(:_id => 1, :ssn => "123-44-4321")
+          Person.create(:_id => 1)
         end
 
         let(:from_db) do
@@ -70,7 +70,7 @@ describe Mongoid::Finders do
       context "when passed an array of strings" do
 
         let!(:person) do
-          Person.create(:_id => 2, :ssn => "123-44-4321")
+          Person.create(:_id => 2)
         end
 
         let(:from_db) do
@@ -86,12 +86,12 @@ describe Mongoid::Finders do
     context "when using string ids" do
 
       let!(:person) do
-        Person.create(:title => "Mrs.", :ssn => "another")
+        Person.create(:title => "Mrs.")
       end
 
       let!(:documents) do
         3.times.map do |n|
-          Person.create(:title => "Mr.", :ssn => "#{n}22")
+          Person.create(:title => "Mr.")
         end
       end
 
@@ -217,12 +217,12 @@ describe Mongoid::Finders do
     context "when using object ids" do
 
       let!(:person) do
-        Person.create(:title => "Mrs.", :ssn => "another")
+        Person.create(:title => "Mrs.")
       end
 
       let!(:documents) do
         3.times.map do |n|
-          Person.create(:title => "Mr.", :ssn => "#{n}22")
+          Person.create(:title => "Mr.")
         end
       end
 
@@ -305,7 +305,7 @@ describe Mongoid::Finders do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create(:title => "Senior", :ssn => "333-22-1111")
+        Person.create(:title => "Senior")
       end
 
       it "returns the document" do
@@ -318,7 +318,7 @@ describe Mongoid::Finders do
       context "when not providing a block" do
 
         let!(:person) do
-          Person.find_or_create_by(:title => "Senorita", :ssn => "1234567")
+          Person.find_or_create_by(:title => "Senorita")
         end
 
         it "creates a persisted document" do
@@ -333,7 +333,7 @@ describe Mongoid::Finders do
       context "when providing a block" do
 
         let!(:person) do
-          Person.find_or_create_by(:title => "Senorita", :ssn => "1") do |person|
+          Person.find_or_create_by(:title => "Senorita") do |person|
             person.pets = true
           end
         end
@@ -358,7 +358,7 @@ describe Mongoid::Finders do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create(:title => "Senior", :ssn => "333-22-1111")
+        Person.create(:title => "Senior")
       end
 
       it "returns the document" do
@@ -371,7 +371,7 @@ describe Mongoid::Finders do
       context "when not providing a block" do
 
         let!(:person) do
-          Person.find_or_initialize_by(:title => "Senorita", :ssn => "1234567")
+          Person.find_or_initialize_by(:title => "Senorita")
         end
 
         it "creates a new document" do
@@ -386,7 +386,7 @@ describe Mongoid::Finders do
       context "when providing a block" do
 
         let!(:person) do
-          Person.find_or_initialize_by(:title => "Senorita", :ssn => "1") do |person|
+          Person.find_or_initialize_by(:title => "Senorita") do |person|
             person.pets = true
           end
         end

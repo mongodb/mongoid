@@ -19,7 +19,6 @@ describe Mongoid::Criteria do
     2.times do |n|
       Person.create(
         :title => "Sir",
-        :ssn => "666-66-666#{n}",
         :name => name,
         :addresses => [ address_one, address_two ]
       )

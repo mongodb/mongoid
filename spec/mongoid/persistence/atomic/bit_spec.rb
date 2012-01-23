@@ -5,7 +5,7 @@ describe Mongoid::Persistence::Atomic::Bit do
   describe "#bit" do
 
     let(:person) do
-      Person.create(:ssn => "777-66-1011", :age => 60)
+      Person.create(:age => 60)
     end
 
     let(:reloaded) do

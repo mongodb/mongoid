@@ -7,7 +7,7 @@ describe Mongoid::Persistence::Atomic::PullAll do
     context "when the field exists" do
 
       let(:person) do
-        Person.create(:ssn => "123-34-3456", :aliases => [ "007" ])
+        Person.create(:aliases => [ "007" ])
       end
 
       let!(:pulled) do

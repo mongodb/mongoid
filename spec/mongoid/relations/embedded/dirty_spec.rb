@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "when initialize a model with an embedded model" do
 
   let(:person) do
-    Person.new(:ssn => "444-44-1234", :pet => Pet.new)
+    Person.new(:pet => Pet.new)
   end
 
   it "has changes in the embedded model" do
@@ -18,7 +18,7 @@ end
 describe "when creating a model with an embedded model" do
 
   let(:person) do
-    Person.create(:ssn => "123-22-2222", :pet => Pet.new)
+    Person.create(:pet => Pet.new)
   end
 
   it "does not have changes in the embedded model" do

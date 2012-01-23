@@ -85,7 +85,7 @@ describe Mongoid::Timestamps do
   context "when only embedded documents have changed" do
 
     let!(:person) do
-      Person.create(:ssn => "123-12-1212", :updated_at => 2.days.ago)
+      Person.create(:updated_at => 2.days.ago)
     end
 
     let!(:address) do

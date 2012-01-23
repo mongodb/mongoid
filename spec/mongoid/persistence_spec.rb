@@ -17,7 +17,7 @@ describe Mongoid::Persistence do
     context "when providing attributes" do
 
       let(:person) do
-        Person.create(:title => "Sensei", :ssn => "666-66-6666")
+        Person.create(:title => "Sensei")
       end
 
       it "it saves the document" do
@@ -409,7 +409,7 @@ describe Mongoid::Persistence do
       context "when performing modification and insert ops" do
 
         let(:person) do
-          Person.create(:title => "Blah", :ssn => "244-01-1112")
+          Person.create(:title => "Blah")
         end
 
         let!(:address) do
@@ -462,7 +462,6 @@ describe Mongoid::Persistence do
         let!(:person) do
           Person.create(
             :title => "Blah",
-            :ssn => "244-01-1112",
             :addresses => [ address ]
           )
         end
@@ -505,7 +504,7 @@ describe Mongoid::Persistence do
       context "when removing elements without using delete or destroy" do
 
         let!(:person) do
-          Person.create!(:title => "Blah", :ssn => "244-01-1112")
+          Person.create!(:title => "Blah")
         end
 
         let(:from_db) do
@@ -598,7 +597,7 @@ describe Mongoid::Persistence do
     context "when setting an array field" do
 
       let(:person) do
-        Person.create(:ssn => "432-11-1123", :aliases => [])
+        Person.create(:aliases => [])
       end
 
       before do
@@ -864,7 +863,7 @@ describe Mongoid::Persistence do
     context "when updating through a one-to-one relation" do
 
       let(:person) do
-        Person.create!(:ssn => "666-77-8888")
+        Person.create!
       end
 
       let(:game) do
@@ -892,7 +891,7 @@ describe Mongoid::Persistence do
       end
 
       before do
-        person.update_attributes(:ssn => "555-55-1235", :pets => false, :title => nil)
+        person.update_attributes(:pets => false, :title => nil)
       end
 
       it "saves the new record" do

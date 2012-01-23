@@ -5,7 +5,7 @@ describe Mongoid::Persistence::Atomic::Sets do
   describe "#set" do
 
     let(:person) do
-      Person.create(:ssn => "777-66-1010", :age => 100, :pets => true)
+      Person.create(:age => 100, :pets => true)
     end
 
     let(:reloaded) do

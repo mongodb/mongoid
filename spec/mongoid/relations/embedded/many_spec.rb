@@ -315,7 +315,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when replacing an existing relation" do
 
       let(:person) do
-        Person.create(:ssn => "999-98-9988", :addresses => [
+        Person.create(:addresses => [
           Address.new(:street => "1st St"),
           Address.new(:street => "2nd St")
         ])

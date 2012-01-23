@@ -5,7 +5,7 @@ describe Mongoid::Criteria do
   [ :update, :update_all ].each do |method|
 
     let!(:person) do
-      Person.create(:title => "Sir", :ssn => "666-66-6666")
+      Person.create(:title => "Sir")
     end
 
     let!(:address_one) do

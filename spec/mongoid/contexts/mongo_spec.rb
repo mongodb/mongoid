@@ -20,8 +20,7 @@ describe Mongoid::Contexts::Mongo do
             Person.create(
               :title => "Sir",
               :age => ((n + 1) * 10),
-              :aliases => ["D", "Durran"],
-              :ssn => "#{n}"
+              :aliases => ["D", "Durran"]
             )
           end
         end
@@ -64,8 +63,7 @@ describe Mongoid::Contexts::Mongo do
           Person.create(
             :title => "Sir",
             :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"],
-            :ssn => "#{n}"
+            :aliases => ["D", "Durran"]
           )
         end
       end
@@ -118,8 +116,7 @@ describe Mongoid::Contexts::Mongo do
           Person.create(
             :title => "Sir",
             :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"],
-            :ssn => "#{n}"
+            :aliases => ["D", "Durran"]
           )
         end
       end
@@ -214,8 +211,7 @@ describe Mongoid::Contexts::Mongo do
           Person.create(
             :title => "Sir",
             :age => (n * 10),
-            :aliases => ["D", "Durran"],
-            :ssn => "#{n}"
+            :aliases => ["D", "Durran"]
           )
         end
       end
@@ -228,7 +224,7 @@ describe Mongoid::Contexts::Mongo do
 
         before do
           Person.create
-          Person.create(:ssn => "123-22-1112", :no_definition => 5)
+          Person.create(:no_definition => 5)
         end
 
         it "returns the sum" do
@@ -265,8 +261,7 @@ describe Mongoid::Contexts::Mongo do
           Person.create(
             :title => "Sir",
             :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"],
-            :ssn => "#{n}"
+            :aliases => ["D", "Durran"]
           )
         end
       end
@@ -279,7 +274,7 @@ describe Mongoid::Contexts::Mongo do
 
         before do
           Person.create
-          Person.create(:ssn => "123-22-1112", :no_definition => 5)
+          Person.create(:no_definition => 5)
         end
 
         it "returns the sum" do
@@ -306,7 +301,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       before do
-        Person.create(:ssn => "444-44-4444", :lunch_time => time)
+        Person.create(:lunch_time => time)
       end
 
       it "returns the value" do
@@ -333,8 +328,7 @@ describe Mongoid::Contexts::Mongo do
             Person.create(
               :title => "Sir",
               :age => 5,
-              :aliases => ["D", "Durran"],
-              :ssn => "#{n}"
+              :aliases => ["D", "Durran"]
             )
           end
         end
@@ -359,7 +353,7 @@ describe Mongoid::Contexts::Mongo do
 
         before do
           Person.create
-          Person.create(:ssn => "123-22-1112", :no_definition => 5)
+          Person.create(:no_definition => 5)
         end
 
         it "returns the sum" do

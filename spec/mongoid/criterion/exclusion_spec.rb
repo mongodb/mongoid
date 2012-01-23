@@ -12,8 +12,7 @@ describe Mongoid::Criterion::Exclusion do
       Person.create(
         :title => "Sir",
         :age => 100,
-        :aliases => ["D", "Durran"],
-        :ssn => "666666666"
+        :aliases => ["D", "Durran"]
       )
     end
 

@@ -193,10 +193,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     let!(:person) do
-      Person.create(
-        :ssn => "342-12-2222",
-        :preference_ids => [ one.id, two.id ]
-      )
+      Person.create(:preference_ids => [ one.id, two.id ])
     end
 
     let!(:three) do
@@ -261,10 +258,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     let!(:person) do
-      Person.create(
-        :ssn => "342-12-2222",
-        :preference_ids => [ one.id, two.id ]
-      )
+      Person.create(:preference_ids => [ one.id, two.id ])
     end
 
     before do
@@ -317,10 +311,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     let!(:person) do
-      Person.create(
-        :ssn => "342-12-2222",
-        :preference_ids => [ one.id, two.id ]
-      )
+      Person.create(:preference_ids => [ one.id, two.id ])
     end
 
     before do
@@ -373,10 +364,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     let!(:person) do
-      Person.create(
-        :ssn => "342-12-2222",
-        :preferences => [ one, two ]
-      )
+      Person.create(:preferences => [ one, two ])
     end
 
     context "when destroying the parent" do

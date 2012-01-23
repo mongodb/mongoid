@@ -43,7 +43,7 @@ describe Mongoid::Timestamps::Timeless do
       context "when used on the class" do
 
         let!(:person) do
-          Person.timeless.create(:ssn => "354-12-1212")
+          Person.timeless.create
         end
 
         it "does not set the created timestamp" do

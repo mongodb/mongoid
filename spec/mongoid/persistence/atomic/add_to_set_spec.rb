@@ -54,7 +54,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
       context "when the value is unique" do
 
         let(:person) do
-          Person.create(:ssn => "123-34-3456", :aliases => [ "007" ])
+          Person.create(:aliases => [ "007" ])
         end
 
         context "when adding a single value" do
@@ -123,7 +123,7 @@ describe Mongoid::Persistence::Atomic::AddToSet do
       context "when the value is not unique" do
 
         let(:person) do
-          Person.create(:ssn => "123-34-3456", :aliases => [ "Bond" ])
+          Person.create(:aliases => [ "Bond" ])
         end
 
         context "when adding a single value" do

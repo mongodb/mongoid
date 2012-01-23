@@ -323,7 +323,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the child is not a new record" do
 
           let(:movie) do
-            Movie.new(:ssn => "437-11-1112")
+            Movie.new
           end
 
           let(:rating) do
@@ -474,7 +474,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the parent is not a new record" do
 
           let(:bar) do
-            Bar.new(:ssn => "437-11-1112")
+            Bar.new
           end
 
           let(:rating) do
@@ -595,7 +595,7 @@ describe Mongoid::Relations::Referenced::In do
         context "when the parent is not a new record" do
 
           let(:movie) do
-            Movie.new(:ssn => "437-11-1112")
+            Movie.new
           end
 
           let(:rating) do

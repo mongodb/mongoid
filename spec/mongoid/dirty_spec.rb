@@ -923,7 +923,7 @@ describe Mongoid::Dirty do
   context "when changing a hash of hashes" do
 
     let!(:person) do
-      Person.create(:ssn => "123-11-1111", :map => { "test" => {}})
+      Person.create(:map => { "test" => {}})
     end
 
     before do
@@ -1004,7 +1004,6 @@ describe Mongoid::Dirty do
     let(:person) do
       Person.create(
         :title => "MC",
-        :ssn => "234-11-2533",
         :some_dynamic_field => 'blah'
       )
     end
@@ -1022,7 +1021,7 @@ describe Mongoid::Dirty do
     it "marks field changes" do
       person.changes.should eq({
         "title" => [ "MC", "DJ" ],
-        "ssn" => [ "234-11-2533", "222-22-2222" ],
+        "ssn" => [ nil, "222-22-2222" ],
         "some_dynamic_field" => [ "blah", "bloop" ]
       })
     end
@@ -1061,7 +1060,7 @@ describe Mongoid::Dirty do
 
       it "stores previous changes" do
         person.previous_changes["title"].should eq([ "MC", "DJ" ])
-        person.previous_changes["ssn"].should eq([ "234-11-2533", "222-22-2222" ])
+        person.previous_changes["ssn"].should eq([ nil, "222-22-2222" ])
       end
     end
 

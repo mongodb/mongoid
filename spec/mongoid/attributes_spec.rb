@@ -1369,7 +1369,7 @@ describe Mongoid::Attributes do
   context "when persisting nil attributes" do
 
     let!(:person) do
-      Person.create(:score => nil, :ssn => "555-66-7777")
+      Person.create(:score => nil)
     end
 
     it "has an entry in the attributes" do
@@ -1405,7 +1405,7 @@ describe Mongoid::Attributes do
       context "when the value is not nil" do
 
         let!(:person) do
-          Person.create(:ssn => "789-67-7861", :age => 50)
+          Person.create(:age => 50)
         end
 
         let(:from_db) do
@@ -1420,7 +1420,7 @@ describe Mongoid::Attributes do
       context "when the value is explicitly nil" do
 
         let!(:person) do
-          Person.create(:ssn => "789-67-7861", :age => nil)
+          Person.create(:age => nil)
         end
 
         let(:from_db) do

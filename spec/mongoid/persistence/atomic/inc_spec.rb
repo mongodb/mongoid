@@ -5,7 +5,7 @@ describe Mongoid::Persistence::Atomic::Inc do
   describe "#inc" do
 
     let(:person) do
-      Person.create(:ssn => "777-66-1010", :age => 100)
+      Person.create(:age => 100)
     end
 
     let(:reloaded) do

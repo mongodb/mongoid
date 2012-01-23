@@ -258,15 +258,15 @@ describe Mongoid::Criterion::Inclusion do
   describe "#any_of" do
 
     let!(:person_one) do
-      Person.create(:title => "Sir", :age => 5, :ssn => "098-76-5432")
+      Person.create(:title => "Sir", :age => 5)
     end
 
     let!(:person_two) do
-      Person.create(:title => "Sir", :age => 7, :ssn => "098-76-5433")
+      Person.create(:title => "Sir", :age => 7)
     end
 
     let!(:person_three) do
-      Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434")
+      Person.create(:title => "Madam", :age => 1)
     end
 
     context "when provided a hash" do
@@ -354,11 +354,11 @@ describe Mongoid::Criterion::Inclusion do
   describe "#all_of" do
 
     let!(:person_one) do
-      Person.safely.create!(:ssn => "354-12-1221")
+      Person.safely.create!
     end
 
     let!(:person_two) do
-      Person.safely.create!(:ssn => "354-12-1222")
+      Person.safely.create!
     end
 
     context "when providing object ids" do
@@ -1128,11 +1128,11 @@ describe Mongoid::Criterion::Inclusion do
     context "when passing in a range" do
 
       let!(:baby) do
-        Person.create(:ssn => "123-12-1212", :dob => Date.new(2011, 1, 1))
+        Person.create(:dob => Date.new(2011, 1, 1))
       end
 
       let!(:adult) do
-        Person.create(:ssn => "124-12-1212", :dob => Date.new(1980, 1, 1))
+        Person.create(:dob => Date.new(1980, 1, 1))
       end
 
       context "when the range matches documents" do

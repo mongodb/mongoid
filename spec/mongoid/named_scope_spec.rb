@@ -16,8 +16,7 @@ describe Mongoid::NamedScope do
       Person.create(
         :title => "Dr.",
         :age => 65,
-        :terms => true,
-        :ssn => "123-22-8346"
+        :terms => true
       )
     end
 
@@ -68,9 +67,9 @@ describe Mongoid::NamedScope do
     context "using order_by in a named scope" do
 
       before do
-        Person.create(:blood_alcohol_content => 0.5, :ssn => "121-22-8346")
-        Person.create(:blood_alcohol_content => 0.4, :ssn => "124-22-8346")
-        Person.create(:blood_alcohol_content => 0.7, :ssn => "125-22-8346")
+        Person.create(:blood_alcohol_content => 0.5)
+        Person.create(:blood_alcohol_content => 0.4)
+        Person.create(:blood_alcohol_content => 0.7)
       end
 
       let(:docs) do

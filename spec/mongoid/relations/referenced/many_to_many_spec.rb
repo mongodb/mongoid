@@ -160,7 +160,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             let(:person) do
-              Person.new(:ssn => "345-12-9867", :preference_ids => [ preference.id ])
+              Person.new(:preference_ids => [ preference.id ])
             end
 
             before do
@@ -1183,7 +1183,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.send(method, :ssn => "554-44-3891")
+            Person.send(method)
           end
 
           let!(:preference) do
@@ -2233,7 +2233,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   context "when setting the ids directly after the documents" do
 
     let!(:person) do
-      Person.create!(:ssn => "132-11-1433", :title => "The Boss")
+      Person.create!(:title => "The Boss")
     end
 
     let!(:girlfriend_house) do
