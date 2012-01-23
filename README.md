@@ -36,6 +36,8 @@ Donating
 <img alt='Click here to lend your support to: Mongoid and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/7757.png?skin_name=chrome' border='0'/>
 </a>
 
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=durran&url=http://github.com/mongoid&title=mongoid&language=&tags=github&category=software)
+
 License
 -------
 
