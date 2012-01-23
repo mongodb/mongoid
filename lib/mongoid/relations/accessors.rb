@@ -90,6 +90,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def getter(name, metadata)
+          undef_method(name) if method_defined?(name)
           define_method(name) do |*args|
             reload, variable = args.first, "@#{name}"
             if instance_variable_defined?(variable) && !reload
