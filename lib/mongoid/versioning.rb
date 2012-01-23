@@ -131,7 +131,7 @@ module Mongoid #:nodoc:
     # @since 2.0.0
     def previous_revision
       _loading_revision do
-        self.class.
+        self.class.unscoped.
           where(:_id => id).
           any_of({ :version => version }, { :version => nil }).first
       end
