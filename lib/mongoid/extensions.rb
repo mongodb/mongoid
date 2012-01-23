@@ -79,6 +79,7 @@ end
 
 class BSON::ObjectId #:nodoc
   extend Mongoid::Extensions::ObjectId::Conversions
+  undef :as_json
   def as_json(options = nil)
     to_s
   end
