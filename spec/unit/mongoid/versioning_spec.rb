@@ -45,6 +45,10 @@ describe Mongoid::Versioning do
       stub
     end
 
+    let(:unscoped) do
+      stub
+    end
+
     context "when a last version does not exist" do
 
       context "when versioning is new to the document" do
@@ -54,7 +58,8 @@ describe Mongoid::Versioning do
         end
 
         before do
-          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          WikiPage.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:_id => page.id).returns(criteria)
           criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
           match.expects(:first).returns(nil)
           page.revise
@@ -72,7 +77,8 @@ describe Mongoid::Versioning do
         end
 
         before do
-          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          WikiPage.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:_id => page.id).returns(criteria)
           criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
           match.expects(:first).returns(page)
           page.revise
@@ -95,7 +101,8 @@ describe Mongoid::Versioning do
       end
 
       before do
-        WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+        WikiPage.expects(:unscoped).returns(unscoped)
+        unscoped.expects(:where).with(:_id => page.id).returns(criteria)
         criteria.expects(:any_of).with({ :version => 2 }, { :version => nil }).returns(match)
         match.expects(:first).returns(first)
         page.revise
@@ -198,6 +205,10 @@ describe Mongoid::Versioning do
       stub
     end
 
+    let(:unscoped) do
+      stub
+    end
+
     context "when a last version does not exist" do
 
       context "when versioning is new to the document" do
@@ -208,7 +219,8 @@ describe Mongoid::Versioning do
         subject { page }
 
         before do
-          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          WikiPage.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:_id => page.id).returns(criteria)
           criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
           match.expects(:first).returns(nil)
           page.expects(:save)
@@ -227,7 +239,8 @@ describe Mongoid::Versioning do
         subject { page }
 
         before do
-          WikiPage.expects(:where).with(:_id => page.id).returns(criteria)
+          WikiPage.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:_id => page.id).returns(criteria)
           criteria.expects(:any_of).with({ :version => 1 }, { :version => nil }).returns(match)
           match.expects(:first).returns(page)
           page.expects(:save)
