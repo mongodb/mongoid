@@ -6,7 +6,6 @@ test:
       database: secondary_config_test
       host: localhost
   allow_dynamic_fields: false
-  parameterize_keys: false
   persist_in_safe_mode: false
   raise_not_found_error: false
   max_retries_on_connection_failure: 5

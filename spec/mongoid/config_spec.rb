@@ -69,10 +69,6 @@ describe Mongoid::Config do
         described_class.include_root_in_json.should be_true
       end
 
-      it "sets parameterize keys" do
-        described_class.parameterize_keys.should be_false
-      end
-
       it "sets scope_overwrite_exception" do
         described_class.scope_overwrite_exception.should be_false
       end
@@ -167,10 +163,6 @@ describe Mongoid::Config do
 
     it "sets include_root_in_json" do
       described_class.include_root_in_json.should be_true
-    end
-
-    it "sets parameterize keys" do
-      described_class.parameterize_keys.should be_false
     end
 
     it "sets scope_overwrite_exception" do
@@ -402,13 +394,6 @@ describe Mongoid::Config do
 
       it "defaults to false" do
         described_class.include_root_in_json.should be_false
-      end
-    end
-
-    describe ".parameterize_keys" do
-
-      it "defaults to true" do
-        described_class.parameterize_keys.should be_true
       end
     end
 

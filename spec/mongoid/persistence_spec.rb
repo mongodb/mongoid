@@ -4,12 +4,10 @@ describe Mongoid::Persistence do
 
   before(:all) do
     Mongoid.persist_in_safe_mode = true
-    Mongoid.parameterize_keys = false
   end
 
   after(:all) do
     Mongoid.persist_in_safe_mode = false
-    Mongoid.parameterize_keys = true
   end
 
   describe ".create" do

@@ -13,44 +13,6 @@ module Mongoid #:nodoc:
           inflect.irregular("canvas", "canvases")
         end
 
-        # Represents how special characters will get converted when creating a
-        # composite key that should be unique and part of a url.
-        CHAR_CONV = {
-          " " => "-",
-          "!" => "-excl-",
-          "\"" => "-dblquo-",
-          "#" => "-hash-",
-          "$" => "-dol-",
-          "%" => "-perc-",
-          "&" => "-and-",
-          "'" => "-quo-",
-          "(" => "-oparen-",
-          ")" => "-cparen-",
-          "*" => "-astx-",
-          "+" => "-plus-",
-          "," => "-comma-",
-          "-" => "-",
-          "." => "-period-",
-          "/" => "-fwdslsh-",
-          ":" => "-colon-",
-          ";" => "-semicol-",
-          "<" => "-lt-",
-          "=" => "-eq-",
-          ">" => "-gt-",
-          "?" => "-ques-",
-          "@" => "-at-",
-          "[" => "-obrck-",
-          "\\" => "-bckslsh-",
-          "]" => "-clbrck-",
-          "^" => "-carat-",
-          "_" => "-undscr-",
-          "`" => "-bcktick-",
-          "{" => "-ocurly-",
-          "|" => "-pipe-",
-          "}" => "-clcurly-",
-          "~" => "-tilde-"
-        }
-
         REVERSALS = {
           "asc" => "desc",
           "ascending" => "descending",
@@ -66,21 +28,6 @@ module Mongoid #:nodoc:
         # @return [ String ] The string in collection friendly form.
         def collectionize
           tableize.gsub("/", "_")
-        end
-
-        # Convert this string to a key friendly string.
-        #
-        # @example Convert to key.
-        #   "testing".identify
-        #
-        # @return [ String ] The key friendly string.
-        def identify
-          if Mongoid.parameterize_keys
-            key = ""
-            each_char { |c| key += (CHAR_CONV[c] || c.downcase) }; key
-          else
-            self
-          end
         end
 
         # Get the inverted sorting option.

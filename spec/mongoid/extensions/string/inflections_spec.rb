@@ -25,31 +25,6 @@ describe Mongoid::Extensions::String::Inflections do
     end
   end
 
-  describe "#identify" do
-
-    context "when parameterizing composite keys" do
-
-      it "converts the string to all lowercase and dashed" do
-        "A Midsummer Night's Dream".identify.should eq("a-midsummer-night-quo-s-dream")
-      end
-    end
-
-    context "when not parameterizing keys" do
-
-      before do
-        Mongoid.parameterize_keys = false
-      end
-
-      after do
-        Mongoid.parameterize_keys = true
-      end
-
-      it "does nothing to the keys" do
-        "A Midsummer Night's Dream".identify.should eq("A Midsummer Night's Dream")
-      end
-    end
-  end
-
   describe "invert" do
 
     context "when asc" do

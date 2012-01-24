@@ -73,7 +73,6 @@ module Rails #:nodoc:
       #       # - host: localhost
       #         # port: 27019
       #     allow_dynamic_fields: false
-      #     parameterize_keys: false
       #     persist_in_safe_mode: false
       #
       initializer "setup database" do
