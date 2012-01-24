@@ -90,6 +90,33 @@ describe Mongoid::NamedScope do
       end
     end
 
+    context "when there is a scope on parent class" do
+      before do
+        Person.class_eval do
+          scope(:important, where( title: 'VIP'))
+        end
+      end
+
+      context "when overwriting scope in child class" do
+
+        before do
+          Doctor.class_eval do
+            scope(:important, where( title: 'Dr.' ))
+          end
+        end
+
+        it "changes the child's scope" do
+          Doctor.important.selector.should eq({ title: 'Dr.' })
+        end
+
+        it "leaves the scope on parent class unchanged" do
+          Person.important.selector.should eq({ title: 'VIP' })
+        end
+
+      end
+
+    end
+
     context "when calling scopes on parent classes" do
 
       it "inherits the scope" do
