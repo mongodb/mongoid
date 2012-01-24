@@ -21,15 +21,33 @@ module Mongoid #:nodoc
       # @param [ Hash, Array, Object ] attrs The attributes or ids.
       def initialize(klass, attrs)
         @klass, @identifiers = klass, attrs
-        message = case attrs
-          when Hash
-            message_for_attributes(attrs)
-          else message_for_ids(attrs)
-        end
-        super(message)
+        super(compose_message)
+      end
+
+      def compose_message
+        "\nProblem:\n  #{problem}\n"+
+        "Summary:\n  #{summary}\n"+
+        "Resolution:\n  #{resolution}\n"
       end
 
       private
+
+      def problem
+        case identifiers
+        when Hash
+          problem_for_attributes
+        else
+          problem_for_ids
+        end
+      end
+
+      def summary
+        translate("document_not_found.summary", { :klass => klass.name })
+      end
+
+      def resolution
+        translate("document_not_found.resolution", { :klass => klass.name })
+      end
 
       # Create the message for id searches.
       #
@@ -41,9 +59,9 @@ module Mongoid #:nodoc
       # @return [ String ] The message.
       #
       # @since 3.0.0
-      def message_for_ids(ids)
+      def problem_for_ids
         translate(
-          "document_not_found",
+          "document_not_found.message",
           { :klass => klass.name, :identifiers => identifiers }
         )
       end
@@ -58,10 +76,10 @@ module Mongoid #:nodoc
       # @return [ String ] The message.
       #
       # @since 3.0.0
-      def message_for_attributes(attrs)
+      def problem_for_attributes
         translate(
           "document_with_attributes_not_found",
-          { :klass => klass.name, :attributes => attrs }
+          { :klass => klass.name, :attributes => identifiers }
         )
       end
     end

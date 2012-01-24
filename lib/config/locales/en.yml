@@ -9,7 +9,12 @@ en:
         calling_document_find_with_nil_is_invalid:
           "Calling Document#find with nil is invalid."
         document_not_found:
-          "Document not found for class %{klass} with id(s) %{identifiers}."
+          message: "Document not found for class %{klass} with id(s) %{identifiers}."
+          summary: "When calling %{klass}.find() with an id or array of ids, each
+            parameter must match a document in the database or this error will be raised."
+          resolution: "a) Search for an id that is in the database.\n
+            \ b) Set the Mongoid.raise_not_found_error configuration option to false,
+            which will cause a nil to be returned instead of raising this error."
         document_with_attributes_not_found:
           "Document not found for class %{klass} with attributes %{attributes}."
         eager_load:
