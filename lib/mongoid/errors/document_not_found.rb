@@ -9,7 +9,7 @@ module Mongoid #:nodoc
 
       attr_reader :klass, :identifiers
 
-      # Create hte new error.
+      # Create the new error.
       #
       # @example Create the error.
       #   DocumentNotFound.new(Person, ["1", "2"])
@@ -21,29 +21,77 @@ module Mongoid #:nodoc
       # @param [ Hash, Array, Object ] attrs The attributes or ids.
       def initialize(klass, attrs)
         @klass, @identifiers = klass, attrs
-        message = case attrs
-          when Hash
-            message_for_attributes(attrs)
-          else message_for_ids(attrs)
-        end
-        super(message)
+        super(compose_message)
+      end
+
+      # Compose the message.
+      #
+      # @example Create the message
+      #   error.compose_message
+      #
+      # @return [ String ] The composed message.
+      #
+      # @since 3.0.0
+      def compose_message
+        "\nProblem:\n  #{problem}"+
+        "\nSummary:\n  #{summary}"+
+        "\nResolution:\n  #{resolution}"
       end
 
       private
 
+      # Create the problem.
+      #
+      # @example Create the problem.
+      #   error.problem
+      #
+      # @return [ String ] The problem.
+      #
+      # @since 3.0.0
+      def problem
+        case identifiers
+        when Hash
+          problem_for_attributes
+        else
+          problem_for_ids
+        end
+      end
+
+      # Create the summary.
+      #
+      # @example Create the summary.
+      #   error.summary
+      #
+      # @return [ String ] The summary.
+      #
+      # @since 3.0.0
+      def summary
+        translate("document_not_found.summary", { :klass => klass.name })
+      end
+
+      # Create the resolution.
+      #
+      # @example Create the resolution.
+      #   error.resolution
+      #
+      # @return [ String ] The resolution.
+      #
+      # @since 3.0.0
+      def resolution
+        translate("document_not_found.resolution", { :klass => klass.name })
+      end
+
       # Create the message for id searches.
       #
       # @example Create the message.
-      #   error.message_for_ids(1)
-      #
-      # @param [ Array, Object ] ids The id or ids.
+      #   error.message_for_ids
       #
       # @return [ String ] The message.
       #
       # @since 3.0.0
-      def message_for_ids(ids)
+      def problem_for_ids
         translate(
-          "document_not_found",
+          "document_not_found.message",
           { :klass => klass.name, :identifiers => identifiers }
         )
       end
@@ -51,17 +99,15 @@ module Mongoid #:nodoc
       # Create the message for attribute searches.
       #
       # @example Create the message.
-      #   error.message_for_attributes(:foo => "bar")
-      #
-      # @param [ Hash ] attrs The attributes.
+      #   error.message_for_attributes
       #
       # @return [ String ] The message.
       #
       # @since 3.0.0
-      def message_for_attributes(attrs)
+      def problem_for_attributes
         translate(
           "document_with_attributes_not_found",
-          { :klass => klass.name, :attributes => attrs }
+          { :klass => klass.name, :attributes => identifiers }
         )
       end
     end
