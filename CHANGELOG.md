@@ -64,6 +64,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1636 Scopes no longer modify parent class scopes when subclassing.
+  (Hans Hasselberg)
+
 * \#1629 $all and $in criteria on embedded many relations now properly
   handles regex searches and elements of varying length. (Douwe Maan)
 
