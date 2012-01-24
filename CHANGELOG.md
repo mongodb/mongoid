@@ -70,6 +70,8 @@ For instructions on upgrading to newer versions, visit
 * \#1623 Default scopes no longer break Mongoid::Versioning.
   (Hans Hasselberg)
 
+* \#1605 Fix regression of rescue responses, Rails 3.2
+
 ## 2.4.2
 
 ### Resolved Issues

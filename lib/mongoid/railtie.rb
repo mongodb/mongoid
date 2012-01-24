@@ -23,7 +23,26 @@ module Rails #:nodoc:
         config.respond_to?(:app_generators) ? :app_generators : :generators
       end
 
+      # Maping of rescued exceptions to HTTP responses
+      #
+      # @example
+      #   railtie.rescue_responses
+      #
+      # @ return [Hash] rescued responses
+      #
+      # @since 2.4.3
+      def self.rescue_responses
+        {
+          "Mongoid::Errors::DocumentNotFound" => :not_found,
+          "Mongoid::Errors::Validations" => 422
+        }
+      end
+
       config.send(generator).orm :mongoid, :migration => false
+
+      if config.action_dispatch.rescue_responses
+        config.action_dispatch.rescue_responses.merge!(rescue_responses)
+      end
 
       rake_tasks do
         load "mongoid/railties/database.rake"
@@ -81,14 +100,8 @@ module Rails #:nodoc:
       # 404s and not 500s, validation errors are 422s.
       initializer "load http errors" do |app|
         config.after_initialize do
-          responses = {
-            "Mongoid::Errors::DocumentNotFound" => :not_found,
-            "Mongoid::Errors::Validations" => 422
-          }
-          if rescue_responses = config.action_dispatch.rescue_responses
-            rescue_responses.update(responses)
-          else
-            ActionDispatch::ShowExceptions.rescue_responses.update(responses)
+          unless config.action_dispatch.rescue_responses
+            ActionDispatch::ShowExceptions.rescue_responses.update(Railtie.rescue_responses)
           end
         end
       end
