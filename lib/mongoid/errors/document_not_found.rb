@@ -25,9 +25,9 @@ module Mongoid #:nodoc
       end
 
       def compose_message
-        "\nProblem:\n  #{problem}\n"+
-        "Summary:\n  #{summary}\n"+
-        "Resolution:\n  #{resolution}\n"
+        "\nProblem:\n  #{problem}"+
+        "\nSummary:\n  #{summary}"+
+        "\nResolution:\n  #{resolution}"
       end
 
       private
