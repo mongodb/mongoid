@@ -18,6 +18,7 @@ module Mongoid # :nodoc:
       # Backwards compatibility with Mongoid beta releases.
       delegate :klass, :to => :metadata
       delegate :bind_one, :unbind_one, :to => :binding
+      delegate :collection_name, :to => :base
 
       # Convenience for setting the target and the metadata properties since
       # all proxies will need to do this.

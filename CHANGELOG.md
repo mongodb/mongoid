@@ -3,59 +3,6 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.0 \[ In Development \] \[ Branch: master \]
-
-* Ranges can now be passed to #where criteria to create a $gte/$lte query under the
-  covers. `Person.where(dob: start_date...end_date)`
-
-## 2.3.4 \[ In Development \] \[ Branch: 2.3.0-stable \]
-
-* \#1445 Prevent duplicate documents in the loaded array on the target
-  enumerable for relational associations.
-
-* \#1442 When using create_ methods for has one relations, the appropriate
-  destructive methods now get called when replacing an existing document.
-
-* \#1431 Enumerable context should add to the loaded array post yield, so
-  that methods like #any? that short circuit based on the value of the block
-  dont falsely have extra documents.
-
-* \#1418 Documents being loaded from the database for revision purposes
-  no longer get placed in the identity map.
-
-* \#1399 Allow conversion of strings to integers in foreign keys where the
-  id is defined as an int.
-
-* \#1397 Don't add default sorting criteria on first if they sort criteria
-  already exists.
-
-* \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
-
-* \#1392 Return 0 on aggregation functions where field is nonexistant.
-
-* \#1391 Uniqueness validation now works properly on embedded documents that are
-  using primary key definitions.
-
-* \#1390 When _type field is lower case class camelize before constantizing.
-
-* \#1383 Fix cast on read for serializable fields that are subclassed.
-
-* \#1357 Delayed atomic sets from update_attributes on embedded documents
-  multiple levels deep now properly persist.
-
-* \#1326 Ensure base document on HABTM gets its keys saved after saving a newly
-  build child document.
-
-* \#1301 Don't overwrite base metadata on embedded in relations if already set.
-
-* \#1221 HABTM with inverse nil is allowed again on embedded documents.
-
-* \#1208 Don't auto-persist child documents via the setter when setting from
-  an embedded_in.
-
-* \#791 Root document updates its timestamps when only embedded documents have
-  changed.
-
 ## 2.3.3
 
 ### Resolved Issues
