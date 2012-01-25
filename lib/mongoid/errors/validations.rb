@@ -12,9 +12,12 @@ module Mongoid #:nodoc
       def initialize(document)
         @document = document
         super(
-          translate(
+          compose_message(
             "validations",
-            { :errors => document.errors.full_messages.join(", ") }
+            {
+              :document => document.class,
+              :errors => document.errors.full_messages.join(", ")
+            }
           )
         )
       end

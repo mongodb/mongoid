@@ -12,7 +12,7 @@ module Mongoid #:nodoc
       #
       # @since 2.4.0
       def initialize
-        super(translate("no_environment", {}))
+        super(compose_message("no_environment", {}))
       end
     end
   end

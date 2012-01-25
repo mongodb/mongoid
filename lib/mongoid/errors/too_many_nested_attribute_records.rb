@@ -9,7 +9,7 @@ module Mongoid #:nodoc
     class TooManyNestedAttributeRecords < MongoidError
       def initialize(association, limit)
         super(
-          translate(
+          compose_message(
             "too_many_nested_attribute_records",
             { :association => association, :limit => limit }
           )

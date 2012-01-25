@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1635 All exceptions now provide more comprehensive errors, including
+  the problem that occured, a detail summary of why it happened, and
+  potential resolutions.
+
 * \#1616 `Model.find_by` added which takes a hash of arugments to search
   for in the database. If no single document is returned a DocumentNotFound
   error is raised. (Piotr Jakubowski)

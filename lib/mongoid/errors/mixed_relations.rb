@@ -26,7 +26,7 @@ module Mongoid #:nodoc
         @root_klass, @embedded_klass = root_klass, embedded_klass
 
         super(
-          translate(
+          compose_message(
             "mixed_relations",
             { :root => root_klass, :embedded => embedded_klass }
           )

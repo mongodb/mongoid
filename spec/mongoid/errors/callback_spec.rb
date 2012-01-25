@@ -8,9 +8,21 @@ describe Mongoid::Errors::Callback do
       described_class.new(Post, :create!)
     end
 
-    it "returns the warning of callback returning false" do
+    it "contains the problem in the message" do
       error.message.should include(
         "Calling create! on Post resulted in a false return from a callback."
+      )
+    end
+
+    it "contains the summary in the message" do
+      error.message.should include(
+        "If a before callback returns false when using Document.create!"
+      )
+    end
+
+    it "contains the resolution in the message" do
+      error.message.should include(
+        "Double check all before callbacks to make sure they are not"
       )
     end
   end

@@ -10,7 +10,7 @@ module Mongoid #:nodoc
     class ScopeOverwrite < MongoidError
       def initialize(model_name,scope_name)
         super(
-          translate(
+          compose_message(
             "scope_overwrite",
             { :model_name => model_name, :scope_name => scope_name }
           )

@@ -9,15 +9,29 @@ describe Mongoid::Errors::Validations do
     end
 
     let(:document) do
-      stub(:errors => errors)
+      stub(:errors => errors, :class => Person)
     end
 
     let(:error) do
       described_class.new(document)
     end
 
-    it "contains the errors' full messages" do
-      error.message.should eq("Validation failed - Error 1, Error 2.")
+    it "contains the problem in the message" do
+      error.message.should include(
+        "Validation of Person failed"
+      )
+    end
+
+    it "contains the summary in the message" do
+      error.message.should include(
+        "The following errors were found: Error 1, Error 2"
+      )
+    end
+
+    it "contains the resolution in the message" do
+      error.message.should include(
+        "Try persisting the document with valid data"
+      )
     end
   end
 end

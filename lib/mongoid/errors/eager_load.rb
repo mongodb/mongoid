@@ -18,7 +18,7 @@ module Mongoid #:nodoc
       # @since 2.2.0
       def initialize(name)
         @name = name
-        super(translate("eager_load", { :name => name }))
+        super(compose_message("eager_load", { :name => name }))
       end
     end
   end

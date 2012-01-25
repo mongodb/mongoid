@@ -19,7 +19,9 @@ module Mongoid #:nodoc
       # @since 2.2.0
       def initialize(klass, method)
         @klass, @method = klass, method
-        super(translate("callbacks", { :klass => klass, :method => method }))
+        super(
+          compose_message("callbacks", { :klass => klass, :method => method })
+        )
       end
     end
   end

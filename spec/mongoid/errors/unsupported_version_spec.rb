@@ -12,9 +12,21 @@ describe Mongoid::Errors::UnsupportedVersion do
       described_class.new(version)
     end
 
-    it "returns a message with the bad version and good version" do
-      error.message.should eq(
-        "MongoDB 1.2.4 not supported, please upgrade to #{Mongoid::MONGODB_VERSION}."
+    it "contains the problem in the message" do
+      error.message.should include(
+        "MongoDB 1.2.4 not supported, please upgrade to"
+      )
+    end
+
+    it "contains the summary in the message" do
+      error.message.should include(
+        "Mongoid is relying on features that were introduced"
+      )
+    end
+
+    it "contains the resolution in the message" do
+      error.message.should include(
+        "Upgrade your MongoDB instances or keep Mongoid"
       )
     end
   end

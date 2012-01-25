@@ -17,7 +17,7 @@ module Mongoid #:nodoc
       # @since 2.1.0
       def initialize(name, invalid, valid)
         super(
-          translate(
+          compose_message(
             "invalid_options",
             { :name => name, :invalid => invalid, :valid => valid.join(', ') }
           )

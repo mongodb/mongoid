@@ -8,10 +8,21 @@ describe Mongoid::Errors::UnknownAttribute do
       described_class.new(Person, :gender)
     end
 
-    it "returns the message with model and attribute information" do
-      error.message.should eq(
-        "Attempted to set a value for 'gender' on the model Person, which " +
-        "has no field defined for it and allow_dynamic_fields is false."
+    it "contains the problem in the message" do
+      error.message.should include(
+        "Attempted to set a value for 'gender' which is not allowed on"
+      )
+    end
+
+    it "contains the summary in the message" do
+      error.message.should include(
+        "When setting Mongoid.allow_dynamic_fields to false"
+      )
+    end
+
+    it "contains the resolution in the message" do
+      error.message.should include(
+        "You can set Mongoid.allow_dynamic_fields to true"
       )
     end
   end

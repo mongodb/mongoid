@@ -8,10 +8,21 @@ describe Mongoid::Errors::MixedRelations do
       described_class.new(Post, Address)
     end
 
-    it "returns the warning of referencing embedded docs" do
+    it "contains the problem in the message" do
       error.message.should include(
-        "Referencing a(n) Address document from the Post document via a " +
-        "relational association is not allowed since the Address is embedded."
+        "Referencing a(n) Address document from the Post document"
+      )
+    end
+
+    it "contains the summary in the message" do
+      error.message.should include(
+        "In order to properly access a(n) Address from Post the reference"
+      )
+    end
+
+    it "contains the resolution in the message" do
+      error.message.should include(
+        "Consider not embedding Address, or do the key storage"
       )
     end
   end

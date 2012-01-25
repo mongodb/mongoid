@@ -10,7 +10,7 @@ module Mongoid #:nodoc
     class InvalidType < MongoidError
       def initialize(klass, value)
         super(
-          translate(
+          compose_message(
             "invalid_type",
             {
               :klass => klass.name,

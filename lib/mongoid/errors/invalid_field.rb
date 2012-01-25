@@ -10,7 +10,7 @@ module Mongoid #:nodoc
     class InvalidField < MongoidError
       def initialize(name)
         super(
-          translate("invalid_field", { :name => name })
+          compose_message("invalid_field", { :name => name })
         )
       end
     end

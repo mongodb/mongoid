@@ -12,7 +12,7 @@ module Mongoid #:nodoc
       #
       # @since 2.2.0
       def initialize
-        super(translate("calling_document_find_with_nil_is_invalid", {}))
+        super(compose_message("calling_document_find_with_nil_is_invalid", {}))
       end
     end
   end

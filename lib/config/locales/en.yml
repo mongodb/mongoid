@@ -5,60 +5,164 @@ en:
         blank:
           "can't be blank"
         callbacks:
-          "Calling %{method} on %{klass} resulted in a false return from a callback."
+          message: "Calling %{method} on %{klass} resulted in a false return
+            from a callback."
+          summary: "If a before callback returns false when using Document.create!,
+            Document#save!, or Documnet#update_attributes! this error will get raised
+            since the document did not actually get saved."
+          resolution: "Double check all before callbacks to make sure they are
+            not unintentionally returning false."
         calling_document_find_with_nil_is_invalid:
-          "Calling Document#find with nil is invalid."
+          message: "Calling Document.find with nil is invalid."
+          summary: "Document.find expects the parameters to be 1 or more ids, and
+            will return a single document if 1 id is provided, otherwise an array
+            of documents if multiple ids are provided."
+          resolution: "Most likely this is caused by passing parameters directly
+            through to the find, and the parameter either is not present or the
+            key from which it is accessed is incorrect."
         document_not_found:
           message: "Document not found for class %{klass} with id(s) %{identifiers}."
-          summary: "When calling %{klass}.find() with an id or array of ids, each
+          summary: "When calling %{klass}.find with an id or array of ids, each
             parameter must match a document in the database or this error will be raised."
-          resolution: "a) Search for an id that is in the database.\n
-            \ b) Set the Mongoid.raise_not_found_error configuration option to false,
+          resolution: "Search for an id that is in the database or set
+            the Mongoid.raise_not_found_error configuration option to false,
             which will cause a nil to be returned instead of raising this error."
         document_with_attributes_not_found:
-          "Document not found for class %{klass} with attributes %{attributes}."
+          message: "Document not found for class %{klass} with attributes %{attributes}."
+          summary: "When calling %{klass}.find_by with a hash of attributes, all
+            attributes provided must match a document in the database of this error
+            will be raised."
+          resolution: "Search for attributes that are in the database or set
+            the Mongoid.raise_not_found_error configuration option to false,
+            which will cause a nil to be returned instead of raising this error."
         eager_load:
-          "Eager loading :%{name} is not supported due to it being a polymorphic
-          or belongs_to relation."
+          message: "Eager loading :%{name} is not supported since it is a
+            polymorphic belongs_to relation."
+          summary: "Mongoid cannot currently determine the classes it needs to
+            eager load when the relation is polymorphic. The parents reside in
+            different collections so a simple id lookup is not sufficient enough."
+          resolution: "Don't attempt to perform this action and have patience,
+            maybe this will be supported in the future."
         invalid_collection:
-          "Access to the collection for %{klass} is not allowed since it
-          is an embedded document, please access a collection from
-          the root document."
+          message: "Access to the collection for %{klass} is not allowed."
+          summary: "%{klass}.collection was called, and %{klass} is an embedded
+            document - it resides within the collection of the root document of
+            the hierarchy."
+          resolution: "For access to the collection that the embedded document is
+            in, use %{klass}#_root.collection, or do not attempt to persist an
+            embedded document without a parent set."
         invalid_database:
-          "Database should be a Mongo::DB, not %{name}."
+          message: "Database should be a Mongo::DB, not %{name}."
+          summary: "When setting a master database in the Mongoid configuration
+            it must be an actual instance of a Mongo::DB, and not just a name
+            of the database. This check is performed when calling
+            Mongoid.master = object."
+          resolution: "Make sure that when setting the configuration
+            programatically that you are passing an actual db instance."
         invalid_field:
-          "Defining a field named %{name} is not allowed. Do not define
-          fields that conflict with Mongoid internal attributes or method
-          names. Use Mongoid.destructive_fields to see what names this includes."
+          message: "Defining a field named %{name} is not allowed."
+          summary: "Defining fields that conflict with Mongoid internal
+            attributes or method names is not allowed since it can cause issues
+            which are very difficult to track down."
+          resolution: "Use Mongoid.destructive_fields to see what names are not
+            allowed, and don't use these names. Also defining field names that
+            conflict with core Ruby methods on Object, Kernel, or Enumerable is
+            a disaster waiting to happen."
         invalid_options:
-          "Invalid option :%{invalid} provided to relation :%{name}. Valid options
-          are: %{valid}."
+          message: "Invalid option :%{invalid} provided to relation :%{name}."
+          summary: "Mongoid checks the options that are passed to the relation
+            macros to ensure that no ill side effects occur by letting something
+            slip by."
+          resolution: "Valid options are: %{valid}, make sure these are the ones
+            you are using."
         invalid_time:
-          "'%{value}' is not a valid Time."
+          message: "'%{value}' is not a valid Time."
+          summary: "Mongoid tries to serialize the values for Date, DateTime, and
+            Time into proper UTC times to store in the database. The provided
+            value could not be parsed."
+          resolution: "Make sure to pass parsable values to the field setter
+            for Date, DateTime, and Time objects. When this is a String it needs
+            to be valid for Time.parse. Other objects must be valid to pass to
+            Time.local."
         invalid_type:
-          "Field was defined as a(n) %{klass}, but received a %{other} with
-          the value %{value}."
+          message: "Field was defined as a(n) %{klass}, but received a %{other}
+            with the value %{value}."
+          summary: "Some types in Mongoid prevent you from setting them to a
+            value that differs from the defined type, like Array, instead of
+            attempting to convert it."
+          resolution: "Set the proper type, %{klass}."
         mixed_relations:
-          "Referencing a(n) %{embedded} document from the %{root} document via a
-          relational association is not allowed since the %{embedded} is embedded."
+          message: "Referencing a(n) %{embedded} document from the %{root}
+            document via a relational association is not allowed since the
+            %{embedded} is embedded."
+          summary: "In order to properly access a(n) %{embedded} from %{root}
+            the reference would need to go through the root document of
+            %{embedded}. In a simple case this would require Mongoid to store
+            an extra foreign key for the root, in more complex cases where
+            %{embedded} is multiple levels deep a key would need to be stored
+            for each parent up the hierarchy."
+          resolution: "Consider not embedding %{embedded}, or do the key
+            storage and access in a custom manner in the application code."
         no_environment:
-          "Mongoid attempted to find the appropriate environment but no Rails.env,
-          Sinatra::Base.environment, RACK_ENV, or MONGOID_ENV could be found."
+          message: "Could not load the configuration since no environment
+            was defined."
+          summary: "Mongoid attempted to find the appropriate environment
+            but no Rails.env, Sinatra::Base.environment, RACK_ENV, or
+            MONGOID_ENV could be found."
+          resolution: "Make sure some environment is set from the mentioned
+            options. Mongoid cannot load configuration from the yaml without
+            knowing which environment it is in, and we have considered
+            defaulting to development an undesireable side effect of this not
+            being defined."
         scope_overwrite:
-          "Cannot create scope :%{scope_name}, because of existing method
-          %{model_name}.%{scope_name}."
+          message: "Cannot create scope :%{scope_name}, because of existing
+            method %{model_name}.%{scope_name}."
+          summary: "When defining a scope that conflicts with a method that
+            already exists on the model, this error will get raised if
+            Mongoid.scope_overwrite_exception is set to true."
+          resolution: "Change the name of the scope so it does not conflict
+            with the already defined method %{model_name}, or set the
+            configuration option Mongoid.scope_overwrite_exception to false,
+            which is it's default. In this case a warning will be logged."
         taken:
           "is already taken"
         too_many_nested_attribute_records:
-          "Accepting nested attributes for %{association} is limited
-          to %{limit} records."
+          message: "Accepting nested attributes for %{association} is limited
+            to %{limit} records."
+          summary: "More documents were sent to be processed than the allowed
+            limit."
+          resolution: "The limit is set as an option to the macro, for example:
+            accepts_nested_attributes_for :%{association}, limit: %{limit}.
+            Consider raising this limit or making sure no more are sent than
+            the set value."
         unknown_attribute:
-          "Attempted to set a value for '%{name}' on the model %{klass}, which
-          has no field defined for it and allow_dynamic_fields is false."
+          message: "Attempted to set a value for '%{name}' which is not
+            allowed on the model %{klass}."
+          summary: "When setting Mongoid.allow_dynamic_fields to false and the
+            attribute does not already exist in the attributes hash, attempting
+            to call %{klass}#%{name}= for it is not allowed. This is also
+            triggered by passing the attribute to any method that accepts an
+            attributes hash, and is raised instead of getting a NoMethodError."
+          resolution: "You can set Mongoid.allow_dynamic_fields to true if you
+            expect to be writing values for undefined fields often."
         unsaved_document:
-          "You cannot call create or create! through a relational association
-          relation (%{document}) who's parent (%{base}) is not already saved."
+          message: "Attempted to save %{document} before the parent %{base}."
+          summary: "You cannot call create or create! through a relational
+            association relation (%{document}) who's parent (%{base}) is
+            not already saved. This would case the database to be out of sync
+            since the child could potentially reference a nonexistant parent."
+          resolution: "Make sure to only use create or create! when the parent
+            document %{base} is persisted."
         unsupported_version:
-          "MongoDB %{version} not supported, please upgrade to %{mongo_version}."
+          message: "MongoDB %{version} not supported, please upgrade to
+            %{mongo_version}."
+          summary: "Mongoid is relying on features that were introduced in
+            MongoDB %{mongo_version} and would cause unexpected behaviour or errors
+            on version %{version}."
+          resolution: "Upgrade your MongoDB instances or keep Mongoid on your
+            previous version."
         validations:
-          "Validation failed - %{errors}."
+          message: "Validation of %{document} failed."
+          summary: "The following errors were found: %{errors}"
+          resolution: "Try persisting the document with valid data or remove
+            the validations."

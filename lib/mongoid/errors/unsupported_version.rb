@@ -9,7 +9,7 @@ module Mongoid #:nodoc
     class UnsupportedVersion < MongoidError
       def initialize(version)
         super(
-          translate(
+          compose_message(
             "unsupported_version",
             { :version => version, :mongo_version => Mongoid::MONGODB_VERSION }
           )

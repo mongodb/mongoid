@@ -5,12 +5,24 @@ describe Mongoid::Errors::EagerLoad do
   describe "#message" do
 
     let(:error) do
-      described_class.new(:preferences)
+      described_class.new(:ratable)
     end
 
-    it "returns the warning of eager loading many to manies" do
+    it "contains the problem in the message" do
       error.message.should include(
-        "Eager loading :preferences is not supported"
+        "Eager loading :ratable is not supported since it is a polymorphic"
+      )
+    end
+
+    it "contains the summary in the message" do
+      error.message.should include(
+        "Mongoid cannot currently determine the classes it needs to eager"
+      )
+    end
+
+    it "contains the resolution in the message" do
+      error.message.should include(
+        "Don't attempt to perform this action and have patience"
       )
     end
   end
