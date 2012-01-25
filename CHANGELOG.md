@@ -64,6 +64,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1640 Update consumers should be tied to the name of the collection
+  they persist to, not the name of the class.
+
 * \#1636 Scopes no longer modify parent class scopes when subclassing.
   (Hans Hasselberg)
 

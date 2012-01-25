@@ -143,7 +143,7 @@ module Mongoid #:nodoc
     #
     # @since 2.0.0
     def update(selector, document, options = {})
-      updater = Threaded.update_consumer(klass)
+      updater = Threaded.update_consumer(name)
       if updater
         updater.consume(selector, document, options)
       else

@@ -210,6 +210,18 @@ module Mongoid #:nodoc:
 
       protected
 
+      # Get the root class collection name.
+      #
+      # @example Get the root class collection name.
+      #   context.collection_name
+      #
+      # @return [ String ] The name of the collection.
+      #
+      # @since 2.4.3
+      def collection_name
+        root ? root.collection_name : nil
+      end
+
       # Filters the documents against the criteria's selector
       #
       # @example Filter the documents.
@@ -251,10 +263,22 @@ module Mongoid #:nodoc:
         documents
       end
 
+      # Get the root document for the enumerable.
+      #
+      # @example Get the root document.
+      #   context.root
+      #
+      # @return [ Document ] The root.
       def root
         @root ||= documents.first.try(:_root)
       end
 
+      # Get the root class for the enumerable.
+      #
+      # @example Get the root class.
+      #   context.root_class
+      #
+      # @return [ Class ] The root class.
       def root_class
         @root_class ||= root ? root.class : nil
       end

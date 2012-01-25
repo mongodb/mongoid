@@ -312,6 +312,60 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
 
+    context "when setting for inherited docs" do
+
+      context "when the parent collection is already accessed" do
+
+        before do
+          Person.collection
+        end
+
+        context "when setting via the subclass" do
+
+          let(:doctor) do
+            Doctor.new
+          end
+
+          let(:address_one) do
+            Address.new(:street => "tauentzien")
+          end
+
+          before do
+            doctor.addresses = [ address_one ]
+            doctor.save
+          end
+
+          it "sets the documents" do
+            doctor.addresses.should eq([ address_one ])
+          end
+
+          it "persists the document" do
+            doctor.reload.addresses.should eq([ address_one ])
+          end
+
+          context "when setting the relation multiple times" do
+
+            let(:address_two) do
+              Address.new(:street => "kudamm")
+            end
+
+            before do
+              doctor.addresses = [ address_two ]
+              doctor.save
+            end
+
+            it "sets the new documents" do
+              doctor.addresses.should eq([ address_two ])
+            end
+
+            it "persits only the new documents" do
+              doctor.reload.addresses.should eq([ address_two ])
+            end
+          end
+        end
+      end
+    end
+
     context "when replacing an existing relation" do
 
       let(:person) do
