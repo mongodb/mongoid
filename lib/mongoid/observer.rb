@@ -170,5 +170,12 @@ module Mongoid #:nodoc:
         end
       end
     end
+
+    def disabled_for?(object)
+      klass = object.class
+      return false unless klass.respond_to?(:observers)
+      klass.observers.disabled_for?(self) || Mongoid.observers.disabled_for?(self)
+    end
+
   end
 end
