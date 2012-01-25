@@ -94,7 +94,7 @@ describe Mongoid::NamedScope do
     context "when there is a scope on parent class" do
       before do
         Person.class_eval do
-          scope(:important, where( title: 'VIP'))
+          scope(:important, where( :title => 'VIP'))
         end
       end
 
@@ -102,16 +102,16 @@ describe Mongoid::NamedScope do
 
         before do
           Doctor.class_eval do
-            scope(:important, where( title: 'Dr.' ))
+            scope(:important, where( :title => 'Dr.' ))
           end
         end
 
         it "changes the child's scope" do
-          Doctor.important.selector.should eq({ title: 'Dr.' })
+          Doctor.important.selector.should eq({ :title => 'Dr.' })
         end
 
         it "leaves the scope on parent class unchanged" do
-          Person.important.selector.should eq({ title: 'VIP' })
+          Person.important.selector.should eq({ :title => 'VIP' })
         end
 
       end
