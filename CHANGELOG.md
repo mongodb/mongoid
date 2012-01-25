@@ -68,16 +68,18 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1641/#1639 Mongoid.observer.disable :all now behaves as AR does.
+
 * \#1640 Update consumers should be tied to the name of the collection
   they persist to, not the name of the class.
 
-* \#1636 Scopes no longer modify parent class scopes when subclassing.
+* \#1637/#1636 Scopes no longer modify parent class scopes when subclassing.
   (Hans Hasselberg)
 
 * \#1629 $all and $in criteria on embedded many relations now properly
   handles regex searches and elements of varying length. (Douwe Maan)
 
-* \#1623 Default scopes no longer break Mongoid::Versioning.
+* \#1623\#1634 Default scopes no longer break Mongoid::Versioning.
   (Hans Hasselberg)
 
 * \#1605 Fix regression of rescue responses, Rails 3.2
