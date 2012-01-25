@@ -55,13 +55,13 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def atomically(modifier, &block)
-          updater = Threaded.update_consumer(root_class) ||
-            Threaded.set_update_consumer(root_class, MODIFIERS[modifier].new)
+          updater = Threaded.update_consumer(collection_name) ||
+            Threaded.set_update_consumer(collection_name, MODIFIERS[modifier].new)
           count_executions do
             block.call if block
           end.tap do
             if @executions.zero?
-              Threaded.set_update_consumer(root_class, nil)
+              Threaded.set_update_consumer(collection_name, nil)
               updater.execute(collection)
             end
           end
