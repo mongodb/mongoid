@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def deserialize(object)
-         return nil if object.blank?
+          return nil if object.blank?
           if Mongoid::Config.use_utc?
             object.to_date
           else
