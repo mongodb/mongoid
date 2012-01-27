@@ -88,7 +88,7 @@ module Mongoid #:nodoc:
       #
       # @note #only and #without cannot be used together.
       #
-      # @param [ Array<Symbol> args A list of fields to exclude.
+      # @param [ Array<Symbol> ] args A list of fields to exclude.
       #
       # @return [ Criteria ] A newly cloned copy.
       #
