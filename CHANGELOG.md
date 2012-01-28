@@ -68,6 +68,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1647 DateTime serialization when already in UTC does not convert to
+  local time.
+
 * \#1641/#1639 Mongoid.observer.disable :all now behaves as AR does.
 
 * \#1640 Update consumers should be tied to the name of the collection
