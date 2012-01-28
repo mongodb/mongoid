@@ -64,7 +64,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#1135 DateTimes now properly get time zones on derserialization.
 
-## 2.4.3 \[ In Development \] \[ Branch: 2.4.0-stable \]
+## 2.4.3
 
 ### Resolved Issues
 
