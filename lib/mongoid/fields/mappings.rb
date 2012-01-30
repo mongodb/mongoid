@@ -38,6 +38,7 @@ module Mongoid #:nodoc
           end
         end
       end
+
     end
   end
 end
