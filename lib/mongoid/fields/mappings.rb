@@ -2,12 +2,15 @@
 module Mongoid #:nodoc
   module Fields #:nodoc:
 
+    module Internal #:nodoc:
+    end
+
     # This module maps classes used in field type definitions to the custom
     # definable field in Mongoid.
     module Mappings
       extend self
 
-      MODULE = "Mongoid::Fields::Internal"
+      MODULE = Mongoid::Fields::Internal
 
       # Get the custom field type for the provided class used in the field
       # definition.
@@ -23,7 +26,7 @@ module Mongoid #:nodoc
       def for(klass, foreign_key = false)
         return Internal::Object unless klass
         if foreign_key
-          return "#{MODULE}::ForeignKeys::#{klass.to_s.demodulize}".constantize
+          return MODULE::ForeignKeys.const_get(klass.to_s.demodulize)
         end
         begin
           modules = "#{ MODULE }::|BSON::|ActiveSupport::"
