@@ -10,8 +10,6 @@ module Mongoid #:nodoc
     module Mappings
       extend self
 
-      MODULE = Mongoid::Fields::Internal
-
       # Get the custom field type for the provided class used in the field
       # definition.
       #
@@ -27,12 +25,12 @@ module Mongoid #:nodoc
         if klass.nil?
           Internal::Object
         elsif foreign_key
-          MODULE::ForeignKeys.const_get(klass.to_s.demodulize)
+          Internal::ForeignKeys.const_get(klass.to_s.demodulize)
         else
           modules = "BSON::|ActiveSupport::"
           match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
-          if match and MODULE.const_defined?(match[2])
-            MODULE.const_get(match[2])
+          if match and Internal.const_defined?(match[2])
+            Internal.const_get(match[2])
           else
             klass
           end
