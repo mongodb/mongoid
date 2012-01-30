@@ -30,13 +30,12 @@ module Mongoid #:nodoc
         end
         begin
           modules = "BSON::|ActiveSupport::"
-          if match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
+          match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
+          if match and MODULE.const_defined?(match[2])
             MODULE.const_get(match[2])
           else
             klass
           end
-        rescue NameError
-          klass
         end
       end
     end
