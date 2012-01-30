@@ -29,7 +29,7 @@ module Mongoid #:nodoc
           return MODULE::ForeignKeys.const_get(klass.to_s.demodulize)
         end
         begin
-          modules = "#{ MODULE }::|BSON::|ActiveSupport::"
+          modules = "BSON::|ActiveSupport::"
           if match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
             MODULE.const_get(match[2])
           else
