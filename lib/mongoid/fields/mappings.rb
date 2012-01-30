@@ -24,11 +24,11 @@ module Mongoid #:nodoc
       #
       # @since 2.1.0
       def for(klass, foreign_key = false)
-        return Internal::Object unless klass
-        if foreign_key
-          return MODULE::ForeignKeys.const_get(klass.to_s.demodulize)
-        end
-        begin
+        if klass.nil?
+          Internal::Object
+        elsif foreign_key
+          MODULE::ForeignKeys.const_get(klass.to_s.demodulize)
+        else
           modules = "BSON::|ActiveSupport::"
           match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
           if match and MODULE.const_defined?(match[2])
