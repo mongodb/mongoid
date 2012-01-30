@@ -309,6 +309,25 @@ describe Mongoid::Relations::Embedded::Many do
         it "does not save the target" do
           address.should_not be_persisted
         end
+
+        context "when setting the relation multiple times" do
+          let(:address_two) do
+            Address.new(:street => "kudamm")
+          end
+
+          before do
+            person.addresses = [ address_two ]
+            person.save
+          end
+
+          it "sets the new documents" do
+            person.addresses.should eq([ address_two ])
+          end
+
+          it "persits only the new documents" do
+            person.reload.addresses.should eq([ address_two ])
+          end
+        end
       end
     end
 
