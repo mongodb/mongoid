@@ -31,7 +31,7 @@ module Mongoid #:nodoc
         begin
           modules = "#{ MODULE }::|BSON::|ActiveSupport::"
           if match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
-            "#{MODULE}::#{ match[2] }".constantize
+            MODULE.const_get(match[2])
           else
             klass
           end
