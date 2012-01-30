@@ -25,7 +25,7 @@ module Mongoid #:nodoc
         if klass.nil?
           Internal::Object
         elsif foreign_key
-          Internal::ForeignKeys.const_get(klass.to_s.demodulize)
+          Internal::ForeignKeys.const_get(klass.to_s)
         else
           modules = "BSON::|ActiveSupport::"
           match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
