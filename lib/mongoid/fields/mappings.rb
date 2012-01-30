@@ -33,7 +33,7 @@ module Mongoid #:nodoc
           if match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
             "#{MODULE}::#{ match[2] }".constantize
           else
-            klass.to_s.constantize
+            klass
           end
         rescue NameError
           klass
