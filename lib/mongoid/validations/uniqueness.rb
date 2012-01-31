@@ -156,8 +156,8 @@ module Mongoid #:nodoc:
       #
       # @since 
       def scope_value_changed?(document)
-        Array.wrap(options[:scope]).reduce(false) do |result, item|
-          (result || document.send("attribute_changed?", item.to_s))
+        Array.wrap(options[:scope]).any? do |item|
+          document.send("attribute_changed?", item.to_s)
         end
       end
     end
