@@ -3,7 +3,14 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.3 \[ In Development \] \[ Branch: 2.4.0-stable \]
+## 2.4.4 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#1656/#1657 Don't hit database for uniqueness validation if BOTH scope
+  and attribute hasn't changed. (priyaaank)
+
+## 2.4.3
 
 ### Resolved Issues
 
