@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def validate_each(document, attribute, value)
-        return unless document.send("attribute_changed?", attribute.to_s)
+        return unless document.send("attribute_changed?", attribute.to_s) || scope_value_changed?(document)
         if document.embedded?
           return if skip_validation?(document)
           relation = document._parent.send(document.metadata.name)
@@ -143,6 +143,22 @@ module Mongoid #:nodoc:
       # @since 2.3.0
       def skip_validation?(document)
         !document._parent || document.embedded_one?
+      end
+
+      # Scope reference has changed? 
+      #
+      # @example Has scope reference changed?
+      #   validator.scope_value_changed?(doc)
+      #
+      # @param [ Document ] document The embedded document.
+      #
+      # @return [ true, false ] If the scope reference has changed.
+      #
+      # @since 
+      def scope_value_changed?(document)
+        Array.wrap(options[:scope]).reduce(false) do |result, item|
+          (result || document.send("attribute_changed?", item.to_s))
+        end
       end
     end
   end
