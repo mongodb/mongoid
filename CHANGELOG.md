@@ -3,7 +3,7 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 3.0.0 \[ In Development \] \[ Branch: master \]
+## 3.0.0 (branch: master)
 
 ### New Features
 
@@ -63,6 +63,13 @@ For instructions on upgrading to newer versions, visit
   sorting options on the criteria.
 
 * \#1135 DateTimes now properly get time zones on derserialization.
+
+## 2.4.4 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#1656/#1657 Don't hit database for uniqueness validation if BOTH scope
+  and attribute hasn't changed. (priyaaank)
 
 ## 2.4.3
 
