@@ -51,7 +51,7 @@ module Mongoid #:nodoc:
       end
 
       def log_retry(retry_number, ex)
-        Mongoid.logger.warn "A #{ex.class.name} was raised. Retry attempt ##{retry_number}."
+        Mongoid.logger.warn "A #{ex.class.name} was raised. Retry attempt ##{retry_number}." if Mongoid.logger
       end
     end
   end
