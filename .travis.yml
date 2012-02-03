@@ -3,5 +3,9 @@ rvm:
   - 1.9.3
   - ruby-head
   - jruby
+  - jruby-head
 env:
   - JRUBY_OPTS="--1.9 --server"
+branches:
+  except:
+    - moped-integration
