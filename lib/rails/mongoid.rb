@@ -41,12 +41,10 @@ module Rails #:nodoc:
       logger = Logger.new($stdout)
       models(pattern).each do |model|
         next if model.embedded?
-        indexes = model.index_information
-        indexes.delete('_id_')
-        next unless indexes.keys.present?
-
+        indexes = model.collection.indexes.map{ |doc| doc["name"] }
+        indexes.delete_one("_id_")
         model.remove_indexes
-        logger.info("Removing indexes on: #{model} for: #{indexes.keys.join(', ')}.")
+        logger.info("Removing indexes on: #{model} for: #{indexes.join(', ')}.")
       end
     end
 

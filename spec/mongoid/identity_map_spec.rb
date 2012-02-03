@@ -534,25 +534,21 @@ describe Mongoid::IdentityMap do
 
   context "when executing in a fiber" do
 
-    if RUBY_VERSION.to_f >= 1.9
+    describe "#.get" do
 
-      describe "#.get" do
+      let(:document) do
+        Person.new
+      end
 
-        let(:document) do
-          Person.new
+      let(:fiber) do
+        Fiber.new do
+          described_class.set(document)
+          described_class.get(Person, document.id).should eq(document)
         end
+      end
 
-        let(:fiber) do
-          Fiber.new do
-            described_class.set(document)
-            described_class.get(Person, document.id).should eq(document)
-          end
-        end
-
-        it "gets the object from the identity map" do
-          pending "segfault on 1.9.2-p290 on Intel i7 OSX Lion"
-          fiber.resume
-        end
+      it "gets the object from the identity map" do
+        fiber.resume
       end
     end
   end

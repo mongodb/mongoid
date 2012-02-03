@@ -8,6 +8,7 @@ module Mongoid #:nodoc:
         include Timekeeping
 
         undef :cast_on_read?
+
         # When reading the field do we need to cast the value? This holds true when
         # times are stored or for big decimals which are stored as strings.
         #

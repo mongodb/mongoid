@@ -7,7 +7,7 @@ describe Mongoid::Criterion::Inspection do
     pending "when documents match in the database" do
 
       let(:criteria) do
-        Person.where(:age.gt => 10, title: "Sir").limit(1)
+        Person.where(:age.gt => 10, title: "Sir")
       end
 
       let!(:person) do
@@ -17,7 +17,7 @@ describe Mongoid::Criterion::Inspection do
       let(:inspection) do
         "#<Mongoid::Criteria\n" <<
         "  selector: {:age=>{\"$gt\"=>10}, :title=>\"Sir\"},\n" <<
-        "  options:  {:limit=>1},\n" <<
+        "  options:  {},\n" <<
         "  class:    Person,\n" <<
         "  embedded: false>\n"
       end

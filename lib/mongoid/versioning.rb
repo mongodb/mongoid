@@ -36,17 +36,16 @@ module Mongoid #:nodoc:
     def revise
       previous = previous_revision
       if previous && versioned_attributes_changed?
-        versions.build(
+        new_version = versions.build(
           previous.versioned_attributes, without_protection: true
-        ).attributes.delete("_id")
+        )
+        new_version._id = nil
         if version_max.present? && versions.length > version_max
           deleted = versions.first
           if deleted.paranoid?
             versions.delete_one(deleted)
-            collection.update(
-              atomic_selector,
-              { "$pull" => { "versions" => { "version" => deleted.version }}}
-            )
+            collection.find(atomic_selector).
+              update({ "$pull" => { "versions" => { "version" => deleted.version }}})
           else
             versions.delete(deleted)
           end

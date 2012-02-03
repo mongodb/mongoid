@@ -11,7 +11,11 @@ describe Mongoid::Persistence::Operations::Remove do
   end
 
   let(:collection) do
-    stub.quacks_like(Mongoid::Collection.allocate)
+    stub.quacks_like(Moped::Collection.allocate)
+  end
+
+  let(:query) do
+    stub
   end
 
   before do
@@ -35,20 +39,14 @@ describe Mongoid::Persistence::Operations::Remove do
     it "defaults validation to true" do
       remove.should be_validating
     end
-
-    it "sets the options" do
-      remove.options.should eq({ safe: Mongoid.persist_in_safe_mode })
-    end
   end
 
   describe "#persist" do
 
     def root_delete_expectation
       ->{
-        collection.expects(:remove).with(
-          { _id: document.id },
-          safe: false
-        ).returns(true)
+        collection.expects(:find).with({ _id: document.id }).returns(query)
+        query.expects(:remove).returns(true)
       }
     end
 

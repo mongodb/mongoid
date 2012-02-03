@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
     # on initialization.
     module Operations
 
-      attr_reader :conflicts, :document
+      attr_reader :conflicts, :document, :options
 
       # Get the collection we should be persisting to.
       #
@@ -78,19 +78,6 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def notifying_parent?
         @notifying_parent ||= !@options.delete(:suppress)
-      end
-
-      # Get all the options that will be sent to the database. Right now this
-      # is only safe mode opts.
-      #
-      # @example Get the options hash.
-      #   operation.options
-      #
-      # @return [ Hash ] The options for the database.
-      #
-      # @since 2.1.0
-      def options
-        Safety.merge_safety_options(@options)
       end
 
       # Get the parent of the provided document.

@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
         # @return [ true ] Always true.
         def persist
           prepare do |doc|
-            collection.remove({ _id: doc.id }, options)
+            collection.find({ _id: doc.id }).remove
           end
         end
       end

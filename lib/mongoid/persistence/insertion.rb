@@ -28,12 +28,7 @@ module Mongoid #:nodoc:
                 true
               end
             end
-
-            unless result == false
-              doc.reset_persisted_children
-              doc.move_changes
-              Threaded.clear_options!
-            end
+            document.post_persist unless result == false
           end
         end
       end

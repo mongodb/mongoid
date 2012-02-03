@@ -288,12 +288,9 @@ module Mongoid # :nodoc:
             )
             if metadata.indexed?
               if metadata.polymorphic?
-                index(
-                  [[ key, Mongo::ASCENDING ], [ metadata.type, Mongo::ASCENDING ]],
-                  background: true
-                )
+                index(key => 1, metadata.type => 1, options: { background: true })
               else
-                index(key, background: true)
+                index(key => 1, options: { background: true })
               end
             end
           end

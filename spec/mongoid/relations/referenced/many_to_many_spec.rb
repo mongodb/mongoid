@@ -5,9 +5,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   before(:all) do
     Mongoid.raise_not_found_error = true
     Person.autosaved_relations.delete_one(:preferences)
-    Person.autosave(
-      Person.relations["preferences"].merge!(autosave: true)
-    )
+    Person.autosave(Person.relations["preferences"].merge!(autosave: true))
     Person.synced(Person.relations["preferences"])
   end
 
@@ -840,33 +838,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
         end
       end
-    end
-  end
-
-  describe "#avg" do
-
-    let(:person) do
-      Person.create
-    end
-
-    let(:preference_one) do
-      Preference.create(ranking: 5)
-    end
-
-    let(:preference_two) do
-      Preference.create(ranking: 10)
-    end
-
-    before do
-      person.preferences.push(preference_one, preference_two)
-    end
-
-    let(:avg) do
-      person.preferences.avg(:ranking)
-    end
-
-    it "returns the avg value of the supplied field" do
-      avg.should eq(7.5)
     end
   end
 
@@ -1923,11 +1894,40 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:max) do
-      person.preferences.max(:ranking)
+      person.preferences.max do |a,b|
+        a.ranking <=> b.ranking
+      end
     end
 
-    it "returns the max value of the supplied field" do
-      max.should eq(10)
+    it "returns the document with the max value of the supplied field" do
+      max.should eq(preference_two)
+    end
+  end
+
+  describe "#max_by" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:preference_one) do
+      Preference.create(ranking: 5)
+    end
+
+    let(:preference_two) do
+      Preference.create(ranking: 10)
+    end
+
+    before do
+      person.preferences.push(preference_one, preference_two)
+    end
+
+    let(:max) do
+      person.preferences.max_by(&:ranking)
+    end
+
+    it "returns the document with the max value of the supplied field" do
+      max.should eq(preference_two)
     end
   end
 
@@ -2035,11 +2035,40 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:min) do
-      person.preferences.min(:ranking)
+      person.preferences.min do |a, b|
+        a.ranking <=> b.ranking
+      end
     end
 
     it "returns the min value of the supplied field" do
-      min.should eq(5)
+      min.should eq(preference_one)
+    end
+  end
+
+  describe "#min_by" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:preference_one) do
+      Preference.create(ranking: 5)
+    end
+
+    let(:preference_two) do
+      Preference.create(ranking: 10)
+    end
+
+    before do
+      person.preferences.push(preference_one, preference_two)
+    end
+
+    let(:min) do
+      person.preferences.min_by(&:ranking)
+    end
+
+    it "returns the min value of the supplied field" do
+      min.should eq(preference_one)
     end
   end
 
@@ -2142,33 +2171,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     it "returns true" do
       described_class.stores_foreign_key?.should be_true
-    end
-  end
-
-  describe "#sum" do
-
-    let(:person) do
-      Person.create
-    end
-
-    let(:preference_one) do
-      Preference.create(ranking: 5)
-    end
-
-    let(:preference_two) do
-      Preference.create(ranking: 10)
-    end
-
-    before do
-      person.preferences.push(preference_one, preference_two)
-    end
-
-    let(:sum) do
-      person.preferences.sum(:ranking)
-    end
-
-    it "returns the sum value of the supplied field" do
-      sum.should eq(15)
     end
   end
 
@@ -2562,9 +2564,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when the relation references the same documents" do
 
       before do
-        Preference.collection.update(
-          { _id: preference_one.id }, { "$set" => { name: "reloaded" }}
-        )
+        Preference.collection.find({ _id: preference_one.id }).
+          update({ "$set" => { name: "reloaded" }})
       end
 
       let(:reloaded) do

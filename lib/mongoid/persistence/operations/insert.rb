@@ -24,7 +24,8 @@ module Mongoid #:nodoc:
         # @return [ Document ] The document to be inserted.
         def persist
           prepare do |doc|
-            collection.insert(doc.as_document, options)
+            # collection.insert(doc.as_document, options)
+            collection.insert(doc.as_document)
             IdentityMap.set(doc)
           end
         end

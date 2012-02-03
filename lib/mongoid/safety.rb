@@ -41,27 +41,34 @@ module Mongoid #:nodoc:
 
     class << self
 
-      # Static class method of easily getting the desired safe mode options
-      # from anywhere in the framework.
+      # Clear the safety options off the current thread.
       #
-      # @example Get the options with safe mode included.
-      #   Safety.merge_safety_options({ :safe => false })
+      # @example Clear the safety options.
+      #   Safety.clear
       #
-      # @param [ Hash ] options The persistence options.
+      # @return [ true ] True.
       #
-      # @return [ Hash ] The options hash.
-      #
-      # @since 2.1.0
-      def merge_safety_options(options = {})
-        options ||= {}
-        return options if options[:safe]
+      # @since 3.0.0
+      def clear
+        Threaded.clear_safety_options!
+        true
+      end
 
-        unless Threaded.safety_options.nil?
-          safety = Threaded.safety_options
+      # Get the safe mode persistence options, either from the current thread
+      # or the configuration.
+      #
+      # @example Get the current safe mode options.
+      #   Safety.options
+      #
+      # @return [ true, false, Hash ] The safe mode options.
+      #
+      # @since 3.0.0
+      def options
+        if Threaded.safety_options.nil?
+          Mongoid.persist_in_safe_mode
         else
-          safety = Mongoid.persist_in_safe_mode
+          Threaded.safety_options
         end
-        options.merge!({ safe: safety })
       end
     end
 

@@ -1,13 +1,44 @@
 test:
-  database: mongoid_config_test
-  host: <%= ENV["MONGOID_SPEC_HOST"] %>
-  allow_dynamic_fields: false
-  include_root_in_json: true
-  scope_overwrite_exception: false
-  persist_in_safe_mode: false
-  raise_not_found_error: false
-  max_retries_on_connection_failure: 5
-  autocreate_indexes: false
-  option_no_exist: false
-  skip_version_check: false
-  logger: false
+  sessions:
+    default:
+      hosts:
+        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+      options:
+        connect_timeout: 10
+        op_timeout: 30
+        pool_size: 1
+        pool_timeout: 5.0
+        safe: false
+        slave_ok: true
+        ssl: false
+    secondary:
+      hosts:
+          - localhost:27018
+          - localhost:27019
+      options:
+        logger: true
+        read: :secondary
+  databases:
+    default:
+      name: mongoid_test
+      session: default
+    secondary:
+      name: mongoid_replica_set
+      session: secondary
+      options:
+        safe: true
+    tertiary:
+      name: mongoid_tertiary
+      session: default
+  options:
+    allow_dynamic_fields: false
+    autocreate_indexes: true
+    identity_map_enabled: true
+    include_root_in_json: true
+    include_type_for_serialization: true
+    preload_models: true
+    scope_overwrite_exception: true
+    raise_not_found_error: false
+    skip_version_check: false
+    use_activesupport_time_zone: false
+    use_utc: true

@@ -25,12 +25,12 @@ class Person
   field :bson_id, type: BSON::ObjectId
   field :pattern, type: Regexp
 
-  index :age
-  index :addresses
-  index :dob
-  index :name
-  index :title
-  index :ssn, unique: true
+  index age: 1
+  index addresses: 1
+  index dob: 1
+  index name: 1
+  index title: 1
+  index ssn: 1, options: { unique: true }
 
   attr_reader :rescored
 
@@ -48,6 +48,7 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
+
   embeds_many :address_components, validate: false
   embeds_many :paranoid_phones, validate: false
   embeds_many :services, cascade_callbacks: true, validate: false

@@ -2525,12 +2525,24 @@ describe Mongoid::Criteria do
 
     context "when provided a string" do
 
-      let(:criteria) do
-        Band.where("this.name == 'Depeche Mode'")
+      context "when the criteria is embedded" do
+
+        it "raises an error" do
+          expect {
+            match.records.where("this.name == null")
+          }.to raise_error(Mongoid::Errors::UnsupportedJavascript)
+        end
       end
 
-      it "returns the matching documents" do
-        criteria.should eq([ match ])
+      context "when the criteria is not embedded" do
+
+        let(:criteria) do
+          Band.where("this.name == 'Depeche Mode'")
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
     end
 

@@ -241,7 +241,7 @@ describe Mongoid::Relations::Referenced::Many do
           it "raises an error" do
             expect {
               person.posts.safely.send(method, post)
-            }.to raise_error(Mongo::OperationFailure)
+            }.to raise_error(Moped::Errors::OperationFailure)
           end
         end
       end
@@ -766,28 +766,33 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  describe "#_ids=" do
+  describe "#\{name}_ids=" do
+
     let(:person) do
       Person.new
     end
 
-    let(:post1) do
+    let(:post_one) do
       Post.create
     end
 
-    let(:post2) do
+    let(:post_two) do
       Post.create
+    end
+
+    before do
+      person.post_ids = [ post_one.id, post_two.id ]
     end
 
     it "calls setter with documents find by given ids" do
-      person.expects(:posts=).with([post1, post2])
-      person.post_ids = [post1.id, post2.id]
+      person.posts.should eq([ post_one, post_two ])
     end
   end
 
-  describe "#_ids" do
+  describe "#\{name}_ids" do
+
     let(:posts) do
-      [Post.create, Post.create]
+      [ Post.create, Post.create ]
     end
 
     let(:person) do
@@ -796,33 +801,6 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "returns ids of documents that are in the relation" do
       person.post_ids.should eq(posts.map(&:id))
-    end
-  end
-
-  describe "#avg" do
-
-    let(:person) do
-      Person.create
-    end
-
-    let(:post_one) do
-      Post.create(rating: 5)
-    end
-
-    let(:post_two) do
-      Post.create(rating: 10)
-    end
-
-    before do
-      person.posts.push(post_one, post_two)
-    end
-
-    let(:avg) do
-      person.posts.avg(:rating)
-    end
-
-    it "returns the average value of the supplied field" do
-      avg.should eq(7.5)
     end
   end
 
@@ -1530,7 +1508,7 @@ describe Mongoid::Relations::Referenced::Many do
               person.posts.safely.create do |doc|
                 doc._id = existing.id
               end
-            }.to raise_error(Mongo::OperationFailure)
+            }.to raise_error(Moped::Errors::OperationFailure)
           end
         end
       end
@@ -2081,10 +2059,6 @@ describe Mongoid::Relations::Referenced::Many do
         Mongoid::IdentityMap.get(Post, "person_id" => person.id)
       end
 
-      it "returns the appropriate criteria" do
-        eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
-      end
-
       it "puts the documents in the identity map" do
         map.should eq([ post ])
       end
@@ -2118,10 +2092,6 @@ describe Mongoid::Relations::Referenced::Many do
 
       let(:map) do
         Mongoid::IdentityMap.get(Rating, "ratable_id" => movie.id)
-      end
-
-      it "returns the appropriate criteria" do
-        eager.selector.should eq({ "ratable_id" => { "$in" => [ movie.id ] }})
       end
 
       it "puts the documents in the identity map" do
@@ -2658,11 +2628,40 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     let(:max) do
-      person.posts.max(:rating)
+      person.posts.max do |a,b|
+        a.rating <=> b.rating
+      end
     end
 
-    it "returns the max value of the supplied field" do
-      max.should eq(10)
+    it "returns the document with the max value of the supplied field" do
+      max.should eq(post_two)
+    end
+  end
+
+  describe "#max_by" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:post_one) do
+      Post.create(rating: 5)
+    end
+
+    let(:post_two) do
+      Post.create(rating: 10)
+    end
+
+    before do
+      person.posts.push(post_one, post_two)
+    end
+
+    let(:max) do
+      person.posts.max_by(&:rating)
+    end
+
+    it "returns the document with the max value of the supplied field" do
+      max.should eq(post_two)
     end
   end
 
@@ -2743,11 +2742,40 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     let(:min) do
-      person.posts.min(:rating)
+      person.posts.min do |a, b|
+        a.rating <=> b.rating
+      end
     end
 
     it "returns the min value of the supplied field" do
-      min.should eq(5)
+      min.should eq(post_one)
+    end
+  end
+
+  describe "#min_by" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:post_one) do
+      Post.create(rating: 5)
+    end
+
+    let(:post_two) do
+      Post.create(rating: 10)
+    end
+
+    before do
+      person.posts.push(post_one, post_two)
+    end
+
+    let(:min) do
+      person.posts.min_by(&:rating)
+    end
+
+    it "returns the min value of the supplied field" do
+      min.should eq(post_one)
     end
   end
 
@@ -2902,33 +2930,6 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "returns false" do
       described_class.stores_foreign_key?.should be_false
-    end
-  end
-
-  describe "#sum" do
-
-    let(:person) do
-      Person.create
-    end
-
-    let(:post_one) do
-      Post.create(rating: 5)
-    end
-
-    let(:post_two) do
-      Post.create(rating: 10)
-    end
-
-    before do
-      person.posts.push(post_one, post_two)
-    end
-
-    let(:sum) do
-      person.posts.sum(:rating)
-    end
-
-    it "returns the sum values of the supplied field" do
-      sum.should eq(15)
     end
   end
 
@@ -3110,9 +3111,8 @@ describe Mongoid::Relations::Referenced::Many do
     context "when the relation references the same documents" do
 
       before do
-        Post.collection.update(
-          { _id: post_one.id }, { "$set" => { title: "reloaded" }}
-        )
+        Post.collection.find({ _id: post_one.id }).
+          update({ "$set" => { title: "reloaded" }})
       end
 
       let(:reloaded) do

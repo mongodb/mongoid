@@ -2,11 +2,12 @@ require "perftools"
 require "mongoid"
 require "./perf/models"
 
-Mongoid.configure do |config|
-  config.master = Mongo::Connection.new().db("mongoid_perf_test")
-end
+# For 1.9.3 profiling add the following to Gemfile:
+# gem 'perftools.rb', :git => 'git://github.com/bearded/perftools.rb.git', :branch => 'perftools-1.8'
+Mongoid.databases = { :default => { :name => "mongoid_perf_test" }}
+Mongoid::Sessions::Factory.default
 
-Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+Mongoid.purge!
 
 puts "Starting profiler"
 
@@ -20,7 +21,7 @@ end
 without_gc do
   puts "[ Root Document #create ]"
   PerfTools::CpuProfiler.start("perf/root_create.profile") do
-    100000.times do |n|
+    1000.times do |n|
       Person.create(:birth_date => Date.new(1970, 1, 1))
     end
   end
@@ -154,7 +155,7 @@ person.addresses.delete_all
 without_gc do
   puts "[ Embedded 1-1 #relation= ]"
   PerfTools::CpuProfiler.start("perf/embedded_1_relation.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.name = Name.new(:given => "Name #{n}")
     end
   end
@@ -163,7 +164,7 @@ end
 without_gc do
   puts "[ Referenced 1-n #build ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_build.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.posts.build(:title => "Posting #{n}")
     end
   end
@@ -179,7 +180,7 @@ end
 without_gc do
   puts "[ Referenced 1-n #create ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_create.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.posts.create(:title => "Posting #{n}")
     end
   end
@@ -202,7 +203,7 @@ end
 without_gc do
   puts "[ Referenced 1-n #push ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_push.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.posts.push(Post.new(:title => "Posting #{n}"))
     end
   end
@@ -248,7 +249,7 @@ person.posts.delete_all
 without_gc do
   puts "[ Referenced 1-1 #relation= ]"
   PerfTools::CpuProfiler.start("perf/referenced_1_relation.profile") do
-    10000.times do |n|
+    1000.times do |n|
       person.name = Game.new(:name => "Final Fantasy #{n}")
     end
   end

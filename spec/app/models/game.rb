@@ -8,7 +8,6 @@ class Game
   has_one :video, validate: false
   has_many :ratings, as: :ratable, dependent: :nullify
   accepts_nested_attributes_for :person
-  cache
 
   validates_format_of :name, without: /\$\$\$/
 

@@ -6,7 +6,6 @@ module Mongoid # :nodoc:
       # This class handles the behaviour for a document that embeds many other
       # documents within in it as an array.
       class Many < Relations::Many
-        include Atomic
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
@@ -56,17 +55,29 @@ module Mongoid # :nodoc:
         # @example Concat with other documents.
         #   person.addresses.concat([ address_one, address_two ])
         #
-        # @param [ Array<Document> ] documents The docs to add.
+        # @param [ Array<Document> ] docs The docs to add.
         #
         # @return [ Array<Document> ] The documents.
         #
         # @since 2.4.0
-        def concat(documents)
-          atomically(:$pushAll) do
-            documents.each do |doc|
-              next unless doc
-              append(doc)
-              doc.save if persistable?
+        def concat(docs)
+          # @todo: Durran: Test all conditions, then refactor.
+          docs.each do |doc|
+            next unless doc
+            append(doc)
+            if persistable?
+              doc.valid?(:create)
+              doc.run_before_callbacks(:save, :create)
+            end
+          end
+          if persistable?
+            collection.find(base.atomic_selector).update(
+              "$pushAll" => { docs.first.atomic_path => docs.map(&:as_document) }
+            )
+            docs.each do |doc|
+              doc.new_record = false
+              doc.run_after_callbacks(:create, :save)
+              doc.post_persist
             end
           end
           self
@@ -111,10 +122,8 @@ module Mongoid # :nodoc:
         # @return [ Many ] The empty relation.
         def clear
           tap do |proxy|
-            atomically(:$unset) do
-              proxy.delete_all
-              _unscoped.clear
-            end
+            proxy.delete_all
+            _unscoped.clear
           end
         end
 
@@ -213,7 +222,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents deleted.
         def delete_all(conditions = {})
-          atomically(:$pull) { remove_all(conditions, :delete) }
+          remove_all(conditions, :delete)
         end
 
         # Destroy all the documents in the association whilst running callbacks.
@@ -228,7 +237,7 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents destroyed.
         def destroy_all(conditions = {})
-          atomically(:$pull) { remove_all(conditions, :destroy) }
+          remove_all(conditions, :destroy)
         end
 
         # Finds a document in this association through several different
@@ -318,6 +327,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
+          # @todo: Durran: Test all conditions and refactor.
           tap do |proxy|
             if replacement.blank?
               if _assigning? && !proxy.empty?
@@ -325,18 +335,33 @@ module Mongoid # :nodoc:
               end
               proxy.clear
             else
-              atomically(:$set) do
-                base.delayed_atomic_sets.clear
-                if replacement.first.is_a?(Hash)
-                  replacement = Many.builder(base, metadata, replacement).build
+              base.delayed_atomic_sets.clear
+              if replacement.first.is_a?(Hash)
+                replacement = Many.builder(base, metadata, replacement).build
+              end
+              docs = replacement.compact
+              proxy.target = docs
+              self._unscoped = docs.dup
+              if _assigning?
+                base.delayed_atomic_sets[metadata.name.to_s] = proxy.as_document
+              end
+              proxy.target.each_with_index do |doc, index|
+                integrate(doc)
+                doc._index = index
+                if base.persisted? && !_assigning?
+                  doc.valid?(:create)
+                  doc.run_before_callbacks(:save, :create)
                 end
-                docs = replacement.compact
-                proxy.target = docs
-                self._unscoped = docs.dup
-                proxy.target.each_with_index do |doc, index|
-                  integrate(doc)
-                  doc._index = index
-                  doc.save if base.persisted? && !_assigning?
+                # doc.save if base.persisted? && !_assigning?
+              end
+              if base.persisted? && !_assigning?
+                collection.find(base.atomic_selector).update(
+                  "$set" => { docs.first.atomic_path => proxy.as_document }
+                )
+                proxy.target.each do |doc|
+                  doc.new_record = false
+                  doc.run_after_callbacks(:create, :save)
+                  doc.post_persist
                 end
                 if _assigning?
                   name = proxy.first.atomic_path
@@ -512,13 +537,38 @@ module Mongoid # :nodoc:
         #
         # @return [ Integer ] The number of documents removed.
         def remove_all(conditions = {}, method = :delete)
+          # @todo: Durran: test all examples and refactor.
           criteria = where(conditions || {})
           criteria.size.tap do
-            criteria.each do |doc|
+            docs = criteria.map do |doc|
               target.delete_one(doc)
               _unscoped.delete_one(doc)
-              doc.send(method, suppress: true) unless _assigning?
+              if !_assigning? && !metadata.versioned?
+                doc.cascade!
+                doc.run_before_callbacks(:destroy) if method == :destroy
+              end
               unbind_one(doc)
+              doc
+            end
+            if !docs.empty? && !_assigning?
+              query = collection.find(base.atomic_selector)
+              # @todo: Durran: Versioned docs have no atomic path?
+              if metadata.versioned?
+                query.update("$pull" => { metadata.name => conditions || {}})
+              else
+                query.update(
+                  "$pullAll" => { docs.first.atomic_path => docs.map(&:as_document) }
+                )
+              end
+            end
+            unless _assigning?
+              docs.each do |doc|
+                doc.run_after_callbacks(:destroy) if method == :destroy
+                doc.freeze
+                doc.destroyed = true
+                IdentityMap.remove(doc)
+              end
+              Threaded.clear_options!
             end
             reindex
           end

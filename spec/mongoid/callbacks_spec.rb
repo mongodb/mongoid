@@ -4,6 +4,18 @@ describe Mongoid::Callbacks do
 
   class TestClass
     include Mongoid::Callbacks
+
+    attr_reader :before_save_called, :after_save_called
+
+    before_save do |object|
+      p "before save"
+      @before_save_called = true
+    end
+
+    after_save do |object|
+      p "after save"
+      @after_save_called = true
+    end
   end
 
   describe ".included" do
@@ -243,6 +255,44 @@ describe Mongoid::Callbacks do
       it "the destroy returns false" do
         artist.destroy.should be_false
       end
+    end
+  end
+
+  describe "#run_after_callbacks" do
+
+    let(:object) do
+      TestClass.new
+    end
+
+    before do
+      object.run_after_callbacks(:save)
+    end
+
+    it "runs the after callbacks" do
+      object.after_save_called.should be_true
+    end
+
+    it "does not run the before callbacks" do
+      object.before_save_called.should be_false
+    end
+  end
+
+  describe "#run_before_callbacks" do
+
+    let(:object) do
+      TestClass.new
+    end
+
+    before do
+      object.run_before_callbacks(:save)
+    end
+
+    it "runs the before callbacks" do
+      object.before_save_called.should be_true
+    end
+
+    it "does not run the after callbacks" do
+      object.after_save_called.should be_false
     end
   end
 

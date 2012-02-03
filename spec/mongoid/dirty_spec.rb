@@ -857,7 +857,6 @@ describe Mongoid::Dirty do
     context "when the document has been saved" do
 
       before do
-        person.collection.expects(:insert).returns(true)
         person.save!
       end
 

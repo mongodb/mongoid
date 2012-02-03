@@ -29,7 +29,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the root collection" do
-        collection.should eq(document.collection)
+        collection.name.should eq(document.collection.name)
       end
     end
 
@@ -48,7 +48,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the root collection" do
-        collection.should eq(document.collection)
+        collection.name.should eq(document.collection.name)
       end
     end
   end
@@ -161,90 +161,16 @@ describe Mongoid::Persistence::Operations do
 
   describe "#options" do
 
+    let(:options) do
+      {}
+    end
+
     let(:operation) do
       klass.new(document, options)
     end
 
-    context "safe is true" do
-
-      let(:options) do
-        { safe: true }
-      end
-
-      let(:opts) do
-        operation.options
-      end
-
-      it "returns the safe options" do
-        opts.should eq(options)
-      end
-    end
-
-    context "when safe is a hash" do
-
-      let(:options) do
-        { safe: { w: 2 } }
-      end
-
-      let(:opts) do
-        operation.options
-      end
-
-      it "returns the safe options" do
-        opts.should eq(options)
-      end
-    end
-
-    context "when safe is false" do
-
-      let(:options) do
-        { safe: false }
-      end
-
-      let(:opts) do
-        operation.options
-      end
-
-      it "returns the safe options" do
-        opts.should eq(options)
-      end
-    end
-
-    context "when safe is nil" do
-
-      let(:options) do
-        {}
-      end
-
-      let(:opts) do
-        operation.options
-      end
-
-      context "when persisting in safe mode" do
-
-        before do
-          Mongoid.persist_in_safe_mode = true
-        end
-
-        after do
-          Mongoid.persist_in_safe_mode = false
-        end
-
-        it "returns :safe => true" do
-          opts.should eq({ safe: true })
-        end
-      end
-
-      context "when not persisting in safe mode" do
-
-        before do
-          Mongoid.persist_in_safe_mode = false
-        end
-
-        it "returns :safe => false" do
-          opts.should eq({ safe: false })
-        end
-      end
+    it "returns the options" do
+      operation.options.should eq(options)
     end
   end
 

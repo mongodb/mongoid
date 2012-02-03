@@ -14,4 +14,5 @@ class User
   has_one :shop
 
   accepts_nested_attributes_for :posts
+  index name: 1
 end

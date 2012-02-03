@@ -87,7 +87,9 @@ describe Mongoid::Reloading do
       context "when raising not found error" do
 
         it "raises an error" do
-          expect { Person.new.reload }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          expect {
+            Person.new.reload
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
     end
@@ -107,9 +109,9 @@ describe Mongoid::Reloading do
           end
 
           before do
-            Person.collection.update(
-              { "_id" => person.id }, { "$set" => { "addresses.0.number" => 3 }}
-            )
+            Person.collection.find(
+              { "_id" => person.id }
+            ).update({ "$set" => { "addresses.0.number" => 3 }})
           end
 
           let!(:reloaded) do
@@ -136,9 +138,8 @@ describe Mongoid::Reloading do
           end
 
           before do
-            Person.collection.update(
-              { "_id" => person.id }, { "$set" => { "name.last_name" => "Vicious" }}
-            )
+            Person.collection.find({ "_id" => person.id }).
+              update({ "$set" => { "name.last_name" => "Vicious" }})
           end
 
           let!(:reloaded) do
@@ -170,10 +171,8 @@ describe Mongoid::Reloading do
         end
 
         before do
-          Person.collection.update(
-            { "_id" => person.id },
-            { "$set" => { "addresses.0.locations.0.name" => "work" }}
-          )
+          Person.collection.find({ "_id" => person.id }).
+            update({ "$set" => { "addresses.0.locations.0.name" => "work" }})
         end
 
         let!(:reloaded) do
@@ -205,9 +204,8 @@ describe Mongoid::Reloading do
       end
 
       before do
-        Person.collection.update(
-          { "_id" => person.id }, { "$set" => { "addresses" => [] } }
-        )
+        Person.collection.find({ "_id" => person.id }).
+          update({ "$set" => { "addresses" => [] }})
         person.reload
       end
 
@@ -229,9 +227,8 @@ describe Mongoid::Reloading do
         end
 
         before do
-          Game.collection.update(
-            { "_id" => game.id }, { "$set" => { "score" => 75 } }
-          )
+          Game.collection.find({ "_id" => game.id }).
+            update({ "$set" => { "score" => 75 }})
           person.reload
         end
 
@@ -247,9 +244,8 @@ describe Mongoid::Reloading do
         end
 
         before do
-          Person.collection.update(
-            { "_id" => person.id }, { "$set" => { "title" => "Mam" } }
-          )
+          Person.collection.find({ "_id" => person.id }).
+            update({ "$set" => { "title" => "Mam" }})
           game.reload
         end
 

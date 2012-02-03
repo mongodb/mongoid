@@ -21,9 +21,7 @@ module Mongoid #:nodoc
     include Mongoid::Atomic
     include Mongoid::Dirty
     include Mongoid::Attributes
-    include Mongoid::Collections
     include Mongoid::Copyable
-    include Mongoid::Extras
     include Mongoid::Fields
     include Mongoid::Hierarchy
     include Mongoid::Indexes
@@ -36,6 +34,7 @@ module Mongoid #:nodoc
     include Mongoid::Reloading
     include Mongoid::Safety
     include Mongoid::Scoping
+    include Mongoid::Sessions
     include Mongoid::Serialization
     include Mongoid::Sharding
     include Mongoid::State
@@ -48,10 +47,8 @@ module Mongoid #:nodoc
     MODULES = [
       Mongoid::Atomic,
       Mongoid::Attributes,
-      Mongoid::Collections,
       Mongoid::Copyable,
       Mongoid::Dirty,
-      Mongoid::Extras,
       Mongoid::Fields,
       Mongoid::Hierarchy,
       Mongoid::Indexes,

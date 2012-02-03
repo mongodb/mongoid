@@ -17,11 +17,11 @@ describe "Rails::Mongoid" do
     end
 
     let(:klass) do
-      Person
+      User
     end
 
     let(:model_paths) do
-      [ "spec/app/models/person.rb" ]
+      [ "spec/app/models/user.rb" ]
     end
 
     let(:indexes) do
@@ -62,8 +62,8 @@ describe "Rails::Mongoid" do
 
       it "is not swallowed" do
         Rails::Mongoid.expects(:determine_model).returns(klass)
-        klass.expects(:create_indexes).raises(Mongo::MongoArgumentError)
-        expect { indexes }.to raise_error(Mongo::MongoArgumentError)
+        klass.expects(:create_indexes).raises(ArgumentError)
+        expect { indexes }.to raise_error(ArgumentError)
       end
     end
 
@@ -100,11 +100,11 @@ describe "Rails::Mongoid" do
     end
 
     let(:klass) do
-      Person
+      User
     end
 
     let(:model_paths) do
-      [ "spec/app/models/person.rb" ]
+      [ "spec/app/models/user.rb" ]
     end
 
     before do
@@ -113,8 +113,8 @@ describe "Rails::Mongoid" do
       logger.expects(:info).times(2)
     end
 
-    let(:index_information) do
-      klass.index_information
+    let(:indexes) do
+      klass.collection.indexes
     end
 
     before :each do
@@ -123,11 +123,11 @@ describe "Rails::Mongoid" do
     end
 
     it "removes indexes from klass" do
-      index_information.reject{ |name, options| name == "_id_" }.keys.should be_empty
+      indexes.reject{ |doc| doc["name"] == "_id_" }.should be_empty
     end
 
     it "leaves _id index untouched" do
-      index_information.keys.should include("_id_")
+      indexes.select{ |doc| doc["name"] == "_id_" }.should_not be_empty
     end
   end
 
@@ -142,11 +142,11 @@ describe "Rails::Mongoid" do
     end
 
     let(:klass) do
-      Person
+      User
     end
 
     let(:model_paths) do
-      [ "spec/app/models/person.rb" ]
+      [ "spec/app/models/user.rb" ]
     end
 
     let(:models) do
@@ -169,11 +169,11 @@ describe "Rails::Mongoid" do
     end
 
     let(:klass) do
-      Person
+      User
     end
 
     let(:file) do
-      "app/models/person.rb"
+      "app/models/user.rb"
     end
 
     let(:model) do
@@ -256,7 +256,7 @@ describe "Rails::Mongoid" do
       context "with file from normal model" do
 
         let(:file) do
-          "app/models/fu/person.rb"
+          "app/models/fu/user.rb"
         end
 
         it "returns klass" do
@@ -299,11 +299,11 @@ describe "Rails::Mongoid" do
     context "with models present in Rails engines" do
 
       let(:file) do
-        "/gem_path/engines/some_engine_gem/app/models/person.rb"
+        "/gem_path/engines/some_engine_gem/app/models/user.rb"
       end
 
       let(:klass) do
-        Person
+        User
       end
 
       it "requires the models by base name from the engine's app/models dir" do

@@ -2,11 +2,10 @@ require "benchmark"
 require "mongoid"
 require "./perf/models"
 
-Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db("mongoid_perf_test")
-end
+Mongoid.databases = { :default => { :name => "mongoid_perf_test" }}
+Mongoid::Sessions::Factory.default
 
-Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:remove)
+Mongoid.purge!
 
 puts "Creating indexes..."
 

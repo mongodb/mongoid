@@ -112,7 +112,7 @@ describe Mongoid::UnitOfWork do
         it "does not clear the map in the inner block" do
           Mongoid.unit_of_work do
             Mongoid.unit_of_work(disable: :current) do
-              Mongoid::IdentityMap["people"][person.id].should eq(person)
+              Mongoid::IdentityMap[:people][person.id].should eq(person)
             end
           end
         end

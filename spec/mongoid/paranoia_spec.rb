@@ -22,7 +22,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        ParanoidPost.collection.find_one(post.id)
+        ParanoidPost.collection.find(_id: post.id).first
       end
 
       it "hard deletes the document" do
@@ -53,7 +53,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        Person.collection.find_one(person.id)
+        Person.collection.find(_id: person.id).first
       end
 
       it "hard deletes the document" do
@@ -104,7 +104,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        ParanoidPost.collection.find_one(post.id)
+        ParanoidPost.collection.find(_id: post.id).first
       end
 
       it "soft deletes the document" do
@@ -141,7 +141,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        Person.collection.find_one(person.id)
+        Person.collection.find(_id: person.id).first
       end
 
       it "soft deletes the document" do
@@ -267,7 +267,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        ParanoidPost.collection.find_one(post.id)
+        ParanoidPost.collection.find(_id: post.id).first
       end
 
       it "hard deletes the document" do
@@ -290,7 +290,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        Person.collection.find_one(person.id)
+        Person.collection.find(_id: person.id).first
       end
 
       it "hard deletes the document" do
@@ -333,7 +333,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        ParanoidPost.collection.find_one(post.id)
+        ParanoidPost.collection.find(_id: post.id).first
       end
 
       it "soft deletes the document" do
@@ -370,7 +370,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:raw) do
-        Person.collection.find_one(person.id)
+        Person.collection.find(_id: person.id).first
       end
 
       it "soft deletes the document" do

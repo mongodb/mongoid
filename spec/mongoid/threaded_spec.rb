@@ -193,36 +193,6 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#update_consumer" do
-
-    before do
-      Thread.current[:"[mongoid][Person]:update-consumer"] = object
-    end
-
-    after do
-      Thread.current[:"[mongoid][Person]:update-consumer"] = nil
-    end
-
-    it "returns the object with the update key" do
-      described_class.update_consumer(Person).should eq(object)
-    end
-  end
-
-  describe "#set_update_consumer" do
-
-    before do
-      described_class.set_update_consumer(Person, object)
-    end
-
-    after do
-      Thread.current[:"[mongoid][Person]:update-consumer"] = nil
-    end
-
-    it "sets the object with the update key" do
-      described_class.update_consumer(Person).should eq(object)
-    end
-  end
-
   describe "#timeless" do
 
     before do

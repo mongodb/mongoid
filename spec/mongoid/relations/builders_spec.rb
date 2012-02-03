@@ -198,7 +198,7 @@ describe Mongoid::Relations::Builders do
           end
 
           it "removes the old document from the database" do
-            Game.collection.count.should eq(1)
+            Game.collection.find.count.should eq(1)
           end
         end
       end

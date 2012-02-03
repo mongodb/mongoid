@@ -42,9 +42,13 @@ module Mongoid #:nodoc:
         def persist
           prepare do
             unless updates.empty?
-              collection.update(selector, updates, options)
+              # collection.update(selector, updates, options)
+              # conflicts.each_pair do |key, value|
+                # collection.update(selector, { key => value }, options)
+              # end
+              collection.find(selector).update(updates)
               conflicts.each_pair do |key, value|
-                collection.update(selector, { key => value }, options)
+                collection.find(selector).update({ key => value })
               end
             end
           end

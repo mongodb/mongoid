@@ -25,11 +25,7 @@ module Mongoid #:nodoc:
             yield(document); true
           end
         end.tap do |result|
-          unless result == false
-            document.reset_persisted_children
-            document.move_changes
-            Threaded.clear_options!
-          end
+          document.post_persist unless result == false
         end
       end
     end

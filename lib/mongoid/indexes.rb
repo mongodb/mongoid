@@ -16,8 +16,8 @@ module Mongoid #:nodoc
       #   Person.create_indexes
       def create_indexes
         return unless index_options
-        index_options.each_pair do |name, options|
-           current_collection.create_index(name, options)
+        index_options.each_pair do |spec, options|
+          collection.indexes.create(spec, options)
         end
       end
 
@@ -27,9 +27,9 @@ module Mongoid #:nodoc
       # @example Remove the indexes for the class.
       #   Person.remove_indexes
       def remove_indexes
-        index_information.keys.each do |name|
-          next if name == "_id_"
-          current_collection.drop_index(name)
+        collection.indexes.each do |spec|
+          next if spec["name"] == "_id_"
+          collection.indexes.drop(spec["key"])
         end
       end
 
@@ -39,8 +39,8 @@ module Mongoid #:nodoc
       # @example Add Mongoid internal indexes.
       #   Person.add_indexes
       def add_indexes
-        if hereditary? && !index_options[:_type]
-          self.index_options[:_type] = {unique: false, background: true}
+        if hereditary? && !index_options[{ _type: 1 }]
+          index _type: 1, options: { unique: false, background: true }
         end
         create_indexes if Mongoid.autocreate_indexes
       end
@@ -51,20 +51,17 @@ module Mongoid #:nodoc
       # @example Create a basic index.
       #   class Person
       #     include Mongoid::Document
-      #     field :name, :type => String
-      #     index :name, :background => true
+      #     field :name, type: String
+      #     index name: 1, options: { background: true }
+      #   end
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The index options.
-      def index(name, options = { unique: false })
-        self.index_options[name] = options
+      def index(spec)
+        # @todo: Durran: Validate options.
+        options = spec.delete(:options)
+        index_options[spec] = { unique: false }.merge(options || {})
         create_indexes if Mongoid.autocreate_indexes
-      end
-
-      private
-
-      def current_collection
-        @current_collection ||= self._collection || set_collection
       end
     end
   end

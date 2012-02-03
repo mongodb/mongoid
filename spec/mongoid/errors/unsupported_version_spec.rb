@@ -5,7 +5,7 @@ describe Mongoid::Errors::UnsupportedVersion do
   describe "#message" do
 
     let(:version) do
-      Mongo::ServerVersion.new("1.2.4")
+      "1.2.4"
     end
 
     let(:error) do

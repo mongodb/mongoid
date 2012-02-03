@@ -6,12 +6,22 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     CALLBACKS = [
-      :before_validation, :after_validation,
-      :after_initialize, :after_build,
-      :before_create, :around_create, :after_create,
-      :before_destroy, :around_destroy, :after_destroy,
-      :before_save, :around_save, :after_save,
-      :before_update, :around_update, :after_update,
+      :after_build,
+      :after_create,
+      :after_destroy,
+      :after_initialize,
+      :after_save,
+      :after_update,
+      :after_validation,
+      :around_create,
+      :around_destroy,
+      :around_save,
+      :around_update,
+      :before_create,
+      :before_destroy,
+      :before_save,
+      :before_update,
+      :before_validation
     ]
 
     included do
@@ -21,6 +31,44 @@ module Mongoid #:nodoc:
       define_model_callbacks :initialize, only: :after
       define_model_callbacks :build, only: :after
       define_model_callbacks :create, :destroy, :save, :update
+    end
+
+    # Run only the after callbacks for the specific event.
+    #
+    # @note ActiveSupport does not allow this type of behaviour by default, so
+    #   Mongoid has to get around it and implement itself.
+    #
+    # @example Run only the after save callbacks.
+    #   model.run_after_callbacks(:save)
+    #
+    # @param [ Array<Symbol> ] kinds The events that are occurring.
+    #
+    # @return [ Object ] The result of the chain executing.
+    #
+    # @since 3.0.0
+    def run_after_callbacks(*kinds)
+      kinds.each do |kind|
+        run_targeted_callbacks(:after, kind)
+      end
+    end
+
+    # Run only the before callbacks for the specific event.
+    #
+    # @note ActiveSupport does not allow this type of behaviour by default, so
+    #   Mongoid has to get around it and implement itself.
+    #
+    # @example Run only the before save callbacks.
+    #   model.run_before_callbacks(:save, :create)
+    #
+    # @param [ Array<Symbol> ] kinds The events that are occurring.
+    #
+    # @return [ Object ] The result of the chain executing.
+    #
+    # @since 3.0.0
+    def run_before_callbacks(*kinds)
+      kinds.each do |kind|
+        run_targeted_callbacks(:before, kind)
+      end
     end
 
     # Run the callbacks for the document. This overrides active support's
@@ -112,6 +160,33 @@ module Mongoid #:nodoc:
       else
         kind
       end
+    end
+
+    # Run only the callbacks for the target location (before, after, around)
+    # and kind (save, update, create).
+    #
+    # @example Run the targeted callbacks.
+    #   model.run_targeted_callbacks(:before, :save)
+    #
+    # @param [ Symbol ] place The time to run, :before, :after, :around.
+    # @param [ Symbol ] kind The type of callback, :save, :create, :update.
+    #
+    # @return [ Object ] The result of the chain execution.
+    #
+    # @since 3.0.0
+    def run_targeted_callbacks(place, kind)
+      name = "_run__#{place}__#{kind}__callbacks"
+      unless respond_to?(name)
+        chain = ActiveSupport::Callbacks::CallbackChain.new(name, {})
+        send("_#{kind}_callbacks").each do |callback|
+          chain.push(callback) if callback.kind == place
+        end
+        class_eval <<-EOM
+          def #{name}() #{chain.compile} end
+          protected :#{name}
+        EOM
+      end
+      send(name)
     end
   end
 end

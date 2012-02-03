@@ -19,7 +19,11 @@ describe Mongoid::Persistence::Operations::Insert do
   end
 
   let(:collection) do
-    stub.quacks_like(Mongoid::Collection.allocate)
+    stub.quacks_like(Moped::Collection.allocate)
+  end
+
+  let(:query) do
+    stub
   end
 
   before do
@@ -63,7 +67,7 @@ describe Mongoid::Persistence::Operations::Insert do
     end
 
     it "sets the options" do
-      insert.options.should eq({ safe: Mongoid.persist_in_safe_mode })
+      insert.options.should be_empty
     end
   end
 
@@ -72,18 +76,16 @@ describe Mongoid::Persistence::Operations::Insert do
     def root_set_expectation
       ->{
         collection.expects(:insert).with(
-          document.raw_attributes,
-          safe: false
+          document.raw_attributes
         ).returns("Object")
       }
     end
 
     def root_push_expectation
       ->{
-        collection.expects(:update).with(
-          { "_id" => document.id },
-          { "addresses" => { "$push" => address.raw_attributes } },
-          safe: false
+        collection.expects(:find).with({ "_id" => document.id }).returns(query)
+        query.expects(:update).with(
+          { "addresses" => { "$push" => address.raw_attributes } }
         ).returns("Object")
       }
     end

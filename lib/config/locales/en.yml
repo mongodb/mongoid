@@ -220,6 +220,17 @@ en:
           resolution: "Ensure that you've set the parent relation if
             instantiating the embedded document direcly, or always create new
             embedded documents via the parent relation."
+        no_session_config:
+          message: "No configuration could be found for a session named
+            '%{name}'."
+          summary: "When attempting to create the new session, Mongoid could
+            not find a session configuration for the name: '%{name}'. This is
+            necessary in order to know the host, port, and options needed
+            to connect."
+          resolution: "Double check your mongoid.yml to make sure under the
+            sessions key that a configuration exists for '%{name}'. If you
+            have set the configuration programatically, ensure that '%{name}'
+            exists in the configuration hash."
         readonly_attribute:
           message: "Attempted to set the readonly attribute '%{name}' with
             the value: %{value}."

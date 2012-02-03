@@ -18,10 +18,9 @@ ENV["MONGOID_SPEC_PORT"] ||= "27017"
 
 # These are used when creating any connection in the test suite.
 HOST = ENV["MONGOID_SPEC_HOST"]
-PORT = ENV["MONGOID_SPEC_PORT"]
+PORT = ENV["MONGOID_SPEC_PORT"].to_i
 
-# Convenience for creating a new logger for debugging.
-LOGGER = Logger.new($stdout)
+# Moped.logger.level = Logger::DEBUG
 
 # When testing locally we use the database named mongoid_test. However when
 # tests are running in parallel on Travis we need to use different database
@@ -31,11 +30,9 @@ def database_id
   ENV["CI"] ? "mongoid_#{Process.pid}" : "mongoid_test"
 end
 
+# Set the database that the spec suite connects to.
 Mongoid.configure do |config|
-  database = Mongo::Connection.new(HOST, PORT).db(database_id)
-  database.add_user("mongoid", "test")
-  config.master = database
-  config.logger = nil
+  config.connect_to(database_id)
 end
 
 # Autoload every model for the test suite that sits in spec/app/models.
@@ -74,18 +71,18 @@ RSpec.configure do |config|
   # drop the database after the suite.
   config.after(:suite) do
     if ENV["CI"]
-      Mongoid.master.connection.drop_database(database_id)
+      Mongoid::Threaded.sessions[:default].drop
     end
   end
 
   # We filter out specs that require authentication to MongoHQ if the
   # environment variables have not been set up locally.
-  mongohq_configured = Support::MongoHQ.configured?
-  warn(Support::MongoHQ.message) unless mongohq_configured
+  # mongohq_configured = Support::MongoHQ.configured?
+  # warn(Support::MongoHQ.message) unless mongohq_configured
 
-  config.filter_run_excluding(config: lambda { |value|
-    return true if value == :mongohq && !mongohq_configured
-  })
+  # config.filter_run_excluding(:config => lambda { |value|
+    # return true if value == :mongohq && !mongohq_configured
+  # })
 end
 
 ActiveSupport::Inflector.inflections do |inflect|

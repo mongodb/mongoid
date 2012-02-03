@@ -26,7 +26,7 @@ module Mongoid #:nodoc
           return "#{MODULE}::ForeignKeys::#{klass.to_s.demodulize}".constantize
         end
         begin
-          modules = "#{ MODULE }::|BSON::|ActiveSupport::"
+          modules = "#{ MODULE }::|Moped::BSON::|ActiveSupport::"
           if match = klass.to_s.match(Regexp.new("^(#{ modules })?(\\w+)$"))
             "#{MODULE}::#{ match[2] }".constantize
           else

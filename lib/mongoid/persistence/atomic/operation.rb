@@ -33,7 +33,7 @@ module Mongoid #:nodoc:
         # @since 2.0.0
         def initialize(document, field, value, options = {})
           @document, @field, @value = document, field.to_s, value
-          @options = Safety.merge_safety_options(options)
+          @options = options
         end
 
         # Get the atomic operation to perform.
@@ -94,7 +94,7 @@ module Mongoid #:nodoc:
         # @since 3.0.0
         def execute(name)
           if document.persisted?
-            collection.update(document.atomic_selector, operation(name), options)
+            collection.find(document.atomic_selector).update(operation(name))
             document.remove_change(field)
           end
         end

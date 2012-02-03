@@ -653,7 +653,9 @@ describe Mongoid::Document do
 
       it "return false" do
         person.should_not be_frozen
-        expect { person.title = "something" }.to_not raise_error
+        expect {
+          person.title = "something"
+        }.to_not raise_error
       end
     end
 
@@ -690,7 +692,9 @@ describe Mongoid::Document do
 
       it "keeps things frozen" do
         person.freeze
-        expect { person.title = "something" }.to raise_error
+        expect {
+          person.title = "something"
+        }.to raise_error
       end
     end
   end
@@ -791,7 +795,7 @@ describe Mongoid::Document do
       let(:model) do
         Class.new do
           include Mongoid::Document
-          store_in :anonymous
+          store_in collection: "anonymous"
           field :gender
         end
       end

@@ -3,7 +3,9 @@ require "spec_helper"
 describe Mongoid::Relations::AutoSave do
 
   before(:all) do
+    Person.autosaved_relations.delete_one(:drugs)
     Person.autosaved_relations.delete_one(:account)
+    Person.autosave(Person.relations["drugs"].merge!(autosave: true))
     Person.autosave(Person.relations["account"].merge!(autosave: true))
   end
 

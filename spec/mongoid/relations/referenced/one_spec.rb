@@ -1033,10 +1033,6 @@ describe Mongoid::Relations::Referenced::One do
         Mongoid::IdentityMap.get(Game, "person_id" => person.id)
       end
 
-      it "returns the appropriate criteria" do
-        eager.selector.should eq({ "person_id" => { "$in" => [ person.id ] }})
-      end
-
       it "puts the documents in the identity map" do
         map.should eq(game)
       end
@@ -1070,10 +1066,6 @@ describe Mongoid::Relations::Referenced::One do
 
       let(:map) do
         Mongoid::IdentityMap.get(Rating, "ratable_id" => book.id)
-      end
-
-      it "returns the appropriate criteria" do
-        eager.selector.should eq({ "ratable_id" => { "$in" => [ book.id ] }})
       end
 
       it "puts the documents in the identity map" do
@@ -1221,9 +1213,8 @@ describe Mongoid::Relations::Referenced::One do
     context "when the relation references the same document" do
 
       before do
-        Game.collection.update(
-          { _id: game_one.id }, { "$set" => { name: "Diablo 2" }}
-        )
+        Game.collection.find({ _id: game_one.id }).
+          update({ "$set" => { name: "Diablo 2" }})
       end
 
       let(:reloaded) do

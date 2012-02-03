@@ -61,10 +61,7 @@ describe Mongoid::Persistence::Atomic::Bit do
     context "when chaining bitwise operations" do
 
       let(:hash) do
-        BSON::OrderedHash.new.tap do |h|
-          h[:and] = 13
-          h[:or] = 10
-        end
+        { and: 13, or: 10 }
       end
 
       let!(:bit) do

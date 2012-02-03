@@ -22,6 +22,10 @@ module Mongoid #:nodoc:
       stack(name).push(true)
     end
 
+    def sessions
+      Thread.current[:"[mongoid]:sessions"] ||= {}
+    end
+
     # Are in the middle of executing the named stack
     #
     # @example Are we in the stack execution?
@@ -313,32 +317,6 @@ module Mongoid #:nodoc:
     # @since 2.3.0
     def timeless=(value)
       Thread.current[:"[mongoid]:timeless"] = value
-    end
-
-    # Get the update consumer from the current thread.
-    #
-    # @example Get the update consumer.
-    #   Threaded.update
-    #
-    # @return [ Object ] The atomic update consumer.
-    #
-    # @since 2.1.0
-    def update_consumer(klass)
-      Thread.current[:"[mongoid][#{klass}]:update-consumer"]
-    end
-
-    # Set the update consumer on the current thread.
-    #
-    # @example Set the update consumer.
-    #   Threaded.update = consumer
-    #
-    # @param [ Object ] consumer The update consumer.
-    #
-    # @return [ Object ] The update consumer.
-    #
-    # @since 2.1.0
-    def set_update_consumer(klass, consumer)
-      Thread.current[:"[mongoid][#{klass}]:update-consumer"] = consumer
     end
 
     # Is the current thread setting timestamps?

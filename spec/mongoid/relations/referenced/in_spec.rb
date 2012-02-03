@@ -1308,9 +1308,8 @@ describe Mongoid::Relations::Referenced::In do
     context "when the relation references the same document" do
 
       before do
-        Person.collection.update(
-          { _id: person_one.id }, { "$set" => { title: "Madam" }}
-        )
+        Person.collection.find({ _id: person_one.id }).
+          update({ "$set" => { title: "Madam" }})
       end
 
       let(:reloaded) do

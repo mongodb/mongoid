@@ -11,7 +11,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
   end
 
   let(:collection) do
-    stub.quacks_like(Mongoid::Collection.allocate)
+    stub.quacks_like(Moped::Collection.allocate)
   end
 
   let(:email) do
@@ -20,6 +20,10 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
   before do
     document.stubs(:collection).returns(collection)
+  end
+
+  let(:query) do
+    stub
   end
 
   before(:all) do
@@ -71,28 +75,25 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
     def root_insert_expectation
       ->{
         collection.expects(:insert).with(
-          document.raw_attributes,
-          safe: false
+          document.raw_attributes
         ).returns("Object")
       }
     end
 
     def root_push_expectation
       ->{
-        collection.expects(:update).with(
-          { "_id" => document.id },
-          { "$push" => { "addresses" => address.raw_attributes } },
-          safe: false
+        collection.expects(:find).with({ "_id" => document.id }).returns(query)
+        query.expects(:update).with(
+          { "$push" => { "addresses" => address.raw_attributes }}
         ).returns("Object")
       }
     end
 
     def root_set_expectation
       ->{
-        collection.expects(:update).with(
-          { "_id" => document.id },
-          { "$set" => { "email" => email.raw_attributes } },
-          safe: false
+        collection.expects(:find).with({ "_id" => document.id }).returns(query)
+        query.expects(:update).with(
+          { "$set" => { "email" => email.raw_attributes } }
         ).returns("Object")
       }
     end
@@ -177,10 +178,9 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
           end
 
           it "performs a $push on the embedded array" do
-            collection.expects(:update).with(
-              { "_id" => document.id },
-              { "$push" => { "addresses" => other_address.raw_attributes } },
-              safe: false
+            collection.expects(:find).with({ "_id" => document.id }).returns(query)
+            query.expects(:update).with(
+              { "$push" => { "addresses" => other_address.raw_attributes } }
             ).returns("Object")
             described_class.new(other_address).persist.should eq(other_address)
           end

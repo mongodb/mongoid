@@ -423,7 +423,7 @@ describe Mongoid::Relations::Embedded::Many do
           class TrackingId
             include Mongoid::Document
             include Mongoid::Timestamps
-            store_in :tracking_ids
+            store_in collection: "tracking_ids"
             embeds_many \
               :validation_history,
               class_name: "MyCompany::Model::TrackingIdValidationHistory"
@@ -911,33 +911,6 @@ describe Mongoid::Relations::Embedded::Many do
           document.should eq([ active.as_document, inactive.as_document ])
         end
       end
-    end
-  end
-
-  describe "#avg" do
-
-    let(:person) do
-      Person.new
-    end
-
-    let(:address_one) do
-      Address.new(number: 5)
-    end
-
-    let(:address_two) do
-      Address.new(number: 10)
-    end
-
-    before do
-      person.addresses.push(address_one, address_two)
-    end
-
-    let(:avg) do
-      person.addresses.avg(:number)
-    end
-
-    it "returns the average value of the supplied field" do
-      avg.should eq(7.5)
     end
   end
 
@@ -2066,11 +2039,40 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:max) do
-      person.addresses.max(:number)
+      person.addresses.max do |a,b|
+        a.number <=> b.number
+      end
     end
 
-    it "returns the max value of the supplied field" do
-      max.should eq(10)
+    it "returns the document with the max value of the supplied field" do
+      max.should eq(address_two)
+    end
+  end
+
+  describe "#max_by" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:address_one) do
+      Address.new(number: 5)
+    end
+
+    let(:address_two) do
+      Address.new(number: 10)
+    end
+
+    before do
+      person.addresses.push(address_one, address_two)
+    end
+
+    let(:max) do
+      person.addresses.max_by(&:number)
+    end
+
+    it "returns the document with the max value of the supplied field" do
+      max.should eq(address_two)
     end
   end
 
@@ -2185,11 +2187,40 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:min) do
-      person.addresses.min(:number)
+      person.addresses.min do |a,b|
+        a.number <=> b.number
+      end
     end
 
     it "returns the min value of the supplied field" do
-      min.should eq(5)
+      min.should eq(address_one)
+    end
+  end
+
+  describe "#min_by" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:address_one) do
+      Address.new(number: 5)
+    end
+
+    let(:address_two) do
+      Address.new(number: 10)
+    end
+
+    before do
+      person.addresses.push(address_one, address_two)
+    end
+
+    let(:min) do
+      person.addresses.min_by(&:number)
+    end
+
+    it "returns the min value of the supplied field" do
+      min.should eq(address_one)
     end
   end
 
@@ -2385,33 +2416,6 @@ describe Mongoid::Relations::Embedded::Many do
       it "returns the number of persisted documents" do
         person.addresses.send(method).should eq(2)
       end
-    end
-  end
-
-  describe "#sum" do
-
-    let(:person) do
-      Person.new
-    end
-
-    let(:address_one) do
-      Address.new(number: 5)
-    end
-
-    let(:address_two) do
-      Address.new(number: 10)
-    end
-
-    before do
-      person.addresses.push(address_one, address_two)
-    end
-
-    let(:sum) do
-      person.addresses.sum(:number)
-    end
-
-    it "returns the sum of all the supplied field values" do
-      sum.should eq(15)
     end
   end
 
