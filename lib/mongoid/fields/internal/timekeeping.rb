@@ -67,7 +67,15 @@ module Mongoid #:nodoc:
         def serialize(object)
           return nil if object.blank?
           begin
-            ::Time.at(convert_to_time(object).to_i).utc
+            seconds, milliseconds = case time = convert_to_time(object)
+            when ::Time
+              [time.to_i, (time.usec/1000.0).round*1000]
+            when ::DateTime
+              [time.to_f.to_s[0..-3].to_f, 0]
+            else
+              [time.to_i, 0]
+            end
+            ::Time.at(seconds, milliseconds).utc
           rescue ArgumentError
             raise Errors::InvalidTime.new(object)
           end
