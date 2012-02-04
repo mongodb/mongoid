@@ -19,6 +19,7 @@ module Mongoid #:nodoc:
             each_pair do |k,v|
               if k.respond_to?(:key) && k.respond_to?(:to_mongo_query)
                 hsh[k.key] ||= {}
+                v = v.expand_complex_criteria if v.is_a?(::Hash)
                 hsh[k.key].merge!(k.to_mongo_query(v))
               else
                 hsh[k] = v
