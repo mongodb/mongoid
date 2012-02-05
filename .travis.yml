@@ -21,7 +21,7 @@ matrix:
       env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
     - rvm: ruby-head
       env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
-    - rvm: jruby
+    - rvm: jruby-19mode
       env: RUBY_GC_MALLOC_LIMIT=60000000 RUBY_HEAP_FREE_MIN=100000 RUBY_HEAP_MIN_SLOTS=600000
     - rvm: jruby-head
       env: RUBY_GC_MALLOC_LIMIT=60000000 RUBY_HEAP_FREE_MIN=100000 RUBY_HEAP_MIN_SLOTS=600000
