@@ -59,6 +59,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1665/#1672 Expand complex criteria in nested criteria selectors, like
+  #matches. (Hans Hasselberg)
+
 * \#1335 Don't add id sorting criteria to first/last is there is already
   sorting options on the criteria.
 
