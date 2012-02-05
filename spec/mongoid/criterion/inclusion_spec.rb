@@ -1273,6 +1273,10 @@ describe Mongoid::Criterion::Inclusion do
         Person.where({:dob => dob.to_s}).should eq([ person ])
       end
 
+      it "typecasts datetimes" do
+        Person.where({:lunch_time => lunch_time.to_f}).should eq([ person ])
+      end
+
       it "typecasts times with zones" do
         time = lunch_time.in_time_zone("Alaska")
         Person.where(:lunch_time => time).should eq([ person ])

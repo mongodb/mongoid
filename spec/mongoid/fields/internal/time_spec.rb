@@ -119,18 +119,14 @@ describe Mongoid::Fields::Internal::Time do
         Time.now
       end
 
+      let(:millis) do
+        ("%.3f" % time.to_f).split(".").last.to_i * 1000
+      end
+
       it "returns a time" do
         field.serialize(time.to_datetime).should eq(
           Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
         )
-      end
-
-      it "strips microseconds" do
-        field.serialize(time).strftime("%6N")[3..-1].to_i.should eq(0)
-      end
-
-      it "doesn't strips milliseconds" do
-        field.serialize(time).strftime("%L").to_i.should_not eq(0)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -163,14 +159,6 @@ describe Mongoid::Fields::Internal::Time do
 
       it "converts to a utc time" do
         field.serialize(time).utc_offset.should eq(0)
-      end
-
-      it "strips microseconds" do
-        field.serialize(Time.now).strftime("%6N")[3..-1].to_i.should eq(0)
-      end
-
-      it "doesn't strips milliseconds" do
-        field.serialize(Time.now).strftime("%L").to_i.should_not eq(0)
       end
 
       it "returns utc times unchanged" do
