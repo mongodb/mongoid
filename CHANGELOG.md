@@ -73,6 +73,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1668 Ensure Mongoid logger exists before calling warn. (Rémy Coutable)
 
+* \#1659 Clear delayed atomic sets when resetting the same embedded relation.
+
 * \#1656/#1657 Don't hit database for uniqueness validation if BOTH scope
   and attribute hasn't changed. (priyaaank)
 

@@ -282,6 +282,7 @@ module Mongoid # :nodoc:
               proxy.clear
             else
               atomically(:$set) do
+                base.delayed_atomic_sets.clear
                 if replacement.first.is_a?(Hash)
                   replacement = Many.builder(base, metadata, replacement).build
                 end
