@@ -46,7 +46,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
           context "when the attribute is unique" do
 
-            before do
+            let!(:oxford) do
               Dictionary.create(:name => "Oxford")
             end
 
@@ -56,6 +56,17 @@ describe Mongoid::Validations::UniquenessValidator do
 
             it "returns true" do
               dictionary.should be_valid
+            end
+
+            context "when subsequently cloning the document" do
+
+              let(:clone) do
+                oxford.clone
+              end
+
+              it "returns false for the clone" do
+                clone.should_not be_valid
+              end
             end
           end
 
