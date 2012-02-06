@@ -71,6 +71,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1665/#1672 Expand complex criteria in nested criteria selectors, like
+  #matches. (Hans Hasselberg)
+
 * \#1668 Ensure Mongoid logger exists before calling warn. (Rémy Coutable)
 
 * \#1659 Clear delayed atomic sets when resetting the same embedded relation.
