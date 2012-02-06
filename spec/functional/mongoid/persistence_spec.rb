@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence do
 
   before do
-    [ Person, Post, Product, Game ].each(&:delete_all)
+    [ Account, Person, Post, Product, Game ].each(&:delete_all)
   end
 
   before(:all) do
@@ -371,6 +371,26 @@ describe Mongoid::Persistence do
 
     let(:person) do
       Person.new(:ssn => "811-82-8345")
+    end
+
+    context "when the document has been instantiated with limited fields" do
+
+      before do
+        person.age = 20
+        person.save
+      end
+
+      context "when a default is excluded" do
+
+        let(:limited) do
+          Person.only(:_id).find(person.id)
+        end
+
+        it "does not overwrite with the default" do
+          limited.save
+          limited.reload.age.should eq(20)
+        end
+      end
     end
 
     context "when saving with a hash field with invalid keys" do
