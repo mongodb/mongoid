@@ -262,6 +262,7 @@ module Mongoid #:nodoc:
       scope_options = @options.dup
       sorting = scope_options.delete(:sort)
       scope_options[:order_by] = sorting if sorting
+      scope_options[:includes] = inclusions.map(&:name) if inclusions.any?
       { :where => @selector }.merge(scope_options)
     end
     alias :to_ary :to_a
