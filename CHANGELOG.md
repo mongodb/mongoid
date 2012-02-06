@@ -73,6 +73,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1681 Attempt to create indexes for models without namespacing if the
+  namespace does not exist for the subdirectory.
+
 * \#1676 Allow eager loading to work as a default scope.
 
 * \#1665/#1672 Expand complex criteria in nested criteria selectors, like

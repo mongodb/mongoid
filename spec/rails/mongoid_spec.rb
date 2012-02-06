@@ -26,6 +26,51 @@ describe "Rails::Mongoid" do
       end
     end
 
+    context "when models exist in subdirectories" do
+
+      context "when the model is namespaced" do
+
+        module Twitter
+          class Follow
+            include Mongoid::Document
+          end
+        end
+
+        let(:files) do
+          ["/app/models/twitter/follow.rb"]
+        end
+
+        before do
+          Dir.expects(:glob).with("/app/models/**/*.rb").returns(files)
+        end
+
+        it "loads the model with the namespacing" do
+          Twitter::Follow.expects(:create_indexes).once
+          Rails::Mongoid.create_indexes("/app/models/**/*.rb")
+        end
+      end
+
+      context "when the model is not namespaced" do
+
+        class Unfollow
+          include Mongoid::Document
+        end
+
+        let(:files) do
+          ["/app/models/twitter/unfollow.rb"]
+        end
+
+        before do
+          Dir.expects(:glob).with("/app/models/**/*.rb").returns(files)
+        end
+
+        it "loads the model with the namespacing" do
+          Unfollow.expects(:create_indexes).once
+          Rails::Mongoid.create_indexes("/app/models/**/*.rb")
+        end
+      end
+    end
+
     context "with ordinary Rails models" do
 
       let(:model_paths) do
