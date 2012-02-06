@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
+
 * \#1635 All exceptions now provide more comprehensive errors, including
   the problem that occured, a detail summary of why it happened, and
   potential resolutions.
@@ -70,8 +72,6 @@ For instructions on upgrading to newer versions, visit
 ## 2.4.4 (branch: 2.4.0-stable)
 
 ### Resolved Issues
-
-* \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
 
 * \#1676 Allow eager loading to work as a default scope.
 
