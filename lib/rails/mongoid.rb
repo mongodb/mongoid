@@ -18,7 +18,7 @@ module Rails #:nodoc:
       Dir.glob(pattern).each do |file|
         logger = Logger.new($stdout)
         begin
-          model = determine_model(file)
+          model = determine_model(file, logger)
         rescue => e
           logger.error(%Q{Failed to determine model from #{file}:
             #{e.class}:#{e.message}
@@ -83,10 +83,17 @@ module Rails #:nodoc:
     # @return [ Class ] The model.
     #
     # @since 2.1.0
-    def determine_model(file)
+    def determine_model(file, logger)
       if file =~ /app\/models\/(.*).rb$/
         model_path = $1.split('/')
-        klass = model_path.map { |path| path.camelize }.join('::').constantize
+        begin
+          parts = model_path.map { |path| path.camelize }
+          name = parts.join("::")
+          klass = name.constantize
+        rescue NameError => e
+          logger.info("Attempted to constantize #{name}, trying without namespacing.")
+          klass = parts.last.constantize
+        end
         if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
           return klass
         end
