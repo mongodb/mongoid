@@ -316,6 +316,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         context "when setting the relation multiple times" do
+
           let(:address_two) do
             Address.new(:street => "kudamm")
           end
