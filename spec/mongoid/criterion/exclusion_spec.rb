@@ -159,20 +159,30 @@ describe Mongoid::Criterion::Exclusion do
 
     context "when args are provided" do
 
+      before do
+        Person.create(age: 50)
+      end
+
       let(:criteria) do
         base.only(:title, :text)
       end
 
       it "adds the options for limiting by fields" do
-        criteria.options.should eq({ :fields => { :_type => 1, :title => 1, :text => 1 } })
+        criteria.options.should eq(
+          { :fields => { :_type => 1, :title => 1, :text => 1 }}
+        )
       end
 
       it "returns a copy" do
         base.only.should_not eql(base)
-
       end
+
       it "assigns the field list" do
-        criteria.without(:title, :text).field_list == [:title, :text]
+        criteria.without(:title, :text).field_list.should eq([ :title, :text ])
+      end
+
+      it "does not apply defaults" do
+        criteria.first.age.should be_nil
       end
     end
 
@@ -195,7 +205,7 @@ describe Mongoid::Criterion::Exclusion do
   describe "#without" do
 
     let!(:person) do
-      Person.create
+      Person.create(ssn: "123-11-1233")
     end
 
     context "when used in a named scope" do
@@ -212,15 +222,19 @@ describe Mongoid::Criterion::Exclusion do
     context "when args are provided" do
 
       let(:criteria) do
-        base.without(:title, :text)
+        base.without(:title, :text, :age)
       end
 
       it "adds the options for excluding the fields" do
-        criteria.options.should eq({ :fields => { :title => 0, :text => 0 } })
+        criteria.options.should eq({ :fields => { :title => 0, :text => 0, :age => 0 } })
       end
 
       it "returns self" do
         criteria.without.should eq(criteria)
+      end
+
+      it "does not apply defaults" do
+        criteria.first.age.should be_nil
       end
     end
 

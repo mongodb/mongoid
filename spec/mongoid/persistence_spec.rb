@@ -369,6 +369,30 @@ describe Mongoid::Persistence do
       Person.new
     end
 
+    context "when the document has been instantiated with limited fields" do
+
+      before do
+        person.age = 20
+        person.save
+      end
+
+      context "when a default is excluded" do
+
+        let(:limited) do
+          Person.only(:_id).find(person.id)
+        end
+
+        it "does not flag the excluded fields as dirty" do
+          limited.changes.should be_empty
+        end
+
+        it "does not overwrite with the default" do
+          limited.save
+          limited.reload.age.should eq(20)
+        end
+      end
+    end
+
     context "when saving with a hash field with invalid keys" do
 
       before do

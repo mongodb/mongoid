@@ -69,10 +69,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.8
       def eval_default(doc)
-        if default_val.respond_to?(:call)
-          serialize(doc.instance_exec(&default_val))
+        if fields = Threaded.selection
+          evaluated_default(doc) if included?(fields)
         else
-          serialize(default_val.duplicable? ? default_val.dup : default_val)
+          evaluated_default(doc)
         end
       end
 
@@ -194,6 +194,44 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def versioned?
         @versioned ||= (options[:versioned].nil? ? true : options[:versioned])
+      end
+
+      private
+
+      # Is the field included in the fields that were returned from the
+      # database? We can apply the default if:
+      #   1. The field is included in an only limitation (field: 1)
+      #   2. The field is not excluded in a without limitation (field: 0)
+      #
+      # @example Is the field included?
+      #   field.included?(fields)
+      #
+      # @param [ Hash ] fields The field limitations.
+      #
+      # @return [ true, false ] If the field was included.
+      #
+      # @since 2.4.4
+      def included?(fields)
+        (fields.values.first == 1 && fields[name.to_sym] == 1) ||
+          (fields.values.first == 0 && !fields.has_key?(name.to_sym))
+      end
+
+      # Get the evaluated default.
+      #
+      # @example Get the evaluated default.
+      #   field.evaluated_default.
+      #
+      # @param [ Document ] doc The doc being applied to.
+      #
+      # @return [ Object ] The default value.
+      #
+      # @since 2.4.4
+      def evaluated_default(doc)
+        if default_val.respond_to?(:call)
+          serialize(doc.instance_exec(&default_val))
+        else
+          serialize(default_val.duplicable? ? default_val.dup : default_val)
+        end
       end
 
       module ClassMethods #:nodoc:

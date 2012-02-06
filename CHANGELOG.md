@@ -87,6 +87,10 @@ For instructions on upgrading to newer versions, visit
 * \#1656/#1657 Don't hit database for uniqueness validation if BOTH scope
   and attribute hasn't changed. (priyaaank)
 
+* \#1205/#1642 When limiting fields returned from the database via
+  `Criteria#only` and `Criteria#without` and then subsequently saving
+  the document. Default values no longer override excluded fields.
+
 ## 2.4.3
 
 ### Resolved Issues

@@ -166,12 +166,14 @@ module Mongoid #:nodoc:
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
         collection, options = klass.collection, process_options
-        if criteria.inclusions.any?
-          collection.find(selector, options).entries.tap do |docs|
-            eager_load(docs)
+        selecting do
+          if criteria.inclusions.any?
+            collection.find(selector, options).entries.tap do |docs|
+              eager_load(docs)
+            end
+          else
+            collection.find(selector, options)
           end
-        else
-          collection.find(selector, options)
         end
       end
 
@@ -202,8 +204,10 @@ module Mongoid #:nodoc:
       def first
         attributes = klass.collection.find_one(selector, options_with_default_sorting)
         return nil unless attributes
-        Mongoid::Factory.from_db(klass, attributes).tap do |doc|
-          eager_load([ doc ]) if criteria.inclusions.any?
+        selecting do
+          Mongoid::Factory.from_db(klass, attributes).tap do |doc|
+            eager_load([ doc ]) if criteria.inclusions.any?
+          end
         end
       end
       alias :one :first
@@ -271,8 +275,10 @@ module Mongoid #:nodoc:
         opts[:sort] = opts[:sort].map{ |option| [ option[0], option[1].invert ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
         return nil unless attributes
-        Mongoid::Factory.from_db(klass, attributes).tap do |doc|
-          eager_load([ doc ]) if criteria.inclusions.any?
+        selecting do
+          Mongoid::Factory.from_db(klass, attributes).tap do |doc|
+            eager_load([ doc ]) if criteria.inclusions.any?
+          end
         end
       end
 
@@ -451,6 +457,28 @@ module Mongoid #:nodoc:
           options[:fields] = fields
         end
         options.dup
+      end
+
+      # If we are limiting results, we need to set the field limitations on a
+      # thread local to avoid overriding the default values.
+      #
+      # @example Execute with selection.
+      #   context.selecting do
+      #     collection.find
+      #   end
+      #
+      # @return [ Object ] The yielded value.
+      #
+      # @since 2.4.4
+      def selecting
+        begin
+          unless options[:fields].blank?
+            Threaded.selection = options[:fields]
+          end
+          yield
+        ensure
+          Threaded.selection = nil
+        end
       end
     end
   end

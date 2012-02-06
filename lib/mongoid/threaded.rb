@@ -175,6 +175,32 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid]:safety-options"] = options
     end
 
+    # Get the field selection options from the current thread.
+    #
+    # @example Get the field selection options.
+    #   Threaded.selection
+    #
+    # @return [ Hash ] The field selection.
+    #
+    # @since 2.4.4
+    def selection
+      Thread.current[:"[mongoid]:selection"]
+    end
+
+    # Set the field selection on the current thread.
+    #
+    # @example Set the field selection.
+    #   Threaded.selection = { field: 1 }
+    #
+    # @param [ Hash ] value The current field selection.
+    #
+    # @return [ Hash ] The field selection.
+    #
+    # @since 2.4.4
+    def selection=(value)
+      Thread.current[:"[mongoid]:selection"] = value
+    end
+
     # Get the mongoid scope stack for chained criteria.
     #
     # @example Get the scope stack.
