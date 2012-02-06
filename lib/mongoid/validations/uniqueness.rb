@@ -41,32 +41,28 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def validate_each(document, attribute, value)
-        return unless document.send("attribute_changed?", attribute.to_s) || scope_value_changed?(document)
+        attrib, val = to_validate(document, attribute, value)
+        return unless validation_required?(document, attrib)
         if document.embedded?
           return if skip_validation?(document)
           relation = document._parent.send(document.metadata.name)
-          criteria = relation.where(criterion(document, attribute, value))
-          criteria = scope(criteria, document, attribute)
-          if document.primary_key == Array.wrap(attribute)
-            if criteria.count > 1
-              document.errors.add(
-                attribute,
-                :taken, options.except(:case_sensitive, :scope).merge(:value => value)
-              )
-            end
-          else
-            if criteria.exists?
-              document.errors.add(
-                attribute,
-                :taken,
-                options.except(:case_sensitive, :scope).merge(:value => value)
-              )
-            end
+          criteria = relation.where(criterion(document, attrib, val))
+          criteria = scope(criteria, document, attrib)
+          if criteria.count > 1
+            document.errors.add(
+              attrib,
+              :taken,
+              options.except(:case_sensitive, :scope).merge(:val => val)
+            )
           end
         else
-          criteria = klass.where(criterion(document, attribute, value))
-          criteria = scope(criteria, document, attribute)
-          document.errors.add(attribute, :taken, options.except(:case_sensitive, :scope).merge(:value => value)) if criteria.exists?
+          criteria = klass.where(criterion(document, attrib, val))
+          criteria = scope(criteria, document, attrib)
+          if criteria.exists?
+            document.errors.add(
+              attrib, :taken, options.except(:case_sensitive, :scope).merge(:val => val)
+            )
+          end
         end
       end
 
@@ -98,8 +94,7 @@ module Mongoid #:nodoc:
       # @since 2.3.0
       def criterion(document, attribute, value)
         { attribute => filter(value) }.tap do |selector|
-          if document.persisted? ||
-            (document.embedded? && (document.primary_key != Array.wrap(attribute)))
+          if document.persisted? && !document.embedded?
             selector.merge!(:_id => { "$ne" => document.id })
           end
         end
@@ -131,10 +126,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.0
       def scope(criteria, document, attribute)
-        unless document.primary_key == Array.wrap(attribute)
-          Array.wrap(options[:scope]).each do |item|
-            criteria = criteria.where(item => document.attributes[item.to_s])
-          end
+        Array.wrap(options[:scope]).each do |item|
+          criteria = criteria.where(item => document.attributes[item.to_s])
         end
         criteria
       end
@@ -164,9 +157,50 @@ module Mongoid #:nodoc:
       #
       # @since 
       def scope_value_changed?(document)
-        Array.wrap(options[:scope]).reduce(false) do |result, item|
-          (result || document.send("attribute_changed?", item.to_s))
+        Array.wrap(options[:scope]).any? do |item|
+          document.send("attribute_changed?", item.to_s)
         end
+      end
+
+      # Get the name of the field and the value to validate. This is for the
+      # case when we validate a relation via the relation name and not the key,
+      # we need to send the key name and value to the db, not the relation
+      # object.
+      #
+      # @example Get the name and key to validate.
+      #   validator.to_validate(doc, :parent, Parent.new)
+      #
+      # @param [ Document ] document The doc getting validated.
+      # @param [ Symbol ] attribute The attribute getting validated.
+      # @param [ Object ] value The value of the attribute.
+      #
+      # @return [ Array<Object, Object> ] The field and value.
+      #
+      # @since 2.4.4
+      def to_validate(document, attribute, value)
+        metadata = document.relations[attribute.to_s]
+        if metadata && metadata.stores_foreign_key?
+          [ metadata.foreign_key, value.id ]
+        else
+          [ attribute, value ]
+        end
+      end
+
+      # Are we required to validate the document?
+      #
+      # @example Is validation needed?
+      #   validator.validation_required?(doc, :field)
+      #
+      # @param [ Document ] document The document getting validated.
+      # @param [ Symbol ] attribute The attribute to validate.
+      #
+      # @return [ true, false ] If we need to validate.
+      #
+      # @since 2.4.4
+      def validation_required?(document, attribute)
+        document.new_record? ||
+          document.send("attribute_changed?", attribute.to_s) ||
+          scope_value_changed?(document)
       end
     end
   end

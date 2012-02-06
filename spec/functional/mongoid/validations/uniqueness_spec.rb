@@ -50,7 +50,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
           context "when the attribute is unique" do
 
-            before do
+            let!(:oxford) do
               Dictionary.create(:name => "Oxford")
             end
 
@@ -60,6 +60,17 @@ describe Mongoid::Validations::UniquenessValidator do
 
             it "returns true" do
               dictionary.should be_valid
+            end
+
+            context "when subsequently cloning the document" do
+
+              let(:clone) do
+                oxford.clone
+              end
+
+              it "returns false for the clone" do
+                clone.should_not be_valid
+              end
             end
           end
 
@@ -88,7 +99,7 @@ describe Mongoid::Validations::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:dictionary) do
-                Dictionary.create(:name => "Oxford")
+                Dictionary.create!(:name => "Oxford")
               end
 
               context "when the field has changed" do
@@ -705,13 +716,8 @@ describe Mongoid::Validations::UniquenessValidator do
               Login.new(:username => "Oxford")
             end
 
-            it "returns false" do
-              login.should_not be_valid
-            end
-
-            it "adds the uniqueness errors" do
-              login.valid?
-              login.errors[:username].should eq([ "is already taken" ])
+            it "returns true" do
+              login.should be_valid
             end
           end
 
@@ -725,13 +731,8 @@ describe Mongoid::Validations::UniquenessValidator do
               Login.new(:username => "Oxford", :application_id => 2)
             end
 
-            it "returns false" do
-              login.should_not be_valid
-            end
-
-            it "adds the uniqueness errors" do
-              login.valid?
-              login.errors[:username].should eq([ "is already taken" ])
+            it "returns true" do
+              login.should be_valid
             end
           end
 
