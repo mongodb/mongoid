@@ -958,6 +958,45 @@ describe Mongoid::Relations::Referenced::One do
     end
   end
 
+  describe ".criteria" do
+
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        Book.relations["rating"]
+      end
+
+      let(:criteria) do
+        described_class.criteria(metadata, id, Book)
+      end
+
+      it "includes the type in the criteria" do
+        criteria.selector.should eq(
+          { "ratable_id" => id, "ratable_type" => "Book" }
+        )
+      end
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        Person.relations["game"]
+      end
+
+      let(:criteria) do
+        described_class.criteria(metadata, id, Person)
+      end
+
+      it "does not include the type in the criteria" do
+        criteria.selector.should eq({ "person_id" => id })
+      end
+    end
+  end
+
   describe ".eager_load" do
 
     before do

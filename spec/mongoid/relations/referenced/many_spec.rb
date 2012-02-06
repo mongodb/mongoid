@@ -1598,6 +1598,45 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe ".criteria" do
+
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        Movie.relations["ratings"]
+      end
+
+      let(:criteria) do
+        described_class.criteria(metadata, id, Movie)
+      end
+
+      it "includes the type in the criteria" do
+        criteria.selector.should eq(
+          { "ratable_id" => id, "ratable_type" => "Movie" }
+        )
+      end
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        Person.relations["posts"]
+      end
+
+      let(:criteria) do
+        described_class.criteria(metadata, id, Person)
+      end
+
+      it "does not include the type in the criteria" do
+        criteria.selector.should eq({ "person_id" => id })
+      end
+    end
+  end
+
   describe "#delete" do
 
     let!(:person) do

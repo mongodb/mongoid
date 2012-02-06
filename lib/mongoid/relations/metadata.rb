@@ -135,11 +135,12 @@ module Mongoid # :nodoc:
       #   metadata.criteria([ id_one, id_two ])
       #
       # @param [ Object ] object The foreign key used for the query.
+      # @param [ Class ] type The base class.
       #
       # @return [ Criteria ] The criteria.
       #
       # @since 2.1.0
-      def criteria(object, type = nil)
+      def criteria(object, type)
         query = relation.criteria(self, object, type)
         order ? query.order_by(order) : query
       end

@@ -71,6 +71,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
+
 * \#1676 Allow eager loading to work as a default scope.
 
 * \#1665/#1672 Expand complex criteria in nested criteria selectors, like

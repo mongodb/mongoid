@@ -122,7 +122,11 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            metadata.klass.where(metadata.foreign_key => object)
+            crit = metadata.klass.where(metadata.foreign_key => object)
+            if metadata.polymorphic?
+              crit = crit.where(metadata.type => type.name)
+            end
+            crit
           end
 
           # Get the criteria that is used to eager load a relation of this

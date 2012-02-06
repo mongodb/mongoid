@@ -17,7 +17,7 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return object.try(:dup) unless query?
             ids = object || []
-            crit = metadata.criteria(ids)
+            crit = metadata.criteria(ids, base.class)
             IdentityMap.get(crit.klass, ids) || crit
           end
 

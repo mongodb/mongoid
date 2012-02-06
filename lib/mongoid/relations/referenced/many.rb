@@ -389,7 +389,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def criteria
-          Many.criteria(metadata, Conversions.flag(base.id, metadata))
+          Many.criteria(metadata, Conversions.flag(base.id, metadata), base.class)
         end
 
         # Perform the necessary cascade operations for documents that just got
@@ -536,7 +536,11 @@ module Mongoid #:nodoc:
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            metadata.klass.where(metadata.foreign_key => object)
+            crit = metadata.klass.where(metadata.foreign_key => object)
+            if metadata.polymorphic?
+              crit = crit.where(metadata.type => type.name)
+            end
+            crit
           end
 
           # Eager load the relation based on the criteria.
