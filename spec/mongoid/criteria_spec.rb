@@ -607,4 +607,33 @@ describe Mongoid::Criteria do
       criteria.limit(1).context.options[:limit].should eq(1)
     end
   end
+
+  context "when the block is omitted" do
+
+    before do
+      3.times do |n|
+        Person.create!(:title => "Sir", :ssn => "#{n}")
+      end
+    end
+
+    let(:cursor) do
+      Person.where(:title => "Sir").asc(:ssn).cursor
+    end
+
+    let(:new_criteria) do
+      described_class.new(Person)
+    end
+
+    it "emits the next document on .next" do
+      cursor.next.ssn.should == "0"
+      cursor.next.ssn.should == "1"
+      cursor.next.ssn.should == "2"
+      cursor.next.should     == nil
+      cursor.next.should     == nil
+    end
+
+    it "returns the collection's cursor" do
+      new_criteria.cursor.should == new_criteria.collection.cursor
+    end
+  end
 end
