@@ -145,6 +145,17 @@ module Mongoid #:nodoc:
       tap { context.iterate(&block) }
     end
 
+    # Return the cursor for the given collection.
+    #
+    # @example call :next on the collection cursor
+    #   cur = criteria.cursor
+    #   cur.next
+    #
+    # @return [ Cursor ] The appropriate cursor.
+    def cursor
+      collection.cursor
+    end
+
     # Return true if the criteria has some Document or not.
     #
     # @example Are there any documents for the criteria?
