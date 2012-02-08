@@ -753,7 +753,13 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def classify
-        macro == :embedded_in ? name.to_s.camelize : name.to_s.classify
+        inverse_class_name =~ /(.*::)?\w+$/
+        value = if macro == :embedded_in
+          name.to_s.camelize
+        else
+          name.to_s.classify
+        end
+        "#{$1}#{value}"
       end
 
       # Get the name of the inverse relation in a cyclic relation.
