@@ -116,8 +116,8 @@ module Mongoid #:nodoc:
     # @param [ Hash ] attributes The attributes to update.
     #
     # @return [ true, false ] True if validation passed, false if not.
-    def update_attributes(attributes = {})
-      write_attributes(attributes); save
+    def update_attributes(attributes = {}, options = {})
+      assign_attributes(attributes, options); save
     end
 
     # Update the document attributes in the database and raise an error if
@@ -131,8 +131,8 @@ module Mongoid #:nodoc:
     # @raise [ Errors::Validations ] If validation failed.
     #
     # @return [ true, false ] True if validation passed.
-    def update_attributes!(attributes = {})
-      update_attributes(attributes).tap do |result|
+    def update_attributes!(attributes = {}, options = {})
+      update_attributes(attributes, options).tap do |result|
         unless result
           self.class.fail_validate!(self) if errors.any?
           self.class.fail_callback!(self, :update_attributes!)
