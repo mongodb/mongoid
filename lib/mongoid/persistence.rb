@@ -116,8 +116,8 @@ module Mongoid #:nodoc:
     # @param [ Hash ] attributes The attributes to update.
     #
     # @return [ true, false ] True if validation passed, false if not.
-    def update_attributes(attributes = {})
-      write_attributes(attributes); save
+    def update_attributes(attributes = {}, options = {})
+      assign_attributes(attributes, options); save
     end
 
     # Update the document attributes in the database and raise an error if
