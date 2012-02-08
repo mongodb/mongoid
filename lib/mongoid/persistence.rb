@@ -131,8 +131,8 @@ module Mongoid #:nodoc:
     # @raise [ Errors::Validations ] If validation failed.
     #
     # @return [ true, false ] True if validation passed.
-    def update_attributes!(attributes = {})
-      update_attributes(attributes).tap do |result|
+    def update_attributes!(attributes = {}, options = {})
+      update_attributes(attributes, options).tap do |result|
         unless result
           self.class.fail_validate!(self) if errors.any?
           self.class.fail_callback!(self, :update_attributes!)

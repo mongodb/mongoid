@@ -1051,6 +1051,24 @@ describe Mongoid::Persistence do
 
   describe "#update_attributes!" do
 
+    context "when providing options" do
+
+      let(:person) { Person.create }
+      let(:params) { [{:pets => false}, {:as => :default}]}
+
+      it "accepts the additional parameter" do
+        expect {
+          person.update_attributes!(*params)
+        }.to_not raise_error(ArgumentError)
+      end
+
+      it "calls assign_attributes" do
+        person.expects(:assign_attributes).with(*params)
+        person.update_attributes!(*params)
+      end
+
+    end
+
     context "when a callback returns false" do
 
       let(:oscar) do
