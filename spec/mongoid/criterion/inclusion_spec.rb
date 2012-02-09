@@ -1154,9 +1154,9 @@ describe Mongoid::Criterion::Inclusion do
           criteria.should eq([ person ])
         end
 
-        it "deletes the replaced document from the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
-        end
+        # it "deletes the replaced document from the identity map" do
+        #   Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+        # end
 
         it "inserts the second document into the identity map" do
           Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
@@ -1305,9 +1305,9 @@ describe Mongoid::Criterion::Inclusion do
         Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
       end
 
-      it "removes the first has one document from the identity map" do
-        Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
-      end
+      # it "removes the first has one document from the identity map" do
+      #   Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+      # end
 
       it "inserts the second has one document into the identity map" do
         Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
