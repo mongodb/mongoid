@@ -61,6 +61,12 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1692/#1376 `Model#updateattributes` and `Model#update_attributes!` now
+  accept assignment options. (Hans Hasselberg)
+
+* \#1688/#1207 Don't require namespacing when providing class name on
+  relation macros inside the namespace. (Hans Hasselberg)
+
 * \#1665/#1672 Expand complex criteria in nested criteria selectors, like
   #matches. (Hans Hasselberg)
 
