@@ -19,12 +19,7 @@ module Mongoid #:nodoc
     #
     # @since 2.0.0
     class MixedRelations < MongoidError
-
-      attr_reader :root_klass, :embedded_klass
-
       def initialize(root_klass, embedded_klass)
-        @root_klass, @embedded_klass = root_klass, embedded_klass
-
         super(
           compose_message(
             "mixed_relations",
