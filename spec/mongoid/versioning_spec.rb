@@ -439,6 +439,10 @@ describe Mongoid::Versioning do
     it "allows the document to be added" do
       page.child_pages.should eq([ child ])
     end
+
+    it "persists the changes" do
+      page.reload.child_pages.should eq([ child ])
+    end
   end
 
   context "when the identity map is enabled" do

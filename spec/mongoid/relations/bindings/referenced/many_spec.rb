@@ -130,4 +130,24 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       end
     end
   end
+
+  context "when the inverse relation can not be determined" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:band) do
+      Band.new
+    end
+
+    context "when adding the document" do
+
+      it "raises an error" do
+        expect {
+          person.posts << band
+        }.to raise_error(Mongoid::Errors::InverseNotFound)
+      end
+    end
+  end
 end

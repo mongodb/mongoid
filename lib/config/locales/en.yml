@@ -91,6 +91,30 @@ en:
             value that differs from the defined type, like Array, instead of
             attempting to convert it."
           resolution: "Set the proper type, %{klass}."
+        inverse_not_found:
+          message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
+            not determing the inverse foreign key to set. The attempted key was
+            '%{inverse}'."
+          summary: "When adding a document to a relation, Mongoid attempts
+            to link the newly added document to the base of the relation in
+            memory, as well as set the foreign key to link them on the
+            database side. In this case Mongoid could not determine what the
+            inverse foreign key was."
+          resolution: "If an inverse is not required, like a belongs_to or
+            has_and_belongs_to_many, ensure that :inverse_of => nil is set
+            on the relation. If the inverse is needed, most likely the
+            inverse cannot be figured out from the names of the relations and
+            you will need to explicitly tell Mongoid on the relation what
+            the inverse is.\n
+            Example:\n
+            \_\_class Lush\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_has_one :whiskey, class_name: \"Drink\", inverse_of: :alcoholic\n
+            \_\_end\n\n
+            \_\_class Drink\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_belongs_to :alcoholic, class_name: \"Lush\", inverse_of: :whiskey\n
+            \_\_end"
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a relational association is not allowed since the

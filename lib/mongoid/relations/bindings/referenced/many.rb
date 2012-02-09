@@ -19,6 +19,7 @@ module Mongoid # :nodoc:
           def bind_one(doc)
             unless _binding?
               _binding do
+                check_inverse!(doc)
                 doc.you_must(metadata.foreign_key_setter, base.id)
                 if metadata.type
                   doc.you_must(metadata.type_setter, base.class.model_name)
@@ -39,12 +40,39 @@ module Mongoid # :nodoc:
           def unbind_one(doc)
             unless _binding?
               _binding do
+                check_inverse!(doc)
                 doc.you_must(metadata.foreign_key_setter, nil)
                 if metadata.type
                   doc.you_must(metadata.type_setter, nil)
                 end
                 doc.send(metadata.inverse_setter, nil)
               end
+            end
+          end
+
+          private
+
+          # Check if the inverse is properly defined.
+          #
+          # @api private
+          #
+          # @example Check the inverse definition.
+          #   binding.check_inverse!(doc)
+          #
+          # @param [ Document ] doc The document getting bound.
+          #
+          # @raise [ Errors::InverseNotFound ] If no inverse found.
+          #
+          # @since 3.0.0
+          def check_inverse!(doc)
+            if !metadata.forced_nil_inverse? &&
+              !doc.respond_to?(metadata.foreign_key_setter)
+              raise Errors::InverseNotFound.new(
+                base.class,
+                metadata.name,
+                doc.class,
+                metadata.foreign_key
+              )
             end
           end
         end

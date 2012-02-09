@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1684 Raise a `Mongoid::Errors::InverseNotFound` when attempting to
+  set a child on a relation without the proper inverse_of definitions
+  due to Mongoid not being able to determine it.
+
 * \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
 
 * \#1635 All exceptions now provide more comprehensive errors, including
