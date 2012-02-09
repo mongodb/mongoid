@@ -79,6 +79,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1686 Set the base metadata on unbind as well as bind for belongs to
+  relations.
+
 * \#1681 Attempt to create indexes for models without namespacing if the
   namespace does not exist for the subdirectory.
 

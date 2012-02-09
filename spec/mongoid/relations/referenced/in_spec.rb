@@ -789,6 +789,70 @@ describe Mongoid::Relations::Referenced::In do
     end
   end
 
+  context "when the relation belongs to a has many and has one" do
+
+    before do
+      class A
+        include Mongoid::Document
+        has_many :bs, :inverse_of => :a
+      end
+
+      class B
+        include Mongoid::Document
+        belongs_to :a, :inverse_of => :bs
+        belongs_to :c, :inverse_of => :b
+      end
+
+      class C
+        include Mongoid::Document
+        has_one :b, :inverse_of => :c
+      end
+    end
+
+    after do
+      Object.send(:remove_const, :A)
+      Object.send(:remove_const, :B)
+      Object.send(:remove_const, :C)
+    end
+
+    context "when setting the has one" do
+
+      let(:a) do
+        A.new
+      end
+
+      let(:b) do
+        B.new
+      end
+
+      let(:c) do
+        C.new
+      end
+
+      before do
+        b.c = c
+      end
+
+      context "when subsequently setting the has many" do
+
+        before do
+          b.a = a
+        end
+
+        context "when setting the has one again" do
+
+          before do
+            b.c = c
+          end
+
+          it "allows the reset of the has one" do
+            b.c.should eq(c)
+          end
+        end
+      end
+    end
+  end
+
   context "when replacing the relation with another" do
 
     let!(:person) do
