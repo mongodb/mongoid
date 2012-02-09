@@ -10,6 +10,12 @@ describe Mongoid::IdentityMap do
     Mongoid.identity_map_enabled = false
   end
 
+  before do
+    Post.delete_all
+    Person.delete_all
+    UserAccount.delete_all
+  end
+
   let(:identity_map) do
     described_class.new
   end
@@ -453,12 +459,25 @@ describe Mongoid::IdentityMap do
         identity_map.set_many(post_two, { :person_id => person.id })
       end
 
-      let(:documents) do
+      let(:document_ids) do
         identity_map[Post.collection_name][{ :person_id => person.id }]
       end
 
+      let(:document_one) do
+        identity_map[Post.collection_name][post_one.id]
+      end
+
+      let(:document_two) do
+        identity_map[Post.collection_name][post_two.id]
+      end
+
+      it "puts the document_ids in the map" do
+        document_ids.should eq([ post_one.id, post_two.id ])
+      end
+
       it "puts the documents in the map" do
-        documents.should eq([ post_one, post_two ])
+        document_one.should eq(post_one)
+        document_two.should eq(post_two)
       end
     end
   end
@@ -479,8 +498,16 @@ describe Mongoid::IdentityMap do
         identity_map.set_one(post_one, { :person_id => person.id })
       end
 
-      let(:document) do
+      let(:document_id) do
         identity_map[Post.collection_name][{ :person_id => person.id }]
+      end
+
+      let(:document) do
+        identity_map[Post.collection_name][post_one.id]
+      end
+
+      it "puts the document_ids in the map" do
+        document_id.should eq(post_one.id)
       end
 
       it "puts the documents in the map" do
@@ -555,5 +582,131 @@ describe Mongoid::IdentityMap do
         end
       end
     end
+  end
+
+  context "ensure object identity with eager loading (many)" do
+
+    let(:person_0) { Person.create(:title => 'Mr.', :ssn => '1') }
+    let(:post_0)   { person_0.posts.create }
+
+    let(:person_1) { Person.includes(:posts).to_a.last }
+    let(:post_1)   { person_1.posts.first }
+    let(:post_2)   { Post.find(post_0.id) }
+
+    it "should return identical objects for create- and find-results" do
+      person_0.should == person_1
+    end
+
+    it "should return the same ruby object for create- and find-results" do
+      person_0.title         = 'Mrs.'
+      person_1.title.should == 'Mrs.'
+    end
+
+    it "should return identical objects for many-relations" do
+      post_0.should == post_1
+      post_0.should == post_2
+    end
+
+    it "should return the same ruby object for many-relations" do
+      post_0.title         = "A post"
+      post_1.title.should == "A post"
+      post_2.title.should == "A post"
+    end
+
+  end
+
+  context "ensure object identity without eager loading (many)" do
+
+    let(:person_0) { Person.create(:title => 'Mr.', :ssn => '1') }
+    let(:post_0)   { person_0.posts.create }
+
+    let(:person_1) { Person.last }
+    let(:post_1)   { person_1.posts.first }
+    let(:post_2)   { Post.find(post_0.id) }
+
+    it "should return identical objects for create- and find-results" do
+      person_0.should == person_1
+    end
+
+    it "should return the same ruby object for create- and find-results" do
+      person_0.title         = 'Mrs.'
+      person_1.title.should == 'Mrs.'
+    end
+
+    it "should return identical objects for many-relations" do
+      post_0.should == post_1
+      post_0.should == post_2
+    end
+
+    it "should return the same ruby object for many-relations" do
+      post_0.title         = "A post"
+      post_1.title.should == "A post"
+      post_2.title.should == "A post"
+    end
+
+  end
+
+  context "ensure object identity without eager loading (many2many)" do
+
+    let(:person_0)  { Person.create(:title => 'Mr.', :ssn => '1') }
+    let(:person_1)  { Person.where(:_id => person_0.id).last }
+    let(:account_0) { person_0.user_accounts.create }
+    let(:account_1) { person_1.user_accounts.first }
+    let(:account_2) { UserAccount.find(account_0.id) }
+
+    it "should return the same object for create- and find-results" do
+      person_0.should == person_1
+    end
+
+    it "should return the same ruby object for create- and find-results" do
+      person_0.title         = 'Mrs.'
+      person_1.title.should == 'Mrs.'
+    end
+
+    it "should return identical objects for many2many-relations" do
+      account_0.should == account_1
+      account_0.should == account_2
+    end
+
+    it "should return the same ruby object for many2many-relations" do
+      account_0.email         = "e@mail.com"
+      account_1.email.should == "e@mail.com"
+      account_2.email.should == "e@mail.com"
+    end
+
+  end
+
+  context "ensure object identity for inverse relational proxies (many)" do
+
+    let!(:person) { Person.create(:title => 'Mr.', :ssn => '1') }
+    let!(:post)   { person.posts.create(:title => 'A Post') }
+
+    it "should return an identical object as parent" do
+      Person.first.should == Post.first.person
+      Person.first.should == person
+    end
+
+    it "should return the same ruby object as parent" do
+      Person.first.object_id.should == Post.first.person.object_id
+      Person.first.object_id.should == person.object_id
+    end
+
+  end
+
+  context "ensure object identity for inverse relational proxies (many2many)" do
+
+    let!(:person)  { Person.create(:title => 'Mr.', :ssn => '1') }
+    let!(:account) { person.user_accounts.create }
+
+    it "should return an identical object as related object" do
+      UserAccount.first.should == Person.first.user_accounts.first
+      UserAccount.first.should == account
+    end
+
+    it "should return the same ruby object as related object" do
+      UserAccount.first.object_id.should == Person.first.user_accounts.first.object_id
+      UserAccount.first.object_id.should == account.object_id
+    end
+
   end
 end
