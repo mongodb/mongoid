@@ -13,6 +13,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
 
+* #1650 Objects that respond to #to_criteria can now be merged into
+  existing criteria objects.
+
 * \#1635 All exceptions now provide more comprehensive errors, including
   the problem that occured, a detail summary of why it happened, and
   potential resolutions.

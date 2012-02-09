@@ -304,6 +304,29 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "with something that responds to #to_criteria" do
+
+      let(:crit) do
+        criteria.where(:name => "Chloe").order_by([[:name, :asc]])
+      end
+
+      let(:other) do
+        stub(:to_criteria => crit)
+      end
+
+      let(:merged) do
+        criteria.merge(other)
+      end
+
+      it "merges the selector" do
+        merged.selector.should eq({ :name => "Chloe" })
+      end
+
+      it "merges the options" do
+        merged.options.should eq({ :sort => [[ :name, :asc ]]})
+      end
+    end
+
     context "with a conditions hash" do
 
       context "when the other has a selector and options" do
