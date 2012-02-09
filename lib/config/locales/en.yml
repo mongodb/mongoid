@@ -93,7 +93,7 @@ en:
           resolution: "Set the proper type, %{klass}."
         inverse_not_found:
           message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
-            not determing the inverse foreign key to set. The attempted key was
+            not determine the inverse foreign key to set. The attempted key was
             '%{inverse}'."
           summary: "When adding a document to a relation, Mongoid attempts
             to link the newly added document to the base of the relation in
