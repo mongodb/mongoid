@@ -183,34 +183,110 @@ describe Mongoid::Relations::Metadata do
 
     context "when no class_name provided" do
 
-      context "when association name is singular" do
+      context "when inverse_class_name is provided" do
 
-        let(:relation) do
-          Mongoid::Relations::Embedded::One
+        context "when inverse_class_name is a simple class name" do
+
+          context "when association name is singular" do
+
+            let(:relation) do
+              Mongoid::Relations::Embedded::One
+            end
+
+            let(:metadata) do
+              described_class.new(:name => :name, :relation => relation, :inverse_class_name => "Person")
+            end
+
+            it "classifies and constantizes the association name and adds the module" do
+              metadata.class_name.should eq("Name")
+            end
+          end
+
+          context "when association name is plural" do
+
+            let(:relation) do
+              Mongoid::Relations::Embedded::Many
+            end
+
+            let(:metadata) do
+              described_class.new(:name => :addresses, :relation => relation, :inverse_class_name => "Person")
+            end
+
+            it "classifies and constantizes the association name and adds the module" do
+              metadata.class_name.should eq("Address")
+            end
+          end
+
         end
 
-        let(:metadata) do
-          described_class.new(:name => :name, :relation => relation)
-        end
+        context "when inverse_class_name is a class name in a module" do
 
-        it "classifies and constantizes the association name" do
-          metadata.class_name.should eq("Name")
+          context "when association name is singular" do
+
+            let(:relation) do
+              Mongoid::Relations::Embedded::One
+            end
+
+            let(:metadata) do
+              described_class.new(:name => :name, :relation => relation, :inverse_class_name => "Business::Person")
+            end
+
+            it "classifies and constantizes the association name and adds the module" do
+              metadata.class_name.should eq("Business::Name")
+            end
+          end
+
+          context "when association name is plural" do
+
+            let(:relation) do
+              Mongoid::Relations::Embedded::Many
+            end
+
+            let(:metadata) do
+              described_class.new(:name => :addresses, :relation => relation, :inverse_class_name => "Business::Person")
+            end
+
+            it "classifies and constantizes the association name and adds the module" do
+              metadata.class_name.should eq("Business::Address")
+            end
+          end
+
         end
       end
 
-      context "when association name is plural" do
+      context "when no inverse_class_name is provided" do
 
-        let(:relation) do
-          Mongoid::Relations::Embedded::Many
+        context "when association name is singular" do
+
+          let(:relation) do
+            Mongoid::Relations::Embedded::One
+          end
+
+          let(:metadata) do
+            described_class.new(:name => :name, :relation => relation)
+          end
+
+          it "classifies and constantizes the association name" do
+            metadata.class_name.should eq("Name")
+          end
         end
 
-        let(:metadata) do
-          described_class.new(:name => :addresses, :relation => relation)
+        context "when association name is plural" do
+
+          let(:relation) do
+            Mongoid::Relations::Embedded::Many
+          end
+
+          let(:metadata) do
+            described_class.new(:name => :addresses, :relation => relation)
+          end
+
+          it "classifies and constantizes the association name" do
+            metadata.class_name.should eq("Address")
+          end
         end
 
-        it "classifies and constantizes the association name" do
-          metadata.class_name.should eq("Address")
-        end
+
       end
     end
   end
