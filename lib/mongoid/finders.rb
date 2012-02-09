@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
     # provided arguments.
     #
     # @example Do any documents exist for the conditions?
-    #   Person.exists?(:conditions => { :attribute => "value" })
+    #   Person.exists?
     #
     # @param [ Array ] args The conditions.
     def exists?
