@@ -7,7 +7,7 @@ module Mongoid #:nodoc
     # it will display all of those.
     class DocumentNotFound < MongoidError
 
-      attr_reader :klass, :identifiers
+      attr_reader :identifiers
 
       # Create the new error.
       #
@@ -20,7 +20,7 @@ module Mongoid #:nodoc
       # @param [ Class ] klass The model class.
       # @param [ Hash, Array, Object ] attrs The attributes or ids.
       def initialize(klass, attrs)
-        @klass, @identifiers = klass, attrs
+        @identifiers = attrs
         super(
           compose_message(
             message_key,

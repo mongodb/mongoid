@@ -6,8 +6,6 @@ module Mongoid #:nodoc
     # of the callbacks returns false.
     class Callback < MongoidError
 
-      attr_reader :klass, :method
-
       # Create the new callbacks error.
       #
       # @example Create the new callbacks error.
@@ -18,7 +16,6 @@ module Mongoid #:nodoc
       #
       # @since 2.2.0
       def initialize(klass, method)
-        @klass, @method = klass, method
         super(
           compose_message("callbacks", { :klass => klass, :method => method })
         )
