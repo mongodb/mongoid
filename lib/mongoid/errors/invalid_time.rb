@@ -6,8 +6,6 @@ module Mongoid #:nodoc
     # a date or time.
     class InvalidTime < MongoidError
 
-      attr_reader :klass, :value
-
       # Create the new invalid date error.
       #
       # @example Create the new invalid date error.
@@ -17,7 +15,6 @@ module Mongoid #:nodoc
       #
       # @since 2.3.1
       def initialize(value)
-        @value = value
         super(compose_message("invalid_time", { :value => value }))
       end
     end
