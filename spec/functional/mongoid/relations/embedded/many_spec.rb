@@ -2429,6 +2429,44 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  context "when deeply nesting documents" do
+
+    context "when all documents are new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      let(:location) do
+        Location.new
+      end
+
+      before do
+        address.locations << location
+        person.addresses << address
+      end
+
+      context "when saving the root" do
+
+        before do
+          person.save
+        end
+
+        it "persists the first level document" do
+          person.reload.addresses.first.should eq(address)
+        end
+
+        it "persists the second level document" do
+          person.reload.addresses[0].locations.should eq([ location ])
+        end
+      end
+    end
+  end
+
   context "when attempting nil pushes and substitutes" do
 
     let(:home_phone) do
