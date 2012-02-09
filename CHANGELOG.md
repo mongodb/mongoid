@@ -72,7 +72,7 @@ For instructions on upgrading to newer versions, visit
   relation macros inside the namespace. (Hans Hasselberg)
 
 * \#1665/#1672 Expand complex criteria in nested criteria selectors, like
-  #matches. (Hans Hasselberg)
+  \#matches. (Hans Hasselberg)
 
 * \#1335 Don't add id sorting criteria to first/last is there is already
   sorting options on the criteria.
