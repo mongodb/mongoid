@@ -247,8 +247,8 @@ describe Mongoid::Versioning do
           version._id.should be_nil
         end
 
-        it "does not version the updated_at timestamp" do
-          version.updated_at.should be_nil
+        it "does version the updated_at timestamp" do
+          version.updated_at.should_not be_nil
         end
 
         it "does not embed versions within versions" do

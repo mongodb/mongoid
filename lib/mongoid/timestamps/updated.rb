@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
       extend ActiveSupport::Concern
 
       included do
-        field :updated_at, :type => Time, :versioned => false
+        field :updated_at, :type => Time
         set_callback :save, :before, :set_updated_at, :if => :able_to_set_updated_at?
       end
 
