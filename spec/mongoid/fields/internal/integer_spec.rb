@@ -88,8 +88,8 @@ describe Mongoid::Fields::Internal::Integer do
 
       context "when the string is non numerical" do
 
-        it "returns the string" do
-          field.serialize("foo").should eq("foo")
+        it "returns 0" do
+          field.serialize("foo").should eq(0)
         end
       end
 

@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def serialize(object)
           return nil if object.blank?
-          numeric(object) rescue object
+          numeric(object) rescue 0
         end
 
         private
