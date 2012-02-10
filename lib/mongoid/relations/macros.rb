@@ -283,7 +283,16 @@ module Mongoid # :nodoc:
               :metadata => metadata,
               :default => metadata.foreign_key_default
             )
-            index(key, :background => true) if metadata.indexed?
+            if metadata.indexed?
+              if metadata.polymorphic?
+                index(
+                  [[ key, Mongo::ASCENDING ], [ metadata.type, Mongo::ASCENDING ]],
+                  :background => true
+                )
+              else
+                index(key, :background => true)
+              end
+            end
           end
         end
 
