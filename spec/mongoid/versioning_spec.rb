@@ -251,6 +251,16 @@ describe Mongoid::Versioning do
           version.updated_at.should_not be_nil
         end
 
+        context "when only updated_at was changed" do
+          before do
+            page.update_attributes(:updated_at => Time.now)
+          end
+
+          it "does not generate another version" do
+            page.versions.count.should eq(1)
+          end
+        end
+
         it "does not embed versions within versions" do
           version.versions.should be_empty
         end
