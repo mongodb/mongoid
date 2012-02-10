@@ -44,7 +44,21 @@ For instructions on upgrading to newer versions, visit
 
 * \#1635 All exceptions now provide more comprehensive errors, including
   the problem that occured, a detail summary of why it happened, and
-  potential resolutions.
+  potential resolutions. Example:
+
+        (Mongoid::Errors::DocumentNotFound)
+        Problem:
+          Document not found for class Town with
+          id(s) [BSON::ObjectId('4f35781b8ad54812e1000001')].
+        Summary:
+          When calling Town.find with an id or array of ids,
+          each parameter must match a document in the database
+          or this error will be raised.
+        Resolution:
+          Search for an id that is in the database or set the
+          Mongoid.raise_not_found_error configuration option to
+          false, which will cause a nil to be returned instead
+          of raising this error.
 
 * \#1616 `Model.find_by` added which takes a hash of arugments to search
   for in the database. If no single document is returned a DocumentNotFound
