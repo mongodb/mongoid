@@ -13,7 +13,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
 
-* #1650 Objects that respond to #to_criteria can now be merged into
+* \#1650 Objects that respond to \#to_criteria can now be merged into
   existing criteria objects.
 
 * \#1635 All exceptions now provide more comprehensive errors, including
@@ -68,13 +68,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \#1692/#1376 `Model#updateattributes` and `Model#update_attributes!` now
+* \#1692/\#1376 `Model#updateattributes` and `Model#update_attributes!` now
   accept assignment options. (Hans Hasselberg)
 
-* \#1688/#1207 Don't require namespacing when providing class name on
+* \#1688/\#1207 Don't require namespacing when providing class name on
   relation macros inside the namespace. (Hans Hasselberg)
 
-* \#1665/#1672 Expand complex criteria in nested criteria selectors, like
+* \#1665/\#1672 Expand complex criteria in nested criteria selectors, like
   \#matches. (Hans Hasselberg)
 
 * \#1335 Don't add id sorting criteria to first/last is there is already
@@ -94,8 +94,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#1676 Allow eager loading to work as a default scope.
 
-* \#1665/#1672 Expand complex criteria in nested criteria selectors, like
-  #matches. (Hans Hasselberg)
+* \#1665/\#1672 Expand complex criteria in nested criteria selectors, like
+  \#matches. (Hans Hasselberg)
 
 * \#1668 Ensure Mongoid logger exists before calling warn. (Rémy Coutable)
 
@@ -103,10 +103,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#1659 Clear delayed atomic sets when resetting the same embedded relation.
 
-* \#1656/#1657 Don't hit database for uniqueness validation if BOTH scope
+* \#1656/\#1657 Don't hit database for uniqueness validation if BOTH scope
   and attribute hasn't changed. (priyaaank)
 
-* \#1205/#1642 When limiting fields returned from the database via
+* \#1205/\#1642 When limiting fields returned from the database via
   `Criteria#only` and `Criteria#without` and then subsequently saving
   the document. Default values no longer override excluded fields.
 
@@ -117,18 +117,18 @@ For instructions on upgrading to newer versions, visit
 * \#1647 DateTime serialization when already in UTC does not convert to
   local time.
 
-* \#1641/#1639 Mongoid.observer.disable :all now behaves as AR does.
+* \#1641/\#1639 Mongoid.observer.disable :all now behaves as AR does.
 
 * \#1640 Update consumers should be tied to the name of the collection
   they persist to, not the name of the class.
 
-* \#1637/#1636 Scopes no longer modify parent class scopes when subclassing.
+* \#1637/\#1636 Scopes no longer modify parent class scopes when subclassing.
   (Hans Hasselberg)
 
 * \#1629 $all and $in criteria on embedded many relations now properly
   handles regex searches and elements of varying length. (Douwe Maan)
 
-* \#1623\#1634 Default scopes no longer break Mongoid::Versioning.
+* \#1623/\#1634 Default scopes no longer break Mongoid::Versioning.
   (Hans Hasselberg)
 
 * \#1605 Fix regression of rescue responses, Rails 3.2
