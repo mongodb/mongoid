@@ -70,6 +70,7 @@ require "mongoid/serialization"
 require "mongoid/sharding"
 require "mongoid/state"
 require "mongoid/timestamps"
+require "mongoid/unit_of_work"
 require "mongoid/validations"
 require "mongoid/versioning"
 require "mongoid/components"
@@ -92,6 +93,7 @@ end
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
 module Mongoid #:nodoc
+  extend UnitOfWork
   extend self
 
   MONGODB_VERSION = "2.0.0"
@@ -113,25 +115,6 @@ module Mongoid #:nodoc
     block_given? ? yield(Config) : Config
   end
   alias :config :configure
-
-  # We can process a unit of work in Mongoid and have the identity map
-  # automatically clear itself out after the work is complete.
-  #
-  # @example Process a unit of work.
-  #   Mongoid.unit_of_work do
-  #     Person.create(:title => "Sir")
-  #   end
-  #
-  # @return [ Object ] The result of the block.
-  #
-  # @since 2.1.0
-  def unit_of_work
-    begin
-      yield if block_given?
-    ensure
-      IdentityMap.clear
-    end
-  end
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.

@@ -123,6 +123,60 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid]:identity-map"] ||= IdentityMap.new
     end
 
+    # Is the identity map enabled on the current thread?
+    #
+    # @example Is the identity map enabled?
+    #   Threaded.identity_map_enabled?
+    #
+    # @return [ true, false ] If the identity map is enabled.
+    #
+    # @since 3.0.0
+    def identity_map_enabled?
+      Thread.current[:"[mongoid]:identity-map-enabled"] != false
+    end
+
+    # Disable the identity map on either the current thread or all threads.
+    #
+    # @example Disable the identity map on all threads.
+    #   Threaded.disable_identity_map(:all)
+    #
+    # @example Disable the identity map on the current thread.
+    #   Threaded.disable_identity_map(:current)
+    #
+    # @param [ Symbol ] option The disabling option.
+    #
+    # @since 3.0.0
+    def disable_identity_map(option)
+      if option == :all
+        Thread.list.each do |thread|
+          thread[:"[mongoid]:identity-map-enabled"] = false
+        end
+      else
+        Thread.current[:"[mongoid]:identity-map-enabled"] = false
+      end
+    end
+
+    # Enable the identity map on either the current thread or all threads.
+    #
+    # @example Enable the identity map on all threads.
+    #   Threaded.enable_identity_map(:all)
+    #
+    # @example Enable the identity map on the current thread.
+    #   Threaded.enable_identity_map(:current)
+    #
+    # @param [ Symbol ] option The disabling option.
+    #
+    # @since 3.0.0
+    def enable_identity_map(option)
+      if option == :all
+        Thread.list.each do |thread|
+          thread[:"[mongoid]:identity-map-enabled"] = true
+        end
+      else
+        Thread.current[:"[mongoid]:identity-map-enabled"] = true
+      end
+    end
+
     # Get the insert consumer from the current thread.
     #
     # @example Get the insert consumer.
