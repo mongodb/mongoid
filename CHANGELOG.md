@@ -24,6 +24,15 @@ For instructions on upgrading to newer versions, visit
 
 * \#1685 Belongs to relations now have build_ and create_ methods.
 
+        class Comment
+          include Mongoid::Document
+          belongs_to :user
+        end
+
+        comment = Comment.new
+        comment.build_user # Build a new user object
+        comment.create_user # Create a new user object
+
 * \#1684 Raise a `Mongoid::Errors::InverseNotFound` when attempting to
   set a child on a relation without the proper inverse_of definitions
   due to Mongoid not being able to determine it.
@@ -40,6 +49,8 @@ For instructions on upgrading to newer versions, visit
 * \#1616 `Model.find_by` added which takes a hash of arugments to search
   for in the database. If no single document is returned a DocumentNotFound
   error is raised. (Piotr Jakubowski)
+
+        Band.find_by(name: "Depeche Mode")
 
 * \#1348 Eager loading is now supported on many-to-many relations.
 
