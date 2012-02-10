@@ -31,6 +31,55 @@ describe Mongoid::Relations::Builders do
           game[:binding].should be_nil
         end
       end
+
+      context "when the relation is a belongs to" do
+
+        context "when the inverse is a has many" do
+
+          let(:post) do
+            Post.new
+          end
+
+          let!(:person) do
+            post.build_person
+          end
+
+          it "builds the document" do
+            post.person.should eq(person)
+          end
+
+          it "sets the inverse" do
+            person.posts.should eq([ post ])
+          end
+
+          it "does not save the document" do
+            person.should_not be_persisted
+          end
+        end
+
+        context "when the inverse is a has one" do
+
+          let(:game) do
+            Game.new
+          end
+
+          let!(:person) do
+            game.build_person
+          end
+
+          it "builds the document" do
+            game.person.should eq(person)
+          end
+
+          it "sets the inverse" do
+            person.game.should eq(game)
+          end
+
+          it "does not save the document" do
+            person.should_not be_persisted
+          end
+        end
+      end
     end
   end
 
@@ -61,6 +110,63 @@ describe Mongoid::Relations::Builders do
 
         it "does not set a binding attribute" do
           game[:binding].should be_nil
+        end
+      end
+
+      context "when the relation is a belongs to" do
+
+        context "when the inverse is a has many" do
+
+          let(:post) do
+            Post.new
+          end
+
+          let!(:person) do
+            post.create_person
+          end
+
+          it "builds the document" do
+            post.person.should eq(person)
+          end
+
+          it "sets the inverse" do
+            person.posts.should eq([ post ])
+          end
+
+          it "saves the document" do
+            person.should be_persisted
+          end
+
+          it "saves the child" do
+            post.should be_persisted
+          end
+        end
+
+        context "when the inverse is a has one" do
+
+          let(:game) do
+            Game.new
+          end
+
+          let!(:person) do
+            game.create_person
+          end
+
+          it "builds the document" do
+            game.person.should eq(person)
+          end
+
+          it "sets the inverse" do
+            person.game.should eq(game)
+          end
+
+          it "saves the document" do
+            person.should be_persisted
+          end
+
+          it "saves the child" do
+            game.should be_persisted
+          end
         end
       end
     end

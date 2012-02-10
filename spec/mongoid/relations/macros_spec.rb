@@ -249,6 +249,14 @@ describe Mongoid::Relations::Macros do
         klass.allocate.should respond_to(:person=)
       end
 
+      it "defines the builder" do
+        klass.allocate.should respond_to(:build_person)
+      end
+
+      it "defines the creator" do
+        klass.allocate.should respond_to(:create_person)
+      end
+
       it "creates the correct relation" do
         klass.relations["person"].relation.should eq(
           Mongoid::Relations::Referenced::In

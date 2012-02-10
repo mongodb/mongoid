@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1685 Belongs to relations now have build_ and create_ methods.
+
 * \#1684 Raise a `Mongoid::Errors::InverseNotFound` when attempting to
   set a child on a relation without the proper inverse_of definitions
   due to Mongoid not being able to determine it.
