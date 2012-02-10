@@ -292,58 +292,78 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       context "when the relation is polymorphic" do
-
-        context "when the child is a new record" do
-
-          let(:movie) do
-            Movie.new
+        
+        context "when multiple relations against the same class exist" do
+          
+          let(:face) do
+            Face.new
           end
-
-          let(:rating) do
-            Rating.new
+          
+          let(:eye) do
+            Eye.new
           end
-
-          before do
-            rating.ratable = movie
-          end
-
-          it "sets the target of the relation" do
-            rating.ratable.target.should eq(movie)
-          end
-
-          it "sets the foreign key on the relation" do
-            rating.ratable_id.should eq(movie.id)
-          end
-
-          it "does not save the target" do
-            movie.should_not be_persisted
+          
+          it "raises an error" do
+            expect {
+              eye.eyeable = face
+            }.to raise_error(Mongoid::Errors::InvalidSetPolymorphicRelation)
           end
         end
+        
+        context "when one relation against the same class exists" do
 
-        context "when the child is not a new record" do
+          context "when the child is a new record" do
 
-          let(:movie) do
-            Movie.new
+            let(:movie) do
+              Movie.new
+            end
+
+            let(:rating) do
+              Rating.new
+            end
+
+            before do
+              rating.ratable = movie
+            end
+
+            it "sets the target of the relation" do
+              rating.ratable.target.should eq(movie)
+            end
+
+            it "sets the foreign key on the relation" do
+              rating.ratable_id.should eq(movie.id)
+            end
+
+            it "does not save the target" do
+              movie.should_not be_persisted
+            end
           end
 
-          let(:rating) do
-            Rating.create
-          end
+          context "when the child is not a new record" do
 
-          before do
-            rating.ratable = movie
-          end
+            let(:movie) do
+              Movie.new
+            end
 
-          it "sets the target of the relation" do
-            rating.ratable.target.should eq(movie)
-          end
+            let(:rating) do
+              Rating.create
+            end
 
-          it "sets the foreign key of the relation" do
-            rating.ratable_id.should eq(movie.id)
-          end
+            before do
+              rating.ratable = movie
+            end
 
-          it "does not saves the target" do
-            movie.should_not be_persisted
+            it "sets the target of the relation" do
+              rating.ratable.target.should eq(movie)
+            end
+
+            it "sets the foreign key of the relation" do
+              rating.ratable_id.should eq(movie.id)
+            end
+
+            it "does not saves the target" do
+              movie.should_not be_persisted
+            end
           end
         end
       end
@@ -442,60 +462,122 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       context "when the relation is polymorphic" do
+        
+        context "when multiple relations against the same class exist" do
+          
+          context "when the parent is a new record" do
 
-        context "when the parent is a new record" do
+            let(:face) do
+              Face.new
+            end
 
-          let(:bar) do
-            Bar.new
+            let(:eye) do
+              Eye.new
+            end
+
+            before do
+              face.left_eye = eye
+              eye.eyeable = nil
+            end
+
+            it "sets the relation to nil" do
+              eye.eyeable.should be_nil
+            end
+
+            it "removed the inverse relation" do
+              face.left_eye.should be_nil
+            end
+
+            it "removes the foreign key value" do
+              eye.eyeable_id.should be_nil
+            end
           end
 
-          let(:rating) do
-            Rating.new
-          end
+          context "when the parent is not a new record" do
 
-          before do
-            rating.ratable = bar
-            rating.ratable = nil
-          end
+            let(:face) do
+              Face.new
+            end
 
-          it "sets the relation to nil" do
-            rating.ratable.should be_nil
-          end
+            let(:eye) do
+              Eye.create
+            end
 
-          it "removed the inverse relation" do
-            bar.rating.should be_nil
-          end
+            before do
+              face.left_eye = eye
+              eye.eyeable = nil
+            end
 
-          it "removes the foreign key value" do
-            rating.ratable_id.should be_nil
+            it "sets the relation to nil" do
+              eye.eyeable.should be_nil
+            end
+
+            it "removed the inverse relation" do
+              face.left_eye.should be_nil
+            end
+
+            it "removes the foreign key value" do
+              eye.eyeable_id.should be_nil
+            end
           end
         end
 
-        context "when the parent is not a new record" do
+        context "when one relation against the same class exists" do
 
-          let(:bar) do
-            Bar.new
+          context "when the parent is a new record" do
+
+            let(:bar) do
+              Bar.new
+            end
+
+            let(:rating) do
+              Rating.new
+            end
+
+            before do
+              rating.ratable = bar
+              rating.ratable = nil
+            end
+
+            it "sets the relation to nil" do
+              rating.ratable.should be_nil
+            end
+
+            it "removed the inverse relation" do
+              bar.rating.should be_nil
+            end
+
+            it "removes the foreign key value" do
+              rating.ratable_id.should be_nil
+            end
           end
 
-          let(:rating) do
-            Rating.create
-          end
+          context "when the parent is not a new record" do
 
-          before do
-            rating.ratable = bar
-            rating.ratable = nil
-          end
+            let(:bar) do
+              Bar.new
+            end
 
-          it "sets the relation to nil" do
-            rating.ratable.should be_nil
-          end
+            let(:rating) do
+              Rating.create
+            end
 
-          it "removed the inverse relation" do
-            bar.rating.should be_nil
-          end
+            before do
+              rating.ratable = bar
+              rating.ratable = nil
+            end
 
-          it "removes the foreign key value" do
-            rating.ratable_id.should be_nil
+            it "sets the relation to nil" do
+              rating.ratable.should be_nil
+            end
+
+            it "removed the inverse relation" do
+              bar.rating.should be_nil
+            end
+
+            it "removes the foreign key value" do
+              rating.ratable_id.should be_nil
+            end
           end
         end
       end

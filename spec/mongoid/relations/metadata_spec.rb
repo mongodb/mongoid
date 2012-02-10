@@ -757,6 +757,74 @@ describe Mongoid::Relations::Metadata do
       end
     end
   end
+  
+  describe "#inverse_of_field" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::In,
+          :foreign_key => "person_id"
+        )
+      end
+
+      it "returns nil" do
+        metadata.inverse_of_field.should be_nil
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :ratable,
+          :relation => Mongoid::Relations::Referenced::In,
+          :polymorphic => true,
+          :inverse_class_name => "Rating"
+        )
+      end
+
+      it "returns the polymorphic name plus field" do
+        metadata.inverse_of_field.should eq("ratable_field")
+      end
+    end
+  end
+
+  describe "#inverse_of_field_setter" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :person,
+          :relation => Mongoid::Relations::Referenced::In,
+          :foreign_key => "person_id"
+        )
+      end
+
+      it "returns nil" do
+        metadata.inverse_of_field_setter.should be_nil
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:metadata) do
+        described_class.new(
+          :name => :ratable,
+          :relation => Mongoid::Relations::Referenced::In,
+          :polymorphic => true,
+          :inverse_class_name => "Rating"
+        )
+      end
+
+      it "returns the inverse of field plus =" do
+        metadata.inverse_of_field_setter.should eq("ratable_field=")
+      end
+    end
+  end
 
   describe "#indexed?" do
 
@@ -807,23 +875,59 @@ describe Mongoid::Relations::Metadata do
     context "when an inverse relation exists" do
 
       context "when multiple relations against the same class exist" do
+        
+        context "when not polymorphic" do
 
-        let(:metadata) do
-          described_class.new(
-            :inverse_class_name => "User",
-            :name => :shop,
-            :relation => Mongoid::Relations::Referenced::One
-          )
+          let(:metadata) do
+            described_class.new(
+              :inverse_class_name => "User",
+              :name => :shop,
+              :relation => Mongoid::Relations::Referenced::One
+            )
+          end
+
+          it "returns the name of the inverse with the matching inverse of" do
+            metadata.inverse.should eq(:user)
+          end
         end
+      
+        context "when polymorphic" do
 
-        it "returns the name of the inverse with the matching inverse of" do
-          metadata.inverse.should eq(:user)
+          let(:metadata) do
+            described_class.new(
+              :name => :left_eye,
+              :as => :eyeable,
+              :inverse_class_name => "Face",
+              :class_name => "Eye",
+              :relation => Mongoid::Relations::Referenced::One
+            )
+          end
+
+          it "returns the name of the relation" do
+            metadata.inverse.should eq(:eyeable)
+          end
+        end
+        
+        context "when polymorphic on the child" do
+
+          let(:metadata) do
+            described_class.new(
+              :name => :eyeable,
+              :polymorphic => true,
+              :inverse_class_name => "Eye",
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          it "returns nil" do
+            metadata.inverse(Face.new).should be_nil
+          end
         end
       end
 
       context "when inverse_of is defined" do
 
-        context "when inverse_of is a symbol" do
+        context "when inverse_of is nil" do
 
           let(:metadata) do
             described_class.new(
@@ -837,7 +941,7 @@ describe Mongoid::Relations::Metadata do
           end
         end
 
-        context "when inverse_of is nil" do
+        context "when inverse_of is a symbol" do
 
           let(:metadata) do
             described_class.new(
@@ -1008,6 +1112,44 @@ describe Mongoid::Relations::Metadata do
     end
 
     context "when the relation is polymorphic" do
+
+      context "when multiple relations against the same class exist" do
+        
+        context "when a referenced in" do
+
+          let(:metadata) do
+            described_class.new(
+              :name => :eyeable,
+              :polymorphic => true,
+              :relation => Mongoid::Relations::Referenced::In
+            )
+          end
+
+          let(:other) do
+            Face.new
+          end
+
+          it "returns nil" do
+            metadata.inverse_setter(other).should be_nil
+          end
+        end
+
+        context "when a references many" do
+
+          let(:metadata) do
+            described_class.new(
+              :name => :blue_eyes,
+              :inverse_class_name => "EyeBowl",
+              :as => :eyeable,
+              :relation => Mongoid::Relations::Referenced::Many
+            )
+          end
+
+          it "returns a string for the setter" do
+            metadata.inverse_setter.should eq("eyeable=")
+          end
+        end        
+      end
 
       context "when a referenced in" do
 
