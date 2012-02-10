@@ -155,6 +155,45 @@ describe Mongoid::Relations::Referenced::Many do
         end
       end
 
+      context "when safely adding to the relation" do
+
+        let(:person) do
+          Person.create
+        end
+
+        context "when the operation succeeds" do
+
+          let(:post) do
+            Post.new
+          end
+
+          before do
+            person.posts.safely.send(method, post)
+          end
+
+          it "adds the document to the relation" do
+            person.posts.should eq([ post ])
+          end
+        end
+
+        context "when the operation fails" do
+
+          let!(:existing) do
+            Post.create
+          end
+
+          let(:post) do
+            Post.new(:_id => existing.id)
+          end
+
+          it "raises an error" do
+            expect {
+              person.posts.safely.send(method, post)
+            }.to raise_error(Mongo::OperationFailure)
+          end
+        end
+      end
+
       context "when the relations are polymorphic" do
 
         context "when the parent is a new record" do
@@ -1367,6 +1406,41 @@ describe Mongoid::Relations::Referenced::Many do
 
         it "raises an unsaved document error" do
           expect { post }.to raise_error(Mongoid::Errors::UnsavedDocument)
+        end
+      end
+
+      context "when safely creating the document" do
+
+        context "when the operation is successful" do
+
+          let(:person) do
+            Person.create
+          end
+
+          let!(:post) do
+            person.posts.safely.create(:text => "Testing")
+          end
+
+          it "creates the document" do
+            person.posts.should eq([ post ])
+          end
+        end
+
+        context "when the operation fails" do
+
+          let(:person) do
+            Person.create
+          end
+
+          let!(:existing) do
+            Post.create
+          end
+
+          it "raises an error" do
+            expect {
+              person.posts.safely.create(:_id => existing.id)
+            }.to raise_error(Mongo::OperationFailure)
+          end
         end
       end
 

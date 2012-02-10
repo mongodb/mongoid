@@ -7,21 +7,6 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
-* \#1459 The identity map can be disabled now for specific code execution
-  by passing options to the unit of work.
-
-        Mongoid.unit_of_work(disable: :all) do
-          # Disables the identity map on all threads for the block.
-        end
-
-        Mongoid.unit_of_work(disable: :current) do
-          # Disables the identity map on the current thread for the block.
-        end
-
-        Mongoid.unit_of_work do
-          # Business as usual.
-        end
-
 * \#1685 Belongs to relations now have build_ and create_ methods.
 
         class Comment
@@ -65,6 +50,29 @@ For instructions on upgrading to newer versions, visit
   error is raised. (Piotr Jakubowski)
 
         Band.find_by(name: "Depeche Mode")
+
+* \#1459 The identity map can be disabled now for specific code execution
+  by passing options to the unit of work.
+
+        Mongoid.unit_of_work(disable: :all) do
+          # Disables the identity map on all threads for the block.
+        end
+
+        Mongoid.unit_of_work(disable: :current) do
+          # Disables the identity map on the current thread for the block.
+        end
+
+        Mongoid.unit_of_work do
+          # Business as usual.
+        end
+
+* \#1355 Associations now can have safety options provided to them on single
+  document persistence operations.
+
+        band.albums.safely.push(album)
+        band.albums.safely.create(name: "Smiths")
+
+        album.safely.create_producer(name: "Flood")
 
 * \#1348 Eager loading is now supported on many-to-many relations.
 

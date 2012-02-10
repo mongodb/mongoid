@@ -5,13 +5,14 @@ module Mongoid # :nodoc:
     # This class is the superclass for all relation proxy objects, and contains
     # common behaviour for all of them.
     class Proxy
-      include Threaded::Lifecycle
-
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
           method =~ /(^__|^send$|^object_id$|^extend$|^respond_to\?$|^tap$)/
       end
+
+      include Threaded::Lifecycle
+      include Safety
 
       attr_accessor :base, :loaded, :metadata, :target
 
