@@ -10,17 +10,17 @@ For instructions on upgrading to newer versions, visit
 * \#1459 The identity map can be disabled now for specific code execution
   by passing options to the unit of work.
 
-      Mongoid.unit_of_work(disable: :all) do
-        # Disables the identity map on all threads for the block.
-      end
+        Mongoid.unit_of_work(disable: :all) do
+          # Disables the identity map on all threads for the block.
+        end
 
-      Mongoid.unit_of_work(disable: :current) do
-        # Disables the identity map on the current thread for the block.
-      end
+        Mongoid.unit_of_work(disable: :current) do
+          # Disables the identity map on the current thread for the block.
+        end
 
-      Mongoid.unit_of_work do
-        # Business as usual.
-      end
+        Mongoid.unit_of_work do
+          # Business as usual.
+        end
 
 * \#1685 Belongs to relations now have build_ and create_ methods.
 
