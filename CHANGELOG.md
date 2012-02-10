@@ -162,6 +162,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1703 Updated at is now versioned again. (Lucas Souza)
+
 * \#1686 Set the base metadata on unbind as well as bind for belongs to
   relations.
 
