@@ -168,57 +168,152 @@ describe Mongoid::Relations::Accessors do
     end
 
     context "when the relation is polymorphic" do
-
-      let(:movie) do
-        Movie.create(:title => "Inception")
-      end
-
-      let(:book) do
-        Book.create(:title => "Jurassic Park")
-      end
-
-      let!(:movie_rating) do
-        movie.ratings.create(:value => 10)
-      end
-
-      let!(:book_rating) do
-        book.create_rating(:value => 5)
-      end
-
-      context "when accessing a referenced in" do
-
-        let(:rating) do
-          Rating.where(:value => 10).first
+      
+      context "when there's a single references many/one" do
+        
+        let(:movie) do
+          Movie.create(:title => "Inception")
         end
 
-        it "returns the correct type" do
-          rating.ratable.should be_a(Movie)
+        let(:book) do
+          Book.create(:title => "Jurassic Park")
         end
 
-        it "returns the correct document" do
-          rating.ratable.should eq(movie)
+        let!(:movie_rating) do
+          movie.ratings.create(:value => 10)
+        end
+
+        let!(:book_rating) do
+          book.create_rating(:value => 5)
+        end
+
+        context "when accessing a referenced in" do
+
+          let(:rating) do
+            Rating.where(:value => 10).first
+          end
+
+          it "returns the correct type" do
+            rating.ratable.should be_a(Movie)
+          end
+
+          it "returns the correct document" do
+            rating.ratable.should eq(movie)
+          end
+        end
+
+        context "when accessing a references many" do
+
+          let(:ratings) do
+            Movie.first.ratings
+          end
+
+          it "returns the correct documents" do
+            ratings.should eq([ movie_rating ])
+          end
+        end
+
+        context "when accessing a references one" do
+
+          let(:rating) do
+            Book.first.rating
+          end
+
+          it "returns the correct document" do
+            rating.should eq(book_rating)
+          end
         end
       end
-
-      context "when accessing a references many" do
-
-        let(:ratings) do
-          Movie.first.ratings
+      
+      context "when there are multiple references many/one" do
+        
+        let(:face) do
+          Face.create
         end
 
-        it "returns the correct documents" do
-          ratings.should eq([ movie_rating ])
-        end
-      end
-
-      context "when accessing a references one" do
-
-        let(:rating) do
-          Book.first.rating
+        let(:eye_bowl) do
+          EyeBowl.create
         end
 
-        it "returns the correct document" do
-          rating.should eq(book_rating)
+        let!(:face_left_eye) do
+          face.create_left_eye(:pupil_dilation => 10)
+        end
+        
+        let!(:face_right_eye) do
+          face.create_right_eye(:pupil_dilation => 5)
+        end
+
+        let!(:eye_bowl_blue_eye) do
+          eye_bowl.blue_eyes.create(:pupil_dilation => 2)
+        end
+        
+        let!(:eye_bowl_brown_eye) do
+          eye_bowl.brown_eyes.create(:pupil_dilation => 1)
+        end
+
+        context "when accessing a referenced in" do
+
+          let(:eye) do
+            Eye.where(:pupil_dilation => 10).first
+          end
+
+          it "returns the correct type" do
+            eye.eyeable.should be_a(Face)
+          end
+
+          it "returns the correct document" do
+            eye.eyeable.should eq(face)
+          end
+        end
+
+        context "when accessing a references many" do
+          
+          context "first references many" do
+
+            let(:eyes) do
+              EyeBowl.first.blue_eyes
+            end
+
+            it "returns the correct documents" do
+              eyes.should eq([ eye_bowl_blue_eye ])
+            end
+          end
+          
+          context "second references many" do
+
+            let(:eyes) do
+              EyeBowl.first.brown_eyes
+            end
+
+            it "returns the correct documents" do
+              eyes.should eq([ eye_bowl_brown_eye ])
+            end
+          end
+        end
+
+        context "when accessing a references one" do
+          
+          context "first references one" do
+
+            let(:eye) do
+              Face.first.left_eye
+            end
+
+            it "returns the correct document" do
+              eye.should eq(face_left_eye)
+            end
+          end
+          
+          context "second references one" do
+
+            let(:eye) do
+              Face.first.right_eye
+            end
+
+            it "returns the correct document" do
+              eye.should eq(face_right_eye)
+            end
+          end
         end
       end
     end

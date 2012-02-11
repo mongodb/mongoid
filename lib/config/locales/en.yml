@@ -115,6 +115,12 @@ en:
             \_\_\_\_include Mongoid::Document\n
             \_\_\_\_belongs_to :alcoholic, class_name: \"Lush\", inverse_of: :whiskey\n
             \_\_end"
+        invalid_set_polymorphic_relation:
+          message: "The %{name} attribute can't be set to an instance of 
+            %{other_klass} as %{other_klass} has multiple relations referencing
+            %{klass} as %{name}."
+          summary: ""
+          resolution: ""
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a relational association is not allowed since the
