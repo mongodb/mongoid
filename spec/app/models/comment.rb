@@ -1,7 +1,5 @@
 class Comment
   include Mongoid::Document
-  include Mongoid::Versioning
-  include Mongoid::Timestamps
 
   field :title, :type => String
   field :text, :type => String

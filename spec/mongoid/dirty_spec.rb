@@ -816,20 +816,20 @@ describe Mongoid::Dirty do
 
   context "when fields have been defined pre-dirty inclusion" do
 
-    let(:person) do
-      Person.new
+    let(:agent) do
+      Agent.new
     end
 
     it "defines a _change method" do
-      person.updated_at_change.should be_nil
+      agent.updated_at_change.should be_nil
     end
 
     it "defines a _changed? method" do
-      person.updated_at_changed?.should be_false
+      agent.updated_at_changed?.should be_false
     end
 
     it "defines a _changes method" do
-      person.updated_at_was.should be_nil
+      agent.updated_at_was.should be_nil
     end
   end
 

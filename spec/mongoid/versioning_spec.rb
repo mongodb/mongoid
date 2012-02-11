@@ -193,14 +193,14 @@ describe Mongoid::Versioning do
 
   describe "#versionless" do
 
-    let(:person) do
-      Person.new(:created_at => Time.now.utc)
+    let(:page) do
+      WikiPage.new(:created_at => Time.now.utc)
     end
 
     context "when executing the block" do
 
       it "sets versionless to true" do
-        person.versionless do |doc|
+        page.versionless do |doc|
           doc.should be_versionless
         end
       end
@@ -209,8 +209,8 @@ describe Mongoid::Versioning do
     context "when the block finishes" do
 
       it "sets versionless to false" do
-        person.versionless
-        person.should_not be_versionless
+        page.versionless
+        page.should_not be_versionless
       end
     end
   end

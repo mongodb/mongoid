@@ -243,42 +243,42 @@ describe Mongoid::Document do
 
   describe "#cache_key" do
 
-    let(:person) do
-      Person.new
+    let(:agent) do
+      Agent.new
     end
 
     context "when the document is new" do
 
       it "has a new key name" do
-        person.cache_key.should eq("people/new")
+        agent.cache_key.should eq("agents/new")
       end
     end
 
     context "when persisted" do
 
       before do
-        person.save
+        agent.save
       end
 
       context "with updated_at" do
 
         let!(:updated_at) do
-          person.updated_at.utc.to_s(:number)
+          agent.updated_at.utc.to_s(:number)
         end
 
         it "has the id and updated_at key name" do
-          person.cache_key.should eq("people/#{person.id}-#{updated_at}")
+          agent.cache_key.should eq("agents/#{agent.id}-#{updated_at}")
         end
       end
 
       context "without updated_at" do
 
         before do
-          person.updated_at = nil
+          agent.updated_at = nil
         end
 
         it "has the id key name" do
-          person.cache_key.should eq("people/#{person.id}")
+          agent.cache_key.should eq("agents/#{agent.id}")
         end
       end
     end
