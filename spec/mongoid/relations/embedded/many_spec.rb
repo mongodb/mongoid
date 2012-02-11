@@ -2149,6 +2149,106 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#pop" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when no argument is provided" do
+
+      let!(:address_one) do
+        person.addresses.create(:street => "sonnenallee")
+      end
+
+      let!(:address_two) do
+        person.addresses.create(:street => "hermannstr")
+      end
+
+      let!(:popped) do
+        person.addresses.pop
+      end
+
+      it "returns the popped document" do
+        popped.should eq(address_two)
+      end
+
+      it "removes the document from the relation" do
+        person.addresses.should eq([ address_one ])
+      end
+
+      it "persists the pop" do
+        person.reload.addresses.should eq([ address_one ])
+      end
+    end
+
+    context "when an integer is provided" do
+
+      let!(:address_one) do
+        person.addresses.create(:street => "sonnenallee")
+      end
+
+      let!(:address_two) do
+        person.addresses.create(:street => "hermannstr")
+      end
+
+      context "when the number is not larger than the relation" do
+
+        let!(:popped) do
+          person.addresses.pop(2)
+        end
+
+        it "returns the popped documents" do
+          popped.should eq([ address_one, address_two ])
+        end
+
+        it "removes the document from the relation" do
+          person.addresses.should be_empty
+        end
+
+        it "persists the pop" do
+          person.reload.addresses.should be_empty
+        end
+      end
+
+      context "when the number is larger than the relation" do
+
+        let!(:popped) do
+          person.addresses.pop(4)
+        end
+
+        it "returns the popped documents" do
+          popped.should eq([ address_one, address_two ])
+        end
+
+        it "removes the document from the relation" do
+          person.addresses.should be_empty
+        end
+
+        it "persists the pop" do
+          person.reload.addresses.should be_empty
+        end
+      end
+    end
+
+    context "when the relation is empty" do
+
+      context "when providing no number" do
+
+        it "returns nil" do
+          person.addresses.pop.should be_nil
+        end
+      end
+
+      context "when providing a number" do
+
+        it "returns nil" do
+          person.addresses.pop(2).should be_nil
+        end
+      end
+    end
+  end
+
   describe "#scoped" do
 
     let(:person) do

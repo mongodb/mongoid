@@ -134,6 +134,11 @@ For instructions on upgrading to newer versions, visit
 
 * \#1348 Eager loading is now supported on many-to-many relations.
 
+* \#1212 Embedded documents can now be popped off a relation with persistence.
+
+        band.albums.pop # Pop 1 document and persist the removal.
+        band.albums.pop(3) # Pop 3 documents and persist the removal.
+
 * \#1081 Mongoid indexes both id and type as a compound index when providing
   `index: true` to a polymorphic belongs_to.
 
