@@ -163,7 +163,7 @@ For instructions on upgrading to newer versions, visit
   combination of `Model.pre_processed_defaults` and
   `Model.post_processed_defaults`
 
-* `Model.identity` and `Model.key` have been removed. For custome ids,
+* `Model.identity` and `Model.key` have been removed. For custom ids,
   users must now override the _id field.
 
     When the default value is a proc, the default is applied *after* all
