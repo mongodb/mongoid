@@ -171,7 +171,7 @@ For instructions on upgrading to newer versions, visit
 
         class Band
           include Mongoid::Document
-          field :_id, type: String, default: ->{ name }`
+          field :_id, type: String, default: ->{ name }
         end
 
     To have the default applied *before* other attributes, set `:pre_processed`
