@@ -22,7 +22,33 @@ For instructions on upgrading to newer versions, visit
   set a child on a relation without the proper inverse_of definitions
   due to Mongoid not being able to determine it.
 
+        class Lush
+          include Mongoid::Document
+          embeds_one :whiskey, class_name: "Drink"
+        end
+
+        class Drink
+          include Mongoid::Document
+          embedded_in :alcoholic, class_name: "Lush"
+        end
+
+        lush = Lush.new
+        lush.whiskey = Drink.new # raises an InverseNotFound error.
+
 * \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
+
+        class User
+          include Mongoid::Document
+          has_many :comments, as: :commentable
+        end
+
+        class Comment
+          include Mongoid::Document
+          belongs_to :commentable, polymorphic: true
+        end
+
+        user = User.find(id)
+        user.comments # Uses user.id and type "User" in the query.
 
 * \#1677 Support for parent separable polymorphic relations to the same
   parent class is now available. This only works if set from the parent
@@ -49,6 +75,15 @@ For instructions on upgrading to newer versions, visit
 
 * \#1650 Objects that respond to \#to_criteria can now be merged into
   existing criteria objects.
+
+        class Filter
+          def to_criteria
+            # return a Criteria object.
+          end
+        end
+
+        criteria = Person.where(title: "Sir")
+        criteria.merge(filter)
 
 * \#1635 All exceptions now provide more comprehensive errors, including
   the problem that occured, a detail summary of why it happened, and
@@ -102,9 +137,25 @@ For instructions on upgrading to newer versions, visit
 * \#1081 Mongoid indexes both id and type as a compound index when providing
   `index: true` to a polymorphic belongs_to.
 
+        class Comment
+          include Mongoid::Document
+
+          # Indexes commentable_id and commentable_type as a compound index.
+          belongs_to :commentable, polymorphic: true, index: true
+        end
+
 * \#1053 Raise a `Mongoid::Errors::UnknownAttribute` instead of no method
   when attempting to set a field that is not defined and allow dynamic
   fields is false. (Cyril Mougel)
+
+        Mongoid.allow_dynamic_fields = false
+
+        class Person
+          include Mongoid::Document
+          field :title, type: String
+        end
+
+        Person.new.age = 50 # raises the UnknownAttribute error.
 
 ### Major Changes
 
