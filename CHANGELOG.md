@@ -24,6 +24,29 @@ For instructions on upgrading to newer versions, visit
 
 * \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
 
+* \#1677 Support for parent separable polymorphic relations to the same
+  parent class is now available. This only works if set from the parent
+  side in order to know which relation the children belong to.
+  (Douwe Maan)
+
+        class Face
+          include Mongoid::Document
+          has_one :left_eye, class_name: "Eye", as: :visible
+          has_one :right_eye, class_name: "Eye", as: :visible
+        end
+
+        class Eye
+          include Mongoid::Document
+          belongs_to :visible, polymorphic: true
+        end
+
+        face = Face.new
+        right_eye = Eye.new
+        left_eye = Eye.new
+        face.right_eye = right_eye
+        face.left_eye = left_eye
+        right_eye.face = face # Will raise an error.
+
 * \#1650 Objects that respond to \#to_criteria can now be merged into
   existing criteria objects.
 
