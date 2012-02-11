@@ -1,6 +1,5 @@
 class Person
   include Mongoid::Document
-  include Mongoid::MultiParameterAttributes
   include Mongoid::Timestamps
   include Mongoid::Versioning
 

@@ -1,6 +1,5 @@
 class Post
   include Mongoid::Document
-  include Mongoid::MultiParameterAttributes
   include Mongoid::Versioning
   include Mongoid::Timestamps
 
