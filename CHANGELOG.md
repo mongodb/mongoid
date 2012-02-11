@@ -164,8 +164,26 @@ For instructions on upgrading to newer versions, visit
   `Model.post_processed_defaults`
 
 * `Model.identity` and `Model.key` have been removed. For custome ids,
-  users must now override the _id field like so:
-  `field :_id, type: String, default: ->{ name }`.
+  users must now override the _id field.
+
+    When the default value is a proc, the default is applied *after* all
+    other attributes are set.
+
+        class Band
+          include Mongoid::Document
+          field :_id, type: String, default: ->{ name }`
+        end
+
+    To have the default applied *before* other attributes, set `:pre_processed`
+    to true.
+
+        class Band
+          include Mongoid::Document
+          field :_id,
+            type: String,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new.to_s }
+        end
 
 * Custom application exceptions in various languages has been removed,
   along with the `Mongoid.add_language` feature.
