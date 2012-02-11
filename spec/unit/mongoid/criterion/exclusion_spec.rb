@@ -135,7 +135,7 @@ describe Mongoid::Criterion::Exclusion do
     context "when args are provided" do
 
       before do
-        Person.create(age: 50)
+        Person.create(:age => 50)
       end
 
       let(:criteria) do
@@ -180,7 +180,7 @@ describe Mongoid::Criterion::Exclusion do
   describe "#without" do
 
     let!(:person) do
-      Person.create(ssn: "123-11-1233")
+      Person.create(:ssn => "123-11-1233")
     end
 
     context "when used in a named scope" do
