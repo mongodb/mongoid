@@ -1,6 +1,8 @@
 class Phone
   include Mongoid::Document
 
+  attr_accessor :number_in_observer
+
   field :_id, type: String, default: ->{ number }
 
   field :number

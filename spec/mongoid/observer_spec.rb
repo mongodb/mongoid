@@ -14,6 +14,32 @@ describe Mongoid::Observer do
     ActorObserver.instance.should be_a_kind_of(ActiveModel::Observer)
   end
 
+  context "when the observer is for an embedded document" do
+
+    before do
+      PhoneObserver.instance
+    end
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:phone) do
+      person.phone_numbers.create(:number => "0152-1111-1111")
+    end
+
+    context "when updating the embedded document" do
+
+      before do
+        phone.update_attribute(:number, "0152-2222-2222")
+      end
+
+      it "contains the updated value in the observer" do
+        phone.number_in_observer.should eq("0152-2222-2222")
+      end
+    end
+  end
+
   context "when the observer has descendants" do
 
     let!(:observer) do
