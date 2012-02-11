@@ -245,6 +245,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1705 Allow changing the order of many to many foreign keys.
+
 * \#1703 Updated at is now versioned again. (Lucas Souza)
 
 * \#1686 Set the base metadata on unbind as well as bind for belongs to

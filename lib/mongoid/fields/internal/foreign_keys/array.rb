@@ -13,6 +13,8 @@ module Mongoid #:nodoc:
           # @example Add the atomic changes.
           #   field.add_atomic_changes(doc, "key", {}, [], [])
           #
+          # @todo: Durran: Refactor, big time.
+          #
           # @param [ Document ] document The document to add to.
           # @param [ String ] name The name of the field.
           # @param [ String ] key The atomic location of the field.
@@ -32,6 +34,8 @@ module Mongoid #:nodoc:
               document.atomic_array_add_to_sets[key] = pushes
             elsif !pulls.empty?
               document.atomic_array_pulls[key] = pulls
+            elsif new != old
+              mods[key] = document.attributes[name]
             end
           end
 
