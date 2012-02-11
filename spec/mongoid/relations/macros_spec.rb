@@ -3,11 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Macros do
 
   class TestClass
-    include Mongoid::Relations
-    include Mongoid::Dirty
-    include Mongoid::Fields
-    include Mongoid::Callbacks
-    include Mongoid::Validations
+    include Mongoid::Document
   end
 
   let(:klass) do

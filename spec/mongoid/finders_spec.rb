@@ -55,7 +55,9 @@ describe Mongoid::Finders do
       context "when passed a string" do
 
         let!(:person) do
-          Person.create(:_id => 1)
+          Person.create do |doc|
+            doc._id = 1
+          end
         end
 
         let(:from_db) do
@@ -70,7 +72,9 @@ describe Mongoid::Finders do
       context "when passed an array of strings" do
 
         let!(:person) do
-          Person.create(:_id => 2)
+          Person.create do |doc|
+            doc._id = 2
+          end
         end
 
         let(:from_db) do

@@ -856,4 +856,49 @@ describe Mongoid::Fields do
       person.map_with_default.should eq({ "key" => "testing" })
     end
   end
+
+  context "when auto protecting id and type" do
+
+    context "when redefining as accessible" do
+
+      before do
+        Person.attr_accessible :id, :_id, :_type
+      end
+
+      after do
+        Person.attr_protected :id, :_id, :_type
+      end
+
+      let(:bson_id) do
+        BSON::ObjectId.new
+      end
+
+      it "allows mass assignment of id" do
+        Person.new(:_id => bson_id).id.should eq(bson_id)
+      end
+
+      it "allows mass assignment of type" do
+        Person.new(:_type => "Something")._type.should eq("Something")
+      end
+    end
+
+    context "when redefining as protected" do
+
+      before do
+        Person.attr_protected :id, :_id, :_type
+      end
+
+      let(:bson_id) do
+        BSON::ObjectId.new
+      end
+
+      it "protects assignment of id" do
+        Person.new(:_id => bson_id).id.should_not eq(bson_id)
+      end
+
+      it "protects assignment of type" do
+        Person.new(:_type => "Something")._type.should_not eq("Something")
+      end
+    end
+  end
 end

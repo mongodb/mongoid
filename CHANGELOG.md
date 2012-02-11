@@ -109,6 +109,15 @@ For instructions on upgrading to newer versions, visit
 
         Band.find_by(name: "Depeche Mode")
 
+* \#1477 Mongoid now automatically protects the id and type attributes
+  from mass assignment. You can override this (not recommended) by redefining
+  them as accessible.
+
+        class Band
+          include Mongoid::Document
+          attr_accessible :id, :_id, :_type
+        end
+
 * \#1459 The identity map can be disabled now for specific code execution
   by passing options to the unit of work.
 

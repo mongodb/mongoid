@@ -517,15 +517,21 @@ describe Mongoid::Criterion::Inclusion do
       context "when ids are not object ids" do
 
         let!(:jar_one) do
-          Jar.create(:_id => 114869287646134350)
+          Jar.create do |doc|
+            doc._id = 114869287646134350
+          end
         end
 
         let!(:jar_two) do
-          Jar.create(:_id => 114869287646134388)
+          Jar.create do |doc|
+            doc._id = 114869287646134388
+          end
         end
 
         let!(:jar_three) do
-          Jar.create(:_id => 114869287646134398)
+          Jar.create do |doc|
+            doc._id = 114869287646134398
+          end
         end
 
         context "when the documents are found" do

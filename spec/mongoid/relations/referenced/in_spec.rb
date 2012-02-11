@@ -1130,7 +1130,9 @@ describe Mongoid::Relations::Referenced::In do
   context "when creating with a reference to an integer id parent" do
 
     let!(:jar) do
-      Jar.create(:_id => 1)
+      Jar.create do |doc|
+        doc._id = 1
+      end
     end
 
     let(:cookie) do

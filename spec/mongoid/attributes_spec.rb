@@ -629,7 +629,6 @@ describe Mongoid::Attributes do
 
       let!(:attributes) do
         {
-          :_id => bson_id,
           :title => "value",
           :age => "30",
           :terms => "true",
@@ -654,10 +653,6 @@ describe Mongoid::Attributes do
 
       it "casts booleans" do
         person[:terms].should be_true
-      end
-
-      it "casts ids" do
-        person[:_id].should eq(bson_id)
       end
 
       it "sets empty strings to nil" do

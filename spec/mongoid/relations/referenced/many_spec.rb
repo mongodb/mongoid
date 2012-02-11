@@ -183,7 +183,9 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           let(:post) do
-            Post.new(:_id => existing.id)
+            Post.new do |doc|
+              doc._id = existing.id
+            end
           end
 
           it "raises an error" do
@@ -1438,7 +1440,9 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "raises an error" do
             expect {
-              person.posts.safely.create(:_id => existing.id)
+              person.posts.safely.create do |doc|
+                doc._id = existing.id
+              end
             }.to raise_error(Mongo::OperationFailure)
           end
         end
@@ -3056,7 +3060,9 @@ describe Mongoid::Relations::Referenced::Many do
   context "when the parent is using integer ids" do
 
     let(:jar) do
-      Jar.create(:_id => 1)
+      Jar.create do |doc|
+        doc._id = 1
+      end
     end
 
     it "allows creation of the document" do
