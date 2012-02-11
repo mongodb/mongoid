@@ -73,6 +73,7 @@ module Mongoid #:nodoc:
       _assigning do
         access = name.to_s
         attribute_will_change!(access)
+        atomic_unsets.push(access)
         attributes.delete(access)
       end
     end

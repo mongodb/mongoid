@@ -955,18 +955,45 @@ describe Mongoid::Attributes do
 
     context "when the attribute exists" do
 
-      it "removes the attribute" do
-        person = Person.new(:title => "Sir")
+      let(:person) do
+        Person.create(:title => "Sir")
+      end
+
+      before do
         person.remove_attribute(:title)
+      end
+
+      it "removes the attribute" do
         person.title.should be_nil
+      end
+
+      it "removes the key from the attributes hash" do
+        person.has_attribute?(:title).should be_false
+      end
+
+      context "when saving after the removal" do
+
+        before do
+          person.save
+        end
+
+        it "persists the removal" do
+          person.reload.has_attribute?(:title).should be_false
+        end
       end
     end
 
     context "when the attribute does not exist" do
 
-      it "does nothing" do
-        person = Person.new
+      let(:person) do
+        Person.new
+      end
+
+      before do
         person.remove_attribute(:title)
+      end
+
+      it "does not fail" do
         person.title.should be_nil
       end
     end

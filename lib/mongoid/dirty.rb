@@ -140,7 +140,9 @@ module Mongoid #:nodoc:
                 old
               )
             else
-              modifications[key] = new
+              unless atomic_unsets.include?(key)
+                modifications[key] = new
+              end
             end
           end
         end

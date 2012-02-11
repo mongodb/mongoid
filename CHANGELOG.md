@@ -143,6 +143,12 @@ For instructions on upgrading to newer versions, visit
 
 * \#1348 Eager loading is now supported on many-to-many relations.
 
+* \#1292 Remove attribute now unsets the attribute when the document is
+  saved instead of setting to nil.
+
+        band = Band.find(id)
+        band.remove_attribute(:label) # Uses $unset when the document is saved.
+
 * \#1212 Embedded documents can now be popped off a relation with persistence.
 
         band.albums.pop # Pop 1 document and persist the removal.
