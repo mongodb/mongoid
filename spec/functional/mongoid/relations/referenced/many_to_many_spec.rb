@@ -2508,4 +2508,40 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  context "when changing the order of existing ids" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:preference_one) do
+      Preference.create(:name => "one")
+    end
+
+    let(:preference_two) do
+      Preference.create(:name => "two")
+    end
+
+    before do
+      person.preference_ids = [ preference_one.id, preference_two.id ]
+      person.save
+    end
+
+    context "and the order is changed" do
+
+      before do
+        person.preference_ids = [ preference_two.id, preference_one.id ]
+        person.save
+      end
+
+      let(:reloaded) do
+        Person.find(person.id)
+      end
+
+      it "persists the change in id order" do
+        reloaded.preference_ids.should eq([ preference_two.id, preference_one.id ])
+      end
+    end
+  end
 end
