@@ -78,7 +78,7 @@ module Rails #:nodoc:
       initializer "setup database" do
         config_file = Rails.root.join("config", "mongoid.yml")
         # @todo: Durran: Remove extra check when #1291 complete.
-        if config_file.file? &&
+        if config_file.file? && (ARGV[0] || '').slice(0,17) != 'assets:precompile' &&
           YAML.load(ERB.new(File.read(config_file)).result)[Rails.env].values.flatten.any?
           ::Mongoid.load!(config_file)
         end
