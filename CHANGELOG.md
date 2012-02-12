@@ -71,7 +71,7 @@ For instructions on upgrading to newer versions, visit
         left_eye = Eye.new
         face.right_eye = right_eye
         face.left_eye = left_eye
-        right_eye.face = face # Will raise an error.
+        right_eye.visible = face # Will raise an error.
 
 * \#1650 Objects that respond to \#to_criteria can now be merged into
   existing criteria objects.
