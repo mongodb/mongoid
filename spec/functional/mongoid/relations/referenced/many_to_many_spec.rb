@@ -2543,5 +2543,47 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         reloaded.preference_ids.should eq([ preference_two.id, preference_one.id ])
       end
     end
+
+    context "and the order is changed and an element is added" do
+
+      let(:preference_three) do
+        Preference.create(:name => "three")
+      end
+
+      before do
+        person.preference_ids = [ preference_two.id, preference_one.id, preference_three.id ]
+        person.save
+      end
+
+      let(:reloaded) do
+        Person.find(person.id)
+      end
+
+      it "also persists the change in id order" do
+        reloaded.preference_ids.should eq([ preference_two.id, preference_one.id, preference_three.id ])
+      end
+    end
+
+    context "and the order is changed and an element is removed" do
+
+      let(:preference_three) do
+        Preference.create(:name => "three")
+      end
+
+      before do
+        person.preference_ids = [ preference_one.id, preference_two.id, preference_three.id ]
+        person.save
+        person.preference_ids = [ preference_three.id, preference_two.id ]
+        person.save
+      end
+
+      let(:reloaded) do
+        Person.find(person.id)
+      end
+
+      it "also persists the change in id order" do
+        reloaded.preference_ids.should eq([ preference_three.id, preference_two.id ])
+      end
+    end
   end
 end
