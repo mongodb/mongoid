@@ -23,17 +23,22 @@ module Mongoid #:nodoc:
           # @param [ Array ] old The old elements getting removed.
           #
           # @since 2.4.0
-          def add_atomic_changes(document, name, key, mods, new, old)
-            pushes = (new || []) - (old || [])
-            pulls = (old || []) - (new || [])
-            if old.nil?
-              mods[key] = pushes
-            elsif !pushes.empty? && !pulls.empty?
-              mods[key] = document.attributes[name]
-            elsif !pushes.empty?
-              document.atomic_array_add_to_sets[key] = pushes
-            elsif !pulls.empty?
-              document.atomic_array_pulls[key] = pulls
+          def add_atomic_changes(document, name, key, mods, new_elements, old_elements)
+            old = (old_elements || [])
+            new = (new_elements || [])
+            if new.length > old.length
+              if new.first(old.length) == old
+                document.atomic_array_add_to_sets[key] = new.drop(old.length)
+              else
+                mods[key] = document.attributes[name]
+              end
+            elsif new.length < old.length
+              pulls = old - new
+              if new == old - pulls
+                document.atomic_array_pulls[key] = pulls
+              else
+                mods[key] = document.attributes[name]
+              end
             elsif new != old
               mods[key] = document.attributes[name]
             end
