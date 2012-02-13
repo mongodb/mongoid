@@ -270,6 +270,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1713 Fixing === checks when comparing a class with an instance of a
+  subclass.
+
 * \#1495 Callbacks no longer get the 'super called outside of method` errors on
   busted 1.8.7 rubies.
 
