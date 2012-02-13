@@ -99,7 +99,7 @@ describe Mongoid::Copyable do
             end
           end
 
-          context "when saving the copy" do
+          pending "when saving the copy" do
 
             let(:reloaded) do
               copy.reload
