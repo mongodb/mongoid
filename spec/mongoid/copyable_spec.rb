@@ -99,14 +99,14 @@ describe Mongoid::Copyable do
             end
           end
 
-          pending "when saving the copy" do
+          context "when saving the copy" do
 
             let(:reloaded) do
               copy.reload
             end
 
             before do
-              copy.save
+              copy.save(:validate => false)
             end
 
             it "persists the attributes" do
@@ -199,7 +199,7 @@ describe Mongoid::Copyable do
             end
 
             before do
-              copy.save
+              copy.save(:validate => false)
             end
 
             it "persists the attributes" do
@@ -282,7 +282,7 @@ describe Mongoid::Copyable do
           end
 
           before do
-            copy.save
+            copy.save(:validate => false)
           end
 
           it "persists the attributes" do
