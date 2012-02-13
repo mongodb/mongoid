@@ -129,6 +129,84 @@ describe Mongoid::Serialization do
       end
     end
 
+    context "when a model has relations" do
+      let(:attributes) do
+        { "title" => "President", "security_code" => "1234" }
+      end
+
+      before do
+        person.write_attributes(attributes, false)
+      end
+
+      context "when the model is saved before the relation is added" do
+
+        before do
+          person.save
+        end
+
+        context "when a model has an embeds many" do
+
+          let!(:address_one) do
+            person.addresses.build(:street => "Kudamm")
+          end
+
+          before do
+            person.save
+          end
+
+          it "includes the relation" do
+            person.serializable_hash.keys.should include('addresses')
+          end
+        end
+
+        context "when a model has an embeds one" do
+          let!(:name) do
+            person.build_name(:first_name => "Leo", :last_name => "Marvin")
+          end
+
+          before do
+            person.save
+          end
+
+          it "includes the relation" do
+            person.serializable_hash.keys.should include('name')
+          end
+        end
+      end
+
+      context "when the model is saved after the relation is added" do
+
+        context "when a model has an embeds many" do
+
+          let!(:address_one) do
+            person.addresses.build(:street => "Kudamm")
+          end
+
+          before do
+            person.save
+          end
+
+          it "includes the relation" do
+            person.serializable_hash.keys.should include('addresses')
+          end
+        end
+
+        context "when a model has an embeds one" do
+          let!(:name) do
+            person.build_name(:first_name => "Leo", :last_name => "Marvin")
+          end
+
+          before do
+            person.save
+          end
+
+          it "includes the relation" do
+            person.serializable_hash.keys.should include('name')
+          end
+        end
+      end
+    end
+
     context "when including methods" do
 
       it "includes the method result" do
