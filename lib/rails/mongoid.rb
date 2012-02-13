@@ -26,10 +26,11 @@ module Rails #:nodoc:
           })
         end
         if model
+          next if model.index_options.empty?
           model.create_indexes
-          logger.info("Generated indexes for #{model}")
+          logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
         else
-          logger.info("Not a Mongoid parent model: #{file}")
+          logger.info("Index ignored on: #{file}, please define in the root Model")
         end
       end
     end
@@ -84,19 +85,19 @@ module Rails #:nodoc:
     #
     # @since 2.1.0
     def determine_model(file, logger)
-      if file =~ /app\/models\/(.*).rb$/
-        model_path = $1.split('/')
-        begin
-          parts = model_path.map { |path| path.camelize }
-          name = parts.join("::")
-          klass = name.constantize
-        rescue NameError => e
-          logger.info("Attempted to constantize #{name}, trying without namespacing.")
-          klass = parts.last.constantize
-        end
-        if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
-          return klass
-        end
+      return nil unless file =~ /app\/models\/(.*).rb$/
+      return nil unless logger
+
+      model_path = $1.split('/')
+      begin
+        parts = model_path.map { |path| path.camelize }
+        name = parts.join("::")
+        klass = name.constantize
+      rescue NameError => e
+        klass = parts.last.constantize
+      end
+      if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
+        return klass
       end
     end
   end
