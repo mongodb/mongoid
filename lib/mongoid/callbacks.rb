@@ -39,9 +39,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
-      run_cascading_callbacks(cascadable_children(kind), kind, *args) do
-        super(kind, *args, &block)
-      end
+      run_cascading_callbacks(cascadable_children(kind), kind, *args) {}
+      super(kind, *args, &block)
     end
 
     private
