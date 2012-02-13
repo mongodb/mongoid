@@ -7,6 +7,12 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1710 For cases when you don't want Mongoid to auto-protect the id
+  and type attributes, you can set a configuration option to turn this
+  off.
+
+        Mongoid.protect_sensitive_fields = false
+
 * \#1685 Belongs to relations now have build_ and create_ methods.
 
         class Comment

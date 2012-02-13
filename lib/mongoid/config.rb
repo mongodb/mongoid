@@ -28,6 +28,7 @@ module Mongoid #:nodoc
     option :scope_overwrite_exception, :default => false
     option :persist_in_safe_mode, :default => false
     option :preload_models, :default => false
+    option :protect_sensitive_fields, :default => true
     option :raise_not_found_error, :default => true
     option :skip_version_check, :default => false
     option :time_zone, :default => nil

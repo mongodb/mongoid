@@ -857,47 +857,83 @@ describe Mongoid::Fields do
     end
   end
 
-  context "when auto protecting id and type" do
+  context "when dealing with auto protection" do
 
-    context "when redefining as accessible" do
+    context "when auto protect ids and types is true" do
 
-      before do
-        Person.attr_accessible :id, :_id, :_type
+      context "when redefining as accessible" do
+
+        before do
+          Person.attr_accessible :id, :_id, :_type
+        end
+
+        after do
+          Person.attr_protected :id, :_id, :_type
+        end
+
+        let(:bson_id) do
+          BSON::ObjectId.new
+        end
+
+        it "allows mass assignment of id" do
+          Person.new(:_id => bson_id).id.should eq(bson_id)
+        end
+
+        it "allows mass assignment of type" do
+          Person.new(:_type => "Something")._type.should eq("Something")
+        end
       end
 
-      after do
-        Person.attr_protected :id, :_id, :_type
-      end
+      context "when redefining as protected" do
 
-      let(:bson_id) do
-        BSON::ObjectId.new
-      end
+        before do
+          Person.attr_protected :id, :_id, :_type
+        end
 
-      it "allows mass assignment of id" do
-        Person.new(:_id => bson_id).id.should eq(bson_id)
-      end
+        let(:bson_id) do
+          BSON::ObjectId.new
+        end
 
-      it "allows mass assignment of type" do
-        Person.new(:_type => "Something")._type.should eq("Something")
+        it "protects assignment of id" do
+          Person.new(:_id => bson_id).id.should_not eq(bson_id)
+        end
+
+        it "protects assignment of type" do
+          Person.new(:_type => "Something")._type.should_not eq("Something")
+        end
       end
     end
 
-    context "when redefining as protected" do
+    context "when auto protecting ids and types is false" do
 
       before do
-        Person.attr_protected :id, :_id, :_type
+        Mongoid.protect_sensitive_fields = false
+      end
+
+      after do
+        Mongoid.protect_sensitive_fields = true
+      end
+
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+        end
       end
 
       let(:bson_id) do
         BSON::ObjectId.new
       end
 
-      it "protects assignment of id" do
-        Person.new(:_id => bson_id).id.should_not eq(bson_id)
+      let(:model) do
+        klass.new(:id => bson_id, :_type => "Model")
       end
 
-      it "protects assignment of type" do
-        Person.new(:_type => "Something")._type.should_not eq("Something")
+      it "allows mass assignment of id" do
+        model.id.should eq(bson_id)
+      end
+
+      it "allows mass assignment of type" do
+        model._type.should eq("Model")
       end
     end
   end

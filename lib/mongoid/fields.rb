@@ -56,7 +56,7 @@ module Mongoid #:nodoc
       alias :id :_id
       alias :id= :_id=
 
-      attr_protected :id, :_id, :_type
+      attr_protected(:id, :_id, :_type) if Mongoid.protect_sensitive_fields?
     end
 
     # Apply all default values to the document which are not procs.
