@@ -90,7 +90,7 @@ module Rails #:nodoc:
           parts = model_path.map { |path| path.camelize }
           name = parts.join("::")
           klass = name.constantize
-        rescue NameError => e
+        rescue NameError, LoadError => e
           logger.info("Attempted to constantize #{name}, trying without namespacing.")
           klass = parts.last.constantize
         end
