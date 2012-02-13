@@ -7,121 +7,152 @@ describe "Rails::Mongoid" do
   end
 
   describe ".create_indexes" do
+    let(:pattern) { "spec/app/models/**/*.rb" }
+    let(:logger) { stub }
+    let(:klass) { Person }
+    let(:model_paths) { [ "spec/app/models/person.rb" ] }
+    let(:indexes) { Rails::Mongoid.create_indexes(pattern) }
 
-    context "when an exception is raised" do
-
-      let(:model) do
-        stub
-      end
-
-      before do
-        Rails::Mongoid.expects(:determine_model).returns(model)
-        model.expects(:create_indexes).raises(Mongo::MongoArgumentError)
-      end
-
-      it "is not swallowed" do
-        expect {
-          Rails::Mongoid.create_indexes("spec/app/models/**/*.rb")
-        }.to raise_error(Mongo::MongoArgumentError)
-      end
-    end
-
-    context "when models exist in subdirectories" do
-
-      context "when the model is namespaced" do
-
-        module Twitter
-          class Follow
-            include Mongoid::Document
-          end
-        end
-
-        let(:files) do
-          ["/app/models/twitter/follow.rb"]
-        end
-
-        before do
-          Dir.expects(:glob).with("/app/models/**/*.rb").returns(files)
-        end
-
-        it "loads the model with the namespacing" do
-          Twitter::Follow.expects(:create_indexes).once
-          Rails::Mongoid.create_indexes("/app/models/**/*.rb")
-        end
-      end
-
-      context "when the model is not namespaced" do
-
-        class Unfollow
-          include Mongoid::Document
-        end
-
-        let(:files) do
-          ["/app/models/twitter/unfollow.rb"]
-        end
-
-        before do
-          Dir.expects(:glob).with("/app/models/**/*.rb").returns(files)
-        end
-
-        it "loads the model with the namespacing" do
-          Unfollow.expects(:create_indexes).once
-          Rails::Mongoid.create_indexes("/app/models/**/*.rb")
-        end
-      end
+    before do
+      Dir.expects(:glob).with(pattern).returns(model_paths).once
+      Logger.expects(:new).returns(logger)
     end
 
     context "with ordinary Rails models" do
-
-      let(:model_paths) do
-        Dir.glob("spec/app/models/**/*.rb")
+      it "creates the indexes for the models" do
+        klass.expects(:create_indexes).once
+        logger.expects(:info).once
+        indexes
       end
+    end
 
-      let(:models) do
-        [].tap do |documents|
-          model_paths.each do |file|
-            file_path = Pathname.new(file).realpath
-            spec_path = Pathname.new("spec/app/models").realpath
-            model_path = file_path.relative_path_from(spec_path).to_s.gsub('.rb', '').split('/')
-            begin
-              klass = model_path.map { |path| path.camelize }.join('::').constantize
-              if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
-                documents << klass
-              end
-            rescue
-            end
-          end
-        end
+    context "with a model without indexes" do
+      let(:model_paths) { [ "spec/app/models/account.rb" ] }
+      let(:klass) { Account }
+
+      it "does nothing" do
+        klass.expects(:create_indexes).never
+        indexes
       end
+    end
+
+    context "when an exception is raised" do
+      it "is not swallowed" do
+        Rails::Mongoid.expects(:determine_model).returns(klass)
+        klass.expects(:create_indexes).raises(Mongo::MongoArgumentError)
+        expect { indexes }.to raise_error(Mongo::MongoArgumentError)
+      end
+    end
+
+    context "when index is defined on embedded model" do
+      let(:klass) { Address }
+      let(:model_paths) { [ "spec/app/models/address.rb" ] }
 
       before do
-        models.each do |klass|
-          klass.expects(:create_indexes).once
+        klass.index_options = { :city => {} }
+      end
+
+      it "does nothing, but logging" do
+        klass.expects(:create_indexes).never
+        logger.expects(:info).once
+        indexes
+      end
+    end
+  end
+
+  describe ".determine_model" do
+    let(:logger) { stub }
+    let(:klass) { Person }
+    let(:file) { "app/models/person.rb" }
+    let(:model) { Rails::Mongoid.send(:determine_model, file, logger) }
+
+    module Twitter
+      class Follow
+        include Mongoid::Document
+      end
+
+      module List
+        class Tweet
+          include Mongoid::Document
+        end
+      end
+    end
+
+    context "when file is nil" do
+      let(:file) { nil }
+
+      it "returns nil" do
+        model.should be_nil
+      end
+    end
+
+    context "when logger is nil" do
+      let(:logger) { nil }
+
+      it "returns nil" do
+        model.should be_nil
+      end
+    end
+
+    context "when path is invalid" do
+      let(:file) { "fu/bar.rb" }
+
+      it "returns nil" do
+        model.should be_nil
+      end
+    end
+
+    context "when file is not in a subdir" do
+      context "when file is from normal model" do
+        it "returns klass" do
+          model.should eq(klass)
         end
       end
 
-      it "creates the indexes for each model" do
-        Rails::Mongoid.create_indexes("spec/app/models/**/*.rb")
+      context "when file is in a module" do
+        let(:klass) { Twitter::Follow }
+        let(:file) { "app/models/follow.rb" }
+
+        it "raises NameError" do
+          expect { model.should eq(klass) }.to raise_error(NameError)
+        end
+      end
+    end
+
+    context "when file is in a subdir" do
+      context "with file from normal model" do
+        let(:file) { "app/models/fu/person.rb" }
+
+        it "returns klass" do
+          model.should eq(klass)
+        end
+      end
+
+      context "when file is in a module" do
+        let(:klass) { Twitter::Follow }
+        let(:file) { "app/models/twitter/follow.rb" }
+
+        it "returns klass in module" do
+          model.should eq(klass)
+        end
+      end
+
+      context "when file is in two modules" do
+        let(:klass) { Twitter::List::Tweet }
+        let(:file) { "app/models/twitter/list/tweet.rb" }
+
+        it "returns klass in module" do
+          model.should eq(klass)
+        end
       end
     end
 
     context "with models present in Rails engines" do
-
-      let(:files) do
-        ["/gem_path/engines/some_engine_gem/app/models/carrot.rb"]
-      end
-
-      before do
-        class Carrot
-          include Mongoid::Document
-        end
-
-        Dir.expects(:glob).with("/gem_path/engines/some_engine_gem/app/models/**/*.rb").returns(files)
-      end
+      let(:file) { "/gem_path/engines/some_engine_gem/app/models/person.rb" }
+      let(:klass) { Person }
 
       it "requires the models by base name from the engine's app/models dir" do
-        Carrot.expects(:create_indexes).once
-        Rails::Mongoid.create_indexes("/gem_path/engines/some_engine_gem/app/models/**/*.rb")
+        model.should eq(klass)
       end
     end
   end
