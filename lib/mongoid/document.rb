@@ -276,7 +276,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.4
       def ===(other)
-        self == (other.is_a?(Class) ? other : other.class)
+        other.is_a?(Class) ? self == other : other.is_a?(self)
       end
 
       # Instantiate a new object, only when loaded from the database or when
