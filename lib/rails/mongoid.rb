@@ -27,10 +27,12 @@ module Rails #:nodoc:
         end
         if model
           next if model.index_options.empty?
-          model.create_indexes
-          logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
-        else
-          logger.info("Index ignored on: #{model}, please define in the root model.")
+          unless model.embedded?
+            model.create_indexes
+            logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
+          else
+            logger.info("Index ignored on: #{model}, please define in the root model.")
+          end
         end
       end
     end
@@ -97,7 +99,7 @@ module Rails #:nodoc:
         logger.info("Attempted to constantize #{name}, trying without namespacing.")
         klass = parts.last.constantize
       end
-      if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
+      if klass.ancestors.include?(::Mongoid::Document)
         return klass
       end
     end
