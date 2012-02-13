@@ -253,7 +253,14 @@ For instructions on upgrading to newer versions, visit
 
 * \#1135 DateTimes now properly get time zones on derserialization.
 
-## 2.4.4 (branch: 2.4.0-stable)
+## 2.4.5 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#1495 Callbacks no longer get the 'super called outside of method` errors on
+  busted 1.8.7 rubies.
+
+## 2.4.4
 
 ### Resolved Issues
 
