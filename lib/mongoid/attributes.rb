@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/attributes/processing"
+require "mongoid/attributes/readonly"
 
 module Mongoid #:nodoc:
 
@@ -8,6 +9,7 @@ module Mongoid #:nodoc:
   module Attributes
     extend ActiveSupport::Concern
     include Processing
+    include Readonly
 
     attr_reader :attributes
     alias :raw_attributes :attributes
@@ -68,10 +70,16 @@ module Mongoid #:nodoc:
     #
     # @param [ String, Symbol ] name The name of the attribute to remove.
     #
+    # @raise [ Errors::ReadonlyAttribute ] If the field cannot be removed due
+    #   to being flagged as reaodnly.
+    #
     # @since 1.0.0
     def remove_attribute(name)
+      access = name.to_s
+      unless attribute_writable?(name)
+        raise Errors::ReadonlyAttribute.new(name, :nil)
+      end
       _assigning do
-        access = name.to_s
         attribute_will_change!(access)
         atomic_unsets.push(access)
         attributes.delete(access)
@@ -110,17 +118,19 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      _assigning do
-        access = name.to_s
-        localized = fields[access].try(:localized?)
-        typed_value_for(access, value).tap do |typed_value|
-          unless attributes[access] == typed_value || attribute_changed?(access)
-            attribute_will_change!(access)
-          end
-          if localized
-            (attributes[access] ||= {}).merge!(typed_value)
-          else
-            attributes[access] = typed_value
+      access = name.to_s
+      if attribute_writable?(access)
+        _assigning do
+          localized = fields[access].try(:localized?)
+          typed_value_for(access, value).tap do |typed_value|
+            unless attributes[access] == typed_value || attribute_changed?(access)
+              attribute_will_change!(access)
+            end
+            if localized
+              (attributes[access] ||= {}).merge!(typed_value)
+            else
+              attributes[access] = typed_value
+            end
           end
         end
       end

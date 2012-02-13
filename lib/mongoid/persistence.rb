@@ -100,10 +100,16 @@ module Mongoid #:nodoc:
     # @param [ Symbol, String ] name The name of the attribute.
     # @param [ Object ] value The new value of the attribute.a
     #
+    # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due
+    #   to being flagged as reaodnly.
+    #
     # @return [ true, false ] True if save was successfull, false if not.
     #
     # @since 2.0.0.rc.6
     def update_attribute(name, value)
+      unless attribute_writable?(name.to_s)
+        raise Errors::ReadonlyAttribute.new(name, value)
+      end
       write_attribute(name, value)
       save(:validate => false)
     end

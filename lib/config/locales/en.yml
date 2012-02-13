@@ -116,11 +116,15 @@ en:
             \_\_\_\_belongs_to :alcoholic, class_name: \"Lush\", inverse_of: :whiskey\n
             \_\_end"
         invalid_set_polymorphic_relation:
-          message: "The %{name} attribute can't be set to an instance of 
+          message: "The %{name} attribute can't be set to an instance of
             %{other_klass} as %{other_klass} has multiple relations referencing
             %{klass} as %{name}."
-          summary: ""
-          resolution: ""
+          summary: "If the parent class of a polymorphic relation has multiple
+            definitions for the same relation, the values must be set from the
+            parent side and not the child side since Mongoid cannot determine
+            from the child side which relation to go in."
+          resolution: "Set the values from the parent, or redefine the relation
+            with only a single definition in the parent."
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a relational association is not allowed since the
@@ -144,6 +148,13 @@ en:
             knowing which environment it is in, and we have considered
             defaulting to development an undesireable side effect of this not
             being defined."
+        readonly_attribute:
+          message: "Attempted to set the readonly attribute '%{name}' with
+            the value: %{value}."
+          summary: "Attributes flagged as readonly via Model.attr_readonly
+            can only have values set when the document is a new record."
+          resolution: "Don't define '%{name}' as readonly, or do not attempt
+            to update it's value after the document is persisted."
         scope_overwrite:
           message: "Cannot create scope :%{scope_name}, because of existing
             method %{model_name}.%{scope_name}."

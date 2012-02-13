@@ -196,6 +196,26 @@ For instructions on upgrading to newer versions, visit
 
         Person.new.age = 50 # raises the UnknownAttribute error.
 
+* \#772 Fields can now be flagged as readonly, which will only let their
+  values be set when the document is new.
+
+        class Band
+          include Mongoid::Document
+          field :name, type: String
+          field :genre, type: String
+
+          attr_readonly :name, :genre
+        end
+
+      Readonly values are ignored when attempting to set them on persisted
+      documents, with the exception of update_attribute and remove_attribute,
+      where errors will get raised.
+
+        band = Band.create(name: "Depeche Mode")
+        band.update_attribute(:name, "Smiths") # Raises ReadonlyAttribute error.
+        band.remove_attribute(:name) # Raises ReadonlyAttribute error.
+
+
 ### Major Changes
 
 * `Model.defaults` no longer exists. You may get all defaults with a
