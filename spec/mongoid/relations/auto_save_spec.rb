@@ -2,6 +2,15 @@ require "spec_helper"
 
 describe Mongoid::Relations::AutoSave do
 
+  before(:all) do
+    Person.autosave(Person.relations["drugs"].merge!(:autosave => true))
+    Person.autosave(Person.relations["account"].merge!(:autosave => true))
+  end
+
+  after(:all) do
+    Person.reset_callbacks(:save)
+  end
+
   describe ".auto_save" do
 
     let(:person) do

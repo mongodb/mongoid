@@ -2,6 +2,16 @@ require "spec_helper"
 
 describe Mongoid::Relations::Synchronization do
 
+  before(:all) do
+    Mongoid.raise_not_found_error = true
+    Person.synced(Person.relations["preferences"])
+  end
+
+  after(:all) do
+    Person.reset_callbacks(:save)
+    Person.reset_callbacks(:destroy)
+  end
+
   describe ".update_inverse_keys" do
 
     let(:agent) do

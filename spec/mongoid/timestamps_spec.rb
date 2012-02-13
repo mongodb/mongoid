@@ -4,17 +4,17 @@ describe Mongoid::Timestamps do
 
   describe ".included" do
 
-    let(:person) do
-      Person.new
+    let(:document) do
+      Dokument.new
     end
 
     let(:fields) do
-      Person.fields
+      Dokument.fields
     end
 
     before do
-      person.run_callbacks(:create)
-      person.run_callbacks(:save)
+      document.run_callbacks(:create)
+      document.run_callbacks(:save)
     end
 
     it "adds created_at to the document" do
@@ -26,83 +26,83 @@ describe Mongoid::Timestamps do
     end
 
     it "forces the created_at timestamps to UTC" do
-      person.created_at.should be_within(10).of(Time.now.utc)
+      document.created_at.should be_within(10).of(Time.now.utc)
     end
 
     it "forces the updated_at timestamps to UTC" do
-      person.updated_at.should be_within(10).of(Time.now.utc)
+      document.updated_at.should be_within(10).of(Time.now.utc)
     end
 
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
-      Person.should.respond_to? :record_timestamps
+      Dokument.should.respond_to? :record_timestamps
     end
   end
 
   context "when the document has not changed" do
 
-    let(:person) do
-      Person.instantiate(Person.new.attributes)
+    let(:document) do
+      Dokument.instantiate(Dokument.new.attributes)
     end
 
     before do
-      person.new_record = false
+      document.new_record = false
     end
 
     it "does not run the update callbacks" do
-      person.expects(:updated_at=).never
-      person.save
+      document.expects(:updated_at=).never
+      document.save
     end
   end
 
   context "when the document has changed with updated_at specified" do
 
-    let(:person) do
-      Person.new(:created_at => Time.now.utc)
+    let(:document) do
+      Dokument.new(:created_at => Time.now.utc)
     end
 
     before do
-      person.new_record = false
-      person.updated_at = DateTime.parse("2001-06-12")
+      document.new_record = false
+      document.updated_at = DateTime.parse("2001-06-12")
     end
 
     it "does not set updated at" do
-      person.expects(:updated_at=).never
-      person.save
+      document.expects(:updated_at=).never
+      document.save
     end
   end
 
   context "when the document is created" do
 
-    let(:person) do
-      Person.create
+    let(:document) do
+      Dokument.create
     end
 
     it "runs the update callbacks" do
-      person.updated_at.should be_within(10).of(Time.now.utc)
+      document.updated_at.should be_within(10).of(Time.now.utc)
     end
   end
 
   context "when only embedded documents have changed" do
 
-    let!(:person) do
-      Person.create(:updated_at => 2.days.ago)
+    let!(:document) do
+      Dokument.create(:updated_at => 2.days.ago)
     end
 
     let!(:address) do
-      person.addresses.create(:street => "Karl Marx Strasse")
+      document.addresses.create(:street => "Karl Marx Strasse")
     end
 
     let!(:updated_at) do
-      person.updated_at
+      document.updated_at
     end
 
     before do
       address.number = 1
-      person.save
+      document.save
     end
 
     it "updates the root document updated at" do
-      person.updated_at.should be_within(1).of(Time.now)
+      document.updated_at.should be_within(1).of(Time.now)
     end
   end
 end

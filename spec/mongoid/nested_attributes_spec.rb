@@ -594,6 +594,14 @@ describe Mongoid::NestedAttributes do
 
         context "when the nested document is invalid" do
 
+          before(:all) do
+            Person.validates_associated(:pet)
+          end
+
+          after(:all) do
+            Person.reset_callbacks(:validate)
+          end
+
           before do
             person.pet_attributes = { :name => "$$$" }
           end
@@ -834,6 +842,14 @@ describe Mongoid::NestedAttributes do
           end
 
           context "when the nested document is invalid" do
+
+            before(:all) do
+              Person.validates_format_of :ssn, :without => /\$\$\$/
+            end
+
+            after(:all) do
+              Person.reset_callbacks(:validate)
+            end
 
             before do
               animal.person_attributes = { :ssn => '$$$' }
@@ -1854,6 +1870,14 @@ describe Mongoid::NestedAttributes do
 
         context "when the nested document is invalid" do
 
+          before(:all) do
+            Person.validates_associated(:addresses)
+          end
+
+          after(:all) do
+            Person.reset_callbacks(:validate)
+          end
+
           before do
             person.addresses_attributes = {
               "0" => { :street => '123' }
@@ -2277,6 +2301,14 @@ describe Mongoid::NestedAttributes do
 
         context "when the nested document is invalid" do
 
+          before(:all) do
+            Person.validates_associated(:game)
+          end
+
+          after(:all) do
+            Person.reset_callbacks(:validate)
+          end
+
           before do
             person.game_attributes = { :name => '$$$' }
           end
@@ -2517,6 +2549,15 @@ describe Mongoid::NestedAttributes do
           end
 
           context "when the nested document is invalid" do
+
+            before(:all) do
+              Person.validates_format_of :ssn, :without => /\$\$\$/
+            end
+
+            after(:all) do
+              Person.reset_callbacks(:validate)
+            end
+
             before do
               game.person_attributes = { :ssn => '$$$' }
             end
@@ -3241,6 +3282,14 @@ describe Mongoid::NestedAttributes do
 
         context "when the nested document is invalid" do
 
+          before(:all) do
+            Person.validates_associated(:posts)
+          end
+
+          after(:all) do
+            Person.reset_callbacks(:validate)
+          end
+
           before do
             person.posts_attributes = {
               "0" => { :title => "$$$" }
@@ -3898,6 +3947,15 @@ describe Mongoid::NestedAttributes do
         end
 
         context "when the nested document is invalid" do
+
+          before(:all) do
+            Person.validates_associated(:preferences)
+          end
+
+          after(:all) do
+            Person.reset_callbacks(:validate)
+          end
+
           before do
             person.preferences_attributes = {
               "0" => { :name => 'x' }

@@ -1,7 +1,5 @@
 class Person
   include Mongoid::Document
-  include Mongoid::Timestamps
-
   attr_accessor :mode
 
   class_attribute :somebody_elses_important_class_options
@@ -33,8 +31,6 @@ class Person
   index :title
   index :ssn, :unique => true
 
-  validates_format_of :ssn, :without => /\$\$\$/
-
   attr_reader :rescored
 
   attr_protected :security_code, :owner_id
@@ -42,7 +38,7 @@ class Person
   embeds_many :favorites, :order => :title.desc, :inverse_of => :perp, :validate => false
   embeds_many :videos, :order => [[ :title, :asc ]], :validate => false
   embeds_many :phone_numbers, :class_name => "Phone", :validate => false
-  embeds_many :addresses, :as => :addressable do
+  embeds_many :addresses, :as => :addressable, :validate => false do
     def extension
       "Testing"
     end
@@ -52,11 +48,11 @@ class Person
   end
   embeds_many :address_components, :validate => false
   embeds_many :paranoid_phones, :validate => false
-  embeds_many :services, :cascade_callbacks => true
+  embeds_many :services, :cascade_callbacks => true, :validate => false
   embeds_many :symptoms, :validate => false
   embeds_many :appointments, :validate => false
 
-  embeds_one :pet, :class_name => "Animal"
+  embeds_one :pet, :class_name => "Animal", :validate => false
   embeds_one :name, :as => :namable, :validate => false do
     def extension
       "Testing"
@@ -78,7 +74,7 @@ class Person
   accepts_nested_attributes_for :quiz
   accepts_nested_attributes_for :services, :allow_destroy => true
 
-  has_one :game, :dependent => :destroy do
+  has_one :game, :dependent => :destroy, :validate => false do
     def extension
       "Testing"
     end
@@ -86,7 +82,8 @@ class Person
 
   has_many \
     :posts,
-    :dependent => :delete do
+    :dependent => :delete,
+    :validate => false do
     def extension
       "Testing"
     end
@@ -97,14 +94,14 @@ class Person
     :preferences,
     :index => true,
     :dependent => :nullify,
-    :autosave => true
+    :validate => false
   has_and_belongs_to_many :user_accounts, :validate => false
   has_and_belongs_to_many :houses, :validate => false
   has_and_belongs_to_many :ordered_preferences, :order => :value.desc, :validate => false
 
-  has_many :drugs, :autosave => true, :validate => false
-  has_one :account, :autosave => true, :validate => false
-  has_one :cat, :dependent => :nullify
+  has_many :drugs, :validate => false
+  has_one :account, :validate => false
+  has_one :cat, :dependent => :nullify, :validate => false
 
   has_and_belongs_to_many \
     :administrated_events,
@@ -136,12 +133,6 @@ class Person
 
   def set_addresses=(addresses)
     self.addresses = addresses
-  end
-
-  before_save :savable?
-
-  def savable?
-    self.mode != :prevent_save
   end
 
   class << self
@@ -182,6 +173,11 @@ class Person
   def set_on_map_with_default=(value)
     self.map_with_default["key"] = value
   end
+
+  reset_callbacks(:validate)
+  reset_callbacks(:create)
+  reset_callbacks(:save)
+  reset_callbacks(:destroy)
 end
 
 require "app/models/doctor"

@@ -873,7 +873,7 @@ describe Mongoid::Relations::Referenced::In do
 
   context "when the relation belongs to a has many and has one" do
 
-    before do
+    before(:all) do
       class A
         include Mongoid::Document
         has_many :bs, :inverse_of => :a
@@ -891,7 +891,7 @@ describe Mongoid::Relations::Referenced::In do
       end
     end
 
-    after do
+    after(:all) do
       Object.send(:remove_const, :A)
       Object.send(:remove_const, :B)
       Object.send(:remove_const, :C)

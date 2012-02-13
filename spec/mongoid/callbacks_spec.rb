@@ -1202,6 +1202,16 @@ describe Mongoid::Callbacks do
       Address.new(:street => "123 Sesame")
     end
 
+    before(:all) do
+      Person.before_save do |doc|
+        doc.mode != :prevent_save
+      end
+    end
+
+    after(:all) do
+      Person.reset_callbacks(:save)
+    end
+
     context "when creating a document" do
 
       let(:person) do

@@ -8,20 +8,20 @@ describe Mongoid::Timestamps::Timeless do
 
       context "when used on the document instance" do
 
-        let(:person) do
-          Person.new
+        let(:document) do
+          Dokument.new
         end
 
         before do
-          person.timeless.save
+          document.timeless.save
         end
 
         it "does not set the created timestamp" do
-          person.created_at.should be_nil
+          document.created_at.should be_nil
         end
 
         it "does not set the updated timestamp" do
-          person.updated_at.should be_nil
+          document.updated_at.should be_nil
         end
 
         it "clears out the timeless option after save" do
@@ -31,27 +31,27 @@ describe Mongoid::Timestamps::Timeless do
         context "when subsequently persisting" do
 
           before do
-            person.update_attribute(:title, "Sir")
+            document.update_attribute(:title, "Sir")
           end
 
           it "sets the updated timestamp" do
-            person.updated_at.should_not be_nil
+            document.updated_at.should_not be_nil
           end
         end
       end
 
       context "when used on the class" do
 
-        let!(:person) do
-          Person.timeless.create
+        let!(:document) do
+          Dokument.timeless.create
         end
 
         it "does not set the created timestamp" do
-          person.created_at.should be_nil
+          document.created_at.should be_nil
         end
 
         it "does not set the updated timestamp" do
-          person.updated_at.should be_nil
+          document.updated_at.should be_nil
         end
 
         it "clears out the timeless option after save" do
@@ -61,11 +61,11 @@ describe Mongoid::Timestamps::Timeless do
         context "when subsequently persisting" do
 
           before do
-            person.update_attribute(:title, "Sir")
+            document.update_attribute(:title, "Sir")
           end
 
           it "sets the updated timestamp" do
-            person.updated_at.should_not be_nil
+            document.updated_at.should_not be_nil
           end
         end
       end

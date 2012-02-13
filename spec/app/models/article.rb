@@ -1,6 +1,5 @@
 class Article
   include Mongoid::Document
-  include Mongoid::Timestamps
 
   field :title, :type => String
   field :is_rss, :type => Boolean, :default => false

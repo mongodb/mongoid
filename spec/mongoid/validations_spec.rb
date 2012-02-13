@@ -141,6 +141,14 @@ describe Mongoid::Validations do
 
       context "when the child does not validate the parent" do
 
+        before(:all) do
+          Person.validates_associated(:services)
+        end
+
+        after(:all) do
+          Person.reset_callbacks(:validate)
+        end
+
         let(:person) do
           Person.new
         end

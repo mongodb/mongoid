@@ -1,7 +1,6 @@
 class ParanoidPost
   include Mongoid::Document
   include Mongoid::Versioning
-  include Mongoid::Timestamps
   include Mongoid::Paranoia
 
   max_versions 2

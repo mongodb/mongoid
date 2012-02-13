@@ -4,6 +4,13 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
   before(:all) do
     Mongoid.raise_not_found_error = true
+    Person.autosave(Person.relations["preferences"].merge!(:autosave => true))
+    Person.synced(Person.relations["preferences"])
+  end
+
+  after(:all) do
+    Person.reset_callbacks(:save)
+    Person.reset_callbacks(:destroy)
   end
 
   [ :<<, :push, :concat ].each do |method|
