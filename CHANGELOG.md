@@ -7,6 +7,19 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1714/\#1706 Added better logging on index creation. (Hans Hasselberg)
+
+    When an index is present on a root document model:
+
+        Creating indexes on: Model for: name, dob.
+
+    When an index is defined on an embedded model:
+
+        Index ignored on: Address, please define in the root model.
+
+    When no index is defined, nothing is logged, and if a bad index is
+    defined an error is raised.
+
 * \#1710 For cases when you don't want Mongoid to auto-protect the id
   and type attributes, you can set a configuration option to turn this
   off.

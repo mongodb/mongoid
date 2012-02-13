@@ -114,6 +114,7 @@ describe "Rails::Mongoid" do
         let(:file) { "app/models/follow.rb" }
 
         it "raises NameError" do
+          logger.expects(:info)
           expect { model.should eq(klass) }.to raise_error(NameError)
         end
       end
@@ -124,6 +125,7 @@ describe "Rails::Mongoid" do
         let(:file) { "app/models/fu/person.rb" }
 
         it "returns klass" do
+          logger.expects(:info)
           model.should eq(klass)
         end
       end

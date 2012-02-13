@@ -30,7 +30,7 @@ module Rails #:nodoc:
           model.create_indexes
           logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
         else
-          logger.info("Index ignored on: #{file}, please define in the root Model")
+          logger.info("Index ignored on: #{model}, please define in the root model.")
         end
       end
     end
@@ -93,7 +93,8 @@ module Rails #:nodoc:
         parts = model_path.map { |path| path.camelize }
         name = parts.join("::")
         klass = name.constantize
-      rescue NameError => e
+      rescue NameError, LoadError => e
+        logger.info("Attempted to constantize #{name}, trying without namespacing.")
         klass = parts.last.constantize
       end
       if klass.ancestors.include?(::Mongoid::Document) && !klass.embedded
