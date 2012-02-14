@@ -148,6 +148,108 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#classify" do
+    let(:name) { "name" }
+    let(:metadata) { described_class.new(:name => name) }
+    let(:classified) { metadata.send(:classify) }
+
+    before do
+      Mongoid::Relations::Options.expects(:validate!).at_least_once
+    end
+
+    context "when relation is embedded_in" do
+      it "returns camelized name" do
+        metadata.expects(:macro).returns(:embedded_in).once
+        classified.should eq(name.camelize)
+      end
+    end
+
+    context "when relation is not embedded_in" do
+      it "concatenates the result from #find_module and name.classify" do
+        metadata.expects(:macro).returns(:has_many).once
+        metadata.expects(:find_module).returns("Fruit").once
+        classified.should eq("Fruit::Name")
+      end
+    end
+  end
+
+  describe "#find_module" do
+    let(:name) { "name" }
+    let(:metadata) { described_class.new(:name => name, :inverse_class_name => inverse_class_name) }
+    let(:mod) { metadata.send(:find_module) }
+
+    before do
+      Mongoid::Relations::Options.expects(:validate!).at_least_once
+    end
+
+    context "when inverse_class_name is nil" do
+      let(:inverse_class_name) { nil }
+
+      it "returns nil" do
+        mod.should be_nil
+      end
+    end
+
+    context "when inverse_class_name is empty" do
+      let(:inverse_class_name) { "" }
+
+      it "returns nil" do
+        mod.should be_nil
+      end
+    end
+
+    context "when inverse_class_name is defined" do
+      context "when inverse_class_name is in root namespace" do
+        let(:inverse_class_name) { "Person" }
+
+        context "when name isn't defined" do
+          let(:name) { "undefined" }
+
+          it "returns nil" do
+            mod.should be_nil
+          end
+        end
+
+        context "when name is defined in root namespace" do
+          let(:name) { "account" }
+
+          it "returns root namespace" do
+            mod.should eq("")
+          end
+        end
+
+        context "when name is defined in module Fruits" do
+          context "when inverse_class_name is defined in the same module" do
+            let(:inverse_class_name) { "Fruits::Apple" }
+            let(:name) { "banana" }
+
+            it "returns Fruits" do
+              mod.should eq("Fruits")
+            end
+          end
+
+          context "when inverse_class_name is defined in a nested module" do
+            let(:inverse_class_name) { "Fruits::Big::Ananas" }
+            let(:name) { "banana" }
+
+            it "returns Fruits" do
+              mod.should eq("Fruits")
+            end
+          end
+
+          context "when the inverse_class_name is defined in the root namespace" do
+            let(:inverse_class_name) { "Person" }
+            let(:name) { "banana" }
+
+            it "returns nil" do
+              mod.should be_nil
+            end
+          end
+        end
+      end
+    end
+  end
+
   describe "#class_name" do
 
     context "when class_name provided" do
@@ -228,11 +330,11 @@ describe Mongoid::Relations::Metadata do
             end
 
             let(:metadata) do
-              described_class.new(:name => :name, :relation => relation, :inverse_class_name => "Business::Person")
+              described_class.new(:name => :apple, :relation => relation, :inverse_class_name => "Fruits::Banana")
             end
 
             it "classifies and constantizes the association name and adds the module" do
-              metadata.class_name.should eq("Business::Name")
+              metadata.class_name.should eq("Fruits::Apple")
             end
           end
 
@@ -243,11 +345,11 @@ describe Mongoid::Relations::Metadata do
             end
 
             let(:metadata) do
-              described_class.new(:name => :addresses, :relation => relation, :inverse_class_name => "Business::Person")
+              described_class.new(:name => :apples, :relation => relation, :inverse_class_name => "Fruits::Banana")
             end
 
             it "classifies and constantizes the association name and adds the module" do
-              metadata.class_name.should eq("Business::Address")
+              metadata.class_name.should eq("Fruits::Apple")
             end
           end
 
@@ -757,7 +859,7 @@ describe Mongoid::Relations::Metadata do
       end
     end
   end
-  
+
   describe "#inverse_of_field" do
 
     context "when the relation is not polymorphic" do
@@ -875,7 +977,7 @@ describe Mongoid::Relations::Metadata do
     context "when an inverse relation exists" do
 
       context "when multiple relations against the same class exist" do
-        
+
         context "when not polymorphic" do
 
           let(:metadata) do
@@ -890,7 +992,7 @@ describe Mongoid::Relations::Metadata do
             metadata.inverse.should eq(:user)
           end
         end
-      
+
         context "when polymorphic" do
 
           let(:metadata) do
@@ -907,7 +1009,7 @@ describe Mongoid::Relations::Metadata do
             metadata.inverse.should eq(:eyeable)
           end
         end
-        
+
         context "when polymorphic on the child" do
 
           let(:metadata) do
@@ -1114,7 +1216,7 @@ describe Mongoid::Relations::Metadata do
     context "when the relation is polymorphic" do
 
       context "when multiple relations against the same class exist" do
-        
+
         context "when a referenced in" do
 
           let(:metadata) do
@@ -1148,7 +1250,7 @@ describe Mongoid::Relations::Metadata do
           it "returns a string for the setter" do
             metadata.inverse_setter.should eq("eyeable=")
           end
-        end        
+        end
       end
 
       context "when a referenced in" do
