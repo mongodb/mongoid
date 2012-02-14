@@ -290,6 +290,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1715 Serializable hashes are now consistent on inclusion of embedded
+  documents per or post save.
+
 * \#1713 Fixing === checks when comparing a class with an instance of a
   subclass.
 
