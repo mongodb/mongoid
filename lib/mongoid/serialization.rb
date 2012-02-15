@@ -41,8 +41,17 @@ module Mongoid # :nodoc:
         attribute_names -= except
       end
 
-      method_names = Array.wrap(options[:methods]).map { |n| n.to_s if respond_to?(n.to_s) }.compact
-      Hash[(attribute_names + method_names).map { |n| [n, send(n)] }].tap do |attrs|
+      method_names = Array.wrap(options[:methods]).map do |name|
+        name.to_s if respond_to?(name)
+      end.compact
+
+      {}.tap do |attrs|
+        attribute_names.each do |name|
+          attrs[name] = attributes[name]
+        end
+        method_names.each do |name|
+          attrs[name] = send(name)
+        end
         serialize_relations(attrs, options) if options[:include]
       end
     end
