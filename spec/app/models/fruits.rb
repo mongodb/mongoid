@@ -19,4 +19,10 @@ module Fruits
     include Mongoid::Document
     recursively_embeds_one :cascade_callbacks => true
   end
+
+  module Big
+    class Ananas
+      include Mongoid::Document
+    end
+  end
 end
