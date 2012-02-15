@@ -363,7 +363,7 @@ module Mongoid # :nodoc:
         "  setter:               #{setter},\n" <<
         "  versioned:            #{versioned? || "No"}>\n"
       end
-      
+
       # Get the name of the inverse relations if they exists. If this is a
       # polymorphic relation then just return the :as option that was defined.
       #
@@ -525,14 +525,14 @@ module Mongoid # :nodoc:
       def inverse_type_setter
         @inverse_type_setter ||= inverse_type ? "#{inverse_type}=" : nil
       end
-      
-      # Returns the name of the field in which to store the name of the inverse 
+
+      # Returns the name of the field in which to store the name of the inverse
       # field for the polymorphic relation.
       #
       # @example Get the name of the field.
       #   metadata.inverse_of_field
       #
-      # @return [ String ] The name of the field for storing the name of the 
+      # @return [ String ] The name of the field for storing the name of the
       # inverse field.
       def inverse_of_field
         @inverse_of_field ||=
@@ -793,13 +793,31 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def classify
-        inverse_class_name =~ /(.*::)?\w+$/
-        value = if macro == :embedded_in
-          name.to_s.camelize
-        else
-          name.to_s.classify
+        return name.to_s.camelize if macro == :embedded_in
+
+        "#{find_module}::#{name.to_s.classify}"
+      end
+
+      # Find the module the class with the specific name is in.
+      # This is done by starting at the inverse_class_name's
+      # module and stepping down to see where it is defined.
+      #
+      # @example Find the module.
+      #   metadata.find_module
+      #
+      # @return [String] The module.
+      def find_module
+        return nil unless inverse_class_name.present?
+        return nil unless name.present?
+
+        parts = inverse_class_name.split('::')
+        [].tap do |combinations|
+          parts.size.times do |i|
+            combinations << parts.combination(i).first
+          end
+        end.map{ |p| p.join('::') }.reverse.find do |mod|
+          ActiveSupport::Inflector.constantize(mod).constants.include?(name.to_s.classify.to_sym)
         end
-        "#{$1}#{value}"
       end
 
       # Get the name of the inverse relation in a cyclic relation.
@@ -958,7 +976,7 @@ module Mongoid # :nodoc:
         matching_metas = other.class.relations.find_all { |key, meta| meta.as == name }
         return matching_metas.map { |meta| meta[1].name }
       end
-      
+
       # For polymorphic children, we need to figure out the inverse from the
       # actual instance on the other side, since we cannot know the exact class
       # name to infer it from at load time.
