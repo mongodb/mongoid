@@ -106,7 +106,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def cascadable_child?(kind, child)
-      [ :create, :destroy ].include?(kind) || child.changed? || child.new_record?
+      [ :create, :destroy, :initialize ].include?(kind) || child.changed? || child.new_record?
     end
 
     # Get the name of the callback that the child should fire. This changes

@@ -293,6 +293,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1723 Initialize callbacks should cascade through children without needing
+  to determine if the child is changed.
+
 * \#1715 Serializable hashes are now consistent on inclusion of embedded
   documents per or post save.
 
