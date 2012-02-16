@@ -154,7 +154,7 @@ describe Mongoid::Fields::Internal::Regexp do
     end
   end
 
-  context "when persisting the value" do
+  pending "when persisting the value" do
 
     let(:person) do
       Person.create(:pattern => /[^a]/)
