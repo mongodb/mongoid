@@ -678,4 +678,44 @@ describe Mongoid::Relations::Embedded::One do
       end
     end
   end
+
+  context "when embedding a many under a one" do
+
+    let!(:person) do
+      Person.create
+    end
+
+    before do
+      person.create_name
+    end
+
+    context "when the documents are reloaded from the database" do
+
+      let(:from_db) do
+        Person.first
+      end
+
+      context "when adding a new many" do
+
+        let(:name) do
+          from_db.name
+        end
+
+        let!(:translation) do
+          name.translations.new
+        end
+
+        context "when saving the root" do
+
+          before do
+            from_db.save
+          end
+
+          it "persists the new document on the first save" do
+            from_db.reload.name.translations.should_not be_empty
+          end
+        end
+      end
+    end
+  end
 end
