@@ -7,6 +7,13 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1724 Mongoid now supports regex fields.
+
+        class Rule
+          include Mongoid::Document
+          field :pattern, type: Regexp, default: /[^abc]/
+        end
+
 * \#1714/\#1706 Added better logging on index creation. (Hans Hasselberg)
 
     When an index is present on a root document model:
