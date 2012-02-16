@@ -189,7 +189,10 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def first
-          added.first || (loaded? ? loaded.first : unloaded.first)
+          loaded.try(:first) ||
+            added.detect { |doc| doc == unloaded.try(:first) } ||
+            unloaded.try(:first) ||
+            added.first
         end
 
         # Initialize the new enumerable either with a criteria or an array.
@@ -251,7 +254,10 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def last
-          added.last || (loaded? ? loaded.last : unloaded.last)
+          loaded.try(:last) ||
+            added.detect { |doc| doc == unloaded.try(:last) } ||
+            unloaded.try(:last) ||
+            added.last
         end
 
         # Loads all the documents in the enumerable from the database.

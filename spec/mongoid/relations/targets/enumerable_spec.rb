@@ -713,12 +713,15 @@ describe Mongoid::Relations::Targets::Enumerable do
             enumerable.first
           end
 
-          it "returns the first added doc" do
-            first.should eq(post_two)
-          end
+          context "when a perviously persisted unloaded doc exists" do
 
-          it "does not load the enumerable" do
-            enumerable.should_not be_loaded
+            it "returns the first added doc" do
+              first.should eq(post)
+            end
+
+            it "does not load the enumerable" do
+              enumerable.should_not be_loaded
+            end
           end
         end
       end
@@ -737,7 +740,7 @@ describe Mongoid::Relations::Targets::Enumerable do
           enumerable.first
         end
 
-        it "returns the first unloaded doc" do
+        it "returns the first loaded doc" do
           first.should eq(post)
         end
 
@@ -1098,6 +1101,28 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "does not load the enumerable" do
           enumerable.should_not be_loaded
+        end
+      end
+
+      context "when added is not empty" do
+
+        let!(:post_one) do
+          person.posts.create
+        end
+
+        let!(:post_two) do
+          person.posts.create
+        end
+
+        let(:last) do
+          enumerable.last
+        end
+
+        context "when accessing from a reloaded child" do
+
+          it "returns the last document" do
+            post_one.reload.person.posts.last.should eq(post_two)
+          end
         end
       end
     end

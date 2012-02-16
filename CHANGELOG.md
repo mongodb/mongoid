@@ -272,6 +272,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1718 Ensure consistency of #first/#last in relations - they now always
+  match first/last in the database, but opts for in memory first.
+
 * \#1692/\#1376 `Model#updateattributes` and `Model#update_attributes!` now
   accept assignment options. (Hans Hasselberg)
 
