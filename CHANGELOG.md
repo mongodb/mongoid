@@ -300,6 +300,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1727 Allow dot notation in embedded criteria to work on both embeds one
+  and embeds many. (Lyle Underwood)
+
 * \#1723 Initialize callbacks should cascade through children without needing
   to determine if the child is changed.
 
