@@ -85,7 +85,7 @@ module Mongoid #:nodoc:
             begin
               _attribs.try(:[], _key)
             rescue TypeError
-              throw $! unless _attribs.kind_of? Array
+              throw $! unless _attribs.respond_to? :map
               _attribs.map {|doc| doc.try(:[], _key)}
             end
           end
