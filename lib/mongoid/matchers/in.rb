@@ -16,11 +16,7 @@ module Mongoid #:nodoc:
       def matches?(value)
         attribute_array = Array.wrap(@attribute)
         value.values.first.any? do |e| 
-          if e.is_a?(Regexp) 
-            attribute_array.any? { |_attribute| _attribute =~ e }
-          else
-            attribute_array.include?(e)
-          end
+          attribute_array.any? { |_attribute| e === _attribute }
         end
       end
     end
