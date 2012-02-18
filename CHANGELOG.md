@@ -7,6 +7,12 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1726 `Mongoid.load!` now accepts an optional second argument for the
+  environment to load. This takes precedence over any environment variable
+  that is set if provided.
+
+        Mongoid.load!("/path/to/mongoid.yml", :development)
+
 * \#1724 Mongoid now supports regex fields.
 
         class Rule

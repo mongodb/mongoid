@@ -144,41 +144,84 @@ describe Mongoid::Config do
       Object.send(:remove_const, :Rails) if defined?(Rails)
     end
 
-    before do
-      ENV["RACK_ENV"] = "test"
-      described_class.load!(standard_config)
+    context "when the rack environment is set" do
+
+      before do
+        ENV["RACK_ENV"] = "test"
+        described_class.load!(standard_config)
+      end
+
+      after do
+        ENV["RACK_ENV"] = nil
+        described_class.reset
+      end
+
+      it "sets the master db" do
+        described_class.master.name.should eq("mongoid_config_test")
+      end
+
+      it "sets allow_dynamic_fields" do
+        described_class.allow_dynamic_fields.should be_false
+      end
+
+      it "sets include_root_in_json" do
+        described_class.include_root_in_json.should be_true
+      end
+
+      it "sets scope_overwrite_exception" do
+        described_class.scope_overwrite_exception.should be_false
+      end
+
+      it "sets persist_in_safe_mode" do
+        described_class.persist_in_safe_mode.should be_false
+      end
+
+      it "sets raise_not_found_error" do
+        described_class.raise_not_found_error.should be_false
+      end
+
+      it "returns nil, which is interpreted as the local time_zone" do
+        described_class.use_utc.should be_false
+      end
     end
 
-    after do
-      described_class.reset
-    end
+    context "when provided an environment" do
 
-    it "sets the master db" do
-      described_class.master.name.should eq("mongoid_config_test")
-    end
+      before do
+        described_class.load!(standard_config, :test)
+      end
 
-    it "sets allow_dynamic_fields" do
-      described_class.allow_dynamic_fields.should be_false
-    end
+      after do
+        described_class.reset
+      end
 
-    it "sets include_root_in_json" do
-      described_class.include_root_in_json.should be_true
-    end
+      it "sets the master db" do
+        described_class.master.name.should eq("mongoid_config_test")
+      end
 
-    it "sets scope_overwrite_exception" do
-      described_class.scope_overwrite_exception.should be_false
-    end
+      it "sets allow_dynamic_fields" do
+        described_class.allow_dynamic_fields.should be_false
+      end
 
-    it "sets persist_in_safe_mode" do
-      described_class.persist_in_safe_mode.should be_false
-    end
+      it "sets include_root_in_json" do
+        described_class.include_root_in_json.should be_true
+      end
 
-    it "sets raise_not_found_error" do
-      described_class.raise_not_found_error.should be_false
-    end
+      it "sets scope_overwrite_exception" do
+        described_class.scope_overwrite_exception.should be_false
+      end
 
-    it "returns nil, which is interpreted as the local time_zone" do
-      described_class.use_utc.should be_false
+      it "sets persist_in_safe_mode" do
+        described_class.persist_in_safe_mode.should be_false
+      end
+
+      it "sets raise_not_found_error" do
+        described_class.raise_not_found_error.should be_false
+      end
+
+      it "returns nil, which is interpreted as the local time_zone" do
+        described_class.use_utc.should be_false
+      end
     end
   end
 

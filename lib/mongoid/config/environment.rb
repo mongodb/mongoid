@@ -33,8 +33,9 @@ module Mongoid #:nodoc
       # @return [ Hash ] The settings.
       #
       # @since 2.3.0
-      def load_yaml(path)
-        YAML.load(ERB.new(File.new(path).read).result)[env_name]
+      def load_yaml(path, environment = nil)
+        env = environment ? environment.to_s : env_name
+        YAML.load(ERB.new(File.new(path).read).result)[env]
       end
     end
   end

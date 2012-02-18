@@ -85,10 +85,11 @@ module Mongoid #:nodoc
     #   Mongoid.load!("/path/to/mongoid.yml")
     #
     # @param [ String ] path The path to the file.
+    # @param [ String, Symbol ] environment The environment to load.
     #
     # @since 2.0.1
-    def load!(path)
-      Environment.load_yaml(path).tap do |settings|
+    def load!(path, environment = nil)
+      Environment.load_yaml(path, environment).tap do |settings|
         from_hash(settings) if settings.present?
       end
     end
