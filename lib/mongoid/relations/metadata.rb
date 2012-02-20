@@ -81,13 +81,9 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def cascade_strategy
-        if dependent?
-          strategy =
-            %{Mongoid::Relations::Cascading::#{dependent.to_s.classify}}
-          strategy.constantize
-        else
-          return nil
-        end
+        return nil unless dependent?
+
+        "Mongoid::Relations::Cascading::#{dependent.to_s.classify}".constantize
       end
 
       # Is this an embedded relations that allows callbacks to cascade down to
