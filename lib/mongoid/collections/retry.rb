@@ -27,7 +27,7 @@ module Mongoid #:nodoc:
         retries = 0
         begin
           yield
-        rescue Mongo::ConnectionFailure => ex
+        rescue Mongo::ConnectionFailure, Mongo::OperationTimeout => ex
           retries = increase_retry_attempts(retries, ex)
           retry
         rescue Mongo::OperationFailure => ex
