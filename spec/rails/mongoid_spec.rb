@@ -89,6 +89,79 @@ describe "Rails::Mongoid" do
     end
   end
 
+  describe ".remove_indexes" do
+
+    let(:pattern) do
+      "spec/app/models/**/*.rb"
+    end
+
+    let(:logger) do
+      stub
+    end
+
+    let(:klass) do
+      Person
+    end
+
+    let(:model_paths) do
+      [ "spec/app/models/person.rb" ]
+    end
+
+    before do
+      Dir.expects(:glob).with(pattern).returns(model_paths).times(2)
+      Logger.expects(:new).returns(logger).times(4)
+      logger.expects(:info).times(2)
+    end
+
+    let(:index_information) do
+      klass.index_information
+    end
+
+    before :each do
+      Rails::Mongoid.create_indexes(pattern)
+      Rails::Mongoid.remove_indexes(pattern)
+    end
+
+    it "removes indexes from klass" do
+      index_information.reject{ |name, options| name == "_id_" }.keys.should be_empty
+    end
+
+    it "leaves _id index untouched" do
+      index_information.keys.should include("_id_")
+    end
+  end
+
+  describe ".models" do
+
+    let(:pattern) do
+      "spec/app/models/**/*.rb"
+    end
+
+    let(:logger) do
+      stub
+    end
+
+    let(:klass) do
+      Person
+    end
+
+    let(:model_paths) do
+      [ "spec/app/models/person.rb" ]
+    end
+
+    let(:models) do
+      Rails::Mongoid.models(pattern)
+    end
+
+    before do
+      Dir.expects(:glob).with(pattern).returns(model_paths).once
+    end
+
+    it "returns models which files matching the pattern" do
+      models.should eq([klass])
+    end
+  end
+
   describe ".determine_model" do
 
     let(:logger) do
