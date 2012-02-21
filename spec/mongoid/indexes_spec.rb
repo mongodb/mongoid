@@ -19,6 +19,42 @@ describe Mongoid::Indexes do
     end
   end
 
+  describe ".current_collection" do
+
+    let(:klass) do
+      Person
+    end
+
+    it "returns a collection" do
+      klass.send(:current_collection).should be_a(Mongoid::Collection)
+    end
+
+    it "returns people collection" do
+      klass.send(:current_collection).name.should eq('people')
+    end
+  end
+
+  describe ".remove_indexes" do
+
+    let(:klass) do
+      Person
+    end
+
+    let(:collection) do
+      klass._collection || klass.set_collection
+    end
+
+    before do
+      klass.create_indexes
+      klass.remove_indexes
+    end
+
+    it "removes the indexes" do
+      collection.index_information.keys.should_not include('age_1')
+    end
+
+  end
+
   describe ".create_indexes" do
 
     let(:klass) do

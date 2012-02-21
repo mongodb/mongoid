@@ -16,9 +16,20 @@ module Mongoid #:nodoc
       #   Person.create_indexes
       def create_indexes
         return unless index_options
-        current_collection = self._collection || set_collection
         index_options.each_pair do |name, options|
-          current_collection.create_index(name, options)
+           current_collection.create_index(name, options)
+        end
+      end
+
+      # Send the actual index removal comments to the MongoDB driver,
+      # but lets _id untouched.
+      #
+      # @example Remove the indexes for the class.
+      #   Person.remove_indexes
+      def remove_indexes
+        index_information.keys.each do |name|
+          next if name == "_id_"
+          current_collection.drop_index(name)
         end
       end
 
@@ -48,6 +59,12 @@ module Mongoid #:nodoc
       def index(name, options = { :unique => false })
         self.index_options[name] = options
         create_indexes if Mongoid.autocreate_indexes
+      end
+
+      private
+
+      def current_collection
+        @current_collection ||= self._collection || set_collection
       end
     end
   end
