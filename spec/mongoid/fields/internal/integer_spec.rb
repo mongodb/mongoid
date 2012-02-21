@@ -57,8 +57,8 @@ describe Mongoid::Fields::Internal::Integer do
 
       context "when the value is a decimal" do
 
-        it "returns the decimal" do
-          field.serialize(2.5).should eq(2.5)
+        it "casts to integer" do
+          field.serialize(2.5).should eq(2)
         end
       end
 
