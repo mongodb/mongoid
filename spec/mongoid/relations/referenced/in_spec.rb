@@ -292,24 +292,24 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       context "when the relation is polymorphic" do
-        
+
         context "when multiple relations against the same class exist" do
-          
+
           let(:face) do
             Face.new
           end
-          
+
           let(:eye) do
             Eye.new
           end
-          
+
           it "raises an error" do
             expect {
               eye.eyeable = face
             }.to raise_error(Mongoid::Errors::InvalidSetPolymorphicRelation)
           end
         end
-        
+
         context "when one relation against the same class exists" do
 
           context "when the child is a new record" do
@@ -371,6 +371,247 @@ describe Mongoid::Relations::Referenced::In do
   end
 
   describe "#= nil" do
+
+    context "when dependent is destroy" do
+
+      let(:account) do
+        Account.create
+      end
+
+      let(:drug) do
+        Drug.create
+      end
+
+      let(:person) do
+        Person.create
+      end
+
+      context "when relation is has_one" do
+
+        before do
+          Account.belongs_to :person, :dependent => :destroy
+          Person.has_one :account
+          person.account = account
+          person.save
+        end
+
+        after :all do
+          Account.belongs_to :person, :dependent => :nullify
+          Person.has_one :account, :validate => false
+        end
+
+        context "when parent exists" do
+
+          context "when child is destroyed" do
+
+            before do
+              account.delete
+            end
+
+            it "deletes child" do
+              account.should be_destroyed
+            end
+
+            it "deletes parent" do
+              person.should be_destroyed
+            end
+          end
+        end
+      end
+
+      context "when relation is has_many" do
+
+        before do
+          Drug.belongs_to :person, :dependent => :destroy
+          Person.has_many :drugs
+          person.drugs = [drug]
+          person.save
+        end
+
+        after :all do
+          Drug.belongs_to :person, :dependent => :nullify
+          Person.has_many :drugs, :validate => false
+        end
+
+        context "when parent exists" do
+
+          context "when child is destroyed" do
+
+            before do
+              drug.delete
+            end
+
+            it "deletes child" do
+              drug.should be_destroyed
+            end
+
+            it "deletes parent" do
+              person.should be_destroyed
+            end
+          end
+        end
+      end
+    end
+
+    context "when dependent is delete" do
+
+      let(:account) do
+        Account.create
+      end
+
+      let(:drug) do
+        Drug.create
+      end
+
+      let(:person) do
+        Person.create
+      end
+
+      context "when relation is has_one" do
+
+        before do
+          Account.belongs_to :person, :dependent => :delete
+          Person.has_one :account
+          person.account = account
+          person.save
+        end
+
+        after :all do
+          Account.belongs_to :person, :dependent => :nullify
+          Person.has_one :account, :validate => false
+        end
+
+        context "when parent is persisted" do
+
+          context "when child is deleted" do
+
+            before do
+              account.delete
+            end
+
+            it "deletes child" do
+              account.should be_destroyed
+            end
+
+            it "deletes parent" do
+              person.should be_destroyed
+            end
+          end
+        end
+      end
+
+      context "when relation is has_many" do
+
+        before do
+          Drug.belongs_to :person, :dependent => :delete
+          Person.has_many :drugs
+          person.drugs = [drug]
+          person.save
+        end
+
+        after :all do
+          Drug.belongs_to :person, :dependent => :nullify
+          Person.has_many :drugs, :validate => false
+        end
+
+        context "when parent exists" do
+
+          context "when child is destroyed" do
+
+            before do
+              drug.delete
+            end
+
+            it "deletes child" do
+              drug.should be_destroyed
+            end
+
+            it "deletes parent" do
+              person.should be_destroyed
+            end
+          end
+        end
+      end
+    end
+
+    context "when dependent is nullify" do
+
+      let(:account) do
+        Account.create
+      end
+
+      let(:drug) do
+        Drug.create
+      end
+
+      let(:person) do
+        Person.create
+      end
+
+      context "when relation is has_one" do
+
+        before do
+          Account.belongs_to :person, :dependent => :nullify
+          Person.has_one :account
+          person.account = account
+          person.save
+        end
+
+        context "when parent is persisted" do
+
+          context "when child is deleted" do
+
+            before do
+              account.delete
+            end
+
+            it "deletes child" do
+              account.should be_destroyed
+            end
+
+            it "doesn't delete parent" do
+              person.should_not be_destroyed
+            end
+
+            it "removes the link" do
+              person.account.should be_nil
+            end
+          end
+        end
+      end
+
+      context "when relation is has_many" do
+
+        before do
+          Drug.belongs_to :person, :dependent => :nullify
+          Person.has_many :drugs
+          person.drugs = [drug]
+          person.save
+        end
+
+        context "when parent exists" do
+
+          context "when child is destroyed" do
+
+            before do
+              drug.delete
+            end
+
+            it "deletes child" do
+              drug.should be_destroyed
+            end
+
+            it "doesn't deletes parent" do
+              person.should_not be_destroyed
+            end
+
+            it "removes the link" do
+              person.drugs.should eq([])
+            end
+          end
+        end
+      end
+    end
 
     context "when the inverse relation has no reference defined" do
 
@@ -462,9 +703,9 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       context "when the relation is polymorphic" do
-        
+
         context "when multiple relations against the same class exist" do
-          
+
           context "when the parent is a new record" do
 
             let(:face) do
@@ -833,7 +1074,7 @@ describe Mongoid::Relations::Referenced::In do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :autosave, :foreign_key, :index, :polymorphic ]
+        [ :autosave, :dependent, :foreign_key, :index, :polymorphic ]
       )
     end
   end

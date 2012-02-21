@@ -25,6 +25,18 @@ module Mongoid # :nodoc:
           end
         end
 
+        # Removes the association between the base document and the target
+        # document by deleting the foreign key and the reference, orphaning
+        # the target document in the process.
+        #
+        # @example Nullify the relation.
+        #   person.game.nullify
+        #
+        def nullify
+          unbind_one
+          target.save
+        end
+
         # Substitutes the supplied target documents for the existing document
         # in the relation.
         #
@@ -240,7 +252,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def valid_options
-            [ :autosave, :foreign_key, :index, :polymorphic ]
+            [ :autosave, :dependent, :foreign_key, :index, :polymorphic ]
           end
 
           # Get the default validation setting for the relation. Determines if
