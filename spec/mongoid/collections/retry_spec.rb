@@ -64,6 +64,43 @@ describe Mongoid::Collections::Retry do
     end
   end
 
+  describe "when a connection times out" do
+
+    before do
+      subject.expects(:do_action).raises(Mongo::OperationTimeout).times(max_retries + 1)
+    end
+
+    describe "and Mongoid.max_retries_on_connection_failure is 0" do
+
+      let :max_retries do
+        0
+      end
+
+      it "raises Mongo::OperationTimeout" do
+        expect { subject.perform }.to raise_error(Mongo::OperationTimeout)
+      end
+    end
+
+    describe "and Mongoid.max_retries_on_connection_failure is greater than 0" do
+
+      let :max_retries do
+        5
+      end
+
+      before do
+        Mongoid.max_retries_on_connection_failure = max_retries
+      end
+
+      after do
+        Mongoid.max_retries_on_connection_failure = 0
+      end
+
+      it "raises Mongo::OperationTimeout" do
+        expect { subject.perform }.to raise_error(Mongo::OperationTimeout)
+      end
+    end
+  end
+
   describe "when a connection failure occurs and it comes back after a few retries" do
 
     let :result do
