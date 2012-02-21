@@ -976,8 +976,8 @@ describe Mongoid::Relations::Referenced::One do
 
       it "includes the type in the criteria" do
         criteria.selector.should eq(
-          { 
-            "ratable_id"    => id, 
+          {
+            "ratable_id"    => id,
             "ratable_type"  => "Book",
             "ratable_field" => { "$in" => [ :rating, nil ] }
           }
