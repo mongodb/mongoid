@@ -56,6 +56,10 @@ namespace :db do
     task :create_indexes => "mongoid:create_indexes"
   end
 
+  unless Rake::Task.task_defined?("db:force_remove_indexes")
+    task :force_remove_indexes => "mongoid:force_remove_indexes"
+  end
+
   namespace :mongoid do
     # gets a list of the mongoid models defined in the app/models directory
     def get_mongoid_models
@@ -85,6 +89,19 @@ namespace :db do
 
       models_paths.each do |path|
         ::Rails::Mongoid.create_indexes("#{path}/**/*.rb")
+      end
+    end
+
+    desc 'Remove the indexes defined on your mongoid models without questions!'
+    task :force_remove_indexes => :environment do
+      engines_models_paths = Rails.application.railties.engines.map do |engine|
+        engine.paths["app/models"].expanded
+      end
+      root_models_paths = Rails.application.paths["app/models"]
+      models_paths = engines_models_paths.push(root_models_paths).flatten
+
+      models_paths.each do |path|
+        ::Rails::Mongoid.remove_indexes("#{path}/**/*.rb")
       end
     end
 
