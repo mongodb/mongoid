@@ -106,6 +106,26 @@ module Mongoid # :nodoc:
           self
         end
 
+        # Defines the getter for the ids of documents in the relation. Should
+        # be specify only for referenced many relations.
+        #
+        # @example Set up the ids getter for the relation.
+        #   Person.ids_getter("addresses", metadata)
+        #
+        # @param [ String, Symbol ] name The name of the relation.
+        # @param [ Metadata] metadata The metadata for the relation.
+        #
+        # @return [ Class ] The class being set up.
+        def ids_getter(name, metadata)
+          ids_method = "#{name.to_s.singularize}_ids"
+          undef_method(ids_method) if method_defined?(ids_method)
+          define_method(ids_method) do
+            send(name).only(:id).map(&:id)
+          end
+          self
+        end
+
+
         # Defines the setter for the relation. This does a few things based on
         # some conditions. If there is an existing association, a target
         # substitution will take place, otherwise a new relation will be

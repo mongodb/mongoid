@@ -735,6 +735,20 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#_ids" do
+    let(:posts) do
+      [Post.create, Post.create]
+    end
+
+    let(:person) do
+      Person.create(posts: posts)
+    end
+
+    it "returns ids of documents that are in the relation" do
+      person.post_ids.should eq(posts.map(&:id))
+    end
+  end
+
   describe "#avg" do
 
     let(:person) do
