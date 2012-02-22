@@ -7,6 +7,13 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1741 Mongoid now provides a rake task to force remove indexes for
+  environments where Mongoid manages the index definitions and the
+  removal should be automated. (Hans Hasselberg)
+
+        rake db:force_remove_indexes
+        rake db:mongoid:force_remove_indexes
+
 * \#1726 `Mongoid.load!` now accepts an optional second argument for the
   environment to load. This takes precedence over any environment variable
   that is set if provided.
