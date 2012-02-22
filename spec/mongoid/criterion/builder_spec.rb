@@ -35,6 +35,7 @@ describe Mongoid::Criterion::Builder do
     end
 
     context "with attributes" do
+
       let(:criteria) do
         Mongoid::Criteria.new(Person, false).where(:title => "Sir")
       end

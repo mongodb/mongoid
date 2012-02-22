@@ -18,26 +18,41 @@ describe Mongoid::Generators::ModelGenerator do
     subject { file('app/models/company.rb') }
 
     describe 'defaults' do
-      before { run_generator %w(company) }
+      before do
+        run_generator %w(company)
+      end
+
       it { should exist }
       it { should contain "class Company" }
       it { should contain "include Mongoid::Document" }
     end
     describe 'with attributes' do
-      before { run_generator %w(company name:string) }
+      before do
+        run_generator %w(company name:string)
+      end
+
       it { should contain "field :name, :type => String" }
     end
     describe 'with timestamps' do
-      before { run_generator %w(company --timestamps) }
+      before do
+        run_generator %w(company --timestamps)
+      end
+
       it { should contain "include Mongoid::Timestamps" }
     end
     describe 'with a parent' do
-      before { run_generator %w(company --parent organization) }
+      before do
+        run_generator %w(company --parent organization)
+      end
+
       it { should contain "class Company < Organization" }
       it { should_not contain "include Mongoid::Document" }
     end
     describe 'with versioning' do
-      before { run_generator %w(company --versioning) }
+      before do
+        run_generator %w(company --versioning)
+      end
+
       it { should contain "include Mongoid::Versioning" }
     end
   end

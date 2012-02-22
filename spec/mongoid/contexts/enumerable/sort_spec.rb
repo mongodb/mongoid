@@ -50,34 +50,50 @@ describe Mongoid::Contexts::Enumerable::Sort do
 
     context "when a is nil" do
 
-      let(:value) { nil }
+      let(:value) do
+        nil
+      end
 
       context "and b is nil" do
 
-        let(:other_value) { nil }
+        let(:other_value) do
+          nil
+        end
+
         it { should eq(0) }
       end
 
       context "and b is not nil" do
 
-        let(:other_value) { "a" }
+        let(:other_value) do
+          "a"
+        end
+
         it { should eq(1) }
       end
     end
 
     context "when a is not nil" do
 
-      let(:value) { "a" }
+      let(:value) do
+        "a"
+      end
 
       context "and b is nil" do
 
-        let(:other_value) { nil }
+        let(:other_value) do
+          nil
+        end
+
         it { should eq(-1) }
       end
 
       context "and b is not nil" do
 
-        let(:other_value) { "b" }
+        let(:other_value) do
+          "b"
+        end
+
         it "uses default comparison" do
           value.expects(:<=>).with(other_value)
           subject

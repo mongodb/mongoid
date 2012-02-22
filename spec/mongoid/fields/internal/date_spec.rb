@@ -37,7 +37,9 @@ describe Mongoid::Fields::Internal::Date do
 
   describe "#deserialize" do
 
-    let(:time) { Time.now.utc }
+    let(:time) do
+      Time.now.utc
+    end
 
     it "converts the time back to a date" do
       field.deserialize(time).should be_a_kind_of(Date)
@@ -51,7 +53,9 @@ describe Mongoid::Fields::Internal::Date do
 
       context "when the local time is not observing daylight saving" do
 
-        let(:time) { Time.utc(2010, 11, 19) }
+        let(:time) do
+          Time.utc(2010, 11, 19)
+        end
 
         it "returns the same day" do
           field.deserialize(time).day.should eq(19)
@@ -60,7 +64,9 @@ describe Mongoid::Fields::Internal::Date do
 
       context "when the local time is observing daylight saving" do
 
-        let(:time) { Time.utc(2010, 9, 19) }
+        let(:time) do
+          Time.utc(2010, 9, 19)
+        end
 
         it "returns the same day" do
           field.deserialize(time).day.should eq(19)
@@ -70,9 +76,13 @@ describe Mongoid::Fields::Internal::Date do
 
     context "when the time zone is defined as UTC" do
 
-      before { Mongoid::Config.use_utc = true }
+      before do
+        Mongoid::Config.use_utc = true
+      end
 
-      after { Mongoid::Config.use_utc = false }
+      after do
+        Mongoid::Config.use_utc = false
+      end
 
       it "returns the same day" do
          field.deserialize(time.dup.utc).day.should eq(time.day)
@@ -181,7 +191,9 @@ describe Mongoid::Fields::Internal::Date do
 
     context "when given an ActiveSupport::TimeWithZone" do
 
-      let(:new_time) { time.in_time_zone("Canberra") }
+      let(:new_time) do
+        time.in_time_zone("Canberra")
+      end
 
       it "converts it to utc" do
         field.serialize(new_time).should eq(Time.utc(new_time.year, new_time.month, new_time.day))

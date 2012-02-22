@@ -56,7 +56,9 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
       context "when the object is an integer" do
 
-        let(:object_id) { 666 }
+        let(:object_id) do
+          666
+        end
 
         let(:object) do
           object_id
@@ -151,8 +153,14 @@ describe Mongoid::Relations::Builders::Referenced::In do
     end
 
     context 'setting an associated document to nil' do
-      let(:person) { Person.create }
-      let(:game) { Game.create(:person => person) }
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:game) do
+        Game.create(:person => person)
+      end
 
       before do
         game.person = nil
@@ -170,8 +178,14 @@ describe Mongoid::Relations::Builders::Referenced::In do
   end
 
   describe '#substitute' do
-    let(:person) { Person.create }
-    let(:game) { Game.create(:person => person) }
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:game) do
+      Game.create(:person => person)
+    end
 
     context 'setting an associated document to nil' do
       before do
@@ -188,7 +202,11 @@ describe Mongoid::Relations::Builders::Referenced::In do
     end
 
     context 'setting an associated document to nil' do
-      let(:other_person) { Person.create }
+
+      let(:other_person) do
+        Person.create
+      end
+
       before do
         game.person = other_person
       end

@@ -831,8 +831,13 @@ describe Mongoid::Persistence do
 
     context "when providing options" do
 
-      let(:person) { Person.create }
-      let(:params) { [{:pets => false}, {:as => :default}]}
+      let(:person) do
+        Person.create
+      end
+
+      let(:params) do
+        [{:pets => false}, {:as => :default}]
+      end
 
       it "accepts the additional parameter" do
         expect {
@@ -1053,8 +1058,13 @@ describe Mongoid::Persistence do
 
     context "when providing options" do
 
-      let(:person) { Person.create }
-      let(:params) { [{:pets => false}, {:as => :default}]}
+      let(:person) do
+        Person.create
+      end
+
+      let(:params) do
+        [{:pets => false}, {:as => :default}]
+      end
 
       it "accepts the additional parameter" do
         expect {
