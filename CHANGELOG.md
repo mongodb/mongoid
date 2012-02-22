@@ -242,6 +242,9 @@ For instructions on upgrading to newer versions, visit
   combination of `Model.pre_processed_defaults` and
   `Model.post_processed_defaults`
 
+        Band.pre_processed_defaults
+        Band.post_processed_defaults
+
 * `Model.identity` and `Model.key` have been removed. For custom ids,
   users must now override the _id field.
 
