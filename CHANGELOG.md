@@ -318,6 +318,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1746 Presence validation now shows which locales were empty for
+  localized fields. (Cyril Mougel)
+
 * \#1727 Allow dot notation in embedded criteria to work on both embeds one
   and embeds many. (Lyle Underwood)
 
