@@ -307,6 +307,9 @@ module Mongoid # :nodoc:
         def relate(name, metadata)
           self.relations = relations.merge(name.to_s => metadata)
           getter(name, metadata).setter(name, metadata)
+          if metadata.many? and !metadata.embedded?
+            ids_setter(name, metadata)
+          end
         end
       end
     end

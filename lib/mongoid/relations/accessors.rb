@@ -133,6 +133,28 @@ module Mongoid # :nodoc:
           end
           self
         end
+
+        # Defines the setter method that allows you to set documents
+        # in this relation by their ids. The defined setter, finds
+        # documents with given ids and invokes regular relation setter
+        # with found documents. Ids setters should be defined only for
+        # referenced many relations.
+        #
+        # @example Set up the id_setter for the relation.
+        #   Person.ids_setter("addesses", metadata)
+        #
+        #  @param [ String, Symbol ] name The name of the relation.
+        #  @param [ Metadata ] metadata The metadata for the relation.
+        #
+        #  @return [ Class ] The class being set up.
+        def ids_setter(name, metadata)
+          ids_method = "#{name.to_s.singularize}_ids="
+          undef_method(ids_method) if method_defined?(ids_method)
+          define_method(ids_method) do |ids|
+            send(metadata.setter, metadata.klass.find(ids))
+          end
+          self
+        end
       end
     end
   end
