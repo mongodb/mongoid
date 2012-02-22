@@ -15,26 +15,63 @@ module Rails #:nodoc:
     #
     # @since 2.1.0
     def create_indexes(pattern)
-      Dir.glob(pattern).each do |file|
+      logger = Logger.new($stdout)
+      models(pattern).each do |model|
+        next if model.index_options.empty?
+        unless model.embedded?
+          model.create_indexes
+          logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
+        else
+          logger.info("Index ignored on: #{model}, please define in the root model.")
+        end
+      end
+    end
+
+    # Remove indexes for each model given the provided pattern and the class is
+    # not embedded.
+    #
+    # @example Remove all the indexes.
+    #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
+    #
+    # @param [ String ] pattern The file matching pattern.
+    #
+    # @return [ Array<String> ] The file names.
+    #
+    def remove_indexes(pattern)
+      logger = Logger.new($stdout)
+      models(pattern).each do |model|
+        next if model.embedded?
+        indexes = model.index_information
+        indexes.delete('_id_')
+        next unless indexes.keys.present?
+
+        model.remove_indexes
+        logger.info("Removing indexes on: #{model} for: #{indexes.keys.join(', ')}.")
+      end
+    end
+
+    # Return all models matching the pattern.
+    #
+    # @example Return all models.
+    #   Rails::Mongoid.models("app/models/**/*.rb")
+    #
+    # @param [ String ] pattern The file matching pattern.
+    #
+    # @return [ Array<Class> ] The models.
+    #
+    def models(pattern)
+      Dir.glob(pattern).map do |file|
         logger = Logger.new($stdout)
         begin
-          model = determine_model(file, logger)
+          determine_model(file, logger)
         rescue => e
           logger.error(%Q{Failed to determine model from #{file}:
             #{e.class}:#{e.message}
             #{e.backtrace.join("\n")}
           })
+          nil
         end
-        if model
-          next if model.index_options.empty?
-          unless model.embedded?
-            model.create_indexes
-            logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
-          else
-            logger.info("Index ignored on: #{model}, please define in the root model.")
-          end
-        end
-      end
+      end.flatten.compact
     end
 
     # Use the application configuration to get every model and require it, so
