@@ -560,6 +560,7 @@ describe Mongoid::Criterion::Optional do
     end
 
     context "when no option exists" do
+
       it "returns nil" do
         base.offset.should be_nil
         base.options[:skip].should be_nil
@@ -667,6 +668,7 @@ describe Mongoid::Criterion::Optional do
     end
 
     context "when chained" do
+
       let(:criteria) do
         base.order_by(:title => :asc).order_by(:text => :desc).order_by(:title.desc)
       end

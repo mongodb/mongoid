@@ -16,6 +16,7 @@ describe "A document loaded from rails" do
   end
 
   describe "#_destroy" do
+
     it "always returns false" do
       Person.new._destroy.should be_false
     end

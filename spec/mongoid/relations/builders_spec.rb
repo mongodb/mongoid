@@ -209,8 +209,13 @@ describe Mongoid::Relations::Builders do
 
     context "with criteria applied" do
 
-      let(:person) { Person.new }
-      let(:services) { person.services.asc(:sid) }
+      let(:person) do
+        Person.new
+      end
+
+      let(:services) do
+        person.services.asc(:sid)
+      end
 
       subject { services.build }
 

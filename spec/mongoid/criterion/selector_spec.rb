@@ -115,7 +115,9 @@ describe Mongoid::Criterion::Selector do
 
     context "when the key is $or or $and" do
 
-      let(:value) { { "age" => "45"  } }
+      let(:value) do
+        { "age" => "45"  }
+      end
 
       context "when the value is not an array" do
 

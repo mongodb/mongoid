@@ -462,7 +462,9 @@ describe Mongoid::Contexts::Enumerable do
 
     context "with sort options" do
 
-      before { context.options[:sort] = [ [:created_at, :asc] ] }
+      before do
+        context.options[:sort] = [ [:created_at, :asc] ]
+      end
 
       it "sorts by the key" do
         docs.expects(:sort_by).once
