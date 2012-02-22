@@ -318,6 +318,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1751 Mongoid's logger now responds to level for Ruby logging API
+  compatibility.
+
 * \#1744/#1750 Sorting works now for localized fields in embedded documents
   using the criteria API. (Hans Hasselberg)
 
