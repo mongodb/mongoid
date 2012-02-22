@@ -118,10 +118,13 @@ describe Mongoid::Validations::PresenceValidator do
           )
         end
 
-        it "adds errors" do
-          product.errors[:name].should eq(["can't be blank in en", "can't be blank in de"])
+        it "adds en errors" do
+          product.errors[:name].should include("can't be blank in en")
         end
 
+        it "adds de errors" do
+          product.errors[:name].should include("can't be blank in de")
+        end
       end
     end
   end
