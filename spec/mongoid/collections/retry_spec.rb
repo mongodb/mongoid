@@ -18,7 +18,9 @@ describe Mongoid::Collections::Retry do
 
   subject { SomeCollection.new }
 
-  let(:logger) { stub.quacks_like(Logger.allocate) }
+  let(:logger) do
+    stub.quacks_like(Logger.allocate)
+  end
 
   before do
     Kernel.stubs(:sleep)

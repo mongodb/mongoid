@@ -69,6 +69,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       context "without skip or limit" do
+
         it "returns the number of documents" do
           Person.count.should eq(13)
         end

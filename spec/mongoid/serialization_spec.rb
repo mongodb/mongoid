@@ -130,6 +130,7 @@ describe Mongoid::Serialization do
     end
 
     context "when a model has relations" do
+
       let(:attributes) do
         { "title" => "President", "security_code" => "1234" }
       end
@@ -326,7 +327,9 @@ describe Mongoid::Serialization do
 
               context "after retrieved from database" do
 
-                let(:db_person) { Person.all.last }
+                let(:db_person) do
+                  Person.all.last
+                end
 
                 let!(:second_location) do
                   address_two.locations.build(:name => "Hotel")
@@ -694,7 +697,10 @@ describe Mongoid::Serialization do
   describe "#to_xml" do
 
     context "BSON::ObjectId" do
-      let(:person) { Person.new }
+
+      let(:person) do
+        Person.new
+      end
 
       it "serializes as string" do
         person.to_xml.should include("<_id>#{person.id}</_id>")

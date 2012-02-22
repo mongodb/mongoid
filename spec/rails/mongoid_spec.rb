@@ -7,11 +7,26 @@ describe "Rails::Mongoid" do
   end
 
   describe ".create_indexes" do
-    let(:pattern) { "spec/app/models/**/*.rb" }
-    let(:logger) { stub }
-    let(:klass) { Person }
-    let(:model_paths) { [ "spec/app/models/person.rb" ] }
-    let(:indexes) { Rails::Mongoid.create_indexes(pattern) }
+
+    let(:pattern) do
+      "spec/app/models/**/*.rb"
+    end
+
+    let(:logger) do
+      stub
+    end
+
+    let(:klass) do
+      Person
+    end
+
+    let(:model_paths) do
+      [ "spec/app/models/person.rb" ]
+    end
+
+    let(:indexes) do
+      Rails::Mongoid.create_indexes(pattern)
+    end
 
     before do
       Dir.expects(:glob).with(pattern).returns(model_paths).once
@@ -19,6 +34,7 @@ describe "Rails::Mongoid" do
     end
 
     context "with ordinary Rails models" do
+
       it "creates the indexes for the models" do
         klass.expects(:create_indexes).once
         logger.expects(:info).once
@@ -27,8 +43,14 @@ describe "Rails::Mongoid" do
     end
 
     context "with a model without indexes" do
-      let(:model_paths) { [ "spec/app/models/account.rb" ] }
-      let(:klass) { Account }
+
+      let(:model_paths) do
+        [ "spec/app/models/account.rb" ]
+      end
+
+      let(:klass) do
+        Account
+      end
 
       it "does nothing" do
         klass.expects(:create_indexes).never
@@ -37,6 +59,7 @@ describe "Rails::Mongoid" do
     end
 
     context "when an exception is raised" do
+
       it "is not swallowed" do
         Rails::Mongoid.expects(:determine_model).returns(klass)
         klass.expects(:create_indexes).raises(Mongo::MongoArgumentError)
@@ -45,8 +68,14 @@ describe "Rails::Mongoid" do
     end
 
     context "when index is defined on embedded model" do
-      let(:klass) { Address }
-      let(:model_paths) { [ "spec/app/models/address.rb" ] }
+
+      let(:klass) do
+        Address
+      end
+
+      let(:model_paths) do
+        [ "spec/app/models/address.rb" ]
+      end
 
       before do
         klass.index_options = { :city => {} }
@@ -61,10 +90,22 @@ describe "Rails::Mongoid" do
   end
 
   describe ".determine_model" do
-    let(:logger) { stub }
-    let(:klass) { Person }
-    let(:file) { "app/models/person.rb" }
-    let(:model) { Rails::Mongoid.send(:determine_model, file, logger) }
+
+    let(:logger) do
+      stub
+    end
+
+    let(:klass) do
+      Person
+    end
+
+    let(:file) do
+      "app/models/person.rb"
+    end
+
+    let(:model) do
+      Rails::Mongoid.send(:determine_model, file, logger)
+    end
 
     module Twitter
       class Follow
@@ -79,7 +120,10 @@ describe "Rails::Mongoid" do
     end
 
     context "when file is nil" do
-      let(:file) { nil }
+
+      let(:file) do
+        nil
+      end
 
       it "returns nil" do
         model.should be_nil
@@ -87,7 +131,10 @@ describe "Rails::Mongoid" do
     end
 
     context "when logger is nil" do
-      let(:logger) { nil }
+
+      let(:logger) do
+        nil
+      end
 
       it "returns nil" do
         model.should be_nil
@@ -95,7 +142,10 @@ describe "Rails::Mongoid" do
     end
 
     context "when path is invalid" do
-      let(:file) { "fu/bar.rb" }
+
+      let(:file) do
+        "fu/bar.rb"
+      end
 
       it "returns nil" do
         model.should be_nil
@@ -103,15 +153,23 @@ describe "Rails::Mongoid" do
     end
 
     context "when file is not in a subdir" do
+
       context "when file is from normal model" do
+
         it "returns klass" do
           model.should eq(klass)
         end
       end
 
       context "when file is in a module" do
-        let(:klass) { Twitter::Follow }
-        let(:file) { "app/models/follow.rb" }
+
+        let(:klass) do
+          Twitter::Follow
+        end
+
+        let(:file) do
+          "app/models/follow.rb"
+        end
 
         it "raises NameError" do
           logger.expects(:info)
@@ -121,8 +179,12 @@ describe "Rails::Mongoid" do
     end
 
     context "when file is in a subdir" do
+
       context "with file from normal model" do
-        let(:file) { "app/models/fu/person.rb" }
+
+        let(:file) do
+          "app/models/fu/person.rb"
+        end
 
         it "returns klass" do
           logger.expects(:info)
@@ -131,8 +193,14 @@ describe "Rails::Mongoid" do
       end
 
       context "when file is in a module" do
-        let(:klass) { Twitter::Follow }
-        let(:file) { "app/models/twitter/follow.rb" }
+
+        let(:klass) do
+          Twitter::Follow
+        end
+
+        let(:file) do
+          "app/models/twitter/follow.rb"
+        end
 
         it "returns klass in module" do
           model.should eq(klass)
@@ -140,8 +208,14 @@ describe "Rails::Mongoid" do
       end
 
       context "when file is in two modules" do
-        let(:klass) { Twitter::List::Tweet }
-        let(:file) { "app/models/twitter/list/tweet.rb" }
+
+        let(:klass) do
+          Twitter::List::Tweet
+        end
+
+        let(:file) do
+          "app/models/twitter/list/tweet.rb"
+        end
 
         it "returns klass in module" do
           model.should eq(klass)
@@ -150,8 +224,14 @@ describe "Rails::Mongoid" do
     end
 
     context "with models present in Rails engines" do
-      let(:file) { "/gem_path/engines/some_engine_gem/app/models/person.rb" }
-      let(:klass) { Person }
+
+      let(:file) do
+        "/gem_path/engines/some_engine_gem/app/models/person.rb"
+      end
+
+      let(:klass) do
+        Person
+      end
 
       it "requires the models by base name from the engine's app/models dir" do
         model.should eq(klass)

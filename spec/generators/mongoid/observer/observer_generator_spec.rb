@@ -15,7 +15,9 @@ describe Mongoid::Generators::ObserverGenerator do
   end
 
   describe 'no arguments' do
-    before { run_generator %w(company) }
+    before do
+      run_generator %w(company)
+    end
 
     describe 'app/models/company_observer.rb' do
       subject { file('app/models/company_observer.rb') }

@@ -147,6 +147,7 @@ describe Mongoid::Attributes do
     end
 
     context "when using override" do
+
       let(:account) do
         Account.new
       end
@@ -849,6 +850,7 @@ describe Mongoid::Attributes do
       end
 
       context "when attribute does not exist" do
+
         it "returns false" do
           person.attribute_present?(:owner_id).should be_false
         end
@@ -887,11 +889,13 @@ describe Mongoid::Attributes do
     end
 
     context "when the value is boolean" do
+
       let(:person) do
         Person.new
       end
 
       context "when attribute does not exist" do
+
         context "when the value is true" do
 
           it "return true"  do
@@ -901,6 +905,7 @@ describe Mongoid::Attributes do
         end
 
         context "when the value is false" do
+
           it "return true"  do
             person.terms = false
             person.attribute_present?(:terms).should be_true
@@ -910,6 +915,7 @@ describe Mongoid::Attributes do
     end
 
     context "when the value is blank string" do
+
       let(:person) do
         Person.new(:title => '')
       end
@@ -1126,7 +1132,9 @@ describe Mongoid::Attributes do
 
   describe "#typed_value_for" do
 
-    let(:person) { Person.new }
+    let(:person) do
+      Person.new
+    end
 
     context "when the key has been specified as a field" do
 
@@ -1145,7 +1153,9 @@ describe Mongoid::Attributes do
 
     context "when the key has not been specified as a field" do
 
-      before { person.stubs(:fields).returns({}) }
+      before do
+        person.stubs(:fields).returns({})
+      end
 
       it "returns the value" do
         person.send(:typed_value_for, "age", "51").should eq("51")
@@ -1157,7 +1167,9 @@ describe Mongoid::Attributes do
 
   describe "#apply_default_attributes" do
 
-    let(:person) { Person.new }
+    let(:person) do
+      Person.new
+    end
 
     it "typecasts proc values" do
       person.age.should eq(100)
@@ -1401,7 +1413,9 @@ describe Mongoid::Attributes do
 
   context "with a default last_drink_taken_at" do
 
-    let(:person) { Person.new }
+    let(:person) do
+      Person.new
+    end
 
     it "saves the default" do
       expect { person.save }.to_not raise_error

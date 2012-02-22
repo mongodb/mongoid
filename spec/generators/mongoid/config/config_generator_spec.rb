@@ -23,7 +23,9 @@ describe Mongoid::Generators::ConfigGenerator do
   end
 
   describe 'no arguments' do
-    before { run_generator  }
+    before do
+      run_generator
+    end
 
     describe 'config/mongoid.yml' do
       subject { file('config/mongoid.yml') }
@@ -33,7 +35,9 @@ describe Mongoid::Generators::ConfigGenerator do
   end
 
   describe 'specifying database name' do
-    before { run_generator %w(my_database) }
+    before do
+      run_generator %w(my_database)
+    end
 
     describe 'config/mongoid.yml' do
       subject { file('config/mongoid.yml') }
