@@ -50,3 +50,4 @@ zh-CN:
         scope_overwrite:
           "Cannot create scope :%{scope_name}, because of existing method
           %{model_name}.%{scope_name}."
+        blank_on_locale: "can't be blank in %{in_locale}"

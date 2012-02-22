@@ -29,7 +29,7 @@ module Mongoid #:nodoc:
         field = document.fields[attribute.to_s]
         if field && field.localized? && !value.blank?
           value.each_pair do |locale, value|
-            document.errors.add(attribute, :blank, options) if value.blank?
+            document.errors.add(attribute, :blank_on_locale, options.merge(:in_locale => locale)) if value.blank?
           end
         else
           document.errors.add(attribute, :blank, options) if value.blank?
