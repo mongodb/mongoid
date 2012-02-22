@@ -114,6 +114,21 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             it "adds the correct number of documents" do
               person.preferences.size.should eq(1)
             end
+
+            context "when appending a second time" do
+
+              before do
+                person.preferences.send(method, preference)
+              end
+
+              it "allows the document to be added again" do
+                person.preferences.should eq([ preference, preference ])
+              end
+
+              it "allows duplicate ids" do
+                person.preference_ids.should eq([ preference.id, preference.id ])
+              end
+            end
           end
 
           context "when the child is already persisted" do
