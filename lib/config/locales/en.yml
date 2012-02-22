@@ -4,6 +4,8 @@ en:
       messages:
         blank:
           "can't be blank"
+        blank_in_locale:
+          "can't be blank in %{in_locale}"
         callbacks:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."
