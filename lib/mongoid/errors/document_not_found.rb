@@ -7,7 +7,7 @@ module Mongoid #:nodoc
     # it will display all of those.
     class DocumentNotFound < MongoidError
 
-      attr_reader :identifiers
+      attr_reader :params
 
       # Create the new error.
       #
@@ -19,21 +19,72 @@ module Mongoid #:nodoc
       #
       # @param [ Class ] klass The model class.
       # @param [ Hash, Array, Object ] attrs The attributes or ids.
-      def initialize(klass, attrs)
-        @identifiers = attrs
+      def initialize(klass, params, unmatched)
         super(
           compose_message(
-            message_key,
+            message_key(params),
             {
               :klass => klass.name,
-              :identifiers => identifiers,
-              :attributes => identifiers
+              :searched => searched(params),
+              :attributes => params,
+              :total => total(params),
+              :missing => missing(unmatched)
             }
           )
         )
       end
 
       private
+
+      # Get the string to display the document params that were unmatched.
+      #
+      # @example Get the missing string.
+      #   error.missing(1)
+      #
+      # @param [ Object, Array ] unmatched The ids that did not match.
+      #
+      # @return [ String ] The missing string.
+      #
+      # @since 3.0.0
+      def missing(unmatched)
+        if unmatched.is_a?(::Array)
+          unmatched.join(", ")
+        else
+          unmatched
+        end
+      end
+
+      # Get the string to display the document params that were searched for.
+      #
+      # @example Get the searched string.
+      #   error.searched(1)
+      #
+      # @param [ Object, Array ] params The ids that were searched for.
+      #
+      # @return [ String ] The searched string.
+      #
+      # @since 3.0.0
+      def searched(params)
+        if params.is_a?(::Array)
+          params.take(3).join(", ") + " ..."
+        else
+          params
+        end
+      end
+
+      # Get the total number of expected documents.
+      #
+      # @example Get the total.
+      #   error.total([ 1, 2, 3 ])
+      #
+      # @param [ Object, Array ] params What was searched for.
+      #
+      # @return [ Integer ] The total number.
+      #
+      # @since 3.0.0
+      def total(params)
+        params.is_a?(::Array) ? params.count : 1
+      end
 
       # Create the problem.
       #
@@ -43,8 +94,8 @@ module Mongoid #:nodoc
       # @return [ String ] The problem.
       #
       # @since 3.0.0
-      def message_key
-        case identifiers
+      def message_key(params)
+        case params
           when Hash then "document_with_attributes_not_found"
           else "document_not_found"
         end

@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
     def reload
       _reload.tap do |reloaded|
         if Mongoid.raise_not_found_error && reloaded.empty?
-          raise Errors::DocumentNotFound.new(self.class, id)
+          raise Errors::DocumentNotFound.new(self.class, id, id)
         end
         @attributes = reloaded
       end

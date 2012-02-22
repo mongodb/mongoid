@@ -126,9 +126,19 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0
       def execute_or_raise(args)
-        (args[0].is_a?(Array) ? entries : from_map_or_db).tap do |result|
-          if Mongoid.raise_not_found_error && !args.flatten.blank?
-            raise Errors::DocumentNotFound.new(klass, args) if result._vacant?
+        ids = args[0]
+        if ids.is_a?(::Array)
+          entries.tap do |result|
+            if (entries.size < ids.size) && Mongoid.raise_not_found_error
+              missing = ids - entries.map(&:_id)
+              raise Errors::DocumentNotFound.new(klass, ids, missing)
+            end
+          end
+        else
+          from_map_or_db.tap do |result|
+            if result.nil? && ids && Mongoid.raise_not_found_error
+              raise Errors::DocumentNotFound.new(klass, ids, ids)
+            end
           end
         end
       end

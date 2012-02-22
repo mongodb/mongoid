@@ -559,6 +559,15 @@ describe Mongoid::Criterion::Inclusion do
 
       context "when the id is not found" do
 
+        context "when not all ids are found" do
+
+          it "raises an error" do
+            expect {
+              Person.where(:title => "Sir").find([ person.id, BSON::ObjectId.new ])
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
         context "when raising a not found error" do
 
           it "raises an error" do

@@ -7,12 +7,12 @@ describe Mongoid::Errors::DocumentNotFound do
     context "when providing an id" do
 
       let(:error) do
-        described_class.new(Person, 1)
+        described_class.new(Person, 1, 1)
       end
 
       it "contains the problem in the message" do
         error.message.should include(
-          "Document not found for class Person with id(s) 1."
+          "Document(s) not found for class Person with id(s) 1."
         )
       end
 
@@ -32,12 +32,12 @@ describe Mongoid::Errors::DocumentNotFound do
     context "when providing ids" do
 
       let(:error) do
-        described_class.new(Person, [ 1, 2, 3 ])
+        described_class.new(Person, [ 1, 2, 3 ], [ 1 ])
       end
 
       it "contains the problem in the message" do
         error.message.should include(
-          "Document not found for class Person with id(s) [1, 2, 3]."
+          "Document(s) not found for class Person with id(s) 1."
         )
       end
 
@@ -57,7 +57,7 @@ describe Mongoid::Errors::DocumentNotFound do
     context "when providing attributes" do
 
       let(:error) do
-        described_class.new(Person, { :name => "syd" })
+        described_class.new(Person, { :name => "syd" }, nil)
       end
 
       it "contains the problem in the message" do

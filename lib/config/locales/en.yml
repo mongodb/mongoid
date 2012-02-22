@@ -21,12 +21,16 @@ en:
             through to the find, and the parameter either is not present or the
             key from which it is accessed is incorrect."
         document_not_found:
-          message: "Document not found for class %{klass} with id(s) %{identifiers}."
+          message: "Document(s) not found for class %{klass} with id(s) %{missing}."
           summary: "When calling %{klass}.find with an id or array of ids, each
-            parameter must match a document in the database or this error will be raised."
+            parameter must match a document in the database or this error will be
+            raised. The search was for the id(s): %{searched} (%{total} total)
+            and the following ids were not found: %{missing}."
           resolution: "Search for an id that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error."
+            which will cause a nil to be returned instead of raising this error when
+            searching for a single id, or only the matched documents when searching
+            for multiples."
         document_with_attributes_not_found:
           message: "Document not found for class %{klass} with attributes %{attributes}."
           summary: "When calling %{klass}.find_by with a hash of attributes, all
