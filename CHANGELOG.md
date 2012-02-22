@@ -263,6 +263,11 @@ For instructions on upgrading to newer versions, visit
 * Mongoid no longer supports 1.8 syntax. 1.9.x or other vms running in
   1.9 mode is now only supported.
 
+* \#1734 When searching for documents via `Model.find` with multiple ids,
+  Mongoid will raise an error if not *all* ids are found, and tell you
+  what the missing ones were. Previously the error only got raised if
+  nothing was returned.
+
 * \#1484 `Model#has_attribute?` now behaves the same as Active Record.
 
 * \#1471 Mongoid no longer strips any level of precision off of times.
