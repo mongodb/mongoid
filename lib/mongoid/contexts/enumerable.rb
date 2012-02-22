@@ -303,7 +303,8 @@ module Mongoid #:nodoc:
         return documents if options[:sort].blank?
         documents.sort_by do |document|
           options[:sort].map do |key, direction|
-            Sort.new(document.read_attribute(key), direction)
+            key = key.to_s.gsub(/(.*)\.#{I18n.locale}$/, '\1')
+            Sort.new(document.send(key), direction)
           end
         end
       end

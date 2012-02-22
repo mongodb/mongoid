@@ -312,6 +312,25 @@ describe Mongoid::Contexts::Enumerable do
         context.send(:sort, docs)
       end
     end
+
+    context "with localized field" do
+
+      before do
+        Address.field(:street, :localize => true)
+        context.options[:sort] = [ [:"street.#{::I18n.locale}", :asc] ]
+      end
+
+      after :all do
+        Address.field(:street)
+      end
+
+      it "removes the appended locale from key" do
+        docs.each do |doc|
+          doc.expects(:street).once
+        end
+        context.send(:sort, docs)
+      end
+    end
   end
 
   describe "#sum" do
