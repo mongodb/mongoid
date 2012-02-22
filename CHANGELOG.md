@@ -318,6 +318,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1744/#1750 Sorting works now for localized fields in embedded documents
+  using the criteria API. (Hans Hasselberg)
+
 * \#1746 Presence validation now shows which locales were empty for
   localized fields. (Cyril Mougel)
 
