@@ -19,7 +19,8 @@ module Mongoid #:nodoc:
           "FALSE" => false,
           "0" => false,
           0 => false,
-          0.0 => false
+          0.0 => false,
+          nil => nil
         }
 
         # Special case to serialize the object.
@@ -49,8 +50,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def serialize(object)
-          object = MAPPINGS[object]
-          object.nil? ? nil : object
+          MAPPINGS.has_key?(object) ? MAPPINGS[object] : false
         end
       end
     end

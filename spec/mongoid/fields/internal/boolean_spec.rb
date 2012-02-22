@@ -70,5 +70,12 @@ describe Mongoid::Fields::Internal::Boolean do
         field.serialize(nil).should be_nil
       end
     end
+
+    context "when provided hash" do
+
+      it "returns false" do
+        field.serialize({:a => :b}).should eq(false)
+      end
+    end
   end
 end
