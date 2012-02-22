@@ -4,7 +4,13 @@ module Mongoid #:nodoc:
   # The Mongoid logger which wraps some other ruby compliant logger class.
   class Logger
 
-    delegate :info, :debug, :error, :fatal, :unknown, :to => :logger, :allow_nil => true
+    delegate \
+      :info,
+      :debug,
+      :error,
+      :fatal,
+      :level,
+      :unknown, :to => :logger, :allow_nil => true
 
     # Emit a warning log message.
     #
