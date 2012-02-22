@@ -12,10 +12,10 @@ module Mongoid #:nodoc:
         # field called "empty" on the document.
         #
         # @example Is the array vacant?
-        #   [].vacant?
+        #   []._vacant?
         #
         # @example Is the object vacant?
-        #   nil.vacant?
+        #   nil._vacant?
         #
         # @return [ true, false ] True if empty or nil, false if not.
         #
