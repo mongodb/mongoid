@@ -66,6 +66,13 @@ describe Mongoid::Fields::Internal::Hash do
 
   describe "#serialize" do
 
+    context "when the value is not a hash" do
+
+      it "attempts to convert the value to a hash" do
+        field.serialize([[ "test", "value" ]]).should eq({ "test" => "value" })
+      end
+    end
+
     context "when the value is nil" do
 
       it "returns nil" do

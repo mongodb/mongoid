@@ -90,13 +90,6 @@ en:
             for Date, DateTime, and Time objects. When this is a String it needs
             to be valid for Time.parse. Other objects must be valid to pass to
             Time.local."
-        invalid_type:
-          message: "Field was defined as a(n) %{klass}, but received a %{other}
-            with the value %{value}."
-          summary: "Some types in Mongoid prevent you from setting them to a
-            value that differs from the defined type, like Array, instead of
-            attempting to convert it."
-          resolution: "Set the proper type, %{klass}."
         inverse_not_found:
           message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
             not determine the inverse foreign key to set. The attempted key was

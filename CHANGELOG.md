@@ -313,6 +313,14 @@ For instructions on upgrading to newer versions, visit
 * \#1268 `Model#new?` has been removed, developers must now always use
   `Model#new_record?`.
 
+* \#1093 Field serialization strategies have changed on Array, Hash, Integer
+  and Boolean to be more consistent and match AR where appropriate.
+
+    Serialization of arrays calls `Array.wrap(object)`
+    Serialization of hashes calls `Hash[object]` (to_hash on the object)
+    Serialization of integers always returns an int via `to_i`
+    Serialization of booleans defaults to false instead of nil.
+
 * \#933 `:field.size` has been renamed to `:field.count` in criteria for
   $size not to conflict with Symbol's size method.
 

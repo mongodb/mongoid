@@ -121,10 +121,8 @@ describe Mongoid::Fields::Internal::Array do
 
     context "when the value is not an array" do
 
-      it "raises an error" do
-        expect {
-          field.serialize("test")
-        }.to raise_error(Mongoid::Errors::InvalidType)
+      it "wraps the value in an array" do
+        field.serialize("test").should eq([ "test" ])
       end
     end
 
