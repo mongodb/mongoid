@@ -1273,4 +1273,24 @@ describe Mongoid::Callbacks do
       end
     end
   end
+
+  context "when loading a model multiple times" do
+
+    before do
+      load "spec/app/models/callback_test.rb"
+      load "spec/app/models/callback_test.rb"
+    end
+
+    let(:callback) do
+      CallbackTest.new
+    end
+
+    context "when saving the document" do
+
+      it "only executes the callbacks once" do
+        callback.expects(:execute).once
+        callback.save
+      end
+    end
+  end
 end
