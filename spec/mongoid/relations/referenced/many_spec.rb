@@ -716,6 +716,39 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#_ids=" do
+    let(:person) do
+      Person.new
+    end
+
+    let(:post1) do
+      Post.create
+    end
+
+    let(:post2) do
+      Post.create
+    end
+
+    it "calls setter with documents find by given ids" do
+      person.expects(:posts=).with([post1, post2])
+      person.post_ids = [post1.id, post2.id]
+    end
+  end
+
+  describe "#_ids" do
+    let(:posts) do
+      [Post.create, Post.create]
+    end
+
+    let(:person) do
+      Person.create(posts: posts)
+    end
+
+    it "returns ids of documents that are in the relation" do
+      person.post_ids.should eq(posts.map(&:id))
+    end
+  end
+
   describe "#avg" do
 
     let(:person) do
@@ -1694,8 +1727,8 @@ describe Mongoid::Relations::Referenced::Many do
 
       it "includes the type in the criteria" do
         criteria.selector.should eq(
-          { 
-            "ratable_id"    => id, 
+          {
+            "ratable_id"    => id,
             "ratable_type"  => "Movie",
             "ratable_field" => { "$in" => [ :ratings, nil ] }
           }
