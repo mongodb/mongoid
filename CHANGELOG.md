@@ -7,6 +7,24 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1753/#1649 A setter and getter for has_many relations to set it's
+  children is now provided. (Piotr Jakubowski)
+
+        class Album
+          include Mongoid::Document
+          has_many :engineers
+        end
+
+        class Engineer
+          include Mongoid::Document
+          belongs_to :album
+        end
+
+        album = Album.first
+        engineer = Engineer.first
+        album.engineer_ids = [ engineer.id ]
+        album.engineer_ids # Returns the ids of the engineers.
+
 * \#1741 Mongoid now provides a rake task to force remove indexes for
   environments where Mongoid manages the index definitions and the
   removal should be automated. (Hans Hasselberg)

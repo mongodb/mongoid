@@ -158,6 +158,7 @@ module Mongoid # :nodoc:
         def has_many(name, options = {}, &block)
           characterize(name, Referenced::Many, options, &block).tap do |meta|
             relate(name, meta)
+            ids_getter(name, meta).ids_setter(name, meta)
             reference(meta)
             autosave(meta)
             validates_relation(meta)
@@ -307,9 +308,6 @@ module Mongoid # :nodoc:
         def relate(name, metadata)
           self.relations = relations.merge(name.to_s => metadata)
           getter(name, metadata).setter(name, metadata)
-          if metadata.relation == Referenced::Many
-            ids_getter(name, metadata).ids_setter(name, metadata)
-          end
         end
       end
     end
