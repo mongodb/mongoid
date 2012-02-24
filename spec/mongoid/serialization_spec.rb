@@ -10,28 +10,6 @@ describe Mongoid::Serialization do
         Person.create
       end
 
-      context "when the model has embedded documents" do
-
-        let!(:address) do
-          person.addresses.create(:street => "test")
-        end
-
-        let(:attributes) do
-          person.serializable_hash(:methods => :id, :except => :_id)
-        end
-
-        let(:address_attributes) do
-          attributes["addresses"].first
-        end
-
-        it "uses the overridden method" do
-          attributes["id"].should eq(person.id)
-        end
-
-        it "uses the overridden method on embedded documents" do
-          address_attributes["id"].should eq(address.id)
-        end
-      end
     end
   end
 
@@ -47,12 +25,33 @@ describe Mongoid::Serialization do
         person.addresses.build(:street => "test")
       end
 
-      let(:attributes) do
-        person.serializable_hash
-      end
+      context "when providing no custom options" do
 
-      it "includes the embedded documents" do
-        attributes["addresses"].first.should eq(address.serializable_hash)
+        let(:attributes) do
+          person.serializable_hash
+        end
+
+        it "includes the embedded documents" do
+          attributes["addresses"].first.should eq(address.serializable_hash)
+        end
+
+      context "when providing options" do
+
+        let(:attributes) do
+          person.serializable_hash(:methods => :id, :except => :_id)
+        end
+
+        let(:address_attributes) do
+          attributes["addresses"].first
+        end
+
+        it "uses the options" do
+          attributes["id"].should eq(person.id)
+        end
+
+        it "uses the options on embedded documents" do
+          address_attributes["id"].should eq(address.id)
+        end
       end
     end
 
