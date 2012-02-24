@@ -46,11 +46,13 @@ module Mongoid # :nodoc:
       end.compact
 
       {}.tap do |attrs|
-        attribute_names.each do |name|
-          attrs[name] = attributes[name]
-        end
-        method_names.each do |name|
-          attrs[name] = send(name)
+        (attribute_names + method_names).each do |name|
+          value = send(name)
+          if relations.has_key?(name)
+            attrs[name] = value.as_document
+          else
+            attrs[name] = value
+          end
         end
         serialize_relations(attrs, options) if options[:include]
       end
