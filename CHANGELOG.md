@@ -10,6 +10,8 @@ For instructions on upgrading to newer versions, visit
 * \#1757 Ensure serialization converts any attribute types to the type
   defined by the field.
 
+* \#1756 Serializable hash options should pass through to embedded docs.
+
 ## 2.4.5
 
 ### Resolved Issues

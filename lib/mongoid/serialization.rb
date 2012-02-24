@@ -49,7 +49,7 @@ module Mongoid # :nodoc:
         (attribute_names + method_names).each do |name|
           value = send(name)
           if relations.has_key?(name)
-            attrs[name] = value.as_document
+            attrs[name] = value.serializable_hash(options)
           else
             attrs[name] = value
           end
@@ -99,8 +99,7 @@ module Mongoid # :nodoc:
       inclusions = options[:include]
       relation_names(inclusions).each do |name|
         metadata = relations[name.to_s]
-        relation = send(metadata.name)
-        if relation
+        if metadata && relation = send(metadata.name)
           attributes[metadata.name.to_s] =
             relation.serializable_hash(relation_options(inclusions, options, name))
         end
