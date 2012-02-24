@@ -21,7 +21,7 @@ module Mongoid # :nodoc:
             return object if object.first.is_a?(Document)
             [].tap do |docs|
               object.each do |attrs|
-                if _loading?
+                if _loading? && base.persisted?
                   docs.push(Factory.from_db(klass, attrs))
                 else
                   docs.push(Factory.build(klass, attrs))

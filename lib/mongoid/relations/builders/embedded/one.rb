@@ -17,7 +17,7 @@ module Mongoid # :nodoc:
           # @return [ Document ] A single document.
           def build(type = nil)
             return object unless object.is_a?(Hash)
-            if _loading?
+            if _loading? && base.persisted?
               Factory.from_db(klass, object)
             else
               Factory.build(klass, object)

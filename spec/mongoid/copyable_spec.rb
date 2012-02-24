@@ -71,12 +71,20 @@ describe Mongoid::Copyable do
             copy.addresses.should eq(person.addresses)
           end
 
+          it "sets the embedded many documents as new" do
+            copy.addresses.first.should be_new_record
+          end
+
           it "creates new embeds many instances" do
             copy.addresses.should_not equal(person.addresses)
           end
 
           it "copys embeds one documents" do
             copy.name.should eq(person.name)
+          end
+
+          it "flags the embeds one documents as new" do
+            copy.name.should be_new_record
           end
 
           it "creates a new embeds one instance" do
