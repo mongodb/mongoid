@@ -8,6 +8,40 @@ describe Mongoid::Serialization do
       Person.new
     end
 
+    context "when the model has embedded documents" do
+
+      let!(:address) do
+        person.addresses.build(:street => "test")
+      end
+
+      let(:attributes) do
+        person.serializable_hash
+      end
+
+      it "includes the embedded documents" do
+        attributes["addresses"].first.should eq(address.as_document)
+      end
+    end
+
+    context "when the model has attributes that need conversion" do
+
+      let(:date) do
+        Date.new(1970, 1, 1)
+      end
+
+      before do
+        person.dob = date
+      end
+
+      let(:attributes) do
+        person.serializable_hash
+      end
+
+      it "converts the objects to the defined type" do
+        attributes["dob"].should eq(date)
+      end
+    end
+
     context "when a model has defined fields" do
 
       let(:attributes) do

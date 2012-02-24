@@ -343,7 +343,14 @@ For instructions on upgrading to newer versions, visit
 
 * \#1135 DateTimes now properly get time zones on derserialization.
 
-## 2.4.5 (branch: 2.4.0-stable)
+## 2.4.6 (branch: 2.4.0-stable)
+
+* \#1757 Ensure serialization converts any attribute types to the type
+  defined by the field.
+
+### Resolved Issues
+
+## 2.4.5
 
 ### Resolved Issues
 
