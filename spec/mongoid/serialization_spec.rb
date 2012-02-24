@@ -2,6 +2,39 @@ require "spec_helper"
 
 describe Mongoid::Serialization do
 
+  describe "#as_json" do
+
+    context "when the method is overridden" do
+
+      let(:person) do
+        Person.create
+      end
+
+      context "when the model has embedded documents" do
+
+        let!(:address) do
+          person.addresses.create(:street => "test")
+        end
+
+        let(:attributes) do
+          person.serializable_hash(:methods => :id, :except => :_id)
+        end
+
+        let(:address_attributes) do
+          attributes["addresses"].first
+        end
+
+        it "uses the overridden method" do
+          attributes["id"].should eq(person.id)
+        end
+
+        it "uses the overridden method on embedded documents" do
+          address_attributes["id"].should eq(address.id)
+        end
+      end
+    end
+  end
+
   describe "#serializable_hash" do
 
     let(:person) do
@@ -19,7 +52,7 @@ describe Mongoid::Serialization do
       end
 
       it "includes the embedded documents" do
-        attributes["addresses"].first.should eq(address.as_document)
+        attributes["addresses"].first.should eq(address.serializable_hash)
       end
     end
 
