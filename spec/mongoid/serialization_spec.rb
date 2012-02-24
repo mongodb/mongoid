@@ -34,6 +34,7 @@ describe Mongoid::Serialization do
         it "includes the embedded documents" do
           attributes["addresses"].first.should eq(address.serializable_hash)
         end
+      end
 
       context "when providing options" do
 
