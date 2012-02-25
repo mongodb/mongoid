@@ -345,12 +345,14 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.4.6 (branch: 2.4.0-stable)
 
+### Resolved Issues
+
+* \#1758 Metadata now returns self on options for external library support.
+
 * \#1757 Ensure serialization converts any attribute types to the type
   defined by the field.
 
 * \#1756 Serializable hash options should pass through to embedded docs.
-
-### Resolved Issues
 
 ## 2.4.5
 

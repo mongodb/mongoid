@@ -754,6 +754,19 @@ module Mongoid # :nodoc:
         !!self[:versioned]
       end
 
+      # Returns the metadata itself. Here for compatibility with Rails
+      # association metadata.
+      #
+      # @example Get the options.
+      #   metadata.options
+      #
+      # @return [ Metadata ] self.
+      #
+      # @since 2.4.6
+      def options
+        self
+      end
+
       # Returns default order for this association.
       #
       # @example Get default order
