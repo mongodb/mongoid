@@ -337,7 +337,7 @@ module Mongoid #:nodoc
       # @since 2.1.8
       def check_field_name!(name)
         if Mongoid.destructive_fields.include?(name)
-          raise Errors::InvalidField.new(name)
+          raise Errors::InvalidField.new(self, name)
         end
       end
 

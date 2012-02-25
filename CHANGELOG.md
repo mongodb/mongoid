@@ -7,6 +7,26 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1759 Invalid fields error messages have been updated to show the
+  source and location of the original method. The new message is:
+
+        Problem:
+          Defining a field named 'crazy_method' is not allowed.
+        Summary:
+          Defining this field would override the method 'crazy_method',
+          which would cause issues with expectations around the original
+          method and cause extremely hard to debug issues.
+          The original method was defined in:
+            Object: MyModule
+            File: /path/to/my/module.rb
+            Line: 8
+        Resolution:
+          Use Mongoid.destructive_fields to see what names are
+          not allowed, and don't use these names. These include names
+          that also conflict with core Ruby methods on Object, Module,
+          Enumerable, or included gems that inject methods into these
+          or Mongoid internals.
+
 * \#1753/#1649 A setter and getter for has_many relations to set it's
   children is now provided. (Piotr Jakubowski)
 

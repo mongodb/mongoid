@@ -66,14 +66,18 @@ en:
           resolution: "Make sure that when setting the configuration
             programatically that you are passing an actual db instance."
         invalid_field:
-          message: "Defining a field named %{name} is not allowed."
-          summary: "Defining fields that conflict with Mongoid internal
-            attributes or method names is not allowed since it can cause issues
-            which are very difficult to track down."
+          message: "Defining a field named '%{name}' is not allowed."
+          summary: "Defining this field would override the method '%{name}',
+            which would cause issues with expectations around the original
+            method and cause extremely hard to debug issues. The original
+            method was defined in:\n
+            \_\_Object: %{origin}\n
+            \_\_File: %{file}\n
+            \_\_Line: %{line}"
           resolution: "Use Mongoid.destructive_fields to see what names are not
-            allowed, and don't use these names. Also defining field names that
-            conflict with core Ruby methods on Object, Kernel, or Enumerable is
-            a disaster waiting to happen."
+            allowed, and don't use these names. These include names that also
+            conflict with core Ruby methods on Object, Module, Enumerable, or
+            included gems that inject methods into these or Mongoid internals."
         invalid_options:
           message: "Invalid option :%{invalid} provided to relation :%{name}."
           summary: "Mongoid checks the options that are passed to the relation
