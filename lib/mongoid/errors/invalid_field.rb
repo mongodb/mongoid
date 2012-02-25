@@ -56,7 +56,8 @@ module Mongoid #:nodoc
       #
       # @since 3.0.0
       def location(klass, name)
-        @location ||= klass.instance_method(name).source_location
+        @location ||=
+          (klass.instance_method(name).source_location || [ "Unknown", 0 ])
       end
     end
   end
