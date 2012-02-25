@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1758 Metadata now returns self on options for external library support.
+
 * \#1757 Ensure serialization converts any attribute types to the type
   defined by the field.
 

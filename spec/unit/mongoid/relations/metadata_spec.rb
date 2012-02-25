@@ -1034,7 +1034,22 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  context "#order" do
+  describe "#options" do
+
+    let(:metadata) do
+      described_class.new(
+        :order => :rating.asc,
+        :relation => Mongoid::Relations::Referenced::Many
+      )
+    end
+
+    it "returns self" do
+      metadata.options.should eq(metadata)
+    end
+  end
+
+  describe "#order" do
+
     let(:metadata) do
       described_class.new(
         :order => :rating.asc,
@@ -1045,7 +1060,6 @@ describe Mongoid::Relations::Metadata do
     it "returns order criteria" do
       metadata.order.should == :rating.asc
     end
-
   end
 
   describe "#klass" do
