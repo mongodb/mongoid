@@ -111,7 +111,7 @@ module Mongoid #:nodoc:
         raise Errors::ReadonlyAttribute.new(name, value)
       end
       write_attribute(name, value)
-      save(:validate => false)
+      set(name, value)
     end
 
     # Update the document attributes in the datbase.
