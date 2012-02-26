@@ -149,6 +149,19 @@ describe Mongoid::Criterion::Inclusion do
       Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434")
     end
 
+    context "on localized fields" do
+
+      let(:criteria) do
+        Product.any_of({ :name => "test" }, { :description => "testing" })
+      end
+
+      it "properly converts the localized keys" do
+        criteria.selector.should eq(
+          { "$or" => [{ "name.en" => "test" }, { "description.en" => "testing" }]}
+        )
+      end
+    end
+
     context "with a single match" do
 
       let(:from_db) do

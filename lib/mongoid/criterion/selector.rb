@@ -103,7 +103,12 @@ module Mongoid #:nodoc:
       def handle_and_or_value(values)
         [].tap do |result|
            result.push(*values.map do |value|
-            Hash[value.map{ |key, value| [key, try_to_typecast(key, value)] }]
+            Hash[value.map do |_key, _value|
+              if klass.fields[_key.to_s].try(:localized?)
+                _key = "#{_key}.#{::I18n.locale}"
+              end
+              [_key, try_to_typecast(_key, _value)]
+            end]
           end)
         end
       end
