@@ -271,6 +271,19 @@ describe Mongoid::Criterion::Inclusion do
 
     context "when provided a hash" do
 
+      context "on localized fields" do
+
+        let(:criteria) do
+          Product.any_of({ :name => "test" }, { :description => "testing" })
+        end
+
+        it "properly converts the localized keys" do
+          criteria.selector.should eq(
+            { "$or" => [{ "name.en" => "test" }, { "description.en" => "testing" }]}
+          )
+        end
+      end
+
       context "on different fields" do
 
         let(:criteria) do

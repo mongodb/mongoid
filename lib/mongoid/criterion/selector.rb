@@ -54,22 +54,6 @@ module Mongoid #:nodoc:
       end
       alias :update :merge!
 
-      if RUBY_VERSION < '1.9'
-
-        # Generate pretty inspection for old ruby versions.
-        #
-        # @example Inspect the selector.
-        #   selector.inspect
-        #
-        # @return [ String ] The inspected selector.
-        def inspect
-          ret = self.keys.inject([]) do |memo, key|
-            memo << "#{key.inspect}=>#{self[key].inspect}"
-          end
-          "{#{ret.sort.join(', ')}}"
-        end
-      end
-
       private
 
       # If the key is defined as a field, then attempt to typecast it.
@@ -102,7 +86,12 @@ module Mongoid #:nodoc:
       def handle_and_or_value(values)
         [].tap do |result|
            result.push(*values.map do |value|
-            Hash[value.map{ |_key, _value| [_key, try_to_typecast(_key, _value)] }]
+            Hash[value.map do |_key, _value|
+              if klass.fields[_key.to_s].try(:localized?)
+                _key = "#{_key}.#{::I18n.locale}"
+              end
+              [_key, try_to_typecast(_key, _value)]
+            end]
           end)
         end
       end

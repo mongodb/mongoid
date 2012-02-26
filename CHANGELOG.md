@@ -401,6 +401,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1762 Criteria#any_of now properly handles localized fields.
+
 * \#1758 Metadata now returns self on options for external library support.
 
 * \#1757 Ensure serialization converts any attribute types to the type

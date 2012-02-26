@@ -163,7 +163,7 @@ describe Mongoid::Criterion::Selector do
     end
   end
 
-  describe "#proper_and_or_value" do
+  describe "#proper_and_or_value?" do
 
     context "when the key is not $or or $and" do
 
