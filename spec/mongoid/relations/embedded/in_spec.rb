@@ -429,7 +429,9 @@ describe Mongoid::Relations::Embedded::In do
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should eq([ :cyclic, :polymorphic ])
+      described_class.valid_options.should eq(
+        [ :autobuild, :cyclic, :polymorphic ]
+      )
     end
   end
 
