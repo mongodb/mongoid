@@ -47,11 +47,13 @@ module Mongoid # :nodoc:
 
       {}.tap do |attrs|
         (attribute_names + method_names).each do |name|
-          value = send(name)
-          if relations.has_key?(name)
-            attrs[name] = value.serializable_hash(options)
-          else
-            attrs[name] = value
+          without_autobuild do
+            value = send(name)
+            if relations.has_key?(name)
+              attrs[name] = value.serializable_hash(options)
+            else
+              attrs[name] = value
+            end
           end
         end
         serialize_relations(attrs, options) if options[:include]

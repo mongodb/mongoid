@@ -165,8 +165,10 @@ module Mongoid #:nodoc:
         return attrs if frozen?
         relations.each_pair do |name, meta|
           if meta.embedded?
-            relation = send(name)
-            attrs[name] = relation.as_document unless relation.blank?
+            without_autobuild do
+              relation = send(name)
+              attrs[name] = relation.as_document unless relation.blank?
+            end
           end
         end
       end

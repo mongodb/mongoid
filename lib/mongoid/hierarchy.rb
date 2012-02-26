@@ -23,11 +23,13 @@ module Mongoid #:nodoc
         [].tap do |children|
           relations.each_pair do |name, metadata|
             if metadata.embedded?
-              child = send(name)
-              Array.wrap(child).each do |doc|
-                children.push(doc)
-                children.concat(doc._children) unless metadata.versioned?
-              end if child
+              without_autobuild do
+                child = send(name)
+                Array.wrap(child).each do |doc|
+                  children.push(doc)
+                  children.concat(doc._children) unless metadata.versioned?
+                end if child
+              end
             end
           end
         end

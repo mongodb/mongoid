@@ -246,6 +246,25 @@ For instructions on upgrading to newer versions, visit
         band.label?
         band.has_label?
 
+* \#1188 1-1 relations now have an :autobuild option to indicate if the
+  relation should automatically be build with empty attributes upon access
+  where the relation currently does not exist. Works on embeds_one,
+  embedded_in, has_one, belongs_to. (Andy Morris)
+
+        class Band
+          include Mongoid::Document
+          has_one :label, autobuild: true
+        end
+
+        band = Band.new
+        band.label # Returns a new label with empty attributes.
+
+      When using existence checks, autobuilding will not execute.
+
+        band = Band.new
+        band.label? # Returns false, does not autobuild on a check.
+        band.has_label? # Returns false, does not autobuild on a check.
+
 * \#1081 Mongoid indexes both id and type as a compound index when providing
   `index: true` to a polymorphic belongs_to.
 

@@ -74,6 +74,37 @@ module Mongoid # :nodoc:
         instance_variable_set("@#{name}", relation)
       end
 
+      private
+
+      # Is the current code executing without autobuild functionality?
+      #
+      # @example Is autobuild disabled?
+      #   document.without_autobuild?
+      #
+      # @return [ true, false ] If autobuild is disabled.
+      #
+      # @since 3.0.0
+      def without_autobuild?
+        Threaded.executing?(:without_autobuild)
+      end
+
+      # Yield to the block with autobuild functionality turned off.
+      #
+      # @example Execute without autobuild.
+      #   document.without_autobuild do
+      #     document.name
+      #   end
+      #
+      # @return [ Object ] The result of the yield.
+      #
+      # @since 3.0.0
+      def without_autobuild
+        Threaded.begin(:without_autobuild)
+        yield
+      ensure
+        Threaded.exit(:without_autobuild)
+      end
+
       module ClassMethods #:nodoc:
 
         # Adds the existence check for relations.
@@ -95,7 +126,7 @@ module Mongoid # :nodoc:
         def existence_check(name, metadata)
           module_eval <<-END
             def #{name}?
-              !#{name}.blank?
+              without_autobuild { !#{name}.blank? }
             end
             alias :has_#{name}? :#{name}?
           END
@@ -119,14 +150,17 @@ module Mongoid # :nodoc:
           undef_method(name) if method_defined?(name)
           define_method(name) do |*args|
             reload, variable = args.first, "@#{name}"
-            if instance_variable_defined?(variable) && !reload
+            value = if instance_variable_defined?(variable) && !reload
               instance_variable_get(variable)
             else
               _building do
-                _loading do
-                  build(name, attributes[metadata.key], metadata)
-                end
+                _loading { build(name, attributes[metadata.key], metadata) }
               end
+            end
+            if value.nil? && metadata.autobuilding? && !without_autobuild?
+              send("build_#{name}")
+            else
+              value
             end
           end
           self
@@ -170,11 +204,13 @@ module Mongoid # :nodoc:
           method = "#{name}="
           undef_method(method) if method_defined?(method)
           define_method(method) do |object|
-            if relation_exists?(name) || metadata.many? ||
-              (object.blank? && send(name))
-              set_relation(name, send(name).substitute(object.substitutable))
-            else
-              build(name, object.substitutable, metadata)
+            without_autobuild do
+              if relation_exists?(name) || metadata.many? ||
+                (object.blank? && send(name))
+                set_relation(name, send(name).substitute(object.substitutable))
+              else
+                build(name, object.substitutable, metadata)
+              end
             end
           end
           self

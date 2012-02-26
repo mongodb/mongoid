@@ -2,6 +2,50 @@ require "spec_helper"
 
 describe Mongoid::Relations::Metadata do
 
+  describe "#autobuilding?" do
+
+    context "when the option is true" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Embedded::One,
+          :autobuild => true
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_autobuilding
+      end
+    end
+
+    context "when the option is false" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Embedded::One,
+          :autobuild => false
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_autobuilding
+      end
+    end
+
+    context "when the option is nil" do
+
+      let(:metadata) do
+        described_class.new(
+          :relation => Mongoid::Relations::Embedded::One
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_autobuilding
+      end
+    end
+  end
+
   describe "#builder" do
 
     let(:metadata) do

@@ -23,8 +23,18 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation does not exist" do
 
-        it "returns false" do
-          person.should_not have_game
+        context "when not autobuilding" do
+
+          it "returns false" do
+            person.should_not have_game
+          end
+        end
+
+        context "when autobuilding" do
+
+          it "returns false" do
+            person.should_not have_book
+          end
         end
       end
     end
@@ -86,12 +96,26 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation does not exist" do
 
-        let(:game) do
-          Game.new
+        context "when the relation does not autobuild" do
+
+          let(:game) do
+            Game.new
+          end
+
+          it "returns false" do
+            game.should_not have_person
+          end
         end
 
-        it "returns false" do
-          game.should_not have_person
+        context "when the relation autobuilds" do
+
+          let(:book) do
+            Book.new
+          end
+
+          it "returns false" do
+            book.should_not have_person
+          end
         end
       end
     end
@@ -111,8 +135,22 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation does not exist" do
 
-        it "returns false" do
-          person.should_not have_name
+        context "when the relation does not autobuild" do
+
+          it "returns false" do
+            person.should_not have_name
+          end
+        end
+
+        context "when the relation autobuilds" do
+
+          let(:person) do
+            Person.new
+          end
+
+          it "returns false" do
+            person.should_not have_passport
+          end
         end
       end
     end
@@ -153,18 +191,147 @@ describe Mongoid::Relations::Accessors do
 
       context "when the relation does not exist" do
 
-        let(:name) do
-          Name.new
+        context "when the relation does not autobuild" do
+
+          let(:name) do
+            Name.new
+          end
+
+          it "returns false" do
+            name.should_not have_namable
+          end
         end
 
-        it "returns false" do
-          name.should_not have_namable
+        context "when the relation autobuilds" do
+
+          let(:passport) do
+            Passport.new
+          end
+
+          it "returns false" do
+            passport.should_not have_person
+          end
         end
       end
     end
   end
 
   describe "\#{getter}" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when autobuilding the relation" do
+
+      context "when the relation is an embeds one" do
+
+        context "when the relation does not exist" do
+
+          let!(:passport) do
+            person.passport
+          end
+
+          it "builds the new document" do
+            passport.should be_a(Passport)
+          end
+        end
+
+        context "when the relation exists" do
+
+          let!(:passport) do
+            person.build_passport(:number => "123123321")
+          end
+
+          it "does not build a new document" do
+            person.passport.should eq(passport)
+          end
+        end
+      end
+
+      context "when the relation is an embedded in" do
+
+        let(:passport) do
+          Passport.new
+        end
+
+        context "when the relation does not exist" do
+
+          let(:person) do
+            passport.person
+          end
+
+          it "builds the new document" do
+            person.should be_a(Person)
+          end
+        end
+
+        context "when the relation exists" do
+
+          let!(:person) do
+            passport.build_person(:title => "sir")
+          end
+
+          it "does not build a new document" do
+            passport.person.should eq(person)
+          end
+        end
+      end
+
+      context "when the relation is a has one" do
+
+        context "when the relation does not exist" do
+
+          let(:book) do
+            person.book
+          end
+
+          it "builds the new document" do
+            book.should be_a(Book)
+          end
+        end
+
+        context "when the relation exists" do
+
+          let!(:book) do
+            person.build_book(:title => "art of war")
+          end
+
+          it "does not build a new document" do
+            person.book.should eq(book)
+          end
+        end
+      end
+
+      context "when the relation is a belongs to" do
+
+        let(:book) do
+          Book.new
+        end
+
+        context "when the relation does not exist" do
+
+          let(:person) do
+            book.person
+          end
+
+          it "builds the new document" do
+            person.should be_a(Person)
+          end
+        end
+
+        context "when the relation exists" do
+
+          let!(:person) do
+            book.build_person(:title => "sir")
+          end
+
+          it "does not build a new document" do
+            book.person.should eq(person)
+          end
+        end
+      end
+    end
 
     context "when the relation is not polymorphic" do
 

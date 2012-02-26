@@ -52,6 +52,7 @@ module Mongoid # :nodoc:
           characterize(name, Embedded::In, options, &block).tap do |meta|
             self.embedded = true
             relate(name, meta)
+            builder(name, meta).creator(name, meta)
           end
         end
 

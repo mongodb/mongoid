@@ -32,6 +32,19 @@ module Mongoid # :nodoc:
         !!as
       end
 
+      # Is the relation autobuilding if accessed via the getter and the
+      # document is new.
+      #
+      # @example Is the relation autobuilding?
+      #   metadata.autobuilding?
+      #
+      # @return [ true, false ] If the relation autobuilds.
+      #
+      # @since 3.0.0
+      def autobuilding?
+        !!self[:autobuild]
+      end
+
       # Returns the autosave option of the relation.
       #
       # @example Get the autosave option.

@@ -53,6 +53,7 @@ class Person
   embeds_many :symptoms, :validate => false
   embeds_many :appointments, :validate => false
 
+  embeds_one :passport, :autobuild => true, :validate => false
   embeds_one :pet, :class_name => "Animal", :validate => false
   embeds_one :name, :as => :namable, :validate => false do
     def extension
@@ -103,6 +104,7 @@ class Person
   has_many :drugs, :validate => false
   has_one :account, :validate => false
   has_one :cat, :dependent => :nullify, :validate => false
+  has_one :book, :autobuild => true, :validate => false
 
   has_and_belongs_to_many \
     :administrated_events,
