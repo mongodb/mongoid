@@ -76,6 +76,32 @@ module Mongoid # :nodoc:
 
       module ClassMethods #:nodoc:
 
+        # Adds the existence check for relations.
+        #
+        # @example Add the existence check.
+        #   Person.existence_check(:name, meta)
+        #
+        # @example Check if a relation exists.
+        #   person = Person.new
+        #   person.has_game?
+        #   person.game?
+        #
+        # @param [ String, Symbol ] name The name of the relation.
+        # @param [ Metadata ] The metadata.
+        #
+        # @return [ Class ] The model being set up.
+        #
+        # @since 3.0.0
+        def existence_check(name, metadata)
+          module_eval <<-END
+            def #{name}?
+              !#{name}.blank?
+            end
+            alias :has_#{name}? :#{name}?
+          END
+          self
+        end
+
         # Defines the getter for the relation. Nothing too special here: just
         # return the instance variable for the relation if it exists or build
         # the thing.

@@ -231,6 +231,21 @@ For instructions on upgrading to newer versions, visit
         band.albums.pop # Pop 1 document and persist the removal.
         band.albums.pop(3) # Pop 3 documents and persist the removal.
 
+* \#1188 Relations now have existence predicates for simplified checking if the
+  relation is blank or not. (Andy Morris)
+
+        class Band
+          include Mongoid::Document
+          embeds_many :albums
+          embeds_one :label
+        end
+
+        band = Band.new
+        band.albums?
+        band.has_albums?
+        band.label?
+        band.has_label?
+
 * \#1081 Mongoid indexes both id and type as a compound index when providing
   `index: true` to a polymorphic belongs_to.
 

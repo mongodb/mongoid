@@ -2,6 +2,168 @@ require "spec_helper"
 
 describe Mongoid::Relations::Accessors do
 
+  describe "\#{getter}?" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when the relation is a has one" do
+
+      context "when the relation exists" do
+
+        let!(:game) do
+          person.build_game
+        end
+
+        it "returns true" do
+          person.should have_game
+        end
+      end
+
+      context "when the relation does not exist" do
+
+        it "returns false" do
+          person.should_not have_game
+        end
+      end
+    end
+
+    context "when the relation is a has many" do
+
+      context "when the relation has documents" do
+
+        let!(:post) do
+          person.posts.build
+        end
+
+        it "returns true" do
+          person.should have_posts
+        end
+      end
+
+      context "when the relation does not have documents" do
+
+        it "returns false" do
+          person.should_not have_posts
+        end
+      end
+    end
+
+    context "when the relation is a has and belongs to many" do
+
+      context "when the relation has documents" do
+
+        let!(:preference) do
+          person.preferences.build
+        end
+
+        it "returns true" do
+          person.should have_preferences
+        end
+      end
+
+      context "when the relation does not have documents" do
+
+        it "returns false" do
+          person.should_not have_preferences
+        end
+      end
+    end
+
+    context "when the relation is a belongs to" do
+
+      context "when the relation exists" do
+
+        let!(:game) do
+          person.build_game
+        end
+
+        it "returns true" do
+          game.should have_person
+        end
+      end
+
+      context "when the relation does not exist" do
+
+        let(:game) do
+          Game.new
+        end
+
+        it "returns false" do
+          game.should_not have_person
+        end
+      end
+    end
+
+    context "when the relation is an embeds one" do
+
+      context "when the relation exists" do
+
+        let!(:name) do
+          person.build_name
+        end
+
+        it "returns true" do
+          person.should have_name
+        end
+      end
+
+      context "when the relation does not exist" do
+
+        it "returns false" do
+          person.should_not have_name
+        end
+      end
+    end
+
+    context "when the relation is an embeds many" do
+
+      context "when the relation has documents" do
+
+        let!(:address) do
+          person.addresses.build
+        end
+
+        it "returns true" do
+          person.should have_addresses
+        end
+      end
+
+      context "when the relation does not have documents" do
+
+        it "returns false" do
+          person.should_not have_addresses
+        end
+      end
+    end
+
+    context "when the relation is an embedded in" do
+
+      context "when the relation exists" do
+
+        let!(:name) do
+          person.build_name
+        end
+
+        it "returns true" do
+          name.should have_namable
+        end
+      end
+
+      context "when the relation does not exist" do
+
+        let(:name) do
+          Name.new
+        end
+
+        it "returns false" do
+          name.should_not have_namable
+        end
+      end
+    end
+  end
+
   describe "\#{getter}" do
 
     context "when the relation is not polymorphic" do
@@ -168,9 +330,9 @@ describe Mongoid::Relations::Accessors do
     end
 
     context "when the relation is polymorphic" do
-      
+
       context "when there's a single references many/one" do
-        
+
         let(:movie) do
           Movie.create(:title => "Inception")
         end
@@ -224,9 +386,9 @@ describe Mongoid::Relations::Accessors do
           end
         end
       end
-      
+
       context "when there are multiple references many/one" do
-        
+
         let(:face) do
           Face.create
         end
@@ -238,7 +400,7 @@ describe Mongoid::Relations::Accessors do
         let!(:face_left_eye) do
           face.create_left_eye(:pupil_dilation => 10)
         end
-        
+
         let!(:face_right_eye) do
           face.create_right_eye(:pupil_dilation => 5)
         end
@@ -246,7 +408,7 @@ describe Mongoid::Relations::Accessors do
         let!(:eye_bowl_blue_eye) do
           eye_bowl.blue_eyes.create(:pupil_dilation => 2)
         end
-        
+
         let!(:eye_bowl_brown_eye) do
           eye_bowl.brown_eyes.create(:pupil_dilation => 1)
         end
@@ -267,7 +429,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         context "when accessing a references many" do
-          
+
           context "first references many" do
 
             let(:eyes) do
@@ -278,7 +440,7 @@ describe Mongoid::Relations::Accessors do
               eyes.should eq([ eye_bowl_blue_eye ])
             end
           end
-          
+
           context "second references many" do
 
             let(:eyes) do
@@ -292,7 +454,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         context "when accessing a references one" do
-          
+
           context "first references one" do
 
             let(:eye) do
@@ -303,7 +465,7 @@ describe Mongoid::Relations::Accessors do
               eye.should eq(face_left_eye)
             end
           end
-          
+
           context "second references one" do
 
             let(:eye) do
