@@ -210,3 +210,7 @@ en:
           summary: "The following errors were found: %{errors}"
           resolution: "Try persisting the document with valid data or remove
             the validations."
+        delete_restriction:
+          message: "Cannot delete %{document} because of dependent %{relation}."
+          summary: ""
+          resolution: ""
