@@ -49,6 +49,9 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
+          if ancestors.include?(Mongoid::Versioning)
+            raise Errors::VersioningNotOnRoot.new(self)
+          end
           characterize(name, Embedded::In, options, &block).tap do |meta|
             self.embedded = true
             relate(name, meta)
