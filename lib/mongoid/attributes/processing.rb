@@ -109,6 +109,9 @@ module Mongoid #:nodoc:
       def process_nested
         pending_nested.each_pair do |name, value|
           send("#{name}=", value)
+          send(name.sub('_attributes', '')).each do |child|
+            child.save
+          end
         end
       end
 
