@@ -292,4 +292,18 @@ describe Mongoid::Config do
       end
     end
   end
+
+  describe "#options=" do
+
+    context "when there are no options" do
+
+      before do
+        described_class.options = nil
+      end
+
+      it "does not try to assign options" do
+        described_class.allow_dynamic_fields.should be_true
+      end
+    end
+  end
 end

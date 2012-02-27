@@ -133,8 +133,10 @@ module Mongoid #:nodoc
 
     def options=(options)
       # @todo: Durran: Validate options.
-      options.each_pair do |option, value|
-        send("#{option}=", value)
+      if options
+        options.each_pair do |option, value|
+          send("#{option}=", value)
+        end
       end
     end
 
