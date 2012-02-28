@@ -481,6 +481,17 @@ describe Mongoid::Criterion::Optional do
     it "returns a copy" do
       base.limit.should_not eql(base)
     end
+
+    context "when value is a String" do
+
+      let(:criteria) do
+        base.limit('100')
+      end
+
+      it "cast the limit value to an Integer" do
+        criteria.options.should eq({ :limit => 100 })
+      end
+    end
   end
 
   describe "#offset" do
@@ -679,6 +690,17 @@ describe Mongoid::Criterion::Optional do
 
       it "defaults to zero" do
         criteria.options.should == { :skip => 0 }
+      end
+    end
+
+    context "when value is a String" do
+
+      let(:criteria) do
+        base.skip('100')
+      end
+
+      it "cast the skip value to an Integer" do
+        criteria.options.should eq({ :skip => 100 })
       end
     end
 
