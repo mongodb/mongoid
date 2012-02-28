@@ -7,6 +7,11 @@ module Mongoid # :nodoc:
     module AutoSave
       extend ActiveSupport::Concern
 
+      included do
+        class_attribute :autosaved_relations
+        self.autosaved_relations = []
+      end
+
       module ClassMethods #:nodoc:
 
         # Set up the autosave behaviour for references many and references one
@@ -21,7 +26,8 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def autosave(metadata)
-          if metadata.autosave?
+          if metadata.autosave? && !autosave_added?(metadata)
+            autosaved_relations.push(metadata.name)
             set_callback :save, :after do |document|
               relation = document.send(metadata.name)
               if relation
@@ -31,6 +37,20 @@ module Mongoid # :nodoc:
               end
             end
           end
+        end
+
+        # Has the autosave callback been added for the relation already?
+        #
+        # @example Has the autosave callback been added.
+        #   Person.autosave_added?(metadata)
+        #
+        # @param [ Metadata ] metadata The relation metadata.
+        #
+        # @return [ true, false ] If the autosave is already added.
+        #
+        # @since 3.0.0
+        def autosave_added?(metadata)
+          autosaved_relations.include?(metadata.name)
         end
       end
     end

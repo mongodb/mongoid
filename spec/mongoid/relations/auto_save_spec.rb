@@ -41,6 +41,25 @@ describe Mongoid::Relations::AutoSave do
 
     context "when the option is true" do
 
+      context "when the relation has already had the autosave callback added" do
+
+        before do
+          Person.autosave(
+            Person.relations["drugs"].merge!(:autosave => true)
+          )
+        end
+
+        let(:drug) do
+          Drug.new(:name => "Percocet")
+        end
+
+        it "does not add the autosave callback twice" do
+          drug.expects(:save).once
+          person.drugs.push(drug)
+          person.save
+        end
+      end
+
       context "when the relation is a references many" do
 
         let(:drug) do
