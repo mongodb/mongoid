@@ -413,6 +413,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1772 Allow skip and limit to convert strings to integers. (Jean Boussier)
+
 * \#1767 Model#update_attributes accepts mass assignment options again.
   (Hans Hasselberg)
 
