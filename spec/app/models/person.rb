@@ -65,17 +65,6 @@ class Person
   end
   embeds_one :quiz, :validate => false
 
-  accepts_nested_attributes_for :addresses
-  accepts_nested_attributes_for :paranoid_phones
-  accepts_nested_attributes_for :name, :update_only => true
-  accepts_nested_attributes_for :pet, :allow_destroy => true
-  accepts_nested_attributes_for :game, :allow_destroy => true
-  accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
-  accepts_nested_attributes_for :posts
-  accepts_nested_attributes_for :preferences
-  accepts_nested_attributes_for :quiz
-  accepts_nested_attributes_for :services, :allow_destroy => true
-
   has_one :game, :dependent => :destroy, :validate => false do
     def extension
       "Testing"
@@ -112,6 +101,17 @@ class Person
     :inverse_of => :administrators,
     :dependent  => :nullify,
     :validate => false
+
+  accepts_nested_attributes_for :addresses
+  accepts_nested_attributes_for :paranoid_phones
+  accepts_nested_attributes_for :name, :update_only => true
+  accepts_nested_attributes_for :pet, :allow_destroy => true
+  accepts_nested_attributes_for :game, :allow_destroy => true
+  accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
+  accepts_nested_attributes_for :posts
+  accepts_nested_attributes_for :preferences
+  accepts_nested_attributes_for :quiz
+  accepts_nested_attributes_for :services, :allow_destroy => true
 
   scope :minor, where(:age.lt => 18)
   scope :without_ssn, without(:ssn)

@@ -64,6 +64,18 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid]:#{name}-stack"] ||= []
     end
 
+    # Begin autosaving a document on the current thread.
+    #
+    # @example Begin autosave.
+    #   Threaded.begin_autosave(doc)
+    #
+    # @param [ Document ] document The document to autosave.
+    #
+    # @since 3.0.0
+    def begin_autosave(document)
+      autosaves_for(document.class).push(document.id)
+    end
+
     # Begin validating a document on the current thread.
     #
     # @example Begin validation.
@@ -97,6 +109,18 @@ module Mongoid #:nodoc:
     def clear_options!
       clear_safety_options!
       self.timeless = false
+    end
+
+    # Exit autosaving a document on the current thread.
+    #
+    # @example Exit autosave.
+    #   Threaded.exit_autosave(doc)
+    #
+    # @param [ Document ] document The document to autosave.
+    #
+    # @since 3.0.0
+    def exit_autosave(document)
+      autosaves_for(document.class).delete_one(document.id)
     end
 
     # Exit validating a document on the current thread.
@@ -329,6 +353,20 @@ module Mongoid #:nodoc:
       !timeless
     end
 
+    # Is the document autosaved on the current thread?
+    #
+    # @example Is the document autosaved?
+    #   Threaded.autosaved?(doc)
+    #
+    # @param [ Document ] document The document to check.
+    #
+    # @return [ true, false ] If the document is autosaved.
+    #
+    # @since 2.1.9
+    def autosaved?(document)
+      autosaves_for(document.class).include?(document.id)
+    end
+
     # Is the document validated on the current thread?
     #
     # @example Is the document validated?
@@ -343,6 +381,18 @@ module Mongoid #:nodoc:
       validations_for(document.class).include?(document.id)
     end
 
+    # Get all autosaves on the current thread.
+    #
+    # @example Get all autosaves.
+    #   Threaded.autosaves
+    #
+    # @return [ Hash ] The current autosaves.
+    #
+    # @since 3.0.0
+    def autosaves
+      Thread.current[:"[mongoid]:autosaves"] ||= {}
+    end
+
     # Get all validations on the current thread.
     #
     # @example Get all validations.
@@ -355,6 +405,19 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid]:validations"] ||= {}
     end
 
+    # Get all autosaves on the current thread for the class.
+    #
+    # @example Get all autosaves.
+    #   Threaded.autosaves_for(Person)
+    #
+    # @param [ Class ] The class to check.
+    #
+    # @return [ Array ] The current autosaves.
+    #
+    # @since 3.0.0
+    def autosaves_for(klass)
+      autosaves[klass] ||= []
+    end
     # Get all validations on the current thread for the class.
     #
     # @example Get all validations.

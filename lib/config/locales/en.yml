@@ -140,6 +140,24 @@ en:
             for each parent up the hierarchy."
           resolution: "Consider not embedding %{embedded}, or do the key
             storage and access in a custom manner in the application code."
+        nested_attributes_metadata_not_found:
+          message: "Could not find metadata for relation '%{name}' on model:
+            %{klass}."
+          summary: "When defining nested attributes for a relation, Mongoid
+            needs to access the metadata for the relation '%{name}' in order
+            if add autosave functionality to it, if applicable. Either no
+            relation named '%{name}' could be found, or the relation had not
+            been defined yet."
+          resolution: "Make sure that there is a relation defined named
+            '%{name}' on %{klass} or that the relation definition comes before
+            the accepts_nested_attributes_for macro in the model - order
+            matters so that Mongoid has access to the metadata.\n
+            Example:\n
+            \_\_class Band\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_has_many :albums\n
+            \_\_\_\_accepts_nested_attributes_for :albums\n
+            \_\_end\n\n"
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."

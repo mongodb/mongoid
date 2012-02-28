@@ -12,6 +12,38 @@ module Mongoid # :nodoc:
         self.autosaved_relations = []
       end
 
+      # Used to prevent infinite loops in associated autosaves.
+      #
+      # @example Is the document autosaved?
+      #   document.autosaved?
+      #
+      # @return [ true, false ] Has the document already been autosaved?
+      #
+      # @since 3.0.0
+      def autosaved?
+        Threaded.autosaved?(self)
+      end
+
+      # Begin the associated autosave.
+      #
+      # @example Begin autosave.
+      #   document.begin_autosave
+      #
+      # @since 3.0.0
+      def begin_autosave
+        Threaded.begin_autosave(self)
+      end
+
+      # Exit the associated autosave.
+      #
+      # @example Exit autosave.
+      #   document.exit_autosave
+      #
+      # @since 3.0.0
+      def exit_autosave
+        Threaded.exit_autosave(self)
+      end
+
       module ClassMethods #:nodoc:
 
         # Set up the autosave behaviour for references many and references one
@@ -26,31 +58,33 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def autosave(metadata)
-          if metadata.autosave? && !autosave_added?(metadata)
+          if metadata.autosave? && autosavable?(metadata)
             autosaved_relations.push(metadata.name)
-            set_callback :save, :after do |document|
+            set_callback :save, :after, :unless => :autosaved? do |document|
+              begin_autosave
               relation = document.send(metadata.name)
               if relation
                 (relation.do_or_do_not(:in_memory) || Array.wrap(relation)).each do |doc|
                   doc.save
                 end
               end
+              exit_autosave
             end
           end
         end
 
-        # Has the autosave callback been added for the relation already?
+        # Can the autosave be added?
         #
-        # @example Has the autosave callback been added.
-        #   Person.autosave_added?(metadata)
+        # @example Can the autosave be added?
+        #   Person.autosavable?(metadata)
         #
         # @param [ Metadata ] metadata The relation metadata.
         #
-        # @return [ true, false ] If the autosave is already added.
+        # @return [ true, false ] If the autosave is able to be added.
         #
         # @since 3.0.0
-        def autosave_added?(metadata)
-          autosaved_relations.include?(metadata.name)
+        def autosavable?(metadata)
+          !autosaved_relations.include?(metadata.name) && !metadata.embedded?
         end
       end
     end

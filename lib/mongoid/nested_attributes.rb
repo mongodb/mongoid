@@ -33,7 +33,8 @@ module Mongoid #:nodoc:
       #   by a hash of options.
       #
       # @option *args [ true, false ] :allow_destroy Can deletion occur?
-      # @option *args [ Proc, Symbol ] :reject_if Block or symbol pointing to a class method to reject documents with.
+      # @option *args [ Proc, Symbol ] :reject_if Block or symbol pointing
+      #   to a class method to reject documents with.
       # @option *args [ Integer ] :limit The max number to create.
       # @option *args [ true, false ] :update_only Only update existing docs.
       def accepts_nested_attributes_for(*args)
@@ -43,10 +44,14 @@ module Mongoid #:nodoc:
           meth = "#{name}_attributes="
           self.nested_attributes += [ meth ]
           undef_method(meth) if method_defined?(meth)
+          metadata = relations[name.to_s]
+          unless metadata
+            raise Errors::NestedAttributesMetadataNotFound.new(self, name)
+          end
+          autosave(metadata.merge!(:autosave => true))
           define_method("#{name}_attributes=") do |attrs|
             _assigning do
-              relation = relations[name.to_s]
-              relation.nested_builder(attrs, options).build(self)
+              metadata.nested_builder(attrs, options).build(self)
             end
           end
         end

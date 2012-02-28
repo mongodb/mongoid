@@ -186,6 +186,15 @@ For instructions on upgrading to newer versions, visit
 
         Band.find_by(name: "Depeche Mode")
 
+* \#1606 Mongoid now enables autosave, like Active Record, when adding
+  an accepts_nested_attributes_for to a relation.
+
+        class Band
+          include Mongoid::Document
+          has_many :albums
+          accepts_nested_attributes_for :albums # This enables the autosave.
+        end
+
 * \#1477 Mongoid now automatically protects the id and type attributes
   from mass assignment. You can override this (not recommended) by redefining
   them as accessible.

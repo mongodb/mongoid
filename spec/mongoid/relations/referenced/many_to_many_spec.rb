@@ -4,7 +4,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
   before(:all) do
     Mongoid.raise_not_found_error = true
-    Person.autosave(Person.relations["preferences"].merge!(:autosave => true))
+    Person.autosaved_relations.delete_one(:preferences)
+    Person.autosave(
+      Person.relations["preferences"].merge!(:autosave => true)
+    )
     Person.synced(Person.relations["preferences"])
   end
 

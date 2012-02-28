@@ -4,7 +4,7 @@ class Vehicle
   belongs_to :driver
 
   accepts_nested_attributes_for :driver
-  accepts_nested_attributes_for :shipping_containers
+  accepts_nested_attributes_for :shipping_container
 end
 
 require "app/models/car"

@@ -4214,6 +4214,31 @@ describe Mongoid::NestedAttributes do
       end
     end
 
+    context "when the relation is a has many" do
+
+      let(:user) do
+        User.create
+      end
+
+      let(:params) do
+        { :posts_attributes =>
+          { "0" => { :title => "Testing" }}
+        }
+      end
+
+      before do
+        user.update_attributes(params)
+      end
+
+      it "adds the new document to the relation" do
+        user.posts.first.title.should eq("Testing")
+      end
+
+      it "autosaves the relation" do
+        user.posts(true).first.title.should eq("Testing")
+      end
+    end
+
     context "when the relation is an embeds many" do
 
       let(:league) do

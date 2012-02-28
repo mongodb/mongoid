@@ -326,4 +326,68 @@ describe Mongoid::Threaded do
       end
     end
   end
+
+  describe "#begin_autosave" do
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      described_class.begin_autosave(person)
+    end
+
+    after do
+      described_class.exit_autosave(person)
+    end
+
+    it "marks the document as being autosaved" do
+      described_class.autosaves_for(Person).should eq([ person.id ])
+    end
+  end
+
+  describe "#exit_autosave" do
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      described_class.begin_autosave(person)
+      described_class.exit_autosave(person)
+    end
+
+    it "unmarks the document as being autosaved" do
+      described_class.autosaves_for(Person).should be_empty
+    end
+  end
+
+  describe "#autosaved?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when the document is autosaved" do
+
+      before do
+        described_class.begin_autosave(person)
+      end
+
+      after do
+        described_class.exit_autosave(person)
+      end
+
+      it "returns true" do
+        described_class.autosaved?(person).should be_true
+      end
+    end
+
+    context "when the document is not autosaved" do
+
+      it "returns false" do
+        described_class.autosaved?(person).should be_false
+      end
+    end
+  end
 end
