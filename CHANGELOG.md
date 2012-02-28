@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1767 Model#update_attributes accepts mass assignment options again.
+  (Hans Hasselberg)
+
 * \#1762 Criteria#any_of now properly handles localized fields.
 
 * \#1758 Metadata now returns self on options for external library support.
