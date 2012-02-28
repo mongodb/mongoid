@@ -109,7 +109,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def limit(value = 20)
-        clone.tap { |crit| crit.options[:limit] = value }
+        clone.tap { |crit| crit.options[:limit] = value.to_i }
       end
 
       # Returns the offset option. If a per_page option is in the list then it
@@ -163,7 +163,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def skip(value = 0)
-        clone.tap { |crit| crit.options[:skip] = value }
+        clone.tap { |crit| crit.options[:skip] = value.to_i }
       end
 
       # Adds a criterion to the +Criteria+ that specifies a type or an Array of
