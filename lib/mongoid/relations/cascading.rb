@@ -2,6 +2,7 @@
 require "mongoid/relations/cascading/delete"
 require "mongoid/relations/cascading/destroy"
 require "mongoid/relations/cascading/nullify"
+require "mongoid/relations/cascading/restrict"
 
 module Mongoid # :nodoc:
   module Relations #:nodoc:
