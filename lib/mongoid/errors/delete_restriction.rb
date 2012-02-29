@@ -17,7 +17,10 @@ module Mongoid #:nodoc
       # @since 2.2.0
       def initialize(document, relation)
         super(
-          compose_message("delete_restriction", { :document => document.class, :relation => relation })
+          compose_message(
+            "delete_restriction",
+            { :document => document.class, :relation => relation }
+          )
         )
       end
     end

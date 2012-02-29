@@ -7,6 +7,19 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1774 Relations now have a :restrict option for dependent relations
+  which will raise an error when attempting to delete a parent that
+  still has children on it. (Hans Hasselberg)
+
+        class Band
+          include Mongoid::Document
+          has_many :albums, dependent: :restrict
+        end
+
+        band = Band.first
+        band.albums << Albums.first
+        band.delete # Raises DeleteRestriction error.
+
 * \#1759 Invalid fields error messages have been updated to show the
   source and location of the original method. The new message is:
 

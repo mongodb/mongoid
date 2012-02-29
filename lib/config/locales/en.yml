@@ -236,6 +236,9 @@ en:
             consider moving it to a root location in the hierarchy if
             versioning is needed."
         delete_restriction:
-          message: "Cannot delete %{document} because of dependent %{relation}."
-          summary: ""
-          resolution: ""
+          message: "Cannot delete %{document} because of dependent '%{relation}'."
+          summary: "When defining '%{relation}' with a :dependent => :restrict,
+            Mongoid will raise an error when attempting to delete the
+            %{document} when the child '%{relation}' still has documents in it."
+          resolution: "Don't attempt to delete the parent %{document} when
+            it has children, or change the dependent option on the relation."
