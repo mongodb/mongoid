@@ -1,12 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
+require "rails/generators/mongoid/model/model_generator"
 
-# Generators are not automatically loaded by Rails
-require 'rails/generators/mongoid/model/model_generator'
-
-module Rails
-end
 describe Mongoid::Generators::ModelGenerator do
-  # Tell the generator where to put its output (what it thinks of as Rails.root)
+
   destination File.expand_path("../../../../../../tmp", __FILE__)
 
   before do
@@ -14,47 +10,77 @@ describe Mongoid::Generators::ModelGenerator do
     prepare_destination
   end
 
-  describe 'for a company' do
-    subject { file('app/models/company.rb') }
+  context "when generating a company model" do
 
-    describe 'defaults' do
+    let(:model) do
+      file("app/models/company.rb")
+    end
+
+    context "when providing no arguments" do
+
       before do
         run_generator %w(company)
       end
 
-      it { should exist }
-      it { should contain "class Company" }
-      it { should contain "include Mongoid::Document" }
+      it "generates the file" do
+        model.should exist
+      end
+
+      it "defines the class" do
+        model.should contain("class Company")
+      end
+
+      it "includes Mongoid::Document" do
+        model.should contain("include Mongoid::Document")
+      end
     end
-    describe 'with attributes' do
+
+    context "when providing field arguments" do
+
       before do
         run_generator %w(company name:string)
       end
 
-      it { should contain "field :name, :type => String" }
+      it "adds the fields to the model" do
+        model.should contain("field :name, :type => String")
+      end
     end
-    describe 'with timestamps' do
+
+    context "when including timestamps" do
+
       before do
         run_generator %w(company --timestamps)
       end
 
-      it { should contain "include Mongoid::Timestamps" }
+      it "adds the timestamping module" do
+        model.should contain("include Mongoid::Timestamps")
+      end
     end
-    describe 'with a parent' do
+
+    context "when providing a superclass" do
+
       before do
         run_generator %w(company --parent organization)
       end
 
-      it { should contain "class Company < Organization" }
-      it { should_not contain "include Mongoid::Document" }
+      it "adds the superclass to the model" do
+        model.should contain("class Company < Organization")
+      end
+
+      it "does not include the document module" do
+        model.should_not contain("include Mongoid::Document")
+      end
     end
-    describe 'with versioning' do
+
+    context "when including versioning" do
+
       before do
         run_generator %w(company --versioning)
       end
 
-      it { should contain "include Mongoid::Versioning" }
+      it "adds the versioning module" do
+        model.should contain("include Mongoid::Versioning")
+      end
     end
   end
-
 end

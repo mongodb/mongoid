@@ -2,18 +2,25 @@ require "spec_helper"
 
 describe Mongoid::Config::Environment do
 
+  after(:all) do
+    Rails = RailsTemp
+    Object.send(:remove_const, :RailsTemp)
+  end
+
   describe "#env_name" do
 
     context "when using rails" do
 
       before do
         module Rails
-          extend self
-          def env; "production"; end
+          class << self
+            def env; "production"; end
+          end
         end
       end
 
       after do
+        RailsTemp = Rails
         Object.send(:remove_const, :Rails)
       end
 

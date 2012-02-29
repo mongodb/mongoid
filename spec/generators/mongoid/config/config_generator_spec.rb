@@ -1,48 +1,55 @@
-require 'spec_helper'
-
-# Generators are not automatically loaded by Rails
-require 'rails/generators/mongoid/config/config_generator'
+require "spec_helper"
+require "rails/generators/mongoid/config/config_generator"
 
 describe Mongoid::Generators::ConfigGenerator do
 
-  module Rails
-    class Application
-    end
-  end
-
-  module MyApp
-    class Application < Rails::Application
-    end
-  end
-
-  # Tell the generator where to put its output (what it thinks of as Rails.root)
   destination File.expand_path("../../../../../../tmp", __FILE__)
 
   before do
     prepare_destination
   end
 
-  describe 'no arguments' do
+  context "when not providing any arguments" do
+
     before do
       run_generator
     end
 
-    describe 'config/mongoid.yml' do
-      subject { file('config/mongoid.yml') }
-      it { should exist }
-      it { should contain "database: my_app_development" }
+    context "when generating config/mongoid.yml" do
+
+      let!(:config) do
+        file("config/mongoid.yml")
+      end
+
+      it "generates the config" do
+        config.should exist
+      end
+
+      it "generates with a default database name" do
+        config.should contain("database: my_app_development")
+      end
     end
   end
 
-  describe 'specifying database name' do
+  context "when not providing arguments" do
+
     before do
       run_generator %w(my_database)
     end
 
-    describe 'config/mongoid.yml' do
-      subject { file('config/mongoid.yml') }
-      it { should exist }
-      it { should contain "database: my_database_development" }
+    context "when generating config/mongoid.yml" do
+
+      let!(:config) do
+        file("config/mongoid.yml")
+      end
+
+      it "generates the config" do
+        config.should exist
+      end
+
+      it "generates with the provided database name" do
+        config.should contain("database: my_database_development")
+      end
     end
   end
 end
