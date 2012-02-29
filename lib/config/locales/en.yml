@@ -235,3 +235,7 @@ en:
           resolution: "Remove the versioning from the embedded %{klass} or
             consider moving it to a root location in the hierarchy if
             versioning is needed."
+        delete_restriction:
+          message: "Cannot delete %{document} because of dependent %{relation}."
+          summary: ""
+          resolution: ""

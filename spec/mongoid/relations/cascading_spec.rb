@@ -191,6 +191,126 @@ describe Mongoid::Relations::Cascading do
             end
           end
         end
+
+        context "when dependent is restrict" do
+
+          context "when restricting a references many" do
+
+            before do
+              Person.has_many :drugs, :dependent => :restrict
+            end
+
+            after do
+              Person.cascades.delete("drugs")
+              Person.has_many :drugs, :validate => false
+            end
+
+            context "when the relation is empty" do
+
+              let(:person) do
+                Person.new :drugs => []
+              end
+
+              it "raises no error" do
+                expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                person.should be_destroyed
+              end
+            end
+
+            context "when the relation is not empty" do
+
+              let(:person) do
+                Person.new :drugs => [ Drug.new ]
+              end
+
+              it "raises DeleteRestriction error" do
+                expect{ person.send(method) }.to raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+            end
+          end
+
+          context "when restricting a references one" do
+
+            before do
+              Person.has_one :account, :dependent => :restrict
+            end
+
+            after do
+              Person.cascades.delete("account")
+              Person.has_one :account, :validate => false
+            end
+
+            context "when the relation is empty" do
+
+              let(:person) do
+                Person.new :account => nil
+              end
+
+              it "raises no error" do
+                expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                person.should be_destroyed
+              end
+            end
+
+            context "when the relation is not empty" do
+
+              let(:person) do
+                Person.new :account => Account.new(:name => 'test')
+              end
+
+              it "raises DeleteRestriction error" do
+                expect { person.send(method) }.to raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+            end
+          end
+
+          context "when restricting a many to many" do
+
+            before do
+              Person.has_and_belongs_to_many :houses, :dependent => :restrict
+            end
+
+            after do
+              Person.cascades.delete("houses")
+              Person.has_and_belongs_to_many :houses, :validate => false
+            end
+
+            context "when the relation is empty" do
+
+              let(:person) do
+                Person.new :houses => []
+              end
+
+              it "raises no error" do
+                expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                person.should be_destroyed
+              end
+            end
+
+            context "when the relation is not empty" do
+
+              let(:person) do
+                Person.new :houses => [House.new]
+              end
+
+              it "raises DeleteRestriction error" do
+                expect { person.send(method) }.to raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+            end
+          end
+        end
       end
     end
   end
