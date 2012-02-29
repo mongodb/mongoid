@@ -62,6 +62,16 @@ module Mongoid
   end
 end
 
+module Rails
+  class Application
+  end
+end
+
+module MyApp
+  class Application < Rails::Application
+  end
+end
+
 Dir[ File.join(SUPPORT, "*.rb") ].each do |file|
   require File.basename(file)
 end

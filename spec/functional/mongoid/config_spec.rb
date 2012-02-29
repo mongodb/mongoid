@@ -3,6 +3,12 @@ require "spec_helper"
 
 describe Mongoid::Config do
 
+  after(:all) do
+    if defined?(RailsTemp)
+      Rails = RailsTemp
+    end
+  end
+
   let(:standard_config) do
     File.join(File.dirname(__FILE__), "..", "..", "config", "mongoid.yml")
   end
@@ -167,7 +173,10 @@ describe Mongoid::Config do
   describe ".load!" do
 
     before(:all) do
-      Object.send(:remove_const, :Rails) if defined?(Rails)
+      if defined?(Rails)
+        RailsTemp = Rails
+        Object.send(:remove_const, :Rails)
+      end
     end
 
     before do

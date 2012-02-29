@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::NestedAttributes do
 
   before(:all) do
-    [ HtmlWriter, BigPalette, Square, Circle, Truck, Car, Learner ]
+    [ HtmlWriter, PdfWriter, BigPalette, Square, Circle, Truck, Car, Learner ]
   end
 
   before do

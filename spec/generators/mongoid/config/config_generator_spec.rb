@@ -1,43 +1,55 @@
-require 'spec_helper'
-
-# Generators are not automatically loaded by Rails
-require 'rails/generators/mongoid/config/config_generator'
-
-module Rails
-  class Application
-  end
-end
-module MyApp
-  class Application < Rails::Application
-  end
-end
+require "spec_helper"
+require "rails/generators/mongoid/config/config_generator"
 
 describe Mongoid::Generators::ConfigGenerator do
-  # Tell the generator where to put its output (what it thinks of as Rails.root)
-  destination File.expand_path("../../../../../../tmp", __FILE__)
 
+  destination File.expand_path("../../../../../../tmp", __FILE__)
 
   before do
     prepare_destination
   end
 
-  describe 'no arguments' do
-    before { run_generator  }
+  context "when not providing any arguments" do
 
-    describe 'config/mongoid.yml' do
-      subject { file('config/mongoid.yml') }
-      it { should exist }
-      it { should contain "database: my_app_development" }
+    before do
+      run_generator
+    end
+
+    context "when generating config/mongoid.yml" do
+
+      let!(:config) do
+        file("config/mongoid.yml")
+      end
+
+      it "generates the config" do
+        config.should exist
+      end
+
+      it "generates with a default database name" do
+        config.should contain("database: my_app_development")
+      end
     end
   end
 
-  describe 'specifying database name' do
-    before { run_generator %w(my_database) }
+  context "when not providing arguments" do
 
-    describe 'config/mongoid.yml' do
-      subject { file('config/mongoid.yml') }
-      it { should exist }
-      it { should contain "database: my_database_development" }
+    before do
+      run_generator %w(my_database)
+    end
+
+    context "when generating config/mongoid.yml" do
+
+      let!(:config) do
+        file("config/mongoid.yml")
+      end
+
+      it "generates the config" do
+        config.should exist
+      end
+
+      it "generates with the provided database name" do
+        config.should contain("database: my_database_development")
+      end
     end
   end
 end

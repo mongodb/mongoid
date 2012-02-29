@@ -1,12 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
+require "rails/generators/mongoid/observer/observer_generator"
 
-# Generators are not automatically loaded by Rails
-require 'rails/generators/mongoid/observer/observer_generator'
-
-module Rails
-end
 describe Mongoid::Generators::ObserverGenerator do
-  # Tell the generator where to put its output (what it thinks of as Rails.root)
+
   destination File.expand_path("../../../../../../tmp", __FILE__)
 
   before do
@@ -14,13 +10,25 @@ describe Mongoid::Generators::ObserverGenerator do
     prepare_destination
   end
 
-  describe 'no arguments' do
-    before { run_generator %w(company) }
+  context "when no arguments are provided" do
 
-    describe 'app/models/company_observer.rb' do
-      subject { file('app/models/company_observer.rb') }
-      it { should exist }
-      it { should contain "class CompanyObserver < Mongoid::Observer" }
+    before do
+      run_generator %w(company)
+    end
+
+    context "when generating a company observer" do
+
+      let(:observer) do
+        file("app/models/company_observer.rb")
+      end
+
+      it "generates the file" do
+        observer.should exist
+      end
+
+      it "defines the observer subclass" do
+        observer.should contain("class CompanyObserver < Mongoid::Observer")
+      end
     end
   end
 end

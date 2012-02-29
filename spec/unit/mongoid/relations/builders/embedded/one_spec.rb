@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Relations::Builders::Embedded::One do
 
-  before(:all) do
-    PdfWriter
-  end
-
   let(:base) do
     stub
   end
@@ -84,7 +80,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
       end
 
       let(:object) do
-        { "_type" => "PdfWriter", "speed" => 100 }
+        { "_type" => PdfWriter.name, "speed" => 100 }
       end
 
       before do
