@@ -126,6 +126,45 @@ describe Mongoid::Validations::PresenceValidator do
     end
   end
 
+  context "when validating a relation" do
+
+    before do
+      Person.autosaved_relations.delete_one(:game)
+      Person.validates :game, :presence => true
+    end
+
+    after do
+      Person.autosaved_relations.clear
+      Person.reset_callbacks(:save)
+      Person.reset_callbacks(:validate)
+    end
+
+    context "when the relation is new" do
+
+      let(:person) do
+        Person.new
+      end
+
+      context "when the base is valid" do
+
+        let!(:game) do
+          person.build_game
+        end
+
+        context "when saving the base" do
+
+          before do
+            person.save
+          end
+
+          it "saves the relation" do
+            game.reload.should eq(game)
+          end
+        end
+      end
+    end
+  end
+
   context "when validating a localized field" do
 
     context "when any translation is blank" do

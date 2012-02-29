@@ -372,6 +372,11 @@ For instructions on upgrading to newer versions, visit
   what the missing ones were. Previously the error only got raised if
   nothing was returned.
 
+* \#1675 Adding presence validation on a relation now enables autosave.
+  This is to ensure that when a new parent object is saved with a new
+  child and marked is valid, both are persisted to ensure a correct
+  state in the database.
+
 * \#1484 `Model#has_attribute?` now behaves the same as Active Record.
 
 * \#1471 Mongoid no longer strips any level of precision off of times.

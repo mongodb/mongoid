@@ -140,7 +140,7 @@ module Mongoid #:nodoc:
       def validates_presence_of(*args)
         validates_with(PresenceValidator, _merge_attributes(args))
       end
-      
+
       # Validates whether or not a field matches a certain regular expression.
       #
       # @example
@@ -154,6 +154,29 @@ module Mongoid #:nodoc:
       # @param [ Array ] *args The arguments to pass to the validator.
       def validates_format_of(*args)
         validates_with(FormatValidator, _merge_attributes(args))
+      end
+
+      # Add validation with the supplied validators forthe provided fields
+      # with options.
+      #
+      # @example Validate with a specific validator.
+      #   validates_with MyValidator, on: :create
+      #
+      # @param [ Class<Array>, Hash ] *args The validator classes and options.
+      #
+      # @note See ActiveModel::Validations::With for full options. This is
+      #   overridden to add autosave functionality when presence validation is
+      #   added.
+      #
+      # @since 3.0.0
+      def validates_with(*args, &block)
+        if args.first == PresenceValidator
+          args.last[:attributes].each do |name|
+            metadata = relations[name.to_s]
+            autosave(metadata.merge!(:autosave => true)) if metadata
+          end
+        end
+        super
       end
 
       protected
