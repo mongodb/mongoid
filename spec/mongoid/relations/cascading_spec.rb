@@ -214,6 +214,11 @@ describe Mongoid::Relations::Cascading do
               it "raises no error" do
                 expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
               end
+
+              it "deletes the parent" do
+                person.send(method)
+                person.should be_destroyed
+              end
             end
 
             context "when the relation is not empty" do
@@ -248,6 +253,11 @@ describe Mongoid::Relations::Cascading do
               it "raises no error" do
                 expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
               end
+
+              it "deletes the parent" do
+                person.send(method)
+                person.should be_destroyed
+              end
             end
 
             context "when the relation is not empty" do
@@ -281,6 +291,11 @@ describe Mongoid::Relations::Cascading do
 
               it "raises no error" do
                 expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                person.should be_destroyed
               end
             end
 
