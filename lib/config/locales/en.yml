@@ -85,6 +85,20 @@ en:
             slip by."
           resolution: "Valid options are: %{valid}, make sure these are the ones
             you are using."
+        invalid_scope:
+          message: "Defining a scope of value %{value} on %{klass} is not
+            allowed."
+          summary: "Scopes in Mongoid must be either criteria objects or procs
+            that wrap criteria objects."
+          resolution: "Change the scope to be a criteria or proc wrapped
+            critera.\n
+            Example:\n
+            \_\_class Band\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_field :active, type: Boolean, default: true\n
+            \_\_\_\_scope :active, where(active: true)\n
+            \_\_\_\_scope :inactive, ->{ where(active: false) }\n
+            \_\_end\n\n"
         invalid_time:
           message: "'%{value}' is not a valid Time."
           summary: "Mongoid tries to serialize the values for Date, DateTime, and

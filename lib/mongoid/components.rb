@@ -23,7 +23,6 @@ module Mongoid #:nodoc
     include Mongoid::Attributes
     include Mongoid::Collections
     include Mongoid::Copyable
-    include Mongoid::DefaultScope
     include Mongoid::Extras
     include Mongoid::Fields
     include Mongoid::Hierarchy
@@ -31,12 +30,12 @@ module Mongoid #:nodoc
     include Mongoid::Inspection
     include Mongoid::JSON
     include Mongoid::Matchers
-    include Mongoid::NamedScope
     include Mongoid::NestedAttributes
     include Mongoid::Persistence
     include Mongoid::Relations
     include Mongoid::Reloading
     include Mongoid::Safety
+    include Mongoid::Scoping
     include Mongoid::Serialization
     include Mongoid::Sharding
     include Mongoid::State
@@ -51,7 +50,6 @@ module Mongoid #:nodoc
       Mongoid::Attributes,
       Mongoid::Collections,
       Mongoid::Copyable,
-      Mongoid::DefaultScope,
       Mongoid::Dirty,
       Mongoid::Extras,
       Mongoid::Fields,
@@ -60,12 +58,12 @@ module Mongoid #:nodoc
       Mongoid::Inspection,
       Mongoid::JSON,
       Mongoid::Matchers,
-      Mongoid::NamedScope,
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
       Mongoid::Relations,
       Mongoid::Relations::Proxy,
       Mongoid::Safety,
+      Mongoid::Scoping,
       Mongoid::Serialization,
       Mongoid::Sharding,
       Mongoid::State,

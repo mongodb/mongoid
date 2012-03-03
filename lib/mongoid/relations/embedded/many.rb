@@ -353,7 +353,8 @@ module Mongoid # :nodoc:
         #
         # @since 2.4.0
         def unscoped
-          klass.criteria(true, false).tap do |criterion|
+          klass.unscoped.tap do |criterion|
+            criterion.embedded = true
             criterion.documents = _unscoped
           end
         end
@@ -398,7 +399,8 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          klass.criteria(true).tap do |criterion|
+          klass.scoped.tap do |criterion|
+            criterion.embedded = true
             criterion.documents = target
           end
         end
@@ -473,7 +475,8 @@ module Mongoid # :nodoc:
         # @since 2.4.0
         def scope(docs)
           return docs unless metadata.order || metadata.klass.default_scoping?
-          metadata.klass.criteria(true).order_by(metadata.order).tap do |crit|
+          metadata.klass.order_by(metadata.order).tap do |crit|
+            crit.embedded = true
             crit.documents = docs
           end.entries
         end

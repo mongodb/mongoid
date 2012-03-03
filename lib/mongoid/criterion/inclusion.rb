@@ -218,6 +218,10 @@ module Mongoid #:nodoc:
         @inclusions ||= []
       end
 
+      def inclusions=(value)
+        @inclusions = value
+      end
+
       # Adds a criterion to the +Criteria+ that specifies values to do
       # geospacial searches by. The field must be indexed with the "2d" option.
       #

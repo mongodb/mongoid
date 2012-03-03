@@ -330,11 +330,11 @@ For instructions on upgrading to newer versions, visit
         band.remove_attribute(:name) # Raises ReadonlyAttribute error.
 
 
-### Major Changes
+### Major Changes (Backwards Incompatible)
 
 * `Model.defaults` no longer exists. You may get all defaults with a
   combination of `Model.pre_processed_defaults` and
-  `Model.post_processed_defaults`
+  `Model.post_processed_defaults`.
 
         Band.pre_processed_defaults
         Band.post_processed_defaults
@@ -404,6 +404,46 @@ For instructions on upgrading to newer versions, visit
 
 * \#933 `:field.size` has been renamed to `:field.count` in criteria for
   $size not to conflict with Symbol's size method.
+
+* \#829/\#797 Mongoid scoping code has been completely rewritten, and now
+  matches the Active Record API. With this backwards incompatible change,
+  some methods have been removed or renamed.
+
+    Criteria#as_conditions and Criteria#fuse no longer exist.
+
+    Criteria#merge now only accepts another object that responds to
+    #to_criteria.
+
+    Criteria#merge! now merges in another object without creating a new
+    criteria object.
+
+        Band.where(name: "Tool").merge!(criteria)
+
+    Named scopes and default scopes no longer take hashes as parameters.
+    From now on only criteria and procs wrapping criteria will be
+    accepted, and an error will be raised if the arguments are incorrect.
+
+        class Band
+          include Mongoid::Document
+
+          default_scope ->{ where(active: true) }
+          scope :inactive, where(active: false)
+          scope :invalid, where: { valid: false } # This will raise an error.
+        end
+
+    The 'named_scope' macro has been removed, from now on only use 'scope'.
+
+    Model.unscoped now accepts a block which will not allow default scoping
+    to be applied for any calls inside the block.
+
+        Band.unscoped do
+          Band.scoped.where(name: "Ministry")
+        end
+
+    Model.scoped now takes options that will be set directly on the criteria
+    options hash.
+
+        Band.scoped(skip: 10, limit: 20)
 
 ### Resolved Issues
 

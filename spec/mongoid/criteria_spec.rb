@@ -27,22 +27,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#as_conditions" do
-
-    context "when the options contain sort criteria" do
-
-      let(:criteria) do
-        Person.where(:title => "Sir").asc(:score)
-      end
-
-      it "changes sort to order_by" do
-        criteria.as_conditions.should eq(
-          { :where => { :title => "Sir" }, :order_by => [[ :score, :asc ]] }
-        )
-      end
-    end
-  end
-
   describe "#clone" do
 
     let(:criteria) do
@@ -140,39 +124,6 @@ describe Mongoid::Criteria do
 
       it 'finds the object with a matching BSON::ObjectId argument' do
         Person.find(BSON::ObjectId(person.id)).should eq(person)
-      end
-    end
-  end
-
-  describe "#fuse" do
-
-    let(:criteria) do
-      described_class.new(Person)
-    end
-
-    context "when providing a selector" do
-
-      let(:result) do
-        criteria.fuse(:where => { :title => 'Test' })
-      end
-
-      it "adds the selector" do
-        result.selector[:title].should eq('Test')
-      end
-    end
-
-    context "when providing a selector and options" do
-
-      let(:result) do
-        criteria.fuse(:where => { :title => 'Test' }, :skip => 10)
-      end
-
-      it "adds the selector" do
-        result.selector[:title].should eq('Test')
-      end
-
-      it "adds the options" do
-        result.options.should eq({ :skip => 10 })
       end
     end
   end
@@ -324,71 +275,6 @@ describe Mongoid::Criteria do
 
       it "merges the options" do
         merged.options.should eq({ :sort => [[ :name, :asc ]]})
-      end
-    end
-
-    context "with a conditions hash" do
-
-      context "when the other has a selector and options" do
-
-        let(:other) do
-          { :conditions => { :name => "Chloe" }, :sort => [[ :name, :asc ]] }
-        end
-
-        let(:selector) do
-          { :title => "Sir", :name => "Chloe" }
-        end
-
-        let(:options) do
-          { :skip => 40, :sort => [[:name, :asc]] }
-        end
-
-        let(:crit) do
-          criteria.where(:title => "Sir").skip(40)
-        end
-
-        let(:merged) do
-          crit.merge(other)
-        end
-
-        it "merges the selector" do
-          merged.selector.should eq(selector)
-        end
-
-        it "merges the options" do
-          merged.options.should eq(options)
-        end
-      end
-
-      context "when the other has no conditions" do
-
-        let(:other) do
-          { :sort => [[ :name, :asc ]] }
-        end
-
-        let(:selector) do
-          { :title => "Sir" }
-        end
-
-        let(:options) do
-          { :skip => 40, :sort => [[:name, :asc]] }
-        end
-
-        let(:crit) do
-          criteria.where(:title => "Sir").skip(40)
-        end
-
-        let(:merged) do
-          crit.merge(other)
-        end
-
-        it "merges the selector" do
-          merged.selector.should eq(selector)
-        end
-
-        it "merges the options" do
-          merged.options.should eq(options)
-        end
       end
     end
   end

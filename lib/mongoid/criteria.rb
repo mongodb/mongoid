@@ -204,9 +204,9 @@ module Mongoid #:nodoc:
     #
     # @param [ Class ] klass The model the criteria is for.
     # @param [ true, false ] embedded Is the criteria for embedded docs.
-    def initialize(klass, embedded = false)
+    def initialize(klass)
       @selector = Criterion::Selector.new(klass)
-      @options, @klass, @documents, @embedded = {}, klass, [], embedded
+      @options, @klass, @documents, @embedded = {}, klass, [], false
     end
 
     # Merges another object with this +Criteria+ and returns a new criteria.
@@ -214,27 +214,36 @@ module Mongoid #:nodoc:
     # combine multiple scopes together, where a chained scope situation
     # may be desired.
     #
-    # @example Merge the criteria with a conditions hash.
-    #   criteria.merge({ :conditions => { :title => "Sir" } })
-    #
     # @example Merge the criteria with another criteria.
     #   criteri.merge(other_criteria)
     #
-    # @param [ Criteria, Hash ] other The other criterion to merge with.
+    # @param [ Criteria ] other The other criterion to merge with.
     #
     # @return [ Criteria ] A cloned self.
     def merge(other)
-      clone.tap do |crit|
-        if other.respond_to?(:to_criteria)
-          criteria = other.to_criteria
-          crit.selector.update(criteria.selector)
-          crit.options.update(criteria.options)
-          crit.documents = criteria.documents
-        else
-          duped = other.dup
-          crit.selector.update(duped.delete(:conditions) || {})
-          crit.options.update(duped)
-        end
+      clone.tap do |criteria|
+        criteria.merge!(other)
+      end
+    end
+
+    # Merge the other criteria into this one.
+    #
+    # @example Merge another criteria into this criteria.
+    #   criteria.merge(Person.where(name: "bob"))
+    #
+    # @param [ Criteria ] other The criteria to merge in.
+    #
+    # @return [ Criteria ] The merged criteria.
+    #
+    # @since 3.0.0
+    def merge!(other)
+      criteria = other.to_criteria
+      tap do |crit|
+        crit.selector.update(criteria.selector)
+        crit.options.update(criteria.options)
+        crit.documents = criteria.documents
+        crit.scoping_options = criteria.scoping_options
+        crit.inclusions = (crit.inclusions + criteria.inclusions.dup).uniq
       end
     end
 
@@ -252,20 +261,6 @@ module Mongoid #:nodoc:
       super || @klass.respond_to?(name) || entries.respond_to?(name, include_private)
     end
 
-    # Returns the selector and options as a +Hash+ that would be passed to a
-    # scope for use with named scopes.
-    #
-    # @example Get the criteria as a scoped hash.
-    #   criteria.as_conditions
-    #
-    # @return [ Hash ] The criteria as a scoped hash.
-    def as_conditions
-      scope_options = @options.dup
-      sorting = scope_options.delete(:sort)
-      scope_options[:order_by] = sorting if sorting
-      scope_options[:includes] = inclusions.map(&:name) if inclusions.any?
-      { :where => @selector }.merge(scope_options)
-    end
     alias :to_ary :to_a
 
     # Needed to properly get a criteria back as json
@@ -302,6 +297,18 @@ module Mongoid #:nodoc:
     # @since 3.0.0
     def to_criteria
       self
+    end
+
+    # Convert the criteria to a proc.
+    #
+    # @example Convert the criteria to a proc.
+    #   criteria.to_proc
+    #
+    # @return [ Proc ] The wrapped criteria.
+    #
+    # @since 3.0.0
+    def to_proc
+      ->{ self }
     end
 
     protected
@@ -347,15 +354,16 @@ module Mongoid #:nodoc:
       @selector = other.selector.dup
       @options = other.options.dup
       @includes = other.inclusions.dup
+      @scoping_options = other.scoping_options
       @context = nil
     end
 
     # Used for chaining +Criteria+ scopes together in the for of class methods
     # on the +Document+ the criteria is for.
     def method_missing(name, *args, &block)
-      if @klass.respond_to?(name)
-        @klass.send(:with_scope, self) do
-          @klass.send(name, *args, &block)
+      if klass.respond_to?(name)
+        klass.send(:with_scope, self) do
+          klass.send(name, *args, &block)
         end
       else
         return entries.send(name, *args)

@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
                         :includes, :limit, :max, :min, :not_in, :only,
                         :order_by, :search, :skip, :sum, :without, :where,
                         :update, :update_all, :near ]
-    delegate(*(critera_methods.dup << { :to => :criteria }))
+    delegate(*(critera_methods.dup << { :to => :with_default_scope }))
 
     # Find all documents that match the given conditions.
     #
@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Criteria ] The matching documents.
     def all
-      criteria
+      with_default_scope
     end
 
     # Returns a count of records in the database.
@@ -35,7 +35,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Integer ] The number of matching documents.
     def count
-      criteria.count
+      with_default_scope.count
     end
 
     # Returns true if count is zero
@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
     #
     # @param [ Array ] args The conditions.
     def exists?
-      criteria.exists?
+      with_default_scope.exists?
     end
 
     # Find a +Document+ in several different ways.
@@ -74,7 +74,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document, nil, Criteria ] A document or matching documents.
     def find(*args)
-      criteria.find(*args)
+      with_default_scope.find(*args)
     end
 
     # Find the first +Document+ given the conditions, or creates a new document
@@ -129,7 +129,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The first matching document.
     def first
-      criteria.first
+      with_default_scope.first
     end
 
     # Find the last +Document+ given the conditions.
@@ -141,7 +141,7 @@ module Mongoid #:nodoc:
     #
     # @return [ Document ] The last matching document.
     def last
-      criteria.last
+      with_default_scope.last
     end
 
     protected

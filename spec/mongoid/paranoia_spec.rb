@@ -2,50 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Paranoia do
 
-  describe ".criteria" do
+  describe ".scoped" do
 
-    context "when setting embedded to true" do
-
-      let(:criteria) do
-        ParanoidPost.criteria(true, true)
-      end
-
-      it "returns an embedded criteria" do
-        criteria.embedded.should be_true
-      end
-    end
-
-    context "when setting embedded to false" do
-
-      let(:criteria) do
-        ParanoidPost.criteria(false, true)
-      end
-
-      it "returns an root criteria" do
-        criteria.embedded.should be_false
-      end
-    end
-
-    context "when setting scoped to true" do
-
-      let(:criteria) do
-        ParanoidPost.criteria(false, true)
-      end
-
-      it "returns a scoped criteria" do
-        criteria.selector.should eq({ :deleted_at => nil })
-      end
-    end
-
-    context "when setting scoped to false" do
-
-      let(:criteria) do
-        ParanoidPost.criteria(false, false)
-      end
-
-      it "returns an scoped criteria" do
-        criteria.selector.should eq({})
-      end
+    it "returns a scoped criteria" do
+      ParanoidPost.scoped.selector.should eq({ :deleted_at => nil })
     end
   end
 

@@ -110,14 +110,14 @@ describe Mongoid::Versioning do
 
     context "when there is a default scope" do
 
-      before :all do
+      before(:all) do
         class WikiPage
           default_scope where(:author => "Jim")
         end
       end
 
-      after :all do
-        WikiPage.default_scoping.clear
+      after(:all) do
+        WikiPage.default_scoping = nil
       end
 
       context "when the document is new" do

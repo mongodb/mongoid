@@ -127,18 +127,18 @@ module Mongoid #:nodoc:
     module ClassMethods #:nodoc:
 
       # Override the default +Criteria+ accessor to only get existing
-      # documents. Passes all arguments up to +NamedScope.criteria+
+      # documents.
       #
       # @example Override the criteria.
-      #   Person.criteria
+      #   Person.queryable
       #
       # @param [ Array ] args The arguments.
       #
       # @return [ Criteria ] The paranoid compliant criteria.
       #
-      # @since 1.0.0
-      def criteria(embedded = false, scoped = true)
-        scoped ? super.where(:deleted_at => nil) : super
+      # @since 3.0.0
+      def queryable
+        super.where(:deleted_at => nil)
       end
 
       # Find deleted documents

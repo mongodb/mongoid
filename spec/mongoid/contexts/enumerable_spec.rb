@@ -286,7 +286,7 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     it "returns the specified number of documents" do
-      person.addresses.criteria.limit(5).size.should eq(5)
+      person.addresses.scoped.limit(5).size.should eq(5)
     end
   end
 
@@ -411,7 +411,7 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     let(:criteria) do
-      person.addresses.criteria
+      person.addresses.scoped
     end
 
     it "returns the first element" do
@@ -446,7 +446,7 @@ describe Mongoid::Contexts::Enumerable do
     end
 
     it "excludes the specified number of document" do
-      person.addresses.criteria.skip(5).limit(10).
+      person.addresses.scoped.skip(5).limit(10).
         map(&:number).should eq([5, 6, 7, 8, 9])
     end
   end

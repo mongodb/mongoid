@@ -12,7 +12,6 @@ require "mongoid/extensions/object/deep_copy"
 require "mongoid/extensions/object/reflections"
 require "mongoid/extensions/object/substitutable"
 require "mongoid/extensions/object/yoda"
-require "mongoid/extensions/proc/scoping"
 require "mongoid/extensions/string/checks"
 require "mongoid/extensions/string/conversions"
 require "mongoid/extensions/string/inflections"
@@ -55,10 +54,6 @@ class Object #:nodoc:
   include Mongoid::Extensions::Object::Reflections
   include Mongoid::Extensions::Object::Substitutable
   include Mongoid::Extensions::Object::Yoda
-end
-
-class Proc #:nodoc:
-  include Mongoid::Extensions::Proc::Scoping
 end
 
 class String #:nodoc

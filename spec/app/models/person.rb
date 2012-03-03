@@ -140,13 +140,13 @@ class Person
 
   class << self
     def accepted
-      criteria.where(:terms => true)
+      scoped.where(:terms => true)
     end
     def knight
-      criteria.where(:title => "Sir")
+      scoped.where(:title => "Sir")
     end
     def old
-      criteria.where(:age => { "$gt" => 50 })
+      scoped.where(:age => { "$gt" => 50 })
     end
   end
 

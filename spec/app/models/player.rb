@@ -5,15 +5,16 @@ class Player
   field :deaths, :type => Integer
   field :status
 
-  named_scope :active, criteria.where(:active => true) do
+  scope :active, where(:active => true) do
     def extension
       "extension"
     end
   end
-  named_scope :inactive, :where => { :active => false }
-  named_scope :frags_over, lambda { |count| { :where => { :frags.gt => count } } }
-  named_scope :deaths_under, lambda { |count| criteria.where(:deaths.lt => count) }
-  scope :deaths_over, lambda { |count| criteria.where(:deaths.gt => count) }
+
+  scope :inactive, where(:active => false)
+  scope :frags_over, lambda { |count| where(:frags.gt => count) }
+  scope :deaths_under, lambda { |count| where(:deaths.lt => count) }
+  scope :deaths_over, lambda { |count| where(:deaths.gt => count) }
 
   has_many :weapons
   has_one :powerup
@@ -23,7 +24,7 @@ class Player
 
   class << self
     def alive
-      criteria.where(:status => "Alive")
+      where(:status => "Alive")
     end
   end
 end

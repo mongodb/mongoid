@@ -7,7 +7,7 @@ describe Mongoid::Criterion::Builder do
     context "when provided a valid selector" do
 
       let(:criteria) do
-        Mongoid::Criteria.new(Person, false).where(:title => "Sir")
+        Mongoid::Criteria.new(Person).where(:title => "Sir")
       end
 
       before do
@@ -22,7 +22,7 @@ describe Mongoid::Criterion::Builder do
     context "when provided invalid selectors" do
 
       let(:criteria) do
-        Mongoid::Criteria.new(Person, false).where(:score.gt => 5)
+        Mongoid::Criteria.new(Person).where(:score.gt => 5)
       end
 
       before do
@@ -37,7 +37,7 @@ describe Mongoid::Criterion::Builder do
     context "with attributes" do
 
       let(:criteria) do
-        Mongoid::Criteria.new(Person, false).where(:title => "Sir")
+        Mongoid::Criteria.new(Person).where(:title => "Sir")
       end
 
       before do
