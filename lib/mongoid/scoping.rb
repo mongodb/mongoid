@@ -170,6 +170,7 @@ module Mongoid #:nodoc:
       def with_default_scope
         queryable.with_default_scope
       end
+      alias :criteria :with_default_scope
 
       # Pushes the provided criteria onto the scope stack, and removes it after the
       # provided block is yielded.
