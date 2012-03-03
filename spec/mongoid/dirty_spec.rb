@@ -328,6 +328,31 @@ describe Mongoid::Dirty do
     end
   end
 
+  describe "#attribute_changed_from_default?" do
+
+    context "when the attribute differs from the default value" do
+
+      let(:person) do
+        Person.new(age: 33)
+      end
+
+      it "returns true" do
+        person.should be_age_changed_from_default
+      end
+    end
+
+    context "when the attribute is the same as the default" do
+
+      let(:person) do
+        Person.new
+      end
+
+      it "returns false" do
+        person.should_not be_age_changed_from_default
+      end
+    end
+  end
+
   describe "#attribute_was" do
 
     context "when the attribute has changed from the persisted value" do

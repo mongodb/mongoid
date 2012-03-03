@@ -180,6 +180,22 @@ module Mongoid #:nodoc:
       changed_attributes[attr] != attributes[attr]
     end
 
+    # Get whether or not the field has a different value from the default.
+    #
+    # @example Is the field different from the default?
+    #   model.attribute_changed_from_default?
+    #
+    # @param [ String ] attr The name of the attribute.
+    #
+    # @return [ true, false ] If the attribute differs.
+    #
+    # @since 3.0.0
+    def attribute_changed_from_default?(attr)
+      field = fields[attr]
+      return false unless field
+      attributes[attr] != field.eval_default(self)
+    end
+
     # Get the previous value for the attribute.
     #
     # @example Get the previous value.
@@ -241,7 +257,9 @@ module Mongoid #:nodoc:
         create_dirty_change_accessor(name, meth)
         create_dirty_change_check(name, meth)
         create_dirty_change_flag(name, meth)
+        create_dirty_default_change_check(name, meth)
         create_dirty_previous_value_accessor(name, meth)
+        create_dirty_reset(name, meth)
         create_dirty_reset(name, meth)
       end
 
@@ -277,6 +295,26 @@ module Mongoid #:nodoc:
           undef_method("#{meth}_changed?") if method_defined?("#{meth}_changed?")
           define_method("#{meth}_changed?") do
             attribute_changed?(name)
+          end
+        end
+      end
+
+      # Creates the dirty default change check.
+      #
+      # @example Create the check.
+      #   Model.create_dirty_default_change_check("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_default_change_check(name, meth)
+        generated_methods.module_eval do
+          if method_defined?("#{meth}_changed_from_default?")
+            undef_method("#{meth}_changed_from_default?")
+          end
+          define_method("#{meth}_changed_from_default?") do
+            attribute_changed_from_default?(name)
           end
         end
       end

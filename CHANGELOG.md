@@ -20,6 +20,16 @@ For instructions on upgrading to newer versions, visit
         band.albums << Albums.first
         band.delete # Raises DeleteRestriction error.
 
+* \#1764 Add method to check if field differs from the default value.
+
+        class Band
+          include Mongoid::Document
+          field :name, type: String, default: "New"
+        end
+
+        band = Band.first
+        band.name_changed_from_default?
+
 * \#1759 Invalid fields error messages have been updated to show the
   source and location of the original method. The new message is:
 
