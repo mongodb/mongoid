@@ -47,7 +47,9 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def serialize(object)
           return object unless object
-          ::Array.wrap(object)
+          ::Array.wrap(object).map do |obj|
+            Serialization.mongoize(obj, obj.class)
+          end
         end
       end
     end

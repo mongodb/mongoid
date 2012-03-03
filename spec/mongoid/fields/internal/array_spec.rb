@@ -135,8 +135,26 @@ describe Mongoid::Fields::Internal::Array do
 
     context "when the value is an array" do
 
-      it "returns the array" do
-        field.serialize(["test"]).should eq(["test"])
+      context "when the array values dont need to be serialized" do
+
+        it "returns the array" do
+          field.serialize(["test"]).should eq(["test"])
+        end
+      end
+
+      context "when the array values need serialization" do
+
+        let(:date) do
+          Date.new(2012, 1, 1)
+        end
+
+        let(:serialized) do
+          field.serialize([ date ])
+        end
+
+        it "serializes the values" do
+          serialized.first.should be_a(Time)
+        end
       end
     end
   end
