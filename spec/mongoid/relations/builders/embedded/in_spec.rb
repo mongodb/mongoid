@@ -13,7 +13,7 @@ describe Mongoid::Relations::Builders::Embedded::In do
     end
 
     let(:metadata) do
-      stub(:klass => Person, :name => :person)
+      stub(klass: Person, name: :person)
     end
 
     context "when a document is provided" do

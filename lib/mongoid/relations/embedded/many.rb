@@ -174,7 +174,7 @@ module Mongoid # :nodoc:
               if _assigning? && !doc.paranoid?
                 base.add_atomic_pull(doc)
               else
-                doc.delete(:suppress => true)
+                doc.delete(suppress: true)
               end
               unbind_one(doc)
             end
@@ -497,7 +497,7 @@ module Mongoid # :nodoc:
             criteria.each do |doc|
               target.delete_one(doc)
               _unscoped.delete_one(doc)
-              doc.send(method, :suppress => true) unless _assigning?
+              doc.send(method, suppress: true) unless _assigning?
               unbind_one(doc)
             end
             reindex

@@ -6,13 +6,13 @@ module Mongoid #:nodoc:
     class ModelGenerator < Base #:nodoc:
 
       desc "Creates a Mongoid model"
-      argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
+      argument :attributes, type: :array, default: [], banner: "field:type field:type"
 
       check_class_collision
 
-      class_option :timestamps, :type => :boolean
-      class_option :parent,     :type => :string, :desc => "The parent class for the generated model"
-      class_option :versioning, :type => :boolean, :default => false, :desc => "Enable mongoid versioning"
+      class_option :timestamps, type: :boolean
+      class_option :parent,     type: :string, desc: "The parent class for the generated model"
+      class_option :versioning, type: :boolean, default: false, desc: "Enable mongoid versioning"
 
       def create_model_file
         template "model.rb.tt", File.join("app/models", class_path, "#{file_name}.rb")

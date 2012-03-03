@@ -15,7 +15,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
     context "when provided nil" do
 
       let(:metadata) do
-        stub(:klass => Name, :name => :name)
+        stub(klass: Name, name: :name)
       end
 
       let(:builder) do
@@ -34,7 +34,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
     context "when provided a document" do
 
       let(:metadata) do
-        stub(:klass => Name, :name => :name)
+        stub(klass: Name, name: :name)
       end
 
       let(:object) do
@@ -53,7 +53,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
     context "when no type is in the object" do
 
       let(:metadata) do
-        stub(:klass => Name, :name => :name)
+        stub(klass: Name, name: :name)
       end
 
       let(:object) do
@@ -76,7 +76,7 @@ describe Mongoid::Relations::Builders::Embedded::One do
     context "when a type is in the object" do
 
       let(:metadata) do
-        stub(:klass => Writer, :name => :writer)
+        stub(klass: Writer, name: :writer)
       end
 
       let(:object) do

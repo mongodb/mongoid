@@ -7,7 +7,7 @@ describe Mongoid::Relations::Cascading::Destroy do
   end
 
   let(:metadata) do
-    stub(:name => :posts)
+    stub(name: :posts)
   end
 
   let(:strategy) do

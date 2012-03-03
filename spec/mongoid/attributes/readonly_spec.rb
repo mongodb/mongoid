@@ -37,7 +37,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       let(:person) do
-        Person.create(:title => "sir", :terms => true)
+        Person.create(title: "sir", terms: true)
       end
 
       it "sets the first readonly value" do
@@ -64,7 +64,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       let(:person) do
-        Person.create(:title => "sir", :terms => true)
+        Person.create(title: "sir", terms: true)
       end
 
       context "when updating via the setter" do
@@ -118,7 +118,7 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via update_attributes" do
 
         before do
-          person.update_attributes(:title => "mr")
+          person.update_attributes(title: "mr")
           person.save
         end
 
@@ -134,7 +134,7 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via update_attributes!" do
 
         before do
-          person.update_attributes!(:title => "mr")
+          person.update_attributes!(title: "mr")
           person.save
         end
 

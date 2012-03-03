@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::Complex do
 
   let(:complex) do
-    described_class.new(:key => :field, :operator => "gt")
+    described_class.new(key: :field, operator: "gt")
   end
 
   describe "#initialize" do
@@ -31,7 +31,7 @@ describe Mongoid::Criterion::Complex do
   describe "#to_s" do
 
     let(:complex) do
-      described_class.new(:key => :field, :operator => "gt")
+      described_class.new(key: :field, operator: "gt")
     end
 
     it "returns the name of the key" do
@@ -42,7 +42,7 @@ describe Mongoid::Criterion::Complex do
   context "when comparing equivalent objects" do
 
     let(:equivalent_complex) do
-      described_class.new(:key => :field, :operator => "gt")
+      described_class.new(key: :field, operator: "gt")
     end
 
     it "is identifiable as equal" do
@@ -57,7 +57,7 @@ describe Mongoid::Criterion::Complex do
   context "when comparing different objects" do
 
     let(:different_complex) do
-      described_class.new(:key => :field, :operator => "lt")
+      described_class.new(key: :field, operator: "lt")
     end
 
     it "is identifiable as different" do

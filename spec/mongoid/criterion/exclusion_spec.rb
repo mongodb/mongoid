@@ -10,20 +10,20 @@ describe Mongoid::Criterion::Exclusion do
 
     let!(:person) do
       Person.create(
-        :title => "Sir",
-        :age => 100,
-        :aliases => ["D", "Durran"]
+        title: "Sir",
+        age: 100,
+        aliases: ["D", "Durran"]
       )
     end
 
     let(:criteria) do
-      base.excludes(:title => "Bad Title", :text => "Bad Text")
+      base.excludes(title: "Bad Title", text: "Bad Text")
     end
 
     context "when passed id" do
 
       let(:documents) do
-        Person.excludes(:id => person.id)
+        Person.excludes(id: person.id)
       end
 
       it "it properly excludes the documents" do
@@ -34,7 +34,7 @@ describe Mongoid::Criterion::Exclusion do
     context "when passed _id" do
 
       let(:documents) do
-        Person.excludes(:_id => person.id)
+        Person.excludes(_id: person.id)
       end
 
       it "it properly excludes the documents" do
@@ -45,15 +45,15 @@ describe Mongoid::Criterion::Exclusion do
     it "adds the $ne query to the selector" do
       criteria.selector.should eq(
         {
-          :title =>
+          title:
             { "$ne" => "Bad Title"},
-          :text =>
+          text:
             { "$ne" => "Bad Text" }
         })
     end
 
     it "returns a copy" do
-      base.excludes(:title => "Bad").should_not eql(base)
+      base.excludes(title: "Bad").should_not eql(base)
     end
 
     context "when passing an id" do
@@ -61,22 +61,22 @@ describe Mongoid::Criterion::Exclusion do
       context "when setting the field as id" do
 
         let(:criteria) do
-          base.excludes(:id => "1")
+          base.excludes(id: "1")
         end
 
         it "updates the selector" do
-          criteria.selector.should eq({ :_id => { "$ne" => "1" }})
+          criteria.selector.should eq({ _id: { "$ne" => "1" }})
         end
       end
 
       context "when setting the field as _id" do
 
         let(:criteria) do
-          base.excludes(:_id => "1")
+          base.excludes(_id: "1")
         end
 
         it "updates the selector" do
-          criteria.selector.should eq({ :_id => { "$ne" => "1" }})
+          criteria.selector.should eq({ _id: { "$ne" => "1" }})
         end
       end
     end
@@ -85,16 +85,16 @@ describe Mongoid::Criterion::Exclusion do
 
       let(:criteria) do
         base.
-          excludes(:title => "Bad Title").
-          excludes(:text => "Bad Text")
+          excludes(title: "Bad Title").
+          excludes(text: "Bad Text")
       end
 
       it "appends to the selector" do
         criteria.selector.should eq(
           {
-            :title =>
+            title:
               { "$ne" => "Bad Title"},
-            :text =>
+            text:
               { "$ne" => "Bad Text" }
           }
         )
@@ -105,7 +105,7 @@ describe Mongoid::Criterion::Exclusion do
   describe "#fields" do
 
     let(:criteria) do
-      base.fields(:field => 1)
+      base.fields(field: 1)
     end
 
     let(:options) do
@@ -113,43 +113,43 @@ describe Mongoid::Criterion::Exclusion do
     end
 
     it "adds the exclusion to the options" do
-      options.should eq({ :field => 1 })
+      options.should eq({ field: 1 })
     end
 
     it "returns a copy" do
-      base.fields(:field => 1).should_not eql(base)
+      base.fields(field: 1).should_not eql(base)
     end
   end
 
   describe "#not_in" do
 
     let(:criteria) do
-      base.not_in(:title => ["title1", "title2"], :text => ["test"])
+      base.not_in(title: ["title1", "title2"], text: ["test"])
     end
 
     it "adds the exclusion to the selector" do
       criteria.selector.should eq({
-        :title => { "$nin" => ["title1", "title2"] },
-        :text => { "$nin" => ["test"] }
+        title: { "$nin" => ["title1", "title2"] },
+        text: { "$nin" => ["test"] }
       })
     end
 
     it "returns a copy" do
-      base.not_in(:title => ["title1"]).should_not eql(base)
+      base.not_in(title: ["title1"]).should_not eql(base)
     end
 
     context "when existing nin criteria exists" do
 
       let(:criteria) do
         base.
-          not_in(:title => ["title1", "title2"]).
-          not_in(:title => ["title3"], :text => ["test"])
+          not_in(title: ["title1", "title2"]).
+          not_in(title: ["title3"], text: ["test"])
       end
 
       it "appends to the nin selector" do
         criteria.selector.should eq({
-          :title => { "$nin" => ["title1", "title2", "title3"] },
-          :text => { "$nin" => ["test"] }
+          title: { "$nin" => ["title1", "title2", "title3"] },
+          text: { "$nin" => ["test"] }
         })
       end
     end
@@ -169,7 +169,7 @@ describe Mongoid::Criterion::Exclusion do
 
       it "adds the options for limiting by fields" do
         criteria.options.should eq(
-          { :fields => { :_type => 1, :title => 1, :text => 1 }}
+          { fields: { _type: 1, title: 1, text: 1 }}
         )
       end
 
@@ -226,7 +226,7 @@ describe Mongoid::Criterion::Exclusion do
       end
 
       it "adds the options for excluding the fields" do
-        criteria.options.should eq({ :fields => { :title => 0, :text => 0, :age => 0 } })
+        criteria.options.should eq({ fields: { title: 0, text: 0, age: 0 } })
       end
 
       it "returns self" do

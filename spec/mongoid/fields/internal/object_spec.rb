@@ -18,7 +18,7 @@ describe Mongoid::Fields::Internal::Object do
     context "when the default value is a proc" do
 
       let(:field) do
-        described_class.instantiate(:test, :default => lambda { 1 })
+        described_class.instantiate(:test, default: ->{ 1 })
       end
 
       it "returns the called proc" do
@@ -29,7 +29,7 @@ describe Mongoid::Fields::Internal::Object do
     context "when the default value is not a proc" do
 
       let(:field) do
-        described_class.instantiate(:test, :default => "test")
+        described_class.instantiate(:test, default: "test")
       end
 
       it "returns the default value" do
@@ -56,7 +56,7 @@ describe Mongoid::Fields::Internal::Object do
   describe "#initialize" do
 
     let(:field) do
-      described_class.instantiate(:test, :type => Integer, :label => "test")
+      described_class.instantiate(:test, type: Integer, label: "test")
     end
 
     it "sets the name" do
@@ -68,7 +68,7 @@ describe Mongoid::Fields::Internal::Object do
     end
 
     it "sets the options" do
-      field.options.should eq({ :type => Integer, :label => "test" })
+      field.options.should eq({ type: Integer, label: "test" })
     end
   end
 

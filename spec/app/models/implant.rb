@@ -3,7 +3,7 @@ class Implant
 
   field :name
 
-  embedded_in :player, :inverse_of => :implants
+  embedded_in :player, inverse_of: :implants
 
   after_build do
     self.name = "Cochlear Implant (#{player.frags})"

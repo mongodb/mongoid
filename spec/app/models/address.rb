@@ -6,21 +6,21 @@ class Address
   attr_accessor :mode
 
   field :address_type
-  field :number, :type => Integer
+  field :number, type: Integer
   field :street
   field :city
   field :state
   field :post_code
   field :parent_title
-  field :services, :type => Array
-  field :latlng, :type => Array
-  field :map, :type => Hash
+  field :services, type: Array
+  field :latlng, type: Array
+  field :map, type: Hash
 
-  embeds_many :locations, :validate => false
-  embeds_one :code, :validate => false
-  embeds_one :target, :as => :targetable, :validate => false
+  embeds_many :locations, validate: false
+  embeds_one :code, validate: false
+  embeds_one :target, as: :targetable, validate: false
 
-  embedded_in :addressable, :polymorphic => true do
+  embedded_in :addressable, polymorphic: true do
     def extension
       "Testing"
     end
@@ -33,15 +33,15 @@ class Address
 
   belongs_to :account
 
-  scope :without_postcode, where(:postcode => nil)
-  scope :rodeo, where(:street => "Rodeo Dr") do
+  scope :without_postcode, where(postcode: nil)
+  scope :rodeo, where(street: "Rodeo Dr") do
     def mansion?
       all? { |address| address.street == "Rodeo Dr" }
     end
   end
 
-  validates_presence_of :street, :on => :update
-  validates_format_of :street, :with => /\D/, :allow_nil => true
+  validates_presence_of :street, on: :update
+  validates_format_of :street, with: /\D/, allow_nil: true
 
   def set_parent=(set = false)
     self.parent_title = addressable.title if set
@@ -53,11 +53,11 @@ class Address
 
   class << self
     def california
-      where(:state => "CA")
+      where(state: "CA")
     end
 
     def homes
-      where(:address_type => "Home")
+      where(address_type: "Home")
     end
 
     def streets

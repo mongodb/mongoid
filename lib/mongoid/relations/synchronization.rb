@@ -137,7 +137,7 @@ module Mongoid # :nodoc:
             set_callback(
               :save,
               :after,
-              :if => lambda { |doc| doc.syncable?(metadata) }
+              if: ->(doc){ doc.syncable?(metadata) }
             ) do |doc|
               doc.update_inverse_keys(metadata)
             end

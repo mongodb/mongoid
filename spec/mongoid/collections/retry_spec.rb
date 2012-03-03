@@ -26,7 +26,7 @@ describe Mongoid::Collections::Retry do
     Kernel.stubs(:sleep)
 
     logger.expects(:warn).at_least(0)
-    Mongoid.stubs(:logger => logger)
+    Mongoid.stubs(logger: logger)
   end
 
   describe "when a connection failure occurs" do

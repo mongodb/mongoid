@@ -5,11 +5,11 @@ describe Mongoid::Extensions::Object::DeepCopy do
   describe "#_deep_copy" do
 
     let(:value) do
-      { :key => "value" }
+      { key: "value" }
     end
 
     let(:hash) do
-      { :test => value }
+      { test: value }
     end
 
     let(:copy) do

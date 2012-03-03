@@ -13,8 +13,8 @@ module Mongoid #:nodoc
           compose_message(
             "validations",
             {
-              :document => document.class,
-              :errors => document.errors.full_messages.join(", ")
+              document: document.class,
+              errors: document.errors.full_messages.join(", ")
             }
           )
         )

@@ -5,15 +5,15 @@ describe Mongoid::Criteria do
   [ :update, :update_all ].each do |method|
 
     let!(:person) do
-      Person.create(:title => "Sir")
+      Person.create(title: "Sir")
     end
 
     let!(:address_one) do
-      person.addresses.create(:street => "Oranienstr")
+      person.addresses.create(street: "Oranienstr")
     end
 
     let!(:address_two) do
-      person.addresses.create(:street => "Wienerstr")
+      person.addresses.create(street: "Wienerstr")
     end
 
     describe "##{method}" do
@@ -27,7 +27,7 @@ describe Mongoid::Criteria do
           end
 
           before do
-            Person.where(:title => "Sir").send(method, :title => "Madam")
+            Person.where(title: "Sir").send(method, title: "Madam")
           end
 
           it "updates all the matching documents" do
@@ -42,7 +42,7 @@ describe Mongoid::Criteria do
           end
 
           before do
-            Person.send(method, :title => "Madam")
+            Person.send(method, title: "Madam")
           end
 
           it "updates all the matching documents" do
@@ -54,7 +54,7 @@ describe Mongoid::Criteria do
       context "when updating an embedded document" do
 
         before do
-          Person.where(:title => "Sir").send(
+          Person.where(title: "Sir").send(
             method,
             "addresses.0.city" => "Berlin"
           )
@@ -84,7 +84,7 @@ describe Mongoid::Criteria do
           context "when updating the relation directly" do
 
             before do
-              person.addresses.send(method, :city => "London")
+              person.addresses.send(method, city: "London")
             end
 
             it "updates the first document" do
@@ -99,8 +99,8 @@ describe Mongoid::Criteria do
           context "when updating the relation through a criteria" do
 
             before do
-              person.addresses.where(:street => "Oranienstr").send(
-                method, :city => "Berlin"
+              person.addresses.where(street: "Oranienstr").send(
+                method, city: "Berlin"
               )
             end
 
@@ -117,17 +117,17 @@ describe Mongoid::Criteria do
         context "when the relation is a references many" do
 
           let!(:post_one) do
-            person.posts.create(:title => "First")
+            person.posts.create(title: "First")
           end
 
           let!(:post_two) do
-            person.posts.create(:title => "Second")
+            person.posts.create(title: "Second")
           end
 
           context "when updating the relation directly" do
 
             before do
-              person.posts.send(method, :title => "London")
+              person.posts.send(method, title: "London")
             end
 
             let!(:from_db) do
@@ -146,8 +146,8 @@ describe Mongoid::Criteria do
           context "when updating the relation through a criteria" do
 
             before do
-              person.posts.where(:title => "First").send(
-                method, :title => "Berlin"
+              person.posts.where(title: "First").send(
+                method, title: "Berlin"
               )
             end
 
@@ -156,11 +156,11 @@ describe Mongoid::Criteria do
             end
 
             it "updates the matching documents" do
-              from_db.posts.where(:title => "Berlin").count.should eq(1)
+              from_db.posts.where(title: "Berlin").count.should eq(1)
             end
 
             it "does not update non matching documents" do
-              from_db.posts.where(:title => "Second").count.should eq(1)
+              from_db.posts.where(title: "Second").count.should eq(1)
             end
           end
         end
@@ -172,17 +172,17 @@ describe Mongoid::Criteria do
           end
 
           let!(:preference_one) do
-            person.preferences.create(:name => "First")
+            person.preferences.create(name: "First")
           end
 
           let!(:preference_two) do
-            person.preferences.create(:name => "Second")
+            person.preferences.create(name: "Second")
           end
 
           context "when updating the relation directly" do
 
             before do
-              person.preferences.send(method, :name => "London")
+              person.preferences.send(method, name: "London")
             end
 
             it "updates the first document" do
@@ -197,8 +197,8 @@ describe Mongoid::Criteria do
           context "when updating the relation through a criteria" do
 
             before do
-              person.preferences.where(:name => "First").send(
-                method, :name => "Berlin"
+              person.preferences.where(name: "First").send(
+                method, name: "Berlin"
               )
             end
 

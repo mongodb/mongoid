@@ -5,7 +5,7 @@ describe Mongoid::Paranoia do
   describe ".scoped" do
 
     it "returns a scoped criteria" do
-      ParanoidPost.scoped.selector.should eq({ :deleted_at => nil })
+      ParanoidPost.scoped.selector.should eq({ deleted_at: nil })
     end
   end
 
@@ -14,7 +14,7 @@ describe Mongoid::Paranoia do
     context "when the document is a root" do
 
       let(:post) do
-        ParanoidPost.create(:title => "testing")
+        ParanoidPost.create(title: "testing")
       end
 
       before do
@@ -45,7 +45,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:phone) do
-        person.paranoid_phones.create(:number => "911")
+        person.paranoid_phones.create(number: "911")
       end
 
       before do
@@ -72,11 +72,11 @@ describe Mongoid::Paranoia do
     context "when the document has a dependent relation" do
 
       let(:post) do
-        ParanoidPost.create(:title => "test")
+        ParanoidPost.create(title: "test")
       end
 
       let!(:author) do
-        post.authors.create(:name => "poe")
+        post.authors.create(name: "poe")
       end
 
       before do
@@ -96,7 +96,7 @@ describe Mongoid::Paranoia do
     context "when the document is a root" do
 
       let(:post) do
-        ParanoidPost.create(:title => "testing")
+        ParanoidPost.create(title: "testing")
       end
 
       before do
@@ -133,7 +133,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:phone) do
-        person.paranoid_phones.create(:number => "911")
+        person.paranoid_phones.create(number: "911")
       end
 
       before do
@@ -170,11 +170,11 @@ describe Mongoid::Paranoia do
     context "when the document has a dependent relation" do
 
       let(:post) do
-        ParanoidPost.create(:title => "test")
+        ParanoidPost.create(title: "test")
       end
 
       let!(:author) do
-        post.authors.create(:name => "poe")
+        post.authors.create(name: "poe")
       end
 
       before do
@@ -194,7 +194,7 @@ describe Mongoid::Paranoia do
     context "when the document is a root" do
 
       let(:post) do
-        ParanoidPost.create(:title => "testing")
+        ParanoidPost.create(title: "testing")
       end
 
       context "when the document is hard deleted" do
@@ -227,7 +227,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:phone) do
-        person.paranoid_phones.create(:number => "911")
+        person.paranoid_phones.create(number: "911")
       end
 
       context "when the document is hard deleted" do
@@ -259,7 +259,7 @@ describe Mongoid::Paranoia do
     context "when the document is a root" do
 
       let(:post) do
-        ParanoidPost.create(:title => "testing")
+        ParanoidPost.create(title: "testing")
       end
 
       before do
@@ -282,7 +282,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:phone) do
-        person.paranoid_phones.create(:number => "911")
+        person.paranoid_phones.create(number: "911")
       end
 
       before do
@@ -301,11 +301,11 @@ describe Mongoid::Paranoia do
     context "when the document has a dependent relation" do
 
       let(:post) do
-        ParanoidPost.create(:title => "test")
+        ParanoidPost.create(title: "test")
       end
 
       let!(:author) do
-        post.authors.create(:name => "poe")
+        post.authors.create(name: "poe")
       end
 
       before do
@@ -325,7 +325,7 @@ describe Mongoid::Paranoia do
     context "when the document is a root" do
 
       let(:post) do
-        ParanoidPost.create(:title => "testing")
+        ParanoidPost.create(title: "testing")
       end
 
       before do
@@ -362,7 +362,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:phone) do
-        person.paranoid_phones.create(:number => "911")
+        person.paranoid_phones.create(number: "911")
       end
 
       before do
@@ -391,11 +391,11 @@ describe Mongoid::Paranoia do
     context "when the document has a dependent relation" do
 
       let(:post) do
-        ParanoidPost.create(:title => "test")
+        ParanoidPost.create(title: "test")
       end
 
       let!(:author) do
-        post.authors.create(:name => "poe")
+        post.authors.create(name: "poe")
       end
 
       before do
@@ -434,7 +434,7 @@ describe Mongoid::Paranoia do
     context "when the document is a root" do
 
       let(:post) do
-        ParanoidPost.create(:title => "testing")
+        ParanoidPost.create(title: "testing")
       end
 
       before do
@@ -458,7 +458,7 @@ describe Mongoid::Paranoia do
       end
 
       let(:phone) do
-        person.paranoid_phones.create(:number => "911")
+        person.paranoid_phones.create(number: "911")
       end
 
       before do
@@ -483,7 +483,7 @@ describe Mongoid::Paranoia do
     end
 
     it "returns a scoped criteria" do
-      scoped.selector.should eq({ :deleted_at => nil })
+      scoped.selector.should eq({ deleted_at: nil })
     end
   end
 

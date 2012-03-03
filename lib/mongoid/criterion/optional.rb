@@ -31,7 +31,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def cache
-        clone.tap { |crit| crit.options.merge!(:cache => true) }
+        clone.tap { |crit| crit.options.merge!(cache: true) }
       end
 
       # Will return true if the cache option has been set.
@@ -92,9 +92,9 @@ module Mongoid #:nodoc:
         field = klass.fields["_id"]
         ids.flatten!
         if ids.size > 1
-          any_in(:_id => ids.map{ |id| field.serialize(id) })
+          any_in(_id: ids.map{ |id| field.serialize(id) })
         else
-          where(:_id => field.serialize(ids.first))
+          where(_id: field.serialize(ids.first))
         end
       end
 
@@ -178,7 +178,7 @@ module Mongoid #:nodoc:
       # @return [ Criteria ] The cloned criteria.
       def type(types)
         types = [types] unless types.is_a?(Array)
-        any_in(:_type => types)
+        any_in(_type: types)
       end
 
       private

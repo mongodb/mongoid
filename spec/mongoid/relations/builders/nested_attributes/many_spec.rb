@@ -4,8 +4,8 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
 
   let(:metadata) do
     Mongoid::Relations::Metadata.new(
-      :name => :addresses,
-      :relation => Mongoid::Relations::Embedded::Many
+      name: :addresses,
+      relation: Mongoid::Relations::Embedded::Many
     )
   end
 
@@ -18,7 +18,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the option is provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, :allow_destroy => true)
+        described_class.new(metadata, {}, allow_destroy: true)
       end
 
       it "returns the option" do
@@ -51,7 +51,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when attributes are over limit" do
 
       let(:builder) do
-        described_class.new(metadata, attributes, :limit => 2)
+        described_class.new(metadata, attributes, limit: 2)
       end
 
       it "raises an error" do
@@ -67,7 +67,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         described_class.new(
           metadata,
           attributes,
-          :reject_if => lambda { |attrs| attrs[:city].blank? }
+          reject_if: ->(attrs){ attrs[:city].blank? }
         )
       end
 
@@ -87,7 +87,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         described_class.new(
           metadata,
           attributes,
-          :reject_if => :reject_if_city_is_empty
+          reject_if: :reject_if_city_is_empty
         )
       end
 
@@ -104,7 +104,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when ids are present" do
 
       let!(:address) do
-        person.addresses.build(:street => "Alexander Platz")
+        person.addresses.build(street: "Alexander Platz")
       end
 
       let(:attributes) do
@@ -168,7 +168,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the proc is provided" do
 
       let(:options) do
-        { :reject_if => lambda { |attrs| attrs[:first_name].blank? } }
+        { reject_if: ->(attrs){ attrs[:first_name].blank? } }
       end
 
       context "when the proc matches" do
@@ -178,7 +178,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         end
 
         it "returns true" do
-          builder.reject?(builder, { :last_name => "Lang" }).should be_true
+          builder.reject?(builder, { last_name: "Lang" }).should be_true
         end
       end
 
@@ -189,7 +189,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         end
 
         it "returns false" do
-          builder.reject?(builder, { :first_name => "Lang" }).should be_false
+          builder.reject?(builder, { first_name: "Lang" }).should be_false
         end
       end
     end
@@ -201,7 +201,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns false" do
-        builder.reject?(builder,{ :first_name => "Lang" }).should be_false
+        builder.reject?(builder,{ first_name: "Lang" }).should be_false
       end
     end
   end
@@ -211,7 +211,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     context "when the option is provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, :update_only => true)
+        described_class.new(metadata, {}, update_only: true)
       end
 
       it "returns the option" do

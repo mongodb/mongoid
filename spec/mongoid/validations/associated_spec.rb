@@ -9,11 +9,11 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the documents are valid" do
 
         let(:user) do
-          User.new(:name => "test")
+          User.new(name: "test")
         end
 
         let(:description) do
-          Description.new(:details => "testing")
+          Description.new(details: "testing")
         end
 
         before do
@@ -32,7 +32,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the documents are not valid" do
 
         let(:user) do
-          User.new(:name => "test")
+          User.new(name: "test")
         end
 
         let(:description) do
@@ -66,7 +66,7 @@ describe Mongoid::Validations::AssociatedValidator do
     end
 
     let(:validator) do
-      described_class.new(:attributes => person.attributes)
+      described_class.new(attributes: person.attributes)
     end
 
     context "when the association is a one to one" do
@@ -85,7 +85,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the association is valid" do
 
         let(:associated) do
-          stub(:valid? => true)
+          stub(valid?: true)
         end
 
         before do
@@ -101,7 +101,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the association is invalid" do
 
         let(:associated) do
-          stub(:valid? => false)
+          stub(valid?: false)
         end
 
         before do
@@ -135,7 +135,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the association has invalid documents" do
 
         let(:associated) do
-          stub(:valid? => false)
+          stub(valid?: false)
         end
 
         before do
@@ -151,7 +151,7 @@ describe Mongoid::Validations::AssociatedValidator do
       context "when the assocation has all valid documents" do
 
         let(:associated) do
-          stub(:valid? => true)
+          stub(valid?: true)
         end
 
         before do

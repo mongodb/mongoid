@@ -3,6 +3,6 @@ class CountryCode
 
   field :_id, type: Integer, default: ->{ code }
 
-  field :code, :type => Integer
-  embedded_in :phone_number, :class_name => "Phone"
+  field :code, type: Integer
+  embedded_in :phone_number, class_name: "Phone"
 end

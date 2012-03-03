@@ -40,7 +40,7 @@ module Mongoid #:nodoc
       #   Person.add_indexes
       def add_indexes
         if hereditary? && !index_options[:_type]
-          self.index_options[:_type] = {:unique => false, :background => true}
+          self.index_options[:_type] = {unique: false, background: true}
         end
         create_indexes if Mongoid.autocreate_indexes
       end
@@ -56,7 +56,7 @@ module Mongoid #:nodoc
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The index options.
-      def index(name, options = { :unique => false })
+      def index(name, options = { unique: false })
         self.index_options[name] = options
         create_indexes if Mongoid.autocreate_indexes
       end

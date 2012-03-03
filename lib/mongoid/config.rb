@@ -19,21 +19,21 @@ module Mongoid #:nodoc
     # @attribute [rw] master The master database.
     attr_accessor :reconnect
 
-    option :allow_dynamic_fields, :default => true
-    option :autocreate_indexes, :default => false
-    option :identity_map_enabled, :default => false
-    option :include_root_in_json, :default => false
-    option :include_type_for_serialization, :default => false
-    option :max_retries_on_connection_failure, :default => 0
-    option :scope_overwrite_exception, :default => false
-    option :persist_in_safe_mode, :default => false
-    option :preload_models, :default => false
-    option :protect_sensitive_fields, :default => true
-    option :raise_not_found_error, :default => true
-    option :skip_version_check, :default => false
-    option :time_zone, :default => nil
-    option :use_activesupport_time_zone, :default => true
-    option :use_utc, :default => false
+    option :allow_dynamic_fields, default: true
+    option :autocreate_indexes, default: false
+    option :identity_map_enabled, default: false
+    option :include_root_in_json, default: false
+    option :include_type_for_serialization, default: false
+    option :max_retries_on_connection_failure, default: 0
+    option :scope_overwrite_exception, default: false
+    option :persist_in_safe_mode, default: false
+    option :preload_models, default: false
+    option :protect_sensitive_fields, default: true
+    option :raise_not_found_error, default: true
+    option :skip_version_check, default: false
+    option :time_zone, default: nil
+    option :use_activesupport_time_zone, default: true
+    option :use_utc, default: false
 
     # Get any extra databases that have been configured.
     #

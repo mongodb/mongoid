@@ -11,7 +11,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "unsupported_version",
-            { :version => version, :mongo_version => Mongoid::MONGODB_VERSION }
+            { version: version, mongo_version: Mongoid::MONGODB_VERSION }
           )
         )
       end

@@ -3,24 +3,24 @@ require "spec_helper"
 describe Mongoid::Criteria do
 
   let(:name) do
-    Name.new(:first_name => "Durran")
+    Name.new(first_name: "Durran")
   end
 
   let(:address_one) do
-    Address.new(:street => "Forsterstr")
+    Address.new(street: "Forsterstr")
   end
 
   let(:address_two) do
-    Address.new(:street => "Hobrechtstr")
+    Address.new(street: "Hobrechtstr")
   end
 
   before do
-    Person.create(:title => "Madam")
+    Person.create(title: "Madam")
     2.times do |n|
       Person.create(
-        :title => "Sir",
-        :name => name,
-        :addresses => [ address_one, address_two ]
+        title: "Sir",
+        name: name,
+        addresses: [ address_one, address_two ]
       )
     end
   end
@@ -32,7 +32,7 @@ describe Mongoid::Criteria do
       context "when removing root documents" do
 
         let(:criteria) do
-          Person.where(:title => "Sir").and(:age.gt => 5)
+          Person.where(title: "Sir").and(:age.gt => 5)
         end
 
         let!(:removed) do
@@ -53,11 +53,11 @@ describe Mongoid::Criteria do
         context "when removing a single document" do
 
           let(:person) do
-            Person.where(:title => "Sir").first
+            Person.where(title: "Sir").first
           end
 
           let(:criteria) do
-            person.addresses.where(:street => "Forsterstr")
+            person.addresses.where(street: "Forsterstr")
           end
 
           let!(:removed) do
@@ -76,11 +76,11 @@ describe Mongoid::Criteria do
         context "when removing multiple documents" do
 
           let(:person) do
-            Person.where(:title => "Sir").first
+            Person.where(title: "Sir").first
           end
 
           let(:criteria) do
-            person.addresses.where(:city => nil)
+            person.addresses.where(city: nil)
           end
 
           let!(:removed) do

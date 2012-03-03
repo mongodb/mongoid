@@ -16,7 +16,7 @@ module Mongoid #:nodoc:
         # @attribute [rw] unloaded A criteria representing persisted docs.
         attr_accessor :added, :loaded, :unloaded
 
-        delegate :===, :is_a?, :kind_of?, :to => :added
+        delegate :===, :is_a?, :kind_of?, to: :added
 
         # Check if the enumerable is equal to the other object.
         #
@@ -96,7 +96,7 @@ module Mongoid #:nodoc:
         def delete(document)
           (loaded.delete(document) || added.delete(document)).tap do |doc|
             unless doc
-              if unloaded && unloaded.where(:_id => document.id).exists?
+              if unloaded && unloaded.where(_id: document.id).exists?
                 yield(document) if block_given?
                 return document
               end

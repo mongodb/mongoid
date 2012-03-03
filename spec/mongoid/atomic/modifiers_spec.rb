@@ -214,7 +214,7 @@ describe Mongoid::Atomic::Modifiers do
         it "adds the push all modifiers to the conflicts hash" do
           modifiers.should eq(
             { "$set" => { "addresses.0.street" => "Bond" },
-              :conflicts => { "$pushAll" =>
+              conflicts: { "$pushAll" =>
                 { "addresses" => [
                     { "street" => "Oxford St" }
                   ]
@@ -244,7 +244,7 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.should eq(
             { "$pullAll" => {
               "addresses" => { "street" => "Bond St" }},
-              :conflicts => { "$pushAll" =>
+              conflicts: { "$pushAll" =>
                 { "addresses" => [
                     { "street" => "Oxford St" }
                   ]
@@ -327,7 +327,7 @@ describe Mongoid::Atomic::Modifiers do
                   { "_id" => "one" }
                 ]
               },
-              :conflicts =>
+              conflicts:
                 { "$set" => { "addresses.0.title" => "Sir" }}
             }
           )

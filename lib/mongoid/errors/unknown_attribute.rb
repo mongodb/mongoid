@@ -17,7 +17,7 @@ module Mongoid #:nodoc
       # @since 3.0.0
       def initialize(klass, name)
         super(
-          compose_message("unknown_attribute", { :klass => klass.name, :name => name })
+          compose_message("unknown_attribute", { klass: klass.name, name: name })
         )
       end
     end

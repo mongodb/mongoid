@@ -15,11 +15,11 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when passed an array of documents" do
 
       let(:metadata) do
-        stub(:klass => Address, :name => :addresses)
+        stub(klass: Address, name: :addresses)
       end
 
       let(:object) do
-        [ Address.new(:city => "London") ]
+        [ Address.new(city: "London") ]
       end
 
       let(:documents) do
@@ -34,7 +34,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when the array is empty" do
 
       let(:metadata) do
-        stub(:klass => Address, :name => :addresses)
+        stub(klass: Address, name: :addresses)
       end
 
       let(:object) do
@@ -53,7 +53,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when passed nil" do
 
       let(:metadata) do
-        stub(:klass => Address, :name => :addresses)
+        stub(klass: Address, name: :addresses)
       end
 
       let(:builder) do
@@ -72,7 +72,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when no type is in the object" do
 
       let(:metadata) do
-        stub_everything(:klass => Address, :name => :addresses)
+        stub_everything(klass: Address, name: :addresses)
       end
 
       let(:object) do
@@ -100,7 +100,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when a type is in the object" do
 
       let(:metadata) do
-        stub_everything(:klass => Shape, :name => :shapes)
+        stub_everything(klass: Shape, name: :shapes)
       end
 
       let(:object) do

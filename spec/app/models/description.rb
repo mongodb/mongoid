@@ -4,8 +4,8 @@ class Description
   field :details
 
   belongs_to :user
-  belongs_to :updater, :class_name => 'User'
+  belongs_to :updater, class_name: 'User'
 
-  validates :user, :associated => true
-  validates :details, :presence => true
+  validates :user, associated: true
+  validates :details, presence: true
 end

@@ -8,10 +8,10 @@ module Mongoid #:nodoc:
       module Inflections
 
         REVERSALS = {
-          :asc => :desc,
-          :ascending => :descending,
-          :desc => :asc,
-          :descending => :ascending
+          asc: :desc,
+          ascending: :descending,
+          desc: :asc,
+          descending: :ascending
         }
 
         # Get the inverted sorting option.

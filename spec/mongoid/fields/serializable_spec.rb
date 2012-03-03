@@ -125,8 +125,8 @@ describe Mongoid::Fields::Serializable do
 
       let(:movie) do
         Movie.new(
-          :poster => Image.new("poster"),
-          :poster_thumb => Thumbnail.new("thumb")
+          poster: Image.new("poster"),
+          poster_thumb: Thumbnail.new("thumb")
         )
       end
 

@@ -7,7 +7,7 @@ describe Mongoid::Persistence::Atomic::Rename do
     context "when incrementing a field with a value" do
 
       let(:person) do
-        Person.create(:age => 100)
+        Person.create(age: 100)
       end
 
       let!(:rename) do

@@ -13,7 +13,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:selector) do
-          { :_id => BSON::ObjectId.new }
+          { _id: BSON::ObjectId.new }
         end
 
         let(:operations) do
@@ -21,7 +21,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:options) do
-          { :safe => true, :multi => false }
+          { safe: true, multi: false }
         end
 
         before do
@@ -50,7 +50,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:selector) do
-          { :_id => BSON::ObjectId.new }
+          { _id: BSON::ObjectId.new }
         end
 
         let(:operations_one) do
@@ -62,7 +62,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:options) do
-          { :safe => true, :multi => false }
+          { safe: true, multi: false }
         end
 
         before do
@@ -98,7 +98,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:selector) do
-          { :_id => BSON::ObjectId.new }
+          { _id: BSON::ObjectId.new }
         end
 
         let(:operations) do
@@ -106,7 +106,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:options) do
-          { :safe => true, :multi => false }
+          { safe: true, multi: false }
         end
 
         before do
@@ -135,7 +135,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:selector) do
-          { :_id => BSON::ObjectId.new }
+          { _id: BSON::ObjectId.new }
         end
 
         let(:operations_one) do
@@ -147,7 +147,7 @@ describe Mongoid::Relations::Embedded::Atomic::PushAll do
         end
 
         let(:options) do
-          { :safe => true, :multi => false }
+          { safe: true, multi: false }
         end
 
         before do

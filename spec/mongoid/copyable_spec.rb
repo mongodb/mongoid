@@ -8,27 +8,27 @@ describe Mongoid::Copyable do
 
       let(:person) do
         Person.new(
-          :title => "Sir",
-          :version => 4,
-          :created_at => Time.now,
-          :updated_at => Time.now
+          title: "Sir",
+          version: 4,
+          created_at: Time.now,
+          updated_at: Time.now
         )
       end
 
       let!(:address) do
-        person.addresses.build(:street => "Bond")
+        person.addresses.build(street: "Bond")
       end
 
       let!(:name) do
-        person.build_name(:first_name => "Judy")
+        person.build_name(first_name: "Judy")
       end
 
       let!(:posts) do
-        person.posts.build(:title => "testing")
+        person.posts.build(title: "testing")
       end
 
       let!(:game) do
-        person.build_game(:name => "Tron")
+        person.build_game(name: "Tron")
       end
 
       context "when the document is new" do
@@ -40,7 +40,7 @@ describe Mongoid::Copyable do
           end
 
           before do
-            person[:versions] = [ { :number => 1 } ]
+            person[:versions] = [ { number: 1 } ]
           end
 
           it "returns a new document" do
@@ -114,7 +114,7 @@ describe Mongoid::Copyable do
             end
 
             before do
-              copy.save(:validate => false)
+              copy.save(validate: false)
             end
 
             it "persists the attributes" do
@@ -145,7 +145,7 @@ describe Mongoid::Copyable do
           end
 
           before do
-            person[:versions] = [ { :number => 1 } ]
+            person[:versions] = [ { number: 1 } ]
           end
 
           it "returns a new document" do
@@ -207,7 +207,7 @@ describe Mongoid::Copyable do
             end
 
             before do
-              copy.save(:validate => false)
+              copy.save(validate: false)
             end
 
             it "persists the attributes" do
@@ -290,7 +290,7 @@ describe Mongoid::Copyable do
           end
 
           before do
-            copy.save(:validate => false)
+            copy.save(validate: false)
           end
 
           it "persists the attributes" do

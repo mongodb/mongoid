@@ -11,7 +11,7 @@ describe Mongoid::Relations::Options do
     context "when the options are valid for the relation" do
 
       let(:options) do
-        { :relation => relation, :as => :addressable }
+        { relation: relation, as: :addressable }
       end
 
       it "returns true" do
@@ -22,7 +22,7 @@ describe Mongoid::Relations::Options do
     context "when the options are invalid for the relation" do
 
       let(:options) do
-        { :name => :addresses, :relation => relation, :polymorphic => true }
+        { name: :addresses, relation: relation, polymorphic: true }
       end
 
       it "raises an error" do

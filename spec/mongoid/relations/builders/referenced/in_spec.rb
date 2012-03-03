@@ -9,15 +9,15 @@ describe Mongoid::Relations::Builders::Referenced::In do
   describe "#build" do
 
     let(:criteria) do
-      Person.where(:_id => object_id)
+      Person.where(_id: object_id)
     end
 
     let(:metadata) do
       stub(
-        :klass => Person,
-        :name => :person,
-        :foreign_key => "person_id",
-        :criteria => criteria
+        klass: Person,
+        name: :person,
+        foreign_key: "person_id",
+        criteria: criteria
       )
     end
 
@@ -136,7 +136,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       let(:game) do
-        Game.new(:person_id => person.id)
+        Game.new(person_id: person.id)
       end
 
       after do
@@ -159,7 +159,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       let(:game) do
-        Game.create(:person => person)
+        Game.create(person: person)
       end
 
       before do
@@ -184,7 +184,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
     end
 
     let(:game) do
-      Game.create(:person => person)
+      Game.create(person: person)
     end
 
     context 'setting an associated document to nil' do

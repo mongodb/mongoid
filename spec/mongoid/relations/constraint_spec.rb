@@ -17,10 +17,10 @@ describe Mongoid::Relations::Constraint do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :class_name => "Person",
-          :name => :person,
-          :inverse_class_name => "Post",
-          :relation => Mongoid::Relations::Referenced::In
+          class_name: "Person",
+          name: :person,
+          inverse_class_name: "Post",
+          relation: Mongoid::Relations::Referenced::In
         )
       end
 
@@ -55,10 +55,10 @@ describe Mongoid::Relations::Constraint do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :class_name => "Account",
-          :name => :account,
-          :inverse_class_name => "Alert",
-          :relation => Mongoid::Relations::Referenced::In
+          class_name: "Account",
+          name: :account,
+          inverse_class_name: "Alert",
+          relation: Mongoid::Relations::Referenced::In
         )
       end
 

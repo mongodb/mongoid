@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Hash do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Hash)
+    described_class.instantiate(:test, type: Hash)
   end
 
   describe "#cast_on_read?" do
@@ -20,8 +20,8 @@ describe Mongoid::Fields::Internal::Hash do
       let(:field) do
         described_class.instantiate(
           :test,
-          :type => Hash,
-          :default => lambda { { "field" => "value" } }
+          type: Hash,
+          default: ->{{ "field" => "value" }}
         )
       end
 
@@ -39,8 +39,8 @@ describe Mongoid::Fields::Internal::Hash do
       let(:field) do
         described_class.instantiate(
           :test,
-          :type => Hash,
-          :default => default
+          type: Hash,
+          default: default
         )
       end
 

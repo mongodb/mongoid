@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
   module Generators #:nodoc:
     class ObserverGenerator < Base #:nodoc:
 
-      check_class_collision :suffix => "Observer"
+      check_class_collision suffix: "Observer"
 
       def create_observer_file
         template 'observer.rb.tt', File.join('app/models', class_path, "#{file_name}_observer.rb")

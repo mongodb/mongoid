@@ -6,7 +6,7 @@ module Mongoid
     class ConfigGenerator < Rails::Generators::Base
       desc "Creates a Mongoid configuration file at config/mongoid.yml"
 
-      argument :database_name, :type => :string, :optional => true
+      argument :database_name, type: :string, optional: true
 
       def self.source_root
         @_mongoid_source_root ||= File.expand_path("../templates", __FILE__)

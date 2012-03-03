@@ -22,7 +22,7 @@ describe Mongoid::Serialization do
     context "when the model has embedded documents" do
 
       let!(:address) do
-        person.addresses.build(:street => "test")
+        person.addresses.build(street: "test")
       end
 
       context "when providing no custom options" do
@@ -39,7 +39,7 @@ describe Mongoid::Serialization do
       context "when providing options" do
 
         let(:attributes) do
-          person.serializable_hash(:methods => :id, :except => :_id)
+          person.serializable_hash(methods: :id, except: :_id)
         end
 
         let(:address_attributes) do
@@ -104,7 +104,7 @@ describe Mongoid::Serialization do
       context "when providing options" do
 
         let(:options) do
-          { :only => :name }
+          { only: :name }
         end
 
         before do
@@ -134,7 +134,7 @@ describe Mongoid::Serialization do
       context "when specifying which fields to only include" do
 
         it "only includes the specified fields" do
-          person.serializable_hash(:only => [:title]).should eq(
+          person.serializable_hash(only: [:title]).should eq(
             { "title" => attributes["title"] }
           )
         end
@@ -144,7 +144,7 @@ describe Mongoid::Serialization do
 
         it "includes the extra fields" do
           person.serializable_hash(
-            :methods => [ :_type ]
+            methods: [ :_type ]
           ).has_key?("_type").should be_true
         end
       end
@@ -152,7 +152,7 @@ describe Mongoid::Serialization do
       context "when specifying which fields to exclude" do
 
         it "excludes the specified fields" do
-          person.serializable_hash(:except => [:title]).should_not include(
+          person.serializable_hash(except: [:title]).should_not include(
             "title" => attributes["title"]
           )
         end
@@ -180,7 +180,7 @@ describe Mongoid::Serialization do
       context "when specifying which dynamic fields to only include" do
 
         it "only includes the specified dynamic fields" do
-          person.serializable_hash(:only => [dynamic_field_name]).should eq(
+          person.serializable_hash(only: [dynamic_field_name]).should eq(
             { dynamic_field_name => dynamic_value }
           )
         end
@@ -189,7 +189,7 @@ describe Mongoid::Serialization do
       context "when specified which dynamic fields to exclude" do
 
         it "excludes the specified fields" do
-          person.serializable_hash(:except => [dynamic_field_name]).should_not include(
+          person.serializable_hash(except: [dynamic_field_name]).should_not include(
             dynamic_field_name => dynamic_value
           )
         end
@@ -215,7 +215,7 @@ describe Mongoid::Serialization do
         context "when a model has an embeds many" do
 
           let!(:address_one) do
-            person.addresses.build(:street => "Kudamm")
+            person.addresses.build(street: "Kudamm")
           end
 
           before do
@@ -229,7 +229,7 @@ describe Mongoid::Serialization do
 
         context "when a model has an embeds one" do
           let!(:name) do
-            person.build_name(:first_name => "Leo", :last_name => "Marvin")
+            person.build_name(first_name: "Leo", last_name: "Marvin")
           end
 
           before do
@@ -247,7 +247,7 @@ describe Mongoid::Serialization do
         context "when a model has an embeds many" do
 
           let!(:address_one) do
-            person.addresses.build(:street => "Kudamm")
+            person.addresses.build(street: "Kudamm")
           end
 
           before do
@@ -261,7 +261,7 @@ describe Mongoid::Serialization do
 
         context "when a model has an embeds one" do
           let!(:name) do
-            person.build_name(:first_name => "Leo", :last_name => "Marvin")
+            person.build_name(first_name: "Leo", last_name: "Marvin")
           end
 
           before do
@@ -278,7 +278,7 @@ describe Mongoid::Serialization do
     context "when including methods" do
 
       it "includes the method result" do
-        person.serializable_hash(:methods => [:foo]).should include(
+        person.serializable_hash(methods: [:foo]).should include(
           "foo" => person.foo
         )
       end
@@ -291,11 +291,11 @@ describe Mongoid::Serialization do
         context "when including an embeds many" do
 
           let!(:address_one) do
-            person.addresses.build(:street => "Kudamm")
+            person.addresses.build(street: "Kudamm")
           end
 
           let!(:address_two) do
-            person.addresses.build(:street => "Tauentzienstr")
+            person.addresses.build(street: "Tauentzienstr")
           end
 
           let(:relation_hash) do
@@ -324,7 +324,7 @@ describe Mongoid::Serialization do
           context "when providing the include as a symbol" do
 
             let(:hash) do
-              person.serializable_hash(:include => :addresses)
+              person.serializable_hash(include: :addresses)
             end
 
             it "includes the first relation" do
@@ -341,7 +341,7 @@ describe Mongoid::Serialization do
           context "when providing the include as an array" do
 
             let(:hash) do
-              person.serializable_hash(:include => [ :addresses ])
+              person.serializable_hash(include: [ :addresses ])
             end
 
             it "includes the first relation" do
@@ -360,7 +360,7 @@ describe Mongoid::Serialization do
             context "when including one level deep" do
 
               let(:hash) do
-                person.serializable_hash(:include => { :addresses => { :except => :_id } })
+                person.serializable_hash(include: { addresses: { except: :_id } })
               end
 
               it "includes the first relation sans exceptions" do
@@ -375,13 +375,13 @@ describe Mongoid::Serialization do
             context "when including multiple levels deep" do
 
               let!(:location) do
-                address_one.locations.build(:name => "Home")
+                address_one.locations.build(name: "Home")
               end
 
               let(:hash) do
                 person.serializable_hash(
-                  :include => { :addresses => {
-                    :except => :_id, :include => { :locations => { :except => :_id } }
+                  include: { addresses: {
+                    except: :_id, include: { locations: { except: :_id } }
                   }
                 })
               end
@@ -399,13 +399,13 @@ describe Mongoid::Serialization do
                 end
 
                 let!(:second_location) do
-                  address_two.locations.build(:name => "Hotel")
+                  address_two.locations.build(name: "Hotel")
                 end
 
                 let(:hash) do
                   db_person.serializable_hash(
-                    :include => { :addresses => {
-                      :except => :_id, :include => { :locations => { :except => :_id } }
+                    include: { addresses: {
+                      except: :_id, include: { locations: { except: :_id } }
                     }
                   })
                 end
@@ -428,13 +428,13 @@ describe Mongoid::Serialization do
             context "when defining a default exclusion" do
 
               let!(:name) do
-                person.build_name(:first_name => "Sebastien")
+                person.build_name(first_name: "Sebastien")
               end
 
               let(:hash) do
                 person.serializable_hash(
-                  :except => :_id,
-                  :include => [ :addresses, :name ]
+                  except: :_id,
+                  include: [ :addresses, :name ]
                 )
               end
 
@@ -456,7 +456,7 @@ describe Mongoid::Serialization do
         context "when including an embeds one" do
 
           let!(:name) do
-            person.build_name(:first_name => "Leo", :last_name => "Marvin")
+            person.build_name(first_name: "Leo", last_name: "Marvin")
           end
 
           let(:relation_hash) do
@@ -466,7 +466,7 @@ describe Mongoid::Serialization do
           context "when providing the include as a symbol" do
 
             let(:hash) do
-              person.serializable_hash(:include => :name)
+              person.serializable_hash(include: :name)
             end
 
             it "includes the specified relation" do
@@ -478,7 +478,7 @@ describe Mongoid::Serialization do
           context "when providing the include as an array" do
 
             let(:hash) do
-              person.serializable_hash(:include => [ :name ])
+              person.serializable_hash(include: [ :name ])
             end
 
             it "includes the specified relation" do
@@ -490,7 +490,7 @@ describe Mongoid::Serialization do
           context "when providing the include as a hash" do
 
             let(:hash) do
-              person.serializable_hash(:include => { :name => { :except => :_id }})
+              person.serializable_hash(include: { name: { except: :_id }})
             end
 
             it "includes the specified relation sans exceptions" do
@@ -503,11 +503,11 @@ describe Mongoid::Serialization do
         context "when including a references many" do
 
           let!(:post_one) do
-            person.posts.build(:title => "First")
+            person.posts.build(title: "First")
           end
 
           let!(:post_two) do
-            person.posts.build(:title => "Second")
+            person.posts.build(title: "Second")
           end
 
           let(:relation_hash) do
@@ -517,7 +517,7 @@ describe Mongoid::Serialization do
           context "when providing the include as a symbol" do
 
             let(:hash) do
-              person.serializable_hash(:include => :posts)
+              person.serializable_hash(include: :posts)
             end
 
             it "includes the specified relation" do
@@ -536,7 +536,7 @@ describe Mongoid::Serialization do
           context "when providing the include as an array" do
 
             let(:hash) do
-              person.serializable_hash(:include => [ :posts ])
+              person.serializable_hash(include: [ :posts ])
             end
 
             it "includes the specified relation" do
@@ -555,7 +555,7 @@ describe Mongoid::Serialization do
           context "when providing the include as a hash" do
 
             let(:hash) do
-              person.serializable_hash(:include => { :posts => { :except => :_id } })
+              person.serializable_hash(include: { posts: { except: :_id } })
             end
 
             it "includes the specified relation" do
@@ -583,11 +583,11 @@ describe Mongoid::Serialization do
         context "when including a references many to many" do
 
           let!(:preference_one) do
-            person.preferences.build(:name => "First")
+            person.preferences.build(name: "First")
           end
 
           let!(:preference_two) do
-            person.preferences.build(:name => "Second")
+            person.preferences.build(name: "Second")
           end
 
           let(:relation_hash) do
@@ -597,7 +597,7 @@ describe Mongoid::Serialization do
           context "when providing the include as a symbol" do
 
             let(:hash) do
-              person.serializable_hash(:include => :preferences)
+              person.serializable_hash(include: :preferences)
             end
 
             it "includes the specified relation" do
@@ -616,7 +616,7 @@ describe Mongoid::Serialization do
           context "when providing the include as an array" do
 
             let(:hash) do
-              person.serializable_hash(:include => [ :preferences ])
+              person.serializable_hash(include: [ :preferences ])
             end
 
             it "includes the specified relation" do
@@ -636,12 +636,12 @@ describe Mongoid::Serialization do
 
             let(:hash) do
               person.serializable_hash(
-                :include => {
-                  :preferences => {
-                    :except => :_id
+                include: {
+                  preferences: {
+                    except: :_id
                   }
                 },
-                :except => :preference_ids
+                except: :preference_ids
               )
             end
 
@@ -732,7 +732,7 @@ describe Mongoid::Serialization do
       context "when serializing an embeds many" do
 
         let!(:address) do
-          person.addresses.build(:street => "Kudamm")
+          person.addresses.build(street: "Kudamm")
         end
 
         let(:json) do
@@ -747,7 +747,7 @@ describe Mongoid::Serialization do
       context "when serializing a references many" do
 
         let!(:post) do
-          person.posts.build(:title => "testing")
+          person.posts.build(title: "testing")
         end
 
         let(:json) do
@@ -778,7 +778,7 @@ describe Mongoid::Serialization do
 
       let(:person) do
         Person.new(
-          :aliases => [ "Kelly", "Machine Gun" ]
+          aliases: [ "Kelly", "Machine Gun" ]
         )
       end
 
@@ -796,7 +796,7 @@ describe Mongoid::Serialization do
 
       let(:person) do
         Person.new(
-          :map => { :lat => 24.5, :long => 22.1 }
+          map: { lat: 24.5, long: 22.1 }
         )
       end
 

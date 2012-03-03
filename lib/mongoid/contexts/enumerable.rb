@@ -8,8 +8,8 @@ module Mongoid #:nodoc:
 
       attr_accessor :collection, :criteria
 
-      delegate :blank?, :empty?, :first, :last, :to => :execute
-      delegate :klass, :documents, :options, :field_list, :selector, :to => :criteria
+      delegate :blank?, :empty?, :first, :last, to: :execute
+      delegate :klass, :documents, :options, :field_list, :selector, to: :criteria
 
       # Return aggregation counts of the grouped documents. This will count by
       # the first field provided in the fields array.

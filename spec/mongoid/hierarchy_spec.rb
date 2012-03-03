@@ -5,17 +5,17 @@ describe Mongoid::Hierarchy do
   describe "#_children" do
 
     let(:person) do
-      Person.new(:title => "King")
+      Person.new(title: "King")
     end
 
     context "with one level of embedding" do
 
       let(:name) do
-        Name.new(:first_name => "Titus")
+        Name.new(first_name: "Titus")
       end
 
       let(:address) do
-        Address.new(:street => "Queen St")
+        Address.new(street: "Queen St")
       end
 
       before do
@@ -35,15 +35,15 @@ describe Mongoid::Hierarchy do
     context "with multiple levels of embedding" do
 
       let(:name) do
-        Name.new(:first_name => "Titus")
+        Name.new(first_name: "Titus")
       end
 
       let(:address) do
-        Address.new(:street => "Queen St")
+        Address.new(street: "Queen St")
       end
 
       let(:location) do
-        Location.new(:name => "Work")
+        Location.new(name: "Work")
       end
 
       before do
@@ -128,7 +128,7 @@ describe Mongoid::Hierarchy do
     context "when child is an embeds one" do
 
       let!(:name) do
-        person.build_name(:first_name => "James")
+        person.build_name(first_name: "James")
       end
 
       before do
@@ -143,7 +143,7 @@ describe Mongoid::Hierarchy do
     context "when child is an embeds many" do
 
       let!(:address) do
-        person.addresses.build(:street => "Upper St")
+        person.addresses.build(street: "Upper St")
       end
 
       before do

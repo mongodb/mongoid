@@ -15,7 +15,7 @@ module Mongoid #:nodoc
       #
       # @since 2.3.1
       def initialize(value)
-        super(compose_message("invalid_time", { :value => value }))
+        super(compose_message("invalid_time", { value: value }))
       end
     end
   end

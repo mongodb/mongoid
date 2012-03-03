@@ -83,7 +83,7 @@ RSpec.configure do |config|
   mongohq_configured = Support::MongoHQ.configured?
   warn(Support::MongoHQ.message) unless mongohq_configured
 
-  config.filter_run_excluding(:config => lambda { |value|
+  config.filter_run_excluding(config: lambda { |value|
     return true if value == :mongohq && !mongohq_configured
   })
 end

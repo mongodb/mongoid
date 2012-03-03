@@ -3,12 +3,12 @@ require 'spec_helper'
 describe Mongoid::Relations::Cascading::Restrict do
 
   before :each do
-    Person.has_many :drugs, :validate => false, :dependent => :restrict
+    Person.has_many :drugs, validate: false, dependent: :restrict
   end
 
   after :each do
     Person.cascades.delete("drugs")
-    Person.has_many :drugs, :validate => false
+    Person.has_many :drugs, validate: false
   end
 
   let(:person) do
@@ -16,7 +16,7 @@ describe Mongoid::Relations::Cascading::Restrict do
   end
 
   let(:metadata) do
-    stub(:name => :drugs)
+    stub(name: :drugs)
   end
 
   let(:strategy) do

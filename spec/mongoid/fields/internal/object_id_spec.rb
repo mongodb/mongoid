@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::ObjectId do
 
   let(:field) do
-    described_class.instantiate(:test, :type => BSON::ObjectId)
+    described_class.instantiate(:test, type: BSON::ObjectId)
   end
 
   let(:object_id) do

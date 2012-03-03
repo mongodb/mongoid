@@ -111,7 +111,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
       end
 
       let(:other) do
-        stub(:value => 1)
+        stub(value: 1)
       end
 
       it "returns the results of compare" do
@@ -127,7 +127,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
       end
 
       let(:other) do
-        stub(:value => 1)
+        stub(value: 1)
       end
 
       it "returns the inverse of compare" do

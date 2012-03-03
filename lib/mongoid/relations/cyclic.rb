@@ -38,9 +38,9 @@ module Mongoid # :nodoc:
         def recursively_embeds_many(options = {})
           embeds_many(
             cyclic_child_name,
-            options.merge(:class_name => self.name, :cyclic => true)
+            options.merge(class_name: self.name, cyclic: true)
           )
-          embedded_in cyclic_parent_name, :class_name => self.name, :cyclic => true
+          embedded_in cyclic_parent_name, class_name: self.name, cyclic: true
         end
 
         # Create a cyclic embedded relation that creates a single self
@@ -68,9 +68,9 @@ module Mongoid # :nodoc:
         def recursively_embeds_one(options = {})
           embeds_one(
             cyclic_child_name(false),
-            options.merge(:class_name => self.name, :cyclic => true)
+            options.merge(class_name: self.name, cyclic: true)
           )
-          embedded_in cyclic_parent_name, :class_name => self.name, :cyclic => true
+          embedded_in cyclic_parent_name, class_name: self.name, cyclic: true
         end
 
         private

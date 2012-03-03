@@ -3,43 +3,43 @@ class Person
   attr_accessor :mode
 
   class_attribute :somebody_elses_important_class_options
-  self.somebody_elses_important_class_options = { :keep_me_around => true }
+  self.somebody_elses_important_class_options = { keep_me_around: true }
 
   field :title
-  field :terms, :type => Boolean
-  field :pets, :type => Boolean, :default => false
-  field :age, :type => Integer, :default => "100"
-  field :dob, :type => Date
+  field :terms, type: Boolean
+  field :pets, type: Boolean, default: false
+  field :age, type: Integer, default: "100"
+  field :dob, type: Date
   field :employer_id
-  field :lunch_time, :type => Time
-  field :aliases, :type => Array
-  field :map, :type => Hash
-  field :map_with_default, :type => Hash, :default => {}
-  field :score, :type => Integer
-  field :blood_alcohol_content, :type => Float, :default => lambda{ 0.0 }
-  field :last_drink_taken_at, :type => Date, :default => lambda { 1.day.ago.in_time_zone("Alaska") }
+  field :lunch_time, type: Time
+  field :aliases, type: Array
+  field :map, type: Hash
+  field :map_with_default, type: Hash, default: {}
+  field :score, type: Integer
+  field :blood_alcohol_content, type: Float, default: ->{ 0.0 }
+  field :last_drink_taken_at, type: Date, default: ->{ 1.day.ago.in_time_zone("Alaska") }
   field :ssn
-  field :owner_id, :type => Integer
+  field :owner_id, type: Integer
   field :security_code
-  field :reading, :type => Object
-  field :bson_id, :type => BSON::ObjectId
-  field :pattern, :type => Regexp
+  field :reading, type: Object
+  field :bson_id, type: BSON::ObjectId
+  field :pattern, type: Regexp
 
   index :age
   index :addresses
   index :dob
   index :name
   index :title
-  index :ssn, :unique => true
+  index :ssn, unique: true
 
   attr_reader :rescored
 
   attr_protected :security_code, :owner_id
 
-  embeds_many :favorites, :order => :title.desc, :inverse_of => :perp, :validate => false
-  embeds_many :videos, :order => [[ :title, :asc ]], :validate => false
-  embeds_many :phone_numbers, :class_name => "Phone", :validate => false
-  embeds_many :addresses, :as => :addressable, :validate => false do
+  embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false
+  embeds_many :videos, order: [[ :title, :asc ]], validate: false
+  embeds_many :phone_numbers, class_name: "Phone", validate: false
+  embeds_many :addresses, as: :addressable, validate: false do
     def extension
       "Testing"
     end
@@ -47,15 +47,15 @@ class Person
       @target.select { |doc| doc.street == street }
     end
   end
-  embeds_many :address_components, :validate => false
-  embeds_many :paranoid_phones, :validate => false
-  embeds_many :services, :cascade_callbacks => true, :validate => false
-  embeds_many :symptoms, :validate => false
-  embeds_many :appointments, :validate => false
+  embeds_many :address_components, validate: false
+  embeds_many :paranoid_phones, validate: false
+  embeds_many :services, cascade_callbacks: true, validate: false
+  embeds_many :symptoms, validate: false
+  embeds_many :appointments, validate: false
 
-  embeds_one :passport, :autobuild => true, :validate => false
-  embeds_one :pet, :class_name => "Animal", :validate => false
-  embeds_one :name, :as => :namable, :validate => false do
+  embeds_one :passport, autobuild: true, validate: false
+  embeds_one :pet, class_name: "Animal", validate: false
+  embeds_one :name, as: :namable, validate: false do
     def extension
       "Testing"
     end
@@ -63,9 +63,9 @@ class Person
       first_name == "Richard" && last_name == "Dawkins"
     end
   end
-  embeds_one :quiz, :validate => false
+  embeds_one :quiz, validate: false
 
-  has_one :game, :dependent => :destroy, :validate => false do
+  has_one :game, dependent: :destroy, validate: false do
     def extension
       "Testing"
     end
@@ -73,49 +73,49 @@ class Person
 
   has_many \
     :posts,
-    :dependent => :delete,
-    :validate => false do
+    dependent: :delete,
+    validate: false do
     def extension
       "Testing"
     end
   end
-  has_many :ordered_posts, :order => :rating.desc, :validate => false
-  has_many :paranoid_posts, :validate => false
+  has_many :ordered_posts, order: :rating.desc, validate: false
+  has_many :paranoid_posts, validate: false
   has_and_belongs_to_many \
     :preferences,
-    :index => true,
-    :dependent => :nullify,
-    :validate => false
-  has_and_belongs_to_many :user_accounts, :validate => false
-  has_and_belongs_to_many :houses, :validate => false
-  has_and_belongs_to_many :ordered_preferences, :order => :value.desc, :validate => false
+    index: true,
+    dependent: :nullify,
+    validate: false
+  has_and_belongs_to_many :user_accounts, validate: false
+  has_and_belongs_to_many :houses, validate: false
+  has_and_belongs_to_many :ordered_preferences, order: :value.desc, validate: false
 
-  has_many :drugs, :validate => false
-  has_one :account, :validate => false
-  has_one :cat, :dependent => :nullify, :validate => false
-  has_one :book, :autobuild => true, :validate => false
+  has_many :drugs, validate: false
+  has_one :account, validate: false
+  has_one :cat, dependent: :nullify, validate: false
+  has_one :book, autobuild: true, validate: false
 
   has_and_belongs_to_many \
     :administrated_events,
-    :class_name => 'Event',
-    :inverse_of => :administrators,
-    :dependent  => :nullify,
-    :validate => false
+    class_name: 'Event',
+    inverse_of: :administrators,
+    dependent:  :nullify,
+    validate: false
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :paranoid_phones
-  accepts_nested_attributes_for :name, :update_only => true
-  accepts_nested_attributes_for :pet, :allow_destroy => true
-  accepts_nested_attributes_for :game, :allow_destroy => true
-  accepts_nested_attributes_for :favorites, :allow_destroy => true, :limit => 5
+  accepts_nested_attributes_for :name, update_only: true
+  accepts_nested_attributes_for :pet, allow_destroy: true
+  accepts_nested_attributes_for :game, allow_destroy: true
+  accepts_nested_attributes_for :favorites, allow_destroy: true, limit: 5
   accepts_nested_attributes_for :posts
   accepts_nested_attributes_for :preferences
   accepts_nested_attributes_for :quiz
-  accepts_nested_attributes_for :services, :allow_destroy => true
+  accepts_nested_attributes_for :services, allow_destroy: true
 
   scope :minor, where(:age.lt => 18)
   scope :without_ssn, without(:ssn)
-  scope :search, lambda { |query| any_of({ :title => query }) }
+  scope :search, ->(query){ any_of({ title: query }) }
 
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
@@ -140,13 +140,13 @@ class Person
 
   class << self
     def accepted
-      scoped.where(:terms => true)
+      scoped.where(terms: true)
     end
     def knight
-      scoped.where(:title => "Sir")
+      scoped.where(title: "Sir")
     end
     def old
-      scoped.where(:age => { "$gt" => 50 })
+      scoped.where(age: { "$gt" => 50 })
     end
   end
 
@@ -164,11 +164,11 @@ class Person
 
   def preference_names=(names)
     names.split(",").each do |name|
-      preference = Preference.where(:name => name).first
+      preference = Preference.where(name: name).first
       if preference
         self.preferences << preference
       else
-        preferences.build(:name => name)
+        preferences.build(name: name)
       end
     end
   end

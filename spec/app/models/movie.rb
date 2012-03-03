@@ -1,9 +1,9 @@
 class Movie
   include Mongoid::Document
-  field :title, :type => String
-  field :poster, :type => Image
-  field :poster_thumb, :type => Thumbnail
-  has_many :ratings, :as => :ratable, :dependent => :nullify
+  field :title, type: String
+  field :poster, type: Image
+  field :poster_thumb, type: Thumbnail
+  has_many :ratings, as: :ratable, dependent: :nullify
   has_many :comments
 
   def global_set

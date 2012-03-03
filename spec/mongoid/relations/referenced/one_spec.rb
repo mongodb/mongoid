@@ -173,13 +173,13 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         let!(:game) do
-          person.create_game(:name => "Starcraft")
+          person.create_game(name: "Starcraft")
         end
 
         context "with a new one created via the parent" do
 
           let!(:new_game) do
-            person.create_game(:name => "Starcraft 2")
+            person.create_game(name: "Starcraft 2")
           end
 
           it "sets the new relation on the parent" do
@@ -210,7 +210,7 @@ describe Mongoid::Relations::Referenced::One do
         context "with a new one built via the parent" do
 
           let!(:new_game) do
-            person.build_game(:name => "Starcraft 2")
+            person.build_game(name: "Starcraft 2")
           end
 
           it "sets the new relation on the parent" do
@@ -246,13 +246,13 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         let!(:game) do
-          person.build_game(:name => "Starcraft")
+          person.build_game(name: "Starcraft")
         end
 
         context "with a new one created via the parent" do
 
           let!(:new_game) do
-            person.create_game(:name => "Starcraft 2")
+            person.create_game(name: "Starcraft 2")
           end
 
           it "sets the new relation on the parent" do
@@ -283,7 +283,7 @@ describe Mongoid::Relations::Referenced::One do
         context "with a new one built via the parent" do
 
           let!(:new_game) do
-            person.build_game(:name => "Starcraft 2")
+            person.build_game(name: "Starcraft 2")
           end
 
           it "sets the new relation on the parent" do
@@ -319,13 +319,13 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         let!(:cat) do
-          person.create_cat(:name => "Cuddles")
+          person.create_cat(name: "Cuddles")
         end
 
         context "with a new one created via the parent" do
 
           let!(:new_cat) do
-            person.create_cat(:name => "Brutus")
+            person.create_cat(name: "Brutus")
           end
 
           it "sets the new relation on the parent" do
@@ -356,7 +356,7 @@ describe Mongoid::Relations::Referenced::One do
         context "with a new one built via the parent" do
 
           let!(:new_cat) do
-            person.build_cat(:name => "Brutus")
+            person.build_cat(name: "Brutus")
           end
 
           it "sets the new relation on the parent" do
@@ -392,13 +392,13 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         let!(:cat) do
-          person.build_cat(:name => "Cuddles")
+          person.build_cat(name: "Cuddles")
         end
 
         context "with a new one created via the parent" do
 
           let!(:new_cat) do
-            person.create_cat(:name => "Brutus")
+            person.create_cat(name: "Brutus")
           end
 
           it "sets the new relation on the parent" do
@@ -429,7 +429,7 @@ describe Mongoid::Relations::Referenced::One do
         context "with a new one built via the parent" do
 
           let!(:new_cat) do
-            person.build_cat(:name => "Brutus")
+            person.build_cat(name: "Brutus")
           end
 
           it "sets the new relation on the parent" do
@@ -467,11 +467,11 @@ describe Mongoid::Relations::Referenced::One do
         context "when dependent is destroy" do
 
           let!(:game) do
-            person.create_game(:name => "Starcraft")
+            person.create_game(name: "Starcraft")
           end
 
           let!(:new_game) do
-            Game.create(:name => "Starcraft 2")
+            Game.create(name: "Starcraft 2")
           end
 
           before do
@@ -498,11 +498,11 @@ describe Mongoid::Relations::Referenced::One do
         context "when dependent is not set" do
 
           let!(:account) do
-            person.create_account(:name => "savings")
+            person.create_account(name: "savings")
           end
 
           let!(:new_account) do
-            Account.create(:name => "checking")
+            Account.create(name: "checking")
           end
 
           before do
@@ -668,7 +668,7 @@ describe Mongoid::Relations::Referenced::One do
 
       let(:account) do
         person.build_account(
-          { :name => "bank", :balance => "big" }, :as => :admin
+          { name: "bank", balance: "big" }, as: :admin
         )
       end
 
@@ -689,7 +689,7 @@ describe Mongoid::Relations::Referenced::One do
 
       it "raises a mixed relation error" do
         expect {
-          game.build_video(:title => "Tron")
+          game.build_video(title: "Tron")
         }.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
@@ -703,7 +703,7 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         let(:game) do
-          person.build_game(:score => 50)
+          person.build_game(score: 50)
         end
 
         it "returns a new document" do
@@ -779,7 +779,7 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         let(:rating) do
-          bar.build_rating(:value => 5)
+          bar.build_rating(value: 5)
         end
 
         it "returns a new document" do
@@ -812,7 +812,7 @@ describe Mongoid::Relations::Referenced::One do
     end
 
     let(:metadata) do
-      stub(:extension? => false)
+      stub(extension?: false)
     end
 
     it "returns the embedded in builder" do
@@ -831,7 +831,7 @@ describe Mongoid::Relations::Referenced::One do
 
       let(:account) do
         person.create_account(
-          { :name => "bank", :balance => "big" }, :as => :admin
+          { name: "bank", balance: "big" }, as: :admin
         )
       end
 
@@ -852,7 +852,7 @@ describe Mongoid::Relations::Referenced::One do
 
       it "raises a mixed relation error" do
         expect {
-          game.create_video(:title => "Tron")
+          game.create_video(title: "Tron")
         }.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
@@ -864,7 +864,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let(:game) do
-        person.create_game(:score => 50)
+        person.create_game(score: 50)
       end
 
       it "returns a new document" do
@@ -937,7 +937,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let(:rating) do
-        bar.create_rating(:value => 5)
+        bar.create_rating(value: 5)
       end
 
       it "returns a new document" do
@@ -1018,7 +1018,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let!(:game) do
-        person.create_game(:name => "Tron")
+        person.create_game(name: "Tron")
       end
 
       let(:metadata) do
@@ -1045,19 +1045,19 @@ describe Mongoid::Relations::Referenced::One do
     context "when the relation is polymorphic" do
 
       let!(:book) do
-        Book.create(:name => "Game of Thrones")
+        Book.create(name: "Game of Thrones")
       end
 
       let!(:movie) do
-        Movie.create(:name => "Bladerunner")
+        Movie.create(name: "Bladerunner")
       end
 
       let!(:movie_rating) do
-        movie.ratings.create(:value => 10)
+        movie.ratings.create(value: 10)
       end
 
       let!(:book_rating) do
-        book.create_rating(:value => 10)
+        book.create_rating(value: 10)
       end
 
       let(:metadata) do
@@ -1110,7 +1110,7 @@ describe Mongoid::Relations::Referenced::One do
     end
 
     let!(:game) do
-      person.create_game(:name => "Starcraft II")
+      person.create_game(name: "Starcraft II")
     end
 
     context "when the instance has been set" do
@@ -1159,7 +1159,7 @@ describe Mongoid::Relations::Referenced::One do
     end
 
     let!(:game) do
-      person.build_game(:name => "Tron")
+      person.build_game(name: "Tron")
     end
 
     let(:document) do
@@ -1207,11 +1207,11 @@ describe Mongoid::Relations::Referenced::One do
     end
 
     let!(:game_one) do
-      Game.create(:name => "Warcraft 3")
+      Game.create(name: "Warcraft 3")
     end
 
     let!(:game_two) do
-      Game.create(:name => "Starcraft 2")
+      Game.create(name: "Starcraft 2")
     end
 
     before do
@@ -1222,7 +1222,7 @@ describe Mongoid::Relations::Referenced::One do
 
       before do
         Game.collection.update(
-          { :_id => game_one.id }, { "$set" => { :name => "Diablo 2" }}
+          { _id: game_one.id }, { "$set" => { name: "Diablo 2" }}
         )
       end
 

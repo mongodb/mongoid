@@ -7,7 +7,7 @@ describe Mongoid::Criterion::Creational do
     context "when provided a valid selector" do
 
       let(:criteria) do
-        Person.where(:title => "Sir")
+        Person.where(title: "Sir")
       end
 
       let(:person) do
@@ -30,7 +30,7 @@ describe Mongoid::Criterion::Creational do
     context "when provided invalid selectors" do
 
       let(:criteria) do
-        Person.where(:title => "Sir").and(:score.gt => 5)
+        Person.where(title: "Sir").and(:score.gt => 5)
       end
 
       let(:person) do

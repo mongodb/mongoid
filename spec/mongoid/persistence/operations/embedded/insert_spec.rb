@@ -3,11 +3,11 @@ require "spec_helper"
 describe Mongoid::Persistence::Operations::Embedded::Insert do
 
   let(:document) do
-    Patient.new(:title => "Mr")
+    Patient.new(title: "Mr")
   end
 
   let(:address) do
-    Address.new(:street => "Oxford St")
+    Address.new(street: "Oxford St")
   end
 
   let(:collection) do
@@ -15,7 +15,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
   end
 
   let(:email) do
-    Email.new(:address => "test@example.com")
+    Email.new(address: "test@example.com")
   end
 
   before do
@@ -39,7 +39,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
       end
 
       let(:address) do
-        person.addresses.create(:street => "Hobrechtstr")
+        person.addresses.create(street: "Hobrechtstr")
       end
 
       let(:in_map) do
@@ -52,30 +52,30 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
     end
 
     def root_insert_expectation
-      lambda {
+      ->{
         collection.expects(:insert).with(
           document.raw_attributes,
-          :safe => false
+          safe: false
         ).returns("Object")
       }
     end
 
     def root_push_expectation
-      lambda {
+      ->{
         collection.expects(:update).with(
           { "_id" => document.id },
           { "$push" => { "addresses" => address.raw_attributes } },
-          :safe => false
+          safe: false
         ).returns("Object")
       }
     end
 
     def root_set_expectation
-      lambda {
+      ->{
         collection.expects(:update).with(
           { "_id" => document.id },
           { "$set" => { "email" => email.raw_attributes } },
-          :safe => false
+          safe: false
         ).returns("Object")
       }
     end
@@ -156,14 +156,14 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
         context "when we add the parent to the child" do
 
           let(:other_address) do
-            document.addresses.build(:street => "Oxford St")
+            document.addresses.build(street: "Oxford St")
           end
 
           it "performs a $push on the embedded array" do
             collection.expects(:update).with(
               { "_id" => document.id },
               { "$push" => { "addresses" => other_address.raw_attributes } },
-              :safe => false
+              safe: false
             ).returns("Object")
             described_class.new(other_address).persist.should eq(other_address)
           end

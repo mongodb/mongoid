@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Integer do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Integer)
+    described_class.instantiate(:test, type: Integer)
   end
 
   describe "#deserialize" do

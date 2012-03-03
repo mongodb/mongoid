@@ -7,7 +7,7 @@ describe Mongoid::Scoping do
     context "when provided a criteria" do
 
       let(:criteria) do
-        Band.where(:name => "Depeche Mode")
+        Band.where(name: "Depeche Mode")
       end
 
       before do
@@ -30,7 +30,7 @@ describe Mongoid::Scoping do
     context "when provided a proc" do
 
       let(:criteria) do
-        Band.where(:name => "Depeche Mode")
+        Band.where(name: "Depeche Mode")
       end
 
       before do
@@ -65,7 +65,7 @@ describe Mongoid::Scoping do
     context "when a default scope exists" do
 
       let(:criteria) do
-        Band.where(:name => "Depeche Mode")
+        Band.where(name: "Depeche Mode")
       end
 
       before do
@@ -564,7 +564,7 @@ describe Mongoid::Scoping do
     context "when a default scope exists" do
 
       let(:criteria) do
-        Band.where(:name => "Depeche Mode")
+        Band.where(name: "Depeche Mode")
       end
 
       before do
@@ -580,7 +580,7 @@ describe Mongoid::Scoping do
       end
 
       it "allows the default scope to be added" do
-        scoped.selector.should eq({ :name => "Depeche Mode" })
+        scoped.selector.should eq({ name: "Depeche Mode" })
       end
 
       context "when chained after an unscoped criteria" do
@@ -590,7 +590,7 @@ describe Mongoid::Scoping do
         end
 
         it "reapplies the default scope" do
-          scoped.selector.should eq({ :name => "Depeche Mode" })
+          scoped.selector.should eq({ name: "Depeche Mode" })
         end
       end
     end
@@ -599,7 +599,7 @@ describe Mongoid::Scoping do
   describe ".unscoped" do
 
     let(:criteria) do
-      Band.where(:name => "Depeche Mode")
+      Band.where(name: "Depeche Mode")
     end
 
     before do
@@ -677,7 +677,7 @@ describe Mongoid::Scoping do
   describe ".with_default_scope" do
 
     let(:criteria) do
-      Band.where(:name => "Depeche Mode")
+      Band.where(name: "Depeche Mode")
     end
 
     before do

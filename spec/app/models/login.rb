@@ -3,6 +3,6 @@ class Login
 
   field :_id, type: String, default: ->{ username }
 
-  field :username, :type => String
-  field :application_id, :type => Integer
+  field :username, type: String
+  field :application_id, type: Integer
 end

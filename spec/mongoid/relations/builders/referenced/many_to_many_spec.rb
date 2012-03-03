@@ -13,15 +13,15 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
   describe "#build" do
 
     let(:criteria) do
-      stub(:klass => Preference, :selector => { "_id" => { "$in" => [] }})
+      stub(klass: Preference, selector: { "_id" => { "$in" => [] }})
     end
 
     let(:metadata) do
       stub_everything(
-        :klass => Preference,
-        :name => :preferences,
-        :foreign_key => "preference_ids",
-        :criteria => criteria
+        klass: Preference,
+        name: :preferences,
+        foreign_key: "preference_ids",
+        criteria: criteria
       )
     end
 
@@ -56,12 +56,12 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
 
       let(:metadata) do
         stub_everything(
-          :klass => Post,
-          :name => :preferences,
-          :foreign_key => "person_id",
-          :inverse_klass => Person,
-          :order => :rating.asc,
-          :criteria => criteria
+          klass: Post,
+          name: :preferences,
+          foreign_key: "person_id",
+          inverse_klass: Person,
+          order: :rating.asc,
+          criteria: criteria
         )
       end
 
@@ -111,10 +111,10 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
 
         let(:metadata) do
           stub_everything(
-            :klass => Post,
-            :name => :preferences,
-            :foreign_key => "preference_ids",
-            :criteria => criteria
+            klass: Post,
+            name: :preferences,
+            foreign_key: "preference_ids",
+            criteria: criteria
           )
         end
 

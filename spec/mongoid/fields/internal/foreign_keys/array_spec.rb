@@ -7,10 +7,10 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
     let(:field) do
       described_class.instantiate(
         :vals,
-        :metadata => Person.relations["preferences"],
-        :type => Array,
-        :default => [],
-        :identity => true
+        metadata: Person.relations["preferences"],
+        type: Array,
+        default: [],
+        identity: true
       )
     end
 
@@ -63,10 +63,10 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
     let(:field) do
       described_class.instantiate(
         :vals,
-        :metadata => Person.relations["posts"],
-        :type => Array,
-        :default => default,
-        :identity => true
+        metadata: Person.relations["posts"],
+        type: Array,
+        default: default,
+        identity: true
       )
     end
 
@@ -84,10 +84,10 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
     let(:field) do
       described_class.instantiate(
         :vals,
-        :metadata => Person.relations["posts"],
-        :type => Array,
-        :default => [],
-        :identity => true
+        metadata: Person.relations["posts"],
+        type: Array,
+        default: [],
+        identity: true
       )
     end
 
@@ -102,19 +102,19 @@ describe Mongoid::Fields::Internal::ForeignKeys::Array do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :inverse_class_name => "Game",
-          :name => :person,
-          :relation => Mongoid::Relations::Referenced::In
+          inverse_class_name: "Game",
+          name: :person,
+          relation: Mongoid::Relations::Referenced::In
         )
       end
 
       let(:field) do
         described_class.instantiate(
           :vals,
-          :type => Array,
-          :default => [],
-          :identity => true,
-          :metadata => metadata
+          type: Array,
+          default: [],
+          identity: true,
+          metadata: metadata
         )
       end
 

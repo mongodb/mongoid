@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Set do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Set)
+    described_class.instantiate(:test, type: Set)
   end
 
   describe "#cast_on_read?" do

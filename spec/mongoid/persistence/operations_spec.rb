@@ -15,7 +15,7 @@ describe Mongoid::Persistence::Operations do
   describe "#collection" do
 
     let(:options) do
-      { :validate => true }
+      { validate: true }
     end
 
     context "when the document is a root" do
@@ -36,7 +36,7 @@ describe Mongoid::Persistence::Operations do
     context "when the document is embedded" do
 
       let(:name) do
-        document.build_name(:first_name => "Syd")
+        document.build_name(first_name: "Syd")
       end
 
       let(:operation) do
@@ -58,7 +58,7 @@ describe Mongoid::Persistence::Operations do
     context "when the child is an embeds one" do
 
       let(:child) do
-        document.build_name(:first_name => "Syd")
+        document.build_name(first_name: "Syd")
       end
 
       let(:operation) do
@@ -79,7 +79,7 @@ describe Mongoid::Persistence::Operations do
     context "when the child is an embeds many" do
 
       let(:child) do
-        document.addresses.build(:street => "Unter den Linden")
+        document.addresses.build(street: "Unter den Linden")
       end
 
       let(:operation) do
@@ -101,7 +101,7 @@ describe Mongoid::Persistence::Operations do
   describe "#inserts" do
 
     let(:child) do
-      document.build_name(:first_name => "Syd")
+      document.build_name(first_name: "Syd")
     end
 
     let(:operation) do
@@ -128,7 +128,7 @@ describe Mongoid::Persistence::Operations do
     context "when the suppress option is true" do
 
       let(:options) do
-        { :suppress => true }
+        { suppress: true }
       end
 
       it "returns false" do
@@ -139,7 +139,7 @@ describe Mongoid::Persistence::Operations do
     context "when the suppress option is false" do
 
       let(:options) do
-        { :suppress => false }
+        { suppress: false }
       end
 
       it "returns true" do
@@ -168,7 +168,7 @@ describe Mongoid::Persistence::Operations do
     context "safe is true" do
 
       let(:options) do
-        { :safe => true }
+        { safe: true }
       end
 
       let(:opts) do
@@ -183,7 +183,7 @@ describe Mongoid::Persistence::Operations do
     context "when safe is a hash" do
 
       let(:options) do
-        { :safe => { :w => 2 } }
+        { safe: { w: 2 } }
       end
 
       let(:opts) do
@@ -198,7 +198,7 @@ describe Mongoid::Persistence::Operations do
     context "when safe is false" do
 
       let(:options) do
-        { :safe => false }
+        { safe: false }
       end
 
       let(:opts) do
@@ -231,7 +231,7 @@ describe Mongoid::Persistence::Operations do
         end
 
         it "returns :safe => true" do
-          opts.should eq({ :safe => true })
+          opts.should eq({ safe: true })
         end
       end
 
@@ -242,7 +242,7 @@ describe Mongoid::Persistence::Operations do
         end
 
         it "returns :safe => false" do
-          opts.should eq({ :safe => false })
+          opts.should eq({ safe: false })
         end
       end
     end
@@ -251,7 +251,7 @@ describe Mongoid::Persistence::Operations do
   describe "#parent" do
 
     let(:child) do
-      document.addresses.build(:street => "Unter den Linden")
+      document.addresses.build(street: "Unter den Linden")
     end
 
     let(:operation) do
@@ -301,13 +301,13 @@ describe Mongoid::Persistence::Operations do
       end
 
       let!(:child) do
-        document.addresses.build(:street => "Unter den Linden").tap do |doc|
+        document.addresses.build(street: "Unter den Linden").tap do |doc|
           doc.new_record = false
         end
       end
 
       let!(:conflict) do
-        document.addresses.build(:street => "Freiderichstr")
+        document.addresses.build(street: "Freiderichstr")
       end
 
       let(:operation) do
@@ -354,7 +354,7 @@ describe Mongoid::Persistence::Operations do
     context "when validate option is true" do
 
       let(:options) do
-        { :validate => true }
+        { validate: true }
       end
 
       it "returns true" do
@@ -365,7 +365,7 @@ describe Mongoid::Persistence::Operations do
     context "when validate option is false" do
 
       let(:options) do
-        { :validate => false }
+        { validate: false }
       end
 
       it "returns false" do

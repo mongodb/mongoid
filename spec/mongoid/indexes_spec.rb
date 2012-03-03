@@ -63,7 +63,7 @@ describe Mongoid::Indexes do
         store_in :test_class
 
         def self.index_options
-          { :_type => { :unique => false, :background => true }}
+          { _type: { unique: false, background: true }}
         end
       end
     end
@@ -96,7 +96,7 @@ describe Mongoid::Indexes do
 
       it "adds the _type index" do
         klass.index_options[:_type].should eq(
-          { :unique => false, :background => true }
+          { unique: false, background: true }
         )
       end
     end
@@ -113,11 +113,11 @@ describe Mongoid::Indexes do
     context "when unique" do
 
       before do
-        klass.index(:name, :unique => true)
+        klass.index(:name, unique: true)
       end
 
       it "creates a unique index on the collection" do
-        klass.index_options[:name].should eq({:unique => true})
+        klass.index_options[:name].should eq({unique: true})
       end
     end
 
@@ -128,7 +128,7 @@ describe Mongoid::Indexes do
       end
 
       it "creates an index on the collection" do
-        klass.index_options[:name].should eq({:unique => false})
+        klass.index_options[:name].should eq({unique: false})
       end
     end
   end

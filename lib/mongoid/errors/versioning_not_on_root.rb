@@ -15,7 +15,7 @@ module Mongoid #:nodoc
       # @since 3.0.0
       def initialize(klass)
         super(
-          compose_message("versioning_not_on_root", { :klass => klass })
+          compose_message("versioning_not_on_root", { klass: klass })
         )
       end
     end

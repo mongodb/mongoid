@@ -7,8 +7,8 @@ describe Mongoid::MultiParameterAttributes do
     class Multi
       include Mongoid::Document
       include Mongoid::MultiParameterAttributes
-      field :created_at, :type => Time
-      field :dob, :type => Date
+      field :created_at, type: Time
+      field :dob, type: Date
     end
 
     context "creating a multi" do
@@ -52,13 +52,13 @@ describe Mongoid::MultiParameterAttributes do
       context "with an invalid DOB" do
 
         it "raises an exception" do
-          lambda {
+          expect {
             Multi.new({
               "dob(1i)" => "1980",
               "dob(2i)" => "2",
               "dob(3i)" => "31"
             })
-          }.should raise_exception(
+          }.to raise_exception(
             Mongoid::MultiParameterAttributes::Errors::MultiparameterAssignmentErrors,
             "1 error(s) on assignment of multiparameter attributes"
           )

@@ -7,10 +7,10 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
     let(:field) do
       described_class.instantiate(
         :vals,
-        :metadata => Person.relations["posts"],
-        :type => Object,
-        :default => [],
-        :identity => true
+        metadata: Person.relations["posts"],
+        type: Object,
+        default: [],
+        identity: true
       )
     end
 
@@ -25,19 +25,19 @@ describe Mongoid::Fields::Internal::ForeignKeys::Object do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :inverse_class_name => "Game",
-          :name => :person,
-          :relation => Mongoid::Relations::Referenced::In
+          inverse_class_name: "Game",
+          name: :person,
+          relation: Mongoid::Relations::Referenced::In
         )
       end
 
       let(:field) do
         described_class.instantiate(
           :vals,
-          :type => Object,
-          :default => nil,
-          :identity => true,
-          :metadata => metadata
+          type: Object,
+          default: nil,
+          identity: true,
+          metadata: metadata
         )
       end
 

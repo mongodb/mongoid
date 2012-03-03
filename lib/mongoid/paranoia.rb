@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      field :deleted_at, :type => Time
+      field :deleted_at, type: Time
       self.paranoid = true
     end
 
@@ -138,7 +138,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def queryable
-        super.where(:deleted_at => nil)
+        super.where(deleted_at: nil)
       end
 
       # Find deleted documents

@@ -4,7 +4,7 @@ class ParanoidPhone
 
   attr_accessor :after_destroy_called, :before_destroy_called
 
-  field :number, :type => String
+  field :number, type: String
 
   embedded_in :person
 

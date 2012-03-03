@@ -10,7 +10,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "unsaved_document",
-            { :base => base.class.name, :document => document.class.name }
+            { base: base.class.name, document: document.class.name }
           )
         )
       end

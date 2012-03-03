@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Date do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Date)
+    described_class.instantiate(:test, type: Date)
   end
 
   let!(:time) do
@@ -24,8 +24,8 @@ describe Mongoid::Fields::Internal::Date do
       let(:field) do
         described_class.instantiate(
           :test,
-          :type => Date,
-          :default => lambda { 1.day.ago }
+          type: Date,
+          default: ->{ 1.day.ago }
         )
       end
 

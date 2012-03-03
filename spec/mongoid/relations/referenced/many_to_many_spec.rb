@@ -6,7 +6,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     Mongoid.raise_not_found_error = true
     Person.autosaved_relations.delete_one(:preferences)
     Person.autosave(
-      Person.relations["preferences"].merge!(:autosave => true)
+      Person.relations["preferences"].merge!(autosave: true)
     )
     Person.synced(Person.relations["preferences"])
   end
@@ -48,7 +48,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when appending in a parent create block" do
 
           let!(:preference) do
-            Preference.create(:name => "testing")
+            Preference.create(name: "testing")
           end
 
           let!(:person) do
@@ -137,7 +137,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           context "when the child is already persisted" do
 
             let!(:persisted) do
-              Preference.create(:name => "testy")
+              Preference.create(name: "testy")
             end
 
             let(:preference) do
@@ -177,7 +177,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           context "when setting via the associated ids" do
 
             let!(:persisted) do
-              Preference.create(:name => "testy")
+              Preference.create(name: "testy")
             end
 
             let(:preference) do
@@ -185,7 +185,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             let(:person) do
-              Person.new(:preference_ids => [ preference.id ])
+              Person.new(preference_ids: [ preference.id ])
             end
 
             before do
@@ -360,7 +360,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           let(:exhibitor) do
-            Exhibitor.create(:exhibition => exhibition)
+            Exhibitor.create(exhibition: exhibition)
           end
 
           before do
@@ -375,11 +375,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the relation is self referencing" do
 
           let(:tag_one) do
-            Tag.create(:text => "one")
+            Tag.create(text: "one")
           end
 
           let(:tag_two) do
-            Tag.create(:text => "two")
+            Tag.create(text: "two")
           end
 
           before do
@@ -437,7 +437,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let(:preference) do
-        Preference.create(:name => "one")
+        Preference.create(name: "one")
       end
 
       before do
@@ -812,11 +812,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:ranking => 5)
+      Preference.create(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(:ranking => 10)
+      Preference.create(ranking: 10)
     end
 
     before do
@@ -845,7 +845,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         let(:house) do
           person.houses.send(
             method,
-            { :name => "Dream", :model => "Home" }, :as => :admin
+            { name: "Dream", model: "Home" }, as: :admin
           )
         end
 
@@ -867,7 +867,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           let!(:preference) do
-            person.preferences.send(method, :name => "settings")
+            person.preferences.send(method, name: "settings")
           end
 
           it "adds the document to the relation" do
@@ -902,7 +902,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           let!(:preference) do
-            person.preferences.send(method, :name => "settings")
+            person.preferences.send(method, name: "settings")
           end
 
           it "adds the document to the relation" do
@@ -959,7 +959,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:metadata) do
-      stub(:extension? => false)
+      stub(extension?: false)
     end
 
     it "returns the embedded in builder" do
@@ -981,7 +981,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the children are persisted" do
 
           let!(:preference) do
-            person.preferences.create(:name => "settings")
+            person.preferences.create(name: "settings")
           end
 
           let!(:relation) do
@@ -1020,7 +1020,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the children are not persisted" do
 
           let!(:preference) do
-            person.preferences.build(:name => "setting")
+            person.preferences.build(name: "setting")
           end
 
           let!(:relation) do
@@ -1040,7 +1040,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         let!(:preference) do
-          person.preferences.build(:name => "setting")
+          person.preferences.build(name: "setting")
         end
 
         let!(:relation) do
@@ -1063,7 +1063,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when documents have been persisted" do
 
       let!(:preference) do
-        person.preferences.create(:name => "setting")
+        person.preferences.create(name: "setting")
       end
 
       it "returns the number of persisted documents" do
@@ -1074,12 +1074,12 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when appending to a loaded relation" do
 
       let!(:preference) do
-        person.preferences.create(:name => "setting")
+        person.preferences.create(name: "setting")
       end
 
       before do
         person.preferences.count
-        person.preferences << Preference.create(:name => "two")
+        person.preferences << Preference.create(name: "two")
       end
 
       it "returns the number of persisted documents" do
@@ -1090,7 +1090,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when documents have not been persisted" do
 
       let!(:preference) do
-        person.preferences.build(:name => "settings")
+        person.preferences.build(name: "settings")
       end
 
       it "returns 0" do
@@ -1103,7 +1103,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when the documents are part of the relation" do
 
         before do
-          Preference.create(:person_ids => [ person.id ])
+          Preference.create(person_ids: [ person.id ])
         end
 
         it "returns the count from the db" do
@@ -1128,7 +1128,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when documents have been persisted" do
 
         let!(:house) do
-          person.houses.create(:name => "Wayne Manor")
+          person.houses.create(name: "Wayne Manor")
         end
 
         it "returns the number of persisted documents" do
@@ -1139,7 +1139,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when documents have not been persisted" do
 
         let!(:house) do
-          person.houses.build(:name => "Ryugyong Hotel")
+          person.houses.build(name: "Ryugyong Hotel")
         end
 
         it "returns 0" do
@@ -1162,7 +1162,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         let(:house) do
           person.houses.send(
             method,
-            { :name => "Dream", :model => "Home" }, :as => :admin
+            { name: "Dream", model: "Home" }, as: :admin
           )
         end
 
@@ -1180,11 +1180,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when using string keys" do
 
           let(:agent) do
-            Agent.create(:number => "007")
+            Agent.create(number: "007")
           end
 
           before do
-            agent.accounts.create(:name => "testing again")
+            agent.accounts.create(name: "testing again")
           end
 
           it "does not convert the string key to an object id" do
@@ -1200,7 +1200,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           it "raises an unsaved document error" do
             expect {
-              person.preferences.send(method, :name => "Testing")
+              person.preferences.send(method, name: "Testing")
             }.to raise_error(Mongoid::Errors::UnsavedDocument)
           end
         end
@@ -1212,7 +1212,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           let!(:preference) do
-            person.preferences.send(method, :name => "Testing")
+            person.preferences.send(method, name: "Testing")
           end
 
           it "sets the foreign key on the relation" do
@@ -1267,7 +1267,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "raises an error" do
           expect {
-            person.preferences.create!(:name => "a")
+            person.preferences.create!(name: "a")
           }.to raise_error(Mongoid::Errors::Validations)
         end
       end
@@ -1281,11 +1281,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:name => "Testing")
+      Preference.create(name: "Testing")
     end
 
     let(:preference_two) do
-      Preference.create(:name => "Test")
+      Preference.create(name: "Test")
     end
 
     before do
@@ -1376,11 +1376,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when the relationships are self referencing" do
 
       let(:tag_one) do
-        Tag.create(:text => "one")
+        Tag.create(text: "one")
       end
 
       let(:tag_two) do
-        Tag.create(:text => "two")
+        Tag.create(text: "two")
       end
 
       before do
@@ -1478,17 +1478,17 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           let!(:preference_one) do
-            person.preferences.create(:name => "Testing")
+            person.preferences.create(name: "Testing")
           end
 
           let!(:preference_two) do
-            person.preferences.create(:name => "Test")
+            person.preferences.create(name: "Test")
           end
 
           let!(:deleted) do
             person.preferences.send(
               method,
-              { :name => "Testing" }
+              { name: "Testing" }
             )
           end
 
@@ -1497,7 +1497,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "deletes the documents from the database" do
-            Preference.where(:name => "Testing").count.should eq(0)
+            Preference.where(name: "Testing").count.should eq(0)
           end
 
           it "returns the number of documents deleted" do
@@ -1513,8 +1513,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           let(:person) do
             Person.create.tap do |person|
-              person.preferences.create(:name => "Testing")
-              person.preferences.create(:name => "Test")
+              person.preferences.create(name: "Testing")
+              person.preferences.create(name: "Test")
             end
           end
 
@@ -1555,7 +1555,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let!(:preference) do
-        person.preferences.create(:name => "testing")
+        person.preferences.create(name: "testing")
       end
 
       let(:metadata) do
@@ -1575,7 +1575,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "returns the appropriate criteria" do
-        eager.selector.should eq({ :_id => { "$in" => ids }})
+        eager.selector.should eq({ _id: { "$in" => ids }})
       end
 
       it "puts the documents in the identity map" do
@@ -1629,19 +1629,19 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let!(:preference_one) do
-        person.preferences.create(:name => "Test")
+        person.preferences.create(name: "Test")
       end
 
       let!(:preference_two) do
-        person.preferences.create(:name => "OMG I has relations")
+        person.preferences.create(name: "OMG I has relations")
       end
 
       let!(:unrelated_pref) do
-        Preference.create(:name => "orphan annie")
+        Preference.create(name: "orphan annie")
       end
 
       let!(:unrelated_pref_two) do
-        Preference.create(:name => "orphan two")
+        Preference.create(name: "orphan two")
       end
 
       context "when providing an id" do
@@ -1781,13 +1781,13 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let!(:preference) do
-        person.preferences.create(:name => "Testing")
+        person.preferences.create(name: "Testing")
       end
 
       context "when the document exists" do
 
         let(:found) do
-          person.preferences.find_or_create_by(:name => "Testing")
+          person.preferences.find_or_create_by(name: "Testing")
         end
 
         it "returns the document" do
@@ -1798,7 +1798,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when the document does not exist" do
 
         let(:found) do
-          person.preferences.find_or_create_by(:name => "Test")
+          person.preferences.find_or_create_by(name: "Test")
         end
 
         it "sets the new document attributes" do
@@ -1821,13 +1821,13 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let!(:preference) do
-        person.preferences.create(:name => "Testing")
+        person.preferences.create(name: "Testing")
       end
 
       context "when the document exists" do
 
         let(:found) do
-          person.preferences.find_or_initialize_by(:name => "Testing")
+          person.preferences.find_or_initialize_by(name: "Testing")
         end
 
         it "returns the document" do
@@ -1838,7 +1838,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when the document does not exist" do
 
         let(:found) do
-          person.preferences.find_or_initialize_by(:name => "Test")
+          person.preferences.find_or_initialize_by(name: "Test")
         end
 
         it "sets the new document attributes" do
@@ -1873,11 +1873,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:ranking => 5)
+      Preference.create(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(:ranking => 10)
+      Preference.create(ranking: 10)
     end
 
     before do
@@ -1900,21 +1900,21 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let!(:preference_one) do
-      person.preferences.create(:name => "First", :value => "Posting")
+      person.preferences.create(name: "First", value: "Posting")
     end
 
     let!(:preference_two) do
-      person.preferences.create(:name => "Second", :value => "Testing")
+      person.preferences.create(name: "Second", value: "Testing")
     end
 
     let!(:unrelated) do
-      Preference.create(:name => "Third")
+      Preference.create(name: "Third")
     end
 
     context "when providing a single criteria" do
 
       let(:preferences) do
-        person.preferences.where(:name => "First")
+        person.preferences.where(name: "First")
       end
 
       it "applies the criteria to the documents" do
@@ -1925,7 +1925,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when providing a criteria on id" do
 
       let(:preferences) do
-        person.preferences.where(:_id => unrelated.id)
+        person.preferences.where(_id: unrelated.id)
       end
 
       it "does not return unrelated documents" do
@@ -1967,7 +1967,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when the inverse relation is not defined" do
 
           let!(:house) do
-            person.houses.create(:name => "Wayne Manor")
+            person.houses.create(name: "Wayne Manor")
           end
 
           it "returns the distinct values for the fields" do
@@ -1985,11 +1985,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:ranking => 5)
+      Preference.create(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(:ranking => 10)
+      Preference.create(ranking: 10)
     end
 
     before do
@@ -2019,11 +2019,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let!(:preference_one) do
-      person.preferences.create(:name => "One")
+      person.preferences.create(name: "One")
     end
 
     let!(:preference_two) do
-      person.preferences.create(:name => "Two")
+      person.preferences.create(name: "Two")
     end
 
     before do
@@ -2114,11 +2114,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:ranking => 5)
+      Preference.create(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(:ranking => 10)
+      Preference.create(ranking: 10)
     end
 
     before do
@@ -2149,7 +2149,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     it "returns with an empty selector" do
-      scoped.selector.should eq({ :_id => { "$in" => [] }})
+      scoped.selector.should eq({ _id: { "$in" => [] }})
     end
   end
 
@@ -2164,7 +2164,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when documents have been persisted" do
 
         let!(:preference) do
-          person.preferences.create(:name => "Testing")
+          person.preferences.create(name: "Testing")
         end
 
         it "returns the number of documents" do
@@ -2175,8 +2175,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when documents have not been persisted" do
 
         before do
-          person.preferences.build(:name => "Test")
-          person.preferences.create(:name => "Test 2")
+          person.preferences.build(name: "Test")
+          person.preferences.create(name: "Test 2")
         end
 
         it "returns the total number of documents" do
@@ -2195,11 +2195,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let!(:preference_one) do
-        person.preferences.create(:name => "first")
+        person.preferences.create(name: "first")
       end
 
       let!(:preference_two) do
-        Preference.create(:name => "second")
+        Preference.create(name: "second")
       end
 
       let(:unscoped) do
@@ -2218,11 +2218,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       let!(:house_one) do
-        person.houses.create(:name => "first")
+        person.houses.create(name: "first")
       end
 
       let!(:house_two) do
-        House.create(:name => "second")
+        House.create(name: "second")
       end
 
       let(:unscoped) do
@@ -2258,26 +2258,26 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   context "when setting the ids directly after the documents" do
 
     let!(:person) do
-      Person.create!(:title => "The Boss")
+      Person.create!(title: "The Boss")
     end
 
     let!(:girlfriend_house) do
-      House.create!(:name => "Girlfriend")
+      House.create!(name: "Girlfriend")
     end
 
     let!(:wife_house) do
-      House.create!(:name => "Wife")
+      House.create!(name: "Wife")
     end
 
     let!(:exwife_house) do
-      House.create!(:name => "Ex-Wife")
+      House.create!(name: "Ex-Wife")
     end
 
     before do
       person.update_attributes(
-        :houses => [ wife_house, exwife_house, girlfriend_house ]
+        houses: [ wife_house, exwife_house, girlfriend_house ]
       )
-      person.update_attributes(:house_ids => [ girlfriend_house.id ])
+      person.update_attributes(house_ids: [ girlfriend_house.id ])
     end
 
     context "when reloading" do
@@ -2293,11 +2293,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when the documents are new" do
 
       let(:user) do
-        User.new(:name => "testing")
+        User.new(name: "testing")
       end
 
       let(:business) do
-        Business.new(:name => "serious", :owners => [ user ])
+        Business.new(name: "serious", owners: [ user ])
       end
 
       before do
@@ -2320,11 +2320,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when one side is persisted" do
 
       let!(:user) do
-        User.new(:name => "testing")
+        User.new(name: "testing")
       end
 
       let!(:business) do
-        Business.create(:name => "serious", :owners => [ user ])
+        Business.create(name: "serious", owners: [ user ])
       end
 
       before do
@@ -2367,11 +2367,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when the documents are persisted" do
 
       let(:user) do
-        User.create(:name => "tst")
+        User.create(name: "tst")
       end
 
       let(:business) do
-        Business.create(:name => "srs", :owners => [ user ])
+        Business.create(name: "srs", owners: [ user ])
       end
 
       before do
@@ -2419,7 +2419,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference) do
-      person.preferences.create(:name => "testing")
+      person.preferences.create(name: "testing")
     end
 
     before do
@@ -2442,15 +2442,15 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      OrderedPreference.create(:name => 'preference-1', :value => 10)
+      OrderedPreference.create(name: 'preference-1', value: 10)
     end
 
     let(:preference_two) do
-      OrderedPreference.create(:name => 'preference-2', :value => 20)
+      OrderedPreference.create(name: 'preference-2', value: 20)
     end
 
     let(:preference_three) do
-      OrderedPreference.create(:name => 'preference-3', :value => 20)
+      OrderedPreference.create(name: 'preference-3', value: 20)
     end
 
     before do
@@ -2510,11 +2510,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let!(:preference_one) do
-      Preference.create(:name => "one")
+      Preference.create(name: "one")
     end
 
     let!(:preference_two) do
-      Preference.create(:name => "two")
+      Preference.create(name: "two")
     end
 
     before do
@@ -2525,7 +2525,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       before do
         Preference.collection.update(
-          { :_id => preference_one.id }, { "$set" => { :name => "reloaded" }}
+          { _id: preference_one.id }, { "$set" => { name: "reloaded" }}
         )
       end
 
@@ -2559,7 +2559,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "when the document is new" do
 
       let!(:person) do
-        Person.create(:preference_names => "one, two")
+        Person.create(preference_names: "one, two")
       end
 
       let(:preference_one) do
@@ -2595,11 +2595,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     let(:preference_one) do
-      Preference.create(:name => "one")
+      Preference.create(name: "one")
     end
 
     let(:preference_two) do
-      Preference.create(:name => "two")
+      Preference.create(name: "two")
     end
 
     before do
@@ -2626,7 +2626,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "and the order is changed and an element is added" do
 
       let(:preference_three) do
-        Preference.create(:name => "three")
+        Preference.create(name: "three")
       end
 
       before do
@@ -2646,7 +2646,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     context "and the order is changed and an element is removed" do
 
       let(:preference_three) do
-        Preference.create(:name => "three")
+        Preference.create(name: "three")
       end
 
       before do

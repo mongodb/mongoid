@@ -61,7 +61,7 @@ module Mongoid #:nodoc:
         else
           safety = Mongoid.persist_in_safe_mode
         end
-        options.merge!({ :safe => safety })
+        options.merge!({ safe: safety })
       end
     end
 

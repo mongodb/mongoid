@@ -52,7 +52,7 @@ module Mongoid #:nodoc:
             document.errors.add(
               attrib,
               :taken,
-              options.except(:case_sensitive, :scope).merge(:val => val)
+              options.except(:case_sensitive, :scope).merge(val: val)
             )
           end
         else
@@ -60,7 +60,7 @@ module Mongoid #:nodoc:
           criteria = scope(criteria, document, attrib)
           if criteria.exists?
             document.errors.add(
-              attrib, :taken, options.except(:case_sensitive, :scope).merge(:val => val)
+              attrib, :taken, options.except(:case_sensitive, :scope).merge(val: val)
             )
           end
         end
@@ -95,7 +95,7 @@ module Mongoid #:nodoc:
       def criterion(document, attribute, value)
         { attribute => filter(value) }.tap do |selector|
           if document.persisted? && !document.embedded?
-            selector.merge!(:_id => { "$ne" => document.id })
+            selector.merge!(_id: { "$ne" => document.id })
           end
         end
       end

@@ -78,7 +78,7 @@ describe "Rails::Mongoid" do
       end
 
       before do
-        klass.index_options = { :city => {} }
+        klass.index_options = { city: {} }
       end
 
       it "does nothing, but logging" do
@@ -315,11 +315,11 @@ describe "Rails::Mongoid" do
   describe ".preload_models" do
 
     let(:app) do
-      stub(:config => config)
+      stub(config: config)
     end
 
     let(:config) do
-      stub(:paths => paths)
+      stub(paths: paths)
     end
 
     let(:paths) do
@@ -393,11 +393,11 @@ describe "Rails::Mongoid" do
   describe ".load_models" do
 
     let(:app) do
-      stub(:config => config)
+      stub(config: config)
     end
 
     let(:config) do
-      stub(:paths => paths)
+      stub(paths: paths)
     end
 
     let(:paths) do

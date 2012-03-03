@@ -19,7 +19,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "nested_attributes_metadata_not_found",
-            { :klass => klass, :name => name }
+            { klass: klass, name: name }
           )
         )
       end

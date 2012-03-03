@@ -7,7 +7,7 @@ describe Mongoid::Dirty do
     context "when the attribute has changed from the persisted value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -30,7 +30,7 @@ describe Mongoid::Dirty do
     context "when the attribute has changed from the default value" do
 
       let(:person) do
-        Person.new(:pets => true)
+        Person.new(pets: true)
       end
 
       it "returns an array of nil and new value" do
@@ -45,7 +45,7 @@ describe Mongoid::Dirty do
     context "when the attribute changes multiple times" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -71,7 +71,7 @@ describe Mongoid::Dirty do
       context "when the attribute is an array" do
 
         let(:person) do
-          Person.new(:aliases => [ "Grand Poobah" ]).tap(&:move_changes)
+          Person.new(aliases: [ "Grand Poobah" ]).tap(&:move_changes)
         end
 
         before do
@@ -107,7 +107,7 @@ describe Mongoid::Dirty do
       context "when the attribute is a hash" do
 
         let(:person) do
-          Person.new(:map => { :location => "Home" }).tap(&:move_changes)
+          Person.new(map: { location: "Home" }).tap(&:move_changes)
         end
 
         before do
@@ -116,13 +116,13 @@ describe Mongoid::Dirty do
 
         it "returns an array of the original value and new value" do
           person.send(:attribute_change, "map").should eq(
-            [{ :location => "Home" }, { :location => "Work" }]
+            [{ location: "Home" }, { location: "Work" }]
           )
         end
 
         it "allows access via (attribute)_change" do
           person.map_change.should eq(
-            [{ :location => "Home" }, { :location => "Work" }]
+            [{ location: "Home" }, { location: "Work" }]
           )
         end
 
@@ -134,7 +134,7 @@ describe Mongoid::Dirty do
 
           it "returns an array of the original value and new value" do
             person.send(:attribute_change, "map").should eq(
-              [{ :location => "Home" }, { :location => "Work", :lat => 20.0 }]
+              [{ location: "Home" }, { location: "Work", lat: 20.0 }]
             )
           end
         end
@@ -144,7 +144,7 @@ describe Mongoid::Dirty do
     context "when the attribute has not changed from the persisted value" do
 
       let(:person) do
-        Person.new(:title => nil)
+        Person.new(title: nil)
       end
 
       it "returns nil" do
@@ -180,7 +180,7 @@ describe Mongoid::Dirty do
     context "when the attribute has been set with the same value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -195,7 +195,7 @@ describe Mongoid::Dirty do
     context "when the attribute is removed" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -215,7 +215,7 @@ describe Mongoid::Dirty do
     context "when the attribute has changed from the persisted value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(title: "Grand Poobah")
       end
 
       before do
@@ -253,7 +253,7 @@ describe Mongoid::Dirty do
     context "when the attribute has not changed the persisted value" do
 
       let!(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       it "returns false" do
@@ -291,7 +291,7 @@ describe Mongoid::Dirty do
       context "when the attribute is an array" do
 
         let!(:person) do
-          Person.new(:aliases => [ "Bond" ])
+          Person.new(aliases: [ "Bond" ])
         end
 
         context "when the array is only accessed" do
@@ -310,7 +310,7 @@ describe Mongoid::Dirty do
       context "when the attribute is a hash" do
 
         let!(:person) do
-          Person.new(:map => { :key => "value" })
+          Person.new(map: { key: "value" })
         end
 
         context "when the hash is only accessed" do
@@ -333,7 +333,7 @@ describe Mongoid::Dirty do
     context "when the attribute has changed from the persisted value" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       before do
@@ -371,7 +371,7 @@ describe Mongoid::Dirty do
     context "when the attribute has not changed from the persisted value" do
 
       let!(:person) do
-        Person.new(:title => "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah").tap(&:move_changes)
       end
 
       it "returns the original value" do
@@ -398,7 +398,7 @@ describe Mongoid::Dirty do
     end
 
     let(:person) do
-      Person.new(:aliases => aliases)
+      Person.new(aliases: aliases)
     end
 
     before do
@@ -489,7 +489,7 @@ describe Mongoid::Dirty do
     context "when the document has changed" do
 
       let(:person) do
-        Person.instantiate(:title => "Grand Poobah")
+        Person.instantiate(title: "Grand Poobah")
       end
 
       before do
@@ -518,7 +518,7 @@ describe Mongoid::Dirty do
     context "when the document has changed" do
 
       let(:person) do
-        Person.new(:title => "Grand Poobah")
+        Person.new(title: "Grand Poobah")
       end
 
       before do
@@ -547,7 +547,7 @@ describe Mongoid::Dirty do
     context "when the document has changed" do
 
       let(:person) do
-        Person.instantiate(:title => "Grand Poobah")
+        Person.instantiate(title: "Grand Poobah")
       end
 
       before do
@@ -584,7 +584,7 @@ describe Mongoid::Dirty do
     context "when the document has changed" do
 
       let(:person) do
-        Person.new(:aliases => [ "007" ]).tap do |p|
+        Person.new(aliases: [ "007" ]).tap do |p|
           p.new_record = false
           p.move_changes
         end
@@ -642,7 +642,7 @@ describe Mongoid::Dirty do
       context "when the document is a root document" do
 
         let(:person) do
-          Person.instantiate(:title => "Grand Poobah")
+          Person.instantiate(title: "Grand Poobah")
         end
 
         before do
@@ -657,11 +657,11 @@ describe Mongoid::Dirty do
       context "when the document is embedded" do
 
         let(:person) do
-          Person.instantiate(:title => "Grand Poobah")
+          Person.instantiate(title: "Grand Poobah")
         end
 
         let(:address) do
-          Address.instantiate(:street => "Oxford St")
+          Address.instantiate(street: "Oxford St")
         end
 
         before do
@@ -680,7 +680,7 @@ describe Mongoid::Dirty do
         context "when the document is embedded multiple levels" do
 
           let(:location) do
-            Location.new(:name => "Home")
+            Location.new(name: "Home")
           end
 
           before do
@@ -713,7 +713,7 @@ describe Mongoid::Dirty do
   describe "#previous_changes" do
 
     let(:person) do
-      Person.new(:title => "Grand Poobah")
+      Person.new(title: "Grand Poobah")
     end
 
     before do
@@ -745,7 +745,7 @@ describe Mongoid::Dirty do
   describe "#move_changes" do
 
     let(:person) do
-      Person.new(:title => "Sir")
+      Person.new(title: "Sir")
     end
 
     before do
@@ -777,7 +777,7 @@ describe Mongoid::Dirty do
     context "when the attribute has changed" do
 
       let(:person) do
-        Person.instantiate(:title => "Grand Poobah")
+        Person.instantiate(title: "Grand Poobah")
       end
 
       before do
@@ -801,7 +801,7 @@ describe Mongoid::Dirty do
     context "when the attribute has not changed" do
 
       let(:person) do
-        Person.instantiate(:title => "Grand Poobah")
+        Person.instantiate(title: "Grand Poobah")
       end
 
       before do
@@ -844,7 +844,7 @@ describe Mongoid::Dirty do
       context "when the child is new" do
 
         let!(:name) do
-          person.build_name(:first_name => "Gordon", :last_name => "Ramsay")
+          person.build_name(first_name: "Gordon", last_name: "Ramsay")
         end
 
         it "flags the parent as changed" do
@@ -855,7 +855,7 @@ describe Mongoid::Dirty do
       context "when the child is modified" do
 
         let!(:name) do
-          person.create_name(:first_name => "Gordon", :last_name => "Ramsay")
+          person.create_name(first_name: "Gordon", last_name: "Ramsay")
         end
 
         before do
@@ -870,7 +870,7 @@ describe Mongoid::Dirty do
       context "when the child is not modified" do
 
         let!(:name) do
-          person.create_name(:first_name => "Gordon", :last_name => "Ramsay")
+          person.create_name(first_name: "Gordon", last_name: "Ramsay")
         end
 
         it "does not flag the parent as changed" do
@@ -884,7 +884,7 @@ describe Mongoid::Dirty do
       context "when a child is new" do
 
         let!(:address) do
-          person.addresses.build(:street => "jakobstr.")
+          person.addresses.build(street: "jakobstr.")
         end
 
         it "flags the parent as changed" do
@@ -895,7 +895,7 @@ describe Mongoid::Dirty do
       context "when a child is modified" do
 
         let!(:address) do
-          person.addresses.create(:street => "jakobstr.")
+          person.addresses.create(street: "jakobstr.")
         end
 
         before do
@@ -910,7 +910,7 @@ describe Mongoid::Dirty do
       context "when no child is modified" do
 
         let!(:address) do
-          person.addresses.create(:street => "skalitzerstr.")
+          person.addresses.create(street: "skalitzerstr.")
         end
 
         it "does not flag the parent as changed" do
@@ -923,7 +923,7 @@ describe Mongoid::Dirty do
   context "when changing a hash of hashes" do
 
     let!(:person) do
-      Person.create(:map => { "test" => {}})
+      Person.create(map: { "test" => {}})
     end
 
     before do
@@ -944,11 +944,11 @@ describe Mongoid::Dirty do
     end
 
     let!(:preference) do
-      Preference.create(:name => "dirty")
+      Preference.create(name: "dirty")
     end
 
     before do
-      person.update_attributes(:preference_ids => [ preference.id ])
+      person.update_attributes(preference_ids: [ preference.id ])
     end
 
     it "records the foreign key dirty changes" do
@@ -1003,8 +1003,8 @@ describe Mongoid::Dirty do
 
     let(:person) do
       Person.create(
-        :title => "MC",
-        :some_dynamic_field => 'blah'
+        title: "MC",
+        some_dynamic_field: 'blah'
       )
     end
 
@@ -1082,11 +1082,11 @@ describe Mongoid::Dirty do
     context "when the document is persisted" do
 
       let!(:acolyte) do
-        Acolyte.create(:name => "callback-test")
+        Acolyte.create(name: "callback-test")
       end
 
       before do
-        Acolyte.set_callback(:save, :after, :if => :callback_test?) do |doc|
+        Acolyte.set_callback(:save, :after, if: :callback_test?) do |doc|
           doc[:changed_in_callback] = doc.changes.dup
         end
       end
@@ -1106,11 +1106,11 @@ describe Mongoid::Dirty do
     context "when the document is new" do
 
       let!(:acolyte) do
-        Acolyte.new(:name => "callback-test")
+        Acolyte.new(name: "callback-test")
       end
 
       before do
-        Acolyte.set_callback(:save, :after, :if => :callback_test?) do |doc|
+        Acolyte.set_callback(:save, :after, if: :callback_test?) do |doc|
           doc[:changed_in_callback] = doc.changes.dup
         end
       end
@@ -1131,7 +1131,7 @@ describe Mongoid::Dirty do
   context "when associations are getting changed" do
 
     let(:person) do
-      Person.create(:addresses => [ Address.new ])
+      Person.create(addresses: [ Address.new ])
     end
 
     before do

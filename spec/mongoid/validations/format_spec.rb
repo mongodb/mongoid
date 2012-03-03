@@ -11,7 +11,7 @@ describe Mongoid::Validations::FormatValidator do
     context "when the field is not localized" do
 
       let(:validator) do
-        described_class.new(:attributes => [:brand_name], :with => /\A[a-z]*\z/i)
+        described_class.new(attributes: [:brand_name], with: /\A[a-z]*\z/i)
       end
 
       context "when the value is valid" do
@@ -40,7 +40,7 @@ describe Mongoid::Validations::FormatValidator do
     context "when the field is localized" do
 
       let(:validator) do
-        described_class.new(:attributes => [:website], :with => URI.regexp)
+        described_class.new(attributes: [:website], with: URI.regexp)
       end
 
       context "when the localized value is valid" do

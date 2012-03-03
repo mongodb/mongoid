@@ -8,8 +8,8 @@ module Mongoid #:nodoc:
       class Many < Relations::Many
         include Batch
 
-        delegate :count, :to => :criteria
-        delegate :first, :in_memory, :last, :reset, :uniq, :to => :target
+        delegate :count, to: :criteria
+        delegate :first, :in_memory, :last, :reset, :uniq, to: :target
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
@@ -485,7 +485,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.4.0
         def remove_not_in(ids)
-          removed = criteria.not_in(:_id => ids)
+          removed = criteria.not_in(_id: ids)
           if metadata.destructive?
             removed.delete_all
           else

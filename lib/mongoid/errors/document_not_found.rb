@@ -24,11 +24,11 @@ module Mongoid #:nodoc
           compose_message(
             message_key(params),
             {
-              :klass => klass.name,
-              :searched => searched(params),
-              :attributes => params,
-              :total => total(params),
-              :missing => missing(unmatched)
+              klass: klass.name,
+              searched: searched(params),
+              attributes: params,
+              total: total(params),
+              missing: missing(unmatched)
             }
           )
         )

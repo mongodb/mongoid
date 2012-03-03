@@ -17,7 +17,7 @@ module Mongoid #:nodoc
       # @since 3.0.0
       def initialize(name, value)
         super(
-          compose_message("readonly_attribute", { :name => name, :value => value })
+          compose_message("readonly_attribute", { name: name, value: value })
         )
       end
     end

@@ -11,7 +11,7 @@ describe Mongoid::Inspection do
       end
 
       let(:person) do
-        Person.new(:title => "CEO")
+        Person.new(title: "CEO")
       end
 
       let(:attributes) do
@@ -30,7 +30,7 @@ describe Mongoid::Inspection do
     context "when allowing dynamic fields" do
 
       let(:person) do
-        Person.new(:title => "CEO", :some_attribute => "foo")
+        Person.new(title: "CEO", some_attribute: "foo")
       end
 
       let(:attributes) do

@@ -12,9 +12,9 @@ describe Mongoid::Relations::Cascading do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :name => :posts,
-          :dependent => :destroy,
-          :relation => Mongoid::Relations::Referenced::Many
+          name: :posts,
+          dependent: :destroy,
+          relation: Mongoid::Relations::Referenced::Many
         )
       end
 
@@ -35,8 +35,8 @@ describe Mongoid::Relations::Cascading do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :name => :posts,
-          :relation => Mongoid::Relations::Referenced::Many
+          name: :posts,
+          relation: Mongoid::Relations::Referenced::Many
         )
       end
 
@@ -67,7 +67,7 @@ describe Mongoid::Relations::Cascading do
           end
 
           let!(:post) do
-            person.posts.create(:title => "Testing")
+            person.posts.create(title: "Testing")
           end
 
           before do
@@ -88,7 +88,7 @@ describe Mongoid::Relations::Cascading do
           end
 
           let!(:game) do
-            person.create_game(:name => "Pong")
+            person.create_game(name: "Pong")
           end
 
           before do
@@ -107,11 +107,11 @@ describe Mongoid::Relations::Cascading do
           context "when nullifying a references many" do
 
             let(:movie) do
-              Movie.create(:title => "Bladerunner")
+              Movie.create(title: "Bladerunner")
             end
 
             let!(:rating) do
-              movie.ratings.create(:value => 10)
+              movie.ratings.create(value: 10)
             end
 
             let(:from_db) do
@@ -132,11 +132,11 @@ describe Mongoid::Relations::Cascading do
             context "when the relation exists" do
 
               let(:book) do
-                Book.create(:title => "Neuromancer")
+                Book.create(title: "Neuromancer")
               end
 
               let!(:rating) do
-                book.create_rating(:value => 10)
+                book.create_rating(value: 10)
               end
 
               let(:from_db) do
@@ -155,7 +155,7 @@ describe Mongoid::Relations::Cascading do
             context "when the relation is nil" do
 
               let(:book) do
-                Book.create(:title => "Neuromancer")
+                Book.create(title: "Neuromancer")
               end
 
               it "returns nil" do
@@ -171,7 +171,7 @@ describe Mongoid::Relations::Cascading do
             end
 
             let!(:preference) do
-              person.preferences.create(:name => "Setting")
+              person.preferences.create(name: "Setting")
             end
 
             let(:from_db) do
@@ -197,18 +197,18 @@ describe Mongoid::Relations::Cascading do
           context "when restricting a references many" do
 
             before do
-              Person.has_many :drugs, :dependent => :restrict
+              Person.has_many :drugs, dependent: :restrict
             end
 
             after do
               Person.cascades.delete("drugs")
-              Person.has_many :drugs, :validate => false
+              Person.has_many :drugs, validate: false
             end
 
             context "when the relation is empty" do
 
               let(:person) do
-                Person.new :drugs => []
+                Person.new drugs: []
               end
 
               it "raises no error" do
@@ -224,7 +224,7 @@ describe Mongoid::Relations::Cascading do
             context "when the relation is not empty" do
 
               let(:person) do
-                Person.new :drugs => [ Drug.new ]
+                Person.new drugs: [ Drug.new ]
               end
 
               it "raises DeleteRestriction error" do
@@ -236,18 +236,18 @@ describe Mongoid::Relations::Cascading do
           context "when restricting a references one" do
 
             before do
-              Person.has_one :account, :dependent => :restrict
+              Person.has_one :account, dependent: :restrict
             end
 
             after do
               Person.cascades.delete("account")
-              Person.has_one :account, :validate => false
+              Person.has_one :account, validate: false
             end
 
             context "when the relation is empty" do
 
               let(:person) do
-                Person.new :account => nil
+                Person.new account: nil
               end
 
               it "raises no error" do
@@ -263,7 +263,7 @@ describe Mongoid::Relations::Cascading do
             context "when the relation is not empty" do
 
               let(:person) do
-                Person.new :account => Account.new(:name => 'test')
+                Person.new account: Account.new(name: 'test')
               end
 
               it "raises DeleteRestriction error" do
@@ -275,18 +275,18 @@ describe Mongoid::Relations::Cascading do
           context "when restricting a many to many" do
 
             before do
-              Person.has_and_belongs_to_many :houses, :dependent => :restrict
+              Person.has_and_belongs_to_many :houses, dependent: :restrict
             end
 
             after do
               Person.cascades.delete("houses")
-              Person.has_and_belongs_to_many :houses, :validate => false
+              Person.has_and_belongs_to_many :houses, validate: false
             end
 
             context "when the relation is empty" do
 
               let(:person) do
-                Person.new :houses => []
+                Person.new houses: []
               end
 
               it "raises no error" do
@@ -302,7 +302,7 @@ describe Mongoid::Relations::Cascading do
             context "when the relation is not empty" do
 
               let(:person) do
-                Person.new :houses => [House.new]
+                Person.new houses: [House.new]
               end
 
               it "raises DeleteRestriction error" do

@@ -320,7 +320,7 @@ describe Mongoid::Fields do
       context "when provided a default array" do
 
         before do
-          Person.field(:array_testing, :type => Array, :default => [])
+          Person.field(:array_testing, type: Array, default: [])
         end
 
         after do
@@ -338,7 +338,7 @@ describe Mongoid::Fields do
       context "when provided a default hash" do
 
         before do
-          Person.field(:hash_testing, :type => Hash, :default => {})
+          Person.field(:hash_testing, type: Hash, default: {})
         end
 
         after do
@@ -359,8 +359,8 @@ describe Mongoid::Fields do
           before do
             Person.field(
               :generated_testing,
-              :type => Float,
-              :default => lambda { Time.now.to_f }
+              type: Float,
+              default: ->{ Time.now.to_f }
             )
           end
 
@@ -381,8 +381,8 @@ describe Mongoid::Fields do
           before do
             Person.field(
               :rank,
-              :type => Integer,
-              :default => lambda { title? ? 1 : 2 }
+              type: Integer,
+              default: ->{ title? ? 1 : 2 }
             )
           end
 
@@ -446,7 +446,7 @@ describe Mongoid::Fields do
       end
 
       let!(:person) do
-        Person.new(:lunch_time => time.utc)
+        Person.new(lunch_time: time.utc)
       end
 
       context "when reading the field" do
@@ -472,7 +472,7 @@ describe Mongoid::Fields do
       end
 
       let(:person) do
-        Person.new(:testing => "Test")
+        Person.new(testing: "Test")
       end
 
       it "adds a reader for the fields defined" do
@@ -509,7 +509,7 @@ describe Mongoid::Fields do
     context "when the type is an object" do
 
       let(:bob) do
-        Person.new(:reading => 10.023)
+        Person.new(reading: 10.023)
       end
 
       it "returns the given value" do
@@ -520,7 +520,7 @@ describe Mongoid::Fields do
     context "when type is a boolean" do
 
       let(:person) do
-        Person.new(:terms => true)
+        Person.new(terms: true)
       end
 
       it "adds an accessor method with a question mark" do
@@ -531,11 +531,11 @@ describe Mongoid::Fields do
     context "when as is specified" do
 
       let(:person) do
-        Person.new(:alias => true)
+        Person.new(alias: true)
       end
 
       before do
-        Person.field :aliased, :as => :alias, :type => Boolean
+        Person.field :aliased, as: :alias, type: Boolean
       end
 
       it "uses the alias to write the attribute" do
@@ -603,11 +603,11 @@ describe Mongoid::Fields do
       context "when defining a criteria" do
 
         let(:criteria) do
-          Person.where(:alias => "true")
+          Person.where(alias: "true")
         end
 
         it "properly serializes the aliased field" do
-          criteria.selector.should eq({ :alias => true })
+          criteria.selector.should eq({ alias: true })
         end
       end
     end
@@ -629,7 +629,7 @@ describe Mongoid::Fields do
             model.should eql User
           end
 
-          User.field :custom, :option => true
+          User.field :custom, option: true
         end
 
         it "calls the handler with the field" do
@@ -637,7 +637,7 @@ describe Mongoid::Fields do
             field.should eql User.fields["custom"]
           end
 
-          User.field :custom, :option => true
+          User.field :custom, option: true
         end
 
         it "calls the handler with the option value" do
@@ -645,7 +645,7 @@ describe Mongoid::Fields do
             value.should eql true
           end
 
-          User.field :custom, :option => true
+          User.field :custom, option: true
         end
       end
 
@@ -653,7 +653,7 @@ describe Mongoid::Fields do
 
         it "calls the handler" do
           handler.expects(:call)
-          User.field :custom, :option => nil
+          User.field :custom, option: nil
         end
       end
 
@@ -793,7 +793,7 @@ describe Mongoid::Fields do
   describe ".replace_field" do
 
     let!(:original) do
-      Person.field(:id_test, :type => BSON::ObjectId, :label => "id")
+      Person.field(:id_test, type: BSON::ObjectId, label: "id")
     end
 
     let!(:altered) do
@@ -849,7 +849,7 @@ describe Mongoid::Fields do
   context "when a setter accesses a field with a default" do
 
     let(:person) do
-      Person.new(:set_on_map_with_default => "testing")
+      Person.new(set_on_map_with_default: "testing")
     end
 
     it "sets the default value pre process" do
@@ -876,11 +876,11 @@ describe Mongoid::Fields do
         end
 
         it "allows mass assignment of id" do
-          Person.new(:_id => bson_id).id.should eq(bson_id)
+          Person.new(_id: bson_id).id.should eq(bson_id)
         end
 
         it "allows mass assignment of type" do
-          Person.new(:_type => "Something")._type.should eq("Something")
+          Person.new(_type: "Something")._type.should eq("Something")
         end
       end
 
@@ -895,11 +895,11 @@ describe Mongoid::Fields do
         end
 
         it "protects assignment of id" do
-          Person.new(:_id => bson_id).id.should_not eq(bson_id)
+          Person.new(_id: bson_id).id.should_not eq(bson_id)
         end
 
         it "protects assignment of type" do
-          Person.new(:_type => "Something")._type.should_not eq("Something")
+          Person.new(_type: "Something")._type.should_not eq("Something")
         end
       end
     end
@@ -925,7 +925,7 @@ describe Mongoid::Fields do
       end
 
       let(:model) do
-        klass.new(:id => bson_id, :_type => "Model")
+        klass.new(id: bson_id, _type: "Model")
       end
 
       it "allows mass assignment of id" do

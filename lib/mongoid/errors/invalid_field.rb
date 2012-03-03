@@ -18,10 +18,10 @@ module Mongoid #:nodoc
           compose_message(
             "invalid_field",
             {
-              :name => name,
-              :origin => origin(klass, name),
-              :file => location(klass, name)[0],
-              :line => location(klass, name)[1]
+              name: name,
+              origin: origin(klass, name),
+              file: location(klass, name)[0],
+              line: location(klass, name)[1]
             }
           )
         )

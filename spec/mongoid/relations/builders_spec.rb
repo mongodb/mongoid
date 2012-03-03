@@ -180,13 +180,13 @@ describe Mongoid::Relations::Builders do
       context "when the relation is a has one" do
 
         let!(:game_one) do
-          person.create_game(:name => "Starcraft")
+          person.create_game(name: "Starcraft")
         end
 
         context "when a document already exists" do
 
           let!(:game_two) do
-            person.create_game(:name => "Skyrim")
+            person.create_game(name: "Skyrim")
           end
 
           it "replaces the existing document" do

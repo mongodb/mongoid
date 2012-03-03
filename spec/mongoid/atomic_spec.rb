@@ -23,7 +23,7 @@ describe Mongoid::Atomic do
         context "when an embeds many child is added" do
 
           let!(:address) do
-            person.addresses.build(:street => "Oxford St")
+            person.addresses.build(street: "Oxford St")
           end
 
           it "returns a $set and $pushAll for modifications" do
@@ -41,7 +41,7 @@ describe Mongoid::Atomic do
         context "when an embeds one child is added" do
 
           let!(:name) do
-            person.build_name(:first_name => "Lionel")
+            person.build_name(first_name: "Lionel")
           end
 
           it "returns a $set for modifications" do
@@ -59,7 +59,7 @@ describe Mongoid::Atomic do
         context "when an existing embeds many gets modified" do
 
           let!(:address) do
-            person.addresses.create(:street => "Oxford St")
+            person.addresses.create(street: "Oxford St")
           end
 
           before do
@@ -75,7 +75,7 @@ describe Mongoid::Atomic do
           context "when an existing 2nd level embedded child gets modified" do
 
             let!(:location) do
-              address.locations.create(:name => "Home")
+              address.locations.create(name: "Home")
             end
 
             before do
@@ -96,7 +96,7 @@ describe Mongoid::Atomic do
           context "when a 2nd level embedded child gets added" do
 
             let!(:location) do
-              address.locations.build(:name => "Home")
+              address.locations.build(name: "Home")
             end
 
             it "returns the $set with correct positions and modifications" do
@@ -106,7 +106,7 @@ describe Mongoid::Atomic do
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
                   },
-                  :conflicts => {
+                  conflicts: {
                     "$pushAll" => {
                       "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
                     }
@@ -119,7 +119,7 @@ describe Mongoid::Atomic do
           context "when an embedded child gets unset" do
 
             before do
-              person.attributes = { :addresses => nil }
+              person.attributes = { addresses: nil }
             end
 
             let(:updates) do
@@ -137,11 +137,11 @@ describe Mongoid::Atomic do
           context "when adding a new second level child" do
 
             let!(:new_address) do
-              person.addresses.build(:street => "Another")
+              person.addresses.build(street: "Another")
             end
 
             let!(:location) do
-              new_address.locations.build(:name => "Home")
+              new_address.locations.build(name: "Home")
             end
 
             it "returns the $set for 1st level and other for the 2nd level" do
@@ -151,7 +151,7 @@ describe Mongoid::Atomic do
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St"
                   },
-                  :conflicts => {
+                  conflicts: {
                     "$pushAll" => {
                       "addresses" => [{
                         "_id" => new_address.id,
@@ -172,11 +172,11 @@ describe Mongoid::Atomic do
         context "when adding new embedded docs at multiple levels" do
 
           let!(:address) do
-            person.addresses.build(:street => "Another")
+            person.addresses.build(street: "Another")
           end
 
           let!(:location) do
-            address.locations.build(:name => "Home")
+            address.locations.build(name: "Home")
           end
 
           it "returns the proper $sets and $pushAlls for all levels" do

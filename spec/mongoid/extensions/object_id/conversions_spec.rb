@@ -138,7 +138,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           context "when the value is an object id" do
 
             let(:hash) do
-              { :_id => object_id }
+              { _id: object_id }
             end
 
             let(:converted) do
@@ -157,7 +157,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             let(:hash) do
-              { :_id => [ object_id, other_id ] }
+              { _id: [ object_id, other_id ] }
             end
 
             let(:converted) do
@@ -172,7 +172,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           context "when the value is a string" do
 
             let(:hash) do
-              { :_id => object_id.to_s }
+              { _id: object_id.to_s }
             end
 
             let(:converted) do
@@ -180,7 +180,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted value" do
-              converted.should eq({ :_id => object_id })
+              converted.should eq({ _id: object_id })
             end
           end
 
@@ -191,7 +191,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             let(:hash) do
-              { :_id => [ object_id.to_s, other_id.to_s ] }
+              { _id: [ object_id.to_s, other_id.to_s ] }
             end
 
             let(:converted) do
@@ -199,7 +199,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted values" do
-              converted.should eq({ :_id => [ object_id, other_id ] })
+              converted.should eq({ _id: [ object_id, other_id ] })
             end
           end
         end
@@ -209,7 +209,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           context "when the value is an object id" do
 
             let(:hash) do
-              { :id => object_id }
+              { id: object_id }
             end
 
             let(:converted) do
@@ -228,7 +228,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             let(:hash) do
-              { :id => [ object_id, other_id ] }
+              { id: [ object_id, other_id ] }
             end
 
             let(:converted) do
@@ -243,7 +243,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           context "when the value is a string" do
 
             let(:hash) do
-              { :id => object_id.to_s }
+              { id: object_id.to_s }
             end
 
             let(:converted) do
@@ -251,7 +251,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted value" do
-              converted.should eq({ :id => object_id })
+              converted.should eq({ id: object_id })
             end
           end
 
@@ -262,7 +262,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             let(:hash) do
-              { :id => [ object_id.to_s, other_id.to_s ] }
+              { id: [ object_id.to_s, other_id.to_s ] }
             end
 
             let(:converted) do
@@ -270,7 +270,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
             end
 
             it "returns the hash with converted values" do
-              converted.should eq({ :id => [ object_id, other_id ] })
+              converted.should eq({ id: [ object_id, other_id ] })
             end
           end
         end
@@ -280,7 +280,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           context "when the value is a string" do
 
             let(:hash) do
-              { :key => composite_key }
+              { key: composite_key }
             end
 
             let(:converted) do
@@ -295,7 +295,7 @@ describe Mongoid::Extensions::ObjectId::Conversions do
           context "when the value is an array of strings" do
 
             let(:hash) do
-              { :key => [ composite_key ] }
+              { key: [ composite_key ] }
             end
 
             let(:converted) do
@@ -337,11 +337,11 @@ describe Mongoid::Extensions::ObjectId::Conversions do
       context "when provided a hash" do
 
         let(:converted) do
-          BSON::ObjectId.convert(Address, { :key => 100 })
+          BSON::ObjectId.convert(Address, { key: 100 })
         end
 
         it "returns the hash" do
-          converted.should eq({ :key => 100 })
+          converted.should eq({ key: 100 })
         end
       end
     end

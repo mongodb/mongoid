@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
         # yes, construction is weird but the driver wants
         # "A list of host-port pairs ending with a hash containing any options"
         # mongo likes symbols
-        options = self.inject({ :logger => Mongoid::Logger.new }) do |memo, (k, v)|
+        options = self.inject({ logger: Mongoid::Logger.new }) do |memo, (k, v)|
           memo[k.to_sym] = v
           memo
         end

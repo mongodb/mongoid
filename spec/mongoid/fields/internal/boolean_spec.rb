@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Boolean do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Boolean)
+    described_class.instantiate(:test, type: Boolean)
   end
 
   describe "#deserialize" do
@@ -74,7 +74,7 @@ describe Mongoid::Fields::Internal::Boolean do
     context "when provided hash" do
 
       it "returns false" do
-        field.serialize({:a => :b}).should eq(false)
+        field.serialize({a: :b}).should eq(false)
       end
     end
   end

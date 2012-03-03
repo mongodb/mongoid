@@ -11,7 +11,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "too_many_nested_attribute_records",
-            { :association => association, :limit => limit }
+            { association: association, limit: limit }
           )
         )
       end

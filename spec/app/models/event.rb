@@ -2,12 +2,12 @@ class Event
   include Mongoid::Document
 
   field :title
-  field :date, :type => Date
+  field :date, type: Date
   has_and_belongs_to_many \
     :administrators,
-    :class_name => 'Person',
-    :inverse_of => :administrated_events,
-    :dependent => :nullify
+    class_name: 'Person',
+    inverse_of: :administrated_events,
+    dependent: :nullify
   belongs_to :owner
 
   def self.each_day(start_date, end_date)
@@ -18,5 +18,5 @@ class Event
   end
 
   scope :best, where(:kind.in => [ "party", "concert" ])
-  scope :by_kind, lambda { |kind| where(:kind.in => [kind]) }
+  scope :by_kind, ->(kind){ where(:kind.in => [kind]) }
 end

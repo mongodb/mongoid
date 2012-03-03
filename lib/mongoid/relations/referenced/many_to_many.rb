@@ -157,7 +157,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.4.0
         def unscoped
-          klass.unscoped.any_in(:_id => base.send(metadata.foreign_key))
+          klass.unscoped.any_in(_id: base.send(metadata.foreign_key))
         end
 
         private
@@ -234,7 +234,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            metadata.klass.any_in(:_id => object)
+            metadata.klass.any_in(_id: object)
           end
 
           # Get the criteria that is used to eager load a relation of this
@@ -250,7 +250,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.2.0
           def eager_load(metadata, ids)
-            metadata.klass.any_in(:_id => ids).each do |doc|
+            metadata.klass.any_in(_id: ids).each do |doc|
               IdentityMap.set(doc)
             end
           end

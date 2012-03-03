@@ -11,7 +11,7 @@ module Mongoid #:nodoc
     class InvalidDatabase < MongoidError
       def initialize(database)
         super(
-          compose_message("invalid_database", { :name => database.class.name })
+          compose_message("invalid_database", { name: database.class.name })
         )
       end
     end

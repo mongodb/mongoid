@@ -173,7 +173,7 @@ module Mongoid #:nodoc:
         if args.first == PresenceValidator
           args.last[:attributes].each do |name|
             metadata = relations[name.to_s]
-            autosave(metadata.merge!(:autosave => true)) if metadata
+            autosave(metadata.merge!(autosave: true)) if metadata
           end
         end
         super

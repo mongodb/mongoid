@@ -99,7 +99,7 @@ describe Mongoid::Relations::Embedded::One do
         context "when setting via the parent attributes" do
 
           before do
-            person.attributes = { :name => name }
+            person.attributes = { name: name }
           end
 
           it "sets the target of the relation" do
@@ -256,7 +256,7 @@ describe Mongoid::Relations::Embedded::One do
 
           before do
             person.name = name
-            person.attributes = { :name => nil }
+            person.attributes = { name: nil }
           end
 
           it "sets the relation to nil" do
@@ -351,7 +351,7 @@ describe Mongoid::Relations::Embedded::One do
 
       let(:quiz) do
         person.build_quiz(
-          { :topic => "Testing", :name => "Test" }, :as => :admin
+          { topic: "Testing", name: "Test" }, as: :admin
         )
       end
 
@@ -460,7 +460,7 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           let!(:name) do
-            person.build_name(:first_name => "James")
+            person.build_name(first_name: "James")
           end
 
           it "sets the target of the relation" do
@@ -488,7 +488,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         let!(:name) do
-          person.build_name(:first_name => "James")
+          person.build_name(first_name: "James")
         end
 
         it "does not save the target" do
@@ -506,7 +506,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         let!(:child_shelf) do
-          parent_shelf.build_child_shelf(:level => 1)
+          parent_shelf.build_child_shelf(level: 1)
         end
 
         it "sets the target of the relation" do
@@ -533,7 +533,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         let!(:child_shelf) do
-          parent_shelf.build_child_shelf(:level => 2)
+          parent_shelf.build_child_shelf(level: 2)
         end
 
         it "does not save the target" do
@@ -576,7 +576,7 @@ describe Mongoid::Relations::Embedded::One do
 
       let(:quiz) do
         person.create_quiz(
-          { :topic => "Testing", :name => "Test" }, :as => :admin
+          { topic: "Testing", name: "Test" }, as: :admin
         )
       end
 
@@ -652,7 +652,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         let!(:name) do
-          person.create_name(:first_name => "James")
+          person.create_name(first_name: "James")
         end
 
         it "sets the target of the relation" do
@@ -679,7 +679,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         let!(:name) do
-          person.create_name(:first_name => "James")
+          person.create_name(first_name: "James")
         end
 
         it "does not save the target" do
@@ -730,7 +730,7 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     let!(:name) do
-      person.build_name(:first_name => "Tony")
+      person.build_name(first_name: "Tony")
     end
 
     let(:document) do
@@ -776,9 +776,9 @@ describe Mongoid::Relations::Embedded::One do
 
     let!(:name) do
       person.create_name(
-        :first_name => "Syd",
-        :last_name => "Vicious",
-        :aliases => nil
+        first_name: "Syd",
+        last_name: "Vicious",
+        aliases: nil
       )
     end
 

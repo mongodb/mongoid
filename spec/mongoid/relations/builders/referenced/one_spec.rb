@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Builders::Referenced::One do
 
   let(:base) do
-    stub(:new_record? => false)
+    stub(new_record?: false)
   end
 
   describe "#build" do
@@ -14,11 +14,11 @@ describe Mongoid::Relations::Builders::Referenced::One do
 
     let(:metadata) do
       stub(
-        :klass => Post,
-        :name => :post,
-        :foreign_key => "person_id",
-        :criteria => criteria,
-        :inverse_klass => Person
+        klass: Post,
+        name: :post,
+        foreign_key: "person_id",
+        criteria: criteria,
+        inverse_klass: Person
       )
     end
 
@@ -94,7 +94,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       let!(:game) do
-        Game.create(:person_id => person.id)
+        Game.create(person_id: person.id)
       end
 
       it "returns the document" do

@@ -12,7 +12,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "scope_overwrite",
-            { :model_name => model_name, :scope_name => scope_name }
+            { model_name: model_name, scope_name: scope_name }
           )
         )
       end

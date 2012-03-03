@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
       :shift,
       :sum,
       :update,
-      :update_all, :to => :context
+      :update_all, to: :context
 
     # Concatinate the criteria with another enumerable. If the other is a
     # +Criteria+ then it needs to get the collection from it.

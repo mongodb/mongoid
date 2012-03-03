@@ -16,7 +16,7 @@ module Mongoid #:nodoc
       # @since 3.0.0
       def initialize(klass, value)
         super(
-          compose_message("invalid_scope", { :klass => klass, :value => value })
+          compose_message("invalid_scope", { klass: klass, value: value })
         )
       end
     end

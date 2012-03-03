@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Symbol do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Symbol)
+    described_class.instantiate(:test, type: Symbol)
   end
 
   describe "#deserialize" do

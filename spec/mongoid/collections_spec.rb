@@ -85,7 +85,7 @@ describe Mongoid::Collections do
       end
 
       before do
-        klass.store_in :caps, :capped => true, :size => 1000
+        klass.store_in :caps, capped: true, size: 1000
       end
 
       after do

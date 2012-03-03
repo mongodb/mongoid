@@ -7,8 +7,8 @@ module Mongoid #:nodoc:
       extend ActiveSupport::Concern
 
       included do
-        field :updated_at, :type => Time
-        set_callback :save, :before, :set_updated_at, :if => :able_to_set_updated_at?
+        field :updated_at, type: Time
+        set_callback :save, :before, :set_updated_at, if: :able_to_set_updated_at?
       end
 
       # Update the updated_at field on the Document to the current time.

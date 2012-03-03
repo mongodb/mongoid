@@ -29,8 +29,8 @@ module Mongoid # :nodoc:
             if metadata.polymorphic?
               klass.polymorphic = true
               if metadata.relation.stores_foreign_key?
-                field(metadata.inverse_type, :type => String)
-                field(metadata.inverse_of_field, :type => Symbol)
+                field(metadata.inverse_type, type: String)
+                field(metadata.inverse_of_field, type: Symbol)
               end
             end
           end

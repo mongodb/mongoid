@@ -18,9 +18,9 @@ describe Mongoid::Contexts::Mongo do
         before do
           5.times do |n|
             Person.create(
-              :title => "Sir",
-              :age => ((n + 1) * 10),
-              :aliases => ["D", "Durran"]
+              title: "Sir",
+              age: ((n + 1) * 10),
+              aliases: ["D", "Durran"]
             )
           end
         end
@@ -61,9 +61,9 @@ describe Mongoid::Contexts::Mongo do
       before do
         13.times do |n|
           Person.create(
-            :title => "Sir",
-            :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"]
+            title: "Sir",
+            age: ((n + 1) * 10),
+            aliases: ["D", "Durran"]
           )
         end
       end
@@ -115,9 +115,9 @@ describe Mongoid::Contexts::Mongo do
       before do
         2.times do |n|
           Person.create(
-            :title => "Sir",
-            :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"]
+            title: "Sir",
+            age: ((n + 1) * 10),
+            aliases: ["D", "Durran"]
           )
         end
       end
@@ -157,7 +157,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
+        criteria.options.should eq({ sort: [[ :"description.en", :desc ]] })
       end
     end
   end
@@ -191,7 +191,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ :sort => [[ :"description.en", :desc ]] })
+        criteria.options.should eq({ sort: [[ :"description.en", :desc ]] })
       end
     end
   end
@@ -210,9 +210,9 @@ describe Mongoid::Contexts::Mongo do
       before do
         5.times do |n|
           Person.create(
-            :title => "Sir",
-            :age => (n * 10),
-            :aliases => ["D", "Durran"]
+            title: "Sir",
+            age: (n * 10),
+            aliases: ["D", "Durran"]
           )
         end
       end
@@ -225,7 +225,7 @@ describe Mongoid::Contexts::Mongo do
 
         before do
           Person.create
-          Person.create(:no_definition => 5)
+          Person.create(no_definition: 5)
         end
 
         it "returns the sum" do
@@ -260,9 +260,9 @@ describe Mongoid::Contexts::Mongo do
       before do
         5.times do |n|
           Person.create(
-            :title => "Sir",
-            :age => ((n + 1) * 10),
-            :aliases => ["D", "Durran"]
+            title: "Sir",
+            age: ((n + 1) * 10),
+            aliases: ["D", "Durran"]
           )
         end
       end
@@ -275,7 +275,7 @@ describe Mongoid::Contexts::Mongo do
 
         before do
           Person.create
-          Person.create(:no_definition => 5)
+          Person.create(no_definition: 5)
         end
 
         it "returns the sum" do
@@ -302,7 +302,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       before do
-        Person.create(:lunch_time => time)
+        Person.create(lunch_time: time)
       end
 
       it "returns the value" do
@@ -327,9 +327,9 @@ describe Mongoid::Contexts::Mongo do
         before do
           2.times do |n|
             Person.create(
-              :title => "Sir",
-              :age => 5,
-              :aliases => ["D", "Durran"]
+              title: "Sir",
+              age: 5,
+              aliases: ["D", "Durran"]
             )
           end
         end
@@ -354,7 +354,7 @@ describe Mongoid::Contexts::Mongo do
 
         before do
           Person.create
-          Person.create(:no_definition => 5)
+          Person.create(no_definition: 5)
         end
 
         it "returns the sum" do

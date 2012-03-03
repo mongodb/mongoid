@@ -36,7 +36,7 @@ describe Mongoid::Atomic::Paths::Root do
     context "when using a shard key" do
 
       let(:profile) do
-        Profile.new(:name => "google")
+        Profile.new(name: "google")
       end
 
       let(:root) do
@@ -60,7 +60,7 @@ describe Mongoid::Atomic::Paths::Root do
       context "when using a composite key" do
 
         let(:account) do
-          Account.new(:name => "savings")
+          Account.new(name: "savings")
         end
 
         let(:root) do

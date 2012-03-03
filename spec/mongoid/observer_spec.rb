@@ -25,7 +25,7 @@ describe Mongoid::Observer do
     end
 
     let!(:phone) do
-      person.phone_numbers.create(:number => "0152-1111-1111")
+      person.phone_numbers.create(number: "0152-1111-1111")
     end
 
     context "when updating the embedded document" do
@@ -47,7 +47,7 @@ describe Mongoid::Observer do
     end
 
     let!(:actress) do
-      Actress.create!(:name => "Tina Fey")
+      Actress.create!(name: "Tina Fey")
     end
 
     it "observes descendent class" do
@@ -62,7 +62,7 @@ describe Mongoid::Observer do
     end
 
     let(:actor) do
-      Actor.create!(:name => "Johnny Depp")
+      Actor.create!(name: "Johnny Depp")
     end
 
     it "does not fire the observer" do
@@ -79,7 +79,7 @@ describe Mongoid::Observer do
     end
 
     let(:actor) do
-      Actor.create!(:name => "Johnny Depp")
+      Actor.create!(name: "Johnny Depp")
     end
 
     it "does not fire the observer" do
@@ -146,7 +146,7 @@ describe Mongoid::Observer do
 
       before do
         recorder.reset
-        actor.update_attributes!(:name => "Johnny Depp")
+        actor.update_attributes!(name: "Johnny Depp")
       end
 
       it "observes #{callback}" do

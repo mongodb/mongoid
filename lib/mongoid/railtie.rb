@@ -38,7 +38,7 @@ module Rails #:nodoc:
         }
       end
 
-      config.send(generator).orm :mongoid, :migration => false
+      config.send(generator).orm :mongoid, migration: false
 
       if config.action_dispatch.rescue_responses
         config.action_dispatch.rescue_responses.merge!(rescue_responses)

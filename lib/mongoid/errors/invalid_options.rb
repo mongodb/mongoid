@@ -19,7 +19,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "invalid_options",
-            { :name => name, :invalid => invalid, :valid => valid.join(', ') }
+            { name: name, invalid: invalid, valid: valid.join(', ') }
           )
         )
       end

@@ -4,8 +4,8 @@ module Mongoid #:nodoc:
     class Mongo
       attr_accessor :criteria
 
-      delegate :cached?, :klass, :options, :field_list, :selector, :to => :criteria
-      delegate :collection, :to => :klass
+      delegate :cached?, :klass, :options, :field_list, :selector, to: :criteria
+      delegate :collection, to: :klass
 
       # Perform an add to set on the matching documents.
       #
@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
         klass.collection.update(
           selector,
           { "$addToSet" => { field => value } },
-          :multi => true
+          multi: true
         )
       end
 
@@ -37,10 +37,10 @@ module Mongoid #:nodoc:
       # @return [ Hash ] A +Hash+ with field values as keys, counts as values
       def aggregate
         klass.collection.group(
-          :key => field_list,
-          :cond => selector,
-          :initial => { :count => 0 },
-          :reduce => Javascript.aggregate
+          key: field_list,
+          cond: selector,
+          initial: { count: 0 },
+          reduce: Javascript.aggregate
         )
       end
 
@@ -70,7 +70,7 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] True if blank.
       def blank?
-        klass.collection.find_one(selector, { :fields => [ :_id ] }).nil?
+        klass.collection.find_one(selector, { fields: [ :_id ] }).nil?
       end
       alias :empty? :blank?
 
@@ -105,7 +105,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def delete_all
-        klass.delete_all(:conditions => selector)
+        klass.delete_all(conditions: selector)
       end
       alias :delete :delete_all
 
@@ -118,7 +118,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def destroy_all
-        klass.destroy_all(:conditions => selector)
+        klass.destroy_all(conditions: selector)
       end
       alias :destroy :destroy_all
 
@@ -191,7 +191,7 @@ module Mongoid #:nodoc:
       def load_ids(key)
         klass.collection.driver.find(
           selector,
-          process_options.merge({ :fields => { key => 1 }})
+          process_options.merge({ fields: { key => 1 }})
         ).map { |doc| doc[key] }
       end
 
@@ -223,10 +223,10 @@ module Mongoid #:nodoc:
       # @return [ Hash ] Hash with field values as keys, arrays of documents as values.
       def group
         klass.collection.group(
-          :key => field_list,
-          :cond => selector,
-          :initial => { :group => [] },
-          :reduce => Javascript.group
+          key: field_list,
+          cond: selector,
+          initial: { group: [] },
+          reduce: Javascript.group
         ).collect do |docs|
           docs["group"] = docs["group"].collect do |attrs|
             Mongoid::Factory.from_db(klass, attrs)
@@ -245,7 +245,7 @@ module Mongoid #:nodoc:
       def initialize(criteria)
         @criteria = criteria
         if klass.hereditary? && !criteria.selector.keys.include?(:_type)
-          @criteria = criteria.in(:_type => criteria.klass._types)
+          @criteria = criteria.in(_type: criteria.klass._types)
         end
         @criteria.cache if klass.cached?
       end
@@ -331,7 +331,7 @@ module Mongoid #:nodoc:
         klass.collection.update(
           selector,
           { "$pull" => { field => value } },
-          :multi => true
+          multi: true
         )
       end
 
@@ -377,7 +377,7 @@ module Mongoid #:nodoc:
         klass.collection.update(
           selector,
           { "$set" => attributes },
-          Safety.merge_safety_options(:multi => true)
+          Safety.merge_safety_options(multi: true)
         ).tap do
           Threaded.clear_options!
         end
@@ -415,10 +415,10 @@ module Mongoid #:nodoc:
       # @return [ Numeric ] A numeric result.
       def grouped(start, field, reduce, finalize)
         collection = klass.collection.group(
-          :cond => selector,
-          :initial => { start => "start" },
-          :finalize => finalize,
-          :reduce => reduce.gsub("[field]", field)
+          cond: selector,
+          initial: { start => "start" },
+          finalize: finalize,
+          reduce: reduce.gsub("[field]", field)
         )
         collection.empty? ? nil : collection.first[start.to_s]
       end

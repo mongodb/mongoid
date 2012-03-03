@@ -11,14 +11,14 @@ describe Mongoid::Collection do
     context "when no block supplied" do
 
       it "finds return a cursor" do
-        collection.find({ :test => "value"}).should be_a(Mongoid::Cursor)
+        collection.find({ test: "value"}).should be_a(Mongoid::Cursor)
       end
     end
 
     context "when a block is supplied" do
 
       it "yields to the cursor and closes it" do
-        collection.find({ :test => "value" }) do |cur|
+        collection.find({ test: "value" }) do |cur|
           cur.should be_a(Mongoid::Cursor)
         end
       end
@@ -51,7 +51,7 @@ describe Mongoid::Collection do
         described_class.new(
           Person,
           "capped_people",
-          :capped => true, :size => 10000, :max => 100
+          capped: true, size: 10000, max: 100
         )
       end
 

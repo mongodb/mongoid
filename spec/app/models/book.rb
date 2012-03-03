@@ -1,10 +1,10 @@
 class Book
   include Mongoid::Document
-  field :title, :type => String
-  field :chapters, :type => Integer
+  field :title, type: String
+  field :chapters, type: Integer
   belongs_to :series
-  belongs_to :person, :autobuild => true
-  has_one :rating, :as => :ratable, :dependent => :nullify
+  belongs_to :person, autobuild: true
+  has_one :rating, as: :ratable, dependent: :nullify
 
   after_initialize do |doc|
     doc.chapters = 5

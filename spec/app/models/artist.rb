@@ -1,11 +1,11 @@
 class Artist
   include Mongoid::Document
 
-  field :name, :type => String
+  field :name, type: String
 
   embeds_many :songs
   embeds_many :labels
-  has_many :albums, :dependent => :destroy
+  has_many :albums, dependent: :destroy
 
   before_create :before_create_stub
   after_create :create_songs
@@ -26,6 +26,6 @@ class Artist
   end
 
   def create_songs
-    2.times { |n| songs.create!(:title => "#{n}") }
+    2.times { |n| songs.create!(title: "#{n}") }
   end
 end

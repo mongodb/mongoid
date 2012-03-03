@@ -15,7 +15,7 @@ describe Mongoid::Persistence do
     context "when providing attributes" do
 
       let(:person) do
-        Person.create(:title => "Sensei")
+        Person.create(title: "Sensei")
       end
 
       it "it saves the document" do
@@ -29,7 +29,7 @@ describe Mongoid::Persistence do
       context "when creating an embedded document" do
 
         let(:address) do
-          Address.create(:addressable => person)
+          Address.create(addressable: person)
         end
 
         it "persists the document" do
@@ -61,9 +61,9 @@ describe Mongoid::Persistence do
 
         let(:item) do
           Item.create(
-            :title => "Some Title",
-            :is_rss => true,
-            :user_login => "SomeLogin"
+            title: "Some Title",
+            is_rss: true,
+            user_login: "SomeLogin"
           )
         end
 
@@ -84,9 +84,9 @@ describe Mongoid::Persistence do
 
         let(:item) do
           Item.create(
-            { :title => "Some Title",
-              :is_rss => true,
-              :user_login => "SomeLogin" }, :as => :parser
+            { title: "Some Title",
+              is_rss: true,
+              user_login: "SomeLogin" }, as: :parser
           )
         end
 
@@ -107,10 +107,10 @@ describe Mongoid::Persistence do
 
         let(:item) do
           Item.create(
-            { :title => "Some Title",
-              :is_rss => true,
-              :user_login => "SomeLogin"
-            }, :without_protection => true
+            { title: "Some Title",
+              is_rss: true,
+              user_login: "SomeLogin"
+            }, without_protection: true
           )
         end
 
@@ -140,12 +140,12 @@ describe Mongoid::Persistence do
         end
 
         let!(:person) do
-          Person.create!(:ssn => "555-55-9999")
+          Person.create!(ssn: "555-55-9999")
         end
 
         it "raises an error" do
           expect {
-            Person.create!(:ssn => "555-55-9999")
+            Person.create!(ssn: "555-55-9999")
           }.to raise_error
         end
       end
@@ -171,7 +171,7 @@ describe Mongoid::Persistence do
     context "when setting the composite key" do
 
       let(:account) do
-        Account.create!(:name => "Hello")
+        Account.create!(name: "Hello")
       end
 
       it "saves the document" do
@@ -192,9 +192,9 @@ describe Mongoid::Persistence do
 
         let(:item) do
           Item.create!(
-            :title => "Some Title",
-            :is_rss => true,
-            :user_login => "SomeLogin"
+            title: "Some Title",
+            is_rss: true,
+            user_login: "SomeLogin"
           )
         end
 
@@ -215,9 +215,9 @@ describe Mongoid::Persistence do
 
         let(:item) do
           Item.create!(
-            { :title => "Some Title",
-              :is_rss => true,
-              :user_login => "SomeLogin" }, :as => :parser
+            { title: "Some Title",
+              is_rss: true,
+              user_login: "SomeLogin" }, as: :parser
           )
         end
 
@@ -238,10 +238,10 @@ describe Mongoid::Persistence do
 
         let(:item) do
           Item.create!(
-            { :title => "Some Title",
-              :is_rss => true,
-              :user_login => "SomeLogin"
-            }, :without_protection => true
+            { title: "Some Title",
+              is_rss: true,
+              user_login: "SomeLogin"
+            }, without_protection: true
           )
         end
 
@@ -292,7 +292,7 @@ describe Mongoid::Persistence do
       context "when removing an embedded document" do
 
         let(:address) do
-          person.addresses.build(:street => "Bond Street")
+          person.addresses.build(street: "Bond Street")
         end
 
         context "when the document is not yet saved" do
@@ -336,11 +336,11 @@ describe Mongoid::Persistence do
         context "when the document has been saved" do
 
           let(:address) do
-            person.addresses.create(:street => "Bond Street")
+            person.addresses.create(street: "Bond Street")
           end
 
           let(:location) do
-            address.locations.create(:name => "Home")
+            address.locations.create(name: "Home")
           end
 
           let(:from_db) do
@@ -414,7 +414,7 @@ describe Mongoid::Persistence do
     context "when validation fails" do
 
       let(:address) do
-        person.addresses.create(:city => "London")
+        person.addresses.create(city: "London")
       end
 
       before do
@@ -431,15 +431,15 @@ describe Mongoid::Persistence do
       context "when performing modification and insert ops" do
 
         let(:person) do
-          Person.create(:title => "Blah")
+          Person.create(title: "Blah")
         end
 
         let!(:address) do
-          person.addresses.build(:street => "Bond St")
+          person.addresses.build(street: "Bond St")
         end
 
         let!(:name) do
-          person.create_name(:first_name => "Tony")
+          person.create_name(first_name: "Tony")
         end
 
         let(:from_db) do
@@ -483,21 +483,21 @@ describe Mongoid::Persistence do
 
         let!(:person) do
           Person.create(
-            :title => "Blah",
-            :addresses => [ address ]
+            title: "Blah",
+            addresses: [ address ]
           )
         end
 
         let!(:address) do
           Address.new(
-            :number => 101,
-            :street => 'South St',
-            :locations => [ location ]
+            number: 101,
+            street: 'South St',
+            locations: [ location ]
           )
         end
 
         let!(:location) do
-          Location.new(:name => 'Work')
+          Location.new(name: 'Work')
         end
 
         let(:from_db) do
@@ -506,7 +506,7 @@ describe Mongoid::Persistence do
 
         before do
           address.number = 102
-          person.addresses << Address.new(:street => "North Ave")
+          person.addresses << Address.new(street: "North Ave")
           person.save
         end
 
@@ -526,7 +526,7 @@ describe Mongoid::Persistence do
       context "when removing elements without using delete or destroy" do
 
         let!(:person) do
-          Person.create!(:title => "Blah")
+          Person.create!(title: "Blah")
         end
 
         let(:from_db) do
@@ -534,7 +534,7 @@ describe Mongoid::Persistence do
         end
 
         before do
-          person.create_name(:first_name => "Tony")
+          person.create_name(first_name: "Tony")
           person.name = nil
           person.save
         end
@@ -568,12 +568,12 @@ describe Mongoid::Persistence do
       context "when a unique index exists" do
 
         let(:person) do
-          Person.new(:ssn => "555-55-9999")
+          Person.new(ssn: "555-55-9999")
         end
 
         before do
           Person.create_indexes
-          Person.create!(:ssn => "555-55-9999")
+          Person.create!(ssn: "555-55-9999")
         end
 
         it "raises an error" do
@@ -589,7 +589,7 @@ describe Mongoid::Persistence do
       end
 
       let!(:service) do
-        Service.new(:person => person, :sid => "a")
+        Service.new(person: person, sid: "a")
       end
 
       it "raises an error with multiple save attempts" do
@@ -619,7 +619,7 @@ describe Mongoid::Persistence do
     context "when setting an array field" do
 
       let(:person) do
-        Person.create(:aliases => [])
+        Person.create(aliases: [])
       end
 
       before do
@@ -640,7 +640,7 @@ describe Mongoid::Persistence do
       context "when the field is true" do
 
         let(:person) do
-          Person.new(:terms => true)
+          Person.new(terms: true)
         end
 
         context "when setting to false" do
@@ -770,7 +770,7 @@ describe Mongoid::Persistence do
     context "when persisting a localized field" do
 
       let!(:product) do
-        Product.create(:description => "The bomb")
+        Product.create(description: "The bomb")
       end
 
       before do
@@ -802,11 +802,11 @@ describe Mongoid::Persistence do
       end
 
       let!(:address) do
-        person.addresses.create(:street => "Winterfeldtstr")
+        person.addresses.create(street: "Winterfeldtstr")
       end
 
       let!(:location) do
-        address.locations.create(:name => "work")
+        address.locations.create(name: "work")
       end
 
       let(:from_db) do
@@ -836,7 +836,7 @@ describe Mongoid::Persistence do
       end
 
       let(:params) do
-        [{:pets => false}, {:as => :default}]
+        [{pets: false}, {as: :default}]
       end
 
       it "accepts the additional parameter" do
@@ -860,7 +860,7 @@ describe Mongoid::Persistence do
 
       it "raises an error" do
         expect {
-          person.update_attributes(:map => { "bad.key" => "value" })
+          person.update_attributes(map: { "bad.key" => "value" })
         }.to raise_error(Mongo::OperationFailure)
       end
     end
@@ -872,7 +872,7 @@ describe Mongoid::Persistence do
       end
 
       let!(:saved) do
-        person.update_attributes(:pets => false)
+        person.update_attributes(pets: false)
       end
 
       let(:from_db) do
@@ -900,7 +900,7 @@ describe Mongoid::Persistence do
 
       it "raises an error" do
         expect {
-          person.update_attributes(:title => "something")
+          person.update_attributes(title: "something")
         }.to raise_error
       end
     end
@@ -912,12 +912,12 @@ describe Mongoid::Persistence do
       end
 
       let(:game) do
-        Game.create(:person => person)
+        Game.create(person: person)
       end
 
       before do
-        person.update_attributes!(:ssn => "444-44-4444")
-        game.person.update_attributes!(:ssn => "555-66-7777")
+        person.update_attributes!(ssn: "444-44-4444")
+        game.person.update_attributes!(ssn: "555-66-7777")
       end
 
       let(:from_db) do
@@ -936,7 +936,7 @@ describe Mongoid::Persistence do
       end
 
       before do
-        person.update_attributes(:pets => false, :title => nil)
+        person.update_attributes(pets: false, title: nil)
       end
 
       it "saves the new record" do
@@ -953,13 +953,13 @@ describe Mongoid::Persistence do
         end
 
         let!(:post) do
-          Post.create(:title => "Testing")
+          Post.create(title: "Testing")
         end
 
         context "when the relation has not yet been touched" do
 
           before do
-            post.update_attributes(:person => person)
+            post.update_attributes(person: person)
           end
 
           it "sets the instance of the relation" do
@@ -979,7 +979,7 @@ describe Mongoid::Persistence do
 
           before do
             person.posts
-            post.update_attributes(:person => person)
+            post.update_attributes(person: person)
           end
 
           it "sets the instance of the relation" do
@@ -1000,15 +1000,15 @@ describe Mongoid::Persistence do
     context "when in a deeply nested hierarchy" do
 
       let!(:person) do
-        Person.new(:title => "The Boss")
+        Person.new(title: "The Boss")
       end
 
       let!(:phone_number) do
-        Phone.new(:number => "123-456-7890")
+        Phone.new(number: "123-456-7890")
       end
 
       let!(:country_code) do
-        CountryCode.new(:code => 1)
+        CountryCode.new(code: 1)
       end
 
       before do
@@ -1033,7 +1033,7 @@ describe Mongoid::Persistence do
 
         before do
           phone.number = "098-765-4321"
-          phone.update_attributes(:number => "098-765-4321")
+          phone.update_attributes(number: "098-765-4321")
         end
 
         it "sets the new attributes" do
@@ -1063,7 +1063,7 @@ describe Mongoid::Persistence do
       end
 
       let(:params) do
-        [{:pets => false}, {:as => :default}]
+        [{pets: false}, {as: :default}]
       end
 
       it "accepts the additional parameter" do
@@ -1087,7 +1087,7 @@ describe Mongoid::Persistence do
 
       it "raises a callback error" do
         expect {
-          oscar.update_attributes!(:title => "The Grouch")
+          oscar.update_attributes!(title: "The Grouch")
         }.to raise_error(Mongoid::Errors::Callback)
       end
     end
@@ -1098,7 +1098,7 @@ describe Mongoid::Persistence do
     describe "##{method}" do
 
       let!(:person) do
-        Person.create(:title => "sir")
+        Person.create(title: "sir")
       end
 
       context "when no conditions are provided" do
@@ -1125,7 +1125,7 @@ describe Mongoid::Persistence do
         context "when in a conditions attribute" do
 
           let!(:removed) do
-            Person.send(method, :conditions => { :title => "sir" })
+            Person.send(method, conditions: { title: "sir" })
           end
 
           it "removes the matching documents" do
@@ -1140,7 +1140,7 @@ describe Mongoid::Persistence do
         context "when no conditions attribute provided" do
 
           let!(:removed) do
-            Person.send(method, :title => "sir")
+            Person.send(method, title: "sir")
           end
 
           it "removes the matching documents" do
@@ -1158,7 +1158,7 @@ describe Mongoid::Persistence do
   context "when a DateTime attribute is updated and persisted" do
 
     let(:user) do
-      User.create!(:last_login => 2.days.ago).tap do |u|
+      User.create!(last_login: 2.days.ago).tap do |u|
         u.last_login = DateTime.now
       end
     end
@@ -1175,7 +1175,7 @@ describe Mongoid::Persistence do
   context "when a Date attribute is persisted" do
 
     let(:user) do
-      User.create!(:account_expires => 2.years.from_now).tap do |u|
+      User.create!(account_expires: 2.years.from_now).tap do |u|
         u.account_expires = "2/2/2002".to_date
       end
     end
@@ -1198,7 +1198,7 @@ describe Mongoid::Persistence do
       end
 
       before do
-        Person.validates_numericality_of :blood_alcohol_content, :allow_blank => true
+        Person.validates_numericality_of :blood_alcohol_content, allow_blank: true
       end
 
       it "does not set the value" do
@@ -1257,7 +1257,7 @@ describe Mongoid::Persistence do
   context "when the document is a subclass of a root class" do
 
     let!(:browser) do
-      Browser.create(:version => 3, :name => "Test")
+      Browser.create(version: 3, name: "Test")
     end
 
     let(:collection) do
@@ -1265,7 +1265,7 @@ describe Mongoid::Persistence do
     end
 
     let(:attributes) do
-      collection.find({ :name => "Test"}, {}).first
+      collection.find({ name: "Test"}, {}).first
     end
 
     it "persists the versions" do
@@ -1284,7 +1284,7 @@ describe Mongoid::Persistence do
   context "when the document is a subclass of a subclass" do
 
     let!(:firefox) do
-      Firefox.create(:version => 2, :name => "Testy")
+      Firefox.create(version: 2, name: "Testy")
     end
 
     let(:collection) do
@@ -1292,11 +1292,11 @@ describe Mongoid::Persistence do
     end
 
     let(:attributes) do
-      collection.find({ :name => "Testy"}, {}).first
+      collection.find({ name: "Testy"}, {}).first
     end
 
     before do
-      Browser.create(:name => 'Safari', :version => '4.0.0')
+      Browser.create(name: 'Safari', version: '4.0.0')
     end
 
     it "persists the versions" do
@@ -1312,11 +1312,11 @@ describe Mongoid::Persistence do
     end
 
     it "returns the document when querying for superclass" do
-      Browser.where(:name => "Testy").first.should eq(firefox)
+      Browser.where(name: "Testy").first.should eq(firefox)
     end
 
     it "returns the document when querying for root class" do
-      Canvas.where(:name => "Testy").first.should eq(firefox)
+      Canvas.where(name: "Testy").first.should eq(firefox)
     end
 
     it 'returnss on of this subclasses if you find by _type' do
@@ -1327,19 +1327,19 @@ describe Mongoid::Persistence do
   context "when the document has associations" do
 
     let!(:firefox) do
-      Firefox.create(:name => "firefox")
+      Firefox.create(name: "firefox")
     end
 
     let!(:writer) do
-      HtmlWriter.new(:speed => 100)
+      HtmlWriter.new(speed: 100)
     end
 
     let!(:circle) do
-      Circle.new(:radius => 50)
+      Circle.new(radius: 50)
     end
 
     let!(:square) do
-      Square.new(:width => 300, :height => 150)
+      Square.new(width: 300, height: 150)
     end
 
     let(:from_db) do
@@ -1380,7 +1380,7 @@ describe Mongoid::Persistence do
   context "when the document is subclassed" do
 
     let!(:firefox) do
-      Firefox.create(:name => "firefox")
+      Firefox.create(name: "firefox")
     end
 
     it "finds the document with String args" do
@@ -1390,7 +1390,7 @@ describe Mongoid::Persistence do
     context "when querying for parent documents" do
 
       let(:canvas) do
-        Canvas.where(:name => "firefox").first
+        Canvas.where(name: "firefox").first
       end
 
       it "returns matching subclasses" do
@@ -1402,19 +1402,19 @@ describe Mongoid::Persistence do
   context "when deleting subclasses" do
 
     let!(:firefox) do
-      Firefox.create(:name => "firefox")
+      Firefox.create(name: "firefox")
     end
 
     let!(:firefox2) do
-      Firefox.create(:name => "firefox 2")
+      Firefox.create(name: "firefox 2")
     end
 
     let!(:browser) do
-      Browser.create(:name => "browser")
+      Browser.create(name: "browser")
     end
 
     let!(:canvas) do
-      Canvas.create(:name => "canvas")
+      Canvas.create(name: "canvas")
     end
 
     context "when deleting a single document" do
@@ -1459,7 +1459,7 @@ describe Mongoid::Persistence do
   context "when document is a subclass and its parent is an embedded document" do
 
     let!(:canvas) do
-      Canvas.create(:name => "canvas")
+      Canvas.create(name: "canvas")
     end
 
     before do

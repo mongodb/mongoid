@@ -241,7 +241,7 @@ module Mongoid #:nodoc
       # @since 2.1.0
       def replace_field(name, type)
         remove_defaults(name)
-        add_field(name, fields[name].options.merge(:type => type))
+        add_field(name, fields[name].options.merge(type: type))
       end
 
       # Convenience method for determining if we are using +BSON::ObjectIds+ as

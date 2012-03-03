@@ -9,16 +9,16 @@ describe Mongoid::Relations::Builders::Referenced::Many do
   describe "#build" do
 
     let(:criteria) do
-      stub(:klass => Post, :selector => { "person_id" => "" })
+      stub(klass: Post, selector: { "person_id" => "" })
     end
 
     let(:metadata) do
       stub_everything(
-        :klass => Post,
-        :name => :posts,
-        :foreign_key => "person_id",
-        :inverse_klass => Person,
-        :criteria => criteria
+        klass: Post,
+        name: :posts,
+        foreign_key: "person_id",
+        inverse_klass: Person,
+        criteria: criteria
       )
     end
 
@@ -53,12 +53,12 @@ describe Mongoid::Relations::Builders::Referenced::Many do
 
       let(:metadata) do
         stub_everything(
-          :klass => Post,
-          :name => :posts,
-          :foreign_key => "person_id",
-          :inverse_klass => Person,
-          :order => :rating.asc,
-          :criteria => criteria
+          klass: Post,
+          name: :posts,
+          foreign_key: "person_id",
+          inverse_klass: Person,
+          order: :rating.asc,
+          criteria: criteria
         )
       end
 
@@ -87,10 +87,10 @@ describe Mongoid::Relations::Builders::Referenced::Many do
 
       let(:metadata) do
         stub_everything(
-          :klass => Post,
-          :name => :posts,
-          :foreign_key => "person_id",
-          :inverse_klass => Person
+          klass: Post,
+          name: :posts,
+          foreign_key: "person_id",
+          inverse_klass: Person
         )
       end
 

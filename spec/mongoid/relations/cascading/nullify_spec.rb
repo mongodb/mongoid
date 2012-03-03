@@ -13,7 +13,7 @@ describe Mongoid::Relations::Cascading::Nullify do
     end
 
     let(:metadata) do
-      stub(:name => :posts)
+      stub(name: :posts)
     end
 
     let(:strategy) do

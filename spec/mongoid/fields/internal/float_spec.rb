@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Float do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Float)
+    described_class.instantiate(:test, type: Float)
   end
 
   describe "#deserialize" do

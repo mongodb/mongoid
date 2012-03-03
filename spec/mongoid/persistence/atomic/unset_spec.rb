@@ -7,7 +7,7 @@ describe Mongoid::Persistence::Atomic::Unset do
     context "when unsetting a field" do
 
       let(:person) do
-        Person.create(:age => 100)
+        Person.create(age: 100)
       end
 
       let!(:removed) do

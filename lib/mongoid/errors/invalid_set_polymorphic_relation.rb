@@ -31,7 +31,7 @@ module Mongoid #:nodoc
       # @example Create the error.
       #   InvalidSetPolymorphicRelation.new
       def initialize(name, klass, other_klass)
-        super(compose_message("invalid_set_polymorphic_relation", { :name => name, :klass => klass, :other_klass => other_klass }))
+        super(compose_message("invalid_set_polymorphic_relation", { name: name, klass: klass, other_klass: other_klass }))
       end
     end
   end

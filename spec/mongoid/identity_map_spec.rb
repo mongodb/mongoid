@@ -120,22 +120,22 @@ describe Mongoid::IdentityMap do
       context "when getting by selector" do
 
         let!(:post_one) do
-          Post.new(:person => person)
+          Post.new(person: person)
         end
 
         let!(:post_two) do
-          Post.new(:person => person)
+          Post.new(person: person)
         end
 
         context "when there are documents in the map" do
 
           before do
-            identity_map.set_many(post_one, :person_id => person.id)
-            identity_map.set_many(post_two, :person_id => person.id)
+            identity_map.set_many(post_one, person_id: person.id)
+            identity_map.set_many(post_two, person_id: person.id)
           end
 
           let(:documents) do
-            identity_map.get(Post, :person_id => person.id)
+            identity_map.get(Post, person_id: person.id)
           end
 
           it "returns the matching documents" do
@@ -146,7 +146,7 @@ describe Mongoid::IdentityMap do
         context "when there are no documents in the map" do
 
           let(:documents) do
-            identity_map.get(Post, :person_id => person.id)
+            identity_map.get(Post, person_id: person.id)
           end
 
           it "returns nil" do
@@ -202,7 +202,7 @@ describe Mongoid::IdentityMap do
     context "embedded class" do
 
       let!(:animal) do
-        circus = Circus.new(:animals => [ Animal.new(:name => "Lion") ])
+        circus = Circus.new(animals: [ Animal.new(name: "Lion") ])
         circus.animals.first
       end
 
@@ -439,22 +439,22 @@ describe Mongoid::IdentityMap do
     end
 
     let!(:post_one) do
-      Post.new(:person => person)
+      Post.new(person: person)
     end
 
     let!(:post_two) do
-      Post.new(:person => person)
+      Post.new(person: person)
     end
 
     context "when no documents exist for the selector" do
 
       let!(:set) do
-        identity_map.set_many(post_one, { :person_id => person.id })
-        identity_map.set_many(post_two, { :person_id => person.id })
+        identity_map.set_many(post_one, { person_id: person.id })
+        identity_map.set_many(post_two, { person_id: person.id })
       end
 
       let(:documents) do
-        identity_map[Post.collection_name][{ :person_id => person.id }]
+        identity_map[Post.collection_name][{ person_id: person.id }]
       end
 
       it "puts the documents in the map" do
@@ -470,17 +470,17 @@ describe Mongoid::IdentityMap do
     end
 
     let!(:post_one) do
-      Post.new(:person => person)
+      Post.new(person: person)
     end
 
     context "when no documents exist for the selector" do
 
       let!(:set) do
-        identity_map.set_one(post_one, { :person_id => person.id })
+        identity_map.set_one(post_one, { person_id: person.id })
       end
 
       let(:document) do
-        identity_map[Post.collection_name][{ :person_id => person.id }]
+        identity_map[Post.collection_name][{ person_id: person.id }]
       end
 
       it "puts the documents in the map" do

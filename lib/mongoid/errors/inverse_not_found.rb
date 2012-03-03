@@ -20,7 +20,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "inverse_not_found",
-            { :base => base, :name => name, :klass => klass, :inverse => inverse }
+            { base: base, name: name, klass: klass, inverse: inverse }
           )
         )
       end

@@ -7,7 +7,7 @@ describe Mongoid::Persistence::Atomic::Push do
     context "when the field exists" do
 
       let(:person) do
-        Person.create(:aliases => [ "007" ])
+        Person.create(aliases: [ "007" ])
       end
 
       let!(:pushed) do

@@ -7,7 +7,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
   end
 
   let(:address) do
-    Address.new(:street => "Strassmannstr.")
+    Address.new(street: "Strassmannstr.")
   end
 
   before do
@@ -51,7 +51,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
     context "when the document is embedded multiple levels" do
 
       let(:location) do
-        Location.new(:name => "home")
+        Location.new(name: "home")
       end
 
       before do
@@ -80,7 +80,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
     context "when the document is embedded multiple levels" do
 
       let(:location) do
-        Location.new(:name => "home")
+        Location.new(name: "home")
       end
 
       before do
@@ -113,7 +113,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
     context "when the document is embedded multiple levels" do
 
       let(:location) do
-        Location.new(:name => "home")
+        Location.new(name: "home")
       end
 
       before do

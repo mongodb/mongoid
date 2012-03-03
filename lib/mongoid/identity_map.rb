@@ -120,7 +120,7 @@ module Mongoid #:nodoc:
       delegate(*(
         Hash.public_instance_methods(false) +
         IdentityMap.public_instance_methods(false) <<
-        { :to => :"Mongoid::Threaded.identity_map" }
+        { to: :"Mongoid::Threaded.identity_map" }
       ))
     end
   end

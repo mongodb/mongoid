@@ -159,9 +159,9 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.1
       def optional(slave = false)
         ({
-          :pool_size => pool_size,
-          :logger => logger? ? Mongoid::Logger.new : nil,
-          :slave_ok => slave
+          pool_size: pool_size,
+          logger: logger? ? Mongoid::Logger.new : nil,
+          slave_ok: slave
         }).merge(self).reject { |k,v| PRIVATE_OPTIONS.include? k }.
           inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo} # mongo likes symbols
       end

@@ -3,7 +3,7 @@ class Augmentation
 
   field :name
 
-  embedded_in :player, :inverse_of => :augmentation
+  embedded_in :player, inverse_of: :augmentation
 
   after_build do
     self.name = "Infolink (#{player.frags})"

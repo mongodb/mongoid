@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::String do
 
   let(:field) do
-    described_class.instantiate(:test, :type => String, :vresioned => true)
+    described_class.instantiate(:test, type: String, vresioned: true)
   end
 
   describe "#deserialize" do
@@ -63,7 +63,7 @@ describe Mongoid::Fields::Internal::String do
     context "when the field is localized" do
 
       let(:field) do
-        described_class.instantiate(:test, :type => String, :localize => true)
+        described_class.instantiate(:test, type: String, localize: true)
       end
 
       it "returns true" do
@@ -84,7 +84,7 @@ describe Mongoid::Fields::Internal::String do
     context "when the field is versioned" do
 
       let(:field) do
-        described_class.instantiate(:test, :type => String, :versioned => true)
+        described_class.instantiate(:test, type: String, versioned: true)
       end
 
       it "returns true" do
@@ -95,7 +95,7 @@ describe Mongoid::Fields::Internal::String do
     context "when the versioning option is nil" do
 
       let(:field) do
-        described_class.instantiate(:test, :type => String)
+        described_class.instantiate(:test, type: String)
       end
 
       it "returns true" do
@@ -106,7 +106,7 @@ describe Mongoid::Fields::Internal::String do
     context "when the field is not versioned" do
 
       let(:field) do
-        described_class.instantiate(:test, :type => String, :versioned => false)
+        described_class.instantiate(:test, type: String, versioned: false)
       end
 
       it "returns false" do

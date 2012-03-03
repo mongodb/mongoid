@@ -6,7 +6,7 @@ module Mongoid # :nodoc:
     # contains everything you could ever possible want to know.
     class Metadata < Hash
 
-      delegate :foreign_key_default, :stores_foreign_key?, :to => :relation
+      delegate :foreign_key_default, :stores_foreign_key?, to: :relation
 
       # Returns the as option of the relation.
       #

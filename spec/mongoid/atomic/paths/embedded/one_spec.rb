@@ -7,7 +7,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
   end
 
   let(:name) do
-    Name.new(:first_name => "Syd")
+    Name.new(first_name: "Syd")
   end
 
   before do
@@ -51,11 +51,11 @@ describe Mongoid::Atomic::Paths::Embedded::One do
     context "when the document is embedded multiple levels" do
 
       let(:phone) do
-        Phone.new(:number => "404-555-1212")
+        Phone.new(number: "404-555-1212")
       end
 
       let(:country_code) do
-        CountryCode.new(:code => 1)
+        CountryCode.new(code: 1)
       end
 
       before do
@@ -85,11 +85,11 @@ describe Mongoid::Atomic::Paths::Embedded::One do
     context "when the document is embedded multiple levels" do
 
       let(:phone) do
-        Phone.new(:number => "404-555-1212")
+        Phone.new(number: "404-555-1212")
       end
 
       let(:country_code) do
-        CountryCode.new(:code => 1)
+        CountryCode.new(code: 1)
       end
 
       before do
@@ -120,11 +120,11 @@ describe Mongoid::Atomic::Paths::Embedded::One do
     context "when the document is embedded multiple levels" do
 
       let(:phone) do
-        Phone.new(:number => "404-555-1212")
+        Phone.new(number: "404-555-1212")
       end
 
       let(:country_code) do
-        CountryCode.new(:code => 1)
+        CountryCode.new(code: 1)
       end
 
       before do

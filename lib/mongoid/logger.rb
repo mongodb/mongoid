@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
       :error,
       :fatal,
       :level,
-      :unknown, :to => :logger, :allow_nil => true
+      :unknown, to: :logger, allow_nil: true
 
     # Emit a warning log message.
     #

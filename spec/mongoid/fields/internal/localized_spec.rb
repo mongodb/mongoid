@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Localized do
 
   let(:field) do
-    described_class.instantiate(:description, :localize => true)
+    described_class.instantiate(:description, localize: true)
   end
 
   context "when no default is provided" do
@@ -18,8 +18,8 @@ describe Mongoid::Fields::Internal::Localized do
     let(:field) do
       described_class.instantiate(
         :description,
-        :localize => true,
-        :default => "No translation"
+        localize: true,
+        default: "No translation"
       )
     end
 

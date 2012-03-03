@@ -1,6 +1,6 @@
 class Oscar
   include Mongoid::Document
-  field :title, :type => String
+  field :title, type: String
   before_save :complain
 
   def complain

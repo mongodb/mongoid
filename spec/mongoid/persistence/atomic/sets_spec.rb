@@ -5,7 +5,7 @@ describe Mongoid::Persistence::Atomic::Sets do
   describe "#set" do
 
     let(:person) do
-      Person.create(:age => 100, :pets => true)
+      Person.create(age: 100, pets: true)
     end
 
     let(:reloaded) do
@@ -15,7 +15,7 @@ describe Mongoid::Persistence::Atomic::Sets do
     context "when setting a field on an embedded document" do
 
       let(:address) do
-        person.addresses.create(:street => "Tauentzienstr", :number => 5)
+        person.addresses.create(street: "Tauentzienstr", number: 5)
       end
 
       let!(:set) do

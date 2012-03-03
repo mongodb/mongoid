@@ -215,7 +215,7 @@ describe Mongoid::Criterion::Scoping do
     context "when a default scope exists" do
 
       let(:criteria) do
-        Band.where(:name => "Depeche Mode")
+        Band.where(name: "Depeche Mode")
       end
 
       before do
@@ -231,7 +231,7 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "allows the default scope to be added" do
-        scoped.selector.should eq({ :name => "Depeche Mode" })
+        scoped.selector.should eq({ name: "Depeche Mode" })
       end
 
       it "flags as scoped" do
@@ -245,7 +245,7 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "reapplies the default scope" do
-          scoped.selector.should eq({ :name => "Depeche Mode" })
+          scoped.selector.should eq({ name: "Depeche Mode" })
         end
       end
     end
@@ -292,7 +292,7 @@ describe Mongoid::Criterion::Scoping do
     end
 
     let(:criteria) do
-      Band.where(:name => "Depeche Mode")
+      Band.where(name: "Depeche Mode")
     end
 
     before do

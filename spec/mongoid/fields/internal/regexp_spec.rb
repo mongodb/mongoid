@@ -18,7 +18,7 @@ describe Mongoid::Fields::Internal::Regexp do
     context "when the default value is a proc" do
 
       let(:field) do
-        described_class.instantiate(:test, :default => lambda { /[^abc]/ })
+        described_class.instantiate(:test, default: ->{ /[^abc]/ })
       end
 
       it "returns the called proc" do
@@ -29,7 +29,7 @@ describe Mongoid::Fields::Internal::Regexp do
     context "when the default value is not a proc" do
 
       let(:field) do
-        described_class.instantiate(:test, :default => /[^abc]/)
+        described_class.instantiate(:test, default: /[^abc]/)
       end
 
       it "returns the default value" do
@@ -56,7 +56,7 @@ describe Mongoid::Fields::Internal::Regexp do
   describe "#initialize" do
 
     let(:field) do
-      described_class.instantiate(:test, :type => Regexp, :label => "test")
+      described_class.instantiate(:test, type: Regexp, label: "test")
     end
 
     it "sets the name" do
@@ -68,7 +68,7 @@ describe Mongoid::Fields::Internal::Regexp do
     end
 
     it "sets the options" do
-      field.options.should eq({ :type => Regexp, :label => "test" })
+      field.options.should eq({ type: Regexp, label: "test" })
     end
   end
 
@@ -157,7 +157,7 @@ describe Mongoid::Fields::Internal::Regexp do
   pending "when persisting the value" do
 
     let(:person) do
-      Person.create(:pattern => /[^a]/)
+      Person.create(pattern: /[^a]/)
     end
 
     it "saves the value to the database" do

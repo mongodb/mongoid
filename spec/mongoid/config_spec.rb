@@ -132,7 +132,7 @@ describe Mongoid::Config do
       end
     end
 
-    context "when configuring with mongohq", :config => :mongohq do
+    context "when configuring with mongohq", config: :mongohq do
 
       let(:settings) do
         YAML.load(ERB.new(File.new(mongohq_config).read).result)
@@ -246,7 +246,7 @@ describe Mongoid::Config do
     context "when passed a bad filename" do
 
       it "raises an error" do
-        lambda { subject.load!("foo") }.should raise_error
+        expect { subject.load!("foo") }.should raise_error
       end
     end
   end
@@ -384,7 +384,7 @@ describe Mongoid::Config do
   describe ".option" do
 
     before(:all) do
-      Mongoid::Config.option(:test_setting, :default => true)
+      Mongoid::Config.option(:test_setting, default: true)
     end
 
     it "creates a getter for the option" do
@@ -407,7 +407,7 @@ describe Mongoid::Config do
   describe ".purge!" do
 
     before do
-      Post.create(:title => "testing")
+      Post.create(title: "testing")
     end
 
     context "when no collection name is provided" do

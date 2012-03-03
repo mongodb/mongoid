@@ -313,11 +313,11 @@ describe Mongoid::Relations::Embedded::In do
         end
 
         let(:address_one) do
-          Address.new(:street => "first")
+          Address.new(street: "first")
         end
 
         let(:address_two) do
-          Address.new(:street => "second")
+          Address.new(street: "second")
         end
 
         before do
@@ -408,7 +408,7 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let!(:name) do
-      person.build_name(:first_name => "Tony")
+      person.build_name(first_name: "Tony")
     end
 
     let(:document) do
@@ -449,15 +449,15 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let!(:address) do
-      Address.create(:addressable => person)
+      Address.create(addressable: person)
     end
 
     let!(:first_location) do
-      Location.create(:address => address)
+      Location.create(address: address)
     end
 
     let!(:second_location) do
-      Location.create(:address => address)
+      Location.create(address: address)
     end
 
     it "saves the child" do
@@ -490,11 +490,11 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let!(:address) do
-      Address.new(:addressable => person)
+      Address.new(addressable: person)
     end
 
     let!(:location) do
-      Location.new(:address => address)
+      Location.new(address: address)
     end
 
     it "does not save the child" do
@@ -517,11 +517,11 @@ describe Mongoid::Relations::Embedded::In do
     end
 
     let!(:address) do
-      person.addresses.create(:street => "Kotbusser Damm")
+      person.addresses.create(street: "Kotbusser Damm")
     end
 
     let!(:name) do
-      person_two.create_name(:first_name => "Syd")
+      person_two.create_name(first_name: "Syd")
     end
 
     before do

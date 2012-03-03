@@ -18,7 +18,7 @@ describe Mongoid::Matchers::Or do
 
         let(:matches) do
           matcher.matches?(
-            [ { :title => "Sir" }, { :title => "King" } ]
+            [ { title: "Sir" }, { title: "King" } ]
           )
         end
 
@@ -46,8 +46,8 @@ describe Mongoid::Matchers::Or do
         let(:matches) do
           matcher.matches?(
             [
-              { :title => { "$in" => [ "Sir", "Madam" ] } },
-              { :title => "King" }
+              { title: { "$in" => [ "Sir", "Madam" ] } },
+              { title: "King" }
             ]
           )
         end
@@ -66,8 +66,8 @@ describe Mongoid::Matchers::Or do
         let(:matches) do
           matcher.matches?(
             [
-              { :title => { "$in" => [ "Prince", "Madam" ] } },
-              { :title => "King" }
+              { title: { "$in" => [ "Prince", "Madam" ] } },
+              { title: "King" }
             ]
           )
         end
@@ -86,8 +86,8 @@ describe Mongoid::Matchers::Or do
         let(:matches) do
           matcher.matches?(
             [
-              { :title => "Sir", :age => 23 },
-              { :title => "King", :age => 100 }
+              { title: "Sir", age: 23 },
+              { title: "King", age: 100 }
             ]
           )
         end

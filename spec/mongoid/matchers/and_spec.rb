@@ -19,7 +19,7 @@ describe Mongoid::Matchers::And do
         context "when the value matches" do
 
           let(:matches) do
-            matcher.matches?([ { :title => "Sir" } ])
+            matcher.matches?([ { title: "Sir" } ])
           end
 
           before do
@@ -34,7 +34,7 @@ describe Mongoid::Matchers::And do
         context "when the value does not match" do
 
           let(:matches) do
-            matcher.matches?([ { :title => "Sir" } ])
+            matcher.matches?([ { title: "Sir" } ])
           end
 
           it "returns false" do
@@ -49,7 +49,7 @@ describe Mongoid::Matchers::And do
 
           let(:matches) do
             matcher.matches?(
-              [ { :title => "Sir" }, { :_id => person.id } ]
+              [ { title: "Sir" }, { _id: person.id } ]
             )
           end
 
@@ -66,7 +66,7 @@ describe Mongoid::Matchers::And do
 
           let(:matches) do
             matcher.matches?(
-              [ { :title => "Sir" }, { :_id => BSON::ObjectId.new } ]
+              [ { title: "Sir" }, { _id: BSON::ObjectId.new } ]
             )
           end
 
@@ -99,8 +99,8 @@ describe Mongoid::Matchers::And do
         let(:matches) do
           matcher.matches?(
             [
-              { :title => { "$in" => [ "Sir", "Madam" ] } },
-              { :_id => person.id }
+              { title: { "$in" => [ "Sir", "Madam" ] } },
+              { _id: person.id }
             ]
           )
         end
@@ -119,8 +119,8 @@ describe Mongoid::Matchers::And do
         let(:matches) do
           matcher.matches?(
             [
-              { :title => { "$in" => [ "Prince", "Madam" ] } },
-              { :_id => BSON::ObjectId.new }
+              { title: { "$in" => [ "Prince", "Madam" ] } },
+              { _id: BSON::ObjectId.new }
             ]
           )
         end
@@ -141,8 +141,8 @@ describe Mongoid::Matchers::And do
           let(:matches) do
             matcher.matches?(
               [
-                { :title => "Sir", :age => 23 },
-                { :_id => person.id }
+                { title: "Sir", age: 23 },
+                { _id: person.id }
               ]
             )
           end

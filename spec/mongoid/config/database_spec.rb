@@ -30,7 +30,7 @@ describe Mongoid::Config::Database do
 
       context "when provided a uri" do
 
-        context "when the uri is on mongohq", :config => :mongohq do
+        context "when the uri is on mongohq", config: :mongohq do
 
           let(:mongohq_user) do
             ENV["MONGOHQ_USER_MONGOID"]

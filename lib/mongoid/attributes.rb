@@ -173,7 +173,7 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def write_attributes(attrs = nil, guard_protected_attributes = true)
-      assign_attributes(attrs, :without_protection => !guard_protected_attributes)
+      assign_attributes(attrs, without_protection: !guard_protected_attributes)
     end
     alias :attributes= :write_attributes
 

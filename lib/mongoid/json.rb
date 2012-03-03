@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
     # similar to +ActiveRecord+.
     included do
       undef_method :include_root_in_json
-      delegate :include_root_in_json, :to => ::Mongoid
+      delegate :include_root_in_json, to: ::Mongoid
     end
   end
 end

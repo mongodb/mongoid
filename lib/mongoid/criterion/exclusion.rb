@@ -20,7 +20,7 @@ module Mongoid #:nodoc:
       # @return [ Criteria ] A newly cloned copy.
       def excludes(attributes = {})
         mongo_id = attributes.delete(:id)
-        attributes = attributes.merge(:_id => mongo_id) if mongo_id
+        attributes = attributes.merge(_id: mongo_id) if mongo_id
         update_selector(attributes, "$ne")
       end
 
@@ -71,7 +71,7 @@ module Mongoid #:nodoc:
       def only(*args)
         clone.tap do |crit|
           if args.any?
-            crit.options[:fields] = {:_type => 1}
+            crit.options[:fields] = {_type: 1}
             crit.field_list = args.flatten
             crit.field_list.each do |f|
               crit.options[:fields][f] = 1

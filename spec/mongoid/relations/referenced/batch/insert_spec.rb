@@ -9,11 +9,11 @@ describe Mongoid::Relations::Referenced::Batch::Insert do
     end
 
     let(:document) do
-      { :field => "value" }
+      { field: "value" }
     end
 
     let(:options) do
-      { :safe => true }
+      { safe: true }
     end
 
     before do

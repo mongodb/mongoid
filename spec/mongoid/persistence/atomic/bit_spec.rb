@@ -5,7 +5,7 @@ describe Mongoid::Persistence::Atomic::Bit do
   describe "#bit" do
 
     let(:person) do
-      Person.create(:age => 60)
+      Person.create(age: 60)
     end
 
     let(:reloaded) do
@@ -15,7 +15,7 @@ describe Mongoid::Persistence::Atomic::Bit do
     context "when performing a bitwise and" do
 
       let!(:bit) do
-        person.bit(:age, { :and => 13 })
+        person.bit(:age, { and: 13 })
       end
 
       it "performs the bitwise operation" do
@@ -38,7 +38,7 @@ describe Mongoid::Persistence::Atomic::Bit do
     context "when performing a bitwise or" do
 
       let!(:bit) do
-        person.bit(:age, { :or => 13 })
+        person.bit(:age, { or: 13 })
       end
 
       it "performs the bitwise operation" do

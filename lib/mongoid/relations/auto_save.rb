@@ -60,7 +60,7 @@ module Mongoid # :nodoc:
         def autosave(metadata)
           if metadata.autosave? && autosavable?(metadata)
             autosaved_relations.push(metadata.name)
-            set_callback :save, :after, :unless => :autosaved? do |document|
+            set_callback :save, :after, unless: :autosaved? do |document|
               begin_autosave
               relation = document.send(metadata.name)
               if relation

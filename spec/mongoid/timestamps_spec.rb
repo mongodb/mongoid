@@ -57,7 +57,7 @@ describe Mongoid::Timestamps do
   context "when the document has changed with updated_at specified" do
 
     let(:document) do
-      Dokument.new(:created_at => Time.now.utc)
+      Dokument.new(created_at: Time.now.utc)
     end
 
     before do
@@ -85,11 +85,11 @@ describe Mongoid::Timestamps do
   context "when only embedded documents have changed" do
 
     let!(:document) do
-      Dokument.create(:updated_at => 2.days.ago)
+      Dokument.create(updated_at: 2.days.ago)
     end
 
     let!(:address) do
-      document.addresses.create(:street => "Karl Marx Strasse")
+      document.addresses.create(street: "Karl Marx Strasse")
     end
 
     let!(:updated_at) do

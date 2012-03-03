@@ -90,7 +90,7 @@ describe Mongoid::Relations do
     context "when the document is not in an embeds_many" do
 
       let(:name) do
-        person.build_name(:first_name => "Test")
+        person.build_name(first_name: "Test")
       end
 
       it "returns false" do
@@ -108,7 +108,7 @@ describe Mongoid::Relations do
     context "when the document is in an embeds_one" do
 
       let(:name) do
-        person.build_name(:first_name => "Test")
+        person.build_name(first_name: "Test")
       end
 
       it "returns true" do
@@ -148,7 +148,7 @@ describe Mongoid::Relations do
     context "when the document is not in an references_many" do
 
       let(:game) do
-        person.build_game(:score => 1)
+        person.build_game(score: 1)
       end
 
       it "returns false" do
@@ -166,7 +166,7 @@ describe Mongoid::Relations do
     context "when the document is in an references_one" do
 
       let(:game) do
-        person.build_game(:score => 1)
+        person.build_game(score: 1)
       end
 
       it "returns true" do

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Fields::Internal::Array do
 
   let(:field) do
-    described_class.instantiate(:test, :type => Array)
+    described_class.instantiate(:test, type: Array)
   end
 
   describe "#add_atomic_changes" do
@@ -62,8 +62,8 @@ describe Mongoid::Fields::Internal::Array do
       let(:field) do
         described_class.instantiate(
           :test,
-          :type => Array,
-          :default => lambda { [ "test" ] }
+          type: Array,
+          default: ->{ [ "test" ] }
         )
       end
 
@@ -81,8 +81,8 @@ describe Mongoid::Fields::Internal::Array do
       let(:field) do
         described_class.instantiate(
           :test,
-          :type => Array,
-          :default => default
+          type: Array,
+          default: default
         )
       end
 

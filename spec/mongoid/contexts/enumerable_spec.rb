@@ -7,23 +7,23 @@ describe Mongoid::Contexts::Enumerable do
   end
 
   let(:london) do
-    Address.new(:number => 1, :street => "Bond Street")
+    Address.new(number: 1, street: "Bond Street")
   end
 
   let(:shanghai) do
-    Address.new(:number => 10, :street => "Nan Jing Dong Lu")
+    Address.new(number: 10, street: "Nan Jing Dong Lu")
   end
 
   let(:melbourne) do
-    Address.new(:number => 20, :street => "Bourke Street")
+    Address.new(number: 20, street: "Bourke Street")
   end
 
   let(:new_york) do
-    Address.new(:number => 20, :street => "Broadway")
+    Address.new(number: 20, street: "Broadway")
   end
 
   let(:berlin) do
-    Address.new(:street => "Hobrechtstr")
+    Address.new(street: "Hobrechtstr")
   end
 
   let(:docs) do
@@ -86,7 +86,7 @@ describe Mongoid::Contexts::Enumerable do
     context "when the criteria is limited" do
 
       before do
-        context.criteria = criteria.where(:street => "Bourke Street")
+        context.criteria = criteria.where(street: "Bourke Street")
       end
 
       it "returns an array of distinct values for the field" do
@@ -116,7 +116,7 @@ describe Mongoid::Contexts::Enumerable do
     context "when the selector is present" do
 
       before do
-        context.criteria = criteria.where(:street => "Bourke Street")
+        context.criteria = criteria.where(street: "Bourke Street")
       end
 
       it "returns the matching documents from the array" do
@@ -170,7 +170,7 @@ describe Mongoid::Contexts::Enumerable do
     context "when a selector is present" do
 
       before do
-        context.criteria = criteria.where(:street => "Bourke Street")
+        context.criteria = criteria.where(street: "Bourke Street")
       end
 
       it "returns the first that matches the selector" do
@@ -209,11 +209,11 @@ describe Mongoid::Contexts::Enumerable do
   describe ".initialize" do
 
     let(:selector) do
-      { :field => "value"  }
+      { field: "value"  }
     end
 
     let(:options) do
-      { :skip => 20 }
+      { skip: 20 }
     end
 
     let(:documents) do
@@ -248,7 +248,7 @@ describe Mongoid::Contexts::Enumerable do
   describe "#iterate" do
 
     let(:crit) do
-      criteria.where(:street => "Bourke Street")
+      criteria.where(street: "Bourke Street")
     end
 
     let(:context) do
@@ -273,12 +273,12 @@ describe Mongoid::Contexts::Enumerable do
   describe "#limit" do
 
     let(:person) do
-      Person.new(:title => "Sir").tap do |person|
+      Person.new(title: "Sir").tap do |person|
         10.times do |n|
           post_code = n % 3 == 0 ? 32250 : 60661
           person.addresses.push(
             Address.new(
-              :number => n, :post_code => post_code, :street => "Upper Street #{n}"
+              number: n, post_code: post_code, street: "Upper Street #{n}"
             )
           )
         end
@@ -295,7 +295,7 @@ describe Mongoid::Contexts::Enumerable do
     context "when the selector is present" do
 
       let(:crit) do
-        criteria.where(:street => "Bourke Street")
+        criteria.where(street: "Bourke Street")
       end
 
       let(:context) do
@@ -327,7 +327,7 @@ describe Mongoid::Contexts::Enumerable do
     context "when the selector is present" do
 
       let(:crit) do
-        criteria.where(:street => "Bourke Street")
+        criteria.where(street: "Bourke Street")
       end
 
       let(:context) do
@@ -343,12 +343,12 @@ describe Mongoid::Contexts::Enumerable do
   describe "#order_by" do
 
     let(:person) do
-      Person.new(:title => "Sir").tap do |person|
+      Person.new(title: "Sir").tap do |person|
         10.times do |n|
           post_code = n % 3 == 0 ? 32250 : 60661
           person.addresses.push(
             Address.new(
-              :number => n, :post_code => post_code, :street => "Upper Street #{n}"
+              number: n, post_code: post_code, street: "Upper Street #{n}"
             )
           )
         end
@@ -398,12 +398,12 @@ describe Mongoid::Contexts::Enumerable do
   describe "#shift" do
 
     let(:person) do
-      Person.new(:title => "Sir").tap do |person|
+      Person.new(title: "Sir").tap do |person|
         10.times do |n|
           post_code = n % 3 == 0 ? 32250 : 60661
           person.addresses.push(
             Address.new(
-              :number => n, :post_code => post_code, :street => "Upper Street #{n}"
+              number: n, post_code: post_code, street: "Upper Street #{n}"
             )
           )
         end
@@ -433,12 +433,12 @@ describe Mongoid::Contexts::Enumerable do
   describe "#skip" do
 
     let(:person) do
-      Person.new(:title => "Sir").tap do |person|
+      Person.new(title: "Sir").tap do |person|
         10.times do |n|
           post_code = n % 3 == 0 ? 32250 : 60661
           person.addresses.push(
             Address.new(
-              :number => n, :post_code => post_code, :street => "Upper Street #{n}"
+              number: n, post_code: post_code, street: "Upper Street #{n}"
             )
           )
         end
@@ -475,7 +475,7 @@ describe Mongoid::Contexts::Enumerable do
     context "with localized field" do
 
       before do
-        Address.field(:street, :localize => true)
+        Address.field(:street, localize: true)
         context.options[:sort] = [ [:"street.#{::I18n.locale}", :asc] ]
       end
 

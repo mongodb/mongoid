@@ -72,7 +72,7 @@ describe Mongoid::Relations::Embedded::Many do
           context "when the document does not match the scope" do
 
             let(:inactive) do
-              Appointment.new(:active => false)
+              Appointment.new(active: false)
             end
 
             before do
@@ -184,11 +184,11 @@ describe Mongoid::Relations::Embedded::Many do
         context "when the parent is not a new record" do
 
           let(:parent_role) do
-            Role.create(:name => "CEO")
+            Role.create(name: "CEO")
           end
 
           let(:child_role) do
-            Role.new(:name => "COO")
+            Role.new(name: "COO")
           end
 
           before do
@@ -280,15 +280,15 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         let!(:address) do
-          person.addresses.create(:street => "Alt Treptow")
+          person.addresses.create(street: "Alt Treptow")
         end
 
         let!(:new_address) do
-          Address.new(:street => "Tempelhofer Damm")
+          Address.new(street: "Tempelhofer Damm")
         end
 
         before do
-          person.update_attributes(:set_addresses => [ new_address ])
+          person.update_attributes(set_addresses: [ new_address ])
         end
 
         it "overwrites the existing addresses" do
@@ -299,7 +299,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when setting via the parent attributes" do
 
         before do
-          person.attributes = { :addresses => [ address ] }
+          person.attributes = { addresses: [ address ] }
         end
 
         it "sets the relation" do
@@ -313,7 +313,7 @@ describe Mongoid::Relations::Embedded::Many do
         context "when setting the relation multiple times" do
 
           let(:address_two) do
-            Address.new(:street => "kudamm")
+            Address.new(street: "kudamm")
           end
 
           before do
@@ -347,7 +347,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           let(:address_one) do
-            Address.new(:street => "tauentzien")
+            Address.new(street: "tauentzien")
           end
 
           before do
@@ -366,7 +366,7 @@ describe Mongoid::Relations::Embedded::Many do
           context "when setting the relation multiple times" do
 
             let(:address_two) do
-              Address.new(:street => "kudamm")
+              Address.new(street: "kudamm")
             end
 
             before do
@@ -389,14 +389,14 @@ describe Mongoid::Relations::Embedded::Many do
     context "when replacing an existing relation" do
 
       let(:person) do
-        Person.create(:addresses => [
-          Address.new(:street => "1st St"),
-          Address.new(:street => "2nd St")
+        Person.create(addresses: [
+          Address.new(street: "1st St"),
+          Address.new(street: "2nd St")
         ])
       end
 
       let(:address) do
-        Address.new(:street => "3rd St")
+        Address.new(street: "3rd St")
       end
 
       before do
@@ -418,16 +418,16 @@ describe Mongoid::Relations::Embedded::Many do
             store_in :tracking_ids
             embeds_many \
               :validation_history,
-              :class_name => "MyCompany::Model::TrackingIdValidationHistory"
+              class_name: "MyCompany::Model::TrackingIdValidationHistory"
           end
 
           class TrackingIdValidationHistory
             include Mongoid::Document
-            field :old_state, :type => String
-            field :new_state, :type => String
-            field :when_changed, :type => DateTime
+            field :old_state, type: String
+            field :new_state, type: String
+            field :when_changed, type: DateTime
             attr_protected :_id
-            embedded_in :tracking_id, :class_name => "MyCompany::Model::TrackingId"
+            embedded_in :tracking_id, class_name: "MyCompany::Model::TrackingId"
           end
         end
       end
@@ -437,7 +437,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let(:history) do
-        MyCompany::Model::TrackingIdValidationHistory.new(:old_state => "Test")
+        MyCompany::Model::TrackingIdValidationHistory.new(old_state: "Test")
       end
 
       before do
@@ -460,14 +460,14 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the relation has address in the name" do
 
       let(:slave) do
-        Slave.new(:first_name => "Test")
+        Slave.new(first_name: "Test")
       end
 
       before do
         ActiveSupport::Inflector.inflections do |inflect|
           inflect.singular("address_numbers", "address_number")
         end
-        slave.address_numbers << AddressNumber.new(:country_code => 1)
+        slave.address_numbers << AddressNumber.new(country_code: 1)
         slave.save
       end
 
@@ -483,11 +483,11 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let!(:address_one) do
-        person.addresses.create(:street => "Tauentzienstr")
+        person.addresses.create(street: "Tauentzienstr")
       end
 
       let!(:address_two) do
-        person.addresses.create(:street => "Kudamm")
+        person.addresses.create(street: "Kudamm")
       end
 
       let(:attributes) do
@@ -559,7 +559,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the parent is not a new record" do
 
         let(:parent_role) do
-          Role.create(:name => "CTO")
+          Role.create(name: "CTO")
         end
 
         let(:child_role) do
@@ -662,7 +662,7 @@ describe Mongoid::Relations::Embedded::Many do
 
           before do
             person.addresses = [ address ]
-            person.attributes = { :addresses => nil }
+            person.attributes = { addresses: nil }
           end
 
           it "sets the relation to empty" do
@@ -796,7 +796,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the relation has no default scope" do
 
       let!(:address) do
-        person.addresses.create(:street => "one")
+        person.addresses.create(street: "one")
       end
 
       let(:document) do
@@ -813,11 +813,11 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the default scope sorts" do
 
         let(:cough) do
-          Symptom.new(:name => "cough")
+          Symptom.new(name: "cough")
         end
 
         let(:headache) do
-          Symptom.new(:name => "headache")
+          Symptom.new(name: "headache")
         end
 
         before do
@@ -840,7 +840,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         let(:inactive) do
-          Appointment.new(:active => false)
+          Appointment.new(active: false)
         end
 
         before do
@@ -865,11 +865,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new(:number => 5)
+      Address.new(number: 5)
     end
 
     let(:address_two) do
-      Address.new(:number => 10)
+      Address.new(number: 10)
     end
 
     before do
@@ -898,7 +898,7 @@ describe Mongoid::Relations::Embedded::Many do
         let(:video) do
           person.videos.send(
             method,
-            { :title => "Inception", :year => 1999 }, :as => :admin
+            { title: "Inception", year: 1999 }, as: :admin
           )
         end
 
@@ -918,7 +918,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         let(:address) do
-          person.addresses.send(method, :street => "Bond") do |address|
+          person.addresses.send(method, street: "Bond") do |address|
             address.state = "CA"
           end
         end
@@ -967,7 +967,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         let(:child_role) do
-          parent_role.child_roles.send(method, :name => "CTO")
+          parent_role.child_roles.send(method, name: "CTO")
         end
 
         it "appends to the target" do
@@ -1008,8 +1008,8 @@ describe Mongoid::Relations::Embedded::Many do
         let(:address) do
           person.addresses.send(
             method,
-            :street => "Bond",
-            :locations_attributes => { "1" => { "name" => "Home" } }
+            street: "Bond",
+            locations_attributes: { "1" => { "name" => "Home" } }
           )
         end
 
@@ -1070,7 +1070,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the children are persisted" do
 
         let!(:address) do
-          person.addresses.create(:street => "High St")
+          person.addresses.create(street: "High St")
         end
 
         let!(:relation) do
@@ -1101,7 +1101,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the children are not persisted" do
 
         let!(:address) do
-          person.addresses.build(:street => "High St")
+          person.addresses.build(street: "High St")
         end
 
         let!(:relation) do
@@ -1121,7 +1121,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let!(:address) do
-        person.addresses.build(:street => "High St")
+        person.addresses.build(street: "High St")
       end
 
       let!(:relation) do
@@ -1277,11 +1277,11 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the parent is not a new record" do
 
         let(:parent_role) do
-          Role.create(:name => "CEO")
+          Role.create(name: "CEO")
         end
 
         let(:child_role) do
-          Role.new(:name => "COO")
+          Role.new(name: "COO")
         end
 
         before do
@@ -1302,8 +1302,8 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     before do
-      person.addresses.create(:street => "Upper")
-      person.addresses.build(:street => "Bond")
+      person.addresses.create(street: "Upper")
+      person.addresses.build(street: "Bond")
     end
 
     it "returns the number of persisted documents" do
@@ -1321,7 +1321,7 @@ describe Mongoid::Relations::Embedded::Many do
 
       let(:video) do
         person.videos.create(
-          { :title => "Inception", :year => 1999 }, :as => :admin
+          { title: "Inception", year: 1999 }, as: :admin
         )
       end
 
@@ -1341,7 +1341,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let!(:address) do
-        person.addresses.create(:street => "Bond") do |address|
+        person.addresses.create(street: "Bond") do |address|
           address.state = "CA"
         end
       end
@@ -1385,7 +1385,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when embedding a multi word named document" do
 
         let!(:component) do
-          person.address_components.create(:street => "Test")
+          person.address_components.create(street: "Test")
         end
 
         it "saves the embedded document" do
@@ -1397,11 +1397,11 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the relation is cyclic" do
 
       let!(:entry) do
-        Entry.create(:title => "hi")
+        Entry.create(title: "hi")
       end
 
       let!(:child_entry) do
-        entry.child_entries.create(:title => "hello")
+        entry.child_entries.create(title: "hello")
       end
 
       it "creates a new child" do
@@ -1420,7 +1420,7 @@ describe Mongoid::Relations::Embedded::Many do
 
       let(:video) do
         person.videos.create!(
-          { :title => "Inception", :year => 1999 }, :as => :admin
+          { title: "Inception", year: 1999 }, as: :admin
         )
       end
 
@@ -1436,7 +1436,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when validation passes" do
 
       let(:address) do
-        person.addresses.create!(:street => "Bond")
+        person.addresses.create!(street: "Bond")
       end
 
       it "appends to the target" do
@@ -1476,7 +1476,7 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "raises an error" do
         expect {
-          person.addresses.create!(:street => "1")
+          person.addresses.create!(street: "1")
         }.to raise_error(Mongoid::Errors::Validations)
       end
     end
@@ -1489,11 +1489,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new(:street => "first")
+      Address.new(street: "first")
     end
 
     let(:address_two) do
-      Address.new(:street => "second")
+      Address.new(street: "second")
     end
 
     before do
@@ -1542,11 +1542,11 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the documents are new" do
 
         let!(:address_one) do
-          person.addresses.build(:street => "Bond")
+          person.addresses.build(street: "Bond")
         end
 
         let!(:address_two) do
-          person.addresses.build(:street => "Upper")
+          person.addresses.build(street: "Upper")
         end
 
         context "when conditions are provided" do
@@ -1554,7 +1554,7 @@ describe Mongoid::Relations::Embedded::Many do
           let!(:deleted) do
             person.addresses.send(
               method,
-              { :street => "Bond" }
+              { street: "Bond" }
             )
           end
 
@@ -1590,11 +1590,11 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the documents persisted" do
 
         let!(:address_one) do
-          person.addresses.create(:street => "Bond")
+          person.addresses.create(street: "Bond")
         end
 
         let!(:address_two) do
-          person.addresses.create(:street => "Upper")
+          person.addresses.create(street: "Upper")
         end
 
         context "when conditions are provided" do
@@ -1602,7 +1602,7 @@ describe Mongoid::Relations::Embedded::Many do
           let!(:deleted) do
             person.addresses.send(
               method,
-              { :street => "Bond" }
+              { street: "Bond" }
             )
           end
 
@@ -1641,12 +1641,12 @@ describe Mongoid::Relations::Embedded::Many do
         context "when removing and resaving" do
 
           let(:owner) do
-            PetOwner.create(:title => "AKC")
+            PetOwner.create(title: "AKC")
           end
 
           before do
-            owner.pet = Pet.new(:name => "Fido")
-            owner.pet.vet_visits << VetVisit.new(:date => Date.today)
+            owner.pet = Pet.new(name: "Fido")
+            owner.pet.vet_visits << VetVisit.new(date: Date.today)
             owner.save!
             owner.pet.vet_visits.destroy_all
           end
@@ -1656,7 +1656,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "allows addition and a resave" do
-            owner.pet.vet_visits << VetVisit.new(:date => Date.today)
+            owner.pet.vet_visits << VetVisit.new(date: Date.today)
             owner.save!
             owner.pet.vet_visits.first.should be_persisted
           end
@@ -1688,7 +1688,7 @@ describe Mongoid::Relations::Embedded::Many do
           let!(:deleted) do
             person.addresses.send(
               method,
-              :conditions => { :street => "Bond" }
+              conditions: { street: "Bond" }
             )
           end
 
@@ -1743,7 +1743,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when documents exist in the database" do
 
       before do
-        person.addresses.create(:street => "Bond St")
+        person.addresses.create(street: "Bond St")
       end
 
       it "returns true" do
@@ -1754,7 +1754,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when no documents exist in the database" do
 
       before do
-        person.addresses.build(:street => "Hyde Park Dr")
+        person.addresses.build(street: "Hyde Park Dr")
       end
 
       it "returns false" do
@@ -1770,11 +1770,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address_one) do
-      person.addresses.build(:street => "Bond", :city => "London")
+      person.addresses.build(street: "Bond", city: "London")
     end
 
     let!(:address_two) do
-      person.addresses.build(:street => "Upper", :city => "London")
+      person.addresses.build(street: "Upper", city: "London")
     end
 
     context "when providing an id" do
@@ -1883,13 +1883,13 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address) do
-      person.addresses.build(:street => "Bourke", :city => "Melbourne")
+      person.addresses.build(street: "Bourke", city: "Melbourne")
     end
 
     context "when the document exists" do
 
       let(:found) do
-        person.addresses.find_or_create_by(:street => "Bourke")
+        person.addresses.find_or_create_by(street: "Bourke")
       end
 
       it "returns the document" do
@@ -1900,7 +1900,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the document does not exist" do
 
       let(:found) do
-        person.addresses.find_or_create_by(:street => "King") do |address|
+        person.addresses.find_or_create_by(street: "King") do |address|
           address.state = "CA"
         end
       end
@@ -1930,8 +1930,8 @@ describe Mongoid::Relations::Embedded::Many do
 
       let(:line_item) do
         purchase.line_items.find_or_create_by(
-          :product_id => product.id,
-          :product_type => product.class.name
+          product_id: product.id,
+          product_type: product.class.name
         )
       end
 
@@ -1948,13 +1948,13 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address) do
-      person.addresses.build(:street => "Bourke", :city => "Melbourne")
+      person.addresses.build(street: "Bourke", city: "Melbourne")
     end
 
     context "when the document exists" do
 
       let(:found) do
-        person.addresses.find_or_initialize_by(:street => "Bourke")
+        person.addresses.find_or_initialize_by(street: "Bourke")
       end
 
       it "returns the document" do
@@ -1965,7 +1965,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the document does not exist" do
 
       let(:found) do
-        person.addresses.find_or_initialize_by(:street => "King") do |address|
+        person.addresses.find_or_initialize_by(street: "King") do |address|
           address.state = "CA"
         end
       end
@@ -1998,11 +1998,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new(:number => 5)
+      Address.new(number: 5)
     end
 
     let(:address_two) do
-      Address.new(:number => 10)
+      Address.new(number: 10)
     end
 
     before do
@@ -2026,17 +2026,17 @@ describe Mongoid::Relations::Embedded::Many do
 
     let!(:address_one) do
       person.addresses.create(
-        :street => "Market",
-        :state => "CA",
-        :services => [ "1", "2" ]
+        street: "Market",
+        state: "CA",
+        services: [ "1", "2" ]
       )
     end
 
     let!(:address_two) do
       person.addresses.create(
-        :street => "Madison",
-        :state => "NY",
-        :services => [ "1", "2" ]
+        street: "Madison",
+        state: "NY",
+        services: [ "1", "2" ]
       )
     end
 
@@ -2045,7 +2045,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when using a simple criteria" do
 
         let(:addresses) do
-          person.addresses.where(:state => "CA")
+          person.addresses.where(state: "CA")
         end
 
         it "applies the criteria to the documents" do
@@ -2056,7 +2056,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when using an $or criteria" do
 
         let(:addresses) do
-          person.addresses.any_of({ :state => "CA" }, { :state => "NY" })
+          person.addresses.any_of({ state: "CA" }, { state: "NY" })
         end
 
         it "applies the criteria to the documents" do
@@ -2067,7 +2067,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when using array comparison" do
 
         let(:addresses) do
-          person.addresses.where(:services => [ "1", "2" ])
+          person.addresses.where(services: [ "1", "2" ])
         end
 
         it "applies the criteria to the documents" do
@@ -2117,11 +2117,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new(:number => 5)
+      Address.new(number: 5)
     end
 
     let(:address_two) do
-      Address.new(:number => 10)
+      Address.new(number: 10)
     end
 
     before do
@@ -2158,11 +2158,11 @@ describe Mongoid::Relations::Embedded::Many do
     context "when no argument is provided" do
 
       let!(:address_one) do
-        person.addresses.create(:street => "sonnenallee")
+        person.addresses.create(street: "sonnenallee")
       end
 
       let!(:address_two) do
-        person.addresses.create(:street => "hermannstr")
+        person.addresses.create(street: "hermannstr")
       end
 
       let!(:popped) do
@@ -2185,11 +2185,11 @@ describe Mongoid::Relations::Embedded::Many do
     context "when an integer is provided" do
 
       let!(:address_one) do
-        person.addresses.create(:street => "sonnenallee")
+        person.addresses.create(street: "sonnenallee")
       end
 
       let!(:address_two) do
-        person.addresses.create(:street => "hermannstr")
+        person.addresses.create(street: "hermannstr")
       end
 
       context "when the number is not larger than the relation" do
@@ -2322,8 +2322,8 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       before do
-        person.addresses.create(:street => "Upper")
-        person.addresses.build(:street => "Bond")
+        person.addresses.create(street: "Upper")
+        person.addresses.build(street: "Bond")
       end
 
       it "returns the number of persisted documents" do
@@ -2339,11 +2339,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new(:number => 5)
+      Address.new(number: 5)
     end
 
     let(:address_two) do
-      Address.new(:number => 10)
+      Address.new(number: 10)
     end
 
     before do
@@ -2407,17 +2407,17 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let!(:address) do
-        person.addresses.create(:street => "Joachimstr")
+        person.addresses.create(street: "Joachimstr")
       end
 
       let!(:location) do
-        address.locations.create(:name => "work")
+        address.locations.create(name: "work")
       end
 
       context "when updating with a hash" do
 
         before do
-          address.update_attributes(:locations => [{ :name => "home" }])
+          address.update_attributes(locations: [{ name: "home" }])
         end
 
         it "updates the attributes" do
@@ -2474,7 +2474,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when the hash uses symbolized keys" do
 
         let(:hash) do
-          { :animals => [{ :name => animal_name, :tag_list => tag_list }] }
+          { animals: [{ name: animal_name, tag_list: tag_list }] }
         end
 
         it "sets up the hierarchy" do
@@ -2627,11 +2627,11 @@ describe Mongoid::Relations::Embedded::Many do
   context "when attempting nil pushes and substitutes" do
 
     let(:home_phone) do
-      Phone.new(:number => "555-555-5555")
+      Phone.new(number: "555-555-5555")
     end
 
     let(:office_phone) do
-      Phone.new(:number => "666-666-6666")
+      Phone.new(number: "666-666-6666")
     end
 
     describe "replacing the entire embedded list" do
@@ -2705,7 +2705,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when appending a nil to the first position in an embedded list" do
 
         let(:person) do
-          Person.create! :phone_numbers => []
+          Person.create! phone_numbers: []
         end
 
         before do
@@ -2724,7 +2724,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when appending a nil into the middle of an embedded list" do
 
         let(:person) do
-          Person.create! :phone_numbers => []
+          Person.create! phone_numbers: []
         end
 
         before do
@@ -2743,7 +2743,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when appending a nil to the end of an embedded list" do
 
         let(:person) do
-          Person.create! :phone_numbers => []
+          Person.create! phone_numbers: []
         end
 
         before do
@@ -2806,13 +2806,13 @@ describe Mongoid::Relations::Embedded::Many do
   context "when embedding children named versions" do
 
     let(:acolyte) do
-      Acolyte.create(:name => "test")
+      Acolyte.create(name: "test")
     end
 
     context "when creating a child" do
 
       let(:version) do
-        acolyte.versions.create(:number => 1)
+        acolyte.versions.create(number: 1)
       end
 
       it "allows the operation" do
@@ -2835,7 +2835,7 @@ describe Mongoid::Relations::Embedded::Many do
   context "when validating the parent before accessing the child" do
 
     let!(:account) do
-      Account.new(:name => "Testing").tap do |acct|
+      Account.new(name: "Testing").tap do |acct|
         acct.memberships.build
         acct.save
       end
@@ -2860,7 +2860,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when updating attributes" do
 
       before do
-        from_db.update_attributes(:name => "")
+        from_db.update_attributes(name: "")
       end
 
       it "does not lose the parent reference" do
@@ -2880,7 +2880,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address) do
-      person_one.addresses.create(:street => "Kudamm")
+      person_one.addresses.create(street: "Kudamm")
     end
 
     before do
@@ -2921,15 +2921,15 @@ describe Mongoid::Relations::Embedded::Many do
     context "when the default scope is a sort" do
 
       let(:cough) do
-        Symptom.new(:name => "cough")
+        Symptom.new(name: "cough")
       end
 
       let(:headache) do
-        Symptom.new(:name => "headache")
+        Symptom.new(name: "headache")
       end
 
       let(:nausea) do
-        Symptom.new(:name => "nausea")
+        Symptom.new(name: "nausea")
       end
 
       before do
@@ -2950,7 +2950,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when modifying the relation" do
 
         let(:constipation) do
-          Symptom.new(:name => "constipation")
+          Symptom.new(name: "constipation")
         end
 
         before do
@@ -2995,7 +2995,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let(:inactive) do
-        Appointment.new(:active => false)
+        Appointment.new(active: false)
       end
 
       before do

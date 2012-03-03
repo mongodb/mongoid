@@ -7,11 +7,11 @@ describe Mongoid::Criterion::Builder do
     context "when provided a valid selector" do
 
       let(:criteria) do
-        Mongoid::Criteria.new(Person).where(:title => "Sir")
+        Mongoid::Criteria.new(Person).where(title: "Sir")
       end
 
       before do
-        Person.expects(:new).with(:title => "Sir")
+        Person.expects(:new).with(title: "Sir")
       end
 
       it "calls create on the class with the attributes" do
@@ -37,15 +37,15 @@ describe Mongoid::Criterion::Builder do
     context "with attributes" do
 
       let(:criteria) do
-        Mongoid::Criteria.new(Person).where(:title => "Sir")
+        Mongoid::Criteria.new(Person).where(title: "Sir")
       end
 
       before do
-        Person.expects(:new).with(:title => "Sir", :name => "Lancelot")
+        Person.expects(:new).with(title: "Sir", name: "Lancelot")
       end
 
       it "calls create on the class with the attributes" do
-        criteria.build(:name => "Lancelot")
+        criteria.build(name: "Lancelot")
       end
     end
   end

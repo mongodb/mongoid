@@ -23,7 +23,7 @@ module Mongoid #:nodoc
         super(
           compose_message(
             "mixed_relations",
-            { :root => root_klass, :embedded => embedded_klass }
+            { root: root_klass, embedded: embedded_klass }
           )
         )
       end

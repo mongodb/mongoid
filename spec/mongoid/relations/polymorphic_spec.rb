@@ -14,9 +14,9 @@ describe Mongoid::Relations::Polymorphic do
 
         let(:metadata) do
           Mongoid::Relations::Metadata.new(
-            :name => :ratable,
-            :polymorphic => true,
-            :relation => Mongoid::Relations::Referenced::In
+            name: :ratable,
+            polymorphic: true,
+            relation: Mongoid::Relations::Referenced::In
           )
         end
 
@@ -45,9 +45,9 @@ describe Mongoid::Relations::Polymorphic do
 
         let(:metadata) do
           Mongoid::Relations::Metadata.new(
-            :name => :ratings,
-            :as => :ratable,
-            :relation => Mongoid::Relations::Referenced::Many
+            name: :ratings,
+            as: :ratable,
+            relation: Mongoid::Relations::Referenced::Many
           )
         end
 
@@ -73,8 +73,8 @@ describe Mongoid::Relations::Polymorphic do
 
       let(:metadata) do
         Mongoid::Relations::Metadata.new(
-          :name => :ratings,
-          :relation => Mongoid::Relations::Referenced::Many
+          name: :ratings,
+          relation: Mongoid::Relations::Referenced::Many
         )
       end
 

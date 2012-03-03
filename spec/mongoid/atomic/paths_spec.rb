@@ -7,7 +7,7 @@ describe Mongoid::Atomic::Paths do
   end
 
   let(:address) do
-    Address.new(:street => "testing")
+    Address.new(street: "testing")
   end
 
   let(:location) do

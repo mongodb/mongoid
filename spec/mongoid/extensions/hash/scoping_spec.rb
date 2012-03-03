@@ -5,7 +5,7 @@ describe Mongoid::Extensions::Hash::Scoping do
   describe "#as_conditions" do
 
     let(:hash) do
-      { :where => { :active => true }}
+      { where: { active: true }}
     end
 
     it "returns self" do

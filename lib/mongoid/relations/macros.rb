@@ -8,7 +8,7 @@ module Mongoid # :nodoc:
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :embedded, :instance_reader => false
+        class_attribute :embedded, instance_reader: false
         class_attribute :relations
         self.embedded = false
         self.relations = {}
@@ -241,10 +241,10 @@ module Mongoid # :nodoc:
         # @return [ Metadata ] The metadata for the relation.
         def characterize(name, relation, options, &block)
           Metadata.new({
-            :relation => relation,
-            :extend => create_extension_module(name, &block),
-            :inverse_class_name => self.name,
-            :name => name
+            relation: relation,
+            extend: create_extension_module(name, &block),
+            inverse_class_name: self.name,
+            name: name
           }.merge(options))
         end
 
@@ -283,19 +283,19 @@ module Mongoid # :nodoc:
             key = metadata.foreign_key
             field(
               key,
-              :type => type,
-              :identity => true,
-              :metadata => metadata,
-              :default => metadata.foreign_key_default
+              type: type,
+              identity: true,
+              metadata: metadata,
+              default: metadata.foreign_key_default
             )
             if metadata.indexed?
               if metadata.polymorphic?
                 index(
                   [[ key, Mongo::ASCENDING ], [ metadata.type, Mongo::ASCENDING ]],
-                  :background => true
+                  background: true
                 )
               else
-                index(key, :background => true)
+                index(key, background: true)
               end
             end
           end

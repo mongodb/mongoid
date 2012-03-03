@@ -9,9 +9,9 @@ class Name
   field :last_name, type: String
   field :parent_title, type: String
 
-  embeds_many :translations, :validate => false
-  embeds_one :language, :as => :translatable, :validate => false
-  embedded_in :namable, :polymorphic => true
+  embeds_many :translations, validate: false
+  embeds_one :language, as: :translatable, validate: false
+  embedded_in :namable, polymorphic: true
 
   accepts_nested_attributes_for :language
 

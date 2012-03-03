@@ -49,7 +49,7 @@ describe Mongoid::Relations::Cyclic do
           include Mongoid::Document
           recursively_embeds_many
 
-          field :name, :type => String
+          field :name, type: String
 
           def is_root?
             parent_node.nil?
@@ -138,15 +138,15 @@ describe Mongoid::Relations::Cyclic do
   context "when building a namespaced hierarchy" do
 
     let(:root) do
-      Trees::Node.new(:name => "root")
+      Trees::Node.new(name: "root")
     end
 
     let!(:child_one) do
-      root.child_nodes.build(:name => "first_child")
+      root.child_nodes.build(name: "first_child")
     end
 
     let!(:child_two) do
-      root.child_nodes.build(:name => "second_child")
+      root.child_nodes.build(name: "second_child")
     end
 
     it "sets the parent node" do
