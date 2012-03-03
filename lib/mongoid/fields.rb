@@ -380,37 +380,17 @@ module Mongoid #:nodoc
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           undef_method(meth) if method_defined?(meth)
-          if meth =~ /\W/
-            if field.cast_on_read?
-              define_method(meth) do
-                fields[name].deserialize(read_attribute(name))
-              end
-            else
-              define_method(meth) do
-                read_attribute(name).tap do |value|
-                  if value.is_a?(Array) || value.is_a?(Hash)
-                    attribute_will_change!(name)
-                  end
-                end
-              end
+          if field.cast_on_read?
+            define_method(meth) do
+              fields[name].deserialize(read_attribute(name))
             end
           else
-            if field.cast_on_read?
-              class_eval <<-EOM
-                def #{meth}
-                  fields[#{name.inspect}].deserialize(read_attribute(#{name.inspect}))
+            define_method(meth) do
+              read_attribute(name).tap do |value|
+                if value.is_a?(Array) || value.is_a?(Hash)
+                  attribute_will_change!(name)
                 end
-              EOM
-            else
-              class_eval <<-EOM
-                def #{meth}
-                  read_attribute(#{name.inspect}).tap do |value|
-                    if value.is_a?(Array) || value.is_a?(Hash)
-                      attribute_will_change!(#{name.inspect})
-                    end
-                  end
-                end
-              EOM
+              end
             end
           end
         end
@@ -428,16 +408,8 @@ module Mongoid #:nodoc
       def create_field_setter(name, meth)
         generated_methods.module_eval do
           undef_method("#{meth}=") if method_defined?("#{meth}=")
-          if meth =~ /\W/
-            define_method(meth) do |value|
-              write_attribute(name, value)
-            end
-          else
-            class_eval <<-EOM
-              def #{meth}=(value)
-                write_attribute(#{name.inspect}, value)
-              end
-            EOM
+          define_method("#{meth}=") do |value|
+            write_attribute(name, value)
           end
         end
       end
@@ -454,18 +426,9 @@ module Mongoid #:nodoc
       def create_field_check(name, meth)
         generated_methods.module_eval do
           undef_method("#{meth}?") if method_defined?("#{meth}?")
-          if meth =~ /\W/
-            define_method("#{meth}?") do
-              attr = read_attribute(name)
-              attr == true || attr.present?
-            end
-          else
-            class_eval <<-EOM
-              def #{meth}?
-                attr = read_attribute(#{name.inspect})
-                attr == true || attr.present?
-              end
-            EOM
+          define_method("#{meth}?") do
+            attr = read_attribute(name)
+            attr == true || attr.present?
           end
         end
       end
@@ -484,16 +447,8 @@ module Mongoid #:nodoc
           if method_defined?("#{meth}_translations")
             undef_method("#{meth}_translations")
           end
-          if meth =~ /\W/
-            define_method("#{meth}_translations") do
-              attributes[name]
-            end
-          else
-            class_eval <<-EOM
-              def #{meth}_translations
-                attributes[#{name.inspect}]
-              end
-            EOM
+          define_method("#{meth}_translations") do
+            attributes[name]
           end
         end
       end
@@ -512,18 +467,9 @@ module Mongoid #:nodoc
           if method_defined?("#{meth}_translations=")
             undef_method("#{meth}_translations=")
           end
-          if meth =~ /\W/
-            define_method("#{meth}_translations=") do |value|
-              attribute_will_change!(name)
-              attributes[name] = value
-            end
-          else
-            class_eval <<-EOM
-              def #{meth}_translations=(value)
-                attribute_will_change!(#{name.inspect})
-                attributes[#{name.inspect}] = value
-              end
-            EOM
+          define_method("#{meth}_translations=") do |value|
+            attribute_will_change!(name)
+            attributes[name] = value
           end
         end
       end
