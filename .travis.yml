@@ -7,6 +7,9 @@ rvm:
 env:
   - JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
   -
+branches:
+  except:
+    - moped-integration
 matrix:
   exclude:
     - rvm: 1.9.2
