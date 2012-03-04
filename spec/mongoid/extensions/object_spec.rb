@@ -96,6 +96,44 @@ describe Mongoid::Extensions::Object do
     end
   end
 
+  describe ".re_define_method" do
+
+    context "when the method already exists" do
+
+      class Smoochy
+        def sing
+          "singing"
+        end
+      end
+
+      before do
+        Smoochy.re_define_method("sing") do
+          "singing again"
+        end
+      end
+
+      it "redefines the existing method" do
+        Smoochy.new.sing.should eq("singing again")
+      end
+    end
+
+    context "when the method does not exist" do
+
+      class Rhino
+      end
+
+      before do
+        Rhino.re_define_method("sing") do
+          "singing"
+        end
+      end
+
+      it "redefines the existing method" do
+        Rhino.new.sing.should eq("singing")
+      end
+    end
+  end
+
   describe "#remove_ivar" do
 
     context "when the instance variable is defined" do

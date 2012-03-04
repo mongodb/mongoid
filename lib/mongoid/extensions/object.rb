@@ -68,6 +68,14 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Get the substitutable version of an object.
+      #
+      # @example Get the substitutable.
+      #   object.substitutable
+      #
+      # @return [ Object ] self.
+      #
+      # @since 2.0.0
       def substitutable
         self
       end
@@ -87,8 +95,31 @@ module Mongoid #:nodoc:
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
       end
+
+      module ClassMethods #:nodoc:
+
+        # Redefine the method. Will undef the method if it exists or simply
+        # just define it.
+        #
+        # @example Redefine the method.
+        #   Object.re_define_method("exists?") do
+        #     self
+        #   end
+        #
+        # @param [ String, Symbol ] name The name of the method.
+        # @param [ Proc ] block The method body.
+        #
+        # @return [ Method ] The new method.
+        #
+        # @since 3.0.0
+        def re_define_method(name, &block)
+          undef_method(name) if method_defined?(name)
+          define_method(name, &block)
+        end
+      end
     end
   end
 end
 
 ::Object.__send__(:include, Mongoid::Extensions::Object)
+::Object.__send__(:extend, Mongoid::Extensions::Object::ClassMethods)
