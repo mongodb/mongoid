@@ -274,8 +274,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_change_accessor(name, meth)
         generated_methods.module_eval do
-          undef_method("#{meth}_change") if method_defined?("#{meth}_change")
-          define_method("#{meth}_change") do
+          re_define_method("#{meth}_change") do
             attribute_change(name)
           end
         end
@@ -292,8 +291,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_change_check(name, meth)
         generated_methods.module_eval do
-          undef_method("#{meth}_changed?") if method_defined?("#{meth}_changed?")
-          define_method("#{meth}_changed?") do
+          re_define_method("#{meth}_changed?") do
             attribute_changed?(name)
           end
         end
@@ -310,10 +308,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_default_change_check(name, meth)
         generated_methods.module_eval do
-          if method_defined?("#{meth}_changed_from_default?")
-            undef_method("#{meth}_changed_from_default?")
-          end
-          define_method("#{meth}_changed_from_default?") do
+          re_define_method("#{meth}_changed_from_default?") do
             attribute_changed_from_default?(name)
           end
         end
@@ -330,8 +325,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_previous_value_accessor(name, meth)
         generated_methods.module_eval do
-          undef_method("#{meth}_was") if method_defined?("#{meth}_was")
-          define_method("#{meth}_was") do
+          re_define_method("#{meth}_was") do
             attribute_was(name)
           end
         end
@@ -348,8 +342,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_change_flag(name, meth)
         generated_methods.module_eval do
-          undef_method("#{meth}_will_change!") if method_defined?("#{meth}_will_change!")
-          define_method("#{meth}_will_change!") do
+          re_define_method("#{meth}_will_change!") do
             attribute_will_change!(name)
           end
         end
@@ -366,8 +359,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_reset(name, meth)
         generated_methods.module_eval do
-          undef_method("reset_#{meth}!") if method_defined?("reset_#{meth}!")
-          define_method("reset_#{meth}!") do
+          re_define_method("reset_#{meth}!") do
             reset_attribute!(name)
           end
         end

@@ -407,8 +407,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_setter(name, meth)
         generated_methods.module_eval do
-          undef_method("#{meth}=") if method_defined?("#{meth}=")
-          define_method("#{meth}=") do |value|
+          re_define_method("#{meth}=") do |value|
             write_attribute(name, value)
           end
         end
@@ -425,8 +424,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_check(name, meth)
         generated_methods.module_eval do
-          undef_method("#{meth}?") if method_defined?("#{meth}?")
-          define_method("#{meth}?") do
+          re_define_method("#{meth}?") do
             attr = read_attribute(name)
             attr == true || attr.present?
           end
@@ -444,10 +442,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
-          if method_defined?("#{meth}_translations")
-            undef_method("#{meth}_translations")
-          end
-          define_method("#{meth}_translations") do
+          re_define_method("#{meth}_translations") do
             attributes[name]
           end
         end
@@ -464,10 +459,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_translations_setter(name, meth)
         generated_methods.module_eval do
-          if method_defined?("#{meth}_translations=")
-            undef_method("#{meth}_translations=")
-          end
-          define_method("#{meth}_translations=") do |value|
+          re_define_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
             attributes[name] = value
           end

@@ -43,13 +43,12 @@ module Mongoid #:nodoc:
         args.each do |name|
           meth = "#{name}_attributes="
           self.nested_attributes += [ meth ]
-          undef_method(meth) if method_defined?(meth)
           metadata = relations[name.to_s]
           unless metadata
             raise Errors::NestedAttributesMetadataNotFound.new(self, name)
           end
           autosave(metadata.merge!(autosave: true))
-          define_method("#{name}_attributes=") do |attrs|
+          re_define_method("#{name}_attributes=") do |attrs|
             _assigning do
               metadata.nested_builder(attrs, options).build(self)
             end
