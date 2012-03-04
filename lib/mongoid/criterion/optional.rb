@@ -14,10 +14,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def ascending(*fields)
-        clone.tap do |crit|
-          setup_sort_options(crit.options) unless fields.first.nil?
-          fields.flatten.each { |field| merge_options(crit.options[:sort], [ localize(field), :asc ]) }
-        end
+        sort_one_direction(:asc, *fields)
       end
       alias :asc :ascending
 
@@ -55,10 +52,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def descending(*fields)
-        clone.tap do |crit|
-          setup_sort_options(crit.options) unless fields.first.nil?
-          fields.flatten.each { |field| merge_options(crit.options[:sort], [ localize(field), :desc ]) }
-        end
+        sort_one_direction(:desc, *fields)
       end
       alias :desc :descending
 
@@ -109,7 +103,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def limit(value = 20)
-        clone.tap { |crit| crit.options[:limit] = value.to_i }
+        optional_int(:limit, value)
       end
 
       # Returns the offset option. If a per_page option is in the list then it
@@ -163,7 +157,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] The cloned criteria.
       def skip(value = 0)
-        clone.tap { |crit| crit.options[:skip] = value.to_i }
+        optional_int(:skip, value)
       end
 
       # Adds a criterion to the +Criteria+ that specifies a type or an Array of
@@ -253,6 +247,21 @@ module Mongoid #:nodoc:
           field = "#{field}.#{::I18n.locale}".to_sym
         end
         field
+      end
+
+      def optional_int(option, value)
+        clone.tap do |crit|
+          crit.options[option] = value.to_i
+        end
+      end
+
+      def sort_one_direction(direction, *fields)
+        clone.tap do |crit|
+          setup_sort_options(crit.options) unless fields.first.nil?
+          fields.flatten.each do |field|
+            merge_options(crit.options[:sort], [ localize(field), direction ])
+          end
+        end
       end
     end
   end
