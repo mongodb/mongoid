@@ -6,7 +6,7 @@ module Mongoid #:nodoc:
       # This class provides the ability to perform an explicit $pushAll modification
       # on a specific field.
       class PushAll
-        include Operation
+        include Pushable
 
         # Sends the atomic $pushAll operation to the database.
         #
@@ -17,13 +17,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def persist
-          prepare do
-            document[field] = [] unless document[field]
-            document.send(field).concat(value).tap do |value|
-              collection.update(document.atomic_selector, operation("$pushAll"), options)
-              document.remove_change(field)
-            end
-          end
+          push("$pushAll")
         end
       end
     end
