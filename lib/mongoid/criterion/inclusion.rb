@@ -33,14 +33,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.0
       def all_of(*args)
-        clone.tap do |crit|
-          unless args.empty?
-            criterion = @selector["$and"] || []
-            converted = BSON::ObjectId.convert(klass, args.flatten)
-            expanded = converted.collect { |hash| hash.expand_complex_criteria }
-            crit.selector["$and"] = criterion.concat(expanded)
-          end
-        end
+        multi_selection("$and", *args)
       end
 
       # Adds a criterion to the +Criteria+ that specifies values where any can
@@ -87,12 +80,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Criteria ] A new criteria with the added selector.
       def any_of(*args)
-        clone.tap do |crit|
-          criterion = @selector["$or"] || []
-          converted = BSON::ObjectId.convert(klass, args.flatten)
-          expanded = converted.collect { |hash| hash.expand_complex_criteria }
-          crit.selector["$or"] = criterion.concat(expanded)
-        end
+        multi_selection("$or", *args)
       end
       alias :or :any_of
 
@@ -276,6 +264,19 @@ module Mongoid #:nodoc:
             else
               crit.selector[key] = value
             end
+          end
+        end
+      end
+
+      private
+
+      def multi_selection(command, *args)
+        clone.tap do |crit|
+          unless args.empty?
+            criterion = @selector[command] || []
+            converted = BSON::ObjectId.convert(klass, args.flatten)
+            expanded = converted.collect { |hash| hash.expand_complex_criteria }
+            crit.selector[command] = criterion.concat(expanded)
           end
         end
       end
