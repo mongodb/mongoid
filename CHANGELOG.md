@@ -480,7 +480,7 @@ For instructions on upgrading to newer versions, visit
 * \#685 Attempting to use versioning with embedded documents will now
   raise a proper error alerting the developer this is not allowed.
 
-## 2.4.6 (branch: 2.4.0-stable)
+## 2.4.7 (branch: 2.4.0-stable)
 
 ### Resolved Issues
 
