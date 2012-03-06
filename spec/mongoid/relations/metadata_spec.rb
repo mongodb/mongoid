@@ -777,6 +777,20 @@ describe Mongoid::Relations::Metadata do
             end
           end
         end
+
+        context "when embeds one" do
+          let(:metadata) do
+            described_class.new(
+              name: :post,
+              relation: Mongoid::Relations::Embedded::One,
+              inverse_class_name: "Person"
+            )
+          end
+
+          it "returns the inverse foreign key" do
+            metadata.foreign_key.should eq("person_id")
+          end
+        end
       end
     end
 
