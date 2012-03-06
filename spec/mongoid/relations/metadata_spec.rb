@@ -1658,6 +1658,40 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+
+  describe "#store_as" do
+
+    context "when store_as is define" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :comment,
+          relation: Mongoid::Relations::Embedded::Many,
+          store_as: 'user_comments'
+        )
+      end
+
+      it "returns the value" do
+        metadata.store_as.should == 'user_comments'
+      end
+    end
+
+    context "when is not define" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :comments,
+          relation: Mongoid::Relations::Embedded::Many,
+        )
+      end
+
+      it "returns false" do
+        metadata.store_as.should == 'comments'
+      end
+    end
+  end
+
+
   context "properties" do
 
     PROPERTIES = [
