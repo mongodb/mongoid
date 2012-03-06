@@ -6,6 +6,42 @@ describe Mongoid::Relations::Embedded::In do
     Person.delete_all
   end
 
+  describe "#===" do
+
+    let(:base) do
+      Name.new
+    end
+
+    let(:target) do
+      Person.new
+    end
+
+    let(:metadata) do
+      Name.relations["namable"]
+    end
+
+    let(:relation) do
+      described_class.new(base, target, metadata)
+    end
+
+    context "when the proxied document is same class" do
+
+      context "when the document is a different instance" do
+
+        it "returns false" do
+          (relation === Person.new).should be_false
+        end
+      end
+
+      context "when the document is the same instance" do
+
+        it "returns true" do
+          (relation === target).should be_true
+        end
+      end
+    end
+  end
+
   describe "#=" do
 
     context "when the inverse of an embeds one" do

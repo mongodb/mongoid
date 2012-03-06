@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.4.7 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#1785 Case equality has been fixed to handle instance checks properly.
+
 ## 2.4.6
 
 ### Resolved Issues

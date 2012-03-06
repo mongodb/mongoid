@@ -135,15 +135,49 @@ describe Mongoid::Document do
 
     context "when comparable is the same type" do
 
-      it "returns true" do
-        (person === Person.new).should be_true
+      context "when the instance is different" do
+
+        it "returns false" do
+          (person === Person.new).should be_false
+        end
+      end
+
+      context "when the instance is the same" do
+
+        it "returns true" do
+          (person === person).should be_true
+        end
       end
     end
 
     context "when the comparable is a subclass" do
 
-      it "returns true" do
-        (person === Doctor.new).should be_true
+      it "returns false" do
+        (person === Doctor.new).should be_false
+      end
+    end
+
+    context "when comparing to a class" do
+
+      context "when the class is the same" do
+
+        it "returns true" do
+          (person === Person).should be_true
+        end
+      end
+
+      context "when the class is a subclass" do
+
+        it "returns false" do
+          (person === Doctor).should be_false
+        end
+      end
+
+      context "when the class is a superclass" do
+
+        it "returns true" do
+          (Doctor.new === Person).should be_true
+        end
       end
     end
   end
