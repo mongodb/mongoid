@@ -44,11 +44,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      if other.class == Class
-        self.class === other
-      else
-        id == other.id
-      end
+      other.class == Class ? self.class === other : self == other
     end
 
     # Delegates to ==. Used when needing checks in hashes.
