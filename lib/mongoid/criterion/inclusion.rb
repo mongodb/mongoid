@@ -96,7 +96,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Array<Document>, Document ] The matching document(s).
       def find(*args)
-        ids = args.flatten
+        ids = args.flat_map{ |arg| arg.is_a?(::Range) ? arg.to_a : arg }
         raise_invalid if ids.any?(&:nil?)
         for_ids(ids).execute_or_raise(args)
       end
@@ -115,6 +115,7 @@ module Mongoid #:nodoc:
       # @since 2.0.0
       def execute_or_raise(args)
         ids = args[0]
+        ids = ids.to_a if ids.is_a?(::Range)
         if ids.is_a?(::Array)
           entries.tap do |result|
             if (entries.size < ids.size) && Mongoid.raise_not_found_error

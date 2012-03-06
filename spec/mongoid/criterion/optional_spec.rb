@@ -822,4 +822,47 @@ describe Mongoid::Criterion::Optional do
       desc.map(&:title).should eq(titles.reverse)
     end
   end
+
+  describe "#for_ids" do
+
+    let(:for_ids) do
+      base.for_ids(ids)
+    end
+
+    context "when single id" do
+
+      let(:ids) do
+        1
+      end
+
+      it "creates a simple selector" do
+        for_ids.selector.should eq({ _id: 1 })
+      end
+    end
+
+    context "when array of ids" do
+
+      context "when array contains one id" do
+
+        let(:ids) do
+          [1]
+        end
+
+        it "creates a simple selector" do
+          for_ids.selector.should eq({ _id: 1 })
+        end
+      end
+
+      context "when array contains multiple ids" do
+
+        let(:ids) do
+          [1, 2, 3]
+        end
+
+        it "creates an $in query" do
+          for_ids.selector.should eq({ _id: { "$in" => [1, 2, 3] } })
+        end
+      end
+    end
+  end
 end
