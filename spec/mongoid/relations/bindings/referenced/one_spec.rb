@@ -14,7 +14,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
     Person.relations["game"]
   end
 
-  describe "#bind" do
+  describe "#bind_one" do
 
     let(:binding) do
       described_class.new(person, game, metadata)
@@ -25,7 +25,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       before do
         person.expects(:save).never
         game.expects(:save).never
-        binding.bind
+        binding.bind_one
       end
 
       it "sets the inverse relation" do
@@ -45,12 +45,12 @@ describe Mongoid::Relations::Bindings::Referenced::One do
 
       it "does nothing" do
         person.expects(:game=).never
-        binding.bind
+        binding.bind_one
       end
     end
   end
 
-  describe "#unbind" do
+  describe "#unbind_one" do
 
     let(:binding) do
       described_class.new(person, game, metadata)
@@ -59,10 +59,10 @@ describe Mongoid::Relations::Bindings::Referenced::One do
     context "when the document is unbindable" do
 
       before do
-        binding.bind
+        binding.bind_one
         person.expects(:delete).never
         game.expects(:delete).never
-        binding.unbind
+        binding.unbind_one
       end
 
       it "removes the inverse relation" do
@@ -78,7 +78,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
 
       it "does nothing" do
         person.expects(:game=).never
-        binding.unbind
+        binding.unbind_one
       end
     end
   end

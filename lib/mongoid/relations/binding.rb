@@ -21,6 +21,24 @@ module Mongoid # :nodoc:
       def initialize(base, target, metadata)
         @base, @target, @metadata = base, target, metadata
       end
+
+      # Execute the provided block inside a binding.
+      #
+      # @example Execute the binding block.
+      #   binding.binding do
+      #     base.foreign_key = 1
+      #   end
+      #
+      # @return [ Object ] The result of the yield.
+      #
+      # @since 3.0.0
+      def binding
+        unless _binding?
+          _binding do
+            yield(self) if block_given?
+          end
+        end
+      end
     end
   end
 end

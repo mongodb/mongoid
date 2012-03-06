@@ -23,15 +23,12 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind
+          def bind_one
             target.parentize(base)
-            unless _binding?
-              _binding do
-                target.do_or_do_not(metadata.inverse_setter(target), base)
-              end
+            binding do
+              target.do_or_do_not(metadata.inverse_setter(target), base)
             end
           end
-          alias :bind_one :bind
 
           # Unbinds the base object and the inverse, caused by setting the
           # reference to nil.
@@ -46,14 +43,11 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def unbind
-            unless _binding?
-              _binding do
-                target.do_or_do_not(metadata.inverse_setter(target), nil)
-              end
+          def unbind_one
+            binding do
+              target.do_or_do_not(metadata.inverse_setter(target), nil)
             end
           end
-          alias :unbind_one :unbind
         end
       end
     end

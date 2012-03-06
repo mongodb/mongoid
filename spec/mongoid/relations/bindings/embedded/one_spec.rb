@@ -23,7 +23,7 @@ describe Mongoid::Relations::Bindings::Embedded::One do
     context "when the document is bindable" do
 
       before do
-        binding.bind
+        binding.bind_one
       end
 
       it "parentizes the documents" do
@@ -43,7 +43,7 @@ describe Mongoid::Relations::Bindings::Embedded::One do
 
       it "does nothing" do
         person.expects(:name=).never
-        binding.bind
+        binding.bind_one
       end
     end
   end
@@ -57,8 +57,8 @@ describe Mongoid::Relations::Bindings::Embedded::One do
     context "when the document is unbindable" do
 
       before do
-        binding.bind
-        binding.unbind
+        binding.bind_one
+        binding.unbind_one
       end
 
       it "removes the inverse relation" do
@@ -70,7 +70,7 @@ describe Mongoid::Relations::Bindings::Embedded::One do
 
       it "does nothing" do
         person.expects(:name=).never
-        binding.unbind
+        binding.unbind_one
       end
     end
   end

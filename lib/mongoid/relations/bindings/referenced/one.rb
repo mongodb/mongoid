@@ -18,21 +18,18 @@ module Mongoid # :nodoc:
           #   person.game = Game.new
           #
           # @since 2.0.0.rc.1
-          def bind
-            unless _binding?
-              _binding do
-                target.you_must(metadata.foreign_key_setter, base.id)
-                target.send(metadata.inverse_setter, base)
-                if metadata.type
-                  target.you_must(metadata.type_setter, base.class.model_name)
-                end
-                if inverse_metadata = metadata.inverse_metadata(target)
-                  target.do_or_do_not(inverse_metadata.inverse_of_field_setter, metadata.name)
-                end
+          def bind_one
+            binding do
+              target.you_must(metadata.foreign_key_setter, base.id)
+              target.send(metadata.inverse_setter, base)
+              if metadata.type
+                target.you_must(metadata.type_setter, base.class.model_name)
+              end
+              if inverse_metadata = metadata.inverse_metadata(target)
+                target.do_or_do_not(inverse_metadata.inverse_of_field_setter, metadata.name)
               end
             end
           end
-          alias :bind_one :bind
 
           # Unbinds the base object and the inverse, caused by setting the
           # reference to nil.
@@ -42,21 +39,18 @@ module Mongoid # :nodoc:
           #   person.game = nil
           #
           # @since 2.0.0.rc.1
-          def unbind
-            unless _binding?
-              _binding do
-                target.you_must(metadata.foreign_key_setter, nil)
-                target.send(metadata.inverse_setter, nil)
-                if metadata.type
-                  target.you_must(metadata.type_setter, nil)
-                end
-                if inverse_metadata = metadata.inverse_metadata(target)
-                  target.do_or_do_not(inverse_metadata.inverse_of_field_setter, nil)
-                end
+          def unbind_one
+            binding do
+              target.you_must(metadata.foreign_key_setter, nil)
+              target.send(metadata.inverse_setter, nil)
+              if metadata.type
+                target.you_must(metadata.type_setter, nil)
+              end
+              if inverse_metadata = metadata.inverse_metadata(target)
+                target.do_or_do_not(inverse_metadata.inverse_of_field_setter, nil)
               end
             end
           end
-          alias :unbind_one :unbind
         end
       end
     end

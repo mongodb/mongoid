@@ -23,20 +23,17 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :binding Are we in build mode?
           #
           # @since 2.0.0.rc.1
-          def bind
+          def bind_one
             base.metadata = metadata.inverse_metadata(target) unless base.metadata
             base.parentize(target)
-            unless _binding?
-              _binding do
-                if base.embedded_many?
-                  target.do_or_do_not(metadata.inverse(target)).push(base)
-                else
-                  target.do_or_do_not(metadata.inverse_setter(target), base)
-                end
+            binding do
+              if base.embedded_many?
+                target.do_or_do_not(metadata.inverse(target)).push(base)
+              else
+                target.do_or_do_not(metadata.inverse_setter(target), base)
               end
             end
           end
-          alias :bind_one :bind
 
           # Unbinds the base object and the inverse, caused by setting the
           # reference to nil.
@@ -50,18 +47,15 @@ module Mongoid # :nodoc:
           # @option options [ true, false ] :continue Do we continue unbinding?
           #
           # @since 2.0.0.rc.1
-          def unbind
-            unless _binding?
-              _binding do
-                if base.embedded_many?
-                  target.do_or_do_not(metadata.inverse(target)).delete(base)
-                else
-                  target.do_or_do_not(metadata.inverse_setter(target), nil)
-                end
+          def unbind_one
+            binding do
+              if base.embedded_many?
+                target.do_or_do_not(metadata.inverse(target)).delete(base)
+              else
+                target.do_or_do_not(metadata.inverse_setter(target), nil)
               end
             end
           end
-          alias :unbind_one :unbind
         end
       end
     end
