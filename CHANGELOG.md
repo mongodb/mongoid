@@ -484,6 +484,12 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1785 Case equality has been fixed to handle instance checks properly.
+
+## 2.4.6
+
+### Resolved Issues
+
 * \#1772 Allow skip and limit to convert strings to integers. (Jean Boussier)
 
 * \#1767 Model#update_attributes accepts mass assignment options again.

@@ -22,8 +22,18 @@ describe Mongoid::Relations::Embedded::In do
 
     context "when the proxied document is same class" do
 
-      it "returns true" do
-        (relation === Person.new).should be_true
+      context "when the document is a different instance" do
+
+        it "returns false" do
+          (relation === Person.new).should be_false
+        end
+      end
+
+      context "when the document is the same instance" do
+
+        it "returns true" do
+          (relation === target).should be_true
+        end
       end
     end
   end
