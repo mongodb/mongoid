@@ -96,7 +96,7 @@ module Mongoid #:nodoc:
       #
       # @return [ Array<Document>, Document ] The matching document(s).
       def find(*args)
-        ids = args.flatten.map{ |arg| arg.is_a?(::Range) ? arg.to_a : arg }.flatten
+        ids = args.flat_map{ |arg| arg.is_a?(::Range) ? arg.to_a : arg }
         raise_invalid if ids.any?(&:nil?)
         for_ids(ids).execute_or_raise(args)
       end
