@@ -610,6 +610,103 @@ describe Mongoid::Criterion::Inclusion do
         end
       end
     end
+
+    context "when finding by an range of ids" do
+
+      let!(:jar_one) do
+        Jar.create do |doc|
+          doc._id = 114869287646134350
+        end
+      end
+
+      let!(:jar_two) do
+        Jar.create do |doc|
+          doc._id = 114869287646134351
+        end
+      end
+
+      let!(:jar_three) do
+        Jar.create do |doc|
+          doc._id = 114869287646134352
+        end
+      end
+
+      context "when ids are not object ids" do
+
+        context "when the documents are found" do
+
+          let(:jars) do
+            Jar.find(jar_one.id..jar_three.id)
+          end
+
+          it "returns the documents from the database" do
+            jars.should eq([ jar_one, jar_two, jar_three ])
+          end
+        end
+      end
+
+      context "when the ids are found" do
+
+        let(:from_db) do
+          Jar.where(title: nil).find(jar_one.id..jar_three.id)
+        end
+
+        it "returns the documents from the database" do
+          from_db.should eq([ jar_one, jar_two, jar_three ])
+        end
+      end
+
+      context "when the id is a BSON::ObjectId" do
+
+        let(:from_db) do
+          Person.where(title: "Sir").find(person.id..person.id)
+        end
+
+        it "raises type error" do
+          expect { from_db }.to raise_error(TypeError)
+        end
+      end
+
+      context "when the id is not found" do
+
+        context "when not all ids are found" do
+
+          it "raises an error" do
+            expect {
+              Jar.where(title: nil).find(jar_three.id..(jar_three.id+1))
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when raising a not found error" do
+
+          it "raises an error" do
+            expect {
+              Person.where(title: "Sir").find(5..6)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when not raising a not found error" do
+
+          before do
+            Mongoid.raise_not_found_error = false
+          end
+
+          after do
+            Mongoid.raise_not_found_error = true
+          end
+
+          let!(:from_db) do
+            Jar.where(title: nil).find(5..6)
+          end
+
+          it "returns an empty array" do
+            from_db.should be_empty
+          end
+        end
+      end
+    end
   end
 
   describe "#in" do
