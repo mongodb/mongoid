@@ -134,10 +134,7 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
           characterize(name, Referenced::In, options, &block).tap do |meta|
-            relate(name, meta)
-            reference(meta)
-            builder(name, meta).creator(name, meta).autosave(meta)
-            validates_relation(meta)
+            reference_one_to_one(name, meta)
           end
         end
 
@@ -219,16 +216,15 @@ module Mongoid # :nodoc:
         # @param [ Proc ] block Optional block for defining extensions.
         def has_one(name, options = {}, &block)
           characterize(name, Referenced::One, options, &block).tap do |meta|
-            relate(name, meta)
-            reference(meta)
-            builder(name, meta).creator(name, meta).autosave(meta)
-            validates_relation(meta)
+            reference_one_to_one(name, meta)
           end
         end
 
         private
 
         # Create the metadata for the relation.
+        #
+        # @api private
         #
         # @example Create the metadata.
         #   Person.characterize(:posts, Referenced::Many, {})
@@ -249,6 +245,8 @@ module Mongoid # :nodoc:
         end
 
         # Generate a named extension module suitable for marshaling
+        #
+        # @api private
         #
         # @example Get the module.
         #   Person.create_extension_module(:posts, &block)
@@ -272,6 +270,8 @@ module Mongoid # :nodoc:
 
         # Defines a field to be used as a foreign key in the relation and
         # indexes it if defined.
+        #
+        # @api private
         #
         # @example Set up the relational fields and indexes.
         #   Person.reference(metadata)
@@ -299,6 +299,26 @@ module Mongoid # :nodoc:
               end
             end
           end
+        end
+
+        # Handle common behaviour for referenced 1-1 relation setup.
+        #
+        # @api private
+        #
+        # @example Add the one to one behaviour.
+        #   Model.reference_one_to_one(:name, meta)
+        #
+        # @param [ Symbol ] name The name of the relation.
+        # @param [ Metadata ] meta The relation metadata.
+        #
+        # @return [ Class ] The model class.
+        #
+        # @since 3.0.0
+        def reference_one_to_one(name, meta)
+          relate(name, meta)
+          reference(meta)
+          builder(name, meta).creator(name, meta).autosave(meta)
+          validates_relation(meta)
         end
 
         # Creates a relation for the given name, metadata and relation. It adds
