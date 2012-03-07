@@ -18,11 +18,7 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind_one(doc)
             binding do
-              check_inverse!(doc)
-              bind_foreign_key(doc, base.id)
-              bind_polymorphic_type(doc, base.class.model_name)
-              bind_inverse(doc, base)
-              bind_inverse_of_field(doc, metadata.name)
+              bind_from_relational_parent(doc)
             end
           end
 
@@ -36,11 +32,7 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def unbind_one(doc)
             binding do
-              check_inverse!(doc)
-              bind_foreign_key(doc, nil)
-              bind_polymorphic_type(doc, nil)
-              bind_inverse(doc, nil)
-              bind_inverse_of_field(doc, nil)
+              unbind_from_relational_parent(doc)
             end
           end
         end

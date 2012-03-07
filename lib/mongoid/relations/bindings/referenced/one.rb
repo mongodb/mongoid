@@ -20,14 +20,7 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind_one
             binding do
-              target.you_must(metadata.foreign_key_setter, base.id)
-              target.send(metadata.inverse_setter, base)
-              if metadata.type
-                target.you_must(metadata.type_setter, base.class.model_name)
-              end
-              if inverse_metadata = metadata.inverse_metadata(target)
-                target.do_or_do_not(inverse_metadata.inverse_of_field_setter, metadata.name)
-              end
+              bind_from_relational_parent(target)
             end
           end
 
@@ -41,14 +34,7 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def unbind_one
             binding do
-              target.you_must(metadata.foreign_key_setter, nil)
-              target.send(metadata.inverse_setter, nil)
-              if metadata.type
-                target.you_must(metadata.type_setter, nil)
-              end
-              if inverse_metadata = metadata.inverse_metadata(target)
-                target.do_or_do_not(inverse_metadata.inverse_of_field_setter, nil)
-              end
+              unbind_from_relational_parent(target)
             end
           end
         end

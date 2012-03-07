@@ -176,6 +176,24 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Bind the provided document with the base from the parent relation.
+      #
+      # @api private
+      #
+      # @example Bind the document with the base.
+      #   binding.bind_from_relational_parent(doc)
+      #
+      # @param [ Document ] doc The document to bind.
+      #
+      # @since 3.0.0
+      def bind_from_relational_parent(doc)
+        check_inverse!(doc)
+        bind_foreign_key(doc, base.id)
+        bind_polymorphic_type(doc, base.class.model_name)
+        bind_inverse(doc, base)
+        bind_inverse_of_field(doc, metadata.name)
+      end
+
       # Ensure that the metadata on the base is correct, for the cases
       # where we have multiple belongs to definitions and were are setting
       # different parents in memory in order.
@@ -193,6 +211,24 @@ module Mongoid # :nodoc:
         if inverse_metadata != metadata && !inverse_metadata.nil?
           base.metadata = inverse_metadata
         end
+      end
+
+      # Bind the provided document with the base from the parent relation.
+      #
+      # @api private
+      #
+      # @example Bind the document with the base.
+      #   unbinding.unbind_from_relational_parent(doc)
+      #
+      # @param [ Document ] doc The document to unbind.
+      #
+      # @since 3.0.0
+      def unbind_from_relational_parent(doc)
+        check_inverse!(doc)
+        bind_foreign_key(doc, nil)
+        bind_polymorphic_type(doc, nil)
+        bind_inverse(doc, nil)
+        bind_inverse_of_field(doc, nil)
       end
     end
   end
