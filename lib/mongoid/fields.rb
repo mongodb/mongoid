@@ -379,13 +379,12 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
-          undef_method(meth) if method_defined?(meth)
           if field.cast_on_read?
-            define_method(meth) do
+            re_define_method(meth) do
               fields[name].deserialize(read_attribute(name))
             end
           else
-            define_method(meth) do
+            re_define_method(meth) do
               read_attribute(name).tap do |value|
                 if value.is_a?(Array) || value.is_a?(Hash)
                   attribute_will_change!(name)
