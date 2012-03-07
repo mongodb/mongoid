@@ -877,35 +877,6 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  describe "#inspect" do
-
-    let(:metadata) do
-      described_class.new(
-        name: :preferences,
-        relation: Mongoid::Relations::Referenced::ManyToMany,
-        inverse_class_name: "Person"
-      )
-    end
-
-    it "contains all relevant information" do
-      metadata.inspect.should eq(
-        "#<Mongoid::Relations::Metadata\n" <<
-        "  class_name:           #{metadata.class_name},\n" <<
-        "  cyclic:               #{metadata.cyclic || "No"},\n" <<
-        "  dependent:            #{metadata.dependent || "None"},\n" <<
-        "  inverse_of:           #{metadata.inverse_of || "N/A"},\n" <<
-        "  key:                  #{metadata.key},\n" <<
-        "  macro:                #{metadata.macro},\n" <<
-        "  name:                 #{metadata.name},\n" <<
-        "  order:                #{metadata.order.inspect || "No"},\n" <<
-        "  polymorphic:          #{metadata.polymorphic? ? "Yes" : "No"},\n" <<
-        "  relation:             #{metadata.relation},\n" <<
-        "  setter:               #{metadata.setter},\n" <<
-        "  versioned:            #{metadata.versioned? || "No"}>\n"
-      )
-    end
-  end
-
   describe "#inverse_type" do
 
     context "when the relation is not polymorphic" do

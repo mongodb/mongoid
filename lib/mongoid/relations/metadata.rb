@@ -358,19 +358,25 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inspect
-        "#<Mongoid::Relations::Metadata\n" <<
-        "  class_name:           #{class_name},\n" <<
-        "  cyclic:               #{cyclic || "No"},\n" <<
-        "  dependent:            #{dependent || "None"},\n" <<
-        "  inverse_of:           #{inverse_of || "N/A"},\n" <<
-        "  key:                  #{key},\n" <<
-        "  macro:                #{macro},\n" <<
-        "  name:                 #{name},\n" <<
-        "  order:                #{order.inspect || "No"},\n" <<
-        "  polymorphic:          #{polymorphic? || "No"},\n" <<
-        "  relation:             #{relation},\n" <<
-        "  setter:               #{setter},\n" <<
-        "  versioned:            #{versioned? || "No"}>\n"
+        ::I18n.translate(
+          "mongoid.inspection.metadata",
+          {
+            autobuild: autobuilding?,
+            class_name: class_name,
+            cyclic: cyclic.inspect,
+            dependent: dependent.inspect,
+            inverse_of: inverse_of.inspect,
+            key: key,
+            locale: :en,
+            macro: macro,
+            name: name,
+            order: order.inspect,
+            polymorphic: polymorphic?,
+            relation: relation,
+            setter: setter,
+            versioned: versioned?
+          }
+        )
       end
 
       # Get the name of the inverse relations if they exists. If this is a
@@ -518,8 +524,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def inverse_type
-        @inverse_type ||=
-          relation.stores_foreign_key? && polymorphic? ? "#{name}_type" : nil
+        @inverse_type ||= determine_inverse_for(:type)
       end
 
       # Gets the setter for the field that sets the type of document on a
@@ -542,10 +547,11 @@ module Mongoid # :nodoc:
       #   metadata.inverse_of_field
       #
       # @return [ String ] The name of the field for storing the name of the
-      # inverse field.
+      #   inverse field.
+      #
+      # @since 2.4.5
       def inverse_of_field
-        @inverse_of_field ||=
-          relation.stores_foreign_key? && polymorphic? ? "#{name}_field" : nil
+        @inverse_of_field ||= determine_inverse_for(:field)
       end
 
       # Gets the setter for the field that stores the name of the inverse field
@@ -816,8 +822,23 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def classify
         return name.to_s.camelize if macro == :embedded_in
-
         "#{find_module}::#{name.to_s.classify}"
+      end
+
+      # Get the name for the inverse field.
+      #
+      # @api private
+      #
+      # @example Get the inverse field name.
+      #   metadata.determine_inverse_for(:type)
+      #
+      # @param [ Symbol ] field The inverse field name.
+      #
+      # @return [ String ] The name of the field.
+      #
+      # @since 3.0.0
+      def determine_inverse_for(field)
+        relation.stores_foreign_key? && polymorphic? ? "#{name}_#{field}" : nil
       end
 
       # Find the module the class with the specific name is in.

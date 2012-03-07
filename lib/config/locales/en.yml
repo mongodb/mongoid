@@ -1,5 +1,20 @@
 en:
   mongoid:
+    inspection:
+      metadata: "#<Mongoid::Relations::Metadata\n
+        \_\_autobuild:    %{autobuild},\n
+        \_\_class_name:   %{class_name},\n
+        \_\_cyclic:       %{cyclic},\n
+        \_\_dependent:    %{dependent},\n
+        \_\_inverse_of:   %{inverse_of},\n
+        \_\_key:          %{key},\n
+        \_\_macro:        %{macro},\n
+        \_\_name:         %{name},\n
+        \_\_order:        %{order},\n
+        \_\_polymorphic:  %{polymorphic},\n
+        \_\_relation:     %{relation},\n
+        \_\_setter:       %{setter},\n
+        \_\_versioned:    %{versioned}>\n"
     errors:
       messages:
         blank:
