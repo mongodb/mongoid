@@ -66,6 +66,25 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Check for problems with multiple inverse definitions.
+      #
+      # @api private
+      #
+      # @example Check for inverses errors.
+      #   binding.check_inverses!(doc)
+      #
+      # @param [ Document ] doc The document to check.
+      #
+      # @since 3.0.0
+      def check_inverses!(doc)
+        inverses = metadata.inverses(doc)
+        if inverses.count > 1 && base.send(metadata.foreign_key).nil?
+          raise Errors::InvalidSetPolymorphicRelation.new(
+            metadata.name, base.class.name, target.class.name
+          )
+        end
+      end
+
       # Set the id of the related document in the foreign key field on the
       # keyed document.
       #
@@ -102,6 +121,24 @@ module Mongoid # :nodoc:
         end
       end
 
+      # Set the type of the related document on the foreign type field, used
+      # when relations are polymorphic.
+      #
+      # @api private
+      #
+      # @example Bind the polymorphic type.
+      #   binding.bind_polymorphic_inverse_type(post, "Person")
+      #
+      # @param [ Document ] typed The document that stores the type field.
+      # @param [ String ] name The name of the model.
+      #
+      # @since 3.0.0
+      def bind_polymorphic_inverse_type(typed, name)
+        if metadata.inverse_type
+          typed.__send__(metadata.inverse_type_setter, name)
+        end
+      end
+
       # Bind the inverse document to the child document so that the in memory
       # instances are the same.
       #
@@ -115,14 +152,46 @@ module Mongoid # :nodoc:
       #
       # @since 3.0.0
       def bind_inverse(doc, inverse)
-        doc.__send__(metadata.inverse_setter, inverse)
+        if doc.respond_to?(metadata.inverse_setter)
+          doc.__send__(metadata.inverse_setter, inverse)
+        end
       end
 
-      def bind_inverse_of_field(doc, unbind = false)
+      # Bind the inverse of field, when in a polymorphic relation.
+      #
+      # @api private
+      #
+      # @example Bind the inverse of field.
+      #   binding.bind_inverse_of_field(doc)
+      #
+      # @param [ Document ] doc The document to bind.
+      # @param [ String ] name The name of the relation.
+      #
+      # @since 3.0.0
+      def bind_inverse_of_field(doc, name)
         if inverse_metadata = metadata.inverse_metadata(doc)
           if setter = inverse_metadata.inverse_of_field_setter
-            doc.__send__(setter, unbind ? nil : metadata.name)
+            doc.__send__(setter, name)
           end
+        end
+      end
+
+      # Ensure that the metadata on the base is correct, for the cases
+      # where we have multiple belongs to definitions and were are setting
+      # different parents in memory in order.
+      #
+      # @api private
+      #
+      # @example Set the base metadata.
+      #   binding.set_base_metadata
+      #
+      # @return [ true, false ] If the metadata changed.
+      #
+      # @since 2.4.4
+      def set_base_metadata
+        inverse_metadata = metadata.inverse_metadata(target)
+        if inverse_metadata != metadata && !inverse_metadata.nil?
+          base.metadata = inverse_metadata
         end
       end
     end

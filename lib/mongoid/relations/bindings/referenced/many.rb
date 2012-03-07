@@ -22,7 +22,7 @@ module Mongoid # :nodoc:
               bind_foreign_key(doc, base.id)
               bind_polymorphic_type(doc, base.class.model_name)
               bind_inverse(doc, base)
-              bind_inverse_of_field(doc)
+              bind_inverse_of_field(doc, metadata.name)
             end
           end
 
@@ -40,7 +40,7 @@ module Mongoid # :nodoc:
               bind_foreign_key(doc, nil)
               bind_polymorphic_type(doc, nil)
               bind_inverse(doc, nil)
-              bind_inverse_of_field(doc, true)
+              bind_inverse_of_field(doc, nil)
             end
           end
         end

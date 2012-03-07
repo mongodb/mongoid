@@ -20,28 +20,14 @@ module Mongoid # :nodoc:
           # @since 2.0.0.rc.1
           def bind_one
             binding do
-              inverses = metadata.inverses(target)
-              if inverses.count > 1 && base.send(metadata.foreign_key) == nil
-                raise Errors::InvalidSetPolymorphicRelation.new(
-                  metadata.name, base.class.name, target.class.name
-                )
-              end
-
-              inverse = metadata.inverse(target)
-
-              base.you_must(metadata.foreign_key_setter, target.id)
-              if metadata.inverse_type
-                base.you_must(metadata.inverse_type_setter, target.class.model_name)
-              end
-
-              if inverse
+              check_inverses!(target)
+              bind_foreign_key(base, target.id)
+              bind_polymorphic_inverse_type(base, target.class.model_name)
+              if inverse = metadata.inverse(target)
                 if set_base_metadata
-                  if metadata.inverse_of_field
-                    base.you_must(metadata.inverse_of_field_setter, base.metadata.name)
-                  end
-
+                  bind_inverse_of_field(base, base.metadata.name)
                   if base.referenced_many?
-                    target.send(inverse).push(base) unless Mongoid.using_identity_map?
+                    target.__send__(inverse).push(base) unless Mongoid.using_identity_map?
                   else
                     target.do_or_do_not(metadata.inverse_setter(target), base)
                   end
@@ -62,46 +48,19 @@ module Mongoid # :nodoc:
             binding do
               inverse = metadata.inverse(target)
               if !inverse && metadata.inverse_of_field
-                inverse = base.send(metadata.inverse_of_field)
+                inverse = base.__send__(metadata.inverse_of_field)
               end
-
-              base.you_must(metadata.foreign_key_setter, nil)
-              if metadata.inverse_type
-                base.you_must(metadata.inverse_type_setter, nil)
-              end
-              if metadata.inverse_of_field
-                base.you_must(metadata.inverse_of_field_setter, nil)
-              end
-
+              bind_foreign_key(base, nil)
+              bind_polymorphic_inverse_type(base, nil)
+              bind_inverse_of_field(base, nil)
               if inverse
                 set_base_metadata
                 if base.referenced_many?
-                  target.send(inverse).delete(base)
+                  target.__send__(inverse).delete(base)
                 else
-                  target.send("#{inverse}=", nil)
+                  target.__send__("#{inverse}=", nil)
                 end
               end
-            end
-          end
-
-          private
-
-          # Ensure that the metadata on the base is correct, for the cases
-          # where we have multiple belongs to definitions and were are setting
-          # different parents in memory in order.
-          #
-          # @api private
-          #
-          # @example Set the base metadata.
-          #   binding.set_base_metadata
-          #
-          # @return [ true, false ] If the metadata changed.
-          #
-          # @since 2.4.4
-          def set_base_metadata
-            inverse_metadata = metadata.inverse_metadata(target)
-            if inverse_metadata != metadata && !inverse_metadata.nil?
-              base.metadata = inverse_metadata
             end
           end
         end
