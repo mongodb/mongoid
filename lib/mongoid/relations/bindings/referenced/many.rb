@@ -19,14 +19,10 @@ module Mongoid # :nodoc:
           def bind_one(doc)
             binding do
               check_inverse!(doc)
-              doc.you_must(metadata.foreign_key_setter, base.id)
-              if metadata.type
-                doc.you_must(metadata.type_setter, base.class.model_name)
-              end
-              doc.send(metadata.inverse_setter, base)
-              if inverse_metadata = metadata.inverse_metadata(doc)
-                doc.do_or_do_not(inverse_metadata.inverse_of_field_setter, metadata.name)
-              end
+              bind_foreign_key(doc, base.id)
+              bind_polymorphic_type(doc, base.class.model_name)
+              bind_inverse(doc, base)
+              bind_inverse_of_field(doc)
             end
           end
 
@@ -41,40 +37,10 @@ module Mongoid # :nodoc:
           def unbind_one(doc)
             binding do
               check_inverse!(doc)
-              doc.you_must(metadata.foreign_key_setter, nil)
-              if metadata.type
-                doc.you_must(metadata.type_setter, nil)
-              end
-              doc.send(metadata.inverse_setter, nil)
-              if inverse_metadata = metadata.inverse_metadata(doc)
-                doc.do_or_do_not(inverse_metadata.inverse_of_field_setter, nil)
-              end
-            end
-          end
-
-          private
-
-          # Check if the inverse is properly defined.
-          #
-          # @api private
-          #
-          # @example Check the inverse definition.
-          #   binding.check_inverse!(doc)
-          #
-          # @param [ Document ] doc The document getting bound.
-          #
-          # @raise [ Errors::InverseNotFound ] If no inverse found.
-          #
-          # @since 3.0.0
-          def check_inverse!(doc)
-            if !metadata.forced_nil_inverse? &&
-              !doc.respond_to?(metadata.foreign_key_setter)
-              raise Errors::InverseNotFound.new(
-                base.class,
-                metadata.name,
-                doc.class,
-                metadata.foreign_key
-              )
+              bind_foreign_key(doc, nil)
+              bind_polymorphic_type(doc, nil)
+              bind_inverse(doc, nil)
+              bind_inverse_of_field(doc, true)
             end
           end
         end
