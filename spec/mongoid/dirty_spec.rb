@@ -565,6 +565,82 @@ describe Mongoid::Dirty do
         acolyte.should_not be_changed
       end
     end
+
+    context "when a child has changed" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:address) do
+        person.addresses.create(street: "hobrecht")
+      end
+
+      before do
+        address.number = 10
+      end
+
+      it "returns true" do
+        person.should be_changed
+      end
+    end
+
+    context "when a deeply embedded child has changed" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:address) do
+        person.addresses.create(street: "hobrecht")
+      end
+
+      let!(:location) do
+        address.locations.create(name: "home")
+      end
+
+      before do
+        location.name = "work"
+      end
+
+      it "returns true" do
+        person.should be_changed
+      end
+    end
+
+    context "when a child is new" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:address) do
+        person.addresses.build(street: "hobrecht")
+      end
+
+      it "returns true" do
+        person.should be_changed
+      end
+    end
+
+    context "when a deeply embedded child is new" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:address) do
+        person.addresses.create(street: "hobrecht")
+      end
+
+      let!(:location) do
+        address.locations.build(name: "home")
+      end
+
+      it "returns true" do
+        person.should be_changed
+      end
+    end
   end
 
   describe "#changes" do
