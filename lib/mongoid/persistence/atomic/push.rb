@@ -17,10 +17,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0
         def persist
-          prepare do
-            document[field] = [] unless document[field]
-            document.send(field).concat(Array(value)).tap { execute("$push") }
-          end
+          append_with("$push")
         end
       end
     end

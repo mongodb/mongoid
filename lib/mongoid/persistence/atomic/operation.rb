@@ -98,6 +98,24 @@ module Mongoid #:nodoc:
             document.remove_change(field)
           end
         end
+
+        # Appends items to an array and executes the corresponding $push or
+        # $pushAll operation.
+        #
+        # @api private
+        #
+        # @example Execute the append.
+        #   operation.append_with("$push")
+        #
+        # @param [ String ] name The name of the operation - $push or $pushAll.
+        #
+        # @since 3.0.0
+        def append_with(name)
+          prepare do
+            document[field] = [] unless document[field]
+            document.send(field).concat(Array(value)).tap { execute(name) }
+          end
+        end
       end
     end
   end
