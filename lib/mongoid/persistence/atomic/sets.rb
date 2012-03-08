@@ -18,10 +18,7 @@ module Mongoid #:nodoc:
         def persist
           prepare do
             document[field] = value
-            document[field].tap do
-              collection.update(document.atomic_selector, operation("$set"), options)
-              document.remove_change(field)
-            end
+            document[field].tap { execute("$set") }
           end
         end
       end

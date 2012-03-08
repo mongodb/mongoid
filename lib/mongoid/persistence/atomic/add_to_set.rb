@@ -23,12 +23,7 @@ module Mongoid #:nodoc:
             Array.wrap(value).each do |val|
               values.push(val) unless values.include?(val)
             end
-            values.tap do
-              if document.persisted?
-                collection.update(document.atomic_selector, operation("$addToSet"), options)
-                document.remove_change(field)
-              end
-            end
+            values.tap { execute("$addToSet") }
           end
         end
 

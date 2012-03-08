@@ -18,8 +18,7 @@ module Mongoid #:nodoc:
         def persist
           prepare do
             document.attributes.delete(field)
-            collection.update(document.atomic_selector, operation("$unset"), options)
-            document.remove_change(value)
+            execute("$unset")
           end
         end
       end

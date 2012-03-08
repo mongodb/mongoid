@@ -79,6 +79,25 @@ module Mongoid #:nodoc:
             Threaded.clear_options!
           end
         end
+
+        private
+
+        # Executes the common functionality between operations.
+        #
+        # @api private
+        #
+        # @example Execute the operation.
+        #   operation.execute("$push")
+        #
+        # @param [ String ] name The name of the operation.
+        #
+        # @since 3.0.0
+        def execute(name)
+          if document.persisted?
+            collection.update(document.atomic_selector, operation(name), options)
+            document.remove_change(field)
+          end
+        end
       end
     end
   end

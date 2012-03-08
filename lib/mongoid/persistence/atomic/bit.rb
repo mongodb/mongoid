@@ -25,10 +25,7 @@ module Mongoid #:nodoc:
               result = result | val if bit.to_s == "or"
               result
             end
-            document[field].tap do
-              collection.update(document.atomic_selector, operation("$bit"), options)
-              document.remove_change(field)
-            end
+            document[field].tap { execute("$bit") }
           end
         end
       end

@@ -19,10 +19,7 @@ module Mongoid #:nodoc:
           prepare do
             current = document[field] || 0
             document[field] = current + value
-            document[field].tap do
-              collection.update(document.atomic_selector, operation("$inc"), options)
-              document.remove_change(field)
-            end
+            document[field].tap { execute("$inc") }
           end
         end
       end
