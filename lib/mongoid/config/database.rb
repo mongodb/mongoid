@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
     class Database < Hash
 
       # keys to remove from self to not pass through to Mongo::Connection
-      PRIVATE_OPTIONS = %w(uri database username password logger)
+      PRIVATE_OPTIONS = %w(uri host port database username password logger)
 
       # Configure the database connections. This will return an array
       # containing the master and an array of slaves.
