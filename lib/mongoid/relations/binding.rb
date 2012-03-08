@@ -99,7 +99,7 @@ module Mongoid # :nodoc:
       # @since 3.0.0
       def bind_foreign_key(keyed, id)
         unless keyed.frozen?
-          keyed.__send__(metadata.foreign_key_setter, id)
+          keyed.you_must(metadata.foreign_key_setter, id)
         end
       end
 
@@ -117,7 +117,7 @@ module Mongoid # :nodoc:
       # @since 3.0.0
       def bind_polymorphic_type(typed, name)
         if metadata.type
-          typed.__send__(metadata.type_setter, name)
+          typed.you_must(metadata.type_setter, name)
         end
       end
 
@@ -135,7 +135,7 @@ module Mongoid # :nodoc:
       # @since 3.0.0
       def bind_polymorphic_inverse_type(typed, name)
         if metadata.inverse_type
-          typed.__send__(metadata.inverse_type_setter, name)
+          typed.you_must(metadata.inverse_type_setter, name)
         end
       end
 
@@ -153,7 +153,7 @@ module Mongoid # :nodoc:
       # @since 3.0.0
       def bind_inverse(doc, inverse)
         if doc.respond_to?(metadata.inverse_setter)
-          doc.__send__(metadata.inverse_setter, inverse)
+          doc.you_must(metadata.inverse_setter, inverse)
         end
       end
 
@@ -171,7 +171,7 @@ module Mongoid # :nodoc:
       def bind_inverse_of_field(doc, name)
         if inverse_metadata = metadata.inverse_metadata(doc)
           if setter = inverse_metadata.inverse_of_field_setter
-            doc.__send__(setter, name)
+            doc.you_must(setter, name)
           end
         end
       end
