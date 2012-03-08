@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Criterion::Builder do
+describe Mongoid::Criteria do
 
   describe "#build" do
 

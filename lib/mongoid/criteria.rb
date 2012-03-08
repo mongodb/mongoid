@@ -1,6 +1,4 @@
 # encoding: utf-8
-require "mongoid/criterion/builder"
-require "mongoid/criterion/creational"
 require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
@@ -24,8 +22,6 @@ module Mongoid #:nodoc:
   #   criteria.execute
   class Criteria
     include Enumerable
-    include Criterion::Builder
-    include Criterion::Creational
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Inspection
@@ -109,6 +105,22 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Build a document given the selector and return it.
+    # Complex criteria, such as $in and $or operations will get ignored.
+    #
+    # @example build the document.
+    #   Person.where(:title => "Sir").build
+    #
+    # @example Build with selectors getting ignored.
+    #   Person.where(:age.gt => 5).build
+    #
+    # @return [ Document ] A non-persisted document.
+    #
+    # @since 2.0.0
+    def build(attrs = {})
+      create_document(:new, attrs)
+    end
+
     # Get the collection associated with the criteria.
     #
     # @example Get the collection.
@@ -132,6 +144,22 @@ module Mongoid #:nodoc:
     # @return [ Mongo, Enumerable ] The appropriate context.
     def context
       @context ||= Contexts.context_for(self, embedded)
+    end
+
+    # Create a document in the database given the selector and return it.
+    # Complex criteria, such as $in and $or operations will get ignored.
+    #
+    # @example Create the document.
+    #   Person.where(:title => "Sir").create
+    #
+    # @example Create with selectors getting ignored.
+    #   Person.where(:age.gt => 5).create
+    #
+    # @return [ Document ] A newly created document.
+    #
+    # @since 2.0.0.rc.1
+    def create(attrs = {})
+      create_document(:create, attrs)
     end
 
     # Iterate over each +Document+ in the results. This can take an optional
@@ -180,20 +208,6 @@ module Mongoid #:nodoc:
     # @since 2.0.0
     def freeze
       context and inclusions and super
-    end
-
-    # Merges the supplied argument hash into a single criteria
-    #
-    # @example Fuse the criteria and the object.
-    #   criteria.fuse(:where => { :field => "value"}, :limit => 20)
-    #
-    # @param [ Hash ] criteria_conditions Criteria keys and values.
-    #
-    # @return [ Criteria ] self.
-    def fuse(criteria_conditions = {})
-      criteria_conditions.inject(self) do |criteria, (key, value)|
-        criteria.send(key, value)
-      end
     end
 
     # Create the new +Criteria+ object. This will initialize the selector
@@ -400,6 +414,34 @@ module Mongoid #:nodoc:
           end
         end
       end
+    end
+
+    private
+
+    # Create a document given the provided method and attributes from the
+    # existing selector.
+    #
+    # @api private
+    #
+    # @example Create a new document.
+    #   criteria.create_document(:new, {})
+    #
+    # @param [ Symbol ] method Either :new or :create.
+    # @param [ Hash ] attrs Additional attributes to use.
+    #
+    # @return [ Document ] The new or saved document.
+    #
+    # @since 3.0.0
+    def create_document(method, attrs = {})
+      klass.__send__(method,
+        selector.inject(attrs) do |hash, (key, value)|
+          hash.tap do |_attrs|
+            unless key.to_s =~ /\$/ || value.is_a?(Hash)
+              _attrs[key] = value
+            end
+          end
+        end
+      )
     end
   end
 end

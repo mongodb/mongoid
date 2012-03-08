@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Criterion::Creational do
+describe Mongoid::Criteria do
 
   describe "#create" do
 

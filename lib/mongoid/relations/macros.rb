@@ -133,9 +133,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
-          characterize(name, Referenced::In, options, &block).tap do |meta|
-            reference_one_to_one(name, meta)
-          end
+          reference_one_to_one(name, options, Referenced::In, &block)
         end
 
         # Adds a relational association from a parent Document to many
@@ -215,9 +213,7 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def has_one(name, options = {}, &block)
-          characterize(name, Referenced::One, options, &block).tap do |meta|
-            reference_one_to_one(name, meta)
-          end
+          reference_one_to_one(name, options, Referenced::One, &block)
         end
 
         private
@@ -314,11 +310,13 @@ module Mongoid # :nodoc:
         # @return [ Class ] The model class.
         #
         # @since 3.0.0
-        def reference_one_to_one(name, meta)
-          relate(name, meta)
-          reference(meta)
-          builder(name, meta).creator(name, meta).autosave(meta)
-          validates_relation(meta)
+        def reference_one_to_one(name, options, relation, &block)
+          characterize(name, relation, options, &block).tap do |meta|
+            relate(name, meta)
+            reference(meta)
+            builder(name, meta).creator(name, meta).autosave(meta)
+            validates_relation(meta)
+          end
         end
 
         # Creates a relation for the given name, metadata and relation. It adds
