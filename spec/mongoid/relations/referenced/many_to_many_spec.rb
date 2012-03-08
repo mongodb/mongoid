@@ -1613,7 +1613,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "returns the appropriate criteria" do
-        eager.selector.should eq({ _id: { "$in" => ids }})
+        eager.selector.should eq({ "_id" => { "$in" => ids }})
       end
 
       it "puts the documents in the identity map" do
@@ -2187,7 +2187,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     it "returns with an empty selector" do
-      scoped.selector.should eq({ _id: { "$in" => [] }})
+      scoped.selector.should eq({ "$and" => [{ "_id" => { "$in" => [] }}]})
     end
   end
 

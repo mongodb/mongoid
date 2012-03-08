@@ -209,7 +209,7 @@ describe Mongoid::Contexts::Enumerable do
   describe ".initialize" do
 
     let(:selector) do
-      { field: "value"  }
+      { "field" => "value"  }
     end
 
     let(:options) do
@@ -463,7 +463,7 @@ describe Mongoid::Contexts::Enumerable do
     context "with sort options" do
 
       before do
-        context.options[:sort] = [ [:created_at, :asc] ]
+        context.options[:sort] = [ [:created_at, 1] ]
       end
 
       it "sorts by the key" do
@@ -476,7 +476,7 @@ describe Mongoid::Contexts::Enumerable do
 
       before do
         Address.field(:street, localize: true)
-        context.options[:sort] = [ [:"street.#{::I18n.locale}", :asc] ]
+        context.options[:sort] = [ [:"street.#{::I18n.locale}", 1] ]
       end
 
       after :all do

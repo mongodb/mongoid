@@ -4,7 +4,7 @@ describe Mongoid::Criterion::Inspection do
 
   describe "#inspect" do
 
-    context "when documents match in the database" do
+    pending "when documents match in the database" do
 
       let(:criteria) do
         Person.where(:age.gt => 10, title: "Sir").limit(1)
@@ -27,7 +27,7 @@ describe Mongoid::Criterion::Inspection do
       end
     end
 
-    context "when no documents match in the database" do
+    pending "when no documents match in the database" do
 
       let(:criteria) do
         Person.where(:age.gt => 10, title: "Sir")

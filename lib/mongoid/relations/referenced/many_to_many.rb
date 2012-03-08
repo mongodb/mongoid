@@ -237,7 +237,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            metadata.klass.any_in(_id: object)
+            metadata.klass.all_of(_id: { "$in" => object })
           end
 
           # Get the criteria that is used to eager load a relation of this

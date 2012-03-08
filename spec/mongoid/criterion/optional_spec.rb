@@ -21,7 +21,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should eq([[:"description.en", :asc]])
+          criteria.options[:sort].should eq({ "description.en" => 1 })
         end
 
       end
@@ -41,7 +41,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should eq([[:"description.de", :asc]])
+          criteria.options[:sort].should eq({ "description.de" => 1 })
         end
       end
     end
@@ -53,7 +53,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the ascending sort criteria" do
-        criteria.options[:sort].should eq([[ :title, :asc ]])
+        criteria.options[:sort].should eq({ "title" => 1 })
       end
     end
 
@@ -77,7 +77,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrites by last" do
-         criteria.options[:sort].should eq([[:title, :desc]])
+         criteria.options[:sort].should eq({ "title" => -1 })
         end
       end
 
@@ -88,7 +88,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrite previous" do
-         criteria.options[:sort].should eq([[:title, :asc]])
+         criteria.options[:sort].should eq({ "title" => 1 })
         end
       end
     end
@@ -104,7 +104,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the ascending sort criteria" do
-        criteria.options[:sort].should eq([[ :title, :asc ], [ :dob, :asc ]])
+        criteria.options[:sort].should eq({ "title" => 1, "dob" => 1 })
       end
     end
 
@@ -168,11 +168,11 @@ describe Mongoid::Criterion::Optional do
 
     it "does not overwrite any previous criteria" do
       criteria.options[:sort].should eq(
-        [[ :title, :asc ], [ :dob, :desc ], [ :name, :desc ], [ :score, :asc ]]
+        { "title" => 1, "dob" => -1, "name" => -1, "score" => 1 }
       )
     end
 
-    it 'does not alter the original criteria' do
+    it "does not alter the original criteria" do
       expect {
         criteria
       }.not_to change { original.options[:sort] }
@@ -227,7 +227,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should eq([[:"description.en", :desc]])
+          criteria.options[:sort].should eq({ "description.en" => -1 })
         end
       end
 
@@ -246,7 +246,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should eq([[:"description.de", :desc]])
+          criteria.options[:sort].should eq({ "description.de" => -1 })
         end
       end
     end
@@ -258,7 +258,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the descending sort criteria" do
-        criteria.options[:sort].should eq([[ :title, :desc ]])
+        criteria.options[:sort].should eq({ "title" => -1 })
       end
     end
 
@@ -282,7 +282,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrites by last" do
-         criteria.options[:sort].should eq([[:title, :asc]])
+         criteria.options[:sort].should eq({ "title" => 1 })
         end
       end
 
@@ -293,7 +293,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "overwrite previous" do
-         criteria.options[:sort].should eq([[:title, :desc]])
+         criteria.options[:sort].should eq({ "title" => -1 })
         end
       end
     end
@@ -308,7 +308,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the descending sort criteria" do
-        criteria.options[:sort].should eq([[ :title, :desc ], [ :dob, :desc ]])
+        criteria.options[:sort].should eq({ "title" => -1, "dob" => -1 })
       end
     end
 
@@ -380,7 +380,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "adds the _id query to the selector" do
-            criteria.selector.should eq({ _id: id })
+            criteria.selector.should eq({ "_id" => id })
           end
 
           it "returns a copy" do
@@ -399,7 +399,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "adds the string _id query to the selector" do
-            criteria.selector.should eq({ _id: id.to_s })
+            criteria.selector.should eq({ "_id" => id.to_s })
           end
 
           it "returns a copy" do
@@ -419,7 +419,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the _id query to the selector" do
-          criteria.selector.should eq({ _id: { "$in" => ids }})
+          criteria.selector.should eq({ "_id" => { "$in" => ids }})
         end
       end
 
@@ -430,7 +430,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "adds the _id query to the selector" do
-          base.for_ids(ids).selector.should eq({ _id: ids.first.to_s })
+          base.for_ids(ids).selector.should eq({ "_id" => ids.first.to_s })
         end
       end
     end
@@ -459,7 +459,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "adds the _id query to the selector convert like BSON::ObjectId" do
-            criteria.selector.should eq({ _id: BSON::ObjectId(id) })
+            criteria.selector.should eq({ "_id" => BSON::ObjectId(id) })
           end
 
           it "returns a copy" do
@@ -478,7 +478,7 @@ describe Mongoid::Criterion::Optional do
           end
 
           it "adds the _id query to the selector without cast" do
-            criteria.selector.should eq({ _id: id })
+            criteria.selector.should eq({ "_id" => id })
           end
 
           it "returns a copy" do
@@ -499,7 +499,7 @@ describe Mongoid::Criterion::Optional do
 
         it "adds the _id query to the selector with all ids like BSON::ObjectId" do
           criteria.selector.should eq(
-            { _id: { "$in" => ids.map { |i| BSON::ObjectId(i) }}}
+            { "_id" => { "$in" => ids.map { |i| BSON::ObjectId(i) }}}
           )
         end
       end
@@ -519,17 +519,6 @@ describe Mongoid::Criterion::Optional do
       end
     end
 
-    context "when value not provided" do
-
-      let(:criteria) do
-        base.limit
-      end
-
-      it "defaults to 20" do
-        criteria.options.should eq({ limit: 20 })
-      end
-    end
-
     it "returns a copy" do
       base.limit.should_not eql(base)
     end
@@ -542,39 +531,6 @@ describe Mongoid::Criterion::Optional do
 
       it "cast the limit value to an Integer" do
         criteria.options.should eq({ limit: 100 })
-      end
-    end
-  end
-
-  describe "#offset" do
-
-    context "when the skip option exists" do
-
-      let(:criteria) do
-        base.extras({ skip: 20 })
-      end
-
-      it "returns the skip option" do
-        criteria.offset.should eq(20)
-      end
-    end
-
-    context "when an argument is provided" do
-
-      let(:criteria) do
-        base.offset(40)
-      end
-
-      it "delegates to skip" do
-        criteria.options[:skip].should eq(40)
-      end
-    end
-
-    context "when no option exists" do
-
-      it "returns nil" do
-        base.offset.should be_nil
-        base.options[:skip].should be_nil
       end
     end
   end
@@ -594,7 +550,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should eq([[:"description.en", :desc]])
+          criteria.options[:sort].should eq({ "description.en" => -1 })
         end
       end
 
@@ -613,7 +569,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "converts to dot notation with the default locale" do
-          criteria.options[:sort].should eq([[:"description.de", :desc]])
+          criteria.options[:sort].should eq({ "description.de" => -1 })
         end
       end
     end
@@ -625,7 +581,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        criteria.options.should eq({ sort: [[:title, :asc], [:text, :desc]] })
+        criteria.options.should eq({ sort: { "title" => 1, "text" => -1 }})
       end
     end
 
@@ -636,7 +592,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        criteria.options[:sort].should include([:title, :asc])
+        criteria.options[:sort].should eq({ "title" => 1 })
       end
     end
 
@@ -647,21 +603,9 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        criteria.options[:sort].should include([:title, :asc], [:text, :desc])
+        criteria.options[:sort].should eq({ "title" => 1, "text" => -1 })
       end
     end
-
-    context "when providing a hash of multiple options" do
-
-      let(:criteria) do
-        base.order_by(title: :asc, text: :desc)
-      end
-
-      it "adds the sort to the options" do
-        expect { criteria }.to raise_exception(ArgumentError)
-      end
-    end
-
 
     context "when providing multiple symbols" do
 
@@ -670,7 +614,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the sort to the options" do
-        criteria.options.should eq({ sort: [[:title, :asc], [:text, :desc]] })
+        criteria.options.should eq({ sort: { "title" => 1, "text" => -1 }})
       end
     end
 
@@ -689,7 +633,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "add to options last chained criterion on same field" do
-        criteria.options[:sort].should include([:title, :desc])
+        criteria.options[:sort].should eq({ "title" => -1, "text" => -1 })
       end
 
       it "don't add to options not last chained criterion on same field"  do
@@ -700,7 +644,7 @@ describe Mongoid::Criterion::Optional do
     context "when chained with mixed defenitions" do
 
       let(:criteria) do
-        base.order_by(title: :asc).order_by([ {text: :desc}, :title.desc ])
+        base.order_by(title: :asc).order_by([ :text.desc, :title.desc ])
       end
 
       it "merge criterias" do
@@ -708,15 +652,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "add to options last chained criterion on same field" do
-        criteria.options[:sort].should include([:title, :desc])
-      end
-
-      it "add to options last chained criterion" do
-        criteria.options[:sort].should include([:text, :desc])
-      end
-
-      it "don't add to options not last chained criterion on same field"  do
-        criteria.options[:sort].should_not include([:title, :asc])
+        criteria.options[:sort].should eq({ "title" => -1, "text" => -1 })
       end
     end
   end
@@ -731,17 +667,6 @@ describe Mongoid::Criterion::Optional do
 
       it "adds the skip value to the options" do
         criteria.options.should eq({ skip: 20 })
-      end
-    end
-
-    context "when value not provided" do
-
-      let(:criteria) do
-        base.skip
-      end
-
-      it "defaults to zero" do
-        criteria.options.should eq({ skip: 0 })
       end
     end
 
@@ -770,7 +695,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the _type query to the selector" do
-        criteria.selector.should eq({ _type: { '$in' => ['Browser'] } })
+        criteria.selector.should eq({ "_type" => { '$in' => ['Browser'] } })
       end
 
       it "returns a copy" do
@@ -785,7 +710,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "adds the _type query to the selector" do
-        criteria.selector.should eq({ _type: { '$in' => ['Browser', 'Firefox'] } })
+        criteria.selector.should eq({ "_type" => { '$in' => ['Browser', 'Firefox'] } })
       end
 
       it "returns a copy" do
@@ -836,7 +761,7 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "creates a simple selector" do
-        for_ids.selector.should eq({ _id: 1 })
+        for_ids.selector.should eq({ "_id" => 1 })
       end
     end
 
@@ -849,7 +774,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "creates a simple selector" do
-          for_ids.selector.should eq({ _id: 1 })
+          for_ids.selector.should eq({ "_id" => 1 })
         end
       end
 
@@ -860,7 +785,7 @@ describe Mongoid::Criterion::Optional do
         end
 
         it "creates an $in query" do
-          for_ids.selector.should eq({ _id: { "$in" => [1, 2, 3] } })
+          for_ids.selector.should eq({ "_id" => { "$in" => [1, 2, 3] } })
         end
       end
     end

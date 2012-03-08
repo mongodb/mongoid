@@ -9,7 +9,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should eq({ aliases: { "$all" => [ "Bond", "007" ] } })
+      criteria.selector.should eq({ "aliases" => { "$all" => [ "Bond", "007" ] } })
     end
   end
 
@@ -20,7 +20,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should eq({ aliases: { "$in" => [ "Bond", "007" ] } })
+      criteria.selector.should eq({ "aliases" => { "$in" => [ "Bond", "007" ] } })
     end
   end
 
@@ -31,7 +31,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should eq({ title: { "$ne" => "Sir" } })
+      criteria.selector.should eq({ "title" => { "$ne" => "Sir" } })
     end
   end
 
@@ -440,7 +440,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.options.should eq({ fields: {_type: 1, title: 1, age: 1} })
+      criteria.options.should eq({ fields: { "title" => 1, "age" => 1, "_type" => 1 }})
     end
   end
 
@@ -451,7 +451,7 @@ describe Mongoid::Finders do
     end
 
     it "returns a new criteria with select conditions added" do
-      criteria.selector.should eq({ title: "Sir" })
+      criteria.selector.should eq({ "title" => "Sir" })
     end
   end
 
@@ -463,7 +463,7 @@ describe Mongoid::Finders do
 
     it "returns a new criteria with select conditions added" do
       criteria.selector.should eq(
-        { latlng: { "$near" => [37.761523, -122.423575, 1] }}
+        { "latlng" => { "$near" => [37.761523, -122.423575, 1] }}
       )
     end
   end

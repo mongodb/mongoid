@@ -1,11 +1,9 @@
 # encoding: utf-8
-require "mongoid/criterion/complex"
 require "mongoid/criterion/exclusion"
 require "mongoid/criterion/inclusion"
 require "mongoid/criterion/inspection"
 require "mongoid/criterion/optional"
 require "mongoid/criterion/scoping"
-require "mongoid/criterion/selector"
 
 module Mongoid #:nodoc:
 
@@ -22,20 +20,14 @@ module Mongoid #:nodoc:
   #   criteria.execute
   class Criteria
     include Enumerable
+    include Origin::Queryable
     include Criterion::Exclusion
     include Criterion::Inclusion
     include Criterion::Inspection
     include Criterion::Optional
     include Criterion::Scoping
 
-    attr_accessor \
-      :documents,
-      :embedded,
-      :ids,
-      :klass,
-      :options,
-      :selector,
-      :field_list
+    attr_accessor :embedded, :klass
 
     delegate \
       :add_to_set,
@@ -162,6 +154,14 @@ module Mongoid #:nodoc:
       create_document(:create, attrs)
     end
 
+    def documents
+      @documents ||= []
+    end
+
+    def documents=(docs)
+      @documents = docs
+    end
+
     # Iterate over each +Document+ in the results. This can take an optional
     # block to pass to each argument in the results.
     #
@@ -205,7 +205,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def extract_id
-      selector[:_id]
+      selector["_id"]
     end
 
     # When freezing a criteria we need to initialize the context first
@@ -222,17 +222,9 @@ module Mongoid #:nodoc:
       context and inclusions and super
     end
 
-    # Create the new +Criteria+ object. This will initialize the selector
-    # and options hashes, as well as the type of criteria.
-    #
-    # @example Instantiate a new criteria.
-    #   Criteria.new(Model, true)
-    #
-    # @param [ Class ] klass The model the criteria is for.
-    # @param [ true, false ] embedded Is the criteria for embedded docs.
     def initialize(klass)
-      @selector = Criterion::Selector.new(klass)
-      @options, @klass, @documents, @embedded = {}, klass, [], false
+      @klass = klass
+      super(klass.aliased_fields, klass.fields)
     end
 
     # Merges another object with this +Criteria+ and returns a new criteria.
@@ -284,7 +276,7 @@ module Mongoid #:nodoc:
     # @return [ true, false ] If the criteria responds to the method.
     def respond_to?(name, include_private = false)
       # don't include klass private methods because method_missing won't call them
-      super || @klass.respond_to?(name) || entries.respond_to?(name, include_private)
+      super || klass.respond_to?(name) || entries.respond_to?(name, include_private)
     end
 
     alias :to_ary :to_a
@@ -394,38 +386,6 @@ module Mongoid #:nodoc:
         end
       else
         return entries.send(name, *args)
-      end
-    end
-
-    # Update the selector setting the operator on the value for each key in the
-    # supplied attributes +Hash+.
-    #
-    # @example Update the selector.
-    #   criteria.update_selector({ :field => "value" }, "$in")
-    #
-    # @param [ Hash, Array ] attributes The values to convert and apply.
-    # @param [ String ] operator The MongoDB operator.
-    # @param [ Symbol ] combine The operator to use when combining sets.
-    def update_selector(attributes, operator, combine = :+)
-      clone.tap do |crit|
-        converted = BSON::ObjectId.convert(klass, attributes || {})
-        converted.each_pair do |key, value|
-          existing = crit.selector[key]
-          unless existing
-            crit.selector[key] = { operator => value }
-          else
-            if existing.respond_to?(:merge)
-              if existing.has_key?(operator)
-                new_value = existing.values.first.send(combine, value)
-                crit.selector[key] = { operator => new_value }
-              else
-                crit.selector[key][operator] = value
-              end
-            else
-              crit.selector[key] = { operator => value }
-            end
-          end
-        end
       end
     end
 

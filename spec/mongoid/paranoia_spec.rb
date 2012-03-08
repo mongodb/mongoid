@@ -5,7 +5,7 @@ describe Mongoid::Paranoia do
   describe ".scoped" do
 
     it "returns a scoped criteria" do
-      ParanoidPost.scoped.selector.should eq({ deleted_at: nil })
+      ParanoidPost.scoped.selector.should eq({ "deleted_at" => nil })
     end
   end
 
@@ -483,7 +483,7 @@ describe Mongoid::Paranoia do
     end
 
     it "returns a scoped criteria" do
-      scoped.selector.should eq({ deleted_at: nil })
+      scoped.selector.should eq({ "deleted_at" => nil })
     end
   end
 

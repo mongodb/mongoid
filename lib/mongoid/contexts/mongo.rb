@@ -272,7 +272,7 @@ module Mongoid #:nodoc:
       # @return [ Document ] The last document in the collection.
       def last
         opts = options_with_default_sorting
-        opts[:sort] = opts[:sort].map{ |option| [ option[0], option[1].invert ] }.uniq
+        opts[:sort] = opts[:sort].map{ |option| [ option[0], -(option[1]) ] }.uniq
         attributes = klass.collection.find_one(selector, opts)
         return nil unless attributes
         selecting do
@@ -434,7 +434,7 @@ module Mongoid #:nodoc:
       def options_with_default_sorting
         process_options.tap do |opts|
           if opts[:sort].blank?
-            opts[:sort] = [[ :_id, :asc ]]
+            opts[:sort] = [[ :_id, 1 ]]
           end
         end
       end
@@ -456,7 +456,11 @@ module Mongoid #:nodoc:
           end
           options[:fields] = fields
         end
-        options.dup
+        options.dup.tap do |opts|
+          if sorting = opts[:sort]
+            opts[:sort] = [*sorting]
+          end
+        end
       end
 
       # If we are limiting results, we need to set the field limitations on a

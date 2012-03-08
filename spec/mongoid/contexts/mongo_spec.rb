@@ -80,21 +80,21 @@ describe Mongoid::Contexts::Mongo do
         context "by default" do
 
           it "ignores previous offset/limit statements" do
-            Person.limit(5).offset(10).count.should eq(13)
+            Person.limit(5).skip(10).count.should eq(13)
           end
         end
 
         context "when passed 'true'" do
 
-          it "includes previous offset/limit statements" do
-            Person.limit(5).offset(5).count(true).should eq(5)
+          it "includes previous skip/limit statements" do
+            Person.limit(5).skip(5).count(true).should eq(5)
           end
         end
 
         context "when passed 'false'" do
 
-          it "ignores previous offset/limit statements" do
-            Person.limit(5).offset(10).count(false).should eq(13)
+          it "ignores previous skip/limit statements" do
+            Person.limit(5).skip(10).count(false).should eq(13)
           end
         end
       end
@@ -157,7 +157,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ sort: [[ :"description.en", :desc ]] })
+        criteria.options.should eq({ sort: { "description.en" => -1 }})
       end
     end
   end
@@ -191,7 +191,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "does not modify the previous criteria's sorting" do
-        criteria.options.should eq({ sort: [[ :"description.en", :desc ]] })
+        criteria.options.should eq({ sort: { "description.en" => -1 }})
       end
     end
   end

@@ -3,21 +3,6 @@ module Mongoid #:nodoc:
   module Criterion #:nodoc:
     module Optional
 
-      # Adds fields to be sorted in ascending order. Will add them in the order
-      # they were passed into the method.
-      #
-      # @example Sort in ascending order.
-      #   criteria.ascending(:title, :dob)
-      #   criteria.asc(:title, :dob)
-      #
-      # @param [ Array<Symbol> ] fields The fields to sort on.
-      #
-      # @return [ Criteria ] The cloned criteria.
-      def ascending(*fields)
-        sort_one_direction(:asc, *fields)
-      end
-      alias :asc :ascending
-
       # Tells the criteria that the cursor that gets returned needs to be
       # cached. This is so multiple iterations don't hit the database multiple
       # times, however this is not advisable when working with large data sets
@@ -40,21 +25,6 @@ module Mongoid #:nodoc:
       def cached?
         options[:cache] == true
       end
-
-      # Adds fields to be sorted in descending order. Will add them in the order
-      # they were passed into the method.
-      #
-      # @example Sort the criteria in descending order.
-      #   criteria.descending(:title, :dob)
-      #   criteria.desc(:title, :dob)
-      #
-      # @param [ Array<Symbol> ] fields The fields to sort on.
-      #
-      # @return [ Criteria ] The cloned criteria.
-      def descending(*fields)
-        sort_one_direction(:desc, *fields)
-      end
-      alias :desc :descending
 
       # Adds a criterion to the +Criteria+ that specifies additional options
       # to be passed to the Ruby driver, in the exact format for the driver.
@@ -85,79 +55,12 @@ module Mongoid #:nodoc:
       def for_ids(*ids)
         field = klass.fields["_id"]
         ids.flatten!
+        method = extract_id ? :all_of : :where
         if ids.size > 1
-          any_in(_id: ids.map{ |id| field.serialize(id) })
+          send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
         else
-          where(_id: field.serialize(ids.first))
+          send(method, { _id: field.serialize(ids.first) })
         end
-      end
-
-      # Adds a criterion to the +Criteria+ that specifies the maximum number of
-      # results to return. This is mostly used in conjunction with skip()
-      # to handle paginated results.
-      #
-      # @example Limit the result set size.
-      #   criteria.limit(100)
-      #
-      # @param [ Integer ] value The max number of results.
-      #
-      # @return [ Criteria ] The cloned criteria.
-      def limit(value = 20)
-        optional_int(:limit, value)
-      end
-
-      # Returns the offset option. If a per_page option is in the list then it
-      # will replace it with a skip parameter and return the same value. Defaults
-      # to 20 if nothing was provided.
-      #
-      # @example Get the offset.
-      #   criteria.offset(10)
-      #
-      # @return [ Integer ] The number of documents to skip.
-      def offset(*args)
-        args.size > 0 ? skip(args.first) : options[:skip]
-      end
-
-      # Adds a criterion to the +Criteria+ that specifies the sort order of
-      # the returned documents in the database. Similar to a SQL "ORDER BY".
-      #
-      # @example Order by specific fields.
-      #   criteria.order_by([[:field1, :asc], [:field2, :desc]])
-      #
-      # @param [ Array ] params: An +Array+ of [field, direction] sorting pairs.
-      #
-      # @return [ Criteria ] The cloned criteria.
-      def order_by(*args)
-        clone.tap do |crit|
-          arguments = args.size == 1 ? args.first : args
-          setup_sort_options(crit.options) unless args.first.nil?
-          if arguments.is_a?(Array)
-            #[:name, :asc]
-            if arguments.size == 2 && (arguments.first.is_a?(Symbol) || arguments.first.is_a?(String))
-              build_order_options(arguments, crit)
-            else
-              arguments.each { |argument| build_order_options(argument, crit) }
-            end
-          else
-            build_order_options(arguments, crit)
-          end
-        end
-      end
-      alias :order :order_by
-
-      # Adds a criterion to the +Criteria+ that specifies how many results to skip
-      # when returning Documents. This is mostly used in conjunction with
-      # limit() to handle paginated results, and is similar to the
-      # traditional "offset" parameter.
-      #
-      # @example Skip a specified number of documents.
-      #   criteria.skip(20)
-      #
-      # @param [ Integer ] value The number of results to skip.
-      #
-      # @return [ Criteria ] The cloned criteria.
-      def skip(value = 0)
-        optional_int(:skip, value)
       end
 
       # Adds a criterion to the +Criteria+ that specifies a type or an Array of
@@ -173,95 +76,6 @@ module Mongoid #:nodoc:
       def type(types)
         types = [types] unless types.is_a?(Array)
         any_in(_type: types)
-      end
-
-      private
-
-      # Build ordering options from given arguments on given criteria
-      #
-      # @example build order options
-      #   criteria.build_order_options(:name.asc, criteria)
-      #
-      #
-      # @param [ <Hash>, <Array>, <Complex> ] argument to build criteria from
-      # @param [ Criterion ] criterion to change
-      def build_order_options(arguments, crit)
-        case arguments
-        when Hash
-          if arguments.size > 1
-            raise ArgumentError, "Please don't use hash to define multiple orders " +
-                "due to the fact that hash doesn't have order this may cause unpredictable results"
-          end
-          arguments.each_pair do |field, direction|
-            merge_options(crit.options[:sort], [ localize(field), direction ])
-          end
-        when Array
-          merge_options(crit.options[:sort], arguments.map{ |field| localize(field) })
-        when Complex
-          merge_options(crit.options[:sort], [ localize(arguments.key), arguments.operator.to_sym ])
-        end
-      end
-
-      # Merge options for order_by criterion
-      # Allow only one order direction for same field
-      #
-      # @example Merge ordering options
-      #   criteria.merge_options([[:title, :asc], [:created_at, :asc]], [:title, :desc])
-      #
-      #
-      # @param [ Array<Array> ] Existing options
-      # @param [ Array ] New option for merge.
-      #
-      # @since 2.1.0
-      def merge_options(options, new_option)
-        old_option = options.assoc(new_option.first)
-
-        if old_option
-          options[options.index(old_option)] = new_option.flatten
-        else
-          options << new_option.flatten
-        end
-      end
-
-      # Initialize the sort options
-      # Set options[:sort] to an empty array if it does not exist, or dup it if
-      # it already has been defined
-      #
-      # @example criteria.setup_sort_options(crit.options)
-      #
-      # @param [ Array<Array> ] Existing options
-      #
-      # @since 2.4.0
-      def setup_sort_options(options)
-        options[:sort] = options[:sort] ? options[:sort].dup : []
-      end
-
-      # Check if field is localized and return localized version if it is.
-      #
-      # @example localize
-      #   criteria.localize(:description)
-      #
-      # @param [ <Symbol> ] field to localize
-      def localize(field)
-        if klass.fields[field.to_s].try(:localized?)
-          field = "#{field}.#{::I18n.locale}".to_sym
-        end
-        field
-      end
-
-      def optional_int(option, value)
-        clone.tap do |crit|
-          crit.options[option] = value.to_i
-        end
-      end
-
-      def sort_one_direction(direction, *fields)
-        clone.tap do |crit|
-          setup_sort_options(crit.options) unless fields.first.nil?
-          fields.flatten.each do |field|
-            merge_options(crit.options[:sort], [ localize(field), direction ])
-          end
-        end
       end
     end
   end

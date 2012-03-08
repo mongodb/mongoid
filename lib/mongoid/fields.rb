@@ -41,7 +41,7 @@ module Mongoid #:nodoc
       class_attribute :pre_processed_defaults
       class_attribute :post_processed_defaults
 
-      self.aliased_fields = {}
+      self.aliased_fields = { "id" => "_id" }
       self.fields = {}
       self.pre_processed_defaults = []
       self.post_processed_defaults = []

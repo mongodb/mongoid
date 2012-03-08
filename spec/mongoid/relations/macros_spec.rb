@@ -145,8 +145,8 @@ describe Mongoid::Relations::Macros do
         metadata.order.should_not be_nil
       end
 
-      it "returns Mongoid::Criterion::Complex" do
-        metadata.order.should be_kind_of(Mongoid::Criterion::Complex)
+      it "returns Origin::Key" do
+        metadata.order.should be_kind_of(Origin::Key)
       end
     end
 
@@ -359,8 +359,8 @@ describe Mongoid::Relations::Macros do
         metadata.order.should_not be_nil
       end
 
-      it "returns Mongoid::Criterion::Complex" do
-        metadata.order.should be_kind_of(Mongoid::Criterion::Complex)
+      it "returns Origin::Key" do
+        metadata.order.should be_kind_of(Origin::Key)
       end
     end
 
@@ -424,11 +424,10 @@ describe Mongoid::Relations::Macros do
           metadata.order.should_not be_nil
         end
 
-        it "returns Mongoid::Criterion::Complex" do
-          metadata.order.should be_kind_of(Mongoid::Criterion::Complex)
+        it "returns Origin::Key" do
+          metadata.order.should be_kind_of(Origin::Key)
         end
       end
-
 
       context "metadata properties" do
 

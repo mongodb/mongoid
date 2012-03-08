@@ -653,7 +653,7 @@ describe Mongoid::Fields do
         end
 
         it "properly serializes the aliased field" do
-          criteria.selector.should eq({ alias: true })
+          criteria.selector.should eq({ "aliased" => true })
         end
       end
     end

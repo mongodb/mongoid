@@ -32,7 +32,7 @@ describe Mongoid::Criteria do
       context "when removing root documents" do
 
         let(:criteria) do
-          Person.where(title: "Sir").and(:age.gt => 5)
+          Person.where(title: "Sir", :age.gt => 5)
         end
 
         let!(:removed) do

@@ -20,44 +20,6 @@ module Mongoid #:nodoc:
         REVERSALS[self]
       end
 
-      # Define all the necessary methods on symbol to support Mongoid's
-      # complex criterion.
-      #
-      # @example A greater than criterion.
-      #   :field.gt => 5
-      #
-      # @return [ Criterion::Complex ] The criterion.
-      #
-      # @since 1.0.0
-      [
-        "all",
-        "asc",
-        "ascending",
-        "desc",
-        "descending",
-        "exists",
-        "gt",
-        "gte",
-        "in",
-        "lt",
-        "lte",
-        "mod",
-        "ne",
-        "near",
-        "not",
-        "nin",
-        "within",
-        ["count", "size"],
-        ["matches","elemMatch"] ].each do |oper|
-        m, oper = oper
-        oper = m unless oper
-        class_eval <<-OPERATORS
-          def #{m}
-            Criterion::Complex.new(:key => self, :operator => "#{oper}")
-          end
-        OPERATORS
-      end
-
       # Is the symbol a valid value for a Mongoid id?
       #
       # @example Is the string an id value?

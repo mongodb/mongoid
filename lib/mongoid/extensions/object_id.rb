@@ -112,6 +112,15 @@ module Mongoid #:nodoc:
         end
       end
 
+      def evolve(object)
+        __evolve__(object) do |obj|
+          if obj.is_a?(BSON::ObjectId) || !BSON::ObjectId.legal?(obj)
+            obj
+          else
+            BSON::ObjectId.from_string(obj)
+          end
+        end
+      end
     end
   end
 end

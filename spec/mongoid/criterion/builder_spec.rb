@@ -11,7 +11,7 @@ describe Mongoid::Criteria do
       end
 
       before do
-        Person.expects(:new).with(title: "Sir")
+        Person.expects(:new).with("title" => "Sir")
       end
 
       it "calls create on the class with the attributes" do
@@ -41,7 +41,7 @@ describe Mongoid::Criteria do
       end
 
       before do
-        Person.expects(:new).with(title: "Sir", name: "Lancelot")
+        Person.expects(:new).with("title" => "Sir", name: "Lancelot")
       end
 
       it "calls create on the class with the attributes" do

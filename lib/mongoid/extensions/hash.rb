@@ -19,28 +19,6 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Expand the complex criteria into a MongoDB compliant selector hash.
-      #
-      # @example Convert the criterion.
-      #   {}.expand_complex_criteria
-      #
-      # @return [ Hash ] The mongo selector.
-      #
-      # @since 1.0.0
-      def expand_complex_criteria
-        {}.tap do |hsh|
-          each_pair do |k,v|
-            if k.respond_to?(:key) && k.respond_to?(:to_mongo_query)
-              hsh[k.key] ||= {}
-              v = v.expand_complex_criteria if v.is_a?(::Hash)
-              hsh[k.key].merge!(k.to_mongo_query(v))
-            else
-              hsh[k] = v
-            end
-          end
-        end
-      end
-
       # Get the id attribute from this hash, whether it's prefixed with an
       # underscore or is a symbol.
       #

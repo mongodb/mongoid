@@ -4,27 +4,10 @@ module Mongoid #:nodoc:
   # This module defines the finder methods that hang off the document at the
   # class level.
   module Finders
+    extend Origin::Forwardable
 
-    # Delegate to the criteria methods that are natural for creating a new
-    # criteria.
-    critera_methods = [ :all_in, :all_of, :any_in, :any_of, :asc, :ascending,
-                        :avg, :desc, :descending, :excludes, :extras,
-                        :includes, :limit, :max, :min, :not_in, :only,
-                        :order_by, :skip, :sum, :without, :where,
-                        :update, :update_all, :near ]
-    delegate(*(critera_methods.dup << { to: :with_default_scope }))
-
-    # Find all documents that match the given conditions.
-    #
-    # @example Find all matching documents given conditions.
-    #   Person.all(:conditions => { :attribute => "value" })
-    #
-    # @param [ Array ] args The conditions with options.
-    #
-    # @return [ Criteria ] The matching documents.
-    def all
-      with_default_scope
-    end
+    select_with :with_default_scope
+    delegate :avg, :includes, :max, :min, :sum, :update, :update_all, to: :with_default_scope
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.

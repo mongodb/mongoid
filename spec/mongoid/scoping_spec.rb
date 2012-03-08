@@ -156,7 +156,7 @@ describe Mongoid::Scoping do
         end
 
         it "adds the extension to the scope" do
-          scope.selector.should eq({ active: true, origin: "Deutschland" })
+          scope.selector.should eq({ "active" => true, "origin" => "Deutschland" })
         end
       end
 
@@ -226,7 +226,7 @@ describe Mongoid::Scoping do
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ active: true })
+              scope.selector.should eq({ "active" => true })
             end
 
             it "contains the proper options" do
@@ -256,7 +256,7 @@ describe Mongoid::Scoping do
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ active: true, origin: "England" })
+              scope.selector.should eq({ "active" => true, "origin" => "England" })
             end
 
             it "contains the proper options" do
@@ -264,7 +264,7 @@ describe Mongoid::Scoping do
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ active: true })
+              Band.active.selector.should eq({ "active" => true })
             end
           end
 
@@ -283,7 +283,7 @@ describe Mongoid::Scoping do
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ origin: "England", active: true })
+              scope.selector.should eq({ "origin" => "England", "active" => true })
             end
 
             it "contains the proper options" do
@@ -291,11 +291,11 @@ describe Mongoid::Scoping do
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ active: true })
+              Band.active.selector.should eq({ "active" => true })
             end
 
             it "does not modify the original criteria" do
-              criteria.selector.should eq({ origin: "England" })
+              criteria.selector.should eq({ "origin" => "England" })
             end
           end
         end
@@ -367,7 +367,7 @@ describe Mongoid::Scoping do
         end
 
         it "adds the extension to the scope" do
-          scope.selector.should eq({ active: true, origin: "Deutschland" })
+          scope.selector.should eq({ "active" => true, "origin" => "Deutschland" })
         end
       end
 
@@ -401,7 +401,7 @@ describe Mongoid::Scoping do
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ active: true })
+              scope.selector.should eq({ "active" => true })
             end
 
             it "contains the proper options" do
@@ -431,7 +431,7 @@ describe Mongoid::Scoping do
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ active: true, origin: "England" })
+              scope.selector.should eq({ "active" => true, "origin" => "England" })
             end
 
             it "contains the proper options" do
@@ -439,7 +439,7 @@ describe Mongoid::Scoping do
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ active: true })
+              Band.active.selector.should eq({ "active" => true })
             end
           end
 
@@ -458,7 +458,7 @@ describe Mongoid::Scoping do
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ origin: "England", active: true })
+              scope.selector.should eq({ "origin" => "England", "active" => true })
             end
 
             it "contains the proper options" do
@@ -466,11 +466,11 @@ describe Mongoid::Scoping do
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ active: true })
+              Band.active.selector.should eq({ "active" => true })
             end
 
             it "does not modify the original criteria" do
-              criteria.selector.should eq({ origin: "England" })
+              criteria.selector.should eq({ "origin" => "England" })
             end
           end
         end
@@ -616,7 +616,7 @@ describe Mongoid::Scoping do
       end
 
       it "allows the default scope to be added" do
-        scoped.selector.should eq({ name: "Depeche Mode" })
+        scoped.selector.should eq({ "name" => "Depeche Mode" })
       end
 
       context "when chained after an unscoped criteria" do
@@ -626,7 +626,7 @@ describe Mongoid::Scoping do
         end
 
         it "reapplies the default scope" do
-          scoped.selector.should eq({ name: "Depeche Mode" })
+          scoped.selector.should eq({ "name" => "Depeche Mode" })
         end
       end
     end
@@ -751,7 +751,7 @@ describe Mongoid::Scoping do
       end
 
       it "returns a scoped criteria" do
-        scoped.selector.should eq({ name: "Depeche Mode" })
+        scoped.selector.should eq({ "name" => "Depeche Mode" })
       end
     end
   end
@@ -764,7 +764,7 @@ describe Mongoid::Scoping do
 
     it "yields to the criteria" do
       Band.with_scope(criteria) do |crit|
-        crit.selector.should eq({ active: true })
+        crit.selector.should eq({ "active" => true })
       end
     end
 

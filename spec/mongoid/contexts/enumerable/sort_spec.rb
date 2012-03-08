@@ -5,7 +5,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
   describe "#initialize" do
 
     let(:sort) do
-      described_class.new("value", :asc)
+      described_class.new("value", 1)
     end
 
     it "sets the value" do
@@ -13,16 +13,16 @@ describe Mongoid::Contexts::Enumerable::Sort do
     end
 
     it "sets the sort order" do
-      sort.direction.should eq(:asc)
+      sort.direction.should eq(1)
     end
   end
 
   describe "#ascending?" do
 
-    context "when the direction is :asc" do
+    context "when the direction is 1" do
 
       let(:sort) do
-        described_class.new("", :asc)
+        described_class.new("", 1)
       end
 
       it "returns true" do
@@ -30,10 +30,10 @@ describe Mongoid::Contexts::Enumerable::Sort do
       end
     end
 
-    context "when the direction is :desc" do
+    context "when the direction is -1" do
 
       let(:sort) do
-        described_class.new("", :desc)
+        described_class.new("", -1)
       end
 
       it "returns false" do
@@ -107,7 +107,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
     context "when direction is ascending" do
 
       let(:sort) do
-        described_class.new(0, :asc)
+        described_class.new(0, 1)
       end
 
       let(:other) do
@@ -123,7 +123,7 @@ describe Mongoid::Contexts::Enumerable::Sort do
     context "when direction is descending" do
 
       let(:sort) do
-        described_class.new(0, :desc)
+        described_class.new(0, -1)
       end
 
       let(:other) do

@@ -54,7 +54,7 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "merges in the options" do
-        scoped.selector.should eq({ name: "Depeche Mode" })
+        scoped.selector.should eq({ "name" => "Depeche Mode" })
       end
 
       it "sets scoped to true" do
@@ -231,7 +231,7 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "allows the default scope to be added" do
-        scoped.selector.should eq({ name: "Depeche Mode" })
+        scoped.selector.should eq({ "name" => "Depeche Mode" })
       end
 
       it "flags as scoped" do
@@ -245,7 +245,7 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "reapplies the default scope" do
-          scoped.selector.should eq({ name: "Depeche Mode" })
+          scoped.selector.should eq({ "name" => "Depeche Mode" })
         end
       end
     end

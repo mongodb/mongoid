@@ -33,42 +33,6 @@ describe Mongoid::Extensions::Symbol do
     end
   end
 
-  [
-    "all",
-    "asc",
-    "ascending",
-    "desc",
-    "descending",
-    "exists",
-    "gt",
-    "gte",
-    "in",
-    "lt",
-    "lte",
-    "mod",
-    "ne",
-    "near",
-    "not",
-    "nin",
-    "within"
-  ].each do |method|
-
-    describe "##{method}" do
-
-      let(:symbol) do
-        :foo.send(method)
-      end
-
-      it "set the proper key" do
-        symbol.key.should eq(:foo)
-      end
-
-      it "sets the operator" do
-        symbol.operator.should eq(method)
-      end
-    end
-  end
-
   describe "#mongoid_id?" do
 
     context "when the string is id" do

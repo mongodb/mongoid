@@ -14,7 +14,7 @@ module Mongoid #:nodoc:
 
         # Return +true+ if the direction is +:asc+, otherwise false.
         def ascending?
-          direction == :asc
+          direction > 0
         end
 
         # Compare two +Sort+ objects against each other, taking into

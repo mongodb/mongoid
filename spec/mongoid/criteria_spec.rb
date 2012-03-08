@@ -139,33 +139,10 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#initialize" do
-
-    let(:criteria) do
-      described_class.new(Person)
-    end
-
-    it "sets the selector to an empty hash" do
-      criteria.selector.should eq({})
-    end
-
-    it "sets the options to an empty hash" do
-      criteria.options.should eq({})
-    end
-
-    it "sets the documents to an empty array" do
-      criteria.documents.should be_empty
-    end
-
-    it "sets the klass to the given class" do
-      criteria.klass.should eq(Person)
-    end
-  end
-
   describe "#merge" do
 
     let(:criteria) do
-      described_class.new(Person)
+      Person.all
     end
 
     before do
@@ -281,11 +258,11 @@ describe Mongoid::Criteria do
       end
 
       it "merges the selector" do
-        merged.selector.should eq({ name: "Chloe" })
+        merged.selector.should eq({ "name" => "Chloe" })
       end
 
       it "merges the options" do
-        merged.options.should eq({ sort: [[ :name, :asc ]]})
+        merged.options.should eq({ sort: { "name" => 1 }})
       end
     end
   end
@@ -305,7 +282,7 @@ describe Mongoid::Criteria do
     end
 
     it "merges the criteria with the next one" do
-      chained.selector.should eq({ title: "Sir", terms: true })
+      chained.selector.should eq({ "title" => "Sir", "terms" => true })
     end
 
     context "chaining more than one scope" do
@@ -320,7 +297,7 @@ describe Mongoid::Criteria do
 
       it "returns the final merged criteria" do
         criteria.selector.should eq(
-          { title: "Sir", terms: true }
+          { "title" => "Sir", "terms" => true }
         )
       end
 
