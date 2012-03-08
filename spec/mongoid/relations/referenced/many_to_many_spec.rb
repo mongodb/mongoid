@@ -20,6 +20,44 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     describe "##{method}" do
 
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let!(:preference) do
+          Preference.new
+        end
+
+        let(:result) do
+          person.preferences.send(method, preference)
+        end
+
+        it "returns an array of loaded documents" do
+          result.should eq([ preference ])
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let!(:preference) do
+          Preference.new
+        end
+
+        let(:result) do
+          person.preferences.send(method, preference)
+        end
+
+        it "returns an array of loaded documents" do
+          result.should eq([ preference ])
+        end
+      end
+
       context "when the relations are not polymorphic" do
 
         context "when the inverse relation is not defined" do
