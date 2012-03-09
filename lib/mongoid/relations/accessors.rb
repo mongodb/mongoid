@@ -199,8 +199,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def setter(name, metadata)
-          method = "#{name}="
-          re_define_method(method) do |object|
+          re_define_method("#{name}=") do |object|
             without_autobuild do
               if relation_exists?(name) || metadata.many? ||
                 (object.blank? && send(name))
