@@ -444,8 +444,8 @@ describe Mongoid::Dirty do
         changes.should eq({ "aliases" => nil })
       end
 
-      it "is flagged as changed" do
-        person.should be_changed
+      it "is not flagged as changed" do
+        person.should_not be_changed
       end
     end
 
@@ -552,6 +552,39 @@ describe Mongoid::Dirty do
 
       it "returns true" do
         person.should be_changed
+      end
+    end
+
+    context "when a hash field has been accessed" do
+
+      context "when the field has not changed" do
+
+        let(:person) do
+          Person.create(map: { name: "value" })
+        end
+
+        before do
+          person.map
+        end
+
+        it "returns false" do
+          person.should_not be_changed
+        end
+      end
+
+      context "when the field is changed" do
+
+        let(:person) do
+          Person.create(map: { name: "value" })
+        end
+
+        before do
+          person.map = { name: "another" }
+        end
+
+        it "returns true" do
+          person.should be_changed
+        end
       end
     end
 

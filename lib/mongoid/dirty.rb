@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def changed?
-      changed_attributes.any? || children_changed?
+      changes.values.any? { |val| val } || children_changed?
     end
 
     # Have any children (embedded documents) of this document changed?
