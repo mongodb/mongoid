@@ -248,6 +248,15 @@ describe Mongoid::Callbacks do
 
   context "when cascading callbacks" do
 
+    context "when attempting to cascade on a referenced relation" do
+
+      it "raises an error" do
+        expect {
+          Band.has_and_belongs_to_many :tags, cascade_callbacks: true
+        }.to raise_error(Mongoid::Errors::InvalidOptions)
+      end
+    end
+
     context "when the documents are embedded one level" do
 
       describe "#after_create" do
