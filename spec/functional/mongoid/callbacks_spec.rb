@@ -12,7 +12,7 @@ describe Mongoid::Callbacks do
 
       it "raises an error" do
         expect {
-          Band.has_and_belongs_to_many :tags, cascade_callbacks: true
+          Band.has_and_belongs_to_many :tags, :cascade_callbacks => true
         }.to raise_error(Mongoid::Errors::InvalidOptions)
       end
     end
