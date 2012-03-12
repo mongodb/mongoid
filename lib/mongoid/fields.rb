@@ -170,6 +170,21 @@ module Mongoid #:nodoc
 
     module ClassMethods #:nodoc
 
+      # Returns an array of names for the attributes available on this object.
+      #
+      # Provides the field names in an ORM-agnostic way. Rails v3.1+ uses this
+      # meathod to automatically wrap params in JSON requests.
+      #
+      # @example Get the field names
+      #   Model.attribute_names
+      #
+      # @return [ Array<String> ] The field names
+      #
+      # @since 3.0.0
+      def attribute_names
+        fields.keys
+      end
+
       # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.

@@ -119,6 +119,52 @@ describe Mongoid::Fields do
     end
   end
 
+  describe ".attribute_names" do
+
+    context "on parent classes" do
+
+      it "includes the _id field" do
+        Shape.attribute_names.should include("_id")
+      end
+
+      it "includes the _type field" do
+        Shape.attribute_names.should include("_type")
+      end
+
+      it "includes its own fields" do
+        Shape.attribute_names.should include("x")
+      end
+
+      it "does not return subclass fields" do
+        Shape.attribute_names.should_not include("radius")
+      end
+    end
+
+    context "on subclasses" do
+
+      it "includes the _id field" do
+        Circle.attribute_names.should include("_id")
+      end
+
+      it "includes the _type field" do
+        Circle.attribute_names.should include("_type")
+      end
+
+      it "includes the first parent field" do
+        Circle.attribute_names.should include("x")
+      end
+
+      it "includes the second parent field" do
+        Circle.attribute_names.should include("y")
+      end
+
+      it "includes the child fields" do
+        Circle.attribute_names.should include("radius")
+      end
+    end
+
+  end
+
   describe "#getter" do
 
     context "when a field is localized" do

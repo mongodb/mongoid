@@ -33,7 +33,7 @@ module Mongoid # :nodoc:
 
       except |= ['_type'] unless Mongoid.include_type_for_serialization
 
-      field_names = fields.keys.map { |field| field.to_s }
+      field_names = self.class.attribute_names
       attribute_names = (as_document.keys + field_names).sort
       if only.any?
         attribute_names &= only

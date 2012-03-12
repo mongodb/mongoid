@@ -7,6 +7,15 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Added an ORM-agnostic way to get the field names
+
+        class Band
+          include Mongoid::Document
+          field :name, type: String
+        end
+
+        Band.attribute_names
+
 * \#1774 Relations now have a :restrict option for dependent relations
   which will raise an error when attempting to delete a parent that
   still has children on it. (Hans Hasselberg)
