@@ -91,13 +91,14 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def scope(name, value, &block)
+        normalized = name.to_sym
         check_scope_validity(value)
-        check_scope_name(name)
-        scopes[name] = {
+        check_scope_name(normalized)
+        scopes[normalized] = {
           scope: strip_default_scope(value),
           extension: Module.new(&block)
         }
-        define_scope_method(name)
+        define_scope_method(normalized)
       end
 
       # Initializes and returns the current scope stack.
