@@ -991,7 +991,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_key
-        return name.to_s if relation.embedded?
+        return store_as.to_s if relation.embedded?
         relation.stores_foreign_key? ? foreign_key : "_id"
       end
 

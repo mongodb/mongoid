@@ -1390,6 +1390,18 @@ describe Mongoid::Relations::Metadata do
       it "returns the name as a string" do
         metadata.key.should eq("addresses")
       end
+      context "with a store_as option define" do
+        let(:metadata) do
+          described_class.new(
+            name: :comment,
+            relation: Mongoid::Relations::Embedded::Many,
+            store_as: 'user_comments'
+          )
+        end
+        it 'return the name define by store_as option' do
+          metadata.key.should == 'user_comments'
+        end
+      end
     end
 
     context "when relation is referenced" do
@@ -1658,7 +1670,6 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-
   describe "#store_as" do
 
     context "when store_as is define" do
@@ -1690,7 +1701,6 @@ describe Mongoid::Relations::Metadata do
       end
     end
   end
-
 
   context "properties" do
 
