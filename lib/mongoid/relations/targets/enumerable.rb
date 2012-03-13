@@ -211,6 +211,20 @@ module Mongoid #:nodoc:
           end
         end
 
+        # Does the target include the provided document?
+        #
+        # @example Does the target include the document?
+        #   enumerable.include?(document)
+        #
+        # @param [ Document ] doc The document to check.
+        #
+        # @return [ true, false ] If the document is in the target.
+        #
+        # @since 3.0.0
+        def include?(doc)
+          unloaded.where(_id: doc.id).exists? || added.include?(doc)
+        end
+
         # Inspection will just inspect the entries for nice array-style
         # printing.
         #
