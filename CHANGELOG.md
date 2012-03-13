@@ -182,7 +182,7 @@ For instructions on upgrading to newer versions, visit
         face.left_eye = left_eye
         right_eye.visible = face # Will raise an error.
 
-* \#1650 Objects that respond to \#to_criteria can now be merged into
+* \#1650 Objects that respond to `to_criteria` can now be merged into
   existing criteria objects.
 
         class Filter
@@ -431,7 +431,7 @@ For instructions on upgrading to newer versions, visit
     Criteria#as_conditions and Criteria#fuse no longer exist.
 
     Criteria#merge now only accepts another object that responds to
-    #to_criteria.
+    `to_criteria`.
 
     Criteria#merge! now merges in another object without creating a new
     criteria object.
