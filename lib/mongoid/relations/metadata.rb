@@ -745,6 +745,21 @@ module Mongoid # :nodoc:
         @type_setter ||= type ? "#{type}=" : nil
       end
 
+
+      # Key where embedded document is save.
+      # By default is the name of relation
+      #
+      # @return [ String ] the name of key where save
+      #
+      # @since 3.0.0
+      def store_as
+        if embedded? && self[:store_as]
+          self[:store_as]
+        else
+          self[:name].to_s
+        end
+      end
+
       # Are we validating this relation automatically?
       #
       # @example Is automatic validation on?
@@ -976,7 +991,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def determine_key
-        return name.to_s if relation.embedded?
+        return store_as.to_s if relation.embedded?
         relation.stores_foreign_key? ? foreign_key : "_id"
       end
 

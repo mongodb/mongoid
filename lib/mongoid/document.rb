@@ -167,7 +167,7 @@ module Mongoid #:nodoc:
           if meta.embedded?
             without_autobuild do
               relation = send(name)
-              attrs[name] = relation.as_document unless relation.blank?
+              attrs[meta.store_as] = relation.as_document unless relation.blank?
             end
           end
         end
