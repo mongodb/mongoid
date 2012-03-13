@@ -39,7 +39,7 @@ class Person
   embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false
   embeds_many :videos, order: [[ :title, :asc ]], validate: false
   embeds_many :phone_numbers, class_name: "Phone", validate: false
-  embeds_many :phone, :store_as => 'mobile_phones'
+  embeds_many :phones, :store_as => 'mobile_phones'
   embeds_many :addresses, as: :addressable, validate: false do
     def extension
       "Testing"

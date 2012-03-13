@@ -82,7 +82,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
         end
 
         before do
-          person.phone << phone
+          person.phones << phone
         end
         it "return the name of the store_as in relation" do
           many.position.should eq("mobile_phones")

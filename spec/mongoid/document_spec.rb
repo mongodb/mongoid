@@ -552,6 +552,20 @@ describe Mongoid::Document do
     it "includes second level embeds many attributes" do
       person.as_document["addresses"].first.should have_key("locations")
     end
+
+    context "with relation define store_as option in embeded_many" do
+
+      let!(:phone) do
+        person.phones.build(number: '+33123456789')
+      end
+
+      it 'includes the store_as key association' do
+        person.as_document.should have_key("mobile_phones")
+      end
+      it 'should not include the key of association' do
+        person.as_document.should_not have_key("phones")
+      end
+    end
   end
 
   describe "#to_key" do
