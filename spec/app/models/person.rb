@@ -39,7 +39,7 @@ class Person
   embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false
   embeds_many :videos, order: [[ :title, :asc ]], validate: false
   embeds_many :phone_numbers, class_name: "Phone", validate: false
-  embeds_many :phones, :store_as => 'mobile_phones'
+  embeds_many :phones, store_as: :mobile_phones, validate: false
   embeds_many :addresses, as: :addressable, validate: false do
     def extension
       "Testing"
@@ -54,7 +54,7 @@ class Person
   embeds_many :symptoms, validate: false
   embeds_many :appointments, validate: false
 
-  embeds_one :passport, autobuild: true, validate: false
+  embeds_one :passport, autobuild: true, store_as: :pass, validate: false
   embeds_one :pet, class_name: "Animal", validate: false
   embeds_one :name, as: :namable, validate: false do
     def extension

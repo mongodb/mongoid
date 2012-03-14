@@ -753,11 +753,7 @@ module Mongoid # :nodoc:
       #
       # @since 3.0.0
       def store_as
-        if embedded? && self[:store_as]
-          self[:store_as]
-        else
-          self[:name].to_s
-        end
+        @store_as ||= (self[:store_as].try(:to_s) || name.to_s)
       end
 
       # Are we validating this relation automatically?

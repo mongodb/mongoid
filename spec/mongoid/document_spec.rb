@@ -562,6 +562,7 @@ describe Mongoid::Document do
       it 'includes the store_as key association' do
         person.as_document.should have_key("mobile_phones")
       end
+
       it 'should not include the key of association' do
         person.as_document.should_not have_key("phones")
       end

@@ -756,7 +756,7 @@ describe Mongoid::Relations::Embedded::One do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :autobuild, :as, :cascade_callbacks, :cyclic ]
+        [ :autobuild, :as, :cascade_callbacks, :cyclic, :store_as ]
       )
     end
   end

@@ -160,13 +160,6 @@ describe Mongoid::Relations::Macros do
         klass._validators.should be_empty
       end
     end
-
-    context "when setting store_as on relation" do
-      before do
-        klass.embeds_many(:addresses, store_as: 'user_addresses')
-      end
-
-    end
   end
 
   describe ".embeds_one" do

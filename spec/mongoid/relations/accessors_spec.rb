@@ -235,6 +235,10 @@ describe Mongoid::Relations::Accessors do
           it "builds the new document" do
             passport.should be_a(Passport)
           end
+
+          it "stores in the altered attribute" do
+            person.as_document["pass"].should eq(passport.attributes)
+          end
         end
 
         context "when the relation exists" do

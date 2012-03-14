@@ -53,7 +53,7 @@ describe Mongoid::Cursor do
 
       it "yields to the next document" do
         cursor.each do |doc|
-          doc.attributes.except("_id").should == Person.instantiate.attributes.except("_id")
+          doc.attributes.except("_id").should eq(Person.instantiate.attributes.except("_id"))
         end
       end
     end
