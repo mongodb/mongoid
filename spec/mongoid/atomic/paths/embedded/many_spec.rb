@@ -10,6 +10,10 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
     Address.new(street: "Strassmannstr.")
   end
 
+  let(:phone) do
+    Phone.new(number: '+33123456789')
+  end
+
   before do
     person.addresses << address
   end
@@ -71,6 +75,19 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
   describe "#position" do
 
     context "when the document is embedded one level" do
+
+      context "with a relation with :store_as option" do
+        let(:many) do
+          described_class.new(phone)
+        end
+
+        before do
+          person.phones << phone
+        end
+        it "return the name of the store_as in relation" do
+          many.position.should eq("mobile_phones")
+        end
+      end
 
       it "returns the name of the relation" do
         many.position.should eq("addresses")

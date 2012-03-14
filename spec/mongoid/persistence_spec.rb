@@ -36,6 +36,25 @@ describe Mongoid::Persistence do
           address.should be_persisted
         end
       end
+
+      context "when creating an embedded document with store_as option" do
+        let(:user) { User.create }
+        before do
+          User.embeds_many :addresses, :class_name => 'Address', store_as: 'user_adresses'
+          Address.embedded_in :user
+          user.addresses.create!(:city => 'nantes')
+        end
+        subject {
+          user.collection.find_one(:_id => user.id)
+        }
+        it 'should not persist in address key on User document' do
+          subject.keys.should_not include('addresses')
+        end
+
+        it 'should persist on user_addesses key on User document' do
+          subject.keys.should include('user_adresses')
+        end
+      end
     end
 
     context "when passing in a block" do
