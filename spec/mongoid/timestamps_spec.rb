@@ -33,6 +33,10 @@ describe Mongoid::Timestamps do
       document.updated_at.should be_within(10).of(Time.now.utc)
     end
 
+    it "ensures created_at equals updated_at on new records" do
+      document.updated_at.should eq(document.created_at)
+    end
+
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
       Dokument.should.respond_to? :record_timestamps
     end
@@ -78,7 +82,7 @@ describe Mongoid::Timestamps do
     end
 
     it "runs the update callbacks" do
-      document.updated_at.should be_within(10).of(Time.now.utc)
+      document.updated_at.should eq(document.created_at)
     end
   end
 
