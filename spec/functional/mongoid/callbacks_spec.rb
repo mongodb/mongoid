@@ -15,7 +15,7 @@ describe Mongoid::Callbacks do
       end
 
       before do
-        person.services.create!(sid: 1)
+        person.services.create!(:sid => 1)
       end
 
       it "only executes the cascading callbacks once" do
