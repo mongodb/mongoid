@@ -466,6 +466,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1823 `Relation#includes?` now properly works with identity map enabled.
+
 * \#1810 `Model#changed?` no longer returns true when hash and array fields
   have only been accessed.
 

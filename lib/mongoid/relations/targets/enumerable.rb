@@ -222,6 +222,7 @@ module Mongoid #:nodoc:
         #
         # @since 3.0.0
         def include?(doc)
+          return super unless unloaded
           unloaded.where(_id: doc.id).exists? || added.include?(doc)
         end
 

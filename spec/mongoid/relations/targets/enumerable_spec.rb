@@ -840,6 +840,55 @@ describe Mongoid::Relations::Targets::Enumerable do
       Post.create(person_id: person.id)
     end
 
+    context "when no criteria exists" do
+
+      context "when the enumerable is loaded" do
+
+        let!(:enumerable) do
+          described_class.new([ post_one, post_two ])
+        end
+
+        let!(:included) do
+          enumerable.include?(post_two)
+        end
+
+        it "returns true" do
+          included.should be_true
+        end
+
+        it "retains the correct length" do
+          enumerable.length.should eq(2)
+        end
+
+        it "retains the correct length when calling to_a" do
+          enumerable.to_a.length.should eq(2)
+        end
+      end
+
+      context "when the enumerable contains an added document" do
+
+        let!(:enumerable) do
+          described_class.new([])
+        end
+
+        let(:post_three) do
+          Post.new(person_id: person)
+        end
+
+        before do
+          enumerable.push(post_three)
+        end
+
+        let!(:included) do
+          enumerable.include?(post_three)
+        end
+
+        it "returns true" do
+          included.should be_true
+        end
+      end
+    end
+
     context "when the document is present and not the first" do
 
       let(:criteria) do
