@@ -498,6 +498,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1814 Don't cascade callbacks on after_initialize.
+
 * \#1800 Invalid options for the Mongo connection are now filtered out.
 
 * \#1785 Case equality has been fixed to handle instance checks properly.
