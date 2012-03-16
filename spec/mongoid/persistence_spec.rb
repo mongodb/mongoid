@@ -1623,6 +1623,15 @@ describe Mongoid::Persistence do
       it "creates with the given attributes" do
         container.vehicles.map(&:driver).should eq([driver])
       end
+
+      it "searches the document from the given type" do
+        container.vehicles.size.should == 1
+        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Car)
+        container.vehicles.size.should == 1 # didn't create because found
+
+        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Truck)
+        container.vehicles.size.should == 2 # created because not found
+      end
     end
   end
 end
