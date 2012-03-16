@@ -37,11 +37,18 @@ module Mongoid #:nodoc:
       # @example Find or create.
       #   person.posts.find_or_create_by(:title => "Testing")
       #
-      # @param [ Hash ] attrs The attributes to search or create with.
+      # @overload find_or_create_by(attributes = nil, options = {}, type = nil)
+      #   @param [ Hash ] attributes The attributes to search or create with.
+      #   @param [ Hash ] options The scoped assignment options.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @overload find_or_create_by(attributes = nil, type = nil)
+      #   @param [ Hash ] attributes The attributes to search or create with.
+      #   @param [ Class ] type The optional type of document to create.
       #
       # @return [ Document ] An existing document or newly created one.
-      def find_or_create_by(attrs = {}, &block)
-        find_or(:create, attrs, &block)
+      def find_or_create_by(attrs = {}, options = {}, type = nil, &block)
+        find_or(:create, attrs, options, type, &block)
       end
 
       # Find the first +Document+ given the conditions, or instantiates a new document
@@ -50,11 +57,18 @@ module Mongoid #:nodoc:
       # @example Find or initialize.
       #   person.posts.find_or_initialize_by(:title => "Test")
       #
-      # @param [ Hash ] attrs The attributes to search or initialize with.
+      # @overload find_or_initialize_by(attributes = {}, options = {}, type = nil)
+      #   @param [ Hash ] attributes The attributes to search or initialize with.
+      #   @param [ Hash ] options The scoped assignment options.
+      #   @param [ Class ] type The optional subclass to build.
+      #
+      # @overload find_or_initialize_by(attributes = {}, type = nil)
+      #   @param [ Hash ] attributes The attributes to search or initialize with.
+      #   @param [ Class ] type The optional subclass to build.
       #
       # @return [ Document ] An existing document or newly instantiated one.
-      def find_or_initialize_by(attrs = {}, &block)
-        find_or(:build, attrs, &block)
+      def find_or_initialize_by(attrs = {}, options = {}, type = nil, &block)
+        find_or(:build, attrs, options, type, &block)
       end
 
       # This proxy can never be nil.
@@ -136,12 +150,26 @@ module Mongoid #:nodoc:
       # @example Find or create|initialize.
       #   person.addresses.find_or(:create, :street => "Bond")
       #
-      # @param [ Symbol ] method The method name, create or new.
-      # @param [ Hash ] attrs The attributes to build with.
+      # @overload find_or(method, attributes = {}, options = {}, type = nil)
+      #   @param [ Symbol ] method The method name, create or new.
+      #   @param [ Hash ] attributes The attributes to search or build with.
+      #   @param [ Hash ] options The scoped assignment options.
+      #   @param [ Class ] type The optional subclass to build.
+      #
+      # @overload find_or(attributes = {}, type = nil)
+      #   @param [ Symbol ] method The method name, create or new.
+      #   @param [ Hash ] attributes The attributes to search or build with.
+      #   @param [ Class ] type The optional subclass to build.
       #
       # @return [ Document ] A matching document or a new/created one.
-      def find_or(method, attrs = {}, &block)
-        where(attrs).first || send(method, attrs, &block)
+      def find_or(method, attrs = {}, options = {}, type = nil, &block)
+        if options.is_a? Class
+          options, type = {}, options
+        end
+
+        attrs["_type"] = type.to_s if type
+
+        where(attrs).first || send(method, attrs, options, type, &block)
       end
     end
   end
