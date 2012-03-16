@@ -163,6 +163,12 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] A matching document or a new/created one.
       def find_or(method, attrs = {}, options = {}, type = nil, &block)
+        if options.is_a? Class
+          options, type = {}, options
+        end
+
+        attrs["_type"] = type.to_s if type
+
         where(attrs).first || send(method, attrs, options, type, &block)
       end
     end
