@@ -17,7 +17,11 @@ module Mongoid #:nodoc:
       # @example Set the created at time.
       #   person.set_created_at
       def set_created_at
-        self.created_at = Time.now.utc if !created_at
+        if !created_at
+          time = Time.now.utc
+          self.updated_at = time if is_a?(Updated)
+          self.created_at = time
+        end
       end
     end
   end

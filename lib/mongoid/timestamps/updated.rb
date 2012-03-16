@@ -17,11 +17,7 @@ module Mongoid #:nodoc:
       # @example Set the updated at time.
       #   person.set_updated_at
       def set_updated_at
-        unless updated_at
-          self.updated_at = respond_to?(:created_at) ? created_at : Time.now.utc
-        else
-          self.updated_at = Time.now.utc unless updated_at_changed?
-        end
+        self.updated_at = Time.now.utc unless updated_at_changed?
       end
 
       # Is the updated timestamp able to be set?
