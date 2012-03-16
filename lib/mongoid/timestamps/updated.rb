@@ -9,6 +9,7 @@ module Mongoid #:nodoc:
       included do
         field :updated_at, type: Time
         set_callback :save, :before, :set_updated_at, if: :able_to_set_updated_at?
+        set_callback :create, :before, :create_updated_at, if: :able_to_set_updated_at?
       end
 
       # Update the updated_at field on the Document to the current time.
@@ -17,11 +18,13 @@ module Mongoid #:nodoc:
       # @example Set the updated at time.
       #   person.set_updated_at
       def set_updated_at
-        unless updated_at
-          self.updated_at = respond_to?(:created_at) ? created_at : Time.now.utc
-        else
-          self.updated_at = Time.now.utc unless updated_at_changed?
-        end
+        self.updated_at = Time.now.utc unless updated_at_changed?
+      end
+
+      # Set the updated_at field it's Time.now.utc or the created_at if define
+      #
+      def create_updated_at
+        self.updated_at = respond_to?(:created_at) ? created_at : Time.now.utc
       end
 
       # Is the updated timestamp able to be set?
