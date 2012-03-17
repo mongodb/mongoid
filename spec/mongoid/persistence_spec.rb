@@ -1520,6 +1520,11 @@ describe Mongoid::Persistence do
       Driver.create
     end
 
+    it "does not bleed relations from one subclass to another" do
+      Truck.relations.keys.should =~ %w/ shipping_container driver bed /
+      Car.relations.keys.should =~ %w/ shipping_container driver /
+    end
+
     context "when appending new documents" do
 
       before do
@@ -1592,45 +1597,59 @@ describe Mongoid::Persistence do
       end
     end
 
-    it "does not bleed relations from one subclass to another" do
-      Truck.relations.keys.should =~ %w/ shipping_container driver bed /
-      Car.relations.keys.should =~ %w/ shipping_container driver /
-    end
-
     context "#find_or_initialize_by" do
+
       before do
-        container.vehicles.find_or_initialize_by({"driver_id" => driver.id}, Car)
+        container.vehicles.find_or_initialize_by({ driver_id: driver.id }, Car)
       end
 
       it "initializes the given type document" do
-        container.vehicles.map(&:class).should eq([Car])
+        container.vehicles.map(&:class).should eq([ Car ])
       end
 
       it "initializes with the given attributes" do
-        container.vehicles.map(&:driver).should eq([driver])
+        container.vehicles.map(&:driver).should eq([ driver ])
       end
     end
 
     context "#find_or_create_by" do
+
       before do
-        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Car)
+        container.vehicles.find_or_create_by({ driver_id: driver.id }, Car)
       end
 
       it "creates the given type document" do
-        container.vehicles.map(&:class).should eq([Car])
+        container.vehicles.map(&:class).should eq([ Car ])
       end
 
       it "creates with the given attributes" do
-        container.vehicles.map(&:driver).should eq([driver])
+        container.vehicles.map(&:driver).should eq([ driver ])
       end
 
-      it "searches the document from the given type" do
-        container.vehicles.size.should == 1
-        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Car)
-        container.vehicles.size.should == 1 # didn't create because found
+      it "creates the correct number of documents" do
+        container.vehicles.size.should eq(1)
+      end
 
-        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Truck)
-        container.vehicles.size.should == 2 # created because not found
+      context "when executing with a found document" do
+
+        before do
+          container.vehicles.find_or_create_by({ driver_id: driver.id }, Car)
+        end
+
+        it "does not create an additional document" do
+          container.vehicles.size.should eq(1)
+        end
+      end
+
+      context "when executing with an additional new document" do
+
+        before do
+          container.vehicles.find_or_create_by({ driver_id: driver.id }, Truck)
+        end
+
+        it "creates the new additional document" do
+          container.vehicles.size.should eq(2)
+        end
       end
     end
   end

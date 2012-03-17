@@ -16,6 +16,16 @@ For instructions on upgrading to newer versions, visit
 
         Band.attribute_names
 
+* \#1831 `find_or_create_by` on relations now takes mass assignment
+  and type options. (Tatsuya Ono)
+
+        class Band
+          include Mongoid::Document
+          embeds_many :albums
+        end
+
+        band.albums.find_or_create_by({ name: "101" }, LP)
+
 * \#1774 Relations now have a :restrict option for dependent relations
   which will raise an error when attempting to delete a parent that
   still has children on it. (Hans Hasselberg)
