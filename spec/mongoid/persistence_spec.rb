@@ -1516,6 +1516,10 @@ describe Mongoid::Persistence do
       ShippingContainer.create
     end
 
+    let(:driver) do
+      Driver.create
+    end
+
     context "when appending new documents" do
 
       before do
@@ -1591,6 +1595,43 @@ describe Mongoid::Persistence do
     it "does not bleed relations from one subclass to another" do
       Truck.relations.keys.should =~ %w/ shipping_container driver bed /
       Car.relations.keys.should =~ %w/ shipping_container driver /
+    end
+
+    context "#find_or_initialize_by" do
+      before do
+        container.vehicles.find_or_initialize_by({"driver_id" => driver.id}, Car)
+      end
+
+      it "initializes the given type document" do
+        container.vehicles.map(&:class).should eq([Car])
+      end
+
+      it "initializes with the given attributes" do
+        container.vehicles.map(&:driver).should eq([driver])
+      end
+    end
+
+    context "#find_or_create_by" do
+      before do
+        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Car)
+      end
+
+      it "creates the given type document" do
+        container.vehicles.map(&:class).should eq([Car])
+      end
+
+      it "creates with the given attributes" do
+        container.vehicles.map(&:driver).should eq([driver])
+      end
+
+      it "searches the document from the given type" do
+        container.vehicles.size.should == 1
+        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Car)
+        container.vehicles.size.should == 1 # didn't create because found
+
+        container.vehicles.find_or_create_by({"driver_id" => driver.id}, Truck)
+        container.vehicles.size.should == 2 # created because not found
+      end
     end
   end
 end
