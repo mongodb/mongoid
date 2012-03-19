@@ -160,6 +160,42 @@ describe Mongoid::Scoping do
         end
       end
 
+      context "when scoping an embedded document" do
+
+        before do
+          Record.scope(
+            :tool,
+            Record.where(:name.in => [ "undertow", "aenima", "lateralus" ])
+          )
+        end
+
+        after do
+          class << Record
+            undef_method :tool
+          end
+          Record.scopes.clear
+        end
+
+        context "when calling the scope" do
+
+          let(:band) do
+            Band.new
+          end
+
+          let!(:undertow) do
+            band.records.build(name: "undertow")
+          end
+
+          let(:scoped) do
+            band.records.tool
+          end
+
+          it "returns the correct documents" do
+            scoped.should eq([ undertow ])
+          end
+        end
+      end
+
       context "when no block is provided" do
 
         before do

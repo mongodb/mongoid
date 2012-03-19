@@ -255,7 +255,7 @@ module Mongoid #:nodoc:
       tap do |crit|
         crit.selector.update(criteria.selector)
         crit.options.update(criteria.options)
-        crit.documents = criteria.documents
+        crit.documents = criteria.documents.dup if criteria.documents.any?
         crit.scoping_options = criteria.scoping_options
         crit.inclusions = (crit.inclusions + criteria.inclusions.dup).uniq
       end
@@ -369,6 +369,7 @@ module Mongoid #:nodoc:
       @options = other.options.dup
       @includes = other.inclusions.dup
       @scoping_options = other.scoping_options
+      @documents = other.documents.dup
       @context = nil
     end
 
