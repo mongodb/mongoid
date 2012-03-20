@@ -508,6 +508,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1837 Always pass symbol options to the driver.
+
 * \#1814 Don't cascade callbacks on after_initialize.
 
 * \#1800 Invalid options for the Mongo connection are now filtered out.
