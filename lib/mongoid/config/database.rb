@@ -83,7 +83,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def master
-        Mongo::Connection.from_uri(uri(self), optional).tap do |conn|
+        Mongo::Connection.from_uri(uri(self), optional.symbolize_keys).tap do |conn|
           conn.apply_saved_authentication
         end
       end
@@ -99,7 +99,7 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.1
       def slaves
         (self["slaves"] || []).map do |options|
-          Mongo::Connection.from_uri(uri(options), optional(true)).tap do |conn|
+          Mongo::Connection.from_uri(uri(options), optional(true).symbolize_keys).tap do |conn|
             conn.apply_saved_authentication
           end
         end
@@ -160,7 +160,7 @@ module Mongoid #:nodoc:
           :logger => logger? ? Mongoid::Logger.new : nil,
           :slave_ok => slave
         }).merge(self).reject { |k,v| Config.blacklisted_options.include? k }.
-          inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo} # mongo likes symbols
+          inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo}
       end
 
       # Get a Mongo compliant URI for the database connection.

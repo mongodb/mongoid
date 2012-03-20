@@ -19,7 +19,7 @@ module Mongoid #:nodoc:
         # mongo likes symbols
         options = reject{ |key, value| Config.blacklisted_options.include?(key.to_s) }
         options["logger"] = Mongoid::Logger.new
-        connection = Mongo::ReplSetConnection.new(*(hosts.clone << options))
+        connection = Mongo::ReplSetConnection.new(*(hosts.clone << options.symbolize_keys))
 
         if authenticating?
           connection.add_auth(database, username, password)
