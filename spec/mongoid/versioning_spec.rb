@@ -243,10 +243,6 @@ describe Mongoid::Versioning do
           page.versions.count.should eq(1)
         end
 
-        it "does not version the _id" do
-          version._id.should be_nil
-        end
-
         it "does version the updated_at timestamp" do
           version.updated_at.should_not be_nil
         end
