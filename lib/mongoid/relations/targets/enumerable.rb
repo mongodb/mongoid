@@ -316,7 +316,12 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def size
-          (unloaded ? unloaded.count : loaded.count) + added.count{ |d| d.new? }
+          count = (unloaded ? unloaded.count : loaded.count)
+          if count.zero?
+            count + added.count
+          else
+            count + added.count{ |d| d.new_record? }
+          end
         end
         alias :length :size
 
