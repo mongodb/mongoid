@@ -3084,4 +3084,54 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when destroying an embedded document" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:address_one) do
+      person.addresses.create(street: "hobrecht")
+    end
+
+    let!(:address_two) do
+      person.addresses.create(street: "maybachufer")
+    end
+
+    before do
+      address_one.destroy
+    end
+
+    it "destroys the document" do
+      address_one.should be_destroyed
+    end
+
+    it "reindexes the relation" do
+      address_two._index.should eq(0)
+    end
+
+    it "removes the document from the unscoped" do
+      person.addresses.send(:_unscoped).should_not include(address_one)
+    end
+
+    context "when subsequently updating the next document" do
+
+      before do
+        address_two.update_attribute(:number, 10)
+      end
+
+      let(:addresses) do
+        person.reload.addresses
+      end
+
+      it "updates the correct document" do
+        addresses.first.number.should eq(10)
+      end
+
+      it "does not add additional documents" do
+        addresses.count.should eq(1)
+      end
+    end
+  end
 end

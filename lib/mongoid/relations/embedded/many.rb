@@ -28,6 +28,22 @@ module Mongoid # :nodoc:
         end
         alias :push :<<
 
+        # Get this relation as as its representation in the database.
+        #
+        # @example Convert the relation to an attributes hash.
+        #   person.addresses.as_document
+        #
+        # @return [ Array<Hash> ] The relation as stored in the db.
+        #
+        # @since 2.0.0.rc.1
+        def as_document
+          [].tap do |attributes|
+            _unscoped.each do |doc|
+              attributes.push(doc.as_document)
+            end
+          end
+        end
+
         # Appends an array of documents to the relation. Performs a batch
         # insert of the documents instead of persisting one at a time.
         #
@@ -327,22 +343,6 @@ module Mongoid # :nodoc:
           end
         end
 
-        # Get this relation as as its representation in the database.
-        #
-        # @example Convert the relation to an attributes hash.
-        #   person.addresses.as_document
-        #
-        # @return [ Array<Hash> ] The relation as stored in the db.
-        #
-        # @since 2.0.0.rc.1
-        def as_document
-          [].tap do |attributes|
-            _unscoped.each do |doc|
-              attributes.push(doc.as_document)
-            end
-          end
-        end
-
         # Return the relation with all previous scoping removed. This is the
         # exact representation of the docs in the database.
         #
@@ -403,6 +403,22 @@ module Mongoid # :nodoc:
             criterion.embedded = true
             criterion.documents = target
           end
+        end
+
+        # Deletes one document from the target and unscoped.
+        #
+        # @api private
+        #
+        # @example Delete one document.
+        #   relation.delete_one(doc)
+        #
+        # @param [ Document ] document The document to delete.
+        #
+        # @since 2.4.7
+        def delete_one(document)
+          target.delete_one(document)
+          _unscoped.delete_one(document)
+          reindex
         end
 
         # Integrate the document into the relation. will set its metadata and
