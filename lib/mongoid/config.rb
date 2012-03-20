@@ -36,7 +36,7 @@ module Mongoid #:nodoc
     option :use_utc, default: false
 
     # keys to remove from self to not pass through to Mongo::Connection
-    PRIVATE_OPTIONS = %w(uri host port database databases username password logger)
+    PRIVATE_OPTIONS = %w(uri host hosts port database databases username password logger)
 
     # Get the blacklisted options from passing through to the driver.
     #
