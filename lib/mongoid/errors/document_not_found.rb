@@ -18,8 +18,12 @@ module Mongoid #:nodoc
       #   DocumentNotFound.new(Person, :ssn => "1234", :name => "Helen")
       #
       # @param [ Class ] klass The model class.
-      # @param [ Hash, Array, Object ] attrs The attributes or ids.
-      def initialize(klass, params, unmatched)
+      # @param [ Hash, Array, Object ] params The attributes or ids.
+      # @param [ Array ] unmatched The unmatched ids, if appropriate
+      def initialize(klass, params, unmatched = nil)
+        if !unmatched && !params.is_a?(Hash)
+          raise ArgumentError, 'please also supply the unmatched ids'
+        end
         super(
           compose_message(
             message_key(params),
