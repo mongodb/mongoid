@@ -18,32 +18,66 @@ describe Mongoid::Relations::Referenced::Many do
             Person.new
           end
 
-          let(:post) do
-            Post.new
+          context "when the child is new" do
+
+            let(:post) do
+              Post.new
+            end
+
+            before do
+              person.posts.send(method, post)
+            end
+
+            it "sets the foreign key on the relation" do
+              post.person_id.should eq(person.id)
+            end
+
+            it "sets the base on the inverse relation" do
+              post.person.should eq(person)
+            end
+
+            it "sets the same instance on the inverse relation" do
+              post.person.should eql(person)
+            end
+
+            it "does not save the target" do
+              post.should be_new_record
+            end
+
+            it "adds the document to the target" do
+              person.posts.size.should eq(1)
+            end
           end
 
-          before do
-            person.posts.send(method, post)
-          end
+          context "when the child is persisted" do
 
-          it "sets the foreign key on the relation" do
-            post.person_id.should eq(person.id)
-          end
+            let(:post) do
+              Post.create
+            end
 
-          it "sets the base on the inverse relation" do
-            post.person.should eq(person)
-          end
+            before do
+              person.posts.send(method, post)
+            end
 
-          it "sets the same instance on the inverse relation" do
-            post.person.should eql(person)
-          end
+            it "sets the foreign key on the relation" do
+              post.person_id.should eq(person.id)
+            end
 
-          it "does not save the target" do
-            post.should be_new_record
-          end
+            it "sets the base on the inverse relation" do
+              post.person.should eq(person)
+            end
 
-          it "adds the document to the target" do
-            person.posts.size.should eq(1)
+            it "sets the same instance on the inverse relation" do
+              post.person.should eql(person)
+            end
+
+            it "does not save the parent" do
+              person.should be_new_record
+            end
+
+            it "adds the document to the target" do
+              person.posts.size.should eq(1)
+            end
           end
         end
 

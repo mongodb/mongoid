@@ -1359,6 +1359,31 @@ describe Mongoid::Relations::Targets::Enumerable do
       Post.create(person_id: person.id)
     end
 
+    context "when the base is new" do
+
+      let!(:person) do
+        Person.new
+      end
+
+      context "when the added contains a persisted document" do
+
+        let!(:post) do
+          Post.create(person_id: person.id)
+        end
+
+        context "when the enumerable is not loaded" do
+
+          let(:enumerable) do
+            described_class.new(Post.where(person_id: person.id))
+          end
+
+          it "includes the number of all added documents" do
+            enumerable.size.should eq(1)
+          end
+        end
+      end
+    end
+
     context "when the enumerable is loaded" do
 
       let(:enumerable) do

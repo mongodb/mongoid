@@ -510,6 +510,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#1837 Always pass symbol options to the driver.
 
+* \#1836 Ensure relation counts pick up persisted document that have not
+  had the foreign key link persisted.
+
 * \#1814 Don't cascade callbacks on after_initialize.
 
 * \#1800 Invalid options for the Mongo connection are now filtered out.
