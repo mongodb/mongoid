@@ -2935,11 +2935,11 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let!(:address_one) do
-      person.addresses.create(street: "hobrecht")
+      person.addresses.create(:street => "hobrecht")
     end
 
     let!(:address_two) do
-      person.addresses.create(street: "maybachufer")
+      person.addresses.create(:street => "maybachufer")
     end
 
     before do
