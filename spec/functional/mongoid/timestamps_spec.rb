@@ -26,7 +26,7 @@ describe Mongoid::Timestamps do
     end
 
     it "updates the root document updated at" do
-      person.updated_at.should be_within(1).of(Time.now)
+      person.updated_at.should be_within(5).of(Time.now)
     end
   end
 end
