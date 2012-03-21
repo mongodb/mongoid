@@ -127,6 +127,10 @@ describe Mongoid::Reloading do
           it "reloads the reference on the parent" do
             person.addresses.first.should eq(reloaded)
           end
+
+          it "retains the relation to the parent" do
+            reloaded.addressable.should eq(person)
+          end
         end
 
         context "when the relation is an embeds one" do
@@ -151,6 +155,10 @@ describe Mongoid::Reloading do
 
           it "reloads the reference on the parent" do
             person.name.should eq(reloaded)
+          end
+
+          it "retains the relation to the parent" do
+            reloaded.namable.should eq(person)
           end
         end
       end
