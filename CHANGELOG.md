@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1842 MultiParameterAttributes now supported aliased fields.
+  (Anton Orel)
+
 * \#1833 If an embedded document is attempted to be saved with no
   parent defined, Mongoid now will raise a `Mongoid::Errors::NoParent`
   exception.
