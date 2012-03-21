@@ -38,7 +38,7 @@ module Mongoid #:nodoc:
       if previous && versioned_attributes_changed?
         versions.build(
           previous.versioned_attributes, without_protection: true
-        ).attributes.delete("_id")
+        )
         if version_max.present? && versions.length > version_max
           deleted = versions.first
           if deleted.paranoid?
