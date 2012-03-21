@@ -78,6 +78,18 @@ describe Mongoid::Relations::Referenced::Many do
             it "adds the document to the target" do
               person.posts.size.should eq(1)
             end
+
+            context "when subsequently saving the parent" do
+
+              before do
+                person.save
+                post.save
+              end
+
+              it "returns the correct count of the relation" do
+                person.posts.count.should eq(1)
+              end
+            end
           end
         end
 
