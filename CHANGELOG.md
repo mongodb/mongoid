@@ -503,7 +503,7 @@ For instructions on upgrading to newer versions, visit
 * \#1335 Don't add id sorting criteria to first/last is there is already
   sorting options on the criteria.
 
-* \#1135 DateTimes now properly get time zones on derserialization.
+* \#1135 DateTimes now properly get time zones on deserialization.
 
 * \#1031 Mongoid now serializes values in Array fields to their proper
   Mongo-friendly values when possible.
