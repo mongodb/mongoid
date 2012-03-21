@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
     critera_methods = [ :all_in, :all_of, :any_in, :any_of, :asc, :ascending,
                         :avg, :desc, :descending, :excludes, :extras,
                         :includes, :limit, :max, :min, :not_in, :only,
-                        :order_by, :search, :skip, :sum, :without, :where,
+                        :order_by, :skip, :sum, :without, :where,
                         :update, :update_all, :near ]
     delegate(*(critera_methods.dup << { to: :with_default_scope }))
 
