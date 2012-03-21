@@ -119,7 +119,7 @@ module Mongoid # :nodoc:
     def reload_relations
       relations.each_pair do |name, meta|
         if instance_variable_defined?("@#{name}")
-          unless instance_variable_get("@#{name}") == _parent
+          if _parent.nil? || instance_variable_get("@#{name}") != _parent
             remove_instance_variable("@#{name}")
           end
         end
