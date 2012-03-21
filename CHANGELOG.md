@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1833 If an embedded document is attempted to be saved with no
+  parent defined, Mongoid now will raise a `Mongoid::Errors::NoParent`
+  exception.
+
 * Added an ORM-agnostic way to get the field names
 
         class Band

@@ -51,6 +51,23 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
       end
     end
 
+    context "when no parent is set" do
+
+      let(:address) do
+        Address.new
+      end
+
+      let(:insert) do
+        described_class.new(address)
+      end
+
+      it "raises an error" do
+        expect {
+          insert.persist
+        }.to raise_error(Mongoid::Errors::NoParent)
+      end
+    end
+
     def root_insert_expectation
       ->{
         collection.expects(:insert).with(

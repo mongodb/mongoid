@@ -198,6 +198,17 @@ en:
             knowing which environment it is in, and we have considered
             defaulting to development an undesireable side effect of this not
             being defined."
+        no_parent:
+          message: "Cannot persist embedded document %{klass} without a
+            parent document."
+          summary: "If the document is embedded, in order to be persisted it
+            must always have a reference to it's parent document. This is
+            most likely cause by either calling %{klass}.create or
+            %{klass}.create! without setting the parent document as an
+            attribute."
+          resolution: "Ensure that you've set the parent relation if
+            instantiating the embedded document direcly, or always create new
+            embedded documents via the parent relation."
         readonly_attribute:
           message: "Attempted to set the readonly attribute '%{name}' with
             the value: %{value}."

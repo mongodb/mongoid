@@ -28,6 +28,7 @@ module Mongoid #:nodoc:
           # @return [ Document ] The document to be inserted.
           def persist
             prepare do
+              raise Errors::NoParent.new(document.class.name) unless parent
               if parent.new_record?
                 parent.insert
               else
