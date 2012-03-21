@@ -508,6 +508,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* Ensure reloading of embedded documents retains reference to the parent.
+
 * \#1837 Always pass symbol options to the driver.
 
 * \#1836 Ensure relation counts pick up persisted document that have not
