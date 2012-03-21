@@ -9,6 +9,7 @@ describe Mongoid::MultiParameterAttributes do
       include Mongoid::MultiParameterAttributes
       field :created_at, type: Time
       field :dob, type: Date
+      field :checked_at, :as => :last_user_checked_at, type: Time
     end
 
     context "creating a multi" do
@@ -101,6 +102,27 @@ describe Mongoid::MultiParameterAttributes do
 
       it "sets empty date's day" do
         multi.dob.day.should eq(1)
+      end
+    end
+
+    context "with aliased field" do
+
+      let(:multi) do
+        Multi.new(
+          "last_user_checked_at(1i)" => "2010",
+          "last_user_checked_at(2i)" => "8",
+          "last_user_checked_at(3i)" => "12",
+          "last_user_checked_at(4i)" => "15",
+          "last_user_checked_at(5i)" => "45"
+        )
+      end
+
+      it "sets a multi-parameter Time attribute correctly" do
+        multi.last_user_checked_at.should eq(Time.local(2010, 8, 12, 15, 45))
+      end
+
+      it "does not leave ugly attributes on the model" do
+        multi.attributes.should_not have_key("created_at(1i)")
       end
     end
   end
