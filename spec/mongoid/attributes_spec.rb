@@ -782,7 +782,7 @@ describe Mongoid::Attributes do
     end
 
     before do
-      person.process(attributes)
+      person.process_attributes(attributes)
     end
 
     it "only overwrites supplied attributes" do
