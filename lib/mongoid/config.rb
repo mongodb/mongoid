@@ -54,7 +54,9 @@ module Mongoid #:nodoc
     end
 
     # keys to remove from self to not pass through to Mongo::Connection
-    PRIVATE_OPTIONS = %w(uri host hosts port database databases username password logger)
+    PRIVATE_OPTIONS =
+      %w(uri host hosts port database databases username
+         password logger use_activesupport_time_zone)
 
     # Get the blacklisted options from passing through to the driver.
     #
