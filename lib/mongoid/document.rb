@@ -118,7 +118,7 @@ module Mongoid #:nodoc:
         @attributes ||= {}
         options ||= {}
         apply_pre_processed_defaults
-        process(attrs, options[:as] || :default, !options[:without_protection]) do
+        process_attributes(attrs, options[:as] || :default, !options[:without_protection]) do
           yield(self) if block_given?
         end
         apply_post_processed_defaults

@@ -25,9 +25,9 @@ module Mongoid # :nodoc:
             end
             attributes.each do |attrs|
               if attrs.respond_to?(:with_indifferent_access)
-                process(parent, attrs)
+                process_attributes(parent, attrs)
               else
-                process(parent, attrs[1])
+                process_attributes(parent, attrs[1])
               end
             end
           end
@@ -86,10 +86,10 @@ module Mongoid # :nodoc:
           # new, existing, or ignored document.
           #
           # @example Process the attributes
-          #   builder.process({ "id" => 1, "street" => "Bond" })
+          #   builder.process_attributes({ "id" => 1, "street" => "Bond" })
           #
           # @param [ Hash ] attrs The single document attributes to process.
-          def process(parent, attrs)
+          def process_attributes(parent, attrs)
             return if reject?(parent, attrs)
             if id = attrs.extract_id
               first = existing.first

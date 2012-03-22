@@ -11,14 +11,14 @@ module Mongoid #:nodoc:
       # put into the document's attributes.
       #
       # @example Process the attributes.
-      #   person.process(:title => "sir", :age => 40)
+      #   person.process_attributes(:title => "sir", :age => 40)
       #
       # @param [ Hash ] attrs The attributes to set.
       # @param [ Symbol ] role A role for scoped mass assignment.
       # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
       #
       # @since 2.0.0.rc.7
-      def process(attrs = nil, role = :default, guard_protected_attributes = true)
+      def process_attributes(attrs = nil, role = :default, guard_protected_attributes = true)
         attrs ||= {}
         attrs = sanitize_for_mass_assignment(attrs, role) if guard_protected_attributes
         attrs.each_pair do |key, value|
