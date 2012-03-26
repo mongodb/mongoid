@@ -248,6 +248,37 @@ describe Mongoid::Callbacks do
 
   context "when cascading callbacks" do
 
+    context "when a document can exist in more than 1 level" do
+
+      let(:band) do
+        Band.new
+      end
+
+      let(:record) do
+        band.records.build
+      end
+
+      let(:note) do
+        Note.new
+      end
+
+      context "when adding the document at multiple levels" do
+
+        before do
+          band.notes.push(note)
+          record.notes.push(note)
+        end
+
+        context "when saving the root" do
+
+          it "only executes the callbacks once for each embed" do
+            note.expects(:update_saved).twice
+            band.save
+          end
+        end
+      end
+    end
+
     context "when cascading after initialize" do
 
       let!(:person) do
@@ -1262,7 +1293,6 @@ describe Mongoid::Callbacks do
         address.should be_changed
         expect { person.save }.not_to change { address.changed? }
       end
-
     end
 
     context "when updating a document" do

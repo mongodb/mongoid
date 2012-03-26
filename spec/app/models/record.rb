@@ -9,6 +9,7 @@ class Record
 
   embedded_in :band
   embeds_many :tracks, cascade_callbacks: true
+  embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
 
   before_create :before_create_stub
   before_save :before_save_stub
