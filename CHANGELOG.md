@@ -483,6 +483,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1852 Ensure no infinite recursion on cascading callbacks. (Ara Howard)
+
 * \#1823 `Relation#includes?` now properly works with identity map enabled.
 
 * \#1810 `Model#changed?` no longer returns true when hash and array fields
