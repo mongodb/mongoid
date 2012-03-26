@@ -319,3 +319,5 @@ module Mongoid #:nodoc:
     end
   end
 end
+
+ActiveSupport.run_load_hooks(:mongoid, Mongoid::Document)
