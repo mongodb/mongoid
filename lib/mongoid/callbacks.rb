@@ -82,14 +82,14 @@ module Mongoid #:nodoc:
     def cascadable_children(kind, seen = {})
       [].tap do |children|
         relations.each_pair do |name, metadata|
-          seen[metadata] ? next : seen[metadata]=true
+          seen[metadata] ? next : seen[metadata] = true
           next unless metadata.cascading_callbacks?
           without_autobuild do
             delayed_pulls = delayed_atomic_pulls[name]
             children.concat(delayed_pulls) if delayed_pulls
             child = send(name)
             Array.wrap(child).each do |doc|
-              seen[doc] ? next : seen[doc]=true
+              seen[doc.object_id] ? next : seen[doc.object_id] = true
               children.push(doc) if cascadable_child?(kind, doc)
               children.concat(doc.send(:cascadable_children, kind, seen))
             end
