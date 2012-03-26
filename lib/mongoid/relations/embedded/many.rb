@@ -20,11 +20,13 @@ module Mongoid # :nodoc:
         # @param [ Document, Array<Document> ] *args Any number of documents.
         def <<(*args)
           docs = args.flatten
-          return concat(docs) if docs.size > 1
-          if doc = docs.first
+          if docs.size > 1
+            concat(docs)
+          elsif doc = docs.first
             append(doc)
             doc.save if persistable? && !_assigning?
           end
+          return self
         end
         alias :push :<<
 
