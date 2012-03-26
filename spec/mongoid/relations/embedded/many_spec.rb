@@ -16,7 +16,7 @@ describe Mongoid::Relations::Embedded::Many do
           Address.new
         end
 
-        before do
+        let!(:added) do
           person.addresses.send(method, address)
         end
 
@@ -46,6 +46,10 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "sets the index on the child" do
           address._index.should eq(0)
+        end
+
+        it "returns the relation" do
+          added.should eq(person.addresses)
         end
 
         context "with a limiting default scope" do
@@ -123,7 +127,7 @@ describe Mongoid::Relations::Embedded::Many do
           Address.new
         end
 
-        before do
+        let!(:added) do
           person.addresses.send(method, [ address_one, address_two ])
         end
 
@@ -133,6 +137,10 @@ describe Mongoid::Relations::Embedded::Many do
 
         it "saves the second document" do
           address_two.should be_persisted
+        end
+
+        it "returns the relation" do
+          added.should eq(person.addresses)
         end
       end
 
@@ -3131,6 +3139,36 @@ describe Mongoid::Relations::Embedded::Many do
 
       it "does not add additional documents" do
         addresses.count.should eq(1)
+      end
+    end
+  end
+
+  context "when adding a document" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:address_one) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:first_add) do
+      person.addresses.push(address_one)
+    end
+
+    context "when chaining a second add" do
+
+      let(:address_two) do
+        Address.new(street: "friedel")
+      end
+
+      let(:result) do
+        first_add.push(address_two)
+      end
+
+      it "adds both documents" do
+        result.should eq([ address_one, address_two ])
       end
     end
   end

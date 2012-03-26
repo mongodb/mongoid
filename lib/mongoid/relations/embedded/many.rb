@@ -25,6 +25,7 @@ module Mongoid # :nodoc:
             append(doc)
             doc.save if persistable? && !_assigning?
           end
+          self
         end
         alias :push :<<
 
@@ -68,6 +69,7 @@ module Mongoid # :nodoc:
               doc.save if persistable?
             end
           end
+          self
         end
 
         # Builds a new document in the relation and appends it to the target.

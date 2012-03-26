@@ -2657,7 +2657,9 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "persists the change in id order" do
-        reloaded.preference_ids.should eq([ preference_two.id, preference_one.id ])
+        reloaded.preference_ids.should eq(
+          [ preference_two.id, preference_one.id ]
+        )
       end
     end
 
@@ -2668,7 +2670,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       before do
-        person.preference_ids = [ preference_two.id, preference_one.id, preference_three.id ]
+        person.preference_ids =
+          [ preference_two.id, preference_one.id, preference_three.id ]
         person.save
       end
 
@@ -2677,7 +2680,9 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "also persists the change in id order" do
-        reloaded.preference_ids.should eq([ preference_two.id, preference_one.id, preference_three.id ])
+        reloaded.preference_ids.should eq(
+          [ preference_two.id, preference_one.id, preference_three.id ]
+        )
       end
     end
 
@@ -2688,9 +2693,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       before do
-        person.preference_ids = [ preference_one.id, preference_two.id, preference_three.id ]
+        person.preference_ids =
+          [ preference_one.id, preference_two.id, preference_three.id ]
         person.save
-        person.preference_ids = [ preference_three.id, preference_two.id ]
+        person.preference_ids =
+          [ preference_three.id, preference_two.id ]
         person.save
       end
 
@@ -2699,7 +2706,39 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it "also persists the change in id order" do
-        reloaded.preference_ids.should eq([ preference_three.id, preference_two.id ])
+        reloaded.preference_ids.should eq(
+          [ preference_three.id, preference_two.id ]
+        )
+      end
+    end
+  end
+
+  context "when adding a document" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:preference_one) do
+      Preference.new
+    end
+
+    let(:first_add) do
+      person.preferences.push(preference_one)
+    end
+
+    context "when chaining a second add" do
+
+      let(:preference_two) do
+        Preference.new
+      end
+
+      let(:result) do
+        first_add.push(preference_two)
+      end
+
+      it "adds both documents" do
+        result.should eq([ preference_one, preference_two ])
       end
     end
   end

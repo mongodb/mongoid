@@ -35,6 +35,7 @@ module Mongoid #:nodoc:
             append(doc)
             doc.save if persistable? && !_assigning? && !doc.validated?
           end
+          self
         end
         alias :push :<<
 
@@ -62,6 +63,7 @@ module Mongoid #:nodoc:
               doc.save if persistable?
             end
           end
+          self
         end
 
         # Build a new document from the attributes and append it to this

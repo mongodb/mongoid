@@ -24,7 +24,7 @@ describe Mongoid::Relations::Referenced::Many do
               Post.new
             end
 
-            before do
+            let!(:added) do
               person.posts.send(method, post)
             end
 
@@ -46,6 +46,10 @@ describe Mongoid::Relations::Referenced::Many do
 
             it "adds the document to the target" do
               person.posts.size.should eq(1)
+            end
+
+            it "returns the relation" do
+              added.should eq(person.posts)
             end
           end
 
@@ -3146,6 +3150,36 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "allows creation of the document" do
       jar.id.should eq(1)
+    end
+  end
+
+  context "when adding a document" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:post_one) do
+      Post.new
+    end
+
+    let(:first_add) do
+      person.posts.push(post_one)
+    end
+
+    context "when chaining a second add" do
+
+      let(:post_two) do
+        Post.new
+      end
+
+      let(:result) do
+        first_add.push(post_two)
+      end
+
+      it "adds both documents" do
+        result.should eq([ post_one, post_two ])
+      end
     end
   end
 end

@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1856 Push on one to many relations can now be chained.
+
+        band.albums.push(undertow).push(aenima)
+
 * \#1842 MultiParameterAttributes now supported aliased fields.
   (Anton Orel)
 
