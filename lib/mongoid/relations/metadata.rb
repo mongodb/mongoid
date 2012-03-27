@@ -969,13 +969,19 @@ module Mongoid # :nodoc:
       def determine_inverse_relation
         default = klass.relations[inverse_klass.name.underscore]
         return default.name if default
-        klass.relations.each_pair do |key, meta|
-          next if meta.versioned? || meta.name == name
-          if meta.class_name == inverse_class_name
-            return key.to_sym
-          end
+        candidates = inverse_relation_candidates
+
+        if candidates.size > 1
+          raise Mongoid::Errors::AmbiguousRelationship.new(klass, inverse_klass)
         end
-        return nil
+        candidates.first
+      end
+
+      def inverse_relation_candidates
+        klass.relations.select do |_, meta|
+          next if meta.versioned? || meta.name == name
+          meta.class_name == inverse_class_name
+        end.keys.map(&:to_sym)
       end
 
       # Determine the key for the relation in the attributes.
