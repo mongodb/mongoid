@@ -989,6 +989,42 @@ describe Mongoid::Attributes do
       end
     end
 
+    context "when the attribute exists in embedded document" do
+     
+     let(:pet) do
+       Animal.new(name: "Cat")
+     end
+
+     let(:person) do
+       Person.new(pet: pet)
+     end
+
+     before do
+       person.save
+       person.pet.remove_attribute(:name)
+     end
+
+     it "removes the attribute" do
+       person.pet.name.should be_nil
+     end
+
+     it "removes the key from the attributes hash" do
+       person.pet.has_attribute?(:name).should be_false
+     end
+
+     context "when saving after the removal" do
+       
+       before do
+         person.save
+       end
+
+       it "persists the removal" do
+         person.reload.pet.has_attribute?(:name).should be_false
+       end
+     end
+
+    end
+
     context "when the attribute does not exist" do
 
       let(:person) do
