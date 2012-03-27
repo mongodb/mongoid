@@ -21,6 +21,10 @@ en:
           "can't be blank"
         blank_in_locale:
           "can't be blank in %{in_locale}"
+        ambiguous_relationship:
+          message: "There are multiple relations on %{klass} which fit to %{referenced_klass}."
+          summary: ""
+          resolution: ""
         callbacks:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."
