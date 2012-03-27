@@ -129,7 +129,7 @@ module Mongoid #:nodoc:
           if changes
             old, new = changes
             field = fields[name]
-            key = embedded? ? "#{atomic_position}.#{name}" : name
+            key = atomic_attribute_name(name) 
             if field && field.resizable?
               field.add_atomic_changes(
                 self,

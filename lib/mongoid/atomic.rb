@@ -151,6 +151,16 @@ module Mongoid #:nodoc:
       atomic_paths.position
     end
 
+    # Returns path of the attribute for modification
+    #
+    # @example Get path of the attribute
+    #   address.atomic_attribute_name(:city)
+    #
+    # @return [ String ] The path to the document attribute in the database
+    def atomic_attribute_name(name)
+      embedded? ? "#{atomic_position}.#{name}" : name
+    end
+
     # Get all the attributes that need to be pulled.
     #
     # @example Get the pulls.
