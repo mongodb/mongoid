@@ -487,6 +487,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1859/#1860 `Model#remove_attribute` now properly unsets on embedded
+  documents. (Anton Onyshchenko)
+
 * \#1852 Ensure no infinite recursion on cascading callbacks. (Ara Howard)
 
 * \#1823 `Relation#includes?` now properly works with identity map enabled.

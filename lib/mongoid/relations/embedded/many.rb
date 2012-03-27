@@ -503,7 +503,7 @@ module Mongoid # :nodoc:
         # destroy depending on what this was called through.
         #
         # @example Destroy documents from the relation.
-        #   relation.remove_all(:conditions => { :num => 1 }, true)
+        #   relation.remove_all({ :num => 1 }, true)
         #
         # @param [ Hash ] conditions Conditions to filter by.
         # @param [ true, false ] destroy If true then destroy, else delete.
