@@ -48,7 +48,7 @@ module Mongoid #:nodoc:
             raise Errors::NestedAttributesMetadataNotFound.new(self, name)
           end
           autosave(metadata.merge!(autosave: true))
-          re_define_method("#{name}_attributes=") do |attrs|
+          redefine_method("#{name}_attributes=") do |attrs|
             _assigning do
               metadata.nested_builder(attrs, options).build(self)
             end

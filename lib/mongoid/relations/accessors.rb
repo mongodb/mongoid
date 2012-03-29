@@ -147,7 +147,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def getter(name, metadata)
-          re_define_method(name) do |*args|
+          redefine_method(name) do |*args|
             reload, variable = args.first, "@#{name}"
             value = if instance_variable_defined?(variable) && !reload
               instance_variable_get(variable)
@@ -177,7 +177,7 @@ module Mongoid # :nodoc:
         # @return [ Class ] The class being set up.
         def ids_getter(name, metadata)
           ids_method = "#{name.to_s.singularize}_ids"
-          re_define_method(ids_method) do
+          redefine_method(ids_method) do
             send(name).only(:id).map(&:id)
           end
           self
@@ -199,7 +199,7 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def setter(name, metadata)
-          re_define_method("#{name}=") do |object|
+          redefine_method("#{name}=") do |object|
             without_autobuild do
               if relation_exists?(name) || metadata.many? ||
                 (object.blank? && send(name))
@@ -227,7 +227,7 @@ module Mongoid # :nodoc:
         #  @return [ Class ] The class being set up.
         def ids_setter(name, metadata)
           ids_method = "#{name.to_s.singularize}_ids="
-          re_define_method(ids_method) do |ids|
+          redefine_method(ids_method) do |ids|
             send(metadata.setter, metadata.klass.find(ids))
           end
           self

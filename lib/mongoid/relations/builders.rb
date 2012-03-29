@@ -65,7 +65,7 @@ module Mongoid # :nodoc:
         def builder(name, metadata)
           tap do
             meth = "build_#{name}"
-            re_define_method(meth) do |*args|
+            redefine_method(meth) do |*args|
               attributes, options = parse_args(*args)
               document = Factory.build(metadata.klass, attributes, options)
               _building do
@@ -92,7 +92,7 @@ module Mongoid # :nodoc:
         def creator(name, metadata)
           tap do
             meth = "create_#{name}"
-            re_define_method(meth) do |*args|
+            redefine_method(meth) do |*args|
               attributes, options = parse_args(*args)
               document = Factory.build(metadata.klass, attributes, options)
               send("#{name}=", document).tap do |doc|

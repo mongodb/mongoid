@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Object do
 
-  describe "#_deep_copy" do
+  describe "#deep_dup" do
 
     context "when the object is cloneable" do
 
@@ -11,7 +11,7 @@ describe Mongoid::Extensions::Object do
       end
 
       let(:copy) do
-        string._deep_copy
+        string.deep_dup
       end
 
       it "returns an equal object" do
@@ -30,7 +30,7 @@ describe Mongoid::Extensions::Object do
       end
 
       let(:copy) do
-        number._deep_copy
+        number.deep_dup
       end
 
       it "returns the same object" do

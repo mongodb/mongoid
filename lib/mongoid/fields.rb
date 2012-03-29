@@ -395,11 +395,11 @@ module Mongoid #:nodoc
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           if field.cast_on_read?
-            re_define_method(meth) do
+            redefine_method(meth) do
               fields[name].deserialize(read_attribute(name))
             end
           else
-            re_define_method(meth) do
+            redefine_method(meth) do
               read_attribute(name).tap do |value|
                 if value.is_a?(Array) || value.is_a?(Hash)
                   attribute_will_change!(name)
@@ -421,7 +421,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_setter(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}=") do |value|
+          redefine_method("#{meth}=") do |value|
             write_attribute(name, value)
           end
         end
@@ -438,7 +438,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_field_check(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}?") do
+          redefine_method("#{meth}?") do
             attr = read_attribute(name)
             attr == true || attr.present?
           end
@@ -456,7 +456,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_translations") do
+          redefine_method("#{meth}_translations") do
             attributes[name]
           end
         end
@@ -473,7 +473,7 @@ module Mongoid #:nodoc
       # @since 2.4.0
       def create_translations_setter(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_translations=") do |value|
+          redefine_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
             attributes[name] = value
           end
