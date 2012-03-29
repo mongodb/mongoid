@@ -92,8 +92,10 @@ module Mongoid #:nodoc
       unless attributes.has_key?(name)
         if field = fields[name]
           default = field.eval_default(self)
-          attribute_will_change!(name)
-          attributes[name] = default
+          unless default.nil?
+            attribute_will_change!(name)
+            attributes[name] = default
+          end
         end
       end
     end

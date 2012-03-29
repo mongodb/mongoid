@@ -75,6 +75,7 @@ module Mongoid # :nodoc:
           Factory.build(type || klass, attributes, options).tap do |doc|
             base.send(metadata.foreign_key).push(doc.id)
             append(doc)
+            doc.apply_proc_defaults
             doc.synced[metadata.inverse_foreign_key] = false
             yield(doc) if block_given?
           end

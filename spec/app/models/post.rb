@@ -7,6 +7,7 @@ class Post
   field :title, :type => String
   field :content, :type => String
   field :rating, :type => Integer
+  field :person_title, :type => String, :default => lambda { person.title if person }
 
   belongs_to :person
   belongs_to :author, :foreign_key => :author_id, :class_name => "User"

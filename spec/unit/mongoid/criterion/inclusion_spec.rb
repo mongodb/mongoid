@@ -289,6 +289,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         before do
+          collection.expects(:find_one).returns(person.attributes)
           collection.expects(:find).with({}, {}).returns([ person ])
           post_collection.expects(:find).with(
             { "person_id" => { "$in" => [ person.id ] }}, {}
@@ -328,6 +329,7 @@ describe Mongoid::Criterion::Inclusion do
         end
 
         before do
+          collection.expects(:find_one).returns(person.attributes)
           collection.expects(:find).with({}, {}).returns([ person ])
           post_collection.expects(:find).with(
             { "person_id" => { "$in" => [ person.id ] }}, {}
