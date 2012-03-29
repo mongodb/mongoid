@@ -538,12 +538,10 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       context "when the attributes have changed" do
-        before do
-          Mongoid.logger = Logger.new('/tmp/log.txt', :debug)
 
+        before do
           attributes["city"] = "Berlin"
           attributes["locations"][0]["name"] = "Home"
-          
           person.addresses.first.update_attributes(attributes)
         end
 
@@ -564,7 +562,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "does not persist the locations collection to the person document" do
-          person.reload['locations'].should be_nil
+          person.reload[:locations].should be_nil
         end
       end
     end

@@ -522,6 +522,12 @@ For instructions on upgrading to newer versions, visit
 
 ## 2.4.8 (branch: 2.4.0-stable)
 
+### Resolved Issues
+
+* \#1869/\#1868 Delayed atomic sets now uses the atomic path instead of
+  the metadata name to fix multiple level embedding issues.
+  (Chris Micacchi provided specs)
+
 ## 2.4.7
 
 ### Resolved Issues

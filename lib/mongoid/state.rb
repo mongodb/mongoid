@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
       new_record? &&
         embedded_many? &&
         _parent.persisted? &&
-        !_parent.delayed_atomic_sets[metadata.name.to_s]
+        !_parent.delayed_atomic_sets[atomic_path]
     end
 
     # Determine if the document can be set.
