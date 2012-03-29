@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.4.8 (branch: 2.4.0-stable)
+
+* \#1869/\#1868 Delayed atomic sets now uses the atomic path instead of
+  the metadata name to fix multiple level embedding issues.
+  (Chris Micacchi provided specs)
+
 ## 2.4.7
 
 ### Resolved Issues
