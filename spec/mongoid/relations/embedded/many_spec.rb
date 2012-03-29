@@ -522,15 +522,15 @@ describe Mongoid::Relations::Embedded::Many do
     context "when setting an embedded sub-document tree via a hash" do
 
       let(:person) do
-        Person.create(:ssn => "456-11-1111")
+        Person.create
       end
 
       let!(:address_one) do
-        person.addresses.create(:street => "Tauentzienstr")
+        person.addresses.create(street: "Tauentzienstr")
       end
 
       let!(:location_one) do
-        person.addresses.first.locations.create(:name => "Work")
+        person.addresses.first.locations.create(name: "Work")
       end
 
       let(:attributes) do
