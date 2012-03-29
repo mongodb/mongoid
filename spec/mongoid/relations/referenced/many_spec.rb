@@ -857,7 +857,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when the parent is a new record" do
 
           let(:person) do
-            Person.new
+            Person.new(title: "sir")
           end
 
           let!(:post) do
@@ -874,6 +874,10 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "sets the attributes" do
             post.title.should eq("$$$")
+          end
+
+          it "sets the post processed defaults" do
+            post.person_title.should eq(person.title)
           end
 
           it "does not save the target" do

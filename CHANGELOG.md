@@ -528,6 +528,9 @@ For instructions on upgrading to newer versions, visit
   the metadata name to fix multiple level embedding issues.
   (Chris Micacchi provided specs)
 
+* \#1866 Post processed defaults (procs) should be applied post binding
+  of the child in a relation.build.
+
 ## 2.4.7
 
 ### Resolved Issues

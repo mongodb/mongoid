@@ -91,6 +91,7 @@ module Mongoid #:nodoc:
 
           Factory.build(type || klass, attributes, options).tap do |doc|
             append(doc)
+            doc.apply_post_processed_defaults
             yield(doc) if block_given?
             doc.run_callbacks(:build) { doc }
           end
