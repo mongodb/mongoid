@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Array do
 
-  describe "#_deep_copy" do
+  describe "#deep_dup" do
 
     context "when the array hash clonable objects" do
 
@@ -19,7 +19,7 @@ describe Mongoid::Extensions::Array do
       end
 
       let(:copy) do
-        array._deep_copy
+        array.deep_dup
       end
 
       it "clones the array" do

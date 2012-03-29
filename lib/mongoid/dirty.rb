@@ -220,7 +220,7 @@ module Mongoid #:nodoc:
     # @since 2.3.0
     def attribute_will_change!(attr)
       unless changed_attributes.has_key?(attr)
-        changed_attributes[attr] = read_attribute(attr)._deep_copy
+        changed_attributes[attr] = read_attribute(attr).deep_dup
       end
     end
 
@@ -274,7 +274,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_change_accessor(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_change") do
+          redefine_method("#{meth}_change") do
             attribute_change(name)
           end
         end
@@ -291,7 +291,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_change_check(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_changed?") do
+          redefine_method("#{meth}_changed?") do
             attribute_changed?(name)
           end
         end
@@ -308,7 +308,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_default_change_check(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_changed_from_default?") do
+          redefine_method("#{meth}_changed_from_default?") do
             attribute_changed_from_default?(name)
           end
         end
@@ -325,7 +325,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_previous_value_accessor(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_was") do
+          redefine_method("#{meth}_was") do
             attribute_was(name)
           end
         end
@@ -342,7 +342,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_change_flag(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_will_change!") do
+          redefine_method("#{meth}_will_change!") do
             attribute_will_change!(name)
           end
         end
@@ -359,7 +359,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_dirty_reset(name, meth)
         generated_methods.module_eval do
-          re_define_method("reset_#{meth}!") do
+          redefine_method("reset_#{meth}!") do
             reset_attribute!(name)
           end
         end

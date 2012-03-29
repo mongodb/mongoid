@@ -6,12 +6,12 @@ module Mongoid #:nodoc:
       # Make a deep copy of the object.
       #
       # @example Make a deep copy.
-      #   "testing"._deep_copy
+      #   "testing".deep_dup
       #
       # @return [ Object ] The deep copy.
       #
       # @since 2.4.0
-      def _deep_copy
+      def deep_dup
         duplicable? ? dup : self
       end
 
