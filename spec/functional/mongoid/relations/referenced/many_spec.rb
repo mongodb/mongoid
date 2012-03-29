@@ -754,7 +754,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when the parent is a new record" do
 
           let(:person) do
-            Person.new(title: "sir")
+            Person.new(:title => "sir")
           end
 
           let!(:post) do
