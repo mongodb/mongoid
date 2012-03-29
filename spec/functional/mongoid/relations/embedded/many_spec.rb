@@ -514,8 +514,6 @@ describe Mongoid::Relations::Embedded::Many do
 
       context "when the attributes have changed" do
         before do
-          Mongoid.logger = Logger.new('/tmp/log.txt', :debug)
-
           attributes["city"] = "Berlin"
           attributes["locations"][0]["name"] = "Home"
           
