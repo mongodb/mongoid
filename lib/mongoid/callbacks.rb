@@ -39,35 +39,13 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
-      run_cascading_callbacks(cascadable_children(kind), kind, *args) do
-        super(kind, *args, &block)
+      cascadable_children(kind).each do |child|
+        child.run_callbacks(child_callback_type(kind, child), *args)
       end
+      super(kind, *args, &block)
     end
 
     private
-
-    # Execute the callbacks, including all children that have cascade callbacks
-    # set to true.
-    #
-    # @example Run the cascading callbacks.
-    #   document.run_cascading_callbacks([], :update)
-    #
-    # @param [ Array<Document> ] children The cascading children.
-    # @param [ Symbol ] kind The callback type.
-    # @param [ Array ] args The options.
-    #
-    # @since 2.3.0
-    def run_cascading_callbacks(children, kind, *args, &block)
-      if child = children.pop
-        run_cascading_callbacks(children, kind, *args) do
-          child.run_callbacks(child_callback_type(kind, child), *args) do
-            block.call
-          end
-        end
-      else
-        block.call
-      end
-    end
 
     # Get all the child embedded documents that are flagged as cascadable.
     #
