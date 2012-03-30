@@ -48,5 +48,27 @@ describe Mongoid::Matchers::Gte do
       end
     end
 
+    context "when the value is an array" do
+      context "there are value valid" do
+        let(:matcher) do
+          described_class.new([6,4])
+        end
+
+        it "returns false" do
+          matcher.matches?("$gte" => 5).should be_true
+        end
+      end
+
+      context "there are not value valid" do
+        let(:matcher) do
+          described_class.new([3,4])
+        end
+
+        it "returns false" do
+          matcher.matches?("$gte" => 5).should be_false
+        end
+
+      end
+    end
   end
 end
