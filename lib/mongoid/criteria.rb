@@ -183,6 +183,18 @@ module Mongoid #:nodoc:
       context.count > 0
     end
 
+    # Run an explain on the criteria.
+    #
+    # @example Explain the criteria.
+    #   Band.where(name: "Depeche Mode").explain
+    #
+    # @return [ Hash ] The explain result.
+    #
+    # @since 3.0.0
+    def explain
+      driver.find(selector, options).explain
+    end
+
     # Extract a single id from the provided criteria. Could be in an $and
     # query or a straight _id query.
     #

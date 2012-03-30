@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* You can now perform an explain directly from criteria.
+
+        Band.where(name: "Depeche Mode").explain
+
 * \#1856 Push on one to many relations can now be chained.
 
         band.albums.push(undertow).push(aenima)

@@ -128,6 +128,17 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#explain" do
+
+    let(:explain) do
+      Person.where(title: "sir").explain
+    end
+
+    it "returns the explain result" do
+      explain["cursor"].should eq("BasicCursor")
+    end
+  end
+
   describe "#initialize" do
 
     let(:criteria) do
