@@ -6,15 +6,15 @@ module Mongoid #:nodoc:
       # Make a deep copy of the array.
       #
       # @example Make a deep copy.
-      #   [ 1, 2, 3 ]._deep_copy
+      #   [ 1, 2, 3 ].deep_dup
       #
       # @return [ Array ] The deep copy.
       #
       # @since 2.4.0
-      def _deep_copy
+      def deep_dup
         [].tap do |copy|
           each do |value|
-            copy.push(value._deep_copy)
+            copy.push(value.deep_dup)
           end
         end
       end

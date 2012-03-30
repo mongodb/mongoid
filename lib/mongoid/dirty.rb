@@ -220,7 +220,7 @@ module Mongoid #:nodoc:
     # @since 2.3.0
     def attribute_will_change!(attr)
       unless changed_attributes.has_key?(attr)
-        changed_attributes[attr] = read_attribute(attr)._deep_copy
+        changed_attributes[attr] = read_attribute(attr).deep_dup
       end
     end
 
