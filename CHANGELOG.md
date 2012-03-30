@@ -497,6 +497,9 @@ For instructions on upgrading to newer versions, visit
 * \#1810 `Model#changed?` no longer returns true when hash and array fields
   have only been accessed.
 
+* \#1876/\#1782 Allow dot notation in embeds many criteria queries.
+  (Cyril Mougel)
+
 * \#1718 Ensure consistency of #first/#last in relations - they now always
   match first/last in the database, but opts for in memory first.
 

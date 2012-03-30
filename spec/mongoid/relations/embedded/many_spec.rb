@@ -3220,4 +3220,27 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when using dot notation in a criteria" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let!(:address) do
+      person.addresses.build(street: "hobrecht")
+    end
+
+    let!(:location) do
+      address.locations.build(number: 5)
+    end
+
+    let(:criteria) do
+      person.addresses.where("locations.number" => { "$gt" => 3 })
+    end
+
+    it "allows the dot notation criteria" do
+      criteria.should eq([ address ])
+    end
+  end
 end
