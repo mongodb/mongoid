@@ -524,6 +524,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1874 Fixed the reject all blank proc constant to handle values
+  properly with a destroy non blank value. (Stefan Daschek)
+
 * \#1869/\#1868 Delayed atomic sets now uses the atomic path instead of
   the metadata name to fix multiple level embedding issues.
   (Chris Micacchi provided specs)

@@ -1883,7 +1883,8 @@ describe Mongoid::NestedAttributes do
             context "when all attributes are blank and _destroy has a truthy, non-blank value" do
 
               before do
-                person.addresses_attributes = { "3" => { last_name: "", _destroy: "0" } }
+                person.addresses_attributes =
+                  { "3" => { last_name: "", _destroy: "0" } }
               end
 
               it "does not add the document" do
@@ -1891,8 +1892,6 @@ describe Mongoid::NestedAttributes do
               end
             end
           end
-
-
         end
 
         context "when the nested document is invalid" do
