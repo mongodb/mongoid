@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
 
     module ClassMethods #:nodoc:
 
-      REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |_, value| value.blank? } }
+      REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |key, value| key == '_destroy' || value.blank? } }
 
       # Used when needing to update related models from a parent relation. Can
       # be used on embedded or referenced relations.

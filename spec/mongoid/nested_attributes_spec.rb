@@ -1866,6 +1866,33 @@ describe Mongoid::NestedAttributes do
               end
             end
           end
+
+          context "when 'reject_if: :all_blank' and 'allow_destroy: true' are specified" do
+
+            before(:all) do
+              Person.send(:undef_method, :addresses_attributes=)
+              Person.accepts_nested_attributes_for \
+                :addresses, reject_if: :all_blank, allow_destroy: true
+            end
+
+            after(:all) do
+              Person.send(:undef_method, :addresses_attributes=)
+              Person.accepts_nested_attributes_for :addresses
+            end
+
+            context "when all attributes are blank and _destroy has a truthy, non-blank value" do
+
+              before do
+                person.addresses_attributes = { "3" => { last_name: "", _destroy: "0" } }
+              end
+
+              it "does not add the document" do
+                person.addresses.should be_empty
+              end
+            end
+          end
+
+
         end
 
         context "when the nested document is invalid" do
