@@ -1839,7 +1839,7 @@ describe Mongoid::NestedAttributes do
             before(:all) do
               Person.send(:undef_method, :addresses_attributes=)
               Person.accepts_nested_attributes_for \
-                :addresses, reject_if: :all_blank, allow_destroy: true
+                :addresses, :reject_if => :all_blank, allow_destroy: true
             end
 
             after(:all) do
@@ -1851,7 +1851,7 @@ describe Mongoid::NestedAttributes do
 
               before do
                 person.addresses_attributes =
-                  { "3" => { last_name: "", _destroy: "0" } }
+                  { "3" => { :last_name => "", _destroy: "0" } }
               end
 
               it "does not add the document" do
