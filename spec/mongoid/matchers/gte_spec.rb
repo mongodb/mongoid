@@ -7,7 +7,7 @@ describe Mongoid::Matchers::Gte do
     context "when the value is larger" do
 
       let(:matcher) do
-        Mongoid::Matchers::Gte.new(5)
+        described_class.new(5)
       end
 
       it "returns true" do
@@ -18,7 +18,7 @@ describe Mongoid::Matchers::Gte do
     context "when the value is smaller" do
 
       let(:matcher) do
-        Mongoid::Matchers::Gte.new(5)
+        described_class.new(5)
       end
 
       it "returns false" do
@@ -29,7 +29,7 @@ describe Mongoid::Matchers::Gte do
     context "when the value is equal" do
 
       let(:matcher) do
-        Mongoid::Matchers::Gte.new(5)
+        described_class.new(5)
       end
 
       it "returns true" do
@@ -40,12 +40,13 @@ describe Mongoid::Matchers::Gte do
     context "when the value is nil" do
 
       let(:matcher) do
-        Mongoid::Matchers::Gte.new(nil)
+        described_class.new(nil)
       end
 
       it "returns false" do
         matcher.matches?("$gte" => 5).should be_false
       end
     end
+
   end
 end
