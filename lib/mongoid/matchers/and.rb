@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
       # Does the supplied query match the attribute?
       #
       # @example Does this match?
-      #   matcher.matches?("$and" => [ { field => value } ])
+      #   matcher.matches?([ { field => value } ])
       #
       # @param [ Array ] conditions The or expression.
       #
