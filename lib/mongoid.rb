@@ -22,6 +22,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require "delegate"
 require "time"
+require "set"
 require "active_support/core_ext"
 require 'active_support/json'
 require "active_support/inflector"
