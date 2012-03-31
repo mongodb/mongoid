@@ -1705,6 +1705,58 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#determine_inverse_relation" do
+
+    let(:class_name) do
+      "Person"
+    end
+
+    let(:metadata) do
+      described_class.new(
+        relation: Mongoid::Relations::Referenced::In,
+        inverse_class_name: "Drug",
+        class_name: class_name
+      )
+    end
+
+    let(:inverse_relation) do
+      metadata.send(:determine_inverse_relation)
+    end
+
+    context "when no match" do
+
+      let(:class_name) do
+        "Slave"
+      end
+
+      it "returns nil" do
+        inverse_relation.should be_nil
+      end
+    end
+
+    context "when one match" do
+
+      it "returns correct relation" do
+        inverse_relation.should eq(:drugs)
+      end
+    end
+
+    context "when multiple matches" do
+
+      before do
+        class_name.constantize.has_many(:evil_drugs, class_name: "Drug")
+      end
+
+      after do
+        class_name.constantize.relations.delete("evil_drugs")
+      end
+
+      it "raises AmbiguousRelationship" do
+        expect { inverse_relation }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+      end
+    end
+  end
+
   context "properties" do
 
     PROPERTIES = [
