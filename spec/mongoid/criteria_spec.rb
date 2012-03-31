@@ -177,26 +177,348 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#build"
-  pending "#clone"
-  pending "#collection"
-  pending "#cache"
-  pending "#cached?"
-  pending "#context"
-  pending "#create"
-  pending "#documents"
-  pending "#documents="
-  pending "#each"
+  describe "#build" do
 
-  pending "#elem_match"
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    context "when provided valid attributes" do
+
+      let(:band) do
+        criteria.build(genres: [ "electro" ])
+      end
+
+      it "returns the new document" do
+        band.should be_new_record
+      end
+
+      it "sets the criteria attributes" do
+        band.name.should eq("Depeche Mode")
+      end
+
+      it "sets the attributes passed to build" do
+        band.genres.should eq([ "electro" ])
+      end
+    end
+  end
+
+  [ :clone, :dup ].each do |method|
+
+    describe "\##{method}" do
+
+      let(:band) do
+        Band.new
+      end
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode").asc(:name).includes(:records)
+      end
+
+      before do
+        criteria.documents = [ band ]
+        criteria.context
+      end
+
+      let(:clone) do
+        criteria.send(method)
+      end
+
+      it "contains an equal selector" do
+        clone.selector.should eq({ "name" => "Depeche Mode" })
+      end
+
+      it "clones the selector" do
+        clone.selector.should_not equal(criteria.selector)
+      end
+
+      it "contains equal options" do
+        clone.options.should eq({ sort: { "name" => 1 }})
+      end
+
+      it "clones the options" do
+        clone.options.should_not equal(criteria.options)
+      end
+
+      it "contains equal inclusions" do
+        clone.inclusions.should eq([ Band.relations["records"] ])
+      end
+
+      it "clones the inclusions" do
+        clone.inclusions.should_not equal(criteria.inclusions)
+      end
+
+      it "contains equal documents" do
+        clone.documents.should eq([ band ])
+      end
+
+      it "clones the documents" do
+        clone.documents.should_not equal(criteria.documents)
+      end
+
+      it "contains equal scoping options" do
+        clone.scoping_options.should eq([ nil, nil ])
+      end
+
+      it "clones the scoping options" do
+        clone.scoping_options.should_not equal(criteria.scoping_options)
+      end
+
+      it "sets the context to nil" do
+        clone.instance_variable_get(:@context).should be_nil
+      end
+    end
+  end
+
+  describe "#collection" do
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    it "returns the model collection" do
+      criteria.collection.should eq(Band.collection)
+    end
+  end
+
+  describe "#cache" do
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    it "sets the cache option to true" do
+      criteria.cache.should be_cached
+    end
+  end
+
+  describe "#context" do
+
+    context "when the model is embedded" do
+
+      let(:criteria) do
+        described_class.new(Record) do |criteria|
+          criteria.embedded = true
+        end
+      end
+
+      it "returns the embedded context" do
+        criteria.context.should be_a(Mongoid::Contexts::Enumerable)
+      end
+    end
+
+    context "when the model is not embedded" do
+
+      let(:criteria) do
+        described_class.new(Band)
+      end
+
+      it "returns the mongo context" do
+        criteria.context.should be_a(Mongoid::Contexts::Mongo)
+      end
+    end
+  end
+
+  describe "#create" do
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    context "when provided valid attributes" do
+
+      let(:band) do
+        criteria.create(genres: [ "electro" ])
+      end
+
+      it "returns the created document" do
+        band.should be_persisted
+      end
+
+      it "sets the criteria attributes" do
+        band.name.should eq("Depeche Mode")
+      end
+
+      it "sets the attributes passed to build" do
+        band.genres.should eq([ "electro" ])
+      end
+    end
+  end
+
+  pending "#create!"
+
+  describe "#documents" do
+
+    let(:band) do
+      Band.new
+    end
+
+    let(:criteria) do
+      described_class.new(Band) do |criteria|
+        criteria.documents = [ band ]
+      end
+    end
+
+    it "returns the documents" do
+      criteria.documents.should eq([ band ])
+    end
+  end
+
+  describe "#documents=" do
+
+    let(:band) do
+      Band.new
+    end
+
+    let(:criteria) do
+      described_class.new(Band)
+    end
+
+    before do
+      criteria.documents = [ band ]
+    end
+
+    it "sets the documents" do
+      criteria.documents.should eq([ band ])
+    end
+  end
+
+  describe "#each" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    context "when provided a block" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      it "iterates over the matching documents" do
+        criteria.each do |doc|
+          doc.should eq(band)
+        end
+      end
+    end
+
+    context "when not provided a block" do
+
+      pending "returns an enumerator"
+    end
+  end
+
+  describe "#elem_match" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode").tap do |band|
+        band.records.create(name: "101")
+      end
+    end
+
+    let!(:non_match) do
+      Band.create(genres: [ "house" ])
+    end
+
+    let(:criteria) do
+      Band.elem_match(records: { name: "101" })
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
 
   pending "#execute_or_raise"
 
-  pending "#exists"
-  pending "#exists?"
+  describe "#exists" do
 
-  pending "#explain"
-  pending "#extract_id"
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:non_match) do
+      Band.create
+    end
+
+    let(:criteria) do
+      Band.exists(name: true)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#exists?" do
+
+    context "when matching documents exist" do
+
+      let!(:match) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      it "returns true" do
+        criteria.exists?.should be_true
+      end
+    end
+
+    context "when no matching documents exist" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      it "returns false" do
+        criteria.exists?.should be_false
+      end
+    end
+  end
+
+  describe "#explain" do
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    it "returns the criteria explain path" do
+      criteria.explain["cursor"].should eq("BasicCursor")
+    end
+  end
+
+  describe "#extract_id" do
+
+    context "when an id exists" do
+
+      let(:criteria) do
+        described_class.new(Band) do |criteria|
+          criteria.selector[:id] = 1
+        end
+      end
+
+      it "returns the id" do
+        criteria.extract_id.should eq(1)
+      end
+    end
+
+    context "when an _id exists" do
+
+      let(:criteria) do
+        described_class.new(Band) do |criteria|
+          criteria.selector[:_id] = 1
+        end
+      end
+
+      it "returns the _id" do
+        criteria.extract_id.should eq(1)
+      end
+    end
+  end
+
   pending "#find"
   pending "#for_ids"
   pending "#freeze"
