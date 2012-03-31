@@ -57,23 +57,21 @@ module Mongoid #:nodoc:
     # @return [ Array<Document> ] The children.
     #
     # @since 2.3.0
-    def cascadable_children(kind, seen = {})
-      [].tap do |children|
-        relations.each_pair do |name, metadata|
-          seen[metadata] ? next : seen[metadata] = true
-          next unless metadata.cascading_callbacks?
-          without_autobuild do
-            delayed_pulls = delayed_atomic_pulls[name]
-            children.concat(delayed_pulls) if delayed_pulls
-            child = send(name)
-            Array.wrap(child).each do |doc|
-              seen[doc.object_id] ? next : seen[doc.object_id] = true
-              children.push(doc) if cascadable_child?(kind, doc)
-              children.concat(doc.send(:cascadable_children, kind, seen))
-            end
+    def cascadable_children(kind, children = Set.new)
+      relations.each_pair do |name, metadata|
+        next unless metadata.cascading_callbacks?
+        without_autobuild do
+          delayed_pulls = delayed_atomic_pulls[name]
+          children.merge(delayed_pulls) if delayed_pulls
+          relation = send(name)
+          Array.wrap(relation).each do |child|
+            next if children.include?(child)
+            children.add(child) if cascadable_child?(kind, child)
+            children.merge(child.send(:cascadable_children, kind, children))
           end
         end
       end
+      children.to_a
     end
 
     # Determine if the child should fire the callback.

@@ -325,14 +325,25 @@ describe Mongoid::Document do
     end
   end
 
+  describe "#identity" do
+
+    let(:person) do
+      Person.new
+    end
+
+    it "returns a [doc.class, doc.id] array" do
+      person.identity.should eq([person.class, person.id])
+    end
+  end
+
   describe "#hash" do
 
     let(:person) do
       Person.new
     end
 
-    it "returns the id hash" do
-      person.hash.should eq(person.id.hash)
+    it "returns the identity hash" do
+      person.hash.should eq(person.identity.hash)
     end
   end
 

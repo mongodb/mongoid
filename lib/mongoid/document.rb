@@ -83,8 +83,8 @@ module Mongoid #:nodoc:
       attributes.frozen?
     end
 
-    # Delegates to id in order to allow two records of the same type and id to
-    # work with something like:
+    # Delegates to identity in order to allow two records of the same identity
+    # to work with something like:
     #
     #   [ Person.find(1), Person.find(2), Person.find(3) ] &
     #   [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
@@ -92,9 +92,22 @@ module Mongoid #:nodoc:
     # @example Get the hash.
     #   document.hash
     #
-    # @return [ Integer ] The hash of the document's id.
+    # @return [ Integer ] The hash of the document's identity.
     def hash
-      attributes["_id"].hash
+      identity.hash
+    end
+
+    # A Document's is identified absolutely by it's class and database id:
+    #
+    # Person.first.identity #=> [Person, BSON::ObjectId('4f775130a04745933a000003')] 
+    #
+    # @example Get the identity
+    #   document.identity
+    #
+    # @return [ Array ] An array containing [document.class, document.id]
+    #
+    def identity
+      [self.class, self.id]
     end
 
     # Instantiate a new +Document+, setting the Document's attributes if
