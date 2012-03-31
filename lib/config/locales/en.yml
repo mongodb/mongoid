@@ -22,9 +22,16 @@ en:
         blank_in_locale:
           "can't be blank in %{in_locale}"
         ambiguous_relationship:
-          message: "There are multiple relations on %{klass} which fit to %{referenced_klass}."
-          summary: ""
-          resolution: ""
+          message: "Ambiguous relations %{candidates} defined on %{klass}."
+          summary:
+            "When Mongoid attempts to set an inverse document of a relation
+            in memory, it needs to know which relation it belongs to. When
+            setting %{name}, Mongoid looked on the class %{inverse}
+            for a matching relation, but multiples were found that could
+            potentially match: %{candidates}."
+          resolution: "On the %{name} relation on %{inverse} you must add an
+            :inverse_of option to specify the exact relationship on %{klass}
+            that is the opposite of %{name}."
         callbacks:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."

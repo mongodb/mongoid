@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1861 Mongoid now raises an `AmbiguousRelationship` error when it
+  cannot determine the inverse of a relation and there are multiple
+  potential candidates. (Hans Hasselberg)
+
 * You can now perform an explain directly from criteria.
 
         Band.where(name: "Depeche Mode").explain

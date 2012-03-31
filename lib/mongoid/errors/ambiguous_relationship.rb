@@ -19,9 +19,31 @@ module Mongoid #:nodoc
     #     belongs_to :referred_by, class_name: "Person"
     #   end
     class AmbiguousRelationship < MongoidError
-      def initialize(klass, referenced_klass)
+
+      # Create the new error.
+      #
+      # @example Create the error.
+      #   AmbiguousRelationship.new(
+      #     Person, Drug, :person, [ :drugs, #   :evil_drugs ]
+      #   )
+      #
+      # @param [ Class ] klass The base class.
+      # @param [ Class ] inverse The inverse class.
+      # @param [ Symbol ] name The relation name.
+      # @param [ Array<Symbol> ] candidates The potential inverses.
+      #
+      # @since 3.0.0
+      def initialize(klass, inverse, name, candidates)
         super(
-          compose_message("ambiguous_relationship", { klass: klass, referenced_klass: referenced_klass})
+          compose_message(
+            "ambiguous_relationship",
+            {
+              klass: klass,
+              inverse: inverse,
+              name: name.inspect,
+              candidates: candidates.map(&:inspect).join(", ")
+            }
+          )
         )
       end
     end

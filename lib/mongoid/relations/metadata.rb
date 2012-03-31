@@ -972,7 +972,12 @@ module Mongoid # :nodoc:
         candidates = inverse_relation_candidates
 
         if candidates.size > 1
-          raise Mongoid::Errors::AmbiguousRelationship.new(klass, inverse_klass)
+          raise Errors::AmbiguousRelationship.new(
+            klass,
+            inverse_klass,
+            name,
+            candidates
+          )
         end
         candidates.first
       end

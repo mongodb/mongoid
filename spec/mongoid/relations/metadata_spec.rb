@@ -1715,7 +1715,8 @@ describe Mongoid::Relations::Metadata do
       described_class.new(
         relation: Mongoid::Relations::Referenced::In,
         inverse_class_name: "Drug",
-        class_name: class_name
+        class_name: class_name,
+        name: :person
       )
     end
 
@@ -1752,7 +1753,9 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "raises AmbiguousRelationship" do
-        expect { inverse_relation }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        expect {
+          inverse_relation
+        }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
       end
     end
   end
