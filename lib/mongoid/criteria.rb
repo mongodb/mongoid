@@ -1,8 +1,5 @@
 # encoding: utf-8
-require "mongoid/criterion/exclusion"
-require "mongoid/criterion/inclusion"
 require "mongoid/criterion/inspection"
-require "mongoid/criterion/optional"
 require "mongoid/criterion/scoping"
 
 module Mongoid #:nodoc:
@@ -13,18 +10,10 @@ module Mongoid #:nodoc:
   # in the Ruby driver. Each method on the +Criteria+ returns self to they
   # can be chained in order to create a readable criterion to be executed
   # against the database.
-  #
-  # @example Create and execute a criteria.
-  #   criteria = Criteria.new
-  #   criteria.only(:field).where(:field => "value").skip(20).limit(20)
-  #   criteria.execute
   class Criteria
     include Enumerable
     include Origin::Queryable
-    include Criterion::Exclusion
-    include Criterion::Inclusion
     include Criterion::Inspection
-    include Criterion::Optional
     include Criterion::Scoping
 
     attr_accessor :embedded, :klass
@@ -56,28 +45,6 @@ module Mongoid #:nodoc:
       :update,
       :update_all, to: :context
 
-    # Concatinate the criteria with another enumerable. If the other is a
-    # +Criteria+ then it needs to get the collection from it.
-    #
-    # @example Concat 2 criteria.
-    #   criteria + criteria
-    #
-    # @param [ Criteria ] other The other criteria.
-    def +(other)
-      entries + comparable(other)
-    end
-
-    # Returns the difference between the criteria and another enumerable. If
-    # the other is a +Criteria+ then it needs to get the collection from it.
-    #
-    # @example Get the difference of 2 criteria.
-    #   criteria - criteria
-    #
-    # @param [ Criteria ] other The other criteria.
-    def -(other)
-      entries - comparable(other)
-    end
-
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.
     #
@@ -86,15 +53,26 @@ module Mongoid #:nodoc:
     # @param [ Object ] other The other +Enumerable+ or +Criteria+ to compare to.
     #
     # @return [ true, false ] If the objects are equal.
+    #
+    # @since 1.0.0
     def ==(other)
       case other
-      when Criteria
-        self.selector == other.selector && self.options == other.options
-      when Enumerable
-        return (execute.entries == other)
-      else
-        return false
+      when Criteria then super
+      when Enumerable then entries == other
+      else false
       end
+    end
+
+    # Needed to properly get a criteria back as json
+    #
+    # @example Get the criteria as json.
+    #   Person.where(:title => "Sir").as_json
+    #
+    # @param [ Hash ] options Options to pass through to the serializer.
+    #
+    # @return [ String ] The JSON string.
+    def as_json(options = nil)
+      entries.as_json(options)
     end
 
     # Build a document given the selector and return it.
@@ -123,6 +101,29 @@ module Mongoid #:nodoc:
     # @since 2.2.0
     def collection
       klass.collection
+    end
+
+    # Tells the criteria that the cursor that gets returned needs to be
+    # cached. This is so multiple iterations don't hit the database multiple
+    # times, however this is not advisable when working with large data sets
+    # as the entire results will get stored in memory.
+    #
+    # @example Flag the criteria as cached.
+    #   criteria.cache
+    #
+    # @return [ Criteria ] The cloned criteria.
+    def cache
+      clone.tap { |crit| crit.options.merge!(cache: true) }
+    end
+
+    # Will return true if the cache option has been set.
+    #
+    # @example Is the criteria cached?
+    #   criteria.cached?
+    #
+    # @return [ true, false ] If the criteria is flagged as cached.
+    def cached?
+      options[:cache] == true
     end
 
     # Return or create the context in which this criteria should be executed.
@@ -154,10 +155,27 @@ module Mongoid #:nodoc:
       create_document(:create, attrs)
     end
 
+    # Get the documents from the embedded criteria.
+    #
+    # @example Get the documents.
+    #   criteria.documents
+    #
+    # @return [ Array<Document> ] The documents.
+    #
+    # @since 3.0.0
     def documents
       @documents ||= []
     end
 
+    # Set the embedded documents on the criteria.
+    #
+    # @example Set the documents.
+    #
+    # @param [ Array<Document> ] docs The embedded documents.
+    #
+    # @return [ Array<Document> ] The embedded documents.
+    #
+    # @since 3.0.0
     def documents=(docs)
       @documents = docs
     end
@@ -169,8 +187,41 @@ module Mongoid #:nodoc:
     #   criteria.each { |doc| p doc }
     #
     # @return [ Criteria ] The criteria itself.
+    #
+    # @since 1.0.0
     def each(&block)
       tap { context.iterate(&block) }
+    end
+
+    # Execute the criteria or raise an error if no documents found.
+    #
+    # @example Execute or raise
+    #   criteria.execute_or_raise(id)
+    #
+    # @param [ Object ] args The arguments passed.
+    #
+    # @raise [ Errors::DocumentNotFound ] If nothing returned.
+    #
+    # @return [ Document, Array<Document> ] The document(s).
+    #
+    # @since 2.0.0
+    def execute_or_raise(args)
+      ids = args[0]
+      ids = ids.to_a if ids.is_a?(::Range)
+      if ids.is_a?(::Array)
+        entries.tap do |result|
+          if (entries.size < ids.size) && Mongoid.raise_not_found_error
+            missing = ids - entries.map(&:_id)
+            raise Errors::DocumentNotFound.new(klass, ids, missing)
+          end
+        end
+      else
+        from_map_or_db.tap do |result|
+          if result.nil? && ids && Mongoid.raise_not_found_error
+            raise Errors::DocumentNotFound.new(klass, ids, ids)
+          end
+        end
+      end
     end
 
     # Return true if the criteria has some Document or not.
@@ -179,6 +230,8 @@ module Mongoid #:nodoc:
     #   criteria.exists?
     #
     # @return [ true, false ] If documents match.
+    #
+    # @since 1.0.0
     def exists?
       context.count > 0
     end
@@ -208,6 +261,47 @@ module Mongoid #:nodoc:
       selector["_id"]
     end
 
+    # Find the matchind document(s) in the criteria for the provided ids.
+    #
+    # @example Find by an id.
+    #   criteria.find(BSON::ObjectId.new)
+    #
+    # @example Find by multiple ids.
+    #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
+    #
+    # @param [ Array<BSON::ObjectId> ] args The ids to search for.
+    #
+    # @return [ Array<Document>, Document ] The matching document(s).
+    #
+    # @since 1.0.0
+    def find(*args)
+      ids = args.flat_map{ |arg| arg.is_a?(::Range) ? arg.to_a : arg }
+      raise_invalid if ids.any?(&:nil?)
+      for_ids(ids).execute_or_raise(args)
+    end
+
+    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
+    #
+    # @example Add a single id criteria.
+    #   criteria.for_ids("4ab2bc4b8ad548971900005c")
+    #
+    # @example Add multiple id criteria.
+    #   criteria.for_ids(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])
+    #
+    # @param [ Array ] ids: A single id or an array of ids.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    def for_ids(*ids)
+      field = klass.fields["_id"]
+      ids.flatten!
+      method = extract_id ? :all_of : :where
+      if ids.size > 1
+        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
+      else
+        send(method, { _id: field.serialize(ids.first) })
+      end
+    end
+
     # When freezing a criteria we need to initialize the context first
     # otherwise the setting of the context on attempted iteration will raise a
     # runtime error.
@@ -222,9 +316,90 @@ module Mongoid #:nodoc:
       context and inclusions and super
     end
 
+    # Get the document from the identity map, and if not found hit the
+    # database.
+    #
+    # @example Get the document from the map or criteria.
+    #   criteria.from_map_or_db(criteria)
+    #
+    # @param [ Criteria ] The cloned criteria.
+    #
+    # @return [ Document ] The found document.
+    #
+    # @since 2.2.1
+    def from_map_or_db
+      doc = IdentityMap.get(klass, extract_id || selector)
+      doc && doc.matches?(selector) ? doc : first
+    end
+
+    # Initialize the new criteria.
+    #
+    # @example Init the new criteria.
+    #   Criteria.new(Band)
+    #
+    # @param [ Class ] klass The model class.
+    #
+    # @since 1.0.0
     def initialize(klass)
       @klass = klass
       super(klass.aliased_fields, klass.fields)
+    end
+
+    # Eager loads all the provided relations. Will load all the documents
+    # into the identity map who's ids match based on the extra query for the
+    # ids.
+    #
+    # @note This will only work if Mongoid's identity map is enabled. To do
+    #   so set identity_map_enabled: true in your mongoid.yml
+    #
+    # @note This will work for embedded relations that reference another
+    #   collection via belongs_to as well.
+    #
+    # @note Eager loading brings all the documents into memory, so there is a
+    #   sweet spot on the performance gains. Internal benchmarks show that
+    #   eager loading becomes slower around 100k documents, but this will
+    #   naturally depend on the specific application.
+    #
+    # @example Eager load the provided relations.
+    #   Person.includes(:posts, :game)
+    #
+    # @param [ Array<Symbol> ] relations The names of the relations to eager
+    #   load.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 2.2.0
+    def includes(*relations)
+      relations.each do |name|
+        inclusions.push(klass.reflect_on_association(name))
+      end
+      clone
+    end
+
+    # Get a list of criteria that are to be executed for eager loading.
+    #
+    # @example Get the eager loading inclusions.
+    #   Person.includes(:game).inclusions
+    #
+    # @return [ Array<Metadata> ] The inclusions.
+    #
+    # @since 2.2.0
+    def inclusions
+      @inclusions ||= []
+    end
+
+    # Set the inclusions for the criteria.
+    #
+    # @example Set the inclusions.
+    #   criteria.inclusions = [ meta ]
+    #
+    # @param [ Array<Metadata> ] The inclusions.
+    #
+    # @return [ Array<Metadata> ] The new inclusions.
+    #
+    # @since 3.0.0
+    def inclusions=(value)
+      @inclusions = value
     end
 
     # Merges another object with this +Criteria+ and returns a new criteria.
@@ -265,6 +440,21 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Overriden to include _type in the fields.
+    #
+    # @example Limit the fields returned from the database.
+    #   Band.only(:name)
+    #
+    # @param [ Array<Symbol> ] args The names of the fields.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 1.0.0
+    def only(*args)
+      return clone if args.empty?
+      super(*args, :_type)
+    end
+
     # Returns true if criteria responds to the given method.
     #
     # @example Does the criteria respond to the method?
@@ -275,35 +465,10 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] If the criteria responds to the method.
     def respond_to?(name, include_private = false)
-      # don't include klass private methods because method_missing won't call them
       super || klass.respond_to?(name) || entries.respond_to?(name, include_private)
     end
 
     alias :to_ary :to_a
-
-    # Needed to properly get a criteria back as json
-    #
-    # @example Get the criteria as json.
-    #   Person.where(:title => "Sir").as_json
-    #
-    # @param [ Hash ] options Options to pass through to the serializer.
-    #
-    # @return [ String ] The JSON string.
-    def as_json(options = nil)
-      entries.as_json(options)
-    end
-
-    # Convenience method of raising an invalid options error.
-    #
-    # @example Raise the error.
-    #   criteria.raise_invalid
-    #
-    # @raise [ Errors::InvalidOptions ] The error.
-    #
-    # @since 2.0.0
-    def raise_invalid
-      raise Errors::InvalidFind.new
-    end
 
     # Convenience for objects that want to be merged into a criteria.
     #
@@ -329,22 +494,26 @@ module Mongoid #:nodoc:
       ->{ self }
     end
 
-    protected
-
-    # Return the entries of the other criteria or the object. Used for
-    # comparing criteria or an enumerable.
+    # Adds a criterion to the +Criteria+ that specifies a type or an Array of
+    # types that must be matched.
     #
-    # @example Get the comparable version.
-    #   criteria.comparable(other)
+    # @example Match only specific models.
+    #   criteria.type('Browser')
+    #   criteria.type(['Firefox', 'Browser'])
     #
-    # @param [ Criteria ] other Another criteria.
+    # @param [ Array<String> ] types The types to match against.
     #
-    # @return [ Array ] The array to compare with.
-    def comparable(other)
-      other.is_a?(Criteria) ? other.entries : other
+    # @return [ Criteria ] The cloned criteria.
+    def type(types)
+      types = [types] unless types.is_a?(Array)
+      any_in(_type: types)
     end
 
+    private
+
     # Get the raw driver collection from the criteria.
+    #
+    # @api private
     #
     # @example Get the raw driver collection.
     #   criteria.driver
@@ -359,6 +528,8 @@ module Mongoid #:nodoc:
     # Clone or dup the current +Criteria+. This will return a new criteria with
     # the selector, options, klass, embedded options, etc intact.
     #
+    # @api private
+    #
     # @example Clone a criteria.
     #   criteria.clone
     #
@@ -368,6 +539,8 @@ module Mongoid #:nodoc:
     # @param [ Criteria ] other The criteria getting cloned.
     #
     # @return [ nil ] nil.
+    #
+    # @since 1.0.0
     def initialize_copy(other)
       @selector = other.selector.dup
       @options = other.options.dup
@@ -379,6 +552,16 @@ module Mongoid #:nodoc:
 
     # Used for chaining +Criteria+ scopes together in the for of class methods
     # on the +Document+ the criteria is for.
+    #
+    # @example Handle method missing.
+    #   criteria.method_missing(:name)
+    #
+    # @param [ Symbol ] name The method name.
+    # @param [ Array ] args The arguments.
+    #
+    # @return [ Object ] The result of the method call.
+    #
+    # @since 1.0.0
     def method_missing(name, *args, &block)
       if klass.respond_to?(name)
         klass.send(:with_scope, self) do
@@ -388,8 +571,6 @@ module Mongoid #:nodoc:
         return entries.send(name, *args)
       end
     end
-
-    private
 
     # Create a document given the provided method and attributes from the
     # existing selector.
@@ -415,6 +596,18 @@ module Mongoid #:nodoc:
           end
         end
       )
+    end
+
+    # Convenience method of raising an invalid options error.
+    #
+    # @example Raise the error.
+    #   criteria.raise_invalid
+    #
+    # @raise [ Errors::InvalidOptions ] The error.
+    #
+    # @since 2.0.0
+    def raise_invalid
+      raise Errors::InvalidFind.new
     end
   end
 end

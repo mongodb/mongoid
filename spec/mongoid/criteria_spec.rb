@@ -2,12 +2,88 @@ require "spec_helper"
 
 describe Mongoid::Criteria do
 
-  context "===" do
+  describe "#==" do
 
-    context "when the other object is a Criteria" do
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    context "when the other is a criteria" do
+
+      context "when the criteria are the same" do
+
+        let(:other) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        it "returns true" do
+          criteria.should eq(other)
+        end
+      end
+
+      context "when the criteria differ" do
+
+        let(:other) do
+          Band.where(name: "Tool")
+        end
+
+        it "returns false" do
+          criteria.should_not eq(other)
+        end
+      end
+    end
+
+    context "when the other is an enumerable" do
+
+      context "when the entries are the same" do
+
+        let!(:band) do
+          Band.create(name: "Depeche Mode")
+        end
+
+        let(:other) do
+          [ band ]
+        end
+
+        it "returns true" do
+          criteria.should eq(other)
+        end
+      end
+
+      context "when the entries are not the same" do
+
+        let!(:band) do
+          Band.create(name: "Depeche Mode")
+        end
+
+        let!(:other_band) do
+          Band.create(name: "Tool")
+        end
+
+        let(:other) do
+          [ other_band ]
+        end
+
+        it "returns false" do
+          criteria.should_not eq(other)
+        end
+      end
+    end
+
+    context "when the other is neither a criteria or enumerable" do
+
+      it "returns false" do
+        criteria.should_not eq("test")
+      end
+    end
+  end
+
+  describe "#===" do
+
+    context "when the other is a criteria" do
 
       let(:other) do
-        described_class.allocate
+        Band.where(name: "Depeche Mode")
       end
 
       it "returns true" do
@@ -15,470 +91,158 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when the other object is not compatible" do
-
-      let(:other) do
-        []
-      end
+    context "when the other is not a criteria" do
 
       it "returns false" do
-        (described_class === other).should be_false
+        (described_class === []).should be_false
       end
     end
   end
 
-  describe "#clone" do
+  [ :all, :all_in ].each do |method|
 
-    let(:criteria) do
-      Person.only(:title).where(:age.gt => 30).skip(10).asc(:age)
-    end
+    describe "\##{method}" do
 
-    let(:copy) do
-      criteria.clone
-    end
-
-    it "copies the selector" do
-      copy.selector.should eq(criteria.selector)
-    end
-
-    it "copies the options" do
-      copy.options.should eq(criteria.options)
-    end
-
-    it "copies the embedded flag" do
-      copy.embedded.should eq(criteria.embedded)
-    end
-
-    it "references the class" do
-      copy.klass.should eql(criteria.klass)
-    end
-
-    it "references the documents" do
-      copy.documents.should eql(criteria.documents)
-    end
-  end
-
-  describe "#find" do
-
-    context "when using object ids" do
-
-      before(:all) do
-        Person.field(
-          :_id,
-          type: BSON::ObjectId,
-          pre_processed: true,
-          default: ->{ BSON::ObjectId.new }
-        )
+      let!(:match) do
+        Band.create(genres: [ "electro", "dub" ])
       end
 
-      let!(:person) do
-        Person.create(
-          title: "Sir",
-          age: 33,
-          aliases: ["D", "Durran"],
-          things: [{phone: 'HTC Incredible'}]
-        )
+      let!(:non_match) do
+        Band.create(genres: [ "house" ])
       end
-
-      it 'finds object with String args' do
-        Person.find(person.id.to_s).should eq(person)
-      end
-
-      it 'finds object with BSON::ObjectId  args' do
-        Person.find(person.id).should eq(person)
-      end
-    end
-
-    context "when not using object ids" do
-
-      before(:all) do
-        Person.field(
-          :_id,
-          type: String,
-          pre_processed: true,
-          default: ->{ BSON::ObjectId.new.to_s }
-        )
-      end
-
-      after(:all) do
-        Person.field(
-          :_id,
-          type: BSON::ObjectId,
-          pre_processed: true,
-          default: ->{ BSON::ObjectId.new }
-        )
-      end
-
-      let!(:person) do
-        Person.create(
-          title: "Sir",
-          age: 33,
-          aliases: ["D", "Durran"],
-          things: [{phone: 'HTC Incredible'}]
-        )
-      end
-
-      it 'finds the object with a matching String arg' do
-        Person.find(person.id.to_s).should eq(person)
-      end
-
-      it 'finds the object with a matching BSON::ObjectId argument' do
-        Person.find(BSON::ObjectId(person.id)).should eq(person)
-      end
-    end
-  end
-
-  describe "#explain" do
-
-    let(:explain) do
-      Person.where(title: "sir").explain
-    end
-
-    it "returns the explain result" do
-      explain["cursor"].should eq("BasicCursor")
-    end
-  end
-
-  describe "#merge" do
-
-    let(:criteria) do
-      Person.all
-    end
-
-    before do
-      criteria.where(title: "Sir", age: 30).skip(40).limit(20)
-    end
-
-    context "with another criteria" do
-
-      context "when the other has a selector and options" do
-
-        let(:other) do
-          criteria.where(name: "Chloe").order_by([[:name, :asc]])
-        end
-
-        let(:selector) do
-          { title: "Sir", age: 30, name: "Chloe" }
-        end
-
-        let(:options) do
-          { skip: 40, limit: 20, sort: [[:name, :asc]] }
-        end
-
-        let(:merged) do
-          criteria.merge(other)
-        end
-
-        before do
-          other.selector = selector
-          other.options = options
-        end
-
-        it "merges the selector" do
-          merged.selector.should eq(selector)
-        end
-
-        it "merges the options" do
-          merged.options.should eq(options)
-        end
-      end
-
-      context "when the other has no selector or options" do
-
-        let(:other) do
-          described_class.new(Person)
-        end
-
-        let(:selector) do
-          { title: "Sir", age: 30 }
-        end
-
-        let(:options) do
-          { skip: 40, limit: 20 }
-        end
-
-        let(:new_criteria) do
-          described_class.new(Person)
-        end
-
-        let(:merged) do
-          new_criteria.merge(other)
-        end
-
-        before do
-          new_criteria.selector = selector
-          new_criteria.options = options
-        end
-
-        it "merges the selector" do
-          merged.selector.should eq(selector)
-        end
-
-        it "merges the options" do
-          merged.options.should eq(options)
-        end
-      end
-
-      context "when the other has a document collection" do
-
-        let(:other) do
-          described_class.new(Person)
-        end
-
-        let(:documents) do
-          [ stub ]
-        end
-
-        let(:merged) do
-          criteria.merge(other)
-        end
-
-        before do
-          other.documents = documents
-        end
-
-        it "merges the documents collection in" do
-          merged.documents.should eq(documents)
-        end
-      end
-    end
-
-    context "with something that responds to #to_criteria" do
-
-      let(:crit) do
-        criteria.where(name: "Chloe").order_by([[:name, :asc]])
-      end
-
-      let(:other) do
-        stub(to_criteria: crit)
-      end
-
-      let(:merged) do
-        criteria.merge(other)
-      end
-
-      it "merges the selector" do
-        merged.selector.should eq({ "name" => "Chloe" })
-      end
-
-      it "merges the options" do
-        merged.options.should eq({ sort: { "name" => 1 }})
-      end
-    end
-  end
-
-  describe "#method_missing" do
-
-    let(:criteria) do
-      described_class.new(Person)
-    end
-
-    let(:new_criteria) do
-      criteria.accepted
-    end
-
-    let(:chained) do
-      new_criteria.where(title: "Sir")
-    end
-
-    it "merges the criteria with the next one" do
-      chained.selector.should eq({ "title" => "Sir", "terms" => true })
-    end
-
-    context "chaining more than one scope" do
 
       let(:criteria) do
-        Person.accepted.knight
+        Band.send(method, genres: [ "electro", "dub" ])
       end
 
-      let(:chained) do
-        criteria.where(security_code: "5555")
-      end
-
-      it "returns the final merged criteria" do
-        criteria.selector.should eq(
-          { "title" => "Sir", "terms" => true }
-        )
-      end
-
-      it "always returns a new criteria" do
-        chained.should_not eql(criteria)
-      end
-    end
-
-    context "when returning a non-criteria object" do
-
-      let(:ages) do
-        [ 10, 20 ]
-      end
-
-      before do
-        Person.stubs(ages: ages)
-      end
-
-      it "does not attempt to merge" do
-        expect { criteria.ages }.to_not raise_error(NoMethodError)
-      end
-    end
-
-    context "when expecting behaviour of an array" do
-
-      let(:array) do
-        stub
-      end
-
-      let(:document) do
-        stub
-      end
-
-      describe "#[]" do
-
-        before do
-          criteria.expects(:entries).returns([ document ])
-        end
-
-        it "collects the criteria and calls []" do
-          criteria[0].should eq(document)
-        end
-      end
-
-      describe "#rand" do
-
-        before do
-          criteria.expects(:entries).returns(array)
-          array.expects(:send).with(:rand).returns(document)
-        end
-
-        it "collects the criteria and call rand" do
-          criteria.rand
-        end
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
       end
     end
   end
 
-  describe "#respond_to?" do
+  [ :and, :all_of ].each do |method|
 
-    let(:criteria) do
-      described_class.new(Person)
-    end
+    describe "\##{method}" do
 
-    before do
-      Person.stubs(ages: [])
-    end
-
-    context "when asking about a model public class method" do
-
-      it "returns true" do
-        criteria.respond_to?(:ages).should be_true
-      end
-    end
-
-    context "when asking about a model private class method" do
-
-      context "when including private methods" do
-
-        it "returns true" do
-          criteria.respond_to?(:alias_method, true).should be_false
-        end
-      end
-    end
-
-    context "when asking about a model class public instance method" do
-
-      it "returns true" do
-        criteria.respond_to?(:join).should be_true
-      end
-    end
-
-    context "when asking about a model private instance method" do
-
-      context "when not including private methods" do
-
-        it "returns false" do
-          criteria.respond_to?(:fork).should be_false
-        end
+      let!(:match) do
+        Band.create(name: "Depeche Mode", genres: [ "electro" ])
       end
 
-      context "when including private methods" do
-
-        it "returns true" do
-          criteria.respond_to?(:fork, true).should be_true
-        end
-      end
-    end
-
-    context "when asking about a criteria instance method" do
-
-      it "returns true" do
-        criteria.respond_to?(:context).should be_true
-      end
-    end
-
-    context "when asking about a private criteria instance method" do
-
-      context "when not including private methods" do
-
-        it "returns false" do
-          criteria.respond_to?(:puts).should be_false
-        end
+      let!(:non_match) do
+        Band.create(genres: [ "house" ])
       end
 
-      context "when including private methods" do
+      let(:criteria) do
+        Band.send(method, { genres: "electro" }, { name: "Depeche Mode" })
+      end
 
-        it "returns true" do
-          criteria.respond_to?(:puts, true).should be_true
-        end
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
       end
     end
   end
 
-  describe "#to_json" do
+  describe "#as_json" do
 
-    let(:criteria) do
-      Person.all
-    end
-
-    let!(:person) do
-      Person.create
-    end
-
-    it "returns the results as a json string" do
-      criteria.to_json.should include("\"_id\":\"#{person.id}\"")
-    end
-  end
-
-  context "when caching" do
-
-    before do
-      5.times do |n|
-        Person.create!(
-          title: "Sir",
-          age: (n * 10),
-          aliases: ["D", "Durran"]
-        )
-      end
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
     end
 
     let(:criteria) do
-      Person.where(title: "Sir").cache
+      Band.where(name: "Depeche Mode")
     end
 
-    it "iterates over the cursor only once" do
-      criteria.size.should eq(5)
-      Person.create!(title: "Sir")
-      criteria.size.should eq(5)
+    it "returns the criteria as a json hash" do
+      criteria.as_json.should eq([ band.serializable_hash ])
     end
   end
 
-  context "when chaining criteria after an initial execute" do
+  describe "#between" do
+
+    let!(:match) do
+      Band.create(member_count: 3)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 10)
+    end
 
     let(:criteria) do
-      described_class.new(Person)
+      Band.between(member_count: 1..5)
     end
 
-    it 'nots carry scope to cloned criteria' do
-      criteria.first
-      criteria.limit(1).context.options[:limit].should eq(1)
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
     end
   end
+
+  pending "#build"
+  pending "#clone"
+  pending "#collection"
+  pending "#cache"
+  pending "#cached?"
+  pending "#context"
+  pending "#create"
+  pending "#documents"
+  pending "#documents="
+  pending "#each"
+
+  pending "#elem_match"
+
+  pending "#execute_or_raise"
+
+  pending "#exists"
+  pending "#exists?"
+
+  pending "#explain"
+  pending "#extract_id"
+  pending "#find"
+  pending "#for_ids"
+  pending "#freeze"
+  pending "#from_map_or_db"
+
+  pending "$gt"
+  pending "$gte"
+
+  pending "#in"
+  pending "#any_in"
+
+  pending "#initialize"
+  pending "#includes"
+  pending "#inclusions"
+  pending "#inclusions="
+
+  pending "#lt"
+  pending "#lte"
+  pending "#max_distance"
+
+  pending "#merge"
+  pending "#merge!"
+
+  pending "#mod"
+  pending "#ne"
+  pending "#near"
+  pending "#near_sphere"
+  pending "#nin"
+  pending "#nor"
+  pending "#only"
+
+  pending "#or"
+  pending "#any_of"
+
+  pending "#respond_to?"
+  pending "#to_ary"
+  pending "#to_criteria"
+  pending "#to_proc"
+  pending "#type"
+
+  pending "#where"
+  pending "#within_box"
+  pending "#within_circle"
+  pending "#within_polygon"
+  pending "#within_spherical_circle"
+
+  pending "#with_size"
+  pending "#with_type"
 end
