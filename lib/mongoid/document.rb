@@ -135,11 +135,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def to_key
-      if destroyed?
-        [ id ]
-      else
-        persisted? ? [ id ] : nil
-      end
+      (persisted? || destroyed?) ? [ id ] : nil
     end
 
     # Return an array with this +Document+ only in it.
