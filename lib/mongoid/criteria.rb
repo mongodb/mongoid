@@ -205,10 +205,10 @@ module Mongoid #:nodoc:
     # @return [ Document, Array<Document> ] The document(s).
     #
     # @since 2.0.0
-    def execute_or_raise(args)
+    def execute_or_raise(*args)
       ids = args[0]
-      ids = ids.to_a if ids.is_a?(::Range)
-      if ids.is_a?(::Array)
+      ids = ids.is_a?(::Range) ? ids.to_a : ids.flatten
+      if ids.size > 1
         entries.tap do |result|
           if (entries.size < ids.size) && Mongoid.raise_not_found_error
             missing = ids - entries.map(&:_id)
