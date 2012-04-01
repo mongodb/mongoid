@@ -519,7 +519,21 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#find"
+  describe "#find" do
+
+    context "when using object ids" do
+
+    end
+
+    context "when using string ids" do
+
+    end
+
+    context "when using integer ids" do
+
+    end
+  end
+
   pending "#for_ids"
   pending "#freeze"
   pending "#from_map_or_db"
