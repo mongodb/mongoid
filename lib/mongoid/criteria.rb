@@ -287,6 +287,8 @@ module Mongoid #:nodoc:
     # @param [ Hash ] extras The extra driver options.
     #
     # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 2.0.0
     def extras(extras)
       clone.tap do |crit|
         crit.options.merge!(extras)

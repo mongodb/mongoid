@@ -7,7 +7,8 @@ module Mongoid #:nodoc:
     extend Origin::Forwardable
 
     select_with :with_default_scope
-    delegate :avg, :includes, :max, :min, :sum, :update, :update_all, to: :with_default_scope
+    delegate :avg, :extras, :includes, :max, :min, :sum,
+      :update, :update_all, to: :with_default_scope
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
