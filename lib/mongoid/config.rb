@@ -267,7 +267,7 @@ module Mongoid #:nodoc
     def configure_extras(extras)
       @databases = (extras || []).inject({}) do |dbs, (name, options)|
         dbs.tap do |extra|
-        dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
+          dbs[name], dbs["#{name}_slaves"] = configure_databases(options)
         end
       end
     end
