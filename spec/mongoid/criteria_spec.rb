@@ -1167,16 +1167,165 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#freeze"
-  pending "#from_map_or_db"
+  describe "#freeze" do
 
-  pending "$gt"
-  pending "$gte"
+    let(:criteria) do
+      Band.all
+    end
 
-  pending "#in"
-  pending "#any_in"
+    before do
+      criteria.freeze
+    end
 
-  pending "#initialize"
+    it "freezes the criteria" do
+      criteria.should be_frozen
+    end
+
+    it "initializes inclusions" do
+      criteria.inclusions.should be_empty
+    end
+
+    it "initializes the context" do
+      criteria.context.should_not be_nil
+    end
+  end
+
+  describe "#from_map_or_db" do
+
+    before(:all) do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after(:all) do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when the document is in the identity map" do
+
+      let!(:band) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let(:criteria) do
+        Band.where(_id: band.id)
+      end
+
+      let(:from_map) do
+        criteria.from_map_or_db
+      end
+
+      it "returns the document from the map" do
+        from_map.should equal(band)
+      end
+    end
+
+    context "when the document is not in the identity map" do
+
+      let!(:band) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let(:criteria) do
+        Band.where(_id: band.id)
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let(:from_db) do
+        criteria.from_map_or_db
+      end
+
+      it "returns the document from the database" do
+        from_db.should_not equal(band)
+      end
+
+      it "returns the correct document" do
+        from_db.should eq(band)
+      end
+    end
+  end
+
+  describe "$gt" do
+
+    let!(:match) do
+      Band.create(member_count: 5)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 1)
+    end
+
+    let(:criteria) do
+      Band.gt(member_count: 4)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "$gte" do
+
+    let!(:match) do
+      Band.create(member_count: 5)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 1)
+    end
+
+    let(:criteria) do
+      Band.gte(member_count: 5)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  [ :in, :any_in ].each do |method|
+
+    describe "\##{method}" do
+
+      let!(:match) do
+        Band.create(genres: [ "electro", "dub" ])
+      end
+
+      let!(:non_match) do
+        Band.create(genres: [ "house" ])
+      end
+
+      let(:criteria) do
+        Band.send(method, genres: [ "dub" ])
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+  end
+
+  describe "#initialize" do
+
+    let(:criteria) do
+      described_class.new(Band)
+    end
+
+    it "sets the class" do
+      criteria.klass.should eq(Band)
+    end
+
+    it "sets the aliased fields" do
+      criteria.aliased_fields.should eq(Band.aliased_fields)
+    end
+
+    it "sets the serializers" do
+      criteria.serializers.should eq(Band.fields)
+    end
+  end
+
   pending "#includes"
   pending "#inclusions"
   pending "#inclusions="
@@ -1200,9 +1349,48 @@ describe Mongoid::Criteria do
   pending "#any_of"
 
   pending "#respond_to?"
-  pending "#to_ary"
-  pending "#to_criteria"
-  pending "#to_proc"
+
+  describe "#to_ary" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    it "returns the executed criteria" do
+      criteria.to_ary.should eq([ band ])
+    end
+  end
+
+  describe "#to_criteria" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    it "returns self" do
+      criteria.to_criteria.should eq(criteria)
+    end
+  end
+
+  describe "#to_proc" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    it "returns a proc" do
+      criteria.to_proc.should be_a(Proc)
+    end
+
+    it "wraps the criteria in the proc" do
+      criteria.to_proc[].should eq(criteria)
+    end
+  end
+
   pending "#type"
 
   pending "#where"
@@ -1210,7 +1398,6 @@ describe Mongoid::Criteria do
   pending "#within_circle"
   pending "#within_polygon"
   pending "#within_spherical_circle"
-
   pending "#with_size"
   pending "#with_type"
 end
