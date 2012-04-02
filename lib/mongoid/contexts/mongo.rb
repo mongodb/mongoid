@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class Mongo
       attr_accessor :criteria
 
-      delegate :cached?, :klass, :options, :selector, to: :criteria
+      delegate :cached?, :field_list, :klass, :options, :selector, to: :criteria
       delegate :collection, to: :klass
 
       # Perform an add to set on the matching documents.
@@ -400,10 +400,6 @@ module Mongoid #:nodoc:
             yield doc if block_given?
           end
         end
-      end
-
-      def field_list
-        options[:fields].keys.reject!{ |field| field == "_type" }
       end
 
       # Common functionality for grouping operations. Currently used by min, max

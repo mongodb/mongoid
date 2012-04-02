@@ -526,6 +526,8 @@ describe Mongoid::Criteria do
     end
   end
 
+  pending "#field_list"
+
   describe "#find" do
 
     context "when using object ids" do
