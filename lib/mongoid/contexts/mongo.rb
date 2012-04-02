@@ -4,7 +4,7 @@ module Mongoid #:nodoc:
     class Mongo
       attr_accessor :criteria
 
-      delegate :cached?, :klass, :options, :field_list, :selector, to: :criteria
+      delegate :cached?, :klass, :options, :selector, to: :criteria
       delegate :collection, to: :klass
 
       # Perform an add to set on the matching documents.
@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
       # @return [ Hash ] A +Hash+ with field values as keys, counts as values
       def aggregate
         klass.collection.group(
-          key: field_list,
+          key: options[:fields].keys,
           cond: selector,
           initial: { count: 0 },
           reduce: Javascript.aggregate
@@ -223,7 +223,7 @@ module Mongoid #:nodoc:
       # @return [ Hash ] Hash with field values as keys, arrays of documents as values.
       def group
         klass.collection.group(
-          key: field_list,
+          key: options[:fields].keys,
           cond: selector,
           initial: { group: [] },
           reduce: Javascript.group
