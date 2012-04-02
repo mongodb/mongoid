@@ -403,7 +403,7 @@ module Mongoid #:nodoc:
       end
 
       def field_list
-        options[:fields].keys.except(:_type)
+        options[:fields].keys.reject!{ |field| field == "_type" }
       end
 
       # Common functionality for grouping operations. Currently used by min, max
