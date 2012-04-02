@@ -2088,15 +2088,138 @@ describe Mongoid::Criteria do
   end
 
   pending "#mod"
-  pending "#ne"
-  pending "#near"
-  pending "#near_sphere"
-  pending "#nin"
-  pending "#nor"
-  pending "#only"
 
-  pending "#or"
-  pending "#any_of"
+  describe "#ne" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:non_match) do
+      Band.create(name: "Tool")
+    end
+
+    let(:criteria) do
+      Band.ne(name: "Tool")
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#near" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.near(location: [ 52, 13 ])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#near_sphere" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.near_sphere(location: [ 52, 13 ])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#nin" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:non_match) do
+      Band.create(name: "Tool")
+    end
+
+    let(:criteria) do
+      Band.nin(name: [ "Tool" ])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#nor" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:non_match) do
+      Band.create(name: "Tool")
+    end
+
+    let(:criteria) do
+      Band.nor({ name: "Tool" }, { name: "New Order" })
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#only" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.only(:_id)
+    end
+
+    it "limits the returned fields" do
+      criteria.first.name.should be_nil
+    end
+  end
+
+  [ :or, :any_of ].each do |method|
+
+    describe "\##{method}" do
+
+      let!(:match) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let!(:non_match) do
+        Band.create(name: "Tool")
+      end
+
+      let(:criteria) do
+        Band.send(method, { name: "Depeche Mode" }, { name: "New Order" })
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+  end
 
   pending "#respond_to?"
 
