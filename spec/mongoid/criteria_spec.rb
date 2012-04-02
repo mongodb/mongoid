@@ -345,7 +345,21 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#create!"
+  describe "#create!" do
+
+    let(:criteria) do
+      Account.where(number: "11123213")
+    end
+
+    context "when provided invalid attributes" do
+
+      it "raises an error" do
+        expect {
+          criteria.create!
+        }.to raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
 
   describe "#documents" do
 
@@ -400,11 +414,6 @@ describe Mongoid::Criteria do
           doc.should eq(band)
         end
       end
-    end
-
-    context "when not provided a block" do
-
-      pending "returns an enumerator"
     end
   end
 
@@ -2266,11 +2275,148 @@ describe Mongoid::Criteria do
 
   pending "#type"
 
-  pending "#where"
-  pending "#within_box"
-  pending "#within_circle"
-  pending "#within_polygon"
-  pending "#within_spherical_circle"
-  pending "#with_size"
-  pending "#with_type"
+  describe "#where" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:non_match) do
+      Band.create(name: "Tool")
+    end
+
+    context "when provided a string" do
+
+      let(:criteria) do
+        Band.where("this.name == 'Depeche Mode'")
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+
+    context "when provided criterion" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+  end
+
+  describe "#within_box" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.within_box(location: [[ 50, 10 ], [ 60, 20 ]])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#within_circle" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.within_circle(location: [[ 52, 13 ], 0.5 ])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#within_polygon" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.within_polygon(
+        location: [[ 50, 10 ], [ 50, 20 ], [ 60, 20 ], [ 60, 10 ]]
+      )
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#within_spherical_circle" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.within_spherical_circle(location: [[ 52, 13 ], 0.5 ])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#with_size" do
+
+    let!(:match) do
+      Band.create(genres: [ "electro", "dub" ])
+    end
+
+    let!(:non_match) do
+      Band.create(genres: [ "house" ])
+    end
+
+    let(:criteria) do
+      Band.with_size(genres: 2)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#with_type" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.with_type(name: 2)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
 end

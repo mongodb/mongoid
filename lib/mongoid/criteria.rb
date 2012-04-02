@@ -155,6 +155,25 @@ module Mongoid #:nodoc:
       create_document(:create, attrs)
     end
 
+    # Create a document in the database given the selector and return it.
+    # Complex criteria, such as $in and $or operations will get ignored.
+    # If validation fails, an error will be raised.
+    #
+    # @example Create the document.
+    #   Person.where(:title => "Sir").create
+    #
+    # @example Create with selectors getting ignored.
+    #   Person.where(:age.gt => 5).create
+    #
+    # @raise [ Errors::Validations ] on a validation error.
+    #
+    # @return [ Document ] A newly created document.
+    #
+    # @since 3.0.0
+    def create!(attrs = {})
+      create_document(:create!, attrs)
+    end
+
     # Get the documents from the embedded criteria.
     #
     # @example Get the documents.
