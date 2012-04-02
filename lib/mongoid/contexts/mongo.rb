@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
       # @return [ Hash ] A +Hash+ with field values as keys, counts as values
       def aggregate
         klass.collection.group(
-          key: options[:fields].keys,
+          key: field_list,
           cond: selector,
           initial: { count: 0 },
           reduce: Javascript.aggregate
@@ -223,7 +223,7 @@ module Mongoid #:nodoc:
       # @return [ Hash ] Hash with field values as keys, arrays of documents as values.
       def group
         klass.collection.group(
-          key: options[:fields].keys,
+          key: field_list,
           cond: selector,
           initial: { group: [] },
           reduce: Javascript.group
@@ -400,6 +400,10 @@ module Mongoid #:nodoc:
             yield doc if block_given?
           end
         end
+      end
+
+      def field_list
+        options[:fields].keys.except(:_type)
       end
 
       # Common functionality for grouping operations. Currently used by min, max
