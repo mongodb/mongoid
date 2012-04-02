@@ -205,8 +205,8 @@ module Mongoid #:nodoc:
     # @return [ Document, Array<Document> ] The document(s).
     #
     # @since 2.0.0
-    def execute_or_raise(ids)
-      if ids.size > 1
+    def execute_or_raise(ids, multi)
+      if multi
         entries.tap do |result|
           if (entries.size < ids.size) && Mongoid.raise_not_found_error
             missing = ids - entries.map(&:_id)
@@ -273,11 +273,12 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def find(*args)
+      multi = args.first.is_a?(::Array) || args.first.is_a?(::Range) || args.size > 1
       ids = *args.flat_map do |arg|
         arg.is_a?(::Range) ? arg.to_a : arg
       end
       raise_invalid if ids.any?(&:nil?)
-      for_ids(ids).execute_or_raise(ids)
+      for_ids(ids).execute_or_raise(ids, multi)
     end
 
     # When freezing a criteria we need to initialize the context first
