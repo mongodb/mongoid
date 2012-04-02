@@ -205,9 +205,7 @@ module Mongoid #:nodoc:
     # @return [ Document, Array<Document> ] The document(s).
     #
     # @since 2.0.0
-    def execute_or_raise(*args)
-      ids = args[0]
-      ids = ids.is_a?(::Range) ? ids.to_a : ids.flatten
+    def execute_or_raise(ids)
       if ids.size > 1
         entries.tap do |result|
           if (entries.size < ids.size) && Mongoid.raise_not_found_error
@@ -275,31 +273,11 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def find(*args)
-      ids = args.flat_map{ |arg| arg.is_a?(::Range) ? arg.to_a : arg }
-      raise_invalid if ids.any?(&:nil?)
-      for_ids(ids).execute_or_raise(args)
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
-    #
-    # @example Add a single id criteria.
-    #   criteria.for_ids("4ab2bc4b8ad548971900005c")
-    #
-    # @example Add multiple id criteria.
-    #   criteria.for_ids(["4ab2bc4b8ad548971900005c", "4c454e7ebf4b98032d000001"])
-    #
-    # @param [ Array ] ids: A single id or an array of ids.
-    #
-    # @return [ Criteria ] The cloned criteria.
-    def for_ids(*ids)
-      field = klass.fields["_id"]
-      ids.flatten!
-      method = extract_id ? :all_of : :where
-      if ids.size > 1
-        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
-      else
-        send(method, { _id: field.serialize(ids.first) })
+      ids = *args.flat_map do |arg|
+        arg.is_a?(::Range) ? arg.to_a : arg
       end
+      raise_invalid if ids.any?(&:nil?)
+      for_ids(ids).execute_or_raise(ids)
     end
 
     # When freezing a criteria we need to initialize the context first
@@ -511,6 +489,32 @@ module Mongoid #:nodoc:
 
     private
 
+    # Create a document given the provided method and attributes from the
+    # existing selector.
+    #
+    # @api private
+    #
+    # @example Create a new document.
+    #   criteria.create_document(:new, {})
+    #
+    # @param [ Symbol ] method Either :new or :create.
+    # @param [ Hash ] attrs Additional attributes to use.
+    #
+    # @return [ Document ] The new or saved document.
+    #
+    # @since 3.0.0
+    def create_document(method, attrs = {})
+      klass.__send__(method,
+        selector.inject(attrs) do |hash, (key, value)|
+          hash.tap do |_attrs|
+            unless key.to_s =~ /\$/ || value.is_a?(Hash)
+              _attrs[key] = value
+            end
+          end
+        end
+      )
+    end
+
     # Get the raw driver collection from the criteria.
     #
     # @api private
@@ -523,6 +527,29 @@ module Mongoid #:nodoc:
     # @since 2.2.0
     def driver
       collection.driver
+    end
+
+    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
+    #
+    # @api private
+    #
+    # @example Add a single id criteria.
+    #   criteria.for_ids([ 1 ])
+    #
+    # @example Add multiple id criteria.
+    #   criteria.for_ids([ 1, 2 ])
+    #
+    # @param [ Array ] ids The array of ids.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    def for_ids(ids)
+      field = klass.fields["_id"]
+      method = extract_id ? :all_of : :where
+      if ids.size > 1
+        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
+      else
+        send(method, { _id: field.serialize(ids.first) })
+      end
     end
 
     # Clone or dup the current +Criteria+. This will return a new criteria with
@@ -570,32 +597,6 @@ module Mongoid #:nodoc:
       else
         return entries.send(name, *args)
       end
-    end
-
-    # Create a document given the provided method and attributes from the
-    # existing selector.
-    #
-    # @api private
-    #
-    # @example Create a new document.
-    #   criteria.create_document(:new, {})
-    #
-    # @param [ Symbol ] method Either :new or :create.
-    # @param [ Hash ] attrs Additional attributes to use.
-    #
-    # @return [ Document ] The new or saved document.
-    #
-    # @since 3.0.0
-    def create_document(method, attrs = {})
-      klass.__send__(method,
-        selector.inject(attrs) do |hash, (key, value)|
-          hash.tap do |_attrs|
-            unless key.to_s =~ /\$/ || value.is_a?(Hash)
-              _attrs[key] = value
-            end
-          end
-        end
-      )
     end
 
     # Convenience method of raising an invalid options error.

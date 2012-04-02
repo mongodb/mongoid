@@ -592,8 +592,12 @@ describe Mongoid::Criteria do
             Band.find(band.id, band_two.id)
           end
 
-          it "returns the matching documents" do
-            found.should eq([ band, band_two ])
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
           end
         end
 
@@ -649,8 +653,12 @@ describe Mongoid::Criteria do
             Band.find([ band.id, band_two.id ])
           end
 
-          it "returns the matching documents" do
-            found.should eq([ band, band_two ])
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
           end
         end
 
@@ -697,14 +705,468 @@ describe Mongoid::Criteria do
 
     context "when using string ids" do
 
+      before(:all) do
+        Band.field :_id, type: String
+      end
+
+      after(:all) do
+        Band.field :_id, type: BSON::ObjectId, default: ->{ BSON::ObjectId.new }
+      end
+
+      let!(:band) do
+        Band.create do |band|
+          band.id = "tool"
+        end
+      end
+
+      context "when providing a single id" do
+
+        context "when the id matches" do
+
+          let(:found) do
+            Band.find(band.id)
+          end
+
+          it "returns the matching document" do
+            found.should eq(band)
+          end
+        end
+
+        context "when the id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find("depeche-mode")
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find("depeche-mode")
+            end
+
+            it "returns nil" do
+              found.should be_nil
+            end
+          end
+        end
+      end
+
+      context "when providing a splat of ids" do
+
+        let!(:band_two) do
+          Band.create do |band|
+            band.id = "depeche-mode"
+          end
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find(band.id, band_two.id)
+          end
+
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(band.id, "new-order")
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(band.id, "new-order")
+            end
+
+            it "returns only the matching documents" do
+              found.should eq([ band ])
+            end
+          end
+        end
+      end
+
+      context "when providing an array of ids" do
+
+        let!(:band_two) do
+          Band.create do |band|
+            band.id = "depeche-mode"
+          end
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find([ band.id, band_two.id ])
+          end
+
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find([ band.id, "new-order" ])
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find([ band.id, "new-order" ])
+            end
+
+            it "returns only the matching documents" do
+              found.should eq([ band ])
+            end
+          end
+        end
+      end
     end
 
     context "when using integer ids" do
 
+      before(:all) do
+        Band.field :_id, type: Integer
+      end
+
+      after(:all) do
+        Band.field :_id, type: BSON::ObjectId, default: ->{ BSON::ObjectId.new }
+      end
+
+      let!(:band) do
+        Band.create do |band|
+          band.id = 1
+        end
+      end
+
+      context "when providing a single id" do
+
+        context "when the id matches" do
+
+          let(:found) do
+            Band.find(band.id)
+          end
+
+          it "returns the matching document" do
+            found.should eq(band)
+          end
+        end
+
+        context "when the id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(3)
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(3)
+            end
+
+            it "returns nil" do
+              found.should be_nil
+            end
+          end
+        end
+      end
+
+      context "when providing a splat of ids" do
+
+        let!(:band_two) do
+          Band.create do |band|
+            band.id = 2
+          end
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find(band.id, band_two.id)
+          end
+
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(band.id, 3)
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(band.id, 3)
+            end
+
+            it "returns only the matching documents" do
+              found.should eq([ band ])
+            end
+          end
+        end
+      end
+
+      context "when providing an array of ids" do
+
+        let!(:band_two) do
+          Band.create do |band|
+            band.id = 2
+          end
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find([ band.id, band_two.id ])
+          end
+
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find([ band.id, 3 ])
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find([ band.id, 3 ])
+            end
+
+            it "returns only the matching documents" do
+              found.should eq([ band ])
+            end
+          end
+        end
+      end
+
+      context "when providing a range" do
+
+        let!(:band_two) do
+          Band.create do |band|
+            band.id = 2
+          end
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find(1..2)
+          end
+
+          it "contains the first match" do
+            found.should include(band)
+          end
+
+          it "contains the second match" do
+            found.should include(band_two)
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(1..3)
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(1..3)
+            end
+
+            it "contains the first match" do
+              found.should include(band)
+            end
+
+            it "contains the second match" do
+              found.should include(band_two)
+            end
+
+            it "returns only the matches" do
+              found.count.should eq(2)
+            end
+          end
+        end
+      end
     end
   end
 
-  pending "#for_ids"
   pending "#freeze"
   pending "#from_map_or_db"
 
