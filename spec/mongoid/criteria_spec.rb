@@ -1928,12 +1928,164 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#lt"
-  pending "#lte"
-  pending "#max_distance"
+  describe "#lt" do
 
-  pending "#merge"
-  pending "#merge!"
+    let!(:match) do
+      Band.create(member_count: 1)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 5)
+    end
+
+    let(:criteria) do
+      Band.lt(member_count: 4)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#lte" do
+
+    let!(:match) do
+      Band.create(member_count: 4)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 5)
+    end
+
+    let(:criteria) do
+      Band.lte(member_count: 4)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#max_distance" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let!(:non_match) do
+      Bar.create(location: [ 19.26, 99.70 ])
+    end
+
+    let(:criteria) do
+      Bar.near(location: [ 52, 13 ]).max_distance(location: 5)
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
+  describe "#merge" do
+
+    let(:band) do
+      Band.new
+    end
+
+    let(:criteria) do
+      Band.scoped.where(name: "Depeche Mode").asc(:name)
+    end
+
+    let(:mergeable) do
+      Band.includes(:records).tap do |crit|
+        crit.documents = [ band ]
+      end
+    end
+
+    let(:metadata) do
+      Band.relations["records"]
+    end
+
+    let(:merged) do
+      criteria.merge(mergeable)
+    end
+
+    it "merges the selector" do
+      merged.selector.should eq({ "name" => "Depeche Mode" })
+    end
+
+    it "merges the options" do
+      merged.options.should eq({ sort: { "name" => 1 }})
+    end
+
+    it "merges the documents" do
+      merged.documents.should eq([ band ])
+    end
+
+    it "merges the scoping options" do
+      merged.scoping_options.should eq([ nil, nil ])
+    end
+
+    it "merges the inclusions" do
+      merged.inclusions.should eq([ metadata ])
+    end
+
+    it "returns a new criteria" do
+      merged.should_not equal(criteria)
+    end
+  end
+
+  describe "#merge!" do
+
+    let(:band) do
+      Band.new
+    end
+
+    let(:criteria) do
+      Band.scoped.where(name: "Depeche Mode").asc(:name)
+    end
+
+    let(:mergeable) do
+      Band.includes(:records).tap do |crit|
+        crit.documents = [ band ]
+      end
+    end
+
+    let(:metadata) do
+      Band.relations["records"]
+    end
+
+    let(:merged) do
+      criteria.merge!(mergeable)
+    end
+
+    it "merges the selector" do
+      merged.selector.should eq({ "name" => "Depeche Mode" })
+    end
+
+    it "merges the options" do
+      merged.options.should eq({ sort: { "name" => 1 }})
+    end
+
+    it "merges the documents" do
+      merged.documents.should eq([ band ])
+    end
+
+    it "merges the scoping options" do
+      merged.scoping_options.should eq([ nil, nil ])
+    end
+
+    it "merges the inclusions" do
+      merged.inclusions.should eq([ metadata ])
+    end
+
+    it "returns the same criteria" do
+      merged.should equal(criteria)
+    end
+  end
 
   pending "#mod"
   pending "#ne"
