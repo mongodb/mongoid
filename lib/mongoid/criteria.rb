@@ -278,6 +278,21 @@ module Mongoid #:nodoc:
       selector["_id"]
     end
 
+    # Adds a criterion to the +Criteria+ that specifies additional options
+    # to be passed to the Ruby driver, in the exact format for the driver.
+    #
+    # @example Add extra params to the criteria.
+    # criteria.extras(:limit => 20, :skip => 40)
+    #
+    # @param [ Hash ] extras The extra driver options.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    def extras(extras)
+      clone.tap do |crit|
+        crit.options.merge!(extras)
+      end
+    end
+
     # Get the list of included fields.
     #
     # @example Get the field list.
